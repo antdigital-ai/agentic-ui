@@ -466,6 +466,12 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
+    // 允许在任意 x 轴垂直区域悬停时触发同一索引的数据提示
+    interaction: {
+      mode: 'index',
+      intersect: false,
+      axis: 'x',
+    },
     plugins: {
       legend: {
         display: showLegend,
@@ -480,6 +486,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
         },
       },
       tooltip: {
+        // 与交互保持一致：不要求点相交，并按 x 索引联动
+        intersect: false,
+        mode: 'index',
         backgroundColor: isLight
           ? 'rgba(255,255,255,0.95)'
           : 'rgba(0,0,0,0.85)',

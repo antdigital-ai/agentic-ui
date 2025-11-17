@@ -312,6 +312,12 @@ const LineChart: React.FC<LineChartProps> = ({
   const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
+    // 允许在任意垂直方向的区域悬停时触发同一 x 索引的数据提示
+    interaction: {
+      mode: 'index',
+      intersect: false,
+      axis: 'x',
+    },
     plugins: {
       legend: {
         display: showLegend && types.length > 0,
@@ -326,6 +332,9 @@ const LineChart: React.FC<LineChartProps> = ({
         },
       },
       tooltip: {
+        // 使 tooltip 不要求与点相交，并按 x 轴索引联动
+        intersect: false,
+        mode: 'index',
         backgroundColor: isLight
           ? 'rgba(255,255,255,0.95)'
           : 'rgba(0,0,0,0.85)',
