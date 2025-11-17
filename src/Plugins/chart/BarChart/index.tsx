@@ -1018,7 +1018,7 @@ const BarChart: React.FC<BarChartProps> = ({
           plugins={[ChartDataLabels]}
         />
       </div>
-    </ChartContainer>,
+    </ChartContainer>
   );
 };
 

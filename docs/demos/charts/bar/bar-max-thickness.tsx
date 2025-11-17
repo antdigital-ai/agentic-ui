@@ -7,11 +7,6 @@ import React, { useState } from 'react';
 const BarMaxThicknessExample: React.FC = () => {
   const [maxBarThickness, setMaxBarThickness] = useState<number>(50);
 
-  // 验证数据是否传递
-  React.useEffect(() => {
-    console.log('maxBarThickness 值更新为:', maxBarThickness);
-  }, [maxBarThickness]);
-
   // 少量数据示例 - 用于展示柱子宽度控制
   const data: BarChartDataItem[] = [
     {

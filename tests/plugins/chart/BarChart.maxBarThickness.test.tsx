@@ -73,13 +73,16 @@ describe('BarChart maxBarThickness 功能测试', () => {
     },
   ];
 
-  it('应该正确接受 maxBarThickness 属性', () => {
+  it('应该正确接受 maxBarThickness 属性并传递给图表', () => {
     const { container } = render(
       <BarChart data={basicData} maxBarThickness={50} />,
     );
 
     const chartElement = container.querySelector('[data-testid="bar-chart"]');
     expect(chartElement).toBeInTheDocument();
+
+    const datasets = JSON.parse(chartElement!.getAttribute('data-datasets')!);
+    expect(datasets[0].maxBarThickness).toBe(50);
   });
 
   it('应该在未设置 maxBarThickness 时正常渲染', () => {
