@@ -208,8 +208,13 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
   }, []);
 
   const store = useMemo(
-    () => new EditorStore(markdownEditorRef, props.plugins),
-    [props.plugins],
+    () =>
+      new EditorStore(
+        markdownEditorRef,
+        props.plugins,
+        props.markdownToHtmlOptions,
+      ),
+    [props.plugins, props.markdownToHtmlOptions],
   );
 
   /**

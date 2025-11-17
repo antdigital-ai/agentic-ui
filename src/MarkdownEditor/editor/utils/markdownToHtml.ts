@@ -6,8 +6,73 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
+import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { fixStrongWithSpecialChars } from '../parser/remarkParse';
+
+export type MarkdownRemarkPlugin = Plugin | [Plugin, ...unknown[]];
+export type MarkdownToHtmlOptions = MarkdownRemarkPlugin[];
+
+const INLINE_MATH_WITH_SINGLE_DOLLAR = { singleDollarTextMath: true };
+const FRONTMATTER_LANGUAGES: readonly string[] = ['yaml'];
+
+const remarkRehypePlugin = remarkRehype as unknown as Plugin;
+
+export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
+  [
+    remarkParse,
+    remarkGfm,
+    fixStrongWithSpecialChars,
+    [remarkMath as unknown as Plugin, INLINE_MATH_WITH_SINGLE_DOLLAR],
+    [remarkFrontmatter, FRONTMATTER_LANGUAGES],
+    [remarkRehypePlugin, { allowDangerousHtml: true }],
+  ] as const;
+
+const DEFAULT_REMARK_PLUGINS: MarkdownRemarkPlugin[] = [
+  ...DEFAULT_MARKDOWN_REMARK_PLUGINS,
+];
+
+const applyPlugins = (
+  processor: Processor,
+  plugins: MarkdownRemarkPlugin[],
+): Processor => {
+  const extendedProcessor = processor as Processor & {
+    use: (plugin: Plugin, ...args: unknown[]) => Processor;
+  };
+  plugins.forEach((entry) => {
+    if (Array.isArray(entry)) {
+      const [plugin, ...pluginOptions] = entry as unknown as [
+        Plugin,
+        ...unknown[],
+      ];
+      extendedProcessor.use(plugin, ...pluginOptions);
+      return;
+    }
+    extendedProcessor.use(entry as Plugin);
+  });
+
+  return processor;
+};
+
+const resolveRemarkPlugins = (
+  plugins?: MarkdownToHtmlOptions,
+): MarkdownRemarkPlugin[] => {
+  if (!plugins || plugins.length === 0) {
+    return DEFAULT_REMARK_PLUGINS;
+  }
+  return plugins;
+};
+
+const createMarkdownProcessor = (plugins?: MarkdownToHtmlOptions) => {
+  const processor = unified();
+  const remarkPlugins = resolveRemarkPlugins(plugins);
+  applyPlugins(processor, remarkPlugins);
+  processor
+    .use(rehypeRaw)
+    .use(rehypeKatex as unknown as Plugin)
+    .use(rehypeStringify);
+  return processor;
+};
 
 /**
  * 将 Markdown 内容转换为 HTML（异步版本）
@@ -30,21 +95,13 @@ import { fixStrongWithSpecialChars } from '../parser/remarkParse';
  *
  * @throws {Error} 当转换过程中发生错误时返回空字符串
  */
-export const markdownToHtml = async (markdown: string): Promise<string> => {
+export const markdownToHtml = async (
+  markdown: string,
+  plugins?: MarkdownToHtmlOptions,
+): Promise<string> => {
   try {
-    const htmlContent = await unified()
-      .use(remarkParse)
-      .use(remarkGfm)
-      .use(fixStrongWithSpecialChars)
-      .use(remarkMath as any, {
-        singleDollarTextMath: true, // 允许单美元符号渲染内联数学公式
-      })
-      .use(remarkFrontmatter, ['yaml'])
-      .use(remarkRehype, { allowDangerousHtml: true })
-      .use(rehypeRaw)
-      .use(rehypeKatex as any)
-      .use(rehypeStringify)
-      .process(markdown);
+    const htmlContent =
+      await createMarkdownProcessor(plugins).process(markdown);
 
     return String(htmlContent);
   } catch (error) {
@@ -74,22 +131,12 @@ export const markdownToHtml = async (markdown: string): Promise<string> => {
  * - 建议在可能的情况下使用异步版本 `markdownToHtml`
  * - 同步版本可能影响用户界面响应性
  */
-export const markdownToHtmlSync = (markdown: string): string => {
+export const markdownToHtmlSync = (
+  markdown: string,
+  plugins?: MarkdownToHtmlOptions,
+): string => {
   try {
-    const processor = unified()
-      .use(remarkParse)
-      .use(remarkGfm)
-      .use(fixStrongWithSpecialChars)
-      .use(remarkMath as any, {
-        singleDollarTextMath: true, // 允许单美元符号渲染内联数学公式
-      })
-      .use(remarkFrontmatter, ['yaml'])
-      .use(remarkRehype, { allowDangerousHtml: true })
-      .use(rehypeRaw)
-      .use(rehypeKatex as any)
-      .use(rehypeStringify);
-
-    const file = processor.processSync(markdown);
+    const file = createMarkdownProcessor(plugins).processSync(markdown);
     return String(file);
   } catch (error) {
     console.error('Error converting markdown to HTML:', error);

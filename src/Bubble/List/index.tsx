@@ -1,4 +1,5 @@
 import SkeletonList from './SkeletonList';
+export { PureBubbleList } from './PureBubbleList';
 
 import { MutableRefObject, useContext, useMemo } from 'react';
 

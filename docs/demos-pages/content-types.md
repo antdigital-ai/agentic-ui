@@ -41,10 +41,6 @@ group:
 
 ## 文件与媒体
 
-### 文件预览
-
-<code src="../demos/fileMapView.tsx"  background="var(--main-bg-color)" iframe=540 ></code>
-
 ### HTML 运行
 
 <code src="../demos/htmlrun.tsx"  background="var(--main-bg-color)" iframe=540 ></code>

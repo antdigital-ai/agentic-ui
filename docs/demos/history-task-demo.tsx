@@ -4,7 +4,7 @@ import {
   HistoryDataType,
 } from '@ant-design/agentic-ui';
 import { MoreOutlined } from '@ant-design/icons';
-import { Dropdown } from 'antd';
+import { Dropdown, message } from 'antd';
 import React, { useState } from 'react';
 const TaskHistoryDemo = () => {
   const [currentSessionId, setCurrentSessionId] = useState('session-1');
@@ -106,6 +106,18 @@ const TaskHistoryDemo = () => {
     );
   };
 
+  // 处理加载更多
+  const handleLoadMore = async () => {
+    message.loading('正在加载更多数据...');
+
+    // 模拟加载更多
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000);
+    });
+
+    message.success('加载完成');
+  };
+
   return (
     <div style={{ padding: 20 }}>
       <h3>History Task 模式</h3>
@@ -136,6 +148,7 @@ const TaskHistoryDemo = () => {
             enabled: true,
             onSearch: () => {},
             onNewChat: () => {},
+            onLoadMore: handleLoadMore,
           }}
           customOperationExtra={<CustomOperationExtra />}
         />

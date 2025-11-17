@@ -157,6 +157,75 @@ describe('AttachmentButton', () => {
       expect(message.error).toHaveBeenCalledWith('最多只能上传 1 个文件');
     });
 
+    it('should validate total file count including existing files', async () => {
+      // 创建已存在的文件
+      const existingFile = new File(
+        ['existing'],
+        'existing.txt',
+      ) as AttachmentFile;
+      existingFile.uuid = 'existing-id';
+      existingFile.status = 'done';
+
+      const existingFileMap = new Map([['existing-id', existingFile]]);
+
+      // 尝试上传 2 个新文件（已有 1 个 + 新上传 2 个 = 3 个，超过限制 2 个）
+      const mockFiles = [
+        new File(['test1'], 'test1.txt', {
+          type: 'text/plain',
+        }) as AttachmentFile,
+        new File(['test2'], 'test2.txt', {
+          type: 'text/plain',
+        }) as AttachmentFile,
+      ];
+
+      await upLoadFileToServer(mockFiles, {
+        upload: mockUpload,
+        onFileMapChange: mockOnFileMapChange,
+        fileMap: existingFileMap,
+        maxFileCount: 2,
+      });
+
+      // 应该显示错误，因为总数 3 超过了限制 2
+      expect(message.error).toHaveBeenCalledWith('最多只能上传 2 个文件');
+      // upload 函数不应该被调用
+      expect(mockUpload).not.toHaveBeenCalled();
+    });
+
+    it('should allow upload when total file count is within limit', async () => {
+      // 创建已存在的文件
+      const existingFile = new File(
+        ['existing'],
+        'existing.txt',
+      ) as AttachmentFile;
+      existingFile.uuid = 'existing-id';
+      existingFile.status = 'done';
+
+      const existingFileMap = new Map([['existing-id', existingFile]]);
+
+      // 尝试上传 1 个新文件（已有 1 个 + 新上传 1 个 = 2 个，不超过限制 3 个）
+      const mockFiles = [
+        new File(['test1'], 'test1.txt', {
+          type: 'text/plain',
+        }) as AttachmentFile,
+      ];
+
+      mockUpload.mockResolvedValue('uploaded-url');
+
+      await upLoadFileToServer(mockFiles, {
+        upload: mockUpload,
+        onFileMapChange: mockOnFileMapChange,
+        fileMap: existingFileMap,
+        maxFileCount: 3,
+      });
+
+      // 不应该显示错误
+      expect(message.error).not.toHaveBeenCalledWith(
+        expect.stringContaining('最多只能上传'),
+      );
+      // upload 函数应该被调用
+      expect(mockUpload).toHaveBeenCalled();
+    });
+
     it('should validate minimum file count', async () => {
       const mockFiles = [
         new File(['test'], 'test.txt', {
@@ -190,6 +259,62 @@ describe('AttachmentButton', () => {
       });
 
       expect(message.error).toHaveBeenCalledWith('文件大小超过 1 KB');
+      // upload 函数不应该被调用，因为文件大小超限
+      expect(mockUpload).not.toHaveBeenCalled();
+    });
+
+    it('should allow upload when file size is within limit', async () => {
+      const mockFiles = [
+        new File(['test'], 'small-file.txt', {
+          type: 'text/plain',
+        }) as AttachmentFile,
+      ];
+
+      // Mock file size - 小于限制
+      Object.defineProperty(mockFiles[0], 'size', { value: 512 });
+
+      mockUpload.mockResolvedValue('uploaded-url');
+
+      await upLoadFileToServer(mockFiles, {
+        upload: mockUpload,
+        onFileMapChange: mockOnFileMapChange,
+        maxFileSize: 1024, // 1KB limit
+      });
+
+      // 不应该显示错误
+      expect(message.error).not.toHaveBeenCalledWith(
+        expect.stringContaining('文件大小超过'),
+      );
+      // upload 函数应该被调用
+      expect(mockUpload).toHaveBeenCalled();
+      expect(message.success).toHaveBeenCalledWith('Upload success');
+    });
+
+    it('should allow upload when file size equals the limit', async () => {
+      const mockFiles = [
+        new File(['test'], 'exact-size-file.txt', {
+          type: 'text/plain',
+        }) as AttachmentFile,
+      ];
+
+      // Mock file size - 等于限制
+      Object.defineProperty(mockFiles[0], 'size', { value: 1024 });
+
+      mockUpload.mockResolvedValue('uploaded-url');
+
+      await upLoadFileToServer(mockFiles, {
+        upload: mockUpload,
+        onFileMapChange: mockOnFileMapChange,
+        maxFileSize: 1024, // 1KB limit
+      });
+
+      // 不应该显示错误
+      expect(message.error).not.toHaveBeenCalledWith(
+        expect.stringContaining('文件大小超过'),
+      );
+      // upload 函数应该被调用
+      expect(mockUpload).toHaveBeenCalled();
+      expect(message.success).toHaveBeenCalledWith('Upload success');
     });
 
     it('should handle image files with preview URL', async () => {

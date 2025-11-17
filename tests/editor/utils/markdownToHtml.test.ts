@@ -1,7 +1,13 @@
+import remarkGfm from 'remark-gfm';
+import type { Plugin } from 'unified';
+import { visit } from 'unist-util-visit';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  DEFAULT_MARKDOWN_REMARK_PLUGINS,
   markdownToHtml,
   markdownToHtmlSync,
+  type MarkdownRemarkPlugin,
+  type MarkdownToHtmlOptions,
 } from '../../../src/MarkdownEditor/editor/utils/markdownToHtml';
 
 // Mock console.error to avoid noise in test output
@@ -19,6 +25,29 @@ describe('Markdown to HTML Utils', () => {
     // 清理任何可能的副作用
   });
 
+  const remarkReplaceFooWithBar: Plugin = () => (tree: any) => {
+    visit(tree, 'text', (node) => {
+      if (typeof node.value === 'string') {
+        node.value = node.value.replace(/foo/g, 'bar');
+      }
+    });
+  };
+
+  const clonePluginEntry = (
+    entry: (typeof DEFAULT_MARKDOWN_REMARK_PLUGINS)[number],
+  ): MarkdownRemarkPlugin => {
+    if (Array.isArray(entry)) {
+      return [entry[0], ...(entry.slice(1) as unknown[])] as [
+        Plugin,
+        ...unknown[],
+      ];
+    }
+    return entry;
+  };
+
+  const createDefaultRemarkPlugins = (): MarkdownToHtmlOptions =>
+    DEFAULT_MARKDOWN_REMARK_PLUGINS.map((entry) => clonePluginEntry(entry));
+
   describe('markdownToHtml', () => {
     it('应该将Markdown转换为HTML', async () => {
       const markdown = '# Hello World\n\nThis is a **test**.';
@@ -26,6 +55,24 @@ describe('Markdown to HTML Utils', () => {
 
       expect(result).toContain('<h1>Hello World</h1>');
       expect(result).toContain('<strong>test</strong>');
+    });
+
+    it('允许通过插件数组新增插件', async () => {
+      const plugins = createDefaultRemarkPlugins();
+      plugins.splice(1, 0, remarkReplaceFooWithBar);
+      const result = await markdownToHtml('foo content', plugins);
+      expect(result).toContain('bar content');
+    });
+
+    it('允许通过插件数组关闭默认插件', async () => {
+      const markdown = '~~strikethrough~~';
+      const plugins = createDefaultRemarkPlugins().filter(
+        (entry) => entry !== remarkGfm,
+      );
+      const result = await markdownToHtml(markdown, plugins);
+
+      expect(result).not.toContain('<del>');
+      expect(result).toContain('~~strikethrough~~');
     });
 
     it('应该处理空字符串', async () => {
@@ -133,6 +180,25 @@ title: Test
 
       expect(result).toContain('<h1>Hello World</h1>');
       expect(result).toContain('<strong>test</strong>');
+    });
+
+    it('允许同步转换时新增 remark 插件', () => {
+      const plugins = createDefaultRemarkPlugins();
+      plugins.splice(1, 0, remarkReplaceFooWithBar);
+      const result = markdownToHtmlSync('foo', plugins);
+
+      expect(result).toContain('bar');
+    });
+
+    it('允许同步转换时关闭默认 remark 插件', () => {
+      const markdown = '~~strikethrough~~';
+      const plugins = createDefaultRemarkPlugins().filter(
+        (entry) => entry !== remarkGfm,
+      );
+      const result = markdownToHtmlSync(markdown, plugins);
+
+      expect(result).not.toContain('<del>');
+      expect(result).toContain('~~strikethrough~~');
     });
 
     it('应该处理空字符串', () => {

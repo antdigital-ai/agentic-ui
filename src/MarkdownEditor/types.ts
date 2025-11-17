@@ -4,6 +4,7 @@ import React from 'react';
 import { BaseEditor, Selection } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor, RenderElementProps } from 'slate-react';
+import type { MarkdownToHtmlOptions } from './editor/utils/markdownToHtml';
 import { TagPopupProps } from './editor/elements/TagPopup';
 import { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
@@ -327,6 +328,11 @@ export type MarkdownEditorProps = {
   ) => void;
 
   onPaste?: (e: React.ClipboardEvent<HTMLDivElement>) => void;
+
+  /**
+   * 自定义 markdown 转 HTML 的 remark 插件配置，格式类似 Babel 插件数组
+   */
+  markdownToHtmlOptions?: MarkdownToHtmlOptions;
 
   /**
    * 其他属性

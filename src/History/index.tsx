@@ -38,6 +38,7 @@ export * from './utils';
  * @param {Function} [props.customDateFormatter] - 日期格式化函数
  * @param {boolean} [props.standalone] - 是否以独立模式显示，为true时直接显示菜单，否则显示为下拉菜单
  * @param {Function} [props.emptyRender] - 空状态渲染函数，当历史记录为空时显示自定义内容
+ * @param {Function} [props.loadMoreRender] - 加载更多渲染函数, 用于自定义加载更多按钮的显示内容
  * @param {boolean} [props.loading] - 加载状态，显示在 GroupMenu 区域
  *
  * @returns {React.ReactElement|null} 返回历史记录组件或null（当没有历史记录时）
@@ -115,6 +116,29 @@ export const History: React.FC<HistoryProps> = (props) => {
       <></>
     );
 
+  const LoadMoreComponent: React.FC = () => {
+    if (props.loadMoreRender) {
+      return props.loadMoreRender();
+    }
+
+    const shouldRender =
+      props.agent?.enabled && !!props.agent?.onLoadMore && !props.loading;
+
+    if (!shouldRender) {
+      return null;
+    }
+
+    return (
+      <HistoryLoadMore
+        onLoadMore={handleLoadMore}
+        type={props.type}
+        className={classNames(`${menuPrefixCls}-load-more`, hashId, {
+          chat: props.type !== 'task',
+        })}
+      />
+    );
+  };
+
   if (props.standalone) {
     return wrapSSR(
       <div
@@ -165,15 +189,7 @@ export const History: React.FC<HistoryProps> = (props) => {
                 className={menuPrefixCls}
                 loading={props.loading}
               />
-              {props.agent?.enabled && !!props.agent?.onLoadMore && (
-                <HistoryLoadMore
-                  onLoadMore={handleLoadMore}
-                  type={props.type}
-                  className={classNames(`${menuPrefixCls}-load-more`, hashId, {
-                    chat: props.type !== 'task',
-                  })}
-                />
-              )}
+              <LoadMoreComponent />
             </>
           )}
         </div>
@@ -210,17 +226,7 @@ export const History: React.FC<HistoryProps> = (props) => {
               loading={props.loading}
             />
           )}
-          {props.agent?.enabled &&
-            !!props.agent?.onLoadMore &&
-            !props.loading && (
-              <HistoryLoadMore
-                onLoadMore={handleLoadMore}
-                type={props.type}
-                className={classNames(`${menuPrefixCls}-load-more`, hashId, {
-                  chat: props.type !== 'task',
-                })}
-              />
-            )}
+          <LoadMoreComponent />
         </>
       }
     >

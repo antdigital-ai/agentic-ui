@@ -109,8 +109,14 @@ const getLocaleMessage = (locale: any, key: string, defaultMsg: string) => {
   return locale?.[key] || defaultMsg;
 };
 
-const validateFileCount = (fileCount: number, props: UploadProps): boolean => {
-  if (props.maxFileCount && fileCount > props.maxFileCount) {
+const validateFileCount = (
+  newFileCount: number,
+  existingFileCount: number,
+  props: UploadProps,
+): boolean => {
+  const totalFileCount = newFileCount + existingFileCount;
+
+  if (props.maxFileCount && totalFileCount > props.maxFileCount) {
     const msg = props.locale?.['markdownInput.maxFileCountExceeded']
       ? compileTemplate(props.locale['markdownInput.maxFileCountExceeded'], {
           maxFileCount: String(props.maxFileCount),
@@ -120,7 +126,7 @@ const validateFileCount = (fileCount: number, props: UploadProps): boolean => {
     return false;
   }
 
-  if (props.minFileCount && fileCount < props.minFileCount) {
+  if (props.minFileCount && totalFileCount < props.minFileCount) {
     const msg = props.locale?.['markdownInput.minFileCountRequired']
       ? compileTemplate(props.locale['markdownInput.minFileCountRequired'], {
           minFileCount: String(props.minFileCount),
@@ -277,6 +283,7 @@ export const upLoadFileToServer = async (
   props: UploadProps,
 ) => {
   const map = props.fileMap || new Map<string, AttachmentFile>();
+  const existingFileCount = map.size;
   const hideLoading = message.loading(
     getLocaleMessage(props.locale, 'uploading', DEFAULT_MESSAGES.uploading),
   );
@@ -285,7 +292,7 @@ export const upLoadFileToServer = async (
   fileList.forEach(prepareFile);
   fileList.forEach((file) => updateFileMap(map, file, props.onFileMapChange));
 
-  if (!validateFileCount(fileList.length, props)) {
+  if (!validateFileCount(fileList.length, existingFileCount, props)) {
     hideLoading();
     return;
   }

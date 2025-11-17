@@ -95,6 +95,22 @@ export const useFileUploadManager = ({
       return;
     }
 
+    // 检查是否已达到最大文件数量限制
+    const currentFileCount = fileMap?.size || 0;
+    if (
+      attachment?.maxFileCount &&
+      currentFileCount >= attachment.maxFileCount
+    ) {
+      const errorMsg = locale?.['markdownInput.maxFileCountExceeded']
+        ? locale['markdownInput.maxFileCountExceeded'].replace(
+            '${maxFileCount}',
+            String(attachment.maxFileCount),
+          )
+        : `最多只能上传 ${attachment.maxFileCount} 个文件`;
+      message.error(errorMsg);
+      return;
+    }
+
     const input = document.createElement('input');
     input.id = 'uploadImage' + '_' + Math.random();
     input.type = 'file';

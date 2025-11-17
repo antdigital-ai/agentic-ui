@@ -68,6 +68,8 @@ export interface HistoryProps {
   loading?: boolean;
   /** 加载状态，显示在 GroupMenu 区域 */
   isLoading?: boolean;
+  /** 加载更多渲染函数, 用于自定义加载更多按钮的显示内容 */
+  loadMoreRender?: () => React.ReactNode;
 }
 
 export interface HistoryActionsBoxProps {

@@ -5,7 +5,10 @@ nav:
 group:
   title: 工具函数
   order: 3
+title: markdownToHtml 工具函数
 ---
+
+<!-- markdownlint-disable-next-line MD025 -->
 
 # markdownToHtml 工具函数
 
@@ -28,25 +31,40 @@ group:
 
 ## API 参考
 
-### `markdownToHtml(markdown: string): Promise<string>`
+### `markdownToHtml(markdown: string, plugins?: MarkdownToHtmlOptions): Promise<string>`
 
 异步将 Markdown 字符串转换为 HTML。
 
 **参数：**
 
 - `markdown: string` - 要转换的 Markdown 字符串
+- `plugins?: MarkdownToHtmlOptions` - Babel 风格的 remark 插件数组
 
 **返回值：**
 
 - `Promise<string>` - 转换后的 HTML 字符串
 
-### `markdownToHtmlSync(markdown: string): string`
+### `markdownToHtmlSync(markdown: string, plugins?: MarkdownToHtmlOptions): string`
 
 同步将 Markdown 字符串转换为 HTML。
 
 **参数：**
 
 - `markdown: string` - 要转换的 Markdown 字符串
+- `plugins?: MarkdownToHtmlOptions` - Babel 风格的 remark 插件数组
+- `string` - 转换后的 HTML 字符串
+
+### `MarkdownToHtmlOptions`
+
+- 类型：`Array<Plugin | [Plugin, ...unknown[]]>`
+- 结构与 Babel 插件数组一致，每一项是一个 remark 插件，第二个及之后的元素为该插件的配置。
+- 当提供该数组时，会完全覆盖默认的 remark 插件链，请确保链条完整。
+
+```typescript
+import { DEFAULT_MARKDOWN_REMARK_PLUGINS } from '@ant-design/agentic-ui';
+
+const plugins: MarkdownToHtmlOptions = [...DEFAULT_MARKDOWN_REMARK_PLUGINS];
+```
 
 **返回值：**
 
@@ -96,6 +114,53 @@ const html = markdownToHtmlSync(markdown);
 console.log(html);
 ```
 
+### 自定义 remark 插件
+
+```typescript | pure
+import remarkDirective from 'remark-directive';
+import {
+  DEFAULT_MARKDOWN_REMARK_PLUGINS,
+  markdownToHtml,
+} from '@ant-design/agentic-ui';
+
+const markdown = `
+:::info
+这里是一个自定义指令块
+:::
+`;
+
+const html = await markdownToHtml(markdown, [
+  ...DEFAULT_MARKDOWN_REMARK_PLUGINS.slice(0, 2),
+  remarkDirective,
+  ...DEFAULT_MARKDOWN_REMARK_PLUGINS.slice(2),
+]);
+```
+
+### 关闭默认插件
+
+```typescript | pure
+import remarkGfm from 'remark-gfm';
+import {
+  DEFAULT_MARKDOWN_REMARK_PLUGINS,
+  markdownToHtmlSync,
+} from '@ant-design/agentic-ui';
+
+const markdown = '~~不会再被渲染成删除线~~';
+
+const html = markdownToHtmlSync(
+  markdown,
+  DEFAULT_MARKDOWN_REMARK_PLUGINS.filter((plugin) => plugin !== remarkGfm),
+);
+```
+
+```typescript | pure
+import { markdownToHtmlSync } from '@ant-design/agentic-ui';
+
+const markdown = '# 标题\n\n这是一个段落。';
+const html = markdownToHtmlSync(markdown);
+console.log(html);
+```
+
 ## 支持的 Markdown 特性
 
 ### 基础语法
@@ -134,6 +199,7 @@ console.log(html);
 
 - **行内公式**：`$E = mc^2$`
 - **块级公式**：
+
   ```markdown
   $$
   E = mc^2
@@ -166,7 +232,7 @@ date: 2024-01-01
 
 ## 处理流程
 
-转换过程使用以下 unified 插件：
+默认处理流程使用以下 unified 插件（可通过自定义 `MarkdownToHtmlOptions` 完全覆盖）：
 
 1. **remarkParse** - 解析 Markdown
 2. **remarkGfm** - GitHub Flavored Markdown 支持

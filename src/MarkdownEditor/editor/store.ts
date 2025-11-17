@@ -28,6 +28,7 @@ import { KeyboardTask, Methods, parserSlateNodeToMarkdown } from './utils';
 import { getOffsetLeft, getOffsetTop } from './utils/dom';
 import { EditorUtils, findByPathAndText } from './utils/editorUtils';
 import { markdownToHtmlSync } from './utils/markdownToHtml';
+import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';
 const { createContext, useContext } = React;
 
 /**
@@ -166,6 +167,7 @@ export class EditorStore {
 
   /** 当前 setMDContent 操作的 AbortController */
   private _currentAbortController: AbortController | null = null;
+  private markdownToHtmlOptions?: MarkdownToHtmlOptions;
 
   /**
    * 获取当前编辑器实例。
@@ -179,10 +181,12 @@ export class EditorStore {
   constructor(
     _editor: React.MutableRefObject<BaseEditor & ReactEditor & HistoryEditor>,
     plugins?: MarkdownEditorPlugin[],
+    markdownToHtmlOptions?: MarkdownToHtmlOptions,
   ) {
     this.dragStart = this.dragStart.bind(this);
     this._editor = _editor;
     this.plugins = plugins;
+    this.markdownToHtmlOptions = markdownToHtmlOptions;
   }
 
   /**
@@ -872,9 +876,13 @@ export class EditorStore {
    *
    * @returns 转换为 HTML 的当前编辑器内容
    */
-  getHtmlContent() {
+  getHtmlContent(options?: MarkdownToHtmlOptions) {
     const markdown = this.getMDContent();
-    return markdownToHtmlSync(markdown);
+    const appliedOptions = options ?? this.markdownToHtmlOptions;
+    if (options) {
+      this.markdownToHtmlOptions = options;
+    }
+    return markdownToHtmlSync(markdown, appliedOptions);
   }
 
   /**
