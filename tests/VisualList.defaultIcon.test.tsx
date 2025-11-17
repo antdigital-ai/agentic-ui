@@ -1,9 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { VisualList, VisualListItem } from '../src/Components/VisualList';
 
 describe('VisualList 默认图标测试', () => {
+  afterEach(() => {
+    cleanup();
+  });
   const mockData: VisualListItem[] = [
     {
       id: '1',

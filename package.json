@@ -1,6 +1,6 @@
 {
   "name": "@ant-design/agentic-ui",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "面向智能体的 UI 组件库，提供多步推理可视化、工具调用展示、任务执行协同等 Agentic UI 能力",
   "repository": "git@github.com:ant-design/agentic-ui.git",
   "license": "MIT",
@@ -130,6 +130,7 @@
     "@umijs/lint": "^4.5.3",
     "@vitejs/plugin-react": "^4.7.0",
     "@vitest/coverage-istanbul": "^2.1.9",
+    "@vitest/ui": "2.1.9",
     "dumi": "^2.4.21",
     "dumi-theme-antd-style": "^0.31.1",
     "eslint": "^8.57.1",

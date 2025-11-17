@@ -1,9 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // 简单的组件测试
 describe('Component Tests', () => {
+  afterEach(() => {
+    cleanup();
+  });
   it('should render a simple div', () => {
     render(<div data-testid="test-div">Test Content</div>);
     expect(screen.getByTestId('test-div')).toBeInTheDocument();

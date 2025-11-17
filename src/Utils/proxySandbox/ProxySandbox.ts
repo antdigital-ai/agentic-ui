@@ -819,6 +819,8 @@ export class ProxySandbox {
       /for\s*\(\s*;\s*;\s*\)/,
       /while\s*\(\s*1\s*\)/,
       /while\s*\(\s*!false\s*\)/,
+      /do\s*\{[^}]*\}\s*while\s*\(\s*true\s*\)/,
+      /do\s*\{[^}]*\}\s*while\s*\(\s*1\s*\)/,
     ];
 
     return infiniteLoopPatterns.some((pattern) => pattern.test(code));
@@ -826,6 +828,8 @@ export class ProxySandbox {
 
   /**
    * 带超时的普通执行
+   * 注意：对于同步死循环，setTimeout 无法中断，需要使用 Worker 或指令计数
+   * 这个方法只适用于不包含死循环的代码
    */
   private async executeWithTimeout(
     code: string,
@@ -851,15 +855,17 @@ export class ProxySandbox {
 
   /**
    * 使用指令计数限制执行时间
+   * 这是处理同步死循环的唯一方法（在不使用 Worker 的情况下）
    */
   private async executeWithInstructionLimit(
     code: string,
     injectedParams?: Record<string, any>,
   ): Promise<any> {
     return new Promise((resolve, reject) => {
-      const maxInstructions = 1000000; // 最大指令数
+      const maxInstructions = 10000; // 降低最大指令数，更快检测死循环
       let instructionCount = 0;
       const startTime = performance.now();
+      let timeoutId: NodeJS.Timeout | null = null;
 
       // 注入指令计数器
       const instrumentedCode = this.instrumentCode(code);
@@ -870,23 +876,34 @@ export class ProxySandbox {
         instructionCount++;
         const elapsed = performance.now() - startTime;
 
+        // 检查时间超时
         if (elapsed > this.config.timeout) {
           throw new Error(
             `Code execution timeout after ${this.config.timeout}ms`,
           );
         }
 
-        // 更宽松的指令限制，只在明显的死循环情况下触发
-        // 如果执行时间很短但指令数很多，说明是死循环
-        if (instructionCount > maxInstructions && elapsed < 10) {
-          throw new Error(`Code execution exceeded maximum instruction limit`);
+        // 如果指令数超过限制，说明可能是死循环
+        if (instructionCount > maxInstructions) {
+          throw new Error(
+            `Code execution exceeded maximum instruction limit (${maxInstructions})`,
+          );
         }
       };
 
+      // 设置超时保护，防止指令检查没有被调用
+      timeoutId = setTimeout(() => {
+        reject(
+          new Error(`Code execution timeout after ${this.config.timeout}ms`),
+        );
+      }, this.config.timeout);
+
       try {
         const result = this.executeCode(instrumentedCode, injectedParams);
+        if (timeoutId) clearTimeout(timeoutId);
         resolve(result);
       } catch (error) {
+        if (timeoutId) clearTimeout(timeoutId);
         reject(error);
       } finally {
         // 恢复原始状态
@@ -901,25 +918,31 @@ export class ProxySandbox {
 
   /**
    * 在代码中注入指令计数器
+   * 在循环体内部注入检查点，确保死循环能够被检测到
    */
   private instrumentCode(code: string): string {
-    // 简化的指令注入，只在明显的循环结构中添加检查
+    // 简化的指令注入，在循环结构中添加检查
     let instrumented = code;
 
-    // 为循环体注入检查（在开括号后，使用换行避免语法错误）
+    // 为 for 循环体注入检查（在开括号后）
     instrumented = instrumented.replace(
       /(\bfor\s*\([^)]*\)\s*\{)/g,
       '$1\n  __checkInstructions();',
     );
+    
+    // 为 while 循环体注入检查（在开括号后）
     instrumented = instrumented.replace(
       /(\bwhile\s*\([^)]*\)\s*\{)/g,
       '$1\n  __checkInstructions();',
     );
+    
+    // 为 do-while 循环体注入检查
     instrumented = instrumented.replace(
       /(\bdo\s*\{)/g,
       '$1\n  __checkInstructions();',
     );
-    // 在代码开始处插入检查
+    
+    // 在代码开始处插入检查，确保即使没有循环也能检测超时
     return `__checkInstructions();\n${instrumented}`;
   }
 
@@ -992,12 +1015,18 @@ export class ProxySandbox {
     resolve: (value: any) => void,
     reject: (reason?: any) => void,
   ): void {
-    try {
-      const result = this.executeCode(code, injectedParams);
-      resolve(result);
-    } catch (error) {
-      reject(error);
+    // 检查是否是死循环，如果是则使用指令计数方法
+    if (this.isObviousInfiniteLoop(code)) {
+      this.executeWithInstructionLimit(code, injectedParams)
+        .then(resolve)
+        .catch(reject);
+      return;
     }
+
+    // 对正常代码使用超时保护
+    this.executeWithTimeout(code, injectedParams)
+      .then(resolve)
+      .catch(reject);
   }
 
   /**

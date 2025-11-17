@@ -411,7 +411,7 @@ describe('ProxySandbox', () => {
 
   describe('超时机制测试', () => {
     it('应该在超时时中断死循环执行', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
       const startTime = Date.now();
 
       const result = await sandbox.execute('while(true) { /* 死循环 */ }');
@@ -419,13 +419,13 @@ describe('ProxySandbox', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.message).toMatch(/timeout|instruction/i);
-      expect(executionTime).toBeLessThan(500); // 应该在合理时间内超时
+      expect(executionTime).toBeLessThan(200); // 应该在合理时间内超时
 
       sandbox.destroy();
-    });
+    }, 1000); // 测试用例超时时间设为1秒
 
     it('应该能够配置自定义超时时间', async () => {
-      const customTimeout = 50;
+      const customTimeout = 30;
       const sandbox = new ProxySandbox({ timeout: customTimeout });
 
       const result = await sandbox.execute('while(true) { /* 死循环 */ }');
@@ -434,10 +434,10 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 500); // 测试用例超时时间设为500ms
 
     it('应该能够中断复杂的死循环', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
 
       const result = await sandbox.execute(`
         let i = 0;
@@ -453,10 +453,10 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 1000); // 测试用例超时时间设为1秒
 
     it('应该能够中断嵌套循环', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
 
       const result = await sandbox.execute(`
         while(true) {
@@ -470,7 +470,7 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 1000); // 测试用例超时时间设为1秒
 
     it('应该允许正常的短时间循环', async () => {
       const sandbox = new ProxySandbox({ timeout: 1000 });
@@ -490,7 +490,7 @@ describe('ProxySandbox', () => {
     });
 
     it('应该检测 for(;;) 形式的死循环', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
 
       const result = await sandbox.execute('for(;;) { /* 死循环 */ }');
 
@@ -498,10 +498,10 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 500); // 测试用例超时时间设为500ms
 
     it('应该检测 while(1) 形式的死循环', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
 
       const result = await sandbox.execute('while(1) { /* 死循环 */ }');
 
@@ -509,10 +509,10 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 500); // 测试用例超时时间设为500ms
 
     it('应该检测 do-while 死循环', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
 
       const result = await sandbox.execute('do { /* 死循环 */ } while(true);');
 
@@ -520,7 +520,7 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 500); // 测试用例超时时间设为500ms
   });
 
   describe('自定义全局变量测试', () => {

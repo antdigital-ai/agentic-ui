@@ -600,12 +600,6 @@ export const ChartRender: React.FC<{
       );
     }
 
-    console.log(
-      'isRuntimeLoading || !isIntersecting',
-      isRuntimeLoading || !isIntersecting,
-      isIntersecting,
-    );
-
     if (!runtime && shouldLoadRuntime) {
       const height = config?.height || 240;
 

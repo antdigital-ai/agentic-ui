@@ -24,6 +24,25 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&::-webkit-scrollbar': {
         width: 'var(--padding-1-5x)',
       },
+      // 小屏幕模式下横向滑动
+      '@media (max-width: 768px)': {
+        flexWrap: 'nowrap',
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        maxHeight: 'none',
+        marginRight: '0',
+        padding: 'var(--padding-2x)',
+        '&::-webkit-scrollbar': {
+          height: 'var(--padding-1x)',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: 'var(--color-gray-border-default)',
+          borderRadius: 'var(--radius-base)',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: 'transparent',
+        },
+      },
       '&-close-icon': {
         width: 'var(--height-control-xs)',
         height: 'var(--height-control-xs)',
@@ -55,6 +74,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         cursor: 'pointer',
         gap: 'var(--margin-2x)',
         position: 'relative',
+        // 小屏幕模式下固定宽度，防止收缩
+        '@media (max-width: 768px)': {
+          flexShrink: 0,
+          minWidth: '168px',
+        },
         '&:hover': {
           [`${token.componentCls}-item-close-icon`]: {
             display: 'flex',
@@ -164,6 +188,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
             transform: 'scale(1.05)',
+          },
+          // 小屏幕模式下常驻展示
+          '@media (max-width: 768px)': {
+            display: 'flex',
           },
         },
         '&-uploading-icon': {
