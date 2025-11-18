@@ -32,6 +32,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         maxHeight: 'none',
         marginRight: '0',
         padding: 'var(--padding-2x)',
+        paddingRight: '40px', // 为右侧关闭按钮预留空间
         '&::-webkit-scrollbar': {
           height: 'var(--padding-1x)',
         },

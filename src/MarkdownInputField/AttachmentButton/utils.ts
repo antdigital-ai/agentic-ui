@@ -36,10 +36,31 @@ export const kbToSize = (kb: number) => {
 
 /**
  * 检查文件是否为图片类型
+ * 通过 MIME 类型和文件扩展名双重判断
  *
  * @param {File} file - 要检查的文件
  * @returns {boolean} 是否为图片文件
  */
 export const isImageFile = (file: File): boolean => {
-  return file.type.startsWith('image/');
+  // 首先检查 MIME 类型
+  if (file.type.startsWith('image/')) {
+    return true;
+  }
+
+  // 如果 MIME 类型不可用或不准确，检查文件扩展名
+  const imageExtensions = [
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.gif',
+    '.bmp',
+    '.webp',
+    '.svg',
+    '.ico',
+    '.tiff',
+    '.tif',
+  ];
+
+  const fileName = file.name.toLowerCase();
+  return imageExtensions.some((ext) => fileName.endsWith(ext));
 };
