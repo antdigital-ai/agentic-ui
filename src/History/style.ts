@@ -247,12 +247,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '&:hover': {
           // 支持直接在元素上的属性
           '&[aria-describedby]': {
-            animation: 'scrollText 2s linear 0.5s forwards',
+            animationName: 'scrollText',
+            animationDuration: '2s',
+            animationTimingFunction: 'linear',
+            animationDelay: '0.5s',
+            animationFillMode: 'forwards',
             animationPlayState: 'running',
           },
           // 支持子元素上的属性
           '& > div[aria-describedby]': {
-            animation: 'scrollText 2s linear 0.5s forwards',
+            animationName: 'scrollText',
+            animationDuration: '2s',
+            animationTimingFunction: 'linear',
+            animationDelay: '0.5s',
+            animationFillMode: 'forwards',
             animationPlayState: 'running',
           },
           // 渐变遮罩层

@@ -2,7 +2,7 @@ import { DownOutlined, SettingOutlined } from '@ant-design/icons';
 import { ProForm, ProFormSelect } from '@ant-design/pro-components';
 import { ConfigProvider, Descriptions, Dropdown, Popover, Table } from 'antd';
 import { DescriptionsItemType } from 'antd/es/descriptions';
-import React, { useContext, useMemo, useState } from 'react';
+import React, { lazy, Suspense, useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
 import { useIntersectionOnce } from '../../Hooks/useIntersectionOnce';
@@ -87,10 +87,296 @@ const getChartMap = (i18n: any) => ({
 });
 
 /**
+ * 图表运行时渲染器组件实现
+ * 负责使用已加载的 runtime 渲染图表
+ */
+const ChartRuntimeRendererImpl: React.FC<{
+  chartType:
+    | 'pie'
+    | 'donut'
+    | 'bar'
+    | 'line'
+    | 'column'
+    | 'area'
+    | 'radar'
+    | 'scatter'
+    | 'funnel';
+  runtime: ChartRuntime;
+  convertDonutData: any[];
+  convertFlatData: any[];
+  config: any;
+  renderKey: number;
+  title?: any;
+  dataTime?: string;
+  toolBar: JSX.Element[];
+  filterBy?: string;
+  groupBy?: string;
+  colorLegend?: string;
+  chartData: Record<string, any>[];
+  getFieldValue: (row: any, field?: string) => string | undefined;
+}> = ({
+  chartType,
+  runtime,
+  convertDonutData,
+  convertFlatData,
+  config,
+  renderKey,
+  title,
+  dataTime,
+  toolBar,
+  filterBy,
+  groupBy,
+  colorLegend,
+  chartData,
+  getFieldValue,
+}) => {
+  const {
+    DonutChart,
+    FunnelChart,
+    AreaChart,
+    BarChart,
+    LineChart,
+    RadarChart,
+    ScatterChart,
+  } = runtime;
+
+  if (chartType === 'pie') {
+    return (
+      <DonutChart
+        key={`${config?.index}-pie-${renderKey}`}
+        data={convertDonutData}
+        configs={[{ chartStyle: 'pie', showLegend: true }]}
+        height={config?.height || 400}
+        title={title}
+        showToolbar={true}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+      />
+    );
+  }
+
+  if (chartType === 'donut') {
+    return (
+      <DonutChart
+        key={`${config?.index}-donut-${renderKey}`}
+        data={convertDonutData}
+        configs={[{ chartStyle: 'donut', showLegend: true }]}
+        height={config?.height || 400}
+        title={title}
+        showToolbar={true}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+      />
+    );
+  }
+
+  if (chartType === 'bar') {
+    return (
+      <BarChart
+        key={`${config?.index}-bar-${renderKey}`}
+        data={convertFlatData}
+        height={config?.height || 400}
+        title={title || ''}
+        indexAxis={'y'}
+        stacked={config?.rest?.stacked}
+        showLegend={config?.rest?.showLegend ?? true}
+        showGrid={config?.rest?.showGrid ?? true}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+      />
+    );
+  }
+
+  if (chartType === 'line') {
+    return (
+      <LineChart
+        key={`${config?.index}-line-${renderKey}`}
+        data={convertFlatData}
+        height={config?.height || 400}
+        title={title || ''}
+        showLegend={config?.rest?.showLegend ?? true}
+        showGrid={config?.rest?.showGrid ?? true}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+      />
+    );
+  }
+
+  if (chartType === 'column') {
+    return (
+      <BarChart
+        key={`${config?.index}-column-${renderKey}`}
+        data={convertFlatData}
+        height={config?.height || 400}
+        title={title || ''}
+        indexAxis={'x'}
+        stacked={config?.rest?.stacked}
+        showLegend={config?.rest?.showLegend ?? true}
+        showGrid={config?.rest?.showGrid ?? true}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+      />
+    );
+  }
+
+  if (chartType === 'area') {
+    return (
+      <AreaChart
+        key={`${config?.index}-area-${renderKey}`}
+        data={convertFlatData}
+        height={config?.height || 400}
+        title={title || ''}
+        showLegend={config?.rest?.showLegend ?? true}
+        showGrid={config?.rest?.showGrid ?? true}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+      />
+    );
+  }
+
+  if (chartType === 'radar') {
+    const radarData = (chartData || []).map((row: any, i: number) => {
+      const filterLabel = getFieldValue(row, filterBy);
+      const category = getFieldValue(row, groupBy);
+      const type = getFieldValue(row, colorLegend);
+      return {
+        label: String(row?.[config?.x] ?? i + 1),
+        score: row?.[config?.y],
+        ...(category ? { category } : {}),
+        ...(type ? { type } : {}),
+        ...(filterLabel ? { filterLabel } : {}),
+      };
+    });
+
+    return (
+      <RadarChart
+        key={`${config?.index}-radar-${renderKey}`}
+        data={radarData}
+        height={config?.height || 400}
+        title={title || ''}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+      />
+    );
+  }
+
+  if (chartType === 'scatter') {
+    const scatterData = (chartData || []).map((row: any) => {
+      const filterLabel = getFieldValue(row, filterBy);
+      const category = getFieldValue(row, groupBy);
+      const type = getFieldValue(row, colorLegend);
+      return {
+        x: row?.[config?.x],
+        y: row?.[config?.y],
+        ...(category ? { category } : {}),
+        ...(type ? { type } : {}),
+        ...(filterLabel ? { filterLabel } : {}),
+      };
+    });
+
+    return (
+      <ScatterChart
+        key={`${config?.index}-scatter-${renderKey}`}
+        data={scatterData}
+        height={config?.height || 400}
+        title={title || ''}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+      />
+    );
+  }
+
+  if (chartType === 'funnel') {
+    const funnelData = (chartData || []).map((row: any, i: number) => {
+      const filterLabel = getFieldValue(row, filterBy);
+      const category = getFieldValue(row, groupBy);
+      const type = getFieldValue(row, colorLegend);
+      return {
+        x: String(row?.[config?.x] ?? i + 1),
+        y: toNumber(row?.[config?.y], 0),
+        ...(row?.ratio !== undefined ? { ratio: row.ratio } : {}),
+        ...(category ? { category } : {}),
+        ...(type ? { type } : {}),
+        ...(filterLabel ? { filterLabel } : {}),
+      };
+    });
+
+    return (
+      <FunnelChart
+        key={`${config?.index}-funnel-${renderKey}`}
+        data={funnelData}
+        height={config?.height || 400}
+        title={title || ''}
+        dataTime={dataTime}
+        typeNames={{ rate: '转化率', name: colorLegend || '转化' }}
+        toolbarExtra={toolBar}
+      />
+    );
+  }
+
+  return null;
+};
+
+/**
+ * 图表运行时渲染器组件
+ * 使用 React.lazy 延迟加载，仅在需要时加载图表运行时
+ */
+const ChartRuntimeRenderer = lazy(async () => {
+  const runtime = await loadChartRuntime();
+  return {
+    default: (props: {
+      chartType:
+        | 'pie'
+        | 'donut'
+        | 'bar'
+        | 'line'
+        | 'column'
+        | 'area'
+        | 'radar'
+        | 'scatter'
+        | 'funnel';
+      convertDonutData: any[];
+      convertFlatData: any[];
+      config: any;
+      renderKey: number;
+      title?: any;
+      dataTime?: string;
+      toolBar: JSX.Element[];
+      filterBy?: string;
+      groupBy?: string;
+      colorLegend?: string;
+      chartData: Record<string, any>[];
+      getFieldValue: (row: any, field?: string) => string | undefined;
+    }) => <ChartRuntimeRendererImpl {...props} runtime={runtime} />,
+  };
+});
+
+/**
+ * 加载中的占位组件
+ */
+const ChartRuntimeFallback = ({ height = 240 }: { height?: number }) => (
+  <div
+    style={{
+      minHeight: height,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+      color: '#6B7280',
+    }}
+    role="status"
+    aria-live="polite"
+  >
+    <Loading />
+  </div>
+);
+
+/**
  * ChartRender 组件 - 图表渲染组件
  *
  * 该组件用于渲染各种类型的图表，支持饼图、柱状图、折线图、面积图、表格等。
  * 提供图表类型切换、全屏显示、下载、配置等功能。
+ * 使用 React.lazy 和 Suspense 实现代码分割和延迟加载，优化性能。
  *
  * @component
  * @description 图表渲染组件，支持多种图表类型的渲染和交互
@@ -141,6 +427,7 @@ const getChartMap = (i18n: any) => ({
  * - 提供响应式布局
  * - 集成国际化支持
  * - 提供图表属性工具栏
+ * - 使用 React.lazy 和 Suspense 实现代码分割
  */
 export const ChartRender: React.FC<{
   chartType:
@@ -202,9 +489,6 @@ export const ChartRender: React.FC<{
   const i18n = useContext(I18nContext);
   const [config, setConfig] = useState(() => props.config);
   const [renderKey, setRenderKey] = useState(0);
-  const [runtime, setRuntime] = useState<ChartRuntime | null>(null);
-  const [runtimeError, setRuntimeError] = useState<string | null>(null);
-  const [isRuntimeLoading, setRuntimeLoading] = useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const isIntersecting = useIntersectionOnce(containerRef);
 
@@ -217,44 +501,6 @@ export const ChartRender: React.FC<{
     chartType !== 'table' &&
     chartType !== 'descriptions' &&
     !renderDescriptionsFallback;
-
-  React.useEffect(() => {
-    if (runtime) return;
-    if (isRuntimeLoading) return;
-    if (runtimeError) return;
-
-    let cancelled = false;
-    setRuntimeLoading(true);
-    loadChartRuntime()
-      .then((module) => {
-        if (cancelled) return;
-        setRuntime(module);
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        const message = error instanceof Error ? error.message : String(error);
-        setRuntimeError(message);
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setRuntimeLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    shouldLoadRuntime,
-    isIntersecting,
-    runtime,
-    isRuntimeLoading,
-    runtimeError,
-  ]);
-
-  const handleRetryRuntime = React.useCallback(() => {
-    setRuntime(null);
-    setRuntimeError(null);
-  }, []);
 
   // 获取国际化的图表类型映射
   const ChartMap = useMemo(() => getChartMap(i18n), [i18n]);
@@ -600,247 +846,32 @@ export const ChartRender: React.FC<{
       );
     }
 
-    if (!runtime && shouldLoadRuntime) {
-      const height = config?.height || 240;
-
-      if (runtimeError) {
-        return (
-          <div
-            style={{
-              minHeight: height,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              gap: 8,
-              color: 'rgba(239, 68, 68, 0.8)',
-            }}
-            role="alert"
-          >
-            <span>{runtimeError}</span>
-            <button
-              type="button"
-              onClick={handleRetryRuntime}
-              style={{
-                padding: '4px 12px',
-                borderRadius: '0.5em',
-                border: '1px solid rgba(239, 68, 68, 0.5)',
-                background: 'transparent',
-                color: 'rgba(239, 68, 68, 0.8)',
-                cursor: 'pointer',
-              }}
-            >
-              重试加载
-            </button>
-          </div>
-        );
-      }
-
+    if (shouldLoadRuntime && isIntersecting) {
       return (
-        <div
-          style={{
-            minHeight: height,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            color: '#6B7280',
-          }}
-          role="status"
-          aria-live="polite"
+        <Suspense
+          fallback={<ChartRuntimeFallback height={config?.height || 240} />}
         >
-          {isRuntimeLoading || !isIntersecting ? <Loading /> : null}
-        </div>
+          <ChartRuntimeRenderer
+            chartType={chartType}
+            convertDonutData={convertDonutData}
+            convertFlatData={convertFlatData}
+            config={config}
+            renderKey={renderKey}
+            title={title}
+            dataTime={dataTime}
+            toolBar={toolBar}
+            filterBy={filterBy}
+            groupBy={groupBy}
+            colorLegend={colorLegend}
+            chartData={chartData}
+            getFieldValue={getFieldValue}
+          />
+        </Suspense>
       );
     }
 
-    if (!runtime) {
-      return null;
-    }
-
-    const {
-      DonutChart,
-      FunnelChart,
-      AreaChart,
-      BarChart,
-      LineChart,
-      RadarChart,
-      ScatterChart,
-    } = runtime;
-
-    if (chartType === 'pie') {
-      return (
-        <DonutChart
-          key={`${config?.index}-pie-${renderKey}`}
-          data={convertDonutData}
-          configs={[{ chartStyle: 'pie', showLegend: true }]}
-          height={config?.height || 400}
-          title={title}
-          showToolbar={true}
-          dataTime={dataTime}
-          toolbarExtra={toolBar}
-        />
-      );
-    }
-
-    if (chartType === 'donut') {
-      return (
-        <DonutChart
-          key={`${config?.index}-donut-${renderKey}`}
-          data={convertDonutData}
-          configs={[{ chartStyle: 'donut', showLegend: true }]}
-          height={config?.height || 400}
-          title={title}
-          showToolbar={true}
-          dataTime={dataTime}
-          toolbarExtra={toolBar}
-        />
-      );
-    }
-
-    if (chartType === 'bar') {
-      return (
-        <BarChart
-          key={`${config?.index}-bar-${renderKey}`}
-          data={convertFlatData}
-          height={config?.height || 400}
-          title={title || ''}
-          indexAxis={'y'}
-          stacked={config?.rest?.stacked}
-          showLegend={config?.rest?.showLegend ?? true}
-          showGrid={config?.rest?.showGrid ?? true}
-          dataTime={dataTime}
-          toolbarExtra={toolBar}
-        />
-      );
-    }
-
-    if (chartType === 'line') {
-      return (
-        <LineChart
-          key={`${config?.index}-line-${renderKey}`}
-          data={convertFlatData}
-          height={config?.height || 400}
-          title={title || ''}
-          showLegend={config?.rest?.showLegend ?? true}
-          showGrid={config?.rest?.showGrid ?? true}
-          dataTime={dataTime}
-          toolbarExtra={toolBar}
-        />
-      );
-    }
-
-    if (chartType === 'column') {
-      return (
-        <BarChart
-          key={`${config?.index}-column-${renderKey}`}
-          data={convertFlatData}
-          height={config?.height || 400}
-          title={title || ''}
-          indexAxis={'x'}
-          stacked={config?.rest?.stacked}
-          showLegend={config?.rest?.showLegend ?? true}
-          showGrid={config?.rest?.showGrid ?? true}
-          dataTime={dataTime}
-          toolbarExtra={toolBar}
-        />
-      );
-    }
-
-    if (chartType === 'area') {
-      return (
-        <AreaChart
-          key={`${config?.index}-area-${renderKey}`}
-          data={convertFlatData}
-          height={config?.height || 400}
-          title={title || ''}
-          showLegend={config?.rest?.showLegend ?? true}
-          showGrid={config?.rest?.showGrid ?? true}
-          dataTime={dataTime}
-          toolbarExtra={toolBar}
-        />
-      );
-    }
-
-    if (chartType === 'radar') {
-      const radarData = (chartData || []).map((row: any, i: number) => {
-        const filterLabel = getFieldValue(row, filterBy);
-        const category = getFieldValue(row, groupBy);
-        const type = getFieldValue(row, colorLegend);
-        return {
-          label: String(row?.[config?.x] ?? i + 1),
-          score: row?.[config?.y],
-          ...(category ? { category } : {}),
-          ...(type ? { type } : {}),
-          ...(filterLabel ? { filterLabel } : {}),
-        };
-      });
-
-      return (
-        <RadarChart
-          key={`${config?.index}-radar-${renderKey}`}
-          data={radarData}
-          height={config?.height || 400}
-          title={title || ''}
-          dataTime={dataTime}
-          toolbarExtra={toolBar}
-        />
-      );
-    }
-
-    if (chartType === 'scatter') {
-      const scatterData = (chartData || []).map((row: any) => {
-        const filterLabel = getFieldValue(row, filterBy);
-        const category = getFieldValue(row, groupBy);
-        const type = getFieldValue(row, colorLegend);
-        return {
-          x: row?.[config?.x],
-          y: row?.[config?.y],
-          ...(category ? { category } : {}),
-          ...(type ? { type } : {}),
-          ...(filterLabel ? { filterLabel } : {}),
-        };
-      });
-
-      return (
-        <ScatterChart
-          key={`${config?.index}-scatter-${renderKey}`}
-          data={scatterData}
-          height={config?.height || 400}
-          title={title || ''}
-          dataTime={dataTime}
-          toolbarExtra={toolBar}
-        />
-      );
-    }
-
-    if (chartType === 'funnel') {
-      const funnelData = (chartData || []).map((row: any, i: number) => {
-        const filterLabel = getFieldValue(row, filterBy);
-        const category = getFieldValue(row, groupBy);
-        const type = getFieldValue(row, colorLegend);
-        return {
-          x: String(row?.[config?.x] ?? i + 1),
-          y: toNumber(row?.[config?.y], 0),
-          ...(row?.ratio !== undefined ? { ratio: row.ratio } : {}),
-          ...(category ? { category } : {}),
-          ...(type ? { type } : {}),
-          ...(filterLabel ? { filterLabel } : {}),
-        };
-      });
-
-      return (
-        <FunnelChart
-          key={`${config?.index}-funnel-${renderKey}`}
-          data={funnelData}
-          height={config?.height || 400}
-          title={title || ''}
-          dataTime={dataTime}
-          typeNames={{ rate: '转化率', name: colorLegend || '转化' }}
-          toolbarExtra={toolBar}
-        />
-      );
+    if (shouldLoadRuntime && !isIntersecting) {
+      return <ChartRuntimeFallback height={config?.height || 240} />;
     }
 
     return null;
@@ -857,13 +888,9 @@ export const ChartRender: React.FC<{
     filterBy,
     groupBy,
     colorLegend,
-    runtime,
-    runtimeError,
-    isRuntimeLoading,
     isIntersecting,
     shouldLoadRuntime,
     renderDescriptionsFallback,
-    handleRetryRuntime,
   ]);
 
   return (

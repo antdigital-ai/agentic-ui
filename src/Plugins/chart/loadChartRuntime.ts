@@ -24,32 +24,35 @@ export const loadChartRuntime = async (): Promise<ChartRuntime> => {
   }
 
   if (!runtimeLoader) {
+    // 使用 webpack 魔法注释确保正确代码分割和解析
     runtimeLoader = Promise.all([
-      import('./AreaChart'),
-      import('./BarChart'),
-      import('./DonutChart'),
-      import('./FunnelChart'),
-      import('./LineChart'),
-      import('./RadarChart'),
-      import('./ScatterChart'),
+      import(/* webpackChunkName: "chart-area" */ './AreaChart'),
+      import(/* webpackChunkName: "chart-bar" */ './BarChart'),
+      import(/* webpackChunkName: "chart-donut" */ './DonutChart'),
+      import(/* webpackChunkName: "chart-funnel" */ './FunnelChart'),
+      import(/* webpackChunkName: "chart-line" */ './LineChart'),
+      import(/* webpackChunkName: "chart-radar" */ './RadarChart'),
+      import(/* webpackChunkName: "chart-scatter" */ './ScatterChart'),
     ])
-      .then(([
-        areaModule,
-        barModule,
-        donutModule,
-        funnelModule,
-        lineModule,
-        radarModule,
-        scatterModule,
-      ]) => ({
-        AreaChart: areaModule.default,
-        BarChart: barModule.default,
-        DonutChart: donutModule.default,
-        FunnelChart: funnelModule.default,
-        LineChart: lineModule.default,
-        RadarChart: radarModule.default,
-        ScatterChart: scatterModule.default,
-      }))
+      .then(
+        ([
+          areaModule,
+          barModule,
+          donutModule,
+          funnelModule,
+          lineModule,
+          radarModule,
+          scatterModule,
+        ]) => ({
+          AreaChart: areaModule.default,
+          BarChart: barModule.default,
+          DonutChart: donutModule.default,
+          FunnelChart: funnelModule.default,
+          LineChart: lineModule.default,
+          RadarChart: radarModule.default,
+          ScatterChart: scatterModule.default,
+        }),
+      )
       .catch((error) => {
         runtimeLoader = null;
         throw error;
@@ -58,5 +61,3 @@ export const loadChartRuntime = async (): Promise<ChartRuntime> => {
 
   return runtimeLoader;
 };
-
-
