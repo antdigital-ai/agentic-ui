@@ -362,7 +362,21 @@ export const AttachmentButton: React.FC<
     /** 按钮标题文本 */
     title?: React.ReactNode;
   }
-> = ({ disabled, uploadImage, title, supportedFormat, render }) => {
+> = ({
+  disabled,
+  uploadImage,
+  title,
+  supportedFormat,
+  render,
+  upload,
+  uploadWithResponse,
+  fileMap,
+  onFileMapChange,
+  maxFileSize,
+  maxFileCount,
+  minFileCount,
+  allowMultiple,
+}) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const prefix = context?.getPrefixCls('agentic-md-editor-attachment-button');
   const { wrapSSR, hashId } = useStyle(prefix);
@@ -380,13 +394,31 @@ export const AttachmentButton: React.FC<
     </div>
   );
 
+  const handleFileSelect = (files: FileList) => {
+    // 触发文件上传
+    upLoadFileToServer(files, {
+      upload,
+      uploadWithResponse,
+      fileMap,
+      onFileMapChange,
+      maxFileSize,
+      maxFileCount,
+      minFileCount,
+      locale: {},
+    });
+  };
+
   const wrapper = render ? (
     render({
       children: buttonWithStyle,
       supportedFormat: format,
     })
   ) : (
-    <AttachmentButtonPopover supportedFormat={format}>
+    <AttachmentButtonPopover
+      supportedFormat={format}
+      onFileSelect={handleFileSelect}
+      allowMultiple={allowMultiple}
+    >
       {buttonWithStyle}
     </AttachmentButtonPopover>
   );

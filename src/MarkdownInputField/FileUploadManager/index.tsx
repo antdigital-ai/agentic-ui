@@ -7,6 +7,13 @@ import { upLoadFileToServer } from '../AttachmentButton';
 import type { AttachmentButtonPopoverProps } from '../AttachmentButton/AttachmentButtonPopover';
 import { SupportedFileFormats } from '../AttachmentButton/AttachmentButtonPopover';
 import type { AttachmentFile } from '../AttachmentButton/types';
+import { isMobileDevice, isVivoOrOppoDevice } from '../AttachmentButton/utils';
+
+/**
+ * 移动设备默认的文件类型 accept 值
+ */
+const MOBILE_DEFAULT_ACCEPT =
+  'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,.csv,image/*,text/plain,application/x-zip-compressed';
 
 type SupportedFileFormatsType = AttachmentButtonPopoverProps['supportedFormat'];
 
@@ -80,6 +87,45 @@ export const useFileUploadManager = ({
   );
 
   /**
+   * 根据支持的格式获取 accept 属性值
+   * 在移动设备上，使用默认的 accept 值
+   * 在 vivo 或 oppo 手机上，如果只支持图片格式，使用 image/* 打开相册；否则使用具体扩展名打开文件选择器
+   */
+  const getAcceptValue = (): string => {
+    const isMobile = isMobileDevice();
+    const isVivoOrOppo = isVivoOrOppoDevice();
+    const extensions = supportedFormat?.extensions || [];
+
+    // 如果是移动设备，返回默认的 accept 值
+    if (isMobile) {
+      return MOBILE_DEFAULT_ACCEPT;
+    }
+
+    if (!isVivoOrOppo) {
+      // 非 vivo/oppo 设备，直接使用扩展名列表
+      return extensions.length > 0
+        ? extensions.map((ext) => `.${ext}`).join(',')
+        : 'image/*';
+    }
+
+    // vivo/oppo 设备：判断是否只包含图片格式
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+    const isImageOnly =
+      extensions.length > 0 &&
+      extensions.every((ext) => imageExtensions.includes(ext.toLowerCase()));
+
+    if (isImageOnly) {
+      // 只支持图片格式，使用 image/* 打开相册
+      return 'image/*';
+    }
+
+    // 支持其他格式，使用具体扩展名列表打开文件选择器
+    return extensions.length > 0
+      ? extensions.map((ext) => `.${ext}`).join(',')
+      : 'image/*';
+  };
+
+  /**
    * 上传图片
    */
   const uploadImage = useRefFunction(async () => {
@@ -114,7 +160,7 @@ export const useFileUploadManager = ({
     const input = document.createElement('input');
     input.id = 'uploadImage' + '_' + Math.random();
     input.type = 'file';
-    input.accept = supportedFormat?.extensions?.join(',') || 'image/*';
+    input.accept = getAcceptValue();
     input.multiple = attachment?.allowMultiple ?? true;
     input.style.display = 'none';
 

@@ -18,6 +18,7 @@ group:
 <code src="../demos/charts/bar/bar-horizontal.tsx" background="var(--main-bg-color)" title="条形图（横向）" iframe=540></code>
 <code src="../demos/charts/bar/bar-horizontal-stacked.tsx" background="var(--main-bg-color)" title="条形堆叠图（横向堆叠）" iframe=540></code>
 <code src="../demos/charts/bar/bar-with-labels.tsx" background="var(--main-bg-color)" title="带数据标签" iframe=540></code>
+<code src="../demos/charts/bar/bar-max-thickness.tsx" background="var(--main-bg-color)" title="柱子最大宽度控制" iframe=540></code>
 <code src="../demos/charts/bar/bar-with-statistic.tsx" background="var(--main-bg-color)" title="指标统计" iframe=540></code>
 
 ## API
@@ -44,6 +45,7 @@ group:
 | hiddenY               | `boolean`                                        | `false`    | 是否隐藏 Y 轴                                                            |
 | stacked               | `boolean`                                        | `false`    | 是否堆叠显示多个数据集                                                   |
 | indexAxis             | `'x' \| 'y'`                                     | `'x'`      | 轴向：`'x'` 垂直柱状图，`'y'` 水平条形图                                 |
+| maxBarThickness       | `number`                                         | -          | 柱子最大宽度                   |
 | toolbarExtra          | `React.ReactNode`                                | -          | 头部工具条额外按钮                                                       |
 | renderFilterInToolbar | `boolean`                                        | `false`    | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧） |
 | statistic             | `ChartStatisticConfig \| ChartStatisticConfig[]` | -          | ChartStatistic组件配置：object表示单个配置，array表示多个配置            |
@@ -98,6 +100,7 @@ group:
 - `stacked` 为 `true` 时，将按 `type` 将数据叠加显示。
 - `indexAxis='y'` 时为横向条形图。
 - `hiddenX` 和 `hiddenY` 可以控制坐标轴的显示/隐藏，适用于只展示图表本身而不需要坐标轴的场景。
+- `maxBarThickness` 用于限制柱子的最大宽度，特别适用于数据较少时避免柱子过宽的问题。建议值：30-80
 - `showDataLabels` 开启时，在柱子顶部（垂直图）或右侧（横向图）显示数值标签；堆叠图中只显示累计总和。
 - `dataLabelFormatter` 提供完整的上下文信息（数值、轴标签、数据集名称等），可灵活自定义标签显示格式。
 - `statistic` 属性支持数组形式，可同时渲染多个静态数据组件，如 `[{title: '总销量', value: 1200}, {title: '增长率', value: '15%'}]`。

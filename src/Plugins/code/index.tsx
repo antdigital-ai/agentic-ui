@@ -74,8 +74,10 @@ export function CodeElement(props: ElementProps<CodeNode>) {
   if (!props.element) {
     return null;
   }
-  if (props.element.value === undefined) return null;
-  if (props.element.value === '') return null;
+  // readonly 模式下，空代码块不展示
+  if (readonly && !props.element.value) {
+    return null;
+  }
   if (readonly && props.element.language === 'csv') {
     return (
       <BaseMarkdownEditor

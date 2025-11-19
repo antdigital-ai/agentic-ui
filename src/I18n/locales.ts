@@ -331,6 +331,9 @@ export const cnLabels = {
   'input.voiceInput': '语音输入',
   'input.voiceInputting': '语音输入中，点击可停止。',
   'input.placeholder': '请输入',
+  'input.selectFile': '选择文件',
+  'input.openGallery': '打开相册',
+  'input.openFile': '打开文件',
   // Other translations
   'common.name': '名称',
   'common.updateTime': '更新时间',
@@ -699,6 +702,9 @@ export const enLabels: typeof cnLabels = {
   'input.voiceInput': 'Voice input',
   'input.voiceInputting': 'Voice input in progress, click to stop.',
   'input.placeholder': 'Please input',
+  'input.selectFile': 'Select File',
+  'input.openGallery': 'Open Gallery',
+  'input.openFile': 'Open File',
   // Other translations
   'common.name': 'Name',
   'common.updateTime': 'Update Time',

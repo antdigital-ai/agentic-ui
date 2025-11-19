@@ -1,5 +1,4 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
 import {
   BarElement,
   CategoryScale,
@@ -12,6 +11,7 @@ import {
   Tooltip,
 } from 'chart.js';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
+import classNames from 'classnames';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -110,6 +110,8 @@ export interface BarChartConfigItem {
   stacked?: boolean;
   /** 索引轴方向 */
   indexAxis?: 'x' | 'y';
+  /** 柱子最大宽度 */
+  maxBarThickness?: number;
 }
 
 export interface BarChartProps extends ChartContainerProps {
@@ -152,6 +154,8 @@ export interface BarChartProps extends ChartContainerProps {
   stacked?: boolean;
   /** 图表轴向，'x'为垂直柱状图，'y'为水平柱状图 */
   indexAxis?: 'x' | 'y';
+  /** 柱子最大宽度 */
+  maxBarThickness?: number;
   /** 是否显示数据标签，默认false */
   showDataLabels?: boolean;
   /** 数据标签格式化函数 */
@@ -215,6 +219,7 @@ const BarChart: React.FC<BarChartProps> = ({
   hiddenY = false,
   stacked = false,
   indexAxis = 'x',
+  maxBarThickness,
   toolbarExtra,
   renderFilterInToolbar = false,
   statistic: statisticConfig,
@@ -506,8 +511,10 @@ const BarChart: React.FC<BarChartProps> = ({
           return gradient;
         },
         borderWidth: 0,
-        categoryPercentage: 0.7,
-        barPercentage: 0.8,
+        // 当设置了 maxBarThickness 时，使用较大的百分比以允许 maxBarThickness 生效
+        categoryPercentage: maxBarThickness ? 1.0 : 0.7,
+        barPercentage: maxBarThickness ? 1.0 : 0.8,
+        ...(maxBarThickness && { maxBarThickness }),
         stack: stacked ? 'stack' : undefined,
         borderRadius: (ctx: any) => {
           const rawValue = ctx?.raw;
@@ -582,7 +589,7 @@ const BarChart: React.FC<BarChartProps> = ({
     });
 
     return { labels, datasets };
-  }, [filteredData, types, xValues, stacked, indexAxis]);
+  }, [filteredData, types, xValues, stacked, indexAxis, maxBarThickness]);
 
   // 筛选器选项
   const filterOptions = useMemo(() => {

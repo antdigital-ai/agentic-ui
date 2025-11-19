@@ -18,7 +18,7 @@ import 'ace-builds/src-noconflict/theme-github';
 import isHotkey from 'is-hotkey';
 import { useCallback, useEffect, useRef } from 'react';
 import { Editor, Path, Transforms } from 'slate';
-import { ReactEditor } from 'slate-react';
+import { useRefFunction } from '../../../Hooks/useRefFunction';
 import partialParse from '../../../MarkdownEditor/editor/parser/json-parse';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
 import { aceLangs, modeMap } from '../../../MarkdownEditor/editor/utils/ace';
@@ -101,44 +101,43 @@ export function AceEditor({
   }, [path]);
 
   // 键盘事件处理
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      // 删除空代码块
-      if (isHotkey('backspace', e)) {
-        if (!codeRef.current) {
-          const currentPath = ReactEditor.findPath(store.editor, element);
-          Transforms.delete(store.editor, { at: currentPath });
+  const handleKeyDown = useRefFunction((e: KeyboardEvent) => {
+    // 删除空代码块
+    if (isHotkey('backspace', e)) {
+      if (codeRef.current.trim() === '') {
+        Editor.withoutNormalizing(store.editor, () => {
+          Transforms.delete(store.editor, { at: pathRef.current });
+          // 如果这是最后一个节点，使用替换而不是删除+插入，避免文档为空
           Transforms.insertNodes(
             store.editor,
             { type: 'paragraph', children: [{ text: '' }] },
-            { at: currentPath },
+            { at: pathRef.current, select: true },
           );
           Transforms.select(
             store.editor,
-            Editor.start(store.editor, currentPath),
+            Editor.start(store.editor, pathRef.current),
           );
-          ReactEditor.focus(store.editor);
-        }
-      }
-
-      // Cmd/Ctrl + Enter: 插入新段落
-      if (isHotkey('mod+enter', e) && pathRef.current) {
-        EditorUtils.focus(store.editor);
-        Transforms.insertNodes(
-          store.editor,
-          { type: 'paragraph', children: [{ text: '' }] },
-          { at: Path.next(pathRef.current), select: true },
-        );
-        e.stopPropagation();
+        });
         return;
       }
+    }
 
-      // 转发键盘事件
-      const newEvent = new KeyboardEvent(e.type, e);
-      window.dispatchEvent(newEvent);
-    },
-    [element, store.editor],
-  );
+    // Cmd/Ctrl + Enter: 插入新段落
+    if (isHotkey('mod+enter', e) && pathRef.current) {
+      EditorUtils.focus(store.editor);
+      Transforms.insertNodes(
+        store.editor,
+        { type: 'paragraph', children: [{ text: '' }] },
+        { at: Path.next(pathRef.current), select: true },
+      );
+      e.stopPropagation();
+      return;
+    }
+
+    // 转发键盘事件
+    const newEvent = new KeyboardEvent(e.type, e);
+    window.dispatchEvent(newEvent);
+  });
 
   // 配置编辑器事件
   const setupEditorEvents = useCallback(
@@ -272,7 +271,7 @@ export function AceEditor({
     }
 
     if (value !== codeRef.current) {
-      if (element) editorRef.current?.setValue(value || 'plain text');
+      if (element) editorRef.current?.setValue(value);
       editorRef.current?.clearSelection();
     }
   }, [element.value]);
