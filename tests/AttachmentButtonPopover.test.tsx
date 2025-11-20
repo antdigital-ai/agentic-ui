@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AttachmentButtonPopover, {
   AttachmentSupportedFormatsContent,
   SupportedFileFormats,
@@ -111,6 +111,10 @@ describe('AttachmentButtonPopover', () => {
   });
 
   describe('AttachmentButtonPopover Component', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
     it('should render popover with children when format provided', () => {
       render(
         <AttachmentButtonPopover supportedFormat={SupportedFileFormats.image}>
@@ -158,6 +162,44 @@ describe('AttachmentButtonPopover', () => {
       // The popover should be rendered (we can check for the presence of the trigger)
       expect(container.querySelector('.ant-popover')).toBeFalsy(); // Popover content is not visible by default
       expect(screen.getByText('Upload File')).toBeInTheDocument();
+    });
+
+    describe('uploadImage prop', () => {
+      it('应该在没有 uploadImage 时不会报错', () => {
+        const { container } = render(
+          <AttachmentButtonPopover>
+            <button type="button">Upload</button>
+          </AttachmentButtonPopover>,
+        );
+
+        expect(container).toBeInTheDocument();
+        expect(screen.getByText('Upload')).toBeInTheDocument();
+      });
+
+      it('应该在 uploadImage 为 undefined 时正常渲染', () => {
+        const { container } = render(
+          <AttachmentButtonPopover uploadImage={undefined}>
+            <button type="button">Upload</button>
+          </AttachmentButtonPopover>,
+        );
+
+        expect(container).toBeInTheDocument();
+        expect(screen.getByText('Upload')).toBeInTheDocument();
+      });
+
+      it('应该正确传递 uploadImage 函数', () => {
+        const mockUploadImage = vi.fn().mockResolvedValue(undefined);
+
+        render(
+          <AttachmentButtonPopover uploadImage={mockUploadImage}>
+            <button type="button">Upload</button>
+          </AttachmentButtonPopover>,
+        );
+
+        expect(screen.getByText('Upload')).toBeInTheDocument();
+        // uploadImage 函数应该被正确传递，但只有在特定设备上才会被调用
+        expect(mockUploadImage).not.toHaveBeenCalled();
+      });
     });
   });
 

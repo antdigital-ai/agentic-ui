@@ -51,7 +51,7 @@ export interface SendActionsProps {
   allowEmptySubmit?: boolean;
 
   /** 上传图片回调 */
-  uploadImage?: () => Promise<void>;
+  uploadImage?: (forGallery?: boolean) => Promise<void>;
 
   /** 开始录音回调 */
   onStartRecording?: () => Promise<void>;

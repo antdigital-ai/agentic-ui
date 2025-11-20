@@ -1,7 +1,7 @@
 import { ChevronDown } from '@sofa-design/icons';
 import { Button, ConfigProvider, Dropdown, Segmented } from 'antd';
 import classNames from 'classnames';
-import { default as React, useContext } from 'react';
+import React, { useContext } from 'react';
 import { I18nContext } from '../../../../I18n';
 import { useStyle } from './style';
 

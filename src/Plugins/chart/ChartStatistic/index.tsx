@@ -1,7 +1,7 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
 import classNames from 'classnames';
-import { default as React, useContext } from 'react';
+import React, { useContext } from 'react';
 import { useStyle } from './style';
 import { formatNumber, NumberFormatOptions } from './utils';
 

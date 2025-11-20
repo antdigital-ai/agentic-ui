@@ -1,7 +1,7 @@
 import { Paperclip } from '@sofa-design/icons';
 import { ConfigProvider, message } from 'antd';
 import classNames from 'classnames';
-import { default as React, useContext } from 'react';
+import React, { useContext } from 'react';
 import { compileTemplate } from '../../I18n';
 import AttachmentButtonPopover, {
   AttachmentButtonPopoverProps,
@@ -358,25 +358,11 @@ const ButtonContent: React.FC<{ title?: React.ReactNode }> = ({ title }) => {
 export const AttachmentButton: React.FC<
   AttachmentButtonProps & {
     /** 上传图片的处理函数 */
-    uploadImage(): Promise<void>;
+    uploadImage(forGallery?: boolean): Promise<void>;
     /** 按钮标题文本 */
     title?: React.ReactNode;
   }
-> = ({
-  disabled,
-  uploadImage,
-  title,
-  supportedFormat,
-  render,
-  upload,
-  uploadWithResponse,
-  fileMap,
-  onFileMapChange,
-  maxFileSize,
-  maxFileCount,
-  minFileCount,
-  allowMultiple,
-}) => {
+> = ({ disabled, uploadImage, title, supportedFormat, render }) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const prefix = context?.getPrefixCls('agentic-md-editor-attachment-button');
   const { wrapSSR, hashId } = useStyle(prefix);
@@ -394,31 +380,13 @@ export const AttachmentButton: React.FC<
     </div>
   );
 
-  const handleFileSelect = (files: FileList) => {
-    // 触发文件上传
-    upLoadFileToServer(files, {
-      upload,
-      uploadWithResponse,
-      fileMap,
-      onFileMapChange,
-      maxFileSize,
-      maxFileCount,
-      minFileCount,
-      locale: {},
-    });
-  };
-
   const wrapper = render ? (
     render({
       children: buttonWithStyle,
       supportedFormat: format,
     })
   ) : (
-    <AttachmentButtonPopover
-      supportedFormat={format}
-      onFileSelect={handleFileSelect}
-      allowMultiple={allowMultiple}
-    >
+    <AttachmentButtonPopover supportedFormat={format} uploadImage={uploadImage}>
       {buttonWithStyle}
     </AttachmentButtonPopover>
   );

@@ -262,5 +262,161 @@ describe('useFileUploadManager', () => {
     });
   });
 
+  describe('uploadImage forGallery 参数', () => {
+    it('应该在 forGallery 为 true 时设置 accept 为 image/*', async () => {
+      const { result } = renderHook(() => useFileUploadManager(defaultProps), {
+        wrapper,
+      });
+
+      const clickSpy = vi.fn();
+      const appendChildSpy = vi.fn();
+      const removeSpy = vi.fn();
+      const originalCreateElement = document.createElement.bind(document);
+      const originalAppendChild = document.body.appendChild.bind(document.body);
+
+      let createdInput: HTMLInputElement | null = null;
+
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const element = originalCreateElement(tagName);
+          if (tagName === 'input') {
+            element.click = clickSpy;
+            element.accept = '';
+            createdInput = element as HTMLInputElement;
+          }
+          return element;
+        });
+
+      vi.spyOn(document.body, 'appendChild').mockImplementation((node) => {
+        appendChildSpy(node);
+        return node;
+      });
+
+      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(
+        removeSpy,
+      );
+
+      // 调用 uploadImage(true) - 相册模式
+      await result.current.uploadImage(true);
+
+      // 验证 accept 属性被设置为 'image/*'
+      expect(createdInput?.accept).toBe('image/*');
+      expect(clickSpy).toHaveBeenCalled();
+
+      createElementSpy.mockRestore();
+      vi.restoreAllMocks();
+    });
+
+    it('应该在 forGallery 为 false 时根据设备类型设置 accept', async () => {
+      const { result } = renderHook(() => useFileUploadManager(defaultProps), {
+        wrapper,
+      });
+
+      const clickSpy = vi.fn();
+      const originalCreateElement = document.createElement.bind(document);
+
+      let createdInput: HTMLInputElement | null = null;
+
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const element = originalCreateElement(tagName);
+          if (tagName === 'input') {
+            element.click = clickSpy;
+            element.accept = '';
+            createdInput = element as HTMLInputElement;
+          }
+          return element;
+        });
+
+      vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
+      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(
+        vi.fn(),
+      );
+
+      // 调用 uploadImage(false) - 文件选择模式
+      await result.current.uploadImage(false);
+
+      // 验证 accept 属性被设置（具体值取决于设备类型和格式）
+      expect(createdInput?.accept).toBeDefined();
+      expect(clickSpy).toHaveBeenCalled();
+
+      createElementSpy.mockRestore();
+      vi.restoreAllMocks();
+    });
+
+    it('应该在 forGallery 为 undefined 时使用默认行为', async () => {
+      const { result } = renderHook(() => useFileUploadManager(defaultProps), {
+        wrapper,
+      });
+
+      const clickSpy = vi.fn();
+      const originalCreateElement = document.createElement.bind(document);
+
+      let createdInput: HTMLInputElement | null = null;
+
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const element = originalCreateElement(tagName);
+          if (tagName === 'input') {
+            element.click = clickSpy;
+            element.accept = '';
+            createdInput = element as HTMLInputElement;
+          }
+          return element;
+        });
+
+      vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
+      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(
+        vi.fn(),
+      );
+
+      // 调用 uploadImage() - 不传参数
+      await result.current.uploadImage();
+
+      // 验证 accept 属性被设置（应该和 false 时一样）
+      expect(createdInput?.accept).toBeDefined();
+      expect(clickSpy).toHaveBeenCalled();
+
+      createElementSpy.mockRestore();
+      vi.restoreAllMocks();
+    });
+
+    it('应该在文件正在上传时阻止新的上传', async () => {
+      const fileMap = new Map();
+      fileMap.set('file1', createMockFile('file1', 'uploading'));
+
+      const { result } = renderHook(
+        () =>
+          useFileUploadManager({
+            ...defaultProps,
+            fileMap,
+          }),
+        { wrapper },
+      );
+
+      const clickSpy = vi.fn();
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const element = document.createElement(tagName);
+          if (tagName === 'input') {
+            element.click = clickSpy;
+          }
+          return element;
+        });
+
+      // 调用 uploadImage
+      await result.current.uploadImage(true);
+
+      // 应该不会触发文件选择对话框
+      expect(clickSpy).not.toHaveBeenCalled();
+
+      createElementSpy.mockRestore();
+    });
+  });
+
   // Note: 文件上传、删除、重试等功能已经在主组件 MarkdownInputField 测试中验证
 });
