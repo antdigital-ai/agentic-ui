@@ -1,4 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
+import { MOBILE_BREAKPOINT } from '../../Constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -501,6 +502,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '[data-be="list"]': {
         marginTop: '0.3em',
         marginBottom: '0.3em',
+      },
+    },
+    [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+      'div[data-be="paragraph"]': {
+        fontSize: '0.95em',
+        lineHeight: '1.4em',
+        margin: 'var(--margin-1x) 0',
       },
     },
   };

@@ -1062,22 +1062,7 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
             </div>
           </div>
           {props.toolsRender ? (
-            <div
-              style={{
-                backgroundColor: '#fff',
-                display: 'flex',
-                boxSizing: 'border-box',
-                borderRadius: 'inherit',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 8,
-                width: '100%',
-                paddingRight: 'var(--padding-3x)',
-                paddingLeft: 'var(--padding-3x)',
-                paddingBottom: 'var(--padding-3x)',
-              }}
-            >
+            <div className={classNames(`${baseCls}-tools-wrapper`, hashId)}>
               <div
                 ref={actionsRef}
                 contentEditable={false}

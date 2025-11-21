@@ -9,6 +9,10 @@ import { ReadonlyTableComponent } from './ReadonlyTableComponent';
 import { TablePropsContext } from './TableContext';
 import { TableRowIndex } from './TableRowIndex';
 import useScrollShadow from './useScrollShadow';
+import {
+  MOBILE_BREAKPOINT,
+  MOBILE_TABLE_MIN_COLUMN_WIDTH,
+} from '../../../../Constants/mobile';
 
 /**
  * 表格组
@@ -50,6 +54,10 @@ export const SlateTable = ({
 
   const baseCls = getPrefixCls('agentic-md-editor-content-table');
   const tableTargetRef = useRef<HTMLTableElement>(null);
+  const columnCount =
+    props.element?.children?.[0]?.children?.length || 0;
+  const mobileBreakpointValue =
+    parseInt(MOBILE_BREAKPOINT, 10) || 768;
 
   // 总是调用 hooks，避免条件调用
   const [tableRef, scrollState] = useScrollShadow();
@@ -85,10 +93,13 @@ export const SlateTable = ({
       )?.clientWidth || 400) -
       32 -
       12;
-    const maxColumnWidth = containerWidth / 4;
-    const minColumnWidth = 60;
-
-    const columnCount = tableRows?.[0]?.children?.length || 0;
+    const isMobileLayout = containerWidth <= mobileBreakpointValue;
+    const minColumnWidth = isMobileLayout
+      ? MOBILE_TABLE_MIN_COLUMN_WIDTH
+      : 60;
+    const maxColumnWidth = isMobileLayout
+      ? containerWidth
+      : containerWidth / 4;
     const rowsToSample = Math.min(5, tableRows.length);
 
     // 一次性计算宽度
@@ -113,7 +124,7 @@ export const SlateTable = ({
     );
 
     // 如果表格少于5行且总宽度超过容器宽度，则均匀分配宽度
-    if (tableRows.length < 5) {
+    if (tableRows.length < 5 && columnCount > 0) {
       const totalWidth = calculatedWidths.reduce(
         (sum, width) => sum + width,
         0,
@@ -132,7 +143,7 @@ export const SlateTable = ({
     readonly,
     props.element?.otherProps?.colWidths,
     props.element?.children?.length,
-    props.element?.children?.[0]?.children?.length,
+    columnCount,
     markdownContainerRef,
   ]);
 
@@ -142,7 +153,7 @@ export const SlateTable = ({
 
     const resize = () => {
       if (process.env.NODE_ENV === 'test') return;
-      let maxWidth = colWidths
+      const maxWidth = colWidths
         ? colWidths?.reduce((a: number, b: number) => a + b, 0) + 8
         : 0;
 
@@ -153,7 +164,25 @@ export const SlateTable = ({
       const dom = tableRef.current as HTMLDivElement;
       if (dom) {
         setTimeout(() => {
-          dom.style.minWidth = `min(${((minWidth || 200) * 0.95).toFixed(0)}px,${maxWidth || minWidth || 'xxx'}px,200px)`;
+          const containerWidthForBreakpoint =
+            (markdownContainerRef?.current?.querySelector(
+              '.ant-agentic-md-editor-content',
+            )?.clientWidth || 400) - 32 - 12;
+          const isMobileLayout =
+            containerWidthForBreakpoint <= mobileBreakpointValue;
+          const computedMinColumnWidth = isMobileLayout
+            ? MOBILE_TABLE_MIN_COLUMN_WIDTH
+            : 60;
+          const fallbackMinWidth = Number(
+            ((minWidth || 200) * 0.95).toFixed(0),
+          );
+          const requiredMinWidth = Math.max(
+            columnCount * computedMinColumnWidth,
+            maxWidth,
+            fallbackMinWidth,
+            200,
+          );
+          dom.style.minWidth = `${requiredMinWidth}px`;
         }, 200);
       }
     };

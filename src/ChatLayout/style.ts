@@ -1,11 +1,10 @@
+import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
   resetComponent,
   useEditorStyleRegister,
 } from '../Hooks/useStyle';
-
-const MOBILE_PADDING = 'var(--padding-1x)';
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
@@ -177,7 +176,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         borderBottomLeftRadius: 'var(--radius-xl)',
         borderBottomRightRadius: 'var(--radius-xl)',
       },
-      '@media (max-width: 768px)': {
+      [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
         '&-header': {
           padding: `0 ${MOBILE_PADDING}`,
         },
