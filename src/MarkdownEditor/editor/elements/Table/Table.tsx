@@ -4,15 +4,15 @@ import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { Node } from 'slate';
 import { RenderElementProps } from 'slate-react';
 import stringWidth from 'string-width';
+import {
+  MOBILE_BREAKPOINT,
+  MOBILE_TABLE_MIN_COLUMN_WIDTH,
+} from '../../../../Constants/mobile';
 import { useEditorStore } from '../../store';
 import { ReadonlyTableComponent } from './ReadonlyTableComponent';
 import { TablePropsContext } from './TableContext';
 import { TableRowIndex } from './TableRowIndex';
 import useScrollShadow from './useScrollShadow';
-import {
-  MOBILE_BREAKPOINT,
-  MOBILE_TABLE_MIN_COLUMN_WIDTH,
-} from '../../../../Constants/mobile';
 
 /**
  * 表格组
@@ -54,10 +54,8 @@ export const SlateTable = ({
 
   const baseCls = getPrefixCls('agentic-md-editor-content-table');
   const tableTargetRef = useRef<HTMLTableElement>(null);
-  const columnCount =
-    props.element?.children?.[0]?.children?.length || 0;
-  const mobileBreakpointValue =
-    parseInt(MOBILE_BREAKPOINT, 10) || 768;
+  const columnCount = props.element?.children?.[0]?.children?.length || 0;
+  const mobileBreakpointValue = parseInt(MOBILE_BREAKPOINT, 10) || 768;
 
   // 总是调用 hooks，避免条件调用
   const [tableRef, scrollState] = useScrollShadow();
@@ -72,7 +70,7 @@ export const SlateTable = ({
       }
       const columnCount = props.element?.children?.[0]?.children?.length || 0;
       if (columnCount === 0) return [];
-      return Array(columnCount).fill(120); // 固定宽度
+      return Array(columnCount).fill(80); // 固定宽度
     }
 
     // 如果在props中存在，直接使用以避免计算
@@ -94,12 +92,8 @@ export const SlateTable = ({
       32 -
       12;
     const isMobileLayout = containerWidth <= mobileBreakpointValue;
-    const minColumnWidth = isMobileLayout
-      ? MOBILE_TABLE_MIN_COLUMN_WIDTH
-      : 60;
-    const maxColumnWidth = isMobileLayout
-      ? containerWidth
-      : containerWidth / 4;
+    const minColumnWidth = isMobileLayout ? MOBILE_TABLE_MIN_COLUMN_WIDTH : 60;
+    const maxColumnWidth = isMobileLayout ? containerWidth : containerWidth / 4;
     const rowsToSample = Math.min(5, tableRows.length);
 
     // 一次性计算宽度
@@ -167,7 +161,9 @@ export const SlateTable = ({
           const containerWidthForBreakpoint =
             (markdownContainerRef?.current?.querySelector(
               '.ant-agentic-md-editor-content',
-            )?.clientWidth || 400) - 32 - 12;
+            )?.clientWidth || 400) -
+            32 -
+            12;
           const isMobileLayout =
             containerWidthForBreakpoint <= mobileBreakpointValue;
           const computedMinColumnWidth = isMobileLayout

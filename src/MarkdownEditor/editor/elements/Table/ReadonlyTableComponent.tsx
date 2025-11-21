@@ -55,7 +55,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
       if (columnCount === 0) return [];
 
       // 使用固定宽度避免复杂计算
-      const defaultWidth = 120;
+      const defaultWidth = 80;
       return Array(columnCount).fill(defaultWidth);
     }, [element?.otherProps, element?.children?.[0]?.children?.length]);
 

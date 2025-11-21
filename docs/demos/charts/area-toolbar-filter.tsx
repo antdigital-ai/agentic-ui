@@ -70,7 +70,7 @@ const AreaChartToolbarFilterExample: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <div style={{ marginBottom: '20px' }}>
         <AreaChart
           title="面积图工具栏过滤器"

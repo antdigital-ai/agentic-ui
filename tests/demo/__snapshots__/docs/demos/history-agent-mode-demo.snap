@@ -6,7 +6,7 @@
       test
     </div>
     <div
-      style="padding: 20px;"
+      style="padding: 12px;"
     >
       <h3>
         History Agent 模式
@@ -24,7 +24,7 @@
         选中数量: 0
       </p>
       <div
-        style="padding: 20px; width: 348px; margin: 0px auto; border-radius: 16px; border: 1px solid var(--color-gray-border-light);"
+        style="padding: 12px; width: 348px; margin: 0px auto; border-radius: 16px; border: 1px solid var(--color-gray-border-light);"
       >
         <div
           agent="[object Object]"
@@ -36,7 +36,7 @@
         </div>
       </div>
       <div
-        style="margin-top: 20px; padding: 20px;"
+        style="margin-top: 20px; padding: 12px;"
       >
         <h4>
           Props 说明：

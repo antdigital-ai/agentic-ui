@@ -29,7 +29,7 @@ const NormalChart: React.FC = () => {
  */
 export const ChartErrorBoundaryExample: React.FC = () => {
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h2>图表错误边界示例（antd Result 简洁版）</h2>
 
       {/* 基础错误边界使用 - 使用 antd Result 组件 */}

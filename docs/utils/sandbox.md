@@ -182,7 +182,7 @@ const result = await quickExecute(
   const style = document.createElement('style');
   style.textContent = \`
     .container {
-      padding: 20px;
+      padding: 12px;
       background: #f0f0f0;
       border-radius: 8px;
     }

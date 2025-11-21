@@ -10,7 +10,7 @@ const DonutChartStatisticExample: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <div style={{ marginBottom: '20px' }}>
         <DonutChart
           title="环形图统计指标"

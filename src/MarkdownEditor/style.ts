@@ -4,6 +4,7 @@ import {
   resetComponent,
   useEditorStyleRegister,
 } from '../Hooks/useStyle';
+import { MOBILE_BREAKPOINT } from '../Constants/mobile';
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
@@ -36,6 +37,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-edit-area': {
         outline: 'none !important',
+      },
+      '&-content': {
+        padding: '4px 20px',
+        [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+          padding: '4px 4px',
+        },
       },
     },
   };

@@ -6,7 +6,7 @@
       test
     </div>
     <div
-      style="padding: 20px; display: flex; flex-direction: row; gap: 16px;"
+      style="padding: 12px; display: flex; flex-direction: row; gap: 16px;"
     >
       <div
         style="flex: 1 1 0%; max-width: 50%; min-width: 50%;"

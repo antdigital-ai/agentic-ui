@@ -298,7 +298,7 @@ export default function MarkdownParseConvertDemo() {
       key: 'editor',
       label: '编辑器',
       children: (
-        <div style={{ padding: '20px' }}>
+        <div style={{ padding: '12px' }}>
           <div style={{ marginBottom: '16px' }}>
             <Space>
               <Button type="primary" onClick={handleExportMarkdown}>
@@ -323,7 +323,7 @@ export default function MarkdownParseConvertDemo() {
       key: 'export',
       label: '导出的 Markdown',
       children: (
-        <div style={{ padding: '20px' }}>
+        <div style={{ padding: '12px' }}>
           <div style={{ marginBottom: '16px' }}>
             <Button
               type="primary"
@@ -360,7 +360,7 @@ export default function MarkdownParseConvertDemo() {
       key: 'code',
       label: '插件代码',
       children: (
-        <div style={{ padding: '20px' }}>
+        <div style={{ padding: '12px' }}>
           <Card title="Markdown 解析与转换插件">
             <pre
               style={{

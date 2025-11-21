@@ -161,7 +161,7 @@ export default function ToMarkdownPluginDemo() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h1>toMarkdown 插件演示</h1>
 
       <div style={{ marginBottom: '20px' }}>

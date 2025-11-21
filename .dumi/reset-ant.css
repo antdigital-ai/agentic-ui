@@ -444,3 +444,10 @@
   margin: var(--margin-5x);
   background: var(--color-gray-bg-card-white);
 }
+
+@media (max-width: 768px) {
+  #root > div:not(.site-app) {
+    padding: 8px;
+    margin: 8px;
+  }
+}

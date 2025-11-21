@@ -1,3 +1,4 @@
+import { MOBILE_BREAKPOINT } from '../../../../../Constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -25,6 +26,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 2,
         pointerEvents: 'none',
         backgroundColor: 'var(--color-primary-control-fill-secondary-hover)',
+      },
+      [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+        padding: '2px',
       },
     },
   };

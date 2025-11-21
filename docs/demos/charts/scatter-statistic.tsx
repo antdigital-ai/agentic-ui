@@ -16,7 +16,7 @@ const ScatterChartStatisticExample: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <div style={{ marginBottom: '20px' }}>
         <ScatterChart
           title="散点图统计指标"

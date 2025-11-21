@@ -315,7 +315,7 @@ describe('ThoughtChainList', () => {
       expect(thoughtChainElement).toHaveStyle(
         'background-color: rgb(255, 0, 0)',
       );
-      expect(thoughtChainElement).toHaveStyle('padding: 20px');
+      expect(thoughtChainElement).toHaveStyle('padding: 12px');
     });
 
     it('should render in compact mode', () => {

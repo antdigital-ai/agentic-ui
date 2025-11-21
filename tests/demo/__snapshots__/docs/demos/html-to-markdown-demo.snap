@@ -6,7 +6,7 @@
       test
     </div>
     <div
-      style="padding: 20px; max-width: 1200px; margin: 0px auto;"
+      style="padding: 12px; max-width: 1200px; margin: 0px auto;"
     >
       <h1>
         HTML 到 Markdown 转换工具演示
@@ -121,7 +121,7 @@
         </div>
       </div>
       <div
-        style="margin-top: 30px; padding: 20px; background-color: rgb(248, 249, 250); border-radius: 8px;"
+        style="margin-top: 30px; padding: 12px; background-color: rgb(248, 249, 250); border-radius: 8px;"
       >
         <h3>
           支持的 HTML 标签
@@ -192,7 +192,7 @@
         </div>
       </div>
       <div
-        style="margin-top: 20px; padding: 20px;"
+        style="margin-top: 20px; padding: 12px;"
       >
         <h4>
           Props 说明：

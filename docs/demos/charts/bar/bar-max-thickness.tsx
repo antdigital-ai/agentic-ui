@@ -36,7 +36,7 @@ const BarMaxThicknessExample: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h2 style={{ marginBottom: '20px', color: '#333' }}>
         柱子最大宽度控制示例
       </h2>
@@ -51,7 +51,7 @@ const BarMaxThicknessExample: React.FC = () => {
         }}
       >
         <div style={{ marginBottom: '12px', color: '#333', fontWeight: 500 }}>
-          柱子最大宽度：{maxBarThickness} 
+          柱子最大宽度：{maxBarThickness}
         </div>
         <Slider
           min={20}

@@ -96,7 +96,7 @@ const hello = 'world';
     const data = {
       content: '测试',
       markdownEditorProps: {
-        contentStyle: { padding: 20 },
+        contentStyle: { padding: 12 },
       },
     };
 

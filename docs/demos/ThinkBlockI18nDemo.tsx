@@ -13,7 +13,7 @@ const ThinkBlockI18nDemo = () => {
 
   return (
     <I18nProvide defaultLanguage={language} autoDetect={false}>
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: '12px' }}>
         <div style={{ marginBottom: '20px' }}>
           <button
             type="button"

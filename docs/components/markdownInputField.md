@@ -616,7 +616,7 @@ export default () => {
     <div>
       <div
         style={{
-          padding: 20,
+          padding: 12,
         }}
       >
         <MarkdownInputField
@@ -1054,7 +1054,7 @@ export default () => {
     <>
       <div
         style={{
-          padding: 20,
+          padding: 12,
         }}
       >
         <MarkdownInputField

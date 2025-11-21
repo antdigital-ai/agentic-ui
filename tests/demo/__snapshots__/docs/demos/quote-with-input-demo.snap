@@ -6,7 +6,7 @@
       test
     </div>
     <div
-      style="padding: 20px; display: flex; flex-direction: column; gap: 20px;"
+      style="padding: 12px; display: flex; flex-direction: column; gap: 20px;"
     >
       <h2>
         MarkdownInputField 中使用 Quote 组件

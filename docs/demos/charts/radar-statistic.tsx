@@ -16,7 +16,7 @@ const RadarChartStatisticExample: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <div style={{ marginBottom: '20px' }}>
         <RadarChart
           title="雷达图统计指标"

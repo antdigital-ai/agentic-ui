@@ -119,7 +119,7 @@ const TaskHistoryDemo = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h3>History Task 模式</h3>
       <p>当前会话ID: {currentSessionId}</p>
 

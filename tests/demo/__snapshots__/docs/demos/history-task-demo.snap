@@ -6,7 +6,7 @@
       test
     </div>
     <div
-      style="padding: 20px;"
+      style="padding: 12px;"
     >
       <h3>
         History Task 模式
@@ -23,7 +23,7 @@
         </li>
       </ul>
       <div
-        style="padding: 20px; width: 348px; margin: 0px auto; border-radius: 16px; border: 1px solid var(--color-gray-border-light);"
+        style="padding: 12px; width: 348px; margin: 0px auto; border-radius: 16px; border: 1px solid var(--color-gray-border-light);"
       >
         <div
           agent="[object Object]"

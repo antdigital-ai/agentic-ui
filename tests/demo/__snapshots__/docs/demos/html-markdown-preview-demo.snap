@@ -6,7 +6,7 @@
       test
     </div>
     <div
-      style="padding: 20px; max-width: 800px; margin: 0px auto;"
+      style="padding: 12px; max-width: 800px; margin: 0px auto;"
     >
       <h1>
         HTML 和 Markdown 源码预览模式切换演示
@@ -60,7 +60,7 @@
         </div>
       </div>
       <div
-        style="background: rgb(245, 245, 245); padding: 20px; border-radius: 8px; margin-top: 40px;"
+        style="background: rgb(245, 245, 245); padding: 12px; border-radius: 8px; margin-top: 40px;"
       >
         <h3>
           使用说明

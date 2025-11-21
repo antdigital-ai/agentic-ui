@@ -131,7 +131,7 @@ const ThinkTagDemo: React.FC = () => {
 `);
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <MarkdownEditor
         initValue={value}
         onChange={(val) => setValue(val)}

@@ -6,7 +6,7 @@
       test
     </div>
     <div
-      style="padding: 20px; height: 100vh; display: flex; flex-direction: column;"
+      style="padding: 12px; height: 100vh; display: flex; flex-direction: column;"
     >
       <h2
         class="ant-typography"

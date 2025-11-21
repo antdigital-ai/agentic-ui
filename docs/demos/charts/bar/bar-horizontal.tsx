@@ -208,7 +208,7 @@ const HorizontalBarChartExample: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h3 style={{ margin: '0 0 12px' }}>条形图（横向柱状图）</h3>
       <div
         style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}
