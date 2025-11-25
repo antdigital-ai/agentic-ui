@@ -35,7 +35,7 @@ export const SchemaEditorI18nDemo: React.FC = () => {
 
   return (
     <I18nProvide defaultLanguage={language} autoDetect={false}>
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: '12px' }}>
         <div style={{ marginBottom: '20px' }}>
           <Space>
             <Button type="primary" onClick={handleLanguageChange}>

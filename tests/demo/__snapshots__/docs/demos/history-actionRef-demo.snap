@@ -6,7 +6,7 @@
       test
     </div>
     <div
-      style="padding: 20px;"
+      style="padding: 12px;"
     >
       <h2>
         History 组件 actionRef 示例

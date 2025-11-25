@@ -7,7 +7,7 @@ export default () => {
   const [focusCount, setFocusCount] = React.useState(0);
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h3>MarkdownInputField onFocus 功能演示</h3>
 
       <div style={{ marginBottom: 16 }}>

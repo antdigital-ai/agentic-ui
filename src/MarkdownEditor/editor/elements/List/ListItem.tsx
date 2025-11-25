@@ -201,6 +201,7 @@ export const ListItem = ({
     return (
       <span
         contentEditable={false}
+        data-check-item
         className={classNames(`${baseCls}-check-item`, hashId)}
       >
         <Checkbox

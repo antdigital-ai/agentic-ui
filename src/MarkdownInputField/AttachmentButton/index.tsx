@@ -290,12 +290,15 @@ export const upLoadFileToServer = async (
 
   const fileList = Array.from(files) as AttachmentFile[];
   fileList.forEach(prepareFile);
-  fileList.forEach((file) => updateFileMap(map, file, props.onFileMapChange));
 
+  // 在添加到 fileMap 之前先验证文件数量
   if (!validateFileCount(fileList.length, existingFileCount, props)) {
     hideLoading();
     return;
   }
+
+  // 验证通过后再添加到 fileMap
+  fileList.forEach((file) => updateFileMap(map, file, props.onFileMapChange));
 
   try {
     for (let i = 0; i < fileList.length; i++) {

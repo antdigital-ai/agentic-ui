@@ -1,4 +1,4 @@
-import { Keyframes } from '@ant-design/cssinjs';
+import { MOBILE_BREAKPOINT } from '../../Constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -10,25 +10,13 @@ import './code.css';
 // 导入统一的标签样式配置
 import { TAG_STYLES } from './tagStyles';
 
-// 定义关键帧动画
-const typing = new Keyframes('typing', {
-  from: { width: 0 },
-  to: { width: '100%' },
-});
-
-const blinkCaret = new Keyframes('blink-caret', {
-  from: { borderColor: 'transparent' },
-  to: { borderColor: 'transparent' },
-  '50%': { borderColor: 'var(--color-primary-control-fill-primary)' },
-});
-
 const COMMENT_HIGHLIGHT_COLOR =
   'var(--agentic-comment-highlight-color, rgba(21, 0, 255, 0.15))';
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     // 拖拽手柄样式
-    '.ant-agentic-md-editor-drag-handle': {
+    '[data-drag-handle]': {
       position: 'absolute',
       display: 'flex',
       userSelect: 'none',
@@ -42,7 +30,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     },
 
     // 拖拽图标样式
-    '.ant-agentic-md-editor-drag-icon': {
+    '[data-drag-icon]': {
       display: 'flex',
       alignItems: 'center',
       borderRadius: '18px',
@@ -57,10 +45,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     },
 
     // 拖拽元素悬浮效果
-    '.ant-agentic-md-editor-drag-el:hover > .ant-agentic-md-editor-drag-handle':
-      {
-        opacity: 1,
-      },
+    '[data-drag-el]:hover > [data-drag-handle]': {
+      opacity: 1,
+    },
 
     // 可调整大小组件样式
     '.react-resizable': {
@@ -101,7 +88,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     },
 
     // 移动标记样式
-    '.move-mark': {
+    '[data-move-mark]': {
       height: '0.125em',
       backgroundColor: 'var(--color-primary-control-fill-primary)',
       left: 0,
@@ -114,7 +101,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     },
 
     // 隐藏样式
-    '.ant-agentic-md-editor-hidden': {
+    '[data-hidden]': {
       display: 'none',
     },
 
@@ -244,7 +231,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       'h1,h2,h3,h4,h5,h6': {
         position: 'relative',
         textWrap: 'balance',
-        '.ant-agentic-md-editor-drag-handle': {
+        '[data-drag-handle]': {
           top: 'calc(3px + 0.05em) !important',
         },
       },
@@ -379,6 +366,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           backgroundColor: 'var(--color-gray-control-fill-secondary)',
         },
       },
+      '[data-be="media-container"], [data-be="image-container"]': {
+        display: 'flex',
+        minWidth: 0,
+        maxWidth: '100%',
+      },
       '@media screen and (max-width: 600px)': {
         h1: {
           fontSize: '1.5em',
@@ -402,6 +394,34 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
         'ol,ul': {
           paddingLeft: '1em',
+        },
+        // 移动端图片和视频响应式样式
+        '[data-be="image"], [data-be="media"]': {
+          width: '100%',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          '[data-be="media-container"]': {
+            width: '100%',
+            maxWidth: '100%',
+            padding: '2px',
+            boxSizing: 'border-box',
+          },
+          'img, video': {
+            maxWidth: '100%',
+            height: 'auto',
+            display: 'block',
+          },
+          '[data-testid="resize-image-container"]': {
+            maxWidth: '100%',
+            width: '100% !important',
+            boxSizing: 'border-box',
+          },
+          '[data-testid="video-element"]': {
+            maxWidth: '100%',
+            width: '100% !important',
+            height: 'auto',
+          },
         },
       },
       '[data-be]:not(p):not(data-be="list")': {
@@ -480,17 +500,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         height: '0',
         margin: 'var(--margin-8x) 0',
       },
-
-      // 打字机效果样式
-      '.ant-agentic-md-editor-content .typewriter:last-of-type > *:last-of-type span[data-slate-leaf]:last-of-type span[data-slate-string]':
-        {
-          borderRight: '0.15em solid var(--color-primary-control-fill-primary)',
-          animationName: `${typing.getName()}, ${blinkCaret.getName()}`,
-          animationDuration: '3.5s, 0.5s',
-          animationTimingFunction: 'steps(30, end), step-end',
-          animationIterationCount: '1, infinite',
-          animationFillMode: 'forwards, both',
-        },
     },
     [`${token.componentCls}-compact`]: {
       'div[data-be="paragraph"]': {
@@ -501,6 +510,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '[data-be="list"]': {
         marginTop: '0.3em',
         marginBottom: '0.3em',
+      },
+    },
+    [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+      'div[data-be="paragraph"]': {
+        fontSize: '0.95em',
+        lineHeight: '1.4em',
+        margin: 'var(--margin-1x) 0',
       },
     },
   };

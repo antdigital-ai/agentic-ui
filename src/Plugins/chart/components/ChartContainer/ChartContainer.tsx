@@ -25,6 +25,7 @@ export interface ChartContainerProps {
     /** 错误回调函数 */
     onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
   };
+  loading?: boolean;
 }
 
 export interface ChartContainerRef {

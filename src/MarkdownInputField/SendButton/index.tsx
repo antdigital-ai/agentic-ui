@@ -1,9 +1,10 @@
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, Tooltip } from 'antd';
 import classNames from 'classnames';
 import { motion } from 'framer-motion';
 import React, { useContext, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { StopIcon } from '../../AgentRunBar/icons';
+import { I18nContext } from '../../I18n';
 import { useStyle } from './style';
 
 function SendIcon(
@@ -152,6 +153,7 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
     props.onInit?.();
   }, []);
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  const { locale } = useContext(I18nContext);
   const baseCls = getPrefixCls('agentic-md-input-field-send-button');
   const { wrapSSR, hashId } = useStyle(baseCls);
 
@@ -164,37 +166,51 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
     return null;
   }
 
+  const sendText =
+    locale?.['input.sendButtonTooltip.send'] || '按 Enter 键发送';
+  const newlineText =
+    locale?.['input.sendButtonTooltip.newline'] || '按 Shift+Enter 键换行';
+
+  const tooltipTitle = (
+    <div style={{ lineHeight: '1.5', textAlign: 'left' }}>
+      <div>{sendText}</div>
+      <div>{newlineText}</div>
+    </div>
+  );
+
   return wrapSSR(
-    <div
-      data-testid="send-button"
-      onClick={() => {
-        if (!disabled) {
-          onClick();
-        }
-      }}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (disabled) return;
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault(); // 防止键盘事件触发 click 事件
-          onClick();
-        }
-      }}
-      style={style}
-      className={classNames(baseCls, hashId, {
-        [`${baseCls}-compact`]: props.compact,
-        [`${baseCls}-disabled`]: disabled,
-        [`${baseCls}-typing`]: typing,
-      })}
-    >
-      <ErrorBoundary fallback={<div />}>
-        <SendIcon
-          hover={isSendable && !disabled}
-          disabled={disabled}
-          typing={typing}
-        />
-      </ErrorBoundary>
-    </div>,
+    <Tooltip arrow={false} title={tooltipTitle} mouseEnterDelay={0.5}>
+      <div
+        data-testid="send-button"
+        onClick={() => {
+          if (!disabled) {
+            onClick();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (disabled) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault(); // 防止键盘事件触发 click 事件
+            onClick();
+          }
+        }}
+        style={style}
+        className={classNames(baseCls, hashId, {
+          [`${baseCls}-compact`]: props.compact,
+          [`${baseCls}-disabled`]: disabled,
+          [`${baseCls}-typing`]: typing,
+        })}
+      >
+        <ErrorBoundary fallback={<div />}>
+          <SendIcon
+            hover={isSendable && !disabled}
+            disabled={disabled}
+            typing={typing}
+          />
+        </ErrorBoundary>
+      </div>
+    </Tooltip>,
   );
 };

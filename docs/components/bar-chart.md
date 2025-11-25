@@ -45,7 +45,7 @@ group:
 | hiddenY               | `boolean`                                        | `false`    | 是否隐藏 Y 轴                                                            |
 | stacked               | `boolean`                                        | `false`    | 是否堆叠显示多个数据集                                                   |
 | indexAxis             | `'x' \| 'y'`                                     | `'x'`      | 轴向：`'x'` 垂直柱状图，`'y'` 水平条形图                                 |
-| maxBarThickness       | `number`                                         | -          | 柱子最大宽度                   |
+| maxBarThickness       | `number`                                         | -          | 柱子最大宽度                                                             |
 | toolbarExtra          | `React.ReactNode`                                | -          | 头部工具条额外按钮                                                       |
 | renderFilterInToolbar | `boolean`                                        | `false`    | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧） |
 | statistic             | `ChartStatisticConfig \| ChartStatisticConfig[]` | -          | ChartStatistic组件配置：object表示单个配置，array表示多个配置            |

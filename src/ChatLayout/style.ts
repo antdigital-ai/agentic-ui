@@ -1,3 +1,4 @@
+import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -174,6 +175,22 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 100,
         borderBottomLeftRadius: 'var(--radius-xl)',
         borderBottomRightRadius: 'var(--radius-xl)',
+      },
+      [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+        '&-header': {
+          padding: `0 ${MOBILE_PADDING}`,
+        },
+        '&-content': {
+          '&-scrollable': {
+            paddingTop: MOBILE_PADDING,
+            paddingLeft: MOBILE_PADDING,
+            paddingRight: MOBILE_PADDING,
+            paddingBottom: '144px',
+          },
+        },
+        '&-footer': {
+          padding: MOBILE_PADDING,
+        },
       },
     },
   };

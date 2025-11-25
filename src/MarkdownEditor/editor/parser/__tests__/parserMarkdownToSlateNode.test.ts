@@ -185,13 +185,19 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      const codeNode = result.schema[0];
+      expect(codeNode).toMatchObject({
         type: 'code',
         language: 'javascript',
         render: false,
         isConfig: false,
         value: 'console.log("hello");',
         children: [{ text: 'console.log("hello");' }],
+      });
+      // 验证 otherProps 存在并包含预期的属性
+      expect(codeNode).toHaveProperty('otherProps');
+      expect(codeNode.otherProps).toMatchObject({
+        'data-block': 'true',
       });
     });
 
@@ -200,13 +206,19 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      const codeNode = result.schema[0];
+      expect(codeNode).toMatchObject({
         type: 'code',
         language: null,
         render: false,
         isConfig: false,
         value: 'some code',
         children: [{ text: 'some code' }],
+      });
+      // 验证 otherProps 存在并包含预期的属性
+      expect(codeNode).toHaveProperty('otherProps');
+      expect(codeNode.otherProps).toMatchObject({
+        'data-block': 'true',
       });
     });
 
@@ -216,7 +228,8 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      const codeNode = result.schema[0];
+      expect(codeNode).toMatchObject({
         type: 'code',
         language: 'python',
         render: false,
@@ -225,6 +238,12 @@ describe('parserMarkdownToSlateNode', () => {
         children: [
           { text: 'def hello():\n    print("Hello World")\n    return True' },
         ],
+      });
+      // 验证 otherProps 存在并包含预期的属性
+      expect(codeNode).toHaveProperty('otherProps');
+      expect(codeNode.otherProps).toMatchObject({
+        'data-block': 'true',
+        'data-language': 'python',
       });
     });
   });

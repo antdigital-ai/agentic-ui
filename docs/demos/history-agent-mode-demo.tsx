@@ -125,7 +125,7 @@ const AgentModeHistoryDemo = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h3>History Agent 模式</h3>
       <p>当前会话ID: {currentSessionId}</p>
       <p>搜索关键词: {searchKeyword}</p>

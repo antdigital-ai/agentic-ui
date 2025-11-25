@@ -17,8 +17,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       borderRadius: 'var(--radius-control-sm)',
       background: 'var(--color-primary-bg-tip)',
 
-      '&-tag-popup-input': {
-        '&:not(.tag-popup-input-composition).empty::before': {
+      '[data-tag-popup-input]': {
+        '&:not([data-composition]).empty::before': {
           color: 'var(--color-primary-text-disabled)',
           content: 'attr(title)',
           userSelect: 'none',

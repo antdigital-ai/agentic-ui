@@ -231,13 +231,13 @@ const initializeAutoOpen = (
 const handleMouseEnter = (domRef: React.RefObject<HTMLDivElement>) => {
   const target = domRef.current;
   if (!target) return;
-  target.classList.remove('no-focus');
+  target.removeAttribute('data-no-focus');
 };
 
 const handleMouseLeave = (domRef: React.RefObject<HTMLDivElement>) => {
   const target = domRef.current;
   if (!target) return;
-  target.classList.add('no-focus');
+  target.setAttribute('data-no-focus', '');
 };
 
 const createDefaultDom = (
@@ -257,7 +257,9 @@ const createDefaultDom = (
   return (
     <div
       ref={domRef}
-      className={classNames(`${baseCls}-tag-popup-input`, 'no-focus', hashId, {
+      data-tag-popup-input
+      data-no-focus
+      className={classNames(`${baseCls}-tag-popup-input`, hashId, {
         empty: isEmpty,
         [`${baseCls}-tag-popup-input-loading`]: loading,
         [`${baseCls}-tag-popup-input-has-arrow`]: hasItems,

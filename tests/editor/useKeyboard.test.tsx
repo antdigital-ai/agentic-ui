@@ -22,14 +22,11 @@ import { act, renderHook } from '@testing-library/react';
 import React from 'react';
 import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
+import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownEditorProps } from '../../src/MarkdownEditor/BaseMarkdownEditor';
 import { useKeyboard } from '../../src/MarkdownEditor/editor/plugins/useKeyboard';
 import { withMarkdown } from '../../src/MarkdownEditor/editor/plugins/withMarkdown';
-import {
-  ReactEditor,
-  withReact,
-} from 'slate-react';
 import { EditorStore } from '../../src/MarkdownEditor/editor/store';
 
 // Mock is-hotkey 库
@@ -118,7 +115,7 @@ describe('useKeyboard Hook Tests', () => {
       expect(typeof keyboardHandler).toBe('function');
     });
 
-    it('should handle Enter key without modifiers', () => {
+    it('should handle Enter key without modifiers (should not prevent default, handled by MarkdownInputField)', () => {
       const { result } = renderHook(() =>
         useKeyboard(store, editorRef, mockProps),
       );
@@ -129,8 +126,9 @@ describe('useKeyboard Hook Tests', () => {
         keyboardHandler(enterEvent);
       });
 
-      expect(enterEvent.preventDefault).toHaveBeenCalled();
-      expect(enterEvent.stopPropagation).toHaveBeenCalled();
+      // Enter 键（无 Shift）由 MarkdownInputField 处理发送，useKeyboard 中不处理
+      expect(enterEvent.preventDefault).not.toHaveBeenCalled();
+      expect(enterEvent.stopPropagation).not.toHaveBeenCalled();
     });
 
     it('should handle Backspace key with selection', () => {
@@ -240,7 +238,7 @@ describe('useKeyboard Hook Tests', () => {
   });
 
   describe('triggerSendKey configuration', () => {
-    it('should handle Enter with Ctrl when triggerSendKey is "Enter"', () => {
+    it('should handle Shift+Enter when triggerSendKey is "Enter"', () => {
       const propsWithTriggerSend = {
         textAreaProps: { triggerSendKey: 'Enter' as const },
       } as MarkdownEditorProps;
@@ -249,33 +247,14 @@ describe('useKeyboard Hook Tests', () => {
         useKeyboard(store, editorRef, propsWithTriggerSend),
       );
       const keyboardHandler = result.current;
-      const enterCtrlEvent = createKeyboardEvent('Enter', { ctrlKey: true });
+      const enterShiftEvent = createKeyboardEvent('Enter', { shiftKey: true });
 
       act(() => {
-        keyboardHandler(enterCtrlEvent);
+        keyboardHandler(enterShiftEvent);
       });
 
-      expect(enterCtrlEvent.preventDefault).toHaveBeenCalled();
-      expect(enterCtrlEvent.stopPropagation).toHaveBeenCalled();
-    });
-
-    it('should handle Enter without modifiers when triggerSendKey is "Mod+Enter"', () => {
-      const propsWithTriggerSend = {
-        textAreaProps: { triggerSendKey: 'Mod+Enter' as const },
-      } as MarkdownEditorProps;
-
-      const { result } = renderHook(() =>
-        useKeyboard(store, editorRef, propsWithTriggerSend),
-      );
-      const keyboardHandler = result.current;
-      const enterEvent = createKeyboardEvent('Enter');
-
-      act(() => {
-        keyboardHandler(enterEvent);
-      });
-
-      expect(enterEvent.preventDefault).toHaveBeenCalled();
-      expect(enterEvent.stopPropagation).toHaveBeenCalled();
+      expect(enterShiftEvent.preventDefault).toHaveBeenCalled();
+      expect(enterShiftEvent.stopPropagation).toHaveBeenCalled();
     });
   });
 

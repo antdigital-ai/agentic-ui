@@ -1,7 +1,6 @@
 import classNames from 'classnames';
-import React, { createElement, useMemo } from 'react';
+import React, { createElement } from 'react';
 import { Node } from 'slate';
-import { useSlate } from 'slate-react';
 import { ElementProps, HeadNode } from '../../el';
 import { useSelStatus } from '../../hooks/editor';
 import { useEditorStore } from '../store';
@@ -16,20 +15,8 @@ export function Head({
   const {
     store = {} as Record<string, any>,
     markdownContainerRef,
-    typewriter,
   } = useEditorStore();
-  const editor = useSlate();
   const [selected, path] = useSelStatus(element);
-
-  const isLast = useMemo(() => {
-    if (editor.children.length === 0) return false;
-    if (!typewriter) return false;
-    return store.isLatestNode(element);
-  }, [
-    editor.children.at?.(path.at(0)!),
-    editor.children.at?.(path.at(0)! + 1),
-    typewriter,
-  ]);
   const str = Node.string(element);
   return React.useMemo(() => {
     return createElement(
@@ -43,9 +30,9 @@ export function Head({
         onDragStart: (e) => store.dragStart(e, markdownContainerRef.current!),
         ['data-empty']: !str && selected ? 'true' : undefined,
         ['data-align']: element.align,
-        className: classNames('ant-agentic-md-editor-drag-el', {
+        ['data-drag-el']: true,
+        className: classNames({
           empty: !str,
-          typewriter: isLast && typewriter,
         }),
       },
       <>
@@ -53,5 +40,5 @@ export function Head({
         {children}
       </>,
     );
-  }, [element.level, isLast, str, element.children, selected, path]);
+  }, [element.level, str, element.children, selected, path]);
 }

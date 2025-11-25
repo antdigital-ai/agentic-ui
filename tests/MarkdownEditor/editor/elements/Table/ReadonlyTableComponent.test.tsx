@@ -550,7 +550,7 @@ describe('ReadonlyTableComponent', () => {
       const cols = document.querySelectorAll('col');
       cols.forEach((col) => {
         const htmlCol = col as HTMLElement;
-        expect(htmlCol.style.width).toBe('120px');
+        expect(htmlCol.style.width).toBe('80px');
       });
     });
   });

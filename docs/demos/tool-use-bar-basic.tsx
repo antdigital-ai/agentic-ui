@@ -63,7 +63,7 @@ const ToolUseBarBasicDemo = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h3>ToolUseBar 基础演示</h3>
       <p>
         当前激活的工具: {activeKeys.length > 0 ? activeKeys.join(', ') : '无'}

@@ -73,8 +73,8 @@ $E = mc^2$
     <meta charset="UTF-8">
     <title>实时 HTML 预览</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .header { background: #f0f0f0; padding: 20px; border-radius: 8px; }
+        body { font-family: sans-serif; padding: 12px; }
+        .header { background: #f0f0f0; padding: 12px; border-radius: 8px; }
     </style>
 </head>
 <body>

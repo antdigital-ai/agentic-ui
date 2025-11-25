@@ -26,25 +26,25 @@ group:
 
 ### FunnelChartProps
 
-| 属性                        | 类型                                     | 默认值     | 说明                                                                                                               |
-| --------------------------- | ---------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------ |
-| title                       | `string`                                 | -          | 图表标题                                                                                                           |
-| data                        | `FunnelChartDataItem[]`                  | -          | 扁平化数据数组（x 为阶段，y 为数值）                                                                               |
-| color                       | `string`                                 | -          | 自定义主色                                                                                                         |
-| width                       | `number \| string`                       | `600`      | 图表宽度（px），移动端自适应为 100%                                                                                |
-| height                      | `number \| string`                       | `400`      | 图表高度（px），移动端最大约 80% 屏宽（上限 400）                                                                  |
-| className                   | `string`                                 | -          | 自定义类名                                                                                                         |
-| dataTime                    | `string`                                 | -          | 数据时间                                                                                                           |
-| theme                       | `'dark' \| 'light'`                      | `'light'`  | 主题风格                                                                                                           |
-| showLegend                  | `boolean`                                | `true`     | 是否显示图例                                                                                                       |
-| legendPosition              | `'top' \| 'left' \| 'bottom' \| 'right'` | `'bottom'` | 图例位置                                                                                                           |
-| legendAlign                 | `'start' \| 'center' \| 'end'`           | `'start'`  | 图例水平对齐方式                                                                                                   |
-| showPercent                 | `boolean`                                | `true`     | 是否显示百分比（相对第一层）                                                                                       |
-| bottomLayerMinWidth  | `number`                                 | `0`        | 最底层的最小宽度占比（0-1），相对于最大层的宽度。用于避免数据跨度过大时底层过窄难以交互。非法值（≤0 或 >1）视为不限制 |
-| toolbarExtra         | `React.ReactNode`                        | -          | 头部工具条额外按钮                                                                          |
-| typeNames            | `{ rate?: string; name: string }`        | -          | 类型名称配置，用于图例和数据集标签                                                          |
-| statistic            | `StatisticConfigType`                    | -          | 统计数据组件配置                                                                            |
-| renderFilterInToolbar | `boolean`                                | `false`    | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧） |
+| 属性                  | 类型                                     | 默认值     | 说明                                                                                                                  |
+| --------------------- | ---------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------- |
+| title                 | `string`                                 | -          | 图表标题                                                                                                              |
+| data                  | `FunnelChartDataItem[]`                  | -          | 扁平化数据数组（x 为阶段，y 为数值）                                                                                  |
+| color                 | `string`                                 | -          | 自定义主色                                                                                                            |
+| width                 | `number \| string`                       | `600`      | 图表宽度（px），移动端自适应为 100%                                                                                   |
+| height                | `number \| string`                       | `400`      | 图表高度（px），移动端最大约 80% 屏宽（上限 400）                                                                     |
+| className             | `string`                                 | -          | 自定义类名                                                                                                            |
+| dataTime              | `string`                                 | -          | 数据时间                                                                                                              |
+| theme                 | `'dark' \| 'light'`                      | `'light'`  | 主题风格                                                                                                              |
+| showLegend            | `boolean`                                | `true`     | 是否显示图例                                                                                                          |
+| legendPosition        | `'top' \| 'left' \| 'bottom' \| 'right'` | `'bottom'` | 图例位置                                                                                                              |
+| legendAlign           | `'start' \| 'center' \| 'end'`           | `'start'`  | 图例水平对齐方式                                                                                                      |
+| showPercent           | `boolean`                                | `true`     | 是否显示百分比（相对第一层）                                                                                          |
+| bottomLayerMinWidth   | `number`                                 | `0`        | 最底层的最小宽度占比（0-1），相对于最大层的宽度。用于避免数据跨度过大时底层过窄难以交互。非法值（≤0 或 >1）视为不限制 |
+| toolbarExtra          | `React.ReactNode`                        | -          | 头部工具条额外按钮                                                                                                    |
+| typeNames             | `{ rate?: string; name: string }`        | -          | 类型名称配置，用于图例和数据集标签                                                                                    |
+| statistic             | `StatisticConfigType`                    | -          | 统计数据组件配置                                                                                                      |
+| renderFilterInToolbar | `boolean`                                | `false`    | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧）                                              |
 
 ### FunnelChartDataItem
 
@@ -81,4 +81,4 @@ group:
 - 漏斗采用对称浮动条（Floating Bar）实现，自动按数值降序排列阶段。
 - Tooltip 默认显示相对第一层的百分比，可通过 `showPercent` 关闭。
 - 当数据跨度过大时（如第一层 10000，最后一层 10），可使用 `bottomLayerMinWidth` 参数保证底层最小宽度，便于用户交互。例如设置 `bottomLayerMinWidth={0.1}` 表示最底层宽度至少为最大层的 10%。
-- 使用 `bottomLayerMinWidth` 时，视觉宽度会被调整，但 Tooltip 和标签仍显示真实数据值，***请根据实际情况合理使用***。
+- 使用 `bottomLayerMinWidth` 时，视觉宽度会被调整，但 Tooltip 和标签仍显示真实数据值，**_请根据实际情况合理使用_**。

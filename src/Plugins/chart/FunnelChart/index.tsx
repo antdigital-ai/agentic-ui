@@ -82,6 +82,8 @@ export interface FunnelChartProps extends ChartContainerProps {
     /** 类型名称，用于图例和数据集标签 */
     name: string;
   };
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
 }
 
 const FunnelChart: React.FC<FunnelChartProps> = ({
@@ -102,6 +104,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   bottomLayerMinWidth = 0,
   typeNames,
   statistic: statisticConfig,
+  loading = false,
   ...props
 }) => {
   useMemo(() => {
@@ -276,7 +279,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
 
       const maxValue = Math.max(...values);
       const minValue = Math.min(...values);
-      
+
       // 如果最小值已经满足最小宽度要求，无需调整
       if (minValue >= maxValue * bottomLayerMinWidth) {
         return values;
@@ -285,7 +288,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
       // 线性映射到 [minWidth, maxValue] 区间
       const minWidth = bottomLayerMinWidth * maxValue;
       const range = maxValue - minValue;
-      
+
       return values.map((v) => {
         if (range === 0) return maxValue;
         const normalized = (v - minValue) / range;
@@ -731,6 +734,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
         onDownload={handleDownload}
         dataTime={dataTime}
         extra={toolbarExtra}
+        loading={loading}
         filter={
           renderFilterInToolbar && filterOptions && filterOptions.length > 1 ? (
             <ChartFilter

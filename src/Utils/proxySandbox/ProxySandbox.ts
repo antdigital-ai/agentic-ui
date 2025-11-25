@@ -929,19 +929,19 @@ export class ProxySandbox {
       /(\bfor\s*\([^)]*\)\s*\{)/g,
       '$1\n  __checkInstructions();',
     );
-    
+
     // 为 while 循环体注入检查（在开括号后）
     instrumented = instrumented.replace(
       /(\bwhile\s*\([^)]*\)\s*\{)/g,
       '$1\n  __checkInstructions();',
     );
-    
+
     // 为 do-while 循环体注入检查
     instrumented = instrumented.replace(
       /(\bdo\s*\{)/g,
       '$1\n  __checkInstructions();',
     );
-    
+
     // 在代码开始处插入检查，确保即使没有循环也能检测超时
     return `__checkInstructions();\n${instrumented}`;
   }
@@ -1024,9 +1024,7 @@ export class ProxySandbox {
     }
 
     // 对正常代码使用超时保护
-    this.executeWithTimeout(code, injectedParams)
-      .then(resolve)
-      .catch(reject);
+    this.executeWithTimeout(code, injectedParams).then(resolve).catch(reject);
   }
 
   /**

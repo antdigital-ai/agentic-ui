@@ -118,7 +118,7 @@ const ScatterChartDemo: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h2>散点图组件示例</h2>
 
       <div

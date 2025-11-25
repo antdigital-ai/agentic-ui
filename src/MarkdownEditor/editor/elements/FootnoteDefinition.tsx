@@ -28,11 +28,8 @@ export const FootnoteDefinition = (
           gap: 4,
         }}
         data-be={'footnoteDefinition'}
-        className={
-          !str
-            ? 'ant-agentic-md-editor-drag-el empty'
-            : 'ant-agentic-md-editor-drag-el'
-        }
+        data-drag-el
+        className={!str ? 'empty' : undefined}
         onDragStart={(e) => store.dragStart(e, markdownContainerRef.current!)}
       >
         <DragHandle />

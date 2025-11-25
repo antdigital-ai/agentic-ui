@@ -8,6 +8,7 @@ import {
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
+      padding: '12px',
       '*': {
         boxSizing: 'border-box',
       },

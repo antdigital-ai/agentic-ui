@@ -64,7 +64,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             fontSize: 12,
           },
         },
-        '& &-editor-icon-box': {
+        '& [data-icon-box]': {
           padding: '0 18px',
           color: '#6b7280',
           cursor: 'pointer',

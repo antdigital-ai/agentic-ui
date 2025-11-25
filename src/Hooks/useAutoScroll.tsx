@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useThrottleFn } from './useThrottleFn';
 
 const SCROLL_TOLERANCE = 20; // 滚动到底部的容差阈值

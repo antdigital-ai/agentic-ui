@@ -305,13 +305,12 @@ describe('MarkdownInputField 断言测试', () => {
   });
 
   describe('功能完整性断言', () => {
-    it('应该支持所有 triggerSendKey 选项', () => {
+    it('应该支持 triggerSendKey 选项', () => {
       const enterProps = { triggerSendKey: 'Enter' as const };
       const { rerender } = render(<MarkdownInputField {...enterProps} />);
       expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
 
-      const modEnterProps = { triggerSendKey: 'Mod+Enter' as const };
-      rerender(<MarkdownInputField {...modEnterProps} />);
+      rerender(<MarkdownInputField />);
       expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
     });
 

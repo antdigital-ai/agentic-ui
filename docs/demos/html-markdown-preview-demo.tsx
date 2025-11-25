@@ -6,7 +6,7 @@
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 import React from 'react';
 
-const htmlCode = `<div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
+const htmlCode = `<div style="padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
   <h2>HTML 预览演示</h2>
   <p>这是一个HTML代码块的预览模式演示。</p>
   <ul>

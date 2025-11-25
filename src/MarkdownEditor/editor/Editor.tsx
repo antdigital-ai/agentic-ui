@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/no-children-prop */
+import { useDebounceFn } from '@ant-design/pro-components';
 import classNames from 'classnames';
 import React, {
   useCallback,
@@ -17,8 +18,11 @@ import {
   Range,
   Transforms,
 } from 'slate';
+import { Editable, ReactEditor, RenderElementProps, Slate } from 'slate-react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { parserMdToSchema } from '../BaseMarkdownEditor';
 import { Elements } from '../el';
+import { PluginContext } from '../plugin';
 import {
   CommentDataType,
   MarkdownEditorInstance,
@@ -26,11 +30,6 @@ import {
 } from '../types';
 import { LazyElement } from './components/LazyElement';
 import { MElement, MLeaf } from './elements';
-
-import { useDebounceFn } from '@ant-design/pro-components';
-import { Editable, ReactEditor, RenderElementProps, Slate } from 'slate-react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
-import { PluginContext } from '../plugin';
 import {
   handleFilesPaste,
   handleHtmlPaste,
@@ -57,6 +56,14 @@ import {
   isPath,
 } from './utils/editorUtils';
 
+// 默认允许的类型
+const defaultAllowedTypes = [
+  'application/x-slate-md-fragment',
+  'text/html',
+  'Files',
+  'text/markdown',
+  'text/plain',
+];
 /**
  * Markdown 编辑器组件的属性接口
  *
@@ -664,15 +671,6 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
 
     const types = event.clipboardData?.types || ['text/plain'];
 
-    // 默认允许的类型
-    const defaultAllowedTypes = [
-      'application/x-slate-md-fragment',
-      'text/html',
-      'Files',
-      'text/markdown',
-      'text/plain',
-    ];
-
     // 获取允许的类型
     const allowedTypes = pasteConfig?.allowedTypes || defaultAllowedTypes;
 
@@ -787,7 +785,9 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
    * 处理输入法开始事件
    */
   const onCompositionStart = (e: React.CompositionEvent) => {
-    markdownContainerRef.current?.classList.add('composition');
+    if (markdownContainerRef.current) {
+      markdownContainerRef.current.setAttribute('data-composition', '');
+    }
     store.inputComposition = true;
 
     const focusPath = markdownEditorRef.current.selection?.focus.path || [];
@@ -799,9 +799,10 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
       if (node) {
         const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
         if (dom) {
-          dom
-            .querySelector('.tag-popup-input')
-            ?.classList.add('tag-popup-input-composition');
+          const tagInput = dom.querySelector('[data-tag-popup-input]');
+          if (tagInput) {
+            tagInput.setAttribute('data-composition', '');
+          }
         }
       }
     }
@@ -819,7 +820,9 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
    */
   const onCompositionEnd = () => {
     store.inputComposition = false;
-    markdownContainerRef.current?.classList.remove('composition');
+    if (markdownContainerRef.current) {
+      markdownContainerRef.current.removeAttribute('data-composition');
+    }
 
     const focusPath = markdownEditorRef.current.selection?.focus.path || [];
     if (focusPath.length > 0) {
@@ -830,9 +833,10 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
       if (node) {
         const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
         if (dom) {
-          dom
-            .querySelector('.tag-popup-input')
-            ?.classList.remove('tag-popup-input-composition');
+          const tagInput = dom.querySelector('[data-tag-popup-input]');
+          if (tagInput) {
+            tagInput.removeAttribute('data-composition');
+          }
         }
       }
     }

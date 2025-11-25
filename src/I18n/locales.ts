@@ -334,6 +334,8 @@ export const cnLabels = {
   'input.selectFile': '选择文件',
   'input.openGallery': '打开相册',
   'input.openFile': '打开文件',
+  'input.sendButtonTooltip.send': '按 Enter 键发送',
+  'input.sendButtonTooltip.newline': '按 Shift+Enter 键换行',
   // Other translations
   'common.name': '名称',
   'common.updateTime': '更新时间',
@@ -705,6 +707,8 @@ export const enLabels: typeof cnLabels = {
   'input.selectFile': 'Select File',
   'input.openGallery': 'Open Gallery',
   'input.openFile': 'Open File',
+  'input.sendButtonTooltip.send': 'Press Enter to send',
+  'input.sendButtonTooltip.newline': 'Press Shift+Enter for new line',
   // Other translations
   'common.name': 'Name',
   'common.updateTime': 'Update Time',

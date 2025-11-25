@@ -60,25 +60,25 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 
 ### History
 
-| 参数                | 说明                                 | 类型                                                                               | 默认值  |
-| ------------------- | ------------------------------------ | ---------------------------------------------------------------------------------- | ------- |
-| agentId             | 代理ID，用于获取历史记录             | `string`                                                                           | -       |
-| sessionId           | 会话ID，变更时会触发数据重新获取     | `string`                                                                           | -       |
-| request             | 请求函数，用于获取历史数据           | `(params: { agentId: string }) => Promise<HistoryDataType[]>`                      | -       |
-| standalone          | 是否以独立模式显示                   | `boolean`                                                                          | `false` |
-| onInit              | 组件初始化时的回调函数               | `() => void`                                                                       | -       |
-| onShow              | 组件显示时的回调函数                 | `() => void`                                                                       | -       |
-| onSelected *(deprecated)* | 选择历史记录项时的回调函数，返回完整的历史记录数据 | `(item: HistoryDataType) => void`                                                      | -       |
-| onDeleteItem        | 删除历史记录项时的回调函数           | `(sessionId: string) => void`                                                      | -       |
-| customDateFormatter | 自定义日期格式化函数                 | `(date: number \| string \| Date) => string`                                       | -       |
-| groupBy             | 自定义分组函数                       | `(item: HistoryDataType) => string`                                                | -       |
-| extra               | 自定义额外内容渲染函数               | `(item: HistoryDataType) => React.ReactElement`                                    | -       |
-| sessionSort         | 自定义排序函数或禁用排序             | `((pre: HistoryDataType, current: HistoryDataType) => number \| boolean) \| false` | -       |
-| actionRef           | 外部操作引用，用于触发 reload 等功能 | `React.MutableRefObject<{ reload: () => void } \| null>`                           | -       |
-| emptyRender         | 空状态渲染函数，当历史记录为空时显示 | `() => React.ReactNode`                                                            | -       |
-| agent               | Agent 模式配置，详见 Agent 配置说明  | `AgentConfig`                                                                      | -       |
-| slots               | 插槽配置                             | `{ beforeHistoryList?: (list: HistoryDataType[]) => React.ReactNode }`             | -       |
-| loading             | 加载状态，显示在 GroupMenu 区域      | `boolean`                                                                          | `false` |
+| 参数                      | 说明                                               | 类型                                                                               | 默认值  |
+| ------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------- | ------- |
+| agentId                   | 代理ID，用于获取历史记录                           | `string`                                                                           | -       |
+| sessionId                 | 会话ID，变更时会触发数据重新获取                   | `string`                                                                           | -       |
+| request                   | 请求函数，用于获取历史数据                         | `(params: { agentId: string }) => Promise<HistoryDataType[]>`                      | -       |
+| standalone                | 是否以独立模式显示                                 | `boolean`                                                                          | `false` |
+| onInit                    | 组件初始化时的回调函数                             | `() => void`                                                                       | -       |
+| onShow                    | 组件显示时的回调函数                               | `() => void`                                                                       | -       |
+| onSelected _(deprecated)_ | 选择历史记录项时的回调函数，返回完整的历史记录数据 | `(item: HistoryDataType) => void`                                                  | -       |
+| onDeleteItem              | 删除历史记录项时的回调函数                         | `(sessionId: string) => void`                                                      | -       |
+| customDateFormatter       | 自定义日期格式化函数                               | `(date: number \| string \| Date) => string`                                       | -       |
+| groupBy                   | 自定义分组函数                                     | `(item: HistoryDataType) => string`                                                | -       |
+| extra                     | 自定义额外内容渲染函数                             | `(item: HistoryDataType) => React.ReactElement`                                    | -       |
+| sessionSort               | 自定义排序函数或禁用排序                           | `((pre: HistoryDataType, current: HistoryDataType) => number \| boolean) \| false` | -       |
+| actionRef                 | 外部操作引用，用于触发 reload 等功能               | `React.MutableRefObject<{ reload: () => void } \| null>`                           | -       |
+| emptyRender               | 空状态渲染函数，当历史记录为空时显示               | `() => React.ReactNode`                                                            | -       |
+| agent                     | Agent 模式配置，详见 Agent 配置说明                | `AgentConfig`                                                                      | -       |
+| slots                     | 插槽配置                                           | `{ beforeHistoryList?: (list: HistoryDataType[]) => React.ReactNode }`             | -       |
+| loading                   | 加载状态，显示在 GroupMenu 区域                    | `boolean`                                                                          | `false` |
 
 ### HistoryDataType
 

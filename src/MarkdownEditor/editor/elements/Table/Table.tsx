@@ -4,6 +4,12 @@ import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { Node } from 'slate';
 import { RenderElementProps } from 'slate-react';
 import stringWidth from 'string-width';
+import { Loading } from '../../../../Components/Loading';
+import {
+  MOBILE_BREAKPOINT,
+  MOBILE_TABLE_MIN_COLUMN_WIDTH,
+} from '../../../../Constants/mobile';
+import { useMEditor } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
 import { ReadonlyTableComponent } from './ReadonlyTableComponent';
 import { TablePropsContext } from './TableContext';
@@ -44,12 +50,14 @@ export const SlateTable = ({
   children: React.ReactNode;
   hashId: string;
 } & RenderElementProps) => {
-  const { readonly, markdownContainerRef } = useEditorStore();
+  const { readonly, markdownContainerRef, store } = useEditorStore();
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { tablePath } = useContext(TablePropsContext);
 
   const baseCls = getPrefixCls('agentic-md-editor-content-table');
   const tableTargetRef = useRef<HTMLTableElement>(null);
+  const columnCount = props.element?.children?.[0]?.children?.length || 0;
+  const mobileBreakpointValue = parseInt(MOBILE_BREAKPOINT, 10) || 768;
 
   // 总是调用 hooks，避免条件调用
   const [tableRef, scrollState] = useScrollShadow();
@@ -64,7 +72,7 @@ export const SlateTable = ({
       }
       const columnCount = props.element?.children?.[0]?.children?.length || 0;
       if (columnCount === 0) return [];
-      return Array(columnCount).fill(120); // 固定宽度
+      return Array(columnCount).fill(80); // 固定宽度
     }
 
     // 如果在props中存在，直接使用以避免计算
@@ -85,10 +93,9 @@ export const SlateTable = ({
       )?.clientWidth || 400) -
       32 -
       12;
-    const maxColumnWidth = containerWidth / 4;
-    const minColumnWidth = 60;
-
-    const columnCount = tableRows?.[0]?.children?.length || 0;
+    const isMobileLayout = containerWidth <= mobileBreakpointValue;
+    const minColumnWidth = isMobileLayout ? MOBILE_TABLE_MIN_COLUMN_WIDTH : 60;
+    const maxColumnWidth = isMobileLayout ? containerWidth : containerWidth / 4;
     const rowsToSample = Math.min(5, tableRows.length);
 
     // 一次性计算宽度
@@ -113,7 +120,7 @@ export const SlateTable = ({
     );
 
     // 如果表格少于5行且总宽度超过容器宽度，则均匀分配宽度
-    if (tableRows.length < 5) {
+    if (tableRows.length < 5 && columnCount > 0) {
       const totalWidth = calculatedWidths.reduce(
         (sum, width) => sum + width,
         0,
@@ -132,7 +139,7 @@ export const SlateTable = ({
     readonly,
     props.element?.otherProps?.colWidths,
     props.element?.children?.length,
-    props.element?.children?.[0]?.children?.length,
+    columnCount,
     markdownContainerRef,
   ]);
 
@@ -142,7 +149,7 @@ export const SlateTable = ({
 
     const resize = () => {
       if (process.env.NODE_ENV === 'test') return;
-      let maxWidth = colWidths
+      const maxWidth = colWidths
         ? colWidths?.reduce((a: number, b: number) => a + b, 0) + 8
         : 0;
 
@@ -153,7 +160,27 @@ export const SlateTable = ({
       const dom = tableRef.current as HTMLDivElement;
       if (dom) {
         setTimeout(() => {
-          dom.style.minWidth = `min(${((minWidth || 200) * 0.95).toFixed(0)}px,${maxWidth || minWidth || 'xxx'}px,200px)`;
+          const containerWidthForBreakpoint =
+            (markdownContainerRef?.current?.querySelector(
+              '.ant-agentic-md-editor-content',
+            )?.clientWidth || 400) -
+            32 -
+            12;
+          const isMobileLayout =
+            containerWidthForBreakpoint <= mobileBreakpointValue;
+          const computedMinColumnWidth = isMobileLayout
+            ? MOBILE_TABLE_MIN_COLUMN_WIDTH
+            : 60;
+          const fallbackMinWidth = Number(
+            ((minWidth || 200) * 0.95).toFixed(0),
+          );
+          const requiredMinWidth = Math.max(
+            columnCount * computedMinColumnWidth,
+            maxWidth,
+            fallbackMinWidth,
+            200,
+          );
+          dom.style.minWidth = `${requiredMinWidth}px`;
         }, 200);
       }
     };
@@ -236,7 +263,64 @@ export const SlateTable = ({
     [scrollState, readonly],
   );
 
-  // readonly 模式渲染 - 使用优化的组件
+  // 检查表格是否未闭合
+  const isUnclosed = props.element?.otherProps?.finish === false;
+
+  // 获取编辑器更新函数 - 必须在早期返回之前调用 hooks
+  const [, update] = useMEditor(props.element);
+
+  // 判断是否是最后一个节点 - 必须在早期返回之前调用 hooks
+  const isLastNode = useMemo(() => {
+    try {
+      return store.isLatestNode(props.element);
+    } catch {
+      return false;
+    }
+  }, [store, props.element]);
+
+  // 如果不是最后一个节点，且未闭合，立即设置为完成 - 必须在早期返回之前调用 hooks
+  useEffect(() => {
+    if (isUnclosed && !readonly && !isLastNode) {
+      // 检查 finish 是否仍然是 false（可能已经被其他逻辑更新）
+      if (props.element?.otherProps?.finish === false) {
+        update(
+          {
+            otherProps: {
+              ...props.element?.otherProps,
+              finish: true,
+            },
+          },
+          props.element,
+        );
+      }
+    }
+  }, [isUnclosed, readonly, isLastNode, props.element, update]);
+
+  // 5 秒超时机制：如果是最后一个节点且未闭合，5 秒后自动设置为完成 - 必须在早期返回之前调用 hooks
+  useEffect(() => {
+    if (isUnclosed && !readonly && isLastNode) {
+      const timer = setTimeout(() => {
+        // 检查 finish 是否仍然是 false（可能已经被其他逻辑更新）
+        if (props.element?.otherProps?.finish === false) {
+          update(
+            {
+              otherProps: {
+                ...props.element?.otherProps,
+                finish: true,
+              },
+            },
+            props.element,
+          );
+        }
+      }, 5000); // 5 秒超时
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [isUnclosed, readonly, isLastNode, props.element, update]);
+
+  // readonly 模式渲染 - 使用优化的组件（早期返回）
   if (readonly) {
     return (
       <ReadonlyTableComponent
@@ -254,7 +338,11 @@ export const SlateTable = ({
     <div
       className={classNames(baseCls, hashId)}
       ref={tableRef}
-      style={boxShadowStyle}
+      style={{
+        ...boxShadowStyle,
+        position: 'relative',
+      }}
+      data-is-unclosed={isUnclosed}
       onDragStart={(e) => {
         // 阻止拖拽开始时的文字选择
         e.preventDefault();
@@ -264,6 +352,19 @@ export const SlateTable = ({
         e.preventDefault();
       }}
     >
+      {/* 未闭合表格的 loading 指示器 */}
+      {isUnclosed && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            zIndex: 10,
+          }}
+        >
+          <Loading />
+        </div>
+      )}
       {tableDom}
     </div>
   );

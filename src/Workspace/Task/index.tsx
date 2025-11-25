@@ -1,8 +1,8 @@
-import { Loading } from '../../Components/Loading';
 import { Check, CircleDashed, OctagonX } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { type FC, useContext } from 'react';
+import { Loading } from '../../Components/Loading';
 import { useTaskStyle } from './style';
 
 export interface TaskItemInput {

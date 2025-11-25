@@ -18,9 +18,14 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
     );
   }
 
+  // 检查代码块是否未闭合
+  const isUnclosed = element?.otherProps?.finish === false;
+
   return (
     <div
       {...attributes}
+      data-is-unclosed={isUnclosed}
+      data-language={element?.language}
       style={
         element?.language === 'html'
           ? {
@@ -49,6 +54,7 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
               borderRadius: '12px',
               background: '#FFFFFF',
               boxShadow: 'var(--shadow-control-base)',
+              position: 'relative',
             }
       }
     >

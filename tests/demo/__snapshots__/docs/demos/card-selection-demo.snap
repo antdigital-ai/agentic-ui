@@ -99,7 +99,8 @@
           style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); min-height: 400px; padding: 20px;"
         >
           <div
-            style="padding: 4px 20px; overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none;"
+            class="ant-agentic-md-editor-content"
+            style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none;"
             tabindex="-1"
           >
             <div
@@ -116,8 +117,9 @@
               zindex="-1"
             >
               <div
-                class="ant-agentic-md-editor-drag-el"
+                class=""
                 data-be="paragraph"
+                data-drag-el="true"
                 data-slate-node="element"
               >
                 <span
@@ -214,8 +216,9 @@
                 </span>
               </div>
               <div
-                class="ant-agentic-md-editor-drag-el"
+                class=""
                 data-be="paragraph"
+                data-drag-el="true"
                 data-slate-node="element"
               >
                 <span

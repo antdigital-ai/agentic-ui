@@ -362,8 +362,8 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
               </div>
             ) : readonly ? null : null}
             <div
+              className={`${baseClassName}-content`}
               style={{
-                padding: '4px 20px',
                 overflow: 'auto',
                 display: 'flex',
                 height:

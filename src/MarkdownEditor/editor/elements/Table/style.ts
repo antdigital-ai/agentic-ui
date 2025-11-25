@@ -1,4 +1,8 @@
 ﻿import {
+  MOBILE_BREAKPOINT,
+  MOBILE_PADDING,
+} from '../../../../Constants/mobile';
+import {
   ChatTokenType,
   CSSInterpolation,
   GenerateStyle,
@@ -9,6 +13,8 @@
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
+      width: '100%',
+      overflow: 'auto',
       '--table-border-radius': '8px',
       '--table-border-color': '#E7E9E8',
       '--table-header-bg': '#f7f7f9',
@@ -49,7 +55,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       table: {
         borderCollapse: 'separate',
         borderSpacing: 0,
-        display: 'block', // 改为 block 以支持水平滚动
         width: '100%',
         tableLayout: 'fixed',
         margin: '16px 0',
@@ -85,14 +90,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             },
         },
 
-        // 表格主体和表头使用 table 布局
-        'tbody, thead': {
-          display: 'table',
-          width: '100%',
-          tableLayout: 'fixed',
-          position: 'relative',
-          background: 'inherit',
-        },
         'th.config-th,td.config-td': {
           borderBottom: '1px solid var(--table-border-color)',
           borderLeft: '1px solid var(--table-border-color)',
@@ -227,6 +224,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             borderTopLeftRadius: 'var(--table-border-radius)',
             borderBottomLeftRadius: 'var(--table-border-radius)',
           },
+        [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+          'th:not(.config-td), td:not(.config-td)': {
+            padding: `${MOBILE_PADDING}`,
+          },
+        },
       },
       'table.htCore': {
         boxSizing: 'content-box',

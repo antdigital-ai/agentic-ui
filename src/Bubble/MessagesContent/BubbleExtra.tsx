@@ -432,7 +432,7 @@ export const BubbleExtra = ({
       }}
     >
       {typing && originalData.content !== '...' ? (
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Loading style={{ fontSize: context?.compact ? 20 : 16 }} />
           <span>{context?.locale?.['chat.message.generating'] || ''}</span>
         </div>

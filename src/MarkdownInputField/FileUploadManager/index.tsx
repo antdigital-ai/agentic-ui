@@ -172,7 +172,41 @@ export const useFileUploadManager = ({
       }
       input.dataset.readonly = 'true';
       try {
-        await upLoadFileToServer(e.target.files, {
+        const selectedFiles = e.target.files;
+        if (!selectedFiles || selectedFiles.length === 0) {
+          return;
+        }
+
+        // 检查选择的文件数量是否超过限制
+        const currentFileCount = fileMap?.size || 0;
+        if (attachment?.maxFileCount) {
+          // 如果一次选择的文件数量超过最大限制，完全拒绝
+          if (selectedFiles.length > attachment.maxFileCount) {
+            const errorMsg = locale?.['markdownInput.maxFileCountExceeded']
+              ? locale['markdownInput.maxFileCountExceeded'].replace(
+                  '${maxFileCount}',
+                  String(attachment.maxFileCount),
+                )
+              : `最多只能上传 ${attachment.maxFileCount} 个文件`;
+            message.error(errorMsg);
+            return;
+          }
+
+          // 如果选择的文件数量加上已有文件数量超过限制，完全拒绝
+          const totalFileCount = selectedFiles.length + currentFileCount;
+          if (totalFileCount > attachment.maxFileCount) {
+            const errorMsg = locale?.['markdownInput.maxFileCountExceeded']
+              ? locale['markdownInput.maxFileCountExceeded'].replace(
+                  '${maxFileCount}',
+                  String(attachment.maxFileCount),
+                )
+              : `最多只能上传 ${attachment.maxFileCount} 个文件`;
+            message.error(errorMsg);
+            return;
+          }
+        }
+
+        await upLoadFileToServer(selectedFiles, {
           ...attachment,
           fileMap,
           onFileMapChange: (newFileMap) => {

@@ -36,7 +36,7 @@ const ThinkDemo = () => {
   ]);
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h3>ToolUseBar 中的 ToolUseBarThink</h3>
       <p>在 ToolUseBar 中使用 ToolUseBarThink 组件</p>
 

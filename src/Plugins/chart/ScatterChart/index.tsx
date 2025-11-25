@@ -76,6 +76,8 @@ export interface ScatterChartProps extends ChartContainerProps {
   statistic?: StatisticConfigType;
   /** 图例文字最大宽度（像素），超出则显示省略号，默认80px */
   textMaxWidth?: number;
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
 }
 
 const ScatterChart: React.FC<ScatterChartProps> = ({
@@ -99,6 +101,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   color,
   statistic: statisticConfig,
   textMaxWidth = 80,
+  loading = false,
   ...props
 }) => {
   useMemo(() => {
@@ -242,6 +245,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}
+          loading={loading}
         />
         <div
           className={classNames(`${prefixCls}-empty-wrapper`, hashId)}
@@ -702,6 +706,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
           onDownload={handleDownload}
           extra={toolbarExtra}
           dataTime={dataTime}
+          loading={loading}
           filter={
             renderFilterInToolbar && filterEnum.length > 0 ? (
               <ChartFilter
@@ -776,6 +781,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}
+          loading={loading}
         />
         <div
           className={classNames(`${prefixCls}-error-wrapper`, hashId)}

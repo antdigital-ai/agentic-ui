@@ -1,6 +1,7 @@
-import ace, { Ace } from 'ace-builds';
-import React, { useEffect, useRef } from 'react';
-import { aceLangs, modeMap } from '../../MarkdownEditor/editor/utils/ace';
+import type { Ace } from 'ace-builds';
+import React, { useEffect, useRef, useState } from 'react';
+import { getAceLangs, modeMap } from '../../MarkdownEditor/editor/utils/ace';
+import { loadAceEditor } from '../../Plugins/code/loadAceEditor';
 
 // 确保 ResizeObserver 在测试环境中可用
 if (typeof window !== 'undefined' && !window.ResizeObserver) {
@@ -50,82 +51,123 @@ export const AceEditorWrapper: React.FC<AceEditorWrapperProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<Ace.Editor>();
   const valueRef = useRef(value);
+  const aceModuleRef = useRef<typeof import('ace-builds') | null>(null);
+  const [aceLoaded, setAceLoaded] = useState(false);
+
+  // 异步加载 Ace Editor
+  useEffect(() => {
+    (async () => {
+      try {
+        const aceModule = await loadAceEditor();
+        aceModuleRef.current = aceModule;
+        setAceLoaded(true);
+      } catch (error) {
+        console.error('Failed to load Ace Editor:', error);
+        setAceLoaded(true);
+      }
+    })();
+  }, []);
 
   // 初始化编辑器
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!aceLoaded || !aceModuleRef.current || !containerRef.current) return;
 
-    const codeEditor = ace.edit(containerRef.current, {
-      useWorker: false,
-      value: value,
-      fontSize: 12,
-      animatedScroll: true,
-      maxLines: Infinity,
-      wrap: true,
-      tabSize: 4,
-      readOnly: readonly,
-      showPrintMargin: false,
-      showLineNumbers: true,
-      showGutter: true,
-      ...options,
-    });
+    (async () => {
+      try {
+        const ace =
+          (aceModuleRef.current as any).default || aceModuleRef.current;
 
-    editorRef.current = codeEditor;
+        const codeEditor = ace.edit(containerRef.current!, {
+          useWorker: false,
+          value: value,
+          fontSize: 12,
+          animatedScroll: true,
+          maxLines: Infinity,
+          wrap: true,
+          tabSize: 4,
+          readOnly: readonly,
+          showPrintMargin: false,
+          showLineNumbers: true,
+          showGutter: true,
+          ...options,
+        });
 
-    // 设置语法高亮
-    setTimeout(() => {
-      let lang = language.toLowerCase();
-      if (modeMap.has(lang)) {
-        lang = modeMap.get(lang)!;
-      }
-      if (aceLangs.has(lang)) {
-        codeEditor.session.setMode(`ace/mode/${lang}`);
-      }
-    }, 16);
+        editorRef.current = codeEditor;
 
-    // 配置编辑器事件
-    if (!readonly && onChange) {
-      codeEditor.on('change', () => {
-        const newValue = codeEditor.getValue();
-        if (newValue !== valueRef.current) {
-          valueRef.current = newValue;
-          onChange(newValue);
+        // 设置语法高亮
+        setTimeout(async () => {
+          let lang = language.toLowerCase();
+          if (modeMap.has(lang)) {
+            lang = modeMap.get(lang)!;
+          }
+          const aceLangs = await getAceLangs();
+          if (aceLangs.has(lang)) {
+            codeEditor.session.setMode(`ace/mode/${lang}`);
+          }
+        }, 16);
+
+        // 配置编辑器事件
+        if (!readonly && onChange) {
+          codeEditor.on('change', () => {
+            const newValue = codeEditor.getValue();
+            if (newValue !== valueRef.current) {
+              valueRef.current = newValue;
+              onChange(newValue);
+            }
+          });
         }
-      });
-    }
+      } catch (error) {
+        console.error('Failed to initialize Ace Editor:', error);
+      }
+    })();
 
     return () => {
-      codeEditor?.destroy();
+      editorRef.current?.destroy();
     };
-  }, []);
+  }, [aceLoaded]);
 
   // 更新值
   useEffect(() => {
     if (editorRef.current && value !== valueRef.current) {
-      editorRef.current.setValue(value);
-      valueRef.current = value;
+      try {
+        editorRef.current.setValue(value);
+        valueRef.current = value;
+      } catch (error) {
+        console.error('Failed to set editor value:', error);
+      }
     }
   }, [value]);
 
   // 更新语言
   useEffect(() => {
-    if (editorRef.current) {
-      let lang = language.toLowerCase();
-      if (modeMap.has(lang)) {
-        lang = modeMap.get(lang)!;
+    if (!editorRef.current || !aceLoaded) return;
+
+    (async () => {
+      try {
+        let lang = language.toLowerCase();
+        if (modeMap.has(lang)) {
+          lang = modeMap.get(lang)!;
+        }
+        const aceLangs = await getAceLangs();
+        if (aceLangs.has(lang)) {
+          editorRef.current?.session.setMode(`ace/mode/${lang}`);
+        } else {
+          editorRef.current?.session.setMode(`ace/mode/text`);
+        }
+      } catch (error) {
+        console.error('Failed to set editor mode:', error);
       }
-      if (aceLangs.has(lang)) {
-        editorRef.current.session.setMode(`ace/mode/${lang}`);
-      } else {
-        editorRef.current.session.setMode(`ace/mode/text`);
-      }
-    }
-  }, [language]);
+    })();
+  }, [language, aceLoaded]);
 
   // 更新只读状态
   useEffect(() => {
     if (editorRef.current) {
-      editorRef.current.setReadOnly(readonly);
+      try {
+        editorRef.current.setReadOnly(readonly);
+      } catch (error) {
+        console.error('Failed to set editor readOnly:', error);
+      }
     }
   }, [readonly]);
 

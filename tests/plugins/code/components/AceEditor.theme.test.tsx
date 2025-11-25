@@ -67,7 +67,11 @@ vi.mock('../../../../src/MarkdownEditor/editor/utils/ace', () => ({
     ['ts', 'typescript'],
     ['js', 'javascript'],
   ]),
-  aceLangs: new Set(['javascript', 'typescript', 'python', 'java']),
+  getAceLangs: vi.fn(() =>
+    Promise.resolve(
+      new Set(['javascript', 'typescript', 'python', 'java']),
+    ),
+  ),
 }));
 
 describe('AceEditor 主题功能', () => {

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext } from 'react';
 import { Node } from 'slate';
 import { I18nContext } from '../../../I18n';
 import { ElementProps, ParagraphNode } from '../../el';
@@ -12,21 +12,11 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     store,
     markdownEditorRef,
     markdownContainerRef,
-    typewriter,
     readonly,
     editorProps,
   } = useEditorStore();
   const { locale } = useContext(I18nContext);
-  const [selected, path] = useSelStatus(props.element);
-  const isLast = useMemo(() => {
-    if (markdownEditorRef.current?.children.length === 0) return false;
-    if (!typewriter) return false;
-    return store.isLatestNode(props.element);
-  }, [
-    markdownEditorRef.current?.children.at?.(path.at(0)!),
-    markdownEditorRef.current?.children.at?.(path.at(0)! + 1),
-    typewriter,
-  ]);
+  const [selected] = useSelStatus(props.element);
 
   return React.useMemo(() => {
     const str = Node.string(props.element).trim();
@@ -43,9 +33,9 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
       <div
         {...props.attributes}
         data-be={'paragraph'}
-        className={classNames('ant-agentic-md-editor-drag-el', {
+        data-drag-el
+        className={classNames({
           empty: isEmpty,
-          typewriter: isLast && typewriter,
         })}
         data-align={props.element.align}
         data-slate-placeholder={
@@ -70,9 +60,7 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     props.element.align,
     readonly,
     selected,
-    isLast,
     markdownEditorRef.current?.children.length,
     editorProps.titlePlaceholderContent,
-    typewriter,
   ]);
 };

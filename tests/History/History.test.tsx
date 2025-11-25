@@ -346,7 +346,7 @@ describe('History 组件', () => {
       (generateHistoryItems as any).mockReturnValue([]);
 
       const emptyRender = () => (
-        <div data-testid="complex-empty-state" style={{ padding: 20 }}>
+        <div data-testid="complex-empty-state" style={{ padding: 12 }}>
           <h3>暂无历史记录</h3>
           <p>开始一段新的对话吧</p>
           <button type="button">创建新对话</button>

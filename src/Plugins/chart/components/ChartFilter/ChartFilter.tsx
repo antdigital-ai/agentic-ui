@@ -1,8 +1,9 @@
 import { ChevronDown } from '@sofa-design/icons';
 import { Button, ConfigProvider, Dropdown, Segmented } from 'antd';
 import classNames from 'classnames';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo, useRef } from 'react';
 import { I18nContext } from '../../../../I18n';
+import { debounce } from '../../utils';
 import { useStyle } from './style';
 
 export interface FilterOption {
@@ -27,7 +28,7 @@ export interface ChartFilterProps {
   variant?: 'default' | 'compact';
 }
 
-const ChartFilter: React.FC<ChartFilterProps> = ({
+const ChartFilterComponent: React.FC<ChartFilterProps> = ({
   filterOptions,
   selectedFilter,
   onFilterChange,
@@ -43,10 +44,57 @@ const ChartFilter: React.FC<ChartFilterProps> = ({
   const prefixCls = getPrefixCls('chart-filter');
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
+  // 使用 useRef 保存最新的回调函数，避免防抖函数闭包问题
+  const onFilterChangeRef = useRef(onFilterChange);
+  const onSelectionChangeRef = useRef(onSelectionChange);
+
+  // 更新 ref，确保总是使用最新的回调
+  React.useEffect(() => {
+    onFilterChangeRef.current = onFilterChange;
+    onSelectionChangeRef.current = onSelectionChange;
+  }, [onFilterChange, onSelectionChange]);
+
+  // 创建防抖的回调函数，1秒更新一次
+  const debouncedFilterChange = useMemo(
+    () =>
+      debounce(
+        function (value: string) {
+          if (onFilterChangeRef.current) {
+            onFilterChangeRef.current(value);
+          }
+        } as any,
+        1000,
+      ),
+    [],
+  );
+
+  const debouncedSelectionChange = useMemo(
+    () =>
+      debounce(
+        function (region: string) {
+          if (onSelectionChangeRef.current) {
+            onSelectionChangeRef.current(region);
+          }
+        } as any,
+        1000,
+      ),
+    [],
+  );
+
+  // 组件卸载时清理防抖函数
+  React.useEffect(() => {
+    return () => {
+      (debouncedFilterChange as any)?.cancel?.();
+      (debouncedSelectionChange as any)?.cancel?.();
+    };
+  }, [debouncedFilterChange, debouncedSelectionChange]);
+
   const handleRegionChange = (region: string) => {
-    if (onSelectionChange) {
-      onSelectionChange(region);
-    }
+    (debouncedSelectionChange as any)(region);
+  };
+
+  const handleFilterChange = (value: string) => {
+    (debouncedFilterChange as any)(value);
   };
 
   const hasMain = Array.isArray(filterOptions) && filterOptions.length > 1;
@@ -115,11 +163,13 @@ const ChartFilter: React.FC<ChartFilterProps> = ({
             'custom-segmented',
             hashId,
           )}
-          onChange={(value) => onFilterChange?.(value as string)}
+          onChange={(value) => handleFilterChange(value as string)}
         />
       )}
     </div>,
   );
 };
+
+const ChartFilter = ChartFilterComponent;
 
 export default ChartFilter;

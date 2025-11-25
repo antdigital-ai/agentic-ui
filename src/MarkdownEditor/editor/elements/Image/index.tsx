@@ -1,9 +1,10 @@
-﻿import {
+import {
   BlockOutlined,
   DeleteFilled,
+  ExclamationCircleOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
-import { Image, ImageProps, Modal, Popover, Space } from 'antd';
+import { Image, ImageProps, Modal, Popover, Skeleton, Space } from 'antd';
 import React, {
   useCallback,
   useContext,
@@ -52,7 +53,9 @@ export const ImageAndError: React.FC<ImageProps> = (props) => {
           color: '#1890ff',
           textDecoration: 'underline',
           wordBreak: 'break-all',
-          display: 'inline-block',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
           maxWidth: '100%',
           padding: '8px 12px',
           border: '1px dashed #d9d9d9',
@@ -60,6 +63,7 @@ export const ImageAndError: React.FC<ImageProps> = (props) => {
           backgroundColor: '#fafafa',
         }}
       >
+        <ExclamationCircleOutlined style={{ color: '#faad14' }} />
         {props.alt || props.src || '图片链接'}
       </a>
     );
@@ -84,7 +88,7 @@ export const ImageAndError: React.FC<ImageProps> = (props) => {
   }
 
   return (
-    <div data-testid="image-container">
+    <div data-testid="image-container" data-be="image-container">
       <Image
         {...props}
         width={Number(props.width) || props.width || 400}
@@ -155,7 +159,9 @@ export const ResizeImage = ({
           color: '#1890ff',
           textDecoration: 'underline',
           wordBreak: 'break-all',
-          display: 'inline-block',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
           maxWidth: '100%',
           padding: '8px 12px',
           border: '1px dashed #d9d9d9',
@@ -165,6 +171,7 @@ export const ResizeImage = ({
           lineHeight: '1.5',
         }}
       >
+        <ExclamationCircleOutlined style={{ color: '#faad14' }} />
         {props.alt || props.src}
       </a>
     );
@@ -181,6 +188,8 @@ export const ResizeImage = ({
         overflow: 'hidden',
         width: size.width as number,
         height: size.height as number,
+        maxWidth: '100%',
+        boxSizing: 'border-box',
       }}
     >
       {loading ? (
@@ -243,11 +252,10 @@ export const ResizeImage = ({
             let width = (e.target as HTMLImageElement).naturalWidth;
             const height = (e.target as HTMLImageElement).naturalHeight;
             radio.current = width / height;
-            width = Math.min(
-              defaultSize?.width || 400,
-              600,
-              document.documentElement.clientWidth * 0.8 || 600,
-            );
+            const containerWidth =
+              document.documentElement.clientWidth || window.innerWidth || 600;
+            const maxAllowedWidth = Math.min(containerWidth * 0.9, 600);
+            width = Math.min(defaultSize?.width || 400, maxAllowedWidth);
             setSize({
               width: width,
               height: width / radio.current,
@@ -341,6 +349,15 @@ export function EditorImage({
   }, [element?.url]);
 
   const imageDom = useMemo(() => {
+    // 检查是否为不完整的图片（loading 状态）
+    const isLoading =
+      (element as any)?.loading || (element as any)?.otherProps?.loading;
+
+    if (isLoading) {
+      // 显示 loading 状态的占位符
+      return <Skeleton.Image active />;
+    }
+
     // 如果图片加载失败，显示为链接
     if (!state().loadSuccess) {
       return (
@@ -352,7 +369,9 @@ export function EditorImage({
             color: '#1890ff',
             textDecoration: 'underline',
             wordBreak: 'break-all',
-            display: 'inline-block',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
             maxWidth: '100%',
             padding: '8px 12px',
             border: '1px dashed #d9d9d9',
@@ -362,6 +381,7 @@ export function EditorImage({
             lineHeight: '1.5',
           }}
         >
+          <ExclamationCircleOutlined style={{ color: '#faad14' }} />
           {element?.alt || state()?.url || element?.url || '图片链接'}
         </a>
       );
@@ -393,7 +413,9 @@ export function EditorImage({
         referrerPolicy={'no-referrer'}
         draggable={false}
         style={{
-          maxWidth: 800,
+          maxWidth: '100%',
+          height: 'auto',
+          display: 'block',
         }}
         width={element.width}
         height={element.height}
@@ -405,13 +427,16 @@ export function EditorImage({
     readonly,
     state().selected,
     state().loadSuccess,
+    (element as any)?.loading,
+    (element as any)?.otherProps?.loading,
+    (element as any)?.rawMarkdown,
   ]);
 
   return (
     <div
       {...attributes}
-      className={'ant-agentic-md-editor-drag-el'}
       data-be="image"
+      data-drag-el
       data-testid="image-container"
       style={{
         cursor: 'pointer',
@@ -420,6 +445,9 @@ export function EditorImage({
         WebkitUserSelect: 'none',
         MozUserSelect: 'none',
         msUserSelect: 'none',
+        width: '100%',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
       }}
       draggable={false}
       onContextMenu={(e) => {
@@ -501,11 +529,14 @@ export function EditorImage({
           style={{
             padding: 4,
             display: 'flex',
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
           }}
           ref={htmlRef}
           draggable={false}
           contentEditable={false}
-          className="md-editor-media"
+          data-be="media-container"
         >
           {imageDom}
           <div

@@ -179,27 +179,16 @@ export const useKeyboard = (
 
       if (e.key === 'Tab') tab.run(e);
 
-      if (props.textAreaProps?.triggerSendKey === 'Enter') {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          e.stopPropagation();
-          e.preventDefault();
-          enter.run(e);
-          return;
-        }
-        return;
-      }
-      if (props.textAreaProps?.triggerSendKey === 'Mod+Enter') {
-        if (e.key === 'Enter' && !(e.ctrlKey || e.metaKey)) {
-          e.stopPropagation();
-          e.preventDefault();
-          enter.run(e);
-        }
-        return;
-      }
-      if (e.key === 'Enter' && !(e.ctrlKey || e.metaKey)) {
+      // Enter 发送，Shift+Enter 换行
+      if (e.key === 'Enter' && e.shiftKey && !(e.ctrlKey || e.metaKey)) {
         e.stopPropagation();
         e.preventDefault();
         enter.run(e);
+        return;
+      }
+      // Enter 键（无 Shift）由 MarkdownInputField 处理发送，这里不处理
+      if (e.key === 'Enter' && !(e.ctrlKey || e.metaKey) && !e.shiftKey) {
+        return;
       }
 
       const [node] = Editor.nodes<any>(markdownEditorRef.current, {

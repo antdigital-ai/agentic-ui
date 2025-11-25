@@ -1,5 +1,10 @@
-import { DeleteFilled, EyeOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Modal, Popover } from 'antd';
+import {
+  DeleteFilled,
+  ExclamationCircleOutlined,
+  EyeOutlined,
+  LoadingOutlined,
+} from '@ant-design/icons';
+import { Modal, Popover, Skeleton } from 'antd';
 import React, {
   useCallback,
   useContext,
@@ -103,6 +108,8 @@ export const ResizeImage = ({
         overflow: 'hidden',
         width: size.width as number,
         height: size.height as number,
+        maxWidth: '100%',
+        boxSizing: 'border-box',
       }}
     >
       {loading ? (
@@ -166,11 +173,10 @@ export const ResizeImage = ({
             let width = (e.target as HTMLImageElement).naturalWidth;
             const height = (e.target as HTMLImageElement).naturalHeight;
             radio.current = width / height;
-            width = Math.min(
-              width,
-              600,
-              document.documentElement.clientWidth * 0.8 || 600,
-            );
+            const containerWidth =
+              document.documentElement.clientWidth || window.innerWidth || 600;
+            const maxAllowedWidth = Math.min(containerWidth * 0.9, 600);
+            width = Math.min(width, maxAllowedWidth);
 
             setSize({
               width: width,
@@ -232,15 +238,16 @@ export function Media({
   const initial = useCallback(async () => {
     let type = getMediaType(element?.url, element.alt);
     type = !type ? 'image' : type;
+    const finalType = ['image', 'video', 'autio', 'attachment'].includes(type!)
+      ? type!
+      : 'other';
     setState({
-      type: ['image', 'video', 'autio', 'attachment'].includes(type!)
-        ? type!
-        : 'other',
+      type: finalType,
     });
     let realUrl = element?.url;
 
     setState({ url: realUrl });
-    if (state().type === 'image' || state().type === 'other') {
+    if (finalType === 'image' || finalType === 'other') {
       const img = document.createElement('img');
       img.referrerPolicy = 'no-referrer';
       img.crossOrigin = 'anonymous';
@@ -249,6 +256,28 @@ export function Media({
         setState({ loadSuccess: false });
       };
       img.onload = () => setState({ loadSuccess: true });
+    }
+    if (finalType === 'video') {
+      const video = document.createElement('video');
+      video.src = realUrl!;
+      video.preload = 'metadata';
+      video.onerror = () => {
+        setState({ loadSuccess: false });
+      };
+      video.onloadedmetadata = () => {
+        setState({ loadSuccess: true });
+      };
+    }
+    if (finalType === 'audio') {
+      const audio = document.createElement('audio');
+      audio.src = realUrl!;
+      audio.preload = 'metadata';
+      audio.onerror = () => {
+        setState({ loadSuccess: false });
+      };
+      audio.onloadedmetadata = () => {
+        setState({ loadSuccess: true });
+      };
     }
     if (!element.mediaType) {
       updateElement({
@@ -263,6 +292,14 @@ export function Media({
 
   const imageDom = useMemo(() => {
     if (state().type !== 'image' && state().type !== 'other') return null;
+
+    // 检查是否为不完整的图片（loading 状态）
+    const isLoading =
+      (element as any)?.loading || (element as any)?.otherProps?.loading;
+    if (isLoading) {
+      // 显示 loading 状态的占位符
+      return <Skeleton.Image active />;
+    }
 
     return !readonly ? (
       <ResizeImage
@@ -291,16 +328,63 @@ export function Media({
         crossOrigin={'anonymous'}
         draggable={false}
         style={{
-          maxWidth: 800,
+          maxWidth: '100%',
+          height: 'auto',
+          display: 'block',
         }}
         width={element.width}
         height={element.height}
       />
     );
-  }, [state().type, state()?.url, readonly, state().selected]);
+  }, [
+    state().type,
+    state()?.url,
+    readonly,
+    state().selected,
+    (element as any)?.loading,
+    (element as any)?.otherProps?.loading,
+    (element as any)?.rawMarkdown,
+  ]);
 
   const mediaElement = useMemo(() => {
-    if (state().type === 'video')
+    // 检查是否为不完整的媒体（loading 状态）
+    const isLoading =
+      (element as any)?.loading || (element as any)?.otherProps?.loading;
+    const rawMarkdown =
+      (element as any)?.rawMarkdown ||
+      (element as any)?.otherProps?.rawMarkdown;
+
+    if (state().type === 'video') {
+      // 如果是 loading 状态，显示 loading 占位符
+      if (isLoading) {
+        return <Skeleton.Image active />;
+      }
+
+      if (!state().loadSuccess) {
+        return (
+          <a
+            href={state()?.url || element?.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: '#1890ff',
+              textDecoration: 'underline',
+              wordBreak: 'break-all',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              maxWidth: '100%',
+              padding: '8px 12px',
+              border: '1px dashed #d9d9d9',
+              borderRadius: '6px',
+              backgroundColor: '#fafafa',
+            }}
+          >
+            <ExclamationCircleOutlined style={{ color: '#faad14' }} />
+            {element.alt || state()?.url || element?.url || '视频链接'}
+          </a>
+        );
+      }
       return (
         <video
           data-testid="video-element"
@@ -312,19 +396,80 @@ export function Media({
           style={{
             width: element.width ? `${element.width}px` : '100%',
             height: element.height ? `${element.height}px` : 'auto',
-            maxWidth: 600,
+            maxWidth: '100%',
             borderRadius: '6px',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            display: 'block',
           }}
           src={state()?.url || ''}
           preload="metadata"
           onError={() => {
             console.warn('Video failed to load:', state()?.url);
+            setState({ loadSuccess: false });
           }}
         />
       );
+    }
 
     if (state().type === 'audio') {
+      // 如果是 loading 状态，显示 loading 占位符
+      if (isLoading) {
+        return (
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 16px',
+              border: '1px dashed #d9d9d9',
+              borderRadius: '6px',
+              backgroundColor: '#fafafa',
+              minWidth: '200px',
+              justifyContent: 'center',
+            }}
+          >
+            <LoadingOutlined
+              style={{ color: '#1890ff', fontSize: '16px' }}
+              spin
+            />
+            <span
+              style={{
+                color: '#666',
+                fontSize: '13px',
+                wordBreak: 'break-all',
+              }}
+            >
+              {rawMarkdown || element?.alt || '音频加载中...'}
+            </span>
+          </div>
+        );
+      }
+
+      if (!state().loadSuccess) {
+        return (
+          <a
+            href={state()?.url || element?.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: '#1890ff',
+              textDecoration: 'underline',
+              wordBreak: 'break-all',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              maxWidth: '100%',
+              padding: '8px 12px',
+              border: '1px dashed #d9d9d9',
+              borderRadius: '6px',
+              backgroundColor: '#fafafa',
+            }}
+          >
+            <ExclamationCircleOutlined style={{ color: '#faad14' }} />
+            {element.alt || state()?.url || element?.url || '音频链接'}
+          </a>
+        );
+      }
       return (
         <audio
           data-testid="audio-element"
@@ -334,6 +479,10 @@ export function Media({
             height: 'auto',
           }}
           src={state()?.url || ''}
+          onError={() => {
+            console.warn('Audio failed to load:', state()?.url);
+            setState({ loadSuccess: false });
+          }}
         >
           Your browser does not support the
           <code>audio</code> element.
@@ -433,7 +582,7 @@ export function Media({
             </div>
           </div>
           <div
-            className="editor-icon-box"
+            data-icon-box
             style={{
               padding: '0 18px',
             }}
@@ -453,13 +602,19 @@ export function Media({
       );
     }
     return null;
-  }, [state().type, state()?.url]);
+  }, [
+    state().type,
+    state()?.url,
+    (element as any)?.loading,
+    (element as any)?.otherProps?.loading,
+    (element as any)?.rawMarkdown,
+  ]);
 
   return (
     <div {...attributes}>
       <div
-        className={'ant-agentic-md-editor-drag-el'}
         data-be="media"
+        data-drag-el
         data-testid="media-container"
         style={{
           cursor: 'pointer',
@@ -470,6 +625,9 @@ export function Media({
           WebkitUserSelect: 'none',
           MozUserSelect: 'none',
           msUserSelect: 'none',
+          width: '100%',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
         }}
         draggable={false}
         onContextMenu={(e) => {
@@ -527,11 +685,13 @@ export function Media({
               display: 'flex',
               flexDirection: 'column',
               width: mediaElement ? '100%' : undefined,
+              maxWidth: '100%',
+              boxSizing: 'border-box',
             }}
             ref={htmlRef}
             draggable={false}
             contentEditable={false}
-            className="md-editor-media"
+            data-be="media-container"
           >
             {mediaElement}
             {imageDom}

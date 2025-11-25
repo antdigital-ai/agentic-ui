@@ -153,7 +153,6 @@ export const tableRenderElement = (
       return (
         <ThWrapper
           style={{
-            padding: '8px',
             verticalAlign: 'middle',
           }}
           {...props}
@@ -163,7 +162,6 @@ export const tableRenderElement = (
       return (
         <TdWrapper
           style={{
-            padding: '8px',
             verticalAlign: 'middle',
           }}
           {...props}

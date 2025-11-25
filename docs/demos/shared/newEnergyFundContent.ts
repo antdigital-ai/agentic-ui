@@ -1,5 +1,6 @@
-export const newEnergyFundContent = `<!-- {"MarkdownType": "report", "id": "new-energy-fund-report", "section_ids": "[1, 2, 3]"} -->
-# 新能源基金现状及投资
+export const newEnergyFundContent = `# 新能源基金现状及投资
+
+![头图](https://mdn.alipayobjects.com/huamei_gcee1x/afts/img/A*VctTQoYxOzYAAAAAAAAAAAAADml6AQ/original)
 
 ## 一、新能源板块现状：机遇与挑战并存
 

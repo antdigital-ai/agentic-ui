@@ -1,4 +1,4 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import { useMergedState } from 'rc-util';
 import React, {
@@ -46,7 +46,7 @@ import { useVoiceInputManager } from './VoiceInputManager';
  * @property {string} [className] - 应用于输入字段的 CSS 类名
  * @property {boolean} [disabled] - 是否禁用输入字段
  * @property {boolean} [typing] - 用户是否正在输入的状态标志
- * @property {'Enter' | 'Mod+Enter'} [triggerSendKey] - 触发发送操作的键盘快捷键
+ * @property {'Enter'} [triggerSendKey] - 触发发送操作的键盘快捷键（Enter 发送，Shift+Enter 换行）
  * @property {function} [onSend] - 当内容发送时触发的异步回调函数
  */
 
@@ -96,11 +96,11 @@ export type MarkdownInputFieldProps = {
 
   /**
    * 触发发送操作的键盘快捷键。
-   * - 'Enter': 回车键触发发送
-   * - 'Mod+Enter': 按下 Ctrl/Command + Enter 触发发送
-   * @example triggerSendKey="Mod+Enter"
+   * - 'Enter': 回车键触发发送，Shift+Enter 换行
+   * @deprecated 此属性已废弃，现在固定使用 Enter 发送，Shift+Enter 换行
+   * @example triggerSendKey="Enter"
    */
-  triggerSendKey?: 'Enter' | 'Mod+Enter';
+  triggerSendKey?: 'Enter';
 
   /**
    * 当内容发送时触发的异步回调函数。
@@ -472,6 +472,41 @@ export type MarkdownInputFieldProps = {
    * ```
    */
   isShowBackTo?: boolean;
+
+  /**
+   * 输入框的最大高度（像素）
+   * @description 设置输入框的最大高度，超出部分将显示滚动条。如果同时设置了 style.maxHeight，则以该属性优先
+   * @example
+   * ```tsx
+   * <MarkdownInputField maxHeight={300} />
+   * ```
+   */
+  maxHeight?: number | string;
+
+  /**
+   * 输入文本的最大字符数限制
+   * @description 限制输入文本的最大字符数，超出限制后将无法继续输入
+   * @example
+   * ```tsx
+   * <MarkdownInputField maxLength={500} />
+   * ```
+   */
+  maxLength?: number;
+
+  /**
+   * 当输入达到最大长度限制时的回调函数
+   * @description 当用户尝试输入超出最大长度限制的内容时触发
+   * @example
+   * ```tsx
+   * <MarkdownInputField
+   *   maxLength={100}
+   *   onMaxLengthExceeded={() => {
+   *     message.warning('已达到最大字数限制');
+   *   }}
+   * />
+   * ```
+   */
+  onMaxLengthExceeded?: (value: string) => void;
 };
 
 /**
@@ -487,7 +522,7 @@ export type MarkdownInputFieldProps = {
  * @param {(value: string) => void} [props.onChange] - 值变化时的回调
  * @param {(value: string) => Promise<void>} [props.onSend] - 发送消息的回调
  * @param {string} [props.placeholder] - 占位符文本
- * @param {string} [props.triggerSendKey='Mod+Enter'] - 触发发送的快捷键
+ * @param {string} [props.triggerSendKey='Enter'] - 触发发送的快捷键（Enter 发送，Shift+Enter 换行）
  * @param {boolean} [props.disabled] - 是否禁用
  * @param {boolean} [props.typing] - 是否正在输入
  * @param {AttachmentProps} [props.attachment] - 附件配置
@@ -503,7 +538,7 @@ export type MarkdownInputFieldProps = {
  *   onChange={(value) => console.log(value)}
  *   onSend={(value) => Promise.resolve()}
  *   placeholder="请输入Markdown文本..."
- *   triggerSendKey="Mod+Enter"
+ *   triggerSendKey="Enter"
  * />
  * ```
  *
@@ -557,16 +592,21 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
   }, [props.toolsRender, rightPadding, topRightPadding, quickRightOffset]);
 
   const collapsedHeight = useMemo(() => {
-    const mh = props.style?.maxHeight;
+    // 优先使用 maxHeight prop，其次使用 style.maxHeight，最后使用默认值
+    const maxHeightValue = props.maxHeight ?? props.style?.maxHeight;
     const base =
-      typeof mh === 'number' ? mh : mh ? parseFloat(String(mh)) || 114 : 114;
+      typeof maxHeightValue === 'number'
+        ? maxHeightValue
+        : maxHeightValue
+          ? parseFloat(String(maxHeightValue)) || 114
+          : 114;
     return base;
-  }, [props.style?.maxHeight, props.attachment?.enable]);
+  }, [props.maxHeight, props.style?.maxHeight, props.attachment?.enable]);
 
   const collapsedHeightPx = useMemo(() => {
     const extra = props.attachment?.enable ? 90 : 0;
     return collapsedHeight + extra;
-  }, [props.style?.maxHeight, props.attachment?.enable]);
+  }, [collapsedHeight, props.attachment?.enable]);
 
   const [fileMap, setFileMap] = useMergedState<
     Map<string, AttachmentFile> | undefined
@@ -797,29 +837,18 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
   // 键盘事件：早返回减少嵌套
   const handleKeyDown = useRefFunction(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const triggerSendKey = props.triggerSendKey || 'Enter';
       if (markdownEditorRef?.current?.store.inputComposition) return;
 
       const isEnter = e.key === 'Enter';
       const isMod = e.ctrlKey || e.metaKey;
+      const isShift = e.shiftKey;
 
-      if (triggerSendKey === 'Enter') {
-        if (!(isEnter && !isMod)) return;
-        e.stopPropagation();
-        e.preventDefault();
-        if (props.onSend) sendMessage();
-        return;
-      }
-
-      if (triggerSendKey === 'Mod+Enter') {
-        if (!(isEnter && isMod)) return;
-        e.stopPropagation();
-        e.preventDefault();
-        // 防止重复触发：检查是否已经在加载中
-        if (props.onSend && !isLoading && !props.disabled && !props.typing) {
-          sendMessage();
-        }
-      }
+      // Enter 发送，Shift+Enter 换行
+      if (!isEnter || isMod) return;
+      if (isShift) return; // Shift+Enter 时让编辑器处理换行
+      e.stopPropagation();
+      e.preventDefault();
+      if (props.onSend) sendMessage();
     },
   );
 
@@ -902,7 +931,13 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
             minHeight: computedMinHeight,
             cursor: isLoading || props.disabled ? 'not-allowed' : 'auto',
             opacity: props.disabled ? 0.5 : 1,
-            maxHeight: isEnlarged ? 'none' : `min(${collapsedHeightPx}px,100%)`,
+            maxHeight: isEnlarged
+              ? 'none'
+              : props.maxHeight !== undefined
+                ? typeof props.maxHeight === 'number'
+                  ? `${props.maxHeight}px`
+                  : props.maxHeight
+                : `min(${collapsedHeightPx}px,100%)`,
             transition:
               'height, max-height 0.3s,border-radius 0.3s,box-shadow 0.3s,transform 0.3s,opacity 0.3s,background 0.3s',
           }}
@@ -920,12 +955,14 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
               maxHeight: isEnlarged
                 ? 'none'
                 : (() => {
-                    const mh = props.style?.maxHeight;
+                    // 优先使用 maxHeight prop，其次使用 style.maxHeight，最后使用默认值
+                    const maxHeightValue =
+                      props.maxHeight ?? props.style?.maxHeight;
                     const base =
-                      typeof mh === 'number'
-                        ? mh
-                        : mh
-                          ? parseFloat(String(mh)) || 400
+                      typeof maxHeightValue === 'number'
+                        ? maxHeightValue
+                        : maxHeightValue
+                          ? parseFloat(String(maxHeightValue)) || 400
                           : 400;
                     const extra = props.attachment?.enable ? 90 : 0;
                     return `min(${base + extra}px)`;
@@ -969,7 +1006,6 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
                 textAreaProps={{
                   enable: true,
                   placeholder: props.placeholder,
-                  triggerSendKey: props.triggerSendKey || 'Enter',
                 }}
                 tagInputProps={{
                   enable: true,
@@ -978,6 +1014,20 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
                 }}
                 initValue={props.value}
                 onChange={(value) => {
+                  // 检查并限制字符数
+                  if (props.maxLength !== undefined) {
+                    if (value.length > props.maxLength) {
+                      const truncatedValue = value.slice(0, props.maxLength);
+                      setValue(truncatedValue);
+                      props.onChange?.(truncatedValue);
+                      props.onMaxLengthExceeded?.(value);
+                      // 更新编辑器内容以反映截断后的值
+                      markdownEditorRef.current?.store?.setMDContent(
+                        truncatedValue,
+                      );
+                      return;
+                    }
+                  }
                   setValue(value);
                   props.onChange?.(value);
                 }}
@@ -1000,22 +1050,7 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
             </div>
           </div>
           {props.toolsRender ? (
-            <div
-              style={{
-                backgroundColor: '#fff',
-                display: 'flex',
-                boxSizing: 'border-box',
-                borderRadius: 'inherit',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 8,
-                width: '100%',
-                paddingRight: 'var(--padding-3x)',
-                paddingLeft: 'var(--padding-3x)',
-                paddingBottom: 'var(--padding-3x)',
-              }}
-            >
+            <div className={classNames(`${baseCls}-tools-wrapper`, hashId)}>
               <div
                 ref={actionsRef}
                 contentEditable={false}

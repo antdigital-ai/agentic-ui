@@ -1,11 +1,10 @@
 import classNames from 'classnames';
-import katex from 'katex';
-import React, { useEffect, useRef } from 'react';
+import React, { startTransition, useEffect, useRef, useState } from 'react';
 import { Editor, Node, Transforms } from 'slate';
 import { useEditorStore } from '../../MarkdownEditor/editor/store';
 import { ElementProps, InlineKatexNode } from '../../MarkdownEditor/el';
 import { useSelStatus } from '../../MarkdownEditor/hooks/editor';
-import './katex.min.css';
+import { loadKatex } from './loadKatex';
 
 /**
  * InlineKatex 组件 - 内联KaTeX数学公式组件
@@ -53,10 +52,37 @@ export const InlineKatex = ({
   const renderEl = useRef<HTMLElement>(null);
   const { markdownEditorRef, readonly } = useEditorStore();
   const [selected, path] = useSelStatus(element);
+  const [katexLoaded, setKatexLoaded] = useState(false);
+  const katexRef = useRef<typeof import('katex').default | null>(null);
+
+  // 异步加载 Katex 库和 CSS
   useEffect(() => {
-    if (!selected) {
-      const value = Node.string(element);
-      katex.render(`${value}`, renderEl.current!, {
+    if (process.env.NODE_ENV === 'test') {
+      setKatexLoaded(true);
+      return;
+    }
+
+    startTransition(() => {
+      // 异步加载在 startTransition 外部执行
+      (async () => {
+        try {
+          const katexModule = await loadKatex();
+          katexRef.current = katexModule.default;
+          setKatexLoaded(true);
+        } catch (error) {
+          console.error('Failed to load Katex:', error);
+          setKatexLoaded(true);
+        }
+      })();
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!katexLoaded || !katexRef.current || selected) return;
+
+    const value = Node.string(element);
+    if (renderEl.current && katexRef.current) {
+      katexRef.current.render(`${value}`, renderEl.current, {
         strict: false,
         output: 'html',
         throwOnError: false,
@@ -65,7 +91,7 @@ export const InlineKatex = ({
         },
       });
     }
-  }, [selected]);
+  }, [selected, katexLoaded, element]);
   if (process.env.NODE_ENV === 'test') {
     return <span contentEditable={false} />;
   }

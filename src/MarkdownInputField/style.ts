@@ -1,4 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
+import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -124,6 +125,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&:active,&.active': {
         outline: '1px solid transparent',
+        outlineColor: 'var(--mif-active-outline-color, transparent)',
       },
 
       '&-enlarged': {
@@ -185,6 +187,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         borderRadius: 'inherit',
         scrollbarColor: 'var(--color-gray-text-tertiary) transparent',
         scrollbarWidth: 'thin',
+        [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+          padding: `${MOBILE_PADDING} !important`,
+        },
       },
       '&&-disabled': {
         backgroundColor: 'rgba(0,0,0,0.04)',
@@ -198,6 +203,25 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         font: 'var(--font-text-body-base)',
         color: 'var(--color-gray-text-default)',
+      },
+      '&-tools-wrapper': {
+        backgroundColor: '#fff',
+        display: 'flex',
+        boxSizing: 'border-box',
+        borderRadius: 'inherit',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 8,
+        width: '100%',
+        paddingLeft: 'var(--padding-3x)',
+        paddingRight: 'var(--padding-3x)',
+        paddingBottom: 'var(--padding-3x)',
+        [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+          paddingLeft: MOBILE_PADDING,
+          paddingRight: MOBILE_PADDING,
+          paddingBottom: MOBILE_PADDING,
+        },
       },
       '&-send-actions': {
         position: 'absolute',

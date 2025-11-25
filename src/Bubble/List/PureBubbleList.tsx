@@ -7,8 +7,8 @@ import type { BubbleMetaData, BubbleProps, MessageBubbleData } from '../type';
 import { ConfigProvider } from 'antd';
 import cx from 'classnames';
 import React from 'react';
-import { PureAIBubble, PureUserBubble } from '../PureBubble';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
+import { PureAIBubble, PureUserBubble } from '../PureBubble';
 import { useStyle } from './style';
 
 export interface PureBubbleListProps {
@@ -161,7 +161,9 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
       ref={bubbleListRef}
       onScroll={onScroll}
       onWheel={(event) => onWheel?.(event, bubbleListRef?.current || null)}
-      onTouchMove={(event) => onTouchMove?.(event, bubbleListRef?.current || null)}
+      onTouchMove={(event) =>
+        onTouchMove?.(event, bubbleListRef?.current || null)
+      }
     >
       {listDom}
     </div>,
@@ -169,4 +171,3 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
 };
 
 export default PureBubbleList;
-

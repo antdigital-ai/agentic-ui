@@ -24,8 +24,9 @@ export function LinkCard({
   return wrapSSR(
     <div {...attributes}>
       <div
-        className={classNames(baseCls, 'ant-agentic-md-editor-drag-el', hashId)}
+        className={classNames(baseCls, hashId)}
         data-be="link-card"
+        data-drag-el
         draggable={false}
         onContextMenu={(e) => {
           e.stopPropagation();

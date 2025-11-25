@@ -8,8 +8,9 @@ import { CloseCircleOutlined } from '@ant-design/icons';
 import { ChevronsUpDown, Copy, Moon } from '@sofa-design/icons';
 import { message, Segmented } from 'antd';
 import copy from 'copy-to-clipboard';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../../Components/ActionIconBox';
+import { Loading } from '../../../Components/Loading';
 import { I18nContext } from '../../../I18n';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { langIconMap } from '../langIconMap';
@@ -87,6 +88,11 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
     viewMode = 'code',
   } = props;
 
+  // 检查代码块是否未闭合 - 使用 useMemo 确保正确响应变化
+  const isUnclosed = useMemo(() => {
+    return element?.otherProps?.finish === false;
+  }, [element?.otherProps?.finish]);
+
   return (
     <div
       data-testid="code-toolbar"
@@ -122,59 +128,76 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
       }}
     >
       {/* 左侧：语言选择器或语言显示 */}
-      {readonly ? (
-        // 只读模式：仅显示当前语言信息
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            cursor: 'pointer',
-            gap: 4,
-            font: 'inherit',
-            color: 'inherit',
-            userSelect: 'none',
-          }}
-          contentEditable={false}
-        >
-          {/* 语言图标（如果存在且不是公式） */}
-          {langIconMap.get(element.language?.toLowerCase() || '') &&
-            !element.katex && (
-              <div
-                style={{
-                  height: '1em',
-                  width: '1em',
-                  fontSize: '16px',
-                  display: 'flex',
-                }}
-              >
-                <LoadImage
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+      >
+        {readonly ? (
+          // 只读模式：仅显示当前语言信息
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              gap: 4,
+              font: 'inherit',
+              color: 'inherit',
+              userSelect: 'none',
+            }}
+            contentEditable={false}
+          >
+            {/* 语言图标（如果存在且不是公式） */}
+            {langIconMap.get(element.language?.toLowerCase() || '') &&
+              !element.katex && (
+                <div
                   style={{
                     height: '1em',
                     width: '1em',
+                    fontSize: '16px',
+                    display: 'flex',
                   }}
-                  src={langIconMap.get(element.language?.toLowerCase() || '')}
-                />
-              </div>
-            )}
-          <div>
-            {element.language ? (
-              <span>
-                {/* 根据代码类型显示不同标签 */}
-                {element.katex
-                  ? 'Formula'
-                  : element.language === 'html' && element.render
-                    ? 'Html Renderer'
-                    : element.language}
-              </span>
-            ) : (
-              <span>{'plain text'}</span>
-            )}
+                >
+                  <LoadImage
+                    style={{
+                      height: '1em',
+                      width: '1em',
+                    }}
+                    src={langIconMap.get(element.language?.toLowerCase() || '')}
+                  />
+                </div>
+              )}
+            <div>
+              {element.language ? (
+                <span>
+                  {/* 根据代码类型显示不同标签 */}
+                  {element.katex
+                    ? 'Formula'
+                    : element.language === 'html' && element.render
+                      ? 'Html Renderer'
+                      : element.language}
+                </span>
+              ) : (
+                <span>{'plain text'}</span>
+              )}
+            </div>
           </div>
-        </div>
-      ) : (
-        // 非只读模式：显示语言选择器
-        <LanguageSelector {...languageSelectorProps} />
-      )}
+        ) : (
+          // 非只读模式：显示语言选择器
+          <LanguageSelector {...languageSelectorProps} />
+        )}
+        {/* 未闭合代码块的 loading 指示器 */}
+        {isUnclosed && (
+          <Loading
+            style={{
+              fontSize: '14px',
+              flexShrink: 0,
+            }}
+          />
+        )}
+      </div>
 
       {/* 右侧：操作按钮组 */}
       <div

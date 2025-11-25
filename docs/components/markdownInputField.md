@@ -210,30 +210,30 @@ export default () => {
 
 ## API
 
-| 属性名                  | 类型                                             | 默认值    | 描述                               |
-| ----------------------- | ------------------------------------------------ | --------- | ---------------------------------- |
-| `value`                 | `string`                                         | -         | 当前的 markdown 文本值             |
-| `onChange`              | `(value: string) => void`                        | -         | 当输入值改变时触发的回调函数       |
-| `placeholder`           | `string`                                         | -         | 输入字段的占位文本                 |
-| `style`                 | `React.CSSProperties`                            | -         | 应用于输入字段的内联样式           |
-| `className`             | `string`                                         | -         | 应用于输入字段的 CSS 类名          |
-| `disabled`              | `boolean`                                        | -         | 是否禁用输入字段                   |
-| `typing`                | `boolean`                                        | -         | 用户是否正在输入的状态标志         |
-| `allowEmptySubmit`      | `boolean`                                        | `false`   | 是否允许在内容为空时也触发发送     |
-| `triggerSendKey`        | `'Enter' \| 'Mod+Enter'`                         | `'Enter'` | 触发发送操作的键盘快捷键           |
-| `onSend`                | `(value: string) => Promise<void>`               | -         | 当内容发送时触发的异步回调函数     |
-| `onStop`                | `() => void`                                     | -         | 正在输入中时点击发送按钮的回调函数 |
-| `onFocus`               | `(value: string, schema: Elements[]) => void`    | -         | 当输入字段获得焦点时触发的回调函数 |
-| `tagInputProps`         | `MarkdownEditorProps['tagInputProps']`           | -         | 标签输入的相关属性                 |
-| `borderRadius`          | `number`                                         | `12`      | 边框圆角大小                       |
-| `attachment`            | `{ enable?: boolean } & AttachmentButtonProps`   | -         | 附件配置                           |
-| `actionsRender`         | `(props, defaultActions) => React.ReactNode[]`   | -         | 自定义渲染操作按钮的函数           |
-| `toolsRender`           | `(props) => React.ReactNode[]`                   | -         | 自定义渲染操作按钮前内容的函数     |
-| `leafRender`            | `(props, defaultDom) => React.ReactElement`      | -         | 自定义叶子节点渲染函数             |
-| `inputRef`              | `React.MutableRefObject<MarkdownEditorInstance>` | -         | 输入框引用                         |
-| `skillMode`             | `SkillModeConfig`                                | -         | 技能模式配置                       |
-| `onSkillModeOpenChange` | `(open: boolean) => void`                        | -         | 技能模式状态变化回调               |
-| `pasteConfig`           | `{ enabled?: boolean; allowedTypes?: string[] }` | -         | 粘贴配置                           |
+| 属性名                  | 类型                                             | 默认值    | 描述                                                     |
+| ----------------------- | ------------------------------------------------ | --------- | -------------------------------------------------------- |
+| `value`                 | `string`                                         | -         | 当前的 markdown 文本值                                   |
+| `onChange`              | `(value: string) => void`                        | -         | 当输入值改变时触发的回调函数                             |
+| `placeholder`           | `string`                                         | -         | 输入字段的占位文本                                       |
+| `style`                 | `React.CSSProperties`                            | -         | 应用于输入字段的内联样式                                 |
+| `className`             | `string`                                         | -         | 应用于输入字段的 CSS 类名                                |
+| `disabled`              | `boolean`                                        | -         | 是否禁用输入字段                                         |
+| `typing`                | `boolean`                                        | -         | 用户是否正在输入的状态标志                               |
+| `allowEmptySubmit`      | `boolean`                                        | `false`   | 是否允许在内容为空时也触发发送                           |
+| `triggerSendKey`        | `'Enter'`                                        | `'Enter'` | 触发发送操作的键盘快捷键（Enter 发送，Shift+Enter 换行） |
+| `onSend`                | `(value: string) => Promise<void>`               | -         | 当内容发送时触发的异步回调函数                           |
+| `onStop`                | `() => void`                                     | -         | 正在输入中时点击发送按钮的回调函数                       |
+| `onFocus`               | `(value: string, schema: Elements[]) => void`    | -         | 当输入字段获得焦点时触发的回调函数                       |
+| `tagInputProps`         | `MarkdownEditorProps['tagInputProps']`           | -         | 标签输入的相关属性                                       |
+| `borderRadius`          | `number`                                         | `12`      | 边框圆角大小                                             |
+| `attachment`            | `{ enable?: boolean } & AttachmentButtonProps`   | -         | 附件配置                                                 |
+| `actionsRender`         | `(props, defaultActions) => React.ReactNode[]`   | -         | 自定义渲染操作按钮的函数                                 |
+| `toolsRender`           | `(props) => React.ReactNode[]`                   | -         | 自定义渲染操作按钮前内容的函数                           |
+| `leafRender`            | `(props, defaultDom) => React.ReactElement`      | -         | 自定义叶子节点渲染函数                                   |
+| `inputRef`              | `React.MutableRefObject<MarkdownEditorInstance>` | -         | 输入框引用                                               |
+| `skillMode`             | `SkillModeConfig`                                | -         | 技能模式配置                                             |
+| `onSkillModeOpenChange` | `(open: boolean) => void`                        | -         | 技能模式状态变化回调                                     |
+| `pasteConfig`           | `{ enabled?: boolean; allowedTypes?: string[] }` | -         | 粘贴配置                                                 |
 
 ## 示例
 
@@ -578,8 +578,8 @@ export default () => {
       <MarkdownInputField
         value={value}
         onChange={setValue}
-        placeholder="按Ctrl+Enter发送消息..."
-        triggerSendKey="Mod+Enter"
+        placeholder="按Enter发送消息，Shift+Enter换行..."
+        triggerSendKey="Enter"
         style={{ minHeight: '200px' }}
         borderRadius={8}
       />
@@ -616,7 +616,7 @@ export default () => {
     <div>
       <div
         style={{
-          padding: 20,
+          padding: 12,
         }}
       >
         <MarkdownInputField
@@ -1054,7 +1054,7 @@ export default () => {
     <>
       <div
         style={{
-          padding: 20,
+          padding: 12,
         }}
       >
         <MarkdownInputField

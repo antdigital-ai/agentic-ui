@@ -49,4 +49,6 @@ export interface DonutChartProps extends ChartContainerProps {
   renderFilterInToolbar?: boolean;
   /** ChartStatistic组件配置：object表示单个配置，array表示多个配置 */
   statistic?: StatisticConfigType;
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
 }

@@ -27,8 +27,8 @@ import { parserMdToSchema } from './parser/parserMdToSchema';
 import { KeyboardTask, Methods, parserSlateNodeToMarkdown } from './utils';
 import { getOffsetLeft, getOffsetTop } from './utils/dom';
 import { EditorUtils, findByPathAndText } from './utils/editorUtils';
-import { markdownToHtmlSync } from './utils/markdownToHtml';
 import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';
+import { markdownToHtmlSync } from './utils/markdownToHtml';
 const { createContext, useContext } = React;
 
 /**
@@ -1671,12 +1671,12 @@ export class EditorStore {
     // @ts-ignore
     for (let el of els) {
       if (!ableToEnter.has(el.dataset.be!)) continue;
-      if (el.classList.contains('frontmatter')) continue;
+      if (el.hasAttribute('data-frontmatter')) continue;
       const pre = el.previousSibling as HTMLElement;
       if (
         el.dataset.be === 'paragraph' &&
         this.draggedElement?.dataset.be === 'list-item' &&
-        (!pre || pre.classList.contains('check-item'))
+        (!pre || pre.hasAttribute('data-check-item'))
       ) {
         continue;
       }
@@ -1720,7 +1720,7 @@ export class EditorStore {
             : last.el.clientWidth + 'px';
         if (!mark) {
           mark = document.createElement('div');
-          mark.classList.add('move-mark');
+          mark.setAttribute('data-move-mark', '');
           mark.style.width = width;
           mark.style.height = '2px';
 

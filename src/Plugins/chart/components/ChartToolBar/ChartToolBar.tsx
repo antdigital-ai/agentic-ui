@@ -2,6 +2,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
 import classNames from 'classnames';
 import React, { useContext } from 'react';
+import { Loading } from '../../../../Components/Loading';
 import { I18nContext } from '../../../../I18n';
 import TimeIcon from '../icons/TimeIcon';
 import { useStyle } from './style';
@@ -50,6 +51,8 @@ export interface ChartToolBarProps {
   extra?: React.ReactNode;
   /** 过滤器内容 */
   filter?: React.ReactNode;
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
 }
 
 /**
@@ -83,6 +86,7 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
   onDownload,
   extra,
   filter,
+  loading = false,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const i18n = useContext(I18nContext);
@@ -111,6 +115,15 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
       {/* 左侧标题 */}
       <div className={classNames(`${prefixCls}-header-title`, hashId)}>
         {title}
+        {loading && (
+          <Loading
+            style={{
+              fontSize: '14px',
+              marginLeft: '8px',
+              flexShrink: 0,
+            }}
+          />
+        )}
       </div>
 
       {/* 右侧时间+下载按钮 */}

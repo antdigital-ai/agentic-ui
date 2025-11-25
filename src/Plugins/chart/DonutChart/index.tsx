@@ -97,6 +97,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   toolbarExtra,
   renderFilterInToolbar = false,
   statistic: statisticConfig,
+  loading = false,
   ...props
 }) => {
   useMemo(() => {
@@ -312,6 +313,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
               onDownload={handleDownload}
               extra={toolbarExtra}
               dataTime={dataTime}
+              loading={loading}
               filter={
                 renderFilterInToolbar && shouldShowFilter ? (
                   <ChartFilter

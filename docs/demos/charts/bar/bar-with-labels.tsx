@@ -235,7 +235,7 @@ const BarChartWithLabelsExample: React.FC = () => {
   ]);
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h3 style={{ margin: '0 0 12px' }}>带数据标签的柱状图</h3>
       <div
         style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}

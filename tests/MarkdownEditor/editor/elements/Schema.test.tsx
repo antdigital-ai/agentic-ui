@@ -157,7 +157,7 @@ describe('Schema', () => {
       );
 
       const container = screen.getByTestId('agentar-card-container');
-      expect(container).toHaveClass('md-editor-agentar-card');
+      expect(container).toHaveAttribute('data-agentar-card');
       expect(container).toHaveStyle({ padding: '0.5em' });
     });
   });

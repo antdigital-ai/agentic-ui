@@ -49,7 +49,7 @@ const WorkspaceFileSearchDemo: React.FC = () => {
   }, [files, keyword]);
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <div style={{ maxWidth: 640 }}>
         <Workspace title="文件管理-搜索">
           <Workspace.File

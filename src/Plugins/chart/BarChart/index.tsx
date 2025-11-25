@@ -28,6 +28,7 @@ import {
   ChartDataItem,
   extractAndSortXValues,
   findDataPointByXValue,
+  hexToRgba,
 } from '../utils';
 import { useStyle } from './style';
 
@@ -174,27 +175,9 @@ export interface BarChartProps extends ChartContainerProps {
   renderFilterInToolbar?: boolean;
   /** ChartStatistic组件配置：object表示单个配置，array表示多个配置 */
   statistic?: StatisticConfigType;
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
 }
-
-// 将十六进制颜色转换为带透明度的 rgba 字符串
-const hexToRgba = (hex: string, alpha: number): string => {
-  const sanitized = hex.replace('#', '');
-  const isShort = sanitized.length === 3;
-  const r = parseInt(
-    isShort ? sanitized[0] + sanitized[0] : sanitized.slice(0, 2),
-    16,
-  );
-  const g = parseInt(
-    isShort ? sanitized[1] + sanitized[1] : sanitized.slice(2, 4),
-    16,
-  );
-  const b = parseInt(
-    isShort ? sanitized[2] + sanitized[2] : sanitized.slice(4, 6),
-    16,
-  );
-  const a = Math.max(0, Math.min(1, alpha));
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-};
 
 // 正负柱状图颜色（与需求给定的 rgba 保持一致）
 const POSITIVE_COLOR_HEX = '#388BFF'; // rgba(56, 139, 255, 1)
@@ -227,6 +210,7 @@ const BarChart: React.FC<BarChartProps> = ({
   showDataLabels = false,
   dataLabelFormatter,
   chartOptions,
+  loading = false,
 }) => {
   useMemo(() => {
     if (barChartComponentsRegistered) {
@@ -965,6 +949,7 @@ const BarChart: React.FC<BarChartProps> = ({
         onDownload={handleDownload}
         extra={toolbarExtra}
         dataTime={dataTime}
+        loading={loading}
         filter={
           renderFilterInToolbar && filterOptions && filterOptions.length > 1 ? (
             <ChartFilter
@@ -1018,7 +1003,7 @@ const BarChart: React.FC<BarChartProps> = ({
           plugins={[ChartDataLabels]}
         />
       </div>
-    </ChartContainer>
+    </ChartContainer>,
   );
 };
 
