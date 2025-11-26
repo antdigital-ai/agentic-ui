@@ -64,7 +64,19 @@ export const TaskList: FC<TaskListProps> = ({ data, onItemClick }) => {
             `${prefixCls}-item-${item.status}`,
             hashId,
           )}
-          onClick={() => handleItemClick(item)}
+          role={onItemClick ? 'button' : undefined}
+          tabIndex={onItemClick ? 0 : undefined}
+          onClick={onItemClick ? () => handleItemClick(item) : undefined}
+          onKeyDown={
+            onItemClick
+              ? (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleItemClick(item);
+                  }
+                }
+              : undefined
+          }
           style={{ cursor: onItemClick ? 'pointer' : undefined }}
         >
           <div className={classNames(`${prefixCls}-status`, hashId)}>
