@@ -41,9 +41,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-content': {
         // 默认 padding，可以通过 contentStyle 覆盖
-        padding: '4px 20px',
+        // 使用 CSS 变量，允许通过内联样式覆盖
+        padding: 'var(--content-padding, 4px 20px)',
         [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
-          padding: '4px 4px',
+          padding: 'var(--content-padding, 4px 4px)',
         },
       },
     },

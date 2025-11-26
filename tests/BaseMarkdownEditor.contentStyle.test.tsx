@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -66,10 +66,7 @@ describe('BaseMarkdownEditor - contentStyle 测试', () => {
   describe('contentStyle padding 功能', () => {
     it('应该能够通过 contentStyle 设置 padding 为 0', async () => {
       const { container } = render(
-        <BaseMarkdownEditor
-          {...defaultProps}
-          contentStyle={{ padding: 0 }}
-        />,
+        <BaseMarkdownEditor {...defaultProps} contentStyle={{ padding: 0 }} />,
       );
 
       await waitFor(() => {
@@ -158,10 +155,7 @@ describe('BaseMarkdownEditor - contentStyle 测试', () => {
 
       // 再测试设置了 padding: 0 的情况
       const { container: customContainer } = render(
-        <BaseMarkdownEditor
-          {...defaultProps}
-          contentStyle={{ padding: 0 }}
-        />,
+        <BaseMarkdownEditor {...defaultProps} contentStyle={{ padding: 0 }} />,
       );
 
       await waitFor(() => {
@@ -229,10 +223,7 @@ describe('BaseMarkdownEditor - contentStyle 测试', () => {
 
     it('应该能够通过 contentStyle 设置 padding 为数字值', async () => {
       const { container } = render(
-        <BaseMarkdownEditor
-          {...defaultProps}
-          contentStyle={{ padding: 16 }}
-        />,
+        <BaseMarkdownEditor {...defaultProps} contentStyle={{ padding: 16 }} />,
       );
 
       await waitFor(() => {
@@ -294,4 +285,3 @@ describe('BaseMarkdownEditor - contentStyle 测试', () => {
     });
   });
 });
-
