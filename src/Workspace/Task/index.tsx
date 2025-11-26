@@ -5,13 +5,22 @@ import React, { type FC, useContext } from 'react';
 import { Loading } from '../../Components/Loading';
 import { useTaskStyle } from './style';
 
+export interface TaskItem {
+  key: string;
+  title?: string;
+  content?: React.ReactNode | React.ReactNode[];
+  status: 'success' | 'pending' | 'loading' | 'error';
+}
+
 export interface TaskItemInput {
-  items: {
-    key: string;
-    title?: string;
-    content?: React.ReactNode | React.ReactNode[];
-    status: 'success' | 'pending' | 'loading' | 'error';
-  }[];
+  items: TaskItem[];
+}
+
+export interface TaskListProps {
+  /** 任务列表数据 */
+  data: TaskItemInput;
+  /** 点击任务项时的回调 */
+  onItemClick?: (item: TaskItem) => void;
 }
 
 const StatusIcon: FC<{
@@ -36,10 +45,14 @@ const StatusIcon: FC<{
   }
 };
 
-export const TaskList: FC<{ data: TaskItemInput }> = ({ data }) => {
+export const TaskList: FC<TaskListProps> = ({ data, onItemClick }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-workspace-task');
   const { wrapSSR, hashId } = useTaskStyle(prefixCls);
+
+  const handleItemClick = (item: TaskItem) => {
+    onItemClick?.(item);
+  };
 
   return wrapSSR(
     <div className={classNames(prefixCls, hashId)} data-testid="task-list">
@@ -51,6 +64,8 @@ export const TaskList: FC<{ data: TaskItemInput }> = ({ data }) => {
             `${prefixCls}-item-${item.status}`,
             hashId,
           )}
+          onClick={() => handleItemClick(item)}
+          style={{ cursor: onItemClick ? 'pointer' : undefined }}
         >
           <div className={classNames(`${prefixCls}-status`, hashId)}>
             <StatusIcon status={item.status} />

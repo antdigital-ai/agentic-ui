@@ -90,8 +90,8 @@ const RealtimeComponent: FC<RealtimeProps> = ({ data }) =>
   data ? <RealtimeFollowList data={data} /> : null;
 const BrowserComponent: FC<BrowserProps> = ({ data }) =>
   data ? <BrowserList data={data} /> : null;
-const TaskComponent: FC<TaskProps> = ({ data }) =>
-  data ? <TaskList data={data} /> : null;
+const TaskComponent: FC<TaskProps> = ({ data, onItemClick }) =>
+  data ? <TaskList data={data} onItemClick={onItemClick} /> : null;
 const FileComponent: FC<FileProps> = (props) => <File {...props} />;
 const CustomComponent: FC<CustomProps> = ({ children }) => children || null;
 

@@ -2,7 +2,7 @@ import React, { type ReactNode } from 'react';
 import type { MarkdownEditorProps } from '../MarkdownEditor';
 import type { BrowserItemInput } from './Browser';
 import type { RealtimeFollowData } from './RealtimeFollow';
-import type { TaskItemInput } from './Task';
+import type { TaskItem, TaskItemInput } from './Task';
 
 // 标签页配置
 export interface TabConfiguration {
@@ -51,6 +51,8 @@ export interface BrowserProps extends BaseChildProps {
 
 export interface TaskProps extends BaseChildProps {
   data?: TaskItemInput;
+  /** 点击任务项时的回调 */
+  onItemClick?: (item: TaskItem) => void;
 }
 
 // 文件类型分类

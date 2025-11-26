@@ -604,4 +604,62 @@ describe('Workspace Component', () => {
 
     expect(screen.getByTestId('task-list')).toBeInTheDocument();
   });
+
+  it('应该支持 Task 组件的 onItemClick 回调', () => {
+    const onItemClick = vi.fn();
+    const taskItems = [
+      { key: '1', title: '任务1', status: 'success' as const },
+      { key: '2', title: '任务2', status: 'pending' as const },
+    ];
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.Task data={{ items: taskItems }} onItemClick={onItemClick} />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    // 点击第一个任务项
+    const taskItem = screen.getByText('任务1');
+    fireEvent.click(taskItem);
+
+    expect(onItemClick).toHaveBeenCalledTimes(1);
+    expect(onItemClick).toHaveBeenCalledWith(taskItems[0]);
+  });
+
+  it('Task 组件在没有 onItemClick 时不应该有 pointer 样式', () => {
+    const taskItems = [
+      { key: '1', title: '任务1', status: 'success' as const },
+    ];
+
+    const { container } = render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.Task data={{ items: taskItems }} />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    const taskItem = container.querySelector('.ant-agentic-workspace-task-item');
+    expect(taskItem).not.toHaveStyle('cursor: pointer');
+  });
+
+  it('Task 组件在有 onItemClick 时应该有 pointer 样式', () => {
+    const onItemClick = vi.fn();
+    const taskItems = [
+      { key: '1', title: '任务1', status: 'success' as const },
+    ];
+
+    const { container } = render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.Task data={{ items: taskItems }} onItemClick={onItemClick} />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    const taskItem = container.querySelector('.ant-agentic-workspace-task-item');
+    expect(taskItem).toHaveStyle('cursor: pointer');
+  });
 });
