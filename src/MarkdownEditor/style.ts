@@ -40,6 +40,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         outline: 'none !important',
       },
       '&-content': {
+        // 默认 padding，可以通过 contentStyle 覆盖
         padding: '4px 20px',
         [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
           padding: '4px 4px',

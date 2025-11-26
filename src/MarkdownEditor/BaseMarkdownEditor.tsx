@@ -371,6 +371,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 position: 'relative',
                 gap: 24,
                 outline: 'none',
+                // contentStyle 放在最后，确保能够覆盖默认样式（包括 padding）
                 ...contentStyle,
               }}
               ref={(dom) => {
