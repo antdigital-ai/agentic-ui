@@ -624,6 +624,195 @@ describe('SchemaEditor', () => {
         expect(screen.getByTestId('schema-renderer')).toBeInTheDocument();
       });
     });
+
+    it('应该验证 htmlContent 和 schemaString 是派生值', async () => {
+      const ref = createRef<SchemaEditorRef>();
+      const newSchema: LowCodeSchema = {
+        version: '1.0.0',
+        name: 'Derived Test',
+        component: {
+          type: 'html',
+          schema: '<div>Derived HTML</div>',
+        },
+      };
+
+      render(
+        <TestWrapper>
+          <SchemaEditor
+            ref={ref}
+            initialSchema={mockSchema}
+            initialValues={mockValues}
+            height={600}
+          />
+        </TestWrapper>,
+      );
+
+      // 设置新的 Schema
+      ref.current?.setSchema(newSchema);
+
+      // 等待状态更新后验证派生值是否正确
+      await waitFor(() => {
+        const schema = ref.current?.getSchema();
+        const htmlContent = ref.current?.getHtmlContent();
+        const schemaString = ref.current?.getSchemaString();
+
+        // htmlContent 应该等于 schema.component.schema
+        expect(htmlContent).toBe(schema?.component?.schema);
+        expect(htmlContent).toBe('<div>Derived HTML</div>');
+
+        // schemaString 应该等于 schema 的 JSON 序列化
+        const expectedJson = JSON.stringify(schema, null, 2);
+        expect(schemaString).toBe(expectedJson);
+        expect(schemaString).toContain('Derived Test');
+        expect(schemaString).toContain('Derived HTML');
+      });
+    });
+
+    it('应该验证 setHtmlContent 和 setSchemaString 使用统一方法', async () => {
+      const ref = createRef<SchemaEditorRef>();
+
+      render(
+        <TestWrapper>
+          <SchemaEditor
+            ref={ref}
+            initialSchema={mockSchema}
+            initialValues={mockValues}
+            height={600}
+          />
+        </TestWrapper>,
+      );
+
+      // 测试 setHtmlContent - 应该更新 schema.component.schema
+      const newHtml = '<div>Updated HTML</div>';
+      ref.current?.setHtmlContent(newHtml);
+
+      await waitFor(() => {
+        const schema = ref.current?.getSchema();
+        expect(schema?.component?.schema).toBe(newHtml);
+        expect(ref.current?.getHtmlContent()).toBe(newHtml);
+        // schemaString 应该自动更新
+        const schemaString = ref.current?.getSchemaString();
+        expect(schemaString).toContain('Updated HTML');
+      });
+
+      // 测试 setSchemaString - 应该更新整个 schema
+      const newJsonString = JSON.stringify({
+        version: '1.0.0',
+        name: 'Updated Schema',
+        component: {
+          type: 'html',
+          schema: '<div>From JSON</div>',
+        },
+      });
+      ref.current?.setSchemaString(newJsonString);
+
+      await waitFor(() => {
+        const schema = ref.current?.getSchema();
+        expect(schema?.name).toBe('Updated Schema');
+        expect(schema?.component?.schema).toBe('<div>From JSON</div>');
+        // htmlContent 应该自动更新
+        expect(ref.current?.getHtmlContent()).toBe('<div>From JSON</div>');
+      });
+    });
+
+    it('应该验证派生值在 schema 变化时自动同步', async () => {
+      const ref = createRef<SchemaEditorRef>();
+
+      render(
+        <TestWrapper>
+          <SchemaEditor
+            ref={ref}
+            initialSchema={mockSchema}
+            initialValues={mockValues}
+            height={600}
+          />
+        </TestWrapper>,
+      );
+
+      // 初始值验证
+      expect(ref.current?.getHtmlContent()).toBe('<div>Hello {{name}}</div>');
+      expect(ref.current?.getSchemaString()).toContain('Test Schema');
+
+      // 通过 setSchema 更新
+      const updatedSchema: LowCodeSchema = {
+        version: '1.0.0',
+        name: 'Synced Schema',
+        component: {
+          type: 'html',
+          schema: '<div>Synced Content</div>',
+        },
+      };
+      ref.current?.setSchema(updatedSchema);
+
+      // 验证派生值自动同步
+      await waitFor(() => {
+        expect(ref.current?.getHtmlContent()).toBe('<div>Synced Content</div>');
+        const schemaString = ref.current?.getSchemaString();
+        expect(schemaString).toContain('Synced Schema');
+        expect(schemaString).toContain('Synced Content');
+      });
+
+      // 再次通过 setHtmlContent 更新
+      ref.current?.setHtmlContent('<div>Double Synced</div>');
+
+      // 验证派生值再次自动同步
+      await waitFor(() => {
+        expect(ref.current?.getHtmlContent()).toBe('<div>Double Synced</div>');
+        const schema = ref.current?.getSchema();
+        expect(schema?.component?.schema).toBe('<div>Double Synced</div>');
+        const schemaString = ref.current?.getSchemaString();
+        expect(schemaString).toContain('Double Synced');
+      });
+    });
+
+    it('应该验证 getHtmlContent 和 getSchemaString 从 schemaRef 计算', () => {
+      const ref = createRef<SchemaEditorRef>();
+
+      render(
+        <TestWrapper>
+          <SchemaEditor
+            ref={ref}
+            initialSchema={mockSchema}
+            initialValues={mockValues}
+            height={600}
+          />
+        </TestWrapper>,
+      );
+
+      // 获取初始值
+      const initialSchema = ref.current?.getSchema();
+      const initialHtml = ref.current?.getHtmlContent();
+      const initialJson = ref.current?.getSchemaString();
+
+      // 验证 getHtmlContent 从 schemaRef 计算
+      expect(initialHtml).toBe(initialSchema?.component?.schema);
+
+      // 验证 getSchemaString 从 schemaRef 计算
+      const expectedJson = JSON.stringify(initialSchema, null, 2);
+      expect(initialJson).toBe(expectedJson);
+
+      // 更新 schema
+      const newSchema: LowCodeSchema = {
+        version: '1.0.0',
+        name: 'Computed Test',
+        component: {
+          type: 'html',
+          schema: '<div>Computed</div>',
+        },
+      };
+      ref.current?.setSchema(newSchema);
+
+      // 验证 get 方法返回的是计算值
+      const updatedSchema = ref.current?.getSchema();
+      const updatedHtml = ref.current?.getHtmlContent();
+      const updatedJson = ref.current?.getSchemaString();
+
+      expect(updatedHtml).toBe(updatedSchema?.component?.schema);
+      expect(updatedHtml).toBe('<div>Computed</div>');
+
+      const expectedUpdatedJson = JSON.stringify(updatedSchema, null, 2);
+      expect(updatedJson).toBe(expectedUpdatedJson);
+    });
   });
 
   describe('htmlActions 功能测试', () => {

@@ -6,7 +6,6 @@ import React, {
   forwardRef,
   useCallback,
   useContext,
-  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
@@ -107,8 +106,6 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
     const [values, setValues] = useState<Record<string, any>>(
       initialValues || {},
     );
-    const [schemaString, setSchemaString] = useState<string>('');
-    const [htmlContent, setHtmlContent] = useState<string>('');
     const [validationError, setValidationError] = useState<string>('');
     const [renderedSchema, setRenderedSchema] = useState<LowCodeSchema>(
       {} as LowCodeSchema,
@@ -117,21 +114,11 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
 
     // 使用 ref 存储最新值，确保 ref 方法能立即获取到最新状态
     const schemaRef = React.useRef<LowCodeSchema>(schema);
-    const htmlContentRef = React.useRef<string>(htmlContent);
-    const schemaStringRef = React.useRef<string>(schemaString);
 
     // 同步更新 ref 值
     React.useEffect(() => {
       schemaRef.current = schema;
     }, [schema]);
-
-    React.useEffect(() => {
-      htmlContentRef.current = htmlContent;
-    }, [htmlContent]);
-
-    React.useEffect(() => {
-      schemaStringRef.current = schemaString;
-    }, [schemaString]);
 
     // 将schema转换为JSON字符串
     const schemaToJson = useCallback(
@@ -159,16 +146,11 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
       [locale],
     );
 
-    // 初始化schema字符串
-    useEffect(() => {
-      const jsonString = schemaToJson(schema);
-      const html = schema.component?.schema || '';
-      setSchemaString(jsonString);
-      setHtmlContent(html);
-      // 同步更新 ref 值
-      schemaRef.current = schema;
-      schemaStringRef.current = jsonString;
-      htmlContentRef.current = html;
+    // 从 schema 派生 htmlContent 和 schemaString
+    const htmlContent = useMemo(() => schema.component?.schema || '', [schema]);
+
+    const schemaString = useMemo(() => {
+      return schemaToJson(schema);
     }, [schema, schemaToJson]);
 
     // 验证schema
@@ -205,8 +187,6 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
     // 处理HTML内容变更
     const handleHtmlChange = useCallback(
       (newHtml: string) => {
-        setHtmlContent(newHtml);
-        htmlContentRef.current = newHtml;
         const newSchema = {
           ...schemaRef.current,
           component: {
@@ -222,14 +202,9 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
     // 处理JSON编辑器变更
     const handleJsonChange = useCallback(
       (newJsonString: string) => {
-        setSchemaString(newJsonString);
-        schemaStringRef.current = newJsonString;
         const newSchema = jsonToSchema(newJsonString);
         if (newSchema) {
-          const html = newSchema.component?.schema || '';
           handleSchemaChange(newSchema);
-          setHtmlContent(html);
-          htmlContentRef.current = html;
         }
       },
       [jsonToSchema, handleSchemaChange],
@@ -282,51 +257,46 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
       handleCopyContent(schemaString, 'json');
     }, [schemaString, handleCopyContent]);
 
+    // 统一的设置内容方法，支持 HTML 或 JSON 字符串
+    const setContent = useCallback(
+      (content: string, type: 'html' | 'json') => {
+        if (type === 'html') {
+          handleHtmlChange(content);
+        } else {
+          handleJsonChange(content);
+        }
+      },
+      [handleHtmlChange, handleJsonChange],
+    );
+
     // 暴露 ref 方法
     useImperativeHandle(
       ref,
       () => ({
         setSchema: (newSchema: LowCodeSchema) => {
           handleSchemaChange(newSchema);
-          const newJsonString = schemaToJson(newSchema);
-          setSchemaString(newJsonString);
-          setHtmlContent(newSchema.component?.schema || '');
-          // 立即更新 ref 值，确保 get 方法能立即获取到最新值
           schemaRef.current = newSchema;
-          schemaStringRef.current = newJsonString;
-          htmlContentRef.current = newSchema.component?.schema || '';
         },
         setHtmlContent: (newHtml: string) => {
-          handleHtmlChange(newHtml);
-          // 立即更新 ref 值
-          htmlContentRef.current = newHtml;
+          setContent(newHtml, 'html');
         },
         setSchemaString: (newJsonString: string) => {
-          handleJsonChange(newJsonString);
-          // 立即更新 ref 值
-          schemaStringRef.current = newJsonString;
-          const newSchema = jsonToSchema(newJsonString);
-          if (newSchema) {
-            schemaRef.current = newSchema;
-            htmlContentRef.current = newSchema.component?.schema || '';
-          }
+          setContent(newJsonString, 'json');
         },
         getSchema: () => schemaRef.current,
-        getHtmlContent: () => htmlContentRef.current,
-        getSchemaString: () => schemaStringRef.current,
+        getHtmlContent: () => schemaRef.current.component?.schema || '',
+        getSchemaString: () => schemaToJson(schemaRef.current),
         run: handleRunClick,
         copyHtml: handleCopyHtml,
         copyJson: handleCopyJson,
       }),
       [
         handleSchemaChange,
-        handleHtmlChange,
-        handleJsonChange,
+        setContent,
         handleRunClick,
         handleCopyHtml,
         handleCopyJson,
         schemaToJson,
-        jsonToSchema,
       ],
     );
 
