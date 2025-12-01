@@ -13,6 +13,7 @@ import {
 import type { UseSpeechAdapter } from './MessagesContent/VoiceButton';
 import { BubbleExtraProps } from './types/BubbleExtra';
 import { DocInfoListProps } from './types/DocInfo';
+import type { SchemaValue } from '@schema-editor/host-sdk';
 
 /**
  * 基础样式属性
@@ -416,4 +417,62 @@ export interface BubbleProps<T = Record<string, any>>
       | (() => React.ReactNode)
       | (() => (file: AttachmentFile) => React.ReactNode);
   };
+
+  /**
+   * Schema Editor 配置（单例模式）
+   * @description 用于单个 Bubble 组件集成 Schema Editor，无需 BubbleList 包裹
+   * 内部使用单例模式管理全局监听器，自动处理注册/注销
+   * @example
+   * ```tsx
+   * <Bubble
+   *   originData={{ id: 'msg-1', originContent: '# Hello' }}
+   *   schemaEditorConfig={{
+   *     enabled: process.env.NODE_ENV === 'development',
+   *     onContentChange: (content) => saveToServer(content)
+   *   }}
+   * />
+   * ```
+   */
+  schemaEditorConfig?: BubbleSchemaEditorConfig;
+}
+
+/**
+ * 单个 Bubble 组件的 Schema Editor 配置（单例模式）
+ * @description 用于单个 Bubble 组件集成 Schema Editor，无需 BubbleList 包裹
+ * 内部使用单例模式管理全局监听器，避免多个 Bubble 组件冲突
+ *
+ * @example
+ * ```tsx
+ * <Bubble
+ *   originData={{ id: 'msg-1', originContent: '# Hello' }}
+ *   schemaEditorConfig={{
+ *     enabled: process.env.NODE_ENV === 'development',
+ *     onContentChange: (content) => saveToServer(content)
+ *   }}
+ * />
+ * ```
+ */
+export interface BubbleSchemaEditorConfig {
+  /**
+   * 是否启用 Schema Editor 集成
+   * @description 默认启用，生产环境建议显式设为 false
+   * @default true
+   */
+  enabled?: boolean;
+
+  /**
+   * 内容变化时的回调（可选）
+   * @description 当插件编辑内容后触发，用于持久化或同步到外部状态
+   * @param content - 新的 Markdown 内容字符串
+   */
+  onContentChange?: (content: string) => void;
+
+  /**
+   * 自定义预览渲染（可选）
+   * @description 在插件中预览编辑效果，如不提供则使用内置 Markdown 预览
+   * @param schema - 当前编辑的内容
+   * @param containerId - 预览容器的 DOM ID
+   * @returns 清理函数（可选），插件关闭预览时自动调用
+   */
+  renderPreview?: (schema: SchemaValue, containerId: string) => (() => void) | void;
 }
