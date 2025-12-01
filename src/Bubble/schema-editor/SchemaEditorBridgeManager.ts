@@ -164,10 +164,17 @@ export class SchemaEditorBridgeManager {
           return false;
         }
 
-        const content =
-          typeof schema === 'string' ? schema : JSON.stringify(schema, null, 2);
-        handler.setContent(content);
-        return true;
+        try {
+          const content =
+            typeof schema === 'string'
+              ? schema
+              : JSON.stringify(schema, null, 2);
+          handler.setContent(content);
+          return true;
+        } catch (error) {
+          console.error('[SchemaEditorBridge] updateSchema failed:', error);
+          return false;
+        }
       },
 
       renderPreview: (schema: SchemaValue, containerId: string) => {
