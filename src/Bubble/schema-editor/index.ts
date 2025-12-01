@@ -1,0 +1,17 @@
+/**
+ * Schema Editor 模块导出
+ * @description 包含 Schema Editor 插件集成相关的所有功能
+ */
+
+export {
+  SchemaEditorBridgeManager,
+  type BubbleHandler,
+  type BridgeManagerConfig,
+} from './SchemaEditorBridgeManager';
+
+export {
+  useSchemaEditorBridge,
+  type UseSchemaEditorBridgeConfig,
+  type UseSchemaEditorBridgeResult,
+} from './useSchemaEditorBridge';
+
