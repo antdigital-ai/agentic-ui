@@ -99,7 +99,7 @@ export const Bubble: React.FC<
           }
         : undefined,
     }),
-    [props, isUserMessage, originData, isSchemaEditorEnabled, editedContent],
+    [props, isUserMessage, isSchemaEditorEnabled, editedContent],
   );
 
   // 根据角色分发到对应的子组件

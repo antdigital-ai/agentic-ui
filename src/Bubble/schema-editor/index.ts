@@ -6,7 +6,6 @@
 export {
   SchemaEditorBridgeManager,
   type BubbleHandler,
-  type BridgeManagerConfig,
 } from './SchemaEditorBridgeManager';
 
 export {

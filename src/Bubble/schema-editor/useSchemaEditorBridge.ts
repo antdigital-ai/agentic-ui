@@ -118,7 +118,8 @@ export function useSchemaEditorBridge(
     const handler: BubbleHandler = {
       getContent: () => contentRef.current,
       setContent,
-      renderPreview: renderPreviewRef.current,
+      renderPreview: (schema, containerId) =>
+        renderPreviewRef.current?.(schema, containerId),
     };
 
     /** 注册 */

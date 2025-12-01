@@ -4,7 +4,7 @@
  */
 import React, { useState } from 'react';
 import { Bubble, MessageBubbleData, BubbleMetaData } from '@ant-design/agentic-ui';
-import { Card, Switch, Space, Typography, Alert, Divider, Tag } from 'antd';
+import { Card, Switch, Space, Typography, Alert, Tag } from 'antd';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -27,28 +27,6 @@ const messages: MessageBubbleData[] = [
   {
     id: 'chrome_ext_msg_1',
     role: 'assistant',
-    content: `## 这是一条可编辑的消息
-
-你可以使用 **Schema Editor** Chrome 扩展来编辑这段内容。
-
-### 功能特点
-
-1. 点击页面元素高亮可编辑区域
-2. 在扩展面板中实时编辑
-3. 修改会即时反映到页面上
-
-\`\`\`typescript
-// 示例代码
-const greeting = "Hello, Schema Editor!";
-console.log(greeting);
-\`\`\`
-
-| 功能 | 描述 | 状态 |
-|------|------|------|
-| 实时编辑 | 修改立即生效 | ✅ |
-| Markdown 预览 | 支持完整语法 | ✅ |
-| 多气泡支持 | 同时编辑多条消息 | ✅ |
-`,
     originContent: `## 这是一条可编辑的消息
 
 你可以使用 **Schema Editor** Chrome 扩展来编辑这段内容。
@@ -77,9 +55,6 @@ console.log(greeting);
   {
     id: 'chrome_ext_msg_2',
     role: 'user',
-    content: `这是用户发送的消息，也可以被编辑。
-
-包含一些 **加粗** 和 *斜体* 文本。`,
     originContent: `这是用户发送的消息，也可以被编辑。
 
 包含一些 **加粗** 和 *斜体* 文本。`,
@@ -89,8 +64,6 @@ console.log(greeting);
   {
     id: 'chrome_ext_msg_3',
     role: 'assistant',
-    content:
-      '这是另一条 AI 回复，你可以通过 Schema Editor 插件来编辑它的内容。\n\n试着修改这段文字看看效果！',
     originContent:
       '这是另一条 AI 回复，你可以通过 Schema Editor 插件来编辑它的内容。\n\n试着修改这段文字看看效果！',
     createAt: Date.now(),

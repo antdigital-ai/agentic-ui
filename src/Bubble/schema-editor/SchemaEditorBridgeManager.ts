@@ -140,12 +140,12 @@ export class SchemaEditorBridgeManager {
         if (!handler) {
           // 返回 undefined 表示该元素不可编辑，插件将无法打开编辑器
           this.currentEditingId = null;
-          return undefined;
+          return undefined as unknown as SchemaValue;
         }
         // 记录当前编辑的 Bubble id，供 renderPreview 使用
         this.currentEditingId = params;
         return handler.getContent();
-      }) as (params: string) => string,
+      }),
 
       updateSchema: (schema: SchemaValue, params: string) => {
         const handler = this.registry.get(params);
