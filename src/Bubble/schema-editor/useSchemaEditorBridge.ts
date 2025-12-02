@@ -13,8 +13,8 @@ import { useRefState } from './useRefState';
 export interface UseSchemaEditorBridgeConfig {
   /**
    * 是否启用 Schema Editor
-   * @description 控制是否启用插件集成，生产环境建议显式设为 false
-   * @default true
+   * @description 控制是否启用插件集成，需用户主动启用
+   * @default false
    */
   enabled?: boolean;
 
