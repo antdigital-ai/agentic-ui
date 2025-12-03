@@ -302,6 +302,11 @@ export type MarkdownEditorProps = {
     onEdit?: (id: string | number, comment: CommentDataType) => void;
     deleteConfirmText?: string;
     mentionsPlaceholder?: string;
+    /**
+     * 评论输入框占位符
+     * @description 评论输入框的占位符文本，如果不提供则使用 titlePlaceholderContent
+     */
+    placeholder?: string;
     listItemRender?: (
       defaultDom: {
         checkbox: React.JSX.Element | null;

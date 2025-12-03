@@ -19,7 +19,7 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
   }
 
   // 检查代码块是否未闭合
-  const isUnclosed = element?.otherProps?.finish === false;
+  const isUnclosed = element?.otherProps?.finished === false;
 
   return (
     <div

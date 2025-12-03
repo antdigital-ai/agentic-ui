@@ -279,7 +279,9 @@ describe('MarkdownInputField Comprehensive Tests', () => {
         />,
       );
 
-      const root = container.querySelector('.ant-agentic-md-input-field');
+      const root = container.querySelector(
+        '.ant-agentic-md-input-field',
+      ) as HTMLElement;
       expect(root).toBeTruthy();
       expect(
         root?.classList.contains('ant-agentic-md-input-field-is-multi-row'),
@@ -315,7 +317,9 @@ describe('MarkdownInputField Comprehensive Tests', () => {
         />,
       );
 
-      const root = container.querySelector('.ant-agentic-md-input-field');
+      const root = container.querySelector(
+        '.ant-agentic-md-input-field',
+      ) as HTMLElement;
       expect(root).toBeTruthy();
       expect(
         root?.classList.contains('ant-agentic-md-input-field-is-multi-row'),

@@ -39,6 +39,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-edit-area': {
         outline: 'none !important',
       },
+      '&-container': {
+        // 外层容器样式 - 不设置 padding，由内层 content 控制
+      },
       '&-content': {
         // 默认 padding，可以通过 contentStyle 覆盖
         // 使用 CSS 变量，允许通过内联样式覆盖

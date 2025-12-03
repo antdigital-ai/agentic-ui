@@ -8,9 +8,8 @@ import { CloseCircleOutlined } from '@ant-design/icons';
 import { ChevronsUpDown, Copy, Moon } from '@sofa-design/icons';
 import { message, Segmented } from 'antd';
 import copy from 'copy-to-clipboard';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext } from 'react';
 import { ActionIconBox } from '../../../Components/ActionIconBox';
-import { Loading } from '../../../Components/Loading';
 import { I18nContext } from '../../../I18n';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { langIconMap } from '../langIconMap';
@@ -87,12 +86,6 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
     setTheme,
     viewMode = 'code',
   } = props;
-
-  // 检查代码块是否未闭合 - 使用 useMemo 确保正确响应变化
-  const isUnclosed = useMemo(() => {
-    return element?.otherProps?.finish === false;
-  }, [element?.otherProps?.finish]);
-
   return (
     <div
       data-testid="code-toolbar"
@@ -187,15 +180,6 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
         ) : (
           // 非只读模式：显示语言选择器
           <LanguageSelector {...languageSelectorProps} />
-        )}
-        {/* 未闭合代码块的 loading 指示器 */}
-        {isUnclosed && (
-          <Loading
-            style={{
-              fontSize: '14px',
-              flexShrink: 0,
-            }}
-          />
         )}
       </div>
 

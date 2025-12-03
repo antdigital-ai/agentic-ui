@@ -312,6 +312,7 @@ export const parserSlateNodeToMarkdown = (
 
       delete configProps['columns'];
       delete configProps['dataSource'];
+      delete configProps['finished'];
 
       if (node.type === 'link-card') {
         configProps.type = 'card';
@@ -337,12 +338,112 @@ export const parserSlateNodeToMarkdown = (
       });
 
       // 只有当 configProps 不为空对象时才生成注释
-      if (Object.keys(configProps).length > 0) {
-        const propsToSerialize =
-          node.type === 'chart' && configProps.config
-            ? configProps.config
-            : configProps;
-        str += `<!--${JSON.stringify(propsToSerialize)}-->\n`;
+      // 检查 configProps 是否为空对象（删除 finished 后可能变成空对象）
+      const hasValidProps = Object.keys(configProps).length > 0;
+      if (hasValidProps) {
+        /**
+         * 将对象转换为数组（处理 {0: {...}, 1: {...}} 这种错误格式）
+         * @param obj - 要转换的对象
+         * @returns 转换后的数组，如果不是数字键对象则返回原对象
+         */
+        const convertObjectToArray = (obj: any): any => {
+          if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
+            return obj;
+          }
+
+          const keys = Object.keys(obj);
+          // 检查是否所有键都是数字字符串（如 "0", "1", "2"）
+          const allNumericKeys =
+            keys.length > 0 && keys.every((key) => /^\d+$/.test(key));
+
+          if (allNumericKeys) {
+            // 按数字顺序排序并转换为数组
+            const sortedKeys = keys.sort(
+              (a, b) => parseInt(a, 10) - parseInt(b, 10),
+            );
+            return sortedKeys.map((key) => obj[key]);
+          }
+
+          return obj;
+        };
+
+        // 对于图表类型，配置应该总是以数组形式存储在 config 中
+        if (node.type === 'chart') {
+          let chartConfig = configProps.config;
+
+          // 如果 config 不存在，但 configProps 看起来像图表配置（有 chartType），使用 configProps
+          if (!chartConfig && configProps.chartType) {
+            chartConfig = configProps;
+          }
+
+          // 如果 chartConfig 是对象且键都是数字（如 {0: {...}}），转换为数组
+          chartConfig = convertObjectToArray(chartConfig);
+
+          // 如果 chartConfig 还不是数组，将其包装为数组
+          // 这样可以确保即使只有一个配置项，也会被放入数组中
+          if (!Array.isArray(chartConfig)) {
+            // 如果 chartConfig 是对象，检查是否是 {0: {...}} 格式但转换失败的情况
+            if (chartConfig && typeof chartConfig === 'object') {
+              const keys = Object.keys(chartConfig);
+              // 如果只有一个键且是数字，提取该值
+              if (keys.length === 1 && /^\d+$/.test(keys[0])) {
+                chartConfig = [chartConfig[keys[0]]];
+              } else if (chartConfig.chartType) {
+                // 如果 chartConfig 有 chartType，说明是单个配置对象
+                chartConfig = [chartConfig];
+              } else {
+                // 其他情况，也包装为数组
+                chartConfig = [chartConfig];
+              }
+            } else if (chartConfig) {
+              chartConfig = [chartConfig];
+            } else {
+              chartConfig = [];
+            }
+          }
+
+          // 序列化为 { config: [...] } 格式
+          if (chartConfig.length > 0) {
+            str += `<!--${JSON.stringify({ config: chartConfig })}-->\n`;
+          }
+        } else {
+          // 非图表类型，使用原有逻辑
+          let nodeConfig = configProps;
+
+          // 如果 nodeConfig 是对象且键都是数字（如 {0: {...}}），转换为数组
+          nodeConfig = convertObjectToArray(nodeConfig);
+
+          let propsToSerialize: any;
+
+          // 如果 nodeConfig 是数组，直接使用数组
+          if (Array.isArray(nodeConfig)) {
+            propsToSerialize = nodeConfig;
+          } else {
+            // 如果是对象，过滤掉 undefined 值，但保留 false 值
+            propsToSerialize = Object.keys(nodeConfig).reduce(
+              (acc, key) => {
+                if (nodeConfig[key] !== undefined) {
+                  acc[key] = nodeConfig[key];
+                }
+                return acc;
+              },
+              {} as Record<string, any>,
+            );
+          }
+
+          // 对于数组，直接序列化；对于对象，检查是否为空
+          if (Array.isArray(propsToSerialize)) {
+            if (propsToSerialize.length > 0) {
+              str += `<!--${JSON.stringify({ config: propsToSerialize })}-->\n`;
+            }
+          } else if (
+            propsToSerialize &&
+            typeof propsToSerialize === 'object' &&
+            Object.keys(propsToSerialize).length > 0
+          ) {
+            str += `<!--${JSON.stringify(propsToSerialize)}-->\n`;
+          }
+        }
       }
     }
     const p = parent.at(-1) || ({} as any);
@@ -559,25 +660,49 @@ const textStyle = (t: Text) => {
   let preStr = '',
     afterStr = '';
 
-  // Extract whitespace
-  if (t.code || t.bold || t.strikethrough || t.italic) {
-    preStr = str.match(/^\s+/)?.[0] || '';
-    afterStr = str.match(/\s+$/)?.[0] || '';
-    str = str.trim();
-  }
-
   // Apply formats in a consistent order:
   // 1. Code (most specific)
   // 2. Bold (strong emphasis)
   // 3. Italic (emphasis)
   // 4. Strikethrough (modification)
   if (t.code && !t.tag) {
+    // Extract whitespace for non-tag code
+    if (t.code || t.bold || t.strikethrough || t.italic) {
+      preStr = str.match(/^\s+/)?.[0] || '';
+      afterStr = str.match(/\s+$/)?.[0] || '';
+      str = str.trim();
+    }
     str = `\`${str}\``;
   } else if (t.tag) {
+    // 如果是 tag，优先检查是否有 value，如果有 value 则使用 value 和 placeholder
+    // 如果没有 value 但有 text（且不为空），则使用 text
+    // 如果没有 text 也没有 value，则使用 placeholder
+    // 对于 tag，如果 text 只是空白字符，不保留空白字符
+    const trimmedStr = str.trim();
+
     if ((t as any).value) {
-      str = `\`${`\${placeholder:${(t as any)?.placeholder || '-'},value:${(t as any).value}}` || ''}\``;
+      // 有 value，优先使用 value 和 placeholder（即使有 text 也使用 value）
+      str = `\`\${placeholder:${(t as any)?.placeholder || '-'},value:${(t as any).value}}\``;
+    } else if (trimmedStr) {
+      // 没有 value 但有 text 且不为空，提取空白字符并使用 text
+      if (t.code || t.bold || t.strikethrough || t.italic) {
+        preStr = str.match(/^\s+/)?.[0] || '';
+        afterStr = str.match(/\s+$/)?.[0] || '';
+      }
+      str = `\`${trimmedStr}\``;
+    } else if ((t as any).placeholder) {
+      // 没有 text 也没有 value，使用 placeholder（不保留空白字符）
+      str = `\`\${placeholder:${(t as any).placeholder}}\``;
     } else {
-      str = `\`${str || `\${placeholder:${(t as any)?.placeholder || '-'}}` || ''}\``;
+      // 都没有，使用默认值（不保留空白字符）
+      str = `\`\${placeholder:-}\``;
+    }
+  } else {
+    // Extract whitespace for other formats
+    if (t.bold || t.strikethrough || t.italic) {
+      preStr = str.match(/^\s+/)?.[0] || '';
+      afterStr = str.match(/\s+$/)?.[0] || '';
+      str = str.trim();
     }
   }
 

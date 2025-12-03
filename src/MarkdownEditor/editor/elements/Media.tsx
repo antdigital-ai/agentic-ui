@@ -8,9 +8,11 @@ import { Modal, Popover, Skeleton } from 'antd';
 import React, {
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 
 import { useDebounceFn } from '@ant-design/pro-components';
@@ -219,6 +221,8 @@ export function Media({
   const { markdownEditorRef, readonly } = useEditorStore();
   const { locale } = useContext(I18nContext);
   const htmlRef = React.useRef<HTMLDivElement>(null);
+  const [showAsText, setShowAsText] = useState(false);
+
   const [state, setState] = useGetSetState({
     height: element.height,
     dragging: false,
@@ -234,6 +238,22 @@ export function Media({
     },
     [path],
   );
+
+  // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
+  useEffect(() => {
+    if (element.finished === false) {
+      setShowAsText(false);
+      const timer = setTimeout(() => {
+        setShowAsText(true);
+      }, 5000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    } else {
+      setShowAsText(false);
+    }
+  }, [element.finished]);
 
   const initial = useCallback(async () => {
     let type = getMediaType(element?.url, element.alt);
@@ -293,11 +313,25 @@ export function Media({
   const imageDom = useMemo(() => {
     if (state().type !== 'image' && state().type !== 'other') return null;
 
-    // 检查是否为不完整的图片（loading 状态）
-    const isLoading =
-      (element as any)?.loading || (element as any)?.otherProps?.loading;
-    if (isLoading) {
-      // 显示 loading 状态的占位符
+    // 检查是否为不完整的图片（finished 状态）
+    if (element.finished === false) {
+      // 如果 5 秒后仍未完成，显示为文本
+      if (showAsText) {
+        return (
+          <div
+            style={{
+              padding: '8px 12px',
+              border: '1px solid #d9d9d9',
+              borderRadius: '4px',
+              color: 'rgba(0, 0, 0, 0.65)',
+              wordBreak: 'break-all',
+            }}
+          >
+            {element.alt || element.url || '图片链接'}
+          </div>
+        );
+      }
+      // 5 秒内显示 loading 状态的占位符
       return <Skeleton.Image active />;
     }
 
@@ -341,22 +375,36 @@ export function Media({
     state()?.url,
     readonly,
     state().selected,
-    (element as any)?.loading,
-    (element as any)?.otherProps?.loading,
+    element.finished,
+    showAsText,
     (element as any)?.rawMarkdown,
   ]);
 
   const mediaElement = useMemo(() => {
-    // 检查是否为不完整的媒体（loading 状态）
-    const isLoading =
-      (element as any)?.loading || (element as any)?.otherProps?.loading;
     const rawMarkdown =
       (element as any)?.rawMarkdown ||
       (element as any)?.otherProps?.rawMarkdown;
 
     if (state().type === 'video') {
-      // 如果是 loading 状态，显示 loading 占位符
-      if (isLoading) {
+      // 如果是不完整状态
+      if (element.finished === false) {
+        // 如果 5 秒后仍未完成，显示为文本
+        if (showAsText) {
+          return (
+            <div
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #d9d9d9',
+                borderRadius: '4px',
+                color: 'rgba(0, 0, 0, 0.65)',
+                wordBreak: 'break-all',
+              }}
+            >
+              {element.alt || element.url || '视频链接'}
+            </div>
+          );
+        }
+        // 5 秒内显示 loading 占位符
         return <Skeleton.Image active />;
       }
 
@@ -412,8 +460,25 @@ export function Media({
     }
 
     if (state().type === 'audio') {
-      // 如果是 loading 状态，显示 loading 占位符
-      if (isLoading) {
+      // 如果是不完整状态
+      if (element.finished === false) {
+        // 如果 5 秒后仍未完成，显示为文本
+        if (showAsText) {
+          return (
+            <div
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #d9d9d9',
+                borderRadius: '4px',
+                color: 'rgba(0, 0, 0, 0.65)',
+                wordBreak: 'break-all',
+              }}
+            >
+              {element.alt || element.url || '音频链接'}
+            </div>
+          );
+        }
+        // 5 秒内显示 loading 占位符
         return (
           <div
             style={{
@@ -605,8 +670,8 @@ export function Media({
   }, [
     state().type,
     state()?.url,
-    (element as any)?.loading,
-    (element as any)?.otherProps?.loading,
+    element.finished,
+    showAsText,
     (element as any)?.rawMarkdown,
   ]);
 

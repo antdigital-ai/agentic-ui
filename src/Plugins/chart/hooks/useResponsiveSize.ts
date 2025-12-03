@@ -27,9 +27,7 @@ export const useResponsiveSize = (
 
   const isMobile = windowWidth <= 768;
   const responsiveWidth = isMobile ? '100%' : width;
-  const responsiveHeight = isMobile
-    ? Math.min(windowWidth * 0.8, 400)
-    : height;
+  const responsiveHeight = isMobile ? Math.min(windowWidth * 0.8, 400) : height;
 
   useEffect(() => {
     const handleResize = () => {
@@ -52,4 +50,3 @@ export const useResponsiveSize = (
     [responsiveWidth, responsiveHeight, isMobile, windowWidth],
   );
 };
-

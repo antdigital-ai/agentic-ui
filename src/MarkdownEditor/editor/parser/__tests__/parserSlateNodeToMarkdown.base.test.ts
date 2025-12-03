@@ -390,3 +390,132 @@ describe('parserSlateNodeToMarkdown - answer blocks', () => {
     expect(result).toBe('```answer\n第一行答案\n第二行答案\n第三行答案\n```');
   });
 });
+
+describe('parserSlateNodeToMarkdown - tag nodes', () => {
+  it('should convert tag with text to inline code', () => {
+    const node = {
+      type: 'paragraph',
+      children: [
+        { text: 'Select ' },
+        {
+          text: '已选择',
+          code: true,
+          tag: true,
+          placeholder: '目标场景',
+        },
+        { text: ' here' },
+      ],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toBe('Select `已选择` here');
+  });
+
+  it('should convert tag with placeholder when text is empty', () => {
+    const node = {
+      type: 'paragraph',
+      children: [
+        { text: 'Select ' },
+        {
+          text: ' ',
+          code: true,
+          tag: true,
+          placeholder: '目标场景',
+        },
+        { text: ' here' },
+      ],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toBe('Select `${placeholder:目标场景}` here');
+  });
+
+  it('should convert tag with placeholder when text is only whitespace', () => {
+    const node = {
+      type: 'paragraph',
+      children: [
+        { text: 'Empty ' },
+        {
+          text: '   ',
+          code: true,
+          tag: true,
+          placeholder: '请选择',
+        },
+        { text: ' tag' },
+      ],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toBe('Empty `${placeholder:请选择}` tag');
+  });
+
+  it('should convert tag with value and placeholder', () => {
+    const node = {
+      type: 'paragraph',
+      children: [
+        { text: 'Value ' },
+        {
+          text: ' ',
+          code: true,
+          tag: true,
+          placeholder: '目标场景',
+          value: '已选择的值',
+        },
+        { text: ' here' },
+      ],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toBe(
+      'Value `${placeholder:目标场景,value:已选择的值}` here',
+    );
+  });
+
+  it('should convert tag with text (priority over placeholder)', () => {
+    const node = {
+      type: 'paragraph',
+      children: [
+        { text: 'Has ' },
+        {
+          text: '实际文本',
+          code: true,
+          tag: true,
+          placeholder: '目标场景',
+        },
+        { text: ' content' },
+      ],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toBe('Has `实际文本` content');
+  });
+
+  it('should convert tag without placeholder (fallback to default)', () => {
+    const node = {
+      type: 'paragraph',
+      children: [
+        { text: 'Default ' },
+        {
+          text: ' ',
+          code: true,
+          tag: true,
+        },
+        { text: ' tag' },
+      ],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toBe('Default `${placeholder:-}` tag');
+  });
+
+  it('should handle normal inline code (not tag)', () => {
+    const node = {
+      type: 'paragraph',
+      children: [
+        { text: 'Code ' },
+        {
+          text: 'const x = 1',
+          code: true,
+          tag: false,
+        },
+        { text: ' here' },
+      ],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toBe('Code `const x = 1` here');
+  });
+});

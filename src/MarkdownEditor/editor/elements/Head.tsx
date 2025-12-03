@@ -12,10 +12,8 @@ export function Head({
   attributes,
   children,
 }: ElementProps<HeadNode>) {
-  const {
-    store = {} as Record<string, any>,
-    markdownContainerRef,
-  } = useEditorStore();
+  const { store = {} as Record<string, any>, markdownContainerRef } =
+    useEditorStore();
   const [selected, path] = useSelStatus(element);
   const str = Node.string(element);
   return React.useMemo(() => {

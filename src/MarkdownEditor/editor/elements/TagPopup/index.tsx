@@ -259,10 +259,10 @@ const createDefaultDom = (
       ref={domRef}
       data-tag-popup-input
       data-no-focus
-      className={classNames(`${baseCls}-tag-popup-input`, hashId, {
+      className={classNames(`${baseCls}-input`, hashId, {
         empty: isEmpty,
-        [`${baseCls}-tag-popup-input-loading`]: loading,
-        [`${baseCls}-tag-popup-input-has-arrow`]: hasItems,
+        [`${baseCls}-loading`]: loading,
+        [`${baseCls}-has-arrow`]: hasItems,
       })}
       onMouseEnter={() => handleMouseEnter(domRef)}
       onMouseLeave={() => handleMouseLeave(domRef)}
@@ -272,7 +272,7 @@ const createDefaultDom = (
       {children}
       {hasItems && (
         <ChevronDown
-          className={classNames(`${baseCls}-tag-popup-input-arrow `, hashId, {
+          className={classNames(`${baseCls}-arrow`, hashId, {
             empty: isEmpty,
             open: isOpen,
           })}
@@ -365,9 +365,7 @@ export const TagPopup = (props: RenderProps) => {
   const domRef = useRef<HTMLDivElement>(null);
   const suggestionConnext = useContext(SuggestionConnext);
   const antdContext = useContext(ConfigProvider.ConfigContext);
-  const baseCls = antdContext?.getPrefixCls(
-    'agentic-md-editor-tag-popup-input',
-  );
+  const baseCls = antdContext?.getPrefixCls('agentic-tag-popup');
   const { wrapSSR, hashId } = useStyle(baseCls);
   const currentNodePath = useRef<number[]>();
 

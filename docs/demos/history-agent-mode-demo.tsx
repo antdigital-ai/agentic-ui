@@ -110,9 +110,11 @@ const AgentModeHistoryDemo = () => {
   };
 
   // 处理选择会话
-  const handleSelected = async (sessionId: string) => {
-    setCurrentSessionId(sessionId);
-    message.success(`选择了会话: ${sessionId}`);
+  const handleSelected = (item: HistoryDataType) => {
+    if (item.sessionId) {
+      setCurrentSessionId(item.sessionId);
+      message.success(`选择了会话: ${item.sessionId}`);
+    }
   };
 
   // 处理删除会话

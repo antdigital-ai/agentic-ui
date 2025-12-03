@@ -34,7 +34,8 @@ export const List = ({
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context.getPrefixCls('agentic-md-editor-list');
   const { wrapSSR, hashId } = useStyle(baseCls);
-  return React.useMemo(() => {
+
+  const listContent = React.useMemo(() => {
     const tag = element.order ? 'ol' : 'ul';
     return wrapSSR(
       <ListContext.Provider
@@ -64,5 +65,19 @@ export const List = ({
         </div>
       </ListContext.Provider>,
     );
-  }, [element.task, element.order, element.start, element.children]);
+  }, [
+    element.task,
+    element.order,
+    element.start,
+    element.children,
+    baseCls,
+    hashId,
+    attributes,
+    children,
+    store,
+    markdownContainerRef,
+    wrapSSR,
+  ]);
+
+  return listContent;
 };

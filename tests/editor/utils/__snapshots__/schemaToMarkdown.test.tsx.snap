@@ -106,7 +106,7 @@ exports[`should convert markdown to schema in
       "data-block": "true",
       "data-language": "typescript",
       "data-state": "loading",
-      "finish": false,
+      "finished": false,
     },
     "render": false,
     "type": "code",
@@ -663,21 +663,74 @@ exports[`should convert markdown to schema in
             "type": "table-row",
           },
         ],
+        "finished": undefined,
         "otherProps": {
           "columns": [
-            "业务",
-            "2021Q1",
-            "2021Q2",
-            "2021Q3",
-            "2021Q4",
-            "2022Q1",
-            "2022Q2",
-            "2022Q3",
-            "2022Q4",
-            "2023Q1",
-            "2023Q2",
-            "2023Q3",
-            "2023Q4",
+            {
+              "dataIndex": "业务",
+              "key": "业务",
+              "title": "业务",
+            },
+            {
+              "dataIndex": "2021Q1",
+              "key": "2021Q1",
+              "title": "2021Q1",
+            },
+            {
+              "dataIndex": "2021Q2",
+              "key": "2021Q2",
+              "title": "2021Q2",
+            },
+            {
+              "dataIndex": "2021Q3",
+              "key": "2021Q3",
+              "title": "2021Q3",
+            },
+            {
+              "dataIndex": "2021Q4",
+              "key": "2021Q4",
+              "title": "2021Q4",
+            },
+            {
+              "dataIndex": "2022Q1",
+              "key": "2022Q1",
+              "title": "2022Q1",
+            },
+            {
+              "dataIndex": "2022Q2",
+              "key": "2022Q2",
+              "title": "2022Q2",
+            },
+            {
+              "dataIndex": "2022Q3",
+              "key": "2022Q3",
+              "title": "2022Q3",
+            },
+            {
+              "dataIndex": "2022Q4",
+              "key": "2022Q4",
+              "title": "2022Q4",
+            },
+            {
+              "dataIndex": "2023Q1",
+              "key": "2023Q1",
+              "title": "2023Q1",
+            },
+            {
+              "dataIndex": "2023Q2",
+              "key": "2023Q2",
+              "title": "2023Q2",
+            },
+            {
+              "dataIndex": "2023Q3",
+              "key": "2023Q3",
+              "title": "2023Q3",
+            },
+            {
+              "dataIndex": "2023Q4",
+              "key": "2023Q4",
+              "title": "2023Q4",
+            },
           ],
           "dataSource": [
             {
@@ -696,7 +749,6 @@ exports[`should convert markdown to schema in
               "业务": "收入",
             },
           ],
-          "finish": false,
         },
         "type": "table",
       },
@@ -777,7 +829,7 @@ return tokens;",
     "otherProps": {
       "data-block": "true",
       "data-state": "loading",
-      "finish": true,
+      "finished": false,
     },
     "render": false,
     "type": "code",
@@ -822,7 +874,7 @@ return tokens;",
     "otherProps": {
       "data-block": "true",
       "data-state": "loading",
-      "finish": false,
+      "finished": false,
     },
     "render": false,
     "type": "code",
@@ -850,6 +902,7 @@ exports[`should convert markdown to schema in ![](https: chunk 1`] = `
             "text": "",
           },
         ],
+        "finished": undefined,
         "mediaType": "image",
         "type": "media",
         "url": "https://mdn.alipayobjects.com/huamei_gcee1x/afts/img/A*9F0qRYV8EjUAAAAAAAAAAAAADml6AQ/original",
@@ -882,6 +935,7 @@ exports[`should convert markdown to schema in ![](https: chunk 1`] = `
             "text": "",
           },
         ],
+        "finished": undefined,
         "mediaType": "image",
         "type": "media",
         "url": "https://mdn.alipayobjects.com/huamei_gcee1x/afts/img/A*9F0qRYV8EjUAAAAAAAAAAAAADml6AQ/original",
@@ -919,6 +973,7 @@ exports[`should convert markdown to schema in ![attachme chunk 1`] = `
             "text": "",
           },
         ],
+        "finished": undefined,
         "mediaType": "image",
         "type": "media",
         "url": "https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/A*NudQQry0ERwAAAAAAAAAAAAADtN3AQ",
@@ -956,6 +1011,7 @@ exports[`should convert markdown to schema in ![video:视频 chunk 1`] = `
             "text": "",
           },
         ],
+        "finished": undefined,
         "mediaType": "image",
         "type": "media",
         "url": "https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/A*NudQQry0ERwAAAAAAAAAAAAADtN3AQ",
@@ -1086,6 +1142,7 @@ exports[`should convert markdown to schema in ## 1. 编辑器核 chunk 1`] = `
                 "type": "list-item",
               },
             ],
+            "finished": undefined,
             "order": false,
             "start": null,
             "task": false,
@@ -1154,6 +1211,7 @@ exports[`should convert markdown to schema in ## 1. 编辑器核 chunk 1`] = `
                 "type": "list-item",
               },
             ],
+            "finished": undefined,
             "order": false,
             "start": null,
             "task": false,
@@ -1164,6 +1222,7 @@ exports[`should convert markdown to schema in ## 1. 编辑器核 chunk 1`] = `
         "type": "list-item",
       },
     ],
+    "finished": undefined,
     "order": false,
     "start": null,
     "task": false,
@@ -1266,6 +1325,7 @@ exports[`should convert markdown to schema in ## 4. 性能优化 chunk 1`] = `
                 "type": "list-item",
               },
             ],
+            "finished": undefined,
             "order": false,
             "start": null,
             "task": false,
@@ -1319,6 +1379,7 @@ exports[`should convert markdown to schema in ## 4. 性能优化 chunk 1`] = `
                 "type": "list-item",
               },
             ],
+            "finished": undefined,
             "order": false,
             "start": null,
             "task": false,
@@ -1329,6 +1390,7 @@ exports[`should convert markdown to schema in ## 4. 性能优化 chunk 1`] = `
         "type": "list-item",
       },
     ],
+    "finished": undefined,
     "order": true,
     "start": 1,
     "task": false,
@@ -1563,6 +1625,7 @@ exports[`should convert markdown to schema in ### 1.2 高级 chunk 1`] = `
         "type": "list-item",
       },
     ],
+    "finished": undefined,
     "order": false,
     "start": null,
     "task": false,
@@ -1615,7 +1678,7 @@ class FileBuffer:
       "data-block": "true",
       "data-language": "python",
       "data-state": "loading",
-      "finish": false,
+      "finished": false,
     },
     "render": false,
     "type": "code",
@@ -1701,7 +1764,7 @@ for num in arr:
               "data-block": "true",
               "data-language": "python",
               "data-state": "loading",
-              "finish": true,
+              "finished": false,
             },
             "render": false,
             "type": "code",
@@ -1722,6 +1785,7 @@ for num in arr:
         "type": "list-item",
       },
     ],
+    "finished": undefined,
     "order": true,
     "start": 1,
     "task": false,
@@ -1763,6 +1827,7 @@ exports[`should convert markdown to schema in ### 三、特殊场景 chunk 1`] =
         "type": "list-item",
       },
     ],
+    "finished": undefined,
     "order": true,
     "start": 6,
     "task": false,
@@ -1782,7 +1847,7 @@ exports[`should convert markdown to schema in ### 三、特殊场景 chunk 1`] =
       "data-block": "true",
       "data-language": "python",
       "data-state": "loading",
-      "finish": false,
+      "finished": false,
     },
     "render": false,
     "type": "code",
@@ -1818,10 +1883,9 @@ exports[`should convert markdown to schema in ### 二、其他遍历 chunk 1`] =
               {
                 "bold": true,
                 "code": true,
-                "text": "while",
-              },
-              {
-                "bold": true,
+                "initialValue": undefined,
+                "placeholder": undefined,
+                "tag": false,
                 "text": "while",
               },
               {
@@ -1853,7 +1917,7 @@ while i < len(arr):
               "data-block": "true",
               "data-language": "python",
               "data-state": "loading",
-              "finish": true,
+              "finished": false,
             },
             "render": false,
             "type": "code",
@@ -1875,6 +1939,7 @@ while i < len(arr):
         "type": "list-item",
       },
     ],
+    "finished": undefined,
     "order": true,
     "start": 4,
     "task": false,
@@ -2199,7 +2264,7 @@ class SyntaxHighlighter {
       "data-block": "true",
       "data-language": "javascript",
       "data-state": "loading",
-      "finish": false,
+      "finished": false,
     },
     "render": false,
     "type": "code",
@@ -2230,7 +2295,7 @@ exports[`should convert markdown to schema in \`\`\`mermaid chunk 1`] = `
       "data-block": "true",
       "data-language": "mermaid",
       "data-state": "loading",
-      "finish": false,
+      "finished": false,
     },
     "render": false,
     "type": "mermaid",
@@ -2272,7 +2337,7 @@ exports[`should convert markdown to schema in \`\`\`mermaid chunk 2`] = `
       "data-block": "true",
       "data-language": "mermaid",
       "data-state": "loading",
-      "finish": false,
+      "finished": false,
     },
     "render": false,
     "type": "mermaid",
@@ -2321,7 +2386,7 @@ exports[`should convert markdown to schema in \`\`\`schema
       "data-block": "true",
       "data-language": "schema",
       "data-state": "loading",
-      "finish": false,
+      "finished": false,
     },
     "render": false,
     "type": "apaasify",
@@ -3331,14 +3396,39 @@ exports[`should convert markdown to schema in | 业务       chunk 1`] = `
             "type": "table-row",
           },
         ],
+        "finished": undefined,
         "otherProps": {
           "columns": [
-            "业务",
-            "2021Q1",
-            "2021Q2",
-            "2021Q3",
-            "2021Q4",
-            "2022Q1",
+            {
+              "dataIndex": "业务",
+              "key": "业务",
+              "title": "业务",
+            },
+            {
+              "dataIndex": "2021Q1",
+              "key": "2021Q1",
+              "title": "2021Q1",
+            },
+            {
+              "dataIndex": "2021Q2",
+              "key": "2021Q2",
+              "title": "2021Q2",
+            },
+            {
+              "dataIndex": "2021Q3",
+              "key": "2021Q3",
+              "title": "2021Q3",
+            },
+            {
+              "dataIndex": "2021Q4",
+              "key": "2021Q4",
+              "title": "2021Q4",
+            },
+            {
+              "dataIndex": "2022Q1",
+              "key": "2022Q1",
+              "title": "2022Q1",
+            },
           ],
           "dataSource": [
             {
@@ -3406,7 +3496,6 @@ exports[`should convert markdown to schema in | 业务       chunk 1`] = `
               "业务": "云",
             },
           ],
-          "finish": false,
         },
         "type": "table",
       },
@@ -4411,18 +4500,43 @@ exports[`should convert markdown to schema in | 业务       chunk 2`] = `
             "type": "table-row",
           },
         ],
+        "finished": undefined,
         "otherProps": {
           "columns": [
-            "业务",
-            "2021Q1",
-            "2021Q2",
-            "2021Q3",
-            "2021Q4",
-            "2022Q1",
+            {
+              "dataIndex": "业务",
+              "key": "业务",
+              "title": "业务",
+            },
+            {
+              "dataIndex": "2021Q1",
+              "key": "2021Q1",
+              "title": "2021Q1",
+            },
+            {
+              "dataIndex": "2021Q2",
+              "key": "2021Q2",
+              "title": "2021Q2",
+            },
+            {
+              "dataIndex": "2021Q3",
+              "key": "2021Q3",
+              "title": "2021Q3",
+            },
+            {
+              "dataIndex": "2021Q4",
+              "key": "2021Q4",
+              "title": "2021Q4",
+            },
+            {
+              "dataIndex": "2022Q1",
+              "key": "2022Q1",
+              "title": "2022Q1",
+            },
           ],
           "dataSource": [
             {
-              "2021Q1": "135,303 \\[^DOC\\_1]",
+              "2021Q1": "135,303 \\[^DOC1]",
               "2021Q2": "138,259",
               "2021Q3": "142,368",
               "2021Q4": "144,188",
@@ -4486,7 +4600,6 @@ exports[`should convert markdown to schema in | 业务       chunk 2`] = `
               "业务": "云",
             },
           ],
-          "finish": true,
         },
         "type": "table",
       },
@@ -5050,12 +5163,29 @@ exports[`should convert markdown to schema in | 技术方向     chunk 1`] = `
             "type": "table-row",
           },
         ],
+        "finished": undefined,
         "otherProps": {
           "columns": [
-            "技术方向",
-            "实现方案",
-            "优点",
-            "缺点",
+            {
+              "dataIndex": "技术方向",
+              "key": "技术方向",
+              "title": "技术方向",
+            },
+            {
+              "dataIndex": "实现方案",
+              "key": "实现方案",
+              "title": "实现方案",
+            },
+            {
+              "dataIndex": "优点",
+              "key": "优点",
+              "title": "优点",
+            },
+            {
+              "dataIndex": "缺点",
+              "key": "缺点",
+              "title": "缺点",
+            },
           ],
           "dataSource": [
             {
@@ -5095,7 +5225,6 @@ exports[`should convert markdown to schema in | 技术方向     chunk 1`] = `
               "缺点": "大数据量性能瓶颈",
             },
           ],
-          "finish": false,
         },
         "type": "table",
       },
@@ -5255,6 +5384,7 @@ exports[`should convert markdown to schema in 2. **通过索引遍 chunk 1`] = `
         "type": "list-item",
       },
     ],
+    "finished": undefined,
     "order": true,
     "start": 2,
     "task": false,
@@ -5273,7 +5403,7 @@ exports[`should convert markdown to schema in 2. **通过索引遍 chunk 1`] = `
       "data-block": "true",
       "data-language": "python",
       "data-state": "loading",
-      "finish": true,
+      "finished": false,
     },
     "render": false,
     "type": "code",
@@ -5307,10 +5437,9 @@ exports[`should convert markdown to schema in 3. **同时获取索 chunk 1`] = `
               {
                 "bold": true,
                 "code": true,
-                "text": "enumerate",
-              },
-              {
-                "bold": true,
+                "initialValue": undefined,
+                "placeholder": undefined,
+                "tag": false,
                 "text": "enumerate",
               },
               {
@@ -5325,6 +5454,7 @@ exports[`should convert markdown to schema in 3. **同时获取索 chunk 1`] = `
         "type": "list-item",
       },
     ],
+    "finished": undefined,
     "order": true,
     "start": 3,
     "task": false,
@@ -5343,7 +5473,7 @@ exports[`should convert markdown to schema in 3. **同时获取索 chunk 1`] = `
       "data-block": "true",
       "data-language": "python",
       "data-state": "loading",
-      "finish": true,
+      "finished": false,
     },
     "render": false,
     "type": "code",
@@ -5389,6 +5519,7 @@ exports[`should convert markdown to schema in 5. **列表推导式 chunk 1`] = `
         "type": "list-item",
       },
     ],
+    "finished": undefined,
     "order": true,
     "start": 5,
     "task": false,
@@ -5406,7 +5537,7 @@ exports[`should convert markdown to schema in 5. **列表推导式 chunk 1`] = `
       "data-block": "true",
       "data-language": "python",
       "data-state": "loading",
-      "finish": true,
+      "finished": false,
     },
     "render": false,
     "type": "code",
@@ -5456,7 +5587,7 @@ registerPlugin(plugin: EditorPlugin): boolean {
     "otherProps": {
       "data-block": "true",
       "data-state": "loading",
-      "finish": false,
+      "finished": false,
     },
     "render": false,
     "type": "code",
@@ -5520,7 +5651,7 @@ exports[`should convert schema to markdown in
 ### 5.2 A chunk 1`] = `
 "### 5.2 API接口设计
 
-<!--{"data-block":"true","data-state":"loading","finish":false,"data-language":"typescript"}-->
+<!--{"data-block":"true","data-state":"loading","data-language":"typescript"}-->
 \`\`\`typescript
 interface EditorPlugin {
   name: string;
@@ -5548,8 +5679,7 @@ exports[`should convert schema to markdown in
 
 exports[`should convert schema to markdown in 
 | 业务      chunk 1`] = `
-"<!--{"finish":false}-->
-| 业务 |  2021Q1 |  2021Q2 |  2021Q3 |  2021Q4 |  2022Q1 |  2022Q2 |  2022Q3 |  2022Q4 |  2023Q1 |  2023Q2 |  2023Q3 |  2023Q4 |
+"| 业务 |  2021Q1 |  2021Q2 |  2021Q3 |  2021Q4 |  2022Q1 |  2022Q2 |  2022Q3 |  2022Q4 |  2023Q1 |  2023Q2 |  2023Q3 |  2023Q4 |
 | ---: | ------: | ------: | ------: | ------: | ------: | ------: | ------: | ------: | ------: | ------: | ------: | ------: |
 | 收入 | 135,303 | 138,259 | 142,368 | 144,188 | 135,471 | 134,034 | 140,093 | 144,954 | 149,986 | 149,208 | 154,625 | 155,200 |"
 `;
@@ -5562,7 +5692,7 @@ exports[`should convert schema to markdown in   parse(te chunk 1`] = `
 let currentState = 'initial';  
 const tokens = [];
 
-<!--{"finish":true,"data-block":"true","data-state":"loading"}-->
+<!--{"data-block":"true","data-state":"loading"}-->
 \`\`\`
 while (text.length > 0) {
   let matched = false;
@@ -5589,7 +5719,7 @@ return tokens;
 }  
 }
 
-<!--{"data-block":"true","data-state":"loading","finish":false}-->
+<!--{"data-block":"true","data-state":"loading"}-->
 \`\`\`
 \`\`\`"
 `;
@@ -5690,7 +5820,7 @@ exports[`should convert schema to markdown in ### 1.2 高级 chunk 1`] = `
 exports[`should convert schema to markdown in ### 4.2 内存 chunk 1`] = `
 "### 4.2 内存管理方案
 
-<!--{"data-block":"true","data-state":"loading","finish":false,"data-language":"python"}-->
+<!--{"data-block":"true","data-state":"loading","data-language":"python"}-->
 \`\`\`python
 # 文件分块加载示例
 class FileBuffer:
@@ -5721,7 +5851,7 @@ exports[`should convert schema to markdown in ### 一、基础遍历 chunk 1`] =
 "### 一、基础遍历方法
 
 1. **直接遍历元素**  
-使用 \`for-in\` 循环直接访问每个元素：<!--{"finish":true,"data-block":"true","data-state":"loading","data-language":"python"}-->
+使用 \`for-in\` 循环直接访问每个元素：<!--{"data-block":"true","data-state":"loading","data-language":"python"}-->
 \`\`\`python
 arr = [1, 2, 3, 4]
 for num in arr:
@@ -5734,7 +5864,7 @@ exports[`should convert schema to markdown in ### 三、特殊场景 chunk 1`] =
 
 6. **递归遍历**（不常用）
 
-<!--{"data-block":"true","data-state":"loading","finish":false,"data-language":"python"}-->
+<!--{"data-block":"true","data-state":"loading","data-language":"python"}-->
 \`\`\`python
    def traverse(arr, i=0):
        if i < len(arr):
@@ -5745,8 +5875,8 @@ exports[`should convert schema to markdown in ### 三、特殊场景 chunk 1`] =
 exports[`should convert schema to markdown in ### 二、其他遍历 chunk 1`] = `
 "### 二、其他遍历方式
 
-4. **使用** **\`while\`** **while** **循环**  
-通过计数器手动控制遍历：<!--{"finish":true,"data-block":"true","data-state":"loading","data-language":"python"}-->
+4. **使用** **\`while\`** **循环**  
+通过计数器手动控制遍历：<!--{"data-block":"true","data-state":"loading","data-language":"python"}-->
 \`\`\`python
 i = 0
 while i < len(arr):
@@ -5789,7 +5919,7 @@ exports[`should convert schema to markdown in [<font col chunk 1`] = `"<a href="
 exports[`should convert schema to markdown in [知乎](https chunk 1`] = `"[知乎](https://www.zhihu.com/favicon.ico?x-oss-process=image%252Fquality%252Cq_10)"`;
 
 exports[`should convert schema to markdown in \`\`\`javascr chunk 1`] = `
-"<!--{"data-block":"true","data-state":"loading","finish":false,"data-language":"javascript"}-->
+"<!--{"data-block":"true","data-state":"loading","data-language":"javascript"}-->
 \`\`\`javascript
 // 使用有限状态机实现基础语法高亮
 class SyntaxHighlighter {
@@ -5800,13 +5930,13 @@ class SyntaxHighlighter {
 \`\`\`"
 `;
 
-exports[`should convert schema to markdown in \`\`\`mermaid chunk 1`] = `"<!--{"data-block":"true","data-state":"loading","finish":false,"data-language":"mermaid"}-->"`;
+exports[`should convert schema to markdown in \`\`\`mermaid chunk 1`] = `"<!--{"data-block":"true","data-state":"loading","data-language":"mermaid"}-->"`;
 
-exports[`should convert schema to markdown in \`\`\`mermaid chunk 2`] = `"<!--{"data-block":"true","data-state":"loading","finish":false,"data-language":"mermaid"}-->"`;
+exports[`should convert schema to markdown in \`\`\`mermaid chunk 2`] = `"<!--{"data-block":"true","data-state":"loading","data-language":"mermaid"}-->"`;
 
 exports[`should convert schema to markdown in \`\`\`schema
  chunk 1`] = `
-"<!--{"data-block":"true","data-state":"loading","finish":false,"data-language":"schema"}-->
+"<!--{"data-block":"true","data-state":"loading","data-language":"schema"}-->
 \`\`\`schema
 [
   {
@@ -5827,8 +5957,7 @@ exports[`should convert schema to markdown in \`\`\`schema
 `;
 
 exports[`should convert schema to markdown in | 业务       chunk 1`] = `
-"<!--{"finish":false}-->
-| 业务 |  2021Q1 |  2021Q2 |  2021Q3 |  2021Q4 |  2022Q1 |
+"| 业务 |  2021Q1 |  2021Q2 |  2021Q3 |  2021Q4 |  2022Q1 |
 | :----------- | ------: | ------: | ------: | ------: | ------: |
 | 收入 | 135,303 | 138,259 | 142,368 | 144,188 | 135,471 |
 | 增值服务 |  72,443 |  72,013 |  75,203 |  71,913 |  72,738 |
@@ -5841,8 +5970,7 @@ exports[`should convert schema to markdown in | 业务       chunk 1`] = `
 `;
 
 exports[`should convert schema to markdown in | 业务       chunk 2`] = `
-"<!--{"finish":true}-->
-| 业务 | 2021Q1 |  2021Q2 |  2021Q3 |  2021Q4 |  2022Q1 |
+"| 业务 | 2021Q1 |  2021Q2 |  2021Q3 |  2021Q4 |  2022Q1 |
 | :----------- | :--------------- | ------: | ------: | ------: | ------: |
 | 收入 | 135,303 [^DOC_1] | 138,259 | 142,368 | 144,188 | 135,471 |
 | 增值服务 | 72,443 |  72,013 |  75,203 |  71,913 |  72,738 |
@@ -5857,8 +5985,7 @@ exports[`should convert schema to markdown in | 业务       chunk 2`] = `
 `;
 
 exports[`should convert schema to markdown in | 技术方向     chunk 1`] = `
-"<!--{"finish":false}-->
-| 技术方向 | 实现方案 | 优点 | 缺点 |
+"| 技术方向 | 实现方案 | 优点 | 缺点 |
 | :------- | :------------- | :--------------- | :--------------- |
 | 语法高亮 | 正则表达式匹配 | 实现简单 | 性能较差 |
 |  | 语法树分析 | 高准确性 | 实现复杂 |
@@ -5888,7 +6015,7 @@ exports[`should convert schema to markdown in 2. **通过索引遍 chunk 1`] = `
 "2. **通过索引遍历**  
 结合 \`range(len())\` 获取索引：
 
-<!--{"finish":true,"data-block":"true","data-state":"loading","data-language":"python"}-->
+<!--{"data-block":"true","data-state":"loading","data-language":"python"}-->
 \`\`\`python
 for i in range(len(arr)):
     print(arr[i])  # 通过索引访问元素
@@ -5898,9 +6025,9 @@ for i in range(len(arr)):
 `;
 
 exports[`should convert schema to markdown in 3. **同时获取索 chunk 1`] = `
-"3. **同时获取索引和值（****\`enumerate\`** **enumerate****）**
+"3. **同时获取索引和值（****\`enumerate\`** **）**
 
-<!--{"finish":true,"data-block":"true","data-state":"loading","data-language":"python"}-->
+<!--{"data-block":"true","data-state":"loading","data-language":"python"}-->
 \`\`\`python
 for index, value in enumerate(arr):
     print(f"索引 {index} 的值是 {value}")
@@ -5913,7 +6040,7 @@ exports[`should convert schema to markdown in 5. **列表推导式 chunk 1`] = `
 "5. **列表推导式**  
 快速生成新列表的同时遍历：
 
-<!--{"finish":true,"data-block":"true","data-state":"loading","data-language":"python"}-->
+<!--{"data-block":"true","data-state":"loading","data-language":"python"}-->
 \`\`\`python
 squared = [x**2 for x in arr]  # 遍历并计算平方
 \`\`\`
@@ -5930,7 +6057,7 @@ registerPlugin(plugin: EditorPlugin): boolean {
 // 其他核心方法...  
 }
 
-<!--{"data-block":"true","data-state":"loading","finish":false}-->
+<!--{"data-block":"true","data-state":"loading"}-->
 \`\`\`
 \`\`\`"
 `;
@@ -6005,6 +6132,7 @@ exports[`多个空格转为一个 1`] = `
         "type": "list-item",
       },
     ],
+    "finished": undefined,
     "order": true,
     "start": 1,
     "task": false,
@@ -6045,7 +6173,14 @@ exports[`引用 1`] = `
       },
       {
         "text": "。
-*** Reference Sources ***",
+*",
+      },
+      {
+        "bold": true,
+        "text": " Reference Sources ",
+      },
+      {
+        "text": "*",
       },
     ],
     "type": "paragraph",
@@ -6069,7 +6204,7 @@ exports[`引用 2`] = `
 "DeepSeek，宣称找到了一种更高效的人工智能模型创建方法，这对微软及其合作伙伴OpenAI构成了挑战[^1]
 
 。  
-*** Reference Sources ***
+* **Reference Sources** *
 
 [^1]: [微软(MSFT)股价陷低谷，AI投入何时兑现增加承诺？ - 美股投资网](https://www.tradesmax.com/component/k2/item/22075-microsoft)"
 `;
@@ -6908,13 +7043,34 @@ exports[`忽略card，并且只生成一次 1`] = `
             "type": "table-row",
           },
         ],
+        "finished": undefined,
         "otherProps": {
           "columns": [
-            "业务",
-            "2021Q1",
-            "2021Q2",
-            "2021Q3",
-            "2021Q4",
+            {
+              "dataIndex": "业务",
+              "key": "业务",
+              "title": "业务",
+            },
+            {
+              "dataIndex": "2021Q1",
+              "key": "2021Q1",
+              "title": "2021Q1",
+            },
+            {
+              "dataIndex": "2021Q2",
+              "key": "2021Q2",
+              "title": "2021Q2",
+            },
+            {
+              "dataIndex": "2021Q3",
+              "key": "2021Q3",
+              "title": "2021Q3",
+            },
+            {
+              "dataIndex": "2021Q4",
+              "key": "2021Q4",
+              "title": "2021Q4",
+            },
           ],
           "dataSource": [
             {
@@ -6974,7 +7130,6 @@ exports[`忽略card，并且只生成一次 1`] = `
               "业务": "云",
             },
           ],
-          "finish": false,
         },
         "type": "table",
       },
@@ -6993,8 +7148,7 @@ exports[`忽略card，并且只生成一次 1`] = `
 `;
 
 exports[`忽略card，并且只生成一次 2`] = `
-"<!--{"finish":false}-->
-| 业务 |  2021Q1 |  2021Q2 |  2021Q3 |  2021Q4 |
+"| 业务 |  2021Q1 |  2021Q2 |  2021Q3 |  2021Q4 |
 | :----------- | ------: | ------: | ------: | ------: |
 | 收入 | 135,303 | 138,259 | 142,368 | 144,188 |
 | 增值服务 |  72,443 |  72,013 |  75,203 |  71,913 |

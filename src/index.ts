@@ -31,6 +31,7 @@ export * from './MarkdownEditor/editor/store';
 export * from './MarkdownEditor/editor/utils';
 export * from './MarkdownEditor/editor/utils/docx/index';
 export * from './MarkdownEditor/editor/utils/markdownToHtml';
+export * from './ToolUseBarThink';
 export * from './Types';
 export { default as Workspace } from './Workspace';
 // HTML to Markdown conversion utilities

@@ -499,7 +499,7 @@ export const hexToRgba = (hex: string, alpha: number): string => {
 
 // 导出 Chart.js 注册相关函数
 export {
+  registerBarChartComponents,
   registerChartComponents,
   registerLineChartComponents,
-  registerBarChartComponents,
 } from './utils/registerChart';

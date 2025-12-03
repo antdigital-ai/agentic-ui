@@ -21,6 +21,7 @@ import {
   upLoadFileToServer,
   type AttachmentButtonProps,
 } from './AttachmentButton';
+import { isMobileDevice } from './AttachmentButton/utils';
 import { AttachmentFileList } from './AttachmentButton/AttachmentFileList';
 import type { AttachmentFile } from './AttachmentButton/types';
 import { getFileListFromDataTransferItems } from './FilePaste';
@@ -842,6 +843,11 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
       const isEnter = e.key === 'Enter';
       const isMod = e.ctrlKey || e.metaKey;
       const isShift = e.shiftKey;
+
+      // 手机端禁用 Enter 键发送
+      if (isEnter && !isMod && !isShift && isMobileDevice()) {
+        return; // 让编辑器正常处理换行
+      }
 
       // Enter 发送，Shift+Enter 换行
       if (!isEnter || isMod) return;

@@ -11,6 +11,7 @@ export type TableCustomElement =
 export interface TableNode {
   type: 'table';
   children: Array<TableHeadNode | TrNode | TableFooterNode>;
+  finished?: boolean;
   otherProps?: {
     mergeCells?: Array<{
       row: number;
@@ -18,7 +19,7 @@ export interface TableNode {
       rowSpan: number;
       colSpan: number;
     }>;
-    finish?: boolean; // 标记表格是否已闭合
+    finished?: boolean; // 标记表格是否已闭合
     config?: any;
     columns?: Array<any>; // 用于定义列属性，如宽度、对齐方式等
   };

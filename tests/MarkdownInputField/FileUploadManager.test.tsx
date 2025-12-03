@@ -281,9 +281,10 @@ describe('useFileUploadManager', () => {
         .mockImplementation((tagName: string) => {
           const element = originalCreateElement(tagName);
           if (tagName === 'input') {
-            element.click = clickSpy;
-            element.accept = '';
-            createdInput = element as HTMLInputElement;
+            const inputElement = element as HTMLInputElement;
+            inputElement.click = clickSpy;
+            inputElement.accept = '';
+            createdInput = inputElement;
           }
           return element;
         });
@@ -301,7 +302,7 @@ describe('useFileUploadManager', () => {
       await result.current.uploadImage(true);
 
       // 验证 accept 属性被设置为 'image/*'
-      expect(createdInput?.accept).toBe('image/*');
+      expect(createdInput!.accept).toBe('image/*');
       expect(clickSpy).toHaveBeenCalled();
 
       createElementSpy.mockRestore();
@@ -323,9 +324,10 @@ describe('useFileUploadManager', () => {
         .mockImplementation((tagName: string) => {
           const element = originalCreateElement(tagName);
           if (tagName === 'input') {
-            element.click = clickSpy;
-            element.accept = '';
-            createdInput = element as HTMLInputElement;
+            const inputElement = element as HTMLInputElement;
+            inputElement.click = clickSpy;
+            inputElement.accept = '';
+            createdInput = inputElement;
           }
           return element;
         });
@@ -339,7 +341,7 @@ describe('useFileUploadManager', () => {
       await result.current.uploadImage(false);
 
       // 验证 accept 属性被设置（具体值取决于设备类型和格式）
-      expect(createdInput?.accept).toBeDefined();
+      expect(createdInput!.accept).toBeDefined();
       expect(clickSpy).toHaveBeenCalled();
 
       createElementSpy.mockRestore();
@@ -361,9 +363,10 @@ describe('useFileUploadManager', () => {
         .mockImplementation((tagName: string) => {
           const element = originalCreateElement(tagName);
           if (tagName === 'input') {
-            element.click = clickSpy;
-            element.accept = '';
-            createdInput = element as HTMLInputElement;
+            const inputElement = element as HTMLInputElement;
+            inputElement.click = clickSpy;
+            inputElement.accept = '';
+            createdInput = inputElement;
           }
           return element;
         });
@@ -377,7 +380,7 @@ describe('useFileUploadManager', () => {
       await result.current.uploadImage();
 
       // 验证 accept 属性被设置（应该和 false 时一样）
-      expect(createdInput?.accept).toBeDefined();
+      expect(createdInput!.accept).toBeDefined();
       expect(clickSpy).toHaveBeenCalled();
 
       createElementSpy.mockRestore();

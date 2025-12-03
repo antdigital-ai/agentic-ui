@@ -83,4 +83,3 @@ export const registerBarChartComponents = () => {
     ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
   });
 };
-

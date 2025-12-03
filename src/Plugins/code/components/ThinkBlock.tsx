@@ -7,7 +7,7 @@ import React, { useContext } from 'react';
 import { I18nContext } from '../../../I18n';
 import { EditorStoreContext } from '../../../MarkdownEditor/editor/store';
 import { CodeNode } from '../../../MarkdownEditor/el';
-import { ToolUseBarThink } from '../../../ToolUseBar';
+import { ToolUseBarThink } from '../../../ToolUseBarThink';
 
 interface ThinkBlockProps {
   element: CodeNode;

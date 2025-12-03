@@ -18,13 +18,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       boxShadow: 'var(--shadow-border-base)',
       minHeight: '20px',
       width: 'auto',
-      transition: 'padding 0.2s ease',
       display: 'flex',
       alignItems: 'center',
       flexDirection: 'column',
       gap: '8px',
       zIndex: 1,
-      padding: '2px',
+      padding: '4px',
       paddingRight: '4px',
       marginBottom: '12px',
 
@@ -139,7 +138,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontSize: 'var(--font-size-base)',
         cursor: 'pointer',
         borderRadius: '12px',
-        transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
       },
 
       '&-name': {
@@ -173,6 +171,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 0,
         '&-loading': {
           borderRadius: '50%',
+          transition: 'border-radius 0.3s ease-in-out',
           position: 'relative',
           '&::after': {
             content: '""',
@@ -303,7 +302,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         backdropFilter: 'blur(8px)',
         border: '1px solid rgba(0, 19, 41, 0.1)',
         boxShadow: '0px 2px 8px rgba(0, 19, 41, 0.15)',
-        transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
         font: 'var(--font-text-body-emphasized-base)',
         color: 'var(--color-gray-text-default)',
         padding: '16px 5px',

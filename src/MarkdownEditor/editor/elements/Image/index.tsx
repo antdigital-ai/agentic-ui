@@ -8,9 +8,11 @@ import { Image, ImageProps, Modal, Popover, Skeleton, Space } from 'antd';
 import React, {
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 
 import { useDebounceFn } from '@ant-design/pro-components';
@@ -299,6 +301,7 @@ export function EditorImage({
   const [_, path] = useSelStatus(element);
   const { markdownEditorRef, readonly } = useEditorStore();
   const htmlRef = React.useRef<HTMLDivElement>(null);
+  const [showAsText, setShowAsText] = useState(false);
   const [state, setState] = useGetSetState({
     height: element.height,
     dragging: false,
@@ -314,6 +317,7 @@ export function EditorImage({
     },
     [path],
   );
+
   const { locale } = useContext(I18nContext);
 
   const initial = useCallback(async () => {
@@ -348,13 +352,42 @@ export function EditorImage({
     initial();
   }, [element?.url]);
 
-  const imageDom = useMemo(() => {
-    // 检查是否为不完整的图片（loading 状态）
-    const isLoading =
-      (element as any)?.loading || (element as any)?.otherProps?.loading;
+  // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
+  useEffect(() => {
+    if (element.finished === false) {
+      setShowAsText(false);
+      const timer = setTimeout(() => {
+        setShowAsText(true);
+      }, 5000);
 
-    if (isLoading) {
-      // 显示 loading 状态的占位符
+      return () => {
+        clearTimeout(timer);
+      };
+    } else {
+      setShowAsText(false);
+    }
+  }, [element.finished]);
+
+  const imageDom = useMemo(() => {
+    // 检查是否为不完整的图片（finished 状态）
+    if (element.finished === false) {
+      // 如果 5 秒后仍未完成，显示为文本
+      if (showAsText) {
+        return (
+          <div
+            style={{
+              padding: '8px 12px',
+              border: '1px solid #d9d9d9',
+              borderRadius: '4px',
+              color: 'rgba(0, 0, 0, 0.65)',
+              wordBreak: 'break-all',
+            }}
+          >
+            {element.alt || element.url || '图片链接'}
+          </div>
+        );
+      }
+      // 5 秒内显示 loading 状态的占位符
       return <Skeleton.Image active />;
     }
 
@@ -427,8 +460,8 @@ export function EditorImage({
     readonly,
     state().selected,
     state().loadSuccess,
-    (element as any)?.loading,
-    (element as any)?.otherProps?.loading,
+    element.finished,
+    showAsText,
     (element as any)?.rawMarkdown,
   ]);
 

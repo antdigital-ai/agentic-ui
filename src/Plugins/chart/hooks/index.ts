@@ -4,9 +4,11 @@
  * @author Chart Plugin Team
  */
 
-export type { ChartStatisticConfig, StatisticConfigType } from './useChartStatistic';
 export { useChartDataFilter } from './useChartDataFilter';
+export type {
+  ChartStatisticConfig,
+  StatisticConfigType,
+} from './useChartStatistic';
 export { useChartStatistics } from './useChartStatistics';
 export { useChartTheme } from './useChartTheme';
 export { useResponsiveSize } from './useResponsiveSize';
-

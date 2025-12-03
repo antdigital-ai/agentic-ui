@@ -1,4 +1,4 @@
-﻿declare module '*.svg';
+declare module '*.svg';
 declare module '*.webp';
 declare module 'direction' {
   function direction(text: string): 'neutral' | 'ltr' | 'rtl';

@@ -12,7 +12,15 @@ import {
 } from '@sofa-design/icons';
 import { Empty } from 'antd';
 import classNames from 'classnames';
-import React, { type FC, useContext, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, {
+  type FC,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor';
@@ -575,6 +583,33 @@ const FileGroupComponent: FC<{
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const finalPrefixCls = prefixCls || getPrefixCls('workspace-file');
+  const contentVariants = useMemo(
+    () => ({
+      expanded: {
+        height: 'auto',
+        opacity: 1,
+      },
+      collapsed: {
+        height: 0,
+        opacity: 0,
+      },
+    }),
+    [],
+  );
+
+  const contentTransition = useMemo(
+    () => ({
+      height: {
+        duration: 0.26,
+        ease: [0.4, 0, 0.2, 1],
+      },
+      opacity: {
+        duration: 0.2,
+        ease: 'linear',
+      },
+    }),
+    [],
+  );
   return (
     <div className={classNames(`${finalPrefixCls}-container--group`, hashId)}>
       <GroupHeader
@@ -584,24 +619,35 @@ const FileGroupComponent: FC<{
         prefixCls={finalPrefixCls}
         hashId={hashId}
       />
-      {!group.collapsed && (
-        <div className={classNames(`${finalPrefixCls}-group-content`, hashId)}>
-          {group.children.map((file) => (
-            <FileItemComponent
-              key={file.id}
-              file={file}
-              onClick={onFileClick}
-              onDownload={onDownload}
-              onPreview={onPreview}
-              onShare={onShare}
-              onLocate={onLocate}
-              prefixCls={finalPrefixCls}
-              hashId={hashId}
-              bindDomId={!!bindDomId}
-            />
-          ))}
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {!group.collapsed && (
+          <motion.div
+            key="group-content"
+            variants={contentVariants}
+            initial="collapsed"
+            animate="expanded"
+            exit="collapsed"
+            transition={contentTransition}
+            style={{ overflow: 'hidden' }}
+            className={classNames(`${finalPrefixCls}-group-content`, hashId)}
+          >
+            {group.children.map((file) => (
+              <FileItemComponent
+                key={file.id}
+                file={file}
+                onClick={onFileClick}
+                onDownload={onDownload}
+                onPreview={onPreview}
+                onShare={onShare}
+                onLocate={onLocate}
+                prefixCls={finalPrefixCls}
+                hashId={hashId}
+                bindDomId={!!bindDomId}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

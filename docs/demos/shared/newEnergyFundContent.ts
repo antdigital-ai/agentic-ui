@@ -2,6 +2,15 @@ export const newEnergyFundContent = `# 新能源基金现状及投资
 
 ![头图](https://mdn.alipayobjects.com/huamei_gcee1x/afts/img/A*VctTQoYxOzYAAAAAAAAAAAAADml6AQ/original)
 
+[受产业链价格战影响，部分产品出现降价，产能过剩问题凸显](https://example.com/report)
+
+<think>
+这是一段思考内容
+</think>
+<answer>
+这是一段答案内容
+</answer>
+
 ## 一、新能源板块现状：机遇与挑战并存
 
 ### 1.1 走势分化，结构性机会凸显
@@ -95,6 +104,7 @@ export const newEnergyFundContent = `# 新能源基金现状及投资
 
 ### 1.4 指标散点分布
 
+[核心能力]
 截至2025年6月19日，新能源板块当日收跌-1.28%。行业市盈率高于近10年60%的时间，估值偏高。新能源汽车行业产能过剩问题突出，技术迭代过快可能制约长期发展。
 
 <!-- {"chartType":"scatter","title":"KPI 指标分布","x":"月份","y":"值","groupBy":"分类","colorLegend":"系列","filterBy":"region","dataTime":"2025-10-30 10:00:00"} -->

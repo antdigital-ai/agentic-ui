@@ -9,7 +9,10 @@ import remarkRehype from 'remark-rehype';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
-import { fixStrongWithSpecialChars } from '../parser/remarkParse';
+import {
+  convertParagraphToImage,
+  fixStrongWithSpecialChars,
+} from '../parser/remarkParse';
 
 // 使用 any 类型避免 hast 类型依赖问题
 type HastElement = {
@@ -195,6 +198,7 @@ export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
     remarkParse,
     remarkGfm,
     fixStrongWithSpecialChars,
+    convertParagraphToImage,
     [remarkMath as unknown as Plugin, INLINE_MATH_WITH_SINGLE_DOLLAR],
     [remarkFrontmatter, FRONTMATTER_LANGUAGES],
     [remarkRehypePlugin, { allowDangerousHtml: true }],

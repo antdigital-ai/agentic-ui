@@ -245,7 +245,7 @@ export const ChartElement = (props: RenderElementProps) => {
   const columns = (node as TableNode).otherProps?.columns || [];
 
   // 检查图表是否未闭合
-  const isUnclosed = node?.otherProps?.finish === false;
+  const isUnclosed = node?.otherProps?.finished === false;
 
   // 获取编辑器更新函数
   const [, update] = useMEditor(node);
@@ -262,13 +262,13 @@ export const ChartElement = (props: RenderElementProps) => {
   // 如果不是最后一个节点，且未闭合，立即设置为完成
   useEffect(() => {
     if (isUnclosed && !readonly && !isLastNode) {
-      // 检查 finish 是否仍然是 false（可能已经被其他逻辑更新）
-      if (node?.otherProps?.finish === false) {
+      // 检查 finished 是否仍然是 false（可能已经被其他逻辑更新）
+      if (node?.otherProps?.finished === false) {
         update(
           {
             otherProps: {
               ...node?.otherProps,
-              finish: true,
+              finished: true,
             },
           },
           node,
@@ -281,13 +281,13 @@ export const ChartElement = (props: RenderElementProps) => {
   useEffect(() => {
     if (isUnclosed && !readonly && isLastNode) {
       const timer = setTimeout(() => {
-        // 检查 finish 是否仍然是 false（可能已经被其他逻辑更新）
-        if (node?.otherProps?.finish === false) {
+        // 检查 finished 是否仍然是 false（可能已经被其他逻辑更新）
+        if (node?.otherProps?.finished === false) {
           update(
             {
               otherProps: {
                 ...node?.otherProps,
-                finish: true,
+                finished: true,
               },
             },
             node,

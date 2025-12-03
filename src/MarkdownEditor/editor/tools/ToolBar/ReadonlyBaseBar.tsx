@@ -173,6 +173,12 @@ export const ReadonlyBaseBar = (props: {
                     height: 100,
                     resize: 'none',
                   }}
+                  placeholder={
+                    editorProps?.comment?.placeholder ||
+                    editorProps?.titlePlaceholderContent ||
+                    i18n.locale?.inputPlaceholder ||
+                    '请输入内容...'
+                  }
                   onChange={(e) => {
                     comment.content = e.target.value;
                   }}

@@ -29,7 +29,7 @@ describe('useChartTheme', () => {
 
   it('当主题变化时应该更新返回值', () => {
     const { result, rerender } = renderHook(
-      ({ theme }) => useChartTheme(theme),
+      ({ theme }: { theme: 'light' | 'dark' }) => useChartTheme(theme),
       {
         initialProps: { theme: 'light' as const },
       },
@@ -37,6 +37,7 @@ describe('useChartTheme', () => {
 
     expect(result.current.isLight).toBe(true);
 
+    // @ts-expect-error - rerender 的类型推断限制，但运行时是正确的
     rerender({ theme: 'dark' });
 
     expect(result.current.isLight).toBe(false);
@@ -60,4 +61,3 @@ describe('useChartTheme', () => {
     expect(result.current).toBe(firstResult);
   });
 });
-

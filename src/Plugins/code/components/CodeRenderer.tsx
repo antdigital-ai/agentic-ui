@@ -3,7 +3,7 @@
  * 封装代码编辑器的所有渲染逻辑
  */
 
-import { ConfigProvider, theme as antdTheme } from 'antd';
+import { ConfigProvider, Skeleton, theme as antdTheme } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { MarkdownEditor } from '../../../MarkdownEditor';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
@@ -98,18 +98,18 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
   });
 
   // 检查代码块是否未闭合
-  const isUnclosed = props.element?.otherProps?.finish === false;
+  const isUnclosed = props.element?.otherProps?.finished === false;
 
   // 5 秒超时机制：如果代码块未闭合，5 秒后自动设置为完成
   useEffect(() => {
     if (isUnclosed && !readonly) {
       const timer = setTimeout(() => {
-        // 检查 finish 是否仍然是 false（可能已经被其他逻辑更新）
-        if (props.element?.otherProps?.finish === false) {
+        // 检查 finished 是否仍然是 false（可能已经被其他逻辑更新）
+        if (props.element?.otherProps?.finished === false) {
           update({
             otherProps: {
               ...props.element?.otherProps,
-              finish: true,
+              finished: true,
             },
           });
         }
@@ -119,12 +119,25 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
         clearTimeout(timer);
       };
     }
-  }, [isUnclosed, readonly, props.element?.otherProps?.finish, update]);
+  }, [isUnclosed, readonly, props.element?.otherProps?.finished, update]);
 
   // 渲染组件
   return useMemo(() => {
-    // 隐藏配置型 HTML 代码块
+    // 配置型 HTML 代码块：如果未完成且内容较长，显示 skeleton
     if (shouldHideConfigHtml) {
+      const isUnclosed = props.element?.otherProps?.finished === false;
+      const contentLength = props.element?.value?.length || 0;
+      const isLongContent = contentLength > 100; // 内容超过 100 字符视为较长
+
+      // 如果未完成且内容较长，显示 skeleton
+      if (isUnclosed && isLongContent) {
+        return (
+          <div {...props.attributes} style={{ padding: '20px' }}>
+            <Skeleton active paragraph={{ rows: 3 }} />
+          </div>
+        );
+      }
+
       return null;
     }
 

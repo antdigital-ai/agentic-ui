@@ -10,7 +10,7 @@ import {
 } from 'slate';
 import { Elements, ListNode } from '../../el';
 import { TrNode } from '../elements/Table';
-import { decodeURIComponentUrl } from '../parser/parserMarkdownToSlateNode';
+import { decodeURIComponentUrl } from '../parser/parse/parseHtml';
 import { EditorUtils } from '../utils/editorUtils';
 
 export const insertAfter = (

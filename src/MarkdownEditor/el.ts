@@ -27,7 +27,14 @@ export type CodeNode<T = Record<string, any>> = {
     className?: string;
     language?: string;
     render?: boolean;
+    mergeCells?: Array<{
+      row: number;
+      col: number;
+      rowSpan: number;
+      colSpan: number;
+    }>;
     frontmatter?: boolean;
+    config?: Record<string, any>[];
   } & T;
   children: [{ text: string }];
   language?: string;
@@ -89,6 +96,7 @@ export type ListNode<T = Record<string, any>> = {
   order?: boolean;
   start?: number;
   task?: boolean;
+  finished?: boolean;
   h?: number;
 };
 
@@ -161,6 +169,7 @@ export type MediaNode<T = Record<string, any>> = {
   url?: string;
   alt: string;
   downloadUrl?: string;
+  finished?: boolean;
   height?: number;
   width?: number;
   docId?: string;
@@ -188,6 +197,7 @@ export type LinkCardNode<T = Record<string, any>> = {
   title?: string;
   name?: string;
   alt: string;
+  finished?: boolean;
   children: BaseElement['children'];
 };
 

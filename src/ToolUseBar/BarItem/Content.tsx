@@ -2,7 +2,7 @@ import { Api, ChevronUp, X } from '@sofa-design/icons';
 import classnames from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { memo, useCallback, useMemo } from 'react';
-import { ToolCall } from './ToolUseBarItem';
+import { ToolCall } from '.';
 
 interface ToolImageProps {
   tool: ToolCall;
@@ -330,30 +330,21 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
         ease: [0.4, 0, 0.2, 1],
       },
       opacity: {
-        duration: 0.26,
-        ease: [0.4, 0, 0.2, 1],
+        duration: 0.2,
+        ease: 'linear',
       },
     }),
     [],
   );
 
-  if (!showContent || !expanded) {
-    return (
-      <div
-        style={{
-          overflow: 'hidden',
-          height: 1,
-          opacity: 0,
-          visibility: 'hidden',
-        }}
-        role="presentation"
-        aria-hidden="true"
-      >
-        {contentDom}
-        {errorDom}
-      </div>
-    );
-  }
+  // 缓存样式对象
+  const containerStyle = useMemo(
+    () => ({
+      overflow: 'hidden',
+      willChange: 'height, opacity',
+    }),
+    [],
+  );
 
   return (
     <AnimatePresence initial={false} mode="sync">
@@ -367,11 +358,27 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
           animate="expanded"
           exit="collapsed"
           transition={contentTransition}
-          style={{ overflow: 'hidden' }}
+          style={containerStyle}
         >
           {contentDom}
           {errorDom}
         </motion.div>
+      ) : null}
+
+      {!showContent || !expanded ? (
+        <div
+          style={{
+            overflow: 'hidden',
+            height: 1,
+            opacity: 0,
+            visibility: 'hidden',
+          }}
+          role="presentation"
+          aria-hidden="true"
+        >
+          {contentDom}
+          {errorDom}
+        </div>
       ) : null}
     </AnimatePresence>
   );

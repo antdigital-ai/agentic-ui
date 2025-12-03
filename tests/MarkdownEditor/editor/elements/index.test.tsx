@@ -743,6 +743,95 @@ describe('Elements Index', () => {
         // 验证事件处理逻辑
         expect(element).toBeInTheDocument();
       });
+
+      it('应该在点击时调用 window.open 打开 URL', () => {
+        const mockWindowOpen = vi.fn();
+        const originalOpen = window.open;
+        window.open = mockWindowOpen;
+
+        const props = {
+          ...defaultLeafProps,
+          leaf: { ...defaultLeafProps.leaf, url: 'https://example.com' },
+        };
+        render(<MLeaf {...props} />);
+        const element = screen.getByText('Test Content').parentElement;
+        fireEvent.click(element!);
+
+        expect(mockWindowOpen).toHaveBeenCalledWith(
+          'https://example.com',
+          '_blank',
+        );
+
+        window.open = originalOpen;
+      });
+
+      it('应该在点击时调用 fncProps.onOriginUrlClick', () => {
+        const mockOnOriginUrlClick = vi.fn();
+        const props = {
+          ...defaultLeafProps,
+          leaf: { ...defaultLeafProps.leaf, identifier: 'test-identifier' },
+          fncProps: { onOriginUrlClick: mockOnOriginUrlClick },
+        };
+        const { container } = render(<MLeaf {...props} />);
+        const element = container.querySelector('[data-fnc="fnc"]');
+        fireEvent.click(element!);
+
+        expect(mockOnOriginUrlClick).toHaveBeenCalledWith('test-identifier');
+      });
+
+      it('应该同时调用 onOriginUrlClick 和 window.open', () => {
+        const mockOnOriginUrlClick = vi.fn();
+        const mockWindowOpen = vi.fn();
+        const originalOpen = window.open;
+        window.open = mockWindowOpen;
+
+        const props = {
+          ...defaultLeafProps,
+          leaf: {
+            ...defaultLeafProps.leaf,
+            identifier: 'test-id',
+            url: 'https://example.com',
+          },
+          fncProps: { onOriginUrlClick: mockOnOriginUrlClick },
+        };
+        const { container } = render(<MLeaf {...props} />);
+        const element = container.querySelector('[data-fnc="fnc"]');
+        fireEvent.click(element!);
+
+        expect(mockOnOriginUrlClick).toHaveBeenCalledWith('test-id');
+        expect(mockWindowOpen).toHaveBeenCalledWith(
+          'https://example.com',
+          '_blank',
+        );
+
+        window.open = originalOpen;
+      });
+
+      it('应该在没有 URL 时不调用 window.open', () => {
+        const mockWindowOpen = vi.fn();
+        const originalOpen = window.open;
+        window.open = mockWindowOpen;
+
+        render(<MLeaf {...defaultLeafProps} />);
+        const element = screen.getByText('Test Content').parentElement;
+        fireEvent.click(element!);
+
+        expect(mockWindowOpen).not.toHaveBeenCalled();
+
+        window.open = originalOpen;
+      });
+
+      it('应该在没有 onOriginUrlClick 回调时不报错', () => {
+        const props = {
+          ...defaultLeafProps,
+          leaf: { ...defaultLeafProps.leaf, identifier: 'test-identifier' },
+        };
+        const { container } = render(<MLeaf {...props} />);
+        const element = container.querySelector('[data-fnc="fnc"]');
+
+        // 应该不会抛出错误
+        expect(() => fireEvent.click(element!)).not.toThrow();
+      });
     });
 
     describe('组合样式测试', () => {

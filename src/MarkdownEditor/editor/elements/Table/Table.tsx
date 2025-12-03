@@ -4,12 +4,10 @@ import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { Node } from 'slate';
 import { RenderElementProps } from 'slate-react';
 import stringWidth from 'string-width';
-import { Loading } from '../../../../Components/Loading';
 import {
   MOBILE_BREAKPOINT,
   MOBILE_TABLE_MIN_COLUMN_WIDTH,
 } from '../../../../Constants/mobile';
-import { useMEditor } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
 import { ReadonlyTableComponent } from './ReadonlyTableComponent';
 import { TablePropsContext } from './TableContext';
@@ -50,7 +48,7 @@ export const SlateTable = ({
   children: React.ReactNode;
   hashId: string;
 } & RenderElementProps) => {
-  const { readonly, markdownContainerRef, store } = useEditorStore();
+  const { readonly, markdownContainerRef } = useEditorStore();
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { tablePath } = useContext(TablePropsContext);
 
@@ -263,63 +261,6 @@ export const SlateTable = ({
     [scrollState, readonly],
   );
 
-  // 检查表格是否未闭合
-  const isUnclosed = props.element?.otherProps?.finish === false;
-
-  // 获取编辑器更新函数 - 必须在早期返回之前调用 hooks
-  const [, update] = useMEditor(props.element);
-
-  // 判断是否是最后一个节点 - 必须在早期返回之前调用 hooks
-  const isLastNode = useMemo(() => {
-    try {
-      return store.isLatestNode(props.element);
-    } catch {
-      return false;
-    }
-  }, [store, props.element]);
-
-  // 如果不是最后一个节点，且未闭合，立即设置为完成 - 必须在早期返回之前调用 hooks
-  useEffect(() => {
-    if (isUnclosed && !readonly && !isLastNode) {
-      // 检查 finish 是否仍然是 false（可能已经被其他逻辑更新）
-      if (props.element?.otherProps?.finish === false) {
-        update(
-          {
-            otherProps: {
-              ...props.element?.otherProps,
-              finish: true,
-            },
-          },
-          props.element,
-        );
-      }
-    }
-  }, [isUnclosed, readonly, isLastNode, props.element, update]);
-
-  // 5 秒超时机制：如果是最后一个节点且未闭合，5 秒后自动设置为完成 - 必须在早期返回之前调用 hooks
-  useEffect(() => {
-    if (isUnclosed && !readonly && isLastNode) {
-      const timer = setTimeout(() => {
-        // 检查 finish 是否仍然是 false（可能已经被其他逻辑更新）
-        if (props.element?.otherProps?.finish === false) {
-          update(
-            {
-              otherProps: {
-                ...props.element?.otherProps,
-                finish: true,
-              },
-            },
-            props.element,
-          );
-        }
-      }, 5000); // 5 秒超时
-
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [isUnclosed, readonly, isLastNode, props.element, update]);
-
   // readonly 模式渲染 - 使用优化的组件（早期返回）
   if (readonly) {
     return (
@@ -342,7 +283,6 @@ export const SlateTable = ({
         ...boxShadowStyle,
         position: 'relative',
       }}
-      data-is-unclosed={isUnclosed}
       onDragStart={(e) => {
         // 阻止拖拽开始时的文字选择
         e.preventDefault();
@@ -352,19 +292,6 @@ export const SlateTable = ({
         e.preventDefault();
       }}
     >
-      {/* 未闭合表格的 loading 指示器 */}
-      {isUnclosed && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            zIndex: 10,
-          }}
-        >
-          <Loading />
-        </div>
-      )}
       {tableDom}
     </div>
   );

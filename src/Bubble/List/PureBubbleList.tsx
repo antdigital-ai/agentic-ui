@@ -1,13 +1,15 @@
 import SkeletonList from './SkeletonList';
 
-import { MutableRefObject, useContext, useMemo } from 'react';
+import { MutableRefObject, useContext, useMemo, useRef } from 'react';
 
 import type { BubbleMetaData, BubbleProps, MessageBubbleData } from '../type';
 
 import { ConfigProvider } from 'antd';
 import cx from 'classnames';
+import { nanoid } from 'nanoid';
 import React from 'react';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
+import { LOADING_FLAT } from '../MessagesContent';
 import { PureAIBubble, PureUserBubble } from '../PureBubble';
 import { useStyle } from './style';
 
@@ -79,6 +81,9 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
 
   const deps = useMemo(() => [props.style], [JSON.stringify(props.style)]);
 
+  // 为 loading 项生成唯一的 key，使用 ref 缓存以确保稳定性
+  const loadingKeysRef = useRef<Map<string, string>>(new Map());
+
   const listDom = useMemo(() => {
     return bubbleList.map((item, index) => {
       const placement = item.role === 'user' ? 'right' : 'left';
@@ -88,9 +93,20 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
       (item as any).isLatest = isLast;
       (item as any).isLast = isLast;
 
+      // 如果 id 是 LOADING_FLAT，使用 uuid 作为 key
+      // 使用 index 和 createAt 的组合作为缓存 key，确保同一项在重新渲染时保持相同的 key
+      let itemKey = item.id;
+      if (item.id === LOADING_FLAT) {
+        const cacheKey = `${index}-${item.createAt || Date.now()}`;
+        if (!loadingKeysRef.current.has(cacheKey)) {
+          loadingKeysRef.current.set(cacheKey, nanoid());
+        }
+        itemKey = loadingKeysRef.current.get(cacheKey)!;
+      }
+
       return (
         <BubbleComponent
-          key={item.id}
+          key={itemKey}
           data-id={item.id}
           avatar={{
             ...(placement === 'right' ? userMeta : assistantMeta),

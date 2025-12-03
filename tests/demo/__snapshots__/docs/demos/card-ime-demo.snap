@@ -104,7 +104,7 @@
           style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); min-height: 500px; padding: 20px;"
         >
           <div
-            class="ant-agentic-md-editor-content"
+            class="ant-agentic-md-editor-container"
             style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none;"
             tabindex="-1"
           >

@@ -1,8 +1,9 @@
 import { ChevronUp, CircleDashed, SuccessFill, X } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
-import React, { memo, useCallback, useContext } from 'react';
+import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { ActionIconBox } from '../Components/ActionIconBox';
 import { Loading } from '../Components/Loading';
 import { I18nContext } from '../I18n';
@@ -45,6 +46,7 @@ type ThoughtChainProps = {
 
 const getArrowRotation = (collapsed: boolean): React.CSSProperties => ({
   transform: collapsed ? 'rotate(0deg)' : 'rotate(180deg)',
+  transition: 'transform 0.3s ease',
 });
 
 const StatusIcon: React.FC<{
@@ -104,6 +106,33 @@ const TaskListItem: React.FC<TaskListItemProps> = ({
     ? locale?.['taskList.expand'] || '展开'
     : locale?.['taskList.collapse'] || '收起';
 
+  const contentVariants = useMemo(
+    () => ({
+      expanded: {
+        height: 'auto',
+        opacity: 1,
+      },
+      collapsed: {
+        height: 0,
+        opacity: 0,
+      },
+    }),
+    [],
+  );
+
+  const contentTransition = useMemo(
+    () => ({
+      height: {
+        duration: 0.26,
+        ease: [0.4, 0, 0.2, 1],
+      },
+      opacity: {
+        duration: 0.2,
+        ease: 'linear',
+      },
+    }),
+    [],
+  );
   return (
     <div
       key={item.key}
@@ -154,13 +183,23 @@ const TaskListItem: React.FC<TaskListItemProps> = ({
             </div>
           )}
         </div>
-        {!isCollapsed && (
-          <div className={buildClassName(`${prefixCls}-body`, hashId)}>
-            <div className={buildClassName(`${prefixCls}-content`, hashId)}>
-              {item.content}
-            </div>
-          </div>
-        )}
+        <AnimatePresence initial={false}>
+          {!isCollapsed && (
+            <motion.div
+              key="task-content"
+              variants={contentVariants}
+              initial="collapsed"
+              animate="expanded"
+              exit="collapsed"
+              transition={contentTransition}
+              className={buildClassName(`${prefixCls}-body`, hashId)}
+            >
+              <div className={buildClassName(`${prefixCls}-content`, hashId)}>
+                {item.content}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

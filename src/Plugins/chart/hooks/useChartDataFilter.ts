@@ -117,4 +117,3 @@ export const useChartDataFilter = (data: ChartDataItem[]) => {
     safeData,
   };
 };
-

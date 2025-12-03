@@ -1,10 +1,11 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
-import React, { CSSProperties, useContext } from 'react';
+import React, { CSSProperties, useContext, useRef } from 'react';
 import { Editor, Path, Transforms } from 'slate';
 
 import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 import { I18nContext } from '../../../I18n';
+import { isMobileDevice } from '../../../MarkdownInputField/AttachmentButton/utils';
 import { MarkdownEditorProps } from '../../types';
 import { useEditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
@@ -310,7 +311,7 @@ const MLeafComponent = (
     tagInputProps: MarkdownEditorProps['tagInputProps'];
   },
 ) => {
-  const { markdownEditorRef, markdownContainerRef, readonly, setShowComment } =
+  const { markdownEditorRef, markdownContainerRef, setShowComment } =
     useEditorStore();
   const context = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
@@ -455,46 +456,55 @@ const MLeafComponent = (
       }
     } catch (e) {}
   };
-  if (leaf?.url && readonly) {
-    const renderDom = (
-      <span
-        data-be="link"
-        draggable={false}
-        onDragStart={dragStart}
-        data-url={leaf?.url ? 'url' : undefined}
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          if (e.metaKey || e.ctrlKey || readonly) {
-            if (!leaf?.url) return;
-            if (typeof window === 'undefined') return;
-            window.open(leaf?.url);
-          } else if (e.detail === 2) {
-            selectFormat();
-          }
-        }}
-        id={leaf?.url}
-        data-slate-inline={true}
-        {...props.attributes}
-      >
-        {children}
-      </span>
-    );
 
-    if (!props.leaf.comment) return renderDom;
-    return (
-      <CommentView
-        id={`comment-${props.leaf?.id}`}
-        comment={props.comment}
-        hashId={props.hashId}
-        selection={leaf?.selection}
-        commentItem={props.leaf?.comment ? (props.leaf.data as any) : null}
-        setShowComment={setShowComment}
-      >
-        {renderDom}
-      </CommentView>
-    );
-  }
+  const handleFncOpen = () => {
+    if (props.fncProps?.onOriginUrlClick) {
+      props.fncProps.onOriginUrlClick(leaf?.identifier);
+    }
+  };
+
+  const isMobile = isMobileDevice();
+  const hasFnc = leaf.fnc || leaf.identifier;
+
+  // 长按处理：用于手机端打开 fnc
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const touchStartTimeRef = useRef<number>(0);
+  const isLongPressRef = useRef<boolean>(false);
+
+  const handleTouchStart = () => {
+    if (!hasFnc) return;
+
+    isLongPressRef.current = false;
+    touchStartTimeRef.current = Date.now();
+
+    longPressTimerRef.current = setTimeout(() => {
+      isLongPressRef.current = true;
+      handleFncOpen();
+    }, 500); // 500ms 长按时间
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!hasFnc) return;
+
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+
+    // 如果是短按（小于 500ms），在手机上阻止默认行为
+    const touchDuration = Date.now() - touchStartTimeRef.current;
+    if (touchDuration < 500 && isMobile) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchCancel = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    isLongPressRef.current = false;
+  };
 
   const fncClassName = classNames(prefixClassName?.trim(), props.hashId, {
     [`${mdEditorBaseClass}-fnc`]: leaf.fnc,
@@ -509,13 +519,24 @@ const MLeafComponent = (
       draggable={false}
       onDragStart={dragStart}
       onClick={(e) => {
+        // 在手机上，如果是 fnc，阻止点击事件（使用长按代替）
+        if (isMobile && hasFnc) {
+          e.preventDefault();
+          return;
+        }
         if (e.detail === 2) {
           selectFormat();
         }
         if (props.fncProps?.onOriginUrlClick) {
           props.fncProps.onOriginUrlClick(leaf?.identifier);
         }
+        if (leaf.url) {
+          window.open(leaf.url, '_blank');
+        }
       }}
+      onTouchStart={hasFnc ? handleTouchStart : undefined}
+      onTouchEnd={hasFnc ? handleTouchEnd : undefined}
+      onTouchCancel={hasFnc ? handleTouchCancel : undefined}
       contentEditable={leaf.fnc ? false : undefined}
       data-fnc={leaf.fnc || leaf.identifier ? 'fnc' : undefined}
       data-fnd={leaf.fnd ? 'fnd' : undefined}

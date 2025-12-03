@@ -6,10 +6,16 @@ import {
 } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
-import React, { memo, useCallback, useContext, useEffect } from 'react';
-import { useStyle } from './thinkStyle';
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from 'react';
+import { useStyle } from './style';
 
 const getChevronStyle = (expanded: boolean): React.CSSProperties => ({
   transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
@@ -215,23 +221,6 @@ const ExpandButton: React.FC<ExpandButtonProps> = ({
   );
 };
 
-const getContainerStyle = (
-  expanded: boolean,
-  customStyle?: React.CSSProperties,
-): React.CSSProperties => ({
-  ...(expanded
-    ? {}
-    : {
-        height: 1,
-        padding: '0 8px',
-        margin: 0,
-        overflow: 'hidden',
-        minHeight: 0,
-        visibility: 'hidden' as const,
-      }),
-  ...customStyle,
-});
-
 interface ThinkContainerProps {
   thinkContent?: React.ReactNode;
   expandedState: boolean;
@@ -257,8 +246,6 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
   styles,
   onToggleFloatingExpand,
 }) => {
-  if (!thinkContent) return null;
-
   const containerClassName = buildClassName(
     `${prefixCls}-container`,
     hashId,
@@ -271,8 +258,6 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
       [`${prefixCls}-container-floating-expanded`]: floatingExpandedState,
     },
   );
-
-  const containerStyle = getContainerStyle(expandedState, styles?.container);
 
   const contentClassName = buildClassName(
     `${prefixCls}-content`,
@@ -296,27 +281,90 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
 
   const showFloatingExpand = status === 'loading' && !light;
 
+  // 缓存容器元素
+  const contentVariants = useMemo(
+    () => ({
+      expanded: {
+        height: 'auto',
+        opacity: 1,
+      },
+      collapsed: {
+        height: 0,
+        opacity: 0,
+      },
+    }),
+    [],
+  );
+
+  const contentTransition = useMemo(
+    () => ({
+      height: {
+        duration: 0.26,
+        ease: [0.4, 0, 0.2, 1],
+      },
+      opacity: {
+        duration: 0.2,
+        ease: 'linear',
+      },
+    }),
+    [],
+  );
+
   return (
-    <div
-      className={containerClassName}
-      data-testid="tool-use-bar-think-container"
-      style={containerStyle}
-    >
-      <div className={contentClassName} style={styles?.content}>
-        {thinkContent}
-      </div>
-      {showFloatingExpand && (
-        <div
-          className={floatingExpandClassName}
-          onClick={onToggleFloatingExpand}
-          data-testid="tool-use-bar-think-floating-expand"
-          style={styles?.floatingExpand}
+    <AnimatePresence initial={false} mode="sync">
+      {expandedState ? (
+        <motion.div
+          variants={contentVariants}
+          initial="collapsed"
+          key="think-container"
+          animate="expanded"
+          exit="collapsed"
+          transition={contentTransition}
+          className={containerClassName}
+          data-testid="tool-use-bar-think-container"
         >
-          {floatingIcon}
-          {floatingText}
+          <div className={contentClassName} style={styles?.content}>
+            {thinkContent}
+          </div>
+          {showFloatingExpand ? (
+            <div
+              className={floatingExpandClassName}
+              onClick={onToggleFloatingExpand}
+              data-testid="tool-use-bar-think-floating-expand"
+              style={styles?.floatingExpand}
+            >
+              {floatingIcon}
+              {floatingText}
+            </div>
+          ) : null}
+        </motion.div>
+      ) : null}
+      {!expandedState ? (
+        <div
+          style={{
+            visibility: 'hidden',
+            height: 1,
+            overflow: 'hidden',
+            opacity: 0,
+          }}
+        >
+          <div className={contentClassName} style={styles?.content}>
+            {thinkContent}
+          </div>
+          {showFloatingExpand ? (
+            <div
+              className={floatingExpandClassName}
+              onClick={onToggleFloatingExpand}
+              data-testid="tool-use-bar-think-floating-expand"
+              style={styles?.floatingExpand}
+            >
+              {floatingIcon}
+              {floatingText}
+            </div>
+          ) : null}
         </div>
-      )}
-    </div>
+      ) : null}
+    </AnimatePresence>
   );
 };
 
@@ -583,18 +631,20 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
           onToggleExpand={handleToggleExpand}
         />
       </div>
-      <ThinkContainer
-        thinkContent={thinkContent}
-        expandedState={expandedState}
-        floatingExpandedState={floatingExpandedState}
-        status={status}
-        light={light}
-        prefixCls={prefixCls}
-        hashId={hashId}
-        classNames={customClassNames}
-        styles={styles}
-        onToggleFloatingExpand={handleToggleFloatingExpand}
-      />
+      {thinkContent ? (
+        <ThinkContainer
+          thinkContent={thinkContent}
+          expandedState={expandedState}
+          floatingExpandedState={floatingExpandedState}
+          status={status}
+          light={light}
+          prefixCls={prefixCls}
+          hashId={hashId}
+          classNames={customClassNames}
+          styles={styles}
+          onToggleFloatingExpand={handleToggleFloatingExpand}
+        />
+      ) : null}
     </div>,
   );
 };

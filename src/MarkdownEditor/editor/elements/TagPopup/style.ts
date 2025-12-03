@@ -26,7 +26,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           left: '4px',
           top: 0,
         },
-
         '&:hover::before': {
           opacity: 0.6,
         },
@@ -36,20 +35,23 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           overflow: 'hidden',
           userSelect: 'none',
         },
-        '&-arrow': {
-          position: 'absolute',
-          right: '4px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          color: 'var(--color-primary-text-disabled)',
-          transition: 'transform 0.2s ease',
-          '&.open': {
-            transform: 'translateY(-50%) rotate(180deg)',
-          },
+      },
+      '&-arrow': {
+        position: 'absolute',
+        right: '4px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        color: 'var(--color-primary-text-disabled)',
+        transition: 'transform 0.2s ease',
+        '&.open': {
+          transform: 'translateY(-50%) rotate(180deg)',
         },
       },
-      '&-tag-popup-input-has-arrow': {
+      '&-has-arrow': {
         paddingRight: '12px',
+      },
+      '&-loading': {
+        // 加载状态的样式可以在这里添加
       },
     },
   };

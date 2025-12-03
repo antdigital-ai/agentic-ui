@@ -22,4 +22,3 @@ export const useChartStatistics = (statisticConfig?: StatisticConfigType) => {
     return Array.isArray(statisticConfig) ? statisticConfig : [statisticConfig];
   }, [statisticConfig]);
 };
-

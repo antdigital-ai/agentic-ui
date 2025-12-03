@@ -7,7 +7,7 @@ import {
   ToolHeaderRight,
   ToolImage,
   ToolTime,
-} from './ToolUseBarItemComponents';
+} from './Content';
 
 export interface ToolCall {
   id: string;

@@ -2,10 +2,9 @@ import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import { useMergedState } from 'rc-util';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
-import { ToolCall, ToolUseBarItem } from './ToolUseBarItem';
+import { ToolCall, ToolUseBarItem } from './BarItem';
 import { useStyle } from './style';
-export * from './ToolUseBarItem';
-export * from './ToolUseBarThink';
+export * from './BarItem';
 
 interface ToolUseBarProps {
   tools?: ToolCall[];

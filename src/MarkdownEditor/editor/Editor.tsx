@@ -1106,11 +1106,20 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
     }
   };
 
+  // 在 SSR 环境下，如果有 initSchemaValue，直接使用它作为初始值
+  // 因为 useEffect 在 SSR 环境下不会执行，initialNote 不会被调用
+  const initialValue = useMemo(() => {
+    if (props.initSchemaValue?.length) {
+      return props.initSchemaValue;
+    }
+    return [EditorUtils.p];
+  }, [props.initSchemaValue]);
+
   return wrapSSR(
     <>
       <Slate
         editor={markdownEditorRef.current}
-        initialValue={[EditorUtils.p]}
+        initialValue={initialValue}
         onChange={onSlateChange}
       >
         <Editable

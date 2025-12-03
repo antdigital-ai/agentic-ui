@@ -21,9 +21,7 @@ export const useChartTheme = (theme: 'light' | 'dark' = 'light') => {
     const axisTextColor = isLight
       ? 'rgba(0, 25, 61, 0.3255)'
       : 'rgba(255, 255, 255, 0.8)';
-    const gridColor = isLight
-      ? 'rgba(0,0,0,0.08)'
-      : 'rgba(255,255,255,0.2)';
+    const gridColor = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.2)';
 
     return {
       isLight,
@@ -32,4 +30,3 @@ export const useChartTheme = (theme: 'light' | 'dark' = 'light') => {
     };
   }, [theme]);
 };
-
