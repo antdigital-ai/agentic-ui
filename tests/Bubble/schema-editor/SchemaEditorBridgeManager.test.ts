@@ -598,6 +598,73 @@ describe('SchemaEditorBridgeManager', () => {
 
       document.body.removeChild(container);
     });
+
+    it('destroy 应该正确清理已创建的 previewRoot', () => {
+      /** 创建容器 */
+      const container = document.createElement('div');
+      container.id = 'preview-root-cleanup-test';
+      document.body.appendChild(container);
+
+      const manager = SchemaEditorBridgeManager.getInstance();
+      manager.setEnabled(true);
+      manager.register('cleanup-test-id', {
+        getContent: () => 'markdown content',
+        setContent: vi.fn(),
+      });
+
+      const config = getBridgeConfig();
+      expect(config).not.toBeNull();
+
+      /** 调用 getSchema 设置 currentEditingId */
+      config?.getSchema?.('cleanup-test-id');
+
+      /** 调用 renderPreview 创建 previewRoot */
+      const cleanup = config?.renderPreview?.(
+        '# Preview Content',
+        'preview-root-cleanup-test',
+      );
+      expect(typeof cleanup).toBe('function');
+
+      /** 验证 destroy 能正确处理有 previewRoot 的情况 */
+      expect(() => {
+        SchemaEditorBridgeManager.destroy();
+      }).not.toThrow();
+
+      /** 清理 DOM */
+      if (document.body.contains(container)) {
+        document.body.removeChild(container);
+      }
+    });
+
+    it('多次调用 renderPreview 后 destroy 应该正常工作', () => {
+      const container = document.createElement('div');
+      container.id = 'multi-preview-test';
+      document.body.appendChild(container);
+
+      const manager = SchemaEditorBridgeManager.getInstance();
+      manager.setEnabled(true);
+      manager.register('multi-test-id', {
+        getContent: () => 'content',
+        setContent: vi.fn(),
+      });
+
+      const config = getBridgeConfig();
+      config?.getSchema?.('multi-test-id');
+
+      /** 多次调用 renderPreview */
+      config?.renderPreview?.('First', 'multi-preview-test');
+      config?.renderPreview?.('Second', 'multi-preview-test');
+      config?.renderPreview?.('Third', 'multi-preview-test');
+
+      /** destroy 应该正常工作 */
+      expect(() => {
+        SchemaEditorBridgeManager.destroy();
+      }).not.toThrow();
+
+      if (document.body.contains(container)) {
+        document.body.removeChild(container);
+      }
+    });
   });
 });
 

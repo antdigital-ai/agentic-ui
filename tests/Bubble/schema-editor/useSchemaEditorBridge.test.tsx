@@ -109,19 +109,47 @@ describe('useSchemaEditorBridge', () => {
       /** 模拟：先在开发环境注册 handler */
       const manager = SchemaEditorBridgeManager.getInstance();
       manager.setEnabled(true);
-      manager.register('test-id', {
+      manager.register('prod-test-id', {
         getContent: () => 'content',
         setContent: () => {},
       });
-      expect(manager.has('test-id')).toBe(true);
+      expect(manager.has('prod-test-id')).toBe(true);
 
       /** 切换到生产环境并执行 hook */
       process.env.NODE_ENV = 'production';
 
-      renderHook(() => useSchemaEditorBridge('test-id', 'content'));
+      /** 使用 rerender 触发 useEffect */
+      const { rerender } = renderHook(
+        ({ id }: { id: string }) => useSchemaEditorBridge(id, 'content'),
+        { initialProps: { id: 'prod-test-id' } },
+      );
+
+      /** 触发 effect */
+      rerender({ id: 'prod-test-id' });
 
       /** 应该注销已存在的 handler */
-      expect(manager.has('test-id')).toBe(false);
+      expect(manager.has('prod-test-id')).toBe(false);
+    });
+
+    it('生产环境 effect 应该执行注销逻辑', () => {
+      /** 先手动注册一个 handler */
+      const manager = SchemaEditorBridgeManager.getInstance();
+      manager.setEnabled(true);
+      manager.register('unregister-test', {
+        getContent: () => 'test',
+        setContent: () => {},
+      });
+
+      /** 确认已注册 */
+      expect(manager.has('unregister-test')).toBe(true);
+
+      /** 在生产环境运行 hook */
+      process.env.NODE_ENV = 'production';
+
+      renderHook(() => useSchemaEditorBridge('unregister-test', 'content'));
+
+      /** 验证被注销 */
+      expect(manager.has('unregister-test')).toBe(false);
     });
   });
 
