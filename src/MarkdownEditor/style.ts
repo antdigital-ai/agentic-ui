@@ -40,9 +40,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         outline: 'none !important',
       },
       '&-container': {
-        // 外层容器样式 - 不设置 padding，由内层 content 控制
-      },
-      '&-content': {
         // 默认 padding，可以通过 contentStyle 覆盖
         // 使用 CSS 变量，允许通过内联样式覆盖
         padding: 'var(--content-padding, 4px 20px)',
@@ -50,6 +47,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           padding: 'var(--content-padding, 4px 4px)',
         },
       },
+      '&-content': {},
     },
   };
 };
