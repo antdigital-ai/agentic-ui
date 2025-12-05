@@ -269,9 +269,9 @@ target={() =>
                   <BackTo.Bottom
                     tooltip="去底部"
                     shouldVisible={200}
-                    target={() =>
-                      containerRef.current?.scrollContainer as HTMLElement
-                    }
+target={() =>
+  containerRef.current?.scrollContainer ?? document.body
+}
                     style={{
                       position: 'relative',
                       bottom: 0,
