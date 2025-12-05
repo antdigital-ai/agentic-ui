@@ -159,10 +159,10 @@ export const AgenticLayout: React.FC<AgenticLayoutProps> = ({
   );
 
   // 处理拖拽结束
-  const handleResizeEnd = useCallback(() => {
+  const handleResizeEnd = useCallback(function handleMouseUp() {
     isResizingRef.current = false;
     document.removeEventListener('mousemove', handleResizeMove);
-    document.removeEventListener('mouseup', handleResizeEnd);
+    document.removeEventListener('mouseup', handleMouseUp);
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
   }, [handleResizeMove]);
