@@ -257,9 +257,9 @@ const ChatLayoutDemo: React.FC = () => {
                   <BackTo.Top
                     tooltip="去顶部"
                     shouldVisible={200}
-                    target={() =>
-                      containerRef.current?.scrollContainer as HTMLElement
-                    }
+target={() =>
+  containerRef.current?.scrollContainer ?? document.body
+}
                     style={{
                       position: 'relative',
                       bottom: 0,
