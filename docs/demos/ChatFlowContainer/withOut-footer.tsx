@@ -6,9 +6,6 @@ import {
   History,
   HistoryDataType,
   MessageBubbleData,
-  TASK_RUNNING_STATUS,
-  TASK_STATUS,
-  TaskRunning,
 } from '@ant-design/agentic-ui';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -164,13 +161,6 @@ const ChatLayoutDemo: React.FC = () => {
   // ***************** Header End ***************** //
 
   // ***************** Footer Task Running ***************** //
-  // 空函数，用于满足类型要求
-  const noop = () => {};
-
-  const handleCreateNewTask = () => {
-    console.log('创建新任务');
-  };
-
   const handleRetry = () => {
     console.log('重试任务');
 
@@ -207,12 +197,9 @@ const ChatLayoutDemo: React.FC = () => {
         }
         isRetryingRef.current = false;
       }
-    }, RETRY_CONFIG.INTERVAL);
+    }, 100);
   };
 
-  const handleViewResult = () => {
-    console.log('查看任务结果');
-  };
   useEffect(() => {
     handleRetry();
   }, []);
@@ -243,6 +230,8 @@ const ChatLayoutDemo: React.FC = () => {
               onLeftCollapse: handleLeftCollapse,
               onShare: handleShare,
             }}
+            footerHeight={0}
+            scrollBehavior="auto"
             footer={
               <div
                 style={{
@@ -290,17 +279,6 @@ const ChatLayoutDemo: React.FC = () => {
                     }}
                   />
                 </div>
-                <TaskRunning
-                  title={`任务已完成, 耗时03分00秒`}
-                  taskStatus={TASK_STATUS.SUCCESS}
-                  taskRunningStatus={TASK_RUNNING_STATUS.COMPLETE}
-                  onPause={noop}
-                  onResume={noop}
-                  onStop={noop}
-                  onCreateNewTask={handleCreateNewTask}
-                  onReplay={handleRetry}
-                  onViewResult={handleViewResult}
-                />
               </div>
             }
           >

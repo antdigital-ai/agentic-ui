@@ -71,18 +71,31 @@ import type { ChatLayoutProps, ChatLayoutRef } from './types';
  * @returns {React.ReactElement} 渲染的聊天布局组件
  */
 const ChatLayout = forwardRef<ChatLayoutRef, ChatLayoutProps>(
-  ({ header, children, footer, className, style }, ref) => {
+  (
+    {
+      header,
+      children,
+      footer,
+      footerHeight = 90,
+      scrollBehavior = 'smooth',
+      className,
+      style,
+    },
+    ref,
+  ) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('chat-layout');
     const { wrapSSR, hashId } = useStyle(prefixCls);
-    const { containerRef } = useAutoScroll({
+    const { containerRef, scrollToBottom } = useAutoScroll({
       SCROLL_TOLERANCE: 30,
       onResize: () => {},
       timeout: 200,
+      scrollBehavior,
     });
 
     useImperativeHandle(ref, () => ({
       scrollContainer: containerRef.current,
+      scrollToBottom,
     }));
 
     return wrapSSR(
@@ -100,12 +113,20 @@ const ChatLayout = forwardRef<ChatLayoutRef, ChatLayoutProps>(
             ref={containerRef}
           >
             {children}
+            <div
+              style={{ height: footer ? footerHeight : 0, width: '100%' }}
+            ></div>
           </div>
         </div>
 
         {/* 底部区域 */}
         {footer && (
-          <div className={`${prefixCls}-footer ${hashId}`}>{footer}</div>
+          <div
+            className={`${prefixCls}-footer ${hashId}`}
+            style={{ height: footerHeight }}
+          >
+            {footer}
+          </div>
         )}
       </div>,
     );
