@@ -814,7 +814,7 @@ describe('Bubble', () => {
       );
 
       /** 组件应该正常渲染（显示加载状态） */
-      expect(document.body).toBeInTheDocument();
+      expect(screen.getByTestId('chat-message')).toBeInTheDocument();
     });
   });
 });
