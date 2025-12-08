@@ -223,6 +223,7 @@ describe('ChatLayout', () => {
     });
 
     it('scrollToBottom method can be called', () => {
+      vi.useFakeTimers();
       const ref = createRef<ChatLayoutRef>();
       const { container } = render(
         <ChatLayout ref={ref}>
@@ -254,22 +255,14 @@ describe('ChatLayout', () => {
         ref.current?.scrollToBottom();
       });
 
-      // Wait for throttle to complete
-      setTimeout(() => {
-        expect(scrollToSpy).toHaveBeenCalled();
-      }, 300);
-    });
+      // Fast-forward timers to trigger the throttled function
+      act(() => {
+        vi.runAllTimers();
+      });
 
-    it('scrollContainer is null when ref is not attached', () => {
-      const ref = createRef<ChatLayoutRef>();
-      render(
-        <ChatLayout ref={ref}>
-          <div>Test content</div>
-        </ChatLayout>,
-      );
+      expect(scrollToSpy).toHaveBeenCalled();
 
-      // Initially, scrollContainer should be set after render
-      expect(ref.current).toBeDefined();
+      vi.useRealTimers();
     });
   });
 
