@@ -362,7 +362,7 @@ describe('FileComponent', () => {
   });
 
   describe('分组交互', () => {
-    it('应该折叠和展开分组', () => {
+    it('应该折叠和展开分组', async () => {
       const nodes: GroupNode[] = [
         {
           id: 'g1',
@@ -390,8 +390,10 @@ describe('FileComponent', () => {
       // Click to collapse
       fireEvent.click(screen.getByText('文档'));
 
-      // File should still be visible because internal state manages collapse
-      expect(screen.queryByText('doc1.txt')).not.toBeInTheDocument();
+      // File should be hidden after animation completes
+      await waitFor(() => {
+        expect(screen.queryByText('doc1.txt')).not.toBeInTheDocument();
+      });
     });
 
     it('应该触发分组折叠回调', () => {
@@ -504,7 +506,7 @@ describe('FileComponent', () => {
   });
 
   describe('预览功能', () => {
-    it('应该默认点击文件打开预览', () => {
+    it('应该默认点击文件打开预览', async () => {
       const nodes: FileNode[] = [
         {
           id: 'f1',
@@ -523,7 +525,9 @@ describe('FileComponent', () => {
       fireEvent.click(screen.getByText('test.txt'));
 
       // Preview should be opened (we'll see preview header)
-      expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
     });
 
     it('应该触发自定义预览回调', async () => {

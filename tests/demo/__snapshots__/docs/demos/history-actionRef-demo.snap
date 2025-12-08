@@ -44,12 +44,224 @@
         style="border: 1px solid rgb(217, 217, 217); border-radius: 6px; padding: 16px;"
       >
         <div
-          actionref="[object Object]"
-          agentid="demo-agent"
-          data-testid="history"
-          sessionid="current-session"
+          style="display: flex; flex-direction: column; height: 100%;"
         >
-          history
+          <div
+            class="ant-agentic-chat-history-menu-scroll-container"
+            style="flex: 1 1 0%; overflow: auto; min-height: 0;"
+          >
+            <div
+              aria-label="菜单"
+              class="ant-agentic-chat-history-menu ant-agentic-chat-history-menu"
+              role="menu"
+              tabindex="0"
+            >
+              <div
+                class="ant-agentic-chat-history-menu-submenu"
+              >
+                <div
+                  class="ant-agentic-chat-history-menu-item-group"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    昨日
+                  </div>
+                </div>
+                <div
+                  aria-selected="false"
+                  class="ant-agentic-chat-history-menu-item"
+                  role="menuitem"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                    >
+                      <div
+                        style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                      >
+                        <div
+                          style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                        >
+                          <div
+                            data-overflow="false"
+                            style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                          >
+                            <div
+                              aria-describedby="test-id"
+                              style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                            >
+                              关于 React Hooks 的讨论
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                      >
+                        <div
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                        >
+                          <div
+                            style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 0; transition: opacity 0.2s ease; pointer-events: none; display: flex; align-items: center; background: transparent; z-index: 1;"
+                          >
+                            <div
+                              class="ant-space ant-space-horizontal ant-space-align-center"
+                              style="column-gap: 4px; row-gap: 4px;"
+                            />
+                          </div>
+                          <div
+                            style="opacity: 1; transition: opacity 0.2s ease;"
+                          >
+                            昨日
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-chat-history-menu-submenu"
+              >
+                <div
+                  class="ant-agentic-chat-history-menu-item-group"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    2 days ago
+                  </div>
+                </div>
+                <div
+                  aria-selected="false"
+                  class="ant-agentic-chat-history-menu-item"
+                  role="menuitem"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                    >
+                      <div
+                        style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                      >
+                        <div
+                          style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                        >
+                          <div
+                            data-overflow="false"
+                            style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                          >
+                            <div
+                              aria-describedby="test-id"
+                              style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                            >
+                              TypeScript 类型系统详解
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                      >
+                        <div
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                        >
+                          <div
+                            style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 0; transition: opacity 0.2s ease; pointer-events: none; display: flex; align-items: center; background: transparent; z-index: 1;"
+                          >
+                            <div
+                              class="ant-space ant-space-horizontal ant-space-align-center"
+                              style="column-gap: 4px; row-gap: 4px;"
+                            />
+                          </div>
+                          <div
+                            style="opacity: 1; transition: opacity 0.2s ease;"
+                          >
+                            2 days ago
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-chat-history-menu-submenu"
+              >
+                <div
+                  class="ant-agentic-chat-history-menu-item-group"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    3 days ago
+                  </div>
+                </div>
+                <div
+                  aria-selected="false"
+                  class="ant-agentic-chat-history-menu-item"
+                  role="menuitem"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                    >
+                      <div
+                        style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                      >
+                        <div
+                          style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                        >
+                          <div
+                            data-overflow="false"
+                            style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                          >
+                            <div
+                              aria-describedby="test-id"
+                              style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                            >
+                              前端性能优化实践
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                      >
+                        <div
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                        >
+                          <div
+                            style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 0; transition: opacity 0.2s ease; pointer-events: none; display: flex; align-items: center; background: transparent; z-index: 1;"
+                          >
+                            <div
+                              class="ant-space ant-space-horizontal ant-space-align-center"
+                              style="column-gap: 4px; row-gap: 4px;"
+                            />
+                          </div>
+                          <div
+                            style="opacity: 1; transition: opacity 0.2s ease;"
+                          >
+                            3 days ago
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div

@@ -3,8 +3,6 @@ import { isString } from 'lodash-es';
 import React from 'react';
 import { DazingLottie, ThinkingLottie } from './lotties';
 
-export * from './lotties';
-
 export type RobotStatus = 'default' | 'running';
 
 export interface RobotProps {

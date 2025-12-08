@@ -1,11 +1,11 @@
 import classNames from 'classnames';
 import React, { useContext } from 'react';
 import { Node } from 'slate';
-import { I18nContext } from '../../../I18n';
-import { ElementProps, ParagraphNode } from '../../el';
-import { useSelStatus } from '../../hooks/editor';
-import { useEditorStore } from '../store';
-import { DragHandle } from '../tools/DragHandle';
+import { I18nContext } from '../../../../I18n';
+import { ElementProps, ParagraphNode } from '../../../el';
+import { useSelStatus } from '../../../hooks/editor';
+import { useEditorStore } from '../../store';
+import { DragHandle } from '../../tools/DragHandle';
 
 export const Paragraph = (props: ElementProps<ParagraphNode>) => {
   const {

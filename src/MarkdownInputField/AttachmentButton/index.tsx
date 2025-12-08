@@ -337,7 +337,9 @@ const ButtonContent: React.FC<{ title?: React.ReactNode }> = ({ title }) => {
   return (
     <>
       <Paperclip />
-      {title !== null && <div style={BUTTON_TITLE_STYLE}>{title}</div>}
+      {title !== null && title ? (
+        <div style={BUTTON_TITLE_STYLE}>{title}</div>
+      ) : null}
     </>
   );
 };

@@ -50,6 +50,24 @@ vi.mock('ace-builds/src-noconflict/ext-modelist', () => ({
   }),
 };
 
+// Mock @galacean/effects 模块，避免在测试环境中访问 DOM 属性导致错误
+vi.mock('@galacean/effects', () => {
+  const mockPlayer = vi.fn().mockImplementation(() => ({
+    loadScene: vi.fn(),
+    dispose: vi.fn(),
+    resume: vi.fn(),
+    pause: vi.fn(),
+    resize: vi.fn(),
+  }));
+
+  return {
+    Player: mockPlayer,
+    Scene: {
+      LoadType: {},
+    },
+  };
+});
+
 // 设置全局mocks
 setupGlobalMocks();
 setupLottieMock();

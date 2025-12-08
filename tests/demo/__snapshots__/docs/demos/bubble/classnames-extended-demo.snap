@@ -148,15 +148,451 @@
         style="height: 500px; border: 1px solid rgb(232, 232, 232); border-radius: 8px; overflow: hidden;"
       >
         <div
-          assistantmeta="[object Object]"
-          bubblelist="[object Object],[object Object],[object Object]"
-          bubblerenderconfig="[object Object]"
-          classnames="[object Object]"
-          data-testid="bubble-list"
-          markdownrenderconfig="[object Object]"
-          styles="[object Object]"
+          class="ant-agentic-bubble-list"
+          data-chat-list="3"
         >
-          bubble-list
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user custom-bubble ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="1"
+            id="1"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container"
+            >
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user custom-container"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+              >
+                <div
+                  class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai custom-avatar-title"
+                >
+                  <div
+                    class="ant-agentic-bubble-title custom-title ant-flex"
+                    data-testid="bubble-title"
+                    style="flex-direction: row-reverse; display: flex; align-items: center; font-size: 14px; font-weight: bold; color: rgb(114, 46, 209); gap: 8px;"
+                  >
+                    <time
+                      class="ant-agentic-bubble-title-time"
+                      data-testid="bubble-time"
+                    >
+                      2024-02-27 17:20:00
+                    </time>
+                  </div>
+                </div>
+                <div
+                  class="ant-agentic-bubble-before ant-agentic-bubble-before-right ant-agentic-bubble-before-user"
+                  data-testid="message-before"
+                >
+                  <div
+                    style="font-size: 12px; color: rgb(102, 102, 102); font-style: italic;"
+                  >
+                    💡 这是自定义的前置内容
+                  </div>
+                </div>
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user custom-content"
+                  data-testid="message-content"
+                  style="min-width: 0px; background-color: rgb(255, 255, 255); border: 1px solid rgb(217, 217, 217); border-radius: 8px; padding: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                >
+                  <div
+                    class="agent-item-default-content"
+                    data-testid="message-box-content"
+                    style="line-height: 24px;"
+                  >
+                    <div
+                      aria-describedby="test-id"
+                      style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                        style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); padding: 0px; margin: 0px;"
+                      >
+                        <div
+                          class="ant-agentic-md-editor-container"
+                          style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none; color: rgb(52, 58, 69);"
+                          tabindex="-1"
+                        >
+                          <div
+                            autocapitalize="false"
+                            autocorrect="false"
+                            class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                            contenteditable="false"
+                            data-slate-editor="true"
+                            data-slate-node="value"
+                            spellcheck="false"
+                            style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                            zindex="-1"
+                          >
+                            <div
+                              class=""
+                              data-be="paragraph"
+                              data-drag-el="true"
+                              data-slate-node="element"
+                            >
+                              <span
+                                data-slate-node="text"
+                              >
+                                <span
+                                  data-be="text"
+                                  data-slate-leaf="true"
+                                  draggable="false"
+                                >
+                                  <span
+                                    data-slate-string="true"
+                                  >
+                                    你好，这是一条用户消息
+                                  </span>
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="font-size: 12px; color: rgb(102, 102, 102); text-align: right;"
+                >
+                  📎 这是自定义的后置内容
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai custom-bubble ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="2"
+            id="2"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+            >
+              <div
+                class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai custom-avatar-title ant-agentic-bubble-avatar-title-pure"
+              >
+                <div
+                  class="ant-agentic-bubble-avatar-emoji"
+                >
+                  🤖
+                </div>
+                <div
+                  class="ant-agentic-bubble-title custom-title ant-flex"
+                  data-testid="bubble-title"
+                  style="flex-direction: row; display: flex; align-items: center; font-size: 14px; font-weight: bold; color: rgb(114, 46, 209); gap: 8px;"
+                >
+                  <span
+                    class="custom-name"
+                  >
+                    助手
+                  </span>
+                  <time
+                    class="ant-agentic-bubble-title-time"
+                    data-testid="bubble-time"
+                  >
+                    2024-02-27 17:20:00
+                  </time>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure custom-container"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+              >
+                <div
+                  class="ant-agentic-bubble-before ant-agentic-bubble-before-left ant-agentic-bubble-before-ai"
+                  data-testid="message-before"
+                >
+                  <div
+                    style="font-size: 12px; color: rgb(102, 102, 102); font-style: italic;"
+                  >
+                    💡 这是自定义的前置内容
+                  </div>
+                </div>
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure custom-content"
+                  data-testid="message-content"
+                  style="min-width: 0px; background-color: rgb(255, 255, 255); border: 1px solid rgb(217, 217, 217); border-radius: 8px; padding: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                >
+                  <div
+                    class="agent-item-default-content"
+                    data-testid="message-box-content"
+                    style="line-height: 24px;"
+                  >
+                    <div
+                      style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                        style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); padding: 0px; margin: 0px;"
+                      >
+                        <div
+                          class="ant-agentic-md-editor-container"
+                          style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none;"
+                          tabindex="-1"
+                        >
+                          <div
+                            autocapitalize="false"
+                            autocorrect="false"
+                            class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                            contenteditable="false"
+                            data-slate-editor="true"
+                            data-slate-node="value"
+                            spellcheck="false"
+                            style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                            zindex="-1"
+                          >
+                            <div
+                              class=""
+                              data-be="paragraph"
+                              data-drag-el="true"
+                              data-slate-node="element"
+                            >
+                              <span
+                                data-slate-node="text"
+                              >
+                                <span
+                                  data-be="text"
+                                  data-slate-leaf="true"
+                                  draggable="false"
+                                >
+                                  <span
+                                    data-slate-string="true"
+                                  >
+                                    你好！这是一条机器人回复，演示各种自定义样式配置。
+                                  </span>
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="ant-chat-item-extra"
+                        style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                      >
+                        <div
+                          animate="visible"
+                          class="ant-chat-item-extra-action-box"
+                          initial="hidden"
+                          style="display: flex; gap: 8px; align-items: center;"
+                          variants="[object Object]"
+                          whileinview="visible"
+                        >
+                          <span
+                            aria-describedby="test-id"
+                            aria-label="复制"
+                            class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                            data-testid="chat-item-copy-button"
+                            data-title="复制"
+                            role="button"
+                            tabindex="0"
+                          >
+                            <svg
+                              class="sofa-icons-icon"
+                              fill="currentColor"
+                              fill-rule="evenodd"
+                              height="1em"
+                              style="vertical-align: -0.125em;"
+                              viewBox="0 0 16 16"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <defs>
+                                <clippath
+                                  id="Copy-master_svg0_388_03608"
+                                >
+                                  <rect
+                                    height="16"
+                                    rx="0"
+                                    width="16"
+                                  />
+                                </clippath>
+                              </defs>
+                              <g
+                                clip-path="url(#Copy-master_svg0_388_03608)"
+                              >
+                                <path
+                                  d="M9.804 2.196q.196.197.196.47a.667.667 0 0 0 1.333 0q0-.825-.587-1.412Q10.16.667 9.333.667H2.667q-.826 0-1.413.587T.667 2.667v6.666q0 .826.587 1.413t1.413.587a.667.667 0 0 0 0-1.333q-.274 0-.47-.196Q2 9.607 2 9.334V2.666q0-.274.196-.47Q2.393 2 2.666 2h6.667q.274 0 .47.196M5.253 14.748q-.586-.586-.586-1.415V6.667q0-.829.586-1.415.585-.585 1.414-.585h6.666q.829 0 1.415.585.585.586.585 1.415v6.666q0 .829-.585 1.415-.586.585-1.415.585H6.667q-.829 0-1.414-.585M6 13.333q0 .276.195.472.196.195.472.195h6.666q.277 0 .472-.195.195-.196.195-.472V6.667q0-.276-.195-.472T13.333 6H6.667q-.276 0-.472.195Q6 6.391 6 6.667z"
+                                />
+                              </g>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="font-size: 12px; color: rgb(102, 102, 102); text-align: right;"
+                >
+                  📎 这是自定义的后置内容
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai custom-bubble ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="3"
+            id="3"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+            >
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure custom-container"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+              >
+                <div
+                  class="ant-agentic-bubble-before ant-agentic-bubble-before-left ant-agentic-bubble-before-ai"
+                  data-testid="message-before"
+                >
+                  <div
+                    style="font-size: 12px; color: rgb(102, 102, 102); font-style: italic;"
+                  >
+                    💡 这是自定义的前置内容
+                  </div>
+                </div>
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure custom-content"
+                  data-testid="message-content"
+                  style="min-width: 0px; background-color: rgb(255, 255, 255); border: 1px solid rgb(217, 217, 217); border-radius: 8px; padding: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                >
+                  <div
+                    class="agent-item-default-content"
+                    data-testid="message-box-content"
+                    style="line-height: 24px;"
+                  >
+                    <div
+                      style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                        style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); padding: 0px; margin: 0px;"
+                      >
+                        <div
+                          class="ant-agentic-md-editor-container"
+                          style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none;"
+                          tabindex="-1"
+                        >
+                          <div
+                            autocapitalize="false"
+                            autocorrect="false"
+                            class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                            contenteditable="false"
+                            data-slate-editor="true"
+                            data-slate-node="value"
+                            spellcheck="false"
+                            style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                            zindex="-1"
+                          >
+                            <div
+                              class=""
+                              data-be="paragraph"
+                              data-drag-el="true"
+                              data-slate-node="element"
+                            >
+                              <span
+                                data-slate-node="text"
+                              >
+                                <span
+                                  data-be="text"
+                                  data-slate-leaf="true"
+                                  draggable="false"
+                                >
+                                  <span
+                                    data-slate-string="true"
+                                  >
+                                    这条消息展示了加载状态和自定义样式
+                                  </span>
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="ant-chat-item-extra"
+                        style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                      >
+                        <div
+                          style="display: flex; align-items: center; gap: 4px;"
+                        >
+                          <div
+                            aria-hidden="true"
+                            data-autoplay="true"
+                            data-loop="true"
+                            data-testid="lottie-animation"
+                            style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center; font-size: 16px;"
+                          />
+                          <span>
+                            生成中...
+                          </span>
+                        </div>
+                        <div
+                          animate="visible"
+                          class="ant-chat-item-extra-action-box"
+                          initial="hidden"
+                          style="display: flex; gap: 8px; align-items: center;"
+                          variants="[object Object]"
+                          whileinview="visible"
+                        >
+                          <span
+                            aria-describedby="test-id"
+                            aria-label="复制"
+                            class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                            data-testid="chat-item-copy-button"
+                            data-title="复制"
+                            role="button"
+                            tabindex="0"
+                          >
+                            <svg
+                              class="sofa-icons-icon"
+                              fill="currentColor"
+                              fill-rule="evenodd"
+                              height="1em"
+                              style="vertical-align: -0.125em;"
+                              viewBox="0 0 16 16"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <defs>
+                                <clippath
+                                  id="Copy-master_svg0_388_03608"
+                                >
+                                  <rect
+                                    height="16"
+                                    rx="0"
+                                    width="16"
+                                  />
+                                </clippath>
+                              </defs>
+                              <g
+                                clip-path="url(#Copy-master_svg0_388_03608)"
+                              >
+                                <path
+                                  d="M9.804 2.196q.196.197.196.47a.667.667 0 0 0 1.333 0q0-.825-.587-1.412Q10.16.667 9.333.667H2.667q-.826 0-1.413.587T.667 2.667v6.666q0 .826.587 1.413t1.413.587a.667.667 0 0 0 0-1.333q-.274 0-.47-.196Q2 9.607 2 9.334V2.666q0-.274.196-.47Q2.393 2 2.666 2h6.667q.274 0 .47.196M5.253 14.748q-.586-.586-.586-1.415V6.667q0-.829.586-1.415.585-.585 1.414-.585h6.666q.829 0 1.415.585.585.586.585 1.415v6.666q0 .829-.585 1.415-.586.585-1.415.585H6.667q-.829 0-1.414-.585M6 13.333q0 .276.195.472.196.195.472.195h6.666q.277 0 .472-.195.195-.196.195-.472V6.667q0-.276-.195-.472T13.333 6H6.667q-.276 0-.472.195Q6 6.391 6 6.667z"
+                                />
+                              </g>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="font-size: 12px; color: rgb(102, 102, 102); text-align: right;"
+                >
+                  📎 这是自定义的后置内容
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div

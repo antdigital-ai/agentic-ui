@@ -1,6 +1,7 @@
-﻿import { ConfigProvider, Spin } from 'antd';
+import { ConfigProvider, Spin } from 'antd';
 import classNames from 'classnames';
-import React, { useCallback, useContext } from 'react';
+import React, { useContext } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { useStyle } from './style';
 
 // Antd Menu 兼容的菜单项类型
@@ -81,12 +82,12 @@ const MenuItem: React.FC<{
   classNames: customClassNames,
 }) => {
   const baseClass = `${prefixCls}-item`;
-  const handleClick = useCallback(() => {
+  const handleClick = useRefFunction(() => {
     if (!item.disabled) {
       onSelect(item.key);
       item.onClick?.();
     }
-  }, [item.disabled, item.key, item.onClick, onSelect]);
+  });
 
   // 如果是分组且有子项，并且嵌套层级小于2
   if (item.type === 'group' && item.children && level < 2) {
@@ -212,12 +213,9 @@ export const GroupMenu: React.FC<GroupMenuProps> = (props) => {
   // 直接使用传入的 items，支持最多双层嵌套
   const dataSource = items || [];
 
-  const handleSelect = useCallback(
-    (key: string) => {
-      onSelect?.({ key });
-    },
-    [onSelect],
-  );
+  const handleSelect = useRefFunction((key: string) => {
+    onSelect?.({ key });
+  });
 
   // 直接传递用户自定义的 classNames
   return wrapSSR(

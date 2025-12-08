@@ -240,6 +240,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         lineHeight: '38px',
         fontWeight: '600',
         margin: 'var(--margin-8x) 0',
+        'a,span[data-url="url"]': {
+          fontSize: '30px',
+          fontWeight: '600',
+        },
       },
 
       h2: {
@@ -248,6 +252,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontWeight: '600',
         marginTop: 'var(--margin-8x)',
         marginBottom: 'var(--margin-4x)',
+        'a,span[data-url="url"]': {
+          fontSize: '24x',
+          fontWeight: '600',
+        },
       },
 
       h3: {
@@ -256,6 +264,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontWeight: '600',
         marginTop: 'var(--margin-4x)',
         marginBottom: 'var(--margin-2x)',
+        'a,span[data-url="url"]': {
+          fontSize: '18x',
+          fontWeight: '600',
+        },
       },
 
       h4: {
@@ -263,6 +275,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         lineHeight: '24px',
         fontWeight: '600',
         marginTop: 'var(--margin-2x)',
+        'a,span[data-url="url"]': {
+          fontSize: '15x',
+          fontWeight: '600',
+        },
       },
 
       h5: {
@@ -270,6 +286,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         lineHeight: '24px',
         fontWeight: '600',
         marginTop: 'var(--margin-2x)',
+        'a,span[data-url="url"]': {
+          fontSize: '15x',
+          fontWeight: '600',
+        },
       },
 
       h6: {
@@ -277,6 +297,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         lineHeight: '24px',
         fontWeight: '600',
         marginTop: 'var(--margin-2x)',
+        'a,span[data-url="url"]': {
+          fontSize: '15x',
+          fontWeight: '600',
+        },
       },
 
       'a,span[data-url="url"]': {
@@ -288,7 +312,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         textDecorationColor: 'var(--color-gray-border-light);',
         textUnderlineOffset: '4px',
         cursor: 'pointer',
-
         '&:hover': {
           textDecorationColor: 'var(--color-gray-text-default)',
         },

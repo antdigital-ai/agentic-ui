@@ -438,15 +438,20 @@ const handleBlockHtml = (
   }
 
   if (isComment || isStandardHtmlElement(commentValue)) {
-    return commentValue.match(/<\/?(table|div|ul|li|ol|p|strong)[^\n>]*?>/)
-      ? htmlToFragmentList(commentValue, '')
-      : {
-          type: 'code',
-          language: 'html',
-          render: true,
-          value: commentValue,
-          children: [{ text: commentValue }],
-        };
+    if (
+      commentValue.match(
+        /<\/?(table|div|ul|li|ol|p|strong|h1|h2|h3|h4|h5|h6)[^\n>]*?>/,
+      )
+    ) {
+      return htmlToFragmentList(commentValue, '');
+    }
+    return {
+      type: 'code',
+      language: 'html',
+      render: true,
+      value: commentValue,
+      children: [{ text: commentValue }],
+    };
   }
 
   return { text: currentElement.value };

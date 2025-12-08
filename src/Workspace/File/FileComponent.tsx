@@ -860,9 +860,7 @@ export const FileComponent: FC<{
   const handlePreview = async (file: FileNode) => {
     // 如果用户提供了预览方法，尝试使用用户的方法
     if (onPreview) {
-      // 立刻进入预览页并展示 loading
       const currentCallId = ++previewRequestIdRef.current;
-      setPreviewFile(file);
 
       try {
         const previewData = await onPreview(file);
@@ -874,6 +872,7 @@ export const FileComponent: FC<{
           setPreviewFile(null);
           return;
         }
+        // 只有当返回结果不是 false 时，才设置预览文件并处理预览数据
         if (previewData) {
           // 区分返回类型：ReactNode -> 自定义内容；FileNode -> 新文件预览
           if (
@@ -882,6 +881,7 @@ export const FileComponent: FC<{
             typeof previewData === 'number' ||
             typeof previewData === 'boolean'
           ) {
+            setPreviewFile(file);
             const content = React.isValidElement(previewData)
               ? React.cloneElement(previewData as React.ReactElement, {
                   setPreviewHeader: (header: React.ReactNode) =>
@@ -915,6 +915,7 @@ export const FileComponent: FC<{
           }
           return;
         }
+        // previewData 为 undefined 或 null，使用默认预览
         setCustomPreviewContent(null);
         setPreviewFile(file);
         return;

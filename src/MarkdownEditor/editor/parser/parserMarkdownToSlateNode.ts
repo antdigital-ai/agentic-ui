@@ -65,6 +65,11 @@ type ElementHandler = {
   needsHtmlResult?: boolean;
 };
 
+// 删除 <answer> 和 </answer> 标签，保留中间内容
+const removeAnswerTags = (text: string): string => {
+  return text.replace(/<answer>\s*/g, '').replace(/\s*<\/answer>/g, '');
+};
+
 /**
  * Markdown 到 Slate 节点解析器类
  *
@@ -94,20 +99,29 @@ export class MarkdownToSlateParser {
     links: { path: number[]; target: string }[];
   } {
     // 先预处理 <think> 标签，然后预处理其他非标准 HTML 标签，最后处理表格换行
-    const thinkProcessed = preprocessThinkTags(md || '');
-    const nonStandardProcessed = preprocessNonStandardHtmlTags(thinkProcessed);
+    const thinkProcessed = removeAnswerTags(preprocessThinkTags(md || ''));
+    const nonStandardProcessed = removeAnswerTags(
+      preprocessNonStandardHtmlTags(thinkProcessed),
+    );
     // parse() 只执行 parser，需要 runSync() 来执行 transformer 插件
     const ast = mdastParser.parse(
       preprocessMarkdownTableNewlines(nonStandardProcessed),
     ) as any;
     const processedMarkdown = mdastParser.runSync(ast) as any;
     const markdownRoot = processedMarkdown.children;
+
     // 使用类的配置和插件，通过 this 访问
     const schema = this.parseNodes(markdownRoot, true, undefined) as Elements[];
     return {
       schema: schema?.filter((item) => {
+        if (item.type === 'paragraph' && !item.children?.length) {
+          return false;
+        }
         if (item.type === 'paragraph' && item.children?.length === 1) {
-          if (item.children[0].text === '\n') {
+          if (
+            item.children[0].text === '\n' ||
+            item.children[0].text === undefined
+          ) {
             return false;
           }
           return true;

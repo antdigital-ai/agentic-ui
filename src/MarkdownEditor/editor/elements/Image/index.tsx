@@ -1,12 +1,10 @@
 import {
   BlockOutlined,
   DeleteFilled,
-  ExclamationCircleOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
 import { Image, ImageProps, Modal, Popover, Skeleton, Space } from 'antd';
 import React, {
-  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -14,6 +12,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useRefFunction } from '../../../../Hooks/useRefFunction';
 
 import { useDebounceFn } from '@ant-design/pro-components';
 import { Rnd } from 'react-rnd';
@@ -22,82 +21,70 @@ import { ActionIconBox } from '../../../../Components/ActionIconBox';
 import { I18nContext } from '../../../../I18n';
 import { ElementProps, MediaNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
+import { MediaErrorLink } from '../../components/MediaErrorLink';
 import { useEditorStore } from '../../store';
 import { useGetSetState } from '../../utils';
 import { getMediaType } from '../../utils/dom';
 
 /**
- * 图片组件，带有错误处理功能
+ * 只读模式下的图片组件，带有错误处理功能
  * 如果图片加载失败，将显示可点击的链接
  *
  * @component
- * @param props - 图片属性，继承自 ImageProps 接口
- * @param props.src - 图片的源地址
+ * @param props - 图片属性
  * @returns 返回一个图片组件，如果加载失败则返回一个链接
- *
- * @example
- * ```tsx
- * <ImageAndError src="https://example.com/image.jpg" alt="示例图片" />
- * ```
  */
-export const ImageAndError: React.FC<ImageProps> = (props) => {
+interface ReadonlyImageProps {
+  src?: string;
+  alt?: string;
+  width?: number | string;
+  height?: number | string;
+  crossOrigin?: 'anonymous' | 'use-credentials' | '';
+}
+
+export const ReadonlyImage: React.FC<ReadonlyImageProps> = ({
+  src,
+  alt,
+  width,
+  height,
+  crossOrigin,
+}) => {
   const { editorProps } = useEditorStore();
   const [error, setError] = React.useState(false);
 
   // 图片加载失败时显示为链接
   if (error) {
-    return (
-      <a
-        href={props.src}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          color: '#1890ff',
-          textDecoration: 'underline',
-          wordBreak: 'break-all',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          maxWidth: '100%',
-          padding: '8px 12px',
-          border: '1px dashed #d9d9d9',
-          borderRadius: '6px',
-          backgroundColor: '#fafafa',
-        }}
-      >
-        <ExclamationCircleOutlined style={{ color: '#faad14' }} />
-        {props.alt || props.src || '图片链接'}
-      </a>
-    );
+    return <MediaErrorLink url={src} displayText={alt || src || '图片链接'} />;
   }
 
+  const imageProps: ImageProps = {
+    src,
+    alt: alt || 'image',
+    width: width ? Number(width) || width : 400,
+    height,
+    preview: {
+      getContainer: () => document.body,
+    },
+    referrerPolicy: 'no-referrer',
+    crossOrigin,
+    draggable: false,
+    style: {
+      maxWidth: '100%',
+      height: 'auto',
+      display: 'block',
+    },
+    onError: () => {
+      setError(true);
+    },
+  };
+
   if (editorProps?.image?.render) {
-    return editorProps.image.render?.(
-      {
-        ...props,
-        onError: () => {
-          setError(true);
-        },
-      },
-      <Image
-        {...props}
-        width={Number(props.width) || props.width || 400}
-        onError={() => {
-          setError(true);
-        }}
-      />,
-    );
+    return editorProps.image.render?.(imageProps, <Image {...imageProps} />);
   }
 
   return (
     <div data-testid="image-container" data-be="image-container">
-      <Image
-        {...props}
-        width={Number(props.width) || props.width || 400}
-        onError={() => {
-          setError(true);
-        }}
-      />
+      <Image {...imageProps} />
     </div>
   );
 };
@@ -153,29 +140,14 @@ export const ResizeImage = ({
   // 如果图片加载失败，显示为链接
   if (error) {
     return (
-      <a
-        href={props.src}
-        target="_blank"
-        rel="noopener noreferrer"
+      <MediaErrorLink
+        url={props.src}
+        displayText={props.alt || props.src || '图片链接'}
         style={{
-          color: '#1890ff',
-          textDecoration: 'underline',
-          wordBreak: 'break-all',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          maxWidth: '100%',
-          padding: '8px 12px',
-          border: '1px dashed #d9d9d9',
-          borderRadius: '6px',
-          backgroundColor: '#fafafa',
           fontSize: '13px',
           lineHeight: '1.5',
         }}
-      >
-        <ExclamationCircleOutlined style={{ color: '#faad14' }} />
-        {props.alt || props.src}
-      </a>
+      />
     );
   }
 
@@ -300,6 +272,7 @@ export function EditorImage({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, path] = useSelStatus(element);
   const { markdownEditorRef, readonly } = useEditorStore();
+
   const htmlRef = React.useRef<HTMLDivElement>(null);
   const [showAsText, setShowAsText] = useState(false);
   const [state, setState] = useGetSetState({
@@ -310,17 +283,14 @@ export function EditorImage({
     selected: false,
     type: getMediaType(element?.url, element.alt),
   });
-  const updateElement = useCallback(
-    (attr: Record<string, any>) => {
-      if (!markdownEditorRef.current) return;
-      Transforms.setNodes(markdownEditorRef.current, attr, { at: path });
-    },
-    [path],
-  );
+  const updateElement = useRefFunction((attr: Record<string, any>) => {
+    if (!markdownEditorRef?.current) return;
+    Transforms.setNodes(markdownEditorRef.current, attr, { at: path });
+  });
 
   const { locale } = useContext(I18nContext);
 
-  const initial = useCallback(async () => {
+  const initial = useRefFunction(async () => {
     let type = getMediaType(element?.url, element.alt);
     type = !type ? 'image' : type;
     setState({
@@ -346,7 +316,7 @@ export function EditorImage({
         mediaType: state().type,
       });
     }
-  }, [element]);
+  });
 
   useLayoutEffect(() => {
     initial();
@@ -394,29 +364,17 @@ export function EditorImage({
     // 如果图片加载失败，显示为链接
     if (!state().loadSuccess) {
       return (
-        <a
-          href={state()?.url || element?.url}
-          target="_blank"
-          rel="noopener noreferrer"
+        <MediaErrorLink
+          url={state()?.url}
+          fallbackUrl={element?.url}
+          displayText={
+            element?.alt || state()?.url || element?.url || '图片链接'
+          }
           style={{
-            color: '#1890ff',
-            textDecoration: 'underline',
-            wordBreak: 'break-all',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            maxWidth: '100%',
-            padding: '8px 12px',
-            border: '1px dashed #d9d9d9',
-            borderRadius: '6px',
-            backgroundColor: '#fafafa',
             fontSize: '13px',
             lineHeight: '1.5',
           }}
-        >
-          <ExclamationCircleOutlined style={{ color: '#faad14' }} />
-          {element?.alt || state()?.url || element?.url || '图片链接'}
-        </a>
+        />
       );
     }
 
@@ -432,24 +390,15 @@ export function EditorImage({
           setState({ selected: true });
         }}
         onResizeStop={(size) => {
+          if (!markdownEditorRef?.current) return;
           Transforms.setNodes(markdownEditorRef.current, size, { at: path });
           setState({ selected: false });
         }}
       />
     ) : (
-      <ImageAndError
+      <ReadonlyImage
         src={state()?.url || element?.url}
-        alt={'image'}
-        preview={{
-          getContainer: () => document.body,
-        }}
-        referrerPolicy={'no-referrer'}
-        draggable={false}
-        style={{
-          maxWidth: '100%',
-          height: 'auto',
-          display: 'block',
-        }}
+        alt={element?.alt || 'image'}
         width={element.width}
         height={element.height}
       />
@@ -514,6 +463,7 @@ export function EditorImage({
                   title: locale?.deleteMedia || '删除媒体',
                   content: locale?.confirmDelete || '确定删除该媒体吗？',
                   onOk: () => {
+                    if (!markdownEditorRef?.current) return;
                     Transforms.removeNodes(markdownEditorRef.current, {
                       at: path,
                     });
@@ -527,6 +477,7 @@ export function EditorImage({
               title={element?.block ? locale?.blockImage : locale?.inlineImage}
               onClick={(e) => {
                 e.stopPropagation();
+                if (!markdownEditorRef?.current) return;
                 Transforms.setNodes(
                   markdownEditorRef.current,
                   {

@@ -9,10 +9,337 @@
       style="height: 600px; width: 100%;"
     >
       <div
+        class="ant-workspace"
         data-testid="workspace"
-        title="任务管理工作空间"
       >
-        workspace
+        <div
+          class="ant-workspace-header"
+          data-testid="workspace-header"
+        >
+          <div
+            class="ant-workspace-title"
+            data-testid="workspace-title"
+          >
+            任务管理工作空间
+          </div>
+        </div>
+        <div
+          class="ant-workspace-content"
+          data-testid="workspace-content"
+        >
+          <div
+            class="ant-agentic-workspace-task"
+            data-testid="task-list"
+          >
+            <div
+              class="ant-agentic-workspace-task-item ant-agentic-workspace-task-item-success"
+            >
+              <div
+                class="ant-agentic-workspace-task-status"
+              >
+                <svg
+                  class="sofa-icons-icon"
+                  fill="currentColor"
+                  fill-rule="evenodd"
+                  height="1em"
+                  style="vertical-align: -0.125em; color: var(--color-green-control-fill-primary);"
+                  viewBox="0 0 16 16"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <clippath
+                      id="Check-master_svg0_280_33510"
+                    >
+                      <rect
+                        height="16"
+                        rx="0"
+                        width="16"
+                      />
+                    </clippath>
+                  </defs>
+                  <g
+                    clip-path="url(#Check-master_svg0_280_33510)"
+                  >
+                    <path
+                      d="M14 4.667c0 .176-.07.346-.195.471l-6.667 6.667a.667.667 0 0 1-.943 0L2.862 8.472a.667.667 0 1 1 .943-.943l2.862 2.862 6.195-6.195a.667.667 0 0 1 1.138.47"
+                      style="mix-blend-mode: passthrough;"
+                    />
+                  </g>
+                </svg>
+              </div>
+              <div
+                class="ant-agentic-workspace-task-content"
+              >
+                <div
+                  class="ant-agentic-workspace-task-title"
+                >
+                  创建全面的 Tesla 股票分析任务列表
+                </div>
+              </div>
+            </div>
+            <div
+              class="ant-agentic-workspace-task-item ant-agentic-workspace-task-item-error"
+            >
+              <div
+                class="ant-agentic-workspace-task-status"
+              >
+                <svg
+                  class="sofa-icons-icon"
+                  fill="currentColor"
+                  fill-rule="evenodd"
+                  height="1em"
+                  style="vertical-align: -0.125em; color: var(--color-red-control-fill-primary);"
+                  viewBox="0 0 16 16"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <clippath
+                      id="OctagonX-master_svg0_740_13536"
+                    >
+                      <rect
+                        height="16"
+                        rx="0"
+                        width="16"
+                      />
+                    </clippath>
+                  </defs>
+                  <g
+                    clip-path="url(#OctagonX-master_svg0_740_13536)"
+                  >
+                    <path
+                      d="m1.253 11.622 3.125 3.125q.586.586 1.414.586h4.416q.828 0 1.414-.586l3.125-3.125q.586-.586.586-1.414V5.792q0-.828-.586-1.414l-3.125-3.125q-.586-.586-1.414-.586H5.792q-.828 0-1.414.586L1.253 4.378q-.586.586-.586 1.414v4.416q0 .828.586 1.414M5.792 14q-.276 0-.471-.195l-3.126-3.126Q2 10.484 2 10.208V5.792q0-.276.195-.471l3.126-3.126Q5.516 2 5.792 2h4.416q.276 0 .471.195l3.126 3.126q.195.195.195.471v4.416q0 .276-.195.471l-3.126 3.126q-.195.195-.471.195zm4.875-8c0 .177-.07.346-.196.471L8.943 8l1.528 1.528a.667.667 0 1 1-.943.943L8 8.943 6.471 10.47a.667.667 0 0 1-.942-.942L7.057 8 5.53 6.471a.667.667 0 1 1 .942-.942L8 7.057 9.528 5.53A.667.667 0 0 1 10.667 6"
+                    />
+                  </g>
+                </svg>
+              </div>
+              <div
+                class="ant-agentic-workspace-task-content"
+              >
+                <div
+                  class="ant-agentic-workspace-task-title"
+                >
+                  下载指定的Bilibili视频分集并确保唯一文件名
+                </div>
+                <div
+                  class="ant-agentic-workspace-task-description"
+                >
+                  <div>
+                    任务已停止
+                    <span
+                      aria-label="question-circle"
+                      class="anticon anticon-question-circle"
+                      role="img"
+                      style="margin-left: 4px;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        data-icon="question-circle"
+                        fill="currentColor"
+                        focusable="false"
+                        height="1em"
+                        viewBox="64 64 896 896"
+                        width="1em"
+                      >
+                        <path
+                          d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"
+                        />
+                        <path
+                          d="M623.6 316.7C593.6 290.4 554 276 512 276s-81.6 14.5-111.6 40.7C369.2 344 352 380.7 352 420v7.6c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V420c0-44.1 43.1-80 96-80s96 35.9 96 80c0 31.1-22 59.6-56.1 72.7-21.2 8.1-39.2 22.3-52.1 40.9-13.1 19-19.9 41.8-19.9 64.9V620c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8v-22.7a48.3 48.3 0 0130.9-44.8c59-22.7 97.1-74.7 97.1-132.5.1-39.3-17.1-76-48.3-103.3zM472 732a40 40 0 1080 0 40 40 0 10-80 0z"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="ant-agentic-workspace-task-item ant-agentic-workspace-task-item-pending"
+            >
+              <div
+                class="ant-agentic-workspace-task-status"
+              >
+                <svg
+                  class="sofa-icons-icon"
+                  fill="currentColor"
+                  fill-rule="evenodd"
+                  height="1em"
+                  style="vertical-align: -0.125em; color: var(--color-gray-text-disabled);"
+                  viewBox="0 0 16 16"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <clippath
+                      id="CircleDashed-master_svg0_691_14098"
+                    >
+                      <rect
+                        height="16"
+                        rx="0"
+                        width="16"
+                      />
+                    </clippath>
+                  </defs>
+                  <g
+                    clip-path="url(#CircleDashed-master_svg0_691_14098)"
+                  >
+                    <path
+                      d="M9.14 2.11q-1.14-.221-2.28 0A.667.667 0 0 1 6.607.8Q8 .53 9.393.8a.667.667 0 0 1-.253 1.31m0 11.78q-1.14.221-2.28 0a.667.667 0 1 0-.254 1.309q1.394.27 2.787 0a.667.667 0 0 0-.253-1.308m4.946-9.981q-.794-1.182-1.973-1.98a.667.667 0 0 0-.748 1.104q.965.653 1.614 1.62a.667.667 0 0 0 1.107-.744M2.12 6.733a.7.7 0 0 1-.012.127q-.22 1.14 0 2.28A.667.667 0 0 1 .8 9.393Q.53 8 .8 6.607a.667.667 0 0 1 1.321.126m12.065 5.006c0 .134-.04.264-.115.374q-.798 1.179-1.98 1.973a.667.667 0 0 1-.744-1.107q.967-.65 1.62-1.614a.667.667 0 0 1 1.219.374m-.307-5.006q0 .064.012.127.22 1.14 0 2.28a.665.665 0 0 0 .654.793c.32 0 .594-.226.655-.54q.27-1.393 0-2.786a.667.667 0 0 0-1.321.126M4.947 2.467c0 .222-.11.43-.294.554q-.967.65-1.62 1.614a.667.667 0 1 1-1.104-.748q.798-1.179 1.98-1.973a.667.667 0 0 1 1.038.553M1.801 11.72c0 .133.04.262.113.372q.794 1.182 1.972 1.98a.667.667 0 1 0 .749-1.104q-.965-.653-1.614-1.62a.667.667 0 0 0-1.22.372"
+                    />
+                  </g>
+                </svg>
+              </div>
+              <div
+                class="ant-agentic-workspace-task-content"
+              >
+                <div
+                  class="ant-agentic-workspace-task-title"
+                >
+                  提取下载的视频帧
+                </div>
+              </div>
+            </div>
+            <div
+              class="ant-agentic-workspace-task-item ant-agentic-workspace-task-item-pending"
+            >
+              <div
+                class="ant-agentic-workspace-task-status"
+              >
+                <svg
+                  class="sofa-icons-icon"
+                  fill="currentColor"
+                  fill-rule="evenodd"
+                  height="1em"
+                  style="vertical-align: -0.125em; color: var(--color-gray-text-disabled);"
+                  viewBox="0 0 16 16"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <clippath
+                      id="CircleDashed-master_svg0_691_14098"
+                    >
+                      <rect
+                        height="16"
+                        rx="0"
+                        width="16"
+                      />
+                    </clippath>
+                  </defs>
+                  <g
+                    clip-path="url(#CircleDashed-master_svg0_691_14098)"
+                  >
+                    <path
+                      d="M9.14 2.11q-1.14-.221-2.28 0A.667.667 0 0 1 6.607.8Q8 .53 9.393.8a.667.667 0 0 1-.253 1.31m0 11.78q-1.14.221-2.28 0a.667.667 0 1 0-.254 1.309q1.394.27 2.787 0a.667.667 0 0 0-.253-1.308m4.946-9.981q-.794-1.182-1.973-1.98a.667.667 0 0 0-.748 1.104q.965.653 1.614 1.62a.667.667 0 0 0 1.107-.744M2.12 6.733a.7.7 0 0 1-.012.127q-.22 1.14 0 2.28A.667.667 0 0 1 .8 9.393Q.53 8 .8 6.607a.667.667 0 0 1 1.321.126m12.065 5.006c0 .134-.04.264-.115.374q-.798 1.179-1.98 1.973a.667.667 0 0 1-.744-1.107q.967-.65 1.62-1.614a.667.667 0 0 1 1.219.374m-.307-5.006q0 .064.012.127.22 1.14 0 2.28a.665.665 0 0 0 .654.793c.32 0 .594-.226.655-.54q.27-1.393 0-2.786a.667.667 0 0 0-1.321.126M4.947 2.467c0 .222-.11.43-.294.554q-.967.65-1.62 1.614a.667.667 0 1 1-1.104-.748q.798-1.179 1.98-1.973a.667.667 0 0 1 1.038.553M1.801 11.72c0 .133.04.262.113.372q.794 1.182 1.972 1.98a.667.667 0 1 0 .749-1.104q-.965-.653-1.614-1.62a.667.667 0 0 0-1.22.372"
+                    />
+                  </g>
+                </svg>
+              </div>
+              <div
+                class="ant-agentic-workspace-task-content"
+              >
+                <div
+                  class="ant-agentic-workspace-task-title"
+                >
+                  对提取的视频帧进行文字识别
+                </div>
+              </div>
+            </div>
+            <div
+              class="ant-agentic-workspace-task-item ant-agentic-workspace-task-item-pending"
+            >
+              <div
+                class="ant-agentic-workspace-task-status"
+              >
+                <svg
+                  class="sofa-icons-icon"
+                  fill="currentColor"
+                  fill-rule="evenodd"
+                  height="1em"
+                  style="vertical-align: -0.125em; color: var(--color-gray-text-disabled);"
+                  viewBox="0 0 16 16"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <clippath
+                      id="CircleDashed-master_svg0_691_14098"
+                    >
+                      <rect
+                        height="16"
+                        rx="0"
+                        width="16"
+                      />
+                    </clippath>
+                  </defs>
+                  <g
+                    clip-path="url(#CircleDashed-master_svg0_691_14098)"
+                  >
+                    <path
+                      d="M9.14 2.11q-1.14-.221-2.28 0A.667.667 0 0 1 6.607.8Q8 .53 9.393.8a.667.667 0 0 1-.253 1.31m0 11.78q-1.14.221-2.28 0a.667.667 0 1 0-.254 1.309q1.394.27 2.787 0a.667.667 0 0 0-.253-1.308m4.946-9.981q-.794-1.182-1.973-1.98a.667.667 0 0 0-.748 1.104q.965.653 1.614 1.62a.667.667 0 0 0 1.107-.744M2.12 6.733a.7.7 0 0 1-.012.127q-.22 1.14 0 2.28A.667.667 0 0 1 .8 9.393Q.53 8 .8 6.607a.667.667 0 0 1 1.321.126m12.065 5.006c0 .134-.04.264-.115.374q-.798 1.179-1.98 1.973a.667.667 0 0 1-.744-1.107q.967-.65 1.62-1.614a.667.667 0 0 1 1.219.374m-.307-5.006q0 .064.012.127.22 1.14 0 2.28a.665.665 0 0 0 .654.793c.32 0 .594-.226.655-.54q.27-1.393 0-2.786a.667.667 0 0 0-1.321.126M4.947 2.467c0 .222-.11.43-.294.554q-.967.65-1.62 1.614a.667.667 0 1 1-1.104-.748q.798-1.179 1.98-1.973a.667.667 0 0 1 1.038.553M1.801 11.72c0 .133.04.262.113.372q.794 1.182 1.972 1.98a.667.667 0 1 0 .749-1.104q-.965-.653-1.614-1.62a.667.667 0 0 0-1.22.372"
+                    />
+                  </g>
+                </svg>
+              </div>
+              <div
+                class="ant-agentic-workspace-task-content"
+              >
+                <div
+                  class="ant-agentic-workspace-task-title"
+                >
+                  筛选掉OCR识别结果为乱码的图片
+                </div>
+              </div>
+            </div>
+            <div
+              class="ant-agentic-workspace-task-item ant-agentic-workspace-task-item-pending"
+            >
+              <div
+                class="ant-agentic-workspace-task-status"
+              >
+                <svg
+                  class="sofa-icons-icon"
+                  fill="currentColor"
+                  fill-rule="evenodd"
+                  height="1em"
+                  style="vertical-align: -0.125em; color: var(--color-gray-text-disabled);"
+                  viewBox="0 0 16 16"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <clippath
+                      id="CircleDashed-master_svg0_691_14098"
+                    >
+                      <rect
+                        height="16"
+                        rx="0"
+                        width="16"
+                      />
+                    </clippath>
+                  </defs>
+                  <g
+                    clip-path="url(#CircleDashed-master_svg0_691_14098)"
+                  >
+                    <path
+                      d="M9.14 2.11q-1.14-.221-2.28 0A.667.667 0 0 1 6.607.8Q8 .53 9.393.8a.667.667 0 0 1-.253 1.31m0 11.78q-1.14.221-2.28 0a.667.667 0 1 0-.254 1.309q1.394.27 2.787 0a.667.667 0 0 0-.253-1.308m4.946-9.981q-.794-1.182-1.973-1.98a.667.667 0 0 0-.748 1.104q.965.653 1.614 1.62a.667.667 0 0 0 1.107-.744M2.12 6.733a.7.7 0 0 1-.012.127q-.22 1.14 0 2.28A.667.667 0 0 1 .8 9.393Q.53 8 .8 6.607a.667.667 0 0 1 1.321.126m12.065 5.006c0 .134-.04.264-.115.374q-.798 1.179-1.98 1.973a.667.667 0 0 1-.744-1.107q.967-.65 1.62-1.614a.667.667 0 0 1 1.219.374m-.307-5.006q0 .064.012.127.22 1.14 0 2.28a.665.665 0 0 0 .654.793c.32 0 .594-.226.655-.54q.27-1.393 0-2.786a.667.667 0 0 0-1.321.126M4.947 2.467c0 .222-.11.43-.294.554q-.967.65-1.62 1.614a.667.667 0 1 1-1.104-.748q.798-1.179 1.98-1.973a.667.667 0 0 1 1.038.553M1.801 11.72c0 .133.04.262.113.372q.794 1.182 1.972 1.98a.667.667 0 1 0 .749-1.104q-.965-.653-1.614-1.62a.667.667 0 0 0-1.22.372"
+                    />
+                  </g>
+                </svg>
+              </div>
+              <div
+                class="ant-agentic-workspace-task-content"
+              >
+                <div
+                  class="ant-agentic-workspace-task-title"
+                >
+                  报告结果并将Word文档发送给用户
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

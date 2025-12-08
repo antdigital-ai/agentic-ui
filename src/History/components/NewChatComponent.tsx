@@ -1,6 +1,7 @@
 import { AiAgentManagement } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { useNewChatStyle } from './NewChatComponent.style';
 
@@ -54,7 +55,7 @@ export const HistoryNewChat: React.FC<HistoryNewChatProps> = ({
   const { locale } = useContext(I18nContext);
   const [loading, setLoading] = useState(false);
 
-  const handleClick = useCallback(async () => {
+  const handleClick = useRefFunction(async () => {
     if (loading) return;
     try {
       setLoading(true);
@@ -62,17 +63,16 @@ export const HistoryNewChat: React.FC<HistoryNewChatProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [loading, onNewChat]);
+  });
 
-  const handleKeyDown = useCallback<React.KeyboardEventHandler<HTMLDivElement>>(
-    (event) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        handleClick();
-      }
-    },
-    [handleClick],
-  );
+  const handleKeyDown = useRefFunction<
+    React.KeyboardEventHandler<HTMLDivElement>
+  >((event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleClick();
+    }
+  });
 
   return wrapSSR(
     <div

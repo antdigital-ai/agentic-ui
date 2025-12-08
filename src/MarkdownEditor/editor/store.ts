@@ -1414,8 +1414,8 @@ export class EditorStore {
     return (
       newChildren.length === 1 &&
       oldChildren.length === 1 &&
-      typeof newChildren[0].text === 'string' &&
-      typeof oldChildren[0].text === 'string'
+      typeof newChildren?.[0]?.text === 'string' &&
+      typeof oldChildren?.[0]?.text === 'string'
     );
   }
 
@@ -1429,11 +1429,11 @@ export class EditorStore {
     operations: UpdateOperation[],
   ): void {
     // 只有文本内容变化
-    if (newChildren[0].text !== oldChildren[0].text) {
+    if (newChildren?.[0]?.text !== oldChildren?.[0]?.text) {
       operations.push({
         type: 'text',
         path: [...path, 0],
-        text: newChildren[0].text,
+        text: newChildren?.[0]?.text || '',
         priority: 8,
       });
     }

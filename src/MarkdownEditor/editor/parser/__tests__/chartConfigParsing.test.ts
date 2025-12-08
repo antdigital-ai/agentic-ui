@@ -19,7 +19,7 @@ describe('Chart Configuration Parsing', () => {
       // 应该解析为 chart 节点（可能包装在 card 中）
       const cardNode = result.schema.find((node: any) => node.type === 'card');
       expect(cardNode).toBeDefined();
-      
+
       // 查找 card 中的 chart 节点
       const findChartNode = (node: any): any => {
         if (node.type === 'chart') return node;
@@ -31,7 +31,7 @@ describe('Chart Configuration Parsing', () => {
         }
         return null;
       };
-      
+
       const chartNode = findChartNode(cardNode);
       expect(chartNode).toBeDefined();
 
@@ -46,7 +46,9 @@ describe('Chart Configuration Parsing', () => {
         expect(chartConfig?.chartType || config?.chartType).toBe('line');
         expect(chartConfig?.x || config?.x).toBe('年份');
         expect(chartConfig?.y || config?.y).toBe('新能源车双积分比例(%)');
-        expect(chartConfig?.title || config?.title).toBe('2018-2023年新能源车双积分比例变化');
+        expect(chartConfig?.title || config?.title).toBe(
+          '2018-2023年新能源车双积分比例变化',
+        );
 
         // 检查数据源
         const dataSource = chartNode.otherProps?.dataSource;
@@ -69,7 +71,7 @@ describe('Chart Configuration Parsing', () => {
       const result = parserMarkdownToSlateNode(markdown);
       const cardNode = result.schema.find((node: any) => node.type === 'card');
       expect(cardNode).toBeDefined();
-      
+
       const findChartNode = (node: any): any => {
         if (node.type === 'chart') return node;
         if (node.children) {
@@ -80,7 +82,7 @@ describe('Chart Configuration Parsing', () => {
         }
         return null;
       };
-      
+
       const chartNode = findChartNode(cardNode);
       expect(chartNode).toBeDefined();
       if (chartNode) {
@@ -104,7 +106,7 @@ describe('Chart Configuration Parsing', () => {
       const result = parserMarkdownToSlateNode(markdown);
       const cardNode = result.schema.find((node: any) => node.type === 'card');
       expect(cardNode).toBeDefined();
-      
+
       const findChartNode = (node: any): any => {
         if (node.type === 'chart') return node;
         if (node.children) {
@@ -115,7 +117,7 @@ describe('Chart Configuration Parsing', () => {
         }
         return null;
       };
-      
+
       const chartNode = findChartNode(cardNode);
       expect(chartNode).toBeDefined();
       if (chartNode) {
@@ -142,7 +144,7 @@ describe('Chart Configuration Parsing', () => {
       const result = parserMarkdownToSlateNode(markdown);
       const cardNode = result.schema.find((node: any) => node.type === 'card');
       expect(cardNode).toBeDefined();
-      
+
       const findChartNode = (node: any): any => {
         if (node.type === 'chart') return node;
         if (node.children) {
@@ -153,11 +155,12 @@ describe('Chart Configuration Parsing', () => {
         }
         return null;
       };
-      
+
       const chartNode = findChartNode(cardNode);
       expect(chartNode).toBeDefined();
       if (chartNode) {
-        const config = chartNode.otherProps?.config || 
+        const config =
+          chartNode.otherProps?.config ||
           (chartNode.otherProps?.chartType ? [chartNode.otherProps] : null);
         expect(config).toBeDefined();
         expect(Array.isArray(config)).toBe(true);
@@ -175,7 +178,7 @@ describe('Chart Configuration Parsing', () => {
       const result = parserMarkdownToSlateNode(markdown);
       const cardNode = result.schema.find((node: any) => node.type === 'card');
       expect(cardNode).toBeDefined();
-      
+
       const findChartNode = (node: any): any => {
         if (node.type === 'chart') return node;
         if (node.children) {
@@ -186,7 +189,7 @@ describe('Chart Configuration Parsing', () => {
         }
         return null;
       };
-      
+
       const chartNode = findChartNode(cardNode);
       expect(chartNode).toBeDefined();
       if (chartNode) {
@@ -212,7 +215,7 @@ describe('Chart Configuration Parsing', () => {
       const result = parserMarkdownToSlateNode(markdown);
       const cardNode = result.schema.find((node: any) => node.type === 'card');
       expect(cardNode).toBeDefined();
-      
+
       const findChartNode = (node: any): any => {
         if (node.type === 'chart') return node;
         if (node.children) {
@@ -223,7 +226,7 @@ describe('Chart Configuration Parsing', () => {
         }
         return null;
       };
-      
+
       const chartNode = findChartNode(cardNode);
       expect(chartNode).toBeDefined();
       if (chartNode) {
@@ -255,7 +258,7 @@ describe('Chart Configuration Parsing', () => {
       const result = parserMarkdownToSlateNode(markdown);
       const cardNode = result.schema.find((node: any) => node.type === 'card');
       expect(cardNode).toBeDefined();
-      
+
       const findChartNode = (node: any): any => {
         if (node.type === 'chart') return node;
         if (node.children) {
@@ -266,7 +269,7 @@ describe('Chart Configuration Parsing', () => {
         }
         return null;
       };
-      
+
       const chartNode = findChartNode(cardNode);
       expect(chartNode).toBeDefined();
       if (chartNode) {
@@ -277,7 +280,7 @@ describe('Chart Configuration Parsing', () => {
         const chartConfig = Array.isArray(config) ? config[0] : config;
         expect(chartConfig?.x || config?.x).toBe('品牌');
         expect(chartConfig?.y || config?.y).toBe('10月销量(辆)');
-        
+
         const dataSource = chartNode.otherProps?.dataSource;
         expect(dataSource[0]['品牌']).toBe('零跑');
         expect(dataSource[0]['10月销量(辆)']).toBe('70289');
@@ -295,7 +298,7 @@ describe('Chart Configuration Parsing', () => {
       const result = parserMarkdownToSlateNode(markdown);
       const cardNode = result.schema.find((node: any) => node.type === 'card');
       expect(cardNode).toBeDefined();
-      
+
       const findTableNode = (node: any): any => {
         if (node.type === 'table') return node;
         if (node.children) {
@@ -306,7 +309,7 @@ describe('Chart Configuration Parsing', () => {
         }
         return null;
       };
-      
+
       const tableNode = findTableNode(cardNode);
       expect(tableNode).toBeDefined();
       expect(tableNode?.type).toBe('table');
@@ -320,7 +323,7 @@ describe('Chart Configuration Parsing', () => {
       const result = parserMarkdownToSlateNode(markdown);
       const cardNode = result.schema.find((node: any) => node.type === 'card');
       expect(cardNode).toBeDefined();
-      
+
       const findChartNode = (node: any): any => {
         if (node.type === 'chart') return node;
         if (node.children) {
@@ -331,7 +334,7 @@ describe('Chart Configuration Parsing', () => {
         }
         return null;
       };
-      
+
       const chartNode = findChartNode(cardNode);
       expect(chartNode).toBeDefined();
       if (chartNode) {
@@ -351,7 +354,7 @@ describe('Chart Configuration Parsing', () => {
       // 无效的JSON应该被忽略，表格应该正常解析
       const cardNode = result.schema.find((node: any) => node.type === 'card');
       expect(cardNode).toBeDefined();
-      
+
       const findTableOrChartNode = (node: any): any => {
         if (node.type === 'table' || node.type === 'chart') return node;
         if (node.children) {
@@ -362,11 +365,10 @@ describe('Chart Configuration Parsing', () => {
         }
         return null;
       };
-      
+
       const tableNode = findTableOrChartNode(cardNode);
       // 应该至少有一个表格或图表节点
       expect(tableNode).toBeDefined();
     });
   });
 });
-

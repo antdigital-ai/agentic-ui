@@ -14,13 +14,7 @@
 
 import type { Ace } from 'ace-builds';
 import isHotkey from 'is-hotkey';
-import {
-  startTransition,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { startTransition, useEffect, useRef, useState } from 'react';
 import { Editor, Path, Transforms } from 'slate';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import partialParse from '../../../MarkdownEditor/editor/parser/json-parse';
@@ -180,71 +174,68 @@ export function AceEditor({
   });
 
   // 配置编辑器事件
-  const setupEditorEvents = useCallback(
-    (codeEditor: Ace.Editor) => {
-      // 禁用默认查找快捷键
-      codeEditor.commands.addCommand({
-        name: 'disableFind',
-        bindKey: { win: 'Ctrl-F', mac: 'Command-F' },
-        exec: () => {},
+  const setupEditorEvents = useRefFunction((codeEditor: Ace.Editor) => {
+    // 禁用默认查找快捷键
+    codeEditor.commands.addCommand({
+      name: 'disableFind',
+      bindKey: { win: 'Ctrl-F', mac: 'Command-F' },
+      exec: () => {},
+    });
+
+    const textarea = dom.current!.querySelector('textarea');
+
+    // 聚焦事件
+    codeEditor.on('focus', () => {
+      onShowBorderChange(false);
+      onHideChange(false);
+    });
+
+    // 失焦事件
+    codeEditor.on('blur', () => {
+      codeEditor.selection.clearSelection();
+    });
+
+    // 光标变化事件
+    codeEditor.selection.on('changeCursor', () => {
+      setTimeout(() => {
+        const pos = codeEditor.getCursorPosition();
+        posRef.current = { row: pos.row, column: pos.column };
       });
+    });
 
-      const textarea = dom.current!.querySelector('textarea');
-
-      // 聚焦事件
-      codeEditor.on('focus', () => {
-        onShowBorderChange(false);
-        onHideChange(false);
-      });
-
-      // 失焦事件
-      codeEditor.on('blur', () => {
-        codeEditor.selection.clearSelection();
-      });
-
-      // 光标变化事件
-      codeEditor.selection.on('changeCursor', () => {
+    // 粘贴事件
+    codeEditor.on('paste', (e) => {
+      if (pasted.current) {
+        e.text = '';
+      } else {
+        pasted.current = true;
         setTimeout(() => {
-          const pos = codeEditor.getCursorPosition();
-          posRef.current = { row: pos.row, column: pos.column };
-        });
-      });
+          pasted.current = false;
+        }, 60);
+      }
+    });
+    codeEditor.on('focus', () => {
+      onSelectionChange?.(true);
+    });
+    codeEditor.on('blur', () => {
+      setTimeout(() => {
+        onSelectionChange?.(false);
+      }, 160);
+    });
 
-      // 粘贴事件
-      codeEditor.on('paste', (e) => {
-        if (pasted.current) {
-          e.text = '';
-        } else {
-          pasted.current = true;
-          setTimeout(() => {
-            pasted.current = false;
-          }, 60);
-        }
-      });
-      codeEditor.on('focus', () => {
-        onSelectionChange?.(true);
-      });
-      codeEditor.on('blur', () => {
-        setTimeout(() => {
-          onSelectionChange?.(false);
-        }, 160);
-      });
+    // 键盘事件
+    textarea?.addEventListener('keydown', handleKeyDown);
 
-      // 键盘事件
-      textarea?.addEventListener('keydown', handleKeyDown);
-
-      // 内容变化事件
-      codeEditor.on('change', () => {
-        if (readonly) return;
-        clearTimeout(debounceTimer.current);
-        debounceTimer.current = window.setTimeout(() => {
-          onUpdate({ value: codeEditor.getValue() });
-          codeRef.current = codeEditor.getValue();
-        }, 100);
-      });
-    },
-    [onUpdate, onShowBorderChange, onHideChange, readonly, handleKeyDown],
-  );
+    // 内容变化事件
+    codeEditor.on('change', () => {
+      if (readonly) return;
+      clearTimeout(debounceTimer.current);
+      debounceTimer.current = window.setTimeout(() => {
+        onUpdate({ value: codeEditor.getValue() });
+        codeRef.current = codeEditor.getValue();
+      }, 100);
+    });
+  });
 
   // 初始化 Ace 编辑器（仅在库加载完成后）
   useEffect(() => {
@@ -351,26 +342,23 @@ export function AceEditor({
   }, [editorProps.codeProps?.theme, props.theme, aceLoaded]);
 
   // 暴露设置语言的方法
-  const setLanguage = useCallback(
-    async (changeLang: string) => {
-      let lang = changeLang.toLowerCase();
-      if (element.language?.toLowerCase() === lang) return;
+  const setLanguage = useRefFunction(async (changeLang: string) => {
+    let lang = changeLang.toLowerCase();
+    if (element.language?.toLowerCase() === lang) return;
 
-      onUpdate({ language: lang });
+    onUpdate({ language: lang });
 
-      if (modeMap.has(lang)) {
-        lang = modeMap.get(lang)!;
-      }
+    if (modeMap.has(lang)) {
+      lang = modeMap.get(lang)!;
+    }
 
-      const aceLangs = await getAceLangs();
-      if (aceLangs.has(lang)) {
-        editorRef.current?.session.setMode(`ace/mode/${lang}`);
-      } else {
-        editorRef.current?.session.setMode(`ace/mode/text`);
-      }
-    },
-    [element, onUpdate],
-  );
+    const aceLangs = await getAceLangs();
+    if (aceLangs.has(lang)) {
+      editorRef.current?.session.setMode(`ace/mode/${lang}`);
+    } else {
+      editorRef.current?.session.setMode(`ace/mode/text`);
+    }
+  });
 
   return {
     dom,

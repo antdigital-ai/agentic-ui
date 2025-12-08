@@ -1,5 +1,12 @@
 import { ConfigProvider } from 'antd';
-import React, { ReactNode, useContext } from 'react';
+import React, {
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   LayoutHeader,
   type LayoutHeaderConfig,
@@ -45,7 +52,7 @@ export interface AgenticLayoutProps {
  * @param {React.CSSProperties} [props.style] - 自定义样式
  * @param {string} [props.className] - 自定义CSS类名
  * @param {number} [props.leftWidth=256] - 左侧宽度
- * @param {number} [props.rightWidth=256] - 右侧宽度
+ * @param {number} [props.rightWidth=540] - 右侧宽度
  * @param {string | number} [props.minHeight='600px'] - 最小高度
  *
  * @example
@@ -75,6 +82,9 @@ export interface AgenticLayoutProps {
  * - 支持自定义宽度和高度
  * - 集成 Ant Design 主题系统
  */
+const MIN_RIGHT_WIDTH = 400;
+const MAX_RIGHT_WIDTH_RATIO = 0.7;
+
 export const AgenticLayout: React.FC<AgenticLayoutProps> = ({
   left,
   center,
@@ -94,6 +104,94 @@ export const AgenticLayout: React.FC<AgenticLayoutProps> = ({
     header?.leftCollapsed ?? header?.leftDefaultCollapsed ?? false;
   const rightCollapsed =
     header?.rightCollapsed ?? header?.rightDefaultCollapsed ?? false;
+
+  // 右侧边栏宽度状态
+  const [currentRightWidth, setCurrentRightWidth] = useState(rightWidth);
+  const isResizingRef = useRef(false);
+  const resizeStartX = useRef<number>(0);
+  const resizeStartWidth = useRef<number>(rightWidth);
+
+  // 计算最大宽度（浏览器窗口的70%）
+  const getMaxRightWidth = useCallback(() => {
+    if (typeof window === 'undefined') return Infinity;
+    return window.innerWidth * MAX_RIGHT_WIDTH_RATIO;
+  }, []);
+
+  // 当 rightWidth prop 变化时更新状态
+  useEffect(() => {
+    setCurrentRightWidth(rightWidth);
+  }, [rightWidth]);
+
+  // 监听窗口大小变化，确保右侧边栏宽度不超过最大限制
+  useEffect(() => {
+    const handleWindowResize = () => {
+      const maxWidth = getMaxRightWidth();
+      if (currentRightWidth > maxWidth) {
+        setCurrentRightWidth(maxWidth);
+      }
+    };
+
+    window.addEventListener('resize', handleWindowResize);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, [currentRightWidth, getMaxRightWidth]);
+
+  // 处理拖拽过程
+  const handleResizeMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizingRef.current) return;
+
+      // 向左拖拽（扩大右侧边栏）时 deltaX 为正，向右拖拽（缩小）时 deltaX 为负
+      const deltaX = resizeStartX.current - e.clientX;
+      const newWidth = resizeStartWidth.current + deltaX;
+      const maxWidth = getMaxRightWidth();
+
+      // 限制宽度范围
+      const clampedWidth = Math.max(
+        MIN_RIGHT_WIDTH,
+        Math.min(newWidth, maxWidth),
+      );
+
+      setCurrentRightWidth(clampedWidth);
+    },
+    [getMaxRightWidth],
+  );
+
+  // 处理拖拽结束
+  const handleResizeEnd = useCallback(function handleMouseUp() {
+    isResizingRef.current = false;
+    document.removeEventListener('mousemove', handleResizeMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  }, [handleResizeMove]);
+
+  // 处理拖拽开始
+  const handleResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      isResizingRef.current = true;
+      resizeStartX.current = e.clientX;
+      resizeStartWidth.current = currentRightWidth;
+      document.addEventListener('mousemove', handleResizeMove);
+      document.addEventListener('mouseup', handleResizeEnd);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    },
+    [currentRightWidth, handleResizeMove, handleResizeEnd],
+  );
+
+  // 清理事件监听器
+  useEffect(() => {
+    return () => {
+      document.removeEventListener('mousemove', handleResizeMove);
+      document.removeEventListener('mouseup', handleResizeEnd);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [handleResizeMove, handleResizeEnd]);
 
   return wrapSSR(
     <div className={`${prefixCls} ${className || ''} ${hashId}`} style={style}>
@@ -125,7 +223,7 @@ export const AgenticLayout: React.FC<AgenticLayoutProps> = ({
           className={`${prefixCls}-main ${hashId}`}
           style={{
             flex: 1,
-            minWidth: 0,
+            minWidth: MIN_RIGHT_WIDTH,
           }}
         >
           {header && (
@@ -141,17 +239,33 @@ export const AgenticLayout: React.FC<AgenticLayoutProps> = ({
       {/* 右侧边栏 */}
       {right && (
         <div
-          className={`${prefixCls}-sidebar ${prefixCls}-sidebar-right ${
-            rightCollapsed ? `${prefixCls}-sidebar-right-collapsed` : ''
-          } ${hashId}`}
+          className={`${prefixCls}-sidebar-wrapper-right ${hashId}`}
           style={{
-            width: rightCollapsed ? 0 : rightWidth,
-            minWidth: rightCollapsed ? 0 : rightWidth,
-            maxWidth: rightCollapsed ? 0 : rightWidth,
+            display: 'flex',
+            alignItems: 'stretch',
+            height: '100%',
           }}
         >
-          <div className={`${prefixCls}-sidebar-content ${hashId}`}>
-            {right}
+          {/* 拖拽手柄 */}
+          {!rightCollapsed && (
+            <div
+              className={`${prefixCls}-resize-handle ${prefixCls}-resize-handle-right ${hashId}`}
+              onMouseDown={handleResizeStart}
+            />
+          )}
+          <div
+            className={`${prefixCls}-sidebar ${prefixCls}-sidebar-right ${
+              rightCollapsed ? `${prefixCls}-sidebar-right-collapsed` : ''
+            } ${hashId}`}
+            style={{
+              width: rightCollapsed ? 0 : currentRightWidth,
+              minWidth: rightCollapsed ? 0 : currentRightWidth,
+              maxWidth: rightCollapsed ? 0 : currentRightWidth,
+            }}
+          >
+            <div className={`${prefixCls}-sidebar-content ${hashId}`}>
+              {right}
+            </div>
           </div>
         </div>
       )}

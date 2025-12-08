@@ -1,12 +1,6 @@
-import {
-  DeleteFilled,
-  ExclamationCircleOutlined,
-  EyeOutlined,
-  LoadingOutlined,
-} from '@ant-design/icons';
+import { DeleteFilled, EyeOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Modal, Popover, Skeleton } from 'antd';
 import React, {
-  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -14,19 +8,21 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useRefFunction } from '../../../../Hooks/useRefFunction';
 
 import { useDebounceFn } from '@ant-design/pro-components';
 import { Rnd } from 'react-rnd';
 import { Transforms } from 'slate';
-import { ActionIconBox } from '../../../Components/ActionIconBox';
-import { I18nContext } from '../../../I18n';
-import { ElementProps, MediaNode } from '../../el';
-import { useSelStatus } from '../../hooks/editor';
-import { AvatarList } from '../components/ContributorAvatar';
-import { useEditorStore } from '../store';
-import { useGetSetState } from '../utils';
-import { getMediaType } from '../utils/dom';
-import { ImageAndError } from './Image';
+import { ActionIconBox } from '../../../../Components/ActionIconBox';
+import { I18nContext } from '../../../../I18n';
+import { ElementProps, MediaNode } from '../../../el';
+import { useSelStatus } from '../../../hooks/editor';
+import { AvatarList } from '../../components/ContributorAvatar';
+import { MediaErrorLink } from '../../components/MediaErrorLink';
+import { useEditorStore } from '../../store';
+import { useGetSetState } from '../../utils';
+import { getMediaType } from '../../utils/dom';
+import { ReadonlyImage } from '../Image';
 
 /**
  * 可调整大小的图片组件的属性接口
@@ -231,13 +227,10 @@ export function Media({
     selected: false,
     type: getMediaType(element?.url, element.alt),
   });
-  const updateElement = useCallback(
-    (attr: Record<string, any>) => {
-      if (!markdownEditorRef.current) return;
-      Transforms.setNodes(markdownEditorRef.current, attr, { at: path });
-    },
-    [path],
-  );
+  const updateElement = useRefFunction((attr: Record<string, any>) => {
+    if (!markdownEditorRef.current) return;
+    Transforms.setNodes(markdownEditorRef.current, attr, { at: path });
+  });
 
   // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
   useEffect(() => {
@@ -255,7 +248,7 @@ export function Media({
     }
   }, [element.finished]);
 
-  const initial = useCallback(async () => {
+  const initial = useRefFunction(async () => {
     let type = getMediaType(element?.url, element.alt);
     type = !type ? 'image' : type;
     const finalType = ['image', 'video', 'autio', 'attachment'].includes(type!)
@@ -304,7 +297,7 @@ export function Media({
         mediaType: state().type,
       });
     }
-  }, [element]);
+  });
 
   useLayoutEffect(() => {
     initial();
@@ -352,22 +345,12 @@ export function Media({
         }}
       />
     ) : (
-      <ImageAndError
+      <ReadonlyImage
         src={state()?.url || element?.url}
-        alt={'image'}
-        preview={{
-          getContainer: () => document.body,
-        }}
-        referrerPolicy={'no-referrer'}
-        crossOrigin={'anonymous'}
-        draggable={false}
-        style={{
-          maxWidth: '100%',
-          height: 'auto',
-          display: 'block',
-        }}
+        alt={element?.alt || 'image'}
         width={element.width}
         height={element.height}
+        crossOrigin="anonymous"
       />
     );
   }, [
@@ -410,27 +393,13 @@ export function Media({
 
       if (!state().loadSuccess) {
         return (
-          <a
-            href={state()?.url || element?.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              color: '#1890ff',
-              textDecoration: 'underline',
-              wordBreak: 'break-all',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              maxWidth: '100%',
-              padding: '8px 12px',
-              border: '1px dashed #d9d9d9',
-              borderRadius: '6px',
-              backgroundColor: '#fafafa',
-            }}
-          >
-            <ExclamationCircleOutlined style={{ color: '#faad14' }} />
-            {element.alt || state()?.url || element?.url || '视频链接'}
-          </a>
+          <MediaErrorLink
+            url={state()?.url}
+            fallbackUrl={element?.url}
+            displayText={
+              element.alt || state()?.url || element?.url || '视频链接'
+            }
+          />
         );
       }
       return (
@@ -512,27 +481,13 @@ export function Media({
 
       if (!state().loadSuccess) {
         return (
-          <a
-            href={state()?.url || element?.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              color: '#1890ff',
-              textDecoration: 'underline',
-              wordBreak: 'break-all',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              maxWidth: '100%',
-              padding: '8px 12px',
-              border: '1px dashed #d9d9d9',
-              borderRadius: '6px',
-              backgroundColor: '#fafafa',
-            }}
-          >
-            <ExclamationCircleOutlined style={{ color: '#faad14' }} />
-            {element.alt || state()?.url || element?.url || '音频链接'}
-          </a>
+          <MediaErrorLink
+            url={state()?.url}
+            fallbackUrl={element?.url}
+            displayText={
+              element.alt || state()?.url || element?.url || '音频链接'
+            }
+          />
         );
       }
       return (

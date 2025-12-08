@@ -1,11 +1,11 @@
 import classNames from 'classnames';
 import React, { createElement } from 'react';
 import { Node } from 'slate';
-import { ElementProps, HeadNode } from '../../el';
-import { useSelStatus } from '../../hooks/editor';
-import { useEditorStore } from '../store';
-import { DragHandle } from '../tools/DragHandle';
-import { slugify } from '../utils/dom';
+import { ElementProps, HeadNode } from '../../../el';
+import { useSelStatus } from '../../../hooks/editor';
+import { useEditorStore } from '../../store';
+import { DragHandle } from '../../tools/DragHandle';
+import { slugify } from '../../utils/dom';
 
 export function Head({
   element,

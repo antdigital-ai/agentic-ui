@@ -8,13 +8,8 @@ import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
-import React, {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from 'react';
+import React, { memo, useContext, useEffect, useMemo } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { useStyle } from './style';
 
 const getChevronStyle = (expanded: boolean): React.CSSProperties => ({
@@ -486,13 +481,13 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
 
   const [hover, setHover] = React.useState(false);
 
-  const handleToggleExpand = useCallback(() => {
+  const handleToggleExpand = useRefFunction(() => {
     setExpandedState(!expandedState);
-  }, [expandedState, setExpandedState]);
+  });
 
-  const handleToggleFloatingExpand = useCallback(() => {
+  const handleToggleFloatingExpand = useRefFunction(() => {
     setFloatingExpandedState(!floatingExpandedState);
-  }, [floatingExpandedState, setFloatingExpandedState]);
+  });
 
   useEffect(() => {
     if (status === 'loading') {

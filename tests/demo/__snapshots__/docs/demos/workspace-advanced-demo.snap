@@ -9,11 +9,379 @@
       style="height: 600px; width: 100%;"
     >
       <div
-        activetabkey="realtime"
+        class="ant-workspace"
         data-testid="workspace"
-        title="高级工作空间"
       >
-        workspace
+        <div
+          class="ant-workspace-header"
+          data-testid="workspace-header"
+        >
+          <div
+            class="ant-workspace-title"
+            data-testid="workspace-title"
+          >
+            高级工作空间
+          </div>
+          <span
+            aria-label="关闭工作空间"
+            class="anticon anticon-close ant-workspace-close"
+            data-testid="workspace-close"
+            role="img"
+            tabindex="-1"
+          >
+            <svg
+              aria-hidden="true"
+              data-icon="close"
+              fill="currentColor"
+              fill-rule="evenodd"
+              focusable="false"
+              height="1em"
+              viewBox="64 64 896 896"
+              width="1em"
+            >
+              <path
+                d="M799.86 166.31c.02 0 .04.02.08.06l57.69 57.7c.04.03.05.05.06.08a.12.12 0 010 .06c0 .03-.02.05-.06.09L569.93 512l287.7 287.7c.04.04.05.06.06.09a.12.12 0 010 .07c0 .02-.02.04-.06.08l-57.7 57.69c-.03.04-.05.05-.07.06a.12.12 0 01-.07 0c-.03 0-.05-.02-.09-.06L512 569.93l-287.7 287.7c-.04.04-.06.05-.09.06a.12.12 0 01-.07 0c-.02 0-.04-.02-.08-.06l-57.69-57.7c-.04-.03-.05-.05-.06-.07a.12.12 0 010-.07c0-.03.02-.05.06-.09L454.07 512l-287.7-287.7c-.04-.04-.05-.06-.06-.09a.12.12 0 010-.07c0-.02.02-.04.06-.08l57.7-57.69c.03-.04.05-.05.07-.06a.12.12 0 01.07 0c.03 0 .05.02.09.06L512 454.07l287.7-287.7c.04-.04.06-.05.09-.06a.12.12 0 01.07 0z"
+              />
+            </svg>
+          </span>
+        </div>
+        <div
+          class="ant-workspace-tabs"
+          data-testid="workspace-tabs"
+        >
+          <div
+            aria-label="segmented control"
+            class="ant-segmented ant-workspace-segmented ant-segmented-block"
+            data-testid="workspace-segmented"
+            role="radiogroup"
+            tabindex="0"
+          >
+            <div
+              class="ant-segmented-group"
+            >
+              <label
+                class="ant-segmented-item ant-segmented-item-selected"
+              >
+                <input
+                  checked=""
+                  class="ant-segmented-item-input"
+                  name="test-id"
+                  type="radio"
+                />
+                <div
+                  aria-selected="true"
+                  class="ant-segmented-item-label"
+                >
+                  <span
+                    class="ant-segmented-item-icon"
+                  >
+                    <svg
+                      class="sofa-icons-icon"
+                      fill="currentColor"
+                      fill-rule="evenodd"
+                      height="1em"
+                      style="vertical-align: -0.125em;"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <defs>
+                        <clippath
+                          id="MousePointerClick-master_svg0_2432_16108"
+                        >
+                          <rect
+                            height="24"
+                            rx="0"
+                            width="24"
+                          />
+                        </clippath>
+                      </defs>
+                      <g
+                        clip-path="url(#MousePointerClick-master_svg0_2432_16108)"
+                      >
+                        <path
+                          d="M15 4.1a1 1 0 0 1-.311.725l-2 1.9a1 1 0 0 1-1.378-1.45l2-1.9A1 1 0 0 1 15 4.1M5.366 7.036l-2.9-.8a1 1 0 1 0-.532 1.928l2.9.8a1.001 1.001 0 1 0 .532-1.928m1.36 5.653a1 1 0 0 0-1.45-1.378l-1.9 2a1 1 0 1 0 1.45 1.378zm2.238-7.856-.8-2.899a1 1 0 1 0-1.928.532l.8 2.9a1 1 0 1 0 1.928-.533M12.61 21.07v-.003L8.11 10.07q-.39-.918.325-1.633.715-.714 1.645-.32l10.988 4.495q1.012.416.927 1.505-.085 1.09-1.148 1.343l-4.348 1.04-1.04 4.35q-.25 1.063-1.343 1.148t-1.506-.928M9.963 9.31l.006.017zm-.664.647.018.007zm5.256 6.074-.68 2.843-3.462-8.462 8.461 3.462-2.84.68q-1.193.284-1.48 1.477"
+                          style="mix-blend-mode: passthrough;"
+                        />
+                      </g>
+                    </svg>
+                  </span>
+                  <span>
+                    <div
+                      class="ant-workspace-tab-item"
+                    >
+                      <span
+                        class="ant-workspace-tab-title"
+                      >
+                        实时数据
+                      </span>
+                      <span
+                        class="ant-workspace-tab-count"
+                      >
+                        3
+                      </span>
+                    </div>
+                  </span>
+                </div>
+              </label>
+              <label
+                class="ant-segmented-item ant-segmented-item-disabled"
+              >
+                <input
+                  class="ant-segmented-item-input"
+                  disabled=""
+                  name="test-id"
+                  type="radio"
+                />
+                <div
+                  aria-selected="false"
+                  class="ant-segmented-item-label"
+                  title=""
+                />
+              </label>
+              <label
+                class="ant-segmented-item"
+              >
+                <input
+                  class="ant-segmented-item-input"
+                  name="test-id"
+                  type="radio"
+                />
+                <div
+                  aria-selected="false"
+                  class="ant-segmented-item-label"
+                >
+                  <span
+                    class="ant-segmented-item-icon"
+                  >
+                    <svg
+                      class="sofa-icons-icon"
+                      fill="currentColor"
+                      fill-rule="evenodd"
+                      height="1em"
+                      style="vertical-align: -0.125em;"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <defs>
+                        <clippath
+                          id="MousePointerClick-master_svg0_2432_16108"
+                        >
+                          <rect
+                            height="24"
+                            rx="0"
+                            width="24"
+                          />
+                        </clippath>
+                      </defs>
+                      <g
+                        clip-path="url(#MousePointerClick-master_svg0_2432_16108)"
+                      >
+                        <path
+                          d="M15 4.1a1 1 0 0 1-.311.725l-2 1.9a1 1 0 0 1-1.378-1.45l2-1.9A1 1 0 0 1 15 4.1M5.366 7.036l-2.9-.8a1 1 0 1 0-.532 1.928l2.9.8a1.001 1.001 0 1 0 .532-1.928m1.36 5.653a1 1 0 0 0-1.45-1.378l-1.9 2a1 1 0 1 0 1.45 1.378zm2.238-7.856-.8-2.899a1 1 0 1 0-1.928.532l.8 2.9a1 1 0 1 0 1.928-.533M12.61 21.07v-.003L8.11 10.07q-.39-.918.325-1.633.715-.714 1.645-.32l10.988 4.495q1.012.416.927 1.505-.085 1.09-1.148 1.343l-4.348 1.04-1.04 4.35q-.25 1.063-1.343 1.148t-1.506-.928M9.963 9.31l.006.017zm-.664.647.018.007zm5.256 6.074-.68 2.843-3.462-8.462 8.461 3.462-2.84.68q-1.193.284-1.48 1.477"
+                          style="mix-blend-mode: passthrough;"
+                        />
+                      </g>
+                    </svg>
+                  </span>
+                  <span>
+                    <div
+                      class="ant-workspace-tab-item"
+                    >
+                      <span
+                        class="ant-workspace-tab-title"
+                      >
+                        Markdown 编辑
+                      </span>
+                    </div>
+                  </span>
+                </div>
+              </label>
+              <label
+                class="ant-segmented-item"
+              >
+                <input
+                  class="ant-segmented-item-input"
+                  name="test-id"
+                  type="radio"
+                />
+                <div
+                  aria-selected="false"
+                  class="ant-segmented-item-label"
+                >
+                  <span
+                    class="ant-segmented-item-icon"
+                  >
+                    <svg
+                      class="sofa-icons-icon"
+                      fill="currentColor"
+                      fill-rule="evenodd"
+                      height="1em"
+                      style="vertical-align: -0.125em;"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <defs>
+                        <clippath
+                          id="FileStack-master_svg0_2432_15948"
+                        >
+                          <rect
+                            height="24"
+                            rx="0"
+                            width="24"
+                          />
+                        </clippath>
+                      </defs>
+                      <g
+                        clip-path="url(#FileStack-master_svg0_2432_15948)"
+                      >
+                        <path
+                          d="m17.707 1.293 4 4A1 1 0 0 1 22 6v6.5q0 1.014-.743 1.757T19.5 15h-7q-1.014 0-1.757-.743T10 12.5v-9q0-1.014.743-1.757T12.5 1H17a1 1 0 0 1 .707.293M15 3h-2.5q-.186 0-.343.157T12 3.5v9q0 .186.157.343T12.5 13h7q.186 0 .343-.157T20 12.5V8h-2q-1.243 0-2.121-.879Q15 6.243 15 5zm4.586 3H18q-.414 0-.707-.293T17 5V3.414zM7 7a1 1 0 0 0-1 1v8.8q0 .814.693 1.507T8.2 19H15a1 1 0 1 0 0-2H8.247l-.006-.003q-.066-.036-.134-.104t-.104-.134L8 16.753V8a1 1 0 0 0-1-1m-5 5a1 1 0 1 1 2 0v8.753l.003.006q.036.066.104.134t.134.104l.006.003H11a1 1 0 1 1 0 2H4.2q-.814 0-1.507-.693T2 20.8z"
+                          style="mix-blend-mode: passthrough;"
+                        />
+                      </g>
+                    </svg>
+                  </span>
+                  <span>
+                    <div
+                      class="ant-workspace-tab-item"
+                    >
+                      <span
+                        class="ant-workspace-tab-title"
+                      >
+                        文件管理
+                      </span>
+                      <span
+                        class="ant-workspace-tab-count"
+                      >
+                        2
+                      </span>
+                    </div>
+                  </span>
+                </div>
+              </label>
+              <label
+                class="ant-segmented-item"
+              >
+                <input
+                  class="ant-segmented-item-input"
+                  name="test-id"
+                  type="radio"
+                />
+                <div
+                  aria-selected="false"
+                  class="ant-segmented-item-label"
+                >
+                  <div
+                    class="ant-workspace-tab-item"
+                  >
+                    <span
+                      class="ant-workspace-tab-title"
+                    >
+                      自定义面板
+                    </span>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div
+          class="ant-workspace-content"
+          data-testid="workspace-content"
+        >
+          <div
+            class="ant-workspace-realtime-container ant-workspace-realtime--shell"
+            data-testid="realtime-follow"
+          >
+            <header
+              class="ant-workspace-realtime-header"
+            >
+              <div
+                class="ant-workspace-realtime-header-left"
+              >
+                <div
+                  class="ant-workspace-realtime-header-content"
+                >
+                  <div
+                    class="ant-workspace-realtime-header-icon ant-workspace-realtime-header-icon--default"
+                  >
+                    <svg
+                      class="sofa-icons-icon"
+                      fill="currentColor"
+                      fill-rule="evenodd"
+                      height="1em"
+                      style="vertical-align: -0.125em;"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <defs>
+                        <clippath
+                          id="SquareTerminal-master_svg0_2173_81992"
+                        >
+                          <rect
+                            height="24"
+                            rx="0"
+                            width="24"
+                          />
+                        </clippath>
+                      </defs>
+                      <g
+                        clip-path="url(#SquareTerminal-master_svg0_2173_81992)"
+                      >
+                        <path
+                          d="M2 19V5q0-1.243.879-2.121Q3.757 2 5 2h14q1.243 0 2.121.879Q22 3.757 22 5v14q0 1.243-.879 2.121Q20.243 22 19 22H5q-1.243 0-2.121-.879Q2 20.243 2 19m2 0q0 1 1 1h14q1 0 1-1V5q0-1-1-1H5Q4 4 4 5zM9.707 8.293l-2-2a1 1 0 1 0-1.414 1.414L7.586 9l-1.293 1.293a1 1 0 0 0 1.414 1.414l2-2a1 1 0 0 0 0-1.414M11 12h4a1 1 0 1 1 0 2h-4a1 1 0 1 1 0-2"
+                          style="mix-blend-mode: passthrough;"
+                        />
+                      </g>
+                    </svg>
+                  </div>
+                  <div
+                    class="ant-workspace-realtime-header-title-wrapper"
+                  >
+                    <div
+                      class="ant-workspace-realtime-header-title"
+                    >
+                      Shell 终端
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="ant-workspace-realtime-header-right"
+              />
+            </header>
+            <div
+              class="ant-workspace-realtime-content"
+            >
+              <div
+                class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: auto; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default);"
+              >
+                <div
+                  class="ant-agentic-md-editor-container"
+                  style="overflow: visible; display: flex; height: 100%; position: relative; gap: 24px; outline: none; --content-padding: 0px; padding: 0px;"
+                  tabindex="-1"
+                >
+                  <div
+                    autocapitalize="false"
+                    autocorrect="false"
+                    class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                    contenteditable="false"
+                    data-slate-editor="true"
+                    data-slate-node="value"
+                    spellcheck="false"
+                    style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                    zindex="-1"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

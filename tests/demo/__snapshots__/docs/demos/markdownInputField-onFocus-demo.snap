@@ -28,10 +28,110 @@
         </p>
       </div>
       <div
-        data-length="0"
-        data-testid="md-input-field"
+        class="ant-dropdown-trigger ant-agentic-md-input-field"
+        style="height: min(114px,100%); border-radius: 16px; min-height: 0; cursor: auto; opacity: 1; max-height: min(114px,100%); transition: height, max-height 0.3s,border-radius 0.3s,box-shadow 0.3s,transform 0.3s,opacity 0.3s,background 0.3s;"
+        tabindex="1"
       >
-        MarkdownInputField(Mock)
+        <div
+          class="ant-agentic-md-input-field-editor"
+          style="display: flex; flex-direction: column; border-top-left-radius: inherit; border-top-right-radius: inherit; max-height: min(400px); height: auto; flex: 1 1 0%;"
+        >
+          <div
+            class="ant-agentic-md-input-field-editor-content"
+          >
+            <div
+              class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-edit"
+              style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); flex: 1 1 0%; padding: 0px 64px 0px 0px;"
+            >
+              <div
+                class="ant-agentic-md-editor-container"
+                style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none; --content-padding: var(--padding-3x); padding: var(--padding-3x);"
+                tabindex="-1"
+              >
+                <div
+                  aria-multiline="true"
+                  autocapitalize="false"
+                  autocorrect="false"
+                  class="ant-agentic-md-editor-content ant-agentic-md-editor-content-focus ant-agentic-md-editor-content-edit"
+                  contenteditable="true"
+                  data-slate-editor="true"
+                  data-slate-node="value"
+                  role="textbox"
+                  spellcheck="false"
+                  style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                  zindex="-1"
+                >
+                  <div
+                    class="empty"
+                    data-be="paragraph"
+                    data-drag-el="true"
+                    data-empty="true"
+                    data-slate-node="element"
+                    data-slate-placeholder="点击输入框获得焦点..."
+                  >
+                    <span
+                      data-slate-node="text"
+                    >
+                      <span
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-length="0"
+                          data-slate-zero-width="n"
+                        >
+                          ﻿
+                          <br />
+                        </span>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          data-testid="resize-observer"
+        >
+          <div
+            class="ant-agentic-md-input-field-send-actions"
+            contenteditable="false"
+          >
+            <div
+              aria-describedby="test-id"
+              class="ant-agentic-md-input-field-send-button"
+              data-testid="send-button"
+              role="button"
+              tabindex="0"
+            >
+              <svg
+                fill="none"
+                height="1em"
+                viewBox="0 0 32 32"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle
+                  animate="[object Object]"
+                  cx="50%"
+                  cy="50%"
+                  r="0.5em"
+                  transition="[object Object]"
+                />
+                <g>
+                  <path
+                    animate="[object Object]"
+                    d="M16.667 12.943l3.528 3.528a.667.667 0 00.943-.942l-4.666-4.667a.665.665 0 00-.943 0l-4.667 4.667a.667.667 0 10.943.942l3.528-3.528v7.724a.667.667 0 101.334 0v-7.724z"
+                    fill-rule="evenodd"
+                    transition="[object Object]"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
       <div
         style="margin-top: 16px;"

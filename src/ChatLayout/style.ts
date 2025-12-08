@@ -141,7 +141,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           paddingTop: 'var(--padding-2x)',
           paddingLeft: 'var(--padding-2x)',
           paddingRight: 'var(--padding-2x)',
-          paddingBottom: '144px', // 内容底部与输入框操作区域距离24px，不遮挡内容
           '&::-webkit-scrollbar': {
             width: '6px',
           },
@@ -166,7 +165,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '&-footer': {
-        padding: 'var(--padding-4x)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         background:
           'linear-gradient(to bottom, #fff0 20%, var(--color-gray-bg-card-white) 70%)',
         width: '100%',
@@ -185,7 +187,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             paddingTop: MOBILE_PADDING,
             paddingLeft: MOBILE_PADDING,
             paddingRight: MOBILE_PADDING,
-            paddingBottom: '144px',
           },
         },
         '&-footer': {

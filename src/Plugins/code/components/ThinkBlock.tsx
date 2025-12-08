@@ -4,6 +4,7 @@
  */
 
 import React, { useContext } from 'react';
+import { MessagesContext } from '../../../Bubble/MessagesContent/BubbleContext';
 import { I18nContext } from '../../../I18n';
 import { EditorStoreContext } from '../../../MarkdownEditor/editor/store';
 import { CodeNode } from '../../../MarkdownEditor/el';
@@ -37,6 +38,7 @@ const restoreCodeBlocks = (content: string): string => {
 export function ThinkBlock({ element }: ThinkBlockProps) {
   const { locale } = useContext(I18nContext);
   const { editorProps } = useContext(EditorStoreContext) || {};
+  const { message } = useContext(MessagesContext);
 
   const rawContent =
     element?.value !== null && element?.value !== undefined
@@ -46,6 +48,10 @@ export function ThinkBlock({ element }: ThinkBlockProps) {
   // 恢复内容中被转义的代码块
   const content = restoreCodeBlocks(rawContent);
 
+  // 获取当前 Bubble 的 isFinished 状态
+  const bubbleIsFinished = message?.isFinished;
+
+  // 判断是否正在加载：内容以...结尾 或者 bubble 还未完成
   const isLoading = content.endsWith('...');
   const toolNameText = isLoading
     ? locale?.['think.deepThinkingInProgress'] || '深度思考...'
@@ -58,10 +64,15 @@ export function ThinkBlock({ element }: ThinkBlockProps) {
         root: {
           boxSizing: 'border-box',
           maxWidth: '680px',
+          marginTop: 8,
         },
       }}
       expanded={
-        editorProps?.codeProps?.alwaysExpandedDeepThink ? true : undefined
+        editorProps?.codeProps?.alwaysExpandedDeepThink
+          ? true
+          : bubbleIsFinished
+            ? false
+            : undefined
       }
       toolName={toolNameText}
       thinkContent={content}

@@ -2,14 +2,16 @@ import { Check, CircleDashed, OctagonX } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { type FC, useContext } from 'react';
-import { Loading } from '../../Components/Loading';
+import { LoadingEffect } from '../../Components/effects';
 import { useTaskStyle } from './style';
+
+type TaskStatus = 'success' | 'pending' | 'loading' | 'error';
 
 export interface TaskItem {
   key: string;
   title?: string;
   content?: React.ReactNode | React.ReactNode[];
-  status: 'success' | 'pending' | 'loading' | 'error';
+  status: TaskStatus;
 }
 
 export interface TaskItemInput {
@@ -24,7 +26,7 @@ export interface TaskListProps {
 }
 
 const StatusIcon: FC<{
-  status: 'success' | 'pending' | 'loading' | 'error';
+  status: TaskStatus;
 }> = ({ status }) => {
   switch (status) {
     case 'success':
@@ -36,7 +38,14 @@ const StatusIcon: FC<{
         <OctagonX style={{ color: 'var(--color-red-control-fill-primary)' }} />
       );
     case 'loading':
-      return <Loading style={{ color: 'var(--color-gray-text-disabled)' }} />;
+      return (
+        <LoadingEffect
+          style={{
+            color: 'var(--color-gray-text-disabled)',
+            transform: 'scale(1.1)',
+          }}
+        />
+      );
     case 'pending':
     default:
       return (

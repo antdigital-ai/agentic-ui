@@ -1,8 +1,8 @@
-﻿import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { RenderElementProps } from 'slate-react';
-import { BubbleConfigContext } from '../../../Bubble/BubbleConfigProvide';
-import { SchemaRenderer } from '../../../Schema';
-import { useEditorStore } from '../store';
+import { BubbleConfigContext } from '../../../../Bubble/BubbleConfigProvide';
+import { SchemaRenderer } from '../../../../Schema';
+import { useEditorStore } from '../../store';
 
 /**
  * Schema 组件 - 模式渲染组件

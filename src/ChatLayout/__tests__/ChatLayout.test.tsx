@@ -105,4 +105,84 @@ describe('ChatLayout', () => {
       'background-color: rgb(255, 0, 0)',
     );
   });
+
+  it('applies custom footerHeight to footer', () => {
+    const { container } = render(
+      <ChatLayout footer={<div>Footer</div>} footerHeight={120}>
+        <div>Test content</div>
+      </ChatLayout>,
+    );
+
+    const footer = container.querySelector('.ant-chat-layout-footer');
+    expect(footer).toHaveStyle('height: 120px');
+  });
+
+  it('uses default footerHeight when not provided', () => {
+    const { container } = render(
+      <ChatLayout footer={<div>Footer</div>}>
+        <div>Test content</div>
+      </ChatLayout>,
+    );
+
+    const footer = container.querySelector('.ant-chat-layout-footer');
+    expect(footer).toHaveStyle('height: 90px');
+  });
+
+  it('applies footerHeight to spacer element when footer is provided', () => {
+    const { container } = render(
+      <ChatLayout footer={<div>Footer</div>} footerHeight={150}>
+        <div>Test content</div>
+      </ChatLayout>,
+    );
+
+    const scrollable = container.querySelector(
+      '.ant-chat-layout-content-scrollable',
+    );
+    const spacer = scrollable?.lastElementChild as HTMLElement;
+    expect(spacer).toHaveStyle('height: 150px');
+  });
+
+  it('sets spacer height to 0 when footer is not provided', () => {
+    const { container } = render(
+      <ChatLayout>
+        <div>Test content</div>
+      </ChatLayout>,
+    );
+
+    const scrollable = container.querySelector(
+      '.ant-chat-layout-content-scrollable',
+    );
+    const spacer = scrollable?.lastElementChild as HTMLElement;
+    expect(spacer).toHaveStyle('height: 0px');
+  });
+
+  it('supports scrollBehavior prop with smooth value', () => {
+    const { container } = render(
+      <ChatLayout scrollBehavior="smooth">
+        <div>Test content</div>
+      </ChatLayout>,
+    );
+
+    expect(container.firstChild).toBeInTheDocument();
+  });
+
+  it('supports scrollBehavior prop with auto value', () => {
+    const { container } = render(
+      <ChatLayout scrollBehavior="auto">
+        <div>Test content</div>
+      </ChatLayout>,
+    );
+
+    expect(container.firstChild).toBeInTheDocument();
+  });
+
+  it('uses default scrollBehavior when not provided', () => {
+    const { container } = render(
+      <ChatLayout>
+        <div>Test content</div>
+      </ChatLayout>,
+    );
+
+    expect(container.firstChild).toBeInTheDocument();
+  });
 });

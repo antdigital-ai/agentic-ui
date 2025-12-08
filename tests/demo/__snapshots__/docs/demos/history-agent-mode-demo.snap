@@ -27,12 +27,1014 @@
         style="padding: 20px; width: 348px; margin: 0px auto; border-radius: 16px; border: 1px solid var(--color-gray-border-light);"
       >
         <div
-          agent="[object Object]"
-          agentid="test-agent"
-          data-testid="history"
-          sessionid="session-1"
+          style="display: flex; flex-direction: column; height: 100%;"
         >
-          history
+          <div
+            style="flex-shrink: 0; margin-bottom: 12px;"
+          >
+            <div
+              aria-busy="false"
+              aria-disabled="false"
+              aria-label="新对话"
+              class="ant-agentic-chat-history-menu-new-chat"
+              role="button"
+              tabindex="0"
+            >
+              <svg
+                class="sofa-icons-icon"
+                fill="currentColor"
+                fill-rule="evenodd"
+                height="1em"
+                style="vertical-align: -0.125em; font-size: 16px;"
+                viewBox="0 0 24 24"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <clippath
+                    id="AiAgentManagement-master_svg0_1063_41430"
+                  >
+                    <rect
+                      height="24"
+                      rx="0"
+                      width="24"
+                    />
+                  </clippath>
+                </defs>
+                <g
+                  clip-path="url(#AiAgentManagement-master_svg0_1063_41430)"
+                >
+                  <path
+                    d="M18.296 11.23c1.006 0 1.991-.303 2.834-.874q.129.803.13 1.644c0 5.523-4.312 10-9.63 10a9.3 9.3 0 0 1-4.535-1.176L2 22l1.132-5.291A10.26 10.26 0 0 1 2 12C2 6.477 6.311 2 11.63 2c.932 0 1.834.138 2.687.394a5.5 5.5 0 0 0-1.206 3.452c0 2.974 2.322 5.385 5.185 5.385m-4.444-5 1.217.468a4.16 4.16 0 0 1 2.407 2.5l.45 1.264.45-1.264a4.16 4.16 0 0 1 2.407-2.5L22 6.231l-1.217-.468a4.16 4.16 0 0 1-2.407-2.5L17.926 2l-.45 1.264a4.16 4.16 0 0 1-2.407 2.5zM6.815 12c0 2.761 2.155 5 4.815 5 2.659 0 4.814-2.239 4.814-5H14.52c0 1.657-1.294 3-2.89 3-1.595 0-2.888-1.343-2.888-3z"
+                  />
+                </g>
+              </svg>
+              新对话
+            </div>
+          </div>
+          <div
+            style="flex-shrink: 0;"
+          >
+            <div
+              style="display: flex; align-items: center; justify-content: space-between; height: 32px; padding: 0px 6px 0px 12px;"
+            >
+              <div
+                style="font: var(--font-text-body-emphasized-sm); letter-spacing: var(--letter-spacing-body-emphasized-sm, normal); color: var(--color-gray-text-light); flex: 1 1 0%;"
+              >
+                历史对话
+              </div>
+              <span
+                aria-describedby="test-id"
+                aria-label="搜索"
+                class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                data-testid="action-icon-box"
+                data-title="搜索"
+                role="button"
+                style="width: 28px; height: 28px; color: var(--color-gray-text-secondary);"
+                tabindex="0"
+              >
+                <svg
+                  fill="none"
+                  height="14"
+                  version="1.1"
+                  viewBox="0 0 14 14"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                >
+                  <g
+                    clip-path="url(#master_svg0_645_36290/645_35767/1_00870)"
+                  >
+                    <g>
+                      <path
+                        d="M9.693555458984376,10.518662270507813C8.795425458984376,11.237102270507812,7.656175458984375,11.666702270507812,6.416595458984375,11.666702270507812C3.517095458984375,11.666702270507812,1.166595458984375,9.316202270507812,1.166595458984375,6.4167022705078125C1.166595458984375,3.5172022705078123,3.517095458984375,1.1667022705078125,6.416595458984375,1.1667022705078125C9.316095458984375,1.1667022705078125,11.666595458984375,3.5172022705078123,11.666595458984375,6.4167022705078125C11.666595458984375,7.656302270507813,11.236995458984374,8.795562270507812,10.518515458984375,9.693702270507812L12.662395458984374,11.837602270507812C12.771795458984375,11.947002270507813,12.833195458984376,12.095302270507812,12.833195458984376,12.250002270507812C12.833195458984376,12.572202270507812,12.572095458984375,12.833402270507813,12.249895458984374,12.833402270507813C12.095195458984374,12.833402270507813,11.946795458984376,12.771902270507812,11.837395458984375,12.662502270507812L9.693555458984376,10.518662270507813ZM10.499925458984375,6.4167022705078125C10.499925458984375,4.1615422705078124,8.671755458984375,2.3333722705078124,6.416595458984375,2.3333722705078124C4.161435458984375,2.3333722705078124,2.333265458984375,4.1615422705078124,2.333265458984375,6.4167022705078125C2.333265458984375,8.671862270507813,4.161435458984375,10.500032270507813,6.416595458984375,10.500032270507813C8.671755458984375,10.500032270507813,10.499925458984375,8.671862270507813,10.499925458984375,6.4167022705078125Z"
+                        fill="currentColor"
+                        fill-rule="evenodd"
+                      />
+                    </g>
+                  </g>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-chat-history-menu-scroll-container"
+            style="flex: 1 1 0%; overflow: auto; min-height: 0;"
+          >
+            <div
+              aria-label="菜单"
+              class="ant-agentic-chat-history-menu ant-agentic-chat-history-menu"
+              role="menu"
+              tabindex="0"
+            >
+              <div
+                class="ant-agentic-chat-history-menu-submenu"
+              >
+                <div
+                  class="ant-agentic-chat-history-menu-item-group"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    今日
+                  </div>
+                </div>
+                <div
+                  aria-selected="true"
+                  class="ant-agentic-chat-history-menu-item ant-agentic-chat-history-menu-item-selected"
+                  role="menuitem"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                    >
+                      <label
+                        class="ant-checkbox-wrapper ant-checkbox-wrapper-checked"
+                      >
+                        <span
+                          class="ant-checkbox ant-wave-target ant-checkbox-checked"
+                        >
+                          <input
+                            checked=""
+                            class="ant-checkbox-input"
+                            type="checkbox"
+                          />
+                          <span
+                            class="ant-checkbox-inner"
+                          />
+                        </span>
+                      </label>
+                      <div
+                        style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                      >
+                        <div
+                          style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                        >
+                          <div
+                            data-overflow="false"
+                            style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                          >
+                            <div
+                              aria-describedby="test-id"
+                              style="white-space: nowrap; font: var(--font-text-h6-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                            >
+                              如何实现 React 组件的懒加载？
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                      >
+                        <div
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                        >
+                          <div
+                            style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                          >
+                            <div
+                              class="ant-space ant-space-horizontal ant-space-align-center"
+                              style="column-gap: 4px; row-gap: 4px;"
+                            >
+                              <div
+                                class="ant-space-item"
+                              >
+                                <span
+                                  aria-describedby="test-id"
+                                  aria-label="已收藏"
+                                  class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                  data-testid="action-icon-box"
+                                  data-title="已收藏"
+                                  role="button"
+                                  style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                  tabindex="0"
+                                >
+                                  <svg
+                                    class="sofa-icons-icon"
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    height="1em"
+                                    style="vertical-align: -0.125em; font-size: 14px; color: var(--color-primary-control-fill-primary);"
+                                    viewBox="0 0 24 24"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="StarFill-master_svg0_2407_13461"
+                                      >
+                                        <rect
+                                          height="24"
+                                          rx="0"
+                                          width="24"
+                                        />
+                                      </clippath>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#StarFill-master_svg0_2407_13461)"
+                                    >
+                                      <g>
+                                        <path
+                                          d="M8.319247228775025,6.531467049942017L10.628247228775024,1.8524690499420164Q11.050087228775025,1.0001069307330166,11.999987228775025,1.0001070499420166Q12.949887228775024,1.0001058578520166,13.371187228775025,1.8513990499420165L15.681687228775024,6.531317049942016Q15.942487228775024,7.0590670499420165,16.525187228775025,7.1446070499420165L21.690787228775026,7.900537049942017Q22.630787228775024,8.036717049942016,22.924987228775024,8.941337049942018Q23.219187228775024,9.845927049942016,22.538087228775023,10.509997049942017L18.801687228775023,14.148407049942017Q18.379387228775023,14.560007049942017,18.478687228775023,15.141607049942017L19.360587228775024,20.280907049942016Q19.526087228775026,21.218007049942017,18.752187228775025,21.780107049942018Q17.978287228775024,22.342207049942015,17.134087228775023,21.892707049942018L12.520587228775025,19.467107049942015Q11.999487228775024,19.193507049942017,11.477887228775025,19.467407049942018L6.861447228775025,21.895107049942016Q6.0201672287750245,22.340407049942016,5.248127228775024,21.778907049942017Q4.476077228775024,21.217507049942018,4.641047228775024,20.277207049942017L5.521377228775024,15.142007049942016Q5.621177228775024,14.560207049942017,5.198327228775025,14.148407049942017L1.4624502287750243,10.511537049942017Q0.7779622287750244,9.850437049942016,1.0729055287750244,8.941527049942017Q1.3678492287750244,8.032627049942016,2.3140072287750244,7.898847049942017L7.474357228775024,7.144517049942016Q8.058137228775024,7.059587049942016,8.319247228775025,6.531467049942017Z"
+                                          style="mix-blend-mode: passthrough;"
+                                        />
+                                      </g>
+                                    </g>
+                                  </svg>
+                                </span>
+                              </div>
+                              <div
+                                class="ant-space-item"
+                              >
+                                <span
+                                  aria-describedby="test-id"
+                                  aria-label="删除"
+                                  class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                  data-testid="action-icon-box"
+                                  data-title="删除"
+                                  role="button"
+                                  style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                  tabindex="0"
+                                >
+                                  <svg
+                                    class="sofa-icons-icon"
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    height="1em"
+                                    style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                    viewBox="0 0 16 16"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="Trash2-master_svg0_308_02283"
+                                      >
+                                        <rect
+                                          height="16"
+                                          rx="0"
+                                          width="16"
+                                        />
+                                      </clippath>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#Trash2-master_svg0_308_02283)"
+                                    >
+                                      <path
+                                        d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                        style="mix-blend-mode: passthrough;"
+                                      />
+                                    </g>
+                                  </svg>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            style="opacity: 1; transition: opacity 0.2s ease;"
+                          >
+                            <span
+                              style="width: 20px; height: 20px;"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  aria-selected="false"
+                  class="ant-agentic-chat-history-menu-item"
+                  role="menuitem"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                    >
+                      <label
+                        class="ant-checkbox-wrapper"
+                      >
+                        <span
+                          class="ant-checkbox ant-wave-target"
+                        >
+                          <input
+                            class="ant-checkbox-input"
+                            type="checkbox"
+                          />
+                          <span
+                            class="ant-checkbox-inner"
+                          />
+                        </span>
+                      </label>
+                      <div
+                        style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                      >
+                        <div
+                          style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                        >
+                          <div
+                            data-overflow="false"
+                            style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                          >
+                            <div
+                              aria-describedby="test-id"
+                              style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                            >
+                              TypeScript 高级类型的使用技巧
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                      >
+                        <div
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                        >
+                          <div
+                            style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                          >
+                            <div
+                              class="ant-space ant-space-horizontal ant-space-align-center"
+                              style="column-gap: 4px; row-gap: 4px;"
+                            >
+                              <div
+                                class="ant-space-item"
+                              >
+                                <span
+                                  aria-describedby="test-id"
+                                  aria-label="收藏"
+                                  class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                  data-testid="action-icon-box"
+                                  data-title="收藏"
+                                  role="button"
+                                  style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                  tabindex="0"
+                                >
+                                  <svg
+                                    class="sofa-icons-icon"
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    height="1em"
+                                    style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                    viewBox="0 0 24 24"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="Star-master_svg0_2407_13457"
+                                      >
+                                        <rect
+                                          height="24"
+                                          rx="0"
+                                          width="24"
+                                        />
+                                      </clippath>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#Star-master_svg0_2407_13457)"
+                                    >
+                                      <g>
+                                        <path
+                                          d="M8.319247228775025,6.531467049942017L8.319247228775025,6.531467049942017L10.628247228775024,1.8524690499420164Q11.050087228775025,1.0001069307330166,11.999987228775025,1.0001070499420166Q12.949887228775024,1.0001058578520166,13.371187228775025,1.8513990499420165L15.681687228775024,6.531317049942016Q15.942487228775024,7.0590670499420165,16.525187228775025,7.1446070499420165L21.690787228775026,7.900537049942017Q22.630787228775024,8.036717049942016,22.924987228775024,8.941337049942018Q23.219187228775024,9.845927049942016,22.538087228775023,10.509997049942017L18.801687228775023,14.148407049942017Q18.379387228775023,14.560007049942017,18.478687228775023,15.141607049942017L19.360587228775024,20.280907049942016Q19.526087228775026,21.218007049942017,18.752187228775025,21.780107049942018Q17.978287228775024,22.342207049942015,17.134087228775023,21.892707049942018L12.520587228775025,19.467107049942015Q11.999487228775024,19.193507049942017,11.477887228775025,19.467407049942018L6.861447228775025,21.895107049942016Q6.0201672287750245,22.340407049942016,5.248127228775024,21.778907049942017Q4.476077228775024,21.217507049942018,4.641047228775024,20.277207049942017L5.521377228775024,15.142007049942016Q5.621177228775024,14.560207049942017,5.198327228775025,14.148407049942017L1.4624502287750243,10.511537049942017Q0.7779622287750244,9.850437049942016,1.0729055287750244,8.941527049942017Q1.3678492287750244,8.032627049942016,2.3140072287750244,7.898847049942017L7.474357228775024,7.144517049942016Q8.058137228775024,7.059587049942016,8.319247228775025,6.531467049942017ZM10.112557228775024,7.416927049942017Q9.386067228775024,8.887447049942017,7.763637228775025,9.123487049942016L3.5382472287750244,9.741127049942017L6.593667228775025,12.715607049942017Q7.770267228775024,13.861407049942017,7.492617228775025,15.480007049942017L6.772187228775024,19.68230704994202L10.548107228775024,17.696607049942017Q11.999487228775024,16.934507049942017,13.451387228775024,17.696907049942016L17.228787228775026,19.682907049942017L16.507287228775024,15.478407049942017Q16.230987228775025,13.861007049942017,17.406387228775024,12.715607049942017L20.460287228775023,9.741767049942016L16.234787228775026,9.123397049942017Q14.614087228775025,8.885517049942017,13.888287228775024,7.416687049942016L12.000087228775024,3.5919970499420164L10.112557228775024,7.416927049942017L10.112557228775024,7.416927049942017Z"
+                                          style="mix-blend-mode: passthrough;"
+                                        />
+                                      </g>
+                                    </g>
+                                  </svg>
+                                </span>
+                              </div>
+                              <div
+                                class="ant-space-item"
+                              >
+                                <span
+                                  aria-describedby="test-id"
+                                  aria-label="删除"
+                                  class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                  data-testid="action-icon-box"
+                                  data-title="删除"
+                                  role="button"
+                                  style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                  tabindex="0"
+                                >
+                                  <svg
+                                    class="sofa-icons-icon"
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    height="1em"
+                                    style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                    viewBox="0 0 16 16"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="Trash2-master_svg0_308_02283"
+                                      >
+                                        <rect
+                                          height="16"
+                                          rx="0"
+                                          width="16"
+                                        />
+                                      </clippath>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#Trash2-master_svg0_308_02283)"
+                                    >
+                                      <path
+                                        d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                        style="mix-blend-mode: passthrough;"
+                                      />
+                                    </g>
+                                  </svg>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            style="opacity: 1; transition: opacity 0.2s ease;"
+                          >
+                            <span
+                              style="width: 20px; height: 20px;"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-chat-history-menu-submenu"
+              >
+                <div
+                  class="ant-agentic-chat-history-menu-item-group"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    昨日
+                  </div>
+                </div>
+                <div
+                  aria-selected="false"
+                  class="ant-agentic-chat-history-menu-item"
+                  role="menuitem"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                    >
+                      <label
+                        class="ant-checkbox-wrapper"
+                      >
+                        <span
+                          class="ant-checkbox ant-wave-target"
+                        >
+                          <input
+                            class="ant-checkbox-input"
+                            type="checkbox"
+                          />
+                          <span
+                            class="ant-checkbox-inner"
+                          />
+                        </span>
+                      </label>
+                      <div
+                        style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                      >
+                        <div
+                          style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                        >
+                          <div
+                            data-overflow="false"
+                            style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                          >
+                            <div
+                              aria-describedby="test-id"
+                              style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                            >
+                              前端性能优化的最佳实践
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                      >
+                        <div
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                        >
+                          <div
+                            style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                          >
+                            <div
+                              class="ant-space ant-space-horizontal ant-space-align-center"
+                              style="column-gap: 4px; row-gap: 4px;"
+                            >
+                              <div
+                                class="ant-space-item"
+                              >
+                                <span
+                                  aria-describedby="test-id"
+                                  aria-label="收藏"
+                                  class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                  data-testid="action-icon-box"
+                                  data-title="收藏"
+                                  role="button"
+                                  style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                  tabindex="0"
+                                >
+                                  <svg
+                                    class="sofa-icons-icon"
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    height="1em"
+                                    style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                    viewBox="0 0 24 24"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="Star-master_svg0_2407_13457"
+                                      >
+                                        <rect
+                                          height="24"
+                                          rx="0"
+                                          width="24"
+                                        />
+                                      </clippath>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#Star-master_svg0_2407_13457)"
+                                    >
+                                      <g>
+                                        <path
+                                          d="M8.319247228775025,6.531467049942017L8.319247228775025,6.531467049942017L10.628247228775024,1.8524690499420164Q11.050087228775025,1.0001069307330166,11.999987228775025,1.0001070499420166Q12.949887228775024,1.0001058578520166,13.371187228775025,1.8513990499420165L15.681687228775024,6.531317049942016Q15.942487228775024,7.0590670499420165,16.525187228775025,7.1446070499420165L21.690787228775026,7.900537049942017Q22.630787228775024,8.036717049942016,22.924987228775024,8.941337049942018Q23.219187228775024,9.845927049942016,22.538087228775023,10.509997049942017L18.801687228775023,14.148407049942017Q18.379387228775023,14.560007049942017,18.478687228775023,15.141607049942017L19.360587228775024,20.280907049942016Q19.526087228775026,21.218007049942017,18.752187228775025,21.780107049942018Q17.978287228775024,22.342207049942015,17.134087228775023,21.892707049942018L12.520587228775025,19.467107049942015Q11.999487228775024,19.193507049942017,11.477887228775025,19.467407049942018L6.861447228775025,21.895107049942016Q6.0201672287750245,22.340407049942016,5.248127228775024,21.778907049942017Q4.476077228775024,21.217507049942018,4.641047228775024,20.277207049942017L5.521377228775024,15.142007049942016Q5.621177228775024,14.560207049942017,5.198327228775025,14.148407049942017L1.4624502287750243,10.511537049942017Q0.7779622287750244,9.850437049942016,1.0729055287750244,8.941527049942017Q1.3678492287750244,8.032627049942016,2.3140072287750244,7.898847049942017L7.474357228775024,7.144517049942016Q8.058137228775024,7.059587049942016,8.319247228775025,6.531467049942017ZM10.112557228775024,7.416927049942017Q9.386067228775024,8.887447049942017,7.763637228775025,9.123487049942016L3.5382472287750244,9.741127049942017L6.593667228775025,12.715607049942017Q7.770267228775024,13.861407049942017,7.492617228775025,15.480007049942017L6.772187228775024,19.68230704994202L10.548107228775024,17.696607049942017Q11.999487228775024,16.934507049942017,13.451387228775024,17.696907049942016L17.228787228775026,19.682907049942017L16.507287228775024,15.478407049942017Q16.230987228775025,13.861007049942017,17.406387228775024,12.715607049942017L20.460287228775023,9.741767049942016L16.234787228775026,9.123397049942017Q14.614087228775025,8.885517049942017,13.888287228775024,7.416687049942016L12.000087228775024,3.5919970499420164L10.112557228775024,7.416927049942017L10.112557228775024,7.416927049942017Z"
+                                          style="mix-blend-mode: passthrough;"
+                                        />
+                                      </g>
+                                    </g>
+                                  </svg>
+                                </span>
+                              </div>
+                              <div
+                                class="ant-space-item"
+                              >
+                                <span
+                                  aria-describedby="test-id"
+                                  aria-label="删除"
+                                  class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                  data-testid="action-icon-box"
+                                  data-title="删除"
+                                  role="button"
+                                  style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                  tabindex="0"
+                                >
+                                  <svg
+                                    class="sofa-icons-icon"
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    height="1em"
+                                    style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                    viewBox="0 0 16 16"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="Trash2-master_svg0_308_02283"
+                                      >
+                                        <rect
+                                          height="16"
+                                          rx="0"
+                                          width="16"
+                                        />
+                                      </clippath>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#Trash2-master_svg0_308_02283)"
+                                    >
+                                      <path
+                                        d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                        style="mix-blend-mode: passthrough;"
+                                      />
+                                    </g>
+                                  </svg>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            style="opacity: 1; transition: opacity 0.2s ease;"
+                          >
+                            <span
+                              style="width: 20px; height: 20px;"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-chat-history-menu-submenu"
+              >
+                <div
+                  class="ant-agentic-chat-history-menu-item-group"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    2 days ago
+                  </div>
+                </div>
+                <div
+                  aria-selected="false"
+                  class="ant-agentic-chat-history-menu-item"
+                  role="menuitem"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                    >
+                      <label
+                        class="ant-checkbox-wrapper"
+                      >
+                        <span
+                          class="ant-checkbox ant-wave-target"
+                        >
+                          <input
+                            class="ant-checkbox-input"
+                            type="checkbox"
+                          />
+                          <span
+                            class="ant-checkbox-inner"
+                          />
+                        </span>
+                      </label>
+                      <div
+                        style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                      >
+                        <div
+                          style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                        >
+                          <div
+                            data-overflow="false"
+                            style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                          >
+                            <div
+                              aria-describedby="test-id"
+                              style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                            >
+                              CSS Grid 布局详解
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                      >
+                        <div
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                        >
+                          <div
+                            style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                          >
+                            <div
+                              class="ant-space ant-space-horizontal ant-space-align-center"
+                              style="column-gap: 4px; row-gap: 4px;"
+                            >
+                              <div
+                                class="ant-space-item"
+                              >
+                                <span
+                                  aria-describedby="test-id"
+                                  aria-label="收藏"
+                                  class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                  data-testid="action-icon-box"
+                                  data-title="收藏"
+                                  role="button"
+                                  style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                  tabindex="0"
+                                >
+                                  <svg
+                                    class="sofa-icons-icon"
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    height="1em"
+                                    style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                    viewBox="0 0 24 24"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="Star-master_svg0_2407_13457"
+                                      >
+                                        <rect
+                                          height="24"
+                                          rx="0"
+                                          width="24"
+                                        />
+                                      </clippath>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#Star-master_svg0_2407_13457)"
+                                    >
+                                      <g>
+                                        <path
+                                          d="M8.319247228775025,6.531467049942017L8.319247228775025,6.531467049942017L10.628247228775024,1.8524690499420164Q11.050087228775025,1.0001069307330166,11.999987228775025,1.0001070499420166Q12.949887228775024,1.0001058578520166,13.371187228775025,1.8513990499420165L15.681687228775024,6.531317049942016Q15.942487228775024,7.0590670499420165,16.525187228775025,7.1446070499420165L21.690787228775026,7.900537049942017Q22.630787228775024,8.036717049942016,22.924987228775024,8.941337049942018Q23.219187228775024,9.845927049942016,22.538087228775023,10.509997049942017L18.801687228775023,14.148407049942017Q18.379387228775023,14.560007049942017,18.478687228775023,15.141607049942017L19.360587228775024,20.280907049942016Q19.526087228775026,21.218007049942017,18.752187228775025,21.780107049942018Q17.978287228775024,22.342207049942015,17.134087228775023,21.892707049942018L12.520587228775025,19.467107049942015Q11.999487228775024,19.193507049942017,11.477887228775025,19.467407049942018L6.861447228775025,21.895107049942016Q6.0201672287750245,22.340407049942016,5.248127228775024,21.778907049942017Q4.476077228775024,21.217507049942018,4.641047228775024,20.277207049942017L5.521377228775024,15.142007049942016Q5.621177228775024,14.560207049942017,5.198327228775025,14.148407049942017L1.4624502287750243,10.511537049942017Q0.7779622287750244,9.850437049942016,1.0729055287750244,8.941527049942017Q1.3678492287750244,8.032627049942016,2.3140072287750244,7.898847049942017L7.474357228775024,7.144517049942016Q8.058137228775024,7.059587049942016,8.319247228775025,6.531467049942017ZM10.112557228775024,7.416927049942017Q9.386067228775024,8.887447049942017,7.763637228775025,9.123487049942016L3.5382472287750244,9.741127049942017L6.593667228775025,12.715607049942017Q7.770267228775024,13.861407049942017,7.492617228775025,15.480007049942017L6.772187228775024,19.68230704994202L10.548107228775024,17.696607049942017Q11.999487228775024,16.934507049942017,13.451387228775024,17.696907049942016L17.228787228775026,19.682907049942017L16.507287228775024,15.478407049942017Q16.230987228775025,13.861007049942017,17.406387228775024,12.715607049942017L20.460287228775023,9.741767049942016L16.234787228775026,9.123397049942017Q14.614087228775025,8.885517049942017,13.888287228775024,7.416687049942016L12.000087228775024,3.5919970499420164L10.112557228775024,7.416927049942017L10.112557228775024,7.416927049942017Z"
+                                          style="mix-blend-mode: passthrough;"
+                                        />
+                                      </g>
+                                    </g>
+                                  </svg>
+                                </span>
+                              </div>
+                              <div
+                                class="ant-space-item"
+                              >
+                                <span
+                                  aria-describedby="test-id"
+                                  aria-label="删除"
+                                  class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                  data-testid="action-icon-box"
+                                  data-title="删除"
+                                  role="button"
+                                  style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                  tabindex="0"
+                                >
+                                  <svg
+                                    class="sofa-icons-icon"
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    height="1em"
+                                    style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                    viewBox="0 0 16 16"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="Trash2-master_svg0_308_02283"
+                                      >
+                                        <rect
+                                          height="16"
+                                          rx="0"
+                                          width="16"
+                                        />
+                                      </clippath>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#Trash2-master_svg0_308_02283)"
+                                    >
+                                      <path
+                                        d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                        style="mix-blend-mode: passthrough;"
+                                      />
+                                    </g>
+                                  </svg>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            style="opacity: 1; transition: opacity 0.2s ease;"
+                          >
+                            <span
+                              style="width: 20px; height: 20px;"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-chat-history-menu-submenu"
+              >
+                <div
+                  class="ant-agentic-chat-history-menu-item-group"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    3 days ago
+                  </div>
+                </div>
+                <div
+                  aria-selected="false"
+                  class="ant-agentic-chat-history-menu-item"
+                  role="menuitem"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-agentic-chat-history-menu-item-content"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                    >
+                      <label
+                        class="ant-checkbox-wrapper"
+                      >
+                        <span
+                          class="ant-checkbox ant-wave-target"
+                        >
+                          <input
+                            class="ant-checkbox-input"
+                            type="checkbox"
+                          />
+                          <span
+                            class="ant-checkbox-inner"
+                          />
+                        </span>
+                      </label>
+                      <div
+                        style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                      >
+                        <div
+                          style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                        >
+                          <div
+                            data-overflow="false"
+                            style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                          >
+                            <div
+                              aria-describedby="test-id"
+                              style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                            >
+                              JavaScript 异步编程模式
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                      >
+                        <div
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                        >
+                          <div
+                            style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                          >
+                            <div
+                              class="ant-space ant-space-horizontal ant-space-align-center"
+                              style="column-gap: 4px; row-gap: 4px;"
+                            >
+                              <div
+                                class="ant-space-item"
+                              >
+                                <span
+                                  aria-describedby="test-id"
+                                  aria-label="收藏"
+                                  class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                  data-testid="action-icon-box"
+                                  data-title="收藏"
+                                  role="button"
+                                  style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                  tabindex="0"
+                                >
+                                  <svg
+                                    class="sofa-icons-icon"
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    height="1em"
+                                    style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                    viewBox="0 0 24 24"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="Star-master_svg0_2407_13457"
+                                      >
+                                        <rect
+                                          height="24"
+                                          rx="0"
+                                          width="24"
+                                        />
+                                      </clippath>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#Star-master_svg0_2407_13457)"
+                                    >
+                                      <g>
+                                        <path
+                                          d="M8.319247228775025,6.531467049942017L8.319247228775025,6.531467049942017L10.628247228775024,1.8524690499420164Q11.050087228775025,1.0001069307330166,11.999987228775025,1.0001070499420166Q12.949887228775024,1.0001058578520166,13.371187228775025,1.8513990499420165L15.681687228775024,6.531317049942016Q15.942487228775024,7.0590670499420165,16.525187228775025,7.1446070499420165L21.690787228775026,7.900537049942017Q22.630787228775024,8.036717049942016,22.924987228775024,8.941337049942018Q23.219187228775024,9.845927049942016,22.538087228775023,10.509997049942017L18.801687228775023,14.148407049942017Q18.379387228775023,14.560007049942017,18.478687228775023,15.141607049942017L19.360587228775024,20.280907049942016Q19.526087228775026,21.218007049942017,18.752187228775025,21.780107049942018Q17.978287228775024,22.342207049942015,17.134087228775023,21.892707049942018L12.520587228775025,19.467107049942015Q11.999487228775024,19.193507049942017,11.477887228775025,19.467407049942018L6.861447228775025,21.895107049942016Q6.0201672287750245,22.340407049942016,5.248127228775024,21.778907049942017Q4.476077228775024,21.217507049942018,4.641047228775024,20.277207049942017L5.521377228775024,15.142007049942016Q5.621177228775024,14.560207049942017,5.198327228775025,14.148407049942017L1.4624502287750243,10.511537049942017Q0.7779622287750244,9.850437049942016,1.0729055287750244,8.941527049942017Q1.3678492287750244,8.032627049942016,2.3140072287750244,7.898847049942017L7.474357228775024,7.144517049942016Q8.058137228775024,7.059587049942016,8.319247228775025,6.531467049942017ZM10.112557228775024,7.416927049942017Q9.386067228775024,8.887447049942017,7.763637228775025,9.123487049942016L3.5382472287750244,9.741127049942017L6.593667228775025,12.715607049942017Q7.770267228775024,13.861407049942017,7.492617228775025,15.480007049942017L6.772187228775024,19.68230704994202L10.548107228775024,17.696607049942017Q11.999487228775024,16.934507049942017,13.451387228775024,17.696907049942016L17.228787228775026,19.682907049942017L16.507287228775024,15.478407049942017Q16.230987228775025,13.861007049942017,17.406387228775024,12.715607049942017L20.460287228775023,9.741767049942016L16.234787228775026,9.123397049942017Q14.614087228775025,8.885517049942017,13.888287228775024,7.416687049942016L12.000087228775024,3.5919970499420164L10.112557228775024,7.416927049942017L10.112557228775024,7.416927049942017Z"
+                                          style="mix-blend-mode: passthrough;"
+                                        />
+                                      </g>
+                                    </g>
+                                  </svg>
+                                </span>
+                              </div>
+                              <div
+                                class="ant-space-item"
+                              >
+                                <span
+                                  aria-describedby="test-id"
+                                  aria-label="删除"
+                                  class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                  data-testid="action-icon-box"
+                                  data-title="删除"
+                                  role="button"
+                                  style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                  tabindex="0"
+                                >
+                                  <svg
+                                    class="sofa-icons-icon"
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    height="1em"
+                                    style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                    viewBox="0 0 16 16"
+                                    width="1em"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="Trash2-master_svg0_308_02283"
+                                      >
+                                        <rect
+                                          height="16"
+                                          rx="0"
+                                          width="16"
+                                        />
+                                      </clippath>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#Trash2-master_svg0_308_02283)"
+                                    >
+                                      <path
+                                        d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                        style="mix-blend-mode: passthrough;"
+                                      />
+                                    </g>
+                                  </svg>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            style="opacity: 1; transition: opacity 0.2s ease;"
+                          >
+                            <span
+                              style="width: 20px; height: 20px;"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="ant-agentic-chat-history-menu-load-more chat"
+              role="button"
+              tabindex="0"
+            >
+              <svg
+                fill="none"
+                height="16"
+                version="1.1"
+                viewBox="0 0 16 16"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+              >
+                <g
+                  clip-path="url(#master_svg0_2168_68970/645_11584/440_02432)"
+                >
+                  <g>
+                    <path
+                      d="M1.3333333730697632,5.333333373069763L1.3333333730697632,2.000000373069763C1.3333333730697632,1.6318103730697633,1.6318103730697633,1.3333333730697632,2.000000373069763,1.3333333730697632C2.3681933730697633,1.3333333730697632,2.6666633730697633,1.6318103730697633,2.6666633730697633,2.000000373069763L2.6666633730697633,3.723853373069763L3.035263373069763,3.3552533730697633Q5.115433373069763,1.344175573069763,7.997493373069763,1.3333333730697632Q10.761423373069762,1.3333286046997632,12.714033373069762,3.285953373069763Q14.666633373069763,5.238573373069763,14.666633373069763,7.999993373069763Q14.666633373069763,10.761423373069762,12.714033373069762,12.714033373069762Q10.761423373069762,14.666633373069763,7.999993373069763,14.666633373069763Q5.238573373069763,14.666633373069763,3.285953373069763,12.714033373069762Q1.3336035810697633,10.761683373069763,1.3333333730697632,8.000753373069763L1.3333333730697632,7.999993373069763C1.3333333730697632,7.631803373069763,1.6318103730697633,7.333333373069763,2.000000373069763,7.333333373069763C2.3681933730697633,7.333333373069763,2.6666633730697633,7.631803373069763,2.6666633730697633,7.999993373069763Q2.6666633730697633,10.209133373069763,4.228763373069763,11.771233373069764Q5.790863373069763,13.333333373069763,7.999993373069763,13.333333373069763Q10.209143373069763,13.333333373069763,11.771233373069764,11.771233373069764Q13.333333373069763,10.209133373069763,13.333333373069763,7.999993373069763Q13.333333373069763,5.790853373069763,11.771233373069764,4.228763373069763Q10.209143373069763,2.6666633730697633,8.002513373069764,2.6666533730697632Q5.656643373069763,2.6754833730697634,3.9780733730697633,4.298063373069763L3.609473373069763,4.666663373069763L5.333333373069763,4.666663373069763C5.701523373069763,4.666663373069763,6.000003373069763,4.965143373069763,6.000003373069763,5.333333373069763C6.000003373069763,5.701523373069763,5.701523373069763,6.000003373069763,5.333333373069763,6.000003373069763L2.000000373069763,5.999993373069763C1.9079523730697632,5.999993373069763,1.8202613730697632,5.981343373069763,1.7405023730697633,5.9476033730697635C1.6514743730697632,5.909953373069763,1.5723283730697633,5.853503373069763,1.508035373069763,5.783243373069763C1.3995321730697632,5.6646633730697635,1.3333333730697632,5.506723373069764,1.3333333730697632,5.333333373069763ZM7.333333373069763,4.666663373069763C7.333333373069763,4.298473373069763,7.631813373069763,4.000003373069763,8.000003373069763,4.000003373069763C8.368193373069763,4.000003373069763,8.666663373069763,4.298473373069763,8.666663373069763,4.666663373069763L8.666663373069763,7.587973373069763L10.964813373069763,8.737053373069763C11.190663373069762,8.849973373069762,11.333333373069763,9.080823373069762,11.333333373069763,9.333333373069763C11.333333373069763,9.701523373069763,11.034853373069764,10.000003373069763,10.666663373069763,10.000003373069763C10.563173373069763,10.000003373069763,10.461093373069764,9.975903373069762,10.368523373069763,9.929613373069763L7.701853373069763,8.596283373069763C7.476003373069763,8.483353373069763,7.333333373069763,8.252513373069764,7.333333373069763,8.000003373069763L7.333333373069763,4.666663373069763Z"
+                      fill="currentColor"
+                      fill-rule="evenodd"
+                    />
+                  </g>
+                </g>
+              </svg>
+              查看更多
+            </div>
+          </div>
         </div>
       </div>
       <div

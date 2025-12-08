@@ -60,6 +60,7 @@ export { default as Robot } from './Components/Robot';
 
 // Quote 组件导出
 export { default as Quote } from './Quote';
+export type { QuoteProps } from './Quote';
 
 // 新增：图表插件对外导出
 export * from './Plugins/chart';
@@ -138,3 +139,10 @@ export * from './MarkdownInputField/AttachmentButton/AttachmentFileList/Attachme
 
 export * from './MarkdownInputField/AttachmentButton/AttachmentFileList';
 export * from './MarkdownInputField/AttachmentButton/utils';
+
+/**
+ * Schema Editor Chrome 插件底层 SDK
+ * @description 原始 SDK 导出，一般用户无需直接使用
+ * 推荐通过 Bubble 组件的 schemaEditorConfig 属性集成
+ */
+export * from '@schema-editor/host-sdk';

@@ -21,6 +21,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         justifyContent: 'center',
         flexShrink: 0,
         marginTop: '2px',
+        fontSize: 16,
       },
 
       '&-content': {

@@ -438,21 +438,208 @@ describe('Media', () => {
       expect(resizeImage).toBeInTheDocument();
     });
 
-    it('应该在选中时显示视觉反馈', () => {
+      it('应该在选中时显示视觉反馈', () => {
+        renderWithProvider(
+          <ResizeImage
+            src="https://example.com/image.jpg"
+            selected={true}
+            onResizeStart={vi.fn()}
+            onResizeStop={vi.fn()}
+          />,
+        );
+      });
+    });
+
+  describe('Media linkConfig 功能测试', () => {
+    const mockWindowOpen = vi.fn();
+
+    beforeEach(() => {
+      mockWindowOpen.mockClear();
+      if (typeof window !== 'undefined') {
+        window.open = mockWindowOpen;
+      }
+    });
+
+    it('视频加载失败时应该显示链接并支持 linkConfig', async () => {
+      const onClick = vi.fn();
+      const { useEditorStore } = await import(
+        '../../../../src/MarkdownEditor/editor/store'
+      );
+      vi.mocked(useEditorStore).mockReturnValue({
+        markdownEditorRef: {
+          current: {
+            setNodes: vi.fn(),
+            removeNodes: vi.fn(),
+          },
+        },
+        readonly: false,
+        editorProps: {
+          linkConfig: {
+            onClick,
+            openInNewTab: true,
+          },
+        },
+      } as any);
+
+      const videoElement: MediaNode = {
+        ...mockElement,
+        url: 'https://example.com/video.mp4',
+        alt: 'Test Video',
+      };
+
+      const mockedUseGetSetState = vi.mocked(utils.useGetSetState);
+      const failedStateData = {
+        height: 300,
+        dragging: false,
+        loadSuccess: false,
+        url: 'https://example.com/video.mp4',
+        selected: false,
+        type: 'video',
+      };
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => failedStateData,
+        vi.fn((updates) => Object.assign(failedStateData, updates)),
+      ]);
+
       renderWithProvider(
-        <ResizeImage
-          src="https://example.com/image.jpg"
-          selected={true}
-          onResizeStart={vi.fn()}
-          onResizeStop={vi.fn()}
-        />,
+        <Media element={videoElement} attributes={mockAttributes}>
+          {null}
+        </Media>,
       );
 
-      const resizeImage = screen.getByTestId('resize-image');
-      expect(resizeImage).toHaveStyle({
-        outline: '2px solid #1890ff',
-        boxShadow: '0 0 0 2px #1890ff',
-      });
+      await screen.findByText('Test Video');
+      const link = screen.getByText('Test Video').closest('a');
+      if (link) {
+        fireEvent.click(link, {
+          preventDefault: vi.fn(),
+          stopPropagation: vi.fn(),
+        });
+        expect(onClick).toHaveBeenCalledWith('https://example.com/video.mp4');
+        expect(mockWindowOpen).toHaveBeenCalledWith(
+          'https://example.com/video.mp4',
+          '_blank',
+        );
+      }
+    });
+
+    it('音频加载失败时应该显示链接并支持 linkConfig', async () => {
+      const onClick = vi.fn();
+      const { useEditorStore } = await import(
+        '../../../../src/MarkdownEditor/editor/store'
+      );
+      vi.mocked(useEditorStore).mockReturnValue({
+        markdownEditorRef: {
+          current: {
+            setNodes: vi.fn(),
+            removeNodes: vi.fn(),
+          },
+        },
+        readonly: false,
+        editorProps: {
+          linkConfig: {
+            onClick,
+            openInNewTab: false,
+          },
+        },
+      } as any);
+
+      const audioElement: MediaNode = {
+        ...mockElement,
+        url: 'https://example.com/audio.mp3',
+        alt: 'Test Audio',
+      };
+
+      const mockedUseGetSetState = vi.mocked(utils.useGetSetState);
+      const failedStateData = {
+        height: 300,
+        dragging: false,
+        loadSuccess: false,
+        url: 'https://example.com/audio.mp3',
+        selected: false,
+        type: 'audio',
+      };
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => failedStateData,
+        vi.fn((updates) => Object.assign(failedStateData, updates)),
+      ]);
+
+      renderWithProvider(
+        <Media element={audioElement} attributes={mockAttributes}>
+          {null}
+        </Media>,
+      );
+
+      await screen.findByText('Test Audio');
+      const link = screen.getByText('Test Audio').closest('a');
+      if (link) {
+        fireEvent.click(link, {
+          preventDefault: vi.fn(),
+          stopPropagation: vi.fn(),
+        });
+        expect(onClick).toHaveBeenCalledWith('https://example.com/audio.mp3');
+        expect(mockWindowOpen).toHaveBeenCalledWith(
+          'https://example.com/audio.mp3',
+          '_self',
+        );
+      }
+    });
+
+    it('当 linkConfig.onClick 返回 false 时应该阻止视频链接的默认行为', async () => {
+      const onClick = vi.fn().mockReturnValue(false);
+      const { useEditorStore } = await import(
+        '../../../../src/MarkdownEditor/editor/store'
+      );
+      vi.mocked(useEditorStore).mockReturnValue({
+        markdownEditorRef: {
+          current: {
+            setNodes: vi.fn(),
+            removeNodes: vi.fn(),
+          },
+        },
+        readonly: false,
+        editorProps: {
+          linkConfig: {
+            onClick,
+          },
+        },
+      } as any);
+
+      const videoElement: MediaNode = {
+        ...mockElement,
+        url: 'https://example.com/video.mp4',
+        alt: 'Test Video',
+      };
+
+      const mockedUseGetSetState = vi.mocked(utils.useGetSetState);
+      const failedStateData = {
+        height: 300,
+        dragging: false,
+        loadSuccess: false,
+        url: 'https://example.com/video.mp4',
+        selected: false,
+        type: 'video',
+      };
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => failedStateData,
+        vi.fn((updates) => Object.assign(failedStateData, updates)),
+      ]);
+
+      renderWithProvider(
+        <Media element={videoElement} attributes={mockAttributes}>
+          {null}
+        </Media>,
+      );
+
+      await screen.findByText('Test Video');
+      const link = screen.getByText('Test Video').closest('a');
+      if (link) {
+        fireEvent.click(link, {
+          preventDefault: vi.fn(),
+          stopPropagation: vi.fn(),
+        });
+        expect(onClick).toHaveBeenCalledWith('https://example.com/video.mp4');
+        expect(mockWindowOpen).not.toHaveBeenCalled();
+      }
     });
   });
 

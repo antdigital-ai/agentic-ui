@@ -2,7 +2,6 @@ import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import { useMergedState } from 'rc-util';
 import React, {
-  useCallback,
   useContext,
   useEffect,
   useImperativeHandle,
@@ -21,9 +20,9 @@ import {
   upLoadFileToServer,
   type AttachmentButtonProps,
 } from './AttachmentButton';
-import { isMobileDevice } from './AttachmentButton/utils';
 import { AttachmentFileList } from './AttachmentButton/AttachmentFileList';
 import type { AttachmentFile } from './AttachmentButton/types';
+import { isMobileDevice } from './AttachmentButton/utils';
 import { getFileListFromDataTransferItems } from './FilePaste';
 import { useFileUploadManager } from './FileUploadManager';
 import { QuickActions } from './QuickActions';
@@ -800,7 +799,7 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
   }, []);
 
   // 图片粘贴上传
-  const handlePaste = useCallback(
+  const handlePaste = useRefFunction(
     async (e: React.ClipboardEvent<HTMLDivElement>) => {
       const imageFiles = (await getFileListFromDataTransferItems(e)).filter(
         (file) => file.type.startsWith('image/'),
@@ -811,7 +810,6 @@ export const MarkdownInputField: React.FC<MarkdownInputFieldProps> = ({
         onFileMapChange: setFileMap,
       });
     },
-    [fileMap, markdownProps?.attachment],
   );
 
   // 预计算：附件列表节点，减少 JSX 嵌套

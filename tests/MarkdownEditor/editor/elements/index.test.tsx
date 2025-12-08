@@ -7,6 +7,8 @@ import {
   MLeaf,
 } from '../../../../src/MarkdownEditor/editor/elements';
 
+// Mock antd theme - 这个 mock 会在后面被合并
+
 // Mock 依赖
 vi.mock('../../../../src/MarkdownEditor/editor/store', () => ({
   useEditorStore: () => ({
@@ -167,19 +169,31 @@ vi.mock('../../../../src/MarkdownEditor/editor/elements/Head', () => ({
 }));
 
 // Mock Ant Design components
-vi.mock('antd', () => ({
-  ConfigProvider: {
-    ConfigContext: React.createContext({
-      getPrefixCls: (suffixCls: string) => `ant-${suffixCls}`,
-    }),
-  },
-  Popover: ({ children, content }: any) => (
-    <div data-testid="popover">
-      {content}
-      {children}
-    </div>
-  ),
-}));
+vi.mock('antd', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('antd')>();
+  return {
+    ...actual,
+    ConfigProvider: {
+      ConfigContext: React.createContext({
+        getPrefixCls: (suffixCls: string) => `ant-${suffixCls}`,
+      }),
+    },
+    Popover: ({ children, content }: any) => (
+      <div data-testid="popover">
+        {content}
+        {children}
+      </div>
+    ),
+    theme: {
+      ...actual.theme,
+      useToken: vi.fn(() => ({
+        token: {},
+        hashId: '',
+        theme: {},
+      })),
+    },
+  };
+});
 
 vi.mock('@ant-design/icons', () => ({
   ExportOutlined: ({ onClick }: any) => (

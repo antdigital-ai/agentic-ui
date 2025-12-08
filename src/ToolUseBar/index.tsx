@@ -1,7 +1,8 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import { useMergedState } from 'rc-util';
-import React, { memo, useCallback, useContext, useMemo } from 'react';
+import React, { memo, useContext, useMemo } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { ToolCall, ToolUseBarItem } from './BarItem';
 import { useStyle } from './style';
 export * from './BarItem';
@@ -93,19 +94,16 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
     },
   );
 
-  const handleActiveChange = useCallback(
-    (id: string, active: boolean) => {
-      if (onActiveKeysChange) {
-        const newActiveKeys = active
-          ? [...activeKeys, id]
-          : activeKeys.filter((key) => key !== id);
-        setActiveKeys(newActiveKeys);
-      }
-    },
-    [onActiveKeysChange, activeKeys, setActiveKeys],
-  );
+  const handleActiveChange = useRefFunction((id: string, active: boolean) => {
+    if (onActiveKeysChange) {
+      const newActiveKeys = active
+        ? [...activeKeys, id]
+        : activeKeys.filter((key) => key !== id);
+      setActiveKeys(newActiveKeys);
+    }
+  });
 
-  const handleExpandedChange = useCallback(
+  const handleExpandedChange = useRefFunction(
     (id: string, expanded: boolean) => {
       const newExpandedKeys = expanded
         ? [...expandedKeys, id]
@@ -123,7 +121,6 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
         onExpandedKeysChange(newExpandedKeys, removedKeys);
       }
     },
-    [onExpandedKeysChange, expandedKeys, setExpandedKeys],
   );
 
   // 使用 useMemo 优化工具列表的渲染

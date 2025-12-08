@@ -62,16 +62,259 @@
           </button>
         </div>
         <div
-          assistantmeta="[object Object]"
-          bubblelist="[object Object],[object Object]"
-          bubblelistref="[object Object]"
-          bubbleref="[object Object]"
-          data-testid="bubble-list"
-          markdownrenderconfig="[object Object]"
+          class="ant-agentic-bubble-list"
+          data-chat-list="2"
           style="height: 400px; overflow: auto; border-radius: 20px;"
-          usermeta="[object Object]"
         >
-          bubble-list
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="1"
+            id="1"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+            >
+              <div
+                class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+              >
+                <span
+                  class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                  data-testid="bubble-avatar"
+                  style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                >
+                  <img
+                    alt="avatar"
+                    src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                  />
+                </span>
+                <div
+                  class="ant-agentic-bubble-title ant-flex"
+                  data-testid="bubble-title"
+                  style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                >
+                  <span>
+                    AI助手
+                  </span>
+                  <time
+                    class="ant-agentic-bubble-title-time"
+                    data-testid="bubble-time"
+                  >
+                    2024-02-27 17:20:00
+                  </time>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+              >
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                  >
+                    <div
+                      class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                      style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); padding: 0px; margin: 0px;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor-container"
+                        style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none;"
+                        tabindex="-1"
+                      >
+                        <div
+                          autocapitalize="false"
+                          autocorrect="false"
+                          class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                          contenteditable="false"
+                          data-slate-editor="true"
+                          data-slate-node="value"
+                          spellcheck="false"
+                          style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                          zindex="-1"
+                        >
+                          <div
+                            class=""
+                            data-be="paragraph"
+                            data-drag-el="true"
+                            data-slate-node="element"
+                          >
+                            <span
+                              data-slate-node="text"
+                            >
+                              <span
+                                data-be="text"
+                                data-slate-leaf="true"
+                                draggable="false"
+                              >
+                                <span
+                                  data-slate-string="true"
+                                >
+                                  欢迎使用 BubbleList 组件！
+                                </span>
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-chat-item-extra"
+                      style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                    >
+                      <div
+                        animate="visible"
+                        class="ant-chat-item-extra-action-box"
+                        initial="hidden"
+                        style="display: flex; gap: 8px; align-items: center;"
+                        variants="[object Object]"
+                        whileinview="visible"
+                      >
+                        <span
+                          aria-describedby="test-id"
+                          aria-label="复制"
+                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                          data-testid="chat-item-copy-button"
+                          data-title="复制"
+                          role="button"
+                          tabindex="0"
+                        >
+                          <svg
+                            class="sofa-icons-icon"
+                            fill="currentColor"
+                            fill-rule="evenodd"
+                            height="1em"
+                            style="vertical-align: -0.125em;"
+                            viewBox="0 0 16 16"
+                            width="1em"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <defs>
+                              <clippath
+                                id="Copy-master_svg0_388_03608"
+                              >
+                                <rect
+                                  height="16"
+                                  rx="0"
+                                  width="16"
+                                />
+                              </clippath>
+                            </defs>
+                            <g
+                              clip-path="url(#Copy-master_svg0_388_03608)"
+                            >
+                              <path
+                                d="M9.804 2.196q.196.197.196.47a.667.667 0 0 0 1.333 0q0-.825-.587-1.412Q10.16.667 9.333.667H2.667q-.826 0-1.413.587T.667 2.667v6.666q0 .826.587 1.413t1.413.587a.667.667 0 0 0 0-1.333q-.274 0-.47-.196Q2 9.607 2 9.334V2.666q0-.274.196-.47Q2.393 2 2.666 2h6.667q.274 0 .47.196M5.253 14.748q-.586-.586-.586-1.415V6.667q0-.829.586-1.415.585-.585 1.414-.585h6.666q.829 0 1.415.585.585.586.585 1.415v6.666q0 .829-.585 1.415-.586.585-1.415.585H6.667q-.829 0-1.414-.585M6 13.333q0 .276.195.472.196.195.472.195h6.666q.277 0 .472-.195.195-.196.195-.472V6.667q0-.276-.195-.472T13.333 6H6.667q-.276 0-.472.195Q6 6.391 6 6.667z"
+                              />
+                            </g>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="2"
+            id="2"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container"
+            >
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+              >
+                <div
+                  class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+                >
+                  <div
+                    class="ant-agentic-bubble-title ant-flex"
+                    data-testid="bubble-title"
+                    style="flex-direction: row-reverse; display: flex; align-items: center; gap: 8px;"
+                  >
+                    <time
+                      class="ant-agentic-bubble-title-time"
+                      data-testid="bubble-time"
+                    >
+                      2024-02-27 17:20:00
+                    </time>
+                  </div>
+                </div>
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    class="agent-item-default-content"
+                    data-testid="message-box-content"
+                    style="line-height: 24px;"
+                  >
+                    <div
+                      aria-describedby="test-id"
+                      style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                        style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); padding: 0px; margin: 0px;"
+                      >
+                        <div
+                          class="ant-agentic-md-editor-container"
+                          style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none; color: rgb(52, 58, 69);"
+                          tabindex="-1"
+                        >
+                          <div
+                            autocapitalize="false"
+                            autocorrect="false"
+                            class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                            contenteditable="false"
+                            data-slate-editor="true"
+                            data-slate-node="value"
+                            spellcheck="false"
+                            style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                            zindex="-1"
+                          >
+                            <div
+                              class=""
+                              data-be="paragraph"
+                              data-drag-el="true"
+                              data-slate-node="element"
+                            >
+                              <span
+                                data-slate-node="text"
+                              >
+                                <span
+                                  data-be="text"
+                                  data-slate-leaf="true"
+                                  draggable="false"
+                                >
+                                  <span
+                                    data-slate-string="true"
+                                  >
+                                    这个组件功能很强大！
+                                  </span>
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div
           style="padding: 16px; background: rgb(230, 247, 255); border-radius: 8px; font-size: 14px;"

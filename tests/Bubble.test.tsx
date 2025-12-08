@@ -667,4 +667,117 @@ describe('Bubble', () => {
       expect(screen.queryByText('Test User')).toBeInTheDocument();
     });
   });
+
+  describe('Schema Editor Bridge', () => {
+    it('should handle originData with originContent for editing', () => {
+      const propsWithOriginContent = {
+        ...defaultProps,
+        id: 'msg-with-origin',
+        originData: {
+          content: 'Rendered content',
+          originContent: '# Original Markdown Content',
+          createAt: 1716537600000,
+          id: 'msg-with-origin',
+          role: 'assistant' as const,
+          updateAt: 1716537600000,
+        },
+      };
+
+      render(
+        <BubbleConfigProvide>
+          <Bubble {...propsWithOriginContent} />
+        </BubbleConfigProvide>,
+      );
+
+      /** 消息应该正常渲染 */
+      expect(screen.getByTestId('chat-message')).toBeInTheDocument();
+    });
+
+    it('should handle undefined originData', () => {
+      const propsWithoutOriginData = {
+        ...defaultProps,
+        id: 'msg-no-data',
+        originData: undefined,
+      };
+
+      render(
+        <BubbleConfigProvide>
+          <Bubble {...propsWithoutOriginData} />
+        </BubbleConfigProvide>,
+      );
+
+      /** 组件应该正常渲染而不崩溃 */
+      expect(document.body).toBeInTheDocument();
+    });
+
+    it('should handle empty string content', () => {
+      const propsWithEmptyContent = {
+        ...defaultProps,
+        id: 'msg-empty',
+        originData: {
+          content: '',
+          createAt: 1716537600000,
+          id: 'msg-empty',
+          role: 'assistant' as const,
+          updateAt: 1716537600000,
+        },
+      };
+
+      render(
+        <BubbleConfigProvide>
+          <Bubble {...propsWithEmptyContent} />
+        </BubbleConfigProvide>,
+      );
+
+      /** 组件应该正常渲染 */
+      expect(screen.getByTestId('chat-message')).toBeInTheDocument();
+    });
+
+    it('should use originContent when both originContent and content exist', () => {
+      const propsWithBothContent = {
+        ...defaultProps,
+        id: 'msg-both',
+        originData: {
+          content: 'Display content',
+          originContent: '**Bold markdown**',
+          createAt: 1716537600000,
+          id: 'msg-both',
+          role: 'assistant' as const,
+          updateAt: 1716537600000,
+        },
+      };
+
+      render(
+        <BubbleConfigProvide>
+          <Bubble {...propsWithBothContent} />
+        </BubbleConfigProvide>,
+      );
+
+      /** 组件应该正常渲染 */
+      expect(screen.getByTestId('chat-message')).toBeInTheDocument();
+    });
+
+    it('should handle content without originContent', () => {
+      const propsWithContentOnly = {
+        ...defaultProps,
+        id: 'msg-content-only',
+        originData: {
+          content: 'Simple text content',
+          createAt: 1716537600000,
+          id: 'msg-content-only',
+          role: 'assistant' as const,
+          updateAt: 1716537600000,
+        },
+      };
+
+      render(
+        <BubbleConfigProvide>
+          <Bubble {...propsWithContentOnly} />
+        </BubbleConfigProvide>,
+      );
+
+      /** 组件应该正常渲染 */
+      expect(screen.getByTestId('chat-message')).toBeInTheDocument();
+    });
+  });
 });

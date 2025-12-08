@@ -12,8 +12,13 @@ export interface ChatLayoutProps extends BaseStyleProps {
   children?: ReactNode;
   /** 底部区域的自定义内容 */
   footer?: ReactNode;
+  /** 底部区域的高度 */
+  footerHeight?: number;
+  /** 滚动行为 */
+  scrollBehavior?: 'smooth' | 'auto';
 }
 
 export interface ChatLayoutRef {
   scrollContainer: HTMLDivElement | null;
+  scrollToBottom: () => void;
 }

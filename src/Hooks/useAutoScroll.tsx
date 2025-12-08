@@ -16,18 +16,29 @@ const SCROLL_TOLERANCE = 20; // 滚动到底部的容差阈值
  * @param {(size: {width: number, height: number}) => void} [props.onResize] - 容器尺寸变化回调
  * @param {any[]} [props.deps] - 依赖数组，用于重新初始化 MutationObserver
  * @param {number} [props.timeout=160] - 节流时间间隔（毫秒）
+ * @param {'smooth' | 'auto'} [props.scrollBehavior='smooth'] - 自动滚动行为，'smooth' 为平滑滚动，'auto' 为立即滚动（仅影响自动滚动，手动滚动默认为立即滚动）
  *
  * @example
  * ```tsx
+ * // 基本用法（默认平滑滚动）
  * const { containerRef, scrollToBottom } = useAutoScroll({
  *   SCROLL_TOLERANCE: 30,
  *   onResize: () => {},
  *   timeout: 200
  * });
  *
+ * // 立即滚动
+ * const { containerRef, scrollToBottom } = useAutoScroll({
+ *   scrollBehavior: 'auto',
+ * });
+ *
+ * // 手动滚动默认为立即滚动，无需平滑滚动
+ * scrollToBottom(); // 立即滚动
+ * ```
+ *
  * @returns {Object} Hook 返回值
  * @returns {React.RefObject<T>} returns.containerRef - 容器引用
- * @returns {() => void} returns.scrollToBottom - 手动滚动到底部方法
+ * @returns {() => void} returns.scrollToBottom - 手动滚动到底部方法（立即滚动，无动画）
  *
  * @remarks
  * - 自动检测内容变化并滚动到底部
@@ -44,6 +55,7 @@ export const useAutoScroll = <T extends HTMLDivElement>(
     onResize?: (size: { width: number; height: number }) => void;
     deps?: any[];
     timeout?: number;
+    scrollBehavior?: 'smooth' | 'auto';
   } = {
     SCROLL_TOLERANCE,
   },
@@ -54,7 +66,7 @@ export const useAutoScroll = <T extends HTMLDivElement>(
   const observer = useRef<MutationObserver | null>(null);
 
   // 主滚动逻辑
-  const _checkScroll = async (force = false) => {
+  const _checkScroll = async (force = false, behavior?: 'smooth' | 'auto') => {
     const container = containerRef.current;
     if (!container) return;
 
@@ -80,9 +92,12 @@ export const useAutoScroll = <T extends HTMLDivElement>(
         (isNearBottom || isLocked.current));
 
     if (shouldScroll && container.scrollTo) {
+      // 如果传入了 behavior，使用传入的值；否则使用配置的 scrollBehavior；最后默认为 'smooth'
+      const scrollBehavior =
+        behavior !== undefined ? behavior : props.scrollBehavior || 'smooth';
       container.scrollTo?.({
         top: currentScrollHeight,
-        behavior: 'smooth',
+        behavior: scrollBehavior,
       });
       isLocked.current = false; // 滚动后解除锁定
     }
@@ -111,9 +126,9 @@ export const useAutoScroll = <T extends HTMLDivElement>(
     return () => observer.current?.disconnect();
   }, [...(props.deps || [])]);
 
-  // 暴露手动滚动方法
+  // 暴露手动滚动方法（默认为立即滚动，无需平滑滚动）
   const scrollToBottom = () => {
-    checkScroll?.(true);
+    checkScroll?.(true, 'auto');
   };
 
   return {

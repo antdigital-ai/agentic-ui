@@ -86,22 +86,475 @@
         style="display: flex; flex-direction: column; gap: 16px;"
       >
         <div
-          avatar="[object Object]"
-          bubbleref="[object Object]"
-          data-testid="bubble"
-          origindata="[object Object]"
-          placement="left"
+          class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+          style="gap: 12px;"
         >
-          bubble
+          <div
+            class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+          >
+            <div
+              class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+            >
+              <span
+                class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                data-testid="bubble-avatar"
+                style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+              >
+                <img
+                  alt="avatar"
+                  src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                />
+              </span>
+              <div
+                class="ant-agentic-bubble-title ant-flex"
+                data-testid="bubble-title"
+                style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+              >
+                <span>
+                  Ant Design Assistant
+                </span>
+                <time
+                  class="ant-agentic-bubble-title-time"
+                  data-testid="bubble-time"
+                >
+                  2024-02-27 17:20:00
+                </time>
+              </div>
+            </div>
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+              data-testid="chat-message"
+              style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+            >
+              <div
+                class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                data-testid="message-content"
+                style="min-width: 0px;"
+              >
+                <div
+                  style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                >
+                  <div
+                    class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                    style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); padding: 0px; margin: 0px;"
+                  >
+                    <div
+                      class="ant-agentic-md-editor-container"
+                      style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none;"
+                      tabindex="-1"
+                    >
+                      <div
+                        autocapitalize="false"
+                        autocorrect="false"
+                        class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                        contenteditable="false"
+                        data-slate-editor="true"
+                        data-slate-node="value"
+                        spellcheck="false"
+                        style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                        zindex="-1"
+                      >
+                        <h1
+                          class=""
+                          data-be="head"
+                          data-drag-el="true"
+                          data-head="消息加载状态演示"
+                          data-slate-node="element"
+                          data-title="true"
+                          id="消息加载状态演示"
+                        >
+                          <span
+                            data-slate-node="text"
+                          >
+                            <span
+                              data-be="text"
+                              data-slate-leaf="true"
+                              draggable="false"
+                            >
+                              <span
+                                data-slate-string="true"
+                              >
+                                消息加载状态演示
+                              </span>
+                            </span>
+                          </span>
+                        </h1>
+                        <div
+                          class=""
+                          data-be="paragraph"
+                          data-drag-el="true"
+                          data-slate-node="element"
+                        >
+                          <span
+                            data-slate-node="text"
+                          >
+                            <span
+                              data-be="text"
+                              data-slate-leaf="true"
+                              draggable="false"
+                            >
+                              <span
+                                data-slate-string="true"
+                              >
+                                这是一个展示 Bubble 组件消息加载状态的示例。
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                        <div
+                          class=""
+                          data-be="paragraph"
+                          data-drag-el="true"
+                          data-slate-node="element"
+                        >
+                          <span
+                            data-slate-node="text"
+                          >
+                            <span
+                              data-be="text"
+                              data-slate-leaf="true"
+                              draggable="false"
+                            >
+                              <span
+                                data-slate-string="true"
+                              >
+                                当消息正在生成时，组件会显示：
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                        <div
+                          class="ant-agentic-md-editor-list-container relative"
+                          data-be="list"
+                          data-slate-node="element"
+                        >
+                          <ul
+                            class="ant-agentic-md-editor-list ul"
+                          >
+                            <li
+                              class="ant-agentic-md-editor-list-item"
+                              data-be="list-item"
+                              data-slate-node="element"
+                            >
+                              <div
+                                class=""
+                                data-be="paragraph"
+                                data-drag-el="true"
+                                data-slate-node="element"
+                              >
+                                <span
+                                  data-slate-node="text"
+                                >
+                                  <span
+                                    data-be="text"
+                                    data-slate-leaf="true"
+                                    draggable="false"
+                                  >
+                                    <span
+                                      data-slate-string="true"
+                                    >
+                                      加载动画
+                                    </span>
+                                  </span>
+                                </span>
+                              </div>
+                            </li>
+                            <li
+                              class="ant-agentic-md-editor-list-item"
+                              data-be="list-item"
+                              data-slate-node="element"
+                            >
+                              <div
+                                class=""
+                                data-be="paragraph"
+                                data-drag-el="true"
+                                data-slate-node="element"
+                              >
+                                <span
+                                  data-slate-node="text"
+                                >
+                                  <span
+                                    data-be="text"
+                                    data-slate-leaf="true"
+                                    draggable="false"
+                                  >
+                                    <span
+                                      data-slate-string="true"
+                                    >
+                                      占位内容
+                                    </span>
+                                  </span>
+                                </span>
+                              </div>
+                            </li>
+                            <li
+                              class="ant-agentic-md-editor-list-item"
+                              data-be="list-item"
+                              data-slate-node="element"
+                            >
+                              <div
+                                class=""
+                                data-be="paragraph"
+                                data-drag-el="true"
+                                data-slate-node="element"
+                              >
+                                <span
+                                  data-slate-node="text"
+                                >
+                                  <span
+                                    data-be="text"
+                                    data-slate-leaf="true"
+                                    draggable="false"
+                                  >
+                                    <span
+                                      data-slate-string="true"
+                                    >
+                                      禁用交互操作
+                                    </span>
+                                  </span>
+                                </span>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                        <div
+                          class=""
+                          data-be="paragraph"
+                          data-drag-el="true"
+                          data-slate-node="element"
+                        >
+                          <span
+                            data-slate-node="text"
+                          >
+                            <span
+                              data-be="text"
+                              data-slate-leaf="true"
+                              draggable="false"
+                            >
+                              <span
+                                data-slate-string="true"
+                              >
+                                你可以通过下方的开关来控制加载状态。
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="ant-chat-item-extra"
+                    style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                  >
+                    <div
+                      animate="visible"
+                      class="ant-chat-item-extra-action-box"
+                      initial="hidden"
+                      style="display: flex; gap: 8px; align-items: center;"
+                      variants="[object Object]"
+                      whileinview="visible"
+                    >
+                      <span
+                        aria-describedby="test-id"
+                        aria-label="复制"
+                        class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                        data-testid="chat-item-copy-button"
+                        data-title="复制"
+                        role="button"
+                        tabindex="0"
+                      >
+                        <svg
+                          class="sofa-icons-icon"
+                          fill="currentColor"
+                          fill-rule="evenodd"
+                          height="1em"
+                          style="vertical-align: -0.125em;"
+                          viewBox="0 0 16 16"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <defs>
+                            <clippath
+                              id="Copy-master_svg0_388_03608"
+                            >
+                              <rect
+                                height="16"
+                                rx="0"
+                                width="16"
+                              />
+                            </clippath>
+                          </defs>
+                          <g
+                            clip-path="url(#Copy-master_svg0_388_03608)"
+                          >
+                            <path
+                              d="M9.804 2.196q.196.197.196.47a.667.667 0 0 0 1.333 0q0-.825-.587-1.412Q10.16.667 9.333.667H2.667q-.826 0-1.413.587T.667 2.667v6.666q0 .826.587 1.413t1.413.587a.667.667 0 0 0 0-1.333q-.274 0-.47-.196Q2 9.607 2 9.334V2.666q0-.274.196-.47Q2.393 2 2.666 2h6.667q.274 0 .47.196M5.253 14.748q-.586-.586-.586-1.415V6.667q0-.829.586-1.415.585-.585 1.414-.585h6.666q.829 0 1.415.585.585.586.585 1.415v6.666q0 .829-.585 1.415-.586.585-1.415.585H6.667q-.829 0-1.414-.585M6 13.333q0 .276.195.472.196.195.472.195h6.666q.277 0 .472-.195.195-.196.195-.472V6.667q0-.276-.195-.472T13.333 6H6.667q-.276 0-.472.195Q6 6.391 6 6.667z"
+                            />
+                          </g>
+                        </svg>
+                      </span>
+                      <div
+                        class="ant-divider ant-divider-vertical"
+                        role="separator"
+                        style="margin: 0px 2px;"
+                      />
+                      <span
+                        aria-describedby="test-id"
+                        aria-label="喜欢"
+                        class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                        data-testid="like-button"
+                        data-title="喜欢"
+                        role="button"
+                        tabindex="0"
+                      >
+                        <span
+                          aria-label="like"
+                          class="anticon anticon-like"
+                          role="img"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            data-icon="like"
+                            fill="currentColor"
+                            focusable="false"
+                            height="1em"
+                            viewBox="64 64 896 896"
+                            width="1em"
+                          >
+                            <path
+                              d="M885.9 533.7c16.8-22.2 26.1-49.4 26.1-77.7 0-44.9-25.1-87.4-65.5-111.1a67.67 67.67 0 00-34.3-9.3H572.4l6-122.9c1.4-29.7-9.1-57.9-29.5-79.4A106.62 106.62 0 00471 99.9c-52 0-98 35-111.8 85.1l-85.9 311H144c-17.7 0-32 14.3-32 32v364c0 17.7 14.3 32 32 32h601.3c9.2 0 18.2-1.8 26.5-5.4 47.6-20.3 78.3-66.8 78.3-118.4 0-12.6-1.8-25-5.4-37 16.8-22.2 26.1-49.4 26.1-77.7 0-12.6-1.8-25-5.4-37 16.8-22.2 26.1-49.4 26.1-77.7-.2-12.6-2-25.1-5.6-37.1zM184 852V568h81v284h-81zm636.4-353l-21.9 19 13.9 25.4a56.2 56.2 0 016.9 27.3c0 16.5-7.2 32.2-19.6 43l-21.9 19 13.9 25.4a56.2 56.2 0 016.9 27.3c0 16.5-7.2 32.2-19.6 43l-21.9 19 13.9 25.4a56.2 56.2 0 016.9 27.3c0 22.4-13.2 42.6-33.6 51.8H329V564.8l99.5-360.5a44.1 44.1 0 0142.2-32.3c7.6 0 15.1 2.2 21.1 6.7 9.9 7.4 15.2 18.6 14.6 30.5l-9.6 198.4h314.4C829 418.5 840 436.9 840 456c0 16.5-7.2 32.1-19.6 43z"
+                            />
+                          </svg>
+                        </span>
+                      </span>
+                      <span
+                        aria-describedby="test-id"
+                        aria-label="不喜欢"
+                        class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                        data-testid="dislike-button"
+                        data-title="不喜欢"
+                        role="button"
+                        tabindex="0"
+                      >
+                        <span
+                          aria-label="dislike"
+                          class="anticon anticon-dislike"
+                          role="img"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            data-icon="dislike"
+                            fill="currentColor"
+                            focusable="false"
+                            height="1em"
+                            viewBox="64 64 896 896"
+                            width="1em"
+                          >
+                            <path
+                              d="M885.9 490.3c3.6-12 5.4-24.4 5.4-37 0-28.3-9.3-55.5-26.1-77.7 3.6-12 5.4-24.4 5.4-37 0-28.3-9.3-55.5-26.1-77.7 3.6-12 5.4-24.4 5.4-37 0-51.6-30.7-98.1-78.3-118.4a66.1 66.1 0 00-26.5-5.4H144c-17.7 0-32 14.3-32 32v364c0 17.7 14.3 32 32 32h129.3l85.8 310.8C372.9 889 418.9 924 470.9 924c29.7 0 57.4-11.8 77.9-33.4 20.5-21.5 31-49.7 29.5-79.4l-6-122.9h239.9c12.1 0 23.9-3.2 34.3-9.3 40.4-23.5 65.5-66.1 65.5-111 0-28.3-9.3-55.5-26.1-77.7zM184 456V172h81v284h-81zm627.2 160.4H496.8l9.6 198.4c.6 11.9-4.7 23.1-14.6 30.5-6.1 4.5-13.6 6.8-21.1 6.7a44.28 44.28 0 01-42.2-32.3L329 459.2V172h415.4a56.85 56.85 0 0133.6 51.8c0 9.7-2.3 18.9-6.9 27.3l-13.9 25.4 21.9 19a56.76 56.76 0 0119.6 43c0 9.7-2.3 18.9-6.9 27.3l-13.9 25.4 21.9 19a56.76 56.76 0 0119.6 43c0 9.7-2.3 18.9-6.9 27.3l-14 25.5 21.9 19a56.76 56.76 0 0119.6 43c0 19.1-11 37.5-28.8 48.4z"
+                            />
+                          </svg>
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div
-          avatar="[object Object]"
-          bubbleref="[object Object]"
-          data-testid="bubble"
-          origindata="[object Object]"
-          placement="right"
+          class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user ant-flex ant-flex-align-stretch ant-flex-vertical"
+          style="gap: 12px;"
         >
-          bubble
+          <div
+            class="ant-agentic-bubble-container"
+          >
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user"
+              data-testid="chat-message"
+              style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+            >
+              <div
+                class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+              >
+                <div
+                  class="ant-agentic-bubble-title ant-flex"
+                  data-testid="bubble-title"
+                  style="flex-direction: row-reverse; display: flex; align-items: center; gap: 8px;"
+                >
+                  <time
+                    class="ant-agentic-bubble-title-time"
+                    data-testid="bubble-time"
+                  >
+                    2024-02-27 17:20:00
+                  </time>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user"
+                data-testid="message-content"
+                style="min-width: 0px;"
+              >
+                <div
+                  class="agent-item-default-content"
+                  data-testid="message-box-content"
+                  style="line-height: 24px;"
+                >
+                  <div
+                    aria-describedby="test-id"
+                    style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                  >
+                    <div
+                      class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                      style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); padding: 0px; margin: 0px;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor-container"
+                        style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none; color: rgb(52, 58, 69);"
+                        tabindex="-1"
+                      >
+                        <div
+                          autocapitalize="false"
+                          autocorrect="false"
+                          class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                          contenteditable="false"
+                          data-slate-editor="true"
+                          data-slate-node="value"
+                          spellcheck="false"
+                          style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                          zindex="-1"
+                        >
+                          <div
+                            class=""
+                            data-be="paragraph"
+                            data-drag-el="true"
+                            data-slate-node="element"
+                          >
+                            <span
+                              data-slate-node="text"
+                            >
+                              <span
+                                data-be="text"
+                                data-slate-leaf="true"
+                                draggable="false"
+                              >
+                                <span
+                                  data-slate-string="true"
+                                >
+                                  请展示一下消息加载状态的效果
+                                </span>
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div

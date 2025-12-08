@@ -1,5 +1,5 @@
 import { EllipsisOutlined, LoadingOutlined } from '@ant-design/icons';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 /**
@@ -95,15 +95,14 @@ export const HistoryLoadMore: React.FC<HistoryLoadMoreProps> = ({
     }
   });
 
-  const handleKeyDown = useCallback<React.KeyboardEventHandler<HTMLDivElement>>(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        onClickFn();
-      }
-    },
-    [onClickFn],
-  );
+  const handleKeyDown = useRefFunction<
+    React.KeyboardEventHandler<HTMLDivElement>
+  >((event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClickFn();
+    }
+  });
 
   return (
     <>

@@ -1,4 +1,4 @@
-﻿import { Keyframes } from '@ant-design/cssinjs';
+import { Keyframes } from '@ant-design/cssinjs';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -25,6 +25,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       alignItems: 'center',
       lineHeight: '32px',
       cursor: 'pointer',
+      marginLeft: 4,
       '&&-disabled': {
         cursor: 'not-allowed',
         opacity: 1,

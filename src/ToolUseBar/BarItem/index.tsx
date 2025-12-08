@@ -1,6 +1,7 @@
 import classnames from 'classnames';
 import { useMergedState } from 'rc-util';
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import {
   ToolContent,
   ToolExpand,
@@ -81,37 +82,31 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
     return classnames(`${prefixCls}-tool-header`, hashId);
   }, [prefixCls, hashId]);
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      onClick?.(tool.id);
-      if (onActiveChange && !showContent) {
-        onActiveChange(tool.id, !isActive);
-      }
+  const handleClick = useRefFunction((e: React.MouseEvent<HTMLDivElement>) => {
+    onClick?.(tool.id);
+    if (onActiveChange && !showContent) {
+      onActiveChange(tool.id, !isActive);
+    }
 
-      // 如果没有内容需要展示，则早返回
-      if (!showContent) return;
+    // 如果没有内容需要展示，则早返回
+    if (!showContent) return;
 
-      // 避免在交互性子元素上误触发折叠
-      if (e.target instanceof Element) {
-        const tag = e.target.tagName.toLowerCase();
-        if (
-          ['a', 'button', 'input', 'textarea', 'select', 'label'].includes(tag)
-        )
-          return;
-      }
+    // 避免在交互性子元素上误触发折叠
+    if (e.target instanceof Element) {
+      const tag = e.target.tagName.toLowerCase();
+      if (['a', 'button', 'input', 'textarea', 'select', 'label'].includes(tag))
+        return;
+    }
 
-      // 使用函数式更新避免闭包陈旧值问题
-      setExpanded((prev) => !prev);
-    },
-    [onClick, tool.id, onActiveChange, showContent, isActive, setExpanded],
-  );
+    // 使用函数式更新避免闭包陈旧值问题
+    setExpanded((prev) => !prev);
+  });
 
-  const handleExpandClick = useCallback(
+  const handleExpandClick = useRefFunction(
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation(); // 阻止事件冒泡到父元素
       setExpanded((prev) => !prev);
     },
-    [setExpanded],
   );
 
   if (tool.type === 'summary') {

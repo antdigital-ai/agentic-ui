@@ -202,7 +202,7 @@ const Demo = () => {
               {
                 key: '3',
                 title: '提取下载的视频帧',
-                status: 'pending',
+                status: 'loading',
               },
               {
                 key: '4',

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TaskList } from '..';
@@ -86,7 +86,7 @@ describe('TaskList', () => {
   });
 
   describe('交互功能测试', () => {
-    it('应该正确切换内容可见性', () => {
+    it('应该正确切换内容可见性', async () => {
       render(<TaskList items={mockItems} />);
 
       const successTask = screen.getByText('Success Task');
@@ -95,28 +95,38 @@ describe('TaskList', () => {
       expect(screen.getByText(successContent)).toBeInTheDocument();
 
       fireEvent.click(successTask);
-      expect(screen.queryByText(successContent)).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByText(successContent)).not.toBeInTheDocument();
+      });
 
       fireEvent.click(successTask);
-      expect(screen.getByText(successContent)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText(successContent)).toBeInTheDocument();
+      });
     });
 
-    it('应该为每个任务独立维护折叠状态', () => {
+    it('应该为每个任务独立维护折叠状态', async () => {
       render(<TaskList items={mockItems} />);
 
       const successTask = screen.getByText('Success Task');
       const pendingTask = screen.getByText('Pending Task');
 
       fireEvent.click(successTask);
-      expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+      });
       expect(screen.getByText('Pending content 1')).toBeInTheDocument();
 
       fireEvent.click(pendingTask);
+      await waitFor(() => {
+        expect(screen.queryByText('Pending content 1')).not.toBeInTheDocument();
+      });
       expect(screen.queryByText('Success content')).not.toBeInTheDocument();
-      expect(screen.queryByText('Pending content 1')).not.toBeInTheDocument();
 
       fireEvent.click(successTask);
-      expect(screen.getByText('Success content')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Success content')).toBeInTheDocument();
+      });
       expect(screen.queryByText('Pending content 1')).not.toBeInTheDocument();
     });
 
@@ -374,17 +384,21 @@ describe('TaskList', () => {
       }
     });
 
-    it('应该支持键盘导航', () => {
+    it('应该支持键盘导航', async () => {
       render(<TaskList items={mockItems} />);
 
       const successTask = screen.getByText('Success Task');
 
       // 测试点击事件，因为组件没有实现键盘导航
       fireEvent.click(successTask);
-      expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+      });
 
       fireEvent.click(successTask);
-      expect(screen.getByText('Success content')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Success content')).toBeInTheDocument();
+      });
     });
   });
 
@@ -510,7 +524,7 @@ describe('TaskList', () => {
       expect(secondLastCall[0]).toEqual(['2', '3']); // 添加 '3' 到当前的 ['2']
     });
 
-    it('应该支持动态更新 expandedKeys', () => {
+    it('应该支持动态更新 expandedKeys', async () => {
       let expandedKeys = ['1'];
       const mockOnChange = vi.fn();
 
@@ -524,7 +538,7 @@ describe('TaskList', () => {
 
       // 初始状态：只有第一个任务展开
       expect(screen.getByText('Success content')).toBeVisible();
-      expect(screen.queryByText('Pending content 1')).toBeNull();
+      expect(screen.queryByText('Pending content 1')).not.toBeInTheDocument();
 
       // 更新 expandedKeys
       expandedKeys = ['1', '2'];
@@ -537,8 +551,10 @@ describe('TaskList', () => {
       );
 
       // 现在两个任务都应该展开
-      expect(screen.getByText('Success content')).toBeVisible();
-      expect(screen.getByText('Pending content 1')).toBeVisible();
+      await waitFor(() => {
+        expect(screen.getByText('Success content')).toBeVisible();
+        expect(screen.getByText('Pending content 1')).toBeVisible();
+      });
     });
 
     it('在受控模式下箭头图标应该正确显示', () => {
@@ -576,7 +592,7 @@ describe('TaskList', () => {
   });
 
   describe('非受控模式兼容性测试', () => {
-    it('在没有传入 expandedKeys 时应该使用内部状态管理', () => {
+    it('在没有传入 expandedKeys 时应该使用内部状态管理', async () => {
       render(<TaskList items={mockItems} />);
 
       // 初始状态：所有任务都应该是展开的（保持向后兼容）
@@ -588,7 +604,9 @@ describe('TaskList', () => {
       fireEvent.click(firstTaskTitle);
 
       // 第一个任务应该折叠
-      expect(screen.queryByText('Success content')).toBeNull();
+      await waitFor(() => {
+        expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+      });
       // 其他任务仍然展开
       expect(screen.getByText('Pending content 1')).toBeVisible();
     });

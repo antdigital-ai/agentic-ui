@@ -305,9 +305,6 @@ const ChatLayoutDemo: React.FC = () => {
             }
           >
             <BubbleList
-              style={{
-                paddingBottom: '60px',
-              }}
               pure
               onLike={() => {}}
               onDisLike={() => {}}

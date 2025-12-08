@@ -3,13 +3,13 @@
  */
 
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   EditorImage,
-  ImageAndError,
+  ReadonlyImage,
   ResizeImage,
 } from '../../../../src/MarkdownEditor/editor/elements/Image';
 import * as utils from '../../../../src/MarkdownEditor/editor/utils';
@@ -131,10 +131,10 @@ describe('Image', () => {
     vi.clearAllMocks();
   });
 
-  describe('ImageAndError', () => {
+  describe('ReadonlyImage', () => {
     it('应该正确渲染图片', () => {
       renderWithProvider(
-        <ImageAndError
+        <ReadonlyImage
           src="https://example.com/image.jpg"
           alt="Test Image"
           width={400}
@@ -152,7 +152,7 @@ describe('Image', () => {
 
     it('应该处理图片加载错误', () => {
       renderWithProvider(
-        <ImageAndError
+        <ReadonlyImage
           src="https://example.com/invalid-image.jpg"
           alt="Invalid Image"
           width={400}
@@ -166,7 +166,7 @@ describe('Image', () => {
 
     it('应该处理空的 alt 属性', () => {
       renderWithProvider(
-        <ImageAndError
+        <ReadonlyImage
           src="https://example.com/image.jpg"
           alt=""
           width={400}
@@ -174,13 +174,14 @@ describe('Image', () => {
         />,
       );
 
-      const imageElement = screen.getByAltText('');
+      // ReadonlyImage 会将空 alt 转换为 'image'
+      const imageElement = screen.getByAltText('image');
       expect(imageElement).toBeInTheDocument();
     });
 
     it('应该处理数字类型的 width', () => {
       renderWithProvider(
-        <ImageAndError
+        <ReadonlyImage
           src="https://example.com/image.jpg"
           alt="Test Image"
           width={400}
@@ -265,6 +266,109 @@ describe('Image', () => {
 
       // 图片在加载时是隐藏的，所以我们检查容器而不是图片本身
       expect(screen.getByAltText('Test Image')).toBeInTheDocument();
+    });
+
+    describe('ResizeImage linkConfig 功能测试', () => {
+      const mockWindowOpen = vi.fn();
+      let containerElement: HTMLElement | null = null;
+
+      const getErrorLink = async () => {
+        if (!containerElement) return null;
+        await waitFor(() => {
+          const link = containerElement?.querySelector('span');
+          if (!link || !link.textContent?.includes('Test Image')) {
+            throw new Error('链接元素未找到');
+          }
+        });
+        return containerElement.querySelector('span') as HTMLSpanElement | null;
+      };
+
+      const triggerError = () => {
+        if (!containerElement) return;
+        const img = containerElement.querySelector('img');
+        if (img) {
+          fireEvent.error(img);
+        }
+      };
+
+      const updateEditorStore = async (linkConfig: {
+        onClick?: (url: string) => boolean | void;
+        openInNewTab?: boolean;
+      }) => {
+        const { useEditorStore } = await import(
+          '../../../../src/MarkdownEditor/editor/store'
+        );
+        vi.mocked(useEditorStore).mockReturnValue({
+          editorProps: {
+            linkConfig,
+          },
+        } as any);
+      };
+
+      beforeEach(async () => {
+        mockWindowOpen.mockClear();
+        if (typeof window !== 'undefined') {
+          window.open = mockWindowOpen;
+        }
+        await updateEditorStore({});
+        const { container } = renderWithProvider(
+          <ResizeImage {...mockResizeProps} src="invalid-url.jpg" />,
+        );
+        containerElement = container;
+      });
+
+      it('图片加载失败时应该显示链接', async () => {
+        triggerError();
+        await waitFor(() => {
+          const link = containerElement?.querySelector('span');
+          expect(link).toBeInTheDocument();
+          expect(link?.textContent).toContain('Test Image');
+        });
+      });
+
+      // 使用工具函数创建标准测试
+      // 注意：工具函数中的 updateEditorStore 需要支持 async
+      // 但当前实现是同步的，需要调整
+      it('应该调用 linkConfig.onClick 当点击失败链接时', async () => {
+        const onClick = vi.fn();
+        await updateEditorStore({ onClick });
+
+        triggerError();
+
+        const link = await waitFor(async () => {
+          const element = await getErrorLink();
+          if (!element) {
+            throw new Error('链接元素未找到');
+          }
+          return element;
+        });
+
+        fireEvent.click(link);
+        expect(onClick).toHaveBeenCalledWith('invalid-url.jpg');
+      });
+
+      it('当 linkConfig.onClick 返回 false 时应该阻止默认行为', async () => {
+        const onClick = vi.fn().mockReturnValue(false);
+        await updateEditorStore({ onClick });
+
+        triggerError();
+
+        const link = await waitFor(async () => {
+          const element = await getErrorLink();
+          if (!element) {
+            throw new Error('链接元素未找到');
+          }
+          return element;
+        });
+
+        fireEvent.click(link, {
+          preventDefault: vi.fn(),
+          stopPropagation: vi.fn(),
+        });
+
+        expect(onClick).toHaveBeenCalledWith('invalid-url.jpg');
+        expect(mockWindowOpen).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -611,10 +715,10 @@ describe('Image', () => {
     });
   });
 
-  describe('ImageAndError 扩展测试', () => {
+  describe('ReadonlyImage 扩展测试', () => {
     it('应该处理图片的 onLoad 事件', () => {
       renderWithProvider(
-        <ImageAndError
+        <ReadonlyImage
           src="https://example.com/image.jpg"
           alt="Test Image"
           width={400}
@@ -628,61 +732,11 @@ describe('Image', () => {
       expect(imageElement).toBeInTheDocument();
     });
 
-    it('应该处理自定义 className', () => {
-      renderWithProvider(
-        <ImageAndError
-          src="https://example.com/image.jpg"
-          alt="Test Image"
-          className="custom-image-class"
-        />,
-      );
-
-      const imageElement = screen.getByAltText('Test Image');
-      expect(imageElement).toBeInTheDocument();
-    });
-
-    it('应该处理自定义 style', () => {
-      renderWithProvider(
-        <ImageAndError
-          src="https://example.com/image.jpg"
-          alt="Test Image"
-          style={{ border: '1px solid red' }}
-        />,
-      );
-
-      const imageElement = screen.getByAltText('Test Image');
-      expect(imageElement).toBeInTheDocument();
-    });
-
-    it('应该处理 preview 为 false', () => {
-      renderWithProvider(
-        <ImageAndError
-          src="https://example.com/image.jpg"
-          alt="Test Image"
-          preview={false}
-        />,
-      );
-
-      const imageElement = screen.getByAltText('Test Image');
-      expect(imageElement).toBeInTheDocument();
-    });
-
-    it('应该处理 preview 配置对象', () => {
-      renderWithProvider(
-        <ImageAndError
-          src="https://example.com/image.jpg"
-          alt="Test Image"
-          preview={{ visible: false }}
-        />,
-      );
-
-      const imageElement = screen.getByAltText('Test Image');
-      expect(imageElement).toBeInTheDocument();
-    });
+    // ReadonlyImage 组件不支持 className, style, preview 属性，这些测试已移除
 
     it('应该处理百分比宽度', () => {
       renderWithProvider(
-        <ImageAndError
+        <ReadonlyImage
           src="https://example.com/image.jpg"
           alt="Test Image"
           width="50%"
@@ -695,7 +749,7 @@ describe('Image', () => {
 
     it('应该处理 rem 单位宽度', () => {
       renderWithProvider(
-        <ImageAndError
+        <ReadonlyImage
           src="https://example.com/image.jpg"
           alt="Test Image"
           width="20rem"
@@ -708,7 +762,7 @@ describe('Image', () => {
 
     it('应该处理特殊字符的 URL', () => {
       renderWithProvider(
-        <ImageAndError
+        <ReadonlyImage
           src="https://example.com/image%20with%20spaces.jpg"
           alt="Test Image"
         />,
@@ -720,7 +774,7 @@ describe('Image', () => {
 
     it('应该处理 data URL', () => {
       renderWithProvider(
-        <ImageAndError
+        <ReadonlyImage
           src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
           alt="Test Image"
         />,
