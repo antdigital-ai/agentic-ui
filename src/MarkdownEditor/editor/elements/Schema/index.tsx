@@ -2,6 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { BubbleConfigContext } from '../../../../Bubble/BubbleConfigProvide';
 import { SchemaRenderer } from '../../../../Schema';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { useEditorStore } from '../../store';
 
 /**
@@ -42,13 +43,20 @@ import { useEditorStore } from '../../store';
  * 3. 默认 JSON 字符串渲染
  */
 export const Schema: React.FC<RenderElementProps> = (props) => {
+  debugInfo('Schema - 渲染 Schema', {
+    language: props.element.language,
+    valueType: typeof props.element.value,
+    hasApaasify: !!(props.element as any).apaasify,
+  });
   const { element: node } = props;
   const { editorProps } = useEditorStore();
   const apaasify = editorProps?.apaasify || editorProps?.apassify;
 
   const { bubble } = useContext(BubbleConfigContext) || {};
+
   return useMemo(() => {
     if (apaasify?.enable && apaasify.render) {
+      debugInfo('Schema - 使用自定义 apaasify 渲染');
       const renderedContent = apaasify.render(props, bubble?.originData);
       return (
         <div
@@ -80,6 +88,7 @@ export const Schema: React.FC<RenderElementProps> = (props) => {
     }
 
     if (node.language === 'agentar-card') {
+      debugInfo('Schema - 使用 AgentAR 卡片渲染');
       return (
         <div
           data-testid="agentar-card-container"
@@ -99,6 +108,7 @@ export const Schema: React.FC<RenderElementProps> = (props) => {
       );
     }
 
+    debugInfo('Schema - 使用默认 JSON 渲染');
     return (
       <div
         {...node.attributes}

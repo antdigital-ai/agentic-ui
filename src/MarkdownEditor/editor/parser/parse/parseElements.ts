@@ -1,9 +1,14 @@
+import { debugInfo } from '../../../../Utils/debugUtils';
+
 /**
  * 处理内联代码节点
  * @param currentElement - 当前处理的内联代码元素
  * @returns 返回格式化的内联代码节点对象，支持占位符和初始值
  */
 export const handleInlineCode = (currentElement: any) => {
+  debugInfo('handleInlineCode - 处理内联代码', {
+    value: currentElement.value,
+  });
   const hasPlaceHolder = currentElement.value?.match(/\$\{(.*?)\}/);
   let values: any = undefined;
 
@@ -58,6 +63,14 @@ export const handleInlineCode = (currentElement: any) => {
     result.initialValue = undefined;
   }
 
+  debugInfo('handleInlineCode - 内联代码处理完成', {
+    code: result.code,
+    tag: result.tag,
+    text: result.text,
+    placeholder: result.placeholder,
+    initialValue: result.initialValue,
+  });
+
   return result;
 };
 
@@ -66,7 +79,10 @@ export const handleInlineCode = (currentElement: any) => {
  * @returns 返回格式化的分割线节点对象
  */
 export const handleThematicBreak = () => {
-  return { type: 'hr', children: [{ text: '' }] };
+  debugInfo('handleThematicBreak - 处理分割线');
+  const result = { type: 'hr', children: [{ text: '' }] };
+  debugInfo('handleThematicBreak - 分割线处理完成', { type: result.type });
+  return result;
 };
 
 /**
@@ -75,7 +91,11 @@ export const handleThematicBreak = () => {
  * @returns 返回格式化的定义段落节点对象
  */
 export const handleDefinition = (currentElement: any) => {
-  return {
+  debugInfo('handleDefinition - 处理定义', {
+    label: currentElement.label,
+    url: currentElement.url,
+  });
+  const result = {
     type: 'paragraph',
     children: [
       {
@@ -85,4 +105,9 @@ export const handleDefinition = (currentElement: any) => {
       },
     ],
   };
+  debugInfo('handleDefinition - 定义处理完成', {
+    type: result.type,
+    text: result.children[0].text,
+  });
+  return result;
 };

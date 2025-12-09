@@ -1,6 +1,7 @@
 ﻿import { ConfigProvider, Skeleton } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, LinkCardNode } from '../../../el';
 import { AvatarList } from '../../components/ContributorAvatar';
 import { DragHandle } from '../../tools/DragHandle';
@@ -17,6 +18,12 @@ export function LinkCard({
     updateTime: string;
   }>
 >) {
+  debugInfo('LinkCard - 渲染链接卡片', {
+    url: element?.url?.substring(0, 100),
+    title: element?.title,
+    name: element?.name,
+    finished: element?.finished,
+  });
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context?.getPrefixCls('agentic-md-editor-link-card');
   const { wrapSSR, hashId } = useStyle(baseCls);
@@ -26,8 +33,10 @@ export function LinkCard({
   // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
   useEffect(() => {
     if (element.finished === false) {
+      debugInfo('LinkCard - 设置超时显示文本');
       setShowAsText(false);
       const timer = setTimeout(() => {
+        debugInfo('LinkCard - 超时，显示为文本');
         setShowAsText(true);
       }, 5000);
 
@@ -43,6 +52,7 @@ export function LinkCard({
   if (element.finished === false) {
     // 如果 5 秒后仍未完成，显示为文本
     if (showAsText) {
+      debugInfo('LinkCard - 显示为文本');
       return (
         <div {...attributes}>
           <div
@@ -61,6 +71,7 @@ export function LinkCard({
       );
     }
     // 5 秒内显示加载骨架屏
+    debugInfo('LinkCard - 显示加载骨架屏');
     return (
       <div {...attributes}>
         <Skeleton active paragraph={{ rows: 2 }} />
@@ -69,6 +80,7 @@ export function LinkCard({
     );
   }
 
+  debugInfo('LinkCard - 渲染完整链接卡片');
   return wrapSSR(
     <div {...attributes}>
       <div

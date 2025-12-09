@@ -2,12 +2,17 @@ import classNames from 'classnames';
 import React, { useContext } from 'react';
 import { Node } from 'slate';
 import { I18nContext } from '../../../../I18n';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ParagraphNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
 import { DragHandle } from '../../tools/DragHandle';
 
 export const Paragraph = (props: ElementProps<ParagraphNode>) => {
+  debugInfo('Paragraph - 渲染段落', {
+    align: props.element.align,
+    childrenCount: props.element.children?.length,
+  });
   const {
     store,
     markdownEditorRef,
@@ -20,6 +25,12 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
 
   return React.useMemo(() => {
     const str = Node.string(props.element).trim();
+    debugInfo('Paragraph - useMemo 渲染', {
+      strLength: str.length,
+      selected,
+      readonly,
+      align: props.element.align,
+    });
     const isEmpty =
       !str &&
       markdownEditorRef.current?.children.length === 1 &&
@@ -45,7 +56,10 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
               '请输入内容...'
             : undefined
         }
-        onDragStart={(e) => store.dragStart(e, markdownContainerRef.current!)}
+        onDragStart={(e) => {
+          debugInfo('Paragraph - 拖拽开始');
+          store.dragStart(e, markdownContainerRef.current!);
+        }}
         data-empty={isEmpty}
         style={{
           display: !!str || !!props.children?.at(0).type ? undefined : 'none',

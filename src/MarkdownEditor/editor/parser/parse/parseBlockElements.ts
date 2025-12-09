@@ -1,3 +1,4 @@
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { CustomLeaf, Elements } from '../../../el';
 import { EditorUtils } from '../../utils';
 import type { ParserMarkdownToSlateNodeConfig } from '../parserMarkdownToSlateNode';
@@ -22,19 +23,34 @@ export const handleHeading = (
   currentElement: any,
   parseNodes: ParseNodesFn,
 ) => {
-  return {
+  debugInfo('handleHeading - 处理标题', {
+    depth: currentElement.depth,
+    childrenCount: currentElement.children?.length,
+  });
+  const result = {
     type: 'head',
     level: currentElement.depth,
     children: currentElement.children?.length
       ? parseNodes(currentElement.children, false, currentElement)
       : [{ text: '' }],
   };
+  debugInfo('handleHeading - 标题处理完成', {
+    level: result.level,
+    childrenCount: result.children?.length,
+  });
+  return result;
 };
 
 /**
  * 处理列表节点
  */
 export const handleList = (currentElement: any, parseNodes: ParseNodesFn) => {
+  debugInfo('handleList - 处理列表', {
+    ordered: currentElement.ordered,
+    start: currentElement.start,
+    finished: currentElement.finished,
+    childrenCount: currentElement.children?.length,
+  });
   const el: any = {
     type: 'list',
     order: currentElement.ordered,
@@ -43,6 +59,13 @@ export const handleList = (currentElement: any, parseNodes: ParseNodesFn) => {
     children: parseNodes(currentElement.children, false, currentElement),
   };
   el.task = el.children?.some((s: any) => typeof s.checked === 'boolean');
+  debugInfo('handleList - 列表处理完成', {
+    type: el.type,
+    order: el.order,
+    start: el.start,
+    task: el.task,
+    childrenCount: el.children?.length,
+  });
   return el;
 };
 
@@ -77,6 +100,10 @@ export const handleListItem = (
   currentElement: any,
   parseNodes: ParseNodesFn,
 ) => {
+  debugInfo('handleListItem - 处理列表项', {
+    checked: currentElement.checked,
+    childrenCount: currentElement.children?.length,
+  });
   const children = currentElement.children?.length
     ? parseNodes(currentElement.children, false, currentElement)
     : ([{ type: 'paragraph', children: [{ text: '' }] }] as any);
@@ -99,15 +126,23 @@ export const handleListItem = (
         },
       ];
       delete children?.[0]?.children?.[0];
+      debugInfo('handleListItem - 提取 mentions', { mentions });
     }
   }
 
-  return {
+  const result = {
     type: 'list-item',
     checked: currentElement.checked,
     children,
     mentions,
   };
+  debugInfo('handleListItem - 列表项处理完成', {
+    type: result.type,
+    checked: result.checked,
+    childrenCount: result.children?.length,
+    hasMentions: !!result.mentions,
+  });
+  return result;
 };
 
 /**
@@ -180,13 +215,22 @@ export const handleParagraph = (
   config: any,
   parseNodes: ParseNodesFn,
 ) => {
+  debugInfo('handleParagraph - 处理段落', {
+    childrenCount: currentElement.children?.length,
+    firstChildType: currentElement.children?.[0]?.type,
+    configType: config?.type,
+  });
   // 检查是否是附件链接
   if (
     currentElement.children?.[0].type === 'html' &&
     currentElement.children[0].value.startsWith('<a')
   ) {
+    debugInfo('handleParagraph - 检测到附件链接');
     const attachNode = handleAttachmentLink(currentElement);
-    if (attachNode) return attachNode;
+    if (attachNode) {
+      debugInfo('handleParagraph - 返回附件节点', { type: attachNode?.type });
+      return attachNode;
+    }
   }
 
   // 检查是否是链接卡片
@@ -194,11 +238,20 @@ export const handleParagraph = (
     currentElement?.children?.at(0)?.type === 'link' &&
     config.type === 'card'
   ) {
-    return handleLinkCard(currentElement, config);
+    debugInfo('handleParagraph - 检测到链接卡片');
+    const linkCard = handleLinkCard(currentElement, config);
+    debugInfo('handleParagraph - 返回链接卡片', { type: linkCard?.type });
+    return linkCard;
   }
 
   // 处理混合内容段落
-  return processParagraphChildren(currentElement, parseNodes);
+  debugInfo('handleParagraph - 处理混合内容段落');
+  const result = processParagraphChildren(currentElement, parseNodes);
+  debugInfo('handleParagraph - 段落处理完成', {
+    resultType: Array.isArray(result) ? 'array' : (result as any)?.type,
+    resultLength: Array.isArray(result) ? result.length : 1,
+  });
+  return result;
 };
 
 /**
@@ -208,12 +261,20 @@ export const handleBlockquote = (
   currentElement: any,
   parseNodes: ParseNodesFn,
 ) => {
-  return {
+  debugInfo('handleBlockquote - 处理引用块', {
+    childrenCount: currentElement.children?.length,
+  });
+  const result = {
     type: 'blockquote',
     children: currentElement.children?.length
       ? parseNodes(currentElement.children, false, currentElement)
       : [{ type: 'paragraph', children: [{ text: '' }] }],
   };
+  debugInfo('handleBlockquote - 引用块处理完成', {
+    type: result.type,
+    childrenCount: result.children?.length,
+  });
+  return result;
 };
 
 /**

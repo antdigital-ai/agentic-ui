@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Node, Text } from 'slate';
 import stringWidth from 'string-width';
+import { debugInfo } from '../../../Utils/debugUtils';
 import { ChartNode } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
 import { getMediaType } from '../utils/dom';
@@ -213,11 +214,23 @@ const parserNode = (
   plugins?: MarkdownEditorPlugin[],
 ) => {
   let str = '';
-  if (!node) return str;
+  if (!node) {
+    debugInfo('parserSlateNodeToMarkdown.parserNode - 空节点');
+    return str;
+  }
+
+  debugInfo('parserSlateNodeToMarkdown.parserNode - 开始解析节点', {
+    nodeType: node.type,
+    preString,
+    parentType: parent[parent.length - 1]?.type,
+  });
 
   // 首先尝试使用插件处理
   const pluginResult = tryPluginConversion(node, preString, parent, plugins);
   if (pluginResult !== null) {
+    debugInfo('parserSlateNodeToMarkdown.parserNode - 使用插件转换', {
+      resultLength: pluginResult.length,
+    });
     return pluginResult;
   }
 
@@ -281,6 +294,13 @@ const parserNode = (
       str += handleDefault(node, parent);
       break;
   }
+
+  debugInfo('parserSlateNodeToMarkdown.parserNode - 节点解析完成', {
+    nodeType: node.type,
+    resultLength: str.length,
+    resultPreview: str.substring(0, 50),
+  });
+
   return str;
 };
 
@@ -302,10 +322,27 @@ export const parserSlateNodeToMarkdown = (
   parent: any[] = [{ root: true }],
   plugins?: MarkdownEditorPlugin[],
 ) => {
+  debugInfo('parserSlateNodeToMarkdown - 开始转换', {
+    treeLength: tree?.length,
+    preString,
+    parentType: parent[parent.length - 1]?.type || 'root',
+    hasPlugins: !!plugins && plugins.length > 0,
+  });
+
   let str = '';
   for (let i = 0; i < tree.length; i++) {
     const node = tree[i];
+    debugInfo(`parserSlateNodeToMarkdown - 处理节点 ${i}/${tree.length}`, {
+      nodeType: node?.type,
+      hasOtherProps: !!node?.otherProps,
+      otherPropsKeys: node?.otherProps ? Object.keys(node.otherProps) : [],
+    });
     if (node.otherProps && Object.keys(node.otherProps).length) {
+      debugInfo(`parserSlateNodeToMarkdown - 处理 otherProps ${i}`, {
+        nodeType: node.type,
+        originalOtherProps: node.otherProps,
+      });
+
       let configProps = {
         ...node.otherProps,
       };
@@ -320,6 +357,9 @@ export const parserSlateNodeToMarkdown = (
         configProps.name = node.name || node.title || configProps.name;
         configProps.description = node.description || configProps.description;
         configProps.icon = node.icon || configProps.icon;
+        debugInfo(`parserSlateNodeToMarkdown - link-card 转换 ${i}`, {
+          configProps,
+        });
       }
       Object.keys(configProps).forEach((key) => {
         if (typeof configProps[key] === 'object' && configProps[key]) {
@@ -369,6 +409,11 @@ export const parserSlateNodeToMarkdown = (
 
         // 对于图表类型，配置应该总是以数组形式存储在 config 中
         if (node.type === 'chart') {
+          debugInfo(`parserSlateNodeToMarkdown - 处理图表节点 ${i}`, {
+            originalConfig: configProps.config,
+            hasChartType: !!configProps.chartType,
+          });
+
           let chartConfig = configProps.config;
 
           // 如果 config 不存在，但 configProps 看起来像图表配置（有 chartType），使用 configProps
@@ -378,6 +423,10 @@ export const parserSlateNodeToMarkdown = (
 
           // 如果 chartConfig 是对象且键都是数字（如 {0: {...}}），转换为数组
           chartConfig = convertObjectToArray(chartConfig);
+          debugInfo(`parserSlateNodeToMarkdown - 图表配置转换后 ${i}`, {
+            chartConfig,
+            isArray: Array.isArray(chartConfig),
+          });
 
           // 如果 chartConfig 还不是数组，将其包装为数组
           // 这样可以确保即使只有一个配置项，也会被放入数组中
@@ -460,6 +509,12 @@ export const parserSlateNodeToMarkdown = (
         str += '\n' + preString + '> ';
       }
     } else if (node.type === 'blockquote') {
+      debugInfo(`parserSlateNodeToMarkdown - 处理引用块 ${i}`, {
+        childrenCount: node.children?.length,
+        hasNestedBlockquote: node.children?.some(
+          (c: any) => c.type === 'blockquote',
+        ),
+      });
       // Handle blockquotes
       const blockquoteContent = node.children
         .map((child: any) => {
@@ -482,7 +537,15 @@ export const parserSlateNodeToMarkdown = (
         })
         .join('\n');
       str += blockquoteContent;
+      debugInfo(`parserSlateNodeToMarkdown - 引用块处理完成 ${i}`, {
+        contentLength: blockquoteContent.length,
+      });
     } else if (node.type === 'list') {
+      debugInfo(`parserSlateNodeToMarkdown - 处理列表 ${i}`, {
+        isOrdered: node.order,
+        start: node.start,
+        childrenCount: node.children?.length,
+      });
       // Handle lists
       const listItems = node.children
         .map((item: any, index: number) => {
@@ -503,6 +566,10 @@ export const parserSlateNodeToMarkdown = (
           str += '\n\n';
         }
       }
+      debugInfo(`parserSlateNodeToMarkdown - 列表处理完成 ${i}`, {
+        listItemsLength: listItems.length,
+        hasContent: !!listItems.trim(),
+      });
     } else if (
       node.type === 'paragraph' &&
       tree[i - 1]?.type === 'list' &&
@@ -549,6 +616,10 @@ export const parserSlateNodeToMarkdown = (
 
   // Clean up trailing newlines and handle special cases
   if (str) {
+    debugInfo('parserSlateNodeToMarkdown - 开始清理换行符', {
+      strLength: str.length,
+      trailingNewlines: (str.match(/\n+$/) || [''])[0].length,
+    });
     // Remove all trailing newlines first
     str = str.replace(/\n+$/, '');
 
@@ -559,6 +630,13 @@ export const parserSlateNodeToMarkdown = (
     const parentType = parent[parent.length - 1]?.type;
     const nextNode = tree[tree.indexOf(lastNode) + 1];
     const isLastNodeInParent = !nextNode;
+    debugInfo('parserSlateNodeToMarkdown - 换行符处理上下文', {
+      lastNodeType: lastNode?.type,
+      isRoot,
+      isConverted,
+      parentType,
+      isLastNodeInParent,
+    });
 
     if (lastNode && lastNode.type && !isConverted) {
       if (parentType === 'blockquote') {
@@ -594,12 +672,28 @@ export const parserSlateNodeToMarkdown = (
   }
 
   // Clean up multiple consecutive newlines
+  const beforeCleanup = str.length;
   str = str.replace(/\n{3,}/g, '\n\n');
+  debugInfo('parserSlateNodeToMarkdown - 清理连续换行符', {
+    beforeLength: beforeCleanup,
+    afterLength: str.length,
+  });
 
   // Remove leading newlines for root level content
   if (parent.length === 1 && parent[0].root) {
+    const beforeLeading = str.length;
     str = str.replace(/^\n+/, '');
+    debugInfo('parserSlateNodeToMarkdown - 清理前导换行符', {
+      beforeLength: beforeLeading,
+      afterLength: str.length,
+    });
   }
+
+  debugInfo('parserSlateNodeToMarkdown - 转换完成', {
+    finalLength: str.length,
+    finalPreview: str.substring(0, 100),
+  });
+
   return str;
 };
 
@@ -803,9 +897,25 @@ const table = (
   parent: any[],
   plugins?: MarkdownEditorPlugin[],
 ) => {
+  debugInfo('parserSlateNodeToMarkdown.table - 开始处理表格', {
+    elType: el.type,
+    childrenCount: el.children?.length,
+  });
+
   const children = el.children;
   const head = children[0]?.children;
-  if (!children.length || !head.length) return '';
+  if (!children.length || !head.length) {
+    debugInfo('parserSlateNodeToMarkdown.table - 空表格，返回空字符串');
+    return '';
+  }
+
+  debugInfo('parserSlateNodeToMarkdown.table - 表格头部信息', {
+    headLength: head.length,
+    headCells: head.map((h: any) => ({
+      type: h.type,
+      align: h.align,
+    })),
+  });
 
   const data: string[][] = new Array(children.length);
   let maxColumns = 0;
@@ -880,6 +990,12 @@ const table = (
   const rowCount = processor();
   data.length = rowCount;
 
+  debugInfo('parserSlateNodeToMarkdown.table - 表格数据处理完成', {
+    rowCount,
+    maxColumns,
+    dataPreview: data.slice(0, 2).map((row) => row.slice(0, 3)),
+  });
+
   // 计算列宽
   const colLength = new Array(maxColumns).fill(0);
   for (const row of data) {
@@ -952,7 +1068,14 @@ const table = (
     }
   }
 
-  return output.join('\n');
+  const result = output.join('\n');
+  debugInfo('parserSlateNodeToMarkdown.table - 表格转换完成', {
+    outputRows: output.length,
+    resultLength: result.length,
+    resultPreview: result.substring(0, 200),
+  });
+
+  return result;
 };
 
 /**

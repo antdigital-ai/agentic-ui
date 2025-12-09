@@ -3,6 +3,7 @@ import { useMountMergeState } from '@ant-design/pro-components';
 import { Checkbox, ConfigProvider, Dropdown, Space } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useMemo } from 'react';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ListItemNode } from '../../../el';
 import { useMEditor } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
@@ -188,6 +189,12 @@ export const ListItem = ({
   children,
   attributes,
 }: ElementProps<ListItemNode>) => {
+  debugInfo('ListItem - 渲染列表项', {
+    checked: element.checked,
+    isTask: typeof element.checked === 'boolean',
+    mentionsCount: element.mentions?.length,
+    childrenCount: element.children?.length,
+  });
   const [, update] = useMEditor(element);
   const { store, editorProps, markdownContainerRef } = useEditorStore();
   const isTask = typeof element.checked === 'boolean';
@@ -206,7 +213,12 @@ export const ListItem = ({
       >
         <Checkbox
           checked={element.checked}
-          onChange={(e) => update({ checked: e.target.checked })}
+          onChange={(e) => {
+            debugInfo('ListItem - 复选框状态改变', {
+              checked: e.target.checked,
+            });
+            update({ checked: e.target.checked });
+          }}
         />
       </span>
     );
@@ -239,7 +251,10 @@ export const ListItem = ({
             [`${baseCls}-task`]: isTask,
           })}
           data-be={'list-item'}
-          onDragStart={(e) => store.dragStart(e, markdownContainerRef.current!)}
+          onDragStart={(e) => {
+            debugInfo('ListItem - 拖拽开始');
+            store.dragStart(e, markdownContainerRef.current!);
+          }}
           {...attributes}
         >
           {listItemRender(props, { element, children, attributes })}
@@ -252,7 +267,10 @@ export const ListItem = ({
           [`${baseCls}-task`]: isTask,
         })}
         data-be={'list-item'}
-        onDragStart={(e) => store.dragStart(e, markdownContainerRef.current!)}
+        onDragStart={(e) => {
+          debugInfo('ListItem - 拖拽开始');
+          store.dragStart(e, markdownContainerRef.current!);
+        }}
         {...attributes}
       >
         {checkbox}

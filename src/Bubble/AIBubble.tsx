@@ -1,6 +1,5 @@
 import { memo, MutableRefObject, useContext } from 'react';
 
-import { Loader } from '@sofa-design/icons';
 import { ConfigProvider, Flex } from 'antd';
 import cx from 'classnames';
 import React from 'react';
@@ -25,15 +24,6 @@ export const runRender = (
   ...rest: undefined[]
 ) => {
   return render ? render(props, defaultDom, ...rest) : defaultDom;
-};
-
-const isTyping = (originData: any) => {
-  return (
-    originData?.isAborted !== true &&
-    originData?.isFinished === false &&
-    originData?.extra?.isHistory === undefined &&
-    originData?.isFinished !== undefined
-  );
 };
 
 const isSameRoleAsPrevious = (preMessage: any, originData: any) => {
@@ -101,7 +91,6 @@ export const AIBubble: React.FC<
   const prefixClass = getPrefixCls('agentic');
   const { wrapSSR, hashId } = useStyle(prefixClass);
 
-  const typing = isTyping(originData);
   const preMessageSameRole = isSameRoleAsPrevious(preMessage, originData);
   const time = originData?.createAt || props.time;
   const avatar = originData?.meta || props.avatar;
@@ -374,7 +363,6 @@ export const AIBubble: React.FC<
                 )}
               >
                 {avatarDom}
-                {typing && <Loader style={{ fontSize: 16 }} />}
                 {titleDom}
               </div>
             ),

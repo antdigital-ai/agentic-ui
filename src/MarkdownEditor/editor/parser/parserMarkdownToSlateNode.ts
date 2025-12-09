@@ -1,6 +1,7 @@
 import type { RootContent } from 'mdast';
 import { Element } from 'slate';
 
+import { debugInfo } from '../../../Utils/debugUtils';
 import { ChartTypeConfig, Elements } from '../../el';
 import { MarkdownEditorPlugin } from '../../plugin';
 import { applyContextPropsAndConfig } from './parse/applyContextPropsAndConfig';
@@ -98,36 +99,76 @@ export class MarkdownToSlateParser {
     schema: Elements[];
     links: { path: number[]; target: string }[];
   } {
+    debugInfo('parserMarkdownToSlateNode.parse - 开始解析', {
+      inputLength: md?.length,
+      hasPlugins: this.plugins?.length > 0,
+      config: this.config,
+    });
+
     // 先预处理 <think> 标签，然后预处理其他非标准 HTML 标签，最后处理表格换行
     const thinkProcessed = removeAnswerTags(preprocessThinkTags(md || ''));
+    debugInfo('parserMarkdownToSlateNode.parse - thinkProcessed', {
+      length: thinkProcessed.length,
+      changed: thinkProcessed !== md,
+    });
+
     const nonStandardProcessed = removeAnswerTags(
       preprocessNonStandardHtmlTags(thinkProcessed),
     );
+    debugInfo('parserMarkdownToSlateNode.parse - nonStandardProcessed', {
+      length: nonStandardProcessed.length,
+      changed: nonStandardProcessed !== thinkProcessed,
+    });
+
     // parse() 只执行 parser，需要 runSync() 来执行 transformer 插件
-    const ast = mdastParser.parse(
-      preprocessMarkdownTableNewlines(nonStandardProcessed),
-    ) as any;
+    const preprocessedMarkdown =
+      preprocessMarkdownTableNewlines(nonStandardProcessed);
+    debugInfo('parserMarkdownToSlateNode.parse - preprocessedMarkdown', {
+      length: preprocessedMarkdown.length,
+    });
+
+    const ast = mdastParser.parse(preprocessedMarkdown) as any;
+    debugInfo('parserMarkdownToSlateNode.parse - AST 解析完成', {
+      astType: ast?.type,
+      childrenCount: ast?.children?.length,
+    });
+
     const processedMarkdown = mdastParser.runSync(ast) as any;
     const markdownRoot = processedMarkdown.children;
+    debugInfo('parserMarkdownToSlateNode.parse - 插件处理完成', {
+      rootChildrenCount: markdownRoot?.length,
+    });
 
     // 使用类的配置和插件，通过 this 访问
     const schema = this.parseNodes(markdownRoot, true, undefined) as Elements[];
-    return {
-      schema: schema?.filter((item) => {
-        if (item.type === 'paragraph' && !item.children?.length) {
+    debugInfo('parserMarkdownToSlateNode.parse - 节点解析完成', {
+      schemaLength: schema?.length,
+      schemaTypes: schema?.map((s) => s.type),
+    });
+
+    const filteredSchema = schema?.filter((item) => {
+      if (item.type === 'paragraph' && !item.children?.length) {
+        return false;
+      }
+      if (item.type === 'paragraph' && item.children?.length === 1) {
+        if (
+          item.children[0].text === '\n' ||
+          item.children[0].text === undefined
+        ) {
           return false;
         }
-        if (item.type === 'paragraph' && item.children?.length === 1) {
-          if (
-            item.children[0].text === '\n' ||
-            item.children[0].text === undefined
-          ) {
-            return false;
-          }
-          return true;
-        }
         return true;
-      }),
+      }
+      return true;
+    });
+
+    debugInfo('parserMarkdownToSlateNode.parse - 过滤完成', {
+      beforeFilter: schema?.length,
+      afterFilter: filteredSchema?.length,
+    });
+
+    return {
+      schema: filteredSchema,
       links: [],
     };
   }
@@ -142,8 +183,16 @@ export class MarkdownToSlateParser {
     top = false,
     parent?: RootContent,
   ): (Elements | Text)[] {
-    if (!nodes?.length)
+    debugInfo('parserMarkdownToSlateNode.parseNodes - 开始解析节点', {
+      nodesCount: nodes?.length,
+      top,
+      parentType: parent?.type,
+    });
+
+    if (!nodes?.length) {
+      debugInfo('parserMarkdownToSlateNode.parseNodes - 空节点，返回默认段落');
       return [{ type: 'paragraph', children: [{ text: '' }] }];
+    }
 
     let els: (Elements | Text)[] = [];
     let preNode: null | RootContent = null;
@@ -154,6 +203,14 @@ export class MarkdownToSlateParser {
 
     for (let i = 0; i < nodes.length; i++) {
       const currentElement = nodes[i] as any;
+      debugInfo(
+        `parserMarkdownToSlateNode.parseNodes - 处理节点 ${i}/${nodes.length}`,
+        {
+          type: currentElement?.type,
+          hasChildren: !!currentElement?.children,
+          childrenCount: currentElement?.children?.length,
+        },
+      );
       let el: Element | null | Element[] = null;
       let pluginHandled = false;
 
@@ -253,6 +310,13 @@ export class MarkdownToSlateParser {
       for (const plugin of this.plugins) {
         const rule = plugin.parseMarkdown?.find((r) => r.match(currentElement));
         if (rule) {
+          debugInfo(
+            `parserMarkdownToSlateNode.parseNodes - 插件处理节点 ${i}`,
+            {
+              pluginName: (plugin as any).name || 'unknown',
+              elementType: currentElement?.type,
+            },
+          );
           const converted = rule.convert(currentElement);
           // 检查转换结果是否为 NodeEntry<Text> 格式
           if (Array.isArray(converted) && converted.length === 2) {
@@ -263,6 +327,12 @@ export class MarkdownToSlateParser {
             el = converted as Element;
           }
           pluginHandled = true;
+          debugInfo(
+            `parserMarkdownToSlateNode.parseNodes - 插件转换完成 ${i}`,
+            {
+              convertedType: el?.type,
+            },
+          );
           break;
         }
       }
@@ -272,6 +342,10 @@ export class MarkdownToSlateParser {
 
       // 如果插件没有处理，使用默认处理逻辑
       if (!pluginHandled) {
+        debugInfo(`parserMarkdownToSlateNode.parseNodes - 使用默认处理 ${i}`, {
+          elementType: currentElement?.type,
+          configKeys: Object.keys(config || {}),
+        });
         // 使用统一的处理函数，通过 this 访问配置和插件
         const result = this.handleSingleElement(
           currentElement,
@@ -282,6 +356,12 @@ export class MarkdownToSlateParser {
         );
 
         el = result.el;
+        debugInfo(`parserMarkdownToSlateNode.parseNodes - 默认处理完成 ${i}`, {
+          resultType: Array.isArray(el) ? 'array' : el?.type,
+          resultLength: Array.isArray(el) ? el.length : 1,
+          hasContextProps: !!result.contextProps,
+          hasHtmlTag: !!result.htmlTag,
+        });
         if (result.contextProps) {
           contextProps = { ...contextProps, ...result.contextProps };
         }
@@ -306,6 +386,11 @@ export class MarkdownToSlateParser {
       preNode = currentElement;
       preElement = el as Element;
     }
+
+    debugInfo('parserMarkdownToSlateNode.parseNodes - 所有节点解析完成', {
+      totalElements: els.length,
+      elementTypes: els.map((e) => (e as any)?.type || 'text'),
+    });
 
     return els;
   }
@@ -378,10 +463,20 @@ export class MarkdownToSlateParser {
     preElement: Element | null,
   ): { el: Element | Element[] | null; contextProps?: any; htmlTag?: any[] } {
     const elementType = currentElement.type;
+    debugInfo('handleSingleElement - 开始处理元素', {
+      elementType,
+      hasConfig: !!config && Object.keys(config).length > 0,
+      configKeys: config ? Object.keys(config) : [],
+      parentType: parent?.type,
+      htmlTagLength: htmlTag?.length,
+      preElementType: preElement?.type,
+    });
+
     const elementHandlers = this.getElementHandlers();
     const handlerInfo = elementHandlers[elementType];
 
     if (handlerInfo?.needsHtmlResult) {
+      debugInfo('handleSingleElement - 使用 HTML 结果处理', { elementType });
       const htmlResult = handleHtml(currentElement, parent, htmlTag);
       const result: any = {
         el: htmlResult.el,
@@ -392,11 +487,18 @@ export class MarkdownToSlateParser {
       if (htmlResult.htmlTag) {
         result.htmlTag = htmlResult.htmlTag;
       }
+      debugInfo('handleSingleElement - HTML 结果处理完成', {
+        elementType,
+        resultType: Array.isArray(result.el) ? 'array' : result.el?.type,
+        hasContextProps: !!result.contextProps,
+        hasHtmlTag: !!result.htmlTag,
+      });
       return result;
     }
 
     if (!handlerInfo) {
-      return {
+      debugInfo('handleSingleElement - 使用默认文本处理', { elementType });
+      const result = {
         el: handleTextAndInlineElements(
           currentElement,
           htmlTag,
@@ -404,8 +506,18 @@ export class MarkdownToSlateParser {
           this.config,
         ),
       };
+      debugInfo('handleSingleElement - 默认文本处理完成', {
+        elementType,
+        resultType: Array.isArray(result.el) ? 'array' : result.el?.type,
+        resultLength: Array.isArray(result.el) ? result.el.length : 1,
+      });
+      return result;
     }
 
+    debugInfo('handleSingleElement - 调用元素处理器', {
+      elementType,
+      handlerExists: !!handlerInfo.handler,
+    });
     const handlerResult = handlerInfo.handler(
       currentElement,
       this.plugins,
@@ -415,6 +527,15 @@ export class MarkdownToSlateParser {
       preElement,
       this,
     );
+
+    debugInfo('handleSingleElement - 元素处理完成', {
+      elementType,
+      resultType: Array.isArray(handlerResult) ? 'array' : handlerResult?.type,
+      resultLength: Array.isArray(handlerResult) ? handlerResult.length : 1,
+      resultPreview: Array.isArray(handlerResult)
+        ? handlerResult.map((r) => ({ type: r?.type }))
+        : { type: handlerResult?.type },
+    });
 
     return { el: handlerResult };
   }

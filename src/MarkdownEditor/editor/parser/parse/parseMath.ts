@@ -1,3 +1,4 @@
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { InlineKatexNode } from '../../../el';
 
 // 常量定义
@@ -32,18 +33,30 @@ export const shouldTreatInlineMathAsText = (rawValue: string): boolean => {
  * @returns 返回格式化的内联KaTeX节点对象
  */
 export const handleInlineMath = (currentElement: any) => {
+  debugInfo('handleInlineMath - 处理内联数学公式', {
+    value: currentElement?.value,
+  });
   const inlineMathValue =
     typeof currentElement?.value === 'string' ? currentElement.value : '';
-  if (shouldTreatInlineMathAsText(inlineMathValue)) {
-    return {
+  const treatAsText = shouldTreatInlineMathAsText(inlineMathValue);
+  debugInfo('handleInlineMath - 判断结果', {
+    treatAsText,
+    value: inlineMathValue,
+  });
+  if (treatAsText) {
+    const result = {
       type: 'paragraph',
       children: [{ text: `$${inlineMathValue}$` }],
     } as any;
+    debugInfo('handleInlineMath - 作为文本处理', { type: result.type });
+    return result;
   }
-  return {
+  const result = {
     type: 'inline-katex',
     children: [{ text: inlineMathValue }],
   } as InlineKatexNode;
+  debugInfo('handleInlineMath - 作为内联公式处理', { type: result.type });
+  return result;
 };
 
 /**
@@ -52,11 +65,20 @@ export const handleInlineMath = (currentElement: any) => {
  * @returns 返回格式化的KaTeX块节点对象
  */
 export const handleMath = (currentElement: any) => {
-  return {
+  debugInfo('handleMath - 处理数学公式块', {
+    valueLength: currentElement.value?.length,
+  });
+  const result = {
     type: 'katex',
     language: 'latex',
     katex: true,
     value: currentElement.value,
     children: [{ text: '' }],
   };
+  debugInfo('handleMath - 数学公式块处理完成', {
+    type: result.type,
+    language: result.language,
+    katex: result.katex,
+  });
+  return result;
 };

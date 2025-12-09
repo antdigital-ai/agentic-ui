@@ -3,6 +3,7 @@
 import { message } from 'antd';
 import { Editor, Element, Node, Path, Range, Transforms } from 'slate';
 import { jsx } from 'slate-hyperscript';
+import { debugInfo } from '../../../Utils/debugUtils';
 import { debugLog, EditorUtils } from '../utils';
 import { docxDeserializer } from '../utils/docx/docxDeserializer';
 
@@ -372,9 +373,20 @@ const insertNodesBatch = async (
  * 优化的HTML解析函数，支持分段处理
  */
 const parseHtmlOptimized = async (html: string, rtf: string) => {
+  debugInfo('parseHtmlOptimized - 开始解析', {
+    htmlLength: html.length,
+    rtfLength: rtf.length,
+    useSync: html.length < MAX_SYNC_SIZE,
+  });
+
   // 对于小内容，使用同步处理
   if (html.length < MAX_SYNC_SIZE) {
-    return docxDeserializer(rtf, html.trim());
+    const result = docxDeserializer(rtf, html.trim());
+    debugInfo('parseHtmlOptimized - 同步解析完成', {
+      resultLength: result?.length,
+      resultTypes: result?.map((r) => r?.type),
+    });
+    return result;
   }
 
   // 对于大内容，使用异步处理
@@ -382,10 +394,16 @@ const parseHtmlOptimized = async (html: string, rtf: string) => {
     // 使用 requestIdleCallback 在空闲时间处理
     const processInIdle = () => {
       try {
+        debugInfo('parseHtmlOptimized - 异步解析开始');
         const result = docxDeserializer(rtf, html.trim());
+        debugInfo('parseHtmlOptimized - 异步解析完成', {
+          resultLength: result?.length,
+          resultTypes: result?.map((r) => r?.type),
+        });
         resolve(result);
       } catch (error) {
         console.error('HTML解析失败:', error);
+        debugInfo('parseHtmlOptimized - 解析失败', { error });
         resolve([]);
       }
     };
@@ -406,9 +424,18 @@ const parseHtmlOptimized = async (html: string, rtf: string) => {
  * @returns
  */
 export const htmlToFragmentList = (html: string, rtl: string) => {
-  let fragmentList = docxDeserializer(rtl, html.trim());
+  debugInfo('htmlToFragmentList - 开始转换', {
+    htmlLength: html.length,
+    rtlLength: rtl.length,
+  });
 
-  return fragmentList.map((fragment) => {
+  let fragmentList = docxDeserializer(rtl, html.trim());
+  debugInfo('htmlToFragmentList - 反序列化完成', {
+    fragmentListLength: fragmentList?.length,
+    fragmentTypes: fragmentList?.map((f) => f?.type),
+  });
+
+  const result = fragmentList.map((fragment) => {
     if (fragment.type === 'table') {
       return EditorUtils.wrapperCardNode(fragment);
     }
@@ -420,6 +447,13 @@ export const htmlToFragmentList = (html: string, rtl: string) => {
     }
     return fragment;
   });
+
+  debugInfo('htmlToFragmentList - 转换完成', {
+    resultLength: result.length,
+    resultTypes: result.map((r) => r?.type),
+  });
+
+  return result;
 };
 
 export const insertParsedHtmlNodes = async (
@@ -428,10 +462,18 @@ export const insertParsedHtmlNodes = async (
   editorProps: any,
   rtl: string,
 ) => {
+  debugInfo('insertParsedHtmlNodes - 开始插入 HTML 节点', {
+    htmlLength: html?.length,
+    htmlPreview: html?.substring(0, 200),
+    rtlLength: rtl?.length,
+    hasEditorProps: !!editorProps,
+  });
+
   // 1. 基础检查
   if (
     html.startsWith('<html>\r\n<body>\r\n\x3C!--StartFragment--><img src="')
   ) {
+    debugInfo('insertParsedHtmlNodes - 跳过特殊格式的 HTML');
     return false;
   }
 
@@ -440,14 +482,23 @@ export const insertParsedHtmlNodes = async (
 
   try {
     // 3. 异步解析 HTML
+    debugInfo('insertParsedHtmlNodes - 开始解析 HTML');
     const fragmentList = await parseHtmlOptimized(html, rtl);
+    debugInfo('insertParsedHtmlNodes - HTML 解析完成', {
+      fragmentListLength: fragmentList?.length,
+      fragmentTypes: fragmentList?.map((f) => f?.type),
+    });
+
     if (!fragmentList?.length) {
+      debugInfo('insertParsedHtmlNodes - 解析结果为空');
       hideLoading();
       return false;
     }
 
     // 4. 异步处理文件上传
+    debugInfo('insertParsedHtmlNodes - 开始处理文件上传');
     await upLoadFileBatch(fragmentList, editorProps);
+    debugInfo('insertParsedHtmlNodes - 文件上传完成');
 
     debugLog('wordFragmentList', fragmentList);
     hideLoading();
@@ -461,6 +512,7 @@ export const insertParsedHtmlNodes = async (
 
     // 6. 如果没有选区或路径无效，直接插入
     if (!selection || !Editor.hasPath(editor, selection.anchor.path)) {
+      debugInfo('insertParsedHtmlNodes - 无有效选区，直接插入');
       const processedNodes = fragmentList?.map((item) => {
         if (!item.type) {
           return { type: 'paragraph', children: [item] };
@@ -468,12 +520,24 @@ export const insertParsedHtmlNodes = async (
         return item;
       });
 
+      debugInfo('insertParsedHtmlNodes - 处理后的节点', {
+        processedNodesLength: processedNodes?.length,
+        processedTypes: processedNodes?.map((n) => n?.type),
+      });
+
       await insertNodesBatch(editor, processedNodes);
+      debugInfo('insertParsedHtmlNodes - 节点插入完成');
       return true;
     }
 
     // 7. 处理非折叠选区
     if (!Range.isCollapsed(selection)) {
+      debugInfo('insertParsedHtmlNodes - 处理非折叠选区', {
+        selectionRange: {
+          anchor: selection.anchor,
+          focus: selection.focus,
+        },
+      });
       const back = new BackspaceKey(editor);
       back.range();
       Transforms.select(editor, Range.start(selection));
@@ -506,16 +570,34 @@ export const insertParsedHtmlNodes = async (
     // 9. 处理代码块和表格单元格
     const parsed = new DOMParser().parseFromString(html, 'text/html').body;
     const inner = !!parsed.querySelector('[data-be]');
+    debugInfo('insertParsedHtmlNodes - DOM 解析完成', {
+      hasDataBe: inner,
+      parsedBodyChildren: parsed.children.length,
+    });
 
     // 对于代码块，检查是否包含代码相关的标签
     if (node?.[0].type === 'code') {
+      debugInfo('insertParsedHtmlNodes - 当前节点是代码块', {
+        nodeType: node[0].type,
+      });
       const hasCodeTags =
         html.includes('<pre>') || html.includes('<code>') || inner;
+      debugInfo('insertParsedHtmlNodes - 代码块检查', {
+        hasPreTag: html.includes('<pre>'),
+        hasCodeTag: html.includes('<code>'),
+        hasDataBe: inner,
+        hasCodeTags,
+      });
       if (hasCodeTags) {
         // 从 HTML 中提取纯文本内容
         const textContent = parsed.textContent || '';
+        debugInfo('insertParsedHtmlNodes - 提取文本内容', {
+          textContentLength: textContent.length,
+          textContentPreview: textContent.substring(0, 100),
+        });
         if (textContent.trim()) {
           Transforms.insertText(editor, textContent.trim(), { at: selection! });
+          debugInfo('insertParsedHtmlNodes - 代码块文本插入完成');
           return true;
         }
       }
@@ -528,8 +610,16 @@ export const insertParsedHtmlNodes = async (
 
     // 10. 处理列表项
     if (node?.[0].type === 'list-item' && fragmentList[0].type === 'list') {
+      debugInfo('insertParsedHtmlNodes - 处理列表项', {
+        currentNodeType: node[0].type,
+        fragmentListType: fragmentList[0].type,
+      });
       const children = fragmentList[0].children || [];
+      debugInfo('insertParsedHtmlNodes - 列表项子节点', {
+        childrenCount: children.length,
+      });
       if (!children.length) {
+        debugInfo('insertParsedHtmlNodes - 列表项无子节点');
         return false;
       }
 
@@ -628,6 +718,7 @@ export const insertParsedHtmlNodes = async (
     }
 
     // 14. 默认情况：替换选中节点
+    debugInfo('insertParsedHtmlNodes - 使用默认处理方式');
     const processedNodes = fragmentList?.map((item) => {
       if (!item.type) {
         return { type: 'paragraph', children: [item] };
@@ -642,7 +733,12 @@ export const insertParsedHtmlNodes = async (
       }
       return item;
     });
+    debugInfo('insertParsedHtmlNodes - 默认处理节点准备完成', {
+      processedNodesLength: processedNodes?.length,
+      processedTypes: processedNodes?.map((n) => n?.type),
+    });
     await insertNodesBatch(editor, processedNodes);
+    debugInfo('insertParsedHtmlNodes - 默认处理完成');
 
     return true;
   } catch (error) {

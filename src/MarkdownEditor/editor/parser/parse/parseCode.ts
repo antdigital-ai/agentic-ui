@@ -1,3 +1,4 @@
+import { debugInfo } from '../../../../Utils/debugUtils';
 import json5 from 'json5';
 import { isCodeBlockLikelyComplete } from '../../utils/findMatchingClose';
 import partialJsonParse from '../json-parse';
@@ -73,6 +74,13 @@ const LANGUAGE_HANDLERS: Record<string, LanguageHandler> = {
  * @returns 返回格式化的代码块节点对象，根据语言类型进行特殊处理
  */
 export const handleCode = (currentElement: any, config?: any): CodeElement => {
+  debugInfo('handleCode - 处理代码块', {
+    rawValueLength: currentElement.value?.length,
+    lang: currentElement.lang,
+    configLanguage: config?.['data-language'],
+    meta: currentElement.meta,
+  });
+
   const rawValue = currentElement.value || '';
 
   // 如果 config 中包含 data-language，优先使用它来恢复语言类型
@@ -82,6 +90,11 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
   const langString = effectiveLang
     ? effectiveLang.match(NOT_SPACE_START)?.[0] || ''
     : '';
+
+  debugInfo('handleCode - 语言处理', {
+    effectiveLang,
+    langString,
+  });
 
   const code = `${rawValue.replace(ENDING_NEWLINE, '')}\n`;
 
@@ -147,6 +160,12 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
   const handler =
     LANGUAGE_HANDLERS[effectiveLang as keyof typeof LANGUAGE_HANDLERS];
 
+  debugInfo('handleCode - 语言处理器', {
+    effectiveLang,
+    hasHandler: !!handler,
+    handlerName: handler ? Object.keys(LANGUAGE_HANDLERS).find(k => LANGUAGE_HANDLERS[k] === handler) : undefined,
+  });
+
   const result = handler
     ? handler(baseCodeElement, currentElement.value)
     : baseCodeElement;
@@ -171,6 +190,16 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
     };
   }
 
+  debugInfo('handleCode - 代码块处理完成', {
+    type: resultWithProps.type,
+    language: resultWithProps.language,
+    render: resultWithProps.render,
+    isConfig: resultWithProps.isConfig,
+    valueLength: resultWithProps.value?.length,
+    hasOtherProps: !!resultWithProps.otherProps,
+    otherPropsKeys: resultWithProps.otherProps ? Object.keys(resultWithProps.otherProps) : [],
+  });
+
   return resultWithProps;
 };
 
@@ -180,11 +209,20 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
  * @returns 返回格式化的YAML代码块节点对象
  */
 export const handleYaml = (currentElement: any) => {
-  return {
+  debugInfo('handleYaml - 处理 YAML', {
+    valueLength: currentElement.value?.length,
+  });
+  const result = {
     type: 'code',
     language: 'yaml',
     value: currentElement.value,
     frontmatter: true,
     children: [{ text: currentElement.value }],
   };
+  debugInfo('handleYaml - YAML 处理完成', {
+    type: result.type,
+    language: result.language,
+    frontmatter: result.frontmatter,
+  });
+  return result;
 };

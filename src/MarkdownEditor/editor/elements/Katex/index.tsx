@@ -1,4 +1,5 @@
 import React from 'react';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { RenderElementProps } from 'slate-react';
 
 export const Katex = ({
@@ -6,6 +7,9 @@ export const Katex = ({
   children,
   element,
 }: RenderElementProps) => {
+  debugInfo('Katex - 渲染数学公式块', {
+    valueLength: element?.value?.length,
+  });
   return (
     <pre
       {...attributes}

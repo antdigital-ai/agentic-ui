@@ -13,6 +13,7 @@ import React, {
   useState,
 } from 'react';
 import { useRefFunction } from '../../../../Hooks/useRefFunction';
+import { debugInfo } from '../../../../Utils/debugUtils';
 
 import { useDebounceFn } from '@ant-design/pro-components';
 import { Rnd } from 'react-rnd';
@@ -269,6 +270,13 @@ export function EditorImage({
   attributes,
   children,
 }: ElementProps<MediaNode>) {
+  debugInfo('EditorImage - 渲染图片', {
+    url: element?.url?.substring(0, 100),
+    alt: element?.alt,
+    width: element?.width,
+    height: element?.height,
+    finished: element?.finished,
+  });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, path] = useSelStatus(element);
   const { markdownEditorRef, readonly } = useEditorStore();
@@ -291,6 +299,10 @@ export function EditorImage({
   const { locale } = useContext(I18nContext);
 
   const initial = useRefFunction(async () => {
+    debugInfo('EditorImage - 初始化图片', {
+      url: element?.url?.substring(0, 100),
+      alt: element?.alt,
+    });
     let type = getMediaType(element?.url, element.alt);
     type = !type ? 'image' : type;
     setState({
@@ -301,15 +313,23 @@ export function EditorImage({
     let realUrl = element?.url;
 
     setState({ url: realUrl });
+    debugInfo('EditorImage - 设置图片类型和URL', {
+      type: state().type,
+      url: realUrl?.substring(0, 100),
+    });
     if (state().type === 'image' || state().type === 'other') {
       const img = document.createElement('img');
       img.referrerPolicy = 'no-referrer';
       img.crossOrigin = 'anonymous';
       img.src = realUrl!;
       img.onerror = () => {
+        debugInfo('EditorImage - 图片加载失败');
         setState({ loadSuccess: false });
       };
-      img.onload = () => setState({ loadSuccess: true });
+      img.onload = () => {
+        debugInfo('EditorImage - 图片加载成功');
+        setState({ loadSuccess: true });
+      };
     }
     if (!element.mediaType) {
       updateElement({
@@ -339,10 +359,17 @@ export function EditorImage({
   }, [element.finished]);
 
   const imageDom = useMemo(() => {
+    debugInfo('EditorImage - 生成图片 DOM', {
+      finished: element.finished,
+      showAsText,
+      loadSuccess: state().loadSuccess,
+      readonly,
+    });
     // 检查是否为不完整的图片（finished 状态）
     if (element.finished === false) {
       // 如果 5 秒后仍未完成，显示为文本
       if (showAsText) {
+        debugInfo('EditorImage - 显示为文本（超时）');
         return (
           <div
             style={{
@@ -358,11 +385,13 @@ export function EditorImage({
         );
       }
       // 5 秒内显示 loading 状态的占位符
+      debugInfo('EditorImage - 显示加载占位符');
       return <Skeleton.Image active />;
     }
 
     // 如果图片加载失败，显示为链接
     if (!state().loadSuccess) {
+      debugInfo('EditorImage - 显示错误链接');
       return (
         <MediaErrorLink
           url={state()?.url}
@@ -378,31 +407,46 @@ export function EditorImage({
       );
     }
 
-    return !readonly ? (
-      <ResizeImage
-        defaultSize={{
-          width: Number(element.width) || element.width || 400,
-          height: Number(element.height) || 400,
-        }}
-        selected={state().selected}
-        src={state()?.url}
-        onResizeStart={() => {
-          setState({ selected: true });
-        }}
-        onResizeStop={(size) => {
-          if (!markdownEditorRef?.current) return;
-          Transforms.setNodes(markdownEditorRef.current, size, { at: path });
-          setState({ selected: false });
-        }}
-      />
-    ) : (
-      <ReadonlyImage
-        src={state()?.url || element?.url}
-        alt={element?.alt || 'image'}
-        width={element.width}
-        height={element.height}
-      />
-    );
+    return !readonly
+      ? (() => {
+          debugInfo('EditorImage - 使用可调整大小的图片', {
+            width: element.width,
+            height: element.height,
+          });
+          return (
+            <ResizeImage
+              defaultSize={{
+                width: Number(element.width) || element.width || 400,
+                height: Number(element.height) || 400,
+              }}
+              selected={state().selected}
+              src={state()?.url}
+              onResizeStart={() => {
+                debugInfo('EditorImage - 开始调整大小');
+                setState({ selected: true });
+              }}
+              onResizeStop={(size) => {
+                debugInfo('EditorImage - 调整大小完成', { size });
+                if (!markdownEditorRef?.current) return;
+                Transforms.setNodes(markdownEditorRef.current, size, {
+                  at: path,
+                });
+                setState({ selected: false });
+              }}
+            />
+          );
+        })()
+      : (() => {
+          debugInfo('EditorImage - 使用只读图片');
+          return (
+            <ReadonlyImage
+              src={state()?.url || element?.url}
+              alt={element?.alt || 'image'}
+              width={element.width}
+              height={element.height}
+            />
+          );
+        })();
   }, [
     state().type,
     state()?.url,

@@ -6,6 +6,7 @@ import { Editor, Path, Transforms } from 'slate';
 import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 import { I18nContext } from '../../../I18n';
 import { isMobileDevice } from '../../../MarkdownInputField/AttachmentButton/utils';
+import { debugInfo } from '../../../Utils/debugUtils';
 import { MarkdownEditorProps } from '../../types';
 import { useEditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
@@ -125,11 +126,25 @@ const MElementComponent = (
     readonly?: boolean;
   },
 ) => {
+  debugInfo('MElementComponent - 渲染元素', {
+    elementType: props.element.type,
+    readonly: props.readonly,
+    hasChildren: !!props.children,
+  });
+
   const dom = tableRenderElement(props, { readonly: props.readonly });
 
   if (dom) {
+    debugInfo('MElementComponent - 使用表格渲染', {
+      elementType: props.element.type,
+    });
     return dom;
   }
+
+  debugInfo('MElementComponent - 选择元素渲染器', {
+    elementType: props.element.type,
+  });
+
   switch (props.element.type) {
     case 'link-card':
       return <LinkCard {...props} />;
@@ -209,6 +224,9 @@ const MElementComponent = (
       );
 
     default:
+      debugInfo('MElementComponent - 使用默认段落渲染', {
+        elementType: props.element.type,
+      });
       return <Paragraph {...props} />;
   }
 };
@@ -318,6 +336,18 @@ const MLeafComponent = (
   const { locale } = useContext(I18nContext);
   const mdEditorBaseClass = context?.getPrefixCls('agentic-md-editor-content');
   const leaf = props.leaf;
+  debugInfo('MLeafComponent - 渲染叶节点', {
+    hasCode: !!leaf.code,
+    hasTag: !!leaf.tag,
+    hasBold: !!leaf.bold,
+    hasItalic: !!leaf.italic,
+    hasStrikethrough: !!leaf.strikethrough,
+    hasUrl: !!leaf.url,
+    hasFnc: !!leaf.fnc,
+    hasComment: !!leaf.comment,
+    text: leaf.text?.substring(0, 50),
+  });
+
   const style: CSSProperties = {};
   let prefixClassName = classNames(props.hashId);
   let children = <>{props.children}</>;
@@ -326,7 +356,19 @@ const MLeafComponent = (
     const { text, tag, placeholder, autoOpen, triggerText } = (props?.leaf ||
       {}) as any;
     const { enable, tagTextRender } = props.tagInputProps || {};
+    debugInfo('MLeafComponent - 处理代码/标签', {
+      code: leaf.code,
+      tag,
+      enable,
+      hasTagTextRender: !!tagTextRender,
+    });
     if (enable && tag) {
+      debugInfo('MLeafComponent - 使用 TagPopup', {
+        text,
+        placeholder,
+        autoOpen,
+        triggerText,
+      });
       children = (
         <>
           <TagPopup
@@ -335,11 +377,20 @@ const MLeafComponent = (
             {...props.tagInputProps}
             text={text}
             onSelect={(v, path, tagNode) => {
+              debugInfo('MLeafComponent - TagPopup onSelect', {
+                value: v,
+                path,
+                hasTagNode: !!tagNode,
+              });
               if (!v) return;
               if (!path?.length) return;
               if (!markdownEditorRef.current) return;
 
               Editor.withoutNormalizing(markdownEditorRef.current, () => {
+                debugInfo('MLeafComponent - 更新标签节点', {
+                  value: v,
+                  path,
+                });
                 const newText =
                   tagTextRender?.(
                     {
@@ -411,6 +462,10 @@ const MLeafComponent = (
         </>
       );
     } else {
+      debugInfo('MLeafComponent - 使用内联代码样式', {
+        code: leaf.code,
+        tag: leaf.tag,
+      });
       children = (
         <code
           className={classNames(
@@ -424,41 +479,67 @@ const MLeafComponent = (
     }
   }
 
-  if (leaf.highColor) style.color = leaf.highColor;
-  if (leaf.color) style.color = leaf.color;
+  if (leaf.highColor) {
+    style.color = leaf.highColor;
+    debugInfo('MLeafComponent - 应用高亮颜色', { color: leaf.highColor });
+  }
+  if (leaf.color) {
+    style.color = leaf.color;
+    debugInfo('MLeafComponent - 应用颜色', { color: leaf.color });
+  }
   if (leaf.bold) {
     style.fontWeight = 'bold';
     children = <span data-testid="markdown-bold">{children}</span>;
+    debugInfo('MLeafComponent - 应用粗体');
   }
-  if (leaf.strikethrough) children = <s>{children}</s>;
-  if (leaf.italic) style.fontStyle = 'italic';
-  if (leaf.html)
+  if (leaf.strikethrough) {
+    children = <s>{children}</s>;
+    debugInfo('MLeafComponent - 应用删除线');
+  }
+  if (leaf.italic) {
+    style.fontStyle = 'italic';
+    debugInfo('MLeafComponent - 应用斜体');
+  }
+  if (leaf.html) {
     prefixClassName = classNames(
       prefixClassName,
       mdEditorBaseClass + '-m-html',
     );
+    debugInfo('MLeafComponent - 应用 HTML 样式');
+  }
   if (leaf.current) {
     style.background = '#f59e0b';
+    debugInfo('MLeafComponent - 应用当前高亮');
   }
 
   const selectFormat = () => {
     try {
+      debugInfo('MLeafComponent - selectFormat 调用');
       if (EditorUtils.isDirtLeaf(props.leaf)) {
         const path = ReactEditor.findPath(
           markdownEditorRef.current,
           props.text,
         );
+        debugInfo('MLeafComponent - 选择格式路径', { path });
         if (path) {
           Transforms.select(markdownEditorRef.current, {
             anchor: Editor.start(markdownEditorRef.current, path),
             focus: Editor.end(markdownEditorRef.current, path),
           });
+          debugInfo('MLeafComponent - 格式选择完成');
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      debugInfo('MLeafComponent - selectFormat 错误', { error: e });
+    }
   };
 
   const handleFncOpen = () => {
+    debugInfo('MLeafComponent - handleFncOpen', {
+      identifier: leaf?.identifier,
+      hasFncProps: !!props.fncProps,
+      hasOnOriginUrlClick: !!props.fncProps?.onOriginUrlClick,
+    });
     if (props.fncProps?.onOriginUrlClick) {
       props.fncProps.onOriginUrlClick(leaf?.identifier);
     }
@@ -520,27 +601,39 @@ const MLeafComponent = (
       draggable={false}
       onDragStart={dragStart}
       onClick={(e) => {
+        debugInfo('MLeafComponent - onClick 事件', {
+          isMobile,
+          hasFnc,
+          detail: e.detail,
+          hasUrl: !!leaf.url,
+        });
         // 在手机上，如果是 fnc，阻止点击事件（使用长按代替）
         if (isMobile && hasFnc) {
+          debugInfo('MLeafComponent - 移动端阻止 fnc 点击');
           e.preventDefault();
           return;
         }
         if (e.detail === 2) {
+          debugInfo('MLeafComponent - 双击选择格式');
           selectFormat();
         }
         if (props.fncProps?.onOriginUrlClick) {
+          debugInfo('MLeafComponent - 触发 fnc 点击');
           props.fncProps.onOriginUrlClick(leaf?.identifier);
         }
         if (props.linkConfig?.onClick) {
           const res = props.linkConfig?.onClick(leaf.url);
+          debugInfo('MLeafComponent - 链接点击处理', { result: res });
           if (res === false) {
             return;
           }
         }
         if (leaf.url && props.linkConfig?.openInNewTab !== false) {
+          debugInfo('MLeafComponent - 新标签页打开链接', { url: leaf.url });
           window.open(leaf.url, '_blank');
         }
         if (leaf.url && props.linkConfig?.openInNewTab === false) {
+          debugInfo('MLeafComponent - 当前窗口打开链接', { url: leaf.url });
           window.location.href = leaf.url;
         }
       }}
@@ -573,6 +666,10 @@ const MLeafComponent = (
     </span>
   );
   if (props.fncProps?.render && (leaf.fnc || leaf.identifier)) {
+    debugInfo('MLeafComponent - 使用 fnc 自定义渲染', {
+      hasFnc: !!leaf.fnc,
+      hasIdentifier: !!leaf.identifier,
+    });
     dom = (
       <>
         {props.fncProps.render?.(
@@ -589,8 +686,15 @@ const MLeafComponent = (
       </>
     );
   }
-  if (!props.leaf.comment) return dom;
+  if (!props.leaf.comment) {
+    debugInfo('MLeafComponent - 返回 DOM（无评论）');
+    return dom;
+  }
 
+  debugInfo('MLeafComponent - 返回带评论的 DOM', {
+    commentId: props.leaf?.id,
+    hasCommentItem: !!leaf?.comment,
+  });
   return (
     <CommentView
       id={`comment-${props.leaf?.id}`}
