@@ -16,11 +16,11 @@ export default defineConfig({
     testTimeout: 500000,
     alias: {
       '@ant-design/agentic-ui': path.resolve(__dirname, './src'),
-      '@schema-editor/host-sdk/core': path.resolve(
+      '@schema-element-editor/host-sdk/core': path.resolve(
         __dirname,
         './tests/_mocks_/schemaEditorHostSdkMock.ts',
       ),
-      '@schema-editor/host-sdk': path.resolve(
+      '@schema-element-editor/host-sdk': path.resolve(
         __dirname,
         './tests/_mocks_/schemaEditorHostSdkMock.ts',
       ),

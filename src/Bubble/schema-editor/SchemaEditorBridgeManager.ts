@@ -1,5 +1,8 @@
-import type { SchemaValue } from '@schema-editor/host-sdk/core';
-import { createSchemaEditorBridge } from '@schema-editor/host-sdk/core';
+import type {
+  SchemaElementEditorBridge,
+  SchemaValue,
+} from '@schema-element-editor/host-sdk/core';
+import { createSchemaElementEditorBridge } from '@schema-element-editor/host-sdk/core';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { MarkdownEditor } from '../../MarkdownEditor';
@@ -53,8 +56,8 @@ export class SchemaEditorBridgeManager {
   /** Bubble 处理器注册表：id -> handler */
   private registry: Map<string, BubbleHandler> = new Map();
 
-  /** Bridge 清理函数 */
-  private cleanup: (() => void) | null = null;
+  /** Bridge 实例 */
+  private bridge: SchemaElementEditorBridge | null = null;
 
   /** 是否启用 */
   private enabled: boolean = false;
@@ -144,9 +147,9 @@ export class SchemaEditorBridgeManager {
    * 启动 Bridge（幂等，已启动时直接返回）
    */
   private startBridge(): void {
-    if (this.cleanup) return;
+    if (this.bridge) return;
 
-    this.cleanup = createSchemaEditorBridge({
+    this.bridge = createSchemaElementEditorBridge({
       getSchema: (params: string) => {
         const handler = this.registry.get(params);
         if (!handler) {
@@ -197,9 +200,9 @@ export class SchemaEditorBridgeManager {
    * 停止 Bridge
    */
   private stopBridge(): void {
-    if (this.cleanup) {
-      this.cleanup();
-      this.cleanup = null;
+    if (this.bridge) {
+      this.bridge.cleanup();
+      this.bridge = null;
     }
   }
 
