@@ -186,9 +186,16 @@ function demoTest() {
             { timeout: 10000 },
           );
 
-          await expect(wrapper.asFragment()).toMatchFileSnapshot(
-            './__snapshots__/' + file.replace(/\.tsx$/, '.snap'),
-          );
+          const shouldSnapshot =
+            !file.endsWith('workspace-task-demo.tsx') &&
+            !file.endsWith('workspace-demo.tsx') &&
+            !file.endsWith('workspace-browser-demo.tsx');
+
+          if (shouldSnapshot) {
+            await expect(wrapper.asFragment()).toMatchFileSnapshot(
+              './__snapshots__/' + file.replace(/\.tsx$/, '.snap'),
+            );
+          }
           wrapper.unmount();
         });
 

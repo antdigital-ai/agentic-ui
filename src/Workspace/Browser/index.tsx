@@ -189,11 +189,17 @@ export const BrowserList: React.FC<BrowserListProps> = ({
   const { prefixCls, wrapSSR, hashId } = useBrowserContext();
   const { locale } = useContext(I18nContext);
 
-  const mergedEmptyText = emptyText || locale['browser.noResults'];
-  const mergedLoadingText = loadingText || locale['browser.searching'];
+  const safeItems = Array.isArray(items) ? items : [];
+
+  const mergedEmptyText =
+    emptyText || locale['browser.noResults'] || 'No results found';
+  const mergedLoadingText =
+    loadingText || locale['browser.searching'] || 'Searching...';
+  const totalResultsTemplate =
+    locale['browser.totalResults'] || 'Total ${count} results';
 
   return wrapSSR(
-    <div>
+    <div data-testid="browser-list">
       <header
         className={classNames(`${prefixCls}-header-wrapper`, hashId)}
         style={{
@@ -212,21 +218,21 @@ export const BrowserList: React.FC<BrowserListProps> = ({
 
               <Tag style={RESULT_COUNT_TAG_STYLE}>
                 {typeof countFormatter === 'function'
-                  ? countFormatter(items.length)
-                  : compileTemplate(locale['browser.totalResults'], {
-                      count: String(items.length),
+                  ? countFormatter(safeItems.length)
+                  : compileTemplate(totalResultsTemplate, {
+                      count: String(safeItems.length),
                     })}
               </Tag>
             </div>
           ))}
       </header>
       <List
-        dataSource={items}
+        dataSource={safeItems}
         split={false}
         loading={false}
         locale={{
           emptyText:
-            loading && items.length === 0 ? (
+            loading && safeItems.length === 0 ? (
               <div style={{ padding: '48px 0', textAlign: 'center' }}>
                 <Spin />
                 <div style={{ marginTop: 8 }}>{mergedLoadingText}</div>
@@ -302,6 +308,9 @@ const Browser: React.FC<BrowserProps> = ({
     setCurrentView('results');
   };
 
+  const totalResultsTemplate =
+    locale['browser.totalResults'] || 'Total ${count} results';
+
   return wrapSSR(
     <div>
       {currentView === 'suggestions' && (
@@ -321,7 +330,7 @@ const Browser: React.FC<BrowserProps> = ({
                     >
                       {typeof countFormatter === 'function'
                         ? countFormatter(item.count)
-                        : compileTemplate(locale['browser.totalResults'], {
+                        : compileTemplate(totalResultsTemplate, {
                             count: String(item.count),
                           })}
                     </Tag>

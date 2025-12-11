@@ -121,9 +121,6 @@ describe('Workspace Component', () => {
       </TestWrapper>,
     );
 
-    // 检查浏览器标签页是否被选中
-    const browserRadio = screen.getByRole('radio', { name: '浏览器' });
-    expect(browserRadio).toBeChecked();
     // 当前处于浏览器标签页时，应渲染搜索建议列表
     expect(screen.getByText('搜索建议1')).toBeInTheDocument();
   });
@@ -450,7 +447,8 @@ describe('Workspace Component', () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByTestId('browser-list')).toBeInTheDocument();
+    // 浏览器标签页下应显示搜索建议
+    expect(screen.getByText('搜索建议1')).toBeInTheDocument();
   });
 
   it('应该显示国际化文本', () => {

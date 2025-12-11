@@ -41,9 +41,9 @@ importers:
       '@juggle/resize-observer':
         specifier: ^3.4.0
         version: 3.4.0
-      '@schema-editor/host-sdk':
-        specifier: ^1.2.0
-        version: 1.2.0(react@18.3.1)
+      '@schema-element-editor/host-sdk':
+        specifier: ^2.0.0
+        version: 2.0.0(react@18.3.1)
       '@sofa-design/icons':
         specifier: ^1.6.1
         version: 1.6.1(react@18.3.1)
@@ -2126,8 +2126,8 @@ packages:
   '@rushstack/ts-command-line@4.21.0':
     resolution: {integrity: sha512-z38FLUCn8M9FQf19gJ9eltdwkvc47PxvJmVZS6aKwbBAa3Pis3r3A+ZcBCVPNb9h/Tbga+i0tHdzoSGUoji9GQ==}
 
-  '@schema-editor/host-sdk@1.2.0':
-    resolution: {integrity: sha512-y7Hxe57LRFk4bnfUPBY+Fykd0o4p2mo+0MTyjJNVe4PC9tpcCG4AyH51YAhCl2Ck56dO5ILLdq/Ci7QKIitxtg==}
+  '@schema-element-editor/host-sdk@2.0.0':
+    resolution: {integrity: sha512-XuhTf6TtY8wj/qPsDAqgTZVA2vPacPweIoXDx2OtGaZTiiyhpqYnm/RKWo30nHleo55J0iVw0HB6qayqKWm4Rw==}
     peerDependencies:
       react: '>=17.0.0'
       vue: '>=3.0.0'
@@ -11473,7 +11473,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@schema-editor/host-sdk@1.2.0(react@18.3.1)':
+  '@schema-element-editor/host-sdk@2.0.0(react@18.3.1)':
     optionalDependencies:
       react: 18.3.1
 
