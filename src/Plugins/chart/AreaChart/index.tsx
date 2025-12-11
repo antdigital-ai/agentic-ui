@@ -434,6 +434,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
         borderWidth: 3,
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   const handleDownload = () => {

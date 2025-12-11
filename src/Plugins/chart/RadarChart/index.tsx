@@ -629,6 +629,9 @@ const RadarChart: React.FC<RadarChartProps> = ({
         hoverRadius: isMobile ? 4 : 6,
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   const handleDownload = () => {

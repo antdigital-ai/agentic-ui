@@ -669,7 +669,7 @@ describe('Bubble', () => {
   });
 
   describe('Schema Editor Bridge', () => {
-    it('should handle originData with originContent for editing', () => {
+    it('should render normally when originContent exists but content is string', () => {
       const propsWithOriginContent = {
         ...defaultProps,
         id: 'msg-with-origin',
@@ -689,7 +689,7 @@ describe('Bubble', () => {
         </BubbleConfigProvide>,
       );
 
-      /** 消息应该正常渲染 */
+      /** 消息应该正常渲染，使用 string content */
       expect(screen.getByTestId('chat-message')).toBeInTheDocument();
     });
 
@@ -733,7 +733,11 @@ describe('Bubble', () => {
       expect(screen.getByTestId('chat-message')).toBeInTheDocument();
     });
 
-    it('should use originContent when both originContent and content exist', () => {
+    it('should only process string content, ignore originContent', () => {
+      /**
+       * 当前实现只处理 string 类型的 content
+       * originContent 不参与 Schema Editor Bridge 的处理
+       */
       const propsWithBothContent = {
         ...defaultProps,
         id: 'msg-both',
@@ -753,11 +757,13 @@ describe('Bubble', () => {
         </BubbleConfigProvide>,
       );
 
-      /** 组件应该正常渲染 */
+      /** 组件应该正常渲染，使用 string content */
       expect(screen.getByTestId('chat-message')).toBeInTheDocument();
+      /** 验证渲染的是 content 而不是 originContent */
+      expect(screen.getByText('Display content')).toBeInTheDocument();
     });
 
-    it('should handle content without originContent', () => {
+    it('should handle string content without originContent', () => {
       const propsWithContentOnly = {
         ...defaultProps,
         id: 'msg-content-only',
@@ -777,6 +783,37 @@ describe('Bubble', () => {
       );
 
       /** 组件应该正常渲染 */
+      expect(screen.getByTestId('chat-message')).toBeInTheDocument();
+    });
+
+    it('should not process non-string content via Schema Editor Bridge', () => {
+      /**
+       * 验证 Schema Editor Bridge 只处理 string 类型的 content
+       * 通过检查 isStringContent 逻辑：typeof content === 'string'
+       *
+       * 注意：当 content 不是 string 时，Bubble 组件不会通过 Schema Editor Bridge 处理
+       * 但下游 MarkdownEditor 可能仍需要 string 类型，这是调用方的责任
+       */
+      const propsWithNullContent = {
+        ...defaultProps,
+        id: 'msg-null-content',
+        originData: {
+          content: null as any,
+          createAt: 1716537600000,
+          id: 'msg-null-content',
+          role: 'assistant' as const,
+          updateAt: 1716537600000,
+          isFinished: false, // 模拟加载中状态，避免触发 Markdown 解析
+        },
+      };
+
+      render(
+        <BubbleConfigProvide>
+          <Bubble {...propsWithNullContent} />
+        </BubbleConfigProvide>,
+      );
+
+      /** 组件应该正常渲染（显示加载状态） */
       expect(screen.getByTestId('chat-message')).toBeInTheDocument();
     });
   });

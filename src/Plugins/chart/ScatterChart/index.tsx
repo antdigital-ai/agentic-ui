@@ -675,6 +675,9 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         hoverRadius: isMobile ? 6 : 8,
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   const handleDownload = () => {

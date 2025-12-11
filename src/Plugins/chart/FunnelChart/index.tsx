@@ -552,6 +552,9 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
         border: { display: false },
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   const handleDownload = () => downloadChart(chartRef.current, 'funnel-chart');

@@ -920,6 +920,9 @@ const BarChart: React.FC<BarChartProps> = ({
         },
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   // 合并外部传入的选项与默认选项

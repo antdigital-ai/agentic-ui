@@ -1,11 +1,10 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
-import React, { CSSProperties, useContext, useRef } from 'react';
+import React, { CSSProperties, useContext } from 'react';
 import { Editor, Path, Transforms } from 'slate';
 
 import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 import { I18nContext } from '../../../I18n';
-import { isMobileDevice } from '../../../MarkdownInputField/AttachmentButton/utils';
 import { debugInfo } from '../../../Utils/debugUtils';
 import { MarkdownEditorProps } from '../../types';
 import { useEditorStore } from '../store';
@@ -14,7 +13,8 @@ import { Blockquote } from './Blockquote';
 import { Break } from './Break';
 import { WarpCard } from './Card';
 import { Code } from './Code';
-import { CommentView } from './Comment';
+import { CommentLeaf } from './CommentLeaf';
+import { FncLeaf } from './FncLeaf';
 import { FootnoteDefinition } from './FootnoteDefinition';
 import { FootnoteReference } from './FootnoteReference';
 import { Head } from './Head';
@@ -43,7 +43,7 @@ import { TagPopup } from './TagPopup';
  * 性能测试结果显示约 43% 的渲染性能提升，在相同 props 的情况下避免了重复渲染。
  */
 
-const dragStart = (e: React.DragEvent) => {
+export const dragStart = (e: React.DragEvent) => {
   e.preventDefault();
   e.stopPropagation();
 };
@@ -330,8 +330,7 @@ const MLeafComponent = (
     linkConfig: MarkdownEditorProps['linkConfig'];
   },
 ) => {
-  const { markdownEditorRef, markdownContainerRef, setShowComment } =
-    useEditorStore();
+  const { markdownEditorRef, markdownContainerRef } = useEditorStore();
   const context = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
   const mdEditorBaseClass = context?.getPrefixCls('agentic-md-editor-content');
@@ -534,67 +533,46 @@ const MLeafComponent = (
     }
   };
 
-  const handleFncOpen = () => {
-    debugInfo('MLeafComponent - handleFncOpen', {
-      identifier: leaf?.identifier,
-      hasFncProps: !!props.fncProps,
-      hasOnOriginUrlClick: !!props.fncProps?.onOriginUrlClick,
+  // 如果检测到 fnc、identifier 或 fnd，使用 FncLeaf 组件
+  const hasFnc = leaf.fnc || leaf.identifier || leaf.fnd;
+  const hasComment = !!leaf.comment;
+
+  if (hasFnc) {
+    debugInfo('MLeafComponent - 使用 FncLeaf 组件', {
+      hasFnc: !!leaf.fnc,
+      hasIdentifier: !!leaf.identifier,
+      hasFnd: !!leaf.fnd,
     });
-    if (props.fncProps?.onOriginUrlClick) {
-      props.fncProps.onOriginUrlClick(leaf?.identifier);
+    const baseClassName = classNames(prefixClassName?.trim(), props.hashId);
+    const fncDom = (
+      <FncLeaf
+        {...props}
+        hashId={props.hashId}
+        fncProps={props.fncProps}
+        linkConfig={props.linkConfig}
+        style={style}
+        prefixClassName={baseClassName}
+      />
+    );
+
+    // 如果有评论，使用 CommentLeaf 包裹 fnc DOM
+    if (hasComment) {
+      return (
+        <CommentLeaf
+          leaf={props.leaf}
+          hashId={props.hashId}
+          comment={props.comment}
+        >
+          {fncDom}
+        </CommentLeaf>
+      );
     }
-  };
+    return fncDom;
+  }
 
-  const isMobile = isMobileDevice();
-  const hasFnc = leaf.fnc || leaf.identifier;
+  const baseClassName = classNames(prefixClassName?.trim(), props.hashId);
 
-  // 长按处理：用于手机端打开 fnc
-  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const touchStartTimeRef = useRef<number>(0);
-  const isLongPressRef = useRef<boolean>(false);
-
-  const handleTouchStart = () => {
-    if (!hasFnc) return;
-
-    isLongPressRef.current = false;
-    touchStartTimeRef.current = Date.now();
-
-    longPressTimerRef.current = setTimeout(() => {
-      isLongPressRef.current = true;
-      handleFncOpen();
-    }, 500); // 500ms 长按时间
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!hasFnc) return;
-
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-
-    // 如果是短按（小于 500ms），在手机上阻止默认行为
-    const touchDuration = Date.now() - touchStartTimeRef.current;
-    if (touchDuration < 500 && isMobile) {
-      e.preventDefault();
-    }
-  };
-
-  const handleTouchCancel = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-    isLongPressRef.current = false;
-  };
-
-  const fncClassName = classNames(prefixClassName?.trim(), props.hashId, {
-    [`${mdEditorBaseClass}-fnc`]: leaf.fnc,
-    [`${mdEditorBaseClass}-fnd`]: leaf.fnd,
-    [`${mdEditorBaseClass}-comment`]: leaf.comment,
-  });
-
-  let dom = (
+  const dom = (
     <span
       {...props.attributes}
       data-be="text"
@@ -602,24 +580,12 @@ const MLeafComponent = (
       onDragStart={dragStart}
       onClick={(e) => {
         debugInfo('MLeafComponent - onClick 事件', {
-          isMobile,
-          hasFnc,
           detail: e.detail,
           hasUrl: !!leaf.url,
         });
-        // 在手机上，如果是 fnc，阻止点击事件（使用长按代替）
-        if (isMobile && hasFnc) {
-          debugInfo('MLeafComponent - 移动端阻止 fnc 点击');
-          e.preventDefault();
-          return;
-        }
         if (e.detail === 2) {
           debugInfo('MLeafComponent - 双击选择格式');
           selectFormat();
-        }
-        if (props.fncProps?.onOriginUrlClick) {
-          debugInfo('MLeafComponent - 触发 fnc 点击');
-          props.fncProps.onOriginUrlClick(leaf?.identifier);
         }
         if (props.linkConfig?.onClick) {
           const res = props.linkConfig?.onClick(leaf.url);
@@ -637,76 +603,28 @@ const MLeafComponent = (
           window.location.href = leaf.url;
         }
       }}
-      onTouchStart={hasFnc ? handleTouchStart : undefined}
-      onTouchEnd={hasFnc ? handleTouchEnd : undefined}
-      onTouchCancel={hasFnc ? handleTouchCancel : undefined}
-      contentEditable={leaf.fnc ? false : undefined}
-      data-fnc={leaf.fnc || leaf.identifier ? 'fnc' : undefined}
-      data-fnd={leaf.fnd ? 'fnd' : undefined}
       data-comment={leaf.comment ? 'comment' : undefined}
-      data-fnc-name={
-        leaf.fnc ? leaf.text?.replace(/\[\^(.+)]:?/g, '$1') : undefined
-      }
       data-url={leaf.url ? 'url' : undefined}
-      data-fnd-name={
-        leaf.fnd ? leaf.text?.replace(/\[\^(.+)]:?/g, '$1') : undefined
-      }
-      className={fncClassName ? fncClassName : undefined}
-      style={{
-        fontSize: leaf.fnc ? 10 : undefined,
-        ...style,
-      }}
+      className={baseClassName ? baseClassName : undefined}
+      style={style}
     >
-      {leaf.fnc || leaf.identifier
-        ? leaf.text
-            ?.replaceAll(']', '')
-            ?.replaceAll('[^DOC_', '')
-            ?.replaceAll('[^', '')
-        : children}
+      {children}
     </span>
   );
-  if (props.fncProps?.render && (leaf.fnc || leaf.identifier)) {
-    debugInfo('MLeafComponent - 使用 fnc 自定义渲染', {
-      hasFnc: !!leaf.fnc,
-      hasIdentifier: !!leaf.identifier,
-    });
-    dom = (
-      <>
-        {props.fncProps.render?.(
-          {
-            ...leaf,
-            children:
-              leaf.text
-                ?.toLocaleUpperCase()
-                ?.replaceAll('[^', '')
-                .replaceAll(']', '') || '',
-          },
-          dom,
-        )}
-      </>
+
+  // 如果有评论，使用 CommentLeaf 包裹普通 DOM
+  if (hasComment) {
+    return (
+      <CommentLeaf
+        leaf={props.leaf}
+        hashId={props.hashId}
+        comment={props.comment}
+      >
+        {dom}
+      </CommentLeaf>
     );
   }
-  if (!props.leaf.comment) {
-    debugInfo('MLeafComponent - 返回 DOM（无评论）');
-    return dom;
-  }
-
-  debugInfo('MLeafComponent - 返回带评论的 DOM', {
-    commentId: props.leaf?.id,
-    hasCommentItem: !!leaf?.comment,
-  });
-  return (
-    <CommentView
-      id={`comment-${props.leaf?.id}`}
-      comment={props.comment}
-      hashId={props.hashId}
-      selection={leaf?.selection}
-      commentItem={leaf?.comment ? (leaf.data as any) : null}
-      setShowComment={setShowComment}
-    >
-      {dom}
-    </CommentView>
-  );
+  return dom;
 };
 
 // 使用 React.memo 优化 MLeaf 组件的性能

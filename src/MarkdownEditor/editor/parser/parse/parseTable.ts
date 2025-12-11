@@ -258,12 +258,20 @@ export const parseTableOrChart = (
   // 如果 chartConfig 是对象且键都是数字（如 {0: {...}}），转换为数组
   chartConfig = convertObjectToArray(chartConfig);
 
-  const isChart =
-    (chartConfig as ChartTypeConfig)?.chartType ||
-    (Array.isArray(chartConfig) &&
-      (chartConfig?.[0] as ChartTypeConfig)?.chartType) ||
-    (config as ChartTypeConfig)?.chartType ||
-    (config as ChartTypeConfig)?.at?.(0)?.chartType;
+  // 获取 chartType，支持多种配置格式
+  const getChartType = (): string | undefined => {
+    return (
+      (chartConfig as ChartTypeConfig)?.chartType ||
+      (Array.isArray(chartConfig) &&
+        (chartConfig?.[0] as ChartTypeConfig)?.chartType) ||
+      (config as ChartTypeConfig)?.chartType ||
+      (config as ChartTypeConfig)?.at?.(0)?.chartType
+    );
+  };
+
+  const chartType = getChartType();
+  // 如果 chartType 为 "table"，将其视为不存在，按普通表格处理
+  const isChart = chartType && chartType !== 'table';
 
   // 计算合并单元格信息
   const mergeCells = (config as CodeNode['otherProps'])?.mergeCells || [];

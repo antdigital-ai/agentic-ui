@@ -33,7 +33,8 @@ describe('ThinkBlock', () => {
     it('应该显示思考块的内容', () => {
       render(<ThinkBlock element={mockCodeNode} />);
 
-      expect(screen.getByText('这是一个思考块的内容')).toBeInTheDocument();
+      const container = screen.getByTestId('tool-use-bar-think-container');
+      expect(container).toHaveTextContent('这是一个思考块的内容');
     });
 
     it('应该正确渲染空内容的思考块', () => {
@@ -83,7 +84,8 @@ describe('ThinkBlock', () => {
 
       render(<ThinkBlock element={specialCharCodeNode} />);
 
-      expect(screen.getByText('特殊字符: <>&"\'')).toBeInTheDocument();
+      const container = screen.getByTestId('tool-use-bar-think-container');
+      expect(container).toHaveTextContent('特殊字符: <>&"\'');
     });
 
     it('应该正确处理包含 HTML 标签的内容', () => {
@@ -109,7 +111,8 @@ describe('ThinkBlock', () => {
 
       render(<ThinkBlock element={longCodeNode} />);
 
-      expect(screen.getByText(longText)).toBeInTheDocument();
+      const container = screen.getByTestId('tool-use-bar-think-container');
+      expect(container).toHaveTextContent(longText);
     });
   });
 

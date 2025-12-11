@@ -1,6 +1,6 @@
-import { ConfigProvider, Skeleton } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ReactEditor, RenderElementProps, useSlate } from 'slate-react';
 import { TableNode } from '../../types/Table';
 import { useTableStyle } from './style';
@@ -16,59 +16,55 @@ export const SimpleTable = (props: RenderElementProps) => {
   const baseCls = getPrefixCls('agentic-md-editor-content-table');
   const editor = useSlate();
   const { wrapSSR, hashId } = useTableStyle(baseCls, {});
-  const [showAsText, setShowAsText] = useState(false);
-  const tableNode = props.element as TableNode;
 
   const tablePath = useMemo(
     () => ReactEditor.findPath(editor, props.element),
     [props.element],
   );
 
-  // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
-  useEffect(() => {
-    if (tableNode.finished === false) {
-      setShowAsText(false);
-      const timer = setTimeout(() => {
-        setShowAsText(true);
-      }, 5000);
+  // // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
+  // useEffect(() => {
+  //   if (tableNode.finished === false) {
+  //     setShowAsText(false);
+  //     const timer = setTimeout(() => {
+  //       setShowAsText(true);
+  //     }, 5000);
 
-      return () => {
-        clearTimeout(timer);
-      };
-    } else {
-      setShowAsText(false);
-    }
-  }, [tableNode.finished]);
+  //     return () => {
+  //       clearTimeout(timer);
+  //     };
+  //   } else {
+  //     setShowAsText(false);
+  //   }
+  // }, [tableNode.finished]);
 
-  // 如果是不完整状态
-  if (tableNode.finished === false) {
-    // 如果 5 秒后仍未完成，显示为文本
-    if (showAsText) {
-      return (
-        <div {...props.attributes}>
-          <div
-            style={{
-              padding: '8px 12px',
-              border: '1px solid #d9d9d9',
-              borderRadius: '4px',
-              color: 'rgba(0, 0, 0, 0.65)',
-              wordBreak: 'break-all',
-            }}
-          >
-            表格链接
-          </div>
-          {props.children}
-        </div>
-      );
-    }
-    // 5 秒内显示加载骨架屏
-    return (
-      <div {...props.attributes}>
-        <Skeleton active paragraph={{ rows: 3 }} />
-        {props.children}
-      </div>
-    );
-  }
+  // // 如果是不完整状态
+  // if (tableNode.finished === false) {
+  //   // 如果 5 秒后仍未完成，显示为文本
+  //   if (showAsText) {
+  //     return (
+  //       <div {...props.attributes}>
+  //         <div
+  //           style={{
+  //             padding: '8px 12px',
+  //             border: '1px solid #d9d9d9',
+  //             borderRadius: '4px',
+  //             color: 'rgba(0, 0, 0, 0.65)',
+  //             wordBreak: 'break-all',
+  //           }}
+  //         ></div>
+  //         {props.children}
+  //       </div>
+  //     );
+  //   }
+  //   // 5 秒内显示加载骨架屏
+  //   return (
+  //     <div {...props.attributes}>
+  //       <Skeleton active paragraph={{ rows: 3 }} />
+  //       {props.children}
+  //     </div>
+  //   );
+  // }
 
   return wrapSSR(
     <TablePropsProvider

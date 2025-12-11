@@ -11,7 +11,7 @@ import { DragHandle } from '../../tools/DragHandle';
 export const Paragraph = (props: ElementProps<ParagraphNode>) => {
   debugInfo('Paragraph - 渲染段落', {
     align: props.element.align,
-    childrenCount: props.element.children?.length,
+    children: props.element.children,
   });
   const {
     store,

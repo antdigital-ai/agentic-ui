@@ -314,6 +314,9 @@ const LineChart: React.FC<LineChartProps> = ({
         borderWidth: 3,
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   const handleDownload = () => {

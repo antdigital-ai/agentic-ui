@@ -522,7 +522,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
               },
             },
             animation: {
-              duration: isMobile ? 200 : 1000,
+              duration: isMobile ? 200 : 400,
             },
             interaction: {
               mode: 'point',

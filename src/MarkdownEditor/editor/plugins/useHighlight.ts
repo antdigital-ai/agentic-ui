@@ -2,9 +2,12 @@ import { Editor, Element, Node, NodeEntry, Path, Range } from 'slate';
 import { EditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
 
-const htmlReg = /<[a-z]+[\s"'=:;()\w\-[\]/.]*\/?>(.*<\/[a-z]+>:?)?/g;
-const linkReg =
+// 预编译正则表达式，避免重复创建
+const HTML_REG = /<[a-z]+[\s"'=:;()\w\-[\]/.]*\/?>(.*<\/[a-z]+>:?)?/g;
+const LINK_REG =
   /(https?|ftp):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gi;
+const FOOTNOTE_REG = /\[\^[^\]]+\]/g;
+const TABLE_ROW_REG = /^\|([^|]+\|)+$/;
 
 export const cacheTextNode = new WeakMap<
   object,
@@ -18,9 +21,10 @@ export const clearInlineKatex = (editor: Editor) => {
       at: [],
     }),
   );
-  inlineMath.map((c) => cacheTextNode.delete(c[0]));
+  inlineMath.forEach((c) => cacheTextNode.delete(c[0]));
 };
 
+const PARAGRAPH_TYPES = new Set(['paragraph', 'table-cell']);
 const highlightNodes = new Set([
   'paragraph',
   'table-cell',
@@ -30,105 +34,151 @@ const highlightNodes = new Set([
   'inline-katex',
 ]);
 
+// 创建 range 对象的工厂函数，复用 path 数组
+const createRange = (
+  path: Path,
+  childIndex: number,
+  offset: number,
+  length: number,
+  props: Record<string, any> = {},
+) => {
+  const childPath = path.concat(childIndex);
+  return {
+    anchor: { path: childPath, offset },
+    focus: { path: childPath, offset: offset + length },
+    ...props,
+  };
+};
+
+// 处理文本节点的匹配逻辑
+const processTextMatches = (
+  text: string,
+  path: Path,
+  childIndex: number,
+): any[] => {
+  const ranges: any[] = [];
+
+  // 匹配 footnote reference
+  let match: RegExpMatchArray | null;
+  FOOTNOTE_REG.lastIndex = 0;
+  while ((match = FOOTNOTE_REG.exec(text)) !== null) {
+    const index = match.index;
+    if (typeof index === 'number') {
+      ranges.push(
+        createRange(path, childIndex, index, match[0].length, {
+          fnc: true,
+          fnd: false,
+        }),
+      );
+    }
+  }
+
+  // 匹配 HTML
+  HTML_REG.lastIndex = 0;
+  while ((match = HTML_REG.exec(text)) !== null) {
+    const index = match.index;
+    if (typeof index === 'number') {
+      ranges.push(
+        createRange(path, childIndex, index, match[0].length, {
+          html: true,
+        }),
+      );
+    }
+  }
+
+  return ranges;
+};
+
+// 处理链接匹配
+const processLinkMatches = (
+  text: string,
+  path: Path,
+  childIndex: number,
+): any[] => {
+  const ranges: any[] = [];
+  let match: RegExpMatchArray | null;
+
+  LINK_REG.lastIndex = 0;
+  while ((match = LINK_REG.exec(text)) !== null) {
+    const index = match.index;
+    if (typeof index === 'number') {
+      ranges.push(
+        createRange(path, childIndex, index, match[0].length, {
+          link: match[0],
+        }),
+      );
+    }
+  }
+
+  return ranges;
+};
+
 export function useHighlight(store?: EditorStore) {
   return ([node, path]: NodeEntry): Range[] => {
-    if (Element.isElement(node) && highlightNodes.has(node.type)) {
-      const ranges = store?.highlightCache.get(node) || [];
-      const cacheText = cacheTextNode.get(node);
-      // footnote
-      if (['paragraph', 'table-cell'].includes(node.type)) {
-        for (let i = 0; i < node.children.length; i++) {
-          const c = node.children[i];
-          if (c.text && !EditorUtils.isDirtLeaf(c)) {
-            if (cacheText && Path.equals(cacheText.path, path)) {
-              ranges.push(...cacheText.range);
-            } else {
-              let textRanges: any[] = [];
-              const matchHtml = c.text.matchAll(htmlReg);
-              for (let m of matchHtml) {
-                textRanges.push({
-                  anchor: { path: [...path, i], offset: m.index },
-                  focus: {
-                    path: [...path, i],
-                    offset: m.index + m[0].length,
-                  },
-                  html: true,
-                });
-              }
-              const match = c.text.matchAll(/\[\^.+?]:?/g);
-              for (let m of match) {
-                if (typeof m.index !== 'number') continue;
-                textRanges.push({
-                  anchor: { path: [...path, i], offset: m.index },
-                  focus: {
-                    path: [...path, i],
-                    offset: m.index + m[0].length,
-                  },
-                  fnc: !m[0].endsWith(':'),
-                  fnd: m[0].endsWith(':'),
-                });
-              }
-              cacheTextNode.set(node, { path, range: textRanges });
-              ranges.push(...textRanges);
-            }
-          }
-          if (c.text && !c.url && !c.docId && !c.hash) {
-            let textRanges: any[] = [];
-            const links = (c.text as string).matchAll(linkReg);
-            for (let m of links) {
-              textRanges.push({
-                anchor: { path: [...path, i], offset: m.index },
-                focus: {
-                  path: [...path, i],
-                  offset: m.index! + m[0].length,
-                },
-                link: m[0],
-              });
-            }
-            ranges.push(...textRanges);
-          }
-        }
-      }
-      if (
-        node.type === 'paragraph' &&
-        node.children.length === 1 &&
-        !EditorUtils.isDirtLeaf(node.children[0])
-      ) {
-        if (cacheText && Path.equals(cacheText.path, path)) {
-          ranges.push(...cacheText.range);
-        } else {
-          const str = Node.string(node);
-          if (str.startsWith('```')) {
-            ranges.push({
-              anchor: {
-                path: [...path, 0],
-                offset: 0,
-              },
-              focus: {
-                path: [...path, 0],
-                offset: 3,
-              },
-              color: '#a3a3a3',
-            });
-            cacheTextNode.set(node, { path, range: ranges });
-          } else if (/^\|([^|]+\|)+$/.test(str)) {
-            ranges.push({
-              anchor: {
-                path: [...path, 0],
-                offset: 0,
-              },
-              focus: {
-                path: [...path, 0],
-                offset: str.length,
-              },
-              color: '#a3a3a3',
-            });
-            cacheTextNode.set(node, { path, range: ranges });
-          }
-        }
-      }
-      return ranges;
+    // 快速路径：非元素节点或不在高亮节点列表中
+    if (!Element.isElement(node) || !highlightNodes.has(node.type)) {
+      return [];
     }
-    return [];
+
+    const ranges = store?.highlightCache.get(node) || [];
+    const cacheText = cacheTextNode.get(node);
+    const isCached = cacheText && Path.equals(cacheText.path, path);
+
+    // 处理 paragraph 和 table-cell
+    if (PARAGRAPH_TYPES.has(node.type)) {
+      if (isCached) {
+        ranges.push(...cacheText.range);
+      } else {
+        const allTextRanges: any[] = [];
+        const children = node.children;
+        const childrenLength = children.length;
+
+        for (let i = 0; i < childrenLength; i++) {
+          const child = children[i];
+
+          // 处理 footnote 和 HTML
+          if (child.text && !EditorUtils.isDirtLeaf(child)) {
+            allTextRanges.push(...processTextMatches(child.text, path, i));
+          }
+
+          // 处理链接
+          if (child.text && !child.url && !child.docId && !child.hash) {
+            allTextRanges.push(...processLinkMatches(child.text, path, i));
+          }
+        }
+
+        // 统一缓存
+        cacheTextNode.set(node, { path, range: allTextRanges });
+        ranges.push(...allTextRanges);
+      }
+    }
+
+    // 处理特殊段落（代码块或表格行）
+    if (
+      node.type === 'paragraph' &&
+      node.children.length === 1 &&
+      !EditorUtils.isDirtLeaf(node.children[0])
+    ) {
+      if (isCached) {
+        ranges.push(...cacheText.range);
+      } else {
+        const str = Node.string(node);
+        const strLength = str.length;
+
+        if (str.startsWith('```')) {
+          const range = createRange(path, 0, 0, 3, { color: '#a3a3a3' });
+          ranges.push(range);
+          cacheTextNode.set(node, { path, range: [range] });
+        } else if (TABLE_ROW_REG.test(str)) {
+          const range = createRange(path, 0, 0, strLength, {
+            color: '#a3a3a3',
+          });
+          ranges.push(range);
+          cacheTextNode.set(node, { path, range: [range] });
+        }
+      }
+    }
+
+    return ranges;
   };
 }

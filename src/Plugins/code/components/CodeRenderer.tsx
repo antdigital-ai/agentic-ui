@@ -143,7 +143,7 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
 
     // 只读模式下的思考块特殊渲染
     if (shouldRenderAsThinkBlock) {
-      return <ThinkBlock element={props.element} />;
+      return <ThinkBlock {...props} />;
     }
 
     // 主要的代码编辑器渲染
