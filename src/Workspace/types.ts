@@ -1,8 +1,10 @@
 import React, { type ReactNode } from 'react';
 import type { MarkdownEditorProps } from '../MarkdownEditor';
-import type { BrowserItemInput } from './Browser';
+import type { BrowserProps as InternalBrowserProps } from './Browser';
 import type { RealtimeFollowData } from './RealtimeFollow';
 import type { TaskItem, TaskItemInput } from './Task';
+
+export type { BrowserItem, BrowserSuggestion } from './Browser';
 
 // 标签页配置
 export interface TabConfiguration {
@@ -45,9 +47,8 @@ export interface RealtimeProps extends BaseChildProps {
   data?: RealtimeFollowData;
 }
 
-export interface BrowserProps extends BaseChildProps {
-  data?: BrowserItemInput;
-}
+// Browser 使用 Browser 组件自身的 props 类型，并额外支持 tab 配置
+export interface BrowserProps extends BaseChildProps, InternalBrowserProps {}
 
 export interface TaskProps extends BaseChildProps {
   data?: TaskItemInput;
@@ -55,6 +56,7 @@ export interface TaskProps extends BaseChildProps {
   onItemClick?: (item: TaskItem) => void;
 }
 
+// ... (rest of the file content unchanged)
 // 文件类型分类
 export enum FileCategory {
   Text = 'text',

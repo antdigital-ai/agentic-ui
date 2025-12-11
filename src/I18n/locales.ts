@@ -364,6 +364,10 @@ export const cnLabels = {
   // Upload related
   'upload.notConfigured': '图片上传功能未配置',
   'upload.failed': '图片上传失败',
+  'browser.noResults': '暂无结果',
+  'browser.totalResults': '共${count}个结果',
+  'browser.searching': '搜索中',
+  'layout.header.title': 'AI 助手',
 };
 
 /**
@@ -737,4 +741,8 @@ export const enLabels: typeof cnLabels = {
   // Upload related
   'upload.notConfigured': 'Image upload function not configured',
   'upload.failed': 'Image upload failed',
+  'browser.noResults': 'No results found',
+  'browser.totalResults': 'Total ${count} results',
+  'browser.searching': 'Searching...',
+  'layout.header.title': 'AI Assistant',
 };

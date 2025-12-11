@@ -1,4 +1,12 @@
-import { Workspace } from '@ant-design/agentic-ui';
+import { ActionIconBox, Workspace } from '@ant-design/agentic-ui';
+import { DownloadOutlined } from '@ant-design/icons';
+import {
+  Copy,
+  Expand,
+  MousePointerClick,
+  SwitchToWindow,
+} from '@sofa-design/icons';
+import { message, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 const WorkspaceRealtimeDemo: React.FC = () => {
@@ -8,6 +16,97 @@ const WorkspaceRealtimeDemo: React.FC = () => {
   const [htmlStatus, setHtmlStatus] = useState<'loading' | 'done' | 'error'>(
     'loading',
   );
+
+  const sampleHtml = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>实时 HTML 预览</title>
+    <style>
+        body { font-family: sans-serif; padding: 12px; }
+        .header { background: #f0f0f0; padding: 12px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 实时 HTML 预览演示</h1>
+        <p>这是一个使用 iframe 渲染的 HTML 预览示例</p>
+    </div>
+    <p>当前时间: <span id="time"></span></p>
+    <script>
+        document.getElementById('time').textContent = '2023-12-21 10:30:56';
+    </script>
+</body>
+</html>`;
+
+  const segmentedContent = (
+    <Space size={8}>
+      <div
+        style={{
+          height: '20px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '4px 6px',
+          borderRadius: '200px',
+          background: 'rgba(0, 16, 32, 0.0627)',
+        }}
+      >
+        <div
+          style={{
+            fontSize: '10px',
+            fontWeight: 500,
+            lineHeight: '7px',
+            color: 'rgba(84, 93, 109, 0.8)',
+          }}
+        >
+          {sampleHtml.split('\n').length}
+        </div>
+      </div>
+      <ActionIconBox
+        title="复制"
+        onClick={() => {
+          console.log('复制');
+          message.success('复制');
+        }}
+      >
+        <Copy />
+      </ActionIconBox>
+      <ActionIconBox
+        title="下载"
+        onClick={() => {
+          console.log('下载');
+          message.success('下载');
+        }}
+      >
+        <DownloadOutlined />
+      </ActionIconBox>
+      <ActionIconBox
+        title="切换"
+        onClick={() => {
+          console.log('切换');
+          message.success('切换');
+        }}
+      >
+        <SwitchToWindow />
+      </ActionIconBox>
+      <ActionIconBox
+        title="全屏"
+        onClick={() => {
+          console.log('全屏');
+          message.success('全屏');
+        }}
+      >
+        <Expand />
+      </ActionIconBox>
+    </Space>
+  );
+
+  const handleBack = () => {
+    console.log('返回');
+    message.success(`返回`);
+    return true;
+  };
 
   useEffect(() => {
     // Shell 命令执行模拟
@@ -67,30 +166,8 @@ $E = mc^2$
     }, 50);
 
     // HTML 内容模拟
-    const htmlText = `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>实时 HTML 预览</title>
-    <style>
-        body { font-family: sans-serif; padding: 12px; }
-        .header { background: #f0f0f0; padding: 12px; border-radius: 8px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>🚀 实时 HTML 预览演示</h1>
-        <p>这是一个使用 iframe 渲染的 HTML 预览示例</p>
-    </div>
-    <p>当前时间: <span id="time"></span></p>
-    <script>
-        document.getElementById('time').textContent = '2023-12-21 10:30:56';
-    </script>
-</body>
-</html>`;
-
     setTimeout(() => {
-      setHtmlContent(htmlText);
+      setHtmlContent(sampleHtml);
       setHtmlStatus('done');
     }, 2000);
 
@@ -122,13 +199,22 @@ $E = mc^2$
           }}
         />
         <Workspace.Realtime
-          tab={{ key: 'html', title: 'HTML 预览' }}
+          tab={{
+            key: 'html',
+            title: 'HTML 预览',
+            icon: <MousePointerClick />,
+          }}
           data={{
             type: 'html',
             content: htmlContent,
-            title: 'HTML 渲染',
-            status: htmlStatus,
+            title: '创建 HTML 文件',
+            subTitle: 'report.html',
             defaultViewMode: 'preview',
+            labels: { preview: '预览', code: '代码' },
+            iframeProps: { sandbox: 'allow-scripts' },
+            status: htmlStatus,
+            segmentedExtra: segmentedContent,
+            onBack: handleBack,
           }}
         />
       </Workspace>

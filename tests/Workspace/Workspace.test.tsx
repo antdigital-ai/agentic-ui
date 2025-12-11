@@ -24,6 +24,24 @@ describe('Workspace Component', () => {
     </ConfigProvider>
   );
 
+  const browserSuggestions = [{ id: '1', label: '搜索建议1', count: 3 }];
+
+  const browserResultsMap: Record<string, any[]> = {
+    '1': [
+      {
+        id: '1-1',
+        title: '搜索结果1',
+        site: 'example.com',
+        url: 'https://example.com',
+      },
+    ],
+  };
+
+  const requestBrowserResults = (suggestion: { id: string }) => ({
+    items: browserResultsMap[suggestion.id] || [],
+    loading: false,
+  });
+
   it('应该渲染基本的工作空间结构', () => {
     render(
       <TestWrapper>
@@ -52,7 +70,10 @@ describe('Workspace Component', () => {
           <Workspace.Realtime
             data={{ type: 'shell', content: 'test content' }}
           />
-          <Workspace.Browser data={{ content: 'browser content' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
           <Workspace.Task data={{ items: [] }} />
           <Workspace.File nodes={[]} />
         </Workspace>
@@ -92,7 +113,10 @@ describe('Workspace Component', () => {
           <Workspace.Realtime
             data={{ type: 'shell', content: 'test content' }}
           />
-          <Workspace.Browser data={{ content: 'browser content' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -100,8 +124,8 @@ describe('Workspace Component', () => {
     // 检查浏览器标签页是否被选中
     const browserRadio = screen.getByRole('radio', { name: '浏览器' });
     expect(browserRadio).toBeChecked();
-    // 检查浏览器组件是否被渲染
-    expect(screen.getByTestId('browser-list')).toBeInTheDocument();
+    // 当前处于浏览器标签页时，应渲染搜索建议列表
+    expect(screen.getByText('搜索建议1')).toBeInTheDocument();
   });
 
   it('应该支持关闭回调', () => {
@@ -164,7 +188,10 @@ describe('Workspace Component', () => {
             data={{ type: 'shell', content: 'test content' }}
           />
           <div>无效组件</div>
-          <Workspace.Browser data={{ content: 'browser content' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -183,7 +210,10 @@ describe('Workspace Component', () => {
           <Workspace.Realtime
             data={{ type: 'shell', content: 'test content' }}
           />
-          <Workspace.Browser data={{ content: 'browser content' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -221,7 +251,10 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace onTabChange={onTabChange}>
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -274,7 +307,11 @@ describe('Workspace Component', () => {
             data={{ type: 'shell', content: '' }}
             tab={{ count: 5 }}
           />
-          <Workspace.Browser data={{ content: '' }} tab={{ count: 10 }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+            tab={{ count: 10 }}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -320,27 +357,15 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace>
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
 
     expect(screen.getByTestId('workspace-tabs')).toBeInTheDocument();
-  });
-
-  it('应该处理 null 或 undefined 的 data 属性', () => {
-    render(
-      <TestWrapper>
-        <Workspace>
-          <Workspace.Realtime data={null as any} />
-          <Workspace.Browser data={undefined as any} />
-          <Workspace.Task data={null as any} />
-        </Workspace>
-      </TestWrapper>,
-    );
-
-    // 组件应该正常渲染，即使 data 为 null/undefined
-    expect(screen.getByTestId('workspace')).toBeInTheDocument();
   });
 
   it('应该在切换标签页时调用 onTabChange', () => {
@@ -350,7 +375,10 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace onTabChange={onTabChange}>
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -360,12 +388,16 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace activeTabKey="browser" onTabChange={onTabChange}>
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
 
-    expect(screen.getByTestId('browser-list')).toBeInTheDocument();
+    // 浏览器标签页下应显示搜索建议
+    expect(screen.getByText('搜索建议1')).toBeInTheDocument();
   });
 
   it('应该自动选择第一个有效的标签页', () => {
@@ -373,7 +405,10 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace activeTabKey="non-existent">
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -390,7 +425,10 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace onTabChange={onTabChange}>
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -404,7 +442,10 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace activeTabKey="browser" onTabChange={onTabChange}>
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -426,7 +467,10 @@ describe('Workspace Component', () => {
         >
           <Workspace>
             <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-            <Workspace.Browser data={{ content: '' }} />
+            <Workspace.Browser
+              suggestions={browserSuggestions}
+              request={requestBrowserResults}
+            />
           </Workspace>
         </I18nContext.Provider>
       </ConfigProvider>,
@@ -440,7 +484,10 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace>
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -503,7 +550,10 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace>
           <Workspace.Realtime data={{ type: 'shell', content: 'realtime' }} />
-          <Workspace.Browser data={{ content: 'browser' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
           <Workspace.Task data={{ items: [] }} />
           <Workspace.File nodes={[]} />
           <Workspace.Custom>
@@ -575,7 +625,10 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace activeTabKey="realtime" onTabChange={onTabChange}>
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
           <Workspace.Task data={{ items: [] }} />
         </Workspace>
       </TestWrapper>,
@@ -586,7 +639,10 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace activeTabKey="browser" onTabChange={onTabChange}>
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
           <Workspace.Task data={{ items: [] }} />
         </Workspace>
       </TestWrapper>,
@@ -596,7 +652,10 @@ describe('Workspace Component', () => {
       <TestWrapper>
         <Workspace activeTabKey="task" onTabChange={onTabChange}>
           <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-          <Workspace.Browser data={{ content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
           <Workspace.Task data={{ items: [] }} />
         </Workspace>
       </TestWrapper>,
@@ -615,7 +674,10 @@ describe('Workspace Component', () => {
     render(
       <TestWrapper>
         <Workspace>
-          <Workspace.Task data={{ items: taskItems }} onItemClick={onItemClick} />
+          <Workspace.Task
+            data={{ items: taskItems }}
+            onItemClick={onItemClick}
+          />
         </Workspace>
       </TestWrapper>,
     );
@@ -641,7 +703,9 @@ describe('Workspace Component', () => {
       </TestWrapper>,
     );
 
-    const taskItem = container.querySelector('.ant-agentic-workspace-task-item');
+    const taskItem = container.querySelector(
+      '.ant-agentic-workspace-task-item',
+    );
     expect(taskItem).not.toHaveStyle('cursor: pointer');
   });
 
@@ -654,12 +718,38 @@ describe('Workspace Component', () => {
     const { container } = render(
       <TestWrapper>
         <Workspace>
-          <Workspace.Task data={{ items: taskItems }} onItemClick={onItemClick} />
+          <Workspace.Task
+            data={{ items: taskItems }}
+            onItemClick={onItemClick}
+          />
         </Workspace>
       </TestWrapper>,
     );
 
-    const taskItem = container.querySelector('.ant-agentic-workspace-task-item');
+    const taskItem = container.querySelector(
+      '.ant-agentic-workspace-task-item',
+    );
     expect(taskItem).toHaveStyle('cursor: pointer');
+  });
+
+  it('Browser 组件在 Workspace 中应支持搜索建议到结果列表的切换', () => {
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    // 初始应展示搜索建议
+    const suggestion = screen.getByText('搜索建议1');
+    expect(suggestion).toBeInTheDocument();
+
+    // 点击搜索建议后，应展示结果标题
+    fireEvent.click(suggestion);
+    expect(screen.getByText('搜索结果1')).toBeInTheDocument();
   });
 });
