@@ -157,9 +157,9 @@ export class SchemaEditorBridgeManager {
           this.currentEditingId = null;
           return undefined as unknown as SchemaValue;
         }
-        // 记录当前编辑的 Bubble id，供 renderPreview 使用
+        // 记录当前编辑的 Bubble id,供 renderPreview 使用
         this.currentEditingId = params;
-          return handler.getContent();
+        return handler.getContent();
       },
 
       updateSchema: (schema: SchemaValue, params: string) => {
@@ -252,10 +252,10 @@ export class SchemaEditorBridgeManager {
 
     const instance = SchemaEditorBridgeManager.instance;
 
-    instance.stopBridge?.();
-    instance.previewRoot?.unmount?.();
+    instance.stopBridge();
+    instance.previewRoot?.unmount();
     instance.previewRoot = null;
-    instance.registry?.clear?.();
+    instance.registry.clear();
     SchemaEditorBridgeManager.instance = null;
   }
 }
