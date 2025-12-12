@@ -366,7 +366,7 @@ export const cnLabels = {
   'upload.failed': '图片上传失败',
   'browser.noResults': '暂无结果',
   'browser.totalResults': '共${count}个结果',
-  'browser.searching': '搜索中',
+  'browser.searching': '搜索中...',
   'layout.header.title': 'AI 助手',
 };
 

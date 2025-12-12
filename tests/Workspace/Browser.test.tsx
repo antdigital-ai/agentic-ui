@@ -14,7 +14,7 @@ describe('BrowserList Component', () => {
   const mockLocale = {
     'browser.noResults': '暂无结果',
     'browser.totalResults': '共${count}个结果',
-    'browser.searching': '搜索中',
+    'browser.searching': '搜索中...',
   } as any;
 
   const renderWithProvider = (ui: React.ReactElement) => {
@@ -125,7 +125,7 @@ describe('Browser Component', () => {
   const mockLocale = {
     'browser.noResults': '暂无结果',
     'browser.totalResults': '共${count}个结果',
-    'browser.searching': '搜索中',
+    'browser.searching': '搜索中...',
   } as any;
 
   const renderBrowserWithProvider = (ui: React.ReactElement) => {
