@@ -53,7 +53,7 @@
     "@better-scroll/scroll-bar": "^2.5.1",
     "@galacean/effects": "^2.6.5",
     "@juggle/resize-observer": "^3.4.0",
-    "@schema-element-editor/host-sdk": "^2.0.0",
+    "@schema-element-editor/host-sdk": "^2.0.1",
     "@sofa-design/icons": "^1.6.1",
     "ace-builds": "^1.43.4",
     "ajv": "^8.17.1",

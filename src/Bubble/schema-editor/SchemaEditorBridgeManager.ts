@@ -203,7 +203,9 @@ export class SchemaEditorBridgeManager {
     if (!this.bridge) return;
 
     try {
-      this.bridge.cleanup?.();
+      if (typeof this.bridge.cleanup === 'function') {
+        this.bridge.cleanup();
+      }
     } finally {
       this.bridge = null;
     }
