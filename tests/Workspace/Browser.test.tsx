@@ -52,6 +52,26 @@ describe('BrowserList Component', () => {
     expect(screen.getByText('共2个结果')).toBeInTheDocument();
   });
 
+  it('点击站点信息时应通过 window.open 打开链接', async () => {
+    const user = userEvent.setup();
+    const openSpy = vi
+      .spyOn(window, 'open')
+      // jsdom 中不需要真正打开窗口
+      .mockImplementation(() => null as any);
+
+    renderWithProvider(<BrowserList items={mockItems} activeLabel="搜索站点" />);
+
+    await user.click(screen.getByText('example.com'));
+
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://example.com',
+      '_blank',
+      'noopener,noreferrer',
+    );
+
+    openSpy.mockRestore();
+  });
+
   it('应该使用自定义计数格式化函数', () => {
     renderWithProvider(
       <BrowserList
