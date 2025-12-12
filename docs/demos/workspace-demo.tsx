@@ -1,4 +1,4 @@
-import { Workspace } from '@ant-design/agentic-ui';
+import { BrowserItem, Workspace } from '@ant-design/agentic-ui';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { defaultValue } from './shared/defaultValue';
