@@ -89,10 +89,6 @@ const resolveTabConfig = (
 const RealtimeComponent: FC<RealtimeProps> = ({ data }) =>
   data ? <RealtimeFollowList data={data} /> : null;
 
-// Updated BrowserComponent to support both new and old API (for backward compatibility if needed, though strictly we should move to new)
-// For now, if data is present (old API), use BrowserList directly (assuming data matches old structure, but BrowserList now expects specific props too)
-// Actually, BrowserList props also changed. So we should just use Browser (default export) which handles suggestions/results.
-// The new BrowserProps interface has suggestions/getItemsById.
 const BrowserComponent: FC<BrowserProps> = (props) => <Browser {...props} />;
 
 const TaskComponent: FC<TaskProps> = ({ data, onItemClick }) =>

@@ -84,7 +84,7 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
   const { prefixCls, wrapSSR, hashId } = useBrowserContext();
 
   const handleSiteClick = () => {
-    window.open(item.url);
+    window.open(item.url, '_blank', 'noopener,noreferrer');
   };
 
   return wrapSSR(
@@ -211,10 +211,7 @@ export const BrowserList: React.FC<BrowserListProps> = ({
         {showHeader &&
           (customHeader || (
             <div className={classNames(`${prefixCls}-header`, hashId)}>
-              <BrowserHeader
-                activeLabel={activeLabel}
-                onBack={onBack || (() => {})}
-              />
+              <BrowserHeader activeLabel={activeLabel} onBack={onBack} />
 
               <Tag style={RESULT_COUNT_TAG_STYLE}>
                 {typeof countFormatter === 'function'
