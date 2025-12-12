@@ -159,7 +159,7 @@ export class SchemaEditorBridgeManager {
         }
         // 记录当前编辑的 Bubble id，供 renderPreview 使用
         this.currentEditingId = params;
-        return handler.getContent();
+          return handler.getContent();
       },
 
       updateSchema: (schema: SchemaValue, params: string) => {
@@ -200,8 +200,11 @@ export class SchemaEditorBridgeManager {
    * 停止 Bridge
    */
   private stopBridge(): void {
-    if (this.bridge) {
-      this.bridge.cleanup();
+    if (!this.bridge) return;
+
+    try {
+      this.bridge.cleanup?.();
+    } finally {
       this.bridge = null;
     }
   }
@@ -236,10 +239,8 @@ export class SchemaEditorBridgeManager {
     );
 
     return () => {
-      if (this.previewRoot) {
-        this.previewRoot.unmount();
-        this.previewRoot = null;
-      }
+      this.previewRoot?.unmount?.();
+      this.previewRoot = null;
     };
   }
 
@@ -247,17 +248,15 @@ export class SchemaEditorBridgeManager {
    * 销毁单例（主要用于测试）
    */
   static destroy(): void {
-    if (SchemaEditorBridgeManager.instance) {
-      SchemaEditorBridgeManager.instance.stopBridge();
-      SchemaEditorBridgeManager.instance.registry.clear();
-      SchemaEditorBridgeManager.instance.currentEditingId = null;
-      /** 清理预览 Root */
-      if (SchemaEditorBridgeManager.instance.previewRoot) {
-        SchemaEditorBridgeManager.instance.previewRoot.unmount();
-        SchemaEditorBridgeManager.instance.previewRoot = null;
-      }
-      SchemaEditorBridgeManager.instance = null;
-    }
+    if (!SchemaEditorBridgeManager.instance) return;
+
+    const instance = SchemaEditorBridgeManager.instance;
+
+    instance.stopBridge?.();
+    instance.previewRoot?.unmount?.();
+    instance.previewRoot = null;
+    instance.registry?.clear?.();
+    SchemaEditorBridgeManager.instance = null;
   }
 }
 
