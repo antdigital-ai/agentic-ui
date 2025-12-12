@@ -1,9 +1,14 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../src/I18n';
-import { BrowserList, type BrowserItem } from '../../src/Workspace/Browser';
+import Browser, {
+  BrowserList,
+  type BrowserItem,
+  type BrowserSuggestion,
+} from '../../src/Workspace/Browser';
 
 describe('BrowserList Component', () => {
   const mockLocale = {
@@ -65,10 +70,14 @@ describe('BrowserList Component', () => {
     );
 
     expect(screen.getByTestId('browser-list')).toBeInTheDocument();
-    const headerWrapper = container.querySelector('.ant-browser-header-wrapper');
+    const headerWrapper = container.querySelector(
+      '.ant-browser-header-wrapper',
+    );
     expect(headerWrapper).toBeInTheDocument();
     // 关闭头部时不应该渲染具体的头部内容
-    expect(container.querySelector('.ant-browser-header')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('.ant-browser-header'),
+    ).not.toBeInTheDocument();
   });
 
   it('应该支持自定义头部内容', () => {
@@ -85,7 +94,12 @@ describe('BrowserList Component', () => {
 
   it('应该在加载时显示加载文案', () => {
     renderWithProvider(
-      <BrowserList items={[]} activeLabel="搜索E" loading loadingText="加载中" />,
+      <BrowserList
+        items={[]}
+        activeLabel="搜索E"
+        loading
+        loadingText="加载中"
+      />,
     );
 
     expect(screen.getByText('加载中')).toBeInTheDocument();
@@ -93,11 +107,7 @@ describe('BrowserList Component', () => {
 
   it('应该在没有结果时显示空状态文案', () => {
     renderWithProvider(
-      <BrowserList
-        items={[]}
-        activeLabel="搜索F"
-        emptyText="没有找到结果"
-      />,
+      <BrowserList items={[]} activeLabel="搜索F" emptyText="没有找到结果" />,
     );
 
     expect(screen.getByText('没有找到结果')).toBeInTheDocument();
@@ -108,5 +118,97 @@ describe('BrowserList Component', () => {
     renderWithProvider(<BrowserList activeLabel="搜索G" />);
 
     expect(screen.getByTestId('browser-list')).toBeInTheDocument();
+  });
+});
+
+describe('Browser Component', () => {
+  const mockLocale = {
+    'browser.noResults': '暂无结果',
+    'browser.totalResults': '共${count}个结果',
+    'browser.searching': '搜索中',
+  } as any;
+
+  const renderBrowserWithProvider = (ui: React.ReactElement) => {
+    return render(
+      <ConfigProvider>
+        <I18nContext.Provider value={{ locale: mockLocale, language: 'zh-CN' }}>
+          {ui}
+        </I18nContext.Provider>
+      </ConfigProvider>,
+    );
+  };
+
+  const createSuggestions = (): BrowserSuggestion[] => [
+    {
+      id: 's1',
+      label: '搜索建议1',
+      count: 2,
+    },
+  ];
+
+  it('点击搜索建议后应展示结果列表', async () => {
+    const user = userEvent.setup();
+    const suggestions = createSuggestions();
+
+    const request = vi.fn().mockReturnValue({
+      items: [
+        {
+          id: '1',
+          title: '结果标题1',
+          site: 'example.com',
+          url: 'https://example.com',
+        },
+      ] satisfies BrowserItem[],
+      loading: false,
+    });
+
+    renderBrowserWithProvider(
+      <Browser
+        suggestions={suggestions}
+        request={request}
+        suggestionIcon={null}
+      />,
+    );
+
+    expect(screen.getByText('搜索建议1')).toBeInTheDocument();
+
+    await user.click(screen.getByText('搜索建议1'));
+
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledWith(suggestions[0]);
+    expect(screen.getByTestId('browser-list')).toBeInTheDocument();
+    expect(screen.getByText('结果标题1')).toBeInTheDocument();
+  });
+
+  it('在结果视图中点击返回按钮应回到搜索建议视图', async () => {
+    const user = userEvent.setup();
+    const suggestions = createSuggestions();
+
+    const request = vi.fn().mockReturnValue({
+      items: [
+        {
+          id: '1',
+          title: '结果标题1',
+          site: 'example.com',
+          url: 'https://example.com',
+        },
+      ] satisfies BrowserItem[],
+      loading: false,
+    });
+
+    renderBrowserWithProvider(
+      <Browser
+        suggestions={suggestions}
+        request={request}
+        suggestionIcon={null}
+      />,
+    );
+
+    await user.click(screen.getByText('搜索建议1'));
+
+    const backButton = screen.getByRole('button');
+    await user.click(backButton);
+
+    expect(screen.getByText('搜索建议1')).toBeInTheDocument();
   });
 });
