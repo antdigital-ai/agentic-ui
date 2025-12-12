@@ -25,7 +25,7 @@ const WorkspaceBrowserDemo: React.FC = () => {
     },
   ]);
 
-  const resultsMap: Record<string, any[]> = {
+  const resultsMap: Record<string, BrowserItem[]> = {
     '1': [
       {
         id: '1-1',
