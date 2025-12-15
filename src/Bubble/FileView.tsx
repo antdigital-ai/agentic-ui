@@ -84,7 +84,16 @@ export const BubbleFileView: React.FC<BubbleFileViewProps> = ({
 
   if (!originData?.fileMap || originData.fileMap.size === 0) return null;
 
-  const events = fileViewEvents?.(defaultHandlers) || {};
+  let events: {
+    onPreview?: (file: AttachmentFile) => void;
+    onDownload?: (file: AttachmentFile) => void;
+    onViewAll?: (files: AttachmentFile[]) => void;
+  } = {};
+  try {
+    events = fileViewEvents?.(defaultHandlers) || {};
+  } catch {
+    console.warn('fileViewEvents execution failed');
+  }
 
   return (
     <FileMapView

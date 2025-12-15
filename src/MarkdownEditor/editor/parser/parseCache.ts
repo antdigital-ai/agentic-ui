@@ -58,7 +58,11 @@ export class ParseCache {
 /**
  * 获取代码块围栏的长度
  */
-function getFenceLength(md: string, start: number, fenceChar: string): number {
+export function getFenceLength(
+  md: string,
+  start: number,
+  fenceChar: string,
+): number {
   let length = 0;
   while (start + length < md.length && md[start + length] === fenceChar) {
     length++;
@@ -70,7 +74,7 @@ function getFenceLength(md: string, start: number, fenceChar: string): number {
  * 查找 HTML 注释的结束位置
  * 返回结束位置（包含 -->），如果未找到则返回 -1
  */
-function findHtmlCommentEnd(md: string, start: number): number {
+export function findHtmlCommentEnd(md: string, start: number): number {
   if (md.slice(start, start + 4) !== '<!--') {
     return -1;
   }
@@ -88,7 +92,7 @@ function findHtmlCommentEnd(md: string, start: number): number {
  * 查找 HTML 标签信息
  * 返回标签信息对象，如果未找到则返回 null
  */
-function findHtmlTagInfo(
+export function findHtmlTagInfo(
   md: string,
   start: number,
 ): { name: string; end: number; isSelfClosing: boolean } | null {
@@ -163,7 +167,7 @@ function findHtmlTagInfo(
  * 查找 HTML 结束标签的位置
  * 返回结束位置（包含 >），如果未找到则返回 -1
  */
-function findHtmlClosingTagEnd(
+export function findHtmlClosingTagEnd(
   md: string,
   start: number,
   tagName: string,
@@ -200,7 +204,7 @@ function findHtmlClosingTagEnd(
  * 1. HTML 注释后紧跟着表格行
  * 2. 当前块包含表格行，且后面也是表格行
  */
-function shouldProtectSeparator(
+export function shouldProtectSeparator(
   md: string,
   separatorIndex: number,
   currentBlock: string,
