@@ -123,7 +123,7 @@ const ChatLayout = forwardRef<ChatLayoutRef, ChatLayoutProps>(
         {footer && (
           <div
             className={`${prefixCls}-footer ${hashId}`}
-            style={{ height: footerHeight }}
+            style={{ minHeight: footerHeight }}
           >
             {footer}
           </div>

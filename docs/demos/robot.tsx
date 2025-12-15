@@ -1,12 +1,16 @@
 import {
+  BlowingWindLottie,
+  BouncingLottie,
   DazingLottie,
+  PeekLottie,
   Robot,
   TASK_RUNNING_STATUS,
   TASK_STATUS,
   TaskRunning,
   ThinkingLottie,
 } from '@ant-design/agentic-ui';
-import React, { useState } from 'react';
+import { Radio } from 'antd';
+import React, { Fragment, useState } from 'react';
 
 export default () => {
   const [robotStatus, setRobotStatus] = useState<'default' | 'running'>(
@@ -23,6 +27,49 @@ export default () => {
   );
   const [taskRunningStatus, setTaskRunningStatus] =
     useState<TASK_RUNNING_STATUS>(TASK_RUNNING_STATUS.RUNNING);
+
+  const robots = [
+    {
+      title: 'DazingLottie - 呼吸+眨眼睛',
+      description: '使用Lottie动画库提供的呼吸+眨眼睛动画效果',
+      render: (size: number) => <DazingLottie size={size} />,
+    },
+    {
+      title: 'ThinkingLottie - 眨眼跑+追星星',
+      description: '使用Lottie动画库提供的眨眼跑+追星星动画效果',
+      render: (size: number) => <ThinkingLottie size={size} />,
+    },
+    {
+      title: 'BouncingLottie - 弹跳',
+      description: '使用Lottie动画库提供的弹跳动画效果',
+      render: (size: number) => <BouncingLottie size={size} />,
+    },
+    {
+      title: 'BlowingWindLottie - 清风拂面',
+      description: '使用Lottie动画库提供的清风拂面动画效果',
+      render: (size: number) => <BlowingWindLottie size={size} />,
+    },
+    {
+      title: 'PeekLottie - 探头',
+      description: '使用Lottie动画库提供的探头动画效果',
+      render: (size: number) => <PeekLottie size={size} />,
+    },
+  ] as const;
+
+  const demoSizes = [
+    {
+      label: '小尺寸 (32px)',
+      value: 32,
+    },
+    {
+      label: '默认尺寸 (48px)',
+      value: 48,
+    },
+    {
+      label: '大尺寸 (64px)',
+      value: 64,
+    },
+  ] as const;
 
   return (
     <div style={{ padding: '0 24px 24px', maxWidth: 1200 }}>
@@ -50,23 +97,17 @@ export default () => {
             {statusOptions.find((opt) => opt.value === robotStatus)?.label}
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
-            {statusOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setRobotStatus(option.value)}
-                style={{
-                  padding: '4px 8px',
-                  border: '1px solid #d9d9d9',
-                  borderRadius: '4px',
-                  background: robotStatus === option.value ? '#1890ff' : '#fff',
-                  color: robotStatus === option.value ? '#fff' : '#000',
-                  cursor: 'pointer',
-                }}
-              >
-                {option.label}
-              </button>
-            ))}
+            <Radio.Group
+              value={robotStatus}
+              buttonStyle="solid"
+              onChange={(e) => setRobotStatus(e.target.value)}
+            >
+              {statusOptions.map((option) => (
+                <Radio.Button key={option.value} value={option.value}>
+                  {option.label}
+                </Radio.Button>
+              ))}
+            </Radio.Group>
           </div>
         </div>
       </div>
@@ -76,69 +117,29 @@ export default () => {
         动画文件较大，建议按需加载
       </p>
 
-      <h3>DazingLottie - 呼吸+眨眼睛动画</h3>
-      <p style={{ color: '#666', marginBottom: 16 }}>
-        使用Lottie动画库提供的呼吸+眨眼睛动画效果
-      </p>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 24,
-          marginBottom: 24,
-        }}
-      >
-        <div style={{ textAlign: 'center' }}>
-          <DazingLottie size={32} />
-          <p style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
-            小尺寸 (32px)
-          </p>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <DazingLottie size={48} />
-          <p style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
-            默认尺寸 (48px)
-          </p>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <DazingLottie size={64} />
-          <p style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
-            大尺寸 (64px)
-          </p>
-        </div>
-      </div>
-
-      <h3>ThinkingLottie - 眨眼跑+追星星动画</h3>
-      <p style={{ color: '#666', marginBottom: 16 }}>
-        使用Lottie动画库提供的眨眼跑+追星星动画效果
-      </p>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 24,
-          marginBottom: 24,
-        }}
-      >
-        <div style={{ textAlign: 'center' }}>
-          <ThinkingLottie size={32} />
-          <p style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
-            小尺寸 (32px)
-          </p>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <ThinkingLottie size={48} />
-          <p style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
-            默认尺寸 (48px)
-          </p>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <ThinkingLottie size={64} />
-          <p style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
-            大尺寸 (64px)
-          </p>
-        </div>
-      </div>
+      {robots.map((robot) => (
+        <Fragment key={robot.title}>
+          <h3>{robot.title}</h3>
+          <p style={{ color: '#666', marginBottom: 16 }}>{robot.description}</p>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 24,
+              marginBottom: 24,
+            }}
+          >
+            {demoSizes.map((size) => (
+              <div key={size.value} style={{ textAlign: 'center' }}>
+                {robot.render(size.value)}
+                <p style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
+                  {size.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Fragment>
+      ))}
 
       <h3>组合使用示例</h3>
       <p style={{ color: '#666', marginBottom: 16 }}>

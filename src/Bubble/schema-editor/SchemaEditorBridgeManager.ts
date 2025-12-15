@@ -157,7 +157,7 @@ export class SchemaEditorBridgeManager {
           this.currentEditingId = null;
           return undefined as unknown as SchemaValue;
         }
-        // 记录当前编辑的 Bubble id，供 renderPreview 使用
+        // 记录当前编辑的 Bubble id,供 renderPreview 使用
         this.currentEditingId = params;
         return handler.getContent();
       },
@@ -200,8 +200,18 @@ export class SchemaEditorBridgeManager {
    * 停止 Bridge
    */
   private stopBridge(): void {
-    if (this.bridge) {
-      this.bridge.cleanup();
+    if (!this.bridge) return;
+
+    try {
+      if (typeof this.bridge.cleanup === 'function') {
+        this.bridge.cleanup();
+      }
+    } catch (error) {
+      console.warn(
+        '[SchemaEditorBridge] cleanup failed during stopBridge:',
+        error,
+      );
+    } finally {
       this.bridge = null;
     }
   }
@@ -236,10 +246,8 @@ export class SchemaEditorBridgeManager {
     );
 
     return () => {
-      if (this.previewRoot) {
-        this.previewRoot.unmount();
-        this.previewRoot = null;
-      }
+      this.previewRoot?.unmount?.();
+      this.previewRoot = null;
     };
   }
 
@@ -247,17 +255,15 @@ export class SchemaEditorBridgeManager {
    * 销毁单例（主要用于测试）
    */
   static destroy(): void {
-    if (SchemaEditorBridgeManager.instance) {
-      SchemaEditorBridgeManager.instance.stopBridge();
-      SchemaEditorBridgeManager.instance.registry.clear();
-      SchemaEditorBridgeManager.instance.currentEditingId = null;
-      /** 清理预览 Root */
-      if (SchemaEditorBridgeManager.instance.previewRoot) {
-        SchemaEditorBridgeManager.instance.previewRoot.unmount();
-        SchemaEditorBridgeManager.instance.previewRoot = null;
-      }
-      SchemaEditorBridgeManager.instance = null;
-    }
+    if (!SchemaEditorBridgeManager.instance) return;
+
+    const instance = SchemaEditorBridgeManager.instance;
+
+    instance.stopBridge();
+    instance.previewRoot?.unmount();
+    instance.previewRoot = null;
+    instance.registry.clear();
+    SchemaEditorBridgeManager.instance = null;
   }
 }
 

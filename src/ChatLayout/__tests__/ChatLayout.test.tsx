@@ -121,7 +121,7 @@ describe('ChatLayout', () => {
     );
 
     const footer = container.querySelector('.ant-chat-layout-footer');
-    expect(footer).toHaveStyle('height: 120px');
+    expect(footer).toHaveStyle('min-height: 120px');
   });
 
   it('uses default footerHeight when not provided', () => {
@@ -132,7 +132,7 @@ describe('ChatLayout', () => {
     );
 
     const footer = container.querySelector('.ant-chat-layout-footer');
-    expect(footer).toHaveStyle('height: 90px');
+    expect(footer).toHaveStyle('min-height: 90px');
   });
 
   it('applies footerHeight to spacer element when footer is provided', () => {
@@ -291,9 +291,7 @@ describe('ChatLayout', () => {
 
     it('handles both leftCollapsed and rightCollapsed in controlled mode', () => {
       render(
-        <ChatLayout
-          header={{ leftCollapsed: true, rightCollapsed: false }}
-        >
+        <ChatLayout header={{ leftCollapsed: true, rightCollapsed: false }}>
           <div>Test content</div>
         </ChatLayout>,
       );

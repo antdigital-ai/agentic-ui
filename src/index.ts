@@ -1,4 +1,6 @@
 export type { RenderElementProps } from 'slate-react';
+import './root.css';
+
 // 统一类型导出 - 最优先导出，避免循环依赖
 export * from './AgenticLayout';
 export * from './AgentRunBar';
