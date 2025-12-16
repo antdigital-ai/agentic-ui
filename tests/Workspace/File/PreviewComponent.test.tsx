@@ -717,6 +717,48 @@ describe('PreviewComponent', () => {
     });
   });
 
+  describe('操作按钮', () => {
+    it('应该显示定位按钮并触发回调', () => {
+      const handleLocate = vi.fn();
+      const file: FileNode = {
+        id: 'f1',
+        name: 'locate.txt',
+        content: 'Locate me',
+        canLocate: true,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onLocate={handleLocate} />
+        </TestWrapper>,
+      );
+
+      const locateBtn = screen.getByLabelText('定位');
+      expect(locateBtn).toBeInTheDocument();
+
+      fireEvent.click(locateBtn);
+      expect(handleLocate).toHaveBeenCalledWith(file);
+    });
+
+    it('canDownload 为 false 时不显示下载按钮', () => {
+      const handleDownload = vi.fn();
+      const file: FileNode = {
+        id: 'f1',
+        name: 'secret.txt',
+        content: 'Top secret',
+        canDownload: false,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onDownload={handleDownload} />
+        </TestWrapper>,
+      );
+
+      expect(screen.queryByLabelText('下载')).not.toBeInTheDocument();
+    });
+  });
+
   describe('边缘情况', () => {
     it('应该处理空内容', () => {
       const file: FileNode = {

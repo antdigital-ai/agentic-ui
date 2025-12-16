@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider, message } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -528,6 +528,57 @@ describe('FileComponent', () => {
       await waitFor(() => {
         expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
       });
+    });
+
+    it('应该忽略过期的预览请求结果', async () => {
+      const firstFile: FileNode = {
+        id: 'f1',
+        name: 'first-old.txt',
+        content: 'old content',
+      };
+      const secondFile: FileNode = {
+        id: 'f2',
+        name: 'second.txt',
+        content: 'new content',
+      };
+      let resolveFirst: (value: FileNode) => void = () => {};
+      const onPreview = vi
+        .fn()
+        .mockReturnValueOnce(
+          new Promise<FileNode>((resolve) => {
+            resolveFirst = resolve;
+          }),
+        )
+        .mockResolvedValueOnce(secondFile);
+      const nodes: FileNode[] = [
+        {
+          id: 'f0',
+          name: 'test.txt',
+          content: 'Hello World',
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onPreview={onPreview} />
+        </TestWrapper>,
+      );
+
+      const previewBtn = screen.getByLabelText('预览');
+      fireEvent.click(previewBtn);
+      fireEvent.click(previewBtn);
+
+      await waitFor(() => {
+        expect(screen.getByText('second.txt')).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        resolveFirst(firstFile);
+        await Promise.resolve();
+      });
+
+      expect(screen.queryByText('first-old.txt')).not.toBeInTheDocument();
+      expect(screen.getByText('second.txt')).toBeInTheDocument();
     });
 
     it('应该触发自定义预览回调', async () => {

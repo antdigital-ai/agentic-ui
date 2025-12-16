@@ -482,7 +482,11 @@ const GroupHeader: FC<{
     if (group.canDownload !== undefined) {
       return group.canDownload;
     }
-    return Boolean(onGroupDownload);
+    if (!onGroupDownload) {
+      return false;
+    }
+    // 如果组内所有文件都明确禁止下载，则不显示分组下载
+    return group.children.some((child) => child.canDownload !== false);
   })();
 
   return (

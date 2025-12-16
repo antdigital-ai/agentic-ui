@@ -204,7 +204,10 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
     'preview',
   );
 
+  const canDownload = file.canDownload !== false;
+
   const handleDownload = () => {
+    if (!canDownload) return;
     onDownload?.(file);
   };
 
@@ -448,21 +451,26 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                 </div>
               </div>
             </div>
-            <div
-              className={classNames(`${prefixCls}-unsupported-text`, hashId)}
-            >
-              此文件无法预览，请下载查看。
-            </div>
-            {onDownload && (
-              <Button
-                color="default"
-                variant="solid"
-                icon={<DownloadIcon />}
-                onClick={handleDownload}
-                aria-label={locale?.['workspace.file.download'] || '下载'}
-              >
-                下载
-              </Button>
+            {canDownload && onDownload && (
+              <>
+                <div
+                  className={classNames(
+                    `${prefixCls}-unsupported-text`,
+                    hashId,
+                  )}
+                >
+                  此文件无法预览，请下载查看。
+                </div>
+                <Button
+                  color="default"
+                  variant="solid"
+                  icon={<DownloadIcon />}
+                  onClick={handleDownload}
+                  aria-label={locale?.['workspace.file.download'] || '下载'}
+                >
+                  下载
+                </Button>
+              </>
             )}
           </div>
         </PlaceholderContent>
@@ -598,7 +606,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
           <PlaceholderContent
             file={file}
             showFileInfo
-            onDownload={onDownload ? handleDownload : undefined}
+            onDownload={canDownload && onDownload ? handleDownload : undefined}
             locale={locale}
             prefixCls={prefixCls}
             hashId={hashId}
@@ -718,7 +726,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                 <ShareIcon />
               </ActionIconBox>
             )}
-            {onDownload && (
+            {canDownload && onDownload && (
               <ActionIconBox
                 title={locale?.['workspace.file.download'] || '下载'}
                 onClick={handleDownload}
