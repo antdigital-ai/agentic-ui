@@ -147,13 +147,15 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         rootContainer={htmlRef as any}
         editorStyle={{
           fontSize: 14,
+          ...(props.markdownRenderConfig?.editorStyle || {}),
         }}
-        typewriter={typing}
+        typewriter={props.markdownRenderConfig?.typewriter ?? typing}
         style={{
           minWidth: minWidth ? `min(${minWidth}px,100%)` : undefined,
           maxWidth: standalone ? '100%' : undefined,
           padding: isPaddingHidden ? 0 : undefined,
           margin: isPaddingHidden ? 0 : undefined,
+          ...(props.markdownRenderConfig?.style || {}),
         }}
         readonly
       />

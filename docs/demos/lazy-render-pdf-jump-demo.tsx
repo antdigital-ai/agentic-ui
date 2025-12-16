@@ -209,7 +209,7 @@ export default () => {
       <Card
         title="PDF 段落列表"
         style={{ width: 300, overflow: 'auto' }}
-        bodyStyle={{ padding: 8 }}
+        styles={{ body: { padding: 8 } }}
       >
         <Space direction="vertical" style={{ width: '100%' }}>
           {paragraphs.map((para) => (
@@ -248,7 +248,7 @@ export default () => {
       <Card
         title="文档内容（懒加载）"
         style={{ flex: 1, overflow: 'hidden' }}
-        bodyStyle={{ padding: 0, height: 'calc(100% - 57px)' }}
+        styles={{ body: { padding: 0, height: 'calc(100% - 57px)' } }}
       >
         <div
           ref={containerRef}

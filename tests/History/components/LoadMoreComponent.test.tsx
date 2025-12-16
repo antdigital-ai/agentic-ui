@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -65,9 +71,12 @@ describe('HistoryLoadMore', () => {
     const button = screen.getByRole('button');
     fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(onLoadMore).toHaveBeenCalledTimes(1);
-    });
+    await waitFor(
+      () => {
+        expect(onLoadMore).toHaveBeenCalledTimes(1);
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该在按下 Enter 键时调用 onLoadMore', async () => {
@@ -81,9 +90,12 @@ describe('HistoryLoadMore', () => {
     const button = screen.getByRole('button');
     fireEvent.keyDown(button, { key: 'Enter' });
 
-    await waitFor(() => {
-      expect(onLoadMore).toHaveBeenCalledTimes(1);
-    });
+    await waitFor(
+      () => {
+        expect(onLoadMore).toHaveBeenCalledTimes(1);
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该在按下空格键时调用 onLoadMore', async () => {
@@ -97,14 +109,20 @@ describe('HistoryLoadMore', () => {
     const button = screen.getByRole('button');
     fireEvent.keyDown(button, { key: ' ' });
 
-    await waitFor(() => {
-      expect(onLoadMore).toHaveBeenCalledTimes(1);
-    });
+    await waitFor(
+      () => {
+        expect(onLoadMore).toHaveBeenCalledTimes(1);
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该在加载时显示 loading 图标', async () => {
     const onLoadMore = vi.fn(
-      () => new Promise((resolve) => setTimeout(resolve, 100)),
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 100);
+        }),
     );
     render(
       <TestWrapper>
@@ -116,15 +134,20 @@ describe('HistoryLoadMore', () => {
     fireEvent.click(button);
 
     // 应该显示 LoadingOutlined
-    await waitFor(() => {
-      expect(button.querySelector('.anticon-loading')).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(button.querySelector('.anticon-loading')).toBeInTheDocument();
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该防止在加载时重复点击', async () => {
     const onLoadMore = vi.fn(async () => {
       // 模拟较长的异步操作
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 200);
+      });
     });
 
     const { container } = render(
@@ -139,10 +162,13 @@ describe('HistoryLoadMore', () => {
     fireEvent.click(button);
 
     // 等待 loading 图标出现，确保组件进入加载状态
-    await waitFor(() => {
-      const loadingIcon = container.querySelector('.anticon-loading');
-      expect(loadingIcon).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        const loadingIcon = container.querySelector('.anticon-loading');
+        expect(loadingIcon).toBeInTheDocument();
+      },
+      { timeout: 1000 },
+    );
 
     // 记录当前的调用次数
     const callCountAfterLoading = onLoadMore.mock.calls.length;
@@ -153,17 +179,22 @@ describe('HistoryLoadMore', () => {
 
     fireEvent.click(button);
 
-    // 等待一小段时间确保如果有重复调用会发生
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // 等待真实的 setTimeout 完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
 
     // 验证在loading图标出现后的点击被忽略了（callCount没有增加）
     expect(onLoadMore).toHaveBeenCalledTimes(callCountAfterLoading);
 
     // 等待 loading 完成
-    await waitFor(() => {
-      const icon = container.querySelector('.anticon-loading');
-      expect(icon).not.toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        const icon = container.querySelector('.anticon-loading');
+        expect(icon).not.toBeInTheDocument();
+      },
+      { timeout: 1000 },
+    );
   });
   it('应该处理加载错误', async () => {
     const onLoadMore = vi.fn().mockRejectedValue(new Error('Load failed'));
@@ -180,13 +211,19 @@ describe('HistoryLoadMore', () => {
     const button = screen.getByRole('button');
     fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(onLoadMore).toHaveBeenCalled();
-    });
+    await waitFor(
+      () => {
+        expect(onLoadMore).toHaveBeenCalled();
+      },
+      { timeout: 1000 },
+    );
 
-    await waitFor(() => {
-      expect(consoleError).toHaveBeenCalled();
-    });
+    await waitFor(
+      () => {
+        expect(consoleError).toHaveBeenCalled();
+      },
+      { timeout: 1000 },
+    );
 
     consoleError.mockRestore();
   });
@@ -226,16 +263,22 @@ describe('HistoryLoadMore', () => {
     const button = screen.getByRole('button');
     fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(onLoadMore).toHaveBeenCalled();
-    });
+    await waitFor(
+      () => {
+        expect(onLoadMore).toHaveBeenCalled();
+      },
+      { timeout: 1000 },
+    );
 
     // 加载完成后应该能够再次点击
     fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(onLoadMore).toHaveBeenCalledTimes(2);
-    });
+    await waitFor(
+      () => {
+        expect(onLoadMore).toHaveBeenCalledTimes(2);
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该为 chat 类型显示正确的图标', () => {

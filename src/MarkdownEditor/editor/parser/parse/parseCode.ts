@@ -1,5 +1,5 @@
-import { debugInfo } from '../../../../Utils/debugUtils';
 import json5 from 'json5';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { isCodeBlockLikelyComplete } from '../../utils/findMatchingClose';
 import partialJsonParse from '../json-parse';
 
@@ -163,7 +163,11 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
   debugInfo('handleCode - 语言处理器', {
     effectiveLang,
     hasHandler: !!handler,
-    handlerName: handler ? Object.keys(LANGUAGE_HANDLERS).find(k => LANGUAGE_HANDLERS[k] === handler) : undefined,
+    handlerName: handler
+      ? Object.keys(LANGUAGE_HANDLERS).find(
+          (k) => LANGUAGE_HANDLERS[k] === handler,
+        )
+      : undefined,
   });
 
   const result = handler
@@ -197,7 +201,9 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
     isConfig: resultWithProps.isConfig,
     valueLength: resultWithProps.value?.length,
     hasOtherProps: !!resultWithProps.otherProps,
-    otherPropsKeys: resultWithProps.otherProps ? Object.keys(resultWithProps.otherProps) : [],
+    otherPropsKeys: resultWithProps.otherProps
+      ? Object.keys(resultWithProps.otherProps)
+      : [],
   });
 
   return resultWithProps;

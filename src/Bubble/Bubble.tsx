@@ -100,8 +100,10 @@ export const Bubble: React.FC<
 
   // 根据角色分发到对应的子组件
   if (isUserMessage) {
-    return <UserBubble {...bubbleProps} pure={false} />;
+    return (
+      <UserBubble {...bubbleProps} pure={false} {...props.userBubbleProps} />
+    );
   }
 
-  return <AIBubble {...bubbleProps} />;
+  return <AIBubble {...bubbleProps} {...props.aIBubbleProps} />;
 });

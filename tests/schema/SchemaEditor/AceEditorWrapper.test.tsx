@@ -90,6 +90,8 @@ Object.defineProperty(window, 'ResizeObserver', {
 
 describe('AceEditorWrapper', () => {
   beforeEach(async () => {
+    // 不使用假定时器，因为 waitFor 需要真实定时器
+    // 只在需要测试定时器行为的特定测试中使用 vi.useFakeTimers()
     // 获取 mock 实例
     const aceModule = await import('ace-builds');
     mockAce = aceModule.default;
@@ -112,6 +114,8 @@ describe('AceEditorWrapper', () => {
   });
 
   afterEach(() => {
+    // 确保清理所有定时器状态
+    vi.useRealTimers();
     cleanup();
   });
 
@@ -228,62 +232,52 @@ describe('AceEditorWrapper', () => {
     it('应该设置默认语言为 text', async () => {
       render(<AceEditorWrapper value="test" />);
 
-      // 等待 setTimeout 执行
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      // 等待编辑器初始化和语言设置完成
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
+          'ace/mode/text',
+        );
       });
-
-      expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
-        'ace/mode/text',
-      );
     });
 
     it('应该设置支持的语言', async () => {
       render(<AceEditorWrapper value="test" language="javascript" />);
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
+          'ace/mode/javascript',
+        );
       });
-
-      expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
-        'ace/mode/javascript',
-      );
     });
 
     it('应该处理语言映射', async () => {
       render(<AceEditorWrapper value="test" language="js" />);
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
+          'ace/mode/javascript',
+        );
       });
-
-      expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
-        'ace/mode/javascript',
-      );
     });
 
     it('应该处理不支持的语言', async () => {
       render(<AceEditorWrapper value="test" language="unsupported" />);
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
+          'ace/mode/text',
+        );
       });
-
-      expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
-        'ace/mode/text',
-      );
     });
 
     it('应该处理大小写不敏感的语言', async () => {
       render(<AceEditorWrapper value="test" language="JAVASCRIPT" />);
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
+          'ace/mode/javascript',
+        );
       });
-
-      expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
-        'ace/mode/javascript',
-      );
     });
   });
 
@@ -314,6 +308,9 @@ describe('AceEditorWrapper', () => {
       // 模拟内部值引用
       mockAceEditor.getValue.mockReturnValue('same value');
 
+      // 清除之前的 setValue 调用
+      mockAceEditor.setValue.mockClear();
+
       rerender(<AceEditorWrapper value="same value" />);
 
       // 等待一个 tick 确保 useEffect 执行
@@ -336,9 +333,9 @@ describe('AceEditorWrapper', () => {
         expect(mockAce.edit).toHaveBeenCalled();
       });
 
-      // 等待初始语言设置
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      // 等待初始语言设置完成
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalled();
       });
 
       // 清除之前的调用
@@ -359,9 +356,9 @@ describe('AceEditorWrapper', () => {
         <AceEditorWrapper value="test" language="js" />,
       );
 
-      // 等待初始语言设置
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      // 等待初始语言设置完成
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalled();
       });
 
       // 清除之前的调用并切换语言
@@ -370,13 +367,11 @@ describe('AceEditorWrapper', () => {
       rerender(<AceEditorWrapper value="test" language="ts" />);
 
       // 等待语言切换完成
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 5));
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
+          'ace/mode/typescript',
+        );
       });
-
-      expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
-        'ace/mode/typescript',
-      );
     });
   });
 
@@ -582,25 +577,21 @@ describe('AceEditorWrapper', () => {
     it('应该处理空语言', async () => {
       render(<AceEditorWrapper value="test" language="" />);
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
+          'ace/mode/text',
+        );
       });
-
-      expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
-        'ace/mode/text',
-      );
     });
 
     it('应该处理 undefined 语言', async () => {
       render(<AceEditorWrapper value="test" language={undefined} />);
 
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
+          'ace/mode/text',
+        );
       });
-
-      expect(mockAceEditor.session.setMode).toHaveBeenCalledWith(
-        'ace/mode/text',
-      );
     });
 
     it('应该处理空选项对象', async () => {
@@ -671,9 +662,9 @@ describe('AceEditorWrapper', () => {
         expect(mockAce.edit).toHaveBeenCalled();
       });
 
-      // 等待初始语言设置
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      // 等待初始语言设置完成
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalled();
       });
 
       // 清除之前的调用
@@ -688,9 +679,9 @@ describe('AceEditorWrapper', () => {
       // 改变语言触发新的设置
       rerender(<AceEditorWrapper value="test" language="python" />);
 
-      // 等待语言切换完成
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      // 等待语言切换完成（即使会失败）
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalled();
       });
 
       // 应该尝试设置语言，即使失败
@@ -803,9 +794,9 @@ describe('AceEditorWrapper', () => {
         expect(mockAce.edit).toHaveBeenCalled();
       });
 
-      // 等待初始语言设置
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+      // 等待初始语言设置完成
+      await waitFor(() => {
+        expect(mockAceEditor.session.setMode).toHaveBeenCalled();
       });
 
       // 清除之前的调用

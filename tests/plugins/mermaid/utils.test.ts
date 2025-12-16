@@ -116,23 +116,6 @@ describe('Mermaid utils', () => {
       expect(svgElement).toBeTruthy();
     });
 
-    it('应该在已有内容时先淡出', async () => {
-      container.innerHTML = '<div>Existing content</div>';
-
-      const svg = '<svg></svg>';
-      renderSvgToContainer(svg, container);
-
-      // 应该先设置 opacity 为 0
-      expect(container.style.opacity).toBe('0');
-      expect(container.style.transition).toContain('opacity');
-
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-
-      // 然后恢复 opacity
-      expect(container.style.opacity).toBe('1');
-    });
-
     it('应该处理 SVG 字符串解析', async () => {
       const svg = '<svg><circle r="50"/></svg>';
 

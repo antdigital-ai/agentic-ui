@@ -34,6 +34,16 @@ export const newEnergyFundContent = `# 新能源基金现状及投资
 | 储能主题基金 | 4.02       | 美国   |
 | 氢能主题基金 | 2.15       | 美国   |
 
+\`\`\`mermaid
+flowchart TD
+    A[Christmas] -->|Get money| B(Go shopping)
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[fa:fa-car Car]
+ 
+\`\`\`
+
 ### 1.2 高估值与产能过剩的双重压力
 
 截至2025年6月19日，新能源板块当日收跌-1.28%。行业市盈率高于近10年60%的时间，估值偏高。新能源汽车行业产能过剩问题突出，技术迭代过快可能制约长期发展。

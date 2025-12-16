@@ -126,7 +126,15 @@ export const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
       <RcResizeObserver
         onResize={(e) => {
           try {
+            if (typeof window === 'undefined') {
+              onResize?.(e.offsetWidth, 0);
+              return;
+            }
             const element = ref && 'current' in ref ? ref.current : null;
+            if (!element) {
+              onResize?.(e.offsetWidth, 0);
+              return;
+            }
             const styles = window.getComputedStyle(element as Element);
             const right = parseFloat(styles.right || '0');
             const rightOffset = Number.isNaN(right) ? 0 : right;
@@ -187,7 +195,7 @@ export const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
                   />,
                 ]
               : []),
-          ]}
+          ].filter(Boolean)}
         </div>
       </RcResizeObserver>
     );

@@ -1,8 +1,8 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { useContext } from 'react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { RenderElementProps } from 'slate-react';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { useStyle } from './style';
 
 export const Mermaid = ({

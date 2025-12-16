@@ -5,7 +5,6 @@ import { DescriptionsItemType } from 'antd/es/descriptions';
 import React, { lazy, Suspense, useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
-import { useIntersectionOnce } from '../../Hooks/useIntersectionOnce';
 import { I18nContext } from '../../I18n';
 import { loadChartRuntime, type ChartRuntime } from './loadChartRuntime';
 import {
@@ -519,7 +518,6 @@ export const ChartRender: React.FC<{
   const [config, setConfig] = useState(() => props.config);
   const [renderKey, setRenderKey] = useState(0);
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const isIntersecting = useIntersectionOnce(containerRef);
 
   // 用于缓存上一次的数据和配置，避免不必要的重新计算
   const prevDataRef = React.useRef<{
@@ -993,7 +991,7 @@ export const ChartRender: React.FC<{
       );
     }
 
-    if (shouldLoadRuntime && isIntersecting) {
+    if (shouldLoadRuntime) {
       return (
         <Suspense
           fallback={<ChartRuntimeFallback height={config?.height || 240} />}
@@ -1018,10 +1016,6 @@ export const ChartRender: React.FC<{
       );
     }
 
-    if (shouldLoadRuntime && !isIntersecting) {
-      return <ChartRuntimeFallback height={config?.height || 240} />;
-    }
-
     return null;
   }, [
     chartType,
@@ -1039,7 +1033,6 @@ export const ChartRender: React.FC<{
     filterBy,
     groupBy,
     colorLegend,
-    isIntersecting,
     shouldLoadRuntime,
     renderDescriptionsFallback,
     chartData,

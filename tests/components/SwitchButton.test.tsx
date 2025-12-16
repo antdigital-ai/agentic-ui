@@ -1,11 +1,19 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SwitchButton } from '../../src/Components/Button/SwitchButton';
 
 describe('SwitchButton 组件', () => {
   const TestIcon = () => <span data-testid="test-icon">📝</span>;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   it('应该渲染基本的切换按钮', () => {
     render(<SwitchButton>切换按钮</SwitchButton>);
@@ -25,26 +33,37 @@ describe('SwitchButton 组件', () => {
     render(<SwitchButton onClick={handleClick}>点击我</SwitchButton>);
 
     const button = screen.getByRole('button');
-    fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(handleClick).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      fireEvent.click(button);
+      // 等待 Promise 完成
+      await Promise.resolve();
+      vi.advanceTimersByTime(0);
+      await vi.runAllTimersAsync();
     });
+
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it('应该处理异步点击事件', async () => {
     const asyncClick = vi.fn(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
     });
 
     render(<SwitchButton onClick={asyncClick}>异步点击</SwitchButton>);
 
     const button = screen.getByRole('button');
-    fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(asyncClick).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      fireEvent.click(button);
+      // 推进时间让 setTimeout 完成
+      vi.advanceTimersByTime(100);
+      await vi.runAllTimersAsync();
     });
+
+    expect(asyncClick).toHaveBeenCalledTimes(1);
   });
 
   it('应该在非受控模式下切换激活状态', () => {
@@ -197,12 +216,17 @@ describe('SwitchButton 组件', () => {
     );
 
     const button = screen.getByRole('button');
-    fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(handleChange).toHaveBeenCalledWith(true);
-      expect(handleClick).toHaveBeenCalled();
+    await act(async () => {
+      fireEvent.click(button);
+      // 等待 Promise 完成
+      await Promise.resolve();
+      vi.advanceTimersByTime(0);
+      await vi.runAllTimersAsync();
     });
+
+    expect(handleChange).toHaveBeenCalledWith(true);
+    expect(handleClick).toHaveBeenCalled();
   });
 
   it('应该正确显示图标和文本', () => {

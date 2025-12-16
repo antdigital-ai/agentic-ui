@@ -29,7 +29,28 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     isVisible,
   );
 
-  return wrapSSR(
+  const isError = useMemo(() => !!error && !!error.trim(), [error]);
+  const isRendered = useMemo(
+    () => renderedCode && !isError,
+    [renderedCode, isError],
+  );
+  const style = useMemo(
+    () =>
+      ({
+        visibility: isRendered ? 'visible' : 'hidden',
+        pointerEvents: isRendered ? 'auto' : 'none',
+        width: '100%',
+        height: isRendered ? '100%' : '0',
+        overflow: isRendered ? 'auto' : 'hidden',
+        maxHeight: isRendered ? '100%' : '0',
+        minHeight: isRendered ? '200px' : '0',
+      }) as React.CSSProperties,
+    [isRendered],
+  );
+
+  const renderCode = props.element.value || '';
+
+  const dom = (
     <div
       ref={containerRef}
       className={classNames(baseCls, hashId)}
@@ -40,20 +61,39 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
         contentEditable={false}
         ref={divRef}
         className={classNames(hashId)}
-        style={{
-          visibility: renderedCode && !error ? 'visible' : 'hidden',
-          pointerEvents: renderedCode && !error ? 'auto' : 'none',
-        }}
+        style={style}
         data-mermaid-container="true"
       ></div>
-      {/* 错误状态显示 */}
+      {/* 错误状态显示：展示原始代码 */}
       {error && (
-        <div className={classNames(`${baseCls}-error`, hashId)}>{error}</div>
+        <div className={classNames(`${baseCls}-error`, hashId)}>
+          <pre
+            style={{
+              margin: 0,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          >
+            {renderCode}
+          </pre>
+        </div>
       )}
       {/* 空状态显示 */}
       {!renderedCode && !error && (
-        <div className={classNames(`${baseCls}-empty`, hashId)}>Empty</div>
+        <div className={classNames(`${baseCls}-empty`, hashId)}>
+          <pre
+            style={{
+              margin: 0,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          >
+            {renderCode}
+          </pre>
+        </div>
       )}
-    </div>,
+    </div>
   );
+
+  return wrapSSR(dom);
 };

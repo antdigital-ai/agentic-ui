@@ -13,28 +13,54 @@ import { I18nContext, LocalKeys } from '../I18n';
  * @example
  * msToTimes(1500, locale) // "1.5s"
  * msToTimes(65000, locale) // "1m 5s"
+ * msToTimes(3665000, locale) // "1H 1m 5s"
  */
 const msToTimes = (ms: number | undefined, locale: LocalKeys) => {
-  if (!ms) {
+  if (ms === undefined || ms === null) {
     return '';
+  }
+  if (ms === 0) {
+    return '0ms';
   }
   if (ms < 1000) {
     return `${ms}ms`;
   }
-  let s = ms / 1000;
-  if (s < 60) {
-    return `${s.toFixed(1)}${locale?.seconds || 's'}`;
+
+  const totalSeconds = Math.floor(ms / 1000);
+  const secondsUnit = locale?.seconds || 's';
+  const minutesUnit = locale?.minutes || 'm';
+  const hoursUnit = locale?.hours || 'H';
+  const daysUnit = locale?.days || 'D';
+
+  // 小于60秒，显示秒（带小数）
+  if (totalSeconds < 60) {
+    const seconds = ms / 1000;
+    return `${seconds.toFixed(1)}${secondsUnit}`;
   }
-  let m = s / 60;
-  if (m < 60) {
-    return `${m.toFixed(0)}${locale?.minutes || 'm'} ${s.toFixed(0)}${locale?.seconds || 's'}`;
+
+  // 计算分钟和秒
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const remainingSeconds = totalSeconds % 60;
+
+  // 小于60分钟，显示分钟和秒
+  if (totalMinutes < 60) {
+    return `${totalMinutes}${minutesUnit} ${remainingSeconds}${secondsUnit}`;
   }
-  let h = m / 60;
-  if (h < 24) {
-    return `${h.toFixed(0)}${locale?.hours || 'H'} ${m.toFixed(0)}${locale?.minutes || 'm'} ${s.toFixed(0)}${locale?.seconds || 's'}`;
+
+  // 计算小时、分钟和秒
+  const totalHours = Math.floor(totalMinutes / 60);
+  const remainingMinutes = totalMinutes % 60;
+
+  // 小于24小时，显示小时、分钟和秒
+  if (totalHours < 24) {
+    return `${totalHours}${hoursUnit} ${remainingMinutes}${minutesUnit} ${remainingSeconds}${secondsUnit}`;
   }
-  let d = h / 24;
-  return `${d.toFixed(0)}${locale?.days || 'D'} ${h.toFixed(0)}${locale?.hours || 'H'} ${m.toFixed(0)}${locale?.minutes || 'm'} ${s.toFixed(0)}${locale?.seconds || 's'}`;
+
+  // 大于等于24小时，计算天、小时、分钟和秒
+  const totalDays = Math.floor(totalHours / 24);
+  const remainingHours = totalHours % 24;
+
+  return `${totalDays}${daysUnit} ${remainingHours}${hoursUnit} ${remainingMinutes}${minutesUnit} ${remainingSeconds}${secondsUnit}`;
 };
 
 /**
@@ -69,7 +95,7 @@ export const CostMillis = (props: { costMillis?: number }) => {
   const { locale } = useContext(I18nContext);
 
   return useMemo(() => {
-    if (!props.costMillis) {
+    if (props.costMillis === undefined || props.costMillis === null) {
       return null;
     }
     return (

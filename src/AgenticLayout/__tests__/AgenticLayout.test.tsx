@@ -1,11 +1,11 @@
 import { act, render, screen } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AgenticLayout } from '../index';
 
 describe('AgenticLayout', () => {
   const originalInnerWidth = window.innerWidth;
-  
+
   beforeEach(() => {
     // 重置 window.innerWidth
     Object.defineProperty(window, 'innerWidth', {
@@ -105,7 +105,9 @@ describe('AgenticLayout', () => {
     const leftSidebar = container.querySelector(
       '.ant-agentic-layout-sidebar-left',
     );
-    expect(leftSidebar).toHaveClass('ant-agentic-layout-sidebar-left-collapsed');
+    expect(leftSidebar).toHaveClass(
+      'ant-agentic-layout-sidebar-left-collapsed',
+    );
   });
 
   it('handles right sidebar collapse state', () => {
@@ -137,7 +139,9 @@ describe('AgenticLayout', () => {
     const leftSidebar = container.querySelector(
       '.ant-agentic-layout-sidebar-left',
     );
-    expect(leftSidebar).toHaveClass('ant-agentic-layout-sidebar-left-collapsed');
+    expect(leftSidebar).toHaveClass(
+      'ant-agentic-layout-sidebar-left-collapsed',
+    );
   });
 
   it('handles rightDefaultCollapsed prop', () => {

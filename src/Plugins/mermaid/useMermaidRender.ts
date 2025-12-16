@@ -15,6 +15,7 @@ export const useMermaidRender = (
   const mermaidRef = useRef<MermaidApi | null>(null);
   const renderedCodeRef = useRef<string>('');
   const [error, setError] = useState<string>('');
+  const [renderedCode, setRenderedCode] = useState<string>('');
 
   useEffect(() => {
     if (!isVisible || renderedCodeRef.current === code) {
@@ -27,6 +28,7 @@ export const useMermaidRender = (
 
     if (!code) {
       renderedCodeRef.current = '';
+      setRenderedCode('');
       setError('');
       if (divRef.current) {
         divRef.current.innerHTML = '';
@@ -48,6 +50,7 @@ export const useMermaidRender = (
         const trimmedCode = code.trim();
         if (!trimmedCode) {
           renderedCodeRef.current = '';
+          setRenderedCode('');
           setError('');
           if (divRef.current) {
             divRef.current.innerHTML = '';
@@ -56,17 +59,23 @@ export const useMermaidRender = (
           return;
         }
 
-        const { svg } = await api.render(id, trimmedCode);
+        const { svg } = await api.render(
+          id,
+          trimmedCode.endsWith('```') ? trimmedCode : trimmedCode,
+        );
+
         if (divRef.current) {
           renderSvgToContainer(svg, divRef.current);
         }
 
         renderedCodeRef.current = code;
+        setRenderedCode(code);
         setError('');
       } catch (err) {
         if (code === currentCode) {
           setError(String(err));
-          renderedCodeRef.current = '';
+          renderedCodeRef.current = code;
+          setRenderedCode(code);
           if (divRef.current) {
             divRef.current.innerHTML = '';
           }
@@ -75,7 +84,7 @@ export const useMermaidRender = (
         cleanupTempElement(id);
         timer.current = null;
       }
-    }, 500);
+    }, 100);
 
     return () => {
       if (timer.current) {
@@ -85,5 +94,5 @@ export const useMermaidRender = (
     };
   }, [code, id, isVisible]);
 
-  return { error, renderedCode: renderedCodeRef.current };
+  return { error, renderedCode };
 };

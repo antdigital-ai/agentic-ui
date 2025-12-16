@@ -1,7 +1,7 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HistorySearch } from '../../../src/History/components/SearchComponent';
 import { I18nContext } from '../../../src/I18n';
 
@@ -22,10 +22,6 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     </I18nContext.Provider>
   </ConfigProvider>
 );
-
-// 辅助函数：等待指定时间
-const waitTime = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
 
 describe('HistorySearch', () => {
   beforeEach(() => {
@@ -141,19 +137,31 @@ describe('HistorySearch', () => {
     const input = screen.getByPlaceholderText('搜索话题') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'test' } });
 
-    await waitTime(360);
-
-    await waitFor(() => {
-      expect(onSearch).toHaveBeenCalledWith('test');
+    // 等待真实的 debounce 延迟完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 360));
     });
+
+    await waitFor(
+      () => {
+        expect(onSearch).toHaveBeenCalledWith('test');
+      },
+      { timeout: 1000 },
+    );
 
     // 清空输入
     fireEvent.change(input, { target: { value: '' } });
-    await waitTime(360);
-
-    await waitFor(() => {
-      expect(onSearch).toHaveBeenCalledWith('');
+    // 等待真实的 debounce 延迟完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 360));
     });
+
+    await waitFor(
+      () => {
+        expect(onSearch).toHaveBeenCalledWith('');
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该在点击后显示输入框', () => {
@@ -189,16 +197,25 @@ describe('HistorySearch', () => {
     // 输入搜索词
     fireEvent.change(input, { target: { value: '测试搜索' } });
 
-    await waitTime(360);
-
-    await waitFor(() => {
-      expect(onSearch).toHaveBeenCalledWith('测试搜索');
+    // 等待真实的 debounce 延迟完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 360));
     });
+
+    await waitFor(
+      () => {
+        expect(onSearch).toHaveBeenCalledWith('测试搜索');
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该在加载时显示 Spin', async () => {
     const onSearch = vi.fn(
-      () => new Promise((resolve) => setTimeout(resolve, 100)),
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 100);
+        }),
     );
 
     render(
@@ -213,12 +230,18 @@ describe('HistorySearch', () => {
     const input = screen.getByPlaceholderText('搜索话题');
     fireEvent.change(input, { target: { value: 'test' } });
 
-    await waitTime(360);
-
-    await waitFor(() => {
-      const spinElement = document.querySelector('.ant-spin');
-      expect(spinElement).toBeInTheDocument();
+    // 等待真实的 debounce 延迟完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 360));
     });
+
+    await waitFor(
+      () => {
+        const spinElement = document.querySelector('.ant-spin');
+        expect(spinElement).toBeInTheDocument();
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该处理搜索错误', async () => {
@@ -236,11 +259,17 @@ describe('HistorySearch', () => {
     const input = screen.getByPlaceholderText('搜索话题');
     fireEvent.change(input, { target: { value: 'test' } });
 
-    await waitTime(360);
-
-    await waitFor(() => {
-      expect(onSearch).toHaveBeenCalled();
+    // 等待真实的 debounce 延迟完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 360));
     });
+
+    await waitFor(
+      () => {
+        expect(onSearch).toHaveBeenCalled();
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该应用正确的样式', () => {
@@ -298,11 +327,17 @@ describe('HistorySearch', () => {
       const input = screen.getByPlaceholderText('搜索话题');
       fireEvent.change(input, { target: { value: '测试搜索' } });
 
-      await waitTime(360);
+      // 等待真实的 debounce 延迟完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 360));
+    });
 
-      await waitFor(() => {
-        expect(onSearch).toHaveBeenCalledWith('测试搜索');
-      });
+      await waitFor(
+        () => {
+          expect(onSearch).toHaveBeenCalledWith('测试搜索');
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该在 trigger=enter 时只在按回车时触发搜索', async () => {
@@ -324,7 +359,10 @@ describe('HistorySearch', () => {
       // 输入文字,不应该触发搜索
       fireEvent.change(input, { target: { value: '测试搜索' } });
 
-      await waitTime(360);
+      // 等待真实的 debounce 延迟完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 360));
+    });
 
       // 验证没有调用搜索
       expect(onSearch).not.toHaveBeenCalled();
@@ -332,10 +370,13 @@ describe('HistorySearch', () => {
       // 按下回车键
       fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
-      await waitFor(() => {
-        expect(onSearch).toHaveBeenCalledWith('测试搜索');
-        expect(onSearch).toHaveBeenCalledTimes(1);
-      });
+      await waitFor(
+        () => {
+          expect(onSearch).toHaveBeenCalledWith('测试搜索');
+          expect(onSearch).toHaveBeenCalledTimes(1);
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该在 trigger=enter 时支持多次回车搜索', async () => {
@@ -358,18 +399,24 @@ describe('HistorySearch', () => {
       fireEvent.change(input, { target: { value: '第一次搜索' } });
       fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
-      await waitFor(() => {
-        expect(onSearch).toHaveBeenCalledWith('第一次搜索');
-      });
+      await waitFor(
+        () => {
+          expect(onSearch).toHaveBeenCalledWith('第一次搜索');
+        },
+        { timeout: 1000 },
+      );
 
       // 第二次搜索
       fireEvent.change(input, { target: { value: '第二次搜索' } });
       fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
-      await waitFor(() => {
-        expect(onSearch).toHaveBeenCalledWith('第二次搜索');
-        expect(onSearch).toHaveBeenCalledTimes(2);
-      });
+      await waitFor(
+        () => {
+          expect(onSearch).toHaveBeenCalledWith('第二次搜索');
+          expect(onSearch).toHaveBeenCalledTimes(2);
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该在 trigger=enter 时按其他键不触发搜索', async () => {
@@ -395,7 +442,10 @@ describe('HistorySearch', () => {
       fireEvent.keyDown(input, { key: 'Escape', code: 'Escape' });
       fireEvent.keyDown(input, { key: 'Tab', code: 'Tab' });
 
-      await waitTime(360);
+      // 等待真实的 debounce 延迟完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 360));
+    });
 
       // 验证没有调用搜索
       expect(onSearch).not.toHaveBeenCalled();
@@ -415,11 +465,17 @@ describe('HistorySearch', () => {
       const input = screen.getByPlaceholderText('搜索话题');
       fireEvent.change(input, { target: { value: '测试' } });
 
-      await waitTime(360);
+      // 等待真实的 debounce 延迟完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 360));
+    });
 
-      await waitFor(() => {
-        expect(onSearch).toHaveBeenCalledWith('测试');
-      });
+      await waitFor(
+        () => {
+          expect(onSearch).toHaveBeenCalledWith('测试');
+        },
+        { timeout: 1000 },
+      );
     });
   });
 });

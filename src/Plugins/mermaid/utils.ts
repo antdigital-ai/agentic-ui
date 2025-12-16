@@ -42,76 +42,63 @@ export const renderSvgToContainer = (
   svg: string,
   container: HTMLDivElement,
 ): void => {
-  // 如果已有内容，先淡出
-  if (container.children.length > 0) {
-    container.style.opacity = '0';
-    container.style.transition = 'opacity 0.2s ease-in-out';
+  container.innerHTML = '';
+
+  const wrapper = document.createElement('div');
+  wrapper.setAttribute('data-mermaid-wrapper', 'true');
+  wrapper.style.cssText = `
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    contain: layout style paint;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  `;
+
+  const parser = new DOMParser();
+  const svgDoc = parser.parseFromString(svg, 'image/svg+xml');
+  const svgElement = svgDoc.querySelector('svg');
+
+  if (svgElement) {
+    const existingStyle = svgElement.getAttribute('style') || '';
+    const newStyle =
+      `${existingStyle}; max-width: 100%; height: auto; overflow: hidden;`.trim();
+    svgElement.setAttribute('style', newStyle);
+    svgElement.setAttribute('data-mermaid-svg', 'true');
+    svgElement.setAttribute(
+      'class',
+      (svgElement.getAttribute('class') || '') + ' mermaid-isolated',
+    );
+
+    const allElements = svgElement.querySelectorAll('*');
+    allElements.forEach((el) => {
+      if (el instanceof SVGElement) {
+        el.setAttribute('data-mermaid-internal', 'true');
+      }
+    });
+
+    wrapper.appendChild(svgElement);
+  } else {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = svg;
+    const extractedSvg = tempDiv.querySelector('svg');
+    if (extractedSvg) {
+      extractedSvg.setAttribute(
+        'style',
+        'max-width: 100%; height: auto; overflow: hidden;',
+      );
+      extractedSvg.setAttribute('data-mermaid-svg', 'true');
+      wrapper.appendChild(extractedSvg);
+    } else {
+      wrapper.innerHTML = svg;
+    }
   }
 
-  requestAnimationFrame(() => {
-    container.innerHTML = '';
-
-    const wrapper = document.createElement('div');
-    wrapper.setAttribute('data-mermaid-wrapper', 'true');
-    wrapper.style.cssText = `
-      position: relative;
-      width: 100%;
-      max-width: 100%;
-      overflow: hidden;
-      isolation: isolate;
-      contain: layout style paint;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 200px;
-    `;
-
-    const parser = new DOMParser();
-    const svgDoc = parser.parseFromString(svg, 'image/svg+xml');
-    const svgElement = svgDoc.querySelector('svg');
-
-    if (svgElement) {
-      const existingStyle = svgElement.getAttribute('style') || '';
-      const newStyle =
-        `${existingStyle}; max-width: 100%; height: auto; overflow: hidden;`.trim();
-      svgElement.setAttribute('style', newStyle);
-      svgElement.setAttribute('data-mermaid-svg', 'true');
-      svgElement.setAttribute(
-        'class',
-        (svgElement.getAttribute('class') || '') + ' mermaid-isolated',
-      );
-
-      const allElements = svgElement.querySelectorAll('*');
-      allElements.forEach((el) => {
-        if (el instanceof SVGElement) {
-          el.setAttribute('data-mermaid-internal', 'true');
-        }
-      });
-
-      wrapper.appendChild(svgElement);
-    } else {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = svg;
-      const extractedSvg = tempDiv.querySelector('svg');
-      if (extractedSvg) {
-        extractedSvg.setAttribute(
-          'style',
-          'max-width: 100%; height: auto; overflow: hidden;',
-        );
-        extractedSvg.setAttribute('data-mermaid-svg', 'true');
-        wrapper.appendChild(extractedSvg);
-      } else {
-        wrapper.innerHTML = svg;
-      }
-    }
-
-    container.appendChild(wrapper);
-
-    requestAnimationFrame(() => {
-      container.style.opacity = '1';
-      container.style.transition = 'opacity 0.3s ease-in-out';
-    });
-  });
+  container.appendChild(wrapper);
 };
 
 /**

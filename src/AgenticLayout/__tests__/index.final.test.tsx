@@ -19,7 +19,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 describe('AgenticLayout', () => {
   // Mock window dimensions
   const mockWindowInnerWidth = 1200;
-  
+
   beforeEach(() => {
     // Mock window properties
     Object.defineProperty(window, 'innerWidth', {
@@ -27,7 +27,7 @@ describe('AgenticLayout', () => {
       configurable: true,
       value: mockWindowInnerWidth,
     });
-    
+
     // Clear all mocks
     vi.clearAllMocks();
   });
@@ -137,7 +137,7 @@ describe('AgenticLayout', () => {
   it('should handle window resize and constrain right width', () => {
     // Mock window resize event
     const mockAddEventListener = vi.spyOn(window, 'addEventListener');
-    
+
     render(
       <TestWrapper>
         <AgenticLayout
@@ -149,12 +149,15 @@ describe('AgenticLayout', () => {
     );
 
     // Check that event listeners were added
-    expect(mockAddEventListener).toHaveBeenCalledWith('resize', expect.any(Function));
-    
+    expect(mockAddEventListener).toHaveBeenCalledWith(
+      'resize',
+      expect.any(Function),
+    );
+
     // Simulate window resize
     const resizeEvent = new Event('resize');
     window.dispatchEvent(resizeEvent);
-    
+
     // Component should still render correctly
     expect(screen.getByTestId('center')).toBeInTheDocument();
     expect(screen.getByTestId('right')).toBeInTheDocument();
@@ -166,7 +169,7 @@ describe('AgenticLayout', () => {
       configurable: true,
       value: 1000,
     });
-    
+
     render(
       <TestWrapper>
         <AgenticLayout

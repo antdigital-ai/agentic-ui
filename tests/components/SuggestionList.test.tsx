@@ -1,4 +1,9 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -25,11 +30,14 @@ describe('SuggestionList 组件', () => {
     render(<SuggestionList items={mockItems} onItemClick={handleClick} />);
 
     const item = screen.getByText('建议1');
-    fireEvent.click(item);
 
-    await waitFor(() => {
-      expect(handleClick).toHaveBeenCalledWith('建议1');
+    await act(async () => {
+      fireEvent.click(item);
+      // 等待 Promise 完成
+      await Promise.resolve();
     });
+
+    expect(handleClick).toHaveBeenCalledWith('建议1');
   });
 
   it('应该支持项的自定义 onClick', async () => {
@@ -39,11 +47,14 @@ describe('SuggestionList 组件', () => {
     render(<SuggestionList items={items} />);
 
     const item = screen.getByText('自定义点击');
-    fireEvent.click(item);
 
-    await waitFor(() => {
-      expect(customClick).toHaveBeenCalledWith('自定义点击');
+    await act(async () => {
+      fireEvent.click(item);
+      // 等待 Promise 完成
+      await Promise.resolve();
     });
+
+    expect(customClick).toHaveBeenCalledWith('自定义点击');
   });
 
   it('应该在禁用状态下阻止点击', async () => {
@@ -52,11 +63,14 @@ describe('SuggestionList 组件', () => {
     render(<SuggestionList items={mockItems} onItemClick={handleClick} />);
 
     const disabledItem = screen.getByText('建议3');
-    fireEvent.click(disabledItem);
 
-    await waitFor(() => {
-      expect(handleClick).not.toHaveBeenCalled();
+    await act(async () => {
+      fireEvent.click(disabledItem);
+      // 等待 Promise 完成
+      await Promise.resolve();
     });
+
+    expect(handleClick).not.toHaveBeenCalled();
   });
 
   it('应该支持最大显示数量限制', () => {
@@ -200,7 +214,9 @@ describe('SuggestionList 组件', () => {
 
   it('应该在提交时禁用所有项', async () => {
     const asyncClick = vi.fn(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
     });
 
     render(<SuggestionList items={mockItems} onItemClick={asyncClick} />);
@@ -208,14 +224,20 @@ describe('SuggestionList 组件', () => {
     const item1 = screen.getByText('建议1');
     const item2 = screen.getByText('建议2');
 
-    fireEvent.click(item1);
-
     // 第一个点击正在处理时，第二个点击应该被阻止
-    fireEvent.click(item2);
-
-    await waitFor(() => {
-      expect(asyncClick).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      fireEvent.click(item1);
+      // 等待状态更新（loading 状态）
+      await Promise.resolve();
     });
+
+    await act(async () => {
+      fireEvent.click(item2);
+      // 等待 Promise 完成
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    expect(asyncClick).toHaveBeenCalledTimes(1);
   });
 
   it('应该在 ConfigProvider 中正确工作', () => {
@@ -295,7 +317,7 @@ describe('SuggestionList 组件', () => {
   });
 
   it('应该在禁用项上应用禁用样式', () => {
-    const { container } = render(<SuggestionList items={mockItems} />);
+    render(<SuggestionList items={mockItems} />);
 
     const disabledItem = screen.getByText('建议3').closest('[role="button"]');
     expect(disabledItem).toHaveClass('ant-follow-up-suggestion-disabled');
@@ -303,16 +325,21 @@ describe('SuggestionList 组件', () => {
 
   it('应该处理异步点击回调', async () => {
     const asyncOnItemClick = vi.fn(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
     });
 
     render(<SuggestionList items={mockItems} onItemClick={asyncOnItemClick} />);
 
     const item = screen.getByText('建议1');
-    fireEvent.click(item);
 
-    await waitFor(() => {
-      expect(asyncOnItemClick).toHaveBeenCalled();
+    await act(async () => {
+      fireEvent.click(item);
+      // 等待真实的 setTimeout 完成
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
+
+    expect(asyncOnItemClick).toHaveBeenCalled();
   });
 });

@@ -15,6 +15,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       borderRadius: '1em',
       display: 'flex',
       justifyContent: 'center',
+      alignItems: 'center',
+      flexDirection: 'column',
       // 增加隔离：防止内容溢出影响其他元素
       position: 'relative',
       isolation: 'isolate', // CSS isolation 属性，创建新的堆叠上下文
@@ -34,8 +36,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         contain: 'layout style paint',
         overflow: 'hidden',
         // 防止 SVG 样式影响外部
-        // 添加过渡效果，使更新更平滑
-        transition: 'opacity 0.3s ease-in-out, min-height 0.2s ease-in-out',
       },
 
       // SVG 包装器样式（用于动态创建的 wrapper）
@@ -95,20 +95,29 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         textAlign: 'center',
         color: 'rgba(239, 68, 68, 0.8)',
         padding: '0.5rem',
+        flex: 1,
         // 错误信息也增加隔离
         position: 'relative',
         zIndex: 1,
         wordBreak: 'break-word',
         maxWidth: '100%',
+        height: '100%',
+        width: '100%',
       },
 
       // 空状态样式
       '&-empty': {
         textAlign: 'center',
         color: '#6B7280',
+        backgroundColor: '#fff',
+        borderRadius: '12px',
+        border: '1px solid #e1e5e9',
         padding: '0.5rem',
         position: 'relative',
         zIndex: 1,
+        flex: 1,
+        height: '100%',
+        width: '100%',
       },
 
       // Fallback 组件样式

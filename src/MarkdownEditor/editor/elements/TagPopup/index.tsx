@@ -429,54 +429,65 @@ export const TagPopup = (props: RenderProps) => {
     onSelect,
     currentNodePath,
   );
+  // 预先计算容器 className 与 style，减少 JSX 中的嵌套
+  const containerClassName = classNames(
+    baseCls,
+    hashId,
+    props.className,
+    props.prefixCls,
+    props.tagTextClassName,
+    `${baseCls}-type-${type}`,
+  );
+
+  const containerStyle = {
+    ...runFunction(props.tagTextStyle, {
+      ...props,
+      text: props.text,
+      placeholder,
+    }),
+  };
+
+  const handleContainerClick = (e: MouseEvent) =>
+    handleClick(
+      e,
+      props,
+      placeholder,
+      type,
+      suggestionConnext,
+      onSelect,
+      currentNodePath,
+    );
+
+  const isDropdown = type === 'dropdown';
+
+  const dropdownMenu = {
+    items: selectedItems as MenuProps['items'],
+    onClick: (e: any) => {
+      onSelect?.(e.key?.trim() || '', currentNodePath.current || []);
+      suggestionConnext?.setOpen?.(false);
+    },
+  } as MenuProps;
+
+  const content = isDropdown ? (
+    <Dropdown
+      trigger={['click']}
+      open={open}
+      onOpenChange={setOpen}
+      menu={dropdownMenu}
+    >
+      {renderDom}
+    </Dropdown>
+  ) : (
+    renderDom
+  );
 
   return wrapSSR(
     <div
-      className={classNames(
-        baseCls,
-        hashId,
-        props.className,
-        props.prefixCls,
-        props.tagTextClassName,
-        `${baseCls}-type-${type}`,
-      )}
-      style={{
-        ...runFunction(props.tagTextStyle, {
-          ...props,
-          text: props.text,
-          placeholder,
-        }),
-      }}
-      onClick={(e) =>
-        handleClick(
-          e,
-          props,
-          placeholder,
-          type,
-          suggestionConnext,
-          onSelect,
-          currentNodePath,
-        )
-      }
+      className={containerClassName}
+      style={containerStyle}
+      onClick={handleContainerClick}
     >
-      {type === 'dropdown' ? (
-        <Dropdown
-          trigger={['click']}
-          open={open}
-          onOpenChange={setOpen}
-          menu={{
-            items: selectedItems as MenuProps['items'],
-            onClick: (e) => {
-              onSelect?.(e.key?.trim() || '', currentNodePath.current || []);
-              suggestionConnext?.setOpen?.(false);
-            },
-          }}
-        >
-          {renderDom}
-        </Dropdown>
-      ) : (
-        renderDom
-      )}
+      {content}
     </div>,
   );
 };

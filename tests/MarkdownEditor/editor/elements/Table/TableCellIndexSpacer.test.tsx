@@ -556,31 +556,6 @@ describe('TableCellIndexSpacer 组件测试', () => {
     Editor.node = originalNode;
   });
 
-  // 由于模块导入问题，暂时跳过这个测试
-  it.skip('应该在点击外部时清除选择', () => {
-    // 直接使用已经 mock 的 useClickAway
-    const useClickAwayMock = require('../../../../../src/Hooks/useClickAway');
-    const mockUseClickAway = useClickAwayMock.useClickAway;
-
-    // 如果 mock 存在，设置其实现
-    if (mockUseClickAway) {
-      mockUseClickAway.mockImplementation((callback: () => void) => {
-        // 立即执行回调来模拟点击外部
-        callback();
-      });
-    }
-
-    renderTableCellIndexSpacer(
-      { columnIndex: 0 },
-      {
-        deleteIconPosition: { columnIndex: 0 },
-        setDeleteIconPosition: mockSetDeleteIconPosition,
-      },
-    );
-
-    expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
-  });
-
   it('应该显示插入列按钮', () => {
     renderTableCellIndexSpacer(
       { columnIndex: 0 },

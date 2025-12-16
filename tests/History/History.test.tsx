@@ -98,9 +98,12 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(screen.getByRole('menu')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByRole('menu')).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该调用 request 函数获取历史数据', async () => {
@@ -110,11 +113,14 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(defaultProps.request).toHaveBeenCalledWith({
-          agentId: 'test-agent',
-        });
-      });
+      await waitFor(
+        () => {
+          expect(defaultProps.request).toHaveBeenCalledWith({
+            agentId: 'test-agent',
+          });
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该处理 sessionId 变化时重新加载数据', async () => {
@@ -124,9 +130,12 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(defaultProps.request).toHaveBeenCalledTimes(1);
-      });
+      await waitFor(
+        () => {
+          expect(defaultProps.request).toHaveBeenCalledTimes(1);
+        },
+        { timeout: 1000 },
+      );
 
       rerender(
         <TestWrapper>
@@ -134,9 +143,12 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(defaultProps.request).toHaveBeenCalledTimes(2);
-      });
+      await waitFor(
+        () => {
+          expect(defaultProps.request).toHaveBeenCalledTimes(2);
+        },
+        { timeout: 1000 },
+      );
     });
   });
 
@@ -151,10 +163,13 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(onInit).toHaveBeenCalled();
-        expect(onShow).toHaveBeenCalled();
-      });
+      await waitFor(
+        () => {
+          expect(onInit).toHaveBeenCalled();
+          expect(onShow).toHaveBeenCalled();
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该处理点击历史记录项', async () => {
@@ -197,10 +212,13 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(screen.getByTestId('search-input')).toBeInTheDocument();
-        expect(screen.getByTestId('new-chat')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId('search-input')).toBeInTheDocument();
+          expect(screen.getByTestId('new-chat')).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该处理搜索功能', () => {
@@ -227,9 +245,12 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(emptyRequest).toHaveBeenCalled();
-      });
+      await waitFor(
+        () => {
+          expect(emptyRequest).toHaveBeenCalled();
+        },
+        { timeout: 1000 },
+      );
     });
   });
 
@@ -256,10 +277,13 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(screen.getByTestId('empty-state')).toBeInTheDocument();
-        expect(screen.getByText('暂无历史记录')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+          expect(screen.getByText('暂无历史记录')).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
 
       expect(emptyRender).toHaveBeenCalled();
     });
@@ -287,9 +311,12 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
 
       expect(emptyRender).not.toHaveBeenCalled();
     });
@@ -315,9 +342,12 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(emptyRequest).toHaveBeenCalled();
-      });
+      await waitFor(
+        () => {
+          expect(emptyRequest).toHaveBeenCalled();
+        },
+        { timeout: 1000 },
+      );
 
       // 验证emptyRender函数可以被正确使用（通过独立模式验证）
       const { unmount } = render(
@@ -331,9 +361,12 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(screen.getByTestId('empty-state-popover')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId('empty-state-popover')).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
 
       unmount();
     });
@@ -364,13 +397,16 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        const emptyState = screen.getByTestId('complex-empty-state');
-        expect(emptyState).toBeInTheDocument();
-        expect(screen.getByText('暂无历史记录')).toBeInTheDocument();
-        expect(screen.getByText('开始一段新的对话吧')).toBeInTheDocument();
-        expect(screen.getByText('创建新对话')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          const emptyState = screen.getByTestId('complex-empty-state');
+          expect(emptyState).toBeInTheDocument();
+          expect(screen.getByText('暂无历史记录')).toBeInTheDocument();
+          expect(screen.getByText('开始一段新的对话吧')).toBeInTheDocument();
+          expect(screen.getByText('创建新对话')).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
     });
   });
 
@@ -382,10 +418,13 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        const spinElement = document.querySelector('.ant-spin');
-        expect(spinElement).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          const spinElement = document.querySelector('.ant-spin');
+          expect(spinElement).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该在 loading 为 false 时显示正常内容', async () => {
@@ -407,11 +446,14 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(screen.getByText('今日')).toBeInTheDocument();
-        const spinElement = document.querySelector('.ant-spin');
-        expect(spinElement).not.toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByText('今日')).toBeInTheDocument();
+          const spinElement = document.querySelector('.ant-spin');
+          expect(spinElement).not.toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该在下拉菜单模式下也支持 loading', async () => {
@@ -422,10 +464,13 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        const spinElement = document.querySelector('.ant-spin');
-        expect(spinElement).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          const spinElement = document.querySelector('.ant-spin');
+          expect(spinElement).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该在 loading 状态切换时正确更新显示', async () => {
@@ -435,10 +480,13 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        const spinElement = document.querySelector('.ant-spin');
-        expect(spinElement).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          const spinElement = document.querySelector('.ant-spin');
+          expect(spinElement).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
 
       // 切换到非加载状态
       rerender(
@@ -447,10 +495,13 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        const spinElement = document.querySelector('.ant-spin');
-        expect(spinElement).not.toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          const spinElement = document.querySelector('.ant-spin');
+          expect(spinElement).not.toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该默认不显示 loading', async () => {
@@ -460,10 +511,13 @@ describe('History 组件', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        const spinElement = document.querySelector('.ant-spin');
-        expect(spinElement).not.toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          const spinElement = document.querySelector('.ant-spin');
+          expect(spinElement).not.toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
     });
   });
 });
