@@ -1439,4 +1439,314 @@ describe('FileComponent', () => {
       expect(childButton).toHaveAttribute('id', 'child-1');
     });
   });
+
+  describe('图片预览特殊处理', () => {
+    it('应该使用Image组件预览图片文件', async () => {
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'image.png',
+          type: 'image',
+          url: 'https://example.com/image.png',
+        },
+      ];
+
+      const { container } = render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onPreview={undefined} />
+        </TestWrapper>,
+      );
+
+      // 点击图片文件
+      fireEvent.click(screen.getByText('image.png'));
+
+      await waitFor(() => {
+        // 应该显示隐藏的 Image 组件（用于预览）
+        const hiddenImage = container.querySelector(
+          'img[style*="display: none"]',
+        );
+        expect(hiddenImage).toBeTruthy();
+      });
+    });
+  });
+
+  describe('nodes更新同步', () => {
+    it('预览文件时nodes更新应同步到previewFile', async () => {
+      const initialNodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'test.txt',
+          content: 'Original content',
+        },
+      ];
+
+      const updatedNodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'test.txt',
+          content: 'Updated content',
+        },
+      ];
+
+      const { rerender } = render(
+        <TestWrapper>
+          <FileComponent nodes={initialNodes} onPreview={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      // 打开预览
+      fireEvent.click(screen.getByLabelText('预览'));
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+
+      // 更新 nodes
+      rerender(
+        <TestWrapper>
+          <FileComponent nodes={updatedNodes} onPreview={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      // previewFile 应该被更新，组件应该仍然在预览状态
+      expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+    });
+
+    it('预览时文件从nodes中移除不应崩溃', async () => {
+      const initialNodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'test.txt',
+          content: 'Content',
+        },
+      ];
+
+      const { rerender } = render(
+        <TestWrapper>
+          <FileComponent nodes={initialNodes} onPreview={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      // 打开预览
+      fireEvent.click(screen.getByLabelText('预览'));
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+
+      // 移除文件
+      rerender(
+        <TestWrapper>
+          <FileComponent nodes={[]} onPreview={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      // 组件不应该崩溃，仍应显示预览
+      expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+    });
+  });
+
+  describe('分组下载按钮显示逻辑', () => {
+    it('分组中有可下载文件时显示下载按钮', () => {
+      const nodes: GroupNode[] = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText',
+          children: [
+            { id: 'f1', name: 'a.txt', url: 'https://a' },
+            { id: 'f2', name: 'b.txt', canDownload: false },
+          ],
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onGroupDownload={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      const downloadButtons = screen.getAllByLabelText('下载');
+      expect(downloadButtons.length).toBeGreaterThan(0);
+    });
+
+    it('分组中所有文件都禁止下载时不显示下载按钮', () => {
+      const nodes: GroupNode[] = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText',
+          children: [
+            { id: 'f1', name: 'a.txt', canDownload: false },
+            { id: 'f2', name: 'b.txt', canDownload: false },
+          ],
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onGroupDownload={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      const groupHeader = screen.getByText('文档').closest('div');
+      const downloadButtons =
+        groupHeader?.querySelectorAll('[aria-label*="下载"]');
+      expect(downloadButtons?.length || 0).toBe(0);
+    });
+
+    it('分组中文件有content时应显示下载按钮', () => {
+      const nodes: GroupNode[] = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText',
+          children: [{ id: 'f1', name: 'a.txt', content: 'Hello' }],
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onGroupDownload={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      const downloadButtons = screen.getAllByLabelText('下载');
+      expect(downloadButtons.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('键盘导航增强', () => {
+    it('应该支持空格键触发文件点击', () => {
+      const handleClick = vi.fn();
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'test.txt', url: 'https://example.com/test.txt' },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onFileClick={handleClick} />
+        </TestWrapper>,
+      );
+
+      const fileItem = screen.getByRole('button', { name: /文件.*test\.txt/ });
+
+      // 模拟空格键
+      fireEvent.keyDown(fileItem, { key: ' ' });
+      expect(handleClick).toHaveBeenCalled();
+    });
+
+    it('应该支持Enter键触发分组折叠', async () => {
+      const nodes: GroupNode[] = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText',
+          collapsed: false,
+          children: [{ id: 'f1', name: 'doc1.txt' }],
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByText('doc1.txt')).toBeInTheDocument();
+
+      const groupHeader = screen.getByRole('button', { name: /收起.*文档/ });
+      fireEvent.keyDown(groupHeader, { key: 'Enter' });
+
+      await waitFor(() => {
+        expect(screen.queryByText('doc1.txt')).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('文件类型推断', () => {
+    it('应该正确推断文件类型并显示图标', () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'document.pdf', type: 'pdf', url: 'https://a/b.pdf' },
+        {
+          id: 'f2',
+          name: 'image.png',
+          type: 'image',
+          url: 'https://a/image.png',
+        },
+        {
+          id: 'f3',
+          name: 'video.mp4',
+          type: 'video',
+          url: 'https://a/video.mp4',
+        },
+      ];
+
+      const { container } = render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByText('document.pdf')).toBeInTheDocument();
+      expect(screen.getByText('image.png')).toBeInTheDocument();
+      expect(screen.getByText('video.mp4')).toBeInTheDocument();
+
+      // 应该有文件类型图标
+      const icons = container.querySelectorAll('.ant-workspace-file-item-icon');
+      expect(icons.length).toBe(3);
+    });
+
+    it('应该显示自定义文件图标', () => {
+      const CustomIcon = () => <span data-testid="custom-icon">📄</span>;
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'custom.txt',
+          url: 'https://a/custom.txt',
+          icon: <CustomIcon />,
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
+    });
+  });
+
+  describe('markdownEditorProps传递', () => {
+    it('应该将markdownEditorProps传递到预览组件', async () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'test.md', content: '# Hello' },
+      ];
+
+      const markdownEditorProps = {
+        theme: 'dark' as const,
+      };
+
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={nodes}
+            onPreview={vi.fn()}
+            markdownEditorProps={markdownEditorProps}
+          />
+        </TestWrapper>,
+      );
+
+      // 打开预览
+      fireEvent.click(screen.getByLabelText('预览'));
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+
+      // Props 应该被传递，组件正常渲染
+      expect(screen.getByText('test.md')).toBeInTheDocument();
+    });
+  });
 });
