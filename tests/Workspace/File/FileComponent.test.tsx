@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { ConfigProvider, message } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -564,21 +570,22 @@ describe('FileComponent', () => {
         </TestWrapper>,
       );
 
-      const previewBtn = screen.getByLabelText('预览');
-      fireEvent.click(previewBtn);
-      fireEvent.click(previewBtn);
+      // 点击文件本身两次（而不是预览按钮），避免 ActionIconBox 的 loading 状态阻止第二次点击
+      const fileItem = screen.getByText('test.txt');
+      fireEvent.click(fileItem);
+      fireEvent.click(fileItem);
 
-      await waitFor(() => {
-        expect(screen.getByText('second.txt')).toBeInTheDocument();
-      });
-
+      // 延迟 resolve 第一个请求
       await act(async () => {
         resolveFirst(firstFile);
         await Promise.resolve();
       });
 
+      // 第二个请求应该胜出，显示 second.txt
+      await waitFor(() => {
+        expect(screen.getByText('second.txt')).toBeInTheDocument();
+      });
       expect(screen.queryByText('first-old.txt')).not.toBeInTheDocument();
-      expect(screen.getByText('second.txt')).toBeInTheDocument();
     });
 
     it('应该触发自定义预览回调', async () => {
