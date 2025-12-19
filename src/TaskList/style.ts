@@ -55,6 +55,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       '&-status-idle': {
         height: 16,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       },
 
       '&-top': {

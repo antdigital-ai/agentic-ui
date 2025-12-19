@@ -18,7 +18,9 @@ export const handleImage = (currentElement: any) => {
     'image',
     {
       alt: currentElement.alt,
-      finished: currentElement.finished,
+      ...(currentElement.finished !== undefined && {
+        finished: currentElement.finished,
+      }),
     },
   );
   debugInfo('handleImage - 图片处理完成', {

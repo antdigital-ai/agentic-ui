@@ -133,17 +133,15 @@ export const handleCode = (currentElement: any, config?: any): CodeElement => {
       ? currentElement.otherProps.finished
       : streamStatus === 'done';
 
-  const otherProps = {
+  // 只保留必要的属性，不添加 data-block、data-state、data-language 到 otherProps
+  // 这些属性会被序列化为 HTML 注释，造成冗余
+  const otherProps: Record<string, any> = {
     ...(currentElement.otherProps || {}),
-    'data-block': 'true',
-    'data-state': streamStatus,
-    // 优先使用 parseNodes 中设置的 finish，否则使用 streamStatus 判断
-    finished: finishValue,
-    ...(langString ? { 'data-language': langString } : {}),
   };
 
-  if (finishValue !== false) {
-    delete otherProps.finished;
+  // 只有未完成时才添加 finished 属性
+  if (finishValue === false) {
+    otherProps.finished = false;
   }
 
   const baseCodeElement: CodeElement = {

@@ -1,6 +1,6 @@
 {
   "name": "@ant-design/agentic-ui",
-  "version": "2.28.9",
+  "version": "2.28.10",
   "description": "面向智能体的 UI 组件库，提供多步推理可视化、工具调用展示、任务执行协同等 Agentic UI 能力",
   "repository": "git@github.com:ant-design/agentic-ui.git",
   "license": "MIT",
@@ -100,11 +100,11 @@
     "remark-rehype": "^11.1.2",
     "rxjs": "^7.8.2",
     "slash2": "^2.0.0",
-    "slate": "0.118.1",
-    "slate-dom": "0.118.1",
+    "slate": "0.120.0",
+    "slate-dom": "0.119.0",
     "slate-history": "0.113.1",
     "slate-hyperscript": "0.100.0",
-    "slate-react": "^0.117.4",
+    "slate-react": "0.120.0",
     "string-width": "^7.2.0",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0"

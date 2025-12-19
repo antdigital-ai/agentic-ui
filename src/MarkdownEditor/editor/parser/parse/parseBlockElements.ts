@@ -55,7 +55,9 @@ export const handleList = (currentElement: any, parseNodes: ParseNodesFn) => {
     type: 'list',
     order: currentElement.ordered,
     start: currentElement.start,
-    finished: currentElement.finished,
+    ...(currentElement.finished !== undefined && {
+      finished: currentElement.finished,
+    }),
     children: parseNodes(currentElement.children, false, currentElement),
   };
   el.task = el.children?.some((s: any) => typeof s.checked === 'boolean');
@@ -172,7 +174,9 @@ export const processParagraphChildren = (
           'image',
           {
             alt: currentChild.alt,
-            finished: currentChild.finished,
+            ...(currentChild.finished !== undefined && {
+              finished: currentChild.finished,
+            }),
           },
         ),
       );

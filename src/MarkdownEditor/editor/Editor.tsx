@@ -1186,8 +1186,8 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
             }
           }}
           renderElement={elementRenderElement}
-          onKeyDown={handleKeyDown}
           renderLeaf={renderMarkdownLeaf}
+          onKeyDown={handleKeyDown}
         />
       </Slate>
     </>,

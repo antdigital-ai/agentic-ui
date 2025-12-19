@@ -1,7 +1,6 @@
 import type { RootContent } from 'mdast';
 import { Element } from 'slate';
 
-import { debugInfo } from '../../../Utils/debugUtils';
 import { ChartTypeConfig, Elements } from '../../el';
 import { MarkdownEditorPlugin } from '../../plugin';
 import { applyContextPropsAndConfig } from './parse/applyContextPropsAndConfig';
@@ -34,6 +33,142 @@ import {
   preprocessMarkdownTableNewlines,
 } from './parse/parseTable';
 import mdastParser from './remarkParse';
+
+// 全局解析缓存
+const parseCache = new Map<string, Elements[]>();
+
+/**
+ * 清空解析缓存
+ */
+export const clearParseCache = (): void => {
+  parseCache.clear();
+};
+
+/**
+ * Markdown 块信息
+ */
+interface MarkdownBlock {
+  content: string;
+  hash: string;
+}
+
+/**
+ * 生成简单的字符串哈希
+ */
+export const simpleHash = (str: string): string => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return hash.toString(36);
+};
+
+/**
+ * 将 Markdown 文本按块分割
+ * 正确处理代码块、HTML 标签、脚注等内容
+ * 返回带有内容和哈希的块数组
+ */
+const splitMarkdownIntoBlocks = (
+  md: string,
+  config?: ParserMarkdownToSlateNodeConfig,
+  plugins?: MarkdownEditorPlugin[],
+): MarkdownBlock[] => {
+  const blocks: string[] = [];
+  let currentBlock = '';
+  let inCodeBlock = false;
+  let htmlTagDepth = 0;
+
+  const lines = md.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // 检测代码块开始/结束
+    if (line.trim().startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+    }
+
+    // 检测 HTML 标签深度（非代码块时）
+    if (!inCodeBlock) {
+      const openTags = (line.match(/<[a-zA-Z][^/>]*>/g) || []).length;
+      const closeTags = (line.match(/<\/[a-zA-Z][^>]*>/g) || []).length;
+      const selfClosing = (line.match(/<[^>]*\/>/g) || []).length;
+      htmlTagDepth += openTags - closeTags - selfClosing;
+      htmlTagDepth = Math.max(0, htmlTagDepth);
+    }
+
+    // 检查当前块是否以 HTML 结尾（注释或标签）
+    const blockEndsWithHtml = /<!--[\s\S]*?-->$|<[^>]+>$/.test(
+      currentBlock.trim(),
+    );
+
+    // 检查当前块是否包含脚注引用（需要和脚注定义一起解析）
+    const hasFootnoteRef = /\[\^[^\]]+\]/.test(currentBlock);
+    // 检查下一行是否是脚注定义
+    const nextLineIsFootnoteDef =
+      i + 1 < lines.length && /^\[\^[^\]]+\]:/.test(lines[i + 1].trim());
+
+    // 只有在非代码块、非 HTML 块、且当前块不以 HTML 结尾、且不涉及脚注时，连续空行才作为分割点
+    const isBlockBoundary =
+      line === '' &&
+      !inCodeBlock &&
+      htmlTagDepth === 0 &&
+      !blockEndsWithHtml &&
+      !hasFootnoteRef &&
+      !nextLineIsFootnoteDef &&
+      currentBlock.endsWith('\n');
+
+    if (isBlockBoundary) {
+      if (currentBlock.trim()) {
+        blocks.push(currentBlock.trim());
+      }
+      currentBlock = '';
+      continue;
+    }
+
+    currentBlock += line + '\n';
+  }
+
+  if (currentBlock.trim()) {
+    blocks.push(currentBlock.trim());
+  }
+
+  // 合并小于 100 个字符的块到下一个块，同时处理包含 --- 的块
+  const MIN_BLOCK_SIZE = 100;
+  const mergedBlocks: string[] = [];
+
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+
+    // 检查当前块是否包含 --- (frontmatter 分隔符或 thematic break)
+    // 如果包含 ---，且有上一个块，则合并到上一个块
+    const containsHr = /^---\s*$/m.test(block);
+    if (containsHr && mergedBlocks.length > 0) {
+      mergedBlocks[mergedBlocks.length - 1] += '\n\n' + block;
+      continue;
+    }
+
+    // 如果当前块小于 100 个字符，且有下一个块，则合并到下一个块
+    if (block.length < MIN_BLOCK_SIZE && i + 1 < blocks.length) {
+      blocks[i + 1] = block + '\n\n' + blocks[i + 1];
+      continue;
+    }
+
+    mergedBlocks.push(block);
+  }
+
+  // 生成带哈希的块数组
+  const configStr = config ? JSON.stringify(config) : '';
+  const pluginsCount = plugins?.length || 0;
+  const configHash = simpleHash(`${configStr}_${pluginsCount}`);
+
+  return mergedBlocks.map((content) => ({
+    content,
+    hash: `${simpleHash(content)}_${configHash}`,
+  }));
+};
 /**
  * 解析Markdown字符串的配置选项
  */
@@ -99,52 +234,22 @@ export class MarkdownToSlateParser {
     schema: Elements[];
     links: { path: number[]; target: string }[];
   } {
-    debugInfo('parserMarkdownToSlateNode.parse - 开始解析', {
-      inputLength: md?.length,
-      hasPlugins: this.plugins?.length > 0,
-      config: this.config,
-    });
-
     // 先预处理 <think> 标签，然后预处理其他非标准 HTML 标签，最后处理表格换行
     const thinkProcessed = removeAnswerTags(preprocessThinkTags(md || ''));
-    debugInfo('parserMarkdownToSlateNode.parse - thinkProcessed', {
-      length: thinkProcessed.length,
-      changed: thinkProcessed !== md,
-    });
-
     const nonStandardProcessed = removeAnswerTags(
       preprocessNonStandardHtmlTags(thinkProcessed),
     );
-    debugInfo('parserMarkdownToSlateNode.parse - nonStandardProcessed', {
-      length: nonStandardProcessed.length,
-      changed: nonStandardProcessed !== thinkProcessed,
-    });
 
     // parse() 只执行 parser，需要 runSync() 来执行 transformer 插件
     const preprocessedMarkdown =
       preprocessMarkdownTableNewlines(nonStandardProcessed);
-    debugInfo('parserMarkdownToSlateNode.parse - preprocessedMarkdown', {
-      length: preprocessedMarkdown.length,
-    });
 
     const ast = mdastParser.parse(preprocessedMarkdown) as any;
-    debugInfo('parserMarkdownToSlateNode.parse - AST 解析完成', {
-      astType: ast?.type,
-      childrenCount: ast?.children?.length,
-    });
-
     const processedMarkdown = mdastParser.runSync(ast) as any;
     const markdownRoot = processedMarkdown.children;
-    debugInfo('parserMarkdownToSlateNode.parse - 插件处理完成', {
-      rootChildrenCount: markdownRoot?.length,
-    });
 
     // 使用类的配置和插件，通过 this 访问
     const schema = this.parseNodes(markdownRoot, true, undefined) as Elements[];
-    debugInfo('parserMarkdownToSlateNode.parse - 节点解析完成', {
-      schemaLength: schema?.length,
-      schemaTypes: schema?.map((s) => s.type),
-    });
 
     const filteredSchema = schema?.filter((item) => {
       if (item.type === 'paragraph' && !item.children?.length) {
@@ -160,11 +265,6 @@ export class MarkdownToSlateParser {
         return true;
       }
       return true;
-    });
-
-    debugInfo('parserMarkdownToSlateNode.parse - 过滤完成', {
-      beforeFilter: schema?.length,
-      afterFilter: filteredSchema?.length,
     });
 
     return {
@@ -183,14 +283,7 @@ export class MarkdownToSlateParser {
     top = false,
     parent?: RootContent,
   ): (Elements | Text)[] {
-    debugInfo('parserMarkdownToSlateNode.parseNodes - 开始解析节点', {
-      nodesCount: nodes?.length,
-      top,
-      parentType: parent?.type,
-    });
-
     if (!nodes?.length) {
-      debugInfo('parserMarkdownToSlateNode.parseNodes - 空节点，返回默认段落');
       return [{ type: 'paragraph', children: [{ text: '' }] }];
     }
 
@@ -199,18 +292,9 @@ export class MarkdownToSlateParser {
     let preElement: Element = null;
     let htmlTag: { tag: string; color?: string; url?: string }[] = [];
     let contextProps = {};
-    let pendingHtmlCommentProps: any = null;
 
     for (let i = 0; i < nodes.length; i++) {
       const currentElement = nodes[i] as any;
-      debugInfo(
-        `parserMarkdownToSlateNode.parseNodes - 处理节点 ${i}/${nodes.length}`,
-        {
-          type: currentElement?.type,
-          hasChildren: !!currentElement?.children,
-          childrenCount: currentElement?.children?.length,
-        },
-      );
       let el: Element | null | Element[] = null;
       let pluginHandled = false;
 
@@ -221,7 +305,6 @@ export class MarkdownToSlateParser {
         currentElement.value?.trim()?.endsWith('-->');
 
       let htmlCommentProps: Record<string, any> = {};
-      let isOtherPropsComment = false;
       if (isHtmlComment) {
         try {
           const commentContent = currentElement.value
@@ -229,65 +312,33 @@ export class MarkdownToSlateParser {
             .replace('-->', '')
             .trim();
           htmlCommentProps = JSON.parse(commentContent);
-          // 如果能够成功解析为 JSON 对象，且是对象类型（不是数组或基本类型）
-          if (
-            typeof htmlCommentProps === 'object' &&
-            htmlCommentProps !== null &&
-            !Array.isArray(htmlCommentProps)
-          ) {
-            // 检查是否包含代码块的元数据属性（data-language、data-block、data-state）
-            // 这些属性表明这是代码块的 otherProps 序列化生成的注释
-            const hasCodeMetadataProps =
-              htmlCommentProps['data-language'] ||
-              htmlCommentProps['data-block'] ||
-              htmlCommentProps['data-state'];
-            // 只有当包含代码块元数据属性时，才认为是 otherProps 注释
-            // 对齐注释（如 {"align":"center"}）不包含这些属性，应该被保留
-            isOtherPropsComment = hasCodeMetadataProps;
-          }
+          // 如果是数组类型，转换为图表配置格式
           if (Array.isArray(htmlCommentProps)) {
             htmlCommentProps = {
               config: htmlCommentProps as ChartTypeConfig[],
             };
           }
         } catch (e) {
-          // 解析失败，不是 JSON 格式的注释，可能是真正的 HTML 注释
-          isOtherPropsComment = false;
+          // 解析失败，不是 JSON 格式的注释，保持为空对象
         }
       }
 
-      const nextElement = i + 1 < nodes.length ? nodes[i + 1] : null;
-      const isNextCodeBlock = nextElement?.type === 'code';
-
-      // 如果 HTML 注释是代码块的 otherProps 序列化生成的，应该跳过，避免被解析为独立的 HTML 代码节点
-      // 如果后面跟着代码块，存储注释属性供代码块使用
-      if (isHtmlComment && isOtherPropsComment) {
-        if (isNextCodeBlock) {
-          // 后面有代码块，存储属性供代码块使用
-          pendingHtmlCommentProps = htmlCommentProps;
-        }
-        // 无论后面是否有代码块，都跳过 HTML 注释，避免生成独立的 HTML 代码节点
-        continue;
-      }
-
-      // 确定要使用的 config：优先使用待处理的 HTML 注释属性，否则使用前一个 HTML 代码节点的属性
-      let config = pendingHtmlCommentProps
-        ? pendingHtmlCommentProps
-        : preElement?.type === 'code' &&
-            preElement?.language === 'html' &&
-            preElement?.otherProps
+      // 确定要使用的 config：使用前一个 HTML 代码节点的属性
+      let config =
+        preElement?.type === 'code' &&
+        preElement?.language === 'html' &&
+        preElement?.otherProps
           ? preElement?.otherProps
           : {};
 
-      // 如果 HTML 注释不是代码块元数据注释，但包含 JSON 对象属性（如对齐注释），
-      // 应该跳过注释本身，但将属性应用到下一个元素
+      // 如果 HTML 注释包含 JSON 对象属性（如对齐注释、图表配置），
+      // 跳过注释本身，但将属性应用到下一个元素
       if (
         isHtmlComment &&
-        !isOtherPropsComment &&
         htmlCommentProps &&
         Object.keys(htmlCommentProps).length > 0
       ) {
-        // 将对齐注释等非代码块元数据注释的属性存储到 contextProps 中，供下一个元素使用
+        // 将注释属性存储到 contextProps 中，供下一个元素使用
         contextProps = { ...contextProps, ...htmlCommentProps };
         // 同时将属性作为 config 传递，以便 applyContextPropsAndConfig 设置 otherProps
         config = { ...config, ...htmlCommentProps };
@@ -301,22 +352,10 @@ export class MarkdownToSlateParser {
         config = { ...config, ...contextProps };
       }
 
-      // 如果使用了待处理的 HTML 注释属性，清空它
-      if (pendingHtmlCommentProps && config === pendingHtmlCommentProps) {
-        pendingHtmlCommentProps = null;
-      }
-
       // 首先尝试使用插件处理，使用 this.plugins
       for (const plugin of this.plugins) {
         const rule = plugin.parseMarkdown?.find((r) => r.match(currentElement));
         if (rule) {
-          debugInfo(
-            `parserMarkdownToSlateNode.parseNodes - 插件处理节点 ${i}`,
-            {
-              pluginName: (plugin as any).name || 'unknown',
-              elementType: currentElement?.type,
-            },
-          );
           const converted = rule.convert(currentElement);
           // 检查转换结果是否为 NodeEntry<Text> 格式
           if (Array.isArray(converted) && converted.length === 2) {
@@ -327,12 +366,6 @@ export class MarkdownToSlateParser {
             el = converted as Element;
           }
           pluginHandled = true;
-          debugInfo(
-            `parserMarkdownToSlateNode.parseNodes - 插件转换完成 ${i}`,
-            {
-              convertedType: el?.type,
-            },
-          );
           break;
         }
       }
@@ -342,11 +375,6 @@ export class MarkdownToSlateParser {
 
       // 如果插件没有处理，使用默认处理逻辑
       if (!pluginHandled) {
-        debugInfo(`parserMarkdownToSlateNode.parseNodes - 使用默认处理 ${i}`, {
-          elementType: currentElement?.type,
-          configKeys: Object.keys(config || {}),
-        });
-        // 使用统一的处理函数，通过 this 访问配置和插件
         const result = this.handleSingleElement(
           currentElement,
           config,
@@ -356,12 +384,6 @@ export class MarkdownToSlateParser {
         );
 
         el = result.el;
-        debugInfo(`parserMarkdownToSlateNode.parseNodes - 默认处理完成 ${i}`, {
-          resultType: Array.isArray(el) ? 'array' : el?.type,
-          resultLength: Array.isArray(el) ? el.length : 1,
-          hasContextProps: !!result.contextProps,
-          hasHtmlTag: !!result.htmlTag,
-        });
         if (result.contextProps) {
           contextProps = { ...contextProps, ...result.contextProps };
         }
@@ -386,11 +408,6 @@ export class MarkdownToSlateParser {
       preNode = currentElement;
       preElement = el as Element;
     }
-
-    debugInfo('parserMarkdownToSlateNode.parseNodes - 所有节点解析完成', {
-      totalElements: els.length,
-      elementTypes: els.map((e) => (e as any)?.type || 'text'),
-    });
 
     return els;
   }
@@ -463,20 +480,10 @@ export class MarkdownToSlateParser {
     preElement: Element | null,
   ): { el: Element | Element[] | null; contextProps?: any; htmlTag?: any[] } {
     const elementType = currentElement.type;
-    debugInfo('handleSingleElement - 开始处理元素', {
-      elementType,
-      hasConfig: !!config && Object.keys(config).length > 0,
-      configKeys: config ? Object.keys(config) : [],
-      parentType: parent?.type,
-      htmlTagLength: htmlTag?.length,
-      preElementType: preElement?.type,
-    });
-
     const elementHandlers = this.getElementHandlers();
     const handlerInfo = elementHandlers[elementType];
 
     if (handlerInfo?.needsHtmlResult) {
-      debugInfo('handleSingleElement - 使用 HTML 结果处理', { elementType });
       const htmlResult = handleHtml(currentElement, parent, htmlTag);
       const result: any = {
         el: htmlResult.el,
@@ -487,18 +494,11 @@ export class MarkdownToSlateParser {
       if (htmlResult.htmlTag) {
         result.htmlTag = htmlResult.htmlTag;
       }
-      debugInfo('handleSingleElement - HTML 结果处理完成', {
-        elementType,
-        resultType: Array.isArray(result.el) ? 'array' : result.el?.type,
-        hasContextProps: !!result.contextProps,
-        hasHtmlTag: !!result.htmlTag,
-      });
       return result;
     }
 
     if (!handlerInfo) {
-      debugInfo('handleSingleElement - 使用默认文本处理', { elementType });
-      const result = {
+      return {
         el: handleTextAndInlineElements(
           currentElement,
           htmlTag,
@@ -506,18 +506,8 @@ export class MarkdownToSlateParser {
           this.config,
         ),
       };
-      debugInfo('handleSingleElement - 默认文本处理完成', {
-        elementType,
-        resultType: Array.isArray(result.el) ? 'array' : result.el?.type,
-        resultLength: Array.isArray(result.el) ? result.el.length : 1,
-      });
-      return result;
     }
 
-    debugInfo('handleSingleElement - 调用元素处理器', {
-      elementType,
-      handlerExists: !!handlerInfo.handler,
-    });
     const handlerResult = handlerInfo.handler(
       currentElement,
       this.plugins,
@@ -527,15 +517,6 @@ export class MarkdownToSlateParser {
       preElement,
       this,
     );
-
-    debugInfo('handleSingleElement - 元素处理完成', {
-      elementType,
-      resultType: Array.isArray(handlerResult) ? 'array' : handlerResult?.type,
-      resultLength: Array.isArray(handlerResult) ? handlerResult.length : 1,
-      resultPreview: Array.isArray(handlerResult)
-        ? handlerResult.map((r) => ({ type: r?.type }))
-        : { type: handlerResult?.type },
-    });
 
     return { el: handlerResult };
   }
@@ -573,6 +554,60 @@ export const parserMarkdownToSlateNode = (
   schema: Elements[];
   links: { path: number[]; target: string }[];
 } => {
+  // 将 markdown 按块分割，同时生成哈希
+  const blocks = splitMarkdownIntoBlocks(md || '', config, plugins);
+
+  // 复用同一个 parser 实例
   const parser = new MarkdownToSlateParser(config || {}, plugins || []);
-  return parser.parse(md);
+
+  // 如果只有一个块，直接解析
+  if (blocks.length <= 1) {
+    const result = parser.parse(md);
+    const blockHash = blocks[0]?.hash || simpleHash(md || '');
+    // 为 schema 元素添加 hash
+    return {
+      schema: result.schema.map((s) => ({ ...s, hash: blockHash })),
+      links: result.links,
+    };
+  }
+
+  // 对每个块进行缓存查找或解析
+  const allSchemas: Elements[] = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const { content, hash } = blocks[i];
+
+    // 检查缓存
+    if (parseCache.has(hash)) {
+      const cachedSchema = parseCache.get(hash)!;
+      allSchemas.push(...cachedSchema);
+      continue;
+    }
+
+    // 缓存未命中，解析块
+    const result = parser.parse(content);
+
+    // 为 schema 元素添加 hash
+    const schemaWithHash = result.schema.map((s, index) => ({
+      ...s,
+      hash: `${hash}-${index}`,
+    }));
+
+    // 存入缓存（带 hash）
+    parseCache.set(hash, schemaWithHash);
+
+    // 限制缓存大小（最多 100 个条目）
+    if (parseCache.size > 100) {
+      const firstKey = parseCache.keys().next().value;
+      if (firstKey) {
+        parseCache.delete(firstKey);
+      }
+    }
+
+    allSchemas.push(...schemaWithHash);
+  }
+
+  return {
+    schema: allSchemas,
+    links: [],
+  };
 };

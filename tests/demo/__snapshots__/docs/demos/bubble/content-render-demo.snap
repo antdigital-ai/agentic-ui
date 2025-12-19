@@ -166,6 +166,7 @@
                           data-slate-node="value"
                           spellcheck="false"
                           style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                          translate="no"
                           zindex="-1"
                         >
                           <h1
@@ -708,6 +709,7 @@
                             data-slate-node="value"
                             spellcheck="false"
                             style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                            translate="no"
                             zindex="-1"
                           >
                             <div
@@ -808,6 +810,7 @@
                           data-slate-node="value"
                           spellcheck="false"
                           style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                          translate="no"
                           zindex="-1"
                         >
                           <h2

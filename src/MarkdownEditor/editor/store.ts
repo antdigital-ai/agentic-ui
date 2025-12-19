@@ -913,9 +913,10 @@ export class EditorStore {
    *
    * 优化步骤：
    * 1. 过滤无效节点
-   * 2. 生成差异操作
-   * 3. 执行优化后的操作
-   * 4. 处理可能的错误情况
+   * 2. 计算 hash 并检查是否需要更新
+   * 3. 生成差异操作
+   * 4. 执行优化后的操作
+   * 5. 处理可能的错误情况
    *
    * 过滤规则：
    * - 移除空的段落节点
@@ -991,9 +992,22 @@ export class EditorStore {
     newNodes: Node[],
     oldNodes: Node[],
   ): UpdateOperation[] {
-    if (!newNodes || !oldNodes) return [];
-
     const operations: UpdateOperation[] = [];
+    this.generateDiffOperationsInternal(newNodes, oldNodes, operations);
+    // 只在最外层排序一次
+    return operations.sort((a, b) => a.priority - b.priority);
+  }
+
+  /**
+   * 内部方法：生成差异操作，不进行排序。
+   * 递归调用时使用此方法，避免重复排序。
+   */
+  private generateDiffOperationsInternal(
+    newNodes: Node[],
+    oldNodes: Node[],
+    operations: UpdateOperation[],
+  ): void {
+    if (!newNodes || !oldNodes) return;
 
     // 第一阶段：处理节点数量不同的情况
     const lengthDiff = newNodes.length - oldNodes.length;
@@ -1026,11 +1040,13 @@ export class EditorStore {
       const newNode = newNodes[i];
       const oldNode = oldNodes[i];
 
+      // 提前检查 hash，相同则跳过
+      if (newNode.hash && oldNode.hash && newNode.hash === oldNode.hash) {
+        continue;
+      }
+
       this.compareNodes(newNode, oldNode, [i], operations);
     }
-
-    // 按优先级排序操作队列
-    return operations.sort((a, b) => a.priority - b.priority);
   }
 
   /**
@@ -1042,11 +1058,12 @@ export class EditorStore {
    * @param operations - 操作队列，用于存储发现的差异操作
    *
    * 比较过程包括：
-   * 1. 检查节点类型是否相同
-   * 2. 特殊处理表格节点
-   * 3. 比较文本节点内容
-   * 4. 比较节点属性
-   * 5. 递归比较子节点
+   * 1. 检查节点 hash 是否相同（相同则跳过比较）
+   * 2. 检查节点类型是否相同
+   * 3. 特殊处理表格节点
+   * 4. 比较文本节点内容
+   * 5. 比较节点属性
+   * 6. 递归比较子节点
    * @private
    */
   private compareNodes(
@@ -1055,6 +1072,11 @@ export class EditorStore {
     path: Path,
     operations: UpdateOperation[],
   ): void {
+    // 如果两个节点的 hash 相同，跳过比较
+    if (newNode.hash && oldNode.hash && newNode.hash === oldNode.hash) {
+      return;
+    }
+
     // 如果节点类型不同，直接替换整个节点
     if (newNode.type !== oldNode.type) {
       operations.push({
@@ -1116,9 +1138,11 @@ export class EditorStore {
     // 递归比较子节点
     if (newNode.children && oldNode.children) {
       // 特殊处理列表、引用等可能有嵌套结构的节点
-      const childrenOps = this.generateDiffOperations(
+      const childrenOps: UpdateOperation[] = [];
+      this.generateDiffOperationsInternal(
         newNode.children,
         oldNode.children,
+        childrenOps,
       );
 
       // 将子节点的操作添加到队列中，调整路径
@@ -1528,7 +1552,8 @@ export class EditorStore {
     path: Path,
     operations: UpdateOperation[],
   ): void {
-    const childOps = this.generateDiffOperations(newChildren, oldChildren);
+    const childOps: UpdateOperation[] = [];
+    this.generateDiffOperationsInternal(newChildren, oldChildren, childOps);
 
     // 调整子操作的路径
     childOps.forEach((op) => {

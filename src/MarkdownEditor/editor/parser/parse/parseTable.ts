@@ -366,7 +366,7 @@ export const parseTableOrChart = (
 
   const node: TableNode | ChartNode = {
     type: isChart ? 'chart' : 'table',
-    finished: table.finished,
+    ...(table.finished !== undefined && { finished: table.finished }),
     children: children,
     otherProps,
   } as any;

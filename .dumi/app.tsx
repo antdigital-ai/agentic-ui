@@ -4,16 +4,12 @@ import React from 'react';
 import './reset-ant.css';
 
 export function rootContainer(container: any) {
-  return (
-    <div className="one-token-vars">
-      {React.createElement(
-        ConfigProvider,
-        {
-          locale: zhCN,
-          prefixCls: 'otk',
-        },
-        container,
-      )}
-    </div>
+  return React.createElement(
+    ConfigProvider,
+    {
+      locale: zhCN,
+      prefixCls: 'otk',
+    },
+    container,
   );
 }

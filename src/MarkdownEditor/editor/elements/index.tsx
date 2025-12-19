@@ -50,75 +50,28 @@ export const dragStart = (e: React.DragEvent) => {
 
 /**
  * 比较函数，用于优化 MElement 组件的渲染性能
- * 只有当 element、children 或 readonly 发生变化时才重新渲染
+ * 只比较 hash 来判断是否需要重新渲染
  */
 const areElementPropsEqual = (
   prevProps: RenderElementProps & { readonly?: boolean },
   nextProps: RenderElementProps & { readonly?: boolean },
 ) => {
+  // table-cell 始终重新渲染
   if (nextProps.element?.type === 'table-cell') {
     return false;
   }
-  if (
-    nextProps.element?.type === 'paragraph' &&
-    nextProps.element.value === ''
-  ) {
-    // 如果是空段落，直接返回 true，避免不必要的渲染
-    return true;
+
+  // 比较 hash
+  const prevHash = (prevProps.element as any)?.hash;
+  const nextHash = (nextProps.element as any)?.hash;
+
+  // 如果都有 hash，只比较 hash
+  if (prevHash && nextHash) {
+    return prevHash === nextHash;
   }
 
-  // 首先进行引用比较，这是最快的
-  if (
-    prevProps.element === nextProps.element &&
-    prevProps.children === nextProps.children &&
-    prevProps.attributes === nextProps.attributes &&
-    prevProps.readonly === nextProps.readonly
-  ) {
-    return true;
-  }
-  if (prevProps.children === nextProps.children) {
-    return true;
-  }
-
-  // 比较 readonly 属性
-  if (prevProps.readonly !== nextProps.readonly) {
-    return false;
-  }
-
-  // 比较 attributes
-  if (prevProps.attributes !== nextProps.attributes) {
-    return false;
-  }
-
-  if (prevProps.element !== nextProps.element) {
-    const prev = prevProps.element;
-    const next = nextProps.element;
-
-    // 比较基本属性
-    if (
-      prev.type !== next.type ||
-      prev.level !== next.level ||
-      prev.value !== next.value
-    ) {
-      return false;
-    }
-
-    // 比较其他可能存在的属性
-    const prevKeys = Object.keys(prev);
-    const nextKeys = Object.keys(next);
-
-    if (prevKeys.length !== nextKeys.length) {
-      return false;
-    }
-
-    for (const key of prevKeys) {
-      if ((prev as any)[key] !== (next as any)[key]) {
-        return false;
-      }
-    }
-  }
-
-  return true;
+  // 没有 hash 时，回退到引用比较
+  return prevProps.element === nextProps.element;
 };
 
 const MElementComponent = (
@@ -233,93 +186,6 @@ const MElementComponent = (
 
 // 使用 React.memo 优化 MElement 组件的性能
 export const MElement = React.memo(MElementComponent, areElementPropsEqual);
-
-/**
- * 比较函数，用于优化 MLeaf 组件的渲染性能
- */
-const areLeafPropsEqual = (
-  prevProps: RenderLeafProps & {
-    hashId: string;
-    comment: MarkdownEditorProps['comment'];
-    fncProps: MarkdownEditorProps['fncProps'];
-    tagInputProps: MarkdownEditorProps['tagInputProps'];
-  },
-  nextProps: RenderLeafProps & {
-    hashId: string;
-    comment: MarkdownEditorProps['comment'];
-    fncProps: MarkdownEditorProps['fncProps'];
-    tagInputProps: MarkdownEditorProps['tagInputProps'];
-  },
-) => {
-  // 首先进行快速引用比较
-  if (
-    prevProps.leaf === nextProps.leaf &&
-    prevProps.children === nextProps.children &&
-    prevProps.attributes === nextProps.attributes &&
-    prevProps.text === nextProps.text &&
-    prevProps.hashId === nextProps.hashId &&
-    prevProps.comment === nextProps.comment &&
-    prevProps.fncProps === nextProps.fncProps &&
-    prevProps.tagInputProps === nextProps.tagInputProps
-  ) {
-    return true;
-  }
-
-  // 比较基本 props
-  if (
-    prevProps.hashId !== nextProps.hashId ||
-    prevProps.children !== nextProps.children ||
-    prevProps.attributes !== nextProps.attributes ||
-    prevProps.text !== nextProps.text
-  ) {
-    return false;
-  }
-
-  // 比较复杂对象的引用（这些通常由上级组件控制）
-  if (
-    prevProps.comment !== nextProps.comment ||
-    prevProps.fncProps !== nextProps.fncProps ||
-    prevProps.tagInputProps !== nextProps.tagInputProps
-  ) {
-    return false;
-  }
-
-  // 比较 leaf 对象
-  if (prevProps.leaf !== nextProps.leaf) {
-    const prevLeaf = prevProps.leaf;
-    const nextLeaf = nextProps.leaf;
-
-    // 使用数组来批量比较关键属性，这样更高效
-    const criticalProps = [
-      'text',
-      'bold',
-      'italic',
-      'strikethrough',
-      'code',
-      'tag',
-      'url',
-      'color',
-      'highColor',
-      'html',
-      'current',
-      'fnc',
-      'fnd',
-      'comment',
-      'identifier',
-      'placeholder',
-      'autoOpen',
-      'triggerText',
-    ];
-
-    for (const prop of criticalProps) {
-      if ((prevLeaf as any)[prop] !== (nextLeaf as any)[prop]) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-};
 
 const MLeafComponent = (
   props: RenderLeafProps & {
@@ -628,7 +494,7 @@ const MLeafComponent = (
 };
 
 // 使用 React.memo 优化 MLeaf 组件的性能
-export const MLeaf = React.memo(MLeafComponent, areLeafPropsEqual);
+export const MLeaf = React.memo(MLeafComponent);
 
 export {
   Blockquote,

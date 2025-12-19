@@ -53,6 +53,7 @@
               role="textbox"
               spellcheck="false"
               style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+              translate="no"
               zindex="-1"
             >
               <h1
