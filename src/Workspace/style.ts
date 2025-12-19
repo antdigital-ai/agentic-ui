@@ -54,7 +54,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       [`${token.componentCls}-tabs`]: {
-        margin: 'var(--margin-3x) var(--margin-4x)',
+        margin: 'var(--margin-3x)',
       },
 
       // 分割线样式
