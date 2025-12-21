@@ -37,9 +37,9 @@ export * from './ToolUseBarThink';
 export * from './Types';
 export { default as Workspace } from './Workspace';
 // HTML to Markdown conversion utilities
+export * from './AILabel';
 export * from './AnswerAlert';
 export * from './BackTo';
-export * from './AILabel';
 export { ActionItemBox } from './Components/ActionItemBox';
 export * from './History';
 export * from './MarkdownEditor/editor/utils/htmlToMarkdown';

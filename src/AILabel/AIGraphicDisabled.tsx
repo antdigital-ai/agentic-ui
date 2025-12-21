@@ -93,4 +93,3 @@ export function AIGraphicDisabled() {
     </svg>
   );
 }
-

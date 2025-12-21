@@ -1,5 +1,9 @@
 import React from 'react';
-import { Elements, MarkdownEditorInstance, MarkdownEditorProps } from '../../MarkdownEditor';
+import {
+  Elements,
+  MarkdownEditorInstance,
+  MarkdownEditorProps,
+} from '../../MarkdownEditor';
 import type { AttachmentButtonProps } from '../AttachmentButton';
 import type { SkillModeConfig } from '../SkillModeBar';
 import type { CreateRecognizer } from '../VoiceInput';
@@ -477,4 +481,3 @@ export type MarkdownInputFieldProps = {
    */
   onMaxLengthExceeded?: (value: string) => void;
 };
-

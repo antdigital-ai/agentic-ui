@@ -1,10 +1,10 @@
 import React from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
+import { upLoadFileToServer } from '../AttachmentButton';
 import type { AttachmentFile } from '../AttachmentButton/types';
 import { isMobileDevice } from '../AttachmentButton/utils';
 import { getFileListFromDataTransferItems } from '../FilePaste';
-import { upLoadFileToServer } from '../AttachmentButton';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
 interface UseMarkdownInputFieldHandlersParams {
@@ -161,4 +161,3 @@ export const useMarkdownInputFieldHandlers = ({
     activeInput,
   };
 };
-
