@@ -80,7 +80,21 @@ export const generateHistoryItems = ({
     },
   );
 
-  const items = Object.keys(groupList).map((key) => {
+  const sortedGroupKeys = Object.keys(groupList).sort((keyA, keyB) => {
+    const listA = groupList[keyA];
+    const listB = groupList[keyB];
+    
+    const maxTimeA = Math.max(
+      ...listA.map((item) => dayjs(item.gmtCreate).valueOf()),
+    );
+    const maxTimeB = Math.max(
+      ...listB.map((item) => dayjs(item.gmtCreate).valueOf()),
+    );
+    
+    return maxTimeB - maxTimeA;
+  });
+
+  const items = sortedGroupKeys.map((key) => {
     const list = groupList[key];
     const firstItem = list?.at(0);
     const label =
