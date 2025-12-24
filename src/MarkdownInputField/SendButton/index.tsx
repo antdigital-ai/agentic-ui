@@ -37,6 +37,7 @@ function SendIcon(
         cx="50%"
         cy="50%"
         r="0.5em"
+        initial={false}
         animate={{
           fill: hover ? '#14161C' : '#001C39',
           fillOpacity: hover ? 1 : 0.03530000150203705,
@@ -50,6 +51,7 @@ function SendIcon(
         <motion.path
           d="M16.667 12.943l3.528 3.528a.667.667 0 00.943-.942l-4.666-4.667a.665.665 0 00-.943 0l-4.667 4.667a.667.667 0 10.943.942l3.528-3.528v7.724a.667.667 0 101.334 0v-7.724z"
           fillRule="evenodd"
+          initial={false}
           animate={{
             fill: hover ? '#fff' : '#00183D',
             fillOpacity: hover ? 1 : 0.24709999561309814,

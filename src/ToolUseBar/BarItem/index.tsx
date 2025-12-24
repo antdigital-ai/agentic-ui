@@ -149,14 +149,16 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
           hashId={hashId}
           light={light}
         />
-        <ToolTime tool={tool} prefixCls={prefixCls} hashId={hashId} />
-        <ToolExpand
-          showContent={showContent}
-          expanded={expanded}
-          prefixCls={prefixCls}
-          hashId={hashId}
-          onExpandClick={handleExpandClick}
-        />
+        <div className={classnames(`${prefixCls}-tool-time-expand`, hashId)}>
+          <ToolTime tool={tool} prefixCls={prefixCls} hashId={hashId} />
+          <ToolExpand
+            showContent={showContent}
+            expanded={expanded}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            onExpandClick={handleExpandClick}
+          />
+        </div>
       </div>
       <ToolContent
         tool={tool}
