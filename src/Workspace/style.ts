@@ -135,7 +135,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       [`${token.componentCls}-content`]: {
         height: 'calc(100% - 95px)',
-        padding: '0 16px 16px',
+        padding: '0 12px 16px',
         display: 'flex',
         flexDirection: 'column',
         minHeight: 0,

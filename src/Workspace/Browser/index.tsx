@@ -38,11 +38,12 @@ export const RESULT_COUNT_TAG_STYLE: React.CSSProperties = {
   alignItems: 'center',
   font: 'var(--font-text-number-xs)',
   color: 'var(--color-gray-text-secondary)',
+  padding: '2px',
 };
 
 export const SUGGESTION_ITEM_STYLE: React.CSSProperties = {
-  padding: 4,
-  margin: 4,
+  padding: '4px',
+  margin: '4px 0',
   cursor: 'pointer',
 };
 
@@ -321,7 +322,7 @@ const Browser: React.FC<BrowserProps> = ({
                 onClick={() => handleExecuteSearch(item)}
                 className={classNames(`${prefixCls}-suggestion`, hashId)}
                 actions={[
-                  <div key="count" style={{ marginInlineStart: '-8px' }}>
+                  <div key="count">
                     <Tag
                       style={{ ...RESULT_COUNT_TAG_STYLE, marginRight: '-8px' }}
                     >

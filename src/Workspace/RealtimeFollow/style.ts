@@ -15,8 +15,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '8px 12px',
-        marginLeft: -16,
-        marginRight: -16,
+        marginLeft: '-12px',
+        marginRight: '-12px',
         borderBottom: '1px solid var(--color-gray-border-light)',
 
         // 返回按钮
@@ -170,7 +170,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         height: 'calc(100% + 16px)',
         paddingTop: 0,
         paddingBottom: 0,
-        margin: '0 -16px -16px',
+        margin: '0 -12px -16px',
 
         [`${token.componentCls}-header`]: {
           marginBottom: 0,
@@ -261,7 +261,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         width: 'auto',
         height: 'calc(100% - 72px)',
         overflow: 'auto',
-        margin: '0 -16px',
+        margin: '0 -12px',
         '.ant-workspace-html-preview-content': {
           '.ace-container': {
             border: 'unset',

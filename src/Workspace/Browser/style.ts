@@ -60,7 +60,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         justifyContent: 'space-between',
         height: '48px',
         width: 'calc(100% - 20px)',
-        padding: '4px',
+        padding: '8px',
         margin: '4px',
         '.ant-tag': {
           marginInlineEnd: '0',
@@ -87,8 +87,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '&-header-wrapper': {
-        marginLeft: '-16px',
-        marginRight: '-16px',
+        marginLeft: '-12px',
+        marginRight: '-12px',
       },
 
       '&-result-item': {
