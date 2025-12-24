@@ -80,15 +80,16 @@ export const generateHistoryItems = ({
     },
   );
 
+  // 对分组进行排序，按每个分组中最新记录的时间倒序排列
   const sortedGroupKeys = Object.entries(groupList)
-  .map(([key, list]) => ({
-    key,
-    maxTime: Math.max(
-      ...list.map((item) => dayjs(item.gmtCreate).valueOf()),
-    ),
-  }))
-  .sort((a, b) => b.maxTime - a.maxTime)
-  .map(({ key }) => key);
+    .map(([key, list]) => ({
+      key,
+      maxTime: Math.max(
+        ...list.map((item) => +dayjs(item.gmtCreate) || 0),
+      ),
+    }))
+    .sort((a, b) => b.maxTime - a.maxTime)
+    .map(({ key }) => key);
 
   const items = sortedGroupKeys.map((key) => {
     const list = groupList[key];
@@ -110,7 +111,10 @@ export const generateHistoryItems = ({
             const result = sessionSort(a, b);
             return typeof result === 'boolean' ? 0 : result;
           }
-          return dayjs(b.gmtCreate).valueOf() - dayjs(a.gmtCreate).valueOf();
+          // 使用 +dayjs() 并提供 0 作为 NaN 的回退值，确保排序稳定
+          const timeB = +dayjs(b.gmtCreate) || 0;
+          const timeA = +dayjs(a.gmtCreate) || 0;
+          return timeB - timeA;
         })
         ?.map((item: HistoryDataType) => {
           return {
