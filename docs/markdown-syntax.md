@@ -126,3 +126,53 @@ function hello() {
 - [x] 已完成任务
 - [ ] 未完成任务
 ```
+
+## 提示块 (Alerts)
+
+使用 `:::` 语法可以创建不同类型的提示块。
+
+```markdown
+:::info
+这是一个信息提示块。
+:::
+
+:::warning
+这是一个警告提示块。
+:::
+
+:::success
+这是一个成功提示块。
+:::
+
+:::error
+这是一个错误提示块。
+:::
+```
+
+## 图表 (Charts)
+
+### Mermaid 图表
+
+支持使用 Mermaid 语法绘制流程图、时序图、甘特图等。
+
+````markdown
+```mermaid
+graph TD
+    A[开始] --> B{判断}
+    B -- 是 --> C[执行]
+    B -- 否 --> D[结束]
+    C --> D
+```
+````
+
+### 内嵌组件
+
+你可以在 Markdown 中直接使用 React 组件（MDX），例如 Ant Design 的组件。
+
+```markdown
+import { Card } from 'antd';
+
+<Card title="卡片标题">
+  卡片内容
+</Card>
+```
