@@ -29,6 +29,13 @@ export type SendButtonCustomizationProps = {
   colors?: SendButtonColors;
 };
 
+const DEFAULT_SEND_BUTTON_COLORS = {
+  icon: '#00183D',
+  iconHover: '#fff',
+  background: '#001C39',
+  backgroundHover: '#14161C',
+};
+
 function SendIcon(
   props: React.SVGProps<SVGSVGElement> & {
     hover?: boolean;
@@ -48,18 +55,12 @@ function SendIcon(
     return <StopIcon {...rest} />;
   }
 
-  const defaultColors = {
-    icon: '#00183D',
-    iconHover: '#fff',
-    background: '#001C39',
-    backgroundHover: '#14161C',
-  };
-
   const currentColors = {
-    icon: colors?.icon ?? defaultColors.icon,
-    iconHover: colors?.iconHover ?? defaultColors.iconHover,
-    background: colors?.background ?? defaultColors.background,
-    backgroundHover: colors?.backgroundHover ?? defaultColors.backgroundHover,
+    icon: colors?.icon ?? DEFAULT_SEND_BUTTON_COLORS.icon,
+    iconHover: colors?.iconHover ?? DEFAULT_SEND_BUTTON_COLORS.iconHover,
+    background: colors?.background ?? DEFAULT_SEND_BUTTON_COLORS.background,
+    backgroundHover:
+      colors?.backgroundHover ?? DEFAULT_SEND_BUTTON_COLORS.backgroundHover,
   };
 
   return (
