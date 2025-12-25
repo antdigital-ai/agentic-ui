@@ -203,3 +203,23 @@ import { Card } from 'antd';
 | B | 150 |
 | C | 80 |
 ```
+
+## 高级自定义组件 (aPaaSify)
+
+支持使用 `apaasify` 代码块来定义基于 Schema 的高级组件，适用于 aPaaS 场景下的自定义渲染。
+
+````markdown
+```apaasify
+{
+  "type": "page",
+  "body": [
+    {
+      "type": "button",
+      "label": "点击我"
+    }
+  ]
+}
+```
+````
+
+> **注意**：`apaasify` 代码块的内容通常是一个 JSON 对象，具体的字段结构取决于项目的自定义渲染器配置。
