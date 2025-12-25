@@ -8,7 +8,7 @@ import { I18nContext } from '../../I18n';
 import type { AttachmentButtonProps } from '../AttachmentButton';
 import { AttachmentButton } from '../AttachmentButton';
 import type { AttachmentFile } from '../AttachmentButton/types';
-import type { SendButtonColors } from '../SendButton';
+import type { SendButtonCustomizationProps } from '../SendButton';
 import { SendButton } from '../SendButton';
 import type { CreateRecognizer } from '../VoiceInput';
 import { VoiceInputButton } from '../VoiceInput';
@@ -85,10 +85,7 @@ export interface SendActionsProps {
   onResize?: (width: number) => void;
 
   /** 发送按钮配置 */
-  sendButtonProps?: {
-    compact?: boolean;
-    colors?: SendButtonColors;
-  };
+  sendButtonProps?: SendButtonCustomizationProps;
 }
 
 /**

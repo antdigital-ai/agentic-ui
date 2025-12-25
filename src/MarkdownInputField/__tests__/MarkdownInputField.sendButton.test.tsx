@@ -48,4 +48,3 @@ describe('MarkdownInputField - sendButtonProps', () => {
     expect(props.colors).toEqual(customColors);
   });
 });
-

@@ -21,6 +21,14 @@ export type SendButtonColors = {
   backgroundHover?: string;
 };
 
+/**
+ * 按钮定制化属性
+ */
+export type SendButtonCustomizationProps = {
+  compact?: boolean;
+  colors?: SendButtonColors;
+};
+
 function SendIcon(
   props: React.SVGProps<SVGSVGElement> & {
     hover?: boolean;
