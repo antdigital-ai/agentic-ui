@@ -27,6 +27,7 @@
     "report:demo": "node scripts/generateDemoReport.js",
     "start": "npm run dev",
     "test": "vitest  --run",
+    "test:e2e": "vitest run tests/e2e",
     "test:coverage": "vitest --run --coverage",
     "tsc": "tsc --noEmit"
   },
@@ -40,6 +41,9 @@
     "*.{md,json}": [
       "prettier --write --no-error-on-unmatched-pattern"
     ]
+  },
+  "overrides": {
+    "ajv-keywords": "5.1.0"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.24.0",
@@ -145,6 +149,7 @@
     "lint-staged": "^13.3.0",
     "mockdate": "^3.0.5",
     "nwsapi": "2.2.13",
+    "playwright": "^1.57.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.3.0",
