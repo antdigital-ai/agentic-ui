@@ -7,7 +7,7 @@ These tests use [Playwright](https://playwright.dev/) running via [Vitest](https
 Before running the tests, you must start the development server:
 
 ```bash
-npm start
+pnpm start
 ```
 
 ## Running Tests
@@ -15,7 +15,7 @@ npm start
 Run the E2E tests with:
 
 ```bash
-npm run test:e2e
+pnpm run test:e2e
 ```
 
 ## Writing Tests

@@ -15,7 +15,7 @@
 ### 开发环境要求
 
 - Node.js 版本 >= 16
-- 推荐使用 npm 或 yarn
+- 推荐使用 npm 或 yarn 或 pnpm
 - Chrome 80+ 浏览器兼容性
 
 ### 安装依赖
@@ -24,15 +24,17 @@
 npm install
 # 或
 yarn install
+# 或
+pnpm install
 ```
 
 ### 开发命令
 
 ```bash
-npm start     # 启动开发服务器
-npm run build # 构建项目
-npm test      # 运行测试
-npm run lint  # 代码检查
+pnpm start    # 启动开发服务器
+pnpm run build # 构建项目
+pnpm test     # 运行测试
+pnpm run lint # 代码检查
 ```
 
 ## 代码风格指南
@@ -200,9 +202,9 @@ ComponentRef {
 ### 运行测试
 
 ```bash
-npm test                    # 运行所有测试
-npm test -- --watch       # 监听模式
-npm run test:coverage     # 生成覆盖率报告
+pnpm test                   # 运行所有测试
+pnpm test -- --watch        # 监听模式
+pnpm run test:coverage      # 生成覆盖率报告
 ```
 
 ## 演示代码规范
