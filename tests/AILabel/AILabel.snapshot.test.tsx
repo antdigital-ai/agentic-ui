@@ -6,7 +6,7 @@ import { AILabel } from '../../src/AILabel';
 // Mock framer-motion to ensure snapshot consistency
 vi.mock('framer-motion', () => ({
   motion: {
-    sup: ({ children, className, style, ...props }: any) => (
+    sup: ({ children, className, style, ...props }: React.ComponentProps<'sup'>) => (
       <sup className={className} style={style} {...props}>
         {children}
       </sup>
