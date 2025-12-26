@@ -814,6 +814,7 @@
                     >
                       <div
                         aria-hidden="true"
+                        class="ant-bubble-actions-lottie"
                         data-autoplay="false"
                         data-loop="false"
                         data-testid="lottie-animation"
@@ -837,6 +838,7 @@
                     >
                       <div
                         aria-hidden="true"
+                        class="ant-bubble-actions-lottie"
                         data-autoplay="false"
                         data-loop="false"
                         data-testid="lottie-animation"
@@ -855,6 +857,7 @@
                     >
                       <div
                         aria-hidden="true"
+                        class="ant-bubble-actions-lottie"
                         data-autoplay="false"
                         data-loop="false"
                         data-testid="lottie-animation"

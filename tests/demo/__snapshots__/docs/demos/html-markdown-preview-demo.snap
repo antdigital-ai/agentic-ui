@@ -94,51 +94,6 @@
                       <div
                         style="display: flex; gap: 5px; align-items: center;"
                       >
-                        <div
-                          aria-label="segmented control"
-                          class="ant-segmented"
-                          data-testid="preview"
-                          role="radiogroup"
-                          tabindex="0"
-                        >
-                          <div
-                            class="ant-segmented-group"
-                          >
-                            <label
-                              class="ant-segmented-item ant-segmented-item-selected"
-                            >
-                              <input
-                                checked=""
-                                class="ant-segmented-item-input"
-                                name="test-id"
-                                type="radio"
-                              />
-                              <div
-                                aria-selected="true"
-                                class="ant-segmented-item-label"
-                                title="预览"
-                              >
-                                预览
-                              </div>
-                            </label>
-                            <label
-                              class="ant-segmented-item"
-                            >
-                              <input
-                                class="ant-segmented-item-input"
-                                name="test-id"
-                                type="radio"
-                              />
-                              <div
-                                aria-selected="false"
-                                class="ant-segmented-item-label"
-                                title="代码"
-                              >
-                                代码
-                              </div>
-                            </label>
-                          </div>
-                        </div>
                         <span
                           aria-describedby="test-id"
                           aria-label="主题"
@@ -267,25 +222,8 @@
                       class="code-editor-content"
                       style="border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; display: block;"
                     >
-                      <iframe
-                        data-testid="html-preview-iframe"
-                        srcdoc="<div style="padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
-  <h2>HTML 预览演示</h2>
-  <p>这是一个HTML代码块的预览模式演示。</p>
-  <ul>
-    <li>支持HTML渲染</li>
-    <li>支持CSS样式</li>
-    <li>支持交互元素</li>
-  </ul>
-  <button onclick="alert('Hello from HTML!')" style="background: #ff6b6b; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
-    点击我
-  </button>
-</div>"
-                        style="outline: 0; border-radius: inherit; height: 100%; min-height: 400px; width: 100%;"
-                        width="100%"
-                      />
                       <div
-                        style="height: 100%; width: 100%; border-radius: inherit; padding: 12px 0px; display: none;"
+                        style="height: 100%; width: 100%; border-radius: inherit; padding: 12px 0px; display: block;"
                       >
                         <div
                           data-testid="ace-editor-container"
