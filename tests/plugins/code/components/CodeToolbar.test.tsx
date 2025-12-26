@@ -10,14 +10,18 @@ import {
   CodeToolbarProps,
 } from '../../../../src/Plugins/code/components/CodeToolbar';
 
-// Mock useEditorStore
-const mockEditorStore = {
-  editorProps: {
-    codeProps: {
-      disableHtmlPreview: false,
+// 使用 vi.hoisted() 定义变量，使其与 vi.mock 一起被提升
+const { mockEditorStore } = vi.hoisted(() => {
+  return {
+    mockEditorStore: {
+      editorProps: {
+        codeProps: {
+          disableHtmlPreview: false,
+        },
+      },
     },
-  },
-};
+  };
+});
 
 vi.mock('../../../../src/MarkdownEditor/editor/store', () => ({
   useEditorStore: () => mockEditorStore,
