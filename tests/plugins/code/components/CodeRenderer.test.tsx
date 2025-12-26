@@ -4,11 +4,11 @@
 
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import React from 'react';
+import React, { createContext } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CodeRenderer } from '../../../../src/Plugins/code/components/CodeRenderer';
 
-// 最小化的 mock
+// 定义 mockEditorStore 对象（在 mock 之前定义，确保可以在 mock 中使用）
 const mockEditorStore = {
   store: {
     editor: {
@@ -30,10 +30,15 @@ const mockEditorStore = {
   },
 };
 
-// Mock 核心依赖
-vi.mock('../../../../src/MarkdownEditor/editor/store', () => ({
-  useEditorStore: () => mockEditorStore,
-}));
+// Mock 核心依赖（使用函数形式，延迟执行以访问 mockEditorStore）
+vi.mock('../../../../src/MarkdownEditor/editor/store', async () => {
+  const React = await import('react');
+  return {
+    useEditorStore: () => mockEditorStore,
+    EditorStore: class EditorStore {},
+    EditorStoreContext: React.createContext(mockEditorStore),
+  };
+});
 
 // Mock hooks
 vi.mock('../../../../src/Plugins/code/hooks', () => ({

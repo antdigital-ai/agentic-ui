@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { message } from 'antd';
 import copy from 'copy-to-clipboard';
-import React from 'react';
+import React, { createContext } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CodeNode } from '../../../../src/MarkdownEditor/el';
 import {
@@ -21,6 +21,8 @@ const mockEditorStore = {
 
 vi.mock('../../../../src/MarkdownEditor/editor/store', () => ({
   useEditorStore: () => mockEditorStore,
+  EditorStore: class EditorStore {},
+  EditorStoreContext: createContext(mockEditorStore),
 }));
 
 // Mock 依赖
