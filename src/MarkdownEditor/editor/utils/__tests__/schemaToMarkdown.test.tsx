@@ -1,7 +1,7 @@
 import {
   parserMdToSchema,
   parserSlateNodeToMarkdown,
-} from '@ant-design/agentic-ui';
+} from '../../../../index';
 import { expect, it } from 'vitest';
 
 const input = `<!-- {"MarkdownType": "report", "id": "8", "section_ids": " [15, 16, 17] "} -->

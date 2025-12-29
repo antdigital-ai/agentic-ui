@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { formatTime } from '@ant-design/agentic-ui/utils/formatTime';
+import { formatTime } from '../formatTime';
 
 describe('formatTime', () => {
   let originalNodeEnv: string | undefined;

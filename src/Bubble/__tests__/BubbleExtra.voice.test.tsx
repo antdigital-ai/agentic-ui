@@ -2,8 +2,8 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { BubbleConfigContext } from '@ant-design/agentic-ui/Bubble/BubbleConfigProvide';
-import { BubbleExtra } from '@ant-design/agentic-ui/Bubble/MessagesContent/BubbleExtra';
+import { BubbleConfigContext } from '../BubbleConfigProvide';
+import { BubbleExtra } from '../MessagesContent/BubbleExtra';
 
 const BubbleConfigProvide: React.FC<{
   children: React.ReactNode;
@@ -26,9 +26,9 @@ vi.mock('framer-motion', () => ({
   },
 }));
 
-// Mock @ant-design/agentic-ui (别名指向 ./src)
-vi.mock('@ant-design/agentic-ui', async () => {
-  const actual = await vi.importActual('@ant-design/agentic-ui');
+// Mock ../../index (别名指向 ./src)
+vi.mock('../../index', async () => {
+  const actual = await vi.importActual('../../index');
   // Mock Lottie 组件，当 active 为 true 时显示 lottie-animation
   const mockPlayLottie = ({ active }: any) => (
     <span data-testid={active ? 'lottie-animation' : 'voice-play-lottie'}>
@@ -66,8 +66,8 @@ vi.mock('@ant-design/agentic-ui', async () => {
 });
 
 // Mock CopyButton / ActionIconBox，避免依赖样式与外部行为
-vi.mock('@ant-design/agentic-ui/index', async () => {
-  const actual = await vi.importActual('@ant-design/agentic-ui/index');
+vi.mock('../../index', async () => {
+  const actual = await vi.importActual('../../index');
   // Mock Lottie 组件，当 active 为 true 时显示 lottie-animation
   const mockPlayLottie = ({ active }: any) => (
     <span data-testid={active ? 'lottie-animation' : 'voice-play-lottie'}>
@@ -145,13 +145,13 @@ vi.mock('@ant-design/agentic-ui/index', async () => {
 });
 
 // Mock lottie 相关组件，避免加载动画 JSON（保持默认导出与命名导出一致）
-vi.mock('@ant-design/agentic-ui/icons/VoicePlayLottie', () => {
+vi.mock('../../icons/VoicePlayLottie', () => {
   const Mock = ({ size = 16 }: { size?: number }) => (
     <span data-testid="voice-play-lottie">lottie-{size}</span>
   );
   return { __esModule: true, default: Mock, VoicePlayLottie: Mock };
 });
-vi.mock('@ant-design/agentic-ui/icons/VoicingLottie', () => {
+vi.mock('../../icons/VoicingLottie', () => {
   const Mock = ({ size = 16 }: { size?: number }) => (
     <span data-testid="voicing-lottie">voicing-{size}</span>
   );

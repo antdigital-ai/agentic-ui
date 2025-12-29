@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { GroupMenu, MenuItemType } from '@ant-design/agentic-ui/History/menu';
+import { GroupMenu, MenuItemType } from '../../../History/menu';
 
 describe('GroupMenu', () => {
   const mockItems: MenuItemType[] = [

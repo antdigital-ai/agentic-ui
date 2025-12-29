@@ -10,8 +10,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type {
   ThoughtChainListProps,
   WhiteBoxProcessInterface,
-} from '@ant-design/agentic-ui/ThoughtChainList';
-import { ThoughtChainList } from '@ant-design/agentic-ui/ThoughtChainList';
+} from '..';
+import { ThoughtChainList } from '..';
 
 /**
  * ThoughtChainList Props API 专项测试

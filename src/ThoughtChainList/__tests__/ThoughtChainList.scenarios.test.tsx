@@ -7,8 +7,8 @@ import {
 } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { WhiteBoxProcessInterface } from '@ant-design/agentic-ui/ThoughtChainList';
-import { ThoughtChainList } from '@ant-design/agentic-ui/ThoughtChainList';
+import type { WhiteBoxProcessInterface } from '..';
+import { ThoughtChainList } from '..';
 
 /**
  * ThoughtChainList 功能场景测试

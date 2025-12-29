@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { ActionItemContainer } from '@ant-design/agentic-ui/MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
+import { ActionItemContainer } from '../BeforeToolContainer';
 
 type KeyedElement = React.ReactElement & { key: React.Key };
 

@@ -2,12 +2,12 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { message } from 'antd';
 import React, { createRef } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { I18nProvide } from '@ant-design/agentic-ui/I18n';
-import { SchemaEditor, SchemaEditorRef } from '@ant-design/agentic-ui/schema/SchemaEditor';
-import { LowCodeSchema } from '@ant-design/agentic-ui/schema/types';
+import { I18nProvide } from '../../../I18n';
+import { SchemaEditor, SchemaEditorRef } from '..';
+import { LowCodeSchema } from '../../types';
 
 // Mock AceEditorWrapper to avoid DOM manipulation issues in tests
-vi.mock('@ant-design/agentic-ui/schema/SchemaEditor/AceEditorWrapper', () => ({
+vi.mock('../AceEditorWrapper', () => ({
   AceEditorWrapper: vi.fn(({ value, language, readonly }) => (
     <div
       data-testid="ace-editor"
@@ -21,7 +21,7 @@ vi.mock('@ant-design/agentic-ui/schema/SchemaEditor/AceEditorWrapper', () => ({
 }));
 
 // Mock SchemaRenderer
-vi.mock('@ant-design/agentic-ui/schema/SchemaRenderer', () => ({
+vi.mock('../../SchemaRenderer', () => ({
   SchemaRenderer: ({
     schema,
     values,

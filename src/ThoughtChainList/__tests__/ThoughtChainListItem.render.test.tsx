@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   ThoughtChainList,
   WhiteBoxProcessInterface,
-} from '@ant-design/agentic-ui/ThoughtChainList';
+} from '..';
 
 describe('ThoughtChainList Custom Render Functions', () => {
   const mockThoughtChainList: WhiteBoxProcessInterface[] = [

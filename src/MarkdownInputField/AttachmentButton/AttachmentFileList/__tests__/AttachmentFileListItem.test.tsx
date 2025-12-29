@@ -1,4 +1,4 @@
-import { AttachmentFile, AttachmentFileListItem } from '@ant-design/agentic-ui';
+import { AttachmentFile, AttachmentFileListItem } from '../../../../index';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
@@ -16,13 +16,13 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock LoadingIcon
-vi.mock('@ant-design/agentic-ui/icons/LoadingIcon', () => ({
+vi.mock('../../../../icons/LoadingIcon', () => ({
   LoadingIcon: () => <div data-testid="loading-icon">Loading...</div>,
 }));
 
 // Mock AttachmentFileIcon
 vi.mock(
-  '@ant-design/agentic-ui/MarkdownInputField/AttachmentButton/AttachmentFileList/AttachmentFileIcon',
+  '../AttachmentFileIcon',
   () => ({
     AttachmentFileIcon: ({ file }: { file: any }) => (
       <div data-testid="file-icon">{file.name}</div>

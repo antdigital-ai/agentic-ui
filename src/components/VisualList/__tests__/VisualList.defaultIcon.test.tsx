@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { VisualList, VisualListItem } from '@ant-design/agentic-ui/components/VisualList';
+import { VisualList, VisualListItem } from '..';
 
 describe('VisualList 默认图标测试', () => {
   afterEach(() => {

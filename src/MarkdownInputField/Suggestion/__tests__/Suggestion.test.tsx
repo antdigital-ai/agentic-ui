@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   Suggestion,
   SuggestionConnext,
-} from '@ant-design/agentic-ui/MarkdownInputField/Suggestion';
+} from '..';
 
 // Mock antd Dropdown
 vi.mock('antd', async () => {

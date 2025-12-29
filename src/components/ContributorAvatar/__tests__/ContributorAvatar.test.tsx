@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
   AvatarList,
   ContributorAvatar,
-} from '@ant-design/agentic-ui/MarkdownEditor/editor/components/ContributorAvatar';
+} from '../../../MarkdownEditor/editor/components/ContributorAvatar';
 
 describe('ContributorAvatar Component', () => {
   const mockItem = {

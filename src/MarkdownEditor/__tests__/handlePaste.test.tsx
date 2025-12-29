@@ -10,12 +10,12 @@ import {
   handleSpecialTextPaste,
   handleTagNodePaste,
   shouldInsertTextDirectly,
-} from '@ant-design/agentic-ui/MarkdownEditor/editor/plugins/handlePaste';
-import { insertParsedHtmlNodes } from '@ant-design/agentic-ui/MarkdownEditor/editor/plugins/insertParsedHtmlNodes';
-import { EditorUtils } from '@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils';
+} from '../editor/plugins/handlePaste';
+import { insertParsedHtmlNodes } from '../editor/plugins/insertParsedHtmlNodes';
+import { EditorUtils } from '../editor/utils/editorUtils';
 
 // Mock insertParsedHtmlNodes
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/plugins/insertParsedHtmlNodes', () => ({
+vi.mock('../editor/plugins/insertParsedHtmlNodes', () => ({
   insertParsedHtmlNodes: vi.fn().mockResolvedValue(true),
 }));
 
@@ -28,7 +28,7 @@ vi.mock('antd', () => ({
 }));
 
 // Mock EditorUtils
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils', () => ({
+vi.mock('../editor/utils/editorUtils', () => ({
   EditorUtils: {
     replaceSelectedNode: vi.fn(),
     findMediaInsertPath: vi.fn(() => [0]),

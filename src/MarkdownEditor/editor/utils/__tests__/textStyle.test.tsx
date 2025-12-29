@@ -1,4 +1,4 @@
-import { parserSlateNodeToMarkdown } from '@ant-design/agentic-ui';
+import { parserSlateNodeToMarkdown } from '../../../../index';
 import { describe, expect, it } from 'vitest';
 
 describe('textStyle function - tag and value handling', () => {

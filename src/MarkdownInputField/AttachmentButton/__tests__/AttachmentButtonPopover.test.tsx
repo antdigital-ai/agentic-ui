@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AttachmentButtonPopover, {
   AttachmentSupportedFormatsContent,
   SupportedFileFormats,
-} from '@ant-design/agentic-ui/MarkdownInputField/AttachmentButton/AttachmentButtonPopover';
+} from '../AttachmentButtonPopover';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({

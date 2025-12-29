@@ -3,7 +3,7 @@ import {
   DislikeLottie,
   LikeLottie,
   RefreshLottie,
-} from '@ant-design/agentic-ui';
+} from '../../index';
 import { DislikeFilled, LikeFilled } from '@ant-design/icons';
 import { ConfigProvider, Divider } from 'antd';
 import classNames from 'classnames';

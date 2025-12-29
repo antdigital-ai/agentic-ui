@@ -12,7 +12,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock LoadingIcon
-vi.mock('@ant-design/agentic-ui/icons/LoadingIcon', () => ({
+vi.mock('../../../../icons/LoadingIcon', () => ({
   LoadingIcon: ({ style, ...props }: any) => (
     <div data-testid="loading-icon" style={style} {...props}>
       Loading...
@@ -24,7 +24,7 @@ import {
   AttachmentFile,
   AttachmentFileList,
   kbToSize,
-} from '@ant-design/agentic-ui';
+} from '../../../../index';
 
 describe('kbToSize utility function', () => {
   it('should convert KB to readable format', () => {

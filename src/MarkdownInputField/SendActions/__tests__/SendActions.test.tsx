@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SendActions } from '@ant-design/agentic-ui/MarkdownInputField/SendActions';
+import { SendActions } from '..';
 
 // Mock RcResizeObserver
 vi.mock('rc-resize-observer', () => ({

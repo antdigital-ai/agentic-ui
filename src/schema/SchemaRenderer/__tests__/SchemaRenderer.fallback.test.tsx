@@ -1,6 +1,6 @@
 import { merge } from 'lodash-es';
 import { describe, expect, it } from 'vitest';
-import type { ComponentProperties } from '@ant-design/agentic-ui/schema/types';
+import type { ComponentProperties } from '../../types';
 
 // 模拟 SchemaRenderer 中的 templateData 计算逻辑
 function calculateTemplateDataWithFallbacks(

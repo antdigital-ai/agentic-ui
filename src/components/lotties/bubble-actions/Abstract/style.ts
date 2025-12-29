@@ -2,7 +2,7 @@ import {
   ChatTokenType,
   GenerateStyle,
   useEditorStyleRegister,
-} from '@ant-design/agentic-ui/hooks/useStyle';
+} from '../../../../hooks/useStyle';
 
 const genAbstractLottieStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {

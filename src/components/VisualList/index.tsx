@@ -71,7 +71,7 @@ export interface VisualListProps {
  * @description 用于展示图片列表的组件，支持头像、缩略图等多种场景
  * @example
  * ```tsx
- * import { VisualList, VisualListItem } from '@ant-design/agentic-ui';
+ * import { VisualList, VisualListItem } from '../../index';
  *
  * const imageData: VisualListItem[] = [
  *   {

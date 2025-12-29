@@ -4,7 +4,7 @@ import { ConfigProvider } from 'antd';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ActionItemContainer } from '@ant-design/agentic-ui/MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
+import { ActionItemContainer } from '../BeforeToolContainer';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({

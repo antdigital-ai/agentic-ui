@@ -5,10 +5,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   BaseMarkdownEditor,
   MarkdownEditorProps,
-} from '@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
+} from '../BaseMarkdownEditor';
 
 // Mock 依赖
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/Editor', () => ({
+vi.mock('../editor/Editor', () => ({
   SlateMarkdownEditor: ({ onChange, initSchemaValue, ...props }: any) => {
     React.useEffect(() => {
       onChange?.('test markdown', initSchemaValue || []);
@@ -27,27 +27,27 @@ vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/Editor', () => ({
   },
 }));
 
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/tools/ToolBar/ToolBar', () => ({
+vi.mock('../editor/tools/ToolBar/ToolBar', () => ({
   default: () => <div data-testid="toolbar">Toolbar</div>,
 }));
 
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/tools/ToolBar/FloatBar', () => ({
+vi.mock('../editor/tools/ToolBar/FloatBar', () => ({
   FloatBar: () => <div data-testid="float-bar">Float Bar</div>,
 }));
 
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/tools/Leading', () => ({
+vi.mock('../editor/tools/Leading', () => ({
   TocHeading: () => <div data-testid="toc-heading">TOC</div>,
 }));
 
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/components/CommentList', () => ({
+vi.mock('../editor/components/CommentList', () => ({
   CommentList: () => <div data-testid="comment-list">Comment List</div>,
 }));
 
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/tools/InsertLink', () => ({
+vi.mock('../editor/tools/InsertLink', () => ({
   InsertLink: () => <div data-testid="insert-link">Insert Link</div>,
 }));
 
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/tools/InsertAutocomplete', () => ({
+vi.mock('../editor/tools/InsertAutocomplete', () => ({
   InsertAutocomplete: () => (
     <div data-testid="insert-autocomplete">Insert Autocomplete</div>
   ),

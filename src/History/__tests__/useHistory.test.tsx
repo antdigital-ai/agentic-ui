@@ -1,4 +1,4 @@
-import { HistoryDataType } from '@ant-design/agentic-ui';
+import { HistoryDataType } from '../../index';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useHistory } from '../hooks/useHistory';

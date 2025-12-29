@@ -2,7 +2,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { I18nProvide, cnLabels, compileTemplate, enLabels } from '@ant-design/agentic-ui/I18n';
+import { I18nProvide, cnLabels, compileTemplate, enLabels } from '../../I18n';
 
 describe('I18n Provider', () => {
   afterEach(() => {

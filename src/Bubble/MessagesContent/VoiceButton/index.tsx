@@ -1,4 +1,4 @@
-import { PlayLottie } from '@ant-design/agentic-ui';
+import { PlayLottie } from '../../../index';
 import { ChevronDown, Pause } from '@sofa-design/icons';
 import { ConfigProvider, Dropdown, Flex, Tooltip } from 'antd';
 import classNames from 'classnames';

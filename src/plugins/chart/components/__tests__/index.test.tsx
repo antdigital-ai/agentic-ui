@@ -1,4 +1,4 @@
-import { downloadChart } from '@ant-design/agentic-ui';
+import { downloadChart } from '../../../../index';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock DOM methods

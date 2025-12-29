@@ -36,7 +36,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock EditorStoreContext and useEditorStore
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/store', async (importOriginal) => {
+vi.mock('../../../store', async (importOriginal) => {
   const actual = (await importOriginal()) as any;
   return {
     ...actual,
@@ -56,7 +56,7 @@ vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/store', async (importOrigi
 });
 
 // Mock useStyle hook
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/elements/Comment/style', () => ({
+vi.mock('../style', () => ({
   useStyle: vi.fn(() => ({
     wrapSSR: (node: React.ReactElement) => node,
     hashId: 'test-hash-id',
@@ -66,11 +66,11 @@ vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/elements/Comment/style', (
 import {
   CommentDataType,
   MarkdownEditorProps,
-} from '@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
+} from '../../../../BaseMarkdownEditor';
 import {
   CommentCreate,
   CommentView,
-} from '@ant-design/agentic-ui/MarkdownEditor/editor/elements/Comment';
+} from '..';
 
 describe('CommentView Component', () => {
   const mockCommentData: CommentDataType[] = [

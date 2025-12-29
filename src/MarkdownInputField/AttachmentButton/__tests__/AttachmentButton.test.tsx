@@ -1,4 +1,4 @@
-import { AttachmentFile, isImageFile } from '@ant-design/agentic-ui';
+import { AttachmentFile, isImageFile } from '../../../index';
 import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
 import { message } from 'antd';
@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   AttachmentButton,
   upLoadFileToServer,
-} from '@ant-design/agentic-ui/MarkdownInputField/AttachmentButton';
+} from '..';
 
 // Mock antd message
 vi.mock('antd', async () => {

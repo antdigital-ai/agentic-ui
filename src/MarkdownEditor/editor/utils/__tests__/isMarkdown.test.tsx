@@ -1,4 +1,4 @@
-import { isMarkdown } from '@ant-design/agentic-ui';
+import { isMarkdown } from '../../../../index';
 import { describe, expect, it } from 'vitest';
 
 describe('isMarkdown', () => {

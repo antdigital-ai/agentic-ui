@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { TextStyleTag } from '@ant-design/agentic-ui/MarkdownEditor/editor/components/fntTag';
+import { TextStyleTag } from '../../../editor/components/fntTag';
 
 describe('TextStyleTag Component', () => {
   const renderWithProvider = (component: React.ReactElement) => {

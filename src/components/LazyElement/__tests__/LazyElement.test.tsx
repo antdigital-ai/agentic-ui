@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { LazyElement } from '@ant-design/agentic-ui/MarkdownEditor/editor/components/LazyElement';
+import { LazyElement } from '../../../MarkdownEditor/editor/components/LazyElement';
 
 // Mock IntersectionObserver
 class MockIntersectionObserver implements IntersectionObserver {

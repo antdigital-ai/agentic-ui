@@ -2,8 +2,8 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { SchemaForm } from '@ant-design/agentic-ui/schema/SchemaForm';
-import type { LowCodeSchema } from '@ant-design/agentic-ui/schema/types';
+import { SchemaForm } from '..';
+import type { LowCodeSchema } from '../../types';
 
 // Mock schema for testing
 const mockSchema: LowCodeSchema = {

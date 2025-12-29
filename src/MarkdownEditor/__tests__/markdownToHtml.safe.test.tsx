@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   markdownToHtml,
   markdownToHtmlSync,
-} from '@ant-design/agentic-ui/MarkdownEditor/editor/utils/markdownToHtml';
+} from '../editor/utils/markdownToHtml';
 
 describe('Markdown to HTML Safe Conversion Tests', () => {
   const testMarkdown = `FTAI Infrastructure在2025-08-09宣布了一项价值10亿美元的铁路资产收购。

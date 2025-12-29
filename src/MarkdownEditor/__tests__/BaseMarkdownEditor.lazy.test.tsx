@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BaseMarkdownEditor } from '@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
+import { BaseMarkdownEditor } from '../BaseMarkdownEditor';
 
 // Mock IntersectionObserver
 class MockIntersectionObserver implements IntersectionObserver {

@@ -2,7 +2,7 @@
  * MarkdownInputField 组件全面测试文件
  */
 
-import { MarkdownInputField } from '@ant-design/agentic-ui';
+import { MarkdownInputField } from '../../index';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

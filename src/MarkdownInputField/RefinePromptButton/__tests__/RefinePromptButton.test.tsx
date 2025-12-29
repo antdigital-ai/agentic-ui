@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { RefinePromptButton } from '@ant-design/agentic-ui/MarkdownInputField/RefinePromptButton';
+import { RefinePromptButton } from '..';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({

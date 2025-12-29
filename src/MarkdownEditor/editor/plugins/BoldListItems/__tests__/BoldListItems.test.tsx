@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { BaseMarkdownEditor } from '@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
+import { BaseMarkdownEditor } from '../../../../BaseMarkdownEditor';
 
 describe('BaseMarkdownEditor - Bold Text in Lists', () => {
   afterEach(() => {

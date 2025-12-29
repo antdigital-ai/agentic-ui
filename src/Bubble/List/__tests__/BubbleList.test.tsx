@@ -1,9 +1,9 @@
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BubbleConfigContext } from '@ant-design/agentic-ui/Bubble/BubbleConfigProvide';
-import { BubbleList } from '@ant-design/agentic-ui/Bubble/List';
-import { MessageBubbleData } from '@ant-design/agentic-ui/Bubble/type';
+import { BubbleConfigContext } from '../../BubbleConfigProvide';
+import { BubbleList } from '..';
+import { MessageBubbleData } from '../../type';
 
 const BubbleConfigProvide: React.FC<{
   children: React.ReactNode;

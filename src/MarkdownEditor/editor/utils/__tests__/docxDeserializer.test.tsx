@@ -1,4 +1,4 @@
-﻿import { docxDeserializer } from '@ant-design/agentic-ui';
+﻿import { docxDeserializer } from '../../../../index';
 import { describe, expect, it } from 'vitest';
 
 // Test data for various DOCX elements

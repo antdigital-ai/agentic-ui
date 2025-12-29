@@ -2,10 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { AgenticLayout } from '@ant-design/agentic-ui/AgenticLayout';
+import { AgenticLayout } from '..';
 
 // Mock the style hook
-vi.mock('@ant-design/agentic-ui/AgenticLayout/style', () => ({
+vi.mock('../style', () => ({
   useAgenticLayoutStyle: () => ({
     wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash',

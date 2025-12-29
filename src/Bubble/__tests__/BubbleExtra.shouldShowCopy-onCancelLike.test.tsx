@@ -2,8 +2,8 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { BubbleConfigContext } from '@ant-design/agentic-ui/Bubble/BubbleConfigProvide';
-import { BubbleExtra } from '@ant-design/agentic-ui/Bubble/MessagesContent/BubbleExtra';
+import { BubbleConfigContext } from '../BubbleConfigProvide';
+import { BubbleExtra } from '../MessagesContent/BubbleExtra';
 
 const BubbleConfigProvide: React.FC<{
   children: React.ReactNode;
@@ -36,9 +36,9 @@ vi.mock('classnames', () => ({
   default: vi.fn(() => 'test-class'),
 }));
 
-// Mock @ant-design/agentic-ui (别名指向 ./src)
-vi.mock('@ant-design/agentic-ui', async () => {
-  const actual = await vi.importActual('@ant-design/agentic-ui');
+// Mock ../../index (别名指向 ./src)
+vi.mock('../../index', async () => {
+  const actual = await vi.importActual('../../index');
   // Mock Lottie 组件
   const mockPlayLottie = ({ active, ...props }: any) => (
     <span data-testid={active ? 'lottie-animation' : 'voice-play-lottie'}>
@@ -76,8 +76,8 @@ vi.mock('@ant-design/agentic-ui', async () => {
 });
 
 // Mock ActionIconBox and CopyButton
-vi.mock('@ant-design/agentic-ui/index', async () => {
-  const actual = await vi.importActual('@ant-design/agentic-ui/index');
+vi.mock('../../index', async () => {
+  const actual = await vi.importActual('../../index');
   return {
     ...actual,
     ActionIconBox: ({

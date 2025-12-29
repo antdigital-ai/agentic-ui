@@ -6,8 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   CommentDataType,
   MarkdownEditorProps,
-} from '@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
-import { CommentList } from '@ant-design/agentic-ui/MarkdownEditor/editor/components/CommentList';
+} from '../../../../BaseMarkdownEditor';
+import { CommentList } from '../../../components/CommentList';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({

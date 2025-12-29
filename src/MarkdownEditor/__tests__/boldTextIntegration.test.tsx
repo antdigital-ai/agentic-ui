@@ -7,10 +7,10 @@ import '@testing-library/jest-dom';
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { BaseMarkdownEditor } from '@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
+import { BaseMarkdownEditor } from '../BaseMarkdownEditor';
 
 // Mock 依赖
-vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/Editor', () => ({
+vi.mock('../editor/Editor', () => ({
   SlateMarkdownEditor: ({ onChange, initSchemaValue, ...props }: any) => {
     React.useEffect(() => {
       onChange?.('test markdown', initSchemaValue || []);

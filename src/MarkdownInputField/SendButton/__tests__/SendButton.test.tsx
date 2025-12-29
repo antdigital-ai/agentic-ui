@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SendButton } from '@ant-design/agentic-ui/MarkdownInputField/SendButton';
+import { SendButton } from '..';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({

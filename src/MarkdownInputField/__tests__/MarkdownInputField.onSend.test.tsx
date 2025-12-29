@@ -2,7 +2,7 @@
  * MarkdownInputField onSend 防重复触发测试
  */
 
-import { MarkdownInputField } from '@ant-design/agentic-ui';
+import { MarkdownInputField } from '../../index';
 import '@testing-library/jest-dom';
 import { act, fireEvent, render } from '@testing-library/react';
 import React from 'react';

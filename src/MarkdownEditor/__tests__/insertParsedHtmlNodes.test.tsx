@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import { createEditor, Editor, Node } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { insertParsedHtmlNodes } from '@ant-design/agentic-ui/MarkdownEditor/editor/plugins/insertParsedHtmlNodes';
+import { insertParsedHtmlNodes } from '../editor/plugins/insertParsedHtmlNodes';
 
 // Mock antd message
 vi.mock('antd', () => ({

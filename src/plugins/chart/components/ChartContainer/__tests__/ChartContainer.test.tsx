@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import ChartContainer from '@ant-design/agentic-ui/plugins/chart/components/ChartContainer/ChartContainer';
+import ChartContainer from '../ChartContainer';
 
 describe('ChartContainer', () => {
   it('应该正确渲染基础容器', () => {
