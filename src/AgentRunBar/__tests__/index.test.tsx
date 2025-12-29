@@ -1,8 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Button } from 'antd';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
-import { TASK_RUNNING_STATUS, TASK_STATUS, TaskRunning } from '../index';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  TASK_RUNNING_STATUS,
+  TASK_STATUS,
+  TaskRunning,
+} from '../@ant-design/agentic-ui/AgentRunBar';
 
 describe('TaskRunning Component', () => {
   // 基础 props
@@ -16,6 +20,11 @@ describe('TaskRunning Component', () => {
     onReplay: vi.fn(),
     onViewResult: vi.fn(),
   };
+
+  beforeEach(() => {
+    // 清除所有模拟函数的调用历史
+    vi.clearAllMocks();
+  });
 
   // 测试默认渲染
   it('should render without title and description', () => {
@@ -442,5 +451,65 @@ describe('TaskRunning Component', () => {
     );
     expect(screen.getByLabelText('继续')).toBeInTheDocument();
     expect(screen.getByLabelText('停止')).toBeInTheDocument();
+  });
+
+  // 测试默认状态：当任务既不在运行中也不在暂停状态且提供了onCreateNewTask时
+  it('should render create new task button when not running and not paused but onCreateNewTask is provided', () => {
+    render(
+      <TaskRunning
+        {...baseProps}
+        taskStatus={TASK_STATUS.SUCCESS}
+        taskRunningStatus={TASK_RUNNING_STATUS.RUNNING} // 这种状态组合会导致既不是运行中也不是暂停状态
+        onCreateNewTask={vi.fn()}
+      />,
+    );
+
+    // 应该显示创建新任务按钮
+    expect(screen.getByText('创建新任务')).toBeInTheDocument();
+  });
+
+  // 测试默认状态：当任务既不在运行中也不在暂停状态但没有提供onCreateNewTask时
+  it('should not render create new task button when not running and not paused and onCreateNewTask is not provided', () => {
+    render(
+      <TaskRunning
+        {...baseProps}
+        taskStatus={TASK_STATUS.SUCCESS}
+        taskRunningStatus={TASK_RUNNING_STATUS.RUNNING} // 这种状态组合会导致既不是运行中也不是暂停状态
+        onCreateNewTask={undefined}
+      />,
+    );
+
+    // 不应该显示创建新任务按钮
+    expect(screen.queryByText('创建新任务')).not.toBeInTheDocument();
+  });
+
+  // 测试暂停状态：当任务处于暂停状态且提供了onCreateNewTask时
+  it('should render new task button when task is paused and onCreateNewTask is provided', () => {
+    render(
+      <TaskRunning
+        {...baseProps}
+        taskStatus={TASK_STATUS.PAUSE}
+        taskRunningStatus={TASK_RUNNING_STATUS.PAUSE}
+        onCreateNewTask={vi.fn()}
+      />,
+    );
+
+    // 应该显示新任务按钮
+    expect(screen.getByText('新任务')).toBeInTheDocument();
+  });
+
+  // 测试暂停状态：当任务处于暂停状态但没有提供onCreateNewTask时
+  it('should not render new task button when task is paused and onCreateNewTask is not provided', () => {
+    render(
+      <TaskRunning
+        {...baseProps}
+        taskStatus={TASK_STATUS.PAUSE}
+        taskRunningStatus={TASK_RUNNING_STATUS.PAUSE}
+        onCreateNewTask={undefined}
+      />,
+    );
+
+    // 不应该显示新任务按钮
+    expect(screen.queryByText('新任务')).not.toBeInTheDocument();
   });
 });
