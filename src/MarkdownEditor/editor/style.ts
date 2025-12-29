@@ -1,10 +1,10 @@
-import { MOBILE_BREAKPOINT } from '../../Constants/mobile';
+import { MOBILE_BREAKPOINT } from '../../constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
   resetComponent,
   useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+} from '../../hooks/useStyle';
 import './code.css';
 
 // 导入统一的标签样式配置

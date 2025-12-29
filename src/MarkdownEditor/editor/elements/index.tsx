@@ -5,7 +5,7 @@ import { Editor, Path, Transforms } from 'slate';
 
 import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 import { I18nContext } from '../../../I18n';
-import { debugInfo } from '../../../Utils/debugUtils';
+import { debugInfo } from '../../../utils/debugUtils';
 import { MarkdownEditorProps } from '../../types';
 import { useEditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';

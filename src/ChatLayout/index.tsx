@@ -6,8 +6,8 @@ import React, {
   useContext,
   useImperativeHandle,
 } from 'react';
-import { LayoutHeader } from '../Components/LayoutHeader';
-import useAutoScroll from '../Hooks/useAutoScroll';
+import { LayoutHeader } from '../components/LayoutHeader';
+import useAutoScroll from '../hooks/useAutoScroll';
 import { useStyle } from './style';
 import type { ChatLayoutProps, ChatLayoutRef } from './types';
 
@@ -141,6 +141,6 @@ ChatLayoutComponent.displayName = 'ChatLayout';
 // 使用 React.memo 优化性能，避免不必要的重新渲染
 export const ChatLayout = memo(ChatLayoutComponent);
 // 保持向后兼容，导出 ChatFlowHeader 作为 LayoutHeader 的别名
-export { LayoutHeader as ChatFlowHeader } from '../Components/LayoutHeader';
-export type { LayoutHeaderProps as ChatFlowHeaderProps } from '../Components/LayoutHeader';
+export { LayoutHeader as ChatFlowHeader } from '../components/LayoutHeader';
+export type { LayoutHeaderProps as ChatFlowHeaderProps } from '../components/LayoutHeader';
 export type { ChatLayoutProps, ChatLayoutRef } from './types';

@@ -3,7 +3,7 @@
 import { message } from 'antd';
 import { Editor, Element, Node, Path, Range, Transforms } from 'slate';
 import { jsx } from 'slate-hyperscript';
-import { debugInfo } from '../../../Utils/debugUtils';
+import { debugInfo } from '../../../utils/debugUtils';
 import { debugLog, EditorUtils } from '../utils';
 import { docxDeserializer } from '../utils/docx/docxDeserializer';
 

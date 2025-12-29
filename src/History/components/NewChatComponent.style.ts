@@ -2,7 +2,7 @@ import {
   ChatTokenType,
   GenerateStyle,
   useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+} from '../../hooks/useStyle';
 
 const genNewChatStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {

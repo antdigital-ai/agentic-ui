@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { memo, useMemo } from 'react';
 import { ToolCall } from '.';
-import { useRefFunction } from '../../Hooks/useRefFunction';
+import { useRefFunction } from '../../hooks/useRefFunction';
 
 interface ToolImageProps {
   tool: ToolCall;

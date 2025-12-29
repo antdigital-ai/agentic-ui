@@ -27,7 +27,7 @@ vi.mock('../EXCEPTION', () => ({
 }));
 
 // Mock hooks
-vi.mock('../../../Hooks/useRefFunction', () => ({
+vi.mock('../../../hooks/useRefFunction', () => ({
   useRefFunction: vi.fn((fn) => fn),
 }));
 

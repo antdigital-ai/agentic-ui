@@ -1,14 +1,14 @@
 ﻿import {
   MOBILE_BREAKPOINT,
   MOBILE_PADDING,
-} from '../../../../Constants/mobile';
+} from '../../../../constants/mobile';
 import {
   ChatTokenType,
   CSSInterpolation,
   GenerateStyle,
   resetComponent,
   useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
+} from '../../../../hooks/useStyle';
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {

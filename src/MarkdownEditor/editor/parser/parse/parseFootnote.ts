@@ -1,4 +1,4 @@
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 
 /**
  * 处理脚注引用

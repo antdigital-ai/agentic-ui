@@ -1,8 +1,8 @@
 import { Input, Spin } from 'antd';
 import React, { useContext, useRef, useState } from 'react';
-import { ActionIconBox } from '../../Components/ActionIconBox';
-import useClickAway from '../../Hooks/useClickAway';
-import { useDebounceFn } from '../../Hooks/useDebounceFn';
+import { ActionIconBox } from '../../components/ActionIconBox';
+import useClickAway from '../../hooks/useClickAway';
+import { useDebounceFn } from '../../hooks/useDebounceFn';
 import { I18nContext } from '../../I18n';
 
 function SearchIcon(props: React.SVGProps<SVGSVGElement>) {

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useScrollVisible } from '../useScrollVisible';
 
 // Mock getScroll
-vi.mock('../../../Utils/getScroll', () => ({
+vi.mock('../../../utils/getScroll', () => ({
   default: vi.fn((target) => {
     if (target === window || !target) {
       return window.pageYOffset || 0;
@@ -13,7 +13,7 @@ vi.mock('../../../Utils/getScroll', () => ({
 }));
 
 // Mock throttleByAnimationFrame
-vi.mock('../../../Utils/throttleByAnimationFrame', () => ({
+vi.mock('../../../utils/throttleByAnimationFrame', () => ({
   default: vi.fn((fn) => {
     const throttled = fn;
     throttled.cancel = vi.fn();
@@ -160,7 +160,7 @@ describe('useScrollVisible hook', () => {
 
     // 验证 hook 正常工作
     const throttleByAnimationFrame = await import(
-      '../../../Utils/throttleByAnimationFrame'
+      '../../../utils/throttleByAnimationFrame'
     );
     expect(throttleByAnimationFrame.default).toBeDefined();
   });

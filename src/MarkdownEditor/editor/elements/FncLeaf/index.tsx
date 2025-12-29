@@ -4,7 +4,7 @@ import React, { CSSProperties, useCallback, useContext, useMemo } from 'react';
 import { RenderLeafProps } from 'slate-react';
 
 import { isMobileDevice } from '../../../../MarkdownInputField/AttachmentButton/utils';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { MarkdownEditorProps } from '../../../types';
 import { dragStart } from '../index';
 

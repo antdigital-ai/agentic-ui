@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import getScroll from '../../Utils/getScroll';
-import throttleByAnimationFrame from '../../Utils/throttleByAnimationFrame';
+import getScroll from '../../utils/getScroll';
+import throttleByAnimationFrame from '../../utils/throttleByAnimationFrame';
 
 export type UseScrollVisibleProps = {
   /**

@@ -1,6 +1,6 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 
 export const Katex = ({
   attributes,

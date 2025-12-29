@@ -3,7 +3,7 @@ import type { BaseEditor } from 'slate';
 import { Editor, Element, Node, Text, Transforms } from 'slate';
 import type { HistoryEditor } from 'slate-history';
 import type { ReactEditor } from 'slate-react';
-import { MarkdownFormatter } from '../../../../../Plugins/formatter';
+import { MarkdownFormatter } from '../../../../../plugins/formatter';
 import { getSelRect } from '../../../utils/dom';
 import { EditorUtils } from '../../../utils/editorUtils';
 

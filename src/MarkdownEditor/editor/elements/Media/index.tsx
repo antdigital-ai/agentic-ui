@@ -8,12 +8,12 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useRefFunction } from '../../../../Hooks/useRefFunction';
+import { useRefFunction } from '../../../../hooks/useRefFunction';
 
 import { useDebounceFn } from '@ant-design/pro-components';
 import { Rnd } from 'react-rnd';
 import { Transforms } from 'slate';
-import { ActionIconBox } from '../../../../Components/ActionIconBox';
+import { ActionIconBox } from '../../../../components/ActionIconBox';
 import { I18nContext } from '../../../../I18n';
 import { ElementProps, MediaNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';

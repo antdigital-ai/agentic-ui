@@ -1,6 +1,6 @@
 import { ExpandAlt, FoldAlt } from '@sofa-design/icons';
 import React from 'react';
-import { ActionIconBox } from '../../Components/ActionIconBox';
+import { ActionIconBox } from '../../components/ActionIconBox';
 
 interface EnlargementProps {
   /** 是否处于放大状态 */

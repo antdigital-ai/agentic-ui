@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BackTo } from '..';
 
 // Mock scrollTo 工具函数
-vi.mock('../../Utils/scrollTo', () => ({
+vi.mock('../../utils/scrollTo', () => ({
   default: vi.fn((y, options) => {
     if (options?.callback) {
       options.callback();
@@ -95,7 +95,7 @@ describe('BackTop 组件', () => {
   });
 
   it('应该在点击时滚动到顶部', async () => {
-    const scrollToMock = await import('../../Utils/scrollTo');
+    const scrollToMock = await import('../../utils/scrollTo');
 
     Object.defineProperty(window, 'pageYOffset', {
       writable: true,
@@ -126,7 +126,7 @@ describe('BackTop 组件', () => {
   });
 
   it('应该支持自定义滚动持续时间', async () => {
-    const scrollToMock = await import('../../Utils/scrollTo');
+    const scrollToMock = await import('../../utils/scrollTo');
 
     Object.defineProperty(window, 'pageYOffset', {
       writable: true,

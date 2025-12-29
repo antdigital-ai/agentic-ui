@@ -9,18 +9,18 @@ export * from './Bubble/List';
 export * from './Bubble/type';
 export * from './ChatBootPage';
 export * from './ChatLayout';
-export * from './Components/ActionIconBox';
-export * from './Components/Button';
-export * from './Components/LayoutHeader';
-export * from './Components/Loading';
-export * from './Components/lotties';
-export * from './Components/SuggestionList';
-export * from './Components/VisualList';
-export * from './Hooks/useAutoScroll';
-export { useLanguage } from './Hooks/useLanguage';
-export * from './Hooks/useRefFunction';
-export * from './Hooks/useStyle';
-export * from './Hooks/useThrottleFn';
+export * from './components/ActionIconBox';
+export * from './components/Button';
+export * from './components/LayoutHeader';
+export * from './components/Loading';
+export * from './components/lotties';
+export * from './components/SuggestionList';
+export * from './components/VisualList';
+export * from './hooks/useAutoScroll';
+export { useLanguage } from './hooks/useLanguage';
+export * from './hooks/useRefFunction';
+export * from './hooks/useStyle';
+export * from './hooks/useThrottleFn';
 export * from './I18n';
 export * from './MarkdownEditor';
 export * from './MarkdownEditor/editor/components/index';
@@ -40,7 +40,7 @@ export { default as Workspace } from './Workspace';
 export * from './AILabel';
 export * from './AnswerAlert';
 export * from './BackTo';
-export { ActionItemBox } from './Components/ActionItemBox';
+export { ActionItemBox } from './components/ActionItemBox';
 export * from './History';
 export * from './MarkdownEditor/editor/utils/htmlToMarkdown';
 export * from './MarkdownEditor/el';
@@ -50,7 +50,7 @@ export * from './MarkdownInputField/AttachmentButton';
 export { ActionItemContainer } from './MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
 export * from './MarkdownInputField/FileMapView';
 export * from './MarkdownInputField/MarkdownInputField';
-export * from './Plugins/formatter';
+export * from './plugins/formatter';
 export * from './Schema';
 export * from './TaskList';
 export * from './ThoughtChainList';
@@ -58,16 +58,16 @@ export * from './ToolUseBar';
 export * from './WelcomeMessage';
 export * from './Workspace';
 // Robot 组件
-export * from './Components/Robot';
-export { default as Robot } from './Components/Robot';
+export * from './components/Robot';
+export { default as Robot } from './components/Robot';
 
 // Quote 组件导出
 export { default as Quote } from './Quote';
 export type { QuoteProps } from './Quote';
 
 // 新增：图表插件对外导出
-export * from './Plugins/chart';
-export * from './Plugins/mermaid';
+export * from './plugins/chart';
+export * from './plugins/mermaid';
 
 export * from './MarkdownEditor/types';
 
@@ -94,7 +94,7 @@ export * from './History/types/HistoryData';
 export * from './History/types/HistoryList';
 
 // Schema 相关类型
-export * from './Schema/types';
+export * from './schema/types';
 
 // Workspace 相关类型
 export * from './Workspace/types';
@@ -103,14 +103,14 @@ export * from './Workspace/types';
 export * from './MarkdownInputField/AttachmentButton/types';
 
 // ProxySandbox 相关类型
-export * from './Utils/proxySandbox/ProxySandbox';
-export * from './Utils/proxySandbox/SecurityContextManager';
+export * from './utils/proxySandbox/ProxySandbox';
+export * from './utils/proxySandbox/SecurityContextManager';
 
 // 代理沙箱相关类型别名
-export * from './Utils/proxySandbox';
+export * from './utils/proxySandbox';
 
 // 代码插件相关类型
-export * from './Plugins/code/components';
+export * from './plugins/code/components';
 
 // Slate Table 相关类型
 export * from './MarkdownEditor/utils/native-table/native-table-editor';
@@ -125,18 +125,18 @@ export * from './Bubble/MessagesContent/VoiceButton/types';
 export * from './MarkdownInputField/VoiceInput';
 
 // 模板引擎类
-export * from './Schema/SchemaRenderer/templateEngine';
+export * from './schema/SchemaRenderer/templateEngine';
 
 // Schema 验证器类
-export * from './Schema/validator';
+export * from './schema/validator';
 
 // 沙箱健康检查器
-export * from './Utils/proxySandbox';
+export * from './utils/proxySandbox';
 
 // 文字动画组件导出
-export * from './Components/GradientText';
-export * from './Components/TextAnimate';
-export * from './Components/TypingAnimation';
+export * from './components/GradientText';
+export * from './components/TextAnimate';
+export * from './components/TypingAnimation';
 
 export * from './MarkdownInputField/AttachmentButton/AttachmentFileList/AttachmentFileListItem';
 

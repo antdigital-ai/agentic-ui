@@ -3,7 +3,7 @@ import { TextOptimize } from '@sofa-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
 import React, { useContext } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ActionIconBox } from '../../Components/ActionIconBox';
+import { ActionIconBox } from '../../components/ActionIconBox';
 import { useStyle } from './style';
 type RefinePromptButtonProps = {
   isHover: boolean;

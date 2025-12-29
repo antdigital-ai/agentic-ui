@@ -9,7 +9,7 @@ import classNames from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
 import React, { memo, useContext, useEffect, useMemo } from 'react';
-import { useRefFunction } from '../Hooks/useRefFunction';
+import { useRefFunction } from '../hooks/useRefFunction';
 import { useStyle } from './style';
 
 const getChevronStyle = (expanded: boolean): React.CSSProperties => ({

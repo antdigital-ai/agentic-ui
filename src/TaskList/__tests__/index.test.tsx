@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TaskList } from '..';
 
 // 模拟 Loading 组件
-vi.mock('../../Components/Loading', () => ({
+vi.mock('../../components/Loading', () => ({
   Loading: ({ size }: { size: number }) => (
     <div data-testid="task-list-loading" data-size={size}>
       Loading...

@@ -2,7 +2,7 @@ import { Check, CircleDashed, OctagonX } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { type FC, useContext } from 'react';
-import { LoadingEffect } from '../../Components/effects';
+import { LoadingEffect } from '../../components/effects';
 import { useTaskStyle } from './style';
 
 type TaskStatus = 'success' | 'pending' | 'loading' | 'error';

@@ -2,7 +2,7 @@ import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import { useMergedState } from 'rc-util';
 import React, { memo, useContext, useMemo } from 'react';
-import { useRefFunction } from '../Hooks/useRefFunction';
+import { useRefFunction } from '../hooks/useRefFunction';
 import { ToolCall, ToolUseBarItem } from './BarItem';
 import { useStyle } from './style';
 export * from './BarItem';

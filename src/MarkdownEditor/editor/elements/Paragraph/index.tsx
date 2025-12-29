@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import React, { useContext } from 'react';
 import { Node } from 'slate';
 import { I18nContext } from '../../../../I18n';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { ElementProps, ParagraphNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';

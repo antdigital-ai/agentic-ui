@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { standardPlugins } from '../Plugins/defaultPlugins';
+import { standardPlugins } from '../plugins/defaultPlugins';
 import { BaseMarkdownEditor, MarkdownEditorProps } from './BaseMarkdownEditor';
 export * from './BaseMarkdownEditor';
 

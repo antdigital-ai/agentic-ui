@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useUpdateEffect } from 'react-use';
 import type { SkillModeConfig } from '../';
-import { useRefFunction } from '../../../Hooks/useRefFunction';
+import { useRefFunction } from '../../../hooks/useRefFunction';
 
 /**
  * 技能模式状态管理 Hook

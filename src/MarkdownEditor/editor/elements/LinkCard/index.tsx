@@ -1,7 +1,7 @@
 ﻿import { ConfigProvider, Skeleton } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { ElementProps, LinkCardNode } from '../../../el';
 import { AvatarList } from '../../components/ContributorAvatar';
 import { DragHandle } from '../../tools/DragHandle';

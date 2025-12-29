@@ -2,7 +2,7 @@ import {
   ChatTokenType,
   GenerateStyle,
   useEditorStyleRegister,
-} from '../Hooks/useStyle';
+} from '../hooks/useStyle';
 
 const LIGHT_MODE_BACKGROUND = 'rgba(255, 255, 255, 0.65)';
 const LIGHT_MODE_BACKDROP_FILTER = 'blur(12px)';

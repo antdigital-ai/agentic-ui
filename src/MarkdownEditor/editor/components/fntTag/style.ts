@@ -2,7 +2,7 @@
   ChatTokenType,
   GenerateStyle,
   useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
+} from '../../../../hooks/useStyle';
 import { FNC_TAG_STYLES } from '../../tagStyles';
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {

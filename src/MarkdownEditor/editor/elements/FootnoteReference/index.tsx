@@ -1,6 +1,6 @@
 import React from 'react';
 import { Node } from 'slate';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { ElementProps, FootnoteDefinitionNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';

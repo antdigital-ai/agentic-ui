@@ -3,7 +3,7 @@ import { Popover } from 'antd';
 import classNames from 'classnames';
 import RcResizeObserver from 'rc-resize-observer';
 import React, { useContext, useMemo } from 'react';
-import { ActionIconBox } from '../../Components/ActionIconBox';
+import { ActionIconBox } from '../../components/ActionIconBox';
 import { I18nContext } from '../../I18n';
 import type { AttachmentButtonProps } from '../AttachmentButton';
 import { AttachmentButton } from '../AttachmentButton';

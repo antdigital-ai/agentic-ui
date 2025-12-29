@@ -1,5 +1,5 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import type { ChatTokenType, GenerateStyle } from '../../hooks/useStyle';
+import { useEditorStyleRegister } from '../../hooks/useStyle';
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {

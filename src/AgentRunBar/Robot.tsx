@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { isString } from 'lodash-es';
 import React from 'react';
-import RobotIcon from '../Components/Robot';
+import RobotIcon from '../components/Robot';
 
 export type RobotStatus = 'default' | 'thinking' | 'dazing' | 'pause';
 

@@ -1,7 +1,7 @@
 ﻿import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { createElement, useContext } from 'react';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { ElementProps, ListNode } from '../../../el';
 import { useEditorStore } from '../../store';
 import { useStyle } from './style';

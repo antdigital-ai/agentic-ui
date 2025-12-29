@@ -4,7 +4,7 @@ import {
   GenerateStyle,
   resetComponent,
   useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+} from '../../hooks/useStyle';
 
 // 定义旋转动画
 const pauseIconRotate = new Keyframes('pauseIconRotate', {

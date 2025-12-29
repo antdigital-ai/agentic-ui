@@ -3,7 +3,7 @@ import {
   GenerateStyle,
   resetComponent,
   useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
+} from '../../../../hooks/useStyle';
 
 /**
  * LazyElement 样式生成器

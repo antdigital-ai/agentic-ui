@@ -1,10 +1,10 @@
-import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
+import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
   resetComponent,
   useEditorStyleRegister,
-} from '../Hooks/useStyle';
+} from '../hooks/useStyle';
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {

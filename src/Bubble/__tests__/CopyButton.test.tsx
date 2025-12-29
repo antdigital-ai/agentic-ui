@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CopyButton } from '../MessagesContent/CopyButton';
 
 // Mock useCopied hook
-vi.mock('../../Hooks/useCopied', () => ({
+vi.mock('../../hooks/useCopied', () => ({
   useCopied: vi.fn(() => ({
     copied: false,
     setCopied: vi.fn(),

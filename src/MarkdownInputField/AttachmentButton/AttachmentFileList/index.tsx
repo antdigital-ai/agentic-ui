@@ -3,7 +3,7 @@ import { ConfigProvider, Image } from 'antd';
 import classNames from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useContext } from 'react';
-import { ActionIconBox } from '../../../Components/ActionIconBox';
+import { ActionIconBox } from '../../../components/ActionIconBox';
 import { AttachmentFile } from '../types';
 import { isImageFile } from '../utils';
 import { AttachmentFileListItem } from './AttachmentFileListItem';

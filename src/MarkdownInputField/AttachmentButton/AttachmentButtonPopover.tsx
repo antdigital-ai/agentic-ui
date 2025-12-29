@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import { Button, Modal, Tooltip } from 'antd';
 import React, { useContext, useMemo, useState } from 'react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
+import { useRefFunction } from '../../hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { isMobileDevice, isVivoOrOppoDevice, kbToSize } from './utils';
 

@@ -12,13 +12,13 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useRefFunction } from '../../../../Hooks/useRefFunction';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { useRefFunction } from '../../../../hooks/useRefFunction';
+import { debugInfo } from '../../../../utils/debugUtils';
 
 import { useDebounceFn } from '@ant-design/pro-components';
 import { Rnd } from 'react-rnd';
 import { Path, Transforms } from 'slate';
-import { ActionIconBox } from '../../../../Components/ActionIconBox';
+import { ActionIconBox } from '../../../../components/ActionIconBox';
 import { I18nContext } from '../../../../I18n';
 import { ElementProps, MediaNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';

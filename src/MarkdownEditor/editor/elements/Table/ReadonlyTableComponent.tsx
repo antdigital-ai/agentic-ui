@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { ActionIconBox } from '../../../../Components/ActionIconBox';
+import { ActionIconBox } from '../../../../components/ActionIconBox';
 import { I18nContext } from '../../../../I18n';
 import { useEditorStore } from '../../store';
 import { TableNode } from '../../types/Table';

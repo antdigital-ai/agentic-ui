@@ -1,11 +1,11 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
+import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
   resetComponent,
   useEditorStyleRegister,
-} from '../Hooks/useStyle';
+} from '../hooks/useStyle';
 
 // MarkdownInputField 样式常量
 // Glow border effect constants - 辉光边框效果常量

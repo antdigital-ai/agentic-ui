@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { RenderLeafProps } from 'slate-react';
 
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { MarkdownEditorProps } from '../../../types';
 import { useEditorStore } from '../../store';
 import { CommentView } from '../Comment';

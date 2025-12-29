@@ -1,11 +1,11 @@
 import { ConfigProvider } from 'antd';
 import classnames from 'classnames';
 import React, { useContext } from 'react';
-import { TextAnimate, TextAnimateProps } from '../Components/TextAnimate';
+import { TextAnimate, TextAnimateProps } from '../components/TextAnimate';
 import {
   TypingAnimation,
   TypingAnimationProps,
-} from '../Components/TypingAnimation';
+} from '../components/TypingAnimation';
 import { useStyle } from './style';
 
 export type WelcomeMessageTitleAnimateProps = Pick<

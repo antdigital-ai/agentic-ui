@@ -1,0 +1,55 @@
+import { cleanup, render, screen } from '@testing-library/react';
+import React from 'react';
+import { afterEach, describe, expect, it } from 'vitest';
+import { cnLabels, enLabels, I18nContext } from '..';
+import { SchemaForm } from '../../schema/SchemaForm/index';
+
+describe('SchemaForm i18n tests', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  const mockSchema: any = {
+    version: '1.0.0',
+    name: 'test-form',
+    description: 'Test form schema',
+    author: 'test',
+    type: 'object',
+    component: {
+      properties: {
+        name: {
+          type: 'string',
+          title: 'Name',
+        },
+        age: {
+          type: 'number',
+          title: 'Age',
+        },
+      },
+    },
+    required: ['name', 'age'],
+    uiSchema: {},
+  };
+
+  it('should render form labels in Chinese', () => {
+    render(
+      <I18nContext.Provider value={{ locale: cnLabels, language: 'zh-CN' }}>
+        <SchemaForm schema={mockSchema} />
+      </I18nContext.Provider>,
+    );
+
+    // Test form labels and buttons in Chinese
+    expect(screen.getByPlaceholderText('请输入 Age')).toBeDefined();
+  });
+
+  it('should render form labels in English', () => {
+    render(
+      <I18nContext.Provider value={{ locale: enLabels, language: 'en-US' }}>
+        <SchemaForm schema={mockSchema} />
+      </I18nContext.Provider>,
+    );
+
+    // Test form labels and buttons in English
+    expect(screen.getByPlaceholderText('Please input Age')).toBeDefined();
+  });
+});

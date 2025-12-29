@@ -1,4 +1,4 @@
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { EditorUtils } from '../../utils';
 import { decodeURIComponentUrl, findAttachment } from './parseHtml';
 

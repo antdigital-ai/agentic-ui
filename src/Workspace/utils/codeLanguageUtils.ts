@@ -3,7 +3,7 @@
  * 基于文件扩展名识别编程语言类型，用于代码块预览
  */
 
-import { langIconMap } from '../../Plugins/code/langIconMap';
+import { langIconMap } from '../../plugins/code/langIconMap';
 
 /**
  * 文件扩展名到编程语言的映射表

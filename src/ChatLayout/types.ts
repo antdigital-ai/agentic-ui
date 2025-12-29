@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { LayoutHeaderConfig } from '../Components/LayoutHeader';
+import type { LayoutHeaderConfig } from '../components/LayoutHeader';
 import type { BaseStyleProps } from '../Types';
 
 /**

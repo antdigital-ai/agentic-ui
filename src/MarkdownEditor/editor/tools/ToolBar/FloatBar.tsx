@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { BaseRange, Editor, Range, Transforms } from 'slate';
-import { useRefFunction } from '../../../../Hooks/useRefFunction';
+import { useRefFunction } from '../../../../hooks/useRefFunction';
 import { IEditor, MARKDOWN_EDITOR_EVENTS } from '../../../BaseMarkdownEditor';
 import { useEditorStore } from '../../store';
 import { getSelRect } from '../../utils/dom';

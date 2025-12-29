@@ -2,7 +2,7 @@ import {
   useEditorStyleRegister,
   type ChatTokenType,
   type GenerateStyle,
-} from '../../Hooks/useStyle';
+} from '../../hooks/useStyle';
 
 export const prefixCls = 'top-operating-area';
 

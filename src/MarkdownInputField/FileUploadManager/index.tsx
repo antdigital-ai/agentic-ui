@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import { useContext } from 'react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
+import { useRefFunction } from '../../hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import type { AttachmentButtonProps } from '../AttachmentButton';
 import { upLoadFileToServer } from '../AttachmentButton';

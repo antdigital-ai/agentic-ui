@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React, { createElement } from 'react';
 import { Node } from 'slate';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { ElementProps, HeadNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';

@@ -3,8 +3,8 @@ import { ChevronDown, Pause } from '@sofa-design/icons';
 import { ConfigProvider, Dropdown, Flex, Tooltip } from 'antd';
 import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
-import { useSpeechSynthesis } from '../../../Hooks/useSpeechSynthesis';
-import VoicingLottie from '../../../Icons/animated/VoicingLottie';
+import { useSpeechSynthesis } from '../../../hooks/useSpeechSynthesis';
+import VoicingLottie from '../../../icons/animated/VoicingLottie';
 import { useStyle } from './style';
 import { UseSpeechAdapter } from './types';
 

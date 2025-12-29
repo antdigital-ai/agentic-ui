@@ -2,7 +2,7 @@
 import { ConfigProvider, Popover } from 'antd';
 import classNames from 'classnames';
 import React, { memo, useContext, useMemo, useRef } from 'react';
-import useClickAway from '../Hooks/useClickAway';
+import useClickAway from '../hooks/useClickAway';
 import { ActionIconBox, BubbleConfigContext } from '../index';
 import {
   HistoryEmpty,

@@ -1,4 +1,4 @@
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { CustomLeaf, Elements } from '../../../el';
 import { EditorUtils } from '../../utils';
 import type { ParserMarkdownToSlateNodeConfig } from '../parserMarkdownToSlateNode';

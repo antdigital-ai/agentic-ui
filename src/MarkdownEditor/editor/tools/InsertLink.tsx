@@ -3,7 +3,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { Input, InputRef, Modal, Tooltip } from 'antd';
 import React, { useCallback, useContext, useRef } from 'react';
 import { Selection, Text, Transforms } from 'slate';
-import { useRefFunction } from '../../../Hooks/useRefFunction';
+import { useRefFunction } from '../../../hooks/useRefFunction';
 import { I18nContext } from '../../../I18n';
 import { IEditor } from '../../BaseMarkdownEditor';
 import { useSubject } from '../../hooks/subscribe';

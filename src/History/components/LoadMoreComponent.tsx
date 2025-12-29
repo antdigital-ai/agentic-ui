@@ -1,6 +1,6 @@
 import { EllipsisOutlined, LoadingOutlined } from '@ant-design/icons';
 import React, { useContext, useState } from 'react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
+import { useRefFunction } from '../../hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 /**
  * 历史记录加载更多组件属性接口

@@ -7,7 +7,7 @@ import {
 import { ConfigProvider, Empty, Segmented, Spin } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import useAutoScroll from '../../Hooks/useAutoScroll';
+import useAutoScroll from '../../hooks/useAutoScroll';
 import { I18nContext } from '../../I18n';
 import {
   MarkdownEditor,

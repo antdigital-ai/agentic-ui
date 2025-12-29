@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { BubbleConfigContext } from '../../../../Bubble/BubbleConfigProvide';
 import { SchemaRenderer } from '../../../../Schema';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { useEditorStore } from '../../store';
 
 /**

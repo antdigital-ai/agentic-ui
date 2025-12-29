@@ -1,4 +1,4 @@
-import { COLORS } from '../../Constants/colors';
+import { COLORS } from '../../constants/colors';
 /**
  * 统一的标签样式配置
  * 集中管理所有标签相关的样式，避免重复定义

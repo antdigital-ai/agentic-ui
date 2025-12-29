@@ -1,4 +1,4 @@
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { InlineKatexNode } from '../../../el';
 
 // 常量定义

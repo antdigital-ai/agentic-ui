@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { SuggestionList } from '../../Components/SuggestionList';
+import { SuggestionList } from '../../components/SuggestionList';
 
 describe('SuggestionList', () => {
   it('renders items vertically and respects max count 6', async () => {

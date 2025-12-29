@@ -5,7 +5,7 @@ import {
   MarkdownEditorProps,
   parserMdToSchema,
 } from '../MarkdownEditor';
-import { MarkdownFormatter } from '../Plugins/formatter';
+import { MarkdownFormatter } from '../plugins/formatter';
 
 /**
  * 将内容转换为列表格式的 Markdown

@@ -1,7 +1,7 @@
 import { Dropdown, Spin } from 'antd';
 import { useMergedState } from 'rc-util';
 import React, { useEffect, useRef, useState } from 'react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
+import { useRefFunction } from '../../hooks/useRefFunction';
 import { MarkdownEditorProps } from '../../MarkdownEditor';
 import { TagPopupProps } from '../../MarkdownEditor/editor/elements/TagPopup';
 

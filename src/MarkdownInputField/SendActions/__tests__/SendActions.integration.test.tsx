@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SendActions } from '..';
 
 // Mock dependencies
-vi.mock('../../../Components/ActionIconBox', () => ({
+vi.mock('../../../components/ActionIconBox', () => ({
   ActionIconBox: ({ children, ...props }: any) => (
     <div data-testid="action-icon-box" {...props}>
       {children}

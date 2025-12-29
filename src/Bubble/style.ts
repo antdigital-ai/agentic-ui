@@ -3,7 +3,7 @@ import {
   CSSInterpolation,
   resetComponent,
   useEditorStyleRegister,
-} from '../Hooks/useStyle';
+} from '../hooks/useStyle';
 import { BubbleProps } from './type';
 
 const genStyle = (

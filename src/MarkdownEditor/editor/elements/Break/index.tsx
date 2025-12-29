@@ -1,6 +1,6 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 
 export const Break = ({ attributes, children }: RenderElementProps) => {
   debugInfo('Break - 渲染换行');

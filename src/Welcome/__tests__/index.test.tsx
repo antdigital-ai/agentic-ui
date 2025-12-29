@@ -6,13 +6,13 @@ import { WelcomeMessage } from '../../WelcomeMessage';
 
 // Mock 动画组件
 beforeAll(() => {
-  vi.mock('../../Components/TypingAnimation', () => ({
+  vi.mock('../../components/TypingAnimation', () => ({
     TypingAnimation: ({ children, className, as: Component = 'div' }: any) => (
       React.createElement(Component, { className }, children)
     ),
   }));
   
-  vi.mock('../../Components/TextAnimate', () => ({
+  vi.mock('../../components/TextAnimate', () => ({
     TextAnimate: ({ children, className, as: Component = 'div' }: any) => (
       React.createElement(Component, { className }, children)
     ),

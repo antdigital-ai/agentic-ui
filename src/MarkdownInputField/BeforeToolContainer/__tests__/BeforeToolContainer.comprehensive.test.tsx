@@ -31,7 +31,7 @@ vi.mock('antd', async () => {
 });
 
 // Mock useStyle
-vi.mock('../../../Components/ActionItemBox', () => ({
+vi.mock('../../../components/ActionItemBox', () => ({
   useStyle: () => ({
     wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash',
@@ -39,7 +39,7 @@ vi.mock('../../../Components/ActionItemBox', () => ({
 }));
 
 // Mock useRefFunction
-vi.mock('../../../Hooks/useRefFunction', () => ({
+vi.mock('../../../hooks/useRefFunction', () => ({
   useRefFunction: (fn: any) => fn,
 }));
 

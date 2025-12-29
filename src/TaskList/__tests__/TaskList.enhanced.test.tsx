@@ -6,7 +6,7 @@ import { I18nContext } from '../../I18n';
 import { TaskList } from '..';
 
 // Mock Loading 组件
-vi.mock('../../Components/Loading', () => ({
+vi.mock('../../components/Loading', () => ({
   Loading: ({ size, ...props }: any) => (
     <div data-testid="task-list-loading" data-size={size} {...props}>
       Loading
@@ -15,7 +15,7 @@ vi.mock('../../Components/Loading', () => ({
 }));
 
 // Mock ActionIconBox
-vi.mock('../../Components/ActionIconBox', () => ({
+vi.mock('../../components/ActionIconBox', () => ({
   ActionIconBox: ({ title, iconStyle, onClick, children, ...props }: any) => (
     <div
       data-testid="action-icon-box"

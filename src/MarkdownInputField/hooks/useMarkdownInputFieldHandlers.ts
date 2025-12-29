@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
+import { useRefFunction } from '../../hooks/useRefFunction';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import { upLoadFileToServer } from '../AttachmentButton';
 import type { AttachmentFile } from '../AttachmentButton/types';

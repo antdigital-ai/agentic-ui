@@ -36,7 +36,7 @@ vi.mock('../../MarkdownEditor', () => ({
 
 // Mock copy function
 const mockCopy = vi.fn();
-vi.mock('../../Utils/copy', () => ({
+vi.mock('../../utils/copy', () => ({
   default: (...args: any[]) => mockCopy(...args),
 }));
 

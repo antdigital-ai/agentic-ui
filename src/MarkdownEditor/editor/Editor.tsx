@@ -19,7 +19,7 @@ import {
   RenderLeafProps,
   Slate,
 } from 'slate-react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
+import { useRefFunction } from '../../hooks/useRefFunction';
 import { parserMdToSchema } from '../BaseMarkdownEditor';
 import { Elements } from '../el';
 import { PluginContext } from '../plugin';

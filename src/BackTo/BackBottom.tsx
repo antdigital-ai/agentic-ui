@@ -1,6 +1,6 @@
 import React, { forwardRef, memo, useCallback } from 'react';
-import { getScrollRailHeight } from '../Utils/getScroll';
-import scrollTo from '../Utils/scrollTo';
+import { getScrollRailHeight } from '../utils/getScroll';
+import scrollTo from '../utils/scrollTo';
 import {
   ScrollVisibleButton,
   ScrollVisibleButtonProps,

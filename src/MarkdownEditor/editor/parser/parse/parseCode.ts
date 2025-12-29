@@ -1,5 +1,5 @@
 import json5 from 'json5';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { isCodeBlockLikelyComplete } from '../../utils/findMatchingClose';
 import partialJsonParse from '../json-parse';
 

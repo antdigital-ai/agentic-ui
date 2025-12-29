@@ -3,7 +3,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { AIBubble } from '../AIBubble';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
-import { RoleType } from '../../Types/common';
+import { RoleType } from '../../types/common';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({

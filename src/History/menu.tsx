@@ -1,7 +1,7 @@
 import { ConfigProvider, Spin } from 'antd';
 import classNames from 'classnames';
 import React, { useContext } from 'react';
-import { useRefFunction } from '../Hooks/useRefFunction';
+import { useRefFunction } from '../hooks/useRefFunction';
 import { useStyle } from './style';
 
 // Antd Menu 兼容的菜单项类型

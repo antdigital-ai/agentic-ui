@@ -1,7 +1,7 @@
 import { memo, MutableRefObject, useMemo } from 'react';
 
 import React from 'react';
-import { debugInfo } from '../Utils/debugUtils';
+import { debugInfo } from '../utils/debugUtils';
 import { AIBubble } from './AIBubble';
 import { useSchemaEditorBridge } from './schema-editor';
 import type { BubbleProps } from './type';

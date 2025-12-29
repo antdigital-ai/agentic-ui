@@ -4,9 +4,9 @@ import classNames from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
 import React, { memo, useCallback, useContext, useMemo } from 'react';
-import { ActionIconBox } from '../Components/ActionIconBox';
-import { Loading } from '../Components/Loading';
-import { useRefFunction } from '../Hooks/useRefFunction';
+import { ActionIconBox } from '../components/ActionIconBox';
+import { Loading } from '../components/Loading';
+import { useRefFunction } from '../hooks/useRefFunction';
 import { I18nContext } from '../I18n';
 import { useStyle } from './style';
 

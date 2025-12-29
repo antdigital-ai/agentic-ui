@@ -1,5 +1,5 @@
 import React from 'react';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { BlockQuoteNode, ElementProps } from '../../../el';
 import { useEditorStore } from '../../store';
 

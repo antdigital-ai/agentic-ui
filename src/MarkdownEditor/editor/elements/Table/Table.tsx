@@ -7,7 +7,7 @@ import stringWidth from 'string-width';
 import {
   MOBILE_BREAKPOINT,
   MOBILE_TABLE_MIN_COLUMN_WIDTH,
-} from '../../../../Constants/mobile';
+} from '../../../../constants/mobile';
 import { useEditorStore } from '../../store';
 import { ReadonlyTableComponent } from './ReadonlyTableComponent';
 import { TablePropsContext } from './TableContext';

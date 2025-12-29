@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { RenderElementProps } from 'slate-react';
 import { useSelStatus } from '../../../../MarkdownEditor/hooks/editor';
-import { debugInfo } from '../../../../Utils/debugUtils';
+import { debugInfo } from '../../../../utils/debugUtils';
 import { useEditorStore } from '../../store';
 
 export const WarpCard = (props: RenderElementProps) => {

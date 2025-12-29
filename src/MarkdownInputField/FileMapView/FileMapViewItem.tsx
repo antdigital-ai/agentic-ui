@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
 import React, { useContext } from 'react';
-import { ActionIconBox } from '../../Components/ActionIconBox';
+import { ActionIconBox } from '../../components/ActionIconBox';
 import { I18nContext } from '../../I18n';
 import { AttachmentFileIcon } from '../AttachmentButton/AttachmentFileList/AttachmentFileIcon';
 import { AttachmentFile } from '../AttachmentButton/types';

@@ -12,7 +12,7 @@ import React, {
 import {
   LayoutHeader,
   type LayoutHeaderConfig,
-} from '../Components/LayoutHeader';
+} from '../components/LayoutHeader';
 import { useAgenticLayoutStyle } from './style';
 
 export interface AgenticLayoutProps {
