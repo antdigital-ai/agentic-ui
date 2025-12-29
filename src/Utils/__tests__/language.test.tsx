@@ -14,7 +14,7 @@ import {
   normalizeLanguage,
   saveLanguage,
   type LanguageType,
-} from '../@ant-design/agentic-ui/Utils/language';
+} from '../language';
 
 // Mock DOM APIs
 const mockNavigator = {

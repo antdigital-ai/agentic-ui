@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import CaseReply from '../@ant-design/agentic-ui/ChatBootPage/CaseReply';
+import CaseReply from '../../ChatBootPage/CaseReply';
 
 describe('CaseReply 组件', () => {
   const TestButton = () => <button data-testid="test-button">测试按钮</button>;

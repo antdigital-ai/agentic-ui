@@ -4,8 +4,8 @@ import {
   ReactEditor,
   withReact,
 } from 'slate-react';
-import { EditorStore } from '../../@ant-design/agentic-ui/MarkdownEditor/editor/store';
-import { KeyboardTask } from '../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/keyboard';
+import { EditorStore } from '../../store';
+import { KeyboardTask } from '../keyboard';
 
 // Mock dependencies
 vi.mock('antd', () => ({
@@ -29,7 +29,7 @@ Object.defineProperty(navigator, 'clipboard', {
 });
 
 // Mock EditorUtils
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils', () => ({
+vi.mock('../editorUtils', () => ({
   EditorUtils: {
     toggleFormat: vi.fn(),
     clearMarks: vi.fn(),
@@ -42,7 +42,7 @@ vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils', 
   },
 }));
 
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../store', () => ({
   EditorStore: vi.fn(),
 }));
 

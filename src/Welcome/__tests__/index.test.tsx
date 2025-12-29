@@ -2,17 +2,17 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import { WelcomeMessage } from '../@ant-design/agentic-ui/WelcomeMessage';
+import { WelcomeMessage } from '../../WelcomeMessage';
 
 // Mock 动画组件
 beforeAll(() => {
-  vi.mock('../@ant-design/agentic-ui/Components/TypingAnimation', () => ({
+  vi.mock('../../Components/TypingAnimation', () => ({
     TypingAnimation: ({ children, className, as: Component = 'div' }: any) => (
       React.createElement(Component, { className }, children)
     ),
   }));
   
-  vi.mock('../@ant-design/agentic-ui/Components/TextAnimate', () => ({
+  vi.mock('../../Components/TextAnimate', () => ({
     TextAnimate: ({ children, className, as: Component = 'div' }: any) => (
       React.createElement(Component, { className }, children)
     ),

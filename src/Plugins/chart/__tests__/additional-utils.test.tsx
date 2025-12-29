@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 // 直接从源文件导入未导出的函数
-import { getDataHash } from '../../@ant-design/agentic-ui/Plugins/chart/utils';
+import { getDataHash } from '../utils';
 
 // 重新定义需要测试的函数
 function reverseFormatNumber(val: string, locale: any) {

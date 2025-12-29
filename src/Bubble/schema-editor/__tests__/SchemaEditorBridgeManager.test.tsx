@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import {
   SchemaEditorBridgeManager,
   BubbleHandler,
-} from '../../@ant-design/agentic-ui/Bubble/schema-editor/SchemaEditorBridgeManager';
+} from '../SchemaEditorBridgeManager';
 import { createSchemaElementEditorBridge } from '@schema-element-editor/host-sdk/core';
 
 describe('SchemaEditorBridgeManager', () => {

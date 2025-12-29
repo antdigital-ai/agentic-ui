@@ -17,13 +17,13 @@ let LineChart: React.FC<any>;
 beforeAll(async () => {
   try {
     const LineChartModule = await import(
-      '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/index'
+      '../index'
     );
     LineChart = LineChartModule.default;
   } catch (error) {
     // 如果上面的导入失败，尝试不带扩展名的导入
     const LineChartModule = await import(
-      '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/'
+      '..'
     );
     LineChart = LineChartModule.default;
   }
@@ -79,7 +79,7 @@ vi.mock('antd', async () => {
 });
 
 // Mock chart components
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
+vi.mock('../../components', () => ({
   ChartContainer: ({ children }: any) => (
     <div data-testid="chart-container">{children}</div>
   ),
@@ -118,7 +118,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
 }));
 
 // Mock hooks
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', () => ({
+vi.mock('../../hooks', () => ({
   useResponsiveSize: () => ({
     responsiveWidth: 600,
     responsiveHeight: 400,
@@ -143,14 +143,14 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', () => ({
 }));
 
 // Mock chart utils
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/utils', () => ({
+vi.mock('../../utils', () => ({
   extractAndSortXValues: vi.fn(() => []),
   findDataPointByXValue: vi.fn(() => null),
   registerLineChartComponents: vi.fn(),
 }));
 
 // Mock style hook
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/LineChart/style', () => ({
+vi.mock('../style', () => ({
   useStyle: () => ({
     wrapSSR: (node: any) => node,
     hashId: 'test-hash',
@@ -221,7 +221,7 @@ describe('LineChart', () => {
       ];
 
       // 重新mock useChartDataFilter 以返回特定数据
-      vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', () => ({
+      vi.mock('../../hooks', () => ({
         useResponsiveSize: () => ({
           responsiveWidth: 600,
           responsiveHeight: 400,
@@ -249,12 +249,12 @@ describe('LineChart', () => {
       let ReRenderedLineChart: React.FC<any>;
       try {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/index'
+          '../index'
         );
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/'
+          '..'
         );
         ReRenderedLineChart = LineChartModule.default;
       }
@@ -273,9 +273,9 @@ describe('LineChart', () => {
       // mock extractAndSortXValues 函数
       let utils: any;
       try {
-        utils = await import('../../../@ant-design/agentic-ui/Plugins/chart/utils');
+        utils = await import('../../utils');
       } catch (error) {
-        utils = await import('../../../@ant-design/agentic-ui/Plugins/chart/');
+        utils = await import('../..');
       }
       vi.spyOn(utils, 'extractAndSortXValues').mockReturnValue([1, 2, 3]);
 
@@ -435,9 +435,9 @@ describe('LineChart', () => {
       };
 
       // 重新mock hooks 以返回特定配置
-      vi.doMock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', async () => {
+      vi.doMock('../../hooks', async () => {
         const actual: any = await vi.importActual(
-          '../../../@ant-design/agentic-ui/Plugins/chart/hooks',
+          '../../hooks',
         );
         return {
           ...actual,
@@ -449,12 +449,12 @@ describe('LineChart', () => {
       let ReRenderedLineChart: React.FC<any>;
       try {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/index'
+          '../index'
         );
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/'
+          '..'
         );
         ReRenderedLineChart = LineChartModule.default;
       }
@@ -477,9 +477,9 @@ describe('LineChart', () => {
       ];
 
       // 重新mock hooks 以返回多个配置
-      vi.doMock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', async () => {
+      vi.doMock('../../hooks', async () => {
         const actual: any = await vi.importActual(
-          '../../../@ant-design/agentic-ui/Plugins/chart/hooks',
+          '../../hooks',
         );
         return {
           ...actual,
@@ -491,12 +491,12 @@ describe('LineChart', () => {
       let ReRenderedLineChart: React.FC<any>;
       try {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/index'
+          '../index'
         );
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/'
+          '..'
         );
         ReRenderedLineChart = LineChartModule.default;
       }
@@ -528,9 +528,9 @@ describe('LineChart', () => {
 
       let components: any;
       try {
-        components = await import('../../../@ant-design/agentic-ui/Plugins/chart/components');
+        components = await import('../../components');
       } catch (error) {
-        components = await import('../../../@ant-design/agentic-ui/Plugins/chart/');
+        components = await import('../..');
       }
       expect(components.downloadChart).toHaveBeenCalled();
     });
@@ -539,9 +539,9 @@ describe('LineChart', () => {
       const mockFilterOptions = ['All', 'Series 1', 'Series 2'];
 
       // 重新mock hooks 以返回过滤选项
-      vi.doMock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', async () => {
+      vi.doMock('../../hooks', async () => {
         const actual: any = await vi.importActual(
-          '../../../@ant-design/agentic-ui/Plugins/chart/hooks',
+          '../../hooks',
         );
         return {
           ...actual,
@@ -562,12 +562,12 @@ describe('LineChart', () => {
       let ReRenderedLineChart: React.FC<any>;
       try {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/index'
+          '../index'
         );
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/'
+          '..'
         );
         ReRenderedLineChart = LineChartModule.default;
       }
@@ -586,7 +586,7 @@ describe('LineChart', () => {
   describe('响应式设计测试', () => {
     it('应该正确处理移动端显示', async () => {
       // 重新mock useResponsiveSize 以返回移动端配置
-      vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', () => ({
+      vi.mock('../../hooks', () => ({
         useResponsiveSize: () => ({
           responsiveWidth: 300,
           responsiveHeight: 200,
@@ -614,12 +614,12 @@ describe('LineChart', () => {
       let ReRenderedLineChart: React.FC<any>;
       try {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/index'
+          '../index'
         );
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/'
+          '..'
         );
         ReRenderedLineChart = LineChartModule.default;
       }
@@ -674,7 +674,7 @@ describe('LineChart', () => {
 
   describe('样式和主题测试', () => {
     it('应该正确调用registerLineChartComponents', async () => {
-      const utils = await import('../../../@ant-design/agentic-ui/Plugins/chart/utils');
+      const utils = await import('../../utils');
       render(<LineChart data={mockData} />);
 
       expect(utils.registerLineChartComponents).toHaveBeenCalled();
@@ -694,7 +694,7 @@ describe('LineChart', () => {
       fireEvent.click(downloadButton);
 
       const components = await import(
-        '../../../@ant-design/agentic-ui/Plugins/chart/components'
+        '../../components'
       );
       expect(components.downloadChart).toHaveBeenCalled();
     });
@@ -716,9 +716,9 @@ describe('LineChart', () => {
     it('应该正确计算xValues数组', async () => {
       let utils: any;
       try {
-        utils = await import('../../../@ant-design/agentic-ui/Plugins/chart/utils');
+        utils = await import('../../utils');
       } catch (error) {
-        utils = await import('../../../@ant-design/agentic-ui/Plugins/chart/');
+        utils = await import('../..');
       }
       const mockDataUnsorted = [
         { x: 3, y: 30, type: 'Series 1' },
@@ -830,9 +830,9 @@ describe('LineChart', () => {
       const mockFilterOptions = ['All', 'Series 1', 'Series 2'];
 
       // 重新mock hooks 以返回过滤选项
-      vi.doMock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', async () => {
+      vi.doMock('../../hooks', async () => {
         const actual: any = await vi.importActual(
-          '../../../@ant-design/agentic-ui/Plugins/chart/hooks',
+          '../../hooks',
         );
         return {
           ...actual,
@@ -853,12 +853,12 @@ describe('LineChart', () => {
       let ReRenderedLineChart: React.FC<any>;
       try {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/index'
+          '../index'
         );
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/'
+          '..'
         );
         ReRenderedLineChart = LineChartModule.default;
       }
@@ -881,9 +881,9 @@ describe('LineChart', () => {
       };
 
       // 重新mock hooks 以返回统计信息配置
-      vi.doMock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', async () => {
+      vi.doMock('../../hooks', async () => {
         const actual: any = await vi.importActual(
-          '../../../@ant-design/agentic-ui/Plugins/chart/hooks',
+          '../../hooks',
         );
         return {
           ...actual,
@@ -895,12 +895,12 @@ describe('LineChart', () => {
       let ReRenderedLineChart: React.FC<any>;
       try {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/index'
+          '../index'
         );
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
         const LineChartModule = await import(
-          '../../../@ant-design/agentic-ui/Plugins/chart/LineChart/'
+          '..'
         );
         ReRenderedLineChart = LineChartModule.default;
       }

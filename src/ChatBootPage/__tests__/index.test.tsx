@@ -10,7 +10,7 @@ import {
   CaseReplyProps,
   Title,
   TitleProps,
-} from '../@ant-design/agentic-ui/ChatBootPage';
+} from '..';
 
 describe('ChatBoot index 导出', () => {
   it('应该导出 Title 组件', () => {

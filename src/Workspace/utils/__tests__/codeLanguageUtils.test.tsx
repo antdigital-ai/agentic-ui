@@ -3,7 +3,7 @@ import {
   getLanguageFromFilename,
   isSupportedLanguage,
   wrapContentInCodeBlock,
-} from '../../@ant-design/agentic-ui/Workspace/utils/codeLanguageUtils';
+} from '../codeLanguageUtils';
 
 describe('codeLanguageUtils', () => {
   describe('getLanguageFromFilename', () => {

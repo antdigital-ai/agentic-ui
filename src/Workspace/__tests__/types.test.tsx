@@ -5,7 +5,7 @@ import {
   getFileCategory,
   getFileType,
   getMimeType,
-} from '../@ant-design/agentic-ui/Workspace/types';
+} from '../types';
 
 describe('Workspace types 工具函数', () => {
   describe('getFileType', () => {

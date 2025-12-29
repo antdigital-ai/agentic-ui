@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ReloadIcon } from '../@ant-design/agentic-ui/Bubble/MessagesContent/icons';
+import { ReloadIcon } from '../MessagesContent/icons';
 
 describe('ReloadIcon', () => {
   beforeEach(() => {

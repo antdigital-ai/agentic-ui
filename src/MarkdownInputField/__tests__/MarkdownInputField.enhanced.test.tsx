@@ -9,8 +9,8 @@ import userEvent from '@testing-library/user-event';
 import classNames from 'classnames';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { MarkdownInputField } from '../@ant-design/agentic-ui/MarkdownInputField/MarkdownInputField';
-import { addGlowBorderOffset } from '../@ant-design/agentic-ui/MarkdownInputField/style';
+import { MarkdownInputField } from '../MarkdownInputField';
+import { addGlowBorderOffset } from '../style';
 
 // 创建更真实的 Mock
 const mockMarkdownEditor = {
@@ -24,7 +24,7 @@ const mockMarkdownEditor = {
   markdownEditorRef: { current: { children: [] } },
 };
 
-vi.mock('../@ant-design/agentic-ui/MarkdownEditor', () => ({
+vi.mock('../../MarkdownEditor', () => ({
   BaseMarkdownEditor: React.forwardRef(
     (
       {
@@ -86,7 +86,7 @@ vi.mock('slate-react', () => ({
   },
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/Suggestion', () => ({
+vi.mock('../Suggestion', () => ({
   Suggestion: ({ children, ...props }: any) => (
     <div data-testid="suggestion" {...props}>
       {children}
@@ -94,7 +94,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/Suggestion', () => ({
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton', () => ({
+vi.mock('../AttachmentButton', () => ({
   AttachmentButton: ({ onClick, disabled, ...props }: any) => (
     <button
       type="button"
@@ -109,7 +109,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton', () => (
   upLoadFileToServer: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/SendButton', () => ({
+vi.mock('../SendButton', () => ({
   SendButton: ({ typing, disabled, onClick, ...props }: any) => {
     const handleClick = () => {
       if (!disabled && onClick) {
@@ -136,7 +136,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/SendButton', () => ({
 }));
 
 vi.mock(
-  '../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton/AttachmentButtonPopover',
+  '../AttachmentButton/AttachmentButtonPopover',
   () => ({
     SupportedFileFormats: {
       image: { name: 'Image', extensions: ['.jpg', '.png', '.gif'] },
@@ -146,7 +146,7 @@ vi.mock(
 );
 
 vi.mock(
-  '../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton/AttachmentFileList',
+  '../AttachmentButton/AttachmentFileList',
   () => ({
     AttachmentFileList: ({ fileMap, onDelete, onClearFileMap }: any) => (
       <div data-testid="attachment-file-list">
@@ -177,7 +177,7 @@ vi.mock(
   }),
 );
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/SkillModeBar', () => ({
+vi.mock('../SkillModeBar', () => ({
   SkillModeBar: () => <div data-testid="skill-mode-bar">Skill Mode</div>,
 }));
 

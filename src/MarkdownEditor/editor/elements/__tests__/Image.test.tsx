@@ -1,10 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { ReadonlyImage } from '../../@ant-design/agentic-ui/MarkdownEditor/editor/elements/Image';
+import { ReadonlyImage } from '../Image';
 
 // Mock the editor store
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../store', () => ({
   useEditorStore: () => ({
     markdownEditorRef: { current: null },
     readonly: false,
@@ -13,7 +13,7 @@ vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
 }));
 
 // Mock the i18n context
-vi.mock('../../@ant-design/agentic-ui/I18n', () => ({
+vi.mock('../../../../I18n', () => ({
   I18nContext: {
     Consumer: ({ children }: { children: any }) =>
       children({

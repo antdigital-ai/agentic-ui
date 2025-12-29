@@ -1,12 +1,12 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { FileCategory, FileType } from '../../@ant-design/agentic-ui/Workspace/types';
+import { FileCategory, FileType } from '../../types';
 import {
   generateUniqueId,
   getFileTypeIcon,
   getGroupIcon,
-} from '../../@ant-design/agentic-ui/Workspace/File/utils';
+} from '../utils';
 
 describe('Workspace File utils', () => {
   describe('getFileTypeIcon', () => {

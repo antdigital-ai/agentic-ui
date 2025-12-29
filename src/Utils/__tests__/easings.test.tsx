@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { easeInOutCubic } from '../@ant-design/agentic-ui/Utils/easings';
+import { easeInOutCubic } from '../easings';
 
 describe('easings 工具函数', () => {
   describe('easeInOutCubic', () => {

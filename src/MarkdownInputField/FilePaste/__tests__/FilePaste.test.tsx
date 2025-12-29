@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { getFileListFromDataTransferItems } from '../@ant-design/agentic-ui/MarkdownInputField/FilePaste';
+import { getFileListFromDataTransferItems } from '..';
 
 describe('FilePaste', () => {
   describe('getFileListFromDataTransferItems', () => {

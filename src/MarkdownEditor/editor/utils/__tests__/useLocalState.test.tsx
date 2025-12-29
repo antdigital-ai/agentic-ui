@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { useLocalState } from '../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/useLocalState';
+import { useLocalState } from '../useLocalState';
 
 describe('useLocalState', () => {
   afterEach(() => {

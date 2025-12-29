@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useResponsiveSize } from '../../../@ant-design/agentic-ui/Plugins/chart/hooks/useResponsiveSize';
+import { useResponsiveSize } from '../useResponsiveSize';
 
 describe('useResponsiveSize', () => {
   const originalInnerWidth =

@@ -2,11 +2,11 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Loading } from '../@ant-design/agentic-ui/Components/Loading';
-import { CreativeSparkLoading } from '../@ant-design/agentic-ui/Components/Loading/CreativeSparkLoading';
+import { Loading } from '..';
+import { CreativeSparkLoading } from '../CreativeSparkLoading';
 
 // Mock LoadingLottie
-vi.mock('../@ant-design/agentic-ui/Components/lotties/LoadingLottie', () => ({
+vi.mock('../../lotties/LoadingLottie', () => ({
   LoadingLottie: ({ size, style, autoplay, loop, className }: any) => (
     <div
       data-testid="lottie-animation"
@@ -20,7 +20,7 @@ vi.mock('../@ant-design/agentic-ui/Components/lotties/LoadingLottie', () => ({
 }));
 
 // Mock CreativeSparkLottie
-vi.mock('../@ant-design/agentic-ui/Components/lotties/CreativeSparkLottie', () => ({
+vi.mock('../../lotties/CreativeSparkLottie', () => ({
   CreativeSparkLottie: ({ size, style, autoplay, loop, className }: any) => (
     <div
       data-testid="creative-spark-lottie"

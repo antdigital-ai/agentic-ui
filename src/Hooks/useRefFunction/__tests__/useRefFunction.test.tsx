@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { useRefFunction } from '../@ant-design/agentic-ui/Hooks/useRefFunction';
+import { useRefFunction } from '..';
 
 describe('useRefFunction', () => {
   it('should return a function that calls the latest function', () => {

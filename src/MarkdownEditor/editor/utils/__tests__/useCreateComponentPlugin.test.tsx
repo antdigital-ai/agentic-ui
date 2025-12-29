@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import React, { useMemo } from 'react';
 import { describe, expect, it } from 'vitest';
 import { MarkdownEditorPlugin, parserMdToSchema } from '../../../src';
-import type { Elements } from '../../@ant-design/agentic-ui/MarkdownEditor/el';
+import type { Elements } from '../../../el';
 
 const useCreateComponentPlugin = (tagName: string, targetType: string) => {
   const matchStr = `<${tagName}`;

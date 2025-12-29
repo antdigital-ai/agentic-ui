@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SchemaRenderer } from '../@ant-design/agentic-ui/Schema/SchemaRenderer';
+import { SchemaRenderer } from '..';
 
 describe('SchemaRenderer', () => {
   const defaultProps = {

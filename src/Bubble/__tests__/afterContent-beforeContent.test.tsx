@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { Bubble } from '../@ant-design/agentic-ui/Bubble';
-import { MessageBubbleData } from '../@ant-design/agentic-ui/Bubble/type';
+import { Bubble } from '..';
+import { MessageBubbleData } from '../type';
 
 describe('Bubble afterContentRender and beforeContentRender', () => {
   const mockMessageData: MessageBubbleData = {

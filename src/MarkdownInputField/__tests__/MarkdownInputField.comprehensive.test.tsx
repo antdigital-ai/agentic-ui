@@ -10,7 +10,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock dependencies
-vi.mock('../@ant-design/agentic-ui/MarkdownEditor', () => ({
+vi.mock('../../MarkdownEditor', () => ({
   BaseMarkdownEditor: ({ children, ...props }: any) => (
     <div data-testid="base-markdown-editor" {...props}>
       {children}
@@ -26,7 +26,7 @@ vi.mock('slate-react', () => ({
   },
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/Suggestion', () => ({
+vi.mock('../Suggestion', () => ({
   Suggestion: ({ children, ...props }: any) => (
     <div data-testid="suggestion" {...props}>
       {children}
@@ -34,7 +34,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/Suggestion', () => ({
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton', () => ({
+vi.mock('../AttachmentButton', () => ({
   AttachmentButton: ({ children, ...props }: any) => (
     <div data-testid="attachment-button" {...props}>
       {children}
@@ -42,7 +42,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton', () => (
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/SendButton', () => ({
+vi.mock('../SendButton', () => ({
   SendButton: ({ children, ...props }: any) => (
     <button data-testid="send-button" type="button" {...props}>
       {children}
@@ -50,7 +50,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/SendButton', () => ({
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/SkillModeBar', () => ({
+vi.mock('../SkillModeBar', () => ({
   SkillModeBar: ({ skillMode, onSkillModeOpenChange, ...props }: any) => {
     // 使用 useRef 和 useEffect 来模拟状态变化监听
     const prevOpenRef = React.useRef<boolean | undefined>(skillMode?.open);
@@ -104,7 +104,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/SkillModeBar', () => ({
   },
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/Enlargement', () => ({
+vi.mock('../Enlargement', () => ({
   __esModule: true,
   default: ({
     isEnlarged,

@@ -7,10 +7,10 @@ let RadarChart: React.FC<any>;
 
 beforeEach(async () => {
   try {
-    const mod = await import('../../../@ant-design/agentic-ui/Plugins/chart/RadarChart/index');
+    const mod = await import('../index');
     RadarChart = mod.default;
   } catch (e) {
-    const mod = await import('../../../@ant-design/agentic-ui/Plugins/chart/RadarChart/');
+    const mod = await import('..');
     RadarChart = mod.default;
   }
 });
@@ -27,11 +27,11 @@ vi.mock('react-chartjs-2', () => ({
   Radar: () => <div data-testid="radar-chart">Radar Chart</div>,
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/RadarChart/style', () => ({
+vi.mock('../style', () => ({
   useStyle: () => ({ wrapSSR: (node: any) => node, hashId: 'test-hash' }),
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
+vi.mock('../../components', () => ({
   ChartContainer: ({ children }: any) => (
     <div data-testid="chart-container">{children}</div>
   ),

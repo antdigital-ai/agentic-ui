@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { BaseMarkdownEditor } from '../@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
+import { BaseMarkdownEditor } from '../../BaseMarkdownEditor';
 
 describe('Card Visual Effects Tests', () => {
   // 创建包含图片卡片的 Markdown 字符串

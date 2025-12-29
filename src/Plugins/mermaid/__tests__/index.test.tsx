@@ -2,16 +2,16 @@ import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { MermaidElement } from '../../@ant-design/agentic-ui/Plugins/mermaid/index';
+import { MermaidElement } from '../index';
 
 // Mock 依赖
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: () => ({
     markdownEditorRef: { current: document.createElement('div') },
   }),
 }));
 
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/hooks/editor', () => ({
+vi.mock('../../../MarkdownEditor/hooks/editor', () => ({
   useSelStatus: () => [false, [0]],
 }));
 
@@ -22,7 +22,7 @@ vi.mock('slate-react', () => ({
   },
 }));
 
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/I18n', () => ({
+vi.mock('../../../MarkdownEditor/I18n', () => ({
   I18nContext: React.createContext({
     locale: 'zh-CN',
     t: (key: string) => key,

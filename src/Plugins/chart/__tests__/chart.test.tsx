@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { debounce, stringFormatNumber } from '../@ant-design/agentic-ui/Plugins/chart/utils';
+import { debounce, stringFormatNumber } from '../utils';
 
 // Mock dependencies
 vi.mock('dayjs', () => ({

@@ -8,9 +8,9 @@ import {
 import { ConfigProvider, message } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { I18nProvide } from '../../@ant-design/agentic-ui/I18n';
-import { FileComponent } from '../../@ant-design/agentic-ui/Workspace/File/FileComponent';
-import type { FileNode, GroupNode } from '../../@ant-design/agentic-ui/Workspace/types';
+import { I18nProvide } from '../../../I18n';
+import { FileComponent } from '../FileComponent';
+import type { FileNode, GroupNode } from '../../types';
 
 //  Mock navigator.clipboard
 const mockClipboard = {

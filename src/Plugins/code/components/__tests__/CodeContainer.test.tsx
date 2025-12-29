@@ -7,10 +7,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CodeContainer } from '../../../@ant-design/agentic-ui/Plugins/code/components/CodeContainer';
+import { CodeContainer } from '../CodeContainer';
 
 // Mock DragHandle
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/tools/DragHandle', () => ({
+vi.mock('../../../../MarkdownEditor/editor/tools/DragHandle', () => ({
   DragHandle: () => <div data-testid="drag-handle" />,
 }));
 

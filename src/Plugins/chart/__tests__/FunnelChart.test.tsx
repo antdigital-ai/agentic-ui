@@ -4,7 +4,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import FunnelChart, {
   FunnelChartDataItem,
-} from '../../@ant-design/agentic-ui/Plugins/chart/FunnelChart';
+} from '../FunnelChart';
 
 // Mock Chart.js
 vi.mock('chart.js', () => ({
@@ -42,7 +42,7 @@ vi.mock('react-chartjs-2', () => ({
 }));
 
 // Mock downloadChart
-vi.mock('../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
+vi.mock('../components', () => ({
   ChartContainer: ({ children, ...props }: any) => (
     <div data-testid="chart-container" {...props}>
       {children}
@@ -75,7 +75,7 @@ vi.mock('../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
 }));
 
 // Mock ChartStatistic
-vi.mock('../../@ant-design/agentic-ui/Plugins/chart/ChartStatistic', () => ({
+vi.mock('../ChartStatistic', () => ({
   default: ({ title, value }: any) => (
     <div data-testid="chart-statistic">
       {title}: {value}
@@ -299,7 +299,7 @@ describe('FunnelChart', () => {
   describe('交互功能测试', () => {
     it('应该支持下载功能', async () => {
       const { downloadChart } = vi.mocked(
-        await import('../../@ant-design/agentic-ui/Plugins/chart/components'),
+        await import('../components'),
       );
 
       render(<FunnelChart data={sampleData} title="可下载漏斗" />);

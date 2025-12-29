@@ -7,8 +7,8 @@ import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { CodeNode } from '../../../@ant-design/agentic-ui/MarkdownEditor/el';
-import { ThinkBlock } from '../../../@ant-design/agentic-ui/Plugins/code/components/ThinkBlock';
+import { CodeNode } from '../../../../MarkdownEditor/el';
+import { ThinkBlock } from '../ThinkBlock';
 
 describe('ThinkBlock alwaysExpandedDeepThink 集成测试', () => {
   const mockCodeNode: CodeNode = {

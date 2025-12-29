@@ -333,7 +333,7 @@ describe('Chart Components Index', () => {
   // describe('导出测试', () => {
   //   it('应该正确导出所有组件和类型', () => {
   //     // 测试模块导出
-  //     const components = require('../../@ant-design/agentic-ui/Plugins/chart/components');
+  //     const components = require('..');
 
   //     expect(components).toHaveProperty('ChartToolBar');
   //     expect(components).toHaveProperty('ChartFilter');

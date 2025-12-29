@@ -4,11 +4,11 @@ import { message } from 'antd';
 import copy from 'copy-to-clipboard';
 import React, { createContext } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CodeNode } from '../../../@ant-design/agentic-ui/MarkdownEditor/el';
+import { CodeNode } from '../../../../MarkdownEditor/el';
 import {
   CodeToolbar,
   CodeToolbarProps,
-} from '../../../@ant-design/agentic-ui/Plugins/code/components/CodeToolbar';
+} from '../CodeToolbar';
 
 // 使用 vi.hoisted() 定义变量，使其与 vi.mock 一起被提升
 const { mockEditorStore } = vi.hoisted(() => {
@@ -23,7 +23,7 @@ const { mockEditorStore } = vi.hoisted(() => {
   };
 });
 
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: () => mockEditorStore,
   EditorStore: class EditorStore {},
   EditorStoreContext: createContext(mockEditorStore),
@@ -55,7 +55,7 @@ vi.mock('antd', () => ({
   ),
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/Plugins/code/components/LanguageSelector', () => ({
+vi.mock('../LanguageSelector', () => ({
   LanguageSelector: ({ element, setLanguage }: any) => (
     <div data-testid="language-selector">
       <span data-testid="current-language">
@@ -72,7 +72,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/code/components/LanguageSelecto
   ),
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/Components/ActionIconBox', () => ({
+vi.mock('../../../../Components/ActionIconBox', () => ({
   ActionIconBox: ({ children, title, onClick, 'data-testid': testId }: any) => (
     <button
       type="button"

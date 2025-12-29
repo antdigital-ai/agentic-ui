@@ -2,8 +2,8 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { HistorySearch } from '../../@ant-design/agentic-ui/History/components/SearchComponent';
-import { I18nContext } from '../../@ant-design/agentic-ui/I18n';
+import { HistorySearch } from '../SearchComponent';
+import { I18nContext } from '../../../I18n';
 
 const mockI18nLocale = {
   'chat.history.search': '搜索',

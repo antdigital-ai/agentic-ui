@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isImageFile,
   kbToSize,
-} from '../../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton/utils';
+} from '../utils';
 
 describe('AttachmentButton Utils', () => {
   describe('kbToSize', () => {

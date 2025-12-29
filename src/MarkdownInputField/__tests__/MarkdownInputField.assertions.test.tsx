@@ -8,10 +8,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { MarkdownInputField } from '../@ant-design/agentic-ui/MarkdownInputField/MarkdownInputField';
+import { MarkdownInputField } from '../MarkdownInputField';
 
 // 简化的 Mock 组件
-vi.mock('../@ant-design/agentic-ui/MarkdownEditor', () => ({
+vi.mock('../../MarkdownEditor', () => ({
   BaseMarkdownEditor: React.forwardRef((props: any, ref: any) => {
     const [content, setContent] = React.useState(
       props.value || props.initValue || '',
@@ -56,7 +56,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownEditor', () => ({
   }),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/SendButton', () => ({
+vi.mock('../SendButton', () => ({
   SendButton: ({ onClick, disabled, loading, ...props }: any) => (
     <button
       data-testid="send-button"
@@ -71,7 +71,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/SendButton', () => ({
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton', () => ({
+vi.mock('../AttachmentButton', () => ({
   AttachmentButton: ({ onFileUpload, disabled, ...props }: any) => (
     <button
       data-testid="attachment-button"
@@ -86,7 +86,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton', () => (
   upLoadFileToServer: vi.fn(),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/Suggestion', () => ({
+vi.mock('../Suggestion', () => ({
   Suggestion: ({ children }: any) => (
     <div data-testid="suggestion">{children}</div>
   ),

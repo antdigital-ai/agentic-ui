@@ -2,10 +2,10 @@ import { fireEvent, render, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BackTo } from '../@ant-design/agentic-ui/BackTo';
+import { BackTo } from '..';
 
 // Mock scrollTo 和 getScrollRailHeight
-vi.mock('../@ant-design/agentic-ui/Utils/scrollTo', () => ({
+vi.mock('../../Utils/scrollTo', () => ({
   default: vi.fn((y, options) => {
     if (options?.callback) {
       options.callback();
@@ -13,7 +13,7 @@ vi.mock('../@ant-design/agentic-ui/Utils/scrollTo', () => ({
   }),
 }));
 
-vi.mock('../@ant-design/agentic-ui/Utils/getScroll', () => ({
+vi.mock('../../Utils/getScroll', () => ({
   default: vi.fn((target) => {
     if (target === window || !target) {
       return window.pageYOffset || 0;
@@ -88,7 +88,7 @@ describe('BackBottom 组件', () => {
   });
 
   it('应该在点击时滚动到底部', async () => {
-    const scrollToMock = await import('../@ant-design/agentic-ui/Utils/scrollTo');
+    const scrollToMock = await import('../../Utils/scrollTo');
 
     const { container } = render(<BackTo.Bottom />);
 
@@ -114,7 +114,7 @@ describe('BackBottom 组件', () => {
   });
 
   it('应该支持自定义滚动持续时间', async () => {
-    const scrollToMock = await import('../@ant-design/agentic-ui/Utils/scrollTo');
+    const scrollToMock = await import('../../Utils/scrollTo');
 
     const { container } = render(<BackTo.Bottom duration={1000} />);
 

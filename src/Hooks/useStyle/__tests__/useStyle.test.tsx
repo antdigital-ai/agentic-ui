@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { useEditorStyleRegister } from '../@ant-design/agentic-ui/Hooks/useStyle';
+import { useEditorStyleRegister } from '..';
 
 describe('useEditorStyleRegister Hook', () => {
   it('应该返回有效的样式对象', () => {

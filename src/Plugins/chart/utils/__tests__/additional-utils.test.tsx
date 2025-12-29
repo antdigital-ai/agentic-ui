@@ -10,7 +10,7 @@ import {
   isXValueEqual,
   normalizeXValue,
   toNumber,
-} from '../../../@ant-design/agentic-ui/Plugins/chart/utils';
+} from '..';
 
 describe('Chart Utils - Additional Functions', () => {
   describe('normalizeXValue', () => {

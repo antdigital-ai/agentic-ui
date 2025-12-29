@@ -1,22 +1,22 @@
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { standardPlugins } from '../@ant-design/agentic-ui/Plugins/defaultPlugins';
+import { standardPlugins } from '../defaultPlugins';
 
 // Mock plugins
-vi.mock('../@ant-design/agentic-ui/Plugins/code', () => ({
+vi.mock('../code', () => ({
   CodeElement: vi.fn(() => <div>Code Element</div>),
 }));
 
-vi.mock('../@ant-design/agentic-ui/Plugins/chart', () => ({
+vi.mock('../chart', () => ({
   ChartElement: vi.fn(() => <div>Chart Element</div>),
 }));
 
-vi.mock('../@ant-design/agentic-ui/Plugins/katex', () => ({
+vi.mock('../katex', () => ({
   KatexElement: vi.fn(() => <div>Katex Element</div>),
   InlineKatex: vi.fn(() => <span>Inline Katex</span>),
 }));
 
-vi.mock('../@ant-design/agentic-ui/Plugins/mermaid/Mermaid', () => ({
+vi.mock('../mermaid/Mermaid', () => ({
   Mermaid: vi.fn(() => <div>Mermaid Element</div>),
 }));
 

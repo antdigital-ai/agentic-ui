@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { useSchemaEditorBridge } from '../../@ant-design/agentic-ui/Bubble/schema-editor/useSchemaEditorBridge';
-import { SchemaEditorBridgeManager } from '../../@ant-design/agentic-ui/Bubble/schema-editor/SchemaEditorBridgeManager';
+import { useSchemaEditorBridge } from '../useSchemaEditorBridge';
+import { SchemaEditorBridgeManager } from '../SchemaEditorBridgeManager';
 
 describe('useSchemaEditorBridge', () => {
   /** 保存原始 NODE_ENV */

@@ -2,8 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { I18nContext } from '../@ant-design/agentic-ui/I18n';
-import Workspace from '../@ant-design/agentic-ui/Workspace';
+import { I18nContext } from '../../I18n';
+import Workspace from '..';
 
 describe('Workspace Component', () => {
   const mockLocale = {

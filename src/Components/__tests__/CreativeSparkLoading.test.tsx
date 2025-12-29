@@ -1,10 +1,10 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CreativeSparkLoading } from '../@ant-design/agentic-ui/Components/Loading/CreativeSparkLoading';
+import { CreativeSparkLoading } from '../Loading/CreativeSparkLoading';
 
 // Mock CreativeSparkLottie
-vi.mock('../@ant-design/agentic-ui/Components/lotties/CreativeSparkLottie', () => ({
+vi.mock('../lotties/CreativeSparkLottie', () => ({
   CreativeSparkLottie: ({ size, style, autoplay, loop, className }: any) => (
     <div
       data-testid="creative-spark-lottie"

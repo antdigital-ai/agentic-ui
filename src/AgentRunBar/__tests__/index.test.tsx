@@ -6,7 +6,7 @@ import {
   TASK_RUNNING_STATUS,
   TASK_STATUS,
   TaskRunning,
-} from '../@ant-design/agentic-ui/AgentRunBar';
+} from '..';
 
 describe('TaskRunning Component', () => {
   // 基础 props

@@ -1,9 +1,9 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useScrollVisible } from '../../@ant-design/agentic-ui/BackTo/hooks/useScrollVisible';
+import { useScrollVisible } from '../useScrollVisible';
 
 // Mock getScroll
-vi.mock('../../@ant-design/agentic-ui/Utils/getScroll', () => ({
+vi.mock('../../../Utils/getScroll', () => ({
   default: vi.fn((target) => {
     if (target === window || !target) {
       return window.pageYOffset || 0;
@@ -13,7 +13,7 @@ vi.mock('../../@ant-design/agentic-ui/Utils/getScroll', () => ({
 }));
 
 // Mock throttleByAnimationFrame
-vi.mock('../../@ant-design/agentic-ui/Utils/throttleByAnimationFrame', () => ({
+vi.mock('../../../Utils/throttleByAnimationFrame', () => ({
   default: vi.fn((fn) => {
     const throttled = fn;
     throttled.cancel = vi.fn();
@@ -160,7 +160,7 @@ describe('useScrollVisible hook', () => {
 
     // 验证 hook 正常工作
     const throttleByAnimationFrame = await import(
-      '../../@ant-design/agentic-ui/Utils/throttleByAnimationFrame'
+      '../../../Utils/throttleByAnimationFrame'
     );
     expect(throttleByAnimationFrame.default).toBeDefined();
   });

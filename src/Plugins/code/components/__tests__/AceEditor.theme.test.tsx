@@ -62,7 +62,7 @@ vi.mock('ace-builds/src-noconflict/ext-modelist', () => ({
 }));
 
 // Mock ace utils 以避免加载所有 ace 模块
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/ace', () => ({
+vi.mock('../../../../MarkdownEditor/editor/utils/ace', () => ({
   modeMap: new Map([
     ['ts', 'typescript'],
     ['js', 'javascript'],

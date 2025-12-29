@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { AIBubble } from '../@ant-design/agentic-ui/Bubble/AIBubble';
-import { BubbleConfigContext } from '../@ant-design/agentic-ui/Bubble/BubbleConfigProvide';
-import { RoleType } from '../@ant-design/agentic-ui/Types/common';
+import { AIBubble } from '../AIBubble';
+import { BubbleConfigContext } from '../BubbleConfigProvide';
+import { RoleType } from '../../Types/common';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({

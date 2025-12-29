@@ -7,10 +7,10 @@ let FunnelChart: React.FC<any>;
 
 beforeEach(async () => {
   try {
-    const mod = await import('../../../@ant-design/agentic-ui/Plugins/chart/FunnelChart/index');
+    const mod = await import('../index');
     FunnelChart = mod.default;
   } catch (e) {
-    const mod = await import('../../../@ant-design/agentic-ui/Plugins/chart/FunnelChart/');
+    const mod = await import('..');
     FunnelChart = mod.default;
   }
 });
@@ -28,11 +28,11 @@ vi.mock('react-chartjs-2', () => ({
 }));
 
 // Mock style hook to avoid depending on antd context internals in tests
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/FunnelChart/style', () => ({
+vi.mock('../style', () => ({
   useStyle: () => ({ wrapSSR: (node: any) => node, hashId: 'test-hash' }),
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
+vi.mock('../../components', () => ({
   ChartContainer: ({ children }: any) => (
     <div data-testid="chart-container">{children}</div>
   ),
@@ -50,7 +50,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
   downloadChart: vi.fn(),
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/utils', () => ({
+vi.mock('../../utils', () => ({
   findDataPointByXValue: (data: any[], x: any) =>
     data.find((d) => String(d.x) === String(x)),
   isXValueEqual: (a: any, b: any) => String(a) === String(b),

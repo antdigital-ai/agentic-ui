@@ -1,7 +1,7 @@
 import { HistoryDataType } from '@ant-design/agentic-ui';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useHistory } from '../@ant-design/agentic-ui/History/hooks/useHistory';
+import { useHistory } from '../hooks/useHistory';
 
 describe('useHistory Hook', () => {
   const mockHistoryData: HistoryDataType[] = [

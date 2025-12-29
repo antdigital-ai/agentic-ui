@@ -5,11 +5,11 @@
 import { act, renderHook } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useMermaidRender } from '../../@ant-design/agentic-ui/Plugins/mermaid/useMermaidRender';
+import { useMermaidRender } from '../useMermaidRender';
 
 // Mock utils
-vi.mock('../../@ant-design/agentic-ui/Plugins/mermaid/utils', async () => {
-  const actual = await vi.importActual('../../@ant-design/agentic-ui/Plugins/mermaid/utils');
+vi.mock('../utils', async () => {
+  const actual = await vi.importActual('../utils');
   return {
     ...actual,
     loadMermaid: vi.fn(),
@@ -31,7 +31,7 @@ describe('useMermaidRender', () => {
     divElement = document.createElement('div');
     divRef = { current: divElement };
 
-    const utils = await import('../../@ant-design/agentic-ui/Plugins/mermaid/utils');
+    const utils = await import('../utils');
     mockLoadMermaid = vi.mocked(utils.loadMermaid);
     mockRenderSvgToContainer = vi.mocked(utils.renderSvgToContainer);
     mockCleanupTempElement = vi.mocked(utils.cleanupTempElement);

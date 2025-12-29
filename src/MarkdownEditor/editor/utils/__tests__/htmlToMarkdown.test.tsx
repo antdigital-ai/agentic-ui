@@ -6,7 +6,7 @@ import {
   htmlToMarkdown,
   isHtml,
   type HtmlToMarkdownOptions,
-} from '../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/htmlToMarkdown';
+} from '../htmlToMarkdown';
 
 describe('HTML to Markdown Utils', () => {
   describe('htmlToMarkdown', () => {

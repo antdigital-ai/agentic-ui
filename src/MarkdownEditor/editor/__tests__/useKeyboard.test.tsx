@@ -24,10 +24,10 @@ import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { MarkdownEditorProps } from '../@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
-import { useKeyboard } from '../@ant-design/agentic-ui/MarkdownEditor/editor/plugins/useKeyboard';
-import { withMarkdown } from '../@ant-design/agentic-ui/MarkdownEditor/editor/plugins/withMarkdown';
-import { EditorStore } from '../@ant-design/agentic-ui/MarkdownEditor/editor/store';
+import { MarkdownEditorProps } from '../../BaseMarkdownEditor';
+import { useKeyboard } from '../plugins/useKeyboard';
+import { withMarkdown } from '../plugins/withMarkdown';
+import { EditorStore } from '../store';
 
 // Mock is-hotkey 库
 vi.mock('is-hotkey', () => ({
@@ -53,7 +53,7 @@ vi.mock('is-hotkey', () => ({
 const mockSetOpenInsertCompletion = vi.fn();
 const mockInsertCompletionText$ = { next: vi.fn() };
 
-vi.mock('../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../store', () => ({
   useEditorStore: () => ({
     openInsertCompletion: false,
     insertCompletionText$: mockInsertCompletionText$,

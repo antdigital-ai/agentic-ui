@@ -2,8 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { I18nContext } from '../@ant-design/agentic-ui/I18n';
-import { HtmlPreview } from '../@ant-design/agentic-ui/Workspace/HtmlPreview';
+import { I18nContext } from '../../../I18n';
+import { HtmlPreview } from '..';
 
 describe('HtmlPreview Component', () => {
   const mockLocale = {

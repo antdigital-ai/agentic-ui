@@ -5,7 +5,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ProxySandbox } from '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox';
+import { ProxySandbox } from '../../proxySandbox/ProxySandbox';
 
 describe('ProxySandbox', () => {
   let sandbox: ProxySandbox;
@@ -847,7 +847,7 @@ describe('工厂函数测试', () => {
   describe('createSandbox', () => {
     it('应该创建带有默认配置的沙箱', async () => {
       const { createSandbox } = await import(
-        '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+        '../../proxySandbox/ProxySandbox'
       );
       const sandbox = createSandbox();
 
@@ -859,7 +859,7 @@ describe('工厂函数测试', () => {
 
     it('应该创建带有自定义配置的沙箱', async () => {
       const { createSandbox } = await import(
-        '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+        '../../proxySandbox/ProxySandbox'
       );
       const config = {
         allowConsole: false,
@@ -881,7 +881,7 @@ describe('工厂函数测试', () => {
   describe('runInSandbox', () => {
     it('应该能够一次性执行代码', async () => {
       const { runInSandbox } = await import(
-        '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+        '../../proxySandbox/ProxySandbox'
       );
       const result = await runInSandbox('return 2 * 3');
 
@@ -891,7 +891,7 @@ describe('工厂函数测试', () => {
 
     it('应该在执行后自动清理资源', async () => {
       const { runInSandbox } = await import(
-        '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+        '../../proxySandbox/ProxySandbox'
       );
       // 这个测试验证不会造成内存泄漏
       const promises = Array.from({ length: 10 }, (_, i) =>
@@ -908,7 +908,7 @@ describe('工厂函数测试', () => {
 
     it('应该使用自定义配置执行代码', async () => {
       const { runInSandbox } = await import(
-        '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+        '../../proxySandbox/ProxySandbox'
       );
       const result = await runInSandbox('return customVar', {
         customGlobals: { customVar: 'test' },
@@ -920,7 +920,7 @@ describe('工厂函数测试', () => {
 
     it('应该支持注入参数', async () => {
       const { runInSandbox } = await import(
-        '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+        '../../proxySandbox/ProxySandbox'
       );
       const result = await runInSandbox(
         'return injectedValue',
@@ -937,7 +937,7 @@ describe('工厂函数测试', () => {
 describe('边界情况测试', () => {
   it('应该处理空代码', async () => {
     const { runInSandbox } = await import(
-      '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+      '../../proxySandbox/ProxySandbox'
     );
     const result = await runInSandbox('');
 
@@ -947,7 +947,7 @@ describe('边界情况测试', () => {
 
   it('应该处理只有注释的代码', async () => {
     const { runInSandbox } = await import(
-      '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+      '../../proxySandbox/ProxySandbox'
     );
     const result = await runInSandbox('// 这是注释\n/* 这也是注释 */');
 
@@ -956,7 +956,7 @@ describe('边界情况测试', () => {
 
   it('应该处理复杂的嵌套结构', async () => {
     const { runInSandbox } = await import(
-      '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+      '../../proxySandbox/ProxySandbox'
     );
     const code = `
       const obj = {
@@ -976,7 +976,7 @@ describe('边界情况测试', () => {
 
   it('应该处理异步代码（Promise）', async () => {
     const { runInSandbox } = await import(
-      '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+      '../../proxySandbox/ProxySandbox'
     );
     const code = `
       return Promise.resolve(42);

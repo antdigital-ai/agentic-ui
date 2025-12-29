@@ -6,7 +6,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import DonutChart from '../../../@ant-design/agentic-ui/Plugins/chart/DonutChart';
+import DonutChart from '..';
 
 // Mock react-chartjs-2
 vi.mock('react-chartjs-2', () => ({
@@ -18,7 +18,7 @@ vi.mock('react-chartjs-2', () => ({
 }));
 
 // Mock hooks
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/DonutChart/hooks', () => ({
+vi.mock('../hooks', () => ({
   useMobile: () => ({ isMobile: false, windowWidth: 1920 }),
   useFilterLabels: (data: any) => ({
     filterLabels: [],
@@ -36,7 +36,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/DonutChart/hooks', () => 
 }));
 
 // Mock ChartContainer
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
+vi.mock('../../components', () => ({
   ChartContainer: ({ children, ...props }: any) => (
     <div data-testid="chart-container" {...props}>
       {children}

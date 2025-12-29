@@ -7,7 +7,7 @@ import {
   cleanupTempElement,
   loadMermaid,
   renderSvgToContainer,
-} from '../../@ant-design/agentic-ui/Plugins/mermaid/utils';
+} from '../utils';
 
 // Mock mermaid module
 const mockMermaidApi = {
@@ -69,7 +69,7 @@ describe('Mermaid utils', () => {
       // 由于模块缓存，这个测试可能无法完全模拟失败场景
       // 但我们可以测试错误处理逻辑
       const originalLoader = (
-        await import('../../@ant-design/agentic-ui/Plugins/mermaid/utils')
+        await import('../utils')
       ).loadMermaid;
 
       // 测试错误处理

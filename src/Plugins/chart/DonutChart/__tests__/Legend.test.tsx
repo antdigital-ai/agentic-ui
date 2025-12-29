@@ -5,8 +5,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import Legend from '../../../@ant-design/agentic-ui/Plugins/chart/DonutChart/Legend';
-import type { DonutChartData } from '../../../@ant-design/agentic-ui/Plugins/chart/DonutChart/types';
+import Legend from '../Legend';
+import type { DonutChartData } from '../types';
 
 const mockData: DonutChartData[] = [
   { label: 'A', value: 30 },

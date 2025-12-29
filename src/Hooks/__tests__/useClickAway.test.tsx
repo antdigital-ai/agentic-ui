@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import useClickAway from '../@ant-design/agentic-ui/Hooks/useClickAway';
+import useClickAway from '../useClickAway';
 
 describe('useClickAway', () => {
   let mockCallback: ReturnType<typeof vi.fn>;

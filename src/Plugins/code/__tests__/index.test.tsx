@@ -14,17 +14,17 @@ const mockEditorStore = {
 };
 
 // Mock useEditorStore
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: () => mockEditorStore,
 }));
 
 // Mock CodeRenderer 组件
-vi.mock('../../@ant-design/agentic-ui/Plugins/code/components', () => ({
+vi.mock('../components', () => ({
   CodeRenderer: () => <div data-testid="code-renderer">Code Renderer</div>,
 }));
 
 // Mock BaseMarkdownEditor 组件
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor', () => ({
+vi.mock('../../../MarkdownEditor', () => ({
   BaseMarkdownEditor: ({ initValue }: any) => (
     <div data-testid="base-markdown-editor">{initValue}</div>
   ),
@@ -36,7 +36,7 @@ let CodeElement: any;
 describe('code plugin index', () => {
   // 在所有测试之前导入 CodeElement 组件
   beforeAll(async () => {
-    const module = await import('../../@ant-design/agentic-ui/Plugins/code/index');
+    const module = await import('../index');
     CodeElement = module.CodeElement;
   });
 

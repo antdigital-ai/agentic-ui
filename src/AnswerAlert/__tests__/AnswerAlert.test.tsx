@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { AnswerAlert } from '../@ant-design/agentic-ui/AnswerAlert';
+import { AnswerAlert } from '..';
 
 describe('AnswerAlert 组件', () => {
   it('应该渲染基本的提示信息', () => {

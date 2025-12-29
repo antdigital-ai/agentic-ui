@@ -30,7 +30,7 @@ vi.mock('ace-builds', () => ({
   },
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: vi.fn(() => ({
     readonly: false,
     markdownEditorRef: { current: null },
@@ -43,7 +43,7 @@ vi.mock('slate-react', () => ({
   },
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownEditor/hooks/editor', () => ({
+vi.mock('../../../MarkdownEditor/hooks/editor', () => ({
   useSelStatus: vi.fn(() => [false, []]),
 }));
 

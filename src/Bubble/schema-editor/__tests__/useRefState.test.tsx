@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { useRefState } from '../../@ant-design/agentic-ui/Bubble/schema-editor/useRefState';
+import { useRefState } from '../useRefState';
 
 describe('useRefState', () => {
   describe('初始化', () => {

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   HistoryRunningIcon,
   HistoryRunningIconContainer,
-} from '../../@ant-design/agentic-ui/History/components/HistoryRunningIcon';
+} from '../HistoryRunningIcon';
 
 describe('HistoryRunningIcon', () => {
   it('应该渲染运行图标', async () => {

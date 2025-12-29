@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   findMatchingClose,
   isCodeBlockLikelyComplete,
-} from '../@ant-design/agentic-ui/MarkdownEditor/editor/utils/findMatchingClose';
+} from '../../MarkdownEditor/editor/utils/findMatchingClose';
 
 describe('findMatchingClose', () => {
   describe('代码块标记匹配', () => {

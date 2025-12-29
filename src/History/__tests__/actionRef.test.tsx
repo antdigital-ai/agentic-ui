@@ -1,7 +1,7 @@
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { History } from '../@ant-design/agentic-ui/History';
+import { History } from '..';
 
 // Mock the request function
 const mockRequest = vi.fn().mockResolvedValue([

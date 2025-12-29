@@ -3,12 +3,12 @@ import { cleanup, waitFor } from '@testing-library/react';
 import { BaseEditor, createEditor, Node, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { withMarkdown } from '../@ant-design/agentic-ui/MarkdownEditor/editor/plugins/withMarkdown';
+import { withMarkdown } from '../plugins/withMarkdown';
 import {
   ReactEditor,
   withReact,
 } from 'slate-react';
-import { EditorUtils } from '../@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils';
+import { EditorUtils } from '../utils/editorUtils';
 
 describe('Editor Card Tests', () => {
   afterEach(() => {

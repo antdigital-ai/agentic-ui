@@ -4,7 +4,7 @@ import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { withMarkdown } from '../@ant-design/agentic-ui/MarkdownEditor/editor/plugins/withMarkdown';
+import { withMarkdown } from '../plugins/withMarkdown';
 
 // Mock ReactEditor DOM methods
 vi.mock('slate-react', () => ({

@@ -2,8 +2,8 @@
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { HistoryActionsBox } from '../../@ant-design/agentic-ui/History/components/HistoryActionsBox';
-import { I18nContext } from '../../@ant-design/agentic-ui/I18n';
+import { HistoryActionsBox } from '../HistoryActionsBox';
+import { I18nContext } from '../../../I18n';
 
 const mockI18nLocale = {
   'chat.history.favorite': '收藏',

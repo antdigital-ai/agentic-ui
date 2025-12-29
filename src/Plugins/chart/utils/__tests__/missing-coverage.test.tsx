@@ -6,7 +6,7 @@ import {
   isXValueEqual,
   isConfigEqual,
   hexToRgba,
-} from '../../../@ant-design/agentic-ui/Plugins/chart/utils';
+} from '..';
 
 describe('Chart Utils - Missing Coverage', () => {
   describe('stringFormatNumber', () => {

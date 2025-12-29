@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { AILabel } from '../@ant-design/agentic-ui/AILabel';
+import { AILabel } from '..';
 
 // Mock framer-motion 以加快测试速度
 vi.mock('framer-motion', () => ({

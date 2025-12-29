@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { useChartDataFilter } from '../../../@ant-design/agentic-ui/Plugins/chart/hooks/useChartDataFilter';
-import type { ChartDataItem } from '../../../@ant-design/agentic-ui/Plugins/chart/utils';
+import { useChartDataFilter } from '../useChartDataFilter';
+import type { ChartDataItem } from '../../utils';
 
 describe('useChartDataFilter', () => {
   const mockData: ChartDataItem[] = [

@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useDebounceFn } from '../@ant-design/agentic-ui/Hooks/useDebounceFn';
+import { useDebounceFn } from '..';
 
 describe('useDebounceFn', () => {
   beforeEach(() => {

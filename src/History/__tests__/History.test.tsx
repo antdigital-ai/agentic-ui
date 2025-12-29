@@ -2,14 +2,14 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { History, HistoryDataType } from '../@ant-design/agentic-ui/History';
+import { History, HistoryDataType } from '..';
 
 // 提供必要的上下文
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ConfigProvider>{children}</ConfigProvider>
 );
 
-vi.mock('../@ant-design/agentic-ui/History/components', () => ({
+vi.mock('../components', () => ({
   HistoryLoadMore: ({ onLoadMore }: { onLoadMore: () => void }) => (
     <button type="button" data-testid="load-more" onClick={onLoadMore}>
       加载更多
@@ -258,7 +258,7 @@ describe('History 组件', () => {
     it('应该在历史记录为空时显示自定义空状态', async () => {
       const emptyRequest = vi.fn().mockResolvedValue([]);
       const { generateHistoryItems } = await import(
-        '../@ant-design/agentic-ui/History/components'
+        '../components'
       );
       (generateHistoryItems as any).mockReturnValue([]);
 
@@ -290,7 +290,7 @@ describe('History 组件', () => {
 
     it('应该在有数据时不显示空状态', async () => {
       const { generateHistoryItems } = await import(
-        '../@ant-design/agentic-ui/History/components'
+        '../components'
       );
       (generateHistoryItems as any).mockReturnValue([
         {
@@ -324,7 +324,7 @@ describe('History 组件', () => {
     it('应该在下拉菜单模式下也支持空状态渲染', async () => {
       const emptyRequest = vi.fn().mockResolvedValue([]);
       const { generateHistoryItems } = await import(
-        '../@ant-design/agentic-ui/History/components'
+        '../components'
       );
       (generateHistoryItems as any).mockReturnValue([]);
 
@@ -374,7 +374,7 @@ describe('History 组件', () => {
     it('应该支持复杂的自定义空状态组件', async () => {
       const emptyRequest = vi.fn().mockResolvedValue([]);
       const { generateHistoryItems } = await import(
-        '../@ant-design/agentic-ui/History/components'
+        '../components'
       );
       (generateHistoryItems as any).mockReturnValue([]);
 
@@ -429,7 +429,7 @@ describe('History 组件', () => {
 
     it('应该在 loading 为 false 时显示正常内容', async () => {
       const { generateHistoryItems } = await import(
-        '../@ant-design/agentic-ui/History/components'
+        '../components'
       );
       (generateHistoryItems as any).mockReturnValue([
         {

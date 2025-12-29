@@ -4,9 +4,9 @@ import {
   ReactEditor,
   withReact,
 } from 'slate-react';
-import { EditorStore } from '../../../@ant-design/agentic-ui/MarkdownEditor/editor/store';
-import { EditorUtils } from '../../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils';
-import { KeyboardTask } from '../../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/keyboard';
+import { EditorStore } from '../../../store';
+import { EditorUtils } from '../../../utils/editorUtils';
+import { KeyboardTask } from '../../../utils/keyboard';
 
 // Mock dependencies
 vi.mock('antd', () => ({
@@ -68,7 +68,7 @@ vi.spyOn(Editor, 'end').mockImplementation(() => ({ path: [0, 0], offset: 0 }));
 vi.spyOn(Editor, 'hasPath').mockImplementation(() => false);
 
 // Mock EditorUtils
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils', () => ({
+vi.mock('../../../utils/editorUtils', () => ({
   EditorUtils: {
     toggleFormat: vi.fn(),
     clearMarks: vi.fn(),
@@ -81,7 +81,7 @@ vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils
   },
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../../store', () => ({
   EditorStore: vi.fn(),
 }));
 

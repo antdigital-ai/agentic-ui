@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useSpeechSynthesis } from '../@ant-design/agentic-ui/Hooks/useSpeechSynthesis';
+import { useSpeechSynthesis } from '../useSpeechSynthesis';
 
 // Mock SpeechSynthesis API
 const mockSpeak = vi.fn();

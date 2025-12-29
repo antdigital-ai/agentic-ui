@@ -2,10 +2,10 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SendActions } from '../@ant-design/agentic-ui/MarkdownInputField/SendActions';
+import { SendActions } from '..';
 
 // Mock dependencies
-vi.mock('../@ant-design/agentic-ui/Components/ActionIconBox', () => ({
+vi.mock('../../../Components/ActionIconBox', () => ({
   ActionIconBox: ({ children, ...props }: any) => (
     <div data-testid="action-icon-box" {...props}>
       {children}
@@ -13,7 +13,7 @@ vi.mock('../@ant-design/agentic-ui/Components/ActionIconBox', () => ({
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton', () => ({
+vi.mock('../../AttachmentButton', () => ({
   AttachmentButton: ({ uploadImage, title, disabled, ...props }: any) => (
     <button
       data-testid="attachment-button"
@@ -28,7 +28,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton', () => (
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/VoiceInput', () => ({
+vi.mock('../../VoiceInput', () => ({
   VoiceInputButton: ({ onStart, onStop, recording, disabled, title }: any) => (
     <button
       data-testid="voice-input-button"
@@ -42,7 +42,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/VoiceInput', () => ({
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/SendButton', () => ({
+vi.mock('../../SendButton', () => ({
   SendButton: ({ onClick, typing, disabled, isSendable }: any) => (
     <button
       data-testid="send-button"

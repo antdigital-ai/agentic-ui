@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultColorList } from '../../@ant-design/agentic-ui/Plugins/chart/const';
+import { defaultColorList } from '../const';
 
 describe('Chart Constants', () => {
   describe('defaultColorList', () => {

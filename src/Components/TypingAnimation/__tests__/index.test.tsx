@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import { TypingAnimation } from '../../@ant-design/agentic-ui/Components/TypingAnimation';
+import { TypingAnimation } from '..';
 
 // Mock framer-motion
 vi.mock('framer-motion', async () => {
@@ -18,7 +18,7 @@ vi.mock('framer-motion', async () => {
 });
 
 // Mock resolveSegments
-vi.mock('../../@ant-design/agentic-ui/Components/TextAnimate', () => ({
+vi.mock('../../TextAnimate', () => ({
   resolveSegments: vi.fn((children) => {
     // 确保返回字符串数组
     if (typeof children === 'string') {

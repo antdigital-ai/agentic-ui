@@ -2,11 +2,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { I18nContext } from '../@ant-design/agentic-ui/I18n';
+import { I18nContext } from '../../../I18n';
 import {
   RealtimeFollow,
   RealtimeFollowList,
-} from '../@ant-design/agentic-ui/Workspace/RealtimeFollow';
+} from '..';
 
 describe('RealtimeFollow Component', () => {
   const mockLocale = {

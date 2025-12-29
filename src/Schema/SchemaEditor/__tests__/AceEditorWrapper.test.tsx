@@ -16,7 +16,7 @@
 import { act, cleanup, render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AceEditorWrapper } from '../../@ant-design/agentic-ui/Schema/SchemaEditor/AceEditorWrapper';
+import { AceEditorWrapper } from '../AceEditorWrapper';
 
 // 创建共享的 mock 对象
 const createMockAceEditor = () => ({
@@ -46,7 +46,7 @@ vi.mock('ace-builds', () => {
 });
 
 // Mock loadAceEditor - 返回与 ace-builds mock 相同的结构
-vi.mock('../../@ant-design/agentic-ui/Plugins/code/loadAceEditor', () => ({
+vi.mock('../../../Plugins/code/loadAceEditor', () => ({
   loadAceEditor: vi.fn(async () => {
     // 动态导入 ace-builds 以获取 mock 实例
     const aceModule = await import('ace-builds');
@@ -55,7 +55,7 @@ vi.mock('../../@ant-design/agentic-ui/Plugins/code/loadAceEditor', () => ({
 }));
 
 // Mock getAceLangs 和 modeMap
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/ace', () => ({
+vi.mock('../../../MarkdownEditor/editor/utils/ace', () => ({
   getAceLangs: vi.fn(() =>
     Promise.resolve(
       new Set([
@@ -108,7 +108,7 @@ describe('AceEditorWrapper', () => {
 
     // 确保 loadAceEditor mock 返回正确的模块
     const { loadAceEditor } = await import(
-      '../../@ant-design/agentic-ui/Plugins/code/loadAceEditor'
+      '../../../Plugins/code/loadAceEditor'
     );
     vi.mocked(loadAceEditor).mockResolvedValue(aceModule);
   });

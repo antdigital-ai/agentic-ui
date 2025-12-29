@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useThrottleFn } from '../@ant-design/agentic-ui/Hooks/useThrottleFn';
+import { useThrottleFn } from '..';
 
 describe('useThrottleFn', () => {
   beforeEach(() => {

@@ -3,12 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { I18nContext } from '../@ant-design/agentic-ui/I18n';
+import { I18nContext } from '../../../I18n';
 import Browser, {
   BrowserList,
   type BrowserItem,
   type BrowserSuggestion,
-} from '../@ant-design/agentic-ui/Workspace/Browser';
+} from '..';
 
 describe('BrowserList Component', () => {
   const mockLocale = {

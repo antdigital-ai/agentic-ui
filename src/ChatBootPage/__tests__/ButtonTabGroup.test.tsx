@@ -4,7 +4,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import ButtonTabGroup, {
   ButtonTabItem,
-} from '../@ant-design/agentic-ui/ChatBootPage/ButtonTabGroup';
+} from '../ButtonTabGroup';
 
 describe('ButtonTabGroup 组件', () => {
   const TestIcon = () => <span data-testid="test-icon">📌</span>;

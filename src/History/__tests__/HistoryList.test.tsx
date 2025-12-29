@@ -3,10 +3,10 @@ import { render } from '@testing-library/react';
 import dayjs from 'dayjs';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { generateHistoryItems } from '../@ant-design/agentic-ui/History/components/HistoryList';
+import { generateHistoryItems } from '../components/HistoryList';
 
 // Mock HistoryItem 组件
-vi.mock('../@ant-design/agentic-ui/History/components/HistoryItem', () => ({
+vi.mock('../components/HistoryItem', () => ({
   HistoryItem: ({ item }: { item: HistoryDataType }) => (
     <div data-testid={`history-item-${item.sessionId}`}>
       {item.sessionTitle}
@@ -15,7 +15,7 @@ vi.mock('../@ant-design/agentic-ui/History/components/HistoryItem', () => ({
 }));
 
 // Mock 工具函数
-vi.mock('../@ant-design/agentic-ui/History/utils', () => ({
+vi.mock('../utils', () => ({
   formatTime: (timestamp: number) => {
     const date = dayjs(timestamp);
     const today = dayjs();

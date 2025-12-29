@@ -8,8 +8,8 @@ import {
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { HistoryLoadMore } from '../../@ant-design/agentic-ui/History/components/LoadMoreComponent';
-import { I18nContext } from '../../@ant-design/agentic-ui/I18n';
+import { HistoryLoadMore } from '../LoadMoreComponent';
+import { I18nContext } from '../../../I18n';
 
 const mockI18nLocale = {
   'task.history.loadMore': '查看更多历史',

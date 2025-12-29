@@ -1,13 +1,13 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MOBILE_MAX_CHART_SIZE } from '../../../@ant-design/agentic-ui/Plugins/chart/DonutChart/constants';
+import { MOBILE_MAX_CHART_SIZE } from '../constants';
 import {
   useAutoCategory,
   useFilterLabels,
   useMobile,
   useResponsiveDimensions,
-} from '../../../@ant-design/agentic-ui/Plugins/chart/DonutChart/hooks';
-import type { DonutChartData } from '../../../@ant-design/agentic-ui/Plugins/chart/DonutChart/types';
+} from '../hooks';
+import type { DonutChartData } from '../types';
 
 describe('DonutChart hooks', () => {
   const originalInnerWidth =

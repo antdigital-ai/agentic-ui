@@ -17,7 +17,7 @@ import {
   isPath,
   isTargetInsideVoid,
   normalizeMarkdownSearchText,
-} from '../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils';
+} from '../editorUtils';
 
 // Mock ReactEditor
 vi.mock('slate-react', () => ({

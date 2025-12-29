@@ -8,10 +8,10 @@ import {
 } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { QuickActions } from '../@ant-design/agentic-ui/MarkdownInputField/QuickActions';
+import { QuickActions } from '..';
 
 // Mock RefinePromptButton
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/RefinePromptButton', () => ({
+vi.mock('../../RefinePromptButton', () => ({
   RefinePromptButton: ({
     onRefine,
     isHover,
@@ -33,7 +33,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownInputField/RefinePromptButton', () =>
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/Enlargement', () => ({
+vi.mock('../../Enlargement', () => ({
   __esModule: true,
   default: ({
     isEnlarged,

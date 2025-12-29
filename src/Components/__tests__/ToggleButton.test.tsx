@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ToggleButton } from '../@ant-design/agentic-ui/Components/Button/ToggleButton';
+import { ToggleButton } from '../Button/ToggleButton';
 
 describe('ToggleButton 组件', () => {
   const TestIcon = () => <span data-testid="test-icon">🔘</span>;

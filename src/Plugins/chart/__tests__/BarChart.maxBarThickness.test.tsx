@@ -43,7 +43,7 @@ vi.mock('rc-resize-observer', () => ({
 // Import BarChart after mocking
 import BarChart, {
   BarChartDataItem,
-} from '../../@ant-design/agentic-ui/Plugins/chart/BarChart';
+} from '../BarChart';
 
 describe('BarChart maxBarThickness 功能测试', () => {
   const basicData: BarChartDataItem[] = [

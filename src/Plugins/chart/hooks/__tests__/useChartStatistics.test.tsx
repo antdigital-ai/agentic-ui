@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { useChartStatistics } from '../../../@ant-design/agentic-ui/Plugins/chart/hooks/useChartStatistics';
-import type { StatisticConfigType } from '../../../@ant-design/agentic-ui/Plugins/chart/hooks/useChartStatistic';
+import { useChartStatistics } from '../useChartStatistics';
+import type { StatisticConfigType } from '../useChartStatistic';
 
 describe('useChartStatistics', () => {
   const mockStatisticConfig: StatisticConfigType = {

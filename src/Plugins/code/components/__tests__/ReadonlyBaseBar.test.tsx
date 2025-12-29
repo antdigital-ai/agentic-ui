@@ -4,7 +4,7 @@ import { message, Modal } from 'antd';
 import copy from 'copy-to-clipboard';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ReadonlyBaseBar } from '../../../@ant-design/agentic-ui/MarkdownEditor/editor/tools/ToolBar/ReadonlyBaseBar';
+import { ReadonlyBaseBar } from '../../../../MarkdownEditor/editor/tools/ToolBar/ReadonlyBaseBar';
 
 // Mock 依赖
 vi.mock('copy-to-clipboard');
@@ -20,7 +20,7 @@ vi.mock('antd', () => ({
   },
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: () => ({
     refreshFloatBar: false,
     markdownEditorRef: {

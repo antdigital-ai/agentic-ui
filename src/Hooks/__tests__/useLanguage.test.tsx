@@ -1,8 +1,8 @@
 import { act, renderHook } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { useLanguage } from '../@ant-design/agentic-ui/Hooks/useLanguage';
-import { I18nProvide } from '../@ant-design/agentic-ui/I18n';
+import { useLanguage } from '../useLanguage';
+import { I18nProvide } from '../../I18n';
 
 describe('useLanguage Hook', () => {
   it('应该在没有 I18nProvide 时抛出错误', () => {

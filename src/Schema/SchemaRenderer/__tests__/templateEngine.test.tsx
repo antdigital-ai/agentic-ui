@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TemplateEngine } from '../../@ant-design/agentic-ui/Schema/SchemaRenderer/templateEngine';
+import { TemplateEngine } from '../templateEngine';
 
 describe('TemplateEngine', () => {
   describe('基本渲染功能', () => {

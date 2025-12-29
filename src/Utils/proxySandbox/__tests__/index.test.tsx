@@ -13,7 +13,7 @@ import {
   safeMathEval,
   SandboxHealthChecker,
   sandboxHealthChecker,
-} from '../../@ant-design/agentic-ui/Utils/proxySandbox';
+} from '..';
 
 describe('proxySandbox/index.ts', () => {
   describe('DEFAULT_SANDBOX_CONFIG', () => {
@@ -172,11 +172,11 @@ describe('proxySandbox/index.ts', () => {
     it('应该在没有错误对象时抛出默认错误', async () => {
       // 模拟一个没有 error 的结果
       const { runInSandbox } = await import(
-        '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+        '../ProxySandbox'
       );
       const originalRunInSandbox = runInSandbox;
       vi.spyOn(
-        await import('../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'),
+        await import('../ProxySandbox'),
         'runInSandbox',
       ).mockResolvedValueOnce({
         success: false,
@@ -239,10 +239,10 @@ describe('proxySandbox/index.ts', () => {
     it('应该在结果不是有效数字时抛出错误', async () => {
       // 模拟返回非数字结果
       const { runInSandbox } = await import(
-        '../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'
+        '../ProxySandbox'
       );
       vi.spyOn(
-        await import('../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'),
+        await import('../ProxySandbox'),
         'runInSandbox',
       ).mockResolvedValueOnce({
         success: true,
@@ -259,7 +259,7 @@ describe('proxySandbox/index.ts', () => {
 
     it('应该在结果为 Infinity 时抛出错误', async () => {
       vi.spyOn(
-        await import('../../@ant-design/agentic-ui/Utils/proxySandbox/ProxySandbox'),
+        await import('../ProxySandbox'),
         'runInSandbox',
       ).mockResolvedValueOnce({
         success: true,

@@ -4,17 +4,17 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { Transforms } from 'slate';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ChartAttrToolBar } from '../../@ant-design/agentic-ui/Plugins/chart/ChartAttrToolBar';
+import { ChartAttrToolBar } from '../ChartAttrToolBar';
 
 // Mock dependencies
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: () => ({
     markdownEditorRef: { current: {} },
     readonly: false,
   }),
 }));
 
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor', () => ({
+vi.mock('../../../MarkdownEditor', () => ({
   EditorUtils: {
     findPath: vi.fn(() => [0]),
   },

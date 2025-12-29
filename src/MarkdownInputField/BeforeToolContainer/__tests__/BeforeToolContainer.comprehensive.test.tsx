@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ActionItemContainer } from '../../@ant-design/agentic-ui/MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
+import { ActionItemContainer } from '../BeforeToolContainer';
 
 // Mock the icons
 vi.mock('@sofa-design/icons', () => ({
@@ -31,7 +31,7 @@ vi.mock('antd', async () => {
 });
 
 // Mock useStyle
-vi.mock('../../@ant-design/agentic-ui/Components/ActionItemBox', () => ({
+vi.mock('../../../Components/ActionItemBox', () => ({
   useStyle: () => ({
     wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash',
@@ -39,7 +39,7 @@ vi.mock('../../@ant-design/agentic-ui/Components/ActionItemBox', () => ({
 }));
 
 // Mock useRefFunction
-vi.mock('../../@ant-design/agentic-ui/Hooks/useRefFunction', () => ({
+vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: any) => fn,
 }));
 

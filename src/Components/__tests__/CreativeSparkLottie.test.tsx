@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { CreativeSparkLottie } from '../@ant-design/agentic-ui/Components/lotties/CreativeSparkLottie';
+import { CreativeSparkLottie } from '../lotties/CreativeSparkLottie';
 
 describe('CreativeSparkLottie Component', () => {
   afterEach(() => {

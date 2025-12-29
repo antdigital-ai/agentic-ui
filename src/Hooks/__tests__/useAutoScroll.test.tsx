@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import useAutoScroll from '../@ant-design/agentic-ui/Hooks/useAutoScroll';
+import useAutoScroll from '../useAutoScroll';
 
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({

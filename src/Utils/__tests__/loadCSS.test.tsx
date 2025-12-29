@@ -1,9 +1,9 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 // 由于 loadedCSS 是模块私有的，我们需要重新导入模块来进行测试
-let loadCSSModule: typeof import('../@ant-design/agentic-ui/Utils/loadCSS');
-let loadCSS: typeof import('../@ant-design/agentic-ui/Utils/loadCSS').loadCSS;
-let preloadCSS: typeof import('../@ant-design/agentic-ui/Utils/loadCSS').preloadCSS;
+let loadCSSModule: typeof import('../loadCSS');
+let loadCSS: typeof import('../loadCSS').loadCSS;
+let preloadCSS: typeof import('../loadCSS').preloadCSS;
 
 describe('loadCSS.ts', () => {
   // 保存原始的 window 对象
@@ -12,7 +12,7 @@ describe('loadCSS.ts', () => {
   beforeEach(async () => {
     // 重新加载模块以重置内部状态
     vi.resetModules();
-    loadCSSModule = await import('../@ant-design/agentic-ui/Utils/loadCSS');
+    loadCSSModule = await import('../loadCSS');
     loadCSS = loadCSSModule.loadCSS;
     preloadCSS = loadCSSModule.preloadCSS;
     

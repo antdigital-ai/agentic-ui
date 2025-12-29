@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { SuggestionList } from '../@ant-design/agentic-ui/Components/SuggestionList';
+import { SuggestionList } from '../../Components/SuggestionList';
 
 describe('SuggestionList', () => {
   it('renders items vertically and respects max count 6', async () => {

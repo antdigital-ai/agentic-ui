@@ -6,8 +6,8 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { cnLabels, enLabels, I18nContext } from '../../../@ant-design/agentic-ui/I18n';
-import { ThinkBlock } from '../../../@ant-design/agentic-ui/Plugins/code/components/ThinkBlock';
+import { cnLabels, enLabels, I18nContext } from '../../../../I18n';
+import { ThinkBlock } from '../ThinkBlock';
 
 // Mock CodeNode for testing
 const mockElement = {

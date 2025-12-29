@@ -5,10 +5,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   CopyButton,
   CopyIcon,
-} from '../@ant-design/agentic-ui/Bubble/MessagesContent/CopyButton';
+} from '../MessagesContent/CopyButton';
 
 // Mock useCopied hook
-vi.mock('../@ant-design/agentic-ui/Hooks/useCopied', () => ({
+vi.mock('../../Hooks/useCopied', () => ({
   useCopied: vi.fn(() => ({
     copied: false,
     setCopied: vi.fn(),
@@ -16,7 +16,7 @@ vi.mock('../@ant-design/agentic-ui/Hooks/useCopied', () => ({
 }));
 
 // Mock ActionIconBox
-vi.mock('../@ant-design/agentic-ui/index', () => ({
+vi.mock('../../index', () => ({
   ActionIconBox: ({
     children,
     onClick,

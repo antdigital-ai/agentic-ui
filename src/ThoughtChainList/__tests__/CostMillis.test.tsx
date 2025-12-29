@@ -5,8 +5,8 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { I18nContext } from '../@ant-design/agentic-ui/I18n';
-import { CostMillis } from '../@ant-design/agentic-ui/ThoughtChainList/CostMillis';
+import { I18nContext } from '../../I18n';
+import { CostMillis } from '../CostMillis';
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <I18nContext.Provider value={{ locale: {} as any, language: 'zh-CN' }}>

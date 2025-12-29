@@ -4,7 +4,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import RadarChart, {
   RadarChartDataItem,
-} from '../../@ant-design/agentic-ui/Plugins/chart/RadarChart';
+} from '../RadarChart';
 
 // Mock Chart.js
 vi.mock('chart.js', () => ({
@@ -38,7 +38,7 @@ vi.mock('react-chartjs-2', () => ({
 }));
 
 // Mock components
-vi.mock('../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
+vi.mock('../components', () => ({
   ChartContainer: ({ children, ...props }: any) => (
     <div data-testid="chart-container" {...props}>
       {children}
@@ -71,7 +71,7 @@ vi.mock('../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
 }));
 
 // Mock ChartStatistic
-vi.mock('../../@ant-design/agentic-ui/Plugins/chart/ChartStatistic', () => ({
+vi.mock('../ChartStatistic', () => ({
   default: ({ title, value }: any) => (
     <div data-testid="chart-statistic">
       {title}: {value}
@@ -80,7 +80,7 @@ vi.mock('../../@ant-design/agentic-ui/Plugins/chart/ChartStatistic', () => ({
 }));
 
 // Mock style hook
-vi.mock('../../@ant-design/agentic-ui/Plugins/chart/RadarChart/style', () => ({
+vi.mock('../RadarChart/style', () => ({
   useStyle: vi.fn(() => ({
     wrapSSR: (node: any) => node,
     hashId: 'test-hash-id',
@@ -409,7 +409,7 @@ describe('RadarChart', () => {
   describe('交互功能测试', () => {
     it('应该支持下载功能', async () => {
       const { downloadChart } = await import(
-        '../../@ant-design/agentic-ui/Plugins/chart/components'
+        '../components'
       );
 
       render(<RadarChart data={sampleData} title="可下载雷达图" />);

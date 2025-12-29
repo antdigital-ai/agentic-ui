@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import scrollTo from '../@ant-design/agentic-ui/Utils/scrollTo';
+import scrollTo from '../scrollTo';
 
 // Mock rc-util/lib/raf
 vi.mock('rc-util/lib/raf', () => ({

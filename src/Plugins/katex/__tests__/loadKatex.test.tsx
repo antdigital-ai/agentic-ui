@@ -13,7 +13,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { loadKatex, preloadKatex } from '../../@ant-design/agentic-ui/Plugins/katex/loadKatex';
+import { loadKatex, preloadKatex } from '../loadKatex';
 
 describe('loadKatex', () => {
   beforeEach(() => {
@@ -69,7 +69,7 @@ describe('loadKatex', () => {
       vi.resetModules();
 
       const { loadKatex } = await import(
-        '../../@ant-design/agentic-ui/Plugins/katex/loadKatex'
+        '../loadKatex'
       );
 
       await expect(loadKatex()).rejects.toThrow('Katex 仅在浏览器环境中可用');
@@ -101,7 +101,7 @@ describe('preloadKatex', () => {
       vi.resetModules();
 
       const { preloadKatex } = await import(
-        '../../@ant-design/agentic-ui/Plugins/katex/loadKatex'
+        '../loadKatex'
       );
 
       expect(() => preloadKatex()).not.toThrow();

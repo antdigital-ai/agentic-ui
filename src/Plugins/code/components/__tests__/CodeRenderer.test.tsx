@@ -6,7 +6,7 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React, { createContext } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CodeRenderer } from '../../../@ant-design/agentic-ui/Plugins/code/components/CodeRenderer';
+import { CodeRenderer } from '../CodeRenderer';
 
 // 使用 vi.hoisted() 定义变量，使其与 vi.mock 一起被提升
 const { mockEditorStore } = vi.hoisted(() => {
@@ -35,7 +35,7 @@ const { mockEditorStore } = vi.hoisted(() => {
 });
 
 // Mock 核心依赖
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/store', async () => {
+vi.mock('../../../../MarkdownEditor/editor/store', async () => {
   const React = await import('react');
   return {
     useEditorStore: () => mockEditorStore,
@@ -45,7 +45,7 @@ vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/store', async () 
 });
 
 // Mock MarkdownEditor 组件
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor', () => ({
+vi.mock('../../../../MarkdownEditor', () => ({
   MarkdownEditor: ({ initValue, ...props }: any) => (
     <div data-testid="markdown-editor">
       <div data-testid="markdown-content">{initValue}</div>
@@ -54,7 +54,7 @@ vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor', () => ({
 }));
 
 // Mock hooks
-vi.mock('../../../@ant-design/agentic-ui/Plugins/code/hooks', () => ({
+vi.mock('../../hooks', () => ({
   useCodeEditorState: () => ({
     state: {
       showBorder: false,
@@ -91,7 +91,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/code/hooks', () => ({
 }));
 
 // Mock AceEditor hook
-vi.mock('../../../@ant-design/agentic-ui/Plugins/code/components/AceEditor', () => ({
+vi.mock('../AceEditor', () => ({
   AceEditor: () => ({
     dom: { current: document.createElement('div') },
     setLanguage: vi.fn(),
@@ -100,7 +100,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/code/components/AceEditor', () 
 }));
 
 // Mock CodeToolbar 组件
-vi.mock('../../../@ant-design/agentic-ui/Plugins/code/components/CodeToolbar', () => ({
+vi.mock('../CodeToolbar', () => ({
   CodeToolbar: ({ element, readonly, isSelected }: any) => (
     <div data-testid="code-toolbar">
       <span>Code Toolbar</span>
@@ -118,7 +118,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/code/components/CodeToolbar', (
 }));
 
 // Mock HtmlPreview 组件
-vi.mock('../../../@ant-design/agentic-ui/Plugins/code/components/HtmlPreview', () => ({
+vi.mock('../HtmlPreview', () => ({
   HtmlPreview: ({ htmlStr }: any) => (
     <div data-testid="html-preview">
       <span>HTML Preview</span>

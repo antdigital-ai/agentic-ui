@@ -2,10 +2,10 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SchemaRenderer } from '../../@ant-design/agentic-ui/Schema/SchemaRenderer';
+import { SchemaRenderer } from '..';
 
 // Mock the proxySandbox module
-vi.mock('../../@ant-design/agentic-ui/Utils/proxySandbox', () => ({
+vi.mock('../../../Utils/proxySandbox', () => ({
   createSandbox: vi.fn().mockImplementation(() => ({
     execute: vi.fn().mockResolvedValue({ success: true }),
     destroy: vi.fn(),
@@ -18,7 +18,7 @@ vi.mock('../../@ant-design/agentic-ui/Utils/proxySandbox', () => ({
 }));
 
 // Mock the template engine
-vi.mock('../../@ant-design/agentic-ui/Schema/SchemaRenderer/templateEngine', () => ({
+vi.mock('../templateEngine', () => ({
   TemplateEngine: {
     render: vi.fn().mockImplementation((template, data) => {
       // 简单的模板替换实现
@@ -152,7 +152,7 @@ describe('SchemaRenderer - Comprehensive Tests', () => {
     });
 
     it('应该处理沙箱执行错误', async () => {
-      const mockCreateSandbox = await import('../../@ant-design/agentic-ui/Utils/proxySandbox');
+      const mockCreateSandbox = await import('../../../Utils/proxySandbox');
       vi.spyOn(mockCreateSandbox, 'createSandbox').mockImplementation(
         () =>
           ({
@@ -190,7 +190,7 @@ describe('SchemaRenderer - Comprehensive Tests', () => {
 
     it('应该销毁沙箱实例', async () => {
       const destroySpy = vi.fn();
-      const mockCreateSandbox = await import('../../@ant-design/agentic-ui/Utils/proxySandbox');
+      const mockCreateSandbox = await import('../../../Utils/proxySandbox');
       vi.spyOn(mockCreateSandbox, 'createSandbox').mockImplementation(
         () =>
           ({

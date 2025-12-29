@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { ActionIconBox } from '../@ant-design/agentic-ui/Components/ActionIconBox';
+import { ActionIconBox } from '..';
 
 describe('ActionIconBox 组件', () => {
   const TestIcon = () => <span data-testid="test-icon">Icon</span>;

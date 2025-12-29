@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import Title from '../@ant-design/agentic-ui/ChatBootPage/Title';
+import Title from '../Title';
 
 describe('Title 组件', () => {
   it('应该渲染基本的标题', () => {

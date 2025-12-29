@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatFileSize, formatLastModified } from '../@ant-design/agentic-ui/Workspace/utils';
+import { formatFileSize, formatLastModified } from '..';
 
 describe('Workspace utils', () => {
   describe('formatFileSize', () => {

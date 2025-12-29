@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { AILabel } from '../@ant-design/agentic-ui/AILabel';
+import { AILabel } from '..';
 
 // Mock framer-motion to ensure snapshot consistency
 vi.mock('framer-motion', () => ({

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { debounce, stringFormatNumber } from '../../@ant-design/agentic-ui/Plugins/chart/utils';
+import { debounce, stringFormatNumber } from '../utils';
 
 describe('Chart Utils', () => {
   beforeEach(() => {

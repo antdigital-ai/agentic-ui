@@ -8,7 +8,7 @@ import {
   markdownToHtmlSync,
   type MarkdownRemarkPlugin,
   type MarkdownToHtmlOptions,
-} from '../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/markdownToHtml';
+} from '../markdownToHtml';
 
 // Mock console.error to avoid noise in test output
 const originalConsoleError = console.error;

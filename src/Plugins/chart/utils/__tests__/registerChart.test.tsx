@@ -3,7 +3,7 @@ import {
   registerChartComponents,
   registerLineChartComponents,
   registerBarChartComponents,
-} from '../../../@ant-design/agentic-ui/Plugins/chart/utils/registerChart';
+} from '../registerChart';
 
 describe('registerChartComponents', () => {
   it('应该调用注册函数', () => {

@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createBackgroundArcPlugin,
   createCenterTextPlugin,
-} from '../../../@ant-design/agentic-ui/Plugins/chart/DonutChart/plugins';
+} from '../plugins';
 
 describe('DonutChart plugins', () => {
   describe('createCenterTextPlugin', () => {

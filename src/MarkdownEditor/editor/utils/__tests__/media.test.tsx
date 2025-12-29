@@ -1,11 +1,11 @@
 import { Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReactEditor } from 'slate-react';
-import { EditorStore } from '../../@ant-design/agentic-ui/MarkdownEditor/editor/store';
+import { EditorStore } from '../../store';
 import {
   convertRemoteImages,
   getRemoteMediaType,
-} from '../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/media';
+} from '../media';
 
 // Mock dependencies
 vi.mock('slate', () => ({
@@ -20,7 +20,7 @@ vi.mock('slate-react', () => ({
   },
 }));
 
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../store', () => ({
   EditorStore: vi.fn(),
 }));
 

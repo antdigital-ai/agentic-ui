@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { TextLoading } from '../@ant-design/agentic-ui/Components/lotties/TextLoading';
+import { TextLoading } from '../lotties/TextLoading';
 
 describe('TextLoading 组件', () => {
   it('应该渲染文字加载组件', () => {

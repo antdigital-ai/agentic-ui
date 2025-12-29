@@ -3,8 +3,8 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { Editor } from 'slate';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ElementProps, InlineKatexNode } from '../../@ant-design/agentic-ui/MarkdownEditor/el';
-import { InlineKatex } from '../../@ant-design/agentic-ui/Plugins/katex/InlineKatex';
+import { ElementProps, InlineKatexNode } from '../../../MarkdownEditor/el';
+import { InlineKatex } from '../InlineKatex';
 
 // Mock katex
 const mockKatexRender = vi.fn();
@@ -16,7 +16,7 @@ vi.mock('katex', () => ({
 
 // Mock loadKatex
 const mockLoadKatex = vi.fn();
-vi.mock('../../@ant-design/agentic-ui/Plugins/katex/loadKatex', () => ({
+vi.mock('../loadKatex', () => ({
   loadKatex: () => mockLoadKatex(),
 }));
 
@@ -29,13 +29,13 @@ const mockMarkdownEditorRef = {
   } as any as Editor,
 };
 
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: () => mockUseEditorStore(),
 }));
 
 // Mock the selection status hook
 const mockUseSelStatus = vi.fn();
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/hooks/editor', () => ({
+vi.mock('../../../MarkdownEditor/hooks/editor', () => ({
   useSelStatus: () => mockUseSelStatus(),
 }));
 

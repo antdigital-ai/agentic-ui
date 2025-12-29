@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { TaskList } from '../../@ant-design/agentic-ui/Workspace/Task';
+import { TaskList } from '..';
 
 describe('TaskList Component', () => {
   const renderWithProvider = (ui: React.ReactElement) => {

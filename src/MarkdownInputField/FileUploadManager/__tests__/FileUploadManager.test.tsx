@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { I18nContext } from '../@ant-design/agentic-ui/I18n';
-import { useFileUploadManager } from '../@ant-design/agentic-ui/MarkdownInputField/FileUploadManager';
+import { I18nContext } from '../../../I18n';
+import { useFileUploadManager } from '..';
 
 // Mock antd message
 vi.mock('antd', async () => {
@@ -17,19 +17,19 @@ vi.mock('antd', async () => {
 });
 
 // Mock upLoadFileToServer
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton', () => ({
+vi.mock('../../AttachmentButton', () => ({
   upLoadFileToServer: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock device detection utilities
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton/utils', () => ({
+vi.mock('../../AttachmentButton/utils', () => ({
   isMobileDevice: vi.fn().mockReturnValue(false),
   isVivoOrOppoDevice: vi.fn().mockReturnValue(false),
   isWeChat: vi.fn().mockReturnValue(false),
 }));
 
 // Import the utils module for mocking in tests
-import * as utils from '../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton/utils';
+import * as utils from '../../AttachmentButton/utils';
 
 describe('useFileUploadManager', () => {
   const mockOnFileMapChange = vi.fn();
@@ -729,7 +729,7 @@ describe('useFileUploadManager', () => {
 
       // 不应该调用上传函数
       const { upLoadFileToServer } = await import(
-        '../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton'
+        '../../AttachmentButton'
       );
       expect(upLoadFileToServer).not.toHaveBeenCalled();
 
@@ -872,7 +872,7 @@ describe('useFileUploadManager', () => {
 
       // readonly 状态下不应该处理
       const { upLoadFileToServer } = await import(
-        '../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton'
+        '../../AttachmentButton'
       );
       expect(upLoadFileToServer).not.toHaveBeenCalled();
 
@@ -886,7 +886,7 @@ describe('useFileUploadManager', () => {
         .mockImplementation(() => {});
 
       const { upLoadFileToServer } = await import(
-        '../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton'
+        '../../AttachmentButton'
       );
       vi.mocked(upLoadFileToServer).mockRejectedValue(
         new Error('Upload error'),
@@ -967,7 +967,7 @@ describe('useFileUploadManager', () => {
 
   describe('getAcceptValue 设备类型处理', () => {
     it('应该在微信环境下返回 *', async () => {
-      vi.mock('../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton/utils', () => ({
+      vi.mock('../../AttachmentButton/utils', () => ({
         isMobileDevice: vi.fn().mockReturnValue(false),
         isVivoOrOppoDevice: vi.fn().mockReturnValue(false),
         isWeChat: vi.fn().mockReturnValue(true),

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { describe, expect, it } from 'vitest';
-import { isLink, parsePath, toUnixPath } from '../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/path';
+import { isLink, parsePath, toUnixPath } from '../path';
 
 describe('Path Utils', () => {
   describe('isLink', () => {

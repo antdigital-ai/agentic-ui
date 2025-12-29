@@ -2,10 +2,10 @@ import { fireEvent, render, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ScrollVisibleButton } from '../@ant-design/agentic-ui/BackTo/ScrollVisibleButton';
+import { ScrollVisibleButton } from '../ScrollVisibleButton';
 
 // Mock getScroll
-vi.mock('../@ant-design/agentic-ui/Utils/getScroll', () => ({
+vi.mock('../../Utils/getScroll', () => ({
   default: vi.fn((target) => {
     if (target === window || !target) {
       return window.pageYOffset || 0;

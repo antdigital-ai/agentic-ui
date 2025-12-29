@@ -6,7 +6,7 @@ import {
   FileDataSourceStrategy,
   PreviewCapability,
   UrlDataSourceStrategy,
-} from '../../@ant-design/agentic-ui/Workspace/File/DataSourceStrategy';
+} from '../DataSourceStrategy';
 
 describe('DataSourceStrategy', () => {
   describe('UrlDataSourceStrategy', () => {
@@ -479,7 +479,7 @@ describe('DataSourceStrategy', () => {
   describe('全局实例', () => {
     it('应该导出全局dataSourceManager实例', async () => {
       const { dataSourceManager } = await import(
-        '../../@ant-design/agentic-ui/Workspace/File/DataSourceStrategy'
+        '../DataSourceStrategy'
       );
       expect(dataSourceManager).toBeInstanceOf(DataSourceManager);
     });

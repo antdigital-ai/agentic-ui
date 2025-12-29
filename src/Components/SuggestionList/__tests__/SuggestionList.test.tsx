@@ -7,7 +7,7 @@ import {
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { SuggestionList } from '../@ant-design/agentic-ui/Components/SuggestionList';
+import { SuggestionList } from '..';
 
 describe('SuggestionList 组件', () => {
   const mockItems = [

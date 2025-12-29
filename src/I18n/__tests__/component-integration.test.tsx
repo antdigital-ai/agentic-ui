@@ -1,14 +1,14 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { HistoryLoadMore } from '../@ant-design/agentic-ui/History/components/LoadMoreComponent';
-import { HistoryNewChat } from '../@ant-design/agentic-ui/History/components/NewChatComponent';
-import { HistorySearch } from '../@ant-design/agentic-ui/History/components/SearchComponent';
-import { cnLabels, enLabels, I18nContext } from '../@ant-design/agentic-ui/I18n';
-import { TaskList } from '../@ant-design/agentic-ui/TaskList';
+import { HistoryLoadMore } from '../../History/components/LoadMoreComponent';
+import { HistoryNewChat } from '../../History/components/NewChatComponent';
+import { HistorySearch } from '../../History/components/SearchComponent';
+import { cnLabels, enLabels, I18nContext } from '..';
+import { TaskList } from '../../TaskList';
 
 // Mock components that might not be available in test environment
-vi.mock('../@ant-design/agentic-ui/MarkdownEditor/editor/components', () => ({
+vi.mock('../../MarkdownEditor/editor/components', () => ({
   ActionIconBox: ({ children, title, onClick }: any) => (
     <button
       onClick={onClick}
@@ -21,7 +21,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownEditor/editor/components', () => ({
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/Components/Loading', () => ({
+vi.mock('../../Components/Loading', () => ({
   Loading: () => <span>Loading</span>,
 }));
 

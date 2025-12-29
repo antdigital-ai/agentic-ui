@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parserMarkdownToSlateNode } from '../@ant-design/agentic-ui/MarkdownEditor/editor/parser/parserMarkdownToSlateNode';
+import { parserMarkdownToSlateNode } from '../parser/parserMarkdownToSlateNode';
 
 describe('Video Support', () => {
   it('should parse video HTML tag with self-closing syntax', () => {

@@ -1,10 +1,10 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CreativeRecommendationEffect } from '../@ant-design/agentic-ui/Components/effects/CreativeRecommendationEffect';
+import { CreativeRecommendationEffect } from '../effects/CreativeRecommendationEffect';
 
 // Mock EffectPlayer
-vi.mock('../@ant-design/agentic-ui/Components/effects/EffectPlayer', () => ({
+vi.mock('../effects/EffectPlayer', () => ({
   default: ({
     sceneUrl,
     downgradeImage,

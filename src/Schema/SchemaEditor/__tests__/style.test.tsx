@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { useStyle } from '../../@ant-design/agentic-ui/Schema/SchemaEditor/style';
+import { useStyle } from '../style';
 
 describe('SchemaEditor style', () => {
   describe('useStyle hook', () => {

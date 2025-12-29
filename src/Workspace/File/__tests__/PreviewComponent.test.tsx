@@ -2,9 +2,9 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { I18nProvide } from '../../@ant-design/agentic-ui/I18n';
-import { PreviewComponent } from '../../@ant-design/agentic-ui/Workspace/File/PreviewComponent';
-import type { FileNode } from '../../@ant-design/agentic-ui/Workspace/types';
+import { I18nProvide } from '../../../I18n';
+import { PreviewComponent } from '../PreviewComponent';
+import type { FileNode } from '../../types';
 
 // Mock fetch
 global.fetch = vi.fn();

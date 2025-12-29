@@ -2,11 +2,11 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BubbleBeforeNode } from '../@ant-design/agentic-ui/Bubble/BubbleBeforeNode';
-import { BubbleConfigContext } from '../@ant-design/agentic-ui/Bubble/BubbleConfigProvide';
+import { BubbleBeforeNode } from '../BubbleBeforeNode';
+import { BubbleConfigContext } from '../BubbleConfigProvide';
 
 // Mock ThoughtChainList 组件
-vi.mock('../@ant-design/agentic-ui/ThoughtChainList', () => ({
+vi.mock('../../ThoughtChainList', () => ({
   ThoughtChainList: ({ thoughtChainList, loading, bubble }: any) => (
     <div data-testid="thought-chain-list">
       <div data-testid="thought-chain-count">

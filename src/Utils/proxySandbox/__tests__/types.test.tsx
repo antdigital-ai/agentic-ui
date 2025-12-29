@@ -24,7 +24,7 @@ import {
   SandboxConfigType,
   SandboxFactoryOptions,
   GlobalSandboxSettings
-} from '../../@ant-design/agentic-ui/Utils/proxySandbox/types';
+} from '../types';
 
 describe('proxySandbox/types.ts', () => {
   describe('SandboxErrorType 枚举测试', () => {

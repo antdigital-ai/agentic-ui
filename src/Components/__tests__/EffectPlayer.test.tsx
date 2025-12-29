@@ -1,7 +1,7 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import EffectPlayer from '../@ant-design/agentic-ui/Components/effects/EffectPlayer';
+import EffectPlayer from '../effects/EffectPlayer';
 
 const getMockPlayer = async () => {
   const { Player } = await import('@galacean/effects');

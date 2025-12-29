@@ -5,11 +5,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { I18nContext } from '../@ant-design/agentic-ui/I18n';
-import { TableSql } from '../@ant-design/agentic-ui/ThoughtChainList/TableSql';
+import { I18nContext } from '../../I18n';
+import { TableSql } from '../TableSql';
 
 // Mock MarkdownEditor
-vi.mock('../@ant-design/agentic-ui/MarkdownEditor', () => ({
+vi.mock('../../MarkdownEditor', () => ({
   MarkdownEditor: ({ initValue, editorRef, ...props }: any) => {
     // 模拟 editorRef
     if (editorRef && typeof editorRef === 'object') {
@@ -36,7 +36,7 @@ vi.mock('../@ant-design/agentic-ui/MarkdownEditor', () => ({
 
 // Mock copy function
 const mockCopy = vi.fn();
-vi.mock('../@ant-design/agentic-ui/Utils/copy', () => ({
+vi.mock('../../Utils/copy', () => ({
   default: (...args: any[]) => mockCopy(...args),
 }));
 

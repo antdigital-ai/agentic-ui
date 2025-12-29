@@ -27,9 +27,9 @@ vi.mock('react-chartjs-2', () => ({
 }));
 
 // Mock components
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/components', async () => {
+vi.mock('../../components', async () => {
   const actual = await vi.importActual(
-    '../../../@ant-design/agentic-ui/Plugins/chart/components',
+    '../../components',
   );
   return {
     ...actual,
@@ -78,11 +78,11 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/components', async () => 
 });
 
 // Import hooks for mocking
-import * as hooks from '../../../@ant-design/agentic-ui/Plugins/chart/hooks';
-import * as utils from '../../../@ant-design/agentic-ui/Plugins/chart/utils';
+import * as hooks from '../../hooks';
+import * as utils from '../../utils';
 
 // Mock hooks
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', () => ({
+vi.mock('../../hooks', () => ({
   useResponsiveSize: vi.fn(() => ({
     responsiveWidth: 600,
     responsiveHeight: 400,
@@ -110,7 +110,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/hooks', () => ({
 }));
 
 // Mock utils
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/utils', () => ({
+vi.mock('../../utils', () => ({
   extractAndSortXValues: vi.fn(() => []),
   findDataPointByXValue: vi.fn(() => null),
   hexToRgba: vi.fn((hex, alpha) => `rgba(0,0,0,${alpha})`),
@@ -120,7 +120,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/utils', () => ({
 }));
 
 // Mock style hook
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/AreaChart/style', () => ({
+vi.mock('../style', () => ({
   useStyle: vi.fn(() => ({
     wrapSSR: (node: any) => node,
     hashId: 'test-hash-id',
@@ -128,7 +128,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/AreaChart/style', () => (
 }));
 
 // Import AreaChart after mocking
-import AreaChart from '../../../@ant-design/agentic-ui/Plugins/chart/AreaChart/index';
+import AreaChart from '../index';
 
 describe('AreaChart', () => {
   const sampleData: any[] = [

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import ChartToolBar from '../../../@ant-design/agentic-ui/Plugins/chart/components/ChartToolBar/ChartToolBar';
+import ChartToolBar from '../ChartToolBar/ChartToolBar';
 // Mock Ant Design components
 vi.mock('antd', async () => {
   const actual = await vi.importActual('antd');
@@ -25,17 +25,17 @@ vi.mock('@ant-design/icons', () => ({
 }));
 
 // Mock TimeIcon
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/components/icons/TimeIcon', () => ({
+vi.mock('../icons/TimeIcon', () => ({
   default: () => <span data-testid="time-icon">时间</span>,
 }));
 
 // Mock Loading component
-vi.mock('../../../@ant-design/agentic-ui/Components/Loading', () => ({
+vi.mock('../../../../Components/Loading', () => ({
   Loading: () => <span data-testid="loading">加载中...</span>,
 }));
 
 // Mock I18nContext
-vi.mock('../../../@ant-design/agentic-ui/I18n', () => ({
+vi.mock('../../../../I18n', () => ({
   I18nContext: {
     Consumer: ({ children }: any) =>
       children({
@@ -185,7 +185,7 @@ describe('ChartToolBar', () => {
 
   it('应该在没有国际化时使用默认文本', () => {
     // Mock I18nContext without locale
-    vi.mock('../../../@ant-design/agentic-ui/I18n', () => ({
+    vi.mock('../../../../I18n', () => ({
       I18nContext: {
         Consumer: ({ children }: any) =>
           children({ locale: {}, language: 'zh-CN' }),

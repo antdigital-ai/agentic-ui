@@ -14,24 +14,24 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CodeNode, ElementProps } from '../../@ant-design/agentic-ui/MarkdownEditor/el';
-import { KatexElement } from '../../@ant-design/agentic-ui/Plugins/katex/index';
+import { CodeNode, ElementProps } from '../../../MarkdownEditor/el';
+import { KatexElement } from '../index';
 
 // Mock Katex 组件
-vi.mock('../../@ant-design/agentic-ui/Plugins/katex/Katex', () => ({
+vi.mock('../Katex', () => ({
   Katex: ({ el }: { el: CodeNode }) => (
     <div data-testid="katex-renderer">{el.value || 'Formula'}</div>
   ),
 }));
 
 // Mock DragHandle 组件
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/tools/DragHandle', () => ({
+vi.mock('../../../MarkdownEditor/editor/tools/DragHandle', () => ({
   DragHandle: () => <div data-testid="drag-handle">DragHandle</div>,
 }));
 
 // Mock useEditorStore
 const mockUseEditorStore = vi.fn();
-vi.mock('../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: () => mockUseEditorStore(),
 }));
 

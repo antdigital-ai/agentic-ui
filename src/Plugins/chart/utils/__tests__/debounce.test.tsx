@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { debounce } from '../../../@ant-design/agentic-ui/Plugins/chart/utils';
+import { debounce } from '..';
 
 describe('debounce', () => {
   beforeEach(() => {

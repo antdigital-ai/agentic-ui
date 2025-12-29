@@ -5,7 +5,7 @@ import {
   getOffsetTop,
   getSelRect,
   slugify,
-} from '../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/dom';
+} from '../dom';
 
 // Mock diacritics
 vi.mock('diacritics', () => ({

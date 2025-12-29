@@ -2,11 +2,11 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { I18nContext } from '../@ant-design/agentic-ui/I18n';
-import { TaskList } from '../@ant-design/agentic-ui/TaskList';
+import { I18nContext } from '../../I18n';
+import { TaskList } from '..';
 
 // Mock Loading 组件
-vi.mock('../@ant-design/agentic-ui/Components/Loading', () => ({
+vi.mock('../../Components/Loading', () => ({
   Loading: ({ size, ...props }: any) => (
     <div data-testid="task-list-loading" data-size={size} {...props}>
       Loading
@@ -15,7 +15,7 @@ vi.mock('../@ant-design/agentic-ui/Components/Loading', () => ({
 }));
 
 // Mock ActionIconBox
-vi.mock('../@ant-design/agentic-ui/Components/ActionIconBox', () => ({
+vi.mock('../../Components/ActionIconBox', () => ({
   ActionIconBox: ({ title, iconStyle, onClick, children, ...props }: any) => (
     <div
       data-testid="action-icon-box"
@@ -30,7 +30,7 @@ vi.mock('../@ant-design/agentic-ui/Components/ActionIconBox', () => ({
 }));
 
 // Mock 样式hook
-vi.mock('../@ant-design/agentic-ui/TaskList/style', () => ({
+vi.mock('../style', () => ({
   useStyle: () => ({
     wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash-id',

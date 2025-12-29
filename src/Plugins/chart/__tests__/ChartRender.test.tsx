@@ -2,10 +2,10 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { I18nContext } from '../../@ant-design/agentic-ui/I18n';
-import { ChartRender } from '../../@ant-design/agentic-ui/Plugins/chart/ChartRender';
+import { I18nContext } from '../../../I18n';
+import { ChartRender } from '../ChartRender';
 
-vi.mock('../../@ant-design/agentic-ui/Hooks/useIntersectionOnce', () => ({
+vi.mock('../../../Hooks/useIntersectionOnce', () => ({
   useIntersectionOnce: () => true,
 }));
 
@@ -61,7 +61,7 @@ vi.mock('react-chartjs-2', () => ({
 }));
 
 // Mock ChartMark components
-vi.mock('../../@ant-design/agentic-ui/Plugins/chart/ChartMark', () => ({
+vi.mock('../ChartMark', () => ({
   Pie: vi.fn().mockImplementation((props) => (
     <div data-testid="pie-chart">
       Pie Chart - {props.xField} vs {props.yField}
@@ -90,7 +90,7 @@ vi.mock('../../@ant-design/agentic-ui/Plugins/chart/ChartMark', () => ({
 }));
 
 // Mock the actual ChartMark components
-vi.mock('../../@ant-design/agentic-ui/Plugins/chart/ChartMark/index', () => ({
+vi.mock('../ChartMark/index', () => ({
   Pie: vi.fn().mockImplementation((props) => (
     <div data-testid="pie-chart">
       Pie Chart - {props.xField} vs {props.yField}
@@ -119,7 +119,7 @@ vi.mock('../../@ant-design/agentic-ui/Plugins/chart/ChartMark/index', () => ({
 }));
 
 // Mock ChartAttrToolBar
-vi.mock('../../@ant-design/agentic-ui/Plugins/chart/ChartAttrToolBar', () => ({
+vi.mock('../ChartAttrToolBar', () => ({
   ChartAttrToolBar: vi.fn().mockImplementation((props) => (
     <div data-testid="chart-attr-toolbar">
       {props.title}
@@ -131,7 +131,7 @@ vi.mock('../../@ant-design/agentic-ui/Plugins/chart/ChartAttrToolBar', () => ({
 }));
 
 // Mock the actual ChartAttrToolBar component
-vi.mock('../../@ant-design/agentic-ui/Plugins/chart/ChartAttrToolBar/index', () => ({
+vi.mock('../ChartAttrToolBar/index', () => ({
   ChartAttrToolBar: vi.fn().mockImplementation((props) => (
     <div data-testid="chart-attr-toolbar">
       {props.title}
@@ -147,7 +147,7 @@ const createRuntimeComponent =
     <div data-testid={testId}>{props.title ?? `mock-${testId}`}</div>
   );
 
-vi.mock('../../@ant-design/agentic-ui/Plugins/chart/loadChartRuntime', () => ({
+vi.mock('../loadChartRuntime', () => ({
   loadChartRuntime: vi.fn(async () => ({
     AreaChart: createRuntimeComponent('area-chart'),
     BarChart: createRuntimeComponent('bar-chart'),

@@ -2,9 +2,9 @@ import '@testing-library/jest-dom';
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Mermaid } from '../../@ant-design/agentic-ui/Plugins/mermaid/Mermaid';
+import { Mermaid } from '../Mermaid';
 
-vi.mock('../../@ant-design/agentic-ui/Hooks/useIntersectionOnce', () => ({
+vi.mock('../../../Hooks/useIntersectionOnce', () => ({
   useIntersectionOnce: () => true,
 }));
 

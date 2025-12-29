@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { SwitchButton } from '../@ant-design/agentic-ui/Components/Button/SwitchButton';
+import { SwitchButton } from '../Button/SwitchButton';
 
 describe('SwitchButton 组件', () => {
   const TestIcon = () => <span data-testid="test-icon">📝</span>;

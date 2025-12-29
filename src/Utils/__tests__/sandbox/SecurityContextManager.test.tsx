@@ -9,7 +9,7 @@ import {
   SecurityContextManager,
   createSecurityContextManager,
   runInSecureContext,
-} from '../../@ant-design/agentic-ui/Utils/proxySandbox/SecurityContextManager';
+} from '../../proxySandbox/SecurityContextManager';
 
 describe('SecurityContextManager', () => {
   let manager: SecurityContextManager;

@@ -18,11 +18,11 @@ import { ReactEditor, withReact } from 'slate-react';
 import type { Plugin } from 'unified';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { parserMdToSchema } from '../../src';
-import { fixStrongWithSpecialChars } from '../@ant-design/agentic-ui/MarkdownEditor/editor/parser/remarkParse';
-import { withMarkdown } from '../@ant-design/agentic-ui/MarkdownEditor/editor/plugins/withMarkdown';
-import { EditorStore } from '../@ant-design/agentic-ui/MarkdownEditor/editor/store';
-import type { MarkdownToHtmlOptions } from '../@ant-design/agentic-ui/MarkdownEditor/editor/utils/markdownToHtml';
-import * as markdownToHtmlUtils from '../@ant-design/agentic-ui/MarkdownEditor/editor/utils/markdownToHtml';
+import { fixStrongWithSpecialChars } from '../parser/remarkParse';
+import { withMarkdown } from '../plugins/withMarkdown';
+import { EditorStore } from '../store';
+import type { MarkdownToHtmlOptions } from '../utils/markdownToHtml';
+import * as markdownToHtmlUtils from '../utils/markdownToHtml';
 
 // Mock ReactEditor DOM methods
 vi.mock('slate-react', () => ({

@@ -5,7 +5,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import ChartErrorBoundary from '../../../../@ant-design/agentic-ui/Plugins/chart/components/ChartContainer/ChartErrorBoundary';
+import ChartErrorBoundary from '../ChartErrorBoundary';
 
 // 模拟一个会抛出错误的组件
 const ThrowError: React.FC<{ shouldThrow?: boolean }> = ({

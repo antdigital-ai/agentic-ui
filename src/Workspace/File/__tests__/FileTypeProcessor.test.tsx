@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   DataSourceManager,
   DataSourceType,
-} from '../../@ant-design/agentic-ui/Workspace/File/DataSourceStrategy';
+} from '../DataSourceStrategy';
 import {
   FileTypeProcessor,
   fileTypeProcessor,
@@ -13,8 +13,8 @@ import {
   isPdfFile,
   isTextFile,
   isVideoFile,
-} from '../../@ant-design/agentic-ui/Workspace/File/FileTypeProcessor';
-import { FileCategory } from '../../@ant-design/agentic-ui/Workspace/types';
+} from '../FileTypeProcessor';
+import { FileCategory } from '../../types';
 
 describe('FileTypeProcessor', () => {
   let processor: FileTypeProcessor;

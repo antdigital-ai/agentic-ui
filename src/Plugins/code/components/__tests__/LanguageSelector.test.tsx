@@ -7,10 +7,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { LanguageSelector } from '../../../@ant-design/agentic-ui/Plugins/code/components/LanguageSelector';
+import { LanguageSelector } from '../LanguageSelector';
 
 // Mock I18nContext
-vi.mock('../../../@ant-design/agentic-ui/I18n/index.tsx', () => ({
+vi.mock('../../../../I18n/index.tsx', () => ({
   I18nContext: React.createContext({
     locale: {
       switchLanguage: '切换语言',
@@ -19,7 +19,7 @@ vi.mock('../../../@ant-design/agentic-ui/I18n/index.tsx', () => ({
 }));
 
 // Mock langIconMap
-vi.mock('../../../@ant-design/agentic-ui/Plugins/code/langIconMap', () => ({
+vi.mock('../../langIconMap', () => ({
   langIconMap: new Map([
     ['javascript', '/icons/javascript.png'],
     ['python', '/icons/python.png'],
@@ -28,7 +28,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/code/langIconMap', () => ({
 }));
 
 // Mock langOptions
-vi.mock('../../../@ant-design/agentic-ui/Plugins/code/utils/langOptions', () => ({
+vi.mock('../../utils/langOptions', () => ({
   langOptions: [
     { value: 'javascript', label: 'JavaScript' },
     { value: 'python', label: 'Python' },
@@ -38,7 +38,7 @@ vi.mock('../../../@ant-design/agentic-ui/Plugins/code/utils/langOptions', () => 
 }));
 
 // Mock LoadImage component
-vi.mock('../../../@ant-design/agentic-ui/Plugins/code/components/LoadImage', () => ({
+vi.mock('../LoadImage', () => ({
   LoadImage: ({ src }: any) => <img src={src} alt="language-icon" />,
 }));
 

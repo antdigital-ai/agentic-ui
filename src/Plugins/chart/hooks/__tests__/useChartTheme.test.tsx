@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { useChartTheme } from '../../../@ant-design/agentic-ui/Plugins/chart/hooks/useChartTheme';
+import { useChartTheme } from '../useChartTheme';
 
 describe('useChartTheme', () => {
   it('应该返回浅色主题的默认配置', () => {

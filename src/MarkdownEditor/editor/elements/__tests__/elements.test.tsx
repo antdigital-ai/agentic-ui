@@ -4,10 +4,10 @@ import {
   CheckMdParams,
   insertAfter,
   MdElements,
-} from '../@ant-design/agentic-ui/MarkdownEditor/editor/plugins/elements';
+} from '../../plugins/elements';
 
 // Mock EditorUtils
-vi.mock('../@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils', () => ({
+vi.mock('../../utils/editorUtils', () => ({
   EditorUtils: {
     isDirtLeaf: vi.fn(() => false),
     moveAfterSpace: vi.fn(),

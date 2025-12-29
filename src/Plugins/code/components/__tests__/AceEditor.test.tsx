@@ -5,7 +5,7 @@
 
 import '@testing-library/jest-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AceEditor } from '../../../@ant-design/agentic-ui/Plugins/code/components/AceEditor';
+import { AceEditor } from '../AceEditor';
 
 // Mock ace-builds
 const mockEditor = {
@@ -55,7 +55,7 @@ vi.mock('ace-builds/src-noconflict/ext-modelist', () => ({
 }));
 
 // Mock ace utils
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/ace', () => ({
+vi.mock('../../../../MarkdownEditor/editor/utils/ace', () => ({
   modeMap: new Map([
     ['ts', 'typescript'],
     ['js', 'javascript'],
@@ -83,31 +83,31 @@ const mockEditorStore = {
   },
 };
 
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
+vi.mock('../../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: () => mockEditorStore,
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils', () => ({
+vi.mock('../../../../MarkdownEditor/editor/utils/editorUtils', () => ({
   EditorUtils: {
     focus: vi.fn(),
   },
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/el', () => ({
+vi.mock('../../../../MarkdownEditor/el', () => ({
   CodeNode: {},
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/Plugins/code/loadAceEditor', () => ({
+vi.mock('../../loadAceEditor', () => ({
   loadAceEditor: vi.fn(() => Promise.resolve({ default: {} })),
   loadAceTheme: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/MarkdownEditor/editor/parser/json-parse', () => ({
+vi.mock('../../../../MarkdownEditor/editor/parser/json-parse', () => ({
   default: vi.fn((str: string) => JSON.parse(str)),
 }));
 
 // Mock useRefFunction hook
-vi.mock('../../../@ant-design/agentic-ui/Hooks/useRefFunction', () => ({
+vi.mock('../../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: any) => fn,
 }));
 

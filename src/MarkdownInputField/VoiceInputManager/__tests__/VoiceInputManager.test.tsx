@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useVoiceInputManager } from '../@ant-design/agentic-ui/MarkdownInputField/VoiceInputManager';
+import { useVoiceInputManager } from '..';
 
 describe('useVoiceInputManager', () => {
   const mockEditorRef = {

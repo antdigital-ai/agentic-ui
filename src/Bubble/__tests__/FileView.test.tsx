@@ -2,11 +2,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BubbleFileView } from '../@ant-design/agentic-ui/Bubble/FileView';
-import { AttachmentFile } from '../@ant-design/agentic-ui/MarkdownInputField/AttachmentButton/types';
+import { BubbleFileView } from '../FileView';
+import { AttachmentFile } from '../../MarkdownInputField/AttachmentButton/types';
 
 // Mock FileMapView 组件
-vi.mock('../@ant-design/agentic-ui/MarkdownInputField/FileMapView', () => ({
+vi.mock('../../MarkdownInputField/FileMapView', () => ({
   FileMapView: (props: any) => (
     <div data-testid="file-map-view">
       <div data-testid="file-map-className">{props.className || 'none'}</div>

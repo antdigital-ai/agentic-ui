@@ -4,12 +4,12 @@ import React from 'react';
 import { BaseEditor, createEditor, Editor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { afterEach, describe, expect, it } from 'vitest';
-import { BaseMarkdownEditor } from '../@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
+import { BaseMarkdownEditor } from '../../BaseMarkdownEditor';
 import {
   ReactEditor,
   withReact,
 } from 'slate-react';
-import { EditorUtils } from '../@ant-design/agentic-ui/MarkdownEditor/editor/utils/editorUtils';
+import { EditorUtils } from '../utils/editorUtils';
 
 describe('Editor Alignment Tests', () => {
   afterEach(() => {

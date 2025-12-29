@@ -3,7 +3,7 @@ import type {
   ChartClassNames,
   ChartStyles,
   ClassNameType,
-} from '../../../@ant-design/agentic-ui/Plugins/chart/types/classNames';
+} from '../classNames';
 
 describe('ChartClassNames 类型', () => {
   it('应该支持所有层级的类名', () => {

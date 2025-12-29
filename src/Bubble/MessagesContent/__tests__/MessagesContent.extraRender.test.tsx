@@ -2,9 +2,9 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { BubbleMessageDisplay } from '../@ant-design/agentic-ui/Bubble/MessagesContent';
+import { BubbleMessageDisplay } from '..';
 
-vi.mock('../@ant-design/agentic-ui/Bubble/MessagesContent/MarkdownPreview', () => ({
+vi.mock('../MarkdownPreview', () => ({
   MarkdownPreview: ({ content, extra }: any) => (
     <div data-testid="markdown-preview">
       <div data-testid="content">{content}</div>
@@ -13,11 +13,11 @@ vi.mock('../@ant-design/agentic-ui/Bubble/MessagesContent/MarkdownPreview', () =
   ),
 }));
 
-vi.mock('../@ant-design/agentic-ui/Bubble/MessagesContent/DocInfo', () => ({
+vi.mock('../DocInfo', () => ({
   DocInfoList: () => <div data-testid="doc-info-list">Doc Info</div>,
 }));
 
-vi.mock('../@ant-design/agentic-ui/Bubble/MessagesContent/EXCEPTION', () => ({
+vi.mock('../EXCEPTION', () => ({
   EXCEPTION: ({ extra }: any) => (
     <div data-testid="exception">
       Exception
@@ -27,7 +27,7 @@ vi.mock('../@ant-design/agentic-ui/Bubble/MessagesContent/EXCEPTION', () => ({
 }));
 
 // Mock hooks
-vi.mock('../@ant-design/agentic-ui/Hooks/useRefFunction', () => ({
+vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: vi.fn((fn) => fn),
 }));
 

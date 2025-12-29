@@ -8,11 +8,11 @@ let ScatterChart: React.FC<any>;
 beforeEach(async () => {
   try {
     const mod = await import(
-      '../../../@ant-design/agentic-ui/Plugins/chart/ScatterChart/index'
+      '../index'
     );
     ScatterChart = mod.default;
   } catch (e) {
-    const mod = await import('../../../@ant-design/agentic-ui/Plugins/chart/ScatterChart/');
+    const mod = await import('..');
     ScatterChart = mod.default;
   }
 });
@@ -29,11 +29,11 @@ vi.mock('react-chartjs-2', () => ({
   Scatter: () => <div data-testid="scatter-chart">Scatter Chart</div>,
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/ScatterChart/style', () => ({
+vi.mock('../style', () => ({
   useStyle: () => ({ wrapSSR: (node: any) => node, hashId: 'test-hash' }),
 }));
 
-vi.mock('../../../@ant-design/agentic-ui/Plugins/chart/components', () => ({
+vi.mock('../../components', () => ({
   ChartContainer: ({ children }: any) => (
     <div data-testid="chart-container">{children}</div>
   ),

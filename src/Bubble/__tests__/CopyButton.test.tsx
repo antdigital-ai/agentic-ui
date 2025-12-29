@@ -2,10 +2,10 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CopyButton } from '../@ant-design/agentic-ui/Bubble/MessagesContent/CopyButton';
+import { CopyButton } from '../MessagesContent/CopyButton';
 
 // Mock useCopied hook
-vi.mock('../@ant-design/agentic-ui/Hooks/useCopied', () => ({
+vi.mock('../../Hooks/useCopied', () => ({
   useCopied: vi.fn(() => ({
     copied: false,
     setCopied: vi.fn(),
@@ -13,7 +13,7 @@ vi.mock('../@ant-design/agentic-ui/Hooks/useCopied', () => ({
 }));
 
 // Mock ActionIconBox
-vi.mock('../@ant-design/agentic-ui/index', () => ({
+vi.mock('../../index', () => ({
   ActionIconBox: ({
     children,
     onClick,

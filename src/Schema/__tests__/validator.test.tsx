@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   SchemaValidator,
   mdDataSchemaValidator,
-} from '../@ant-design/agentic-ui/Schema/validator';
+} from '../validator';
 
 // Mock Ajv
 vi.mock('ajv', () => {

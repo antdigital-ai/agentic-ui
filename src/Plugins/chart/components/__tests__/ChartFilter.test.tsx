@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import ChartFilter from '../../../@ant-design/agentic-ui/Plugins/chart/components/ChartFilter/ChartFilter';
+import ChartFilter from '../ChartFilter/ChartFilter';
 
 // Mock Ant Design components
 vi.mock('antd', async () => {
@@ -47,7 +47,7 @@ vi.mock('antd', async () => {
 });
 
 // Mock I18nContext
-vi.mock('../../../@ant-design/agentic-ui/I18n', () => ({
+vi.mock('../../../../I18n', () => ({
   I18nContext: {
     Consumer: ({ children }: any) =>
       children({ locale: {}, language: 'zh-CN' }),
@@ -353,7 +353,7 @@ describe('ChartFilter', () => {
 
   it('应该正确显示默认国际化文本', () => {
     // 重新模拟 I18nContext 以测试默认文本
-    vi.doMock('../../../@ant-design/agentic-ui/I18n', () => ({
+    vi.doMock('../../../../I18n', () => ({
       I18nContext: {
         Consumer: ({ children }: any) =>
           children({}),

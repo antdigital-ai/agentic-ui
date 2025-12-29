@@ -15,12 +15,12 @@ import '@testing-library/jest-dom';
 import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { CodeNode } from '../../@ant-design/agentic-ui/MarkdownEditor/el';
-import { Katex } from '../../@ant-design/agentic-ui/Plugins/katex/Katex';
+import { CodeNode } from '../../../MarkdownEditor/el';
+import { Katex } from '../Katex';
 
 // Mock loadKatex
 const mockLoadKatex = vi.fn();
-vi.mock('../../@ant-design/agentic-ui/Plugins/katex/loadKatex', () => ({
+vi.mock('../loadKatex', () => ({
   loadKatex: () => mockLoadKatex(),
 }));
 

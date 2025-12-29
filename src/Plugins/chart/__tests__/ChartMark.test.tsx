@@ -66,13 +66,13 @@ vi.mock('rc-resize-observer', () => ({
 }));
 
 // Import components after mocking
-import { Area } from '../../@ant-design/agentic-ui/Plugins/chart/ChartMark/Area';
-import { Bar } from '../../@ant-design/agentic-ui/Plugins/chart/ChartMark/Bar';
-import { Column } from '../../@ant-design/agentic-ui/Plugins/chart/ChartMark/Column';
-import { Container } from '../../@ant-design/agentic-ui/Plugins/chart/ChartMark/Container';
-import { Line } from '../../@ant-design/agentic-ui/Plugins/chart/ChartMark/Line';
-import { Pie } from '../../@ant-design/agentic-ui/Plugins/chart/ChartMark/Pie';
-import { debounce, stringFormatNumber } from '../../@ant-design/agentic-ui/Plugins/chart/utils';
+import { Area } from '../ChartMark/Area';
+import { Bar } from '../ChartMark/Bar';
+import { Column } from '../ChartMark/Column';
+import { Container } from '../ChartMark/Container';
+import { Line } from '../ChartMark/Line';
+import { Pie } from '../ChartMark/Pie';
+import { debounce, stringFormatNumber } from '../utils';
 
 describe('ChartMark Components', () => {
   afterEach(() => {
