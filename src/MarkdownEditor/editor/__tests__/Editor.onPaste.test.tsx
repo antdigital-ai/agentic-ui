@@ -2,7 +2,7 @@ import { render, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MarkdownEditor } from '../../src';
+import { MarkdownEditor } from '../../../index';
 
 // Mock console.log to ignore act warnings
 const originalConsoleLog = console.log;

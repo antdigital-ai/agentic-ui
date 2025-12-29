@@ -4,7 +4,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BaseMarkdownEditor } from '@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
-import { TestWrapper } from './testUtils';
+import { TestWrapper } from '../../testUtils';
 
 /**
  * 模拟 Next.js SSR 环境

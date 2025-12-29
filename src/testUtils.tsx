@@ -1,6 +1,6 @@
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { I18nProvide } from '../src/I18n';
+import { I18nProvide } from './I18n';
 
 /**
  * 测试环境的 ConfigProvider 配置

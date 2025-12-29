@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import React, { useMemo } from 'react';
 import { describe, expect, it } from 'vitest';
-import { MarkdownEditorPlugin, parserMdToSchema } from '../../../src';
+import { MarkdownEditorPlugin, parserMdToSchema } from '../../../../index';
 import type { Elements } from '../../../el';
 
 const useCreateComponentPlugin = (tagName: string, targetType: string) => {

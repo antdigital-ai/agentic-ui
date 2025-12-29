@@ -4,7 +4,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { BaseMarkdownEditor } from '@ant-design/agentic-ui/MarkdownEditor/BaseMarkdownEditor';
-import { TestWrapper } from './testUtils';
+import { TestWrapper } from '../../testUtils';
 
 // 复杂的 Markdown 内容 - 拼多多商业模式分析
 const complexMarkdownContent = `### 核心商业模式

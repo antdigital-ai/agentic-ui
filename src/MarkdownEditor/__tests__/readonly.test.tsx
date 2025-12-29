@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MarkdownEditor } from '../src';
+import { MarkdownEditor } from '../../index';
 import { ReactEditor } from 'slate-react';
 
 // 扩展 fireEvent 类型

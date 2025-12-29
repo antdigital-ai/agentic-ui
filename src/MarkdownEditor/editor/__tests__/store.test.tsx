@@ -17,7 +17,7 @@ import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import type { Plugin } from 'unified';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { parserMdToSchema } from '../../src';
+import { parserMdToSchema } from '../../../index';
 import { fixStrongWithSpecialChars } from '../parser/remarkParse';
 import { withMarkdown } from '../plugins/withMarkdown';
 import { EditorStore } from '../store';
