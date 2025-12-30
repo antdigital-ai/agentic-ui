@@ -722,7 +722,7 @@ test('MarkdownInputField clear input should work correctly', async () => {
 
       const textAfterClear = await input.innerText();
       const trimmedText = textAfterClear.trim();
-      expect(trimmedText.length).toBeLessThan(textBeforeClear.length);
+      expect(trimmedText.length).toBe(0);
 
       // 验证 placeholder 重新显示
       const placeholderAfterClear = await page.evaluate(() => {
