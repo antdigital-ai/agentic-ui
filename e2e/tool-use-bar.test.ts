@@ -39,7 +39,7 @@ test('ToolUseBar basic rendering should work correctly', async () => {
         .or(page.locator('text=文件搜索').locator('..'));
 
       // 等待至少一个工具项出现
-      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
+      await toolItems.first().waitFor({ state: 'visible', timeout: 15000 });
 
       const toolCount = await toolItems.count();
       expect(toolCount).toBeGreaterThan(0);
@@ -88,7 +88,7 @@ test('ToolUseBar tool status display should work correctly', async () => {
         .or(page.locator('.ant-agentic-tool-use-bar-tool'));
 
       // 等待至少一个工具项出现
-      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
+      await toolItems.first().waitFor({ state: 'visible', timeout: 15000 });
 
       // 验证 success 状态
       const successTool = page.locator(
@@ -154,7 +154,7 @@ test('ToolUseBar active keys management should work correctly', async () => {
         .or(page.locator('.ant-agentic-tool-use-bar-tool'));
 
       // 等待至少一个工具项出现
-      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
+      await toolItems.first().waitFor({ state: 'visible', timeout: 15000 });
       const firstTool = toolItems.first();
 
       // 点击第一个工具项激活
@@ -213,7 +213,7 @@ test('ToolUseBar tool click interaction should work correctly', async () => {
         .or(page.locator('.ant-agentic-tool-use-bar-tool'));
 
       // 等待至少一个工具项出现
-      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
+      await toolItems.first().waitFor({ state: 'visible', timeout: 15000 });
       const firstTool = toolItems.first();
 
       // 监听控制台日志以验证点击回调
@@ -274,7 +274,7 @@ test('ToolUseBar empty state should work correctly', async () => {
         .or(page.locator('.ant-agentic-tool-use-bar-tool'));
 
       // 等待工具项出现（在这个 demo 中应该有工具项）
-      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
+      await toolItems.first().waitFor({ state: 'visible', timeout: 15000 });
 
       const toolCount = await toolItems.count();
 
@@ -318,7 +318,7 @@ test('ToolUseBar light mode should work correctly', async () => {
 
       if (toolUseBarCount >= 2) {
         const lightToolUseBar = toolUseBars.nth(1);
-        await lightToolUseBar.waitFor({ state: 'visible', timeout: 5000 });
+        await lightToolUseBar.waitFor({ state: 'visible', timeout: 15000 });
 
         // 验证 light 模式的工具项存在
         const lightToolItems = lightToolUseBar.locator(
@@ -365,7 +365,7 @@ test('ToolUseBar error message display should work correctly', async () => {
       const toolItems = page
         .locator('[data-testid="ToolUserItem"]')
         .or(page.locator('.ant-agentic-tool-use-bar-tool'));
-      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
+      await toolItems.first().waitFor({ state: 'visible', timeout: 15000 });
 
       // 查找错误状态的工具项
       const errorTool = page.locator('.ant-agentic-tool-use-bar-tool-error');

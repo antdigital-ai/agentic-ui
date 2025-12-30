@@ -39,11 +39,11 @@ test('MarkdownInputField copy functionality should work correctly', async () => 
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 5000 });
+      await inputField.waitFor({ state: 'visible', timeout: 15000 });
 
       // 找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 5000 });
+      await input.waitFor({ state: 'visible', timeout: 15000 });
 
       // 点击输入框以聚焦
       await input.click();

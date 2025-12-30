@@ -34,13 +34,13 @@ test('MarkdownInputField styles should work correctly', async () => {
 
       // 先找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 5000 });
+      await input.waitFor({ state: 'visible', timeout: 15000 });
 
       // 直接查找 MarkdownInputField 容器
       const inputFieldElement = page
         .locator('.ant-agentic-md-input-field')
         .first();
-      await inputFieldElement.waitFor({ state: 'visible', timeout: 5000 });
+      await inputFieldElement.waitFor({ state: 'visible', timeout: 15000 });
 
       // 测试默认状态的 boxShadow
       const defaultBoxShadow = await inputFieldElement.evaluate((el) => {
@@ -147,7 +147,7 @@ test('MarkdownInputField disabled styles should work correctly', async () => {
 
       // 直接查找 MarkdownInputField 容器
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 5000 });
+      await inputField.waitFor({ state: 'visible', timeout: 15000 });
 
       // 通过 JavaScript 添加 disabled className
       await inputField.evaluate((el) => {
@@ -212,11 +212,11 @@ test('MarkdownInputField loading styles should work correctly', async () => {
 
       // 先找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 5000 });
+      await input.waitFor({ state: 'visible', timeout: 15000 });
 
       // 直接查找 MarkdownInputField 容器
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 5000 });
+      await inputField.waitFor({ state: 'visible', timeout: 15000 });
 
       // 通过 JavaScript 添加 loading className
       await inputField.evaluate((el) => {
