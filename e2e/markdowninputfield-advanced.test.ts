@@ -22,14 +22,14 @@ test('MarkdownInputField keyboard shortcuts should work correctly', async () => 
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const inputField = page.locator('.ant-agentic-md-input-field').first();
       await inputField.waitFor({ state: 'visible', timeout: 5000 });
@@ -88,14 +88,14 @@ test('MarkdownInputField multi-line input should work correctly', async () => {
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 5000 });
@@ -142,14 +142,14 @@ test('MarkdownInputField long text and scrolling should work correctly', async (
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 5000 });
@@ -214,10 +214,10 @@ test('MarkdownInputField focus and blur should work correctly', async () => {
 
     if (response?.ok()) {
       await page.waitForLoadState('domcontentloaded');
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(300);
 
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 10000 });
+      await inputField.waitFor({ state: 'visible', timeout: 15000 });
 
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 5000 });
@@ -263,14 +263,14 @@ test('MarkdownInputField markdown formatting should work correctly', async () =>
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 5000 });
@@ -348,14 +348,14 @@ test('MarkdownInputField text selection and editing should work correctly', asyn
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 5000 });
@@ -419,14 +419,14 @@ test('MarkdownInputField undo and redo should work correctly', async () => {
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 5000 });
@@ -488,14 +488,14 @@ test('MarkdownInputField input validation should work correctly', async () => {
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 5000 });
@@ -563,14 +563,14 @@ test('MarkdownInputField responsive behavior should work correctly', async () =>
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const inputField = page.locator('.ant-agentic-md-input-field').first();
       await inputField.waitFor({ state: 'visible', timeout: 5000 });

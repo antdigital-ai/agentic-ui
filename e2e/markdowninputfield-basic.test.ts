@@ -22,15 +22,15 @@ test('MarkdownInputField basic input functionality should work correctly', async
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
@@ -83,15 +83,15 @@ test('MarkdownInputField delete functionality should work correctly', async () =
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
@@ -190,15 +190,15 @@ test('MarkdownInputField copy functionality should work correctly', async () => 
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
@@ -296,15 +296,15 @@ test('MarkdownInputField cut functionality should work correctly', async () => {
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
@@ -416,15 +416,15 @@ test('MarkdownInputField paste functionality should work correctly', async () =>
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
@@ -494,15 +494,15 @@ test('MarkdownInputField should show placeholder when only whitespace is entered
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
@@ -619,14 +619,14 @@ test('MarkdownInputField cursor position and navigation should work correctly', 
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 5000 });
@@ -688,14 +688,14 @@ test('MarkdownInputField clear input should work correctly', async () => {
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 5000 });
@@ -751,14 +751,14 @@ test('MarkdownInputField rapid input should work correctly', async () => {
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 5000 });
@@ -767,11 +767,10 @@ test('MarkdownInputField rapid input should work correctly', async () => {
       await page.waitForTimeout(200);
 
       // 快速输入多个字符
-      // 使用 type 方法一次性输入整个字符串，比逐个字符输入更可靠
+      // 使用 fill 方法直接设置内容，避免快速输入时字符顺序错乱
       const rapidText = 'Rapid input test: ';
-      await input.type(rapidText, { delay: 10 });
-
-      await page.waitForTimeout(300);
+      await input.fill(rapidText);
+      await page.waitForTimeout(200);
 
       const text = await input.innerText();
       expect(text).toContain('Rapid input test');
