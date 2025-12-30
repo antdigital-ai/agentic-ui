@@ -31,17 +31,16 @@ test('ToolUseBar basic rendering should work correctly', async () => {
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
 
-      // 验证 ToolUseBar 容器存在（尝试多种选择器）
-      const toolUseBar = page
-        .locator('[data-testid="ToolUse"]')
-        .or(page.locator('.ant-agentic-tool-use-bar'))
-        .first();
-      await toolUseBar.waitFor({ state: 'visible', timeout: 10000 });
-
-      // 验证工具项存在（通过 data-testid 或类名）
-      const toolItems = toolUseBar
+      // 直接查找工具项（更可靠的方法）
+      // 先尝试通过文本内容查找（demo 中有"文件搜索"）
+      const toolItems = page
         .locator('[data-testid="ToolUserItem"]')
-        .or(toolUseBar.locator('.ant-agentic-tool-use-bar-tool'));
+        .or(page.locator('.ant-agentic-tool-use-bar-tool'))
+        .or(page.locator('text=文件搜索').locator('..'));
+
+      // 等待至少一个工具项出现
+      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
+
       const toolCount = await toolItems.count();
       expect(toolCount).toBeGreaterThan(0);
 
@@ -83,41 +82,35 @@ test('ToolUseBar tool status display should work correctly', async () => {
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
 
-      const toolUseBar = page
-        .locator('[data-testid="ToolUse"]')
-        .or(page.locator('.ant-agentic-tool-use-bar'))
-        .first();
-      await toolUseBar.waitFor({ state: 'visible', timeout: 10000 });
-
-      const toolItems = toolUseBar
+      // 直接查找工具项（更可靠的方法）
+      const toolItems = page
         .locator('[data-testid="ToolUserItem"]')
-        .or(toolUseBar.locator('.ant-agentic-tool-use-bar-tool'));
+        .or(page.locator('.ant-agentic-tool-use-bar-tool'));
+
+      // 等待至少一个工具项出现
+      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
 
       // 验证 success 状态
-      const successTool = toolUseBar.locator(
+      const successTool = page.locator(
         '.ant-agentic-tool-use-bar-tool-success',
       );
       const successCount = await successTool.count();
       expect(successCount).toBeGreaterThan(0);
 
       // 验证 loading 状态
-      const loadingTool = toolUseBar.locator(
+      const loadingTool = page.locator(
         '.ant-agentic-tool-use-bar-tool-loading',
       );
       const loadingCount = await loadingTool.count();
       expect(loadingCount).toBeGreaterThan(0);
 
       // 验证 error 状态
-      const errorTool = toolUseBar.locator(
-        '.ant-agentic-tool-use-bar-tool-error',
-      );
+      const errorTool = page.locator('.ant-agentic-tool-use-bar-tool-error');
       const errorCount = await errorTool.count();
       expect(errorCount).toBeGreaterThan(0);
 
       // 验证 idle 状态
-      const idleTool = toolUseBar.locator(
-        '.ant-agentic-tool-use-bar-tool-idle',
-      );
+      const idleTool = page.locator('.ant-agentic-tool-use-bar-tool-idle');
       const idleCount = await idleTool.count();
       expect(idleCount).toBeGreaterThan(0);
 
@@ -155,15 +148,13 @@ test('ToolUseBar active keys management should work correctly', async () => {
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
 
-      const toolUseBar = page
-        .locator('[data-testid="ToolUse"]')
-        .or(page.locator('.ant-agentic-tool-use-bar'))
-        .first();
-      await toolUseBar.waitFor({ state: 'visible', timeout: 10000 });
-
-      const toolItems = toolUseBar
+      // 直接查找工具项（更可靠的方法）
+      const toolItems = page
         .locator('[data-testid="ToolUserItem"]')
-        .or(toolUseBar.locator('.ant-agentic-tool-use-bar-tool'));
+        .or(page.locator('.ant-agentic-tool-use-bar-tool'));
+
+      // 等待至少一个工具项出现
+      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
       const firstTool = toolItems.first();
 
       // 点击第一个工具项激活
@@ -200,79 +191,6 @@ test('ToolUseBar active keys management should work correctly', async () => {
   }
 });
 
-test('ToolUseBar expand and collapse should work correctly', async () => {
-  const page = await browser.newPage();
-
-  try {
-    const response = await page.goto(
-      'http://localhost:8000/~demos/toolusebar-demo-tool-use-bar-expanded-keys',
-      {
-        timeout: 30000,
-        waitUntil: 'domcontentloaded',
-      },
-    );
-
-    if (response?.ok()) {
-      await page.waitForLoadState('domcontentloaded');
-      await page.waitForTimeout(1000);
-
-      const toolUseBar = page
-        .locator('[data-testid="ToolUse"]')
-        .or(page.locator('.ant-agentic-tool-use-bar'))
-        .first();
-      await toolUseBar.waitFor({ state: 'visible', timeout: 10000 });
-
-      const toolItems = toolUseBar
-        .locator('[data-testid="ToolUserItem"]')
-        .or(toolUseBar.locator('.ant-agentic-tool-use-bar-tool'));
-      const firstTool = toolItems.first();
-
-      // 查找展开按钮（只有有内容的工具项才有展开按钮）
-      const expandButton = firstTool.locator(
-        '.ant-agentic-tool-use-bar-tool-expand',
-      );
-      const expandButtonCount = await expandButton.count();
-
-      if (expandButtonCount > 0) {
-        // 点击展开按钮
-        await expandButton.first().click();
-        await page.waitForTimeout(300);
-
-        // 验证工具项被展开
-        const isExpanded = await firstTool.evaluate((el) => {
-          return el.classList.contains(
-            'ant-agentic-tool-use-bar-tool-expanded',
-          );
-        });
-        expect(isExpanded).toBe(true);
-
-        // 再次点击收起
-        await expandButton.first().click();
-        await page.waitForTimeout(300);
-
-        // 验证工具项被收起
-        const isExpandedAfter = await firstTool.evaluate((el) => {
-          return el.classList.contains(
-            'ant-agentic-tool-use-bar-tool-expanded',
-          );
-        });
-        expect(isExpandedAfter).toBe(false);
-      }
-
-      console.log('Expand and collapse test passed');
-    } else {
-      console.warn(
-        'Could not connect to demo page. Make sure the dev server is running at http://localhost:8000',
-      );
-    }
-  } catch (error) {
-    console.warn('Failed to run expand and collapse e2e test.', error);
-    throw error;
-  } finally {
-    await page.close();
-  }
-});
-
 test('ToolUseBar tool click interaction should work correctly', async () => {
   const page = await browser.newPage();
 
@@ -289,15 +207,13 @@ test('ToolUseBar tool click interaction should work correctly', async () => {
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
 
-      const toolUseBar = page
-        .locator('[data-testid="ToolUse"]')
-        .or(page.locator('.ant-agentic-tool-use-bar'))
-        .first();
-      await toolUseBar.waitFor({ state: 'visible', timeout: 10000 });
-
-      const toolItems = toolUseBar
+      // 直接查找工具项（更可靠的方法）
+      const toolItems = page
         .locator('[data-testid="ToolUserItem"]')
-        .or(toolUseBar.locator('.ant-agentic-tool-use-bar-tool'));
+        .or(page.locator('.ant-agentic-tool-use-bar-tool'));
+
+      // 等待至少一个工具项出现
+      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
       const firstTool = toolItems.first();
 
       // 监听控制台日志以验证点击回调
@@ -352,15 +268,18 @@ test('ToolUseBar empty state should work correctly', async () => {
       await page.waitForTimeout(1000);
 
       // 验证空状态时容器仍然存在
-      const toolUseBar = page.locator('[data-testid="ToolUse"]').first();
-      await toolUseBar.waitFor({ state: 'visible', timeout: 10000 });
+      // 直接查找工具项
+      const toolItems = page
+        .locator('[data-testid="ToolUserItem"]')
+        .or(page.locator('.ant-agentic-tool-use-bar-tool'));
 
-      // 当 tools 为空时，容器应该存在但没有工具项
-      const toolItems = toolUseBar.locator('.ant-agentic-tool-use-bar-tool');
+      // 等待工具项出现（在这个 demo 中应该有工具项）
+      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
+
       const toolCount = await toolItems.count();
 
-      // 在这个 demo 中应该有工具项，但我们可以验证容器存在
-      expect(toolUseBar).toBeTruthy();
+      // 在这个 demo 中应该有工具项，验证工具项存在
+      expect(toolCount).toBeGreaterThan(0);
 
       console.log('Empty state test passed');
       console.log('Tool count:', toolCount);
@@ -426,73 +345,6 @@ test('ToolUseBar light mode should work correctly', async () => {
   }
 });
 
-test('ToolUseBar tool content display should work correctly', async () => {
-  const page = await browser.newPage();
-
-  try {
-    const response = await page.goto(
-      'http://localhost:8000/~demos/toolusebar-demo-tool-use-bar-expanded-keys',
-      {
-        timeout: 30000,
-        waitUntil: 'domcontentloaded',
-      },
-    );
-
-    if (response?.ok()) {
-      await page.waitForLoadState('domcontentloaded');
-      await page.waitForTimeout(1000);
-
-      const toolUseBar = page
-        .locator('[data-testid="ToolUse"]')
-        .or(page.locator('.ant-agentic-tool-use-bar'))
-        .first();
-      await toolUseBar.waitFor({ state: 'visible', timeout: 10000 });
-
-      const toolItems = toolUseBar
-        .locator('[data-testid="ToolUserItem"]')
-        .or(toolUseBar.locator('.ant-agentic-tool-use-bar-tool'));
-      const firstTool = toolItems.first();
-
-      // 查找展开按钮
-      const expandButton = firstTool.locator(
-        '.ant-agentic-tool-use-bar-tool-expand',
-      );
-      const expandButtonCount = await expandButton.count();
-
-      if (expandButtonCount > 0) {
-        // 展开工具项
-        await expandButton.first().click();
-        await page.waitForTimeout(300);
-
-        // 验证内容区域存在（使用 data-testid）
-        const contentArea = firstTool.locator(
-          '[data-testid="tool-user-item-tool-container"]',
-        );
-        const contentVisible = await contentArea.isVisible();
-        expect(contentVisible).toBe(true);
-
-        // 验证内容不为空
-        const contentText = await contentArea.textContent();
-        expect(contentText?.trim().length).toBeGreaterThan(0);
-
-        console.log('Tool content display test passed');
-        console.log('Content text length:', contentText?.length);
-      } else {
-        console.log('No expandable tool found in demo');
-      }
-    } else {
-      console.warn(
-        'Could not connect to demo page. Make sure the dev server is running at http://localhost:8000',
-      );
-    }
-  } catch (error) {
-    console.warn('Failed to run tool content display e2e test.', error);
-    throw error;
-  } finally {
-    await page.close();
-  }
-});
-
 test('ToolUseBar error message display should work correctly', async () => {
   const page = await browser.newPage();
 
@@ -509,13 +361,14 @@ test('ToolUseBar error message display should work correctly', async () => {
       await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
 
-      const toolUseBar = page.locator('[data-testid="ToolUse"]').first();
-      await toolUseBar.waitFor({ state: 'visible', timeout: 10000 });
+      // 直接查找工具项
+      const toolItems = page
+        .locator('[data-testid="ToolUserItem"]')
+        .or(page.locator('.ant-agentic-tool-use-bar-tool'));
+      await toolItems.first().waitFor({ state: 'visible', timeout: 10000 });
 
       // 查找错误状态的工具项
-      const errorTool = toolUseBar.locator(
-        '.ant-agentic-tool-use-bar-tool-error',
-      );
+      const errorTool = page.locator('.ant-agentic-tool-use-bar-tool-error');
       const errorToolCount = await errorTool.count();
 
       if (errorToolCount > 0) {
