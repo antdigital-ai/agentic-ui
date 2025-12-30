@@ -16,7 +16,7 @@
       >
         <div
           class="ant-dropdown-trigger ant-agentic-md-input-field"
-          style="height: min(114px,100%); border-radius: 16px; min-height: 0; cursor: auto; opacity: 1; max-height: min(114px,100%); transition: height, max-height 0.3s,border-radius 0.3s,box-shadow 0.3s,transform 0.3s,opacity 0.3s,background 0.3s;"
+          style="height: min(114px,100%); border-radius: 16px; min-height: 0; max-height: min(114px,100%);"
           tabindex="1"
         >
           <div
@@ -24,7 +24,7 @@
           />
           <div
             class="ant-agentic-md-input-field-editor"
-            style="display: flex; flex-direction: column; border-radius: 0; border-top-left-radius: inherit; border-top-right-radius: inherit; max-height: min(400px); height: auto; flex: 1 1 0%;"
+            style="display: flex; flex-direction: column; border-radius: inherit; border-top-left-radius: inherit; border-top-right-radius: inherit; max-height: min(400px); height: auto; flex: 1 1 0%;"
           >
             <div
               animate="[object Object]"
