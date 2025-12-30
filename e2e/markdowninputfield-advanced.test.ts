@@ -216,11 +216,13 @@ test('MarkdownInputField focus and blur should work correctly', async () => {
       await page.reload({ waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(1000);
 
-      const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 20000 });
-
+      // 先等待输入框出现（更可靠）
       const input = page.locator('[contenteditable="true"]').first();
       await input.waitFor({ state: 'visible', timeout: 20000 });
+
+      // 然后等待容器出现
+      const inputField = page.locator('.ant-agentic-md-input-field').first();
+      await inputField.waitFor({ state: 'visible', timeout: 20000 });
 
       // 测试聚焦
       await input.click();
