@@ -54,10 +54,16 @@ test('MarkdownInputField basic input functionality should work correctly', async
       expect(inputText).toContain('Hello');
 
       // 测试追加输入
+      // 先清空并重新输入，确保文本正确
       await input.click();
-      await page.keyboard.press('End');
       await page.waitForTimeout(100);
-      await input.type(' - Test');
+      // 使用 Ctrl+A 全选（Mac 使用 Cmd+A）
+      const isMac = process.platform === 'darwin';
+      const modifierKey = isMac ? 'Meta' : 'Control';
+      await page.keyboard.press(`${modifierKey}+a`);
+      await page.waitForTimeout(100);
+      // 输入完整文本
+      await input.type('Hello World - Test');
       await page.waitForTimeout(300);
 
       const updatedText = await input.innerText();

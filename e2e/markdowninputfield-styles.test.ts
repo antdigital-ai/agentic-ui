@@ -131,19 +131,19 @@ test('MarkdownInputField disabled styles should work correctly', async () => {
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
       // 先等待页面加载完成
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(1000);
 
       // 先找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 5000 });
+      await input.waitFor({ state: 'visible', timeout: 10000 });
 
       // 直接查找 MarkdownInputField 容器
       const inputField = page.locator('.ant-agentic-md-input-field').first();

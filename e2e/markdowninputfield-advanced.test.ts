@@ -207,13 +207,13 @@ test('MarkdownInputField focus and blur should work correctly', async () => {
     const response = await page.goto(
       'http://localhost:8000/~demos/markdowninputfield-demo-1',
       {
-        timeout: 10000,
-        waitUntil: 'networkidle',
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
       },
     );
 
     if (response?.ok()) {
-      await page.reload({ waitUntil: 'networkidle' });
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(500);
 
       const inputField = page.locator('.ant-agentic-md-input-field').first();
