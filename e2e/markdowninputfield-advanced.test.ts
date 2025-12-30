@@ -289,25 +289,24 @@ test('MarkdownInputField markdown formatting should work correctly', async () =>
       expect(text).toContain('代码文本');
 
       // 验证 Markdown 格式被正确解析（通过检查 DOM 结构）
+      // 验证 Markdown 格式被正确解析（通过检查 DOM 结构）
       const hasBold = await page.evaluate(() => {
         const boldElements = document.querySelectorAll('strong, b, [data-mark="bold"]');
         return boldElements.length > 0;
       });
+      expect(hasBold).toBe(true);
 
       const hasItalic = await page.evaluate(() => {
         const italicElements = document.querySelectorAll('em, i, [data-mark="italic"]');
         return italicElements.length > 0;
       });
+      expect(hasItalic).toBe(true);
 
       const hasCode = await page.evaluate(() => {
         const codeElements = document.querySelectorAll('code, [data-mark="code"]');
         return codeElements.length > 0;
       });
-
-      console.log('Markdown formatting test passed');
-      console.log('Has bold:', hasBold);
-      console.log('Has italic:', hasItalic);
-      console.log('Has code:', hasCode);
+      expect(hasCode).toBe(true);
     } else {
       console.warn(
         'Could not connect to demo page. Make sure the dev server is running at http://localhost:8000',
