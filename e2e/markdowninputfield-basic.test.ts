@@ -613,3 +613,187 @@ test('MarkdownInputField should show placeholder when only whitespace is entered
     await page.close();
   }
 });
+
+test('MarkdownInputField cursor position and navigation should work correctly', async () => {
+  const page = await browser.newPage();
+
+  try {
+    const response = await page.goto(
+      'http://localhost:8000/~demos/markdowninputfield-demo-1',
+      {
+        timeout: 10000,
+        waitUntil: 'networkidle',
+      },
+    );
+
+    if (response?.ok()) {
+      await page.reload({ waitUntil: 'networkidle' });
+      await page.waitForTimeout(500);
+
+      const input = page.locator('[contenteditable="true"]').first();
+      await input.waitFor({ state: 'visible', timeout: 5000 });
+
+      await input.click();
+      await page.waitForTimeout(200);
+
+      // 输入测试文本
+      await input.fill('Test cursor navigation');
+      await page.waitForTimeout(300);
+
+      // 测试 Home 键（移动到开头）
+      await page.keyboard.press('Home');
+      await page.waitForTimeout(100);
+      await input.type('Start: ');
+      await page.waitForTimeout(300);
+
+      const textAfterHome = await input.innerText();
+      expect(textAfterHome).toContain('Start:');
+
+      // 测试 End 键（移动到结尾）
+      await page.keyboard.press('End');
+      await page.waitForTimeout(100);
+      await input.type(' :End');
+      await page.waitForTimeout(300);
+
+      const textAfterEnd = await input.innerText();
+      expect(textAfterEnd).toContain(':End');
+
+      // 测试方向键导航
+      await page.keyboard.press('Home');
+      await page.waitForTimeout(100);
+      await page.keyboard.press('ArrowRight');
+      await page.waitForTimeout(100);
+      await input.type('X');
+      await page.waitForTimeout(300);
+
+      const textAfterArrow = await input.innerText();
+      expect(textAfterArrow).toContain('X');
+
+      console.log('Cursor position and navigation test passed');
+    } else {
+      console.warn(
+        'Could not connect to demo page. Make sure the dev server is running at http://localhost:8000',
+      );
+    }
+  } catch (error) {
+    console.warn('Failed to run cursor navigation e2e test.', error);
+    throw error;
+  } finally {
+    await page.close();
+  }
+});
+
+test('MarkdownInputField clear input should work correctly', async () => {
+  const page = await browser.newPage();
+
+  try {
+    const response = await page.goto(
+      'http://localhost:8000/~demos/markdowninputfield-demo-1',
+      {
+        timeout: 10000,
+        waitUntil: 'networkidle',
+      },
+    );
+
+    if (response?.ok()) {
+      await page.reload({ waitUntil: 'networkidle' });
+      await page.waitForTimeout(500);
+
+      const input = page.locator('[contenteditable="true"]').first();
+      await input.waitFor({ state: 'visible', timeout: 5000 });
+
+      await input.click();
+      await page.waitForTimeout(200);
+
+      // 输入文本
+      await input.fill('Text to be cleared');
+      await page.waitForTimeout(300);
+
+      const textBeforeClear = await input.innerText();
+      expect(textBeforeClear).toContain('Text to be cleared');
+
+      // 使用 Ctrl+A + Delete 清空
+      const isMac = process.platform === 'darwin';
+      const modifierKey = isMac ? 'Meta' : 'Control';
+      await page.keyboard.press(`${modifierKey}+a`);
+      await page.waitForTimeout(200);
+      await page.keyboard.press('Delete');
+      await page.waitForTimeout(300);
+
+      const textAfterClear = await input.innerText();
+      const trimmedText = textAfterClear.trim();
+      expect(trimmedText.length).toBeLessThan(textBeforeClear.length);
+
+      // 验证 placeholder 重新显示
+      const placeholderAfterClear = await page.evaluate(() => {
+        const paragraph = document.querySelector('[data-slate-placeholder]');
+        return paragraph?.getAttribute('data-slate-placeholder') || null;
+      });
+      expect(placeholderAfterClear).toBeTruthy();
+
+      console.log('Clear input test passed');
+      console.log('Text after clear:', textAfterClear);
+    } else {
+      console.warn(
+        'Could not connect to demo page. Make sure the dev server is running at http://localhost:8000',
+      );
+    }
+  } catch (error) {
+    console.warn('Failed to run clear input e2e test.', error);
+    throw error;
+  } finally {
+    await page.close();
+  }
+});
+
+test('MarkdownInputField rapid input should work correctly', async () => {
+  const page = await browser.newPage();
+
+  try {
+    const response = await page.goto(
+      'http://localhost:8000/~demos/markdowninputfield-demo-1',
+      {
+        timeout: 10000,
+        waitUntil: 'networkidle',
+      },
+    );
+
+    if (response?.ok()) {
+      await page.reload({ waitUntil: 'networkidle' });
+      await page.waitForTimeout(500);
+
+      const input = page.locator('[contenteditable="true"]').first();
+      await input.waitFor({ state: 'visible', timeout: 5000 });
+
+      await input.click();
+      await page.waitForTimeout(200);
+
+      // 快速输入多个字符
+      const rapidText = 'Rapid input test: ';
+      for (let i = 0; i < rapidText.length; i++) {
+        await input.type(rapidText[i]);
+        await page.waitForTimeout(10); // 很短的延迟模拟快速输入
+      }
+
+      await page.waitForTimeout(300);
+
+      const text = await input.innerText();
+      expect(text).toContain('Rapid input test');
+
+      // 验证所有字符都被正确输入
+      expect(text.length).toBeGreaterThanOrEqual(rapidText.length);
+
+      console.log('Rapid input test passed');
+      console.log('Input length:', text.length);
+    } else {
+      console.warn(
+        'Could not connect to demo page. Make sure the dev server is running at http://localhost:8000',
+      );
+    }
+  } catch (error) {
+    console.warn('Failed to run rapid input e2e test.', error);
+    throw error;
+  } finally {
+    await page.close();
+  }
+});
