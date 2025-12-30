@@ -494,39 +494,51 @@ const rgbToHex = (rgb: string): string => {
  *
  * @since 1.0.0
  */
-export const resolveCssVariable = (cssVar: string): string => {
-  // 如果不是 CSS 变量，直接返回
-  if (!cssVar.trim().startsWith('var(')) {
-    return cssVar;
-  }
+export const resolveCssVariable = (() => {
+  const cssVariableCache = new Map<string, string>();
 
-  // 提取变量名，如 'var(--color-blue)' => '--color-blue'
-  const match = cssVar.match(/var\((--[^)]+)\)/);
-  if (!match) {
-    return cssVar;
-  }
-
-  // 从 DOM 中获取计算后的样式值
-  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-    try {
-      // 创建临时元素来获取计算后的颜色值
-      const tempEl = document.createElement('div');
-      tempEl.style.color = cssVar;
-      document.body.appendChild(tempEl);
-      const computedColor = window.getComputedStyle(tempEl).color;
-      document.body.removeChild(tempEl);
-
-      // 如果解析成功，将 rgb/rgba 转换为十六进制
-      if (computedColor && computedColor !== cssVar) {
-        return rgbToHex(computedColor);
-      }
-    } catch (e) {
-      console.warn(`Failed to resolve CSS variable: ${cssVar}`, e);
+  return (cssVar: string): string => {
+    // 如果不是 CSS 变量，直接返回
+    if (!cssVar.trim().startsWith('var(')) {
+      return cssVar;
     }
-  }
 
-  return cssVar;
-};
+    if (cssVariableCache.has(cssVar)) {
+      return cssVariableCache.get(cssVar)!;
+    }
+
+    // 提取变量名，如 'var(--color-blue)' => '--color-blue'
+    const match = cssVar.match(/var\((--[^)]+)\)/);
+    if (!match) {
+      // 无法匹配也缓存，避免重复解析
+      cssVariableCache.set(cssVar, cssVar);
+      return cssVar;
+    }
+
+    let resolvedColor = cssVar;
+    // 从 DOM 中获取计算后的样式值
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      try {
+        // 创建临时元素来获取计算后的颜色值
+        const tempEl = document.createElement('div');
+        tempEl.style.color = cssVar;
+        document.body.appendChild(tempEl);
+        const computedColor = window.getComputedStyle(tempEl).color;
+        document.body.removeChild(tempEl);
+
+        // 如果解析成功，将 rgb/rgba 转换为十六进制
+        if (computedColor && computedColor !== cssVar) {
+          resolvedColor = rgbToHex(computedColor);
+        }
+      } catch (e) {
+        console.warn(`Failed to resolve CSS variable: ${cssVar}`, e);
+      }
+    }
+
+    cssVariableCache.set(cssVar, resolvedColor);
+    return resolvedColor;
+  };
+})();
 
 /**
  * 将十六进制颜色或CSS变量转换为带透明度的 RGBA 字符串
