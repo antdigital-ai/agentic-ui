@@ -59,6 +59,18 @@ vi.mock('../../../../src/Plugins/chart/utils', () => ({
     const n = Number(v);
     return Number.isFinite(n) ? n : d;
   },
+  hexToRgba: (color: string, alpha: number) => {
+    if (color.startsWith('#')) {
+      return `rgba(0, 0, 0, ${alpha})`;
+    }
+    return color;
+  },
+  resolveCssVariable: (cssVar: string) => {
+    if (cssVar.startsWith('var(')) {
+      return '#1890ff';
+    }
+    return cssVar;
+  },
 }));
 
 describe('FunnelChart', () => {

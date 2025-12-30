@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { debounce, stringFormatNumber } from '../../../src/Plugins/chart/utils';
+import {
+  debounce,
+  hexToRgba,
+  resolveCssVariable,
+  stringFormatNumber,
+} from '../../../src/Plugins/chart/utils';
 
 describe('Chart Utils', () => {
   beforeEach(() => {
@@ -124,6 +129,59 @@ describe('Chart Utils', () => {
       debouncedFn.flush();
 
       expect(fn).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('resolveCssVariable', () => {
+    it('应该返回非 CSS 变量的原值', () => {
+      expect(resolveCssVariable('#ff0000')).toBe('#ff0000');
+      expect(resolveCssVariable('rgb(255, 0, 0)')).toBe('rgb(255, 0, 0)');
+      expect(resolveCssVariable('blue')).toBe('blue');
+    });
+
+    it('应该处理格式错误的 CSS 变量', () => {
+      expect(resolveCssVariable('var(')).toBe('var(');
+      expect(resolveCssVariable('var()')).toBe('var()');
+    });
+
+    // 注意：在 Node.js 测试环境中，无法真正解析 CSS 变量
+    // 这些测试只验证函数不会崩溃
+    it('应该在无 DOM 环境中安全处理 CSS 变量', () => {
+      const result = resolveCssVariable('var(--color-blue)');
+      expect(result).toBeDefined();
+      expect(typeof result).toBe('string');
+    });
+  });
+
+  describe('hexToRgba', () => {
+    it('应该正确转换6位十六进制颜色', () => {
+      expect(hexToRgba('#ff0000', 0.5)).toBe('rgba(255, 0, 0, 0.5)');
+      expect(hexToRgba('#00ff00', 0.8)).toBe('rgba(0, 255, 0, 0.8)');
+      expect(hexToRgba('#0000ff', 1)).toBe('rgba(0, 0, 255, 1)');
+    });
+
+    it('应该正确转换3位十六进制颜色', () => {
+      expect(hexToRgba('#f00', 0.5)).toBe('rgba(255, 0, 0, 0.5)');
+      expect(hexToRgba('#0f0', 0.3)).toBe('rgba(0, 255, 0, 0.3)');
+      expect(hexToRgba('#00f', 0.9)).toBe('rgba(0, 0, 255, 0.9)');
+    });
+
+    it('应该处理不带 # 前缀的十六进制颜色', () => {
+      expect(hexToRgba('ff0000', 0.5)).toBe('rgba(255, 0, 0, 0.5)');
+      expect(hexToRgba('f00', 0.5)).toBe('rgba(255, 0, 0, 0.5)');
+    });
+
+    it('应该限制透明度在 0 到 1 之间', () => {
+      expect(hexToRgba('#ff0000', -0.5)).toBe('rgba(255, 0, 0, 0)');
+      expect(hexToRgba('#ff0000', 1.5)).toBe('rgba(255, 0, 0, 1)');
+      expect(hexToRgba('#ff0000', 0)).toBe('rgba(255, 0, 0, 0)');
+    });
+
+    // 在 Node.js 环境中，CSS 变量无法被解析，所以测试预期行为
+    it('应该尝试解析 CSS 变量（在无 DOM 环境中返回 NaN）', () => {
+      const result = hexToRgba('var(--color-blue)', 0.5);
+      // 在 Node.js 环境中，CSS 变量无法解析，会返回 NaN
+      expect(result).toContain('rgba');
     });
   });
 });

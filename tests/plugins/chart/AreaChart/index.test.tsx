@@ -114,6 +114,9 @@ vi.mock('../../../../src/Plugins/chart/utils', () => ({
   extractAndSortXValues: vi.fn(() => []),
   findDataPointByXValue: vi.fn(() => null),
   hexToRgba: vi.fn((hex, alpha) => `rgba(0,0,0,${alpha})`),
+  resolveCssVariable: vi.fn((color) =>
+    color.startsWith('var(') ? '#1d7afc' : color,
+  ),
   registerLineChartComponents: vi.fn(),
   getDataHash: vi.fn(() => 'mock-hash'),
   ChartDataItem: function () {},
@@ -405,6 +408,33 @@ describe('AreaChart', () => {
     it('应该支持自定义颜色', () => {
       render(
         <AreaChart data={sampleData} color="#ff0000" title="自定义颜色" />,
+      );
+
+      expect(screen.getByTestId('area-chart')).toBeInTheDocument();
+    });
+
+    it('应该支持 CSS 变量颜色', () => {
+      render(
+        <AreaChart
+          data={sampleData}
+          color="var(--color-blue-control-fill-primary)"
+          title="CSS变量颜色"
+        />,
+      );
+
+      expect(screen.getByTestId('area-chart')).toBeInTheDocument();
+    });
+
+    it('应该支持多个 CSS 变量颜色', () => {
+      render(
+        <AreaChart
+          data={sampleData}
+          color={[
+            'var(--color-blue-control-fill-primary)',
+            'var(--color-green-control-fill-primary)',
+          ]}
+          title="多个CSS变量颜色"
+        />,
       );
 
       expect(screen.getByTestId('area-chart')).toBeInTheDocument();

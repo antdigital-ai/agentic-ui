@@ -24,7 +24,12 @@ import {
 import { defaultColorList } from '../const';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
-import { findDataPointByXValue, isXValueEqual, toNumber } from '../utils';
+import {
+  findDataPointByXValue,
+  isXValueEqual,
+  resolveCssVariable,
+  toNumber,
+} from '../utils';
 import { useStyle } from './style';
 
 let funnelChartComponentsRegistered = false;
@@ -261,6 +266,8 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     string
   > = useMemo(() => {
     const baseColor = color || defaultColorList[0];
+    // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+    const resolvedBaseColor = resolveCssVariable(baseColor);
     const labels = stages.map((x) => x.toString());
 
     const values = stages.map((x) => {
@@ -335,7 +342,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     const count = Math.max(1, stages.length - 1);
     const colorList = stages.map((_, i) => {
       const t = (i / count) * 0.6; // 限制变浅上限，避免变白
-      return lighten(baseColor, t);
+      return lighten(resolvedBaseColor, t);
     });
 
     return {

@@ -462,11 +462,78 @@ export const isConfigEqual = (config1: any, config2: any): boolean => {
 };
 
 /**
- * 将十六进制颜色转换为带透明度的 RGBA 字符串
+ * 将 RGB/RGBA 颜色字符串转换为十六进制格式
  *
- * 支持3位和6位十六进制颜色格式，并添加透明度。
+ * @param {string} rgb - RGB/RGBA 颜色字符串（如 'rgb(29, 122, 252)' 或 'rgba(29, 122, 252, 0.5)'）
+ * @returns {string} 十六进制颜色值（如 '#1d7afc'）
  *
- * @param {string} hex - 十六进制颜色值（如 '#ff0000' 或 '#f00'）
+ * @since 1.0.0
+ */
+const rgbToHex = (rgb: string): string => {
+  const match = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (!match) return rgb;
+
+  const r = parseInt(match[1], 10);
+  const g = parseInt(match[2], 10);
+  const b = parseInt(match[3], 10);
+
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+};
+
+/**
+ * 从浏览器 DOM 中解析 CSS 变量的实际颜色值
+ *
+ * @param {string} cssVar - CSS 变量表达式（如 'var(--color-blue)'）
+ * @returns {string} 解析后的颜色值（如 '#1d7afc'）或原值
+ *
+ * @example
+ * ```typescript
+ * resolveCssVariable('var(--color-blue-control-fill-primary)'); // '#1d7afc'
+ * resolveCssVariable('#ff0000'); // '#ff0000'
+ * ```
+ *
+ * @since 1.0.0
+ */
+export const resolveCssVariable = (cssVar: string): string => {
+  // 如果不是 CSS 变量，直接返回
+  if (!cssVar.trim().startsWith('var(')) {
+    return cssVar;
+  }
+
+  // 提取变量名，如 'var(--color-blue)' => '--color-blue'
+  const match = cssVar.match(/var\((--[^)]+)\)/);
+  if (!match) {
+    return cssVar;
+  }
+
+  // 从 DOM 中获取计算后的样式值
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    try {
+      // 创建临时元素来获取计算后的颜色值
+      const tempEl = document.createElement('div');
+      tempEl.style.color = cssVar;
+      document.body.appendChild(tempEl);
+      const computedColor = window.getComputedStyle(tempEl).color;
+      document.body.removeChild(tempEl);
+
+      // 如果解析成功，将 rgb/rgba 转换为十六进制
+      if (computedColor && computedColor !== cssVar) {
+        return rgbToHex(computedColor);
+      }
+    } catch (e) {
+      console.warn(`Failed to resolve CSS variable: ${cssVar}`, e);
+    }
+  }
+
+  return cssVar;
+};
+
+/**
+ * 将十六进制颜色或CSS变量转换为带透明度的 RGBA 字符串
+ *
+ * 支持3位和6位十六进制颜色格式、CSS变量（如 var(--color-name)），并添加透明度。
+ *
+ * @param {string} color - 颜色值（如 '#ff0000'、'#f00' 或 'var(--color-blue)'）
  * @param {number} alpha - 透明度值（0-1之间）
  * @returns {string} RGBA 颜色字符串
  *
@@ -474,12 +541,17 @@ export const isConfigEqual = (config1: any, config2: any): boolean => {
  * ```typescript
  * hexToRgba('#ff0000', 0.5); // 'rgba(255, 0, 0, 0.5)'
  * hexToRgba('#f00', 0.8); // 'rgba(255, 0, 0, 0.8)'
+ * hexToRgba('var(--color-blue)', 0.5); // 'rgba(29, 122, 252, 0.5)'
  * ```
  *
  * @since 1.0.0
  */
-export const hexToRgba = (hex: string, alpha: number): string => {
-  const sanitized = hex.replace('#', '');
+export const hexToRgba = (color: string, alpha: number): string => {
+  // 解析 CSS 变量为实际颜色值
+  const resolvedColor = resolveCssVariable(color);
+
+  // 处理十六进制颜色
+  const sanitized = resolvedColor.replace('#', '');
   const isShort = sanitized.length === 3;
   const r = parseInt(
     isShort ? sanitized[0] + sanitized[0] : sanitized.slice(0, 2),

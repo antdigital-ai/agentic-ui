@@ -31,6 +31,7 @@ import {
   findDataPointByXValue,
   hexToRgba,
   registerLineChartComponents,
+  resolveCssVariable,
 } from '../utils';
 import { useStyle } from './style';
 
@@ -302,6 +303,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
           defaultColorList[index % defaultColorList.length]
         : provided || defaultColorList[index % defaultColorList.length];
 
+      // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+      const resolvedColor = resolveCssVariable(baseColor);
+
       // 为每个类型收集数据点
       const typeData = xValues.map((x) => {
         const dataPoint = findDataPointByXValue(filteredData, x, type);
@@ -313,20 +317,22 @@ const AreaChart: React.FC<AreaChartProps> = ({
       return {
         label: type || '默认',
         data: typeData,
-        borderColor: baseColor,
+        borderColor: resolvedColor,
         backgroundColor: (ctx: ScriptableContext<'line'>) => {
           const chart = ctx.chart;
           const chartArea = chart.chartArea;
-          if (!chartArea) return hexToRgba(baseColor, 0.2);
+
+          // 对于所有颜色（包括解析后的 CSS 变量），使用渐变效果
+          if (!chartArea) return hexToRgba(resolvedColor, 0.2);
 
           const { top, bottom } = chartArea;
           const gradient = chart.ctx.createLinearGradient(0, top, 0, bottom);
           // 顶部颜色更实，向下逐渐透明，形成柔和的面积过渡
-          gradient.addColorStop(0, hexToRgba(baseColor, 0.28));
-          gradient.addColorStop(1, hexToRgba(baseColor, 0.05));
+          gradient.addColorStop(0, hexToRgba(resolvedColor, 0.28));
+          gradient.addColorStop(1, hexToRgba(resolvedColor, 0.05));
           return gradient;
         },
-        pointBackgroundColor: baseColor,
+        pointBackgroundColor: resolvedColor,
         pointBorderColor: '#fff',
         pointBorderWidth: 1,
         borderWidth: 3,

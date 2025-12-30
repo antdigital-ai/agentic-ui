@@ -30,6 +30,7 @@ import {
   extractAndSortXValues,
   findDataPointByXValue,
   hexToRgba,
+  resolveCssVariable,
 } from '../utils';
 import { useStyle } from './style';
 
@@ -389,6 +390,14 @@ const BarChart: React.FC<BarChartProps> = ({
           : provided || defaultColorList[i % defaultColorList.length];
       const baseColor = pickByIndex(index);
 
+      // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+      const resolvedBaseColor = resolveCssVariable(baseColor);
+      const resolvedProvidedColors = Array.isArray(provided)
+        ? provided.map((c) => resolveCssVariable(c))
+        : provided
+          ? [resolveCssVariable(provided)]
+          : null;
+
       // 为每个类型收集数据点
       const typeData = xValues.map((x) => {
         const dataPoint = findDataPointByXValue(filteredData, x, type);
@@ -410,12 +419,15 @@ const BarChart: React.FC<BarChartProps> = ({
               : typeof parsed?.y === 'number'
                 ? parsed.y
                 : 0;
-          let base = baseColor;
+          let base = resolvedBaseColor;
           if (!color && isDiverging) {
             base = value >= 0 ? POSITIVE_COLOR_HEX : NEGATIVE_COLOR_HEX;
-          } else if (Array.isArray(color) && isDiverging) {
-            const pos = color[0] || baseColor;
-            const neg = color[1] || color[0] || baseColor;
+          } else if (resolvedProvidedColors && isDiverging) {
+            const pos = resolvedProvidedColors[0] || resolvedBaseColor;
+            const neg =
+              resolvedProvidedColors[1] ||
+              resolvedProvidedColors[0] ||
+              resolvedBaseColor;
             base = value >= 0 ? pos : neg;
           }
           return hexToRgba(base, 0.95);
@@ -424,7 +436,7 @@ const BarChart: React.FC<BarChartProps> = ({
           const chart = ctx.chart;
           const chartArea = chart.chartArea;
           const parsed: any = ctx.parsed as any;
-          if (!chartArea) return hexToRgba(baseColor, 0.6);
+          if (!chartArea) return hexToRgba(resolvedBaseColor, 0.6);
 
           const xScale = chart.scales['x'];
           const yScale = chart.scales['y'];
@@ -438,17 +450,20 @@ const BarChart: React.FC<BarChartProps> = ({
             typeof xScale.getPixelForValue !== 'function' ||
             typeof yScale.getPixelForValue !== 'function'
           ) {
-            return hexToRgba(baseColor, 0.6);
+            return hexToRgba(resolvedBaseColor, 0.6);
           }
 
           if (indexAxis === 'y') {
             const value = typeof parsed?.x === 'number' ? parsed.x : 0;
-            let base = baseColor;
+            let base = resolvedBaseColor;
             if (!color && isDiverging) {
               base = value >= 0 ? POSITIVE_COLOR_HEX : NEGATIVE_COLOR_HEX;
-            } else if (Array.isArray(color) && isDiverging) {
-              const pos = color[0] || baseColor;
-              const neg = color[1] || color[0] || baseColor;
+            } else if (resolvedProvidedColors && isDiverging) {
+              const pos = resolvedProvidedColors[0] || resolvedBaseColor;
+              const neg =
+                resolvedProvidedColors[1] ||
+                resolvedProvidedColors[0] ||
+                resolvedBaseColor;
               base = value >= 0 ? pos : neg;
             }
 
@@ -474,12 +489,15 @@ const BarChart: React.FC<BarChartProps> = ({
           }
 
           const value = typeof parsed?.y === 'number' ? parsed.y : 0;
-          let base = baseColor;
+          let base = resolvedBaseColor;
           if (!color && isDiverging) {
             base = value >= 0 ? POSITIVE_COLOR_HEX : NEGATIVE_COLOR_HEX;
-          } else if (Array.isArray(color) && isDiverging) {
-            const pos = color[0] || baseColor;
-            const neg = color[1] || color[0] || baseColor;
+          } else if (resolvedProvidedColors && isDiverging) {
+            const pos = resolvedProvidedColors[0] || resolvedBaseColor;
+            const neg =
+              resolvedProvidedColors[1] ||
+              resolvedProvidedColors[0] ||
+              resolvedBaseColor;
             base = value >= 0 ? pos : neg;
           }
 

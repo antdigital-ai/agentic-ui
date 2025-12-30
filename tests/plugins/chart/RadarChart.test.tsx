@@ -37,6 +37,14 @@ vi.mock('react-chartjs-2', () => ({
   )),
 }));
 
+// Mock utils
+vi.mock('../../../src/Plugins/chart/utils', () => ({
+  hexToRgba: vi.fn((color, alpha) => `rgba(0,0,0,${alpha})`),
+  resolveCssVariable: vi.fn((color) =>
+    typeof color === 'string' && color.startsWith('var(') ? '#1d7afc' : color,
+  ),
+}));
+
 // Mock components
 vi.mock('../../../src/Plugins/chart/components', () => ({
   ChartContainer: ({ children, ...props }: any) => (
@@ -654,6 +662,44 @@ describe('RadarChart', () => {
       render(<RadarChart data={sampleData} styles={undefined} />);
 
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+  });
+
+  describe('CSS 变量颜色支持测试', () => {
+    it('应该支持单个 CSS 变量颜色', () => {
+      render(
+        <RadarChart
+          data={sampleData}
+          color="var(--color-blue-control-fill-primary)"
+        />,
+      );
+
+      expect(screen.getByTestId('radar-chart')).toBeInTheDocument();
+    });
+
+    it('应该支持多个 CSS 变量颜色', () => {
+      render(
+        <RadarChart
+          data={sampleData}
+          color={[
+            'var(--color-blue-control-fill-primary)',
+            'var(--color-green-control-fill-primary)',
+          ]}
+        />,
+      );
+
+      expect(screen.getByTestId('radar-chart')).toBeInTheDocument();
+    });
+
+    it('应该支持混合使用 CSS 变量和十六进制颜色', () => {
+      render(
+        <RadarChart
+          data={sampleData}
+          color={['var(--color-blue-control-fill-primary)', '#ff0000']}
+        />,
+      );
+
+      expect(screen.getByTestId('radar-chart')).toBeInTheDocument();
     });
   });
 });

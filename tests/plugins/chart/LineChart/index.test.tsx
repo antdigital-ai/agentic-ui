@@ -146,6 +146,10 @@ vi.mock('../../../../src/Plugins/chart/hooks', () => ({
 vi.mock('../../../../src/Plugins/chart/utils', () => ({
   extractAndSortXValues: vi.fn(() => []),
   findDataPointByXValue: vi.fn(() => null),
+  hexToRgba: vi.fn((hex, alpha) => `rgba(0,0,0,${alpha})`),
+  resolveCssVariable: vi.fn((color) =>
+    color.startsWith('var(') ? '#1d7afc' : color,
+  ),
   registerLineChartComponents: vi.fn(),
 }));
 
@@ -330,7 +334,11 @@ describe('LineChart', () => {
       };
 
       render(
-        <LineChart data={mockData} styles={styles} style={{ padding: '10px' }} />,
+        <LineChart
+          data={mockData}
+          styles={styles}
+          style={{ padding: '10px' }}
+        />,
       );
 
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
@@ -961,6 +969,44 @@ describe('LineChart', () => {
 
       render(<LineChart data={largeDataSet} />);
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+  });
+
+  describe('CSS 变量颜色支持测试', () => {
+    it('应该支持单个 CSS 变量颜色', () => {
+      render(
+        <LineChart
+          data={mockData}
+          color="var(--color-blue-control-fill-primary)"
+        />,
+      );
+
+      expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+    });
+
+    it('应该支持多个 CSS 变量颜色', () => {
+      render(
+        <LineChart
+          data={mockData}
+          color={[
+            'var(--color-blue-control-fill-primary)',
+            'var(--color-green-control-fill-primary)',
+          ]}
+        />,
+      );
+
+      expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+    });
+
+    it('应该支持混合使用 CSS 变量和十六进制颜色', () => {
+      render(
+        <LineChart
+          data={mockData}
+          color={['var(--color-blue-control-fill-primary)', '#ff0000']}
+        />,
+      );
+
+      expect(screen.getByTestId('line-chart')).toBeInTheDocument();
     });
   });
 });

@@ -23,6 +23,7 @@ import {
 import { defaultColorList } from '../const';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
+import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
 
 let scatterChartComponentsRegistered = false;
@@ -325,11 +326,14 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
 
     const finalColor = baseColor || safeDefaultColor;
 
+    // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+    const resolvedColor = resolveCssVariable(finalColor);
+
     return {
       label: type || '默认',
       data: coordinates,
-      backgroundColor: `${finalColor}99`,
-      borderColor: finalColor,
+      backgroundColor: hexToRgba(resolvedColor, 0.6),
+      borderColor: resolvedColor,
       pointRadius: isMobile ? 4 : 6,
       pointHoverRadius: isMobile ? 6 : 8,
     };

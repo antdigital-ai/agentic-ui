@@ -17,6 +17,13 @@ vi.mock('react-chartjs-2', () => ({
   ),
 }));
 
+// Mock utils
+vi.mock('../../../../src/Plugins/chart/utils', () => ({
+  resolveCssVariable: vi.fn((color) =>
+    typeof color === 'string' && color.startsWith('var(') ? '#1d7afc' : color,
+  ),
+}));
+
 // Mock hooks
 vi.mock('../../../../src/Plugins/chart/DonutChart/hooks', () => ({
   useMobile: () => ({ isMobile: false, windowWidth: 1920 }),
@@ -514,6 +521,75 @@ describe('DonutChart', () => {
       render(
         <TestWrapper>
           <DonutChart data={mockData} styles={undefined} />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByTestId('doughnut-chart')).toBeInTheDocument();
+    });
+  });
+
+  describe('CSS 变量颜色支持测试', () => {
+    it('应该支持单个配置中使用 CSS 变量颜色', () => {
+      const configs = [
+        {
+          backgroundColor: [
+            'var(--color-blue-control-fill-primary)',
+            'var(--color-green-control-fill-primary)',
+            'var(--color-red-control-fill-primary)',
+          ],
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <DonutChart data={mockData} configs={configs} />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByTestId('doughnut-chart')).toBeInTheDocument();
+    });
+
+    it('应该支持多个配置使用不同的 CSS 变量', () => {
+      const multiData = [
+        { label: '类别A', value: 30, category: '分组1' },
+        { label: '类别B', value: 40, category: '分组1' },
+        { label: '类别C', value: 50, category: '分组2' },
+        { label: '类别D', value: 60, category: '分组2' },
+      ];
+
+      const configs = [
+        {
+          backgroundColor: ['var(--color-blue-control-fill-primary)'],
+        },
+        {
+          backgroundColor: ['var(--color-green-control-fill-primary)'],
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <DonutChart data={multiData} configs={configs} />
+        </TestWrapper>,
+      );
+
+      const charts = screen.getAllByTestId('doughnut-chart');
+      expect(charts.length).toBeGreaterThan(0);
+    });
+
+    it('应该支持混合使用 CSS 变量和十六进制颜色', () => {
+      const configs = [
+        {
+          backgroundColor: [
+            'var(--color-blue-control-fill-primary)',
+            '#ff0000',
+            '#00ff00',
+          ],
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <DonutChart data={mockData} configs={configs} />
         </TestWrapper>,
       );
 

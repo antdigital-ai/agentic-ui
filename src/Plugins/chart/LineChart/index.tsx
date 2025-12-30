@@ -24,7 +24,9 @@ import {
   ChartDataItem,
   extractAndSortXValues,
   findDataPointByXValue,
+  hexToRgba,
   registerLineChartComponents,
+  resolveCssVariable,
 } from '../utils';
 import { useStyle } from './style';
 
@@ -188,6 +190,9 @@ const LineChart: React.FC<LineChartProps> = ({
           defaultColorList[index % defaultColorList.length]
         : provided || defaultColorList[index % defaultColorList.length];
 
+      // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+      const resolvedColor = resolveCssVariable(baseColor);
+
       // 为每个类型收集数据点
       const typeData = xValues.map((x) => {
         const dataPoint = findDataPointByXValue(filteredData, x, type);
@@ -199,9 +204,9 @@ const LineChart: React.FC<LineChartProps> = ({
       return {
         label: type || '默认',
         data: typeData,
-        borderColor: baseColor,
-        backgroundColor: `${baseColor}33`,
-        pointBackgroundColor: baseColor,
+        borderColor: resolvedColor,
+        backgroundColor: hexToRgba(resolvedColor, 0.2),
+        pointBackgroundColor: resolvedColor,
         pointBorderColor: '#fff',
         pointBorderWidth: 1,
         borderWidth: 3,

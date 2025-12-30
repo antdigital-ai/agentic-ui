@@ -40,6 +40,21 @@ vi.mock('rc-resize-observer', () => ({
   default: ({ children }: any) => <div>{children}</div>,
 }));
 
+// Mock utils - 必须在导入 BarChart 之前
+vi.mock('../../../src/Plugins/chart/utils', () => ({
+  ChartDataItem: class {},
+  extractAndSortXValues: vi.fn((data) => [
+    ...new Set(data.map((d: any) => d.x)),
+  ]),
+  findDataPointByXValue: vi.fn((data, x, type) =>
+    data.find((d: any) => d.x === x && d.type === type),
+  ),
+  hexToRgba: vi.fn((color, alpha) => `rgba(0,0,0,${alpha})`),
+  resolveCssVariable: vi.fn((color) =>
+    typeof color === 'string' && color.startsWith('var(') ? '#1d7afc' : color,
+  ),
+}));
+
 // Import BarChart after mocking
 import BarChart, {
   BarChartDataItem,
@@ -210,7 +225,9 @@ describe('BarChart maxBarThickness 功能测试', () => {
         <BarChart data={basicData} classNames={classNames} />,
       );
 
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
     });
 
     it('应该支持 ChartStyles 对象格式的 styles', () => {
@@ -227,7 +244,9 @@ describe('BarChart maxBarThickness 功能测试', () => {
         <BarChart data={basicData} styles={styles} />,
       );
 
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
     });
 
     it('应该合并 classNames 和 className', () => {
@@ -243,7 +262,9 @@ describe('BarChart maxBarThickness 功能测试', () => {
         />,
       );
 
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
     });
 
     it('应该合并 styles 和 style', () => {
@@ -259,7 +280,9 @@ describe('BarChart maxBarThickness 功能测试', () => {
         />,
       );
 
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
     });
 
     it('应该正确处理 styles?.root 的合并顺序', () => {
@@ -275,7 +298,9 @@ describe('BarChart maxBarThickness 功能测试', () => {
         />,
       );
 
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
     });
 
     it('应该处理 classNames 为 undefined 的情况', () => {
@@ -283,7 +308,9 @@ describe('BarChart maxBarThickness 功能测试', () => {
         <BarChart data={basicData} classNames={undefined} />,
       );
 
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
     });
 
     it('应该处理 styles 为 undefined 的情况', () => {
@@ -291,8 +318,76 @@ describe('BarChart maxBarThickness 功能测试', () => {
         <BarChart data={basicData} styles={undefined} />,
       );
 
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe('CSS 变量颜色支持测试', () => {
+    it('应该支持单个 CSS 变量颜色', () => {
+      const { container } = render(
+        <BarChart
+          data={basicData}
+          color="var(--color-blue-control-fill-primary)"
+        />,
+      );
+
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
+    });
+
+    it('应该支持多个 CSS 变量颜色', () => {
+      const { container } = render(
+        <BarChart
+          data={basicData}
+          color={[
+            'var(--color-blue-control-fill-primary)',
+            'var(--color-green-control-fill-primary)',
+          ]}
+        />,
+      );
+
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
+    });
+
+    it('应该支持混合使用 CSS 变量和十六进制颜色', () => {
+      const { container } = render(
+        <BarChart
+          data={basicData}
+          color={['var(--color-blue-control-fill-primary)', '#ff0000']}
+        />,
+      );
+
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
+    });
+
+    it('应该支持在正负值分离模式下使用 CSS 变量', () => {
+      const divergingData: BarChartDataItem[] = [
+        { x: 'A', y: 10, type: 'Data' },
+        { x: 'B', y: -5, type: 'Data' },
+        { x: 'C', y: 15, type: 'Data' },
+        { x: 'D', y: -8, type: 'Data' },
+      ];
+
+      const { container } = render(
+        <BarChart
+          data={divergingData}
+          color={[
+            'var(--color-blue-control-fill-primary)',
+            'var(--color-red-control-fill-primary)',
+          ]}
+        />,
+      );
+
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
     });
   });
 });
-

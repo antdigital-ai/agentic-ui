@@ -17,6 +17,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
+import { resolveCssVariable } from '../utils';
 import {
   SINGLE_MODE_DESKTOP_CUTOUT,
   SINGLE_MODE_MOBILE_CUTOUT,
@@ -421,9 +422,15 @@ const DonutChart: React.FC<DonutChartProps> = ({
           );
           const backgroundColors = cfg.backgroundColor || defaultColorList;
 
+          // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+          const resolvedBackgroundColors = backgroundColors.map((color) =>
+            resolveCssVariable(color),
+          );
+
           const mainColor =
             cfg.backgroundColor?.[0] ??
             defaultColorList[idx % defaultColorList.length];
+          const resolvedMainColor = resolveCssVariable(mainColor);
 
           const chartJsData = {
             labels,
@@ -431,14 +438,14 @@ const DonutChart: React.FC<DonutChartProps> = ({
               {
                 data: safeValues,
                 backgroundColor: isSingleValueMode
-                  ? [mainColor, 'transparent']
-                  : backgroundColors.slice(0, values.length),
+                  ? [resolvedMainColor, 'transparent']
+                  : resolvedBackgroundColors.slice(0, values.length),
                 borderColor: isSingleValueMode
                   ? [cfg.borderColor || '#fff', 'transparent']
                   : cfg.borderColor || '#fff',
                 hoverBackgroundColor: isSingleValueMode
-                  ? [mainColor, 'transparent']
-                  : backgroundColors.slice(0, values.length),
+                  ? [resolvedMainColor, 'transparent']
+                  : resolvedBackgroundColors.slice(0, values.length),
                 hoverBorderColor: isSingleValueMode
                   ? [cfg.borderColor || '#fff', 'transparent']
                   : cfg.borderColor || '#fff',
