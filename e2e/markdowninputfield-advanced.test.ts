@@ -158,8 +158,9 @@ test('MarkdownInputField long text and scrolling should work correctly', async (
       await page.waitForTimeout(200);
 
       // 输入长文本
-      const longText =
-        '这是一段很长的文本，用来测试输入框的滚动功能。'.repeat(20);
+      const longText = '这是一段很长的文本，用来测试输入框的滚动功能。'.repeat(
+        20,
+      );
       await input.fill(longText);
       await page.waitForTimeout(500);
 
@@ -289,22 +290,42 @@ test('MarkdownInputField markdown formatting should work correctly', async () =>
       expect(text).toContain('代码文本');
 
       // 验证 Markdown 格式被正确解析（通过检查 DOM 结构）
-      // 验证 Markdown 格式被正确解析（通过检查 DOM 结构）
+      // 粗体文本被渲染为 <span data-testid="markdown-bold">
       const hasBold = await page.evaluate(() => {
-        const boldElements = document.querySelectorAll('strong, b, [data-mark="bold"]');
+        const boldElements = document.querySelectorAll(
+          '[data-testid="markdown-bold"]',
+        );
         return boldElements.length > 0;
       });
       expect(hasBold).toBe(true);
 
+      // 斜体文本只应用了 fontStyle: 'italic'，没有特定的 testid
+      // 通过检查计算样式来验证斜体
       const hasItalic = await page.evaluate(() => {
-        const italicElements = document.querySelectorAll('em, i, [data-mark="italic"]');
-        return italicElements.length > 0;
+        const allElements = document.querySelectorAll('*');
+        for (const el of allElements) {
+          const style = window.getComputedStyle(el);
+          if (
+            style.fontStyle === 'italic' &&
+            el.textContent?.includes('斜体文本')
+          ) {
+            return true;
+          }
+        }
+        return false;
       });
       expect(hasItalic).toBe(true);
 
+      // 内联代码被渲染为 <code> 元素
       const hasCode = await page.evaluate(() => {
-        const codeElements = document.querySelectorAll('code, [data-mark="code"]');
-        return codeElements.length > 0;
+        const codeElements = document.querySelectorAll('code');
+        // 检查是否有包含"代码文本"的 code 元素
+        for (const codeEl of codeElements) {
+          if (codeEl.textContent?.includes('代码文本')) {
+            return true;
+          }
+        }
+        return false;
       });
       expect(hasCode).toBe(true);
     } else {
@@ -599,4 +620,3 @@ test('MarkdownInputField responsive behavior should work correctly', async () =>
     await page.close();
   }
 });
-

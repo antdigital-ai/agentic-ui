@@ -769,11 +769,9 @@ test('MarkdownInputField rapid input should work correctly', async () => {
       await page.waitForTimeout(200);
 
       // 快速输入多个字符
+      // 使用 type 方法一次性输入整个字符串，比逐个字符输入更可靠
       const rapidText = 'Rapid input test: ';
-      for (let i = 0; i < rapidText.length; i++) {
-        await input.type(rapidText[i]);
-        await page.waitForTimeout(10); // 很短的延迟模拟快速输入
-      }
+      await input.type(rapidText, { delay: 10 });
 
       await page.waitForTimeout(300);
 
