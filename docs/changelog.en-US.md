@@ -1,30 +1,30 @@
 ## v2.29.3
 
 - MarkdownInputField
-  - 🆕 Add animated border beam effect. [@qixian.cs]
-  - 🆕 Add new component with placeholder and send functionality. [@qixian.cs]
+  - 🆕 Add animated border beam effect. [@qixian]
+  - 🆕 Add new component with placeholder and send functionality. [@qixian]
   - 🆕 Support customizing send button colors via `sendButtonProps`. [#241](https://github.com/ant-design/agentic-ui/pull/241) [@Chiaki枫烨]
   - 💄 Optimize disabled and loading styles. [@qixian]
   - 💄 Optimize styles for tool rendering and border radius. [@qixian]
 
 - Bubble
-  - 🐞 Fix `useEffect` dependency issues. [@qixian.cs]
+  - 🐞 Fix `useEffect` dependency issues. [@qixian]
   - 💄 Optimize content font style. [#246](https://github.com/ant-design/agentic-ui/pull/246) [@不见月]
   - 💄 Optimize Loading and action icon display effects. [#237](https://github.com/ant-design/agentic-ui/pull/237) [@不见月]
 
 - MarkdownEditor
-  - 💄 Default content font size now uses `--font-text-paragraph-lg` variable. [#249](https://github.com/ant-design/agentic-ui/pull/249) [@不见月]
-  - 🆕 Add `disableHtmlPreview` and `viewModeLabels` properties. [@qixian.cs]
+  - 💄 Default content font size now uses ``--font-text-paragraph-lg`` variable. [#249](https://github.com/ant-design/agentic-ui/pull/249) [@不见月]
+  - 🆕 Add `disableHtmlPreview` and `viewModeLabels` properties. [@qixian]
 
-🆕 AppWrapper: Add `AppWrapper` component to utilize `useAppData` and log app data on mount. [@qixian.cs]
+🆕 AppWrapper: Add `AppWrapper` component to utilize `useAppData` and log app data on mount. [@qixian]
 
-🆕 BubbleList: Add lazy loading support to improve performance. [@qixian.cs]
+🆕 BubbleList: Add lazy loading support to improve performance. [@qixian]
 
-🆕 CodeRenderer: Support JavaScript detection in HTML code. [@qixian.cs]
+🆕 CodeRenderer: Support JavaScript detection in HTML code. [@qixian]
 
 🆕 ChatLayout: Auto-scroll to bottom when switching conversation records. [#247](https://github.com/ant-design/agentic-ui/pull/247) [@不见月]
 
-🆕 QuickLink: Add viewport link prefetching. [@qixian.cs]
+🆕 QuickLink: Add viewport link prefetching. [@qixian]
 
 🐞 SendButton: Fix `fillOpacity` animation warning. [#236](https://github.com/ant-design/agentic-ui/pull/236) [@Chiaki枫烨]
 
@@ -36,17 +36,17 @@
 
 🐞 EditorStore: Optimize node replacement logic to consider `finished` state. [@陈帅]
 
-🐞 TagPopup: Fix node path retrieval errors and dependency checks. [@qixian.cs]
+🐞 TagPopup: Fix node path retrieval errors and dependency checks. [@qixian]
 
 🆕 ChatLayout: Add animations for flow action buttons. [#234](https://github.com/ant-design/agentic-ui/pull/234) [@不见月]
 
 ## v2.29.0
 
-🛠 Bubble: Optimize message content styling and structure. [@qixian.cs]
+🛠 Bubble: Optimize message content styling and structure. [@qixian]
 
-🛠 MarkdownEditor: Optimize style handling, node comparison logic, and drag-and-drop functionality. [@qixian.cs]
+🛠 MarkdownEditor: Optimize style handling, node comparison logic, and drag-and-drop functionality. [@qixian]
 
-🆕 Dumirc: Add Google Tag Manager script. [@qixian.cs]
+🆕 Dumirc: Add Google Tag Manager script. [@qixian]
 
 ## v2.28.11
 
@@ -58,13 +58,13 @@
 
 ## v2.28.10
 
-⚡️ MarkdownEditor: Optimize node comparison and parsing logic to improve rendering performance. [@qixian.cs]
+⚡️ MarkdownEditor: Optimize node comparison and parsing logic to improve rendering performance. [@qixian]
 
-🛠 MarkdownToSlateParser: Optimize HTML comment handling. [@qixian.cs]
+🛠 MarkdownToSlateParser: Optimize HTML comment handling. [@qixian]
 
 💄 Workspace: Optimize download button display logic. [#228](https://github.com/ant-design/agentic-ui/pull/228) [@ranranup]
 
-💄 Reset CSS: Remove deprecated color variables. [@qixian.cs]
+💄 Reset CSS: Remove deprecated color variables. [@qixian]
 
 ⚡️ useIntersectionOnce: Use `useLayoutEffect` instead of `useEffect` for optimized detection. [@qixian]
 
@@ -76,9 +76,9 @@
 
 🛠 MarkdownInputField: Remove `enlargeable` prop and refactor component structure. [@qixian]
 
-🐞 QuickActions: Fix exception in resize events. [@qixian.cs]
+🐞 QuickActions: Fix exception in resize events. [@qixian]
 
-🆕 Mermaid: Add flowchart support. [@qixian.cs]
+🆕 Mermaid: Add flowchart support. [@qixian]
 
 ## v2.28.8
 
@@ -86,7 +86,7 @@
 
 🐞 SchemaEditorBridgeManager: Fix `stopBridge` error in strict mode. [#226](https://github.com/ant-design/agentic-ui/pull/226) [@hei-f]
 
-🐞 Mermaid: Enhance error handling and rendering logic. [@qixian.cs]
+🐞 Mermaid: Enhance error handling and rendering logic. [@qixian]
 
 ## v2.28.7
 

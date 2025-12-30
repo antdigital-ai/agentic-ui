@@ -1,30 +1,30 @@
 ## v2.29.3
 
 - MarkdownInputField
-  - 🆕 为输入框添加流光边框动画效果。 [@qixian.cs]
-  - 🆕 新增组件，支持占位符和发送功能。 [@qixian.cs]
+  - 🆕 为输入框添加流光边框动画效果。 [@qixian]
+  - 🆕 新增组件，支持占位符和发送功能。 [@qixian]
   - 🆕 支持通过 `sendButtonProps` 自定义发送按钮颜色。 [#241](https://github.com/ant-design/agentic-ui/pull/241) [@Chiaki枫烨]
   - 💄 优化禁用和加载状态样式。 [@qixian]
   - 💄 优化工具渲染支持及圆角样式。 [@qixian]
 
 - Bubble
-  - 🐞 修复 `useEffect` 依赖问题。 [@qixian.cs]
+  - 🐞 修复 `useEffect` 依赖问题。 [@qixian]
   - 💄 优化内容字体样式。 [#246](https://github.com/ant-design/agentic-ui/pull/246) [@不见月]
   - 💄 优化 Loading 和操作图标展示效果。 [#237](https://github.com/ant-design/agentic-ui/pull/237) [@不见月]
 
 - MarkdownEditor
-  - 💄 内容默认使用 `--font-text-paragraph-lg` 变量的字号。 [#249](https://github.com/ant-design/agentic-ui/pull/249) [@不见月]
-  - 🆕 新增 `disableHtmlPreview` 和 `viewModeLabels` 属性。 [@qixian.cs]
+  - 💄 内容默认使用 ``--font-text-paragraph-lg`` 变量的字号。 [#249](https://github.com/ant-design/agentic-ui/pull/249) [@不见月]
+  - 🆕 新增 `disableHtmlPreview` 和 `viewModeLabels` 属性。 [@qixian]
 
-🆕 AppWrapper: 新增 `AppWrapper` 组件以利用 `useAppData` 并在挂载时记录应用数据。 [@qixian.cs]
+🆕 AppWrapper: 新增 `AppWrapper` 组件以利用 `useAppData` 并在挂载时记录应用数据。 [@qixian]
 
-🆕 BubbleList: 新增懒加载支持以提升性能。 [@qixian.cs]
+🆕 BubbleList: 新增懒加载支持以提升性能。 [@qixian]
 
-🆕 CodeRenderer: 支持 HTML 代码中的 JavaScript 检测。 [@qixian.cs]
+🆕 CodeRenderer: 支持 HTML 代码中的 JavaScript 检测。 [@qixian]
 
 🆕 ChatLayout: 切换对话记录时自动滚动到底部。 [#247](https://github.com/ant-design/agentic-ui/pull/247) [@不见月]
 
-🆕 QuickLink: 新增视口内链接预加载功能。 [@qixian.cs]
+🆕 QuickLink: 新增视口内链接预加载功能。 [@qixian]
 
 🐞 SendButton: 修复 `fillOpacity` 动画警告。 [#236](https://github.com/ant-design/agentic-ui/pull/236) [@Chiaki枫烨]
 
@@ -36,17 +36,17 @@
 
 🐞 EditorStore: 优化节点替换逻辑，考虑 `finished` 状态。 [@陈帅]
 
-🐞 TagPopup: 修复节点路径获取错误及依赖检查。 [@qixian.cs]
+🐞 TagPopup: 修复节点路径获取错误及依赖检查。 [@qixian]
 
 🆕 ChatLayout: 新增多个对话流操作按钮动画。 [#234](https://github.com/ant-design/agentic-ui/pull/234) [@不见月]
 
 ## v2.29.0
 
-🛠 Bubble: 优化消息内容样式和结构。 [@qixian.cs]
+🛠 Bubble: 优化消息内容样式和结构。 [@qixian]
 
-🛠 MarkdownEditor: 优化样式处理、节点对比逻辑及拖拽功能。 [@qixian.cs]
+🛠 MarkdownEditor: 优化样式处理、节点对比逻辑及拖拽功能。 [@qixian]
 
-🆕 Dumirc: 增加 Google Tag Manager 脚本。 [@qixian.cs]
+🆕 Dumirc: 增加 Google Tag Manager 脚本。 [@qixian]
 
 ## v2.28.11
 
@@ -58,13 +58,13 @@
 
 ## v2.28.10
 
-⚡️ MarkdownEditor: 优化节点对比和解析逻辑，提升渲染性能。 [@qixian.cs]
+⚡️ MarkdownEditor: 优化节点对比和解析逻辑，提升渲染性能。 [@qixian]
 
-🛠 MarkdownToSlateParser: 优化 HTML 注释处理。 [@qixian.cs]
+🛠 MarkdownToSlateParser: 优化 HTML 注释处理。 [@qixian]
 
 💄 Workspace: 优化下载按钮展示逻辑。 [#228](https://github.com/ant-design/agentic-ui/pull/228) [@ranranup]
 
-💄 Reset CSS: 移除废弃颜色变量。 [@qixian.cs]
+💄 Reset CSS: 移除废弃颜色变量。 [@qixian]
 
 ⚡️ useIntersectionOnce: 使用 `useLayoutEffect` 替代 `useEffect` 以优化检测。 [@qixian]
 
@@ -76,9 +76,9 @@
 
 🛠 MarkdownInputField: 移除 `enlargeable` 属性并重构组件结构。 [@qixian]
 
-🐞 QuickActions: 修复 resize 事件中的异常问题。 [@qixian.cs]
+🐞 QuickActions: 修复 resize 事件中的异常问题。 [@qixian]
 
-🆕 Mermaid: 新增流程图支持。 [@qixian.cs]
+🆕 Mermaid: 新增流程图支持。 [@qixian]
 
 ## v2.28.8
 
@@ -86,7 +86,7 @@
 
 🐞 SchemaEditorBridgeManager: 修复严格模式下 `stopBridge` 报错问题。 [#226](https://github.com/ant-design/agentic-ui/pull/226) [@hei-f]
 
-🐞 Mermaid: 增强错误处理和渲染逻辑。 [@qixian.cs]
+🐞 Mermaid: 增强错误处理和渲染逻辑。 [@qixian]
 
 ## v2.28.7
 
