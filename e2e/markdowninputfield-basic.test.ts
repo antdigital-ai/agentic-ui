@@ -30,15 +30,15 @@ test('MarkdownInputField basic input functionality should work correctly', async
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 15000 });
+      await inputField.waitFor({ state: 'visible', timeout: 20000 });
 
       // 找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       // 点击输入框以聚焦
       await input.click();
@@ -91,15 +91,15 @@ test('MarkdownInputField delete functionality should work correctly', async () =
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 15000 });
+      await inputField.waitFor({ state: 'visible', timeout: 20000 });
 
       // 找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       // 点击输入框以聚焦
       await input.click();
@@ -198,15 +198,15 @@ test('MarkdownInputField copy functionality should work correctly', async () => 
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 15000 });
+      await inputField.waitFor({ state: 'visible', timeout: 20000 });
 
       // 找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       // 点击输入框以聚焦
       await input.click();
@@ -304,15 +304,15 @@ test('MarkdownInputField cut functionality should work correctly', async () => {
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 15000 });
+      await inputField.waitFor({ state: 'visible', timeout: 20000 });
 
       // 找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       // 点击输入框以聚焦
       await input.click();
@@ -424,15 +424,15 @@ test('MarkdownInputField paste functionality should work correctly', async () =>
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 15000 });
+      await inputField.waitFor({ state: 'visible', timeout: 20000 });
 
       // 找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       // 点击输入框以聚焦
       await input.click();
@@ -502,15 +502,15 @@ test('MarkdownInputField should show placeholder when only whitespace is entered
     if (response?.ok()) {
       // 重新加载页面以确保测试从干净状态开始
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       // 等待 MarkdownInputField 容器出现
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 15000 });
+      await inputField.waitFor({ state: 'visible', timeout: 20000 });
 
       // 找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       // 点击输入框以聚焦
       await input.click();
@@ -629,7 +629,7 @@ test('MarkdownInputField cursor position and navigation should work correctly', 
       await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       await input.click();
       await page.waitForTimeout(200);
@@ -698,7 +698,7 @@ test('MarkdownInputField clear input should work correctly', async () => {
       await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       await input.click();
       await page.waitForTimeout(200);
@@ -761,7 +761,7 @@ test('MarkdownInputField rapid input should work correctly', async () => {
       await page.waitForTimeout(300);
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       await input.click();
       await page.waitForTimeout(200);

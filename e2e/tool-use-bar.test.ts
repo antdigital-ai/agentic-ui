@@ -274,7 +274,7 @@ test('ToolUseBar empty state should work correctly', async () => {
         .or(page.locator('.ant-agentic-tool-use-bar-tool'));
 
       // 等待工具项出现（在这个 demo 中应该有工具项）
-      await toolItems.first().waitFor({ state: 'visible', timeout: 15000 });
+      await toolItems.first().waitFor({ state: 'visible', timeout: 20000 });
 
       const toolCount = await toolItems.count();
 

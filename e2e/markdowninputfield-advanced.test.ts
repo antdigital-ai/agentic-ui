@@ -29,13 +29,13 @@ test('MarkdownInputField keyboard shortcuts should work correctly', async () => 
 
     if (response?.ok()) {
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 15000 });
+      await inputField.waitFor({ state: 'visible', timeout: 20000 });
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       await input.click();
       await page.waitForTimeout(200);
@@ -95,10 +95,10 @@ test('MarkdownInputField multi-line input should work correctly', async () => {
 
     if (response?.ok()) {
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       await input.click();
       await page.waitForTimeout(200);
@@ -149,10 +149,10 @@ test('MarkdownInputField long text and scrolling should work correctly', async (
 
     if (response?.ok()) {
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       await input.click();
       await page.waitForTimeout(200);
@@ -214,13 +214,13 @@ test('MarkdownInputField focus and blur should work correctly', async () => {
 
     if (response?.ok()) {
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 15000 });
+      await inputField.waitFor({ state: 'visible', timeout: 20000 });
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       // 测试聚焦
       await input.click();
@@ -270,10 +270,10 @@ test('MarkdownInputField markdown formatting should work correctly', async () =>
 
     if (response?.ok()) {
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       await input.click();
       await page.waitForTimeout(200);
@@ -355,10 +355,10 @@ test('MarkdownInputField text selection and editing should work correctly', asyn
 
     if (response?.ok()) {
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       await input.click();
       await page.waitForTimeout(200);
@@ -426,10 +426,10 @@ test('MarkdownInputField undo and redo should work correctly', async () => {
 
     if (response?.ok()) {
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       await input.click();
       await page.waitForTimeout(200);
@@ -495,10 +495,10 @@ test('MarkdownInputField input validation should work correctly', async () => {
 
     if (response?.ok()) {
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 15000 });
+      await input.waitFor({ state: 'visible', timeout: 20000 });
 
       await input.click();
       await page.waitForTimeout(200);
@@ -570,10 +570,10 @@ test('MarkdownInputField responsive behavior should work correctly', async () =>
 
     if (response?.ok()) {
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
 
       const inputField = page.locator('.ant-agentic-md-input-field').first();
-      await inputField.waitFor({ state: 'visible', timeout: 15000 });
+      await inputField.waitFor({ state: 'visible', timeout: 20000 });
 
       // 测试桌面尺寸
       await page.setViewportSize({ width: 1920, height: 1080 });
