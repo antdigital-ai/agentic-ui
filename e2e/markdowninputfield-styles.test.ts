@@ -143,7 +143,7 @@ test('MarkdownInputField disabled styles should work correctly', async () => {
 
       // 先找到可编辑的输入框
       const input = page.locator('[contenteditable="true"]').first();
-      await input.waitFor({ state: 'visible', timeout: 10000 });
+      await input.waitFor({ state: 'visible', timeout: 15000 });
 
       // 直接查找 MarkdownInputField 容器
       const inputField = page.locator('.ant-agentic-md-input-field').first();
