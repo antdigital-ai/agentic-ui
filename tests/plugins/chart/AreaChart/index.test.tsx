@@ -808,5 +808,17 @@ describe('AreaChart', () => {
       const filter = screen.getByTestId('chart-filter');
       expect(toolbar).toContainElement(filter);
     });
+
+    it('renderFilterInToolbar=true 但仅一个分类时不应渲染筛选器', () => {
+      render(
+        <AreaChart
+          data={sampleData}
+          renderFilterInToolbar={true}
+          title="单分类"
+        />,
+      );
+
+      expect(screen.queryByTestId('chart-filter')).not.toBeInTheDocument();
+    });
   });
 });

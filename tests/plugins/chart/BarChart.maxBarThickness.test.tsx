@@ -390,4 +390,38 @@ describe('BarChart maxBarThickness 功能测试', () => {
       ).toBeInTheDocument();
     });
   });
+
+  describe('BarChart 其他功能覆盖测试', () => {
+    const mockData = [{ x: 'A', y: 10, type: 'Data' } as BarChartDataItem];
+
+    it('应该支持自定义数据标签格式化函数', () => {
+      const dataLabelFormatter = vi.fn().mockReturnValue('custom-label');
+      const { container } = render(
+        <BarChart
+          data={mockData}
+          showDataLabels={true}
+          dataLabelFormatter={dataLabelFormatter}
+        />,
+      );
+      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(dataLabelFormatter).toHaveBeenCalled();
+    });
+
+    it('应该支持 indexAxis="y" 配置', () => {
+      const { container } = render(
+        <BarChart data={mockData} indexAxis="y" showDataLabels={true} />,
+      );
+      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+    });
+
+    it('当无法获取 canvas context 时应使用备用宽度计算', () => {
+      const originalGetContext = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(null);
+
+      const { container } = render(<BarChart data={mockData} showDataLabels={true} />);
+      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+
+      HTMLCanvasElement.prototype.getContext = originalGetContext;
+    });
+  });
 });

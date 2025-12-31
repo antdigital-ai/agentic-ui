@@ -25,6 +25,7 @@ describe('Chart Utils', () => {
       expect(stringFormatNumber(1234567.89)).toBe('1,234,567.89');
       expect(stringFormatNumber(1000)).toBe('1,000');
       expect(stringFormatNumber(0)).toBe(0);
+      expect(stringFormatNumber(undefined as any)).toBe(undefined);
     });
 
     it('应该直接返回字符串值', () => {
