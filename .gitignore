@@ -7,3 +7,5 @@ node_modules
 /docs-dist
 tsconfig.tsbuildinfo
 coverage/**
+playwright-report/*
+test-results/*
