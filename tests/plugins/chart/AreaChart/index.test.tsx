@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -33,6 +33,7 @@ vi.mock('../../../../src/Plugins/chart/components', async () => {
   );
   return {
     ...actual,
+    downloadChart: vi.fn(),
     ChartContainer: ({ children, ...props }: any) => (
       <div data-testid="chart-container" {...props}>
         {children}
@@ -52,13 +53,14 @@ vi.mock('../../../../src/Plugins/chart/components', async () => {
         ))}
       </div>
     ),
-    ChartToolBar: ({ title, onDownload, dataTime, extra }: any) => (
+    ChartToolBar: ({ title, onDownload, dataTime, extra, filter }: any) => (
       <div data-testid="chart-toolbar">
         {(title || '面积图') && (
           <span data-testid="chart-title">{title || '面积图'}</span>
         )}
         {dataTime && <span data-testid="chart-datatime">{dataTime}</span>}
         {extra}
+        {filter}
         <button
           type="button"
           onClick={onDownload}
@@ -80,6 +82,7 @@ vi.mock('../../../../src/Plugins/chart/components', async () => {
 // Import hooks for mocking
 import * as hooks from '../../../../src/Plugins/chart/hooks';
 import * as utils from '../../../../src/Plugins/chart/utils';
+import * as components from '../../../../src/Plugins/chart/components';
 
 // Mock hooks
 vi.mock('../../../../src/Plugins/chart/hooks', () => ({
@@ -756,6 +759,54 @@ describe('AreaChart', () => {
       render(<AreaChart data={sampleData} styles={undefined} />);
 
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+  });
+
+  describe('交互测试', () => {
+    it('点击下载按钮应触发下载函数', () => {
+      render(<AreaChart data={sampleData} title="下载测试" />);
+
+      const downloadButton = screen.getByTestId('download-button');
+      fireEvent.click(downloadButton);
+
+      expect(components.downloadChart).toHaveBeenCalled();
+    });
+
+    it('当 renderFilterInToolbar 为 true 时应在工具栏显示筛选器', () => {
+      const multiCategoryData = [
+        ...sampleData,
+        { category: '市场数据', type: '团队A', x: 'Q1', y: 100 },
+      ];
+
+      // 需要 mock filterOptions 使其长度 > 1
+      vi.mocked(hooks.useChartDataFilter).mockImplementation(() => ({
+        filteredData: multiCategoryData,
+        categories: ['销售数据', '市场数据'],
+        filterOptions: [
+          { label: '销售数据', value: '销售数据' },
+          { label: '市场数据', value: '市场数据' },
+        ],
+        filterLabels: undefined,
+        selectedFilter: '销售数据',
+        setSelectedFilter: vi.fn(),
+        selectedFilterLabel: undefined,
+        setSelectedFilterLabel: vi.fn(),
+        filteredDataByFilterLabel: undefined,
+        safeData: multiCategoryData,
+      }));
+
+      render(
+        <AreaChart
+          data={multiCategoryData}
+          renderFilterInToolbar={true}
+          title="工具栏筛选器测试"
+        />,
+      );
+
+      // 在 ChartToolBar 内部渲染了 ChartFilter
+      const toolbar = screen.getByTestId('chart-toolbar');
+      const filter = screen.getByTestId('chart-filter');
+      expect(toolbar).toContainElement(filter);
     });
   });
 });

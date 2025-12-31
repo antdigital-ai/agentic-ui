@@ -14,6 +14,7 @@ import {
 } from './icons';
 import Robot from './Robot';
 import { useStyle } from './style';
+export * from './Robot';
 
 /**
  * 任务状态枚举

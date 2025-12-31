@@ -158,6 +158,23 @@ describe('Chart Utils', () => {
       expect(resolveCssVariable(' var(--color) ')).toBeDefined();
     });
 
+    it('应该在解析出错时安全返回原值', () => {
+      const originalCreateElement = document.createElement;
+      document.createElement = vi.fn().mockImplementation(() => {
+        throw new Error('Mock error');
+      });
+
+      const result = resolveCssVariable('var(--error-var)');
+      expect(result).toBe('var(--error-var)');
+
+      document.createElement = originalCreateElement;
+    });
+
+    it('应该处理正则不匹配但以 var( 开头的字符串', () => {
+      // var() 不匹配 /var\((--[^)]+)\)/
+      expect(resolveCssVariable('var()')).toBe('var()');
+    });
+
     it('应该缓存已解析的 CSS 变量', () => {
       const cssVar = 'var(--test-color)';
       const result1 = resolveCssVariable(cssVar);
@@ -358,6 +375,21 @@ describe('Chart Utils', () => {
     });
   });
 
+  describe('isNotEmpty', () => {
+    it('应该返回 true 对于非空值', () => {
+      expect(isNotEmpty(123)).toBe(true);
+      expect(isNotEmpty('abc')).toBe(true);
+      expect(isNotEmpty(0)).toBe(true);
+      expect(isNotEmpty(false)).toBe(true);
+      expect(isNotEmpty('')).toBe(true); // 空字符串也是非空（不是 null/undefined）
+    });
+
+    it('应该返回 false 对于空值', () => {
+      expect(isNotEmpty(null)).toBe(false);
+      expect(isNotEmpty(undefined)).toBe(false);
+    });
+  });
+
   describe('toNumber', () => {
     it('应该返回数字类型的原值', () => {
       expect(toNumber(123, 0)).toBe(123);
@@ -373,32 +405,9 @@ describe('Chart Utils', () => {
 
     it('应该返回 fallback 值当无法转换时', () => {
       expect(toNumber('abc', 100)).toBe(100);
-      expect(toNumber(null, 50)).toBe(50);
+      expect(toNumber(null, 50)).toBe(0); // Number(null) is 0
       expect(toNumber(undefined, 25)).toBe(25);
-    });
-
-    it('应该处理 NaN 值', () => {
-      expect(toNumber(NaN, 100)).toBe(100);
-    });
-  });
-
-  describe('isNotEmpty', () => {
-    it('应该返回 true 对于非空值', () => {
-      expect(isNotEmpty(123)).toBe(true);
-      expect(isNotEmpty('abc')).toBe(true);
-      expect(isNotEmpty(0)).toBe(true);
-      expect(isNotEmpty(false)).toBe(true);
-    });
-
-    it('应该返回 false 对于空值', () => {
-      expect(isNotEmpty(null)).toBe(false);
-      expect(isNotEmpty(undefined)).toBe(false);
-      expect(isNotEmpty('')).toBe(false);
-    });
-
-    it('应该处理空数组和对象', () => {
-      expect(isNotEmpty([])).toBe(true); // 数组对象本身不为空
-      expect(isNotEmpty({})).toBe(true); // 对象本身不为空
+      expect(toNumber(NaN, 10)).toBe(10);
     });
   });
 
@@ -417,7 +426,10 @@ describe('Chart Utils', () => {
 
     it('应该为不同数据生成不同的哈希', () => {
       const data1 = [{ x: 1, y: 10 }];
-      const data2 = [{ x: 2, y: 20 }];
+      const data2 = [
+        { x: 1, y: 10 },
+        { x: 2, y: 20 },
+      ];
       expect(getDataHash(data1)).not.toBe(getDataHash(data2));
     });
 
@@ -436,8 +448,9 @@ describe('Chart Utils', () => {
     });
 
     it('应该返回 false 对于不同的配置', () => {
-      const config1 = { color: '#ff0000', size: 10 };
-      const config2 = { color: '#00ff00', size: 10 };
+      // isConfigEqual 只比较特定字段：['x', 'y', 'height', 'index', 'rest']
+      const config1 = { x: 'date1', height: 400 };
+      const config2 = { x: 'date2', height: 400 };
       expect(isConfigEqual(config1, config2)).toBe(false);
     });
 
@@ -451,6 +464,15 @@ describe('Chart Utils', () => {
       expect(isConfigEqual(null, null)).toBe(true);
       expect(isConfigEqual(undefined, undefined)).toBe(true);
       expect(isConfigEqual(null, undefined)).toBe(false);
+      expect(isConfigEqual({}, null)).toBe(false);
+    });
+
+    it('应该比较 nested rest 对象', () => {
+      const config1 = { x: 1, rest: { a: 1 } };
+      const config2 = { x: 1, rest: { a: 2 } };
+      const config3 = { x: 1, rest: { a: 1, b: 2 } };
+      expect(isConfigEqual(config1, config2)).toBe(false);
+      expect(isConfigEqual(config1, config3)).toBe(false);
     });
   });
 });

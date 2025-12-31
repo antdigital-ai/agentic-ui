@@ -272,7 +272,7 @@ const BarChart: React.FC<BarChartProps> = ({
   // 从数据中提取唯一的类别作为筛选选项
   const categories = useMemo(() => {
     const uniqueCategories = [
-      ...new Set(safeData.map((item) => item.category)),
+      ...new Set(safeData.map((item) => item?.category)),
     ].filter(Boolean);
     return uniqueCategories;
   }, [safeData]);
@@ -280,7 +280,7 @@ const BarChart: React.FC<BarChartProps> = ({
   // 从数据中提取 filterLabel，过滤掉 undefined 值
   const validFilterLabels = useMemo(() => {
     return safeData
-      .map((item) => item.filterLabel)
+      .map((item) => item?.filterLabel)
       .filter(
         (filterLabel): filterLabel is string => filterLabel !== undefined,
       );

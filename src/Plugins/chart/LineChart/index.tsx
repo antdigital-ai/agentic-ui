@@ -216,7 +216,7 @@ const LineChart: React.FC<LineChartProps> = ({
     });
 
     return { labels, datasets };
-  }, [filteredData, types, xValues]);
+  }, [filteredData, types, xValues, color]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,
@@ -390,17 +390,19 @@ const LineChart: React.FC<LineChartProps> = ({
         </div>
       )}
 
-      <ChartFilter
-        filterOptions={filterOptions}
-        selectedFilter={selectedFilter}
-        onFilterChange={setSelectedFilter}
-        {...(filterLabels && {
-          customOptions: filteredDataByFilterLabel,
-          selectedCustomSelection: selectedFilterLabel,
-          onSelectionChange: setSelectedFilterLabel,
-        })}
-        theme={theme}
-      />
+      {!renderFilterInToolbar && filterOptions && filterOptions.length > 1 && (
+        <ChartFilter
+          filterOptions={filterOptions}
+          selectedFilter={selectedFilter}
+          onFilterChange={setSelectedFilter}
+          {...(filterLabels && {
+            customOptions: filteredDataByFilterLabel,
+            selectedCustomSelection: selectedFilterLabel,
+            onSelectionChange: setSelectedFilterLabel,
+          })}
+          theme={theme}
+        />
+      )}
 
       <div
         className={`${baseClassName}-wrapper`}

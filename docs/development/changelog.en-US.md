@@ -1,3 +1,14 @@
+---
+nav:
+  title: 项目研发
+  order: 3
+group:
+  title: 开发指南
+  order: 2
+---
+
+# Changelog
+
 ## v2.29.3
 
 - MarkdownInputField
@@ -13,7 +24,7 @@
   - 💄 Optimize Loading and action icon display effects. [#237](https://github.com/ant-design/agentic-ui/pull/237) [@不见月]
 
 - MarkdownEditor
-  - 💄 Default content font size now uses ``--font-text-paragraph-lg`` variable. [#249](https://github.com/ant-design/agentic-ui/pull/249) [@不见月]
+  - 💄 Default content font size now uses `--font-text-paragraph-lg` variable. [#249](https://github.com/ant-design/agentic-ui/pull/249) [@不见月]
   - 🆕 Add `disableHtmlPreview` and `viewModeLabels` properties. [@qixian]
 
 🆕 AppWrapper: Add `AppWrapper` component to utilize `useAppData` and log app data on mount. [@qixian]

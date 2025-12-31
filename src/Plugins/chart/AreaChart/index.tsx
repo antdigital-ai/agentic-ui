@@ -342,7 +342,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
     });
 
     return { labels, datasets };
-  }, [filteredData, types, xValues]);
+  }, [filteredData, types, xValues, color]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,

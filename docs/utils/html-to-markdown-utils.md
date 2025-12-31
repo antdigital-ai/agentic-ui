@@ -3,7 +3,7 @@ nav:
   title: 高级功能
   order: 4
 group:
-  title: 工具函数
+  title: 基础能力
   order: 7
 ---
 

@@ -1,6 +1,10 @@
 ---
-title: Markdown Syntax Guide
-order: 10
+nav:
+  title: 基础能力
+  order: 5
+group:
+  title: 基础能力
+  order: 1
 ---
 
 # Markdown Syntax Guide

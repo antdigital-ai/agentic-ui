@@ -1,3 +1,14 @@
+---
+nav:
+  title: 项目研发
+  order: 3
+group:
+  title: 开发指南
+  order: 2
+---
+
+# Changelog
+
 ## v2.29.3
 
 - MarkdownInputField
@@ -13,7 +24,7 @@
   - 💄 优化 Loading 和操作图标展示效果。 [#237](https://github.com/ant-design/agentic-ui/pull/237) [@不见月]
 
 - MarkdownEditor
-  - 💄 内容默认使用 ``--font-text-paragraph-lg`` 变量的字号。 [#249](https://github.com/ant-design/agentic-ui/pull/249) [@不见月]
+  - 💄 内容默认使用 `--font-text-paragraph-lg` 变量的字号。 [#249](https://github.com/ant-design/agentic-ui/pull/249) [@不见月]
   - 🆕 新增 `disableHtmlPreview` 和 `viewModeLabels` 属性。 [@qixian]
 
 🆕 AppWrapper: 新增 `AppWrapper` 组件以利用 `useAppData` 并在挂载时记录应用数据。 [@qixian]
