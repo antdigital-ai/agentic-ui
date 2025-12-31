@@ -75,14 +75,13 @@ vi.mock('../../../../src/Plugins/chart/components', async () => {
         {title}: {value}
       </div>
     ),
-    downloadChart: vi.fn(),
   };
 });
 
 // Import hooks for mocking
+import * as components from '../../../../src/Plugins/chart/components';
 import * as hooks from '../../../../src/Plugins/chart/hooks';
 import * as utils from '../../../../src/Plugins/chart/utils';
-import * as components from '../../../../src/Plugins/chart/components';
 
 // Mock hooks
 vi.mock('../../../../src/Plugins/chart/hooks', () => ({
