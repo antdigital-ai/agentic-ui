@@ -1,0 +1,70 @@
+import { FeatureItem } from './components/cardStates/types';
+
+export const FEATURES: FeatureItem[] = [
+  {
+    id: 'intro',
+    label: 'intro.设计原则',
+    title: ['intro.', '智能增效，精准可控'],
+    description: 'Tob Agent 体验核心设计策略',
+    subFeatures: [
+      '主动预判，精准预期',
+      '高效互动，透明可控',
+      '信息精准，专业表达',
+      '读懂环境，无缝融入',
+      '智能可感，精准赋能',
+    ],
+    color: '68, 47, 107',
+  },
+  {
+    id: '01',
+    label: '01.精准预期',
+    title: ['01.', '主动预判，精准预期'],
+    description: '对话启动与意图确立，边界的精准是信任的基石',
+    subFeatures: [
+      '可理解性',
+      '引导有效性',
+      '开始前-能力边界透明度',
+      '使用后-期望符合度',
+    ],
+    color: '91, 59, 159',
+  },
+  {
+    id: '02',
+    label: '02.精准理解和控制',
+    title: ['02.', '高效互动，透明可控'],
+    description: '意图表达与澄清阶段，意图与执行的精准对齐',
+    subFeatures: [
+      '交互轮次',
+      '决策成本',
+      '输入便捷度',
+      '过程透明度',
+      '过程修正便捷度',
+      '结果修正便捷度',
+    ],
+    color: '0, 130, 133',
+  },
+  {
+    id: '03',
+    label: '03.精准交付',
+    title: ['03.', '信息精准，专业表达'],
+    description: 'AI生成结果的精确性与易读性',
+    subFeatures: ['准确性', '专业度', '视觉层级清晰度', '行文易读性'],
+    color: '0, 179, 0',
+  },
+  {
+    id: '04',
+    label: '04.精准协同',
+    title: ['04.', '读懂环境，无缝融入'],
+    description: '集成的精准是流程的保障',
+    subFeatures: ['唤醒便捷度与场景化', '结果的可操作性'],
+    color: '0, 92, 157',
+  },
+  {
+    id: '05',
+    label: '05.精准赋能',
+    title: ['05.', '智能可感，精准赋能'],
+    description: 'AI 能力是否有效解决场景痛点',
+    subFeatures: ['任务提效感知度', '行业特性/产品特色显著度', '视觉智能感'],
+    color: '204, 153, 0',
+  },
+];

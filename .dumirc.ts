@@ -14,6 +14,18 @@ export default defineConfig({
   resolve: {
     docDirs: ['docs', 'src/schema'],
   },
+  chainWebpack(config: any) {
+    // 确保静态资源可以被正确解析
+    config.module
+      .rule('svg')
+      .test(/\.svg$/)
+      .type('asset/resource');
+
+    config.module
+      .rule('images')
+      .test(/\.(png|jpg|jpeg|gif|webp)$/)
+      .type('asset/resource');
+  },
   headScripts: [
     {
       src: 'https://www.googletagmanager.com/gtag/js?id=G-8V1D6XCMW3',

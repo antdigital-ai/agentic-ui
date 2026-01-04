@@ -103,7 +103,7 @@ describe('BarChart 额外覆盖用例', () => {
     const data = [
       { category: 'A', type: 't1', x: 'X1', y: 10, filterLabel: 'F1' },
       { category: 'B', type: 't1', x: 'X2', y: 20, filterLabel: 'F2' },
-      { category: 'A', type: 't1', x: null, y: 30, filterLabel: 'F1' },
+      { category: 'A', type: 't1', x: '', y: 30, filterLabel: 'F1' },
     ];
 
     render(<BarChart data={data} title="过滤测试" showDataLabels />);
