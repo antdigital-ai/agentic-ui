@@ -1,9 +1,6 @@
 {
   "extends": "../tsconfig.json",
-  "include": [
-    "**/*",
-    "typing.d.ts"
-  ],
+  "include": ["**/*", "typing.d.ts"],
   "compilerOptions": {
     "typeRoots": ["./node_modules/@types", "../node_modules/@types"]
   }

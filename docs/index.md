@@ -1,5 +1,7 @@
 ```tsx
-import HomePage from '../.dumi/components/HomePage/index';
+import HomePage from '../.dumi/demo-components/HomePage/index';
 
-export default HomePage;
+export default () => {
+  return <div />;
+};
 ```
