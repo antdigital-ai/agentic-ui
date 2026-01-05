@@ -2,7 +2,6 @@ import React from 'react';
 import CircularCarousel from '../CircularCarousel';
 import EnhanceDesign from '../EnhanceDesign';
 import Hero from '../Hero';
-import QuickStart from '../QuickStart';
 import Showroom from '../Showroom';
 import SupportDesign from '../SupportDesign';
 import { PageWrapper, SectionWithBorders, SectionWithDividers } from './style';
@@ -15,7 +14,6 @@ const HomePage: React.FC = () => {
       <SectionWithDividers>
         <Hero />
       </SectionWithDividers>
-      {/* The Carousel Section */}
       <SectionWithDividers>
         <CircularCarousel />
       </SectionWithDividers>
@@ -28,12 +26,8 @@ const HomePage: React.FC = () => {
       <SectionWithDividers>
         <Showroom />
       </SectionWithDividers>
-      <SectionWithDividers>
-        <QuickStart />
-      </SectionWithDividers>
     </PageWrapper>
   );
 };
 
 export default HomePage;
-
