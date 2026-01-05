@@ -1,7 +1,7 @@
 import { Editor, Node, Operation, Path, Range, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 
-export const inlineNode = new Set(['break']);
+export const inlineNode = new Set(['break', 'inline-katex']);
 
 const voidNode = new Set(['hr', 'break']);
 
