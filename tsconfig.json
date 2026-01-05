@@ -38,6 +38,7 @@
     "src/**/**/*",
     "src/MarkDown/demos/.tsx",
     "tests/**/*",
-    "docs/pure.tsx"
+    "docs/pure.tsx",
+    "home/**/*"
   ]
 }

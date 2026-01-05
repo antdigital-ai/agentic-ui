@@ -78,11 +78,7 @@ export const CarouselCard: React.FC<CarouselCardProps> = ({
         {/* Flipping Container */}
         <CardFlipContainer
           $isActive={isActive}
-          style={
-            {
-              // transform: 'rotateY(180deg)', // TODO szy 调试：始终显示背面
-            }
-          }
+          style={{}}
         >
           {/* Corner Plus Marks - Now inside flip container to flip with card */}
           <CornerMarks />

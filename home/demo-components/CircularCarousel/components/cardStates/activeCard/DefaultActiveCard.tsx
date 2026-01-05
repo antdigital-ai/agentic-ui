@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { CheckCircleIcon } from '../../CheckCircleIcon';
 import { Rotate3DIcon } from '../../Rotate3DIcon';
 import { FeatureItem } from '../types';
-// import { CanvasRevealEffect } from './canvas-reveal-effect'; // 已禁用，使用 MakeCanvasRevealEffect 替代
 import * as CardStyles from './defaultActiveCardStyle';
 import { MakeCanvasRevealEffect } from './make-canvas-reveal-effect';
 import { CardFront } from './style';
@@ -22,8 +21,6 @@ export const DefaultActiveCard: React.FC<DefaultActiveCardProps> = ({
   index: _index, // eslint-disable-line @typescript-eslint/no-unused-vars
   smoothIndex: _smoothIndex, // eslint-disable-line @typescript-eslint/no-unused-vars
 }) => {
-  // 已切换到 MakeCanvasRevealEffect（不依赖 @react-three/fiber）
-
   // 将 themeColor 从 "r, g, b" 格式转换为 [[r, g, b]] 数组格式
   const colors = React.useMemo(() => {
     const rgb = themeColor.split(',').map((c) => parseInt(c.trim()));
@@ -50,7 +47,6 @@ export const DefaultActiveCard: React.FC<DefaultActiveCardProps> = ({
           pointerEvents: 'none',
         }}
       >
-        {/* 使用基于 2D Canvas API 的实现，性能更优且不依赖 @react-three/fiber */}
         <MakeCanvasRevealEffect
           animationSpeed={1}
           colors={colors}

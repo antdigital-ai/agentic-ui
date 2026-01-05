@@ -1,23 +1,16 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import { history } from 'styled-components';
+import { ONE_TOKEN_URL } from '../../../constants';
 import componentIconBg from '../../assets/component-icon.png';
 import componentMobileBg from '../../assets/component-mobile-bg.png';
 import componentsBg from '../../assets/components-bg.png';
 import visualAssetsBg from '../../assets/visual-assets-bg.png';
-import { ONE_TOKEN_URL } from '../../../constants';
 import ChevronDownIcon from '../../icons/chevron-down.svg';
 import LinkIcon from '../../icons/link.svg';
 import LogoIcon from '../../icons/logo.svg';
 import SearchIcon from '../../icons/search.svg';
-import { history } from 'styled-components';
-import React, {
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { PCComponentsMenu } from './components';
-import IconDropMenu from './components/IconDropMenu';
-import MobileComponentsMenu from './components/MobileComponent';
 import SearchDropdown from './components/SearchDropdown';
 import { useImagePreload } from './hooks/useImagePreload';
 import {
@@ -132,13 +125,7 @@ const Header: React.FC = () => {
       hasDropdown: true,
       dropdownNode: <PCComponentsMenu />,
     },
-    {
-      name: 'Mobile 组件',
-      hasDropdown: true,
-      dropdownNode: <MobileComponentsMenu />,
-    },
     { name: '样板间', path: '/showroom', disabled: true },
-    { name: 'Icon', hasDropdown: true, dropdownNode: <IconDropMenu /> },
     {
       name: 'OneToken',
       link: ONE_TOKEN_URL,

@@ -1,5 +1,5 @@
-import TitleIcon from '../../icons/titleIcon.svg';
 import React from 'react';
+import TitleIcon from '../../icons/titleIcon.svg';
 import HeroButtons from './components/HeroButtons';
 import { RollingText } from './components/RollingText';
 import LeftBG from './icons/leftBG.svg';
@@ -26,55 +26,11 @@ const Hero: React.FC = () => {
       <ContentContainer>
         <Badge>
           <img src={TitleIcon} alt="Title Icon" />
-          <BadgeText>蚂蚁数科一站式企业 Agent 应用设计资源库</BadgeText>
+          <BadgeText>蚂蚁数科一站式企业 Agent 应用</BadgeText>
         </Badge>
 
         <TitleContainer>
           <MainTitle>
-            {/* <AnimatePresence mode="popLayout">
-              <motion.span
-                key={index}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                variants={containerVariants}
-                style={{
-                  display: 'inline-flex',
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
-                  perspective: '800px',
-                  letterSpacing: '-0.06em',
-                }}
-              >
-                {text.split('').map((char, charIdx) => (
-                  <StaggeredChar
-                    key={charIdx}
-                    as={motion.span}
-                    style={{
-                      position: 'relative',
-                      display: 'block',
-                      overflow: 'hidden',
-                      paddingBottom: '0.12em',
-                      marginBottom: '-0.12em',
-                      paddingLeft: '0.02em',
-                      paddingRight: '0.02em',
-                    }}
-                  >
-                    <motion.span
-                      style={{
-                        display: 'inline-block',
-                        willChange: 'transform, filter, opacity',
-                        whiteSpace: 'pre',
-                        transformOrigin: 'bottom',
-                      }}
-                      variants={charVariants}
-                    >
-                      {char}
-                    </motion.span>
-                  </StaggeredChar>
-                ))}
-              </motion.span>
-            </AnimatePresence> */}
             <RollingText text={text}></RollingText>
           </MainTitle>
         </TitleContainer>

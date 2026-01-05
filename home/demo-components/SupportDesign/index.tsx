@@ -1,8 +1,7 @@
-import VectorIcon from '../../icons/vector.svg';
 import React, { useEffect, useRef } from 'react';
+import VectorIcon from '../../icons/vector.svg';
 import AIChatbot from '../AIChatbot';
 import {
-  DesignManualCards,
   DialogFlowCard,
   SuggestionCard,
   SuperInputCard,
@@ -121,10 +120,6 @@ const SupportDesign: React.FC = () => {
         <div style={{ height: '32px' }}></div>
         <HorizontalDivider />
         <AIChatbot />
-        <HorizontalDivider />
-        <div style={{ height: '32px' }}></div>
-        <HorizontalDivider />
-        <DesignManualCards />
       </Container>
     </SectionWrapper>
   );

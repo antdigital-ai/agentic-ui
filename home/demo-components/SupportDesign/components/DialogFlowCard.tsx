@@ -1,4 +1,3 @@
-import React, { useEffect, useRef, useState } from 'react';
 import {
   AttachmentFile,
   BubbleList,
@@ -6,6 +5,7 @@ import {
   ChatLayoutRef,
   MessageBubbleData,
 } from '@ant-design/agentic-ui';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   CardDescription,
   CardTitle,
@@ -47,11 +47,6 @@ const mockInlineFileMap = new Map<string, AttachmentFile>([
   // [
   //   'component-preview.png',
   //   createMockFile(
-  //     'component-preview.png',
-  //     'image/png',
-  //     1048576,
-  //     'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-  //   ),
   // ],
   // [
   //   'api-reference-henchangehnchangmingzichang.json',
@@ -159,8 +154,7 @@ const DialogFlowCard = () => {
   // 用户和助手元数据
   const userMeta = {
     name: '用户',
-    avatar:
-      'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+    avatar: '',
   };
 
   const assistantMeta = {

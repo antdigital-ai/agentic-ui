@@ -4,18 +4,14 @@
  */
 
 // 组件库相关链接
-export const COMPONENT_LIBRARY_URL = 'https://lui.antdigital.dev/components';
+export const COMPONENT_LIBRARY_URL = 'https://.antdigital.ai/components';
 
 // Agent 体验评估链接
 export const AGENT_EVALUATION_URL = 'https://fire-study-94125373.figma.site';
 
-// 图标库链接
-export const ICON_LIBRARY_URL =
-  'https://hitu.antgroup-inc.cn/packages/@alipay/sofa-icons/components/Icons';
+export const ICON_LIBRARY_URL = '';
 
-// 移动端组件库链接
-export const MOBILE_COMPONENT_LIBRARY_URL =
-  'https://hitu.antgroup-inc.cn/packages/@alipay/agentic-ui-mobile';
+export const MOBILE_COMPONENT_LIBRARY_URL = '';
 
 // 设计资源链接
 export const DESIGN_RESOURCE_PC_URL =
@@ -24,7 +20,7 @@ export const DESIGN_RESOURCE_PC_URL =
 export const DESIGN_RESOURCE_MOBILE_URL =
   'https://mgdone.alibaba-inc.com/goto/P4LcwoMX';
 
-export const ONE_TOKEN_URL = 'https://onetoken.alipay.com/';
+export const ONE_TOKEN_URL = '';
 
 export const PC_COMPONENT_URL = {
   COMPONENTS: 'https://agentic.antdigital.ai/components/ai-label',
@@ -39,5 +35,5 @@ export const PC_COMPONENT_DESIGN_RESOURCE_URL = {
 };
 
 export const START_USING_URL =
-  'https://lui.antdigital.dev/components/chat-flow-container';
-export const AI_CHATBOT_URL = 'https://lui.antdigital.dev/components/robot';
+  'https://agentic.antdigital.ai/components/chat-flow-container';
+export const AI_CHATBOT_URL = 'https://agentic.antdigital.ai/components/robot';

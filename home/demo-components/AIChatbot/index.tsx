@@ -1,5 +1,5 @@
-import LinkIcon from '../../icons/link.svg';
 import React, { useState } from 'react';
+import LinkIcon from '../../icons/link.svg';
 import BoltIconSelected from './icons/bolt.png';
 import BoltIcon from './icons/bolt.svg';
 import ChartIconSelected from './icons/chart.png';

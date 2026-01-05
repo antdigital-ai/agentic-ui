@@ -3,7 +3,6 @@ import React from 'react';
 import designStrategyIcon from '../../../../../assets/design-strategy-icon-white.png';
 import { Rotate3DIcon } from '../../Rotate3DIcon';
 import { FeatureItem, FEATURES } from '../types';
-// import { CanvasRevealEffect } from './canvas-reveal-effect'; // 已禁用，使用 MakeCanvasRevealEffect 替代
 import * as CardStyles from './introActiveCardStyle';
 import { MakeCanvasRevealEffect } from './make-canvas-reveal-effect';
 import { CardFront } from './style';
@@ -21,8 +20,6 @@ export const IntroActiveCard: React.FC<IntroActiveCardProps> = ({
   index: _index, // eslint-disable-line @typescript-eslint/no-unused-vars
   smoothIndex: _smoothIndex, // eslint-disable-line @typescript-eslint/no-unused-vars
 }) => {
-  // 已切换到 MakeCanvasRevealEffect（不依赖 @react-three/fiber）
-
   // Get other features (excluding intro)
   const otherFeatures = FEATURES.filter((f) => f.id !== 'intro');
 
@@ -52,7 +49,6 @@ export const IntroActiveCard: React.FC<IntroActiveCardProps> = ({
           pointerEvents: 'none',
         }}
       >
-        {/* 使用基于 2D Canvas API 的实现，性能更优且不依赖 @react-three/fiber */}
         <MakeCanvasRevealEffect
           animationSpeed={1}
           colors={colors}

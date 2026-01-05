@@ -1,10 +1,10 @@
+import { motion } from 'framer-motion';
+import React from 'react';
 import componentsBg from '../../../assets/component-mobile-bg.png';
 import {
   DESIGN_RESOURCE_MOBILE_URL,
   MOBILE_COMPONENT_LIBRARY_URL,
 } from '../../../constants/links';
-import React from 'react';
-import { motion } from 'framer-motion';
 import {
   DesignResourceCard,
   DesignResourceCardContent,
