@@ -279,8 +279,14 @@ export const isXValueEqual = (
 export const extractAndSortXValues = (
   data: ChartDataItem[],
 ): Array<number | string> => {
-  // 提取所有 x 值并归一化
-  const normalizedValues = data.map((item) => normalizeXValue(item.x));
+  // 提取所有 x 值并归一化，同时过滤掉空值（null/undefined/空字符串）
+  const normalizedValues = data
+    .map((item) => item.x)
+    .filter(
+      (x) =>
+        x !== null && x !== undefined && x !== '' && String(x).trim() !== '',
+    )
+    .map((x) => normalizeXValue(x));
 
   // 去重并排序
   const uniqueValues = [...new Set(normalizedValues)];

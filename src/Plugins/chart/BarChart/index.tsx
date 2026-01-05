@@ -319,9 +319,13 @@ const BarChart: React.FC<BarChartProps> = ({
         ? base
         : base.filter((item) => item.filterLabel === selectedFilterLabel);
 
-    // 最终统一过滤掉 x 为空（null/undefined）的数据，避免后续 toString 报错
+    // 最终统一过滤掉 x 为空（null/undefined/空字符串）的数据，避免后续 toString 报错
     return withFilterLabel.filter(
-      (item) => item.x !== null && item.x !== undefined,
+      (item) =>
+        item.x !== null &&
+        item.x !== undefined &&
+        item.x !== '' &&
+        String(item.x).trim() !== '',
     );
   }, [safeData, selectedFilter, filterLabels, selectedFilterLabel]);
 
@@ -338,7 +342,13 @@ const BarChart: React.FC<BarChartProps> = ({
         ...new Set(
           filteredData
             .map((item) => item.x)
-            .filter((x) => x !== null && x !== undefined),
+            .filter(
+              (x) =>
+                x !== null &&
+                x !== undefined &&
+                x !== '' &&
+                String(x).trim() !== '',
+            ),
         ),
       ];
       return uniqueValues;
@@ -626,13 +636,18 @@ const BarChart: React.FC<BarChartProps> = ({
   // 标签宽度计算函数
   const calculateLabelWidth = (text: string, fontSize: number = 11): number => {
     // 创建临时canvas来测量文本宽度
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    if (!context) return text.length * fontSize * 0.6; // 备用估算
+    try {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) return text.length * fontSize * 0.6; // 备用估算
 
-    context.font = `${fontSize}px Arial, sans-serif`;
-    const metrics = context.measureText(text);
-    return metrics.width;
+      context.font = `${fontSize}px Arial, sans-serif`;
+      const metrics = context.measureText(text);
+      return metrics.width;
+    } catch (e) {
+      // 在测试环境或无法使用 canvas 时使用备用估算
+      return text.length * fontSize * 0.6;
+    }
   };
 
   // 计算所需的最大标签宽度
