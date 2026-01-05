@@ -105,8 +105,17 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       display: 'none',
     },
 
-    // KaTeX容器样式
+    // KaTeX容器样式和公式样式修复
+    // 确保 white-space: nowrap 不被父元素的 pre-wrap 覆盖
+    // KaTeX 库生成的元素需要 nowrap 来防止公式堆叠
+    '.katex': {
+      whiteSpace: 'nowrap !important',
+    },
     '.katex-container': {
+      whiteSpace: 'nowrap !important',
+      '& *': {
+        whiteSpace: 'nowrap !important',
+      },
       '.newline': {
         margin: '4px 0',
       },

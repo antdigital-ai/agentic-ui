@@ -1,3 +1,4 @@
+import { ConfigProvider } from 'antd';
 import React from 'react';
 import CircularCarousel from '../CircularCarousel';
 import EnhanceDesign from '../EnhanceDesign';
@@ -10,23 +11,25 @@ import { PageWrapper, SectionWithBorders, SectionWithDividers } from './style';
 
 const HomePage: React.FC = () => {
   return (
-    <PageWrapper>
-      <SectionWithDividers>
-        <Hero />
-      </SectionWithDividers>
-      <SectionWithDividers>
-        <CircularCarousel />
-      </SectionWithDividers>
-      <SectionWithBorders backgroundColor="#f7f8f9" data-section-with-borders>
-        <SupportDesign />
-      </SectionWithBorders>
-      <SectionWithBorders data-section-with-borders>
-        <EnhanceDesign />
-      </SectionWithBorders>
-      <SectionWithDividers>
-        <Showroom />
-      </SectionWithDividers>
-    </PageWrapper>
+    <ConfigProvider prefixCls="ant">
+      <PageWrapper>
+        <SectionWithDividers>
+          <Hero />
+        </SectionWithDividers>
+        <SectionWithDividers>
+          <CircularCarousel />
+        </SectionWithDividers>
+        <SectionWithBorders backgroundColor="#f7f8f9" data-section-with-borders>
+          <SupportDesign />
+        </SectionWithBorders>
+        <SectionWithBorders data-section-with-borders>
+          <EnhanceDesign />
+        </SectionWithBorders>
+        <SectionWithDividers>
+          <Showroom />
+        </SectionWithDividers>
+      </PageWrapper>
+    </ConfigProvider>
   );
 };
 
