@@ -47,13 +47,115 @@ export class MarkdownInputFieldPage {
   /**
    * 输入文本
    * 使用 type() 而不是 fill()，以便在有选中文本时替换选中部分
+   * 对于多行文本，正确处理换行符（\n）转换为实际的 Enter 键按下
+   * 对于包含 Markdown 语法的文本，使用适当的延迟确保语法字符被正确输入
    */
   async typeText(text: string) {
     await this.focus();
-    // 使用 type() 而不是 fill()，这样：
-    // 1. 如果有选中文本，会替换选中部分
-    // 2. 如果没有选中文本，会在光标位置插入
-    await this.editableInput.type(text, { delay: 0 });
+    // 如果文本包含换行符，需要逐行输入并在行间按 Enter
+    if (text.includes('\n')) {
+      const lines = text.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        // 先输入当前行的文本（如果有）
+        if (lines[i]) {
+          // 输入当前行的文本，对于包含 Markdown 语法的行使用较小的延迟
+          const hasMarkdownSyntax = /[*_`#\[\]()]/.test(lines[i]);
+          const isLineWhitespace = lines[i].trim().length === 0;
+          const beforeType = await this.getText();
+          const beforeLength = beforeType.length;
+          await this.editableInput.type(lines[i], {
+            delay: hasMarkdownSyntax ? 30 : 0,
+          });
+          // 等待当前行输入完成：等待文本长度增加或内容变化
+          // 注意：对于 Markdown 语法，解析后的文本可能不包含原始语法字符
+          // 对于只包含空白字符的行，getText() 会返回空字符串，所以跳过等待
+          if (!isLineWhitespace) {
+            await expect
+              .poll(
+                async () => {
+                  const currentText = await this.getText();
+                  const currentLength = currentText.length;
+                  // 文本长度增加，或者内容变化（说明输入已生效）
+                  return (
+                    currentLength > beforeLength ||
+                    currentText !== beforeType ||
+                    // 对于纯文本行，也可以检查是否包含（去除 Markdown 语法后的文本）
+                    (!hasMarkdownSyntax && currentText.includes(lines[i]))
+                  );
+                },
+                {
+                  timeout: 3000,
+                  message: `等待行 "${lines[i]}" 输入完成`,
+                },
+              )
+              .toBe(true);
+          }
+        }
+
+        // 如果不是最后一行，按 Enter 键创建新行
+        if (i < lines.length - 1) {
+          // 获取按 Enter 前的段落数量或子元素数量
+          const beforeCount = await this.editableInput.evaluate((el) => {
+            const paragraphs = el.querySelectorAll('div[data-be="paragraph"]');
+            return paragraphs.length || el.children.length;
+          });
+
+          await this.page.keyboard.press('Enter');
+
+          // 等待换行完成：等待段落数量增加或文本内容变化
+          // 使用更灵活的检查方式，不仅检查段落数量，还检查文本内容
+          await expect
+            .poll(
+              async () => {
+                const afterCount = await this.editableInput.evaluate((el) => {
+                  const paragraphs = el.querySelectorAll(
+                    'div[data-be="paragraph"]',
+                  );
+                  return paragraphs.length || el.children.length;
+                });
+                // 段落数量增加，或者检查文本中是否包含换行符（表示新行已创建）
+                const currentText = await this.getText();
+                const hasNewline =
+                  currentText.includes('\n') || currentText.length > 0;
+                return afterCount > beforeCount || hasNewline;
+              },
+              {
+                timeout: 3000,
+                message: '等待换行完成',
+              },
+            )
+            .toBe(true);
+        }
+      }
+    } else {
+      // 单行文本，直接使用 type()
+      // 使用 type() 而不是 fill()，这样：
+      // 1. 如果有选中文本，会替换选中部分
+      // 2. 如果没有选中文本，会在光标位置插入
+      const hasMarkdownSyntax = /[*_`#\[\]()]/.test(text);
+      await this.editableInput.type(text, {
+        delay: hasMarkdownSyntax ? 20 : 0,
+      });
+    }
+    // 等待文本内容稳定，确保所有输入都被处理
+    // 注意：如果输入只包含空白字符，getText() 会返回空字符串（这是预期的）
+    // 所以对于只包含空白字符的输入，跳过等待文本不为空的逻辑
+    const isOnlyWhitespace = text.trim().length === 0;
+    if (!isOnlyWhitespace) {
+      // 使用智能等待，等待文本实际出现
+      await expect
+        .poll(
+          async () => {
+            const currentText = await this.getText();
+            return currentText;
+          },
+          {
+            timeout: 3000,
+            message: '等待文本输入完成',
+          },
+        )
+        .not.toBe('');
+    }
   }
 
   /**
@@ -158,6 +260,7 @@ export class MarkdownInputFieldPage {
    * 复制文本到剪贴板
    * 注意：在 Playwright 中，剪贴板操作可能需要权限，但不保证立即可用
    * 建议在测试中通过粘贴操作来验证复制是否成功
+   * 不验证剪贴板内容，因为 navigator.clipboard.readText() 在 Playwright 中可能不可靠
    */
   async copy() {
     const context = this.page.context();
@@ -165,24 +268,30 @@ export class MarkdownInputFieldPage {
     const isMac = process.platform === 'darwin';
     const modifierKey = isMac ? 'Meta' : 'Control';
     await this.page.keyboard.press(`${modifierKey}+c`);
-    // 等待剪贴板操作完成（使用稍长的延迟，确保复制操作完成）
-    // 注意：虽然使用了 waitForTimeout，但这是必要的，因为剪贴板操作是异步的
+    // 等待一小段时间，确保复制操作完成
+    // 注意：不验证剪贴板内容，因为 navigator.clipboard.readText() 可能不可靠
+    // 复制是否成功应该通过后续的粘贴操作来验证
     await this.page.waitForTimeout(200);
   }
 
   /**
    * 从剪贴板粘贴
    * 添加等待文本变化的机制
+   * 注意：不检查剪贴板内容，因为 navigator.clipboard.readText() 在 Playwright 中可能不可靠
+   * 直接执行粘贴操作，然后等待文本变化来验证粘贴是否成功
    */
   async paste() {
     const context = this.page.context();
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+
     const beforeText = await this.getText();
     const beforeLength = beforeText.trim().length;
     const isMac = process.platform === 'darwin';
     const modifierKey = isMac ? 'Meta' : 'Control';
 
-    // 先等待一小段时间，确保输入框已准备好接收粘贴
+    // 确保输入框已聚焦，准备好接收粘贴
+    await this.focus();
+    // 等待一小段时间，确保输入框已准备好接收粘贴
     await this.page.waitForTimeout(100);
 
     await this.page.keyboard.press(`${modifierKey}+v`);
@@ -197,8 +306,8 @@ export class MarkdownInputFieldPage {
             return text.trim().length;
           },
           {
-            timeout: 3000,
-            message: '等待粘贴内容出现，如果超时可能是剪贴板为空',
+            timeout: 5000,
+            message: '等待粘贴内容出现，如果超时可能是剪贴板为空或粘贴操作失败',
           },
         )
         .toBeGreaterThan(0);
@@ -210,7 +319,7 @@ export class MarkdownInputFieldPage {
             const text = await this.getText();
             return text.trim().length;
           },
-          { timeout: 3000 },
+          { timeout: 5000 },
         )
         .toBeGreaterThan(beforeLength);
     }

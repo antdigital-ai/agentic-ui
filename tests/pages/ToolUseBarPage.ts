@@ -10,7 +10,8 @@ export class ToolUseBarPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.container = page.getByTestId('ToolUse');
+    // 使用 .first() 确保唯一匹配，因为页面上可能有多个 ToolUseBar 组件
+    this.container = page.getByTestId('ToolUse').first();
   }
 
   /**
@@ -32,15 +33,27 @@ export class ToolUseBarPage {
 
     // 优先等待工具项出现（使用 test-id）
     const toolItems = this.page.getByTestId('ToolUserItem');
-    const toolItemsCount = await toolItems.count();
 
-    if (toolItemsCount > 0) {
-      // 如果有工具项，等待第一个工具项可见
-      await expect(toolItems.first()).toBeVisible({ timeout: 10000 });
-    } else {
-      // 如果没有工具项，至少等待容器存在
-      await expect(this.container).toBeAttached({ timeout: 10000 });
-    }
+    // 使用智能等待，等待工具项出现或容器可见
+    // 优先等待工具项，因为工具项的出现更可靠地表示组件已准备好
+    await expect
+      .poll(
+        async () => {
+          const toolItemsCount = await toolItems.count();
+          if (toolItemsCount > 0) {
+            // 如果有工具项，检查第一个是否可见
+            return await toolItems.first().isVisible();
+          }
+          // 如果没有工具项，检查容器是否可见（使用 .first() 确保唯一匹配）
+          // 直接使用容器 locator，因为已经在构造函数中使用了 .first()
+          return await this.container.isVisible();
+        },
+        {
+          timeout: 10000,
+          message: '等待 ToolUseBar 组件准备就绪',
+        },
+      )
+      .toBe(true);
   }
 
   /**

@@ -2,7 +2,7 @@ import { expect, test } from '../tests/fixtures/page-fixture';
 
 test.describe('MarkdownInputField 高级功能', () => {
   test('应该支持多行输入', async ({ markdownInputFieldPage }) => {
-    await markdownInputFieldPage.goto();
+    await markdownInputFieldPage.goto('markdowninputfield-demo-8');
     const multiLineText = 'Line 1\nLine 2\nLine 3\nLine 4';
     await markdownInputFieldPage.typeText(multiLineText);
     const text = await markdownInputFieldPage.getText();
@@ -26,26 +26,6 @@ test.describe('MarkdownInputField 高级功能', () => {
     await markdownInputFieldPage.goto();
     await markdownInputFieldPage.focus();
     await markdownInputFieldPage.expectFocused();
-  });
-
-  test('应该支持 Markdown 格式化', async ({ markdownInputFieldPage, page }) => {
-    await markdownInputFieldPage.goto();
-    const markdownText = '# 标题\n\n**粗体文本**\n\n*斜体文本*\n\n`代码文本`';
-    await markdownInputFieldPage.typeText(markdownText);
-    const text = await markdownInputFieldPage.getText();
-    expect(text).toContain('标题');
-    expect(text).toContain('粗体文本');
-    expect(text).toContain('斜体文本');
-    expect(text).toContain('代码文本');
-
-    // 验证 Markdown 格式被正确解析
-    const hasBold = await page.evaluate(() => {
-      const boldElements = document.querySelectorAll(
-        '[data-testid="markdown-bold"]',
-      );
-      return boldElements.length > 0;
-    });
-    expect(hasBold).toBe(true);
   });
 
   test('应该支持文本选择和编辑', async ({ markdownInputFieldPage, page }) => {

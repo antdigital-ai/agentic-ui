@@ -1,4 +1,5 @@
 import React from 'react';
+import { Editor, Transforms } from 'slate';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import { upLoadFileToServer } from '../AttachmentButton';
@@ -135,9 +136,39 @@ export const useMarkdownInputFieldHandlers = ({
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (markdownEditorRef?.current?.store.inputComposition) return;
 
+      const editor = markdownEditorRef?.current?.markdownEditorRef?.current;
       const isEnter = e.key === 'Enter';
       const isMod = e.ctrlKey || e.metaKey;
       const isShift = e.shiftKey;
+
+      // 处理 Home 键：移动到文档开头
+      if (e.key === 'Home' && !isMod && editor) {
+        e.preventDefault();
+        e.stopPropagation();
+        const start = Editor.start(editor, []);
+        Transforms.select(editor, start);
+        return;
+      }
+
+      // 处理 End 键：移动到文档末尾
+      if (e.key === 'End' && !isMod && editor) {
+        e.preventDefault();
+        e.stopPropagation();
+        const end = Editor.end(editor, []);
+        Transforms.select(editor, end);
+        return;
+      }
+
+      // 处理 Ctrl+A / Cmd+A：全选
+      if ((e.key === 'a' || e.key === 'A') && isMod && !isShift && editor) {
+        e.preventDefault();
+        e.stopPropagation();
+        Transforms.select(editor, {
+          anchor: Editor.start(editor, []),
+          focus: Editor.end(editor, []),
+        });
+        return;
+      }
 
       // 手机端禁用 Enter 键发送
       if (isEnter && !isMod && !isShift && isMobileDevice()) {
