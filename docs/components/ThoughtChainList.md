@@ -61,7 +61,7 @@ function App() {
     <>
       <ThoughtChainList
         thoughtChainList={thoughtChainData}
-        loading={false}
+        isLoading={false}
         style={{ marginBottom: 16 }}
       />
       <div>
@@ -71,7 +71,7 @@ function App() {
             <code>thoughtChainList</code> - 思维链项目数组，包含 AI 推理步骤数据
           </li>
           <li>
-            <code>loading</code> - 表示组件是否处于加载状态
+            <code>isLoading</code> - 表示组件是否处于加载状态
           </li>
           <li>
             <code>style</code> - 自定义 CSS 样式
@@ -86,20 +86,77 @@ export default App;
 
 ## 属性
 
-| 属性                  | 类型                         | 必需 | 描述                          |
-| --------------------- | ---------------------------- | ---- | ----------------------------- |
-| `thoughtChainList`    | `WhiteBoxProcessInterface[]` | 是   | 思维链项目数组                |
-| `loading`             | `boolean`                    | 否   | 表示组件是否处于加载状态      |
-| `bubble`              | `object`                     | 否   | 聊天状态信息                  |
-| `bubble.isFinished`   | `boolean`                    | 否   | 聊天/任务是否已完成           |
-| `bubble.endTime`      | `number`                     | 否   | 聊天结束的时间戳              |
-| `bubble.createAt`     | `number`                     | 否   | 聊天创建的时间戳              |
-| `bubble.isAborted`    | `boolean`                    | 否   | 聊天/任务是否被中止           |
-| `style`               | `React.CSSProperties`        | 否   | 自定义 CSS 样式               |
-| `compact`             | `boolean`                    | 否   | 启用紧凑显示模式              |
-| `markdownRenderProps` | `MarkdownEditorProps`        | 否   | Markdown 渲染属性             |
-| `finishAutoCollapse`  | `boolean`                    | 否   | 完成时自动折叠（默认为 true） |
-| `locale`              | `object`                     | 否   | 本地化字符串                  |
+| 属性                     | 类型                         | 必需 | 描述                                                   |
+| ------------------------ | ---------------------------- | ---- | ------------------------------------------------------ |
+| `thoughtChainList`       | `WhiteBoxProcessInterface[]` | 是   | 思维链项目数组                                         |
+| `isLoading`              | `boolean`                    | 否   | 表示组件是否处于加载状态                               |
+| `loading`                | `boolean`                    | 否   | **已废弃**，请使用 `isLoading`                         |
+| `bubble`                 | `object`                     | 否   | 聊天状态信息                                           |
+| `bubble.isFinished`      | `boolean`                    | 否   | 聊天/任务是否已完成                                    |
+| `bubble.endTime`         | `number`                     | 否   | 聊天结束的时间戳                                       |
+| `bubble.createAt`        | `number`                     | 否   | 聊天创建的时间戳                                       |
+| `bubble.isAborted`       | `boolean`                    | 否   | 聊天/任务是否被中止                                    |
+| `style`                  | `React.CSSProperties`        | 否   | 自定义 CSS 样式                                        |
+| `compact`                | `boolean`                    | 否   | 启用紧凑显示模式                                       |
+| `markdownRenderProps`    | `MarkdownEditorProps`        | 否   | Markdown 渲染属性                                      |
+| `finishAutoCollapse`     | `boolean`                    | 否   | 完成时自动折叠（默认为 true）                          |
+| `locale`                 | `object`                     | 否   | 本地化字符串                                           |
+| `titleRender`            | `(props, defaultDom) => ReactNode` | 否   | 自定义标题渲染                                         |
+| `titleExtraRender`       | `(props, defaultDom) => ReactNode` | 否   | 自定义标题右侧额外内容渲染                             |
+| `thoughtChainItemRender` | `object`                     | 否   | 自定义思维链项目的渲染                                 |
+| `onDocMetaClick`         | `(docMeta: DocMeta) => void` | 否   | 文档元数据点击回调                                     |
+
+## 类型定义
+
+### WhiteBoxProcessInterface
+
+思维链项目接口，定义了单个推理步骤的数据结构。
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `category` | `string` | 分类类型：`'TableSql' \| 'ToolCall' \| 'RagRetrieval' \| 'DeepThink' \| 'WebSearch' \| 'other'` |
+| `isLoading` | `boolean` | 是否正在加载 |
+| `info` | `string` | 信息描述 |
+| `costMillis` | `number` | 执行耗时（毫秒） |
+| `input` | `object` | 输入参数，包含 `sql`, `inputArgs`, `searchQueries` 等 |
+| `meta` | `object` | 元数据，包含工具名称、HTTP方法、路径等 |
+| `runId` | `string` | 任务 ID |
+| `output` | `object` | 输出结果 |
+
+### Output
+
+输出结果对象结构。
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `type` | `string` | 输出类型：`'TOKEN' \| 'TABLE' \| 'CHUNK' \| 'ERROR' \| 'END' \| 'RUNNING'` |
+| `data` | `string` | 文本数据 |
+| `errorMsg` | `string` | 错误信息 |
+| `response` | `object` | API 响应数据 |
+| `chunks` | `Chunk[]` | 文档块数组 |
+| `tableData` | `object` | 表格数据 |
+| `columns` | `string[]` | 表格列名 |
+
+### Chunk & DocMeta
+
+文档块和元数据结构。
+
+```typescript
+interface Chunk {
+  docMeta: DocMeta;
+  content: string;
+  originUrl: string;
+}
+
+interface DocMeta {
+  type?: string;
+  doc_id?: string;
+  upload_time?: string;
+  doc_name?: string;
+  origin_text?: string;
+  answer?: string;
+}
+```
 
 ## 示例
 
@@ -230,7 +287,7 @@ export default function ProgressDemo() {
     <ThoughtChainList
       thoughtChainList={thoughtChain}
       bubble={chatState}
-      loading={!chatState.isFinished}
+      isLoading={!chatState.isFinished}
     />
   );
 }
