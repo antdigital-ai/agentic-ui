@@ -18,6 +18,18 @@ export class MarkdownInputFieldPage {
     this.editableInput = page.locator('[contenteditable="true"]').first();
   }
 
+  get sendButton(): Locator {
+    return this.page.getByTestId('send-button');
+  }
+
+  get enlargeButton(): Locator {
+    return this.page.getByRole('button', { name: '放大' });
+  }
+
+  get shrinkButton(): Locator {
+    return this.page.getByRole('button', { name: '缩小' });
+  }
+
   /**
    * 导航到 demo 页面
    */
