@@ -251,6 +251,58 @@ export default () => {
 | `disableHoverAnimation` | `boolean` | `false` | 是否禁用 hover 动画 |
 | `bgColorList` | `string[]` | - | 背景颜色列表 |
 
+### 类型定义
+
+#### AttachmentButtonProps
+
+附件按钮配置属性。
+
+| 属性名 | 类型 | 说明 |
+| --- | --- | --- |
+| `upload` | `(file: AttachmentFile, index: number) => Promise<string>` | 文件上传处理函数，返回文件 URL |
+| `uploadWithResponse` | `(file: AttachmentFile, index: number) => Promise<UploadResponse>` | 文件上传处理函数（返回完整响应），优先级高于 upload |
+| `fileMap` | `Map<string, AttachmentFile>` | 文件映射表，用于存储已上传的文件 |
+| `onFileMapChange` | `(files?: Map<string, AttachmentFile>) => void` | 文件映射表变更时的回调 |
+| `supportedFormat` | `SupportedFileFormats` | 支持的文件格式配置 |
+| `disabled` | `boolean` | 是否禁用按钮 |
+| `maxFileSize` | `number` | 单个文件最大大小（字节） |
+| `maxFileCount` | `number` | 最大文件数量 |
+| `allowMultiple` | `boolean` | 是否允许一次选择多个文件（默认：true） |
+
+#### SkillModeConfig
+
+技能模式配置接口。
+
+| 属性名 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `enable` | `boolean` | `true` | 是否启用技能模式组件，当为 false 时组件完全不渲染 |
+| `open` | `boolean` | `false` | 是否打开技能模式 |
+| `title` | `React.ReactNode` | - | 技能模式标题 |
+| `rightContent` | `React.ReactNode \| React.ReactNode[]` | - | 右侧自定义内容，支持单个节点或数组 |
+| `closable` | `boolean` | `true` | 是否显示默认关闭按钮 |
+| `style` | `React.CSSProperties` | - | 技能模式容器样式 |
+| `className` | `string` | - | 技能模式容器类名 |
+
+#### SendButtonCustomizationProps
+
+发送按钮自定义配置。
+
+| 属性名 | 类型 | 说明 |
+| --- | --- | --- |
+| `compact` | `boolean` | 是否使用紧凑模式显示按钮 |
+| `colors` | `SendButtonColors` | 自定义按钮颜色配置 |
+
+#### SendButtonColors
+
+发送按钮颜色配置。
+
+| 属性名 | 类型 | 说明 |
+| --- | --- | --- |
+| `icon` | `string` | 默认状态下的图标颜色 |
+| `iconHover` | `string` | Hover 状态下的图标颜色 |
+| `background` | `string` | 默认状态下的背景颜色 |
+| `backgroundHover` | `string` | Hover 状态下的背景颜色 |
+
 ## 示例
 
 ### 基础使用

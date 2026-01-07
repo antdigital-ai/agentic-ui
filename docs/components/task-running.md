@@ -38,9 +38,11 @@ group:
 | className         | 自定义类名             | `string`                              | -           |
 | style             | 自定义样式             | `React.CSSProperties`                 | -           |
 
-### TASK_STATUS
+### 类型定义
 
-任务状态枚举：
+#### TASK_STATUS
+
+任务状态枚举，用于控制任务的整体状态显示。
 
 ```typescript
 enum TASK_STATUS {
@@ -59,9 +61,9 @@ enum TASK_STATUS {
 }
 ```
 
-### TASK_RUNNING_STATUS
+#### TASK_RUNNING_STATUS
 
-任务运行状态枚举：
+任务运行状态枚举，用于细粒度控制机器人动画和按钮显示。
 
 ```typescript
 enum TASK_RUNNING_STATUS {
@@ -72,4 +74,15 @@ enum TASK_RUNNING_STATUS {
   /** 已暂停 */
   PAUSE = 'pause',
 }
+```
+
+#### TaskRunningActionsRender
+
+自定义操作按钮渲染函数类型。
+
+```typescript
+type TaskRunningActionsRender = (props: {
+  status?: TASK_STATUS;
+  runningStatus?: TASK_RUNNING_STATUS;
+}) => React.ReactNode;
 ```
