@@ -1757,4 +1757,307 @@ describe('FileComponent', () => {
       expect(screen.getByText('test.md')).toBeInTheDocument();
     });
   });
+
+  describe('自定义渲染与禁用状态', () => {
+    it('应该支持 disabled 状态', () => {
+      const handleClick = vi.fn();
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'disabled-file.txt',
+          url: 'https://example.com/disabled.txt',
+          disabled: true,
+        },
+      ];
+
+      const { container } = render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onFileClick={handleClick} />
+        </TestWrapper>,
+      );
+
+      // 应该显示文件名
+      expect(screen.getByText('disabled-file.txt')).toBeInTheDocument();
+
+      // 应该有禁用样式类
+      const fileItem = container.querySelector(
+        '.ant-workspace-file-item-disabled',
+      );
+      expect(fileItem).toBeInTheDocument();
+
+      // 点击不应触发回调
+      fireEvent.click(screen.getByText('disabled-file.txt'));
+      expect(handleClick).not.toHaveBeenCalled();
+
+      // 不应显示操作按钮
+      expect(screen.queryByLabelText('下载')).not.toBeInTheDocument();
+    });
+
+    it('应该支持 renderName 自定义渲染', () => {
+      const customRenderName = vi
+        .fn()
+        .mockReturnValue(<span data-testid="custom-name">自定义文件名</span>);
+
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'test.txt',
+          url: 'https://example.com/test.txt',
+          renderName: customRenderName,
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      // 应该调用自定义渲染函数
+      expect(customRenderName).toHaveBeenCalled();
+
+      // 应该显示自定义内容
+      expect(screen.getByTestId('custom-name')).toBeInTheDocument();
+      expect(screen.getByText('自定义文件名')).toBeInTheDocument();
+    });
+
+    it('应该支持 renderDetails 自定义渲染', () => {
+      const customRenderDetails = vi
+        .fn()
+        .mockReturnValue(
+          <span data-testid="custom-details">2025-10-01 · 已编辑</span>,
+        );
+
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'test.txt',
+          url: 'https://example.com/test.txt',
+          size: '1KB',
+          lastModified: '2025-10-01',
+          renderDetails: customRenderDetails,
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      // 应该调用自定义渲染函数
+      expect(customRenderDetails).toHaveBeenCalled();
+
+      // 应该显示自定义内容
+      expect(screen.getByTestId('custom-details')).toBeInTheDocument();
+      expect(screen.getByText('2025-10-01 · 已编辑')).toBeInTheDocument();
+
+      // 不应显示默认的大小和时间
+      expect(screen.queryByText('1KB')).not.toBeInTheDocument();
+    });
+
+    it('renderName 和 renderDetails 应该接收正确的 context', () => {
+      const customRenderName = vi.fn().mockReturnValue(<span>名称</span>);
+      const customRenderDetails = vi.fn().mockReturnValue(<span>详情</span>);
+
+      const testFile: FileNode = {
+        id: 'f1',
+        name: 'context-test.txt',
+        url: 'https://example.com/test.txt',
+        renderName: customRenderName,
+        renderDetails: customRenderDetails,
+      };
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={[testFile]} />
+        </TestWrapper>,
+      );
+
+      // 验证 renderName 接收的 context
+      expect(customRenderName).toHaveBeenCalledWith(
+        expect.objectContaining({
+          file: expect.objectContaining({ name: 'context-test.txt' }),
+          prefixCls: expect.any(String),
+          hashId: expect.any(String),
+        }),
+      );
+
+      // 验证 renderDetails 接收的 context
+      expect(customRenderDetails).toHaveBeenCalledWith(
+        expect.objectContaining({
+          file: expect.objectContaining({ name: 'context-test.txt' }),
+          prefixCls: expect.any(String),
+          hashId: expect.any(String),
+        }),
+      );
+    });
+
+    it('disabled 状态下应该阻止键盘导航', () => {
+      const handleClick = vi.fn();
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'disabled-keyboard.txt',
+          url: 'https://example.com/test.txt',
+          disabled: true,
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onFileClick={handleClick} />
+        </TestWrapper>,
+      );
+
+      const fileItem = screen.getByRole('button', {
+        name: /文件.*disabled-keyboard\.txt/,
+      });
+
+      // 模拟 Enter 键
+      fireEvent.keyDown(fileItem, { key: 'Enter' });
+      expect(handleClick).not.toHaveBeenCalled();
+
+      // 模拟空格键
+      fireEvent.keyDown(fileItem, { key: ' ' });
+      expect(handleClick).not.toHaveBeenCalled();
+    });
+
+    it('应该支持 renderActions 自定义渲染操作按钮', () => {
+      const customRenderActions = vi.fn().mockReturnValue(
+        <div data-testid="custom-actions">
+          <button type="button" data-testid="custom-edit-btn">
+            编辑
+          </button>
+          <button type="button" data-testid="custom-delete-btn">
+            删除
+          </button>
+        </div>,
+      );
+
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'actions-test.txt',
+          url: 'https://example.com/test.txt',
+          renderActions: customRenderActions,
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onDownload={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      // 应该调用自定义渲染函数
+      expect(customRenderActions).toHaveBeenCalled();
+
+      // 应该显示自定义操作按钮
+      expect(screen.getByTestId('custom-actions')).toBeInTheDocument();
+      expect(screen.getByTestId('custom-edit-btn')).toBeInTheDocument();
+      expect(screen.getByTestId('custom-delete-btn')).toBeInTheDocument();
+
+      // 不应显示默认的下载按钮
+      expect(screen.queryByLabelText('下载')).not.toBeInTheDocument();
+    });
+
+    it('renderActions 应该接收正确的 context', () => {
+      const customRenderActions = vi
+        .fn()
+        .mockReturnValue(<span>自定义按钮</span>);
+
+      const testFile: FileNode = {
+        id: 'f1',
+        name: 'render-actions-context.txt',
+        url: 'https://example.com/test.txt',
+        renderActions: customRenderActions,
+      };
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={[testFile]} />
+        </TestWrapper>,
+      );
+
+      // 验证 renderActions 接收的 context
+      expect(customRenderActions).toHaveBeenCalledWith(
+        expect.objectContaining({
+          file: expect.objectContaining({ name: 'render-actions-context.txt' }),
+          prefixCls: expect.any(String),
+          hashId: expect.any(String),
+        }),
+      );
+    });
+
+    it('renderActions context 应包含内置 actions', () => {
+      let capturedContext: any = null;
+      const customRenderActions = vi.fn().mockImplementation((ctx) => {
+        capturedContext = ctx;
+        return <span>自定义按钮</span>;
+      });
+
+      const testFile: FileNode = {
+        id: 'f1',
+        name: 'builtin-actions.txt',
+        url: 'https://example.com/test.txt',
+        canDownload: true,
+        renderActions: customRenderActions,
+      };
+
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={[testFile]}
+            onDownload={vi.fn()}
+            onPreview={vi.fn()}
+          />
+        </TestWrapper>,
+      );
+
+      // 验证 context.actions 存在
+      expect(capturedContext).not.toBeNull();
+      expect(capturedContext.actions).toBeDefined();
+      expect(capturedContext.actions).toHaveProperty('preview');
+      expect(capturedContext.actions).toHaveProperty('locate');
+      expect(capturedContext.actions).toHaveProperty('share');
+      expect(capturedContext.actions).toHaveProperty('download');
+    });
+
+    it('应该可以复用内置 actions 渲染', () => {
+      const customRenderActions = vi.fn().mockImplementation((ctx) => {
+        return (
+          <div data-testid="custom-actions-wrapper">
+            {ctx.actions.download}
+            <button type="button" data-testid="custom-edit">
+              编辑
+            </button>
+          </div>
+        );
+      });
+
+      const testFile: FileNode = {
+        id: 'f1',
+        name: 'reuse-builtin.txt',
+        url: 'https://example.com/test.txt',
+        canDownload: true,
+        renderActions: customRenderActions,
+      };
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={[testFile]} onDownload={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      // 应该显示自定义包装器
+      expect(screen.getByTestId('custom-actions-wrapper')).toBeInTheDocument();
+
+      // 应该显示内置下载按钮（通过 aria-label）
+      expect(screen.getByLabelText('下载')).toBeInTheDocument();
+
+      // 应该显示自定义按钮
+      expect(screen.getByTestId('custom-edit')).toBeInTheDocument();
+    });
+  });
 });

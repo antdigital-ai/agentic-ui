@@ -310,6 +310,36 @@ export interface BaseNode {
   icon?: ReactNode;
 }
 
+/**
+ * 内置操作按钮
+ */
+export interface FileBuiltinActions {
+  /** 预览按钮 */
+  preview: ReactNode;
+  /** 定位按钮 */
+  locate: ReactNode;
+  /** 分享按钮 */
+  share: ReactNode;
+  /** 下载按钮 */
+  download: ReactNode;
+}
+
+/**
+ * 文件卡片自定义渲染函数参数
+ */
+export interface FileRenderContext {
+  /** 当前文件节点 */
+  file: FileNode;
+  /** 样式前缀 */
+  prefixCls: string;
+  /** 样式 hash */
+  hashId: string;
+  /** 是否禁用 */
+  disabled: boolean;
+  /** 内置操作按钮，可在 renderActions 中复用 */
+  actions: FileBuiltinActions;
+}
+
 // 文件节点（叶子节点）
 export interface FileNode extends BaseNode {
   displayType?: string; // 用于展示在文件标题下方的类型：文件类型、文件大小、文件更新时间
@@ -328,6 +358,26 @@ export interface FileNode extends BaseNode {
   /** 用户自定义是否可以定位（默认隐藏，设置为 true 显示） */
   canLocate?: boolean;
   loading?: boolean; // 文件是否处于加载中
+  /**
+   * 是否禁用文件卡片
+   * @description 禁用后文件卡片不可点击，操作按钮也会隐藏
+   */
+  disabled?: boolean;
+  /**
+   * 自定义渲染文件名区域
+   * @description 传入后将替换默认的文件名渲染
+   */
+  renderName?: (ctx: FileRenderContext) => ReactNode;
+  /**
+   * 自定义渲染详情行区域
+   * @description 传入后将替换默认的详情行（类型、大小、时间等）渲染
+   */
+  renderDetails?: (ctx: FileRenderContext) => ReactNode;
+  /**
+   * 自定义渲染操作按钮区域
+   * @description 传入后将替换默认的操作按钮（预览、下载、分享等）渲染
+   */
+  renderActions?: (ctx: FileRenderContext) => ReactNode;
 }
 
 // 分组节点

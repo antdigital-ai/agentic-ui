@@ -5,8 +5,10 @@ export type { PreviewComponentProps } from './PreviewComponent';
 // 导出类型和工具函数
 export type {
   FileActionRef,
+  FileBuiltinActions,
   FileNode,
   FileProps,
+  FileRenderContext,
   FileType,
   GroupNode,
 } from '../types';

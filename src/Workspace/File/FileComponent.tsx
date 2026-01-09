@@ -222,7 +222,13 @@ const FileItemComponent: FC<{
   const fileWithId = ensureNodeWithId(file);
   const fileTypeInfo = fileTypeProcessor.inferFileType(fileWithId);
 
+  // 禁用状态
+  const isDisabled = fileWithId.disabled === true;
+
   const handleClick = () => {
+    // 禁用状态下不响应点击
+    if (isDisabled) return;
+
     // 如果有传入 onClick 事件，优先使用
     if (onClick) {
       onClick(fileWithId);
@@ -305,6 +311,68 @@ const FileItemComponent: FC<{
     onLocate?.(fileWithId);
   };
 
+  // 内置操作按钮
+  const actionBtnClass = classNames(
+    `${finalPrefixCls}-item-action-btn`,
+    hashId,
+  );
+
+  const builtinActions = {
+    preview: showPreviewButton ? (
+      <ActionIconBox
+        key="preview"
+        title={locale?.['workspace.file.preview'] || '预览'}
+        onClick={handlePreview}
+        tooltipProps={{ mouseEnterDelay: 0.3 }}
+        className={actionBtnClass}
+      >
+        <EyeIcon />
+      </ActionIconBox>
+    ) : null,
+    locate: showLocationButton ? (
+      <ActionIconBox
+        key="locate"
+        title={locale?.['workspace.file.location'] || '定位'}
+        onClick={handleLocate}
+        tooltipProps={{ mouseEnterDelay: 0.3 }}
+        className={actionBtnClass}
+      >
+        <Locate />
+      </ActionIconBox>
+    ) : null,
+    share: showShareButton ? (
+      <ActionIconBox
+        key="share"
+        title={locale?.['workspace.file.share'] || '分享'}
+        onClick={handleShare}
+        tooltipProps={{ mouseEnterDelay: 0.3 }}
+        className={actionBtnClass}
+      >
+        <ShareIcon />
+      </ActionIconBox>
+    ) : null,
+    download: showDownloadButton ? (
+      <ActionIconBox
+        key="download"
+        title={locale?.['workspace.file.download'] || '下载'}
+        onClick={handleDownload}
+        tooltipProps={{ mouseEnterDelay: 0.3 }}
+        className={actionBtnClass}
+      >
+        <DownloadIcon />
+      </ActionIconBox>
+    ) : null,
+  };
+
+  // 自定义渲染上下文
+  const renderContext = {
+    file: fileWithId,
+    prefixCls: finalPrefixCls,
+    hashId: hashId || '',
+    disabled: isDisabled,
+    actions: builtinActions,
+  };
+
   return (
     <AccessibleButton
       icon={
@@ -318,123 +386,96 @@ const FileItemComponent: FC<{
           </div>
           <div className={classNames(`${finalPrefixCls}-item-info`, hashId)}>
             <div className={classNames(`${finalPrefixCls}-item-name`, hashId)}>
-              <Typography.Text ellipsis={{ tooltip: fileWithId.name }}>
-                {fileWithId.name}
-              </Typography.Text>
+              {fileWithId.renderName ? (
+                fileWithId.renderName(renderContext)
+              ) : (
+                <Typography.Text ellipsis={{ tooltip: fileWithId.name }}>
+                  {fileWithId.name}
+                </Typography.Text>
+              )}
             </div>
             <div
               className={classNames(`${finalPrefixCls}-item-details`, hashId)}
             >
-              <Typography.Text type="secondary" ellipsis>
-                <span
-                  className={classNames(`${finalPrefixCls}-item-type`, hashId)}
-                >
-                  {fileTypeInfo.displayType || fileTypeInfo.fileType}
-                </span>
-                {fileWithId.size && (
-                  <>
-                    <span
-                      className={classNames(
-                        `${finalPrefixCls}-item-separator`,
-                        hashId,
-                      )}
-                    >
-                      |
-                    </span>
-                    <span
-                      className={classNames(
-                        `${finalPrefixCls}-item-size`,
-                        hashId,
-                      )}
-                    >
-                      {formatFileSize(fileWithId.size)}
-                    </span>
-                  </>
-                )}
-                {fileWithId.lastModified && (
-                  <>
-                    <span
-                      className={classNames(
-                        `${finalPrefixCls}-item-separator`,
-                        hashId,
-                      )}
-                    >
-                      |
-                    </span>
-                    <span
-                      className={classNames(
-                        `${finalPrefixCls}-item-time`,
-                        hashId,
-                      )}
-                    >
-                      {formatLastModified(fileWithId.lastModified)}
-                    </span>
-                  </>
-                )}
-              </Typography.Text>
+              {fileWithId.renderDetails ? (
+                fileWithId.renderDetails(renderContext)
+              ) : (
+                <Typography.Text type="secondary" ellipsis>
+                  <span
+                    className={classNames(
+                      `${finalPrefixCls}-item-type`,
+                      hashId,
+                    )}
+                  >
+                    {fileTypeInfo.displayType || fileTypeInfo.fileType}
+                  </span>
+                  {fileWithId.size && (
+                    <>
+                      <span
+                        className={classNames(
+                          `${finalPrefixCls}-item-separator`,
+                          hashId,
+                        )}
+                      >
+                        |
+                      </span>
+                      <span
+                        className={classNames(
+                          `${finalPrefixCls}-item-size`,
+                          hashId,
+                        )}
+                      >
+                        {formatFileSize(fileWithId.size)}
+                      </span>
+                    </>
+                  )}
+                  {fileWithId.lastModified && (
+                    <>
+                      <span
+                        className={classNames(
+                          `${finalPrefixCls}-item-separator`,
+                          hashId,
+                        )}
+                      >
+                        |
+                      </span>
+                      <span
+                        className={classNames(
+                          `${finalPrefixCls}-item-time`,
+                          hashId,
+                        )}
+                      >
+                        {formatLastModified(fileWithId.lastModified)}
+                      </span>
+                    </>
+                  )}
+                </Typography.Text>
+              )}
             </div>
           </div>
           <div
             className={classNames(`${finalPrefixCls}-item-actions`, hashId)}
             onClick={(e) => e.stopPropagation()}
           >
-            {showPreviewButton && (
-              <ActionIconBox
-                title={locale?.['workspace.file.preview'] || '预览'}
-                onClick={handlePreview}
-                tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${finalPrefixCls}-item-action-btn`,
-                  hashId,
-                )}
-              >
-                <EyeIcon />
-              </ActionIconBox>
-            )}
-            {showLocationButton && (
-              <ActionIconBox
-                title={locale?.['workspace.file.location'] || '定位'}
-                onClick={handleLocate}
-                tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${finalPrefixCls}-item-action-btn`,
-                  hashId,
-                )}
-              >
-                <Locate />
-              </ActionIconBox>
-            )}
-            {showShareButton && (
-              <ActionIconBox
-                title={locale?.['workspace.file.share'] || '分享'}
-                onClick={handleShare}
-                tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${finalPrefixCls}-item-action-btn`,
-                  hashId,
-                )}
-              >
-                <ShareIcon />
-              </ActionIconBox>
-            )}
-            {showDownloadButton && (
-              <ActionIconBox
-                title={locale?.['workspace.file.download'] || '下载'}
-                onClick={handleDownload}
-                tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${finalPrefixCls}-item-action-btn`,
-                  hashId,
-                )}
-              >
-                <DownloadIcon />
-              </ActionIconBox>
-            )}
+            {fileWithId.renderActions ? (
+              fileWithId.renderActions(renderContext)
+            ) : !isDisabled ? (
+              <>
+                {builtinActions.preview}
+                {builtinActions.locate}
+                {builtinActions.share}
+                {builtinActions.download}
+              </>
+            ) : null}
           </div>
         </>
       }
       onClick={handleClick}
-      className={classNames(`${finalPrefixCls}-item`, hashId)}
+      className={classNames(
+        `${finalPrefixCls}-item`,
+        { [`${finalPrefixCls}-item-disabled`]: isDisabled },
+        hashId,
+      )}
       ariaLabel={`${locale?.['workspace.file'] || '文件'}：${fileWithId.name}`}
       id={bindDomId ? fileWithId.id : undefined}
     />

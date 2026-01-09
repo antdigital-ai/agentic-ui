@@ -40,6 +40,7 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 <code src="../demos/workspace-file-custom-preview-flow.tsx">文件-自定义预览</code>
 <code src="../demos/workspace-file-actionref-demo.tsx">actionRef外部打开</code>
 <code src="../demos/workspace-file-search-demo.tsx">文件-搜索</code>
+<code src="../demos/workspace-file-custom-render-demo.tsx">文件-自定义渲染</code>
 
 <!-- <code src="../demos/workspace-file-previewComponent.tsx">导出文件预览组件</code> -->
 
@@ -187,25 +188,52 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 #### FileNode
 
-| 参数         | 说明                                                       | 类型                       |
-| ------------ | ---------------------------------------------------------- | -------------------------- |
-| id           | 唯一标识（可选）                                           | `string`                   |
-| name         | 文件名                                                     | `string \| ReactNode`      |
-| icon         | 自定义图标（可选）                                         | `ReactNode`                |
-| displayType  | 展示在文件标题下方的类型（如类型/大小/更新时间等）         | `string`                   |
-| type         | 文件类型                                                   | `FileType`                 |
-| size         | 文件大小                                                   | `string \| number`         |
-| lastModified | 最后修改时间                                               | `string \| number \| Date` |
-| url          | 文件下载地址（或预览地址）                                 | `string`                   |
-| file         | 文件二进制内容（浏览器环境）                               | `File \| Blob`             |
-| previewUrl   | 预览地址（优先用于图片类预览）                             | `string`                   |
-| content      | 文本内容（如 md/html 等，优先用于内置预览）                | `string`                   |
-| metadata     | 额外元数据                                                 | `Record<string, unknown>`  |
-| canPreview   | 是否允许预览（用户自定义开关，默认由系统推断是否可预览）   | `boolean`                  |
-| canDownload  | 是否在文件列表页面展示下载图标（用户自定义开关，默认展示） | `boolean`                  |
-| canShare     | 是否在文件列表/预览页展示分享按钮（默认隐藏）              | `boolean`                  |
-| canLocate    | 是否在文件列表/预览页展示“定位”按钮（默认隐藏）            | `boolean`                  |
-| loading      | 文件是否处于加载中状态                                     | `boolean`                  |
+| 参数          | 说明                                                       | 类型                                    |
+| ------------- | ---------------------------------------------------------- | --------------------------------------- |
+| id            | 唯一标识（可选）                                           | `string`                                |
+| name          | 文件名                                                     | `string \| ReactNode`                   |
+| icon          | 自定义图标（可选）                                         | `ReactNode`                             |
+| displayType   | 展示在文件标题下方的类型（如类型/大小/更新时间等）         | `string`                                |
+| type          | 文件类型                                                   | `FileType`                              |
+| size          | 文件大小                                                   | `string \| number`                      |
+| lastModified  | 最后修改时间                                               | `string \| number \| Date`              |
+| url           | 文件下载地址（或预览地址）                                 | `string`                                |
+| file          | 文件二进制内容（浏览器环境）                               | `File \| Blob`                          |
+| previewUrl    | 预览地址（优先用于图片类预览）                             | `string`                                |
+| content       | 文本内容（如 md/html 等，优先用于内置预览）                | `string`                                |
+| metadata      | 额外元数据                                                 | `Record<string, unknown>`               |
+| canPreview    | 是否允许预览（用户自定义开关，默认由系统推断是否可预览）   | `boolean`                               |
+| canDownload   | 是否在文件列表页面展示下载图标（用户自定义开关，默认展示） | `boolean`                               |
+| canShare      | 是否在文件列表/预览页展示分享按钮（默认隐藏）              | `boolean`                               |
+| canLocate     | 是否在文件列表/预览页展示“定位”按钮（默认隐藏）            | `boolean`                               |
+| loading       | 文件是否处于加载中状态                                     | `boolean`                               |
+| disabled      | 是否禁用文件卡片（禁用后不可点击，操作按钮隐藏）           | `boolean`                               |
+| renderName    | 自定义渲染文件名区域                                       | `(ctx: FileRenderContext) => ReactNode` |
+| renderDetails | 自定义渲染详情行区域（类型、大小、时间等）                 | `(ctx: FileRenderContext) => ReactNode` |
+| renderActions | 自定义渲染操作按钮区域（预览、下载、分享等）               | `(ctx: FileRenderContext) => ReactNode` |
+
+#### FileRenderContext
+
+自定义渲染函数的参数类型：
+
+| 参数      | 说明                                    | 类型                 |
+| --------- | --------------------------------------- | -------------------- |
+| file      | 当前文件节点                            | `FileNode`           |
+| prefixCls | 样式前缀                                | `string`             |
+| hashId    | 样式 hash                               | `string`             |
+| disabled  | 是否禁用                                | `boolean`            |
+| actions   | 内置操作按钮，可在 renderActions 中复用 | `FileBuiltinActions` |
+
+#### FileBuiltinActions
+
+内置操作按钮类型，用于在 `renderActions` 中复用：
+
+| 参数     | 说明     | 类型        |
+| -------- | -------- | ----------- |
+| preview  | 预览按钮 | `ReactNode` |
+| locate   | 定位按钮 | `ReactNode` |
+| share    | 分享按钮 | `ReactNode` |
+| download | 下载按钮 | `ReactNode` |
 
 #### GroupNode
 
