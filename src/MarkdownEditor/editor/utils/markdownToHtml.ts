@@ -196,7 +196,7 @@ function rehypeCodeBlock(): Plugin<[], HastRoot> {
 export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
   [
     remarkParse,
-    remarkGfm,
+    [remarkGfm, { singleTilde: false }],
     fixStrongWithSpecialChars,
     convertParagraphToImage,
     [remarkMath as unknown as Plugin, INLINE_MATH_WITH_SINGLE_DOLLAR],

@@ -66,8 +66,11 @@ describe('Markdown to HTML Utils', () => {
 
     it('允许通过插件数组关闭默认插件', async () => {
       const markdown = '~~strikethrough~~';
+      // 过滤掉 remarkGfm 插件（支持数组形式 [remarkGfm, options] 和直接引用形式）
       const plugins = createDefaultRemarkPlugins().filter(
-        (entry) => entry !== remarkGfm,
+        (entry) =>
+          entry !== remarkGfm &&
+          !(Array.isArray(entry) && entry[0] === remarkGfm),
       );
       const result = await markdownToHtml(markdown, plugins);
 
@@ -192,8 +195,11 @@ title: Test
 
     it('允许同步转换时关闭默认 remark 插件', () => {
       const markdown = '~~strikethrough~~';
+      // 过滤掉 remarkGfm 插件（支持数组形式 [remarkGfm, options] 和直接引用形式）
       const plugins = createDefaultRemarkPlugins().filter(
-        (entry) => entry !== remarkGfm,
+        (entry) =>
+          entry !== remarkGfm &&
+          !(Array.isArray(entry) && entry[0] === remarkGfm),
       );
       const result = markdownToHtmlSync(markdown, plugins);
 
