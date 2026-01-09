@@ -386,7 +386,7 @@ const markdownParser = unified()
   .use(remarkParse) // 解析 Markdown
   .use(remarkHtml)
   .use(remarkFrontmatter, ['yaml']) // 处理前置元数据
-  .use(remarkGfm) // GFM 插件
+  .use(remarkGfm, { singleTilde: false }) // GFM 插件，禁用单波浪线删除线
   .use(fixStrongWithSpecialChars) // 修复包含特殊字符的加粗文本
   .use(convertParagraphToImage) // 将以 ! 开头的段落转换为图片,将 | 开头的段落转换为表格
   .use(remarkMath as any, {
