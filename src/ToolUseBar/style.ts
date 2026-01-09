@@ -24,7 +24,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         minHeight: '20px',
         backdropFilter: 'blur(8px)',
         width: 'max-content',
-        transition: 'padding 0.2s ease',
+        transition: 'border-radius 0.4s ease',
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'column',
@@ -46,7 +46,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
         '&-expanded': {
           borderRadius: '14px',
-          padding: 4,
           gap: 8,
           outline: 'none',
           '&:hover': {
@@ -134,7 +133,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         cursor: 'pointer',
         transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
         '&:hover': {
-          background: 'rgba(20, 22, 28, 0.06)',
           color: '#959DA8',
         },
       },
@@ -267,6 +265,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-tool-container': {
         display: 'flex',
         width: '100%',
+        paddingInline: 4,
+        paddingBottom: 4,
         '&-light': {
           borderLeft: '1px solid var(--color-gray-border-light)',
           paddingLeft: 12,

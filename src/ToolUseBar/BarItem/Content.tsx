@@ -363,7 +363,7 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
         </motion.div>
       ) : null}
 
-      {!showContent || !expanded ? (
+      {!showContent ? (
         <div
           style={{
             overflow: 'hidden',

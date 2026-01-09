@@ -1,4 +1,5 @@
 import { ToolUseBar } from '@ant-design/agentic-ui';
+import { Space } from 'antd';
 import React, { useState } from 'react';
 
 const ToolUseBarBasicDemo = () => {
@@ -47,8 +48,35 @@ const ToolUseBarBasicDemo = () => {
     {
       id: 'test',
       toolName: '单元测试',
-      toolTarget: '运行 Jest 测试套件',
+      toolTarget: (
+        <Space size={8}>
+          <span>运行 Jest 测试套件</span>
+          <span>2.3s</span>
+        </Space>
+      ),
       time: '3',
+      status: 'idle' as const,
+    },
+    {
+      id: 'test2',
+      toolName: '工具类/工具名称',
+      toolTarget: (
+        <Space size={8}>
+          <span>操作对象</span>
+          <span>2.3s</span>
+        </Space>
+      ),
+      status: 'idle' as const,
+    },
+    {
+      id: 'test3',
+      toolName: '工具类/工具名称',
+      toolTarget: '操作对象',
+      status: 'idle' as const,
+    },
+    {
+      id: 'test4',
+      toolName: '工具类/工具名称',
       status: 'idle' as const,
     },
   ];
