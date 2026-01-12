@@ -3,14 +3,14 @@
 exports[`AILabel Snapshot > renders correctly with children 1`] = `
 <div>
   <span
-    class="ant-ai-label ant-ai-label-with-children css-dev-only-do-not-override-11mmrso"
+    class="ant-ai-label ant-ai-label-with-children css-dev-only-do-not-override-mncuj7"
   >
     <span>
       Test Content
     </span>
     <sup
       aria-describedby="test-id"
-      class="ant-ai-label-dot css-dev-only-do-not-override-11mmrso"
+      class="ant-ai-label-dot css-dev-only-do-not-override-mncuj7"
     >
       <svg
         fill="none"
@@ -174,11 +174,11 @@ exports[`AILabel Snapshot > renders correctly with children 1`] = `
 exports[`AILabel Snapshot > renders correctly with default props 1`] = `
 <div>
   <span
-    class="ant-ai-label css-dev-only-do-not-override-11mmrso"
+    class="ant-ai-label css-dev-only-do-not-override-mncuj7"
   >
     <sup
       aria-describedby="test-id"
-      class="ant-ai-label-dot css-dev-only-do-not-override-11mmrso"
+      class="ant-ai-label-dot css-dev-only-do-not-override-mncuj7"
     >
       <svg
         fill="none"
@@ -342,11 +342,11 @@ exports[`AILabel Snapshot > renders correctly with default props 1`] = `
 exports[`AILabel Snapshot > renders correctly with different statuses 1`] = `
 <div>
   <span
-    class="ant-ai-label ant-ai-label-status-default css-dev-only-do-not-override-11mmrso"
+    class="ant-ai-label ant-ai-label-status-default css-dev-only-do-not-override-mncuj7"
   >
     <sup
       aria-describedby="test-id"
-      class="ant-ai-label-dot css-dev-only-do-not-override-11mmrso"
+      class="ant-ai-label-dot css-dev-only-do-not-override-mncuj7"
     >
       <svg
         fill="none"
@@ -505,11 +505,11 @@ exports[`AILabel Snapshot > renders correctly with different statuses 1`] = `
     </sup>
   </span>
   <span
-    class="ant-ai-label ant-ai-label-status-emphasis css-dev-only-do-not-override-11mmrso"
+    class="ant-ai-label ant-ai-label-status-emphasis css-dev-only-do-not-override-mncuj7"
   >
     <sup
       aria-describedby="test-id"
-      class="ant-ai-label-dot css-dev-only-do-not-override-11mmrso"
+      class="ant-ai-label-dot css-dev-only-do-not-override-mncuj7"
     >
       <svg
         fill="none"
@@ -668,11 +668,11 @@ exports[`AILabel Snapshot > renders correctly with different statuses 1`] = `
     </sup>
   </span>
   <span
-    class="ant-ai-label ant-ai-label-status-watermark css-dev-only-do-not-override-11mmrso"
+    class="ant-ai-label ant-ai-label-status-watermark css-dev-only-do-not-override-mncuj7"
   >
     <sup
       aria-describedby="test-id"
-      class="ant-ai-label-dot css-dev-only-do-not-override-11mmrso"
+      class="ant-ai-label-dot css-dev-only-do-not-override-mncuj7"
     >
       <svg
         fill="none"
@@ -799,12 +799,12 @@ exports[`AILabel Snapshot > renders correctly with different statuses 1`] = `
 exports[`AILabel Snapshot > renders correctly with offset and custom style 1`] = `
 <div>
   <span
-    class="ant-ai-label test-class css-dev-only-do-not-override-11mmrso"
+    class="ant-ai-label test-class css-dev-only-do-not-override-mncuj7"
     style="margin: 20px;"
   >
     <sup
       aria-describedby="test-id"
-      class="ant-ai-label-dot css-dev-only-do-not-override-11mmrso"
+      class="ant-ai-label-dot css-dev-only-do-not-override-mncuj7"
       style="margin-top: -5px; inset-inline-end: -10px; color: red;"
     >
       <svg
@@ -969,11 +969,11 @@ exports[`AILabel Snapshot > renders correctly with offset and custom style 1`] =
 exports[`AILabel Snapshot > renders correctly with tooltip 1`] = `
 <div>
   <span
-    class="ant-ai-label css-dev-only-do-not-override-11mmrso"
+    class="ant-ai-label css-dev-only-do-not-override-mncuj7"
   >
     <sup
       aria-describedby="test-id"
-      class="ant-ai-label-dot css-dev-only-do-not-override-11mmrso"
+      class="ant-ai-label-dot css-dev-only-do-not-override-mncuj7"
     >
       <svg
         fill="none"

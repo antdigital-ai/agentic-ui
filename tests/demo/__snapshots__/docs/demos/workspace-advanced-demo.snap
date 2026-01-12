@@ -51,6 +51,7 @@
         >
           <div
             aria-label="segmented control"
+            aria-orientation="horizontal"
             class="ant-segmented ant-workspace-segmented ant-segmented-block"
             data-testid="workspace-segmented"
             role="radiogroup"
@@ -69,7 +70,6 @@
                   type="radio"
                 />
                 <div
-                  aria-selected="true"
                   class="ant-segmented-item-label"
                 >
                   <span
@@ -134,7 +134,6 @@
                   type="radio"
                 />
                 <div
-                  aria-selected="false"
                   class="ant-segmented-item-label"
                   title=""
                 />
@@ -148,7 +147,6 @@
                   type="radio"
                 />
                 <div
-                  aria-selected="false"
                   class="ant-segmented-item-label"
                 >
                   <span
@@ -207,7 +205,6 @@
                   type="radio"
                 />
                 <div
-                  aria-selected="false"
                   class="ant-segmented-item-label"
                 >
                   <span
@@ -271,7 +268,6 @@
                   type="radio"
                 />
                 <div
-                  aria-selected="false"
                   class="ant-segmented-item-label"
                 >
                   <div

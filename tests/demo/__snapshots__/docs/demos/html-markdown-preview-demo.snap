@@ -355,6 +355,7 @@
                       >
                         <div
                           aria-label="segmented control"
+                          aria-orientation="horizontal"
                           class="ant-segmented"
                           data-testid="preview"
                           role="radiogroup"
@@ -373,7 +374,6 @@
                                 type="radio"
                               />
                               <div
-                                aria-selected="true"
                                 class="ant-segmented-item-label"
                                 title="预览"
                               >
@@ -389,7 +389,6 @@
                                 type="radio"
                               />
                               <div
-                                aria-selected="false"
                                 class="ant-segmented-item-label"
                                 title="代码"
                               >
