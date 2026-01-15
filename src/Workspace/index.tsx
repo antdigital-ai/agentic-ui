@@ -1,9 +1,9 @@
-import { CloseOutlined } from '@ant-design/icons';
 import {
   FileStack,
   Language,
   ListTodo,
   MousePointerClick,
+  X,
 } from '@sofa-design/icons';
 import { ConfigProvider, Segmented } from 'antd';
 import classNames from 'classnames';
@@ -15,6 +15,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { ActionIconBox } from '../Components/ActionIconBox';
 import { I18nContext } from '../I18n';
 import Browser from './Browser';
 import { File } from './File';
@@ -130,6 +131,7 @@ const Workspace: FC<WorkspaceProps> & {
   onClose,
   children,
   pure = false,
+  headerExtra,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
@@ -255,14 +257,19 @@ const Workspace: FC<WorkspaceProps> & {
         >
           {displayTitle}
         </div>
-        {onClose && (
-          <CloseOutlined
-            className={classNames(`${prefixCls}-close`, hashId)}
-            onClick={onClose}
-            aria-label={locale?.['workspace.closeWorkspace'] || '关闭工作空间'}
-            data-testid="workspace-close"
-          />
-        )}
+        <div className={classNames(`${prefixCls}-header-right`, hashId)}>
+          {headerExtra}
+          {onClose && (
+            <ActionIconBox
+              className={classNames(`${prefixCls}-close`, hashId)}
+              onClick={onClose}
+              title={locale?.['workspace.closeWorkspace'] || '关闭工作空间'}
+              data-testid="workspace-close"
+            >
+              <X />
+            </ActionIconBox>
+          )}
+        </div>
       </div>
 
       {availableTabs.length > 1 && (

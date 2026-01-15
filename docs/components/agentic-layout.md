@@ -18,32 +18,25 @@ group:
 
 ### AgenticLayoutProps
 
-| 参数                  | 说明                 | 类型                           | 默认值    |
-| --------------------- | -------------------- | ------------------------------ | --------- |
-| left                  | 左侧内容             | `ReactNode`                    | -         |
-| center                | 中间内容             | `ReactNode`                    | -         |
-| right                 | 右侧内容             | `ReactNode`                    | -         |
-| leftCollapsible       | 左侧是否可折叠       | `boolean`                      | `true`    |
-| rightCollapsible      | 右侧是否可折叠       | `boolean`                      | `true`    |
-| leftCollapsed         | 左侧折叠状态（受控） | `boolean`                      | -         |
-| rightCollapsed        | 右侧折叠状态（受控） | `boolean`                      | -         |
-| leftDefaultCollapsed  | 左侧默认折叠状态     | `boolean`                      | `false`   |
-| rightDefaultCollapsed | 右侧默认折叠状态     | `boolean`                      | `false`   |
-| onLeftCollapse        | 左侧折叠状态变化回调 | `(collapsed: boolean) => void` | -         |
-| onRightCollapse       | 右侧折叠状态变化回调 | `(collapsed: boolean) => void` | -         |
-| style                 | 自定义样式           | `React.CSSProperties`          | -         |
-| className             | 自定义类名           | `string`                       | -         |
-| leftWidth             | 左侧宽度             | `number`                       | `256`     |
-| rightWidth            | 右侧宽度             | `number`                       | `256`     |
-| minHeight             | 最小高度             | `string \| number`             | `'600px'` |
+| 参数       | 说明                                                              | 类型                 | 默认值    |
+| ---------- | ----------------------------------------------------------------- | -------------------- | --------- |
+| left       | 左侧内容                                                          | `ReactNode`          | -         |
+| center     | 中间内容                                                          | `ReactNode`          | -         |
+| right      | 右侧内容                                                          | `ReactNode`          | -         |
+| header     | 头部配置，包含折叠控制等（详见 [LayoutHeader](/components/layout-header)） | `LayoutHeaderConfig` | -         |
+| style      | 自定义样式                                                        | `React.CSSProperties`| -         |
+| className  | 自定义类名                                                        | `string`             | -         |
+| leftWidth  | 左侧宽度                                                          | `number`             | `256`     |
+| rightWidth | 右侧宽度                                                          | `number`             | `256`     |
+| minHeight  | 最小高度                                                          | `string \| number`   | `'600px'` |
 
 ## 受控与非受控
 
-`AgenticLayout` 支持受控和非受控两种模式：
+`AgenticLayout` 的折叠状态通过 `header` 属性进行配置，支持受控和非受控两种模式。详细配置请参考 [LayoutHeader](/components/layout-header) 文档。
 
 ### 受控模式
 
-当传入 `leftCollapsed` 或 `rightCollapsed` 属性时，组件进入受控模式：
+通过 `header` 属性传入 `leftCollapsed` 或 `rightCollapsed`：
 
 ```tsx | pure
 const [leftCollapsed, setLeftCollapsed] = useState(false);
@@ -64,7 +57,7 @@ const [rightCollapsed, setRightCollapsed] = useState(false);
 
 ### 非受控模式
 
-当不传入 `leftCollapsed` 或 `rightCollapsed` 属性时，组件使用内部状态：
+通过 `header` 属性传入 `leftDefaultCollapsed` 或 `rightDefaultCollapsed`：
 
 ```tsx | pure
 <AgenticLayout
@@ -83,12 +76,12 @@ const [rightCollapsed, setRightCollapsed] = useState(false);
 ## 特性
 
 - **三栏布局**: 支持左中右三个区域的灵活配置
-- **折叠功能**: 左右侧栏支持独立折叠控制
-- **受控/非受控**: 支持受控和非受控两种模式，使用 `useMergedState` 实现
+- **折叠功能**: 左右侧栏支持独立折叠控制（通过 `header` 配置）
+- **受控/非受控**: 支持受控和非受控两种模式
 - **响应式设计**: 中间区域自适应剩余宽度
 - **主题集成**: 集成 Ant Design 主题系统
 - **动画效果**: 平滑的折叠展开动画
-- **状态管理**: 使用 `rc-util` 的 `useMergedState` 提供统一的状态管理
+- **可拖拽右侧栏**: 右侧栏支持拖拽调整宽度
 
 ## 使用场景
 
@@ -100,4 +93,4 @@ const [rightCollapsed, setRightCollapsed] = useState(false);
 
 - `center` 属性是必需的
 - 左右侧栏是可选的，可以根据需要配置
-- 折叠状态变化会触发相应的回调函数
+- 折叠状态的控制逻辑位于 `header` 属性中

@@ -10,6 +10,7 @@ import {
   TASK_STATUS,
   TaskRunning,
 } from '@ant-design/agentic-ui';
+import { Flex } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   assistantMeta,
@@ -259,27 +260,8 @@ const ChatLayoutDemo: React.FC = () => {
               onShare: handleShare,
             }}
             footer={
-              <div
-                style={{
-                  position: 'relative',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '-16px',
-                    left: '50%',
-                    transform: 'translate(-50%, -100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 16,
-                  }}
-                >
+              <Flex vertical align="center" justify="center" gap={24}>
+                <Flex gap={8} align="center" justify="center">
                   <BackTo.Top
                     tooltip="去顶部"
                     shouldVisible={200}
@@ -304,7 +286,7 @@ const ChatLayoutDemo: React.FC = () => {
                       insetInlineEnd: 0,
                     }}
                   />
-                </div>
+                </Flex>
                 <TaskRunning
                   title={`任务已完成, 耗时03分00秒`}
                   taskStatus={TASK_STATUS.SUCCESS}
@@ -316,7 +298,7 @@ const ChatLayoutDemo: React.FC = () => {
                   onReplay={handleRetry}
                   onViewResult={handleViewResult}
                 />
-              </div>
+              </Flex>
             }
           >
             <BubbleList

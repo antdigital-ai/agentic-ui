@@ -7,6 +7,7 @@ import {
   HistoryDataType,
   MessageBubbleData,
 } from '@ant-design/agentic-ui';
+import { Flex } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   assistantMeta,
@@ -230,56 +231,35 @@ const ChatLayoutDemo: React.FC = () => {
               onLeftCollapse: handleLeftCollapse,
               onShare: handleShare,
             }}
-            footerHeight={0}
             scrollBehavior="auto"
+            showFooterBackground={false}
             footer={
-              <div
-                style={{
-                  position: 'relative',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <div
+              <Flex gap={8} align="center" justify="center">
+                <BackTo.Top
+                  tooltip="去顶部"
+                  shouldVisible={200}
+                  target={() =>
+                    containerRef.current?.scrollContainer ?? document.body
+                  }
                   style={{
-                    position: 'absolute',
-                    top: '-16px',
-                    left: '50%',
-                    transform: 'translate(-50%, -100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 16,
+                    position: 'relative',
+                    bottom: 0,
+                    insetInlineEnd: 0,
                   }}
-                >
-                  <BackTo.Top
-                    tooltip="去顶部"
-                    shouldVisible={200}
-                    target={() =>
-                      containerRef.current?.scrollContainer ?? document.body
-                    }
-                    style={{
-                      position: 'relative',
-                      bottom: 0,
-                      insetInlineEnd: 0,
-                    }}
-                  />
-                  <BackTo.Bottom
-                    tooltip="去底部"
-                    shouldVisible={200}
-                    target={() =>
-                      containerRef.current?.scrollContainer ?? document.body
-                    }
-                    style={{
-                      position: 'relative',
-                      bottom: 0,
-                      insetInlineEnd: 0,
-                    }}
-                  />
-                </div>
-              </div>
+                />
+                <BackTo.Bottom
+                  tooltip="去底部"
+                  shouldVisible={200}
+                  target={() =>
+                    containerRef.current?.scrollContainer ?? document.body
+                  }
+                  style={{
+                    position: 'relative',
+                    bottom: 0,
+                    insetInlineEnd: 0,
+                  }}
+                />
+              </Flex>
             }
           >
             <BubbleList

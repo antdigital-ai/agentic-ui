@@ -285,6 +285,10 @@ export const cnLabels = {
   'workspace.title': '工作空间',
   'workspace.searchPlaceholder': '搜索文件名',
   'workspace.noResultsFor': '未找到与「${keyword}」匹配的结果',
+  // 新增：文件预览相关
+  'workspace.file.generating': '正在生成',
+  'workspace.file.processing': '正在处理文件...',
+  'workspace.file.processFailed': '文件处理失败',
   // 工具栏相关
   'toolbar.bold': '加粗',
   'toolbar.italic': '斜体',
@@ -368,6 +372,8 @@ export const cnLabels = {
   'browser.totalResults': '共${count}个结果',
   'browser.searching': '搜索中...',
   'layout.header.title': 'AI 助手',
+  theme: '主题',
+  expandCollapse: '展开/收起',
 };
 
 /**
@@ -660,6 +666,10 @@ export const enLabels: typeof cnLabels = {
   'workspace.title': 'Workspace',
   'workspace.searchPlaceholder': 'Search file name',
   'workspace.noResultsFor': 'No results for "${keyword}"',
+  // New: File preview related
+  'workspace.file.generating': 'Generating',
+  'workspace.file.processing': 'Processing file...',
+  'workspace.file.processFailed': 'File processing failed',
   // Toolbar related
   'toolbar.bold': 'Bold',
   'toolbar.italic': 'Italic',
@@ -745,4 +755,6 @@ export const enLabels: typeof cnLabels = {
   'browser.totalResults': 'Total ${count} results',
   'browser.searching': 'Searching...',
   'layout.header.title': 'AI Assistant',
+  theme: 'Theme',
+  expandCollapse: 'Expand/Collapse',
 };

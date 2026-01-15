@@ -174,7 +174,11 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
         {popoverContent}
         {previewOpen && (
           <Modal
-            title={editorProps?.tableConfig?.previewTitle || '预览表格'}
+            title={
+              editorProps?.tableConfig?.previewTitle ||
+              i18n?.locale?.previewTable ||
+              '预览表格'
+            }
             open={previewOpen}
             closable
             footer={null}

@@ -34,7 +34,7 @@ const stringifyObj = remark()
   .use(remarkRehype as any, { allowDangerousHtml: true })
   .use(rehypeRaw)
   .use(rehypeKatex as any)
-  .use(remarkGfm)
+  .use(remarkGfm, { singleTilde: false }) // 禁用单波浪线删除线
   .use(remarkFrontmatter, ['yaml']);
 
 const myRemark = {

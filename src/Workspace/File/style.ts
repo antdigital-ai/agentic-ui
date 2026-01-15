@@ -180,6 +180,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         letterSpacing: 'var(--letter-spacing-body-sm, normal)',
       },
 
+      // 禁用状态
+      [`&-disabled`]: {
+        cursor: 'not-allowed',
+        opacity: 0.5,
+
+        '&:hover': {
+          background: 'transparent',
+        },
+      },
+
       // 分割符
       [`&-separator`]: {
         fontSize: 'var(--font-size-xs)',

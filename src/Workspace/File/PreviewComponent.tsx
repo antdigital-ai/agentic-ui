@@ -230,7 +230,10 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
     } catch (err) {
       setContentState({
         status: 'error',
-        error: err instanceof Error ? err.message : '文件处理失败',
+        error:
+          err instanceof Error
+            ? err.message
+            : locale?.['workspace.file.processFailed'] || '文件处理失败',
       });
     }
   }, [file, customContent]);
@@ -313,7 +316,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
             className={classNames(`${prefixCls}-content-loading-tip`, hashId)}
           >
             <LoadingOutlined />
-            正在生成
+            {locale?.['workspace.file.generating'] || '正在生成'}
           </span>
           <div
             className={classNames(`${prefixCls}-content-loading-inner`, hashId)}
@@ -335,7 +338,10 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
     if (!processResult) {
       return (
         <PlaceholderContent prefixCls={prefixCls} hashId={hashId}>
-          <Spin size="large" tip="正在处理文件..." />
+          <Spin
+            size="large"
+            tip={locale?.['workspace.file.processing'] || '正在处理文件...'}
+          />
         </PlaceholderContent>
       );
     }
@@ -344,7 +350,9 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
       return (
         <PlaceholderContent prefixCls={prefixCls} hashId={hashId}>
           <Alert
-            message="文件处理失败"
+            message={
+              locale?.['workspace.file.processFailed'] || '文件处理失败'
+            }
             description={contentState.error}
             type="error"
             showIcon

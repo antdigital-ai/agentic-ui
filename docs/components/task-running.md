@@ -18,22 +18,31 @@ group:
 
 ### TaskRunning
 
-| 参数              | 说明                   | 类型                                  | 默认值 |
-| ----------------- | ---------------------- | ------------------------------------- | ------ |
-| minutes           | 任务运行时长           | `string`                              | -      |
-| taskStatus        | 任务状态               | `TASK_STATUS`                         | -      |
-| taskRunningStatus | 任务运行状态           | `TASK_RUNNING_STATUS`                 | -      |
-| actionsRender     | 自定义操作按钮         | `TaskRunningActionsRender` \| `false` | -      |
-| variant           | 主题样式变体           | `'simple' \| 'default'`               | -      |
-| onCreateNewTask   | 创建新任务的回调函数   | `() => void`                          | -      |
-| onPause           | 暂停任务的回调函数     | `() => void`                          | -      |
-| onReplay          | 重新回放任务的回调函数 | `() => void`                          | -      |
-| onViewResult      | 查看任务结果的回调函数 | `() => void`                          | -      |
-| className         | 自定义类名             | `string`                              | -      |
+| 参数              | 说明                   | 类型                                  | 默认值      |
+| ----------------- | ---------------------- | ------------------------------------- | ----------- |
+| title             | 标题文案               | `string`                              | -           |
+| description       | 描述文案               | `string`                              | -           |
+| taskStatus        | 任务状态               | `TASK_STATUS`                         | -           |
+| taskRunningStatus | 任务运行状态           | `TASK_RUNNING_STATUS`                 | -           |
+| icon              | 自定义图标             | `React.ReactNode`                     | -           |
+| iconTooltip       | 图标提示文案           | `string`                              | -           |
+| actionsRender     | 自定义操作按钮         | `TaskRunningActionsRender` \| `false` | -           |
+| variant           | 主题样式变体           | `'simple' \| 'default'`               | `'default'` |
+| onCreateNewTask   | 创建新任务的回调函数   | `() => void`                          | -           |
+| onPause           | 暂停任务的回调函数     | `() => void`                          | -           |
+| onResume          | 继续任务的回调函数     | `() => void`                          | -           |
+| onStop            | 停止任务的回调函数     | `() => void`                          | -           |
+| onReplay          | 重新回放任务的回调函数 | `() => void`                          | -           |
+| onViewResult      | 查看任务结果的回调函数 | `() => void`                          | -           |
+| locale            | 国际化配置             | `object`                              | -           |
+| className         | 自定义类名             | `string`                              | -           |
+| style             | 自定义样式             | `React.CSSProperties`                 | -           |
 
-### TASK_STATUS
+### 类型定义
 
-任务状态枚举：
+#### TASK_STATUS
+
+任务状态枚举，用于控制任务的整体状态显示。
 
 ```typescript
 enum TASK_STATUS {
@@ -45,14 +54,16 @@ enum TASK_STATUS {
   ERROR = 'error',
   /** 任务已暂停 */
   PAUSE = 'pause',
+  /** 任务已停止 */
+  STOPPED = 'stopped',
   /** 任务已取消 */
   CANCELLED = 'cancelled',
 }
 ```
 
-### TASK_RUNNING_STATUS
+#### TASK_RUNNING_STATUS
 
-任务运行状态枚举：
+任务运行状态枚举，用于细粒度控制机器人动画和按钮显示。
 
 ```typescript
 enum TASK_RUNNING_STATUS {
@@ -63,4 +74,15 @@ enum TASK_RUNNING_STATUS {
   /** 已暂停 */
   PAUSE = 'pause',
 }
+```
+
+#### TaskRunningActionsRender
+
+自定义操作按钮渲染函数类型。
+
+```typescript
+type TaskRunningActionsRender = (props: {
+  status?: TASK_STATUS;
+  runningStatus?: TASK_RUNNING_STATUS;
+}) => React.ReactNode;
 ```

@@ -115,7 +115,6 @@ const genStyle: GenerateStyle<
         [`${token.componentCls}-editor`]: {
           flex: 1,
           height: '100%',
-          minHeight: '100%',
           maxHeight: 'none',
           overflow: 'hidden',
           width: '100%',
@@ -165,11 +164,13 @@ const genStyle: GenerateStyle<
         },
       },
       '&-editor-content': {
-        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
         maxHeight: 'inherit',
+        minHeight: 0,
         borderRadius: 'inherit',
-        scrollbarColor: 'var(--color-gray-text-tertiary) transparent',
-        scrollbarWidth: 'thin',
+        overflow: 'hidden',
         [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
           padding: `${MOBILE_PADDING} !important`,
         },
@@ -194,6 +195,9 @@ const genStyle: GenerateStyle<
         alignItems: 'center',
         font: 'var(--font-text-body-base)',
         color: 'var(--color-gray-text-default)',
+      },
+      '&-skill-mode &-editor-content': {
+        borderRadius: 0,
       },
       '&-tools-wrapper': {
         backgroundColor: '#fff',

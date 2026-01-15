@@ -59,6 +59,9 @@
           >
             文件工作台
           </div>
+          <div
+            class="ant-workspace-header-right"
+          />
         </div>
         <div
           class="ant-workspace-content"

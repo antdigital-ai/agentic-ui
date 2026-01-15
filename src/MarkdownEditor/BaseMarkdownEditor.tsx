@@ -123,6 +123,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
     },
     editorStyle,
     height,
+    children,
     ...rest
   } = props;
   // 是否挂载
@@ -436,6 +437,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 />
               </>
             )}
+            {children}
           </div>
         </EditorStoreContext.Provider>
       </PluginContext.Provider>

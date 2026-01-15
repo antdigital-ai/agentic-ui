@@ -8,6 +8,9 @@
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 32,
       overflowY: 'auto',
       minHeight: 200,
       padding: 'var(--padding-6x)',

@@ -172,11 +172,22 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         background:
           'linear-gradient(to bottom, #fff0 20%, var(--color-gray-bg-card-white) 70%)',
         width: '100%',
+        paddingTop: 8,
+        paddingBottom: 24,
+        gap: 24,
         position: 'absolute',
         bottom: 0,
         zIndex: 100,
         borderBottomLeftRadius: 'var(--radius-xl)',
         borderBottomRightRadius: 'var(--radius-xl)',
+      },
+      '&-footer-background': {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        pointerEvents: 'none',
       },
       [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
         '&-header': {

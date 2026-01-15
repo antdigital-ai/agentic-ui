@@ -9,6 +9,33 @@ group:
 
 # Changelog
 
+## v2.29.7
+
+🆕 FooterBackgroundLottie: 添加 Lottie 动画配置文件。 ([a77e7f6a](https://github.com/ant-design/agentic-ui/commit/a77e7f6a))
+
+## v2.29.4
+
+- Workspace
+  - 🆕 支持标题右侧自定义。 [@shuyan] ([619309d4](https://github.com/ant-design/agentic-ui/commit/619309d4))
+  - 💄 优化样式。 [@shuyan] ([619309d4](https://github.com/ant-design/agentic-ui/commit/619309d4))
+  - 🌐 补充国际化。 [@shuyan] ([619309d4](https://github.com/ant-design/agentic-ui/commit/619309d4))
+  - ✅ 补充测试用例。 [@shuyan] ([619309d4](https://github.com/ant-design/agentic-ui/commit/619309d4))
+  - 🆕 增加文件卡片自定义渲染能力。 [#263](https://github.com/ant-design/agentic-ui/pull/263) ([7be1d6a2](https://github.com/ant-design/agentic-ui/commit/7be1d6a2))
+
+- MarkdownInputField
+  - 🐞 修复样式问题。 [#267](https://github.com/ant-design/agentic-ui/pull/267) ([189d19c9](https://github.com/ant-design/agentic-ui/commit/189d19c9))
+
+- ToolUseBar
+  - 💄 优化调用工具组件样式。 [#264](https://github.com/ant-design/agentic-ui/pull/264) ([8ca40d7b](https://github.com/ant-design/agentic-ui/commit/8ca40d7b))
+
+- ChatLayout
+  - 💄 调整 `ant-chat-item-extra` 样式，优化间距和对齐方式。 ([24334255](https://github.com/ant-design/agentic-ui/commit/24334255))
+  - 🆕 增强样式适配能力，优化对话流 demo。 [#258](https://github.com/ant-design/agentic-ui/pull/258) ([a54a5934](https://github.com/ant-design/agentic-ui/commit/a54a5934))
+
+🆕 禁用单个波浪号功能。 [#265](https://github.com/ant-design/agentic-ui/pull/265) ([57d65ef2](https://github.com/ant-design/agentic-ui/commit/57d65ef2))
+
+📚 API 文档更新。 [#259](https://github.com/ant-design/agentic-ui/pull/259) ([66f9ec17](https://github.com/ant-design/agentic-ui/commit/66f9ec17))
+
 ## v2.29.3
 
 - MarkdownInputField

@@ -37,7 +37,6 @@ const genStyle = (
         height: 40,
       },
       '&-bubble-avatar-title': {
-        paddingTop: 'var(--padding-3x)',
         lineHeight: '20px',
         textAlign: 'justify',
         letterSpacing: 'normal',
@@ -71,7 +70,7 @@ const genStyle = (
         flexDirection: 'column',
         gap: 8,
         '&-pure': {
-          gap: 4,
+          gap: 8,
         },
         '&-right': {
           alignItems: 'flex-end',
@@ -166,6 +165,7 @@ const genStyle = (
 
       // 用户消息特定样式
       '&-bubble-user': {
+        marginBlockStart: -20, // title line height
         '&-avatar-title-user': {
           flexDirection: 'row-reverse', // 用户消息头像和标题顺序相反
           justifyContent: 'flex-end',

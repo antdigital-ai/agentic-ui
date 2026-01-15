@@ -571,17 +571,22 @@ describe('Workspace Component', () => {
 
   it('应该正确处理 aria-label', () => {
     const onClose = vi.fn();
+    const mockLocale = {
+      'workspace.closeWorkspace': '关闭工作空间',
+    } as any;
 
     render(
-      <TestWrapper>
-        <Workspace onClose={onClose}>
-          <Workspace.Realtime data={{ type: 'shell', content: '' }} />
-        </Workspace>
-      </TestWrapper>,
+      <ConfigProvider>
+        <I18nContext.Provider value={{ locale: mockLocale, language: 'zh-CN' }}>
+          <Workspace onClose={onClose}>
+            <Workspace.Realtime data={{ type: 'shell', content: '' }} />
+          </Workspace>
+        </I18nContext.Provider>
+      </ConfigProvider>,
     );
 
     const closeButton = screen.getByTestId('workspace-close');
-    expect(closeButton).toHaveAttribute('aria-label');
+    expect(closeButton).toHaveAttribute('aria-label', '关闭工作空间');
   });
 
   it('应该在没有 children 时返回 null', () => {
@@ -749,5 +754,429 @@ describe('Workspace Component', () => {
     // 点击搜索建议后，应展示结果标题
     fireEvent.click(suggestion);
     expect(screen.getByText('搜索结果1')).toBeInTheDocument();
+  });
+
+  describe('headerExtra 自定义 header 右侧区域', () => {
+    it('应该渲染 headerExtra 自定义内容', () => {
+      const customContent = (
+        <div data-testid="custom-header-extra">自定义按钮</div>
+      );
+
+      render(
+        <TestWrapper>
+          <Workspace headerExtra={customContent}>
+            <Workspace.Realtime
+              data={{ type: 'shell', content: 'test content' }}
+            />
+          </Workspace>
+        </TestWrapper>,
+      );
+
+      // 检查自定义内容是否渲染
+      expect(screen.getByTestId('custom-header-extra')).toBeInTheDocument();
+      expect(screen.getByText('自定义按钮')).toBeInTheDocument();
+    });
+
+    it('应该在关闭按钮之前渲染 headerExtra', () => {
+      const onClose = vi.fn();
+      const customContent = <button data-testid="custom-button">操作</button>;
+
+      const { container } = render(
+        <TestWrapper>
+          <Workspace onClose={onClose} headerExtra={customContent}>
+            <Workspace.Realtime
+              data={{ type: 'shell', content: 'test content' }}
+            />
+          </Workspace>
+        </TestWrapper>,
+      );
+
+      // 获取 header-right 容器 (注意：实际生成的类名是 ant-workspace-header-right)
+      const headerRight = container.querySelector(
+        '.ant-workspace-header-right',
+      );
+      expect(headerRight).toBeInTheDocument();
+
+      // 检查自定义内容和关闭按钮都存在
+      expect(screen.getByTestId('custom-button')).toBeInTheDocument();
+      expect(screen.getByTestId('workspace-close')).toBeInTheDocument();
+
+      // 验证顺序：自定义内容应该在关闭按钮之前
+      const children = headerRight?.children;
+      expect(children).toHaveLength(2);
+      expect(children?.[0]).toContainElement(
+        screen.getByTestId('custom-button'),
+      );
+      expect(children?.[1]).toContainElement(
+        screen.getByTestId('workspace-close'),
+      );
+    });
+
+    it('应该支持 headerExtra 中的交互操作', () => {
+      const handleClick = vi.fn();
+      const customContent = (
+        <button data-testid="action-button" onClick={handleClick}>
+          执行操作
+        </button>
+      );
+
+      render(
+        <TestWrapper>
+          <Workspace headerExtra={customContent}>
+            <Workspace.Realtime
+              data={{ type: 'shell', content: 'test content' }}
+            />
+          </Workspace>
+        </TestWrapper>,
+      );
+
+      const button = screen.getByTestId('action-button');
+      fireEvent.click(button);
+
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('应该支持 headerExtra 渲染多个元素', () => {
+      const customContent = (
+        <>
+          <button data-testid="button-1">按钮1</button>
+          <button data-testid="button-2">按钮2</button>
+          <span data-testid="text">文本</span>
+        </>
+      );
+
+      render(
+        <TestWrapper>
+          <Workspace headerExtra={customContent}>
+            <Workspace.Realtime
+              data={{ type: 'shell', content: 'test content' }}
+            />
+          </Workspace>
+        </TestWrapper>,
+      );
+
+      expect(screen.getByTestId('button-1')).toBeInTheDocument();
+      expect(screen.getByTestId('button-2')).toBeInTheDocument();
+      expect(screen.getByTestId('text')).toBeInTheDocument();
+    });
+
+    it('当 headerExtra 为 null 或 undefined 时不应渲染额外内容', () => {
+      const { container: container1 } = render(
+        <TestWrapper>
+          <Workspace headerExtra={null}>
+            <Workspace.Realtime
+              data={{ type: 'shell', content: 'test content' }}
+            />
+          </Workspace>
+        </TestWrapper>,
+      );
+
+      const { container: container2 } = render(
+        <TestWrapper>
+          <Workspace headerExtra={undefined}>
+            <Workspace.Realtime
+              data={{ type: 'shell', content: 'test content' }}
+            />
+          </Workspace>
+        </TestWrapper>,
+      );
+
+      // header-right 应该只包含 headerExtra 的位置（即使为空）
+      const headerRight1 = container1.querySelector(
+        '.ant-workspace-header-right',
+      );
+      const headerRight2 = container2.querySelector(
+        '.ant-workspace-header-right',
+      );
+
+      expect(headerRight1).toBeInTheDocument();
+      expect(headerRight2).toBeInTheDocument();
+    });
+
+    it('应该支持 headerExtra 与 onClose 同时使用', () => {
+      const onClose = vi.fn();
+      const handleAction = vi.fn();
+      const customContent = (
+        <button data-testid="custom-action" onClick={handleAction}>
+          自定义操作
+        </button>
+      );
+
+      render(
+        <TestWrapper>
+          <Workspace onClose={onClose} headerExtra={customContent}>
+            <Workspace.Realtime
+              data={{ type: 'shell', content: 'test content' }}
+            />
+          </Workspace>
+        </TestWrapper>,
+      );
+
+      // 点击自定义按钮
+      const customButton = screen.getByTestId('custom-action');
+      fireEvent.click(customButton);
+      expect(handleAction).toHaveBeenCalledTimes(1);
+      expect(onClose).not.toHaveBeenCalled();
+
+      // 点击关闭按钮
+      const closeButton = screen.getByTestId('workspace-close');
+      fireEvent.click(closeButton);
+      expect(onClose).toHaveBeenCalledTimes(1);
+      expect(handleAction).toHaveBeenCalledTimes(1); // 不应增加
+    });
+
+    it('应该支持 headerExtra 只存在而没有 onClose', () => {
+      const customContent = <div data-testid="only-extra">仅自定义内容</div>;
+
+      render(
+        <TestWrapper>
+          <Workspace headerExtra={customContent}>
+            <Workspace.Realtime
+              data={{ type: 'shell', content: 'test content' }}
+            />
+          </Workspace>
+        </TestWrapper>,
+      );
+
+      // 应该有自定义内容
+      expect(screen.getByTestId('only-extra')).toBeInTheDocument();
+
+      // 不应该有关闭按钮
+      expect(screen.queryByTestId('workspace-close')).not.toBeInTheDocument();
+    });
+
+    it('应该在 pure 模式下正常渲染 headerExtra', () => {
+      const customContent = <div data-testid="pure-extra">纯净模式</div>;
+
+      render(
+        <TestWrapper>
+          <Workspace pure headerExtra={customContent}>
+            <Workspace.Realtime
+              data={{ type: 'shell', content: 'test content' }}
+            />
+          </Workspace>
+        </TestWrapper>,
+      );
+
+      const workspace = screen.getByTestId('workspace');
+      expect(workspace).toHaveClass('ant-workspace-pure');
+      expect(screen.getByTestId('pure-extra')).toBeInTheDocument();
+    });
+  });
+
+  describe('国际化支持', () => {
+    it('应该使用默认中文文案', () => {
+      const mockLocale = {
+        'workspace.title': '工作空间',
+        'workspace.realtimeFollow': '实时跟随',
+        'workspace.task': '任务',
+        'workspace.closeWorkspace': '关闭工作空间',
+      } as any;
+
+      render(
+        <ConfigProvider>
+          <I18nContext.Provider
+            value={{ locale: mockLocale, language: 'zh-CN' }}
+          >
+            <Workspace onClose={() => {}}>
+              <Workspace.Realtime
+                data={{ type: 'shell', content: 'test content' }}
+              />
+              <Workspace.Task data={{ items: [] }} />
+            </Workspace>
+          </I18nContext.Provider>
+        </ConfigProvider>,
+      );
+
+      expect(screen.getByText('工作空间')).toBeInTheDocument();
+      expect(screen.getByText('实时跟随')).toBeInTheDocument();
+      expect(screen.getByText('任务')).toBeInTheDocument();
+    });
+
+    it('应该支持英文文案', () => {
+      const enLocale = {
+        'workspace.title': 'Workspace',
+        'workspace.realtimeFollow': 'Real-time follow',
+        'workspace.browser': 'Browser',
+        'workspace.task': 'Task',
+        'workspace.file': 'File',
+        'workspace.closeWorkspace': 'Close workspace',
+      } as any;
+
+      render(
+        <ConfigProvider>
+          <I18nContext.Provider value={{ locale: enLocale, language: 'en-US' }}>
+            <Workspace onClose={() => {}}>
+              <Workspace.Realtime
+                data={{ type: 'shell', content: 'test content' }}
+              />
+              <Workspace.Browser
+                suggestions={[]}
+                request={() => ({ items: [] })}
+              />
+              <Workspace.Task data={{ items: [] }} />
+              <Workspace.File nodes={[]} />
+            </Workspace>
+          </I18nContext.Provider>
+        </ConfigProvider>,
+      );
+
+      expect(screen.getByText('Workspace')).toBeInTheDocument();
+      expect(screen.getByText('Real-time follow')).toBeInTheDocument();
+      expect(screen.getByText('Browser')).toBeInTheDocument();
+      expect(screen.getByText('Task')).toBeInTheDocument();
+      expect(screen.getByText('File')).toBeInTheDocument();
+    });
+
+    it('应该在没有 locale 时使用默认文案', () => {
+      render(
+        <ConfigProvider>
+          <I18nContext.Provider
+            value={{ locale: {} as any, language: 'zh-CN' }}
+          >
+            <Workspace onClose={() => {}}>
+              <Workspace.Realtime
+                data={{ type: 'shell', content: 'test content' }}
+              />
+            </Workspace>
+          </I18nContext.Provider>
+        </ConfigProvider>,
+      );
+
+      // 应该显示默认的英文文案
+      expect(screen.getByText('Workspace')).toBeInTheDocument();
+    });
+
+    it('应该支持自定义标题覆盖国际化文案', () => {
+      const mockLocale = {
+        'workspace.title': '工作空间',
+      } as any;
+
+      render(
+        <ConfigProvider>
+          <I18nContext.Provider
+            value={{ locale: mockLocale, language: 'zh-CN' }}
+          >
+            <Workspace title="自定义标题" onClose={() => {}}>
+              <Workspace.Realtime
+                data={{ type: 'shell', content: 'test content' }}
+              />
+            </Workspace>
+          </I18nContext.Provider>
+        </ConfigProvider>,
+      );
+
+      // 自定义标题应该覆盖国际化配置
+      expect(screen.getByText('自定义标题')).toBeInTheDocument();
+      expect(screen.queryByText('工作空间')).not.toBeInTheDocument();
+    });
+
+    it('关闭按钮应该支持国际化 aria-label', () => {
+      const mockLocale = {
+        'workspace.closeWorkspace': '关闭工作空间',
+      } as any;
+
+      render(
+        <ConfigProvider>
+          <I18nContext.Provider
+            value={{ locale: mockLocale, language: 'zh-CN' }}
+          >
+            <Workspace onClose={() => {}}>
+              <Workspace.Realtime
+                data={{ type: 'shell', content: 'test content' }}
+              />
+            </Workspace>
+          </I18nContext.Provider>
+        </ConfigProvider>,
+      );
+
+      const closeButton = screen.getByTestId('workspace-close');
+      expect(closeButton).toHaveAttribute('aria-label', '关闭工作空间');
+    });
+
+    it('子组件标签页应该支持自定义配置覆盖国际化', () => {
+      const mockLocale = {
+        'workspace.realtimeFollow': '实时跟随',
+        'workspace.task': '任务',
+      } as any;
+
+      render(
+        <ConfigProvider>
+          <I18nContext.Provider
+            value={{ locale: mockLocale, language: 'zh-CN' }}
+          >
+            <Workspace>
+              <Workspace.Realtime
+                tab={{ title: '自定义实时' }}
+                data={{ type: 'shell', content: 'test' }}
+              />
+              <Workspace.Task data={{ items: [] }} />
+            </Workspace>
+          </I18nContext.Provider>
+        </ConfigProvider>,
+      );
+
+      // 自定义标题覆盖国际化
+      expect(screen.getByText('自定义实时')).toBeInTheDocument();
+      expect(screen.queryByText('实时跟随')).not.toBeInTheDocument();
+
+      // 未自定义的使用国际化
+      expect(screen.getByText('任务')).toBeInTheDocument();
+    });
+
+    it('RealtimeFollow 组件应该支持国际化标题', () => {
+      const mockLocale = {
+        'workspace.terminalExecution': '终端执行',
+        'workspace.createHtmlFile': '创建 HTML 文件',
+        'workspace.markdownContent': 'Markdown 内容',
+      } as any;
+
+      const { rerender } = render(
+        <ConfigProvider>
+          <I18nContext.Provider
+            value={{ locale: mockLocale, language: 'zh-CN' }}
+          >
+            <Workspace>
+              <Workspace.Realtime data={{ type: 'shell', content: 'test' }} />
+            </Workspace>
+          </I18nContext.Provider>
+        </ConfigProvider>,
+      );
+
+      // shell 类型应该显示"终端执行"
+      expect(screen.getByText('终端执行')).toBeInTheDocument();
+
+      // 测试 html 类型
+      rerender(
+        <ConfigProvider>
+          <I18nContext.Provider
+            value={{ locale: mockLocale, language: 'zh-CN' }}
+          >
+            <Workspace>
+              <Workspace.Realtime
+                data={{ type: 'html', content: '<div></div>' }}
+              />
+            </Workspace>
+          </I18nContext.Provider>
+        </ConfigProvider>,
+      );
+
+      expect(screen.getByText('创建 HTML 文件')).toBeInTheDocument();
+
+      // 测试 markdown 类型
+      rerender(
+        <ConfigProvider>
+          <I18nContext.Provider
+            value={{ locale: mockLocale, language: 'zh-CN' }}
+          >
+            <Workspace>
+              <Workspace.Realtime data={{ type: 'md', content: '# title' }} />
+            </Workspace>
+          </I18nContext.Provider>
+        </ConfigProvider>,
+      );
+
+      expect(screen.getByText('Markdown 内容')).toBeInTheDocument();
+    });
   });
 });

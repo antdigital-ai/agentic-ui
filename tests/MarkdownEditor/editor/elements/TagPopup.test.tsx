@@ -359,6 +359,125 @@ describe('TagPopup 组件测试', () => {
         expect(Array.isArray(callArgs[1])).toBe(true); // path 应该是数组
       });
     });
+
+    it('应该支持连续多次选择下拉选项而不报错', async () => {
+      // 此测试用例验证修复：连续选择下拉选项时不再抛出
+      // "Cannot destructure property 'path' of 'at' as it is null" 错误
+      const onSelect = vi.fn();
+      const items = [
+        { label: '选项1', key: 'tag1' },
+        { label: '选项2', key: 'tag2' },
+      ] as Array<{ label: string; key: string | number }>;
+
+      const { container, rerender } = render(
+        <ConfigProvider>
+          <SuggestionConnext.Provider value={mockSuggestionContext}>
+            <TagPopup
+              text=" "
+              items={items}
+              onSelect={onSelect}
+              type="panel"
+            >
+              <span data-testid="tag-content"> </span>
+            </TagPopup>
+          </SuggestionConnext.Provider>
+        </ConfigProvider>,
+      );
+
+      await waitFor(() => {
+        expect(
+          container.querySelector('[data-tag-popup-input]'),
+        ).toBeInTheDocument();
+      });
+
+      // 第一次选择
+      if (mockSuggestionContext.onSelectRef.current) {
+        mockSuggestionContext.onSelectRef.current('tag1');
+      }
+
+      await waitFor(() => {
+        expect(onSelect).toHaveBeenCalledWith('tag1', expect.any(Array));
+      });
+
+      // 模拟第一次选择后文本内容更新
+      rerender(
+        <ConfigProvider>
+          <SuggestionConnext.Provider value={mockSuggestionContext}>
+            <TagPopup
+              text="$tag1"
+              items={items}
+              onSelect={onSelect}
+              type="panel"
+            >
+              <span data-testid="tag-content">$tag1</span>
+            </TagPopup>
+          </SuggestionConnext.Provider>
+        </ConfigProvider>,
+      );
+
+      // 重置 mock 以便追踪第二次调用
+      onSelect.mockClear();
+
+      // 第二次选择 - 修复前会抛出错误
+      if (mockSuggestionContext.onSelectRef.current) {
+        expect(() => {
+          mockSuggestionContext.onSelectRef.current!('tag1');
+        }).not.toThrow();
+      }
+
+      await waitFor(() => {
+        expect(onSelect).toHaveBeenCalledWith('tag1', expect.any(Array));
+      });
+
+      // 验证连续选择后路径参数仍然有效
+      const callArgs = onSelect.mock.calls[0];
+      expect(Array.isArray(callArgs[1])).toBe(true);
+      expect(callArgs[1].length).toBeGreaterThan(0);
+    });
+
+    it('应该在节点已有内容时正确处理 onSelect 回调', async () => {
+      // 此测试验证：当节点已有内容（如 "$tag1"）时，再次选择不会导致
+      // Slate 的 insertText 操作失败
+      const onSelect = vi.fn();
+      const items = [
+        { label: '选项1', key: 'tag1' },
+        { label: '选项2', key: 'tag2' },
+      ] as Array<{ label: string; key: string | number }>;
+
+      // 初始状态：节点已有内容
+      const { container } = render(
+        <ConfigProvider>
+          <SuggestionConnext.Provider value={mockSuggestionContext}>
+            <TagPopup
+              text="$tag1"
+              items={items}
+              onSelect={onSelect}
+              type="panel"
+            >
+              <span data-testid="tag-content">$tag1</span>
+            </TagPopup>
+          </SuggestionConnext.Provider>
+        </ConfigProvider>,
+      );
+
+      await waitFor(() => {
+        expect(
+          container.querySelector('[data-tag-popup-input]'),
+        ).toBeInTheDocument();
+      });
+
+      // 在已有内容的情况下选择
+      if (mockSuggestionContext.onSelectRef.current) {
+        mockSuggestionContext.onSelectRef.current('tag2');
+      }
+
+      await waitFor(() => {
+        expect(onSelect).toHaveBeenCalledWith('tag2', expect.any(Array));
+      });
+
+      // 验证 setOpen 被正确调用
+      expect(mockSuggestionContext.setOpen).toHaveBeenCalledWith(false);
+    });
   });
 
   describe('onChange 回调', () => {

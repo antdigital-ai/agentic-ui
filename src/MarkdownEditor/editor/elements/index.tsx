@@ -280,14 +280,24 @@ const MLeafComponent = (
                     `${triggerText ?? '$'}${v}`,
                   ) || `${triggerText ?? '$'}${v}`;
 
+                // 使用 Point 而不是 Path 来避免 Slate 的 Range 转换问题
+                // 先删除节点的全部文本，再在起始位置插入新文本
+                const startPoint = Editor.start(markdownEditorRef.current, path);
+                const endPoint = Editor.end(markdownEditorRef.current, path);
+
+                // 删除节点的全部文本
+                Transforms.delete(markdownEditorRef.current, {
+                  at: { anchor: startPoint, focus: endPoint },
+                });
+
+                // 在节点起始位置插入新文本
                 Transforms.insertText(markdownEditorRef.current, newText, {
-                  at: path,
+                  at: startPoint,
                 });
 
                 Transforms.setNodes(
                   markdownEditorRef.current,
                   {
-                    text: newText,
                     tag: true,
                     code: true,
                     placeholder,

@@ -25,6 +25,9 @@
             >
               文件管理-搜索
             </div>
+            <div
+              class="ant-workspace-header-right"
+            />
           </div>
           <div
             class="ant-workspace-content"

@@ -26,13 +26,16 @@ group:
 | filter        | 数据过滤函数           | `(item: VisualListItem) => boolean`                        | `() => true`    |
 | emptyRender   | 空状态自定义渲染函数   | `() => React.ReactNode`                                    | -               |
 | renderItem    | 自定义列表项渲染函数   | `(item: VisualListItem, index: number) => React.ReactNode` | -               |
-| loading       | 是否显示加载状态       | `boolean`                                                  | `false`         |
+| loading       | **已废弃**，请使用 `isLoading` | `boolean`                                          | `false`         |
+| isLoading     | 是否显示加载状态       | `boolean`                                                  | `false`         |
 | loadingRender | 加载状态自定义渲染函数 | `() => React.ReactNode`                                    | -               |
 | itemStyle     | 列表项自定义样式       | `React.CSSProperties`                                      | -               |
 | imageStyle    | 图片自定义样式         | `React.CSSProperties`                                      | -               |
 | linkStyle     | 链接自定义样式         | `React.CSSProperties`                                      | -               |
 | shape         | 图片形状               | `'default' \| 'circle'`                                    | `'default'`     |
 | prefixCls     | 样式前缀类名           | `string`                                                   | `'visual-list'` |
+| variant       | 组件变体               | `'default' \| 'outline' \| 'borderless'`                   | `'default'`     |
+| description   | 描述文字               | `string`                                                   | -               |
 
 ### VisualListItem
 
@@ -81,6 +84,25 @@ const imageData: VisualListItem[] = [
 <VisualList data={imageData} shape="default" />
 ```
 
+### 组件变体
+
+```tsx | pure
+// 带边框
+<VisualList data={imageData} variant="outline" />
+
+// 无边框
+<VisualList data={imageData} variant="borderless" />
+```
+
+### 带描述文字
+
+```tsx | pure
+<VisualList
+  data={imageData}
+  description="这里是列表的描述信息"
+/>
+```
+
 ### 数据过滤
 
 ```tsx | pure
@@ -114,7 +136,7 @@ const imageData: VisualListItem[] = [
 // 加载状态
 <VisualList
   data={[]}
-  loading={true}
+  isLoading={true}
   loadingRender={() => <div>正在加载...</div>}
 />
 ```

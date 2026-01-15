@@ -18,15 +18,42 @@ group:
 
 ### ChatLayoutProps
 
-| 属性           | 类型                | 默认值   | 描述                                             |
-| -------------- | ------------------- | -------- | ------------------------------------------------ |
-| header         | LayoutHeaderConfig  | -        | 头部配置对象，详见下方 LayoutHeaderConfig        |
-| children       | ReactNode           | -        | 内容区域的自定义内容                             |
-| footer         | ReactNode           | -        | 底部区域的自定义内容                             |
-| footerHeight   | number              | 90       | 底部区域的高度（单位：px）                       |
-| scrollBehavior | 'smooth' \| 'auto'  | 'smooth' | 滚动行为，'smooth' 为平滑滚动，'auto' 为立即滚动 |
-| className      | string              | -        | 自定义类名                                       |
-| style          | React.CSSProperties | -        | 自定义样式                                       |
+| 属性                 | 类型                 | 默认值   | 描述                                             |
+| -------------------- | -------------------- | -------- | ------------------------------------------------ |
+| header               | LayoutHeaderConfig   | -        | 头部配置对象，详见下方 LayoutHeaderConfig        |
+| children             | ReactNode            | -        | 内容区域的自定义内容                             |
+| footer               | ReactNode            | -        | 底部区域的自定义内容                             |
+| footerHeight         | number               | 48       | 底部区域的最小高度（单位：px）                   |
+| scrollBehavior       | 'smooth' \| 'auto'   | 'smooth' | 滚动行为，'smooth' 为平滑滚动，'auto' 为立即滚动 |
+| showFooterBackground | boolean              | true     | 是否显示底部背景动效                             |
+| className            | string               | -        | 自定义类名                                       |
+| style                | React.CSSProperties  | -        | 自定义样式                                       |
+| classNames           | ChatLayoutClassNames | -        | 自定义各部分类名，详见下方 ChatLayoutClassNames  |
+| styles               | ChatLayoutStyles     | -        | 自定义各部分样式，详见下方 ChatLayoutStyles      |
+
+### ChatLayoutClassNames
+
+用于自定义组件各部分的类名。
+
+| 属性             | 类型   | 描述             |
+| ---------------- | ------ | ---------------- |
+| root             | string | 根容器类名       |
+| content          | string | 内容区域类名     |
+| scrollable       | string | 滚动区域类名     |
+| footer           | string | 底部区域类名     |
+| footerBackground | string | 底部背景区域类名 |
+
+### ChatLayoutStyles
+
+用于自定义组件各部分的内联样式。
+
+| 属性             | 类型                | 描述             |
+| ---------------- | ------------------- | ---------------- |
+| root             | React.CSSProperties | 根容器样式       |
+| content          | React.CSSProperties | 内容区域样式     |
+| scrollable       | React.CSSProperties | 滚动区域样式     |
+| footer           | React.CSSProperties | 底部区域样式     |
+| footerBackground | React.CSSProperties | 底部背景区域样式 |
 
 ### LayoutHeaderConfig
 
@@ -63,3 +90,5 @@ group:
 3. 所有按钮都支持键盘导航和屏幕阅读器
 4. 支持受控和非受控两种模式，灵活适应不同使用场景
 5. 通过 ref 可以访问滚动容器和手动控制滚动行为
+6. 底部背景动效默认开启，可通过 `showFooterBackground` 控制
+7. 支持通过 `classNames` 和 `styles` 精细化定制各部分样式

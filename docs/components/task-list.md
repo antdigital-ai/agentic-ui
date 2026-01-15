@@ -18,19 +18,55 @@ group:
 
 ### TaskList
 
-| 参数      | 说明         | 类型         | 默认值 |
-| --------- | ------------ | ------------ | ------ |
-| items     | 任务列表数据 | `TaskItem[]` | `[]`   |
-| className | 自定义类名   | `string`     | -      |
+| 参数 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| items | 任务列表数据 | `TaskItem[]` | `[]` |
+| className | 自定义类名 | `string` | - |
+| expandedKeys | 受控模式：当前展开的任务项 key 数组 | `string[]` | - |
+| onExpandedKeysChange | 受控模式：展开状态变化时的回调函数 | `(expandedKeys: string[]) => void` | - |
 
 ### TaskItem
 
-| 参数    | 说明         | 类型                                   | 默认值 |
-| ------- | ------------ | -------------------------------------- | ------ |
-| key     | 任务唯一标识 | `string`                               | -      |
-| title   | 任务标题     | `string`                               | -      |
-| content | 任务内容     | `React.ReactNode \| React.ReactNode[]` | -      |
-| status  | 任务状态     | `'success' \| 'error' \| 'pending'`    | -      |
+| 参数 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| key | 任务唯一标识 | `string` | - |
+| title | 任务标题 | `string` | - |
+| content | 任务内容 | `React.ReactNode \| React.ReactNode[]` | - |
+| status | 任务状态 | `'success' \| 'loading' \| 'pending' \| 'error'` | - |
+
+### 受控模式示例
+
+```tsx
+import { useState } from 'react';
+import { TaskList } from '@ant-design/agentic-ui';
+
+export default () => {
+  const [expandedKeys, setExpandedKeys] = useState(['task-1']);
+
+  const items = [
+    {
+      key: 'task-1',
+      title: '任务 1',
+      status: 'success',
+      content: '任务内容 1'
+    },
+    {
+      key: 'task-2',
+      title: '任务 2',
+      status: 'loading',
+      content: '任务内容 2'
+    }
+  ];
+
+  return (
+    <TaskList
+      items={items}
+      expandedKeys={expandedKeys}
+      onExpandedKeysChange={setExpandedKeys}
+    />
+  );
+};
+```
 
 ### 样式定制
 

@@ -34,22 +34,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         color: 'var(--color-gray-text-default)',
         letterSpacing: 'var(--letter-spacing-h5-base, normal)',
       },
-
-      [`${token.componentCls}-close`]: {
-        padding: 'var(--padding-1x)',
-        borderRadius: '6px',
-        color: 'var(--color-gray-text-secondary)',
-        cursor: 'pointer',
-        transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
-
-        '&:hover': {
-          color: 'var(--color-gray-text-default)',
-          backgroundColor: 'var(--color-gray-control-fill-hover)',
-        },
-
-        '&:focus': {
-          outline: '2px solid var(--color-primary-control-fill-primary)',
-          outlineOffset: '2px',
+      [`${token.componentCls}-header-right`]: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: 'var(--gap-2x)',
+        [`${token.componentCls}-close`]: {
+          cursor: 'pointer',
+          transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
         },
       },
 

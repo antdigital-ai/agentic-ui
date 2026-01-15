@@ -44,7 +44,11 @@ describe('HistoryNewChat', () => {
 
     await act(async () => {
       fireEvent.click(button);
-      // 等待 Promise 完成
+    });
+
+    // 等待所有异步操作完成，包括 setState
+    await act(async () => {
+      await Promise.resolve();
       await Promise.resolve();
     });
 
@@ -63,7 +67,11 @@ describe('HistoryNewChat', () => {
 
     await act(async () => {
       fireEvent.keyDown(button, { key: 'Enter' });
-      // 等待 Promise 完成
+    });
+
+    // 等待所有异步操作完成，包括 setState
+    await act(async () => {
+      await Promise.resolve();
       await Promise.resolve();
     });
 
@@ -82,7 +90,11 @@ describe('HistoryNewChat', () => {
 
     await act(async () => {
       fireEvent.keyDown(button, { key: ' ' });
-      // 等待 Promise 完成
+    });
+
+    // 等待所有异步操作完成，包括 setState
+    await act(async () => {
+      await Promise.resolve();
       await Promise.resolve();
     });
 
@@ -117,10 +129,11 @@ describe('HistoryNewChat', () => {
   });
 
   it('应该在加载时设置 aria-busy 和 aria-disabled', async () => {
+    let resolvePromise: () => void;
     const onNewChat = vi.fn(
       () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 100);
+        new Promise<void>((resolve) => {
+          resolvePromise = resolve;
         }),
     );
     render(
@@ -140,13 +153,20 @@ describe('HistoryNewChat', () => {
     // 此时 loading 状态应该已经设置为 true
     expect(button).toHaveAttribute('aria-busy', 'true');
     expect(button).toHaveAttribute('aria-disabled', 'true');
+
+    // 确保在测试结束前完成 Promise，避免在测试环境拆除后执行 setState
+    await act(async () => {
+      resolvePromise!();
+      await Promise.resolve();
+    });
   });
 
   it('应该防止在加载时重复点击', async () => {
+    let resolvePromise: () => void;
     const onNewChat = vi.fn(
       () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 100);
+        new Promise<void>((resolve) => {
+          resolvePromise = resolve;
         }),
     );
     render(
@@ -177,6 +197,12 @@ describe('HistoryNewChat', () => {
 
     // 应该只调用一次，因为后续点击被 loading 状态阻止
     expect(onNewChat).toHaveBeenCalledTimes(1);
+
+    // 确保在测试结束前完成 Promise，避免在测试环境拆除后执行 setState
+    await act(async () => {
+      resolvePromise!();
+      await Promise.resolve();
+    });
   });
 
   it('应该应用自定义类名', async () => {
@@ -205,7 +231,11 @@ describe('HistoryNewChat', () => {
 
     await act(async () => {
       fireEvent.click(button);
-      // 等待 Promise 完成
+    });
+
+    // 等待所有异步操作完成，包括 setState
+    await act(async () => {
+      await Promise.resolve();
       await Promise.resolve();
     });
 
@@ -218,7 +248,11 @@ describe('HistoryNewChat', () => {
     // 加载完成后应该能够再次点击
     await act(async () => {
       fireEvent.click(button);
-      // 等待 Promise 完成
+    });
+
+    // 等待所有异步操作完成，包括 setState
+    await act(async () => {
+      await Promise.resolve();
       await Promise.resolve();
     });
 
@@ -227,10 +261,11 @@ describe('HistoryNewChat', () => {
   });
 
   it('应该防止通过键盘在加载时重复触发', async () => {
+    let resolvePromise: () => void;
     const onNewChat = vi.fn(
       () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 100);
+        new Promise<void>((resolve) => {
+          resolvePromise = resolve;
         }),
     );
     render(
@@ -261,6 +296,12 @@ describe('HistoryNewChat', () => {
 
     // 应该只调用一次，因为后续按键被 loading 状态阻止
     expect(onNewChat).toHaveBeenCalledTimes(1);
+
+    // 确保在测试结束前完成 Promise，避免在测试环境拆除后执行 setState
+    await act(async () => {
+      resolvePromise!();
+      await Promise.resolve();
+    });
   });
 
   it('应该忽略其他按键', () => {

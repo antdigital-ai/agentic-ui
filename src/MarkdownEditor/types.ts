@@ -480,6 +480,8 @@ export type MarkdownEditorProps = {
     ) => React.ReactNode;
   };
 
+  children?: React.ReactNode;
+
   /**
    * 其他属性
    */

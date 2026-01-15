@@ -210,6 +210,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
     },
     [`${token.componentCls}-container`]: {
+      position: 'relative',
       background: 'var(--color-gray-bg-page)',
       borderBottom: '1px solid rgba(0, 16, 64, 0.0627)',
       '&-empty': {

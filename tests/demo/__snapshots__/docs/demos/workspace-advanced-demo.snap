@@ -22,28 +22,49 @@
           >
             高级工作空间
           </div>
-          <span
-            aria-label="关闭工作空间"
-            class="anticon anticon-close ant-workspace-close"
-            data-testid="workspace-close"
-            role="img"
-            tabindex="-1"
+          <div
+            class="ant-workspace-header-right"
           >
-            <svg
-              aria-hidden="true"
-              data-icon="close"
-              fill="currentColor"
-              fill-rule="evenodd"
-              focusable="false"
-              height="1em"
-              viewBox="64 64 896 896"
-              width="1em"
+            <span
+              aria-describedby="test-id"
+              aria-label="关闭工作空间"
+              class="ant-agentic-md-editor-action-icon-box ant-workspace-close ant-agentic-md-editor-action-icon-box-light"
+              data-testid="workspace-close"
+              data-title="关闭工作空间"
+              role="button"
+              tabindex="0"
             >
-              <path
-                d="M799.86 166.31c.02 0 .04.02.08.06l57.69 57.7c.04.03.05.05.06.08a.12.12 0 010 .06c0 .03-.02.05-.06.09L569.93 512l287.7 287.7c.04.04.05.06.06.09a.12.12 0 010 .07c0 .02-.02.04-.06.08l-57.7 57.69c-.03.04-.05.05-.07.06a.12.12 0 01-.07 0c-.03 0-.05-.02-.09-.06L512 569.93l-287.7 287.7c-.04.04-.06.05-.09.06a.12.12 0 01-.07 0c-.02 0-.04-.02-.08-.06l-57.69-57.7c-.04-.03-.05-.05-.06-.07a.12.12 0 010-.07c0-.03.02-.05.06-.09L454.07 512l-287.7-287.7c-.04-.04-.05-.06-.06-.09a.12.12 0 010-.07c0-.02.02-.04.06-.08l57.7-57.69c.03-.04.05-.05.07-.06a.12.12 0 01.07 0c.03 0 .05.02.09.06L512 454.07l287.7-287.7c.04-.04.06-.05.09-.06a.12.12 0 01.07 0z"
-              />
-            </svg>
-          </span>
+              <svg
+                class="sofa-icons-icon"
+                fill="currentColor"
+                fill-rule="evenodd"
+                height="1em"
+                style="vertical-align: -0.125em;"
+                viewBox="0 0 16 16"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <clippath
+                    id="X-master_svg0_339_8586"
+                  >
+                    <rect
+                      height="16"
+                      rx="0"
+                      width="16"
+                    />
+                  </clippath>
+                </defs>
+                <g
+                  clip-path="url(#X-master_svg0_339_8586)"
+                >
+                  <path
+                    d="M12.471 4.471a.667.667 0 1 0-.943-.942L8 7.057 4.47 3.53a.667.667 0 1 0-.942.942L7.057 8 3.53 11.529a.667.667 0 0 0 .942.942L8 8.943l3.529 3.528a.667.667 0 0 0 .942-.942L8.943 8z"
+                  />
+                </g>
+              </svg>
+            </span>
+          </div>
         </div>
         <div
           class="ant-workspace-tabs"
@@ -51,6 +72,7 @@
         >
           <div
             aria-label="segmented control"
+            aria-orientation="horizontal"
             class="ant-segmented ant-workspace-segmented ant-segmented-block"
             data-testid="workspace-segmented"
             role="radiogroup"
@@ -69,7 +91,6 @@
                   type="radio"
                 />
                 <div
-                  aria-selected="true"
                   class="ant-segmented-item-label"
                 >
                   <span
@@ -134,7 +155,6 @@
                   type="radio"
                 />
                 <div
-                  aria-selected="false"
                   class="ant-segmented-item-label"
                   title=""
                 />
@@ -148,7 +168,6 @@
                   type="radio"
                 />
                 <div
-                  aria-selected="false"
                   class="ant-segmented-item-label"
                 >
                   <span
@@ -207,7 +226,6 @@
                   type="radio"
                 />
                 <div
-                  aria-selected="false"
                   class="ant-segmented-item-label"
                 >
                   <span
@@ -271,7 +289,6 @@
                   type="radio"
                 />
                 <div
-                  aria-selected="false"
                   class="ant-segmented-item-label"
                 >
                   <div

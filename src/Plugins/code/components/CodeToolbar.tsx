@@ -288,7 +288,7 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
           />
         ) : null}
         <ActionIconBox
-          title="主题"
+          title={i18n?.locale?.theme || '主题'}
           theme={theme === 'chaos' ? 'dark' : 'light'}
           onClick={() => {
             setTheme(theme === 'github' ? 'chaos' : 'github');
@@ -322,7 +322,7 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
           <Copy />
         </ActionIconBox>
         <ActionIconBox
-          title="展开/收起"
+          title={i18n?.locale?.expandCollapse || '展开/收起'}
           theme={theme === 'chaos' ? 'dark' : 'light'}
           onClick={() => {
             onExpandToggle?.();
