@@ -361,11 +361,11 @@ test.describe('MarkdownInputField 快捷键功能', () => {
     // 先确保没有选中文本，然后按 Home 键
     await markdownInputFieldPage.focus();
     await markdownInputFieldPage.pressKey('Home');
-    
+
     // 等待光标移动到开头（通过验证输入后的文本位置来确认）
     // 直接输入完整文本
     await markdownInputFieldPage.typeText('Prefix ');
-    
+
     // 使用智能等待验证文本已正确插入到开头
     await expect
       .poll(
@@ -391,7 +391,7 @@ test.describe('MarkdownInputField 快捷键功能', () => {
         },
       )
       .toBe(true);
-    
+
     const afterHome = await markdownInputFieldPage.getText();
     // 验证文本包含新插入的内容
     expect(afterHome).toContain('Prefix');
