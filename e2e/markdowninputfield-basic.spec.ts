@@ -358,10 +358,40 @@ test.describe('MarkdownInputField 快捷键功能', () => {
     expect(afterEnd.trim().endsWith('End')).toBe(true);
 
     // 移动到开头并插入
+    // 先确保没有选中文本，然后按 Home 键
+    await markdownInputFieldPage.focus();
     await markdownInputFieldPage.pressKey('Home');
-    // 等待光标移动到开头
-    await markdownInputFieldPage.page.waitForTimeout(100);
+    
+    // 等待光标移动到开头（通过验证输入后的文本位置来确认）
+    // 直接输入完整文本
     await markdownInputFieldPage.typeText('Prefix ');
+    
+    // 使用智能等待验证文本已正确插入到开头
+    await expect
+      .poll(
+        async () => {
+          const text = await markdownInputFieldPage.getText();
+          // 验证文本包含新插入的内容且位置正确（Prefix 应该在开头）
+          const hasPrefix = text.includes('Prefix');
+          const hasMiddleContent = text.includes('Middle Content');
+          // 验证 Prefix 在 Middle Content 之前（通过检查文本顺序）
+          const prefixIndex = text.indexOf('Prefix');
+          const middleIndex = text.indexOf('Middle Content');
+          return (
+            hasPrefix &&
+            hasMiddleContent &&
+            prefixIndex !== -1 &&
+            middleIndex !== -1 &&
+            prefixIndex < middleIndex
+          );
+        },
+        {
+          timeout: 3000,
+          message: '等待文本插入到开头',
+        },
+      )
+      .toBe(true);
+    
     const afterHome = await markdownInputFieldPage.getText();
     // 验证文本包含新插入的内容
     expect(afterHome).toContain('Prefix');

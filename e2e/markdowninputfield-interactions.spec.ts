@@ -36,8 +36,13 @@ test.describe('MarkdownInputField 交互功能', () => {
       const text = await markdownInputFieldPage.getText();
       expect(text).toContain('Line 1');
       expect(text).toContain('Line 2');
-      // 验证包含换行符 (innerText 可能将换行显示为换行)
-      expect(text).toMatch(/Line 1\s+Line 2/); 
+      
+      // 验证换行：检查是否有多个段落元素（Slate 使用块级元素表示换行）
+      const paragraphCount = await markdownInputFieldPage.editableInput.evaluate((el) => {
+        const paragraphs = el.querySelectorAll('div[data-be="paragraph"]');
+        return paragraphs.length || el.children.length;
+      });
+      expect(paragraphCount).toBeGreaterThanOrEqual(2);
     });
 
     test('点击发送按钮应该发送消息', async ({ markdownInputFieldPage }) => {
