@@ -1,4 +1,4 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { createElement, useContext } from 'react';
 import { debugInfo } from '../../../../Utils/debugUtils';
@@ -31,8 +31,14 @@ export const List = ({
   attributes,
   children,
 }: ElementProps<ListNode>) => {
+  // 支持新的列表类型和向后兼容
+  const isOrdered =
+    element.type === 'numbered-list' ||
+    (element.type === 'list' && (element as any).order);
+  
   debugInfo('List - 渲染列表', {
-    order: element.order,
+    type: element.type,
+    isOrdered,
     task: element.task,
     start: element.start,
     childrenCount: element.children?.length,
@@ -43,10 +49,14 @@ export const List = ({
   const { wrapSSR, hashId } = useStyle(baseCls);
 
   const listContent = React.useMemo(() => {
-    const tag = element.order ? 'ol' : 'ul';
+    // 支持新的列表类型和向后兼容
+    const isOrdered =
+      element.type === 'numbered-list' ||
+      (element.type === 'list' && (element as any).order);
+    const tag = isOrdered ? 'ol' : 'ul';
     debugInfo('List - useMemo 渲染', {
       tag,
-      order: element.order,
+      type: element.type,
       start: element.start,
       task: element.task,
     });
@@ -71,9 +81,9 @@ export const List = ({
               className: classNames(
                 baseCls,
                 hashId,
-                element.order ? 'ol' : 'ul',
+                isOrdered ? 'ol' : 'ul',
               ),
-              start: element.start,
+              start: isOrdered ? element.start : undefined,
               ['data-task']: element.task ? 'true' : undefined,
             },
             children,
@@ -82,8 +92,9 @@ export const List = ({
       </ListContext.Provider>,
     );
   }, [
+    element.type,
     element.task,
-    element.order,
+    isOrdered,
     element.start,
     element.children,
     baseCls,

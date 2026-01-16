@@ -51,19 +51,32 @@ export const handleList = (currentElement: any, parseNodes: ParseNodesFn) => {
     finished: currentElement.finished,
     childrenCount: currentElement.children?.length,
   });
+  
+  const isOrdered = currentElement.ordered;
+  const listType = isOrdered ? 'numbered-list' : 'bulleted-list';
+  const children = parseNodes(currentElement.children, false, currentElement);
+  const hasTask = children?.some((s: any) => typeof s.checked === 'boolean');
+  
   const el: any = {
-    type: 'list',
-    order: currentElement.ordered,
-    start: currentElement.start,
+    type: listType,
     ...(currentElement.finished !== undefined && {
       finished: currentElement.finished,
     }),
-    children: parseNodes(currentElement.children, false, currentElement),
+    children,
   };
-  el.task = el.children?.some((s: any) => typeof s.checked === 'boolean');
+  
+  // 有序列表需要 start 属性
+  if (isOrdered && currentElement.start) {
+    el.start = currentElement.start;
+  }
+  
+  // 任务列表需要 task 属性
+  if (hasTask) {
+    el.task = true;
+  }
+  
   debugInfo('handleList - 列表处理完成', {
     type: el.type,
-    order: el.order,
     start: el.start,
     task: el.task,
     childrenCount: el.children?.length,

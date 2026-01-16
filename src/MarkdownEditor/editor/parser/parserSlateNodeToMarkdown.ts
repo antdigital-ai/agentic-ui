@@ -263,7 +263,9 @@ const parserNode = (
     case 'media':
       str += handleMedia(node);
       break;
-    case 'list':
+    case 'bulleted-list':
+    case 'numbered-list':
+    case 'list': // 向后兼容
       str += '\n' + handleList(node, preString, parent, plugins) + '\n\n';
       break;
     case 'list-item':
@@ -540,16 +542,23 @@ export const parserSlateNodeToMarkdown = (
       debugInfo(`parserSlateNodeToMarkdown - 引用块处理完成 ${i}`, {
         contentLength: blockquoteContent.length,
       });
-    } else if (node.type === 'list') {
+    } else if (
+      node.type === 'bulleted-list' ||
+      node.type === 'numbered-list' ||
+      node.type === 'list' // 向后兼容
+    ) {
       debugInfo(`parserSlateNodeToMarkdown - 处理列表 ${i}`, {
-        isOrdered: node.order,
+        type: node.type,
+        isOrdered: node.type === 'numbered-list' || node.order,
         start: node.start,
         childrenCount: node.children?.length,
       });
       // Handle lists
+      const isOrdered =
+        node.type === 'numbered-list' || (node.type === 'list' && node.order);
       const listItems = node.children
         .map((item: any, index: number) => {
-          const prefix = node.order ? `${index + (node.start || 1)}.` : '-';
+          const prefix = isOrdered ? `${index + (node.start || 1)}.` : '-';
           return (
             prefix +
             ' ' +
@@ -572,8 +581,12 @@ export const parserSlateNodeToMarkdown = (
       });
     } else if (
       node.type === 'paragraph' &&
-      tree[i - 1]?.type === 'list' &&
-      tree[i + 1]?.type === 'list'
+      (tree[i - 1]?.type === 'list' ||
+        tree[i - 1]?.type === 'bulleted-list' ||
+        tree[i - 1]?.type === 'numbered-list') &&
+      (tree[i + 1]?.type === 'list' ||
+        tree[i + 1]?.type === 'bulleted-list' ||
+        tree[i + 1]?.type === 'numbered-list')
     ) {
       if (!Node.string(node)?.replace(/\s|\t/g, '')) {
         str += '<br/>\n\n';
@@ -600,7 +613,11 @@ export const parserSlateNodeToMarkdown = (
           str += '\n\n';
         }
         // Lists should have double newlines after them
-        else if (node.type === 'list') {
+        else if (
+          node.type === 'list' ||
+          node.type === 'bulleted-list' ||
+          node.type === 'numbered-list'
+        ) {
           str += '\n\n';
         }
         // Most block elements should have double newlines
@@ -1338,7 +1355,7 @@ const handleMedia = (node: any) => {
 
 /**
  * 处理列表节点，递归处理其子节点
- * @param node - 列表节点
+ * @param node - 列表节点（bulleted-list、numbered-list 或 list）
  * @param preString - 前缀字符串，用于处理缩进
  * @param parent - 父节点数组
  * @param plugins - 可选的插件数组
@@ -1350,12 +1367,27 @@ const handleList = (
   parent: any[],
   plugins?: MarkdownEditorPlugin[],
 ) => {
-  return parserSlateNodeToMarkdown(
-    node.children,
-    preString,
-    [...parent, node],
-    plugins,
-  );
+  // 检查是否在嵌套列表中（父节点是 list-item）
+  const isNested = parent.length > 0 && parent[parent.length - 1]?.type === 'list-item';
+  
+  // 如果是嵌套列表，需要添加缩进
+  const indent = isNested ? '  ' : '';
+  
+  // 递归处理列表项，每个列表项都会添加缩进前缀
+  const listItems = node.children
+    .map((item: any, index: number) => {
+      const isOrdered =
+        node.type === 'numbered-list' || (node.type === 'list' && node.order);
+      const prefix = isOrdered ? `${index + (node.start || 1)}.` : '-';
+      
+      // 处理列表项内容，如果是嵌套列表，需要额外缩进
+      const itemContent = parserNode(item, indent + preString, [...parent, node], plugins).trimEnd();
+      
+      return indent + prefix + ' ' + itemContent;
+    })
+    .join('\n' + indent);
+  
+  return listItems;
 };
 
 /**
@@ -1372,12 +1404,33 @@ const handleListItem = (
   parent: any[],
   plugins?: MarkdownEditorPlugin[],
 ) => {
-  return parserSlateNodeToMarkdown(
-    node.children,
-    preString,
-    [...parent, node],
-    plugins,
-  );
+  // 列表项的第一个子节点应该是段落或其他块级元素
+  // 后续子节点可能是嵌套的列表
+  const result: string[] = [];
+  
+  for (let i = 0; i < node.children.length; i++) {
+    const child = node.children[i];
+    const childResult = parserNode(child, preString, [...parent, node], plugins);
+    
+    if (i === 0) {
+      // 第一个子节点是主要内容
+      result.push(childResult);
+    } else {
+      // 后续子节点可能是嵌套列表，需要换行并添加缩进
+      if (
+        child.type === 'bulleted-list' ||
+        child.type === 'numbered-list' ||
+        child.type === 'list'
+      ) {
+        result.push('\n' + childResult);
+      } else {
+        // 其他块级元素也需要换行
+        result.push('\n' + childResult);
+      }
+    }
+  }
+  
+  return result.join('');
 };
 
 /**

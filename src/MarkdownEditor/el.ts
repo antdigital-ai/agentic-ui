@@ -88,17 +88,29 @@ export type BlockQuoteNode<T = Record<string, any>> = {
   children: (BlockQuoteNode | ParagraphNode)[];
 };
 
-export type ListNode<T = Record<string, any>> = {
+export type BulletedListNode<T = Record<string, any>> = {
   contextProps?: T;
   otherProps?: T;
-  type: 'list';
+  type: 'bulleted-list';
   children: ListItemNode[];
-  order?: boolean;
-  start?: number;
   task?: boolean;
   finished?: boolean;
   h?: number;
 };
+
+export type NumberedListNode<T = Record<string, any>> = {
+  contextProps?: T;
+  otherProps?: T;
+  type: 'numbered-list';
+  children: ListItemNode[];
+  start?: number;
+  h?: number;
+};
+
+// 向后兼容：保留 ListNode 作为联合类型
+export type ListNode<T = Record<string, any>> =
+  | BulletedListNode<T>
+  | NumberedListNode<T>;
 
 export type ChartTypeConfig<T = Record<string, any>> = {
   contextProps?: T;
@@ -233,7 +245,9 @@ export type Elements<T = Record<string, any>> =
   | SchemaNode<{ valueType: string } & T>
   | ParagraphNode<T>
   | BlockQuoteNode<T>
-  | ListNode<T>
+  | BulletedListNode<T>
+  | NumberedListNode<T>
+  | ListNode<T> // 向后兼容
   | ListItemNode<T>
   | HeadNode<T>
   | HrNode<T>

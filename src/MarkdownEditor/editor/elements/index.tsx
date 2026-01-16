@@ -183,7 +183,9 @@ const MElementComponent = (
       ) : (
         <ListItem {...props} />
       );
-    case 'list':
+    case 'bulleted-list':
+    case 'numbered-list':
+    case 'list': // 向后兼容
       return props.readonly ? <ReadonlyList {...props} /> : <List {...props} />;
     case 'schema':
     case 'apassify':

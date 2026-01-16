@@ -1057,7 +1057,12 @@ export class EditorStore {
     if (!item) return false;
     if (item.type === 'p' && (!item.children || item.children.length === 0))
       return false;
-    if (item.type === 'list' && (!item.children || item.children.length === 0))
+    if (
+      (item.type === 'list' ||
+        item.type === 'bulleted-list' ||
+        item.type === 'numbered-list') &&
+      (!item.children || item.children.length === 0)
+    )
       return false;
     if (
       item.type === 'listItem' &&

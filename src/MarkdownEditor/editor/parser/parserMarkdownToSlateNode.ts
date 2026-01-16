@@ -66,6 +66,89 @@ export const simpleHash = (str: string): string => {
 };
 
 /**
+ * 将单个换行符转换为双换行符，使每个换行符都创建一个段落
+ * 保护代码块、表格等特殊结构
+ * @param markdown - 原始 Markdown 字符串
+ * @returns 处理后的 Markdown 字符串
+ */
+const preprocessSingleLineBreaksToParagraphs = (markdown: string): string => {
+  if (!markdown) return markdown;
+
+  const lines = markdown.split('\n');
+  const result: string[] = [];
+  let inCodeBlock = false;
+  let codeBlockFence = '';
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmedLine = line.trim();
+
+    // 检测代码块开始/结束
+    if (trimmedLine.startsWith('```')) {
+      const fence = trimmedLine.match(/^(`{3,})/)?.[1] || '```';
+      if (!inCodeBlock) {
+        inCodeBlock = true;
+        codeBlockFence = fence;
+      } else if (fence === codeBlockFence) {
+        inCodeBlock = false;
+        codeBlockFence = '';
+      }
+      result.push(line);
+      continue;
+    }
+
+    // 代码块内的换行符保持不变
+    if (inCodeBlock) {
+      result.push(line);
+      continue;
+    }
+
+    // 检查是否是表格行
+    const isTableRow = /^\s*\|.*\|\s*$/.test(line);
+    const prevIsTableRow = i > 0 && /^\s*\|.*\|\s*$/.test(lines[i - 1]);
+    const nextIsTableRow =
+      i < lines.length - 1 && /^\s*\|.*\|\s*$/.test(lines[i + 1]);
+
+    // 表格行之间的换行符保持不变
+    if (isTableRow || (prevIsTableRow && nextIsTableRow)) {
+      result.push(line);
+      continue;
+    }
+
+    // 检查是否是空行
+    if (trimmedLine === '') {
+      result.push(line);
+      continue;
+    }
+
+    // 普通行：如果不是最后一行，且下一行不是空行、代码块或表格行，则将单个换行符转换为双换行符
+    if (i < lines.length - 1) {
+      const nextLine = lines[i + 1];
+      const nextTrimmedLine = nextLine.trim();
+
+      // 检查下一行是否是特殊结构
+      const nextIsCodeBlock = nextTrimmedLine.startsWith('```');
+      const nextIsTableRow = /^\s*\|.*\|\s*$/.test(nextLine);
+      const nextIsEmpty = nextTrimmedLine === '';
+
+      // 如果下一行是代码块、表格行或空行，保持单换行符
+      if (nextIsCodeBlock || nextIsTableRow || nextIsEmpty) {
+        result.push(line);
+      } else {
+        // 否则，将单个换行符转换为双换行符（添加空行）
+        result.push(line);
+        result.push('');
+      }
+    } else {
+      // 最后一行，直接添加
+      result.push(line);
+    }
+  }
+
+  return result.join('\n');
+};
+
+/**
  * 将 Markdown 文本按块分割
  * 正确处理代码块、HTML 标签、脚注等内容
  * 返回带有内容和哈希的块数组

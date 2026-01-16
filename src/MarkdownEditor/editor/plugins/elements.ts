@@ -216,7 +216,7 @@ export const MdElements: Record<string, MdNode> = {
       Transforms.insertNodes(
         ctx.editor,
         {
-          type: 'list',
+          type: 'bulleted-list',
           task: true,
           children: [
             {
@@ -255,12 +255,12 @@ export const MdElements: Record<string, MdNode> = {
         at: path,
       });
       const start = match[1].match(/^\s*(\d+)\./);
+      const listType = start ? 'numbered-list' : 'bulleted-list';
       Transforms.insertNodes(
         editor,
         {
-          type: 'list',
-          order: !!start,
-          start: start ? +start[1] : undefined,
+          type: listType,
+          ...(start && { start: +start[1] }),
           children: [
             {
               type: 'list-item',

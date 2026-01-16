@@ -1156,10 +1156,7 @@ exports[`should convert markdown to schema in ## 1. 编辑器核 chunk 1`] = `
                 "type": "list-item",
               },
             ],
-            "order": false,
-            "start": null,
-            "task": false,
-            "type": "list",
+            "type": "bulleted-list",
           },
         ],
         "mentions": undefined,
@@ -1224,10 +1221,7 @@ exports[`should convert markdown to schema in ## 1. 编辑器核 chunk 1`] = `
                 "type": "list-item",
               },
             ],
-            "order": false,
-            "start": null,
-            "task": false,
-            "type": "list",
+            "type": "bulleted-list",
           },
         ],
         "mentions": undefined,
@@ -1235,10 +1229,7 @@ exports[`should convert markdown to schema in ## 1. 编辑器核 chunk 1`] = `
       },
     ],
     "hash": "-f5pkdc_2b5",
-    "order": false,
-    "start": null,
-    "task": false,
-    "type": "list",
+    "type": "bulleted-list",
   },
 ]
 `;
@@ -1341,10 +1332,7 @@ exports[`should convert markdown to schema in ## 4. 性能优化 chunk 1`] = `
                 "type": "list-item",
               },
             ],
-            "order": false,
-            "start": null,
-            "task": false,
-            "type": "list",
+            "type": "bulleted-list",
           },
         ],
         "mentions": undefined,
@@ -1394,10 +1382,7 @@ exports[`should convert markdown to schema in ## 4. 性能优化 chunk 1`] = `
                 "type": "list-item",
               },
             ],
-            "order": false,
-            "start": null,
-            "task": false,
-            "type": "list",
+            "type": "bulleted-list",
           },
         ],
         "mentions": undefined,
@@ -1405,10 +1390,8 @@ exports[`should convert markdown to schema in ## 4. 性能优化 chunk 1`] = `
       },
     ],
     "hash": "7ci3h4_2b5",
-    "order": true,
     "start": 1,
-    "task": false,
-    "type": "list",
+    "type": "numbered-list",
   },
 ]
 `;
@@ -1653,10 +1636,7 @@ exports[`should convert markdown to schema in ### 1.2 高级 chunk 1`] = `
       },
     ],
     "hash": "-s5c4zl_2b5",
-    "order": false,
-    "start": null,
-    "task": false,
-    "type": "list",
+    "type": "bulleted-list",
   },
 ]
 `;
@@ -1810,10 +1790,8 @@ for num in arr:
       },
     ],
     "hash": "-k4ne4t_2b5",
-    "order": true,
     "start": 1,
-    "task": false,
-    "type": "list",
+    "type": "numbered-list",
   },
 ]
 `;
@@ -1853,10 +1831,8 @@ exports[`should convert markdown to schema in ### 三、特殊场景 chunk 1`] =
       },
     ],
     "hash": "dsdtlo_2b5",
-    "order": true,
     "start": 6,
-    "task": false,
-    "type": "list",
+    "type": "numbered-list",
   },
   {
     "children": [
@@ -1961,10 +1937,8 @@ while i < len(arr):
       },
     ],
     "hash": "2bnza3_2b5",
-    "order": true,
     "start": 4,
-    "task": false,
-    "type": "list",
+    "type": "numbered-list",
   },
 ]
 `;
@@ -5415,10 +5389,8 @@ exports[`should convert markdown to schema in 2. **通过索引遍 chunk 1`] = `
       },
     ],
     "hash": "bm1qaw_2b5",
-    "order": true,
     "start": 2,
-    "task": false,
-    "type": "list",
+    "type": "numbered-list",
   },
   {
     "children": [
@@ -5484,10 +5456,8 @@ exports[`should convert markdown to schema in 3. **同时获取索 chunk 1`] = `
       },
     ],
     "hash": "i4tuxr_2b5",
-    "order": true,
     "start": 3,
-    "task": false,
-    "type": "list",
+    "type": "numbered-list",
   },
   {
     "children": [
@@ -5548,10 +5518,8 @@ exports[`should convert markdown to schema in 5. **列表推导式 chunk 1`] = `
       },
     ],
     "hash": "-btih4z_2b5",
-    "order": true,
     "start": 5,
-    "task": false,
-    "type": "list",
+    "type": "numbered-list",
   },
   {
     "children": [
@@ -5771,17 +5739,15 @@ exports[`should convert schema to markdown in ## 1. 编辑器核 chunk 1`] = `
 ### 1.1 基础功能模块
 
 - 文本处理系统
-行缓冲区管理
 
-字符编码转换
-
-撤销/重做堆栈
+  - 行缓冲区管理
+    - 字符编码转换
+    - 撤销/重做堆栈
 - 用户界面组件
-多标签页管理
 
-分屏视图
-
-状态栏集成"
+  - 多标签页管理
+    - 分屏视图
+    - 状态栏集成"
 `;
 
 exports[`should convert schema to markdown in ## 2. 关键技术 chunk 1`] = `"## 2. 关键技术方案对比"`;
@@ -5794,13 +5760,13 @@ exports[`should convert schema to markdown in ## 4. 性能优化 chunk 1`] = `
 ### 4.1 渲染优化技巧
 
 1. 视窗区域计算
-动态加载可见区域内容
 
-使用图层化渲染策略
+  - 动态加载可见区域内容
+    - 使用图层化渲染策略
 2. 增量更新机制
-差异对比算法
 
-局部重绘技术"
+  - 差异对比算法
+    - 局部重绘技术"
 `;
 
 exports[`should convert schema to markdown in ## 5. 扩展功能 chunk 1`] = `
@@ -5877,11 +5843,13 @@ exports[`should convert schema to markdown in ### 一、基础遍历 chunk 1`] =
 "### 一、基础遍历方法
 
 1. **直接遍历元素**  
-使用 \`for-in\` 循环直接访问每个元素：\`\`\`python
+使用 \`for-in\` 循环直接访问每个元素：
+\`\`\`python
 arr = [1, 2, 3, 4]
 for num in arr:
     print(num)  # 输出每个元素的值
-\`\`\`这是最简洁直观的方式 [^DOC_1] [^DOC_2] [^DOC_7]。"
+\`\`\`
+这是最简洁直观的方式 [^DOC_1] [^DOC_2] [^DOC_7]。"
 `;
 
 exports[`should convert schema to markdown in ### 三、特殊场景 chunk 1`] = `
@@ -5900,12 +5868,14 @@ exports[`should convert schema to markdown in ### 二、其他遍历 chunk 1`] =
 "### 二、其他遍历方式
 
 4. **使用** **\`while\`** **循环**  
-通过计数器手动控制遍历：\`\`\`python
+通过计数器手动控制遍历：
+\`\`\`python
 i = 0
 while i < len(arr):
     print(arr[i])
     i += 1  # 必须手动递增
-\`\`\`灵活性高但需注意避免无限循环 [^DOC_1] [^DOC_9] [^DOC_10]。"
+\`\`\`
+灵活性高但需注意避免无限循环 [^DOC_1] [^DOC_9] [^DOC_10]。"
 `;
 
 exports[`should convert schema to markdown in <!-- {"Mar chunk 1`] = `
@@ -6152,10 +6122,8 @@ exports[`多个空格转为一个 1`] = `
       },
     ],
     "hash": "nh47ze_2b5",
-    "order": true,
     "start": 1,
-    "task": false,
-    "type": "list",
+    "type": "numbered-list",
   },
   {
     "children": [
