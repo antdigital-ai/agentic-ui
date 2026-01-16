@@ -358,13 +358,11 @@ test.describe('MarkdownInputField 快捷键功能', () => {
     expect(afterEnd.trim().endsWith('End')).toBe(true);
 
     // 移动到开头并插入
-    // 先确保没有选中文本，然后按 Home 键
-    await markdownInputFieldPage.focus();
+    // 按 Home 键移动到开头（不调用 focus，避免重置光标位置）
     await markdownInputFieldPage.pressKey('Home');
 
-    // 等待光标移动到开头（通过验证输入后的文本位置来确认）
-    // 直接输入完整文本
-    await markdownInputFieldPage.typeText('Prefix ');
+    // 直接使用 editableInput.type() 输入，避免 typeText() 中的 focus() 重置光标位置
+    await markdownInputFieldPage.editableInput.type('Prefix ', { delay: 0 });
 
     // 使用智能等待验证文本已正确插入到开头
     await expect

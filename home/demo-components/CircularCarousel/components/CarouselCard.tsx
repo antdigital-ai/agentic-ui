@@ -49,12 +49,12 @@ export const CarouselCard: React.FC<CarouselCardProps> = ({
     <CardMotionContainer
       as={motion.div}
       style={{
-        rotate,
-        x,
-        y,
+        rotate: rotate as any,
+        x: x as any,
+        y: y as any,
         opacity: 1,
-        scale,
-        zIndex,
+        scale: scale as any,
+        zIndex: zIndex as any,
         transformOrigin: '50% 1500px',
       }}
       onClick={(e) => {

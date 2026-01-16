@@ -77,6 +77,7 @@ const ToolUseBarBasicDemo = () => {
     {
       id: 'test4',
       toolName: '工具类/工具名称',
+      toolTarget: '操作对象',
       status: 'idle' as const,
     },
   ];

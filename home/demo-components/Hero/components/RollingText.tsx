@@ -74,11 +74,19 @@ const RollingText = React.forwardRef<HTMLSpanElement, RollingTextProps>(
     const [animationKey, setAnimationKey] = React.useState(0);
 
     // 计算动画总时长（最后一个字符的 exit 动画完成时间）
+    const transitionDuration =
+      typeof transition === 'object' && 'duration' in transition
+        ? transition.duration
+        : 0.5;
+    const transitionDelay =
+      typeof transition === 'object' && 'delay' in transition
+        ? transition.delay
+        : 0.1;
     const totalDuration =
-      (transition?.duration ?? 0.5) +
-      (characters.length - 1) * (transition?.delay ?? 0.1) +
+      transitionDuration +
+      (characters.length - 1) * transitionDelay +
       0.3 + // exit delay
-      (transition?.duration ?? 0.5); // exit duration
+      transitionDuration; // exit duration
 
     // 动画完成后重新播放
     React.useEffect(() => {

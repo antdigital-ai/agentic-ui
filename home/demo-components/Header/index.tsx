@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
-import { history } from 'styled-components';
-import { ONE_TOKEN_URL } from '../../../constants';
+import { ONE_TOKEN_URL } from '../../../constants/links';
 import componentIconBg from '../../assets/component-icon.png';
 import componentMobileBg from '../../assets/component-mobile-bg.png';
 import componentsBg from '../../assets/components-bg.png';
@@ -97,13 +96,8 @@ const Header: React.FC = () => {
     const BASE = '/page/agentic-website';
     let fullPath = '';
 
-    // 优先使用 history
-    if (history?.location?.pathname) {
-      fullPath = history.location.pathname;
-    } else {
-      // Fallback: 从 window.location 获取
-      fullPath = window.location.pathname;
-    }
+    // 从 window.location 获取路径
+    fullPath = window.location.pathname;
 
     // 如果路径以 base 开头，去掉 base 部分
     if (fullPath.startsWith(BASE)) {
@@ -257,8 +251,8 @@ const Header: React.FC = () => {
                     // 如果有 link，使用 window.open 打开新链接
                     window.open(item.link, '_blank', 'noopener,noreferrer');
                   } else if (item.path) {
-                    // 如果有 path，使用 history.push 进行路由跳转
-                    history?.push(item.path);
+                    // 如果有 path，使用 window.location 进行路由跳转
+                    window.location.href = item.path;
                   }
                 }
               }}

@@ -19,7 +19,8 @@ export class MarkdownInputFieldPage {
   }
 
   get sendButton(): Locator {
-    return this.page.getByTestId('send-button');
+    // 使用 .first() 确保只匹配第一个发送按钮，避免 strict mode 错误
+    return this.page.getByTestId('send-button').first();
   }
 
   get enlargeButton(): Locator {
@@ -71,7 +72,7 @@ export class MarkdownInputFieldPage {
         // 先输入当前行的文本（如果有）
         if (lines[i]) {
           // 输入当前行的文本，对于包含 Markdown 语法的行使用较小的延迟
-          const hasMarkdownSyntax = /[*_`#\[\]()]/.test(lines[i]);
+          const hasMarkdownSyntax = /[*_`#\u005B\u005D()]/.test(lines[i]);
           const isLineWhitespace = lines[i].trim().length === 0;
           const beforeType = await this.getText();
           const beforeLength = beforeType.length;
@@ -104,7 +105,7 @@ export class MarkdownInputFieldPage {
           }
         }
 
-        // 如果不是最后一行，按 Enter 键创建新行
+        // 如果不是最后一行，按 Shift+Enter 创建新行（避免 Enter 触发发送）
         if (i < lines.length - 1) {
           // 获取按 Enter 前的段落数量或子元素数量
           const beforeCount = await this.editableInput.evaluate((el) => {
@@ -112,27 +113,40 @@ export class MarkdownInputFieldPage {
             return paragraphs.length || el.children.length;
           });
 
-          await this.page.keyboard.press('Enter');
+          // 使用 Shift+Enter 强制换行，避免 Enter 键触发发送消息
+          await this.page.keyboard.press('Shift+Enter');
 
-          // 等待换行完成：等待段落数量增加或文本内容变化
-          // 使用更灵活的检查方式，不仅检查段落数量，还检查文本内容
+          // 等待换行完成：等待段落数量增加或结构变化
+          // 在 Slate 编辑器中，换行通过块级元素表示，不依赖 \n 字符
           await expect
             .poll(
               async () => {
-                const afterCount = await this.editableInput.evaluate((el) => {
+                const result = await this.editableInput.evaluate((el) => {
                   const paragraphs = el.querySelectorAll(
                     'div[data-be="paragraph"]',
                   );
-                  return paragraphs.length || el.children.length;
+                  const paragraphCount =
+                    paragraphs.length || el.children.length;
+                  // 检查是否有空段落（新创建的行通常是空的）
+                  const hasEmptyParagraph = Array.from(paragraphs).some(
+                    (p) => !p.textContent || p.textContent.trim() === '',
+                  );
+                  return {
+                    count: paragraphCount,
+                    hasEmpty: hasEmptyParagraph,
+                  };
                 });
-                // 段落数量增加，或者检查文本中是否包含换行符（表示新行已创建）
-                const currentText = await this.getText();
-                const hasNewline =
-                  currentText.includes('\n') || currentText.length > 0;
-                return afterCount > beforeCount || hasNewline;
+                // 段落数量增加表示换行成功
+                // 或者有多个段落且存在空段落（表示新行已创建）
+                // 或者段落数量至少为 2（表示已经有多行）
+                return (
+                  result.count > beforeCount ||
+                  (result.count > 1 && result.hasEmpty) ||
+                  result.count >= 2
+                );
               },
               {
-                timeout: 3000,
+                timeout: 5000,
                 message: '等待换行完成',
               },
             )
@@ -144,7 +158,7 @@ export class MarkdownInputFieldPage {
       // 使用 type() 而不是 fill()，这样：
       // 1. 如果有选中文本，会替换选中部分
       // 2. 如果没有选中文本，会在光标位置插入
-      const hasMarkdownSyntax = /[*_`#\[\]()]/.test(text);
+      const hasMarkdownSyntax = /[*_`#\u005B\u005D()]/.test(text);
       await this.editableInput.type(text, {
         delay: hasMarkdownSyntax ? 20 : 0,
       });
