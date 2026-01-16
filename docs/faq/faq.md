@@ -9,7 +9,7 @@ group:
 
 # 常见问题与故障排除
 
-本页面整理了使用 md-editor 过程中经常遇到的问题和解决方案。
+本页面整理了使用 agentic-ui 过程中经常遇到的问题和解决方案。
 
 ## 📋 目录
 
@@ -88,7 +88,7 @@ group:
 
 ### Q: Webpack 构建时出现错误
 
-**A:** 配置 Webpack 正确处理 md-editor：
+**A:** 配置 Webpack 正确处理 agentic-ui：
 
 ```tsx | pure
 // webpack.config.js
@@ -571,7 +571,7 @@ import { ConfigProvider, theme } from 'antd';
 如果以上解决方案无法解决您的问题：
 
 1. **搜索已有 Issues**
-   - [GitHub Issues](https://github.com/ant-design/md-editor/issues)
+   - [GitHub Issues](https://github.com/ant-design/agentic-ui/issues)
    - 使用关键词搜索类似问题
 
 2. **提交新 Issue**
@@ -580,7 +580,7 @@ import { ConfigProvider, theme } from 'antd';
    - 说明环境信息（Node 版本、浏览器等）
 
 3. **参与社区讨论**
-   - [GitHub Discussions](https://github.com/ant-design/md-editor/discussions)
+   - [GitHub Discussions](https://github.com/ant-design/agentic-ui/discussions)
    - 技术交流和经验分享
 
 ## 📚 相关资源

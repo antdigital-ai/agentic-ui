@@ -9,7 +9,7 @@ group:
 
 # CSS-in-JS 方案指南
 
-> **方案简介**：`md-editor` 项目采用 `@ant-design/cssinjs` 作为 CSS-in-JS 解决方案，提供类型安全、主题定制、动态样式等现代化样式管理能力。
+> **方案简介**：`agentic-ui` 项目采用 `@ant-design/cssinjs` 作为 CSS-in-JS 解决方案，提供类型安全、主题定制、动态样式等现代化样式管理能力。
 
 <!--
   CSS-in-JS方案说明：
@@ -1376,4 +1376,4 @@ const useStyles = createStyles(({ token }) => ({
 3. **生态扩展**：与更多UI库和框架集成
 4. **标准推进**：参与CSS-in-JS相关标准制定
 
-CSS-in-JS方案为`md-editor`项目提供了现代化、类型安全、高性能的样式解决方案，是项目技术栈的重要组成部分。
+CSS-in-JS方案为`agentic-ui`项目提供了现代化、类型安全、高性能的样式解决方案，是项目技术栈的重要组成部分。

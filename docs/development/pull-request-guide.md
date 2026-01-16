@@ -9,7 +9,7 @@ group:
 
 # Pull Request 提交指南
 
-本指南将帮助您了解如何正确地向 md-editor 项目提交 Pull Request (PR)，包括从分支创建到合并的完整流程。
+本指南将帮助您了解如何正确地向 agentic-ui 项目提交 Pull Request (PR)，包括从分支创建到合并的完整流程。
 
 ## 📋 目录
 
@@ -30,7 +30,7 @@ group:
 # 1. 在 GitHub 上点击 Fork 按钮
 # 2. 克隆 Fork 的仓库到本地
 git clone https://github.com/YOUR_USERNAME/agentic-ui.git
-cd md-editor
+cd agentic-ui
 
 # 3. 添加上游仓库
 git remote add upstream git@github.com:ant-design/agentic-ui.git
@@ -165,7 +165,7 @@ git push origin feature/your-feature-name
 1. 访问您的 Fork 仓库页面
 2. 点击 "Compare & pull request" 按钮
 3. 选择正确的分支：
-   - **base**: `ant-design/md-editor` 的 `main` 分支
+   - **base**: `ant-design/agentic-ui` 的 `main` 分支
    - **compare**: 您的功能分支
 
 ### 3. PR 标题和描述
@@ -376,10 +376,10 @@ git push origin main
 如果在 PR 过程中遇到问题：
 
 1. 查看[开发指南](./development-guide.md)
-2. 搜索相关 [Issues](https://github.com/ant-design/md-editor/issues)
-3. 在 [Discussions](https://github.com/ant-design/md-editor/discussions) 中提问
+2. 搜索相关 [Issues](https://github.com/ant-design/agentic-ui/issues)
+3. 在 [Discussions](https://github.com/ant-design/agentic-ui/discussions) 中提问
 4. 联系维护者
 
 ---
 
-感谢您的贡献！每个 PR 都让 md-editor 变得更好。🎉
+感谢您的贡献！每个 PR 都让 agentic-ui 变得更好。🎉

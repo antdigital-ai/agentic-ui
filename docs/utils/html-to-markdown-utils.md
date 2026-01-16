@@ -22,7 +22,7 @@ group:
 ## 安装
 
 ```bash
-npm install md-editor
+npm install agentic-ui
 ```
 
 ## 使用方法

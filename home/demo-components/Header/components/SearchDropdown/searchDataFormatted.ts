@@ -355,7 +355,7 @@ export const searchResults: SearchResultItem[] = [
     type: 'doc',
     title: 'Pull Request 提交指南',
     description:
-      '本指南将帮助您了解如何正确地向 md-editor 项目提交 Pull Request (PR)，包括从分支创建到合并的完整流程。',
+      '本指南将帮助您了解如何正确地向 agentic-ui 项目提交 Pull Request (PR)，包括从分支创建到合并的完整流程。',
     url: 'https://agentic.antdigital.ai/development/pull-request-guide',
   },
   {
@@ -363,7 +363,7 @@ export const searchResults: SearchResultItem[] = [
     type: 'doc',
     title: '开发指南与最佳实践',
     description:
-      '本指南涵盖了 md-editor 项目的开发流程、最佳实践、性能优化和常见问题解决方案。',
+      '本指南涵盖了 agentic-ui 项目的开发流程、最佳实践、性能优化和常见问题解决方案。',
     url: 'https://agentic.antdigital.ai/development/development-guide',
   },
   {
@@ -371,7 +371,7 @@ export const searchResults: SearchResultItem[] = [
     type: 'doc',
     title: '项目技术栈与架构说明',
     description:
-      '项目简介：md-editor 是一个基于 React + TypeScript 的现代化 Markdown 编辑器，提供丰富的编辑功能和插件系统，支持实时预览、语法高亮、数学公式渲染等特性。',
+      '项目简介：agentic-ui 是一个基于 React + TypeScript 的现代化 Markdown 编辑器，提供丰富的编辑功能和插件系统，支持实时预览、语法高亮、数学公式渲染等特性。',
     url: 'https://agentic.antdigital.ai/development/project-overview',
   },
   {
@@ -379,7 +379,7 @@ export const searchResults: SearchResultItem[] = [
     type: 'doc',
     title: 'CSS-in-JS 方案指南',
     description:
-      '方案简介：md-editor 项目采用 @ant-design/cssinjs 作为 CSS-in-JS 解决方案，提供类型安全、主题定制、动态样式等现代化样式管理能力。',
+      '方案简介：agentic-ui 项目采用 @ant-design/cssinjs 作为 CSS-in-JS 解决方案，提供类型安全、主题定制、动态样式等现代化样式管理能力。',
     url: 'https://agentic.antdigital.ai/development/css-in-js-guide',
   },
   {
@@ -387,7 +387,7 @@ export const searchResults: SearchResultItem[] = [
     type: 'doc',
     title: '发布测试版本指南',
     description:
-      '本指南详细介绍了如何发布 md-editor 的测试版本，包括版本管理、发布流程和测试验证。',
+      '本指南详细介绍了如何发布 agentic-ui 的测试版本，包括版本管理、发布流程和测试验证。',
     url: 'https://agentic.antdigital.ai/development/release-guide',
   },
   {
@@ -434,7 +434,7 @@ export const searchResults: SearchResultItem[] = [
     type: 'doc',
     title: '工具函数总览',
     description:
-      'md-editor 提供了丰富的工具函数，用于支持编辑器的各种功能。这些工具函数都是模块化设计的，可以独立使用。',
+      'agentic-ui 提供了丰富的工具函数，用于支持编辑器的各种功能。这些工具函数都是模块化设计的，可以独立使用。',
     url: 'https://agentic.antdigital.ai/utils',
   },
   {
@@ -486,7 +486,7 @@ export const searchResults: SearchResultItem[] = [
     id: 'docs/faq/faq',
     type: 'doc',
     title: '常见问题与故障排除',
-    description: '本页面整理了使用 md-editor 过程中经常遇到的问题和解决方案。',
+    description: '本页面整理了使用 agentic-ui 过程中经常遇到的问题和解决方案。',
     url: 'https://agentic.antdigital.ai/faq/faq',
   },
 ];

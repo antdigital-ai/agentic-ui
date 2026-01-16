@@ -1400,4 +1400,4 @@ const groupedMessages = useMemo(() => {
 
 ---
 
-_Bubble 组件是 @ant-design/agentic-ui 的核心组件之一，持续更新中。如果遇到问题或有改进建议，欢迎提交 [Issue](https://github.com/ant-design/md-editor/issues) 或 [PR](https://github.com/ant-design/md-editor/pulls)。_
+_Bubble 组件是 @ant-design/agentic-ui 的核心组件之一，持续更新中。如果遇到问题或有改进建议，欢迎提交 [Issue](https://github.com/ant-design/agentic-ui/issues) 或 [PR](https://github.com/ant-design/agentic-ui/pulls)。_

@@ -1,7 +1,7 @@
 {
   "cSpell.words": ["Agentar", "fprq", "agentic"],
   "yaml.schemas": {
-    "https://www.schemastore.org/github-workflow.json": "file:///e%3A/github/md-editor/.github/workflows/codecov.yml"
+    "https://www.schemastore.org/github-workflow.json": "file:///e%3A/github/agentic-ui/.github/workflows/codecov.yml"
   },
   "eslint.validate": ["typescript", "typescriptreact"],
   "editor.codeActionsOnSave": {

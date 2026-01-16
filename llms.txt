@@ -1,11 +1,11 @@
-﻿# md-editor - LLMs Semantic Map
+﻿# agentic-ui - LLMs Semantic Map
 
 - 本文件以 Ant Design 的组织方式为参考，整理当前项目的语义与导航，方便 LLM/协作成员理解与检索。
  - 官网：https://agentic.antdigital.ai/
 
 ## 项目概览
 
-- 名称：md-editor
+- 名称：agentic-ui
 - 目标：提供支持思维链、工具调用与富文本的现代 Markdown/Chat 编辑体验。
 - 技术栈：React、TypeScript、Vitest、CSS（root.css）、自研组件体系。
 
@@ -38,82 +38,82 @@
 
 - 布局/场景：`src/AgenticLayout/`、`src/ChatLayout/`、`src/ChatBootPage/`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/AgenticLayout
-		- https://github.com/ant-design/md-editor/tree/main/src/ChatLayout
-		- https://github.com/ant-design/md-editor/tree/main/src/ChatBootPage
+		- https://github.com/ant-design/agentic-ui/tree/main/src/AgenticLayout
+		- https://github.com/ant-design/agentic-ui/tree/main/src/ChatLayout
+		- https://github.com/ant-design/agentic-ui/tree/main/src/ChatBootPage
 - 思维链：`src/ThoughtChainList/`、`src/ThoughtChainListItem/`（若存在）
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/ThoughtChainList
-		- https://github.com/ant-design/md-editor/tree/main/src/ThoughtChainListItem
+		- https://github.com/ant-design/agentic-ui/tree/main/src/ThoughtChainList
+		- https://github.com/ant-design/agentic-ui/tree/main/src/ThoughtChainListItem
 - 工具调用：`src/ToolUseBar/`、`src/ToolUseBarThink/`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/ToolUseBar
-		- https://github.com/ant-design/md-editor/tree/main/src/ToolUseBarThink
+		- https://github.com/ant-design/agentic-ui/tree/main/src/ToolUseBar
+		- https://github.com/ant-design/agentic-ui/tree/main/src/ToolUseBarThink
 - 编辑器：`src/MarkdownEditor/`、`src/MarkdownInputField/`、`src/Components/`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/MarkdownEditor
-		- https://github.com/ant-design/md-editor/tree/main/src/MarkdownInputField
-		- https://github.com/ant-design/md-editor/tree/main/src/Components
+		- https://github.com/ant-design/agentic-ui/tree/main/src/MarkdownEditor
+		- https://github.com/ant-design/agentic-ui/tree/main/src/MarkdownInputField
+		- https://github.com/ant-design/agentic-ui/tree/main/src/Components
 - 工作区：`src/Workspace/`
-	- GitHub：https://github.com/ant-design/md-editor/tree/main/src/Workspace
+	- GitHub：https://github.com/ant-design/agentic-ui/tree/main/src/Workspace
 - 历史与引用：`src/History/`、`src/Quote/`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/History
-		- https://github.com/ant-design/md-editor/tree/main/src/Quote
+		- https://github.com/ant-design/agentic-ui/tree/main/src/History
+		- https://github.com/ant-design/agentic-ui/tree/main/src/Quote
 - 警示与提示：`src/AnswerAlert/`、`src/Bubble/`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/AnswerAlert
-		- https://github.com/ant-design/md-editor/tree/main/src/Bubble
+		- https://github.com/ant-design/agentic-ui/tree/main/src/AnswerAlert
+		- https://github.com/ant-design/agentic-ui/tree/main/src/Bubble
 - 插件体系：`src/Plugins/`
-	- GitHub：https://github.com/ant-design/md-editor/tree/main/src/Plugins
+	- GitHub：https://github.com/ant-design/agentic-ui/tree/main/src/Plugins
 - 国际化与图标：`src/I18n/`、`src/Icons/`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/I18n
-		- https://github.com/ant-design/md-editor/tree/main/src/Icons
+		- https://github.com/ant-design/agentic-ui/tree/main/src/I18n
+		- https://github.com/ant-design/agentic-ui/tree/main/src/Icons
 - 常量与类型：`src/Constants/`、`src/Types/`、`src/typing.d.ts`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/Constants
-		- https://github.com/ant-design/md-editor/tree/main/src/Types
-		- https://github.com/ant-design/md-editor/blob/main/src/typing.d.ts
+		- https://github.com/ant-design/agentic-ui/tree/main/src/Constants
+		- https://github.com/ant-design/agentic-ui/tree/main/src/Types
+		- https://github.com/ant-design/agentic-ui/blob/main/src/typing.d.ts
 - 工具库与样式：`src/Utils/`、`src/root.css`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/Utils
-		- https://github.com/ant-design/md-editor/blob/main/src/root.css
+		- https://github.com/ant-design/agentic-ui/tree/main/src/Utils
+		- https://github.com/ant-design/agentic-ui/blob/main/src/root.css
 - 入口与导出：`src/index.ts`
-	- GitHub：https://github.com/ant-design/md-editor/blob/main/src/index.ts
+	- GitHub：https://github.com/ant-design/agentic-ui/blob/main/src/index.ts
 
 
 ## 运行与配置
 
 - 包管理：`package.json`、`pnpm-lock.yaml`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/blob/main/package.json
-		- https://github.com/ant-design/md-editor/blob/main/pnpm-lock.yaml
+		- https://github.com/ant-design/agentic-ui/blob/main/package.json
+		- https://github.com/ant-design/agentic-ui/blob/main/pnpm-lock.yaml
 - TypeScript：`tsconfig.json`
-	- GitHub：https://github.com/ant-design/md-editor/blob/main/tsconfig.json
+	- GitHub：https://github.com/ant-design/agentic-ui/blob/main/tsconfig.json
 - 测试：`vitest.config.ts`
-	- GitHub：https://github.com/ant-design/md-editor/blob/main/vitest.config.ts
+	- GitHub：https://github.com/ant-design/agentic-ui/blob/main/vitest.config.ts
 - 许可证与法律：`LICENSE`、`LEGAL.md`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/blob/main/LICENSE
-		- https://github.com/ant-design/md-editor/blob/main/LEGAL.md
+		- https://github.com/ant-design/agentic-ui/blob/main/LICENSE
+		- https://github.com/ant-design/agentic-ui/blob/main/LEGAL.md
 
 ## 关联入口（快速导航）
 
 - 编辑器核心：`src/MarkdownEditor/`、`src/MarkdownInputField/`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/MarkdownEditor
-		- https://github.com/ant-design/md-editor/tree/main/src/MarkdownInputField
+		- https://github.com/ant-design/agentic-ui/tree/main/src/MarkdownEditor
+		- https://github.com/ant-design/agentic-ui/tree/main/src/MarkdownInputField
 - 工作区文件：`src/Workspace/File/`（如当前 `FileComponent.tsx`）
-	- GitHub：https://github.com/ant-design/md-editor/tree/main/src/Workspace/File
+	- GitHub：https://github.com/ant-design/agentic-ui/tree/main/src/Workspace/File
 - 思维链与任务：`src/ThoughtChainList/`、`src/TaskList/`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/ThoughtChainList
-		- https://github.com/ant-design/md-editor/tree/main/src/TaskList
+		- https://github.com/ant-design/agentic-ui/tree/main/src/ThoughtChainList
+		- https://github.com/ant-design/agentic-ui/tree/main/src/TaskList
 - 工具调用交互：`src/ToolUseBar/`、`src/ToolUseBarThink/`
 	- GitHub：
-		- https://github.com/ant-design/md-editor/tree/main/src/ToolUseBar
-		- https://github.com/ant-design/md-editor/tree/main/src/ToolUseBarThink
+		- https://github.com/ant-design/agentic-ui/tree/main/src/ToolUseBar
+		- https://github.com/ant-design/agentic-ui/tree/main/src/ToolUseBarThink
 
 ## 备注
 

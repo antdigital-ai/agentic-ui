@@ -9,7 +9,7 @@ group:
 
 # 工具函数总览
 
-md-editor 提供了丰富的工具函数，用于支持编辑器的各种功能。这些工具函数都是模块化设计的，可以独立使用。
+agentic-ui 提供了丰富的工具函数，用于支持编辑器的各种功能。这些工具函数都是模块化设计的，可以独立使用。
 
 ## 工具函数分类
 
@@ -286,8 +286,8 @@ const options: HtmlToMarkdownOptions = {
 
 ```typescript | pure
 // 按需导入，减少包大小
-import { isMarkdown } from 'md-editor/utils/isMarkdown';
-import { htmlToMarkdown } from 'md-editor/utils/htmlToMarkdown';
+import { isMarkdown } from 'agentic-ui/utils/isMarkdown';
+import { htmlToMarkdown } from 'agentic-ui/utils/htmlToMarkdown';
 ```
 
 ## 扩展开发

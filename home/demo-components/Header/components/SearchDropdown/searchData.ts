@@ -1082,7 +1082,7 @@ export const searchData = {
           order: 1,
         },
         description:
-          '基于 md-editor 项目的实际开发经验，定义完整的组件开发规范。',
+          '基于 agentic-ui 项目的实际开发经验，定义完整的组件开发规范。',
       },
       toc: [],
       texts: [],
@@ -1107,7 +1107,7 @@ export const searchData = {
           order: 3,
         },
         description:
-          '本指南将帮助您了解如何正确地向 md-editor 项目提交 Pull Request (PR)，包括从分支创建到合并的完整流程。',
+          '本指南将帮助您了解如何正确地向 agentic-ui 项目提交 Pull Request (PR)，包括从分支创建到合并的完整流程。',
       },
       toc: [],
       texts: [],
@@ -1132,7 +1132,7 @@ export const searchData = {
           order: 2,
         },
         description:
-          '本指南涵盖了 md-editor 项目的开发流程、最佳实践、性能优化和常见问题解决方案。',
+          '本指南涵盖了 agentic-ui 项目的开发流程、最佳实践、性能优化和常见问题解决方案。',
       },
       toc: [],
       texts: [],
@@ -1157,7 +1157,7 @@ export const searchData = {
           order: 5,
         },
         description:
-          '项目简介：md-editor 是一个基于 React + TypeScript 的现代化 Markdown 编辑器，提供丰富的编辑功能和插件系统，支持实时预览、语法高亮、数学公式渲染等特性。',
+          '项目简介：agentic-ui 是一个基于 React + TypeScript 的现代化 Markdown 编辑器，提供丰富的编辑功能和插件系统，支持实时预览、语法高亮、数学公式渲染等特性。',
       },
       toc: [],
       texts: [],
@@ -1182,7 +1182,7 @@ export const searchData = {
           order: 6,
         },
         description:
-          '方案简介：md-editor 项目采用 @ant-design/cssinjs 作为 CSS-in-JS 解决方案，提供类型安全、主题定制、动态样式等现代化样式管理能力。',
+          '方案简介：agentic-ui 项目采用 @ant-design/cssinjs 作为 CSS-in-JS 解决方案，提供类型安全、主题定制、动态样式等现代化样式管理能力。',
       },
       toc: [],
       texts: [],
@@ -1207,7 +1207,7 @@ export const searchData = {
           order: 4,
         },
         description:
-          '本指南详细介绍了如何发布 md-editor 的测试版本，包括版本管理、发布流程和测试验证。',
+          '本指南详细介绍了如何发布 agentic-ui 的测试版本，包括版本管理、发布流程和测试验证。',
       },
       toc: [],
       texts: [],
@@ -1381,7 +1381,7 @@ export const searchData = {
           order: 1,
         },
         description:
-          'md-editor 提供了丰富的工具函数，用于支持编辑器的各种功能。这些工具函数都是模块化设计的，可以独立使用。',
+          'agentic-ui 提供了丰富的工具函数，用于支持编辑器的各种功能。这些工具函数都是模块化设计的，可以独立使用。',
       },
       toc: [],
       texts: [],
@@ -1564,7 +1564,7 @@ export const searchData = {
           order: 3,
         },
         description:
-          '本页面整理了使用 md-editor 过程中经常遇到的问题和解决方案。',
+          '本页面整理了使用 agentic-ui 过程中经常遇到的问题和解决方案。',
       },
       toc: [],
       texts: [],
@@ -1591,7 +1591,7 @@ export const searchData = {
             },
             {
               text: '查看 GitHub',
-              link: 'https://github.com/ant-design/md-editor',
+              link: 'https://github.com/ant-design/agentic-ui',
               type: 'primary',
             },
           ],

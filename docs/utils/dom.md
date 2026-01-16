@@ -167,7 +167,7 @@ if (selection && !selection.isCollapsed) {
 
 ```typescript | pure
 // 计算工具栏位置
-const editorElement = document.querySelector('.md-editor');
+const editorElement = document.querySelector('.agentic-ui');
 const toolbarElement = document.querySelector('.toolbar');
 
 if (editorElement && toolbarElement) {
