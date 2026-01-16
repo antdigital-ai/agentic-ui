@@ -60,6 +60,9 @@ export default () => (
 | scrollToBottom  | 滚动到底部的方法     | `() => void`       |
 
 ```tsx | pure
+import { useRef } from 'react';
+import { ChatLayoutRef } from '@ant-design/agentic-ui';
+
 const chatRef = useRef<ChatLayoutRef>(null);
 
 // 滚动到底部
