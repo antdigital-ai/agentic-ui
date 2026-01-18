@@ -304,7 +304,9 @@ describe('HTML 标题元素解析测试', () => {
       // 验证包含多种元素类型
       const elementTypes = new Set(result.schema.map((n: any) => n.type));
       expect(elementTypes.has('head')).toBeTruthy();
-      expect(elementTypes.has('list')).toBeTruthy();
+      expect(
+        elementTypes.has('bulleted-list') || elementTypes.has('numbered-list')
+      ).toBeTruthy();
     });
   });
 

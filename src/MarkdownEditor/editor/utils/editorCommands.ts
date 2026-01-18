@@ -7,7 +7,7 @@ import { EditorUtils } from './editorUtils';
 /**
  * 获取当前编辑器中的最低层级元素节点
  */
-function getCurrentNodes(editor: Editor) {
+export function getCurrentNodes(editor: Editor) {
   return Editor.nodes<any>(editor, {
     mode: 'lowest',
     match: (m) => {
@@ -24,14 +24,15 @@ function getCurrentNodes(editor: Editor) {
  * 决定在何处插入表格及如何处理现有内容。
  *
  * @param editor Slate 编辑器实例
+ * @param node 可选的节点，如果不提供则从编辑器获取
  */
-export function insertTable(editor: Editor) {
-  const [node] = getCurrentNodes(editor);
-  if (node && ['paragraph', 'head'].includes(node?.[0]?.type)) {
+export function insertTable(editor: Editor, node?: [any, Path]) {
+  const currentNode = node || Array.from(getCurrentNodes(editor))[0];
+  if (currentNode && ['paragraph', 'head'].includes(currentNode?.[0]?.type)) {
     const path =
-      node?.[0]?.type === 'paragraph' && !Node.string(node[0])
-        ? node[1]
-        : Path.next(node[1]);
+      currentNode?.[0]?.type === 'paragraph' && !Node.string(currentNode[0])
+        ? currentNode[1]
+        : Path.next(currentNode[1]);
 
     // 使用原生表格编辑器插入表格
     NativeTableEditor.insertTable(editor, {
@@ -40,17 +41,17 @@ export function insertTable(editor: Editor) {
       at: path,
     });
 
-    if (node?.[0]?.type === 'paragraph' && !Node.string(node[0])) {
+    if (currentNode?.[0]?.type === 'paragraph' && !Node.string(currentNode[0])) {
       Transforms.delete(editor, { at: Path.next(path) });
     }
     Transforms.select(editor, Editor.start(editor, path));
   }
 
-  if (node && ['column-cell'].includes(node?.[0]?.type)) {
+  if (currentNode && ['column-cell'].includes(currentNode?.[0]?.type)) {
     NativeTableEditor.insertTable(editor, {
       rows: 3,
       cols: 3,
-      at: [...node[1], 0],
+      at: [...currentNode[1], 0],
     });
   }
 }
@@ -63,14 +64,15 @@ export function insertTable(editor: Editor) {
  *
  * @param editor Slate 编辑器实例
  * @param type 可选的代码块类型，'mermaid'表示流程图，'html'表示HTML渲染
+ * @param node 可选的节点，如果不提供则从编辑器获取
  */
-export function insertCodeBlock(editor: Editor, type?: 'mermaid' | 'html') {
-  const [node] = getCurrentNodes(editor);
-  if (node && node[0] && ['paragraph', 'head'].includes(node[0].type)) {
+export function insertCodeBlock(editor: Editor, type?: 'mermaid' | 'html', node?: [any, Path]) {
+  const currentNode = node || Array.from(getCurrentNodes(editor))[0];
+  if (currentNode && currentNode[0] && ['paragraph', 'head'].includes(currentNode[0].type)) {
     const path =
-      node[0].type === 'paragraph' && !Node.string(node[0])
-        ? node[1]
-        : Path.next(node[1]);
+      currentNode[0].type === 'paragraph' && !Node.string(currentNode[0])
+        ? currentNode[1]
+        : Path.next(currentNode[1]);
     let lang = '';
     if (type === 'mermaid') {
       lang = 'mermaid';
@@ -103,21 +105,22 @@ export function insertCodeBlock(editor: Editor, type?: 'mermaid' | 'html') {
  * 如果当前节点是标题，先将其转换为普通段落。
  *
  * @param editor Slate 编辑器实例
+ * @param node 可选的节点，如果不提供则从编辑器获取
  */
-export function toggleQuote(editor: Editor) {
-  const [node] = getCurrentNodes(editor);
-  if (!['paragraph', 'head'].includes(node?.[0]?.type)) return;
-  if (Node.parent(editor, node[1]).type === 'blockquote') {
-    Transforms.unwrapNodes(editor, { at: Path.parent(node[1]) });
+export function toggleQuote(editor: Editor, node?: [any, Path]) {
+  const currentNode = node || Array.from(getCurrentNodes(editor))[0];
+  if (!currentNode || !['paragraph', 'head'].includes(currentNode?.[0]?.type)) return;
+  if (Node.parent(editor, currentNode[1]).type === 'blockquote') {
+    Transforms.unwrapNodes(editor, { at: Path.parent(currentNode[1]) });
     return;
   }
-  if (node?.[0]?.type === 'head') {
+  if (currentNode?.[0]?.type === 'head') {
     Transforms.setNodes(
       editor,
       {
         type: 'paragraph',
       },
-      { at: node[1] },
+      { at: currentNode[1] },
     );
   }
   Transforms.wrapNodes(editor, {
@@ -133,14 +136,15 @@ export function toggleQuote(editor: Editor) {
  * 如果分割线后没有内容，则自动插入一个空段落并将光标定位到该段落。
  *
  * @param editor Slate 编辑器实例
+ * @param node 可选的节点，如果不提供则从编辑器获取
  */
-export function insertHorizontalLine(editor: Editor) {
-  const [node] = getCurrentNodes(editor);
-  if (node && ['paragraph', 'head'].includes(node?.[0]?.type)) {
+export function insertHorizontalLine(editor: Editor, node?: [any, Path]) {
+  const currentNode = node || Array.from(getCurrentNodes(editor))[0];
+  if (currentNode && ['paragraph', 'head'].includes(currentNode?.[0]?.type)) {
     const path =
-      node?.[0]?.type === 'paragraph' && !Node.string(node[0])
-        ? node[1]
-        : Path.next(node[1]);
+      currentNode?.[0]?.type === 'paragraph' && !Node.string(currentNode[0])
+        ? currentNode[1]
+        : Path.next(currentNode[1]);
     Transforms.insertNodes(
       editor,
       {
@@ -251,6 +255,30 @@ function convertHeadingToParagraph(editor: Editor, path: Path) {
 }
 
 /**
+ * 检查路径是否有后一个兄弟节点
+ * 注意：Path.hasNext 在 Slate 中不存在，所以需要自定义实现
+ */
+function hasNext(editor: Editor, path: Path): boolean {
+  if (path.length === 0) {
+    return false;
+  }
+  try {
+    const parentPath = Path.parent(path);
+    if (!Editor.hasPath(editor, parentPath)) {
+      return false;
+    }
+    const parentNode = Node.get(editor, parentPath);
+    if (!Element.isElement(parentNode)) {
+      return false;
+    }
+    const index = path[path.length - 1];
+    return index < parentNode.children.length - 1;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * 查找相邻的列表节点
  *
  * @param editor - 编辑器实例
@@ -268,7 +296,7 @@ function findAdjacentList(
     return null;
   }
 
-  // 检查前一个兄弟节点
+  // 检查前一个兄弟节点（使用 Slate 的 Path.hasPrevious）
   if (Path.hasPrevious(path)) {
     const prevPath = Path.previous(path);
     if (Editor.hasPath(editor, prevPath)) {
@@ -279,8 +307,8 @@ function findAdjacentList(
     }
   }
 
-  // 检查后一个兄弟节点
-  if (Path.hasNext(path)) {
+  // 检查后一个兄弟节点（使用自定义 hasNext）
+  if (hasNext(editor, path)) {
     const nextPath = Path.next(path);
     if (Editor.hasPath(editor, nextPath)) {
       const nextNode = Node.get(editor, nextPath);
@@ -447,12 +475,13 @@ export function createList(
   if (['paragraph', 'head'].includes(curNode[0].type)) {
     const parent = Editor.parent(editor, curNode[1]);
     if (
+      parent &&
       Element.isElement(parent[0]) &&
       parent[0].type === 'list-item' &&
       !Path.hasPrevious(curNode[1])
     ) {
       const listParent = Editor.parent(editor, parent[1]);
-      if (Element.isElement(listParent[0]) && isListType(listParent[0])) {
+      if (listParent && Element.isElement(listParent[0]) && isListType(listParent[0])) {
         // 如果列表类型与目标类型相同，且不是任务列表，执行解包
         const isTaskList =
           listParent[0].type === 'bulleted-list' &&
@@ -544,13 +573,22 @@ export function createList(
   Editor.withoutNormalizing(editor, () => {
     // 步骤1: 处理标题降级和空节点
     for (const [node, path] of blockNodes) {
+      if (!node || !Element.isElement(node)) {
+        continue;
+      }
+
       if (node.type === 'head') {
         convertHeadingToParagraph(editor, path);
       }
 
       // 处理空节点：确保节点有内容
+      // 注意：convertHeadingToParagraph 可能改变了节点，需要重新获取
+      if (!Editor.hasPath(editor, path)) {
+        continue;
+      }
       const currentNode = Node.get(editor, path);
       if (
+        currentNode &&
         Element.isElement(currentNode) &&
         currentNode.type === 'paragraph' &&
         Node.string(currentNode).trim() === ''

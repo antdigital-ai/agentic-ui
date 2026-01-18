@@ -1193,8 +1193,8 @@ function hello() {
                 data-be="list"
                 data-slate-node="element"
               >
-                <ol
-                  class="ant-agentic-md-editor-list ol"
+                <ul
+                  class="ant-agentic-md-editor-list ul"
                   start="1"
                 >
                   <li
@@ -1278,7 +1278,7 @@ function hello() {
                       </span>
                     </div>
                   </li>
-                </ol>
+                </ul>
               </div>
               <div
                 class="ant-agentic-md-editor-list-container relative"

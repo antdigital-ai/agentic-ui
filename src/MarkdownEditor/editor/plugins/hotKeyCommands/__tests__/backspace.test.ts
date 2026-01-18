@@ -205,7 +205,7 @@ describe('BackspaceKey', () => {
       const result = backspaceKey.run();
 
       expect(result).toBe(true);
-      expect(Transforms.delete).toHaveBeenCalled();
+      expect(Transforms.removeNodes).toHaveBeenCalled();
       expect(Transforms.insertNodes).toHaveBeenCalled();
     });
 
@@ -225,16 +225,17 @@ describe('BackspaceKey', () => {
       (Node.string as Mock).mockReturnValue(''); // 空的list-item
       (Path.parent as Mock).mockReturnValue([1]); // listPath
       (Editor.node as Mock).mockReturnValue([listNode, [1]]); // listNode
-      (EditorUtils.copy as Mock).mockReturnValue([{ text: '' }]);
+      (isListType as any).mockReturnValue(true);
+      (Node.get as Mock).mockReturnValue({ children: [] }); // 删除后列表为空
 
       const result = backspaceKey.run();
 
       expect(result).toBe(true);
-      expect(Transforms.delete).toHaveBeenCalledWith(editor, { at: [0] });
+      expect(Transforms.removeNodes).toHaveBeenCalledWith(editor, { at: [0] });
       expect(Transforms.insertNodes).toHaveBeenCalledWith(
         editor,
         { type: 'paragraph', children: [{ text: '' }] },
-        { at: [0], select: true },
+        { at: [1], select: true },
       );
     });
 
@@ -266,31 +267,24 @@ describe('BackspaceKey', () => {
         .mockReturnValueOnce([2]); // newListPath
       (EditorUtils.copy as Mock).mockReturnValue([{ text: '' }]);
 
+      (isListType as any).mockReturnValue(true);
+      (Node.get as Mock).mockReturnValue({ children: [listItemNode1] }); // 删除后还有前面的item
+
       const result = backspaceKey.run();
 
       expect(result).toBe(true);
 
       // 验证删除后续items (从后往前删除)
-      expect(Transforms.delete).toHaveBeenCalledWith(editor, { at: [0, 2] });
+      expect(Transforms.removeNodes).toHaveBeenCalledWith(editor, { at: [0, 2] });
 
       // 验证删除当前item
-      expect(Transforms.delete).toHaveBeenCalledWith(editor, { at: [1] });
+      expect(Transforms.removeNodes).toHaveBeenCalledWith(editor, { at: [1] });
 
-      // 验证插入paragraph
+      // 验证插入paragraph (在列表后插入)
       expect(Transforms.insertNodes).toHaveBeenCalledWith(
         editor,
         { type: 'paragraph', children: [{ text: '' }] },
         { at: [1], select: true },
-      );
-
-      // 验证创建新列表包含剩余items
-      expect(Transforms.insertNodes).toHaveBeenCalledWith(
-        editor,
-        {
-          type: 'unordered-list',
-          children: [listItemNode3],
-        },
-        { at: [2] },
       );
     });
 
@@ -313,23 +307,22 @@ describe('BackspaceKey', () => {
       (Node.string as Mock).mockReturnValue(''); // 空的list-item
       (Path.parent as Mock).mockReturnValue([1]); // listPath
       (Editor.node as Mock).mockReturnValue([listNode, [1]]); // listNode
-      (Path.next as Mock)
-        .mockReturnValueOnce([2]) // insertPath
-        .mockReturnValueOnce([3]); // newListPath
-      (EditorUtils.copy as Mock).mockReturnValue([{ text: '' }]);
+      (isListType as any).mockReturnValue(true);
+      (Node.get as Mock).mockReturnValue({ children: [] }); // 删除后列表为空
 
       const result = backspaceKey.run();
 
       expect(result).toBe(true);
 
-      // 验证新列表保持了ordered-list类型
+      // 验证删除当前item
+      expect(Transforms.removeNodes).toHaveBeenCalledWith(editor, { at: [0] });
+      // 验证删除空列表容器
+      expect(Transforms.removeNodes).toHaveBeenCalledWith(editor, { at: [1] });
+      // 验证在列表位置插入 paragraph
       expect(Transforms.insertNodes).toHaveBeenCalledWith(
         editor,
-        {
-          type: 'ordered-list', // 应该保持原始类型
-          children: [listItemNode2],
-        },
-        { at: [3] },
+        { type: 'paragraph', children: [{ text: '' }] },
+        { at: [1], select: true },
       );
     });
 
@@ -348,18 +341,22 @@ describe('BackspaceKey', () => {
       (Node.string as Mock).mockReturnValue(''); // 空的list-item
       (Path.parent as Mock).mockReturnValue([1]); // listPath
       (Editor.node as Mock).mockReturnValue([listNode, [1]]); // listNode
-      (EditorUtils.copy as Mock).mockReturnValue([{ text: '' }]);
+      (isListType as any).mockReturnValue(true);
+      (Node.get as Mock).mockReturnValue({ children: [] }); // 删除后列表为空
 
       const result = backspaceKey.run();
 
       expect(result).toBe(true);
 
       // 验证删除当前item并替换成paragraph (因为是最后一个)
-      expect(Transforms.delete).toHaveBeenCalledWith(editor, { at: [0] });
+      expect(Transforms.removeNodes).toHaveBeenCalledWith(editor, { at: [0] });
+      // 验证删除空列表容器
+      expect(Transforms.removeNodes).toHaveBeenCalledWith(editor, { at: [1] });
+      // 验证在列表位置插入 paragraph
       expect(Transforms.insertNodes).toHaveBeenCalledWith(
         editor,
         { type: 'paragraph', children: [{ text: '' }] },
-        { at: [0], select: true },
+        { at: [1], select: true },
       );
     });
 
@@ -444,13 +441,14 @@ describe('BackspaceKey', () => {
       (Path.parent as Mock).mockReturnValue([1]); // listPath
       const listNode = { type: 'ordered-list', children: [parentNode] };
       (Editor.node as Mock).mockReturnValue([listNode, [1]]);
-      (EditorUtils.copy as Mock).mockReturnValue([{ text: '' }]);
+      (isListType as any).mockReturnValue(true);
+      (Node.get as Mock).mockReturnValue({ children: [] }); // 删除后列表为空
 
       const result = backspaceKey.run();
 
       expect(result).toBe(true);
       // 验证函数正确处理了列表项的场景
-      expect(Transforms.delete).toHaveBeenCalled();
+      expect(Transforms.removeNodes).toHaveBeenCalled();
       expect(Transforms.insertNodes).toHaveBeenCalled();
     });
 
@@ -628,14 +626,22 @@ describe('BackspaceKey', () => {
         (Node.string as Mock).mockReturnValue(''); // 空的list-item
         (Path.parent as Mock).mockReturnValue([2]); // listPath
         (Editor.node as Mock).mockReturnValue([listNode, [2]]); // listNode
-        (isListType as any).mockReturnValue(true);
+        (isListType as any).mockImplementation((node: any) => {
+          // Return true for list nodes
+          return node && (node.type === 'numbered-list' || node.type === 'bulleted-list' || node.type === 'ordered-list' || node.type === 'unordered-list');
+        });
         (Path.next as Mock).mockReturnValue([3]); // insertPath
-        (Node.get as Mock).mockReturnValue({ children: [listItemNode1] }); // 删除后还有前面的item
+        // Node.get is called after deletion to check if list is empty
+        // The list should still have listItemNode1 after deletion, so list container shouldn't be deleted
+        (Node.get as Mock).mockReturnValue({
+          type: 'numbered-list',
+          children: [listItemNode1],
+        }); // After deletion, still has items
 
         const result = backspaceKey.run();
 
         expect(result).toBe(true);
-        // 验证删除后续items
+        // 验证删除后续items (listPath是[2], 所以删除[2, 2])
         expect(Transforms.removeNodes).toHaveBeenCalledWith(editor, {
           at: [2, 2],
         });
@@ -644,6 +650,8 @@ describe('BackspaceKey', () => {
           at: [1],
         });
         // 验证不应该删除列表容器（因为还有前面的item）
+        // listPath是[2]，所以不应该删除[2]
+        // 检查是否有调用删除列表容器的操作
         expect(Transforms.removeNodes).not.toHaveBeenCalledWith(editor, {
           at: [2],
         });
@@ -675,17 +683,26 @@ describe('BackspaceKey', () => {
           ],
         };
         (Editor.nodes as Mock).mockReturnValue([[paragraphNode, path]]);
+        // Implementation calls Editor.parent multiple times:
+        // 1. First call at line 43: Editor.parent(this.editor, path) for clearStyle check - returns list-item
+        // 2. Second call at line 70: Editor.parent(this.editor, path) for paragraph check - returns list-item
+        // 3. Third call at line 79: Editor.parent(this.editor, listPath) where listPath is [0, 1] - returns parent list-item
         (Editor.parent as Mock)
-          .mockReturnValueOnce([listItemNode, [0, 0]]) // paragraph parent
-          .mockReturnValueOnce([nestedList, [0, 1]]) // list parent
-          .mockReturnValueOnce([parentListItem, [0]]); // list-item parent
+          .mockReturnValueOnce([listItemNode, [0, 0]]) // First call: for clearStyle check
+          .mockReturnValueOnce([listItemNode, [0, 0]]) // Second call: for paragraph check
+          .mockReturnValueOnce([parentListItem, [0]]); // Third call: for listParent check
         (Range.isCollapsed as Mock).mockReturnValue(true);
         (isListType as unknown as Mock).mockReturnValue(true);
         (Element.isElement as unknown as Mock).mockReturnValue(true);
+        // Node.get is called twice:
+        // 1. First call: get list at listPath [0, 1] to check if it's a list type
+        // 2. Second call: after lift, check if list is empty
         (Node.get as Mock)
-          .mockReturnValueOnce(nestedList) // 获取列表
-          .mockReturnValueOnce({ children: [] }); // 删除后列表为空
+          .mockReturnValueOnce(nestedList) // First call: get list at listPath [0, 1]
+          .mockReturnValueOnce({ type: 'bulleted-list', children: [] }); // Second call: after lift, check if list is empty
         (Path.hasPrevious as Mock).mockReturnValue(false);
+        // listPath is Path.parent(listItemPath) where listItemPath is [0, 0]
+        // So listPath should be [0, 1]
         (Path.parent as Mock).mockReturnValue([0, 1]); // listPath
 
         const result = backspaceKey.run();

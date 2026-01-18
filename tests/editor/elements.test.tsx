@@ -195,7 +195,7 @@ describe('elements.ts', () => {
         MdElements.task.run(ctx);
 
         expect(editor.children[0]).toMatchObject({
-          type: 'list',
+          type: 'bulleted-list',
           task: true,
           children: [
             {
@@ -226,7 +226,7 @@ describe('elements.ts', () => {
         MdElements.task.run(ctx);
 
         expect(editor.children[0]).toMatchObject({
-          type: 'list',
+          type: 'bulleted-list',
           task: true,
           children: [
             {
@@ -259,8 +259,7 @@ describe('elements.ts', () => {
         MdElements.list.run(ctx);
 
         expect(editor.children[0]).toMatchObject({
-          type: 'list',
-          order: false,
+          type: 'bulleted-list',
           children: [
             {
               type: 'list-item',
@@ -289,8 +288,7 @@ describe('elements.ts', () => {
         MdElements.list.run(ctx);
 
         expect(editor.children[0]).toMatchObject({
-          type: 'list',
-          order: true,
+          type: 'numbered-list',
           start: 1,
           children: [
             {

@@ -254,7 +254,7 @@ exports[`docxDeserializer > should correctly deserialize unordered list 1`] = `
         "type": "list-item",
       },
     ],
-    "type": "list",
+    "type": "bulleted-list",
   },
 ]
 `;
@@ -369,7 +369,7 @@ exports[`docxDeserializer > should match snapshot for all test cases combined 1`
           "type": "list-item",
         },
       ],
-      "type": "list",
+      "type": "bulleted-list",
     },
   ],
   [

@@ -253,6 +253,10 @@ export class KeyboardTask {
    * @param level 标题级别（1-3）或4（表示普通段落）
    */
   head(level: number) {
+    if (level === 4) {
+      this.paragraph();
+      return;
+    }
     setHeading(this.editor, level);
   }
 
@@ -295,7 +299,8 @@ export class KeyboardTask {
    * 如果当前节点是标题，先将其转换为普通段落。
    */
   insertQuote() {
-    toggleQuote(this.editor);
+    const [node] = this.curNodes;
+    toggleQuote(this.editor, node);
   }
 
   /**
@@ -306,7 +311,8 @@ export class KeyboardTask {
    * 决定在何处插入表格及如何处理现有内容。
    */
   insertTable() {
-    insertTableCommand(this.editor);
+    const [node] = this.curNodes;
+    insertTableCommand(this.editor, node);
   }
 
   /**
@@ -325,7 +331,8 @@ export class KeyboardTask {
    * @param type 可选的代码块类型，'mermaid'表示流程图，'html'表示HTML渲染
    */
   insertCode(type?: 'mermaid' | 'html') {
-    insertCodeBlock(this.editor, type);
+    const [node] = this.curNodes;
+    insertCodeBlock(this.editor, type, node);
   }
 
   /**
@@ -335,7 +342,8 @@ export class KeyboardTask {
    * 如果分割线后没有内容，则自动插入一个空段落并将光标定位到该段落。
    */
   horizontalLine() {
-    insertHorizontalLine(this.editor);
+    const [node] = this.curNodes;
+    insertHorizontalLine(this.editor, node);
   }
 
   /**

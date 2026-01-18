@@ -256,8 +256,8 @@
                 data-be="list"
                 data-slate-node="element"
               >
-                <ol
-                  class="ant-agentic-md-editor-list ol"
+                <ul
+                  class="ant-agentic-md-editor-list ul"
                   start="1"
                 >
                   <li
@@ -368,7 +368,7 @@
                       </span>
                     </div>
                   </li>
-                </ol>
+                </ul>
               </div>
               <blockquote
                 data-be="blockquote"
