@@ -32,15 +32,14 @@ export const List = ({
   children,
 }: ElementProps<ListNode>) => {
   // 支持新的列表类型和向后兼容
-  const isOrdered =
-    element.type === 'numbered-list' ||
-    (element.type === 'list' && (element as any).order);
+  const isOrdered = element.type === 'numbered-list';
+  const isBulleted = element.type === 'bulleted-list';
   
   debugInfo('List - 渲染列表', {
     type: element.type,
     isOrdered,
-    task: element.task,
-    start: element.start,
+    task: isBulleted ? element.task : undefined,
+    start: isOrdered ? element.start : undefined,
     childrenCount: element.children?.length,
   });
   const { store, markdownContainerRef } = useEditorStore();
@@ -50,15 +49,14 @@ export const List = ({
 
   const listContent = React.useMemo(() => {
     // 支持新的列表类型和向后兼容
-    const isOrdered =
-      element.type === 'numbered-list' ||
-      (element.type === 'list' && (element as any).order);
+    const isOrdered = element.type === 'numbered-list';
+    const isBulleted = element.type === 'bulleted-list';
     const tag = isOrdered ? 'ol' : 'ul';
     debugInfo('List - useMemo 渲染', {
       tag,
       type: element.type,
-      start: element.start,
-      task: element.task,
+      start: isOrdered ? element.start : undefined,
+      task: isBulleted ? element.task : undefined,
     });
     return wrapSSR(
       <ListContext.Provider
@@ -84,7 +82,7 @@ export const List = ({
                 isOrdered ? 'ol' : 'ul',
               ),
               start: isOrdered ? element.start : undefined,
-              ['data-task']: element.task ? 'true' : undefined,
+              ['data-task']: isBulleted && element.task ? 'true' : undefined,
             },
             children,
           )}
@@ -93,9 +91,9 @@ export const List = ({
     );
   }, [
     element.type,
-    element.task,
+    isBulleted ? element.task : undefined,
     isOrdered,
-    element.start,
+    isOrdered ? element.start : undefined,
     element.children,
     baseCls,
     hashId,

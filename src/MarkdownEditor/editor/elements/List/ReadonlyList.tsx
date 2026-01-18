@@ -37,10 +37,14 @@ import { useStyle } from './style';
  */
 export const ReadonlyList: React.FC<ElementProps<ListNode>> = React.memo(
   ({ element, attributes, children }) => {
+    const isOrdered = element.type === 'numbered-list';
+    const isBulleted = element.type === 'bulleted-list';
+    
     debugInfo('ReadonlyList - 渲染只读列表', {
-      order: element.order,
-      task: element.task,
-      start: element.start,
+      type: element.type,
+      isOrdered,
+      task: isBulleted ? element.task : undefined,
+      start: isOrdered ? element.start : undefined,
       childrenCount: element.children?.length,
     });
 
@@ -48,12 +52,12 @@ export const ReadonlyList: React.FC<ElementProps<ListNode>> = React.memo(
     const baseCls = context.getPrefixCls('agentic-md-editor-list');
     const { wrapSSR, hashId } = useStyle(baseCls);
 
-    const tag = element.order ? 'ol' : 'ul';
+    const tag = isOrdered ? 'ol' : 'ul';
     debugInfo('ReadonlyList - 渲染', {
       tag,
-      order: element.order,
-      start: element.start,
-      task: element.task,
+      type: element.type,
+      start: isOrdered ? element.start : undefined,
+      task: isBulleted ? element.task : undefined,
     });
     return wrapSSR(
       <div
@@ -67,10 +71,10 @@ export const ReadonlyList: React.FC<ElementProps<ListNode>> = React.memo(
             className: classNames(
               baseCls,
               hashId,
-              element.order ? 'ol' : 'ul',
+              isOrdered ? 'ol' : 'ul',
             ),
-            start: element.start,
-            ['data-task']: element.task ? 'true' : undefined,
+            start: isOrdered ? element.start : undefined,
+            ['data-task']: isBulleted && element.task ? 'true' : undefined,
           },
           children,
         )}

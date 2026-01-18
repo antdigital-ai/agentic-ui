@@ -273,7 +273,7 @@ describe('EditorUtils', () => {
     });
 
     it('should handle empty list', () => {
-      const listNode = { type: 'list' as const, children: [] };
+      const listNode = { type: 'bulleted-list' as const, children: [] };
       const result = EditorUtils.listToParagraph(editor, listNode);
       expect(result).toEqual([]);
     });

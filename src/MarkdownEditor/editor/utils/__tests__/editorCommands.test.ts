@@ -66,7 +66,7 @@ describe('createList', () => {
 
     // 默认 mock 返回值
     (Editor.hasPath as Mock).mockReturnValue(true);
-    (Element.isElement as Mock).mockReturnValue(true);
+    (Element.isElement as unknown as Mock).mockReturnValue(true);
     (Range.isCollapsed as Mock).mockReturnValue(true);
   });
 
@@ -226,7 +226,7 @@ describe('createList', () => {
       // Mock Editor.parent to return list node
       (Editor.parent as Mock).mockReturnValue([listNode, listPath]);
       (getListType as Mock).mockReturnValue('bulleted-list');
-      (isListType as Mock).mockReturnValue(true);
+      (isListType as unknown as Mock).mockReturnValue(true);
       (Node.get as Mock).mockReturnValue(listNode);
       (Path.parent as Mock).mockReturnValue(listPath);
       (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
@@ -253,7 +253,7 @@ describe('createList', () => {
 
       (Editor.nodes as Mock).mockReturnValue([[listItemNode, listItemPath]]);
       (getListType as Mock).mockReturnValue('numbered-list');
-      (isListType as Mock).mockReturnValue(true);
+      (isListType as unknown as Mock).mockReturnValue(true);
       (Node.get as Mock).mockReturnValue(listNode);
       (Path.parent as Mock).mockReturnValue(listPath);
       (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
@@ -287,7 +287,7 @@ describe('createList', () => {
       // Mock Editor.parent to return list node
       (Editor.parent as Mock).mockReturnValue([listNode, listPath]);
       (getListType as Mock).mockReturnValue('bulleted-list');
-      (isListType as Mock).mockReturnValue(true);
+      (isListType as unknown as Mock).mockReturnValue(true);
       (Node.get as Mock).mockReturnValue(listNode);
       (Path.parent as Mock).mockReturnValue(listPath);
       (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
@@ -342,7 +342,7 @@ describe('createList', () => {
         .mockReturnValueOnce(adjacentListNode) // For adjacent list check
         .mockReturnValueOnce(listItemNode); // After wrapping
       (Node.string as Mock).mockReturnValue('Test');
-      (isListType as Mock).mockReturnValue(true);
+      (isListType as unknown as Mock).mockReturnValue(true);
       // Mock Editor.hasPath for various checks
       (Editor.hasPath as Mock).mockReturnValue(true);
 
@@ -375,7 +375,6 @@ describe('createList', () => {
       (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
       (Path.parent as Mock).mockReturnValue([0]);
       (Path.hasPrevious as Mock).mockReturnValue(false);
-      (Path.hasNext as Mock).mockReturnValue(false);
 
       createList(editor, 'unordered');
 
@@ -427,7 +426,7 @@ describe('createList', () => {
         .mockReturnValueOnce([listNode, listPath]);
       (Path.hasPrevious as Mock).mockReturnValue(false);
       (getListType as Mock).mockReturnValue('bulleted-list');
-      (isListType as Mock).mockReturnValue(true);
+      (isListType as unknown as Mock).mockReturnValue(true);
       (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
 
       createList(editor, 'unordered');
@@ -519,10 +518,12 @@ describe('createList', () => {
         (call) => call[1]?.type === 'bulleted-list',
       );
       expect(listWrapCall).toBeDefined();
-      expect(listWrapCall[1]).toMatchObject({
-        type: 'bulleted-list',
-        task: true,
-      });
+      if (listWrapCall) {
+        expect(listWrapCall[1]).toMatchObject({
+          type: 'bulleted-list',
+          task: true,
+        });
+      }
     });
   });
 });
