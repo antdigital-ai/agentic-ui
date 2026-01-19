@@ -32,21 +32,55 @@ test.describe('MarkdownInputField 高级功能', () => {
     await markdownInputFieldPage.goto();
     await markdownInputFieldPage.typeText('Select and edit this text');
     await markdownInputFieldPage.pressKey('Home');
+    await page.waitForTimeout(100); // 等待光标移动到开头
 
-    // 选中前 6 个字符
+    // 选中前 6 个字符 "Select"
+    // 使用 Shift+ArrowRight 6次来选中
     await page.keyboard.down('Shift');
     for (let i = 0; i < 6; i++) {
-      await markdownInputFieldPage.pressKey('ArrowRight');
+      await page.keyboard.press('ArrowRight');
     }
     await page.keyboard.up('Shift');
+    await page.waitForTimeout(200); // 等待选择完成
 
-    // 输入替换文本（typeText 是同步的，文本会立即更新）
-    await markdownInputFieldPage.typeText('Replace');
+    // 验证选择是否正确
+    const selectedText = await markdownInputFieldPage.editableInput.evaluate(
+      (el) => {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+          return '';
+        }
+        return selection.toString();
+      },
+    );
+    // 验证选中了文本
+    expect(selectedText.length).toBeGreaterThan(0);
 
-    // 直接获取文本并验证（typeText 已同步完成，无需等待）
+    // 输入替换文本（type() 在有选中文本时会替换选中部分）
+    // 直接使用 editableInput.type() 确保替换行为
+    await markdownInputFieldPage.editableInput.type('Replace', { delay: 0 });
+    await page.waitForTimeout(300); // 等待替换完成
+
+    // 使用轮询等待替换完成
+    await expect
+      .poll(
+        async () => {
+          const textAfterEdit = await markdownInputFieldPage.getText();
+          return textAfterEdit.includes('Replace') && textAfterEdit.includes('edit this text');
+        },
+        {
+          timeout: 3000,
+          message: '等待文本替换完成',
+        },
+      )
+      .toBe(true);
+
+    // 验证替换结果
     const textAfterEdit = await markdownInputFieldPage.getText();
     expect(textAfterEdit).toContain('Replace');
     expect(textAfterEdit).toContain('edit this text');
+    // 验证 "Select" 已被替换
+    expect(textAfterEdit).not.toContain('Select and');
   });
 
   test('应该支持输入验证', async ({ markdownInputFieldPage }) => {

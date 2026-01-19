@@ -52,9 +52,16 @@ export class MarkdownInputFieldPage {
 
   /**
    * 点击输入框以聚焦
+   * 如果已经聚焦则跳过点击操作，避免重置光标位置
    */
   async focus() {
-    await this.editableInput.click();
+    // 检查是否已经聚焦，如果已聚焦则跳过点击操作，避免重置光标位置
+    const isFocused = await this.editableInput.evaluate((el) => {
+      return el === document.activeElement;
+    });
+    if (!isFocused) {
+      await this.editableInput.click();
+    }
   }
 
   /**
@@ -62,9 +69,16 @@ export class MarkdownInputFieldPage {
    * 使用 type() 而不是 fill()，以便在有选中文本时替换选中部分
    * 对于多行文本，正确处理换行符（\n）转换为实际的 Enter 键按下
    * 对于包含 Markdown 语法的文本，使用适当的延迟确保语法字符被正确输入
+   * 自动检测焦点状态，如果已聚焦则跳过聚焦操作，避免重置光标位置
    */
   async typeText(text: string) {
-    await this.focus();
+    // 检查是否已经聚焦，如果已聚焦则跳过聚焦操作，避免重置光标位置
+    const isFocused = await this.editableInput.evaluate((el) => {
+      return el === document.activeElement;
+    });
+    if (!isFocused) {
+      await this.focus();
+    }
     // 如果文本包含换行符，需要逐行输入并在行间按 Enter
     if (text.includes('\n')) {
       const lines = text.split('\n');
@@ -281,6 +295,7 @@ export class MarkdownInputFieldPage {
     } else {
       await this.page.keyboard.press(key);
     }
+    await this.page.waitForTimeout(100);
   }
 
   /**

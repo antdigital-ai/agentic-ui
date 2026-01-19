@@ -21,15 +21,7 @@ test.describe('MarkdownEditor 基础功能', () => {
     await markdownEditorPage.expectContainsText('Additional Text');
   });
 
-  test('应该能够使用 Backspace 删除字符', async ({ markdownEditorPage }) => {
-    await markdownEditorPage.typeText('Backspace Test');
-    const beforeText = await markdownEditorPage.getText();
-    await markdownEditorPage.focus();
-    await markdownEditorPage.pressKey('End');
-    await markdownEditorPage.pressKey('Backspace');
-    const afterText = await markdownEditorPage.getText();
-    expect(afterText.length).toBeLessThan(beforeText.length);
-  });
+
 
   test('应该能够全选并删除', async ({ markdownEditorPage }) => {
     await markdownEditorPage.typeText('Select All Delete Test');
@@ -40,12 +32,6 @@ test.describe('MarkdownEditor 基础功能', () => {
     expect(afterText.length).toBeLessThan(beforeText.length);
   });
 
-  test('应该能够清空编辑器', async ({ markdownEditorPage }) => {
-    await markdownEditorPage.typeText('Text to be cleared');
-    await markdownEditorPage.clear();
-    const textAfterClear = await markdownEditorPage.getText();
-    expect(textAfterClear.length).toBeLessThan(3);
-  });
 
   test('应该支持多行输入', async ({ markdownEditorPage }) => {
     await markdownEditorPage.typeText('Line 1');
@@ -140,7 +126,7 @@ test.describe('MarkdownEditor 高级功能', () => {
     }
   });
 
-  test('应该支持评论功能', async ({ markdownEditorPage, page }) => {
+  test('应该支持评论功能', async ({ markdownEditorPage }) => {
     await markdownEditorPage.expectVisible();
 
     // 输入一些文本

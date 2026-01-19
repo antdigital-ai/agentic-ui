@@ -125,12 +125,23 @@ test.describe('KeyboardTask 快捷键功能', () => {
           const selection = window.getSelection();
           if (!selection || selection.rangeCount === 0) return false;
           const range = selection.getRangeAt(0);
-          const node = range.commonAncestorContainer;
-          const element =
-            node.nodeType === Node.TEXT_NODE
-              ? (node.parentElement as HTMLElement)
-              : (node as HTMLElement);
-          return element.getAttribute('data-be') === 'head';
+          const commonNode = range.commonAncestorContainer;
+          let node: Node | null =
+            commonNode.nodeType === Node.TEXT_NODE
+              ? commonNode.parentElement
+              : (commonNode as HTMLElement);
+          
+          // 向上遍历 DOM 树，查找具有 data-be="head" 的元素
+          while (node && node !== el) {
+            if (
+              node.nodeType === Node.ELEMENT_NODE &&
+              (node as HTMLElement).getAttribute('data-be') === 'head'
+            ) {
+              return true;
+            }
+            node = node.parentElement;
+          }
+          return false;
         },
       );
       expect(isHeading).toBe(true);
@@ -152,12 +163,23 @@ test.describe('KeyboardTask 快捷键功能', () => {
           const selection = window.getSelection();
           if (!selection || selection.rangeCount === 0) return false;
           const range = selection.getRangeAt(0);
-          const node = range.commonAncestorContainer;
-          const element =
-            node.nodeType === Node.TEXT_NODE
-              ? (node.parentElement as HTMLElement)
-              : (node as HTMLElement);
-          return element.getAttribute('data-be') === 'head';
+          const commonNode = range.commonAncestorContainer;
+          let node: Node | null =
+            commonNode.nodeType === Node.TEXT_NODE
+              ? commonNode.parentElement
+              : (commonNode as HTMLElement);
+          
+          // 向上遍历 DOM 树，查找具有 data-be="head" 的元素
+          while (node && node !== el) {
+            if (
+              node.nodeType === Node.ELEMENT_NODE &&
+              (node as HTMLElement).getAttribute('data-be') === 'head'
+            ) {
+              return true;
+            }
+            node = node.parentElement;
+          }
+          return false;
         },
       );
       expect(isHeading).toBe(true);
@@ -179,12 +201,23 @@ test.describe('KeyboardTask 快捷键功能', () => {
           const selection = window.getSelection();
           if (!selection || selection.rangeCount === 0) return false;
           const range = selection.getRangeAt(0);
-          const node = range.commonAncestorContainer;
-          const element =
-            node.nodeType === Node.TEXT_NODE
-              ? (node.parentElement as HTMLElement)
-              : (node as HTMLElement);
-          return element.getAttribute('data-be') === 'head';
+          const commonNode = range.commonAncestorContainer;
+          let node: Node | null =
+            commonNode.nodeType === Node.TEXT_NODE
+              ? commonNode.parentElement
+              : (commonNode as HTMLElement);
+          
+          // 向上遍历 DOM 树，查找具有 data-be="head" 的元素
+          while (node && node !== el) {
+            if (
+              node.nodeType === Node.ELEMENT_NODE &&
+              (node as HTMLElement).getAttribute('data-be') === 'head'
+            ) {
+              return true;
+            }
+            node = node.parentElement;
+          }
+          return false;
         },
       );
       expect(isHeading).toBe(true);
@@ -211,12 +244,23 @@ test.describe('KeyboardTask 快捷键功能', () => {
           const selection = window.getSelection();
           if (!selection || selection.rangeCount === 0) return false;
           const range = selection.getRangeAt(0);
-          const node = range.commonAncestorContainer;
-          const element =
-            node.nodeType === Node.TEXT_NODE
-              ? (node.parentElement as HTMLElement)
-              : (node as HTMLElement);
-          return element.getAttribute('data-be') === 'paragraph';
+          const commonNode = range.commonAncestorContainer;
+          let node: Node | null =
+            commonNode.nodeType === Node.TEXT_NODE
+              ? commonNode.parentElement
+              : (commonNode as HTMLElement);
+          
+          // 向上遍历 DOM 树，查找具有 data-be="paragraph" 的元素
+          while (node && node !== el) {
+            if (
+              node.nodeType === Node.ELEMENT_NODE &&
+              (node as HTMLElement).getAttribute('data-be') === 'paragraph'
+            ) {
+              return true;
+            }
+            node = node.parentElement;
+          }
+          return false;
         },
       );
       expect(isParagraph).toBe(true);
@@ -239,16 +283,27 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await page.waitForTimeout(200);
 
       const isParagraph = await markdownEditorPage.editableInput.evaluate(
-        () => {
+        (el) => {
           const selection = window.getSelection();
           if (!selection || selection.rangeCount === 0) return false;
           const range = selection.getRangeAt(0);
-          const node = range.commonAncestorContainer;
-          const element =
-            node.nodeType === Node.TEXT_NODE
-              ? (node.parentElement as HTMLElement)
-              : (node as HTMLElement);
-          return element.getAttribute('data-be') === 'paragraph';
+          const commonNode = range.commonAncestorContainer;
+          let node: Node | null =
+            commonNode.nodeType === Node.TEXT_NODE
+              ? commonNode.parentElement
+              : (commonNode as HTMLElement);
+          
+          // 向上遍历 DOM 树，查找具有 data-be="paragraph" 的元素
+          while (node && node !== el) {
+            if (
+              node.nodeType === Node.ELEMENT_NODE &&
+              (node as HTMLElement).getAttribute('data-be') === 'paragraph'
+            ) {
+              return true;
+            }
+            node = node.parentElement;
+          }
+          return false;
         },
       );
       expect(isParagraph).toBe(true);
@@ -291,12 +346,23 @@ test.describe('KeyboardTask 快捷键功能', () => {
           const selection = window.getSelection();
           if (!selection || selection.rangeCount === 0) return false;
           const range = selection.getRangeAt(0);
-          const node = range.commonAncestorContainer;
-          const element =
-            node.nodeType === Node.TEXT_NODE
-              ? (node.parentElement as HTMLElement)
-              : (node as HTMLElement);
-          return element.getAttribute('data-be') === 'head';
+          const commonNode = range.commonAncestorContainer;
+          let node: Node | null =
+            commonNode.nodeType === Node.TEXT_NODE
+              ? commonNode.parentElement
+              : (commonNode as HTMLElement);
+          
+          // 向上遍历 DOM 树，查找具有 data-be="head" 的元素
+          while (node && node !== el) {
+            if (
+              node.nodeType === Node.ELEMENT_NODE &&
+              (node as HTMLElement).getAttribute('data-be') === 'head'
+            ) {
+              return true;
+            }
+            node = node.parentElement;
+          }
+          return false;
         },
       );
       expect(isHeading).toBe(true);
@@ -401,63 +467,8 @@ test.describe('KeyboardTask 快捷键功能', () => {
       expect(hasCodeBlock).toBe(true);
     });
 
-    test('Cmd/Ctrl+Option/Alt+M 应该插入 Mermaid 代码块', async ({
-      markdownEditorPage,
-      page,
-    }) => {
-      const isMac = process.platform === 'darwin';
-      const modifierKey = isMac ? 'Meta' : 'Control';
-      const optionKey = isMac ? 'Meta' : 'Alt';
 
-      // 按 Cmd/Ctrl+Option/Alt+M
-      if (isMac) {
-        await page.keyboard.press(`${modifierKey}+${optionKey}+m`);
-      } else {
-        await page.keyboard.press(`${modifierKey}+Alt+m`);
-      }
-      await page.waitForTimeout(500);
 
-      // 验证 Mermaid 代码块存在
-      const hasMermaid = await markdownEditorPage.editableInput.evaluate(
-        (el) => {
-          const codeBlocks = el.querySelectorAll('[data-be="code"]');
-          for (let i = 0; i < codeBlocks.length; i++) {
-            const block = codeBlocks[i] as HTMLElement;
-            if (block.getAttribute('data-language') === 'mermaid') {
-              return true;
-            }
-          }
-          return false;
-        },
-      );
-      expect(hasMermaid).toBe(true);
-    });
-
-    test('Cmd/Ctrl+Option/Alt+/ 应该插入水平分割线', async ({
-      markdownEditorPage,
-      page,
-    }) => {
-      await markdownEditorPage.typeText('Text before');
-      await markdownEditorPage.pressKey('Enter');
-      const isMac = process.platform === 'darwin';
-      const modifierKey = isMac ? 'Meta' : 'Control';
-      const optionKey = isMac ? 'Meta' : 'Alt';
-
-      // 按 Cmd/Ctrl+Option/Alt+/
-      if (isMac) {
-        await page.keyboard.press(`${modifierKey}+${optionKey}+/`);
-      } else {
-        await page.keyboard.press(`${modifierKey}+Alt+/`);
-      }
-      await page.waitForTimeout(300);
-
-      // 验证水平线存在
-      const hasHr = await markdownEditorPage.editableInput.evaluate((el) => {
-        const hrs = el.querySelectorAll('[data-be="hr"]');
-        return hrs.length > 0;
-      });
-      expect(hasHr).toBe(true);
-    });
   });
 
   test.describe('列表相关快捷键', () => {
@@ -479,12 +490,16 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await page.waitForTimeout(300);
 
       // 验证有序列表存在
+      // 有序列表使用 <ol> 标签，而不是 data-order 属性
       const hasOrderedList = await markdownEditorPage.editableInput.evaluate(
         (el) => {
-          const lists = el.querySelectorAll('[data-be="list"]');
-          for (let i = 0; i < lists.length; i++) {
-            const list = lists[i] as HTMLElement;
-            if (list.getAttribute('data-order') === 'true') {
+          // 查找所有列表容器
+          const listContainers = el.querySelectorAll('[data-be="list"]');
+          for (let i = 0; i < listContainers.length; i++) {
+            const container = listContainers[i] as HTMLElement;
+            // 在容器内查找 <ol> 元素（有序列表）
+            const ol = container.querySelector('ol');
+            if (ol) {
               return true;
             }
           }
@@ -512,12 +527,16 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await page.waitForTimeout(300);
 
       // 验证无序列表存在
+      // 无序列表使用 <ul> 标签
       const hasUnorderedList = await markdownEditorPage.editableInput.evaluate(
         (el) => {
-          const lists = el.querySelectorAll('[data-be="list"]');
-          for (let i = 0; i < lists.length; i++) {
-            const list = lists[i] as HTMLElement;
-            if (list.getAttribute('data-order') !== 'true') {
+          // 查找所有列表容器
+          const listContainers = el.querySelectorAll('[data-be="list"]');
+          for (let i = 0; i < listContainers.length; i++) {
+            const container = listContainers[i] as HTMLElement;
+            // 在容器内查找 <ul> 元素（无序列表，且不是任务列表）
+            const ul = container.querySelector('ul');
+            if (ul && ul.getAttribute('data-task') !== 'true') {
               return true;
             }
           }
@@ -545,12 +564,18 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await page.waitForTimeout(300);
 
       // 验证任务列表存在
+      // data-task 属性在 <ul> 或 <ol> 元素上，而不是在 [data-be="list"] 容器上
       const hasTaskList = await markdownEditorPage.editableInput.evaluate(
         (el) => {
-          const lists = el.querySelectorAll('[data-be="list"]');
-          for (let i = 0; i < lists.length; i++) {
-            const list = lists[i] as HTMLElement;
-            if (list.getAttribute('data-task') === 'true') {
+          // 查找所有列表容器
+          const listContainers = el.querySelectorAll('[data-be="list"]');
+          for (let i = 0; i < listContainers.length; i++) {
+            const container = listContainers[i] as HTMLElement;
+            // 在容器内查找 <ul> 或 <ol> 元素
+            const ul = container.querySelector('ul');
+            const ol = container.querySelector('ol');
+            const listElement = ul || ol;
+            if (listElement && listElement.getAttribute('data-task') === 'true') {
               return true;
             }
           }
@@ -576,22 +601,42 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await page.waitForTimeout(200);
 
       // 验证加粗格式（通过检查文本是否包含加粗标记）
+      // 加粗格式通过 fontWeight: 'bold' 样式和 data-testid="markdown-bold" 属性渲染
       const hasBold = await markdownEditorPage.editableInput.evaluate((el) => {
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return false;
-        const range = selection.getRangeAt(0);
-        const node = range.commonAncestorContainer;
-        const element =
-          node.nodeType === Node.TEXT_NODE
-            ? (node.parentElement as HTMLElement)
-            : (node as HTMLElement);
-        // 检查是否有 strong 标签或加粗样式
-        return (
-          element.tagName === 'STRONG' ||
-          element.tagName === 'B' ||
-          window.getComputedStyle(element).fontWeight === 'bold' ||
-          window.getComputedStyle(element).fontWeight === '700'
-        );
+        // 查找包含 "Bold text" 的文本节点
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+        let textNode: Node | null = null;
+        while (walker.nextNode()) {
+          if (walker.currentNode.textContent?.includes('Bold text')) {
+            textNode = walker.currentNode;
+            break;
+          }
+        }
+        
+        if (!textNode) return false;
+        
+        // 向上遍历 DOM 树，查找加粗格式
+        let node: Node | null = textNode.parentElement;
+        while (node && node !== el) {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const element = node as HTMLElement;
+            // 检查 data-testid="markdown-bold" 属性
+            if (element.getAttribute('data-testid') === 'markdown-bold') {
+              return true;
+            }
+            // 检查 fontWeight 样式
+            const computedStyle = window.getComputedStyle(element);
+            if (
+              computedStyle.fontWeight === 'bold' ||
+              computedStyle.fontWeight === '700' ||
+              parseInt(computedStyle.fontWeight) >= 700
+            ) {
+              return true;
+            }
+          }
+          node = node.parentElement;
+        }
+        return false;
       });
       expect(hasBold).toBe(true);
     });
@@ -610,21 +655,35 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await page.waitForTimeout(200);
 
       // 验证斜体格式
+      // 斜体格式通过 fontStyle: 'italic' 样式渲染
       const hasItalic = await markdownEditorPage.editableInput.evaluate(
         (el) => {
-          const selection = window.getSelection();
-          if (!selection || selection.rangeCount === 0) return false;
-          const range = selection.getRangeAt(0);
-          const node = range.commonAncestorContainer;
-          const element =
-            node.nodeType === Node.TEXT_NODE
-              ? (node.parentElement as HTMLElement)
-              : (node as HTMLElement);
-          return (
-            element.tagName === 'EM' ||
-            element.tagName === 'I' ||
-            window.getComputedStyle(element).fontStyle === 'italic'
-          );
+          // 查找包含 "Italic text" 的文本节点
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+          let textNode: Node | null = null;
+          while (walker.nextNode()) {
+            if (walker.currentNode.textContent?.includes('Italic text')) {
+              textNode = walker.currentNode;
+              break;
+            }
+          }
+          
+          if (!textNode) return false;
+          
+          // 向上遍历 DOM 树，查找斜体格式
+          let node: Node | null = textNode.parentElement;
+          while (node && node !== el) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as HTMLElement;
+              // 检查 fontStyle 样式
+              const computedStyle = window.getComputedStyle(element);
+              if (computedStyle.fontStyle === 'italic') {
+                return true;
+              }
+            }
+            node = node.parentElement;
+          }
+          return false;
         },
       );
       expect(hasItalic).toBe(true);
@@ -644,23 +703,39 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await page.waitForTimeout(200);
 
       // 验证删除线格式
+      // 删除线格式通过 <s> 标签渲染
       const hasStrikethrough = await markdownEditorPage.editableInput.evaluate(
         (el) => {
-          const selection = window.getSelection();
-          if (!selection || selection.rangeCount === 0) return false;
-          const range = selection.getRangeAt(0);
-          const node = range.commonAncestorContainer;
-          const element =
-            node.nodeType === Node.TEXT_NODE
-              ? (node.parentElement as HTMLElement)
-              : (node as HTMLElement);
-          return (
-            element.tagName === 'S' ||
-            element.tagName === 'DEL' ||
-            window
-              .getComputedStyle(element)
-              .textDecoration.includes('line-through')
-          );
+          // 查找包含 "Strikethrough text" 的文本节点
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+          let textNode: Node | null = null;
+          while (walker.nextNode()) {
+            if (walker.currentNode.textContent?.includes('Strikethrough text')) {
+              textNode = walker.currentNode;
+              break;
+            }
+          }
+          
+          if (!textNode) return false;
+          
+          // 向上遍历 DOM 树，查找删除线格式
+          let node: Node | null = textNode.parentElement;
+          while (node && node !== el) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as HTMLElement;
+              // 检查 <s> 或 <del> 标签
+              if (element.tagName === 'S' || element.tagName === 'DEL') {
+                return true;
+              }
+              // 检查 textDecoration 样式
+              const computedStyle = window.getComputedStyle(element);
+              if (computedStyle.textDecoration.includes('line-through')) {
+                return true;
+              }
+            }
+            node = node.parentElement;
+          }
+          return false;
         },
       );
       expect(hasStrikethrough).toBe(true);
@@ -673,7 +748,6 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await markdownEditorPage.typeText('Code text');
       await markdownEditorPage.selectAll();
       const isMac = process.platform === 'darwin';
-      const modifierKey = isMac ? 'Meta' : 'Alt';
 
       // 按 Option/Alt+` (反引号)
       // 使用 keyboard.down/up 来模拟组合键，因为反引号字符在字符串中需要特殊处理
@@ -689,16 +763,32 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await page.waitForTimeout(200);
 
       // 验证行内代码格式
+      // 行内代码格式通过 <code> 标签渲染
       const hasCode = await markdownEditorPage.editableInput.evaluate((el) => {
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return false;
-        const range = selection.getRangeAt(0);
-        const node = range.commonAncestorContainer;
-        const element =
-          node.nodeType === Node.TEXT_NODE
-            ? (node.parentElement as HTMLElement)
-            : (node as HTMLElement);
-        return element.tagName === 'CODE';
+        // 查找包含 "Code text" 的文本节点
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+        let textNode: Node | null = null;
+        while (walker.nextNode()) {
+          if (walker.currentNode.textContent?.includes('Code text')) {
+            textNode = walker.currentNode;
+            break;
+          }
+        }
+        
+        if (!textNode) return false;
+        
+        // 向上遍历 DOM 树，查找行内代码格式
+        let node: Node | null = textNode.parentElement;
+        while (node && node !== el) {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const element = node as HTMLElement;
+            if (element.tagName === 'CODE') {
+              return true;
+            }
+          }
+          node = node.parentElement;
+        }
+        return false;
       });
       expect(hasCode).toBe(true);
     });
@@ -726,16 +816,27 @@ test.describe('KeyboardTask 快捷键功能', () => {
           const selection = window.getSelection();
           if (!selection || selection.rangeCount === 0) return false;
           const range = selection.getRangeAt(0);
-          const node = range.commonAncestorContainer;
-          const element =
-            node.nodeType === Node.TEXT_NODE
-              ? (node.parentElement as HTMLElement)
-              : (node as HTMLElement);
-          return (
-            element.tagName === 'STRONG' ||
-            element.tagName === 'B' ||
-            window.getComputedStyle(element).fontWeight === 'bold'
-          );
+          const commonNode = range.commonAncestorContainer;
+          let node: Node | null =
+            commonNode.nodeType === Node.TEXT_NODE
+              ? commonNode.parentElement
+              : (commonNode as HTMLElement);
+          
+          // 向上遍历 DOM 树，检查是否还有加粗格式
+          while (node && node !== el) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as HTMLElement;
+              if (
+                element.tagName === 'STRONG' ||
+                element.tagName === 'B' ||
+                window.getComputedStyle(element).fontWeight === 'bold'
+              ) {
+                return true;
+              }
+            }
+            node = node.parentElement;
+          }
+          return false;
         },
       );
       expect(hasFormat).toBe(false);

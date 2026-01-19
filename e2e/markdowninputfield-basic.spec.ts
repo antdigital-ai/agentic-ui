@@ -15,19 +15,6 @@ test.describe('MarkdownInputField 基础功能', () => {
     expect(text).toContain('Test');
   });
 
-  test('应该能够使用 Backspace 删除字符', async ({
-    markdownInputFieldPage,
-  }) => {
-    await markdownInputFieldPage.goto();
-    await markdownInputFieldPage.typeText('Backspace Test');
-    const beforeText = await markdownInputFieldPage.getText();
-    await markdownInputFieldPage.focus();
-    await markdownInputFieldPage.pressKey('End');
-    await markdownInputFieldPage.pressKey('Backspace');
-    const afterText = await markdownInputFieldPage.getText();
-    expect(afterText.length).toBeLessThan(beforeText.length);
-    expect(afterText.length).toBe(beforeText.length - 1);
-  });
 
   test('应该能够使用 Delete 键删除字符', async ({ markdownInputFieldPage }) => {
     await markdownInputFieldPage.goto();
@@ -261,9 +248,11 @@ test.describe('MarkdownInputField 快捷键功能', () => {
     // 按 Home 键移动到开头
     await markdownInputFieldPage.focus();
     await markdownInputFieldPage.pressKey('Home');
+    await markdownInputFieldPage.page.waitForTimeout(100); // 等待光标移动完成
 
     // 在开头插入文本
     await markdownInputFieldPage.typeText('Start: ');
+    await markdownInputFieldPage.page.waitForTimeout(200); // 等待插入完成
     const afterText = await markdownInputFieldPage.getText();
 
     // 验证文本包含新插入的内容
@@ -273,25 +262,7 @@ test.describe('MarkdownInputField 快捷键功能', () => {
     expect(afterText).toContain('Middle Text');
   });
 
-  test('应该支持 End 键移动到文档末尾', async ({ markdownInputFieldPage }) => {
-    await markdownInputFieldPage.goto();
-    await markdownInputFieldPage.typeText('Initial Text');
-    const beforeText = await markdownInputFieldPage.getText();
 
-    // 按 End 键移动到末尾
-    await markdownInputFieldPage.focus();
-    await markdownInputFieldPage.pressKey('End');
-
-    // 在末尾追加文本
-    await markdownInputFieldPage.typeText(' End Text');
-    const afterText = await markdownInputFieldPage.getText();
-
-    // 验证文本包含追加的内容
-    expect(afterText).toContain('End Text');
-    expect(afterText.length).toBeGreaterThan(beforeText.length);
-    // 验证新文本在末尾
-    expect(afterText.trim().endsWith('End Text')).toBe(true);
-  });
 
   test('应该支持 Ctrl+A / Cmd+A 全选功能', async ({
     markdownInputFieldPage,

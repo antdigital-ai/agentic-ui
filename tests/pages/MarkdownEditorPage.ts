@@ -79,7 +79,9 @@ export class MarkdownEditorPage {
     const isMac = process.platform === 'darwin';
     const modifierKey = isMac ? 'Meta' : 'Control';
     await this.page.keyboard.press(`${modifierKey}+a`);
+    await this.page.waitForTimeout(100); // 等待全选操作完成
     await this.page.keyboard.press('Delete');
+    await this.page.waitForTimeout(200); // 等待删除操作完成
   }
 
   /**

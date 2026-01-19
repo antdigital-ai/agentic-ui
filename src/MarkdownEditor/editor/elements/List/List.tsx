@@ -32,14 +32,20 @@ export const List = ({
   children,
 }: ElementProps<ListNode>) => {
   // 支持新的列表类型和向后兼容
-  const isOrdered = element.type === 'numbered-list';
-  const isBulleted = element.type === 'bulleted-list';
+  // 新格式：numbered-list 或 bulleted-list
+  // 旧格式：list 类型，通过 order 属性判断
+  const isOrdered =
+    element.type === 'numbered-list' ||
+    ((element as any).type === 'list' && (element as any).order === true);
+  
+  // 获取 task 属性（支持旧格式和新格式）
+  const task = (element as any).task;
   
   debugInfo('List - 渲染列表', {
     type: element.type,
     isOrdered,
-    task: isBulleted ? element.task : undefined,
-    start: isOrdered ? element.start : undefined,
+    task,
+    start: isOrdered ? (element as any).start : undefined,
     childrenCount: element.children?.length,
   });
   const { store, markdownContainerRef } = useEditorStore();
@@ -49,15 +55,20 @@ export const List = ({
 
   const listContent = React.useMemo(() => {
     // 支持新的列表类型和向后兼容
-    const isOrdered = element.type === 'numbered-list';
-    const isBulleted = element.type === 'bulleted-list';
+    const isOrdered =
+      element.type === 'numbered-list' ||
+      ((element as any).type === 'list' && (element as any).order === true);
+    const task = (element as any).task;
+    const start = isOrdered ? (element as any).start : undefined;
     const tag = isOrdered ? 'ol' : 'ul';
+    
     debugInfo('List - useMemo 渲染', {
       tag,
       type: element.type,
-      start: isOrdered ? element.start : undefined,
-      task: isBulleted ? element.task : undefined,
+      start,
+      task,
     });
+    
     return wrapSSR(
       <ListContext.Provider
         value={{
@@ -81,8 +92,8 @@ export const List = ({
                 hashId,
                 isOrdered ? 'ol' : 'ul',
               ),
-              start: isOrdered ? element.start : undefined,
-              ['data-task']: isBulleted && element.task ? 'true' : undefined,
+              ...(start !== undefined && { start }),
+              ...(task && { 'data-task': 'true' }),
             },
             children,
           )}
@@ -91,9 +102,9 @@ export const List = ({
     );
   }, [
     element.type,
-    isBulleted ? element.task : undefined,
-    isOrdered,
-    isOrdered ? element.start : undefined,
+    (element as any).order,
+    (element as any).task,
+    (element as any).start,
     element.children,
     baseCls,
     hashId,
