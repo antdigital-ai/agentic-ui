@@ -122,12 +122,16 @@ export const makeDeserializer = (jsx: any) => {
         return jsx('element', attrs, (attrs as CardNode)?.children || children);
       }
       if (nodeName === 'H3' || nodeName === 'H2' || nodeName === 'H1') {
+        const attrs = ELEMENT_TAGS[nodeName as keyof typeof ELEMENT_TAGS]?.(
+          el as any,
+        );
         return jsx(
           'element',
           {
             type: 'head',
             className: nodeName,
-            level: nodeName?.replace('H', ''),
+            level: (attrs as any)?.level || Number(nodeName?.replace('H', '')),
+            align: (attrs as any)?.align,
           },
           children,
         );

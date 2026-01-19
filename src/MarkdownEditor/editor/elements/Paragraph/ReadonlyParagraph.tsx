@@ -57,6 +57,7 @@ export const ReadonlyParagraph: React.FC<ElementProps<ParagraphNode>> =
         data-align={props.element.align}
         style={{
           display: !!str || !!props.children?.at(0).type ? undefined : 'none',
+          textAlign: props.element.align,
         }}
       >
         {props.children}

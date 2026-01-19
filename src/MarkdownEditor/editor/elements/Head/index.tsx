@@ -45,6 +45,7 @@ export function Head({
         ['data-empty']: !str && selected ? 'true' : undefined,
         ['data-align']: element.align,
         ['data-drag-el']: true,
+        style: { textAlign: element.align },
         className: classNames({
           empty: !str,
         }),

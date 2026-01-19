@@ -60,6 +60,7 @@ export const ReadonlyHead: React.FC<ElementProps<HeadNode>> = React.memo(
         ['data-head']: slugify(Node.string(element) || ''),
         ['data-title']: true, // 预览模式下不标记为标题
         ['data-align']: element.align,
+        style: { textAlign: element.align },
         className: classNames({
           empty: !str,
         }),

@@ -69,6 +69,7 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
         data-empty={isEmpty}
         style={{
           display: !!str || !!props.children?.at(0).type ? undefined : 'none',
+          textAlign: props.element.align,
         }}
       >
         <DragHandle />
