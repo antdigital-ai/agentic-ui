@@ -1116,9 +1116,17 @@ const handleParagraph = (
 ) => {
   let str = '';
 
-  // 处理对齐注释
+  // 如果有对齐属性，使用 HTML 标签包裹以支持对齐
   if (node.align) {
-    str += `<!--${JSON.stringify({ align: node.align })}-->\n${preString}`;
+    // 递归处理子节点
+    const content = parserSlateNodeToMarkdown(
+      node?.children,
+      '',
+      [...parent, node],
+      plugins,
+    );
+    // 使用 p 标签并添加 align 属性
+    return `<p align="${node.align}">${content}</p>`;
   }
 
   str += parserSlateNodeToMarkdown(
@@ -1147,9 +1155,17 @@ const handleHead = (
 ) => {
   let str = '';
 
-  // 处理对齐注释
+  // 如果有对齐属性，使用 HTML 标签包裹以支持对齐
   if (node.align) {
-    str += `<!--${JSON.stringify({ align: node.align })}-->\n${preString}`;
+    // 递归处理子节点
+    const content = parserSlateNodeToMarkdown(
+      node?.children,
+      '',
+      [...parent, node],
+      plugins,
+    );
+    // 使用 h 标签并添加 align 属性
+    return `<h${node.level} align="${node.align}">${content}</h${node.level}>`;
   }
 
   str +=

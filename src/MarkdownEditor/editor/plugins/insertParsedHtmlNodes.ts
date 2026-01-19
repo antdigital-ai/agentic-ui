@@ -22,11 +22,46 @@ const fragment = new Set(['body', 'figure', 'div']);
 
 export const ELEMENT_TAGS = {
   BLOCKQUOTE: () => ({ type: 'blockquote' }),
-  H1: () => ({ type: 'head', level: 1 }),
-  H2: () => ({ type: 'head', level: 2 }),
-  H3: () => ({ type: 'head', level: 3 }),
-  H4: () => ({ type: 'head', level: 4 }),
-  H5: () => ({ type: 'head', level: 5 }),
+  H1: (el: HTMLElement) => ({
+    type: 'head',
+    level: 1,
+    align:
+      el.getAttribute('align') ||
+      el.style.textAlign ||
+      el.getAttribute('data-align'),
+  }),
+  H2: (el: HTMLElement) => ({
+    type: 'head',
+    level: 2,
+    align:
+      el.getAttribute('align') ||
+      el.style.textAlign ||
+      el.getAttribute('data-align'),
+  }),
+  H3: (el: HTMLElement) => ({
+    type: 'head',
+    level: 3,
+    align:
+      el.getAttribute('align') ||
+      el.style.textAlign ||
+      el.getAttribute('data-align'),
+  }),
+  H4: (el: HTMLElement) => ({
+    type: 'head',
+    level: 4,
+    align:
+      el.getAttribute('align') ||
+      el.style.textAlign ||
+      el.getAttribute('data-align'),
+  }),
+  H5: (el: HTMLElement) => ({
+    type: 'head',
+    level: 5,
+    align:
+      el.getAttribute('align') ||
+      el.style.textAlign ||
+      el.getAttribute('data-align'),
+  }),
   TABLE: () => ({ type: 'table' }),
   IMG: (el: HTMLImageElement) => {
     // 添加更严格的图片URL验证，避免将普通URL误识别为图片
@@ -101,7 +136,13 @@ export const ELEMENT_TAGS = {
   TD: () => ({ type: 'table-cell' }),
   LI: () => ({ type: 'list-item' }),
   OL: () => ({ type: 'list', order: true }),
-  P: () => ({ type: 'paragraph' }),
+  P: (el: HTMLElement) => ({
+    type: 'paragraph',
+    align:
+      el.getAttribute('align') ||
+      el.style.textAlign ||
+      el.getAttribute('data-align'),
+  }),
   PRE: () => ({ type: 'code' }),
   UL: () => ({ type: 'list' }),
 };
