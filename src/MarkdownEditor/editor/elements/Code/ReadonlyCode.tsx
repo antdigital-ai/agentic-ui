@@ -1,7 +1,6 @@
 import DOMPurify from 'dompurify';
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 
 /**
  * ReadonlyCode 组件 - 只读代码块预览组件
@@ -63,11 +62,6 @@ export const ReadonlyCode: React.FC<RenderElementProps> = React.memo(
 
     // 检查代码块是否未闭合
     const isUnclosed = element?.otherProps?.finished === false;
-    debugInfo('ReadonlyCode - 普通代码块', {
-      language: element?.language,
-      isUnclosed,
-      valueLength: element?.value?.length,
-    });
 
     return (
       <div

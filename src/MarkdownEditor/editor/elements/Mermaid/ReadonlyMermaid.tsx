@@ -2,7 +2,6 @@ import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { useContext } from 'react';
 import { RenderElementProps } from 'slate-react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 
 /**
  * ReadonlyMermaid 组件 - 只读 Mermaid 图表预览组件
@@ -35,10 +34,6 @@ import { debugInfo } from '../../../../Utils/debugUtils';
  */
 export const ReadonlyMermaid: React.FC<RenderElementProps> = React.memo(
   ({ attributes, children, element }) => {
-    debugInfo('ReadonlyMermaid - 渲染只读 Mermaid 图表', {
-      hasError: element?.otherProps?.error === true,
-      valueLength: element?.value?.length,
-    });
     const context = useContext(ConfigProvider.ConfigContext);
     const baseCls = context?.getPrefixCls('agentic-md-editor-mermaid');
     const hasError = element?.otherProps?.error === true;

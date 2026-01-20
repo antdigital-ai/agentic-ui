@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { RenderLeafProps } from 'slate-react';
 
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { MarkdownEditorProps } from '../../../types';
 import { useEditorStore } from '../../store';
 import { CommentView } from '../Comment';
@@ -77,14 +76,9 @@ const CommentLeafComponent = ({
     [leaf?.comment, leaf?.data],
   );
 
-  debugInfo('CommentLeaf - 渲染评论节点', {
-    hasComment: !!leaf.comment,
-    commentId: leaf?.id,
-  });
 
   // 如果没有评论，直接返回子元素
   if (!leaf.comment) {
-    debugInfo('CommentLeaf - 无评论，直接返回子元素');
     return <>{children}</>;
   }
 

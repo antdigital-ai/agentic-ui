@@ -1,6 +1,5 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 
 /**
  * ReadonlyCard 组件 - 只读卡片预览组件
@@ -35,10 +34,6 @@ import { debugInfo } from '../../../../Utils/debugUtils';
  */
 export const ReadonlyCard: React.FC<RenderElementProps> = React.memo(
   (props) => {
-    debugInfo('ReadonlyCard - 渲染只读卡片', {
-      block: props.element.block,
-      childrenCount: props.element.children?.length,
-    });
 
     return (
       <div {...props.attributes} data-be={'card'} role="button">

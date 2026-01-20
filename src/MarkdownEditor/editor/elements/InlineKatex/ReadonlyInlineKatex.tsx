@@ -1,6 +1,5 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 
 /**
  * ReadonlyInlineKatex 组件 - 只读行内数学公式预览组件
@@ -33,9 +32,6 @@ import { debugInfo } from '../../../../Utils/debugUtils';
  */
 export const ReadonlyInlineKatex: React.FC<RenderElementProps> = React.memo(
   ({ attributes, children, element }) => {
-    debugInfo('ReadonlyInlineKatex - 渲染只读行内数学公式', {
-      valueLength: element?.value?.length,
-    });
     return (
       <code
         {...attributes}

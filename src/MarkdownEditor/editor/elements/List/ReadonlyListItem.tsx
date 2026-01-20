@@ -1,9 +1,7 @@
 import { Checkbox, ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useMemo } from 'react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ListItemNode } from '../../../el';
-import { ListContext } from './List';
 
 /**
  * ReadonlyListItem 组件 - 只读列表项预览组件
@@ -39,16 +37,8 @@ import { ListContext } from './List';
  */
 export const ReadonlyListItem: React.FC<ElementProps<ListItemNode>> =
   React.memo(({ element, children, attributes }) => {
-    debugInfo('ReadonlyListItem - 渲染只读列表项', {
-      checked: element.checked,
-      isTask: typeof element.checked === 'boolean',
-      mentionsCount: element.mentions?.length,
-      childrenCount: element.children?.length,
-    });
-
     const isTask = typeof element.checked === 'boolean';
     const context = useContext(ConfigProvider.ConfigContext);
-    const { hashId = '' } = useContext(ListContext) || {};
     const baseCls = context.getPrefixCls('agentic-md-editor-list');
 
     // 任务列表的复选框（只读模式）
@@ -58,12 +48,12 @@ export const ReadonlyListItem: React.FC<ElementProps<ListItemNode>> =
         <span
           contentEditable={false}
           data-check-item
-          className={classNames(`${baseCls}-check-item`, hashId)}
+          className={classNames(`${baseCls}-check-item`)}
         >
           <Checkbox checked={element.checked} disabled />
         </span>
       );
-    }, [element.checked, isTask, baseCls, hashId]);
+    }, [element.checked, isTask, baseCls]);
 
     // 提及用户显示（只读模式，只显示不编辑）
     const mentionsUser = useMemo(() => {
@@ -104,7 +94,7 @@ export const ReadonlyListItem: React.FC<ElementProps<ListItemNode>> =
 
     return (
       <li
-        className={classNames(`${baseCls}-item`, hashId, {
+        className={classNames(`${baseCls}-item`, {
           [`${baseCls}-task`]: isTask,
         })}
         data-be={'list-item'}

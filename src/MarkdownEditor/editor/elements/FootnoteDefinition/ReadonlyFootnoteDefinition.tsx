@@ -1,7 +1,6 @@
 import { ExportOutlined } from '@ant-design/icons';
 import React, { useMemo } from 'react';
 import { Node } from 'slate';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, FootnoteDefinitionNode } from '../../../el';
 import { useEditorStore } from '../../store';
 
@@ -39,17 +38,10 @@ import { useEditorStore } from '../../store';
 export const ReadonlyFootnoteDefinition: React.FC<
   ElementProps<FootnoteDefinitionNode>
 > = React.memo((props) => {
-  debugInfo('ReadonlyFootnoteDefinition - 渲染只读脚注定义', {
-    identifier: props.element.identifier,
-    url: props.element.url,
-  });
   const { store } = useEditorStore();
   const element = props.element;
 
   useMemo(() => {
-    debugInfo('ReadonlyFootnoteDefinition - 更新脚注定义映射', {
-      identifier: element.identifier,
-    });
     store.footnoteDefinitionMap = store.footnoteDefinitionMap.set(
       element.identifier,
       element,

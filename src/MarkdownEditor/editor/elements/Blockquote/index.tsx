@@ -1,5 +1,4 @@
 import React from 'react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { BlockQuoteNode, ElementProps } from '../../../el';
 import { useEditorStore } from '../../store';
 
@@ -36,20 +35,13 @@ import { useEditorStore } from '../../store';
  * - 提供 data-be 属性用于标识
  */
 export function Blockquote(props: ElementProps<BlockQuoteNode>) {
-  debugInfo('Blockquote - 渲染引用块', {
-    childrenCount: props.element.children?.length,
-  });
   const { store, markdownContainerRef } = useEditorStore();
   return React.useMemo(() => {
-    debugInfo('Blockquote - useMemo 渲染', {
-      childrenCount: props.element.children?.length,
-    });
     return (
       <blockquote
         data-be={'blockquote'}
         {...props.attributes}
         onDragStart={(e) => {
-          debugInfo('Blockquote - 拖拽开始');
           store.dragStart(e, markdownContainerRef.current!);
         }}
       >

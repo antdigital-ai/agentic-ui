@@ -2,7 +2,6 @@ import classNames from 'classnames';
 import React, { useContext } from 'react';
 import { Node } from 'slate';
 import { I18nContext } from '../../../../I18n';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ParagraphNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
@@ -63,7 +62,6 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
             : undefined
         }
         onDragStart={(e) => {
-          debugInfo('Paragraph - 拖拽开始');
           store.dragStart(e, markdownContainerRef.current!);
         }}
         data-empty={isEmpty}

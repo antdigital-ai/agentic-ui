@@ -1,7 +1,6 @@
 import { ExportOutlined } from '@ant-design/icons';
 import React, { useMemo } from 'react';
 import { Node } from 'slate';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, FootnoteDefinitionNode } from '../../../el';
 import { useEditorStore } from '../../store';
 import { DragHandle } from '../../tools/DragHandle';
@@ -44,7 +43,6 @@ export const FootnoteDefinition = (
         data-drag-el
         className={!str ? 'empty' : undefined}
         onDragStart={(e) => {
-          debugInfo('FootnoteDefinition - 拖拽开始');
           store.dragStart(e, markdownContainerRef.current!);
         }}
       >

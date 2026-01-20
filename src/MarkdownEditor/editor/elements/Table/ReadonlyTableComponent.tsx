@@ -17,7 +17,6 @@ import { TableNode } from '../../types/Table';
 import { parserSlateNodeToMarkdown } from '../../utils';
 
 interface ReadonlyTableComponentProps {
-  hashId: string;
   children: React.ReactNode;
   element: TableNode;
   baseCls: string;
@@ -28,7 +27,7 @@ interface ReadonlyTableComponentProps {
  * 移除了不必要的滚动监听和复杂的宽度计算
  */
 export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
-  React.memo(({ hashId, children, element, baseCls }) => {
+  React.memo(({ children, element, baseCls }) => {
     const { editorProps } = useEditorStore();
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const {
@@ -110,7 +109,6 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
           className={classNames(
             `${baseCls}-editor-table`,
             'readonly',
-            hashId,
             `${baseCls}-readonly-table`,
             {
               [`${baseCls}-readonly-pure`]: editorProps?.tableConfig?.pure,
@@ -132,15 +130,13 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
           <tbody>{children}</tbody>
         </table>
       ),
-      [colWidths, children, hashId, baseCls],
+      [colWidths, children, baseCls],
     );
 
     // 缓存操作按钮内容
     const popoverContent = useMemo(
       () => (
-        <div
-          className={classNames(hashId, `${baseCls}-readonly-table-actions`)}
-        >
+        <div className={classNames(`${baseCls}-readonly-table-actions`)}>
           {actions?.fullScreen && (
             <ActionIconBox
               title={i18n?.locale?.fullScreen || '全屏'}
@@ -170,7 +166,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
 
     return (
       <>
-        <div className={classNames(baseCls, hashId)}>{tableDom}</div>
+        <div className={classNames(baseCls)}>{tableDom}</div>
         {popoverContent}
         {previewOpen && (
           <Modal
@@ -189,7 +185,6 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
             <div
               className={classNames(
                 baseCls,
-                hashId,
                 getPrefixCls('agentic-md-editor-content'),
               )}
               style={{

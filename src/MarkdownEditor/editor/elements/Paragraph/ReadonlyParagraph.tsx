@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import React from 'react';
 import { Node } from 'slate';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ParagraphNode } from '../../../el';
 
 /**
@@ -38,16 +37,8 @@ import { ElementProps, ParagraphNode } from '../../../el';
  */
 export const ReadonlyParagraph: React.FC<ElementProps<ParagraphNode>> =
   React.memo((props) => {
-    debugInfo('ReadonlyParagraph - 渲染只读段落', {
-      align: props.element.align,
-      children: props.element.children,
-    });
 
     const str = Node.string(props.element).trim();
-    debugInfo('ReadonlyParagraph - useMemo 渲染', {
-      strLength: str.length,
-      align: props.element.align,
-    });
 
     return (
       <div

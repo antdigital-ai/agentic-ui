@@ -4,7 +4,6 @@ import React, { CSSProperties, useCallback, useContext, useMemo } from 'react';
 import { RenderLeafProps } from 'slate-react';
 
 import { isMobileDevice } from '../../../../MarkdownInputField/AttachmentButton/utils';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { MarkdownEditorProps } from '../../../types';
 import { dragStart } from '../index';
 
@@ -34,12 +33,6 @@ export const FncLeaf = ({
   const isMobile = isMobileDevice();
   const hasFnc = leaf.fnc || leaf.identifier;
 
-  debugInfo('FncLeaf - 渲染 fnc 节点', {
-    hasFnc: !!leaf.fnc,
-    hasIdentifier: !!leaf.identifier,
-    hasFnd: !!leaf.fnd,
-    text: leaf.text?.substring(0, 50),
-  });
 
   // 使用 useMemo 优化 className 计算
   const fncClassName = useMemo(
@@ -87,15 +80,8 @@ export const FncLeaf = ({
   // 使用 useCallback 优化 onClick 处理函数
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
-      debugInfo('FncLeaf - onClick 事件', {
-        isMobile,
-        hasFnc,
-        detail: e.detail,
-        hasUrl: !!leaf.url,
-      });
       // 在手机上，如果是 fnc，阻止点击事件（使用长按代替）
       if (isMobile && hasFnc) {
-        debugInfo('FncLeaf - 移动端阻止 fnc 点击');
         e.preventDefault();
         return;
       }
@@ -103,23 +89,19 @@ export const FncLeaf = ({
         e.preventDefault();
         e.stopPropagation();
         if (fncProps?.onOriginUrlClick) {
-          debugInfo('FncLeaf - 触发 fnc 点击');
           fncProps.onOriginUrlClick(leaf?.identifier);
         }
         // 如果同时有 URL，也要处理 URL 打开逻辑
         if (leaf.url) {
           if (linkConfig?.onClick) {
             const res = linkConfig.onClick(leaf.url);
-            debugInfo('FncLeaf - 链接点击处理', { result: res });
             if (res === false) {
               return false;
             }
           }
           if (linkConfig?.openInNewTab !== false) {
-            debugInfo('FncLeaf - 新标签页打开链接', { url: leaf.url });
             window.open(leaf.url, '_blank');
           } else {
-            debugInfo('FncLeaf - 当前窗口打开链接', { url: leaf.url });
             window.location.href = leaf.url;
           }
         }
@@ -160,10 +142,6 @@ export const FncLeaf = ({
 
   // 如果提供了自定义渲染函数，使用它
   if (fncProps?.render && (leaf.fnc || leaf.identifier)) {
-    debugInfo('FncLeaf - 使用 fnc 自定义渲染', {
-      hasFnc: !!leaf.fnc,
-      hasIdentifier: !!leaf.identifier,
-    });
     dom = (
       <>
         {fncProps.render?.(

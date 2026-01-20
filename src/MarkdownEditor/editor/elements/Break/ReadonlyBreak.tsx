@@ -1,6 +1,5 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 
 /**
  * ReadonlyBreak 组件 - 只读换行预览组件
@@ -31,7 +30,6 @@ import { debugInfo } from '../../../../Utils/debugUtils';
  */
 export const ReadonlyBreak: React.FC<RenderElementProps> = React.memo(
   ({ attributes, children }) => {
-    debugInfo('ReadonlyBreak - 渲染只读换行');
     return (
       <span {...attributes} contentEditable={false}>
         {children}

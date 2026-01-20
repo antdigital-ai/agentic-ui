@@ -1,23 +1,13 @@
-﻿import React from 'react';
+import React from 'react';
 import { RenderElementProps } from 'slate-react';
 import { useSelStatus } from '../../../../MarkdownEditor/hooks/editor';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { useEditorStore } from '../../store';
 
 export const WarpCard = (props: RenderElementProps) => {
-  debugInfo('WarpCard - 渲染卡片', {
-    block: props.element.block,
-    childrenCount: props.element.children?.length,
-  });
   const [selected, path] = useSelStatus(props.element);
   const { readonly } = useEditorStore();
 
   return React.useMemo(() => {
-    debugInfo('WarpCard - useMemo 渲染', {
-      readonly,
-      selected,
-      block: props.element.block,
-    });
     if (readonly) {
       return (
         <div {...props.attributes} data-be={'card'} role="button">

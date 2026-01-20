@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { BubbleConfigContext } from '../../../../Bubble/BubbleConfigProvide';
 import { SchemaRenderer } from '../../../../Schema';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { useEditorStore } from '../../store';
 
 /**
@@ -37,11 +36,6 @@ import { useEditorStore } from '../../store';
  */
 export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
   (props) => {
-    debugInfo('ReadonlySchema - 渲染只读 Schema', {
-      language: props.element.language,
-      valueType: typeof props.element.value,
-      hasApaasify: !!(props.element as any).apaasify,
-    });
     const { element: node } = props;
     const { editorProps } = useEditorStore();
     const apaasify = editorProps?.apaasify || editorProps?.apassify;
@@ -49,7 +43,6 @@ export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
     const { bubble } = useContext(BubbleConfigContext) || {};
 
     if (apaasify?.enable && apaasify.render) {
-      debugInfo('ReadonlySchema - 使用自定义 apaasify 渲染');
       const renderedContent = apaasify.render(props, bubble?.originData);
       return (
         <div
@@ -81,7 +74,6 @@ export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
     }
 
     if (node.language === 'agentar-card') {
-      debugInfo('ReadonlySchema - 使用 AgentAR 卡片渲染');
       return (
         <div
           data-testid="agentar-card-container"
@@ -101,7 +93,6 @@ export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
       );
     }
 
-    debugInfo('ReadonlySchema - 使用默认 JSON 渲染');
     return (
       <pre
         {...props.attributes}

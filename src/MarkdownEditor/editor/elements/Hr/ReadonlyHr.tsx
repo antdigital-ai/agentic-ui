@@ -1,6 +1,5 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 
 /**
  * ReadonlyHr 组件 - 只读分割线预览组件
@@ -31,7 +30,6 @@ import { debugInfo } from '../../../../Utils/debugUtils';
  */
 export const ReadonlyHr: React.FC<RenderElementProps> = React.memo(
   ({ attributes, children }) => {
-    debugInfo('ReadonlyHr - 渲染只读分割线');
     return (
       <div
         {...attributes}

@@ -1,9 +1,7 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 
 export const Hr = ({ attributes, children }: RenderElementProps) => {
-  debugInfo('Hr - 渲染分割线');
   return (
     <div
       {...attributes}

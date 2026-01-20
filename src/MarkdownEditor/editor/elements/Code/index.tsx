@@ -1,7 +1,6 @@
 import DOMPurify from 'dompurify';
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 
 export const Code = ({ attributes, children, element }: RenderElementProps) => {
   debugInfo('Code - 渲染代码块', {
@@ -31,11 +30,6 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
 
   // 检查代码块是否未闭合
   const isUnclosed = element?.otherProps?.finished === false;
-  debugInfo('Code - 普通代码块', {
-    language: element?.language,
-    isUnclosed,
-    valueLength: element?.value?.length,
-  });
 
   return (
     <div

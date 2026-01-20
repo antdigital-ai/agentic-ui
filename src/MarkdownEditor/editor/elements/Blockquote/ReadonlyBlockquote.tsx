@@ -1,5 +1,4 @@
 import React from 'react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { BlockQuoteNode, ElementProps } from '../../../el';
 
 /**
@@ -34,9 +33,6 @@ import { BlockQuoteNode, ElementProps } from '../../../el';
  */
 export const ReadonlyBlockquote: React.FC<ElementProps<BlockQuoteNode>> =
   React.memo((props) => {
-    debugInfo('ReadonlyBlockquote - 渲染只读引用块', {
-      childrenCount: props.element.children?.length,
-    });
 
     return (
       <blockquote data-be={'blockquote'} {...props.attributes}>

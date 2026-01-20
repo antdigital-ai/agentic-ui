@@ -1,7 +1,6 @@
 import { ConfigProvider, Skeleton } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, LinkCardNode } from '../../../el';
 import { AvatarList } from '../../components/ContributorAvatar';
 
@@ -45,12 +44,6 @@ export const ReadonlyLinkCard: React.FC<
     }>
   >
 > = React.memo(({ element, attributes, children }) => {
-  debugInfo('ReadonlyLinkCard - 渲染只读链接卡片', {
-    url: element?.url?.substring(0, 100),
-    title: element?.title,
-    name: element?.name,
-    finished: element?.finished,
-  });
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context?.getPrefixCls('agentic-md-editor-link-card');
   const [showAsText, setShowAsText] = useState(false);
@@ -58,10 +51,8 @@ export const ReadonlyLinkCard: React.FC<
   // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
   useEffect(() => {
     if (element.finished === false) {
-      debugInfo('ReadonlyLinkCard - 设置超时显示文本');
       setShowAsText(false);
       const timer = setTimeout(() => {
-        debugInfo('ReadonlyLinkCard - 超时，显示为文本');
         setShowAsText(true);
       }, 5000);
 
@@ -77,7 +68,6 @@ export const ReadonlyLinkCard: React.FC<
   if (element.finished === false) {
     // 如果 5 秒后仍未完成，显示为文本
     if (showAsText) {
-      debugInfo('ReadonlyLinkCard - 显示为文本');
       return (
         <div {...attributes}>
           <div
@@ -96,7 +86,6 @@ export const ReadonlyLinkCard: React.FC<
       );
     }
     // 5 秒内显示加载骨架屏
-    debugInfo('ReadonlyLinkCard - 显示加载骨架屏');
     return (
       <div {...attributes}>
         <Skeleton active paragraph={{ rows: 2 }} />
@@ -105,7 +94,6 @@ export const ReadonlyLinkCard: React.FC<
     );
   }
 
-  debugInfo('ReadonlyLinkCard - 渲染完整链接卡片');
   return (
     <div {...attributes}>
       <div

@@ -1,13 +1,11 @@
-﻿import { LoadingOutlined } from '@ant-design/icons';
+import { LoadingOutlined } from '@ant-design/icons';
 import { useMountMergeState } from '@ant-design/pro-components';
 import { Checkbox, ConfigProvider, Dropdown, Space } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useMemo } from 'react';
-import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ListItemNode } from '../../../el';
 import { useMEditor } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
-import { ListContext } from './List';
 
 type Mentions = { name: string; avatar?: string; id: string };
 
@@ -133,7 +131,12 @@ const MentionsUser = (props: {
                   >
                     @
                     {u.avatar?.startsWith('http') ? (
-                      <img width={16} height={16} src={u.avatar} alt={u.name} />
+                      <img
+                        width={16}
+                        height={16}
+                        src={u.avatar}
+                        alt={u.name}
+                      />
                     ) : null}
                     <span>{u.name}</span>
                   </div>
@@ -189,18 +192,11 @@ export const ListItem = ({
   children,
   attributes,
 }: ElementProps<ListItemNode>) => {
-  debugInfo('ListItem - 渲染列表项', {
-    checked: element.checked,
-    isTask: typeof element.checked === 'boolean',
-    mentionsCount: element.mentions?.length,
-    childrenCount: element.children?.length,
-  });
   const [, update] = useMEditor(element);
   const { store, editorProps, markdownContainerRef } = useEditorStore();
   const isTask = typeof element.checked === 'boolean';
   const context = useContext(ConfigProvider.ConfigContext);
   const listItemRender = editorProps?.comment?.listItemRender;
-  const { hashId = '' } = useContext(ListContext) || {};
   const baseCls = context.getPrefixCls('agentic-md-editor-list');
 
   const checkbox = React.useMemo(() => {
@@ -209,14 +205,11 @@ export const ListItem = ({
       <span
         contentEditable={false}
         data-check-item
-        className={classNames(`${baseCls}-check-item`, hashId)}
+        className={classNames(`${baseCls}-check-item`)}
       >
         <Checkbox
           checked={element.checked}
           onChange={(e) => {
-            debugInfo('ListItem - 复选框状态改变', {
-              checked: e.target.checked,
-            });
             update({ checked: e.target.checked });
           }}
         />
@@ -247,12 +240,11 @@ export const ListItem = ({
       };
       return (
         <li
-          className={classNames(`${baseCls}-item`, hashId, {
+          className={classNames(`${baseCls}-item`, {
             [`${baseCls}-task`]: isTask,
           })}
           data-be={'list-item'}
           onDragStart={(e) => {
-            debugInfo('ListItem - 拖拽开始');
             store.dragStart(e, markdownContainerRef.current!);
           }}
           {...attributes}
@@ -263,12 +255,11 @@ export const ListItem = ({
     }
     return (
       <li
-        className={classNames(`${baseCls}-item`, hashId, {
+        className={classNames(`${baseCls}-item`, {
           [`${baseCls}-task`]: isTask,
         })}
         data-be={'list-item'}
         onDragStart={(e) => {
-          debugInfo('ListItem - 拖拽开始');
           store.dragStart(e, markdownContainerRef.current!);
         }}
         {...attributes}

@@ -1,4 +1,4 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { Node } from 'slate';
@@ -41,12 +41,10 @@ import useScrollShadow from './useScrollShadow';
  * @see https://reactjs.org/docs/hooks-intro.html React Hooks
  */
 export const SlateTable = ({
-  hashId,
   children,
   ...props
 }: {
   children: React.ReactNode;
-  hashId: string;
 } & RenderElementProps) => {
   const { readonly, markdownContainerRef } = useEditorStore();
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
@@ -205,7 +203,7 @@ export const SlateTable = ({
     () => (
       <table
         ref={tableTargetRef}
-        className={classNames(`${baseCls}-editor-table`, hashId)}
+        className={classNames(`${baseCls}-editor-table`)}
         onDragStart={(e) => {
           // 阻止拖拽开始事件
           e.preventDefault();
@@ -241,7 +239,7 @@ export const SlateTable = ({
         </tbody>
       </table>
     ),
-    [colWidths, children, hashId, baseCls],
+    [colWidths, children, baseCls],
   );
 
   // 缓存boxShadow样式，只在scrollState变化时重新计算
@@ -264,11 +262,7 @@ export const SlateTable = ({
   // readonly 模式渲染 - 使用优化的组件（早期返回）
   if (readonly) {
     return (
-      <ReadonlyTableComponent
-        hashId={hashId}
-        element={props.element}
-        baseCls={baseCls}
-      >
+      <ReadonlyTableComponent element={props.element} baseCls={baseCls}>
         {children}
       </ReadonlyTableComponent>
     );
@@ -277,7 +271,7 @@ export const SlateTable = ({
   // 编辑模式渲染
   return (
     <div
-      className={classNames(baseCls, hashId)}
+      className={classNames(baseCls)}
       ref={tableRef}
       style={{
         ...boxShadowStyle,
