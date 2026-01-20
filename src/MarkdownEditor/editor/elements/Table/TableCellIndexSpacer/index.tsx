@@ -12,7 +12,6 @@ import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { useRefFunction } from '../../../../../Hooks/useRefFunction';
 import { NativeTableEditor } from '../../../../utils/native-table';
 import { TablePropsContext } from '../TableContext';
-import { useStyle } from './style';
 
 /**
  * TableCellIndexSpacer 组件的属性接口
@@ -75,7 +74,6 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
   const baseClassName = context?.getPrefixCls(
     'agentic-md-editor-table-cell-index-spacer',
   );
-  const { wrapSSR, hashId } = useStyle(baseClassName);
   const editor = useSlate();
   const tableContext = useContext(TablePropsContext);
 
@@ -331,10 +329,10 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
   // 判断是否应该显示增加列的按钮（总是显示）
   const shouldShowInsertButtons = shouldShowDeleteIcon;
 
-  return wrapSSR(
+  return (
     <td
       ref={ref}
-      className={classNames(baseClassName, hashId, className, 'config-td')}
+      className={classNames(baseClassName, className, 'config-td')}
       contentEditable={false}
       style={{
         cursor: columnIndex !== undefined ? 'pointer' : 'default',
@@ -358,7 +356,6 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
         className={classNames(
           `${baseClassName}-action-buttons`,
           shouldShowDeleteIcon && `${baseClassName}-action-buttons-visible`,
-          hashId,
         )}
       >
         {/* 总是显示增加列的按钮 */}
@@ -367,7 +364,6 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
             className={classNames(
               `${baseClassName}-action-button`,
               `${baseClassName}-insert-column-before`,
-              hashId,
             )}
             onClick={handleInsertColumnBefore}
             title="在前面增加一列"
@@ -379,7 +375,6 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
           className={classNames(
             `${baseClassName}-action-button`,
             `${baseClassName}-delete-icon`,
-            hashId,
           )}
           onClick={handleDeleteClick}
           title="删除整列"
@@ -392,7 +387,6 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
             className={classNames(
               `${baseClassName}-action-button`,
               `${baseClassName}-insert-column-after`,
-              hashId,
             )}
             onClick={handleInsertColumnAfter}
             title="在后面增加一列"
@@ -401,6 +395,6 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
           </div>
         )}
       </div>
-    </td>,
+    </td>
   );
 };

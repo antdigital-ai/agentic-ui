@@ -4,7 +4,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, LinkCardNode } from '../../../el';
 import { AvatarList } from '../../components/ContributorAvatar';
-import { useStyle } from './style';
 
 /**
  * ReadonlyLinkCard 组件 - 只读链接卡片预览组件
@@ -54,7 +53,6 @@ export const ReadonlyLinkCard: React.FC<
   });
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context?.getPrefixCls('agentic-md-editor-link-card');
-  const { wrapSSR, hashId } = useStyle(baseCls);
   const [showAsText, setShowAsText] = useState(false);
 
   // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
@@ -108,10 +106,10 @@ export const ReadonlyLinkCard: React.FC<
   }
 
   debugInfo('ReadonlyLinkCard - 渲染完整链接卡片');
-  return wrapSSR(
+  return (
     <div {...attributes}>
       <div
-        className={classNames(baseCls, hashId)}
+        className={classNames(baseCls)}
         data-be="link-card"
         draggable={false}
         style={{
@@ -138,18 +136,15 @@ export const ReadonlyLinkCard: React.FC<
             if (typeof window === 'undefined') return;
             window.open(element?.url);
           }}
-          className={classNames(`${baseCls}-container`, hashId)}
+          className={classNames(`${baseCls}-container`)}
         >
           <div
-            className={classNames(`${baseCls}-container-content`, hashId)}
+            className={classNames(`${baseCls}-container-content`)}
             contentEditable={false}
           >
             {element.icon ? (
               <img
-                className={classNames(
-                  `${baseCls}-container-content-icon`,
-                  hashId,
-                )}
+                className={classNames(`${baseCls}-container-content-icon`)}
                 src={element.icon}
                 width={56}
               />
@@ -162,10 +157,7 @@ export const ReadonlyLinkCard: React.FC<
             >
               <a
                 href={element?.url}
-                className={classNames(
-                  `${baseCls}-container-content-title`,
-                  hashId,
-                )}
+                className={classNames(`${baseCls}-container-content-title`)}
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
@@ -179,7 +171,6 @@ export const ReadonlyLinkCard: React.FC<
               <div
                 className={classNames(
                   `${baseCls}-container-content-description`,
-                  hashId,
                 )}
               >
                 {element.description ? element.description : element?.url}
@@ -187,7 +178,6 @@ export const ReadonlyLinkCard: React.FC<
               <div
                 className={classNames(
                   `${baseCls}-container-content-collaborators`,
-                  hashId,
                 )}
               >
                 {element.otherProps?.collaborators ? (
@@ -213,7 +203,6 @@ export const ReadonlyLinkCard: React.FC<
                   <div
                     className={classNames(
                       `${baseCls}-container-content-updateTime`,
-                      hashId,
                     )}
                     style={{
                       color: 'rgba(0,0,0,0.45)',
@@ -240,7 +229,7 @@ export const ReadonlyLinkCard: React.FC<
           {children.at(-1)}
         </div>
       </div>
-    </div>,
+    </div>
   );
 });
 

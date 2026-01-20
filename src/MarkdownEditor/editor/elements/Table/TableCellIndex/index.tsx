@@ -12,7 +12,6 @@ import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { useRefFunction } from '../../../../../Hooks/useRefFunction';
 import { NativeTableEditor } from '../../../../utils/native-table';
 import { TablePropsContext } from '../TableContext';
-import { useStyle } from './style';
 
 /**
  * TableCellIndex 组件的属性接口
@@ -75,7 +74,6 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
   const baseClassName = context?.getPrefixCls(
     'agentic-md-editor-table-cell-index',
   );
-  const { wrapSSR, hashId } = useStyle(baseClassName);
   const editor = useSlate();
   const tableContext = useContext(TablePropsContext);
 
@@ -345,10 +343,10 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
     }
   }, ref);
 
-  return wrapSSR(
+  return (
     <td
       ref={ref}
-      className={classNames(baseClassName, hashId, className, 'config-td')}
+      className={classNames(baseClassName, className, 'config-td')}
       contentEditable={false}
       style={{
         padding: 0,
@@ -366,7 +364,6 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
         className={classNames(
           `${baseClassName}-action-buttons`,
           shouldShowDeleteIcon && `${baseClassName}-action-buttons-visible`,
-          hashId,
         )}
       >
         {/* 在上面插入一行 */}
@@ -375,7 +372,6 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
             className={classNames(
               `${baseClassName}-action-button`,
               `${baseClassName}-insert-row-before`,
-              hashId,
             )}
             onClick={handleInsertRowBefore}
             title="在上面增加一行"
@@ -387,7 +383,6 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
           className={classNames(
             `${baseClassName}-action-button`,
             `${baseClassName}-delete-icon`,
-            hashId,
           )}
           onClick={handleDeleteClick}
           title="删除整行"
@@ -400,7 +395,6 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
             className={classNames(
               `${baseClassName}-action-button`,
               `${baseClassName}-insert-row-after`,
-              hashId,
             )}
             onClick={handleInsertRowAfter}
             title="在下面增加一行"
@@ -409,6 +403,6 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
           </div>
         )}
       </div>
-    </td>,
+    </td>
   );
 };

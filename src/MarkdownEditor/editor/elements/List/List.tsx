@@ -4,7 +4,6 @@ import React, { createElement, useContext } from 'react';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ListNode } from '../../../el';
 import { useEditorStore } from '../../store';
-import { useStyle } from './style';
 
 export const ListContext = React.createContext<{
   hashId: string;
@@ -51,7 +50,6 @@ export const List = ({
   const { store, markdownContainerRef } = useEditorStore();
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context.getPrefixCls('agentic-md-editor-list');
-  const { wrapSSR, hashId } = useStyle(baseCls);
 
   const listContent = React.useMemo(() => {
     // 支持新的列表类型和向后兼容
@@ -69,14 +67,14 @@ export const List = ({
       task,
     });
 
-    return wrapSSR(
+    return (
       <ListContext.Provider
         value={{
-          hashId,
+          hashId: '',
         }}
       >
         <div
-          className={classNames(`${baseCls}-container`, hashId, 'relative')}
+          className={classNames(`${baseCls}-container`, 'relative')}
           data-be={'list'}
           {...attributes}
           onDragStart={(e) => {
@@ -87,14 +85,14 @@ export const List = ({
           {createElement(
             tag,
             {
-              className: classNames(baseCls, hashId, isOrdered ? 'ol' : 'ul'),
+              className: classNames(baseCls, isOrdered ? 'ol' : 'ul'),
               ...(start !== undefined && { start }),
               ...(task && { 'data-task': 'true' }),
             },
             children,
           )}
         </div>
-      </ListContext.Provider>,
+      </ListContext.Provider>
     );
   }, [
     element.type,
@@ -103,12 +101,10 @@ export const List = ({
     (element as any).start,
     element.children,
     baseCls,
-    hashId,
     attributes,
     children,
     store,
     markdownContainerRef,
-    wrapSSR,
   ]);
 
   return listContent;

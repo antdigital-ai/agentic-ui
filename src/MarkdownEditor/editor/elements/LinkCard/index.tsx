@@ -1,11 +1,10 @@
-﻿import { ConfigProvider, Skeleton } from 'antd';
+import { ConfigProvider, Skeleton } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useState } from 'react';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, LinkCardNode } from '../../../el';
 import { AvatarList } from '../../components/ContributorAvatar';
 import { DragHandle } from '../../tools/DragHandle';
-import { useStyle } from './style';
 
 export function LinkCard({
   element,
@@ -26,7 +25,6 @@ export function LinkCard({
   });
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context?.getPrefixCls('agentic-md-editor-link-card');
-  const { wrapSSR, hashId } = useStyle(baseCls);
   const htmlRef = React.useRef<HTMLDivElement>(null);
   const [showAsText, setShowAsText] = useState(false);
 
@@ -81,10 +79,10 @@ export function LinkCard({
   }
 
   debugInfo('LinkCard - 渲染完整链接卡片');
-  return wrapSSR(
+  return (
     <div {...attributes}>
       <div
-        className={classNames(baseCls, hashId)}
+        className={classNames(baseCls)}
         data-be="link-card"
         data-drag-el
         draggable={false}
@@ -120,18 +118,15 @@ export function LinkCard({
             if (typeof window === 'undefined') return;
             window.open(element?.url);
           }}
-          className={classNames(`${baseCls}-container`, hashId)}
+          className={classNames(`${baseCls}-container`)}
         >
           <div
-            className={classNames(`${baseCls}-container-content`, hashId)}
+            className={classNames(`${baseCls}-container-content`)}
             contentEditable={false}
           >
             {element.icon ? (
               <img
-                className={classNames(
-                  `${baseCls}-container-content-icon`,
-                  hashId,
-                )}
+                className={classNames(`${baseCls}-container-content-icon`)}
                 src={element.icon}
                 width={56}
               />
@@ -144,10 +139,7 @@ export function LinkCard({
             >
               <a
                 href={element?.url}
-                className={classNames(
-                  `${baseCls}-container-content-title`,
-                  hashId,
-                )}
+                className={classNames(`${baseCls}-container-content-title`)}
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
@@ -161,7 +153,6 @@ export function LinkCard({
               <div
                 className={classNames(
                   `${baseCls}-container-content-description`,
-                  hashId,
                 )}
               >
                 {element.description ? element.description : element?.url}
@@ -169,7 +160,6 @@ export function LinkCard({
               <div
                 className={classNames(
                   `${baseCls}-container-content-collaborators`,
-                  hashId,
                 )}
               >
                 {element.otherProps?.collaborators ? (
@@ -195,7 +185,6 @@ export function LinkCard({
                   <div
                     className={classNames(
                       `${baseCls}-container-content-updateTime`,
-                      hashId,
                     )}
                     style={{
                       color: 'rgba(0,0,0,0.45)',
@@ -222,6 +211,6 @@ export function LinkCard({
           {children.at(-1)}
         </div>
       </div>
-    </div>,
+    </div>
   );
 }

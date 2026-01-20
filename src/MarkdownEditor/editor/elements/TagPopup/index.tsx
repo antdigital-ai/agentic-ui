@@ -13,7 +13,6 @@ import React, {
 import { BaseEditor } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
 import { SuggestionConnext } from '../../../../MarkdownInputField/Suggestion';
-import { useStyle } from './style';
 
 type TagPopupItem = Array<{
   label: string;
@@ -249,7 +248,6 @@ const handleMouseLeave = (domRef: React.RefObject<HTMLDivElement>) => {
 const createDefaultDom = (
   domRef: React.RefObject<HTMLDivElement>,
   baseCls: string,
-  hashId: string,
   loading: boolean,
   selectedItems: TagPopupItem,
   children: React.ReactNode,
@@ -265,7 +263,7 @@ const createDefaultDom = (
       ref={domRef}
       data-tag-popup-input
       data-no-focus
-      className={classNames(`${baseCls}-input`, hashId, {
+      className={classNames(`${baseCls}-input`, {
         empty: isEmpty,
         [`${baseCls}-loading`]: loading,
         [`${baseCls}-has-arrow`]: hasItems,
@@ -278,7 +276,7 @@ const createDefaultDom = (
       {children}
       {hasItems && (
         <ChevronDown
-          className={classNames(`${baseCls}-arrow`, hashId, {
+          className={classNames(`${baseCls}-arrow`, {
             empty: isEmpty,
             open: isOpen,
           })}
@@ -371,8 +369,7 @@ export const TagPopup = (props: RenderProps) => {
   const domRef = useRef<HTMLDivElement>(null);
   const suggestionConnext = useContext(SuggestionConnext);
   const antdContext = useContext(ConfigProvider.ConfigContext);
-  const baseCls = antdContext?.getPrefixCls('agentic-tag-popup');
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const baseCls = antdContext?.getPrefixCls('agentic-md-editor-tag-popup');
   const currentNodePath = useRef<number[]>();
 
   useEffect(() => {
@@ -420,7 +417,6 @@ export const TagPopup = (props: RenderProps) => {
   const defaultDom = createDefaultDom(
     domRef,
     baseCls,
-    hashId,
     loading,
     selectedItems,
     children,
@@ -438,7 +434,6 @@ export const TagPopup = (props: RenderProps) => {
   // 预先计算容器 className 与 style，减少 JSX 中的嵌套
   const containerClassName = classNames(
     baseCls,
-    hashId,
     props.className,
     props.prefixCls,
     props.tagTextClassName,
@@ -487,13 +482,13 @@ export const TagPopup = (props: RenderProps) => {
     renderDom
   );
 
-  return wrapSSR(
+  return (
     <div
       className={containerClassName}
       style={containerStyle}
       onClick={handleContainerClick}
     >
       {content}
-    </div>,
+    </div>
   );
 };
