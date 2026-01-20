@@ -1,6 +1,7 @@
 import DOMPurify from 'dompurify';
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
+import { debugInfo } from '../../../../Utils/debugUtils';
 
 export const Code = ({ attributes, children, element }: RenderElementProps) => {
   debugInfo('Code - 渲染代码块', {

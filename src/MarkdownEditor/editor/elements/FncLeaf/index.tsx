@@ -8,7 +8,6 @@ import { MarkdownEditorProps } from '../../../types';
 import { dragStart } from '../index';
 
 interface FncLeafProps extends RenderLeafProps {
-  hashId: string;
   fncProps: MarkdownEditorProps['fncProps'];
   linkConfig?: MarkdownEditorProps['linkConfig'];
   style?: CSSProperties;
@@ -22,7 +21,6 @@ export const FncLeaf = ({
   attributes,
   children,
   leaf,
-  hashId,
   fncProps,
   linkConfig,
   style = {},
@@ -37,11 +35,11 @@ export const FncLeaf = ({
   // 使用 useMemo 优化 className 计算
   const fncClassName = useMemo(
     () =>
-      classNames(prefixClassName?.trim(), hashId, {
+      classNames(prefixClassName?.trim(), {
         [`${mdEditorBaseClass}-fnc`]: leaf.fnc,
         [`${mdEditorBaseClass}-fnd`]: leaf.fnd,
       }),
-    [prefixClassName, hashId, mdEditorBaseClass, leaf.fnc, leaf.fnd],
+    [prefixClassName, mdEditorBaseClass, leaf.fnc, leaf.fnd],
   );
 
   // 使用 useMemo 优化文本格式化计算

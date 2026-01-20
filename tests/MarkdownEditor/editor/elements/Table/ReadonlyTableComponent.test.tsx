@@ -78,7 +78,6 @@ describe('ReadonlyTableComponent', () => {
           initialValue={[{ type: 'paragraph', children: [{ text: '' }] }]}
         >
           <ReadonlyTableComponent
-            hashId="test-hash"
             element={element as any}
             baseCls="ant-agentic-md-editor-content-table"
             {...props}
@@ -105,7 +104,6 @@ describe('ReadonlyTableComponent', () => {
       const table = document.querySelector('table');
       expect(table).toHaveClass('ant-agentic-md-editor-content-table-editor-table');
       expect(table).toHaveClass('readonly');
-      expect(table).toHaveClass('test-hash');
     });
 
     it('应该渲染 tbody', () => {
@@ -403,12 +401,6 @@ describe('ReadonlyTableComponent', () => {
   });
 
   describe('样式和容器测试', () => {
-    it('应该应用 hashId', () => {
-      renderComponent();
-      const wrapper = document.querySelector('.test-hash');
-      expect(wrapper).toBeInTheDocument();
-    });
-
     it('应该应用 baseCls', () => {
       renderComponent();
       const wrapper = document.querySelector('.ant-agentic-md-editor-content-table');
@@ -504,7 +496,6 @@ describe('ReadonlyTableComponent', () => {
             initialValue={[{ type: 'paragraph', children: [{ text: '' }] }]}
           >
             <ReadonlyTableComponent
-              hashId="test-hash"
               element={mockTableElement as any}
               baseCls="ant-agentic-md-editor-content-table"
             >
@@ -562,7 +553,6 @@ describe('ReadonlyTableComponent', () => {
             initialValue={[{ type: 'paragraph', children: [{ text: '' }] }]}
           >
             <ReadonlyTableComponent
-              hashId="test-hash"
               element={mockTableElement as any}
               baseCls="ant-agentic-md-editor-content-table"
             >

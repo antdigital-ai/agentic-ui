@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import React, { createElement } from 'react';
 import { Node } from 'slate';
 import { ElementProps, HeadNode } from '../../../el';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { slugify } from '../../utils/dom';
 
 /**

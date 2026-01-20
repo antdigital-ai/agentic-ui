@@ -6,6 +6,7 @@ import { Editor, Path, Transforms } from 'slate';
 import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 import { I18nContext } from '../../../I18n';
 import { MarkdownEditorProps } from '../../types';
+import { debugInfo } from '../../../Utils/debugUtils';
 import { useEditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
 import { Blockquote } from './Blockquote';
@@ -269,7 +270,6 @@ export const MElement = React.memo(MElementComponent, areElementPropsEqual);
 
 const MLeafComponent = (
   props: RenderLeafProps & {
-    hashId: string;
     comment: MarkdownEditorProps['comment'];
     fncProps: MarkdownEditorProps['fncProps'];
     tagInputProps: MarkdownEditorProps['tagInputProps'];
@@ -294,7 +294,7 @@ const MLeafComponent = (
   });
 
   const style: CSSProperties = {};
-  let prefixClassName = classNames(props.hashId);
+  let prefixClassName = classNames(mdEditorBaseClass);
   let children = <>{props.children}</>;
 
   if (leaf.code || leaf.tag) {
@@ -399,13 +399,12 @@ const MLeafComponent = (
         </>
       );
     } else {
+      prefixClassName = classNames(
+        prefixClassName,
+        mdEditorBaseClass + '-inline-code',
+      );
       children = (
-        <code
-          className={classNames(
-            mdEditorBaseClass + '-inline-code',
-            props.hashId,
-          )}
-        >
+        <code className={prefixClassName}>
           {children}
         </code>
       );
@@ -461,11 +460,10 @@ const MLeafComponent = (
   const hasComment = !!leaf.comment;
 
   if (hasFnc) {
-    const baseClassName = classNames(prefixClassName?.trim(), props.hashId);
+    const baseClassName = classNames(prefixClassName?.trim());
     const fncDom = (
       <FncLeaf
         {...props}
-        hashId={props.hashId}
         fncProps={props.fncProps}
         linkConfig={props.linkConfig}
         style={style}
@@ -478,7 +476,6 @@ const MLeafComponent = (
       return (
         <CommentLeaf
           leaf={props.leaf}
-          hashId={props.hashId}
           comment={props.comment}
         >
           {fncDom}
@@ -488,7 +485,7 @@ const MLeafComponent = (
     return fncDom;
   }
 
-  const baseClassName = classNames(prefixClassName?.trim(), props.hashId);
+  const baseClassName = classNames(prefixClassName?.trim());
 
   const dom = (
     <span
@@ -527,7 +524,6 @@ const MLeafComponent = (
     return (
       <CommentLeaf
         leaf={props.leaf}
-        hashId={props.hashId}
         comment={props.comment}
       >
         {dom}

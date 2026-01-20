@@ -19,6 +19,7 @@ import { Rnd } from 'react-rnd';
 import { Path, Transforms } from 'slate';
 import { ActionIconBox } from '../../../../Components/ActionIconBox';
 import { I18nContext } from '../../../../I18n';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, MediaNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
 import { MediaErrorLink } from '../../components/MediaErrorLink';

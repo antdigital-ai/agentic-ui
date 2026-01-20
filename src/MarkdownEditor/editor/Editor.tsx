@@ -937,7 +937,6 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
           fncProps={props.fncProps}
           comment={props?.comment}
           children={leafComponentProps.children}
-          hashId={hashId}
           tagInputProps={props.tagInputProps}
           linkConfig={props.linkConfig}
         />

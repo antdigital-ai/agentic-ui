@@ -2,6 +2,7 @@ import { ExportOutlined } from '@ant-design/icons';
 import React, { useMemo } from 'react';
 import { Node } from 'slate';
 import { ElementProps, FootnoteDefinitionNode } from '../../../el';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { useEditorStore } from '../../store';
 
 /**

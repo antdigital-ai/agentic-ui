@@ -359,6 +359,7 @@
                         data-slate-node="text"
                       >
                         <span
+                          class="ant-agentic-md-editor-content"
                           data-be="text"
                           data-slate-leaf="true"
                           draggable="false"
@@ -383,6 +384,7 @@
                         data-slate-node="text"
                       >
                         <span
+                          class="ant-agentic-md-editor-content"
                           data-be="text"
                           data-slate-leaf="true"
                           draggable="false"
@@ -404,6 +406,7 @@
                         data-slate-node="text"
                       >
                         <span
+                          class="ant-agentic-md-editor-content"
                           data-be="text"
                           data-slate-leaf="true"
                           draggable="false"
@@ -419,12 +422,13 @@
                         data-slate-node="text"
                       >
                         <span
+                          class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                           data-be="text"
                           data-slate-leaf="true"
                           draggable="false"
                         >
                           <code
-                            class="ant-agentic-md-editor-content-inline-code"
+                            class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                           >
                             <span
                               data-slate-string="true"
@@ -438,6 +442,7 @@
                         data-slate-node="text"
                       >
                         <span
+                          class="ant-agentic-md-editor-content"
                           data-be="text"
                           data-slate-leaf="true"
                           draggable="false"
@@ -462,6 +467,7 @@
                         data-slate-node="text"
                       >
                         <span
+                          class="ant-agentic-md-editor-content"
                           data-be="text"
                           data-slate-leaf="true"
                           draggable="false"
@@ -496,6 +502,7 @@
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -511,12 +518,13 @@
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
                               >
                                 <code
-                                  class="ant-agentic-md-editor-content-inline-code"
+                                  class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                                 >
                                   <span
                                     data-slate-string="true"
@@ -530,6 +538,7 @@
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -557,6 +566,7 @@
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -572,12 +582,13 @@
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
                               >
                                 <code
-                                  class="ant-agentic-md-editor-content-inline-code"
+                                  class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                                 >
                                   <span
                                     data-slate-string="true"
@@ -591,6 +602,7 @@
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -618,6 +630,7 @@
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -645,6 +658,7 @@
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -672,6 +686,7 @@
                         data-slate-node="text"
                       >
                         <span
+                          class="ant-agentic-md-editor-content"
                           data-be="text"
                           data-slate-leaf="true"
                           draggable="false"
@@ -882,6 +897,7 @@
                                   data-slate-node="text"
                                 >
                                   <span
+                                    class="ant-agentic-md-editor-content"
                                     data-be="text"
                                     data-slate-leaf="true"
                                     draggable="false"
@@ -942,6 +958,7 @@ const headerExtra = (
                         data-slate-node="text"
                       >
                         <span
+                          class="ant-agentic-md-editor-content"
                           data-be="text"
                           data-slate-leaf="true"
                           draggable="false"
@@ -977,6 +994,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -997,6 +1015,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1024,6 +1043,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1044,6 +1064,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1071,6 +1092,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1091,6 +1113,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1106,12 +1129,13 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
                               >
                                 <code
-                                  class="ant-agentic-md-editor-content-inline-code"
+                                  class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                                 >
                                   <span
                                     data-slate-string="true"
@@ -1125,6 +1149,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1152,6 +1177,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1172,6 +1198,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1187,12 +1214,13 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
                               >
                                 <code
-                                  class="ant-agentic-md-editor-content-inline-code"
+                                  class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                                 >
                                   <span
                                     data-slate-string="true"
@@ -1206,6 +1234,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1221,12 +1250,13 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
                               >
                                 <code
-                                  class="ant-agentic-md-editor-content-inline-code"
+                                  class="ant-agentic-md-editor-content ant-agentic-md-editor-content-inline-code"
                                 >
                                   <span
                                     data-slate-string="true"
@@ -1240,6 +1270,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1267,6 +1298,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -1287,6 +1319,7 @@ const headerExtra = (
                               data-slate-node="text"
                             >
                               <span
+                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"

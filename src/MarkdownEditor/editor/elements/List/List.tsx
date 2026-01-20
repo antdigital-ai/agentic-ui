@@ -25,15 +25,8 @@ export const List = ({
   attributes,
   children,
 }: ElementProps<ListNode>) => {
-  // 支持新的列表类型和向后兼容
-  // 新格式：numbered-list 或 bulleted-list
-  // 旧格式：list 类型，通过 order 属性判断
-  const isOrdered =
-    element.type === 'numbered-list' ||
-    ((element as any).type === 'list' && (element as any).order === true);
 
-  // 获取 task 属性（支持旧格式和新格式）
-  const task = (element as any).task;
+
 
   const { store, markdownContainerRef } = useEditorStore();
   const context = useContext(ConfigProvider.ConfigContext);

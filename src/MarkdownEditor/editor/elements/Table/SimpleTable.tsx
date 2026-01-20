@@ -32,7 +32,7 @@ export const SimpleTable = (props: RenderElementProps) => {
         className={classNames(`${baseCls}-container`)}
         style={{ position: 'relative' }}
       >
-        <SlateTable {...props} hashId={''}>
+        <SlateTable {...props}>
           {props.children}
         </SlateTable>
       </div>

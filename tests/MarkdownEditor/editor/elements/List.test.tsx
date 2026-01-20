@@ -81,7 +81,6 @@ describe('List Components', () => {
       it('应该应用正确的CSS类', () => {
         render(<List {...defaultListProps} />);
         const ul = document.querySelector('ul');
-        expect(ul).toHaveClass('test-hash');
         expect(ul).toHaveClass('ul');
       });
     });
@@ -112,7 +111,6 @@ describe('List Components', () => {
         };
         render(<List {...orderedListProps} />);
         const ol = document.querySelector('ol');
-        expect(ol).toHaveClass('test-hash');
         expect(ol).toHaveClass('ol');
       });
     });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Node } from 'slate';
 import { ElementProps, FootnoteDefinitionNode } from '../../../el';
+import { debugInfo } from '../../../../Utils/debugUtils';
 
 /**
  * ReadonlyFootnoteReference 组件 - 只读脚注引用预览组件

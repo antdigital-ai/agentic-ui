@@ -1,5 +1,6 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
+import { debugInfo } from '../../../../Utils/debugUtils';
 
 /**
  * ReadonlyKatex 组件 - 只读数学公式块预览组件

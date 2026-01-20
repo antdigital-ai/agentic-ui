@@ -121,8 +121,8 @@ describe('ReadonlyBaseBar', () => {
       const commentButton = screen.getByRole('button', { name: /comment/i });
       const copyButton = screen.getByRole('button', { name: /copy/i });
 
-      expect(commentButton).toHaveClass('test-prefix-item', 'test-hash');
-      expect(copyButton).toHaveClass('test-prefix-item', 'test-hash');
+      expect(commentButton).toHaveClass('test-prefix-item');
+      expect(copyButton).toHaveClass('test-prefix-item');
     });
 
     it('应该应用默认样式类当没有提供 prefix 时', () => {
@@ -211,7 +211,7 @@ describe('ReadonlyBaseBar', () => {
       render(<ReadonlyBaseBar hashId="test-hash" />);
 
       const commentButton = screen.getByRole('button', { name: /comment/i });
-      expect(commentButton).toHaveClass('toolbar-action-item', 'test-hash');
+      expect(commentButton).toHaveClass('toolbar-action-item');
     });
 
     it('应该处理没有 props 的情况', () => {

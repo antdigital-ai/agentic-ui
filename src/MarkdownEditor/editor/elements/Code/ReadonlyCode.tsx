@@ -1,6 +1,7 @@
 import DOMPurify from 'dompurify';
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
+import { debugInfo } from '../../../../Utils/debugUtils';
 
 /**
  * ReadonlyCode 组件 - 只读代码块预览组件
