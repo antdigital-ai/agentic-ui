@@ -33,7 +33,6 @@ import { BlockQuoteNode, ElementProps } from '../../../el';
  */
 export const ReadonlyBlockquote: React.FC<ElementProps<BlockQuoteNode>> =
   React.memo((props) => {
-
     return (
       <blockquote data-be={'blockquote'} {...props.attributes}>
         {props.children}

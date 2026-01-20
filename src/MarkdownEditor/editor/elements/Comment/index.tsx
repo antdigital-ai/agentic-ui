@@ -58,7 +58,7 @@ export const CommentView = (props: CommentViewProps) => {
       data-be="comment-text"
       data-testid="comment-view"
       id={props.id}
-      className={classNames( {
+      className={classNames({
         [`${mdEditorBaseClass}-comment-${type}`]: type,
       })}
       style={{

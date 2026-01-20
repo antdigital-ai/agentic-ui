@@ -82,7 +82,11 @@ export const Td: React.FC<TdProps> = ({
 
   if (element.hidden) {
     return (
-      <td ref={tdRef} className={classNames(prefix)} style={{ display: 'none' }} />
+      <td
+        ref={tdRef}
+        className={classNames(prefix)}
+        style={{ display: 'none' }}
+      />
     );
   }
 

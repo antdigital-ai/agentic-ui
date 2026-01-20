@@ -25,9 +25,6 @@ export const List = ({
   attributes,
   children,
 }: ElementProps<ListNode>) => {
-
-
-
   const { store, markdownContainerRef } = useEditorStore();
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context.getPrefixCls('agentic-md-editor-list');

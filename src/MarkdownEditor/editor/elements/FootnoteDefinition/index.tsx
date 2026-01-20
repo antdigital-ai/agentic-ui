@@ -1,8 +1,8 @@
 import { ExportOutlined } from '@ant-design/icons';
 import React, { useMemo } from 'react';
 import { Node } from 'slate';
-import { ElementProps, FootnoteDefinitionNode } from '../../../el';
 import { debugInfo } from '../../../../Utils/debugUtils';
+import { ElementProps, FootnoteDefinitionNode } from '../../../el';
 import { useEditorStore } from '../../store';
 import { DragHandle } from '../../tools/DragHandle';
 

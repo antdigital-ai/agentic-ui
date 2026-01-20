@@ -38,7 +38,6 @@ export const ReadonlyList: React.FC<ElementProps<ListNode>> = React.memo(
     const isOrdered = element.type === 'numbered-list';
     const isBulleted = element.type === 'bulleted-list';
 
-
     const context = useContext(ConfigProvider.ConfigContext);
     const baseCls = context.getPrefixCls('agentic-md-editor-list');
 

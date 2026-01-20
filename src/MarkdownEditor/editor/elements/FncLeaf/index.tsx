@@ -31,7 +31,6 @@ export const FncLeaf = ({
   const isMobile = isMobileDevice();
   const hasFnc = leaf.fnc || leaf.identifier;
 
-
   // 使用 useMemo 优化 className 计算
   const fncClassName = useMemo(
     () =>

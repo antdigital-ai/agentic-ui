@@ -37,7 +37,6 @@ import { ElementProps, ParagraphNode } from '../../../el';
  */
 export const ReadonlyParagraph: React.FC<ElementProps<ParagraphNode>> =
   React.memo((props) => {
-
     const str = Node.string(props.element).trim();
 
     return (

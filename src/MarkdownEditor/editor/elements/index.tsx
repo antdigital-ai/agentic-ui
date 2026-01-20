@@ -5,8 +5,8 @@ import { Editor, Path, Transforms } from 'slate';
 
 import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 import { I18nContext } from '../../../I18n';
-import { MarkdownEditorProps } from '../../types';
 import { debugInfo } from '../../../Utils/debugUtils';
+import { MarkdownEditorProps } from '../../types';
 import { useEditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
 import { Blockquote } from './Blockquote';
@@ -123,7 +123,6 @@ const MElementComponent = (
   if (tableDom) {
     return tableDom;
   }
-
 
   // 统一处理预览/编辑模式切换
   switch (props.element.type) {
@@ -403,11 +402,7 @@ const MLeafComponent = (
         prefixClassName,
         mdEditorBaseClass + '-inline-code',
       );
-      children = (
-        <code className={prefixClassName}>
-          {children}
-        </code>
-      );
+      children = <code className={prefixClassName}>{children}</code>;
     }
   }
 
@@ -451,8 +446,7 @@ const MLeafComponent = (
           });
         }
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   };
 
   // 如果检测到 fnc、identifier 或 fnd，使用 FncLeaf 组件
@@ -474,10 +468,7 @@ const MLeafComponent = (
     // 如果有评论，使用 CommentLeaf 包裹 fnc DOM
     if (hasComment) {
       return (
-        <CommentLeaf
-          leaf={props.leaf}
-          comment={props.comment}
-        >
+        <CommentLeaf leaf={props.leaf} comment={props.comment}>
           {fncDom}
         </CommentLeaf>
       );
@@ -522,10 +513,7 @@ const MLeafComponent = (
   // 如果有评论，使用 CommentLeaf 包裹普通 DOM
   if (hasComment) {
     return (
-      <CommentLeaf
-        leaf={props.leaf}
-        comment={props.comment}
-      >
+      <CommentLeaf leaf={props.leaf} comment={props.comment}>
         {dom}
       </CommentLeaf>
     );

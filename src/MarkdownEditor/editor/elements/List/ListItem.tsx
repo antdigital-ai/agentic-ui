@@ -131,12 +131,7 @@ const MentionsUser = (props: {
                   >
                     @
                     {u.avatar?.startsWith('http') ? (
-                      <img
-                        width={16}
-                        height={16}
-                        src={u.avatar}
-                        alt={u.name}
-                      />
+                      <img width={16} height={16} src={u.avatar} alt={u.name} />
                     ) : null}
                     <span>{u.name}</span>
                   </div>

@@ -21,9 +21,7 @@ import {
  * @param props
  * @returns
  */
-export const ReadonlyBaseBar = (props: {
-  prefix?: string;
-}) => {
+export const ReadonlyBaseBar = (props: { prefix?: string }) => {
   const baseClassName = props.prefix || `toolbar-action`;
 
   const { refreshFloatBar, markdownEditorRef, editorProps } = useEditorStore();

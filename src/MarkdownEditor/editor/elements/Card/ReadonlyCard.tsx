@@ -34,7 +34,6 @@ import { RenderElementProps } from 'slate-react';
  */
 export const ReadonlyCard: React.FC<RenderElementProps> = React.memo(
   (props) => {
-
     return (
       <div {...props.attributes} data-be={'card'} role="button">
         {props.children}

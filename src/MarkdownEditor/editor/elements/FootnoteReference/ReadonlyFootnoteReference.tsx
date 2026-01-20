@@ -1,7 +1,7 @@
 import React from 'react';
 import { Node } from 'slate';
-import { ElementProps, FootnoteDefinitionNode } from '../../../el';
 import { debugInfo } from '../../../../Utils/debugUtils';
+import { ElementProps, FootnoteDefinitionNode } from '../../../el';
 
 /**
  * ReadonlyFootnoteReference 组件 - 只读脚注引用预览组件
@@ -37,7 +37,6 @@ import { debugInfo } from '../../../../Utils/debugUtils';
 export const ReadonlyFootnoteReference: React.FC<
   ElementProps<FootnoteDefinitionNode>
 > = React.memo((props) => {
-
   const str = Node.string(props.element);
   debugInfo('ReadonlyFootnoteReference - 渲染', {
     identifier: props.element.identifier,
