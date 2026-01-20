@@ -45,20 +45,6 @@ export const renderSvgToContainer = (
   container.innerHTML = '';
 
   const wrapper = document.createElement('div');
-  wrapper.setAttribute('data-mermaid-wrapper', 'true');
-  wrapper.style.cssText = `
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    isolation: isolate;
-    contain: layout style paint;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-  `;
-
   const parser = new DOMParser();
   const svgDoc = parser.parseFromString(svg, 'image/svg+xml');
   const svgElement = svgDoc.querySelector('svg');
