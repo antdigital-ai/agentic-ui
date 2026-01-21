@@ -36,10 +36,15 @@ const MIN_ITERATIONS = 5;
 const MAX_ITERATIONS = 2000;
 const MIN_WARMUP = 0;
 const MAX_WARMUP = 500;
+const DEFAULT_APPEND_STEPS = 20;
+const MIN_APPEND_STEPS = 5;
+const MAX_APPEND_STEPS = 200;
 const SECTION_SEPARATOR = '\n\n';
 const SMALL_REPEAT = 2;
 const MEDIUM_REPEAT = 6;
 const LARGE_REPEAT = 12;
+const APPEND_BASE_REPEAT = 2;
+const APPEND_CHUNK_REPEAT = 1;
 const BENCHMARK_OUTPUT_DIR = 'benchmarks';
 const BENCHMARK_OUTPUT_FILE = 'parseMd.benchmark.jsonl';
 
@@ -112,6 +117,48 @@ const writeBenchmarkResults = (record: BenchmarkRecord): void => {
   } catch (error) {
     console.log('[parseMd-benchmark] save failed', error);
   }
+};
+
+const measureIncrementalAppendScenario = (
+  scenarioName: string,
+  baseMarkdown: string,
+  appendChunk: string,
+  steps: number,
+  warmup: number,
+): BenchmarkResult => {
+  for (let i = 0; i < warmup; i += 1) {
+    parserMdToSchema(baseMarkdown).schema.length;
+  }
+
+  const durations: number[] = [];
+  let totalNodes = 0;
+  let current = baseMarkdown;
+
+  for (let i = 0; i < steps; i += 1) {
+    current = `${current}${SECTION_SEPARATOR}${appendChunk}\n<!-- append:${i} -->`;
+    const start = performance.now();
+    const { schema } = parserMdToSchema(current);
+    const end = performance.now();
+
+    durations.push(end - start);
+    totalNodes += schema.length;
+  }
+
+  const totalMs = durations.reduce((sum, value) => sum + value, 0);
+  const minMs = Math.min(...durations);
+  const maxMs = Math.max(...durations);
+  const averageMs = totalMs / durations.length;
+
+  return {
+    name: scenarioName,
+    iterations: steps,
+    warmup,
+    totalMs,
+    averageMs,
+    minMs,
+    maxMs,
+    totalNodes,
+  };
 };
 
 const measureScenario = (
@@ -190,11 +237,25 @@ describe('parseMd benchmark', () => {
       MIN_WARMUP,
       MAX_WARMUP,
     );
+    const appendSteps = getEnvInt(
+      'BENCH_APPEND_STEPS',
+      DEFAULT_APPEND_STEPS,
+      MIN_APPEND_STEPS,
+      MAX_APPEND_STEPS,
+    );
 
     const scenarios = createScenarios();
     const results = scenarios.map((scenario) =>
       measureScenario(scenario, iterations, warmup),
     );
+    const appendResult = measureIncrementalAppendScenario(
+      'append-growth',
+      createMarkdownSample(APPEND_BASE_REPEAT),
+      createMarkdownSample(APPEND_CHUNK_REPEAT),
+      appendSteps,
+      warmup,
+    );
+    const allResults = [...results, appendResult];
 
     writeBenchmarkResults({
       timestamp: new Date().toISOString(),
@@ -202,10 +263,10 @@ describe('parseMd benchmark', () => {
       warmup,
       nodeVersion: process.version,
       platform: `${process.platform}-${process.arch}`,
-      results,
+      results: allResults,
     });
 
-    results.forEach((result) => {
+    allResults.forEach((result) => {
       console.log(`[parseMd-benchmark] ${result.name}`, {
         iterations: result.iterations,
         warmup: result.warmup,

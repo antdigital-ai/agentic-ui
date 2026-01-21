@@ -8,3 +8,4 @@
 - [x] 保存 parseMd benchmark 执行结果
 - [x] 忽略 benchmark 输出文件
 - [x] 过滤非 JSON 注释解析告警
+- [x] 新增增量追加场景 benchmark
