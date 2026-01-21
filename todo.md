@@ -5,3 +5,5 @@
 - [x] 检查现有脚本与性能相关入口
 - [x] 新增 parseMd benchmark 脚本
 - [x] 补充运行方式文档与脚本入口
+- [x] 保存 parseMd benchmark 执行结果
+- [x] 忽略 benchmark 输出文件

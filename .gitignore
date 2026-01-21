@@ -9,3 +9,4 @@ tsconfig.tsbuildinfo
 coverage/**
 playwright-report/*
 test-results/*
+benchmarks/*

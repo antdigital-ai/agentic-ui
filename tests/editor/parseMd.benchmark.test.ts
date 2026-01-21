@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { describe, expect, it } from 'vitest';
 
 import { parserMdToSchema } from '../../src/MarkdownEditor/editor/parser/parserMdToSchema';
@@ -19,6 +21,15 @@ interface BenchmarkResult {
   totalNodes: number;
 }
 
+interface BenchmarkRecord {
+  timestamp: string;
+  iterations: number;
+  warmup: number;
+  nodeVersion: string;
+  platform: string;
+  results: BenchmarkResult[];
+}
+
 const DEFAULT_ITERATIONS = 50;
 const DEFAULT_WARMUP = 5;
 const MIN_ITERATIONS = 5;
@@ -29,6 +40,8 @@ const SECTION_SEPARATOR = '\n\n';
 const SMALL_REPEAT = 2;
 const MEDIUM_REPEAT = 6;
 const LARGE_REPEAT = 12;
+const BENCHMARK_OUTPUT_DIR = 'benchmarks';
+const BENCHMARK_OUTPUT_FILE = 'parseMd.benchmark.jsonl';
 
 const BASE_SECTION = [
   '# Benchmark Title',
@@ -87,6 +100,19 @@ const createMarkdownSample = (repeat: number): string => {
 };
 
 const formatDuration = (value: number): string => `${value.toFixed(2)}ms`;
+
+const writeBenchmarkResults = (record: BenchmarkRecord): void => {
+  const outputDir = path.join(process.cwd(), BENCHMARK_OUTPUT_DIR);
+  const outputPath = path.join(outputDir, BENCHMARK_OUTPUT_FILE);
+
+  try {
+    fs.mkdirSync(outputDir, { recursive: true });
+    fs.appendFileSync(outputPath, `${JSON.stringify(record)}\n`, 'utf8');
+    console.log(`[parseMd-benchmark] saved: ${outputPath}`);
+  } catch (error) {
+    console.log('[parseMd-benchmark] save failed', error);
+  }
+};
 
 const measureScenario = (
   scenario: BenchmarkScenario,
@@ -169,6 +195,15 @@ describe('parseMd benchmark', () => {
     const results = scenarios.map((scenario) =>
       measureScenario(scenario, iterations, warmup),
     );
+
+    writeBenchmarkResults({
+      timestamp: new Date().toISOString(),
+      iterations,
+      warmup,
+      nodeVersion: process.version,
+      platform: `${process.platform}-${process.arch}`,
+      results,
+    });
 
     results.forEach((result) => {
       console.log(`[parseMd-benchmark] ${result.name}`, {
