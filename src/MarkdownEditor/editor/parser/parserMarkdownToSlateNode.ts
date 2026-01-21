@@ -52,6 +52,15 @@ interface MarkdownBlock {
   hash: string;
 }
 
+type HtmlTagInfo = { tag: string; color?: string; url?: string };
+
+type ParseContext = {
+  preNode: RootContent | null;
+  preElement: Element | null;
+  htmlTag: HtmlTagInfo[];
+  contextProps: Record<string, unknown>;
+};
+
 /**
  * 生成简单的字符串哈希
  */
@@ -194,7 +203,7 @@ type ElementHandler = {
     _plugins: MarkdownEditorPlugin[],
     config?: any,
     parent?: RootContent,
-    htmlTag?: { tag: string; color?: string; url?: string }[],
+    htmlTag?: HtmlTagInfo[],
     preElement?: Element | null,
     _parser?: any,
   ) => Element | Element[] | null;
@@ -224,34 +233,23 @@ export class MarkdownToSlateParser {
     this.plugins = plugins;
   }
 
-  /**
-   * 解析 Markdown 字符串并返回解析后的结构和链接信息
-   *
-   * @param md - 要解析的 Markdown 字符串
-   * @returns 一个包含解析后的元素数组和链接信息的对象
-   */
-  parse(md: string): {
-    schema: Elements[];
-    links: { path: number[]; target: string }[];
-  } {
-    // 先预处理 <think> 标签，然后预处理其他非标准 HTML 标签，最后处理表格换行
+  private preprocessMarkdown(md: string): string {
     const thinkProcessed = removeAnswerTags(preprocessThinkTags(md || ''));
     const nonStandardProcessed = removeAnswerTags(
       preprocessNonStandardHtmlTags(thinkProcessed),
     );
+    return preprocessMarkdownTableNewlines(nonStandardProcessed);
+  }
 
-    // parse() 只执行 parser，需要 runSync() 来执行 transformer 插件
-    const preprocessedMarkdown =
-      preprocessMarkdownTableNewlines(nonStandardProcessed);
-
+  private buildMarkdownRoot(md: string): RootContent[] {
+    const preprocessedMarkdown = this.preprocessMarkdown(md);
     const ast = mdastParser.parse(preprocessedMarkdown) as any;
     const processedMarkdown = mdastParser.runSync(ast) as any;
-    const markdownRoot = processedMarkdown.children;
+    return processedMarkdown.children as RootContent[];
+  }
 
-    // 使用类的配置和插件，通过 this 访问
-    const schema = this.parseNodes(markdownRoot, true, undefined) as Elements[];
-
-    const filteredSchema = schema?.filter((item) => {
+  private filterTopLevelSchema(schema: Elements[]): Elements[] {
+    return schema?.filter((item) => {
       if (item.type === 'paragraph' && !item.children?.length) {
         return false;
       }
@@ -266,6 +264,93 @@ export class MarkdownToSlateParser {
       }
       return true;
     });
+  }
+
+  private createEmptyParagraph(): Elements {
+    return { type: 'paragraph', children: [{ text: '' }] };
+  }
+
+  private createParseContext(): ParseContext {
+    return { preNode: null, preElement: null, htmlTag: [], contextProps: {} };
+  }
+
+  private parseHtmlCommentProps(
+    currentElement: RootContent,
+  ): Record<string, unknown> | null {
+    const htmlValue = (currentElement as any)?.value;
+    const isHtmlComment =
+      currentElement.type === 'html' &&
+      typeof htmlValue === 'string' &&
+      htmlValue.trim().startsWith('<!--') &&
+      htmlValue.trim().endsWith('-->');
+    if (!isHtmlComment) {
+      return null;
+    }
+
+    try {
+      const commentContent = htmlValue
+        .replace('<!--', '')
+        .replace('-->', '')
+        .trim();
+      const parsed = JSON.parse(commentContent) as Record<string, unknown>;
+      if (Array.isArray(parsed)) {
+        return { config: parsed as ChartTypeConfig[] };
+      }
+      if (parsed && Object.keys(parsed).length > 0) {
+        return parsed;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  private resolveConfig(
+    preElement: Element | null,
+    contextProps: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const baseConfig =
+      preElement?.type === 'code' &&
+      preElement?.language === 'html' &&
+      preElement?.otherProps
+        ? preElement?.otherProps
+        : {};
+    if (contextProps && Object.keys(contextProps).length > 0) {
+      return { ...baseConfig, ...contextProps };
+    }
+    return baseConfig;
+  }
+
+  private parseWithPlugins(currentElement: RootContent): {
+    handled: boolean;
+    el: Element | Element[] | null;
+  } {
+    for (const plugin of this.plugins) {
+      const rule = plugin.parseMarkdown?.find((r) => r.match(currentElement));
+      if (rule) {
+        const converted = rule.convert(currentElement);
+        if (Array.isArray(converted) && converted.length === 2) {
+          return { handled: true, el: converted[0] as Element };
+        }
+        return { handled: true, el: converted as Element };
+      }
+    }
+    return { handled: false, el: null };
+  }
+
+  /**
+   * 解析 Markdown 字符串并返回解析后的结构和链接信息
+   *
+   * @param md - 要解析的 Markdown 字符串
+   * @returns 一个包含解析后的元素数组和链接信息的对象
+   */
+  parse(md: string): {
+    schema: Elements[];
+    links: { path: number[]; target: string }[];
+  } {
+    const markdownRoot = this.buildMarkdownRoot(md);
+    const schema = this.parseNodes(markdownRoot, true, undefined) as Elements[];
+    const filteredSchema = this.filterTopLevelSchema(schema);
 
     return {
       schema: filteredSchema,
@@ -284,64 +369,17 @@ export class MarkdownToSlateParser {
     parent?: RootContent,
   ): (Elements | Text)[] {
     if (!nodes?.length) {
-      return [{ type: 'paragraph', children: [{ text: '' }] }];
+      return [this.createEmptyParagraph()];
     }
 
     let els: (Elements | Text)[] = [];
-    let preNode: null | RootContent = null;
-    let preElement: Element = null;
-    let htmlTag: { tag: string; color?: string; url?: string }[] = [];
-    let contextProps = {};
+    const context = this.createParseContext();
 
-    for (let i = 0; i < nodes.length; i++) {
-      const currentElement = nodes[i] as any;
-      let el: Element | null | Element[] = null;
-      let pluginHandled = false;
-
-      // 检查当前元素是否是 HTML 注释
-      const isHtmlComment =
-        currentElement.type === 'html' &&
-        currentElement.value?.trim()?.startsWith('<!--') &&
-        currentElement.value?.trim()?.endsWith('-->');
-
-      let htmlCommentProps: Record<string, any> = {};
-      if (isHtmlComment) {
-        try {
-          const commentContent = currentElement.value
-            .replace('<!--', '')
-            .replace('-->', '')
-            .trim();
-          htmlCommentProps = JSON.parse(commentContent);
-          // 如果是数组类型，转换为图表配置格式
-          if (Array.isArray(htmlCommentProps)) {
-            htmlCommentProps = {
-              config: htmlCommentProps as ChartTypeConfig[],
-            };
-          }
-        } catch (e) {
-          // 解析失败，不是 JSON 格式的注释，保持为空对象
-        }
-      }
-
-      // 确定要使用的 config：使用前一个 HTML 代码节点的属性
-      let config =
-        preElement?.type === 'code' &&
-        preElement?.language === 'html' &&
-        preElement?.otherProps
-          ? preElement?.otherProps
-          : {};
-
-      // 如果 HTML 注释包含 JSON 对象属性（如对齐注释、图表配置），
-      // 跳过注释本身，但将属性应用到下一个元素
-      if (
-        isHtmlComment &&
-        htmlCommentProps &&
-        Object.keys(htmlCommentProps).length > 0
-      ) {
+    for (const currentElement of nodes) {
+      const htmlCommentProps = this.parseHtmlCommentProps(currentElement);
+      if (htmlCommentProps) {
         // 将注释属性存储到 contextProps 中，供下一个元素使用
-        contextProps = { ...contextProps, ...htmlCommentProps };
-        // 同时将属性作为 config 传递，以便 applyContextPropsAndConfig 设置 otherProps
-        config = { ...config, ...htmlCommentProps };
+        context.contextProps = { ...context.contextProps, ...htmlCommentProps };
         // 跳过 HTML 注释本身，避免生成独立的 HTML 代码节点
         //
         // 【为何 preNode 里拿不到图表配置】
@@ -349,72 +387,59 @@ export class MarkdownToSlateParser {
         // 下一轮处理表格时，preElement 仍是「注释前」的节点（如 paragraph/heading），
         // 不可能是 type='code' 且 language='html' 的节点，parseTableOrChart 里
         // 从 preNode（实为 preElement）取 otherProps 会得到 {}。
-        // 因此图表配置必须通过 contextProps → config，由 table handler 以
+        // 因此图表配置必须通过 contextProps，由 table handler 以
         // contextChartConfig 传入 parseTableOrChart。
         continue;
       }
 
-      // 如果当前元素应该使用 contextProps 中的属性作为 config（用于设置 otherProps）
-      // 这主要针对对齐注释等场景，需要同时设置 contextProps 和 otherProps
-      if (contextProps && Object.keys(contextProps).length > 0) {
-        config = { ...config, ...contextProps };
-      }
+      const config = this.resolveConfig(context.preElement, context.contextProps);
+      const pluginResult = this.parseWithPlugins(currentElement);
+      let el: Element | Element[] | null = pluginResult.el;
 
-      // 首先尝试使用插件处理，使用 this.plugins
-      for (const plugin of this.plugins) {
-        const rule = plugin.parseMarkdown?.find((r) => r.match(currentElement));
-        if (rule) {
-          const converted = rule.convert(currentElement);
-          // 检查转换结果是否为 NodeEntry<Text> 格式
-          if (Array.isArray(converted) && converted.length === 2) {
-            // NodeEntry<Text> 格式: [node, path]
-            el = converted[0] as Element;
-          } else {
-            // Elements 格式
-            el = converted as Element;
-          }
-          pluginHandled = true;
-          break;
-        }
-      }
       if (Object.keys(config).length > 0) {
         this.config = { ...this.config, ...config };
       }
 
-      // 如果插件没有处理，使用默认处理逻辑
-      if (!pluginHandled) {
+      if (!pluginResult.handled) {
         const result = this.handleSingleElement(
           currentElement,
           config,
           parent,
-          htmlTag,
-          preElement,
+          context.htmlTag,
+          context.preElement,
         );
 
         el = result.el;
         if (result.contextProps) {
-          contextProps = { ...contextProps, ...result.contextProps };
+          context.contextProps = {
+            ...context.contextProps,
+            ...result.contextProps,
+          };
         }
         // 更新 htmlTag 数组，以便后续节点可以使用
         if (result.htmlTag) {
-          htmlTag = result.htmlTag;
+          context.htmlTag = result.htmlTag;
         }
       }
 
-      els = addEmptyLinesIfNeeded(els, preNode, currentElement, top);
+      els = addEmptyLinesIfNeeded(els, context.preNode, currentElement, top);
 
       if (el) {
-        el = applyContextPropsAndConfig(el, contextProps, config);
+        const appliedElement = applyContextPropsAndConfig(
+          el,
+          context.contextProps,
+          config,
+        );
         // 使用 if-else 而不是条件表达式，避免类型错误
-        if (Array.isArray(el)) {
-          els = [...els, ...el];
+        if (Array.isArray(appliedElement)) {
+          els = [...els, ...appliedElement];
         } else {
-          els = [...els, el];
+          els = [...els, appliedElement];
         }
       }
 
-      preNode = currentElement;
-      preElement = el as Element;
+      context.preNode = currentElement;
+      context.preElement = el as Element;
     }
 
     return els;
@@ -487,7 +512,7 @@ export class MarkdownToSlateParser {
     currentElement: RootContent,
     config: any,
     parent: RootContent | undefined,
-    htmlTag: { tag: string; color?: string; url?: string }[],
+    htmlTag: HtmlTagInfo[],
     preElement: Element | null,
   ): { el: Element | Element[] | null; contextProps?: any; htmlTag?: any[] } {
     const elementType = currentElement.type;
