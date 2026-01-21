@@ -109,7 +109,6 @@
                               data-slate-node="text"
                             >
                               <span
-                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -258,7 +257,6 @@
                               data-slate-node="text"
                             >
                               <span
-                                class="ant-agentic-md-editor-content"
                                 data-be="text"
                                 data-slate-leaf="true"
                                 draggable="false"
@@ -428,7 +426,6 @@
                                 data-slate-node="text"
                               >
                                 <span
-                                  class="ant-agentic-md-editor-content"
                                   data-be="text"
                                   data-slate-leaf="true"
                                   draggable="false"

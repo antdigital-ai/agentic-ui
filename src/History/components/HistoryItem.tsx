@@ -100,7 +100,7 @@ const useTextOverflow = (text: React.ReactNode) => {
       );
       el.style.setProperty('--scroll-width', `${scrollDistance}px`);
       // 根据滚动距离动态计算动画时长，保持恒定滚动速度（每 100px 约 1.5s）
-      const duration = Math.max(2, Math.abs(scrollDistance) / 100 * 1.5);
+      const duration = Math.max(2, (Math.abs(scrollDistance) / 100) * 1.5);
       el.style.setProperty('--scroll-duration', `${duration}s`);
     }
   }, [text]); // 仅在文本内容变化时重新计算

@@ -349,12 +349,18 @@ const parseCommentContextProps = (
 };
 
 /**
+ * 解析 Markdown 得到 schema 的回调，用于 <p align> 内部解析
+ */
+type ParseMarkdownFn = (md: string) => { schema: any[] };
+
+/**
  * 处理块级 HTML 元素
  */
 const handleBlockHtml = (
   currentElement: any,
   processedValue: string,
   isUnclosedComment: boolean,
+  parseMarkdownFn?: ParseMarkdownFn,
 ): any => {
   const thinkElement = findThinkElement(currentElement.value);
   if (thinkElement) {
@@ -438,6 +444,28 @@ const handleBlockHtml = (
   }
 
   if (isComment || isStandardHtmlElement(commentValue)) {
+    // 优先处理 <p align="...">：将内部按 Markdown 解析以支持 ** 加粗等，保留 <p> 输出（不用注释）
+    const pAlignMatch = commentValue.match(
+      /<p\s+align="(left|right|center|justify)"[^>]*>([\s\S]*?)<\/p\s*>/i,
+    );
+    if (pAlignMatch && parseMarkdownFn) {
+      const align = pAlignMatch[1].toLowerCase();
+      const { schema } = parseMarkdownFn(pAlignMatch[2]);
+      const first = schema?.[0];
+      if (first?.type === 'paragraph' && first.children) {
+        return { ...first, align, otherProps: { align } };
+      }
+      if (first?.children) {
+        return { ...first, align, otherProps: { align } };
+      }
+      return {
+        type: 'paragraph',
+        align,
+        children: [{ text: pAlignMatch[2].trim() || '' }],
+        otherProps: { align },
+      };
+    }
+
     if (
       commentValue.match(
         /<\/?(table|div|ul|li|ol|p|strong|h1|h2|h3|h4|h5|h6)[^\n>]*?>/,
@@ -660,12 +688,14 @@ export const findAttachment = (str: string) => {
  * @param currentElement - 当前处理的HTML元素
  * @param parent - 父级元素，用于判断上下文
  * @param htmlTag - HTML标签栈，用于跟踪嵌套的HTML标签
+ * @param parseMarkdownFn - 可选，解析 Markdown 得到 schema，用于 <p align> 内部按 Markdown 解析（如 ** 加粗）
  * @returns 返回包含解析后元素和上下文属性的对象
  */
 export const handleHtml = (
   currentElement: any,
   parent: any,
   htmlTag: any[],
+  parseMarkdownFn?: ParseMarkdownFn,
 ) => {
   const trimmedValue = currentElement?.value?.trim() || '';
   const isUnclosedComment =
@@ -716,7 +746,12 @@ export const handleHtml = (
   let updatedHtmlTag = htmlTag;
 
   if (isBlockLevel) {
-    el = handleBlockHtml(currentElement, processedValue, isUnclosedComment);
+    el = handleBlockHtml(
+      currentElement,
+      processedValue,
+      isUnclosedComment,
+      parseMarkdownFn,
+    );
   } else {
     const inlineResult = processInlineHtml(currentElement, htmlTag);
     el = inlineResult.el;

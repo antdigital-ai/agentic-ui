@@ -34,7 +34,7 @@ export const FncLeaf = ({
   // 使用 useMemo 优化 className 计算
   const fncClassName = useMemo(
     () =>
-      classNames(prefixClassName?.trim(), {
+      classNames({
         [`${mdEditorBaseClass}-fnc`]: leaf.fnc,
         [`${mdEditorBaseClass}-fnd`]: leaf.fnd,
       }),

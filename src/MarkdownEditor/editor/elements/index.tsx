@@ -345,7 +345,7 @@ const MLeafComponent = (
   });
 
   const style: CSSProperties = {};
-  let prefixClassName = classNames(mdEditorBaseClass);
+  let prefixClassName = ''
   let children = <>{props.children}</>;
 
   if (leaf.code || leaf.tag) {
@@ -451,10 +451,7 @@ const MLeafComponent = (
         </>
       );
     } else {
-      prefixClassName = classNames(
-        prefixClassName,
-        mdEditorBaseClass + '-inline-code',
-      );
+      prefixClassName = classNames(mdEditorBaseClass + '-inline-code');
       children = <code className={prefixClassName}>{children}</code>;
     }
   }
@@ -476,10 +473,7 @@ const MLeafComponent = (
     style.fontStyle = 'italic';
   }
   if (leaf.html) {
-    prefixClassName = classNames(
-      prefixClassName,
-      mdEditorBaseClass + '-m-html',
-    );
+    prefixClassName = classNames(mdEditorBaseClass + '-m-html');
   }
   if (leaf.current) {
     style.background = '#f59e0b';
@@ -507,14 +501,13 @@ const MLeafComponent = (
   const hasComment = !!leaf.comment;
 
   if (hasFnc) {
-    const baseClassName = classNames(prefixClassName?.trim());
     const fncDom = (
       <FncLeaf
         {...props}
         fncProps={props.fncProps}
         linkConfig={props.linkConfig}
         style={style}
-        prefixClassName={baseClassName}
+        prefixClassName={prefixClassName}
       />
     );
 
@@ -528,8 +521,6 @@ const MLeafComponent = (
     }
     return fncDom;
   }
-
-  const baseClassName = classNames(prefixClassName?.trim());
 
   const dom = (
     <span
@@ -556,8 +547,8 @@ const MLeafComponent = (
       }}
       data-comment={leaf.comment ? 'comment' : undefined}
       data-url={leaf.url ? 'url' : undefined}
-      className={baseClassName ? baseClassName : undefined}
       style={style}
+      className={prefixClassName}
     >
       {children}
     </span>

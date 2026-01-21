@@ -821,6 +821,24 @@ function hello() {
         ],
       });
     });
+
+    it('should parse <p align="right"> with **bold** Markdown inside and render bold', () => {
+      const markdown =
+        '<p align="right"> **4 Do not wear yourself out to get rich**  </p>';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        align: 'right',
+        children: [
+          {
+            text: '4 Do not wear yourself out to get rich',
+            bold: true,
+          },
+        ],
+      });
+    });
   });
 
   describe('handleMedia', () => {

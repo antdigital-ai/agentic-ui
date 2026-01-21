@@ -9,8 +9,8 @@ import {
 import { Button, Modal, Tooltip } from 'antd';
 import React, { useContext, useMemo, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
-import { compileTemplate, I18nContext } from '../../I18n';
 import type { LocalKeys } from '../../I18n';
+import { compileTemplate, I18nContext } from '../../I18n';
 import { isMobileDevice, isVivoOrOppoDevice, kbToSize } from './utils';
 
 export type SupportedFormat = {
@@ -101,9 +101,7 @@ const FormatContent: React.FC<{
 }> = ({ format, locale }) => {
   if (format.content) return <>{format.content}</>;
 
-  return (
-    <div style={CONTENT_STYLE}>{buildFormatMessage(format, locale)}</div>
-  );
+  return <div style={CONTENT_STYLE}>{buildFormatMessage(format, locale)}</div>;
 };
 
 export const AttachmentSupportedFormatsContent: React.FC<

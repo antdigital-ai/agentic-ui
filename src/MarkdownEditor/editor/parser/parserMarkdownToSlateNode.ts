@@ -234,7 +234,7 @@ export class MarkdownToSlateParser {
     schema: Elements[];
     links: { path: number[]; target: string }[];
   } {
-    // 先预处理 <think> 标签，然后预处理其他非标准 HTML 标签，最后处理表格换行
+    // 先预处理 <think> 标签，然后预处理其他非标准 HTML 标签、<p align>，最后处理表格换行
     const thinkProcessed = removeAnswerTags(preprocessThinkTags(md || ''));
     const nonStandardProcessed = removeAnswerTags(
       preprocessNonStandardHtmlTags(thinkProcessed),
@@ -495,7 +495,9 @@ export class MarkdownToSlateParser {
     const handlerInfo = elementHandlers[elementType];
 
     if (handlerInfo?.needsHtmlResult) {
-      const htmlResult = handleHtml(currentElement, parent, htmlTag);
+      const htmlResult = handleHtml(currentElement, parent, htmlTag, (md) =>
+        ({ schema: this.parse(md).schema }),
+      );
       const result: any = {
         el: htmlResult.el,
       };

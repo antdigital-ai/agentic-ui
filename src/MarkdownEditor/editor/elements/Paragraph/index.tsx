@@ -9,8 +9,9 @@ import { useEditorStore } from '../../store';
 import { DragHandle } from '../../tools/DragHandle';
 
 export const Paragraph = (props: ElementProps<ParagraphNode>) => {
+  const align = props.element.align ?? props.element.otherProps?.align;
   debugInfo('Paragraph - 渲染段落', {
-    align: props.element.align,
+    align,
     children: props.element.children,
   });
   const {
@@ -29,7 +30,7 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
       strLength: str.length,
       selected,
       readonly,
-      align: props.element.align,
+      align,
     });
     // 检查是否为空：trim 后的字符串为空（包括只包含空格的情况），且所有子节点都是纯文本节点（没有 type、code、tag）
     // 当只输入空格时，trim() 后为空字符串，应该显示 placeholder
@@ -54,7 +55,7 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
         className={classNames({
           empty: isEmpty,
         })}
-        data-align={props.element.align}
+        data-align={align}
         data-slate-placeholder={
           isEmpty
             ? editorProps.titlePlaceholderContent ||
@@ -68,7 +69,7 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
         data-empty={isEmpty}
         style={{
           display: !!str || !!props.children?.at(0).type ? undefined : 'none',
-          textAlign: props.element.align,
+          textAlign: align,
         }}
       >
         <DragHandle />
@@ -77,7 +78,7 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     );
   }, [
     props.element.children,
-    props.element.align,
+    align,
     readonly,
     selected,
     markdownEditorRef.current?.children.length,
