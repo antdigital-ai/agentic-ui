@@ -71,6 +71,26 @@ describe('TaskList', () => {
       expect(screen.getByText('Pending content 2')).toBeInTheDocument();
     });
 
+    it('应该支持 ReactNode 类型的标题', () => {
+      const nodeTitleItems = [
+        {
+          key: 'node-title',
+          title: (
+            <span>
+              <span data-testid="task-title-prefix">步骤一</span> 创建任务
+            </span>
+          ),
+          content: '内容',
+          status: 'success' as const,
+        },
+      ];
+
+      render(<TaskList items={nodeTitleItems} />);
+
+      expect(screen.getByTestId('task-title-prefix')).toBeInTheDocument();
+      expect(screen.getByText('创建任务')).toBeInTheDocument();
+    });
+
     it('应该使用自定义className', () => {
       const customClass = 'custom-task-list';
       render(<TaskList items={mockItems} className={customClass} />);

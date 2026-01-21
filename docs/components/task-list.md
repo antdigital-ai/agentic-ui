@@ -30,7 +30,7 @@ group:
 | 参数    | 说明         | 类型                                             | 默认值 |
 | ------- | ------------ | ------------------------------------------------ | ------ |
 | key     | 任务唯一标识 | `string`                                         | -      |
-| title   | 任务标题     | `string`                                         | -      |
+| title   | 任务标题     | `React.ReactNode`                                | -      |
 | content | 任务内容     | `React.ReactNode \| React.ReactNode[]`           | -      |
 | status  | 任务状态     | `'success' \| 'loading' \| 'pending' \| 'error'` | -      |
 

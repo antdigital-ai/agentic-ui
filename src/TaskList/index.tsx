@@ -26,7 +26,7 @@ type TaskStatus = 'success' | 'pending' | 'loading' | 'error';
 
 type TaskItem = {
   key: string;
-  title?: string;
+  title?: React.ReactNode;
   content: React.ReactNode | React.ReactNode[];
   status: TaskStatus;
 };

@@ -45,6 +45,11 @@ const WorkspaceTaskDemo: React.FC = () => {
         title: '报告结果并将Word文档发送给用户',
         status: 'pending',
       },
+      {
+        key: '7',
+        title: <span>用户可自定义title</span>,
+        status: 'pending',
+      },
     ];
 
     setTasks(initialTasks);
