@@ -157,12 +157,14 @@ export const parseTableOrChart = (
 ): CardNode | Elements => {
   const keyMap = new Map<string, string>();
 
+  // 只在明确有 HTML 注释配置时才使用配置，避免使用全局 parserConfig 导致误识别
+  // 如果前一个节点是 HTML 代码块且有配置，使用它；否则使用空配置
   const config =
     preNode?.type === 'code' &&
     (preNode as CodeNode)?.language === 'html' &&
     (preNode as CodeNode)?.otherProps
       ? (preNode as CodeNode)?.otherProps
-      : parserConfig || {};
+      : {};
 
   const tableHeader = table?.children?.at(0);
   const columns =

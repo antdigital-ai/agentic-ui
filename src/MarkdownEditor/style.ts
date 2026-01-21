@@ -420,9 +420,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         table: {
           borderCollapse: 'separate',
           borderSpacing: 0,
-          width: '100%',
+          width: 'max-content',
           tableLayout: 'fixed',
           margin: '16px 0',
+          maxWidth: '100%',
           position: 'relative',
           fontVariant: 'tabular-nums',
           borderRadius: 'var(--table-border-radius)',

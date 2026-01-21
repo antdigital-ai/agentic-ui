@@ -116,16 +116,23 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
           )}
         >
           <colgroup>
-            {colWidths.map((colWidth: number, index: number) => (
-              <col
-                key={index}
-                style={{
-                  width: colWidth,
-                  minWidth: colWidth,
-                  maxWidth: colWidth,
-                }}
-              />
-            ))}
+            {colWidths.map((colWidth: number, index: number) => {
+              const isLastCol = index === colWidths.length - 1;
+              return (
+                <col
+                  key={index}
+                  style={
+                    isLastCol
+                      ? { minWidth: 60 }
+                      : {
+                          width: colWidth,
+                          minWidth: colWidth,
+                          maxWidth: colWidth,
+                        }
+                  }
+                />
+              );
+            })}
           </colgroup>
           <tbody>{children}</tbody>
         </table>

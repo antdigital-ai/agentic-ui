@@ -219,14 +219,19 @@ export const SlateTable = ({
             }}
           />
           {(colWidths || []).map((colWidth: number, index: number) => {
+            const isLastCol = index === (colWidths?.length ?? 0) - 1;
             return (
               <col
                 key={index}
-                style={{
-                  width: colWidth,
-                  minWidth: colWidth,
-                  maxWidth: colWidth,
-                }}
+                style={
+                  isLastCol
+                    ? { minWidth: 60 }
+                    : {
+                        width: colWidth,
+                        minWidth: colWidth,
+                        maxWidth: colWidth,
+                      }
+                }
               />
             );
           }) || null}
