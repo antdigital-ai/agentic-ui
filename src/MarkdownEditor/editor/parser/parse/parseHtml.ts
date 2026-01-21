@@ -332,14 +332,25 @@ const parseCommentContextProps = (
     return {};
   }
 
+  const trimmedValue = value.trim();
+  if (!trimmedValue) {
+    return {};
+  }
+
+  const looksLikeJson =
+    trimmedValue.startsWith('{') || trimmedValue.startsWith('[');
+  if (!looksLikeJson) {
+    return {};
+  }
+
   try {
-    return json5.parse(value);
+    return json5.parse(trimmedValue);
   } catch (e) {
     try {
-      return partialJsonParse(value);
+      return partialJsonParse(trimmedValue);
     } catch (parseError) {
       console.warn('Failed to parse HTML comment as JSON or partial JSON:', {
-        value,
+        value: trimmedValue,
         error: parseError,
       });
     }

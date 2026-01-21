@@ -7,3 +7,4 @@
 - [x] 补充运行方式文档与脚本入口
 - [x] 保存 parseMd benchmark 执行结果
 - [x] 忽略 benchmark 输出文件
+- [x] 过滤非 JSON 注释解析告警
