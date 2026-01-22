@@ -69,6 +69,13 @@ interface HandleSingleElementParams {
   preElement: Element | null;
 }
 
+interface ElementHandlerContext {
+  config: Record<string, unknown>;
+  parent?: RootContent;
+  htmlTag: HtmlTagInfo[];
+  preElement: Element | null;
+}
+
 /**
  * 生成简单的字符串哈希
  */
@@ -206,15 +213,7 @@ export interface ParserMarkdownToSlateNodeConfig {
  * 注意：parserConfig 需要通过 handleSingleElement 传递，不在这里传递
  */
 type ElementHandler = {
-  handler: (
-    element: any,
-    _plugins: MarkdownEditorPlugin[],
-    config?: any,
-    parent?: RootContent,
-    htmlTag?: HtmlTagInfo[],
-    preElement?: Element | null,
-    _parser?: any,
-  ) => Element | Element[] | null;
+  handler: (element: any, context: ElementHandlerContext) => Element | Element[] | null;
   needsHtmlResult?: boolean;
 };
 
@@ -478,7 +477,7 @@ export class MarkdownToSlateParser {
       footnoteReference: { handler: (el) => handleFootnoteReference(el) },
       inlineCode: { handler: (el) => handleInlineCode(el) },
       thematicBreak: { handler: () => handleThematicBreak() },
-      code: { handler: (el, _plugins, config) => handleCode(el, config) },
+      code: { handler: (el, context) => handleCode(el, context.config) },
       yaml: { handler: (el) => handleYaml(el) },
       definition: { handler: (el) => handleDefinition(el) },
       heading: {
@@ -497,20 +496,20 @@ export class MarkdownToSlateParser {
         handler: (el) => handleFootnoteDefinition(el, parseNodesFn),
       },
       paragraph: {
-        handler: (el, _plugins, config) =>
-          handleParagraph(el, config, parseNodesFn),
+        handler: (el, context) =>
+          handleParagraph(el, context.config, parseNodesFn),
       },
       table: {
         // 传入 config：当上一条是图表注释且被 continue 掉时，config 来自 contextProps，
         // 作为 contextChartConfig 供 parseTableOrChart 在 preNode 无 html 配置时使用
-        handler: (el, _plugins, config, parent, _htmlTag, preElement) =>
+        handler: (el, context) =>
           parseTableOrChart(
             el,
-            preElement || (parent as any),
+            context.preElement || (context.parent as any),
             this.plugins,
             parseNodesForTable,
             this.config,
-            config as Record<string, unknown>,
+            context.config as Record<string, unknown>,
           ),
       },
     };
@@ -551,12 +550,12 @@ export class MarkdownToSlateParser {
 
     const handlerResult = handlerInfo.handler(
       currentElement,
-      this.plugins,
-      config,
-      parent,
-      htmlTag,
-      preElement,
-      this,
+      {
+        config,
+        parent,
+        htmlTag,
+        preElement,
+      },
     );
 
     return { el: handlerResult };
