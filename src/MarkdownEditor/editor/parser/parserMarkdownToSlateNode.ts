@@ -61,6 +61,14 @@ type ParseContext = {
   contextProps: Record<string, unknown>;
 };
 
+interface HandleSingleElementParams {
+  currentElement: RootContent;
+  config: Record<string, unknown>;
+  parent?: RootContent;
+  htmlTag: HtmlTagInfo[];
+  preElement: Element | null;
+}
+
 /**
  * 生成简单的字符串哈希
  */
@@ -401,13 +409,13 @@ export class MarkdownToSlateParser {
       }
 
       if (!pluginResult.handled) {
-        const result = this.handleSingleElement(
+        const result = this.handleSingleElement({
           currentElement,
           config,
           parent,
-          context.htmlTag,
-          context.preElement,
-        );
+          htmlTag: context.htmlTag,
+          preElement: context.preElement,
+        });
 
         el = result.el;
         if (result.contextProps) {
@@ -509,12 +517,9 @@ export class MarkdownToSlateParser {
   }
 
   private handleSingleElement(
-    currentElement: RootContent,
-    config: any,
-    parent: RootContent | undefined,
-    htmlTag: HtmlTagInfo[],
-    preElement: Element | null,
+    params: HandleSingleElementParams,
   ): { el: Element | Element[] | null; contextProps?: any; htmlTag?: any[] } {
+    const { currentElement, config, parent, htmlTag, preElement } = params;
     const elementType = currentElement.type;
     const elementHandlers = this.getElementHandlers();
     const handlerInfo = elementHandlers[elementType];
