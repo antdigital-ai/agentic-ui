@@ -1,5 +1,8 @@
-import { AGENT_EVALUATION_URL, START_USING_URL } from '../../../constants/links';
 import React from 'react';
+import {
+  AGENT_EVALUATION_URL,
+  START_USING_URL,
+} from '../../../constants/links';
 import { ButtonsContainer } from '../style';
 import EvaluationButtonComponent from './EvaluationButton';
 import StartButtonComponent from './StartButton';

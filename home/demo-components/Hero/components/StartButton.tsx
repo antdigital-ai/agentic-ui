@@ -1,6 +1,6 @@
-import StartStar from '../../../icons/startStar.svg';
-import { styled } from 'styled-components';
 import React from 'react';
+import { styled } from 'styled-components';
+import StartStar from '../../../icons/startStar.svg';
 
 // --- 核心样式组件 ---
 
@@ -59,6 +59,7 @@ const StyledButton = styled.button`
   background: #16181e;
   border-radius: 200px;
   border: 1px solid rgba(0, 16, 32, 0.06);
+  corner-shape: squircle;
   cursor: default;
   overflow: hidden;
   outline: none;
