@@ -17,6 +17,10 @@ group:
 
 <code src="../demos/markdownInputField-onFocus-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+## webllm 助手集成
+
+<code src="../demos/markdownInputField-webllm.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 ## 自定义发送按钮
 
 <code src="../demos/markdownInputField/custom-send-button.tsx" background="var(--main-bg-color)" iframe=540></code>

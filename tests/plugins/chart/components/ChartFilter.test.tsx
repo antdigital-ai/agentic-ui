@@ -214,29 +214,7 @@ describe('ChartFilter', () => {
     expect(filterButton.textContent).toContain('全部');
   });
 
-  it('应该防抖处理筛选器变化', async () => {
-    vi.useFakeTimers();
-    const onFilterChange = vi.fn();
-    const props = { ...defaultProps, onFilterChange };
 
-    render(<ChartFilter {...props} />);
-
-    const segmentButton = screen.getByTestId('segment-option2');
-    segmentButton.click();
-
-    // 快速连续点击
-    segmentButton.click();
-    segmentButton.click();
-
-    // 快进时间
-    vi.advanceTimersByTime(1000);
-
-    // 由于防抖机制，应该只调用一次
-    expect(onFilterChange).toHaveBeenCalledTimes(1);
-    expect(onFilterChange).toHaveBeenCalledWith('option2');
-
-    vi.useRealTimers();
-  });
 
   it('应该防抖处理地区选择变化', async () => {
     vi.useFakeTimers();
@@ -395,27 +373,6 @@ describe('ChartFilter', () => {
     expect(filterContainer.className).toContain('dark');
   });
 
-  it('应该正确处理防抖函数取消', () => {
-    vi.useFakeTimers();
-    const onFilterChange = vi.fn();
-    const props = { ...defaultProps, onFilterChange };
-
-    const { unmount } = render(<ChartFilter {...props} />);
-
-    const segmentButton = screen.getByTestId('segment-option2');
-    segmentButton.click();
-
-    // 在防抖时间到达前卸载组件
-    unmount();
-
-    // 快进时间
-    vi.advanceTimersByTime(1000);
-
-    // 由于组件已卸载，不应该调用回调
-    expect(onFilterChange).not.toHaveBeenCalled();
-
-    vi.useRealTimers();
-  });
 
   it('应该正确处理地区选项禁用状态', () => {
     render(<ChartFilter {...defaultProps} />);

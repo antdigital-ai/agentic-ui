@@ -588,57 +588,101 @@ test.describe('KeyboardTask 快捷键功能', () => {
 
   test.describe('文本格式快捷键', () => {
     test('Cmd/Ctrl+B 应该切换加粗格式', async ({
-      markdownEditorPage,
+      markdownInputFieldPage,
       page,
     }) => {
-      await markdownEditorPage.typeText('Bold text');
-      await markdownEditorPage.selectAll();
+      // 使用 markdowninputfield-demo-0
+      await markdownInputFieldPage.goto('markdowninputfield-demo-0');
+      
+      // 先清空编辑器内容，确保测试环境干净
+      // 直接执行 Ctrl+A 和 Delete，不使用 clear() 方法
+      await markdownInputFieldPage.focus();
       const isMac = process.platform === 'darwin';
       const modifierKey = isMac ? 'Meta' : 'Control';
+      
+      // 全选
+      await page.keyboard.press(`${modifierKey}+a`);
+      await page.waitForTimeout(200); // 增加等待时间确保全选完成
+      
+      // 删除
+      await page.keyboard.press('Delete');
+      await page.waitForTimeout(300); // 等待删除完成
+      
+      // 验证编辑器已清空
+      await expect
+        .poll(async () => await markdownInputFieldPage.getText(), {
+          timeout: 2000,
+        })
+        .toBe('');
+
+      // 输入新文本
+      await markdownInputFieldPage.typeText('Bold text');
+      await markdownInputFieldPage.selectAll();
 
       // 按 Cmd/Ctrl+B
       await page.keyboard.press(`${modifierKey}+b`);
-      await page.waitForTimeout(200);
+      await page.waitForTimeout(300);
 
       // 验证加粗格式（通过检查文本是否包含加粗标记）
       // 加粗格式通过 fontWeight: 'bold' 样式和 data-testid="markdown-bold" 属性渲染
-      const hasBold = await markdownEditorPage.editableInput.evaluate((el) => {
-        // 查找包含 "Bold text" 的文本节点
-        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
-        let textNode: Node | null = null;
-        while (walker.nextNode()) {
-          if (walker.currentNode.textContent?.includes('Bold text')) {
-            textNode = walker.currentNode;
-            break;
-          }
-        }
-        
-        if (!textNode) return false;
-        
-        // 向上遍历 DOM 树，查找加粗格式
-        let node: Node | null = textNode.parentElement;
-        while (node && node !== el) {
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            const element = node as HTMLElement;
-            // 检查 data-testid="markdown-bold" 属性
-            if (element.getAttribute('data-testid') === 'markdown-bold') {
-              return true;
-            }
-            // 检查 fontWeight 样式
-            const computedStyle = window.getComputedStyle(element);
-            if (
-              computedStyle.fontWeight === 'bold' ||
-              computedStyle.fontWeight === '700' ||
-              parseInt(computedStyle.fontWeight) >= 700
-            ) {
-              return true;
-            }
-          }
-          node = node.parentElement;
-        }
-        return false;
-      });
-      expect(hasBold).toBe(true);
+      // 使用 expect.poll 等待格式应用完成
+      await expect
+        .poll(
+          async () => {
+            const hasBold = await markdownInputFieldPage.editableInput.evaluate(
+              (el) => {
+                // 查找包含 "Bold text" 的文本节点
+                const walker = document.createTreeWalker(
+                  el,
+                  NodeFilter.SHOW_TEXT,
+                  null,
+                );
+                let textNode: Node | null = null;
+                while (walker.nextNode()) {
+                  if (
+                    walker.currentNode.textContent?.trim() === 'Bold text'
+                  ) {
+                    textNode = walker.currentNode;
+                    break;
+                  }
+                }
+
+                if (!textNode) return false;
+
+                // 向上遍历 DOM 树，查找加粗格式
+                let node: Node | null = textNode.parentElement;
+                while (node && node !== el) {
+                  if (node.nodeType === Node.ELEMENT_NODE) {
+                    const element = node as HTMLElement;
+                    // 检查 data-testid="markdown-bold" 属性
+                    if (
+                      element.getAttribute('data-testid') === 'markdown-bold'
+                    ) {
+                      return true;
+                    }
+                    // 检查 fontWeight 样式
+                    const computedStyle = window.getComputedStyle(element);
+                    if (
+                      computedStyle.fontWeight === 'bold' ||
+                      computedStyle.fontWeight === '700' ||
+                      parseInt(computedStyle.fontWeight) >= 700
+                    ) {
+                      return true;
+                    }
+                  }
+                  node = node.parentElement;
+                }
+                return false;
+              },
+            );
+            return hasBold;
+          },
+          {
+            timeout: 3000,
+            message: '等待加粗格式应用完成',
+          },
+        )
+        .toBe(true);
     });
 
     test('Cmd/Ctrl+I 应该切换斜体格式', async ({

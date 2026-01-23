@@ -13,7 +13,7 @@ test.describe('TagPopup 连续选择功能', () => {
 
     // 等待 tag popup 输入区域出现
     const popupInputs = page.locator(
-      '[data-tag-popup-input].ant-agentic-tag-popup-has-arrow',
+      '[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow',
     );
     await expect(popupInputs.first()).toBeVisible({ timeout: 5000 });
 
@@ -101,7 +101,7 @@ test.describe('TagPopup 连续选择功能', () => {
 
     // 等待 tag popup 输入区域出现
     const popupInputs = page.locator(
-      '[data-tag-popup-input].ant-agentic-tag-popup-has-arrow',
+      '[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow',
     );
     await expect(popupInputs.first()).toBeVisible({ timeout: 5000 });
 
@@ -117,11 +117,11 @@ test.describe('TagPopup 连续选择功能', () => {
     });
 
     // 快速连续点击多个 popup
-    const clickPromises = [];
+    const clickPromises: Promise<void>[] = [];
     for (let i = 0; i < Math.min(popupCount, 2); i++) {
       const popupInput = popupInputs.nth(i);
       clickPromises.push(
-        (async () => {
+        (async (): Promise<void> => {
           try {
             await popupInput.click({ timeout: 2000 });
             // 等待菜单出现
@@ -160,7 +160,7 @@ test.describe('TagPopup 连续选择功能', () => {
 
     // 等待 tag popup 输入区域出现
     const popupInput = page
-      .locator('[data-tag-popup-input].ant-agentic-tag-popup-has-arrow')
+      .locator('[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow')
       .first();
     await expect(popupInput).toBeVisible({ timeout: 5000 });
 

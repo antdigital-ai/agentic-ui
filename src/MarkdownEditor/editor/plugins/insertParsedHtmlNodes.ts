@@ -338,9 +338,31 @@ const blobToFile = async (blobUrl: string, fileName: string) => {
 };
 
 /**
+ * 从片段列表中递归移除所有媒体类型的片段（图片、视频、音频等）
+ */
+const removeMediaFragments = (fragments: any[]): void => {
+  for (let i = fragments.length - 1; i >= 0; i--) {
+    const fragment = fragments[i];
+    if (fragment.type === 'media') {
+      fragments.splice(i, 1);
+      continue;
+    }
+    if (fragment?.children) {
+      removeMediaFragments(fragment.children);
+    }
+  }
+};
+
+/**
  * 分段处理文件上传，避免阻塞主线程
  */
 const upLoadFileBatch = async (fragmentList: any[], editorProps: any) => {
+  // 如果没有配置 upload，过滤掉所有媒体类型的片段
+  if (!editorProps.image?.upload) {
+    removeMediaFragments(fragmentList);
+    return;
+  }
+
   const mediaFragments: any[] = [];
 
   // 收集所有需要上传的媒体文件

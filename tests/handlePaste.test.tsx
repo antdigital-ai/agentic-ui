@@ -24,6 +24,7 @@ vi.mock('antd', () => ({
   message: {
     loading: vi.fn(() => vi.fn()),
     success: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -530,6 +531,78 @@ describe('handlePaste utilities', () => {
       // 如果它抛出错误，则上面的 catch 会捕获它
       // 这里我们主要验证 mockUpload 被调用，且不会导致未捕获的 promise rejection
       expect(mockUpload).toHaveBeenCalledWith([mockFile]);
+    });
+
+    it('should not process files when upload is not configured', async () => {
+      const mockFile = new File(['test'], 'test.png', { type: 'image/png' });
+      const mockDataTransfer = {
+        ...mockClipboardData,
+        files: [mockFile],
+      };
+
+      // 设置选择范围
+      Transforms.select(editor, { path: [0, 0], offset: 0 });
+
+      const result = await handleFilesPaste(
+        editor,
+        mockDataTransfer as unknown as DataTransfer,
+        {}, // 未配置 upload
+      );
+
+      // 应该返回 false，表示没有处理文件
+      expect(result).toBe(false);
+      // 不应该显示任何上传相关的消息
+      expect(message.loading).not.toHaveBeenCalled();
+      expect(message.success).not.toHaveBeenCalled();
+      expect(message.error).not.toHaveBeenCalled();
+    });
+
+    it('should not process files when image.upload is undefined', async () => {
+      const mockFile = new File(['test'], 'test.png', { type: 'image/png' });
+      const mockDataTransfer = {
+        ...mockClipboardData,
+        files: [mockFile],
+      };
+
+      // 设置选择范围
+      Transforms.select(editor, { path: [0, 0], offset: 0 });
+
+      const result = await handleFilesPaste(
+        editor,
+        mockDataTransfer as unknown as DataTransfer,
+        { image: {} }, // image 存在但 upload 未配置
+      );
+
+      // 应该返回 false，表示没有处理文件
+      expect(result).toBe(false);
+      // 不应该显示任何上传相关的消息
+      expect(message.loading).not.toHaveBeenCalled();
+      expect(message.success).not.toHaveBeenCalled();
+      expect(message.error).not.toHaveBeenCalled();
+    });
+
+    it('should not process files when image is undefined', async () => {
+      const mockFile = new File(['test'], 'test.png', { type: 'image/png' });
+      const mockDataTransfer = {
+        ...mockClipboardData,
+        files: [mockFile],
+      };
+
+      // 设置选择范围
+      Transforms.select(editor, { path: [0, 0], offset: 0 });
+
+      const result = await handleFilesPaste(
+        editor,
+        mockDataTransfer as unknown as DataTransfer,
+        {}, // image 未配置
+      );
+
+      // 应该返回 false，表示没有处理文件
+      expect(result).toBe(false);
+      // 不应该显示任何上传相关的消息
+      expect(message.loading).not.toHaveBeenCalled();
+      expect(message.success).not.toHaveBeenCalled();
+      expect(message.error).not.toHaveBeenCalled();
     });
   });
 

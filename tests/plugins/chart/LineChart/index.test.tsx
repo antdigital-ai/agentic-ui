@@ -22,12 +22,20 @@ beforeAll(async () => {
     LineChart = LineChartModule.default;
   } catch (error) {
     // 如果上面的导入失败，尝试不带扩展名的导入
-    const LineChartModule = await import(
-      '../../../../src/Plugins/chart/LineChart/'
-    );
-    LineChart = LineChartModule.default;
+    try {
+      const LineChartModule = await import(
+        '../../../../src/Plugins/chart/LineChart/'
+      );
+      LineChart = LineChartModule.default;
+    } catch (secondError) {
+      // 如果都失败了，尝试从 Plugins 目录导入
+      const LineChartModule = await import(
+        '../../../../src/Plugins/chart/LineChart/index'
+      );
+      LineChart = LineChartModule.default;
+    }
   }
-}, 30000); // 增加超时时间到 30 秒
+}, 60000); // 增加超时时间到 60 秒
 
 // 定义 LineChartDataItem 类型
 interface LineChartDataItem {

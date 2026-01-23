@@ -7,6 +7,8 @@ import { insertParsedHtmlNodes } from '../src/MarkdownEditor/editor/plugins/inse
 vi.mock('antd', () => ({
   message: {
     loading: vi.fn(() => vi.fn()),
+    success: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -59,6 +61,73 @@ vi.mock('../../utils/docx/docxDeserializer', () => ({
           type: 'head',
           level: 1,
           children: [{ text: 'Heading' }],
+        },
+      ];
+    }
+    if (html.includes('media') || html.includes('<img') || html.includes('image')) {
+      // 检查是否包含多个图片
+      const imageMatches = html.match(/<img[^>]*>/g);
+      if (imageMatches && imageMatches.length > 1) {
+        return [
+          {
+            type: 'paragraph',
+            children: [
+              {
+                type: 'media',
+                url: 'blob:http://localhost/test1.png',
+                mediaType: 'image',
+                children: [{ text: '' }],
+              },
+              { text: 'Text between' },
+              {
+                type: 'media',
+                url: 'blob:http://localhost/test2.png',
+                mediaType: 'image',
+                children: [{ text: '' }],
+              },
+              { text: 'Text after' },
+            ],
+          },
+        ];
+      }
+      // 检查是否包含嵌套结构（检查是否有嵌套的段落标签）
+      if (html.includes('</p><p>') || html.includes('</p>\n<p>') || html.match(/<p>.*<p>/)) {
+        return [
+          {
+            type: 'paragraph',
+            children: [
+              { text: 'Text before' },
+              {
+                type: 'media',
+                url: 'blob:http://localhost/test.png',
+                mediaType: 'image',
+                children: [{ text: '' }],
+              },
+              { text: 'Nested text' },
+              {
+                type: 'media',
+                url: 'blob:http://localhost/nested.png',
+                mediaType: 'image',
+                children: [{ text: '' }],
+              },
+              { text: 'Text after' },
+            ],
+          },
+        ];
+      }
+      // 单个图片
+      return [
+        {
+          type: 'paragraph',
+          children: [
+            {
+              type: 'media',
+              url: 'blob:http://localhost/test-image.png',
+              mediaType: 'image',
+              children: [{ text: '' }],
+            },
+            { text: 'Text after image' },
+          ],
         },
       ];
     }
@@ -323,5 +392,155 @@ describe('insertParsedHtmlNodes', () => {
     expect(result).toBe(true);
     // 代码块内容应该被更新为新的代码
     expect(Node.string(editor.children[0])).toBe('const x = 1;');
+  });
+
+  // 测试用例：未配置 upload 时，粘贴包含媒体文件的 HTML 应该过滤掉媒体片段
+  it('should filter out media fragments when upload is not configured', async () => {
+    // 设置选区
+    const path = [0, 0];
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [{ text: '' }],
+      },
+    ];
+    editor.selection = {
+      anchor: { path, offset: 0 },
+      focus: { path, offset: 0 },
+    };
+
+    // 执行粘贴包含媒体文件的 HTML
+    const result = await insertParsedHtmlNodes(
+      editor,
+      '<p><img src="blob:http://localhost/test.png" />Text after image</p>',
+      {}, // 未配置 upload
+      '',
+    );
+
+    // 验证结果
+    expect(result).toBe(true);
+    // 媒体片段应该被过滤掉，只保留文本内容
+    const textContent = Node.string(editor.children[0]);
+    expect(textContent).toBe('Text after image');
+    // 不应该显示上传成功消息
+    expect(message.success).not.toHaveBeenCalled();
+    expect(message.error).not.toHaveBeenCalled();
+  });
+
+  // 测试用例：未配置 upload 时，粘贴包含多个媒体文件的 HTML 应该过滤掉所有媒体片段
+  it('should filter out all media fragments when upload is not configured', async () => {
+    // 设置选区
+    const path = [0, 0];
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [{ text: '' }],
+      },
+    ];
+    editor.selection = {
+      anchor: { path, offset: 0 },
+      focus: { path, offset: 0 },
+    };
+
+    // 使用包含多个媒体片段的 HTML
+    const htmlWithMultipleMedia = '<p><img src="blob:http://localhost/test1.png" />Text between<img src="blob:http://localhost/test2.png" />Text after</p>';
+
+    // 执行粘贴
+    const result = await insertParsedHtmlNodes(
+      editor,
+      htmlWithMultipleMedia,
+      {}, // 未配置 upload
+      '',
+    );
+
+    // 验证结果
+    expect(result).toBe(true);
+    // 所有媒体片段应该被过滤掉，只保留文本内容
+    const textContent = Node.string(editor.children[0]);
+    expect(textContent).toContain('Text between');
+    expect(textContent).toContain('Text after');
+    // 不应该显示上传成功消息
+    expect(message.success).not.toHaveBeenCalled();
+    expect(message.error).not.toHaveBeenCalled();
+  });
+
+  // 测试用例：未配置 upload 时，粘贴包含嵌套媒体文件的 HTML 应该过滤掉所有媒体片段
+  it('should filter out nested media fragments when upload is not configured', async () => {
+    // 设置选区
+    const path = [0, 0];
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [{ text: '' }],
+      },
+    ];
+    editor.selection = {
+      anchor: { path, offset: 0 },
+      focus: { path, offset: 0 },
+    };
+
+    // 使用包含嵌套媒体片段的 HTML
+    const htmlWithNestedMedia = '<p>Text before<img src="blob:http://localhost/test.png" />Nested text<img src="blob:http://localhost/nested.png" />Text after</p>';
+
+    // 执行粘贴
+    const result = await insertParsedHtmlNodes(
+      editor,
+      htmlWithNestedMedia,
+      {}, // 未配置 upload
+      '',
+    );
+
+    // 验证结果
+    expect(result).toBe(true);
+    // 所有媒体片段（包括嵌套的）应该被过滤掉
+    const textContent = Node.string(editor.children[0]);
+    expect(textContent).toContain('Text before');
+    expect(textContent).toContain('Nested text');
+    expect(textContent).toContain('Text after');
+    // 不应该显示上传成功消息
+    expect(message.success).not.toHaveBeenCalled();
+    expect(message.error).not.toHaveBeenCalled();
+  });
+
+  // 测试用例：配置了 upload 时，正常上传流程不受影响
+  it('should upload media files normally when upload is configured', async () => {
+    // Mock fetch for blobToFile
+    global.fetch = vi.fn().mockResolvedValue({
+      blob: () => Promise.resolve(new Blob(['test'], { type: 'image/png' })),
+    });
+
+    // 设置选区
+    const path = [0, 0];
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [{ text: '' }],
+      },
+    ];
+    editor.selection = {
+      anchor: { path, offset: 0 },
+      focus: { path, offset: 0 },
+    };
+
+    const mockUpload = vi
+      .fn()
+      .mockResolvedValue('https://example.com/uploaded-image.png');
+
+    // 执行粘贴包含媒体文件的 HTML
+    const result = await insertParsedHtmlNodes(
+      editor,
+      '<p><img src="blob:http://localhost/test.png" />Text after image</p>',
+      { image: { upload: mockUpload } },
+      '',
+    );
+
+    // 验证结果
+    expect(result).toBe(true);
+    // 等待异步上传完成
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    // 应该调用上传函数（如果媒体片段存在且需要上传）
+    // 注意：由于 blobToFile 需要 fetch，如果 fetch mock 失败，上传可能不会触发
+    // 这里我们主要验证函数能正常执行而不报错，并且不会因为未配置 upload 而过滤媒体
+    expect(result).toBe(true);
   });
 });

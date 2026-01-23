@@ -15,6 +15,12 @@ export const applyContextPropsAndConfig = (
   const hasContextProps = Object.keys(contextProps || {}).length > 0;
   const hasConfig = Object.keys(config || {}).length > 0;
 
+  const resolveAlign = (item: any, res: any) =>
+    config?.align ??
+    res.otherProps?.align ??
+    item.otherProps?.align ??
+    item.align;
+
   if (Array.isArray(el)) {
     return (el as Element[]).map((item) => {
       const result = { ...item };
@@ -23,6 +29,13 @@ export const applyContextPropsAndConfig = (
       }
       if (hasConfig && !item.otherProps) {
         result.otherProps = config;
+      }
+      const alignVal = resolveAlign(item, result);
+      if (
+        alignVal &&
+        (result.type === 'paragraph' || result.type === 'head')
+      ) {
+        result.align = alignVal;
       }
       return result;
     }) as Element[];
@@ -34,6 +47,13 @@ export const applyContextPropsAndConfig = (
   }
   if (hasConfig && !el.otherProps) {
     result.otherProps = config;
+  }
+  const alignVal = resolveAlign(el, result);
+  if (
+    alignVal &&
+    (result.type === 'paragraph' || result.type === 'head')
+  ) {
+    result.align = alignVal;
   }
   return result;
 };

@@ -35,7 +35,12 @@ describe('ChatLayout', () => {
     const handleLeftCollapse = vi.fn();
 
     render(
-      <ChatLayout header={{ onLeftCollapse: handleLeftCollapse }}>
+      <ChatLayout
+        header={{
+          leftCollapsible: true,
+          onLeftCollapse: handleLeftCollapse,
+        }}
+      >
         <div>Test content</div>
       </ChatLayout>,
     );
@@ -50,7 +55,12 @@ describe('ChatLayout', () => {
     const handleShare = vi.fn();
 
     render(
-      <ChatLayout header={{ onShare: handleShare }}>
+      <ChatLayout
+        header={{
+          showShare: true,
+          onShare: handleShare,
+        }}
+      >
         <div>Test content</div>
       </ChatLayout>,
     );

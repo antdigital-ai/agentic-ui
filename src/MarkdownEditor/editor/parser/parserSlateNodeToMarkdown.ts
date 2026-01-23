@@ -352,6 +352,10 @@ export const parserSlateNodeToMarkdown = (
       delete configProps['columns'];
       delete configProps['dataSource'];
       delete configProps['finished'];
+      // paragraph/head 的 align 已输出到 <p align> / <h align>，不再写入注释
+      if (node.type === 'paragraph' || node.type === 'head') {
+        delete configProps['align'];
+      }
 
       if (node.type === 'link-card') {
         configProps.type = 'card';
@@ -1133,8 +1137,9 @@ const handleParagraph = (
 ) => {
   let str = '';
 
-  // 如果有对齐属性，使用 HTML 标签包裹以支持对齐
-  if (node.align) {
+  // 如果有对齐属性，使用 HTML 标签包裹以支持对齐（兼容 align 在 otherProps 的情况）
+  const align = node.align ?? node.otherProps?.align;
+  if (align) {
     // 递归处理子节点
     const content = parserSlateNodeToMarkdown(
       node?.children,
@@ -1142,8 +1147,7 @@ const handleParagraph = (
       [...parent, node],
       plugins,
     );
-    // 使用 p 标签并添加 align 属性
-    return `<p align="${node.align}">${content}</p>`;
+    return `<p align="${align}">${content}</p>`;
   }
 
   str += parserSlateNodeToMarkdown(
@@ -1172,8 +1176,9 @@ const handleHead = (
 ) => {
   let str = '';
 
-  // 如果有对齐属性，使用 HTML 标签包裹以支持对齐
-  if (node.align) {
+  // 如果有对齐属性，使用 HTML 标签包裹以支持对齐（兼容 align 在 otherProps 的情况）
+  const align = node.align ?? node.otherProps?.align;
+  if (align) {
     // 递归处理子节点
     const content = parserSlateNodeToMarkdown(
       node?.children,
@@ -1181,8 +1186,7 @@ const handleHead = (
       [...parent, node],
       plugins,
     );
-    // 使用 h 标签并添加 align 属性
-    return `<h${node.level} align="${node.align}">${content}</h${node.level}>`;
+    return `<h${node.level} align="${align}">${content}</h${node.level}>`;
   }
 
   str +=

@@ -524,7 +524,9 @@ export class MarkdownToSlateParser {
     const handlerInfo = elementHandlers[elementType];
 
     if (handlerInfo?.needsHtmlResult) {
-      const htmlResult = handleHtml(currentElement, parent, htmlTag);
+      const htmlResult = handleHtml(currentElement, parent, htmlTag, (md) =>
+        ({ schema: this.parse(md).schema }),
+      );
       const result: any = {
         el: htmlResult.el,
       };

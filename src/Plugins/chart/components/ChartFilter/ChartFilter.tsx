@@ -1,8 +1,7 @@
 import { ChevronDown } from '@sofa-design/icons';
 import { Button, ConfigProvider, Dropdown, Segmented } from 'antd';
-import React, { useContext, useMemo, useRef } from 'react';
+import React, { useContext } from 'react';
 import { I18nContext } from '../../../../I18n';
-import { debounce } from '../../utils';
 import { useStyle } from './style';
 
 export interface FilterOption {
@@ -51,57 +50,16 @@ const ChartFilterComponent: React.FC<ChartFilterProps> = ({
   const prefixCls = getPrefixCls('chart-filter');
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
-  // 使用 useRef 保存最新的回调函数，避免防抖函数闭包问题
-  const onFilterChangeRef = useRef(onFilterChange);
-  const onSelectionChangeRef = useRef(onSelectionChange);
-
-  // 更新 ref，确保总是使用最新的回调
-  React.useEffect(() => {
-    onFilterChangeRef.current = onFilterChange;
-    onSelectionChangeRef.current = onSelectionChange;
-  }, [onFilterChange, onSelectionChange]);
-
-  // 创建防抖的回调函数，1秒更新一次
-  const debouncedFilterChange = useMemo(
-    () =>
-      debounce(
-        function (value: string) {
-          if (onFilterChangeRef.current) {
-            onFilterChangeRef.current(value);
-          }
-        } as any,
-        1000,
-      ),
-    [],
-  );
-
-  const debouncedSelectionChange = useMemo(
-    () =>
-      debounce(
-        function (region: string) {
-          if (onSelectionChangeRef.current) {
-            onSelectionChangeRef.current(region);
-          }
-        } as any,
-        1000,
-      ),
-    [],
-  );
-
-  // 组件卸载时清理防抖函数
-  React.useEffect(() => {
-    return () => {
-      (debouncedFilterChange as any)?.cancel?.();
-      (debouncedSelectionChange as any)?.cancel?.();
-    };
-  }, [debouncedFilterChange, debouncedSelectionChange]);
-
   const handleRegionChange = (region: string) => {
-    (debouncedSelectionChange as any)(region);
+    if (onSelectionChange) {
+      onSelectionChange(region);
+    }
   };
 
   const handleFilterChange = (value: string) => {
-    (debouncedFilterChange as any)(value);
+    if (onFilterChange) {
+      onFilterChange(value);
+    }
   };
 
   const hasMain = Array.isArray(filterOptions) && filterOptions.length > 1;

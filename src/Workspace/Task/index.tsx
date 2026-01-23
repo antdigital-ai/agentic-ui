@@ -9,7 +9,7 @@ type TaskStatus = 'success' | 'pending' | 'loading' | 'error';
 
 export interface TaskItem {
   key: string;
-  title?: string;
+  title?: React.ReactNode;
   content?: React.ReactNode | React.ReactNode[];
   status: TaskStatus;
 }
@@ -79,11 +79,11 @@ export const TaskList: FC<TaskListProps> = ({ data, onItemClick }) => {
           onKeyDown={
             onItemClick
               ? (e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleItemClick(item);
-                  }
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleItemClick(item);
                 }
+              }
               : undefined
           }
           style={{ cursor: onItemClick ? 'pointer' : undefined }}

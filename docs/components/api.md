@@ -82,26 +82,28 @@ export default () => {
   return (
     <MarkdownEditor
       editorRef={editorRef}
-      initValue={`# 高级配置示例 
-4 Do not wear yourself out to get rich;  
-Stop and show understanding.
-5 You will fix your eyes on wealth, and it is no more,  
+      initValue={`# 高级配置示例
+
+<p align="right">**4 Do not wear yourself out to get rich;**</p>
+
+Stop and show understanding.  
+**5 You will fix your eyes on wealth, and it is no more,**  
 For it will surely sprout wings and fly off to the sky like an eagle
- \n * 数据表1 \n * 数据表二 8. 绘制表格
 
-\`\`\`think
-这是一个思考块，表示正在分析需求或处理复杂逻辑。
-\`\`\`
+- 数据表1
+- 数据表二 8. 绘制表格
 
-| 作品名称        | 在线地址   |  上线日期  |
-| :--------  | :-----  | :----:  |
-| 逍遥自在轩 | [https://niceshare.site](https://niceshare.site/?ref=markdown.lovejade.cn) |2024-04-26|
-| 玉桃文飨轩 | [https://share.lovejade.cn](https://share.lovejade.cn/?ref=markdown.lovejade.cn) |2022-08-26|
-| 缘知随心庭 | [https://fine.niceshare.site](https://fine.niceshare.site/?ref=markdown.lovejade.cn) |2022-02-26|
-| 静轩之别苑 | [http://quickapp.lovejade.cn](http://quickapp.lovejade.cn/?ref=markdown.lovejade.cn) |2019-01-12|
-| 晚晴幽草轩 | [https://www.jeffjade.com](https://www.jeffjade.com/?ref=markdown.lovejade.cn) |2014-09-20|
+<think>这是一个思考块，表示正在分析需求或处理复杂逻辑。</think>
 
----`}
+| 作品名称   | 在线地址                                                                             |  上线日期  |
+| :--------- | :----------------------------------------------------------------------------------- | :--------: |
+| 逍遥自在轩 | [https://niceshare.site](https://niceshare.site/?ref=markdown.lovejade.cn)           | 2024-04-26 |
+| 玉桃文飨轩 | [https://share.lovejade.cn](https://share.lovejade.cn/?ref=markdown.lovejade.cn)     | 2022-08-26 |
+| 缘知随心庭 | [https://fine.niceshare.site](https://fine.niceshare.site/?ref=markdown.lovejade.cn) | 2022-02-26 |
+| 静轩之别苑 | [http://quickapp.lovejade.cn](http://quickapp.lovejade.cn/?ref=markdown.lovejade.cn) | 2019-01-12 |
+| 晚晴幽草轩 | [https://www.jeffjade.com](https://www.jeffjade.com/?ref=markdown.lovejade.cn)       | 2014-09-20 |
+
+***`}
       height="600px"
       toolBar={{
         enable: true,

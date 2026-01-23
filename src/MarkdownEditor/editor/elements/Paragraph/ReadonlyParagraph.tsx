@@ -38,16 +38,17 @@ import { ElementProps, ParagraphNode } from '../../../el';
 export const ReadonlyParagraph: React.FC<ElementProps<ParagraphNode>> =
   React.memo((props) => {
     const str = Node.string(props.element).trim();
+    const align = props.element.align ?? props.element.otherProps?.align;
 
     return (
       <div
         {...props.attributes}
         data-be={'paragraph'}
         className={classNames({})}
-        data-align={props.element.align}
+        data-align={align}
         style={{
           display: !!str || !!props.children?.at(0).type ? undefined : 'none',
-          textAlign: props.element.align,
+          textAlign: align,
         }}
       >
         {props.children}

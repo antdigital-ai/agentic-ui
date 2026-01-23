@@ -18,7 +18,12 @@ import { LayoutHeader } from '../index';
 
 describe('LayoutHeader', () => {
   it('renders with default props', () => {
-    render(<LayoutHeader />);
+    render(
+      <LayoutHeader
+        leftCollapsible={true}
+        showShare={true}
+      />,
+    );
 
     expect(screen.getByText('AI 助手')).toBeInTheDocument();
     expect(screen.getByLabelText('折叠左侧边栏')).toBeInTheDocument();
@@ -33,7 +38,12 @@ describe('LayoutHeader', () => {
 
   it('handles left collapse click', () => {
     const onLeftCollapse = vi.fn();
-    render(<LayoutHeader onLeftCollapse={onLeftCollapse} />);
+    render(
+      <LayoutHeader
+        leftCollapsible={true}
+        onLeftCollapse={onLeftCollapse}
+      />,
+    );
 
     fireEvent.click(screen.getByLabelText('折叠左侧边栏'));
     expect(onLeftCollapse).toHaveBeenCalledWith(true, false);
@@ -54,7 +64,12 @@ describe('LayoutHeader', () => {
 
   it('handles share click', () => {
     const onShare = vi.fn();
-    render(<LayoutHeader onShare={onShare} />);
+    render(
+      <LayoutHeader
+        showShare={true}
+        onShare={onShare}
+      />,
+    );
 
     fireEvent.click(screen.getByText('分享'));
     expect(onShare).toHaveBeenCalledTimes(1);
@@ -87,7 +102,11 @@ describe('LayoutHeader', () => {
   it('supports controlled mode for left collapse', () => {
     const onLeftCollapse = vi.fn();
     render(
-      <LayoutHeader leftCollapsed={true} onLeftCollapse={onLeftCollapse} />,
+      <LayoutHeader
+        leftCollapsible={true}
+        leftCollapsed={true}
+        onLeftCollapse={onLeftCollapse}
+      />,
     );
 
     fireEvent.click(screen.getByLabelText('折叠左侧边栏'));
@@ -113,6 +132,7 @@ describe('LayoutHeader', () => {
     const onRightCollapse = vi.fn();
     render(
       <LayoutHeader
+        leftCollapsible={true}
         leftDefaultCollapsed={true}
         rightDefaultCollapsed={false}
         onLeftCollapse={onLeftCollapse}

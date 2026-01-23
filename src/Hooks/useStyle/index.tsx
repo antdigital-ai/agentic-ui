@@ -79,5 +79,7 @@ export function useEditorStyleRegister(
   const result = genStyles(componentName, styleFn);
 
   // 确保总是返回一个有效的对象，且 hashId 保持关闭
-  return result ? { ...result, hashId: '' } : { wrapSSR: (node: any) => node, hashId: '' };
+  return result
+    ? { ...result, hashId: '' }
+    : { wrapSSR: (node: any) => node, hashId: '' };
 }

@@ -196,11 +196,9 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
           }}
           readonly={props.readonly}
           onReply={onReply}
-          onDisLike={onDisLike}
-          onDislike={onDislike}
+          onDislike={onDislike || onDisLike}
           onLike={onLike}
-          onCancelLike={onCancelLike}
-          onLikeCancel={onLikeCancel}
+          onLikeCancel={onLikeCancel || onCancelLike}
           onAvatarClick={onAvatarClick}
           onDoubleClick={onDoubleClick}
           customConfig={bubbleRenderConfig?.customConfig}

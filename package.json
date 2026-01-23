@@ -1,6 +1,6 @@
 {
   "name": "@ant-design/agentic-ui",
-  "version": "2.29.13",
+  "version": "2.29.15",
   "description": "面向智能体的 UI 组件库，提供多步推理可视化、工具调用展示、任务执行协同等 Agentic UI 能力",
   "repository": "git@github.com:ant-design/agentic-ui.git",
   "license": "MIT",
@@ -22,6 +22,7 @@
     "lint:css": "stylelint \"{src,test}/**/*.{css,less}\"",
     "lint:es": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "prepare": "husky install && dumi setup",
+    "prepublishOnly": "father doctor && pnpm run test && pnpm run build",
     "prettier": "prettier --write \"{src,docs,test}/**/*.{js,jsx,ts,tsx,css,less,json,md}\"",
     "preview": "pnpm dumi preview",
     "report:demo": "node scripts/generateDemoReport.js",
@@ -126,6 +127,7 @@
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
+    "@mlc-ai/web-llm": "^0.2.80",
     "@playwright/test": "^1.57.0",
     "@swc/core": "^1.15.8",
     "@testing-library/jest-dom": "^6.9.1",

@@ -10,7 +10,7 @@ test.describe('MarkdownInputField Tag Popup', () => {
     // 等待 tag popup 输入区域出现（这是实际可点击的元素）
     // 选择有下拉箭头的 tag popup（有可选项的那个），使用 .first() 确保唯一匹配
     const popupInput = page
-      .locator('[data-tag-popup-input].ant-agentic-tag-popup-has-arrow')
+      .locator('[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow')
       .first();
     await expect(popupInput).toBeVisible();
 

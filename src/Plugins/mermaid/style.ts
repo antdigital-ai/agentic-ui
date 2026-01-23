@@ -30,7 +30,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       // 渲染容器样式
       '& [data-mermaid-container="true"]': {
-        width: '100%',      
+        width: '100%',
         display: 'flex',
         justifyContent: 'center',
         // 增加隔离样式

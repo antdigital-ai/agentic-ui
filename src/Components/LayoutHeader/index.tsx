@@ -65,8 +65,8 @@ import type { LayoutHeaderProps } from './types';
  */
 const LayoutHeader: React.FC<LayoutHeaderProps> = ({
   title = 'AI 助手',
-  showShare = true,
-  leftCollapsible = true,
+  showShare = false,
+  leftCollapsible = false,
   rightCollapsible = false,
   leftCollapsed: controlledLeftCollapsed,
   rightCollapsed: controlledRightCollapsed,
