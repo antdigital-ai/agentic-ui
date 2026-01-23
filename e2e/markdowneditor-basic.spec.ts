@@ -166,8 +166,39 @@ test.describe('MarkdownEditor 高级功能', () => {
     await markdownEditorPage.pressKey('Enter');
     await markdownEditorPage.typeText('```');
 
-    // 验证包含代码内容
-    await markdownEditorPage.expectContainsText('const x = 1');
+    // 等待代码块元素出现，确保代码块已完全渲染
+    await expect
+      .poll(
+        async () => {
+          const hasCodeBlock = await markdownEditorPage.editableInput.evaluate(
+            (el) => {
+              // 查找代码块元素（通过 data-language 属性或代码块相关的类名）
+              const codeBlock = el.querySelector('[data-language]');
+              return codeBlock !== null;
+            },
+          );
+          return hasCodeBlock;
+        },
+        {
+          timeout: 5000,
+          message: '等待代码块元素出现',
+        },
+      )
+      .toBe(true);
+
+    // 验证包含代码内容（增加超时时间，因为代码块可能需要更长时间渲染）
+    await expect
+      .poll(
+        async () => {
+          const content = await markdownEditorPage.getText();
+          return content.includes('const x = 1');
+        },
+        {
+          timeout: 5000,
+          message: `等待文本 "const x = 1" 出现`,
+        },
+      )
+      .toBe(true);
   });
 
   test('应该能够处理列表', async ({ markdownEditorPage }) => {

@@ -324,7 +324,22 @@ test.describe('MarkdownInputField 快捷键功能', () => {
     // 移动到末尾并追加
     await markdownInputFieldPage.focus();
     await markdownInputFieldPage.pressKey('End');
-    await markdownInputFieldPage.typeText(' End');
+    // 等待光标移动完成，然后直接使用 editableInput.type() 输入，避免 typeText() 中的 focus() 重置光标位置
+    await markdownInputFieldPage.page.waitForTimeout(100);
+    await markdownInputFieldPage.editableInput.type(' End', { delay: 0 });
+    // 等待文本输入完成
+    await expect
+      .poll(
+        async () => {
+          const text = await markdownInputFieldPage.getText();
+          return text.trim().endsWith('End');
+        },
+        {
+          timeout: 3000,
+          message: '等待文本追加到末尾',
+        },
+      )
+      .toBe(true);
     const afterEnd = await markdownInputFieldPage.getText();
     expect(afterEnd.trim().endsWith('End')).toBe(true);
 
