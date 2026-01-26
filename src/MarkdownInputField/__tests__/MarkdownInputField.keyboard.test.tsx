@@ -90,6 +90,21 @@ describe('MarkdownInputField - Keyboard Shortcuts', () => {
       
       expect(onSend).not.toHaveBeenCalled();
     });
+
+    it('should not send on Mod+Shift+Enter', () => {
+      setup({ triggerSendKey: 'Mod+Enter' });
+      const wrapper = document.querySelector('.ant-agentic-md-input-field')!;
+
+      fireEvent.keyDown(wrapper, { 
+        key: 'Enter', 
+        code: 'Enter', 
+        charCode: 13, 
+        ctrlKey: true,
+        shiftKey: true 
+      });
+      
+      expect(onSend).not.toHaveBeenCalled();
+    });
   });
 
   describe('Mobile Device Override', () => {

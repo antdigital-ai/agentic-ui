@@ -191,7 +191,7 @@ export const useMarkdownInputFieldHandlers = ({
         }
       } else if (effectiveTriggerKey === 'Mod+Enter') {
         // 模式2: Mod+Enter (Cmd/Ctrl+Enter) 发送，Enter 换行
-        if (isEnter && isMod) {
+        if (isEnter && isMod && !isShift) {
           e.stopPropagation();
           e.preventDefault();
           if (props.onSend) sendMessage();
