@@ -16,6 +16,7 @@ Here are the guidelines files for the core Agentic UI components:
 | ToolUseBar | Display for tool usage/calls | [tool-use-bar.md](components/tool-use-bar.md) | `src/ToolUseBar/index.tsx` |
 | TaskList | List of tasks/steps | [task-list.md](components/task-list.md) | `src/TaskList/index.tsx` |
 | WelcomeMessage | Initial welcome screen | [welcome-message.md](components/welcome-message.md) | `src/WelcomeMessage/index.tsx` |
+| Workspace | Multi-tab workspace (Browser, File, Task) | [workspace.md](components/workspace.md) | `src/Workspace/index.tsx` |
 
 ## General Component Usage and Best Practices
 
