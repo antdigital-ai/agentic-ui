@@ -5,6 +5,7 @@ export const Hr = ({ attributes, children }: RenderElementProps) => {
   return (
     <div
       {...attributes}
+      data-be="hr"
       contentEditable={false}
       className={'select-none'}
       style={{

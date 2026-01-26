@@ -138,8 +138,7 @@ export const useKeyboard = (
       }
 
       if (props?.markdown?.matchInputToNode) {
-        match.run(e);
-        return;
+        if (match.run(e)) return;
       }
 
       if (e.key.toLowerCase().startsWith('arrow')) {

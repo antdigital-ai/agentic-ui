@@ -123,6 +123,24 @@ export const MdElements: Record<string, MdNode> = {
       return true;
     },
   },
+  codeSpace: {
+    matchKey: ' ',
+    reg: /^\s*(```|···)([\w#\-+*]{1,30})?\s*$/,
+    run: ({ editor, path, match }) => {
+      const lang = match[2];
+      Transforms.delete(editor, { at: path });
+      Transforms.insertNodes(
+        editor,
+        {
+          type: 'code',
+          language: lang,
+          value: '',
+        },
+        { at: path, select: true },
+      );
+      return true;
+    },
+  },
 
   head: {
     matchKey: ' ',
@@ -279,6 +297,21 @@ export const MdElements: Record<string, MdNode> = {
   },
   hr: {
     reg: /^\s*\*\*\*|___|---\s*/,
+    checkAllow: (ctx) =>
+      ctx.node?.[0]?.type === 'paragraph' && ctx.node[1][0] !== 0,
+    run: ({ editor, path }) => {
+      Transforms.delete(editor, { at: path });
+      Transforms.insertNodes(
+        editor,
+        { type: 'hr', children: [{ text: '' }] },
+        { at: path },
+      );
+      insertAfter(editor, path);
+    },
+  },
+  hrSpace: {
+    matchKey: ' ',
+    reg: /^\s*(\*\*\*|___|---)\s*/,
     checkAllow: (ctx) =>
       ctx.node?.[0]?.type === 'paragraph' && ctx.node[1][0] !== 0,
     run: ({ editor, path }) => {

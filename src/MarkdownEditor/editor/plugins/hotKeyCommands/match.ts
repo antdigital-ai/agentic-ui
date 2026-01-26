@@ -16,14 +16,14 @@ export class MatchKey {
     };
   }
 
-  run(e: React.KeyboardEvent) {
+  run(e: React.KeyboardEvent): boolean {
     const [node] = Editor.nodes<Element>(this.editor, {
       match: (n) => Element.isElement(n),
       mode: 'lowest',
     });
-    if (!node || ['code'].includes(node?.[0]?.type)) return;
+    if (!node || ['code'].includes(node?.[0]?.type)) return false;
     const sel = this.editor.selection;
-    if (!sel || !Range.isCollapsed(sel)) return;
+    if (!sel || !Range.isCollapsed(sel)) return false;
     for (let n of TextMatchNodes) {
       if (
         typeof n.matchKey === 'object'
@@ -41,10 +41,11 @@ export class MatchKey {
         if (m) {
           if (n.run(this.createParams(node, m))) {
             e.preventDefault();
-            break;
+            return true;
           }
         }
       }
     }
+    return false;
   }
 }
