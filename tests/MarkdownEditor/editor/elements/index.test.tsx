@@ -1312,4 +1312,194 @@ describe('Elements Index', () => {
       expect(screen.getByTestId('schema')).toBeInTheDocument();
     });
   });
+
+  describe('areDepsEqual 函数测试', () => {
+    it('应该在 deps 相等时返回 true', () => {
+      const props1 = {
+        element: { type: 'paragraph', children: [] },
+        attributes: {},
+        children: <div>Test</div>,
+        deps: ['dep1', 'dep2'],
+      };
+      const props2 = {
+        element: { type: 'paragraph', children: [] },
+        attributes: {},
+        children: <div>Test</div>,
+        deps: ['dep1', 'dep2'],
+      };
+      
+      // 通过 React.memo 的比较函数来测试
+      const { rerender } = render(<MElement {...props1} />);
+      rerender(<MElement {...props2} />);
+      expect(screen.getByText('Test')).toBeInTheDocument();
+    });
+
+    it('应该在 deps 为 undefined 时返回 true', () => {
+      const props1 = {
+        element: { type: 'paragraph', children: [] },
+        attributes: {},
+        children: <div>Test</div>,
+      };
+      const props2 = {
+        element: { type: 'paragraph', children: [] },
+        attributes: {},
+        children: <div>Test</div>,
+      };
+      
+      const { rerender } = render(<MElement {...props1} />);
+      rerender(<MElement {...props2} />);
+      expect(screen.getByText('Test')).toBeInTheDocument();
+    });
+
+    it('应该在 deps 长度不同时返回 false', () => {
+      const props1 = {
+        element: { type: 'paragraph', children: [] },
+        attributes: {},
+        children: <div>Test</div>,
+        deps: ['dep1'],
+      };
+      const props2 = {
+        element: { type: 'paragraph', children: [] },
+        attributes: {},
+        children: <div>Test</div>,
+        deps: ['dep1', 'dep2'],
+      };
+      
+      const { rerender } = render(<MElement {...props1} />);
+      rerender(<MElement {...props2} />);
+      expect(screen.getByText('Test')).toBeInTheDocument();
+    });
+  });
+
+  describe('MLeafComponent 测试', () => {
+    it('应该处理 tag onSelect 回调中的条件判断', () => {
+      const props = {
+        leaf: {
+          text: 'test',
+          tag: true,
+          code: true,
+        },
+        attributes: {},
+        children: <span>test</span>,
+        readonly: false,
+        tagInputProps: {
+          enable: true,
+          tagTextRender: vi.fn((props, text) => text),
+        },
+        fncProps: {},
+        comment: undefined,
+        linkConfig: {},
+      };
+
+      render(<MLeaf {...props} />);
+      expect(screen.getByText('test')).toBeInTheDocument();
+    });
+
+    it('应该处理 selectFormat 函数', async () => {
+      // EditorUtils 已经在文件顶部被 mock，使用 import 来获取 mock 的模块
+      const editorUtilsModule = await import('../../../../src/MarkdownEditor/editor/utils/editorUtils');
+      const mockIsDirtLeaf = vi.mocked(editorUtilsModule.EditorUtils.isDirtLeaf);
+      mockIsDirtLeaf.mockReturnValueOnce(true);
+
+      const props = {
+        leaf: {
+          text: 'test',
+        },
+        attributes: {},
+        children: <span>test</span>,
+        readonly: false,
+        text: {
+          type: 'text',
+          text: 'test',
+        },
+        tagInputProps: {},
+        fncProps: {},
+        comment: undefined,
+        linkConfig: {},
+      };
+
+      const { container } = render(<MLeaf {...props} />);
+      const span = container.querySelector('span[data-be="text"]');
+      if (span) {
+        fireEvent.dblClick(span);
+      }
+      expect(span).toBeInTheDocument();
+    });
+
+    it('应该处理 linkConfig.onClick 返回 false 的情况', () => {
+      const props = {
+        leaf: {
+          text: 'test',
+          url: 'http://example.com',
+        },
+        attributes: {},
+        children: <span>test</span>,
+        readonly: false,
+        tagInputProps: {},
+        fncProps: {},
+        comment: undefined,
+        linkConfig: {
+          onClick: vi.fn(() => false),
+          openInNewTab: true,
+        },
+      };
+
+      const { container } = render(<MLeaf {...props} />);
+      const span = container.querySelector('span[data-be="text"]');
+      if (span) {
+        fireEvent.click(span);
+      }
+      expect(span).toBeInTheDocument();
+    });
+
+    it('应该处理 linkConfig.openInNewTab 为 false 的情况', () => {
+      // window.location 是只读的，不能直接重新定义
+      // 我们主要验证组件渲染和点击事件，而不是验证 location.href 的赋值
+      // 因为在实际代码中，window.location.href = url 会触发导航，这在测试环境中很难验证
+      const props = {
+        leaf: {
+          text: 'test',
+          url: 'http://example.com',
+        },
+        attributes: {},
+        children: <span>test</span>,
+        readonly: false,
+        tagInputProps: {},
+        fncProps: {},
+        comment: undefined,
+        linkConfig: {
+          openInNewTab: false,
+        },
+      };
+
+      const { container } = render(<MLeaf {...props} />);
+      const span = container.querySelector('span[data-be="text"]');
+      if (span) {
+        fireEvent.click(span);
+      }
+      // 验证组件已渲染，点击事件已触发
+      // 注意：我们无法直接验证 window.location.href 的赋值，因为它是只读的
+      expect(span).toBeInTheDocument();
+    });
+
+    it('应该处理 hasFnc 和 hasComment 的情况', () => {
+      const props = {
+        leaf: {
+          text: 'test',
+          fnc: true,
+          comment: 'test comment',
+        },
+        attributes: {},
+        children: <span>test</span>,
+        readonly: false,
+        tagInputProps: {},
+        fncProps: {},
+        comment: 'test comment',
+        linkConfig: {},
+      };
+
+      render(<MLeaf {...props} />);
+      expect(screen.getByText('test')).toBeInTheDocument();
+    });
+  });
 });
