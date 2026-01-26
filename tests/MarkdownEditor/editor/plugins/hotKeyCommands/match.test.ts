@@ -1,5 +1,4 @@
 import { vi } from 'vitest';
-import { MdElements } from '../../../../../src/MarkdownEditor/editor/plugins/elements';
 import { MatchKey } from '../../../../../src/MarkdownEditor/editor/plugins/hotKeyCommands/match';
 
 // 模拟 Slate Editor
