@@ -208,6 +208,49 @@ export default () => {
 };
 ```
 
+## 快捷键
+
+组件支持以下快捷键操作，可以通过 `triggerSendKey` 属性配置发送行为。
+
+### 发送与换行
+
+| 模式 | 发送快捷键 | 换行快捷键 | 适用场景 |
+| :--- | :--- | :--- | :--- |
+| `'Enter'` (默认) | <kbd>Enter</kbd> | <kbd>Shift</kbd> + <kbd>Enter</kbd> | 适合短文本对话，按回车直接发送 |
+| `'Mod+Enter'` | <kbd>Cmd</kbd> / <kbd>Ctrl</kbd> + <kbd>Enter</kbd> | <kbd>Enter</kbd> | 适合长文本编辑，需要频繁换行 |
+
+> **特殊说明**：
+>
+> 1.  **移动端适配**：在移动设备上，为防止误触，强制使用 `'Mod+Enter'` 模式（即点击键盘回车键仅换行，不发送）。
+> 2.  **输入法兼容**：在中文输入法（IME）组字/选词过程中，按 <kbd>Enter</kbd> 键不会触发发送。
+
+### 编辑器通用快捷键
+
+除了发送快捷键外，组件还支持以下 Markdown 编辑常用的快捷键：
+
+| 快捷键 (Mac / Windows) | 功能 |
+| :--- | :--- |
+| <kbd>Cmd</kbd> + <kbd>B</kbd> / <kbd>Ctrl</kbd> + <kbd>B</kbd> | 加粗 |
+| <kbd>Cmd</kbd> + <kbd>I</kbd> / <kbd>Ctrl</kbd> + <kbd>I</kbd> | 斜体 |
+| <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> | 删除线 |
+| <kbd>Option</kbd> + <kbd>`</kbd> / <kbd>Alt</kbd> + <kbd>`</kbd> | 行内代码 |
+| <kbd>Cmd</kbd> + <kbd>\</kbd> / <kbd>Ctrl</kbd> + <kbd>\</kbd> | 清除格式 |
+| <kbd>Cmd</kbd> + <kbd>1</kbd>~<kbd>4</kbd> / <kbd>Ctrl</kbd> + <kbd>1</kbd>~<kbd>4</kbd> | 标题 H1 ~ H4 |
+| <kbd>Cmd</kbd> + <kbd>0</kbd> / <kbd>Ctrl</kbd> + <kbd>0</kbd> | 转换为普通段落 |
+| <kbd>Cmd</kbd> + <kbd>]</kbd> / <kbd>Ctrl</kbd> + <kbd>]</kbd> | 增加标题级别（变小） |
+| <kbd>Cmd</kbd> + <kbd>[</kbd> / <kbd>Ctrl</kbd> + <kbd>[</kbd> | 降低标题级别（变大） |
+| <kbd>Option</kbd> + <kbd>Q</kbd> / <kbd>Alt</kbd> + <kbd>Q</kbd> | 引用块 |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>O</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>O</kbd> | 有序列表 |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>U</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd> | 无序列表 |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>S</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd> | 任务列表 |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>C</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd> | 代码块 |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>T</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd> | 表格 |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>/</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>/</kbd> | 分割线 |
+| <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> | 选择当前行 |
+| <kbd>Cmd</kbd> + <kbd>D</kbd> / <kbd>Ctrl</kbd> + <kbd>D</kbd> | 选择当前单词/汉字 |
+| <kbd>Cmd</kbd> + <kbd>Z</kbd> / <kbd>Ctrl</kbd> + <kbd>Z</kbd> | 撤销 |
+| <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> | 重做 |
+
 ## API
 
 | 属性名                   | 类型                                                                 | 默认值    | 描述                                                                 |
@@ -220,7 +263,7 @@ export default () => {
 | `disabled`               | `boolean`                                                            | -         | 是否禁用输入字段                                                     |
 | `typing`                 | `boolean`                                                            | -         | 用户是否正在输入的状态标志                                           |
 | `allowEmptySubmit`       | `boolean`                                                            | `false`   | 是否允许在内容为空时也触发发送                                       |
-| `triggerSendKey`         | `'Enter'`                                                            | `'Enter'` | **已废弃**。触发发送操作的键盘快捷键（Enter 发送，Shift+Enter 换行） |
+| `triggerSendKey`         | `'Enter' \| 'Mod+Enter'`                             | `'Enter'` | 触发发送操作的键盘快捷键 |
 | `onSend`                 | `(value: string) => Promise<void>`                                   | -         | 当内容发送时触发的异步回调函数                                       |
 | `onStop`                 | `() => void`                                                         | -         | 正在输入中时点击发送按钮的回调函数                                   |
 | `onFocus`                | `(value: string, schema: Elements[], e: FocusEvent) => void`         | -         | 当输入字段获得焦点时触发的回调函数                                   |
