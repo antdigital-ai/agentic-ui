@@ -129,7 +129,7 @@ Use `|` to separate cells, and `-` to separate headers and content.
 
 Use three or more `-`, `*`, or `_`.
 
-**Quick Input Tip**: Type `---`, `***`, or `___` at the beginning of a line followed by a **Space** to automatically convert it to a horizontal rule.
+**Quick Input Tip**: Type `---`, `***`, or `___` at the beginning of a line (except the very first line of the document) followed by a **Space** to automatically convert it to a horizontal rule.
 
 ```markdown
 ---
