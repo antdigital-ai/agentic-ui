@@ -15,6 +15,8 @@ This document introduces common Markdown syntax to help you get started with wri
 
 Use `#` to denote headers level 1-6.
 
+**Quick Input Tip**: Type 1-6 `#` characters at the beginning of a line followed by a **Space** to automatically convert it to the corresponding header style.
+
 ```markdown
 # Header 1
 
