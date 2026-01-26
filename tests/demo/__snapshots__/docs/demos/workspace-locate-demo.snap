@@ -1,0 +1,2133 @@
+<DocumentFragment>
+  <div
+    class="ant-app"
+  >
+    <div>
+      test
+    </div>
+    <div
+      style="padding: 12px;"
+    >
+      <style>
+        
+@keyframes flash-shadow {
+  0%, 100% {
+    box-shadow: -5.23px -3.23px 12px 0 rgba(229, 255, 115, 40%),
+      4.23px 5.23px 16px 0 rgba(0, 206, 255, 24.12%);
+  }
+
+  50% {
+    box-shadow: none;
+  }
+}
+
+.workspace-file-locate-chat-file {
+  border-radius: 12px;
+}
+
+.workspace-file-locate-chat-file--highlight {
+}
+
+/* 仅高亮 Bubble 内部的“文件卡片”区域（FileMapViewItem / Image） */
+.workspace-file-locate-chat-file--highlight .ant-agentic-md-editor-file-view-list-item,
+.workspace-file-locate-chat-file--highlight .ant-agentic-md-editor-file-view-list-image {
+  animation-name: flash-shadow;
+  animation-duration: 1500ms;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 3;
+}
+
+/* 网页卡片高亮：只高亮卡片本体 */
+.workspace-browser-locate-web-list--highlight .visual-list-container {
+  animation-name: flash-shadow;
+  animation-duration: 1500ms;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 3;
+}
+        
+      </style>
+      <div
+        style="display: flex; gap: 16px; height: 600px; max-height: 600px;"
+      >
+        <div
+          style="flex: 1 1 0%; min-width: 0; border: 1px solid rgb(240, 240, 240); border-radius: 8px; background: rgb(255, 255, 255); display: flex; flex-direction: column;"
+        >
+          <div
+            style="padding: 12px 12px 8px; border-bottom: 1px solid rgb(240, 240, 240); font-weight: 600;"
+          >
+            对话
+          </div>
+          <div
+            style="padding: 12px; overflow: auto; flex: 1 1 0%;"
+          >
+            <div
+              style="display: flex; flex-direction: column; gap: 12px;"
+            >
+              <div>
+                <div
+                  class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+                  style="gap: 12px;"
+                >
+                  <div
+                    class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+                  >
+                    <div
+                      class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+                    >
+                      <span
+                        class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                        data-testid="bubble-avatar"
+                        style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                      >
+                        <img
+                          alt="avatar"
+                          src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                        />
+                      </span>
+                      <div
+                        class="ant-agentic-bubble-title ant-flex"
+                        data-testid="bubble-title"
+                        style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                      >
+                        <span>
+                          Ant Design Assistant
+                        </span>
+                        <time
+                          class="ant-agentic-bubble-title-time"
+                          data-testid="bubble-time"
+                        >
+                          2024-02-27 17:20:00
+                        </time>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                      data-testid="chat-message"
+                      style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+                    >
+                      <div
+                        class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                        data-testid="message-content"
+                        style="min-width: 0px;"
+                      >
+                        <div
+                          style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                        >
+                          <div
+                            class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                            style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                          >
+                            <div
+                              class="ant-agentic-md-editor-container"
+                              style="height: 100%;"
+                              tabindex="-1"
+                            >
+                              <div
+                                autocapitalize="false"
+                                autocorrect="false"
+                                class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                                contenteditable="false"
+                                data-slate-editor="true"
+                                data-slate-node="value"
+                                spellcheck="false"
+                                style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                                translate="no"
+                                zindex="-1"
+                              >
+                                <div
+                                  class=""
+                                  data-be="paragraph"
+                                  data-slate-node="element"
+                                >
+                                  <span
+                                    data-slate-node="text"
+                                  >
+                                    <span
+                                      data-be="text"
+                                      data-slate-leaf="true"
+                                      draggable="false"
+                                    >
+                                      <span
+                                        data-slate-string="true"
+                                      >
+                                        我已经整理了需要的材料。
+                                      </span>
+                                    </span>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            class="ant-chat-item-extra"
+                            style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                          >
+                            <div
+                              animate="visible"
+                              class="ant-chat-item-extra-action-box"
+                              initial="hidden"
+                              style="display: flex; gap: 8px; align-items: center;"
+                              variants="[object Object]"
+                              whileinview="visible"
+                            >
+                              <span
+                                aria-describedby="test-id"
+                                aria-label="复制"
+                                class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                data-testid="chat-item-copy-button"
+                                data-title="复制"
+                                role="button"
+                                tabindex="0"
+                              >
+                                <div
+                                  aria-hidden="true"
+                                  class="ant-bubble-actions-lottie"
+                                  data-autoplay="false"
+                                  data-loop="false"
+                                  data-testid="lottie-animation"
+                                  lottieref="[object Object]"
+                                  style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                                />
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div
+                  class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+                  style="gap: 12px;"
+                >
+                  <div
+                    class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+                  >
+                    <div
+                      class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+                    >
+                      <span
+                        class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                        data-testid="bubble-avatar"
+                        style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                      >
+                        <img
+                          alt="avatar"
+                          src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                        />
+                      </span>
+                      <div
+                        class="ant-agentic-bubble-title ant-flex"
+                        data-testid="bubble-title"
+                        style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                      >
+                        <span>
+                          Ant Design Assistant
+                        </span>
+                        <time
+                          class="ant-agentic-bubble-title-time"
+                          data-testid="bubble-time"
+                        >
+                          2024-02-27 17:20:00
+                        </time>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                      data-testid="chat-message"
+                      style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+                    >
+                      <div
+                        class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                        data-testid="message-content"
+                        style="min-width: 0px;"
+                      >
+                        <div
+                          style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                        >
+                          <div
+                            class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                            style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                          >
+                            <div
+                              class="ant-agentic-md-editor-container"
+                              style="height: 100%;"
+                              tabindex="-1"
+                            >
+                              <div
+                                autocapitalize="false"
+                                autocorrect="false"
+                                class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                                contenteditable="false"
+                                data-slate-editor="true"
+                                data-slate-node="value"
+                                spellcheck="false"
+                                style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                                translate="no"
+                                zindex="-1"
+                              >
+                                <div
+                                  class=""
+                                  data-be="paragraph"
+                                  data-slate-node="element"
+                                >
+                                  <span
+                                    data-slate-node="text"
+                                  >
+                                    <span
+                                      data-be="text"
+                                      data-slate-leaf="true"
+                                      draggable="false"
+                                    >
+                                      <span
+                                        data-slate-string="true"
+                                      >
+                                        这里是需求文档，后续实现会按这个来。
+                                      </span>
+                                    </span>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            class="ant-chat-item-extra"
+                            style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                          >
+                            <div
+                              animate="visible"
+                              class="ant-chat-item-extra-action-box"
+                              initial="hidden"
+                              style="display: flex; gap: 8px; align-items: center;"
+                              variants="[object Object]"
+                              whileinview="visible"
+                            >
+                              <span
+                                aria-describedby="test-id"
+                                aria-label="复制"
+                                class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                data-testid="chat-item-copy-button"
+                                data-title="复制"
+                                role="button"
+                                tabindex="0"
+                              >
+                                <div
+                                  aria-hidden="true"
+                                  class="ant-bubble-actions-lottie"
+                                  data-autoplay="false"
+                                  data-loop="false"
+                                  data-testid="lottie-animation"
+                                  lottieref="[object Object]"
+                                  style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                                />
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="display: flex; justify-content: flex-start; margin-top: 8px;"
+                >
+                  <div
+                    class="workspace-file-locate-chat-file"
+                    id="chat-file-file-1"
+                    style="width: min(520px, 90%);"
+                  >
+                    <div
+                      class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+                      style="gap: 12px;"
+                    >
+                      <div
+                        class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+                      >
+                        <div
+                          class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+                        >
+                          <span
+                            class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                            data-testid="bubble-avatar"
+                            style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                          >
+                            <img
+                              alt="avatar"
+                              src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                            />
+                          </span>
+                          <div
+                            class="ant-agentic-bubble-title ant-flex"
+                            data-testid="bubble-title"
+                            style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                          >
+                            <span>
+                              Ant Design Assistant
+                            </span>
+                            <time
+                              class="ant-agentic-bubble-title-time"
+                              data-testid="bubble-time"
+                            >
+                              2024-02-27 17:20:00
+                            </time>
+                          </div>
+                        </div>
+                        <div
+                          class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                          data-testid="chat-message"
+                          style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+                        >
+                          <div
+                            class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                            data-testid="message-content"
+                            style="min-width: 0px;"
+                          >
+                            <div
+                              style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                            >
+                              <div
+                                class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                                style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                              >
+                                <div
+                                  class="ant-agentic-md-editor-container"
+                                  style="height: 100%;"
+                                  tabindex="-1"
+                                >
+                                  <div
+                                    autocapitalize="false"
+                                    autocorrect="false"
+                                    class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                                    contenteditable="false"
+                                    data-slate-editor="true"
+                                    data-slate-node="value"
+                                    spellcheck="false"
+                                    style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                                    translate="no"
+                                    zindex="-1"
+                                  >
+                                    <div
+                                      class=""
+                                      data-be="paragraph"
+                                      data-slate-node="element"
+                                    >
+                                      <span
+                                        data-slate-node="text"
+                                      >
+                                        <span
+                                          data-be="text"
+                                          data-slate-leaf="true"
+                                          draggable="false"
+                                        >
+                                          <span
+                                            data-slate-string="true"
+                                          >
+                                            这里是文件：项目需求文档.docx
+                                          </span>
+                                        </span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                class="ant-agentic-bubble-after ant-agentic-bubble-after-left ant-agentic-bubble-after-ai"
+                                data-testid="message-after"
+                                style="min-width: 0px; padding-left: 12px; max-width: 100%; width: 100%;"
+                              >
+                                <div
+                                  style="display: flex; flex-direction: column; gap: 4px; max-width: 100%; min-width: 0; align-items: flex-start; width: max-content;"
+                                >
+                                  <div
+                                    animate="visible"
+                                    class="ant-agentic-md-editor-file-view-list ant-agentic-md-editor-file-view-list-left"
+                                    initial="hidden"
+                                    variants="[object Object]"
+                                    whileinview="visible"
+                                  />
+                                  <div
+                                    animate="visible"
+                                    class="ant-agentic-md-editor-file-view-list ant-agentic-md-editor-file-view-list-left ant-agentic-md-editor-file-view-list-vertical"
+                                    initial="hidden"
+                                    variants="[object Object]"
+                                    whileinview="visible"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      class="ant-agentic-md-editor-file-view-list-item"
+                                      data-testid="file-item"
+                                      exit="[object Object]"
+                                      variants="[object Object]"
+                                    >
+                                      <div
+                                        class="ant-agentic-md-editor-file-view-list-item-file-icon"
+                                      >
+                                        <svg
+                                          class="sofa-icons-icon"
+                                          fill="none"
+                                          height="1em"
+                                          style="vertical-align: -0.125em;"
+                                          viewBox="0 0 24 24"
+                                          width="1em"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M8 2h7l5 5v11c0 1.4-.003 2.116-.279 2.649a2.5 2.5 0 0 1-1.072 1.072C18.116 21.997 17.4 22 16 22H8c-1.4 0-2.116-.003-2.649-.279a2.5 2.5 0 0 1-1.072-1.072C4.003 20.116 4 19.4 4 18V6c0-1.4.003-2.116.279-2.649A2.5 2.5 0 0 1 5.351 2.28C5.884 2.003 6.6 2 8 2m2.966 13.5h-1.71L7.897 9.254h1.431l.9 4.617h.054l.954-4.014h1.584l.9 4.014h.054l.918-4.617h1.413l-1.43 6.246h-1.71L12 11.54h-.054z"
+                                            fill="#1677FF"
+                                            fill-rule="evenodd"
+                                          />
+                                          <path
+                                            d="m15 2 5 5h-3c-.7 0-1.058-.001-1.324-.14a1.26 1.26 0 0 1-.536-.536C15 6.058 15 5.7 15 5z"
+                                            fill="#BCD4F6"
+                                            fill-rule="evenodd"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <div
+                                        class="ant-agentic-md-editor-file-view-list-item-file-info"
+                                      >
+                                        <div
+                                          class="ant-agentic-md-editor-file-view-list-item-file-name"
+                                        >
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-file-name-text"
+                                            title="项目需求文档.docx"
+                                          >
+                                            项目需求文档
+                                          </span>
+                                        </div>
+                                        <div
+                                          class="ant-agentic-md-editor-file-view-list-item-file-name-extension-container"
+                                        >
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-file-name-extension"
+                                          >
+                                            docx
+                                          </span>
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-separator"
+                                          >
+                                            |
+                                          </span>
+                                          <div
+                                            class="ant-agentic-md-editor-file-view-list-item-file-size"
+                                          >
+                                            1 MB
+                                          </div>
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-separator"
+                                          >
+                                            |
+                                          </span>
+                                          <div>
+                                            09:50
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                class="ant-chat-item-extra"
+                                style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                              >
+                                <div
+                                  animate="visible"
+                                  class="ant-chat-item-extra-action-box"
+                                  initial="hidden"
+                                  style="display: flex; gap: 8px; align-items: center;"
+                                  variants="[object Object]"
+                                  whileinview="visible"
+                                >
+                                  <span
+                                    aria-describedby="test-id"
+                                    aria-label="复制"
+                                    class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                    data-testid="chat-item-copy-button"
+                                    data-title="复制"
+                                    role="button"
+                                    tabindex="0"
+                                  >
+                                    <div
+                                      aria-hidden="true"
+                                      class="ant-bubble-actions-lottie"
+                                      data-autoplay="false"
+                                      data-loop="false"
+                                      data-testid="lottie-animation"
+                                      lottieref="[object Object]"
+                                      style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                                    />
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div
+                  class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user ant-flex ant-flex-align-stretch ant-flex-vertical"
+                  style="gap: 12px;"
+                >
+                  <div
+                    class="ant-agentic-bubble-container"
+                  >
+                    <div
+                      class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user"
+                      data-testid="chat-message"
+                      style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+                    >
+                      <div
+                        class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+                      >
+                        <div
+                          class="ant-agentic-bubble-title ant-flex"
+                          data-testid="bubble-title"
+                          style="flex-direction: row-reverse; display: flex; align-items: center; gap: 8px;"
+                        >
+                          <time
+                            class="ant-agentic-bubble-title-time"
+                            data-testid="bubble-time"
+                          >
+                            2024-02-27 17:20:00
+                          </time>
+                        </div>
+                      </div>
+                      <div
+                        class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user"
+                        data-testid="message-content"
+                        style="min-width: 0px;"
+                      >
+                        <div
+                          class="agent-item-default-content ant-agentic-ui-messages-content-message"
+                          data-testid="message-box-content"
+                        >
+                          <div
+                            aria-describedby="test-id"
+                            style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                          >
+                            <div
+                              class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                              style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                            >
+                              <div
+                                class="ant-agentic-md-editor-container"
+                                style="height: 100%; color: rgb(52, 58, 69);"
+                                tabindex="-1"
+                              >
+                                <div
+                                  autocapitalize="false"
+                                  autocorrect="false"
+                                  class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                                  contenteditable="false"
+                                  data-slate-editor="true"
+                                  data-slate-node="value"
+                                  spellcheck="false"
+                                  style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                                  translate="no"
+                                  zindex="-1"
+                                >
+                                  <div
+                                    class=""
+                                    data-be="paragraph"
+                                    data-slate-node="element"
+                                  >
+                                    <span
+                                      data-slate-node="text"
+                                    >
+                                      <span
+                                        data-be="text"
+                                        data-slate-leaf="true"
+                                        draggable="false"
+                                      >
+                                        <span
+                                          data-slate-string="true"
+                                        >
+                                          好的，麻烦把关键点再列一下。
+                                        </span>
+                                      </span>
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div
+                  class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+                  style="gap: 12px;"
+                >
+                  <div
+                    class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+                  >
+                    <div
+                      class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+                    >
+                      <span
+                        class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                        data-testid="bubble-avatar"
+                        style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                      >
+                        <img
+                          alt="avatar"
+                          src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                        />
+                      </span>
+                      <div
+                        class="ant-agentic-bubble-title ant-flex"
+                        data-testid="bubble-title"
+                        style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                      >
+                        <span>
+                          Ant Design Assistant
+                        </span>
+                        <time
+                          class="ant-agentic-bubble-title-time"
+                          data-testid="bubble-time"
+                        >
+                          2024-02-27 17:20:00
+                        </time>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                      data-testid="chat-message"
+                      style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+                    >
+                      <div
+                        class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                        data-testid="message-content"
+                        style="min-width: 0px;"
+                      >
+                        <div
+                          style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                        >
+                          <div
+                            class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                            style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                          >
+                            <div
+                              class="ant-agentic-md-editor-container"
+                              style="height: 100%;"
+                              tabindex="-1"
+                            >
+                              <div
+                                autocapitalize="false"
+                                autocorrect="false"
+                                class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                                contenteditable="false"
+                                data-slate-editor="true"
+                                data-slate-node="value"
+                                spellcheck="false"
+                                style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                                translate="no"
+                                zindex="-1"
+                              >
+                                <div
+                                  class=""
+                                  data-be="paragraph"
+                                  data-slate-node="element"
+                                >
+                                  <span
+                                    data-slate-node="text"
+                                  >
+                                    <span
+                                      data-be="text"
+                                      data-slate-leaf="true"
+                                      draggable="false"
+                                    >
+                                      <span
+                                        data-slate-string="true"
+                                      >
+                                        我补充了会议纪要，包含决策与待办。
+                                      </span>
+                                    </span>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            class="ant-chat-item-extra"
+                            style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                          >
+                            <div
+                              animate="visible"
+                              class="ant-chat-item-extra-action-box"
+                              initial="hidden"
+                              style="display: flex; gap: 8px; align-items: center;"
+                              variants="[object Object]"
+                              whileinview="visible"
+                            >
+                              <span
+                                aria-describedby="test-id"
+                                aria-label="复制"
+                                class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                data-testid="chat-item-copy-button"
+                                data-title="复制"
+                                role="button"
+                                tabindex="0"
+                              >
+                                <div
+                                  aria-hidden="true"
+                                  class="ant-bubble-actions-lottie"
+                                  data-autoplay="false"
+                                  data-loop="false"
+                                  data-testid="lottie-animation"
+                                  lottieref="[object Object]"
+                                  style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                                />
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="display: flex; justify-content: flex-start; margin-top: 8px;"
+                >
+                  <div
+                    class="workspace-file-locate-chat-file"
+                    id="chat-file-file-2"
+                    style="width: min(520px, 90%);"
+                  >
+                    <div
+                      class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+                      style="gap: 12px;"
+                    >
+                      <div
+                        class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+                      >
+                        <div
+                          class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+                        >
+                          <span
+                            class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                            data-testid="bubble-avatar"
+                            style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                          >
+                            <img
+                              alt="avatar"
+                              src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                            />
+                          </span>
+                          <div
+                            class="ant-agentic-bubble-title ant-flex"
+                            data-testid="bubble-title"
+                            style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                          >
+                            <span>
+                              Ant Design Assistant
+                            </span>
+                            <time
+                              class="ant-agentic-bubble-title-time"
+                              data-testid="bubble-time"
+                            >
+                              2024-02-27 17:20:00
+                            </time>
+                          </div>
+                        </div>
+                        <div
+                          class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                          data-testid="chat-message"
+                          style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+                        >
+                          <div
+                            class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                            data-testid="message-content"
+                            style="min-width: 0px;"
+                          >
+                            <div
+                              style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                            >
+                              <div
+                                class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                                style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                              >
+                                <div
+                                  class="ant-agentic-md-editor-container"
+                                  style="height: 100%;"
+                                  tabindex="-1"
+                                >
+                                  <div
+                                    autocapitalize="false"
+                                    autocorrect="false"
+                                    class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                                    contenteditable="false"
+                                    data-slate-editor="true"
+                                    data-slate-node="value"
+                                    spellcheck="false"
+                                    style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                                    translate="no"
+                                    zindex="-1"
+                                  >
+                                    <div
+                                      class=""
+                                      data-be="paragraph"
+                                      data-slate-node="element"
+                                    >
+                                      <span
+                                        data-slate-node="text"
+                                      >
+                                        <span
+                                          data-be="text"
+                                          data-slate-leaf="true"
+                                          draggable="false"
+                                        >
+                                          <span
+                                            data-slate-string="true"
+                                          >
+                                            这里是文件：会议纪要.docx
+                                          </span>
+                                        </span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                class="ant-agentic-bubble-after ant-agentic-bubble-after-left ant-agentic-bubble-after-ai"
+                                data-testid="message-after"
+                                style="min-width: 0px; padding-left: 12px; max-width: 100%; width: 100%;"
+                              >
+                                <div
+                                  style="display: flex; flex-direction: column; gap: 4px; max-width: 100%; min-width: 0; align-items: flex-start; width: max-content;"
+                                >
+                                  <div
+                                    animate="visible"
+                                    class="ant-agentic-md-editor-file-view-list ant-agentic-md-editor-file-view-list-left"
+                                    initial="hidden"
+                                    variants="[object Object]"
+                                    whileinview="visible"
+                                  />
+                                  <div
+                                    animate="visible"
+                                    class="ant-agentic-md-editor-file-view-list ant-agentic-md-editor-file-view-list-left ant-agentic-md-editor-file-view-list-vertical"
+                                    initial="hidden"
+                                    variants="[object Object]"
+                                    whileinview="visible"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      class="ant-agentic-md-editor-file-view-list-item"
+                                      data-testid="file-item"
+                                      exit="[object Object]"
+                                      variants="[object Object]"
+                                    >
+                                      <div
+                                        class="ant-agentic-md-editor-file-view-list-item-file-icon"
+                                      >
+                                        <svg
+                                          class="sofa-icons-icon"
+                                          fill="none"
+                                          height="1em"
+                                          style="vertical-align: -0.125em;"
+                                          viewBox="0 0 24 24"
+                                          width="1em"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M8 2h7l5 5v11c0 1.4-.003 2.116-.279 2.649a2.5 2.5 0 0 1-1.072 1.072C18.116 21.997 17.4 22 16 22H8c-1.4 0-2.116-.003-2.649-.279a2.5 2.5 0 0 1-1.072-1.072C4.003 20.116 4 19.4 4 18V6c0-1.4.003-2.116.279-2.649A2.5 2.5 0 0 1 5.351 2.28C5.884 2.003 6.6 2 8 2m2.966 13.5h-1.71L7.897 9.254h1.431l.9 4.617h.054l.954-4.014h1.584l.9 4.014h.054l.918-4.617h1.413l-1.43 6.246h-1.71L12 11.54h-.054z"
+                                            fill="#1677FF"
+                                            fill-rule="evenodd"
+                                          />
+                                          <path
+                                            d="m15 2 5 5h-3c-.7 0-1.058-.001-1.324-.14a1.26 1.26 0 0 1-.536-.536C15 6.058 15 5.7 15 5z"
+                                            fill="#BCD4F6"
+                                            fill-rule="evenodd"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <div
+                                        class="ant-agentic-md-editor-file-view-list-item-file-info"
+                                      >
+                                        <div
+                                          class="ant-agentic-md-editor-file-view-list-item-file-name"
+                                        >
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-file-name-text"
+                                            title="会议纪要.docx"
+                                          >
+                                            会议纪要
+                                          </span>
+                                        </div>
+                                        <div
+                                          class="ant-agentic-md-editor-file-view-list-item-file-name-extension-container"
+                                        >
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-file-name-extension"
+                                          >
+                                            docx
+                                          </span>
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-separator"
+                                          >
+                                            |
+                                          </span>
+                                          <div
+                                            class="ant-agentic-md-editor-file-view-list-item-file-size"
+                                          >
+                                            1 MB
+                                          </div>
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-separator"
+                                          >
+                                            |
+                                          </span>
+                                          <div>
+                                            09:50
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                class="ant-chat-item-extra"
+                                style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                              >
+                                <div
+                                  animate="visible"
+                                  class="ant-chat-item-extra-action-box"
+                                  initial="hidden"
+                                  style="display: flex; gap: 8px; align-items: center;"
+                                  variants="[object Object]"
+                                  whileinview="visible"
+                                >
+                                  <span
+                                    aria-describedby="test-id"
+                                    aria-label="复制"
+                                    class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                    data-testid="chat-item-copy-button"
+                                    data-title="复制"
+                                    role="button"
+                                    tabindex="0"
+                                  >
+                                    <div
+                                      aria-hidden="true"
+                                      class="ant-bubble-actions-lottie"
+                                      data-autoplay="false"
+                                      data-loop="false"
+                                      data-testid="lottie-animation"
+                                      lottieref="[object Object]"
+                                      style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                                    />
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div
+                  class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+                  style="gap: 12px;"
+                >
+                  <div
+                    class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+                  >
+                    <div
+                      class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+                    >
+                      <span
+                        class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                        data-testid="bubble-avatar"
+                        style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                      >
+                        <img
+                          alt="avatar"
+                          src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                        />
+                      </span>
+                      <div
+                        class="ant-agentic-bubble-title ant-flex"
+                        data-testid="bubble-title"
+                        style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                      >
+                        <span>
+                          Ant Design Assistant
+                        </span>
+                        <time
+                          class="ant-agentic-bubble-title-time"
+                          data-testid="bubble-time"
+                        >
+                          2024-02-27 17:20:00
+                        </time>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                      data-testid="chat-message"
+                      style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+                    >
+                      <div
+                        class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                        data-testid="message-content"
+                        style="min-width: 0px;"
+                      >
+                        <div
+                          style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                        >
+                          <div
+                            class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                            style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                          >
+                            <div
+                              class="ant-agentic-md-editor-container"
+                              style="height: 100%;"
+                              tabindex="-1"
+                            >
+                              <div
+                                autocapitalize="false"
+                                autocorrect="false"
+                                class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                                contenteditable="false"
+                                data-slate-editor="true"
+                                data-slate-node="value"
+                                spellcheck="false"
+                                style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                                translate="no"
+                                zindex="-1"
+                              >
+                                <div
+                                  class=""
+                                  data-be="paragraph"
+                                  data-slate-node="element"
+                                >
+                                  <span
+                                    data-slate-node="text"
+                                  >
+                                    <span
+                                      data-be="text"
+                                      data-slate-leaf="true"
+                                      draggable="false"
+                                    >
+                                      <span
+                                        data-slate-string="true"
+                                      >
+                                        产品说明书也在这里，便于查阅细节。
+                                      </span>
+                                    </span>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            class="ant-chat-item-extra"
+                            style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                          >
+                            <div
+                              animate="visible"
+                              class="ant-chat-item-extra-action-box"
+                              initial="hidden"
+                              style="display: flex; gap: 8px; align-items: center;"
+                              variants="[object Object]"
+                              whileinview="visible"
+                            >
+                              <span
+                                aria-describedby="test-id"
+                                aria-label="复制"
+                                class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                data-testid="chat-item-copy-button"
+                                data-title="复制"
+                                role="button"
+                                tabindex="0"
+                              >
+                                <div
+                                  aria-hidden="true"
+                                  class="ant-bubble-actions-lottie"
+                                  data-autoplay="false"
+                                  data-loop="false"
+                                  data-testid="lottie-animation"
+                                  lottieref="[object Object]"
+                                  style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                                />
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="display: flex; justify-content: flex-start; margin-top: 8px;"
+                >
+                  <div
+                    class="workspace-file-locate-chat-file"
+                    id="chat-file-file-3"
+                    style="width: min(520px, 90%);"
+                  >
+                    <div
+                      class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+                      style="gap: 12px;"
+                    >
+                      <div
+                        class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+                      >
+                        <div
+                          class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+                        >
+                          <span
+                            class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                            data-testid="bubble-avatar"
+                            style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                          >
+                            <img
+                              alt="avatar"
+                              src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                            />
+                          </span>
+                          <div
+                            class="ant-agentic-bubble-title ant-flex"
+                            data-testid="bubble-title"
+                            style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                          >
+                            <span>
+                              Ant Design Assistant
+                            </span>
+                            <time
+                              class="ant-agentic-bubble-title-time"
+                              data-testid="bubble-time"
+                            >
+                              2024-02-27 17:20:00
+                            </time>
+                          </div>
+                        </div>
+                        <div
+                          class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                          data-testid="chat-message"
+                          style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+                        >
+                          <div
+                            class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                            data-testid="message-content"
+                            style="min-width: 0px;"
+                          >
+                            <div
+                              style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                            >
+                              <div
+                                class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                                style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                              >
+                                <div
+                                  class="ant-agentic-md-editor-container"
+                                  style="height: 100%;"
+                                  tabindex="-1"
+                                >
+                                  <div
+                                    autocapitalize="false"
+                                    autocorrect="false"
+                                    class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                                    contenteditable="false"
+                                    data-slate-editor="true"
+                                    data-slate-node="value"
+                                    spellcheck="false"
+                                    style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                                    translate="no"
+                                    zindex="-1"
+                                  >
+                                    <div
+                                      class=""
+                                      data-be="paragraph"
+                                      data-slate-node="element"
+                                    >
+                                      <span
+                                        data-slate-node="text"
+                                      >
+                                        <span
+                                          data-be="text"
+                                          data-slate-leaf="true"
+                                          draggable="false"
+                                        >
+                                          <span
+                                            data-slate-string="true"
+                                          >
+                                            这里是文件：产品说明书.pdf
+                                          </span>
+                                        </span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                class="ant-agentic-bubble-after ant-agentic-bubble-after-left ant-agentic-bubble-after-ai"
+                                data-testid="message-after"
+                                style="min-width: 0px; padding-left: 12px; max-width: 100%; width: 100%;"
+                              >
+                                <div
+                                  style="display: flex; flex-direction: column; gap: 4px; max-width: 100%; min-width: 0; align-items: flex-start; width: max-content;"
+                                >
+                                  <div
+                                    animate="visible"
+                                    class="ant-agentic-md-editor-file-view-list ant-agentic-md-editor-file-view-list-left"
+                                    initial="hidden"
+                                    variants="[object Object]"
+                                    whileinview="visible"
+                                  />
+                                  <div
+                                    animate="visible"
+                                    class="ant-agentic-md-editor-file-view-list ant-agentic-md-editor-file-view-list-left ant-agentic-md-editor-file-view-list-vertical"
+                                    initial="hidden"
+                                    variants="[object Object]"
+                                    whileinview="visible"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      class="ant-agentic-md-editor-file-view-list-item"
+                                      data-testid="file-item"
+                                      exit="[object Object]"
+                                      variants="[object Object]"
+                                    >
+                                      <div
+                                        class="ant-agentic-md-editor-file-view-list-item-file-icon"
+                                      >
+                                        <svg
+                                          class="sofa-icons-icon"
+                                          fill="none"
+                                          height="1em"
+                                          style="vertical-align: -0.125em;"
+                                          viewBox="0 0 24 24"
+                                          width="1em"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M8 2h7l5 5v11c0 1.4-.003 2.116-.279 2.649a2.5 2.5 0 0 1-1.072 1.072C18.116 21.997 17.4 22 16 22H8c-1.4 0-2.116-.003-2.649-.279a2.5 2.5 0 0 1-1.072-1.072C4.003 20.116 4 19.4 4 18V6c0-1.4.003-2.116.279-2.649A2.5 2.5 0 0 1 5.351 2.28C5.884 2.003 6.6 2 8 2m6.23 11.368a9.6 9.6 0 0 1 1.495-.09c.643.021 1.117.143 1.375.396.25.249.341.699.225 1.087-.132.442-.498.722-1.04.722-.655 0-1.63-.296-2.472-.747-.485.083-1.019.228-1.723.457-.163.053-.327.108-.554.184l-.358.122-.333.11c-.986 1.695-1.88 2.445-2.608 2.388a.9.9 0 0 1-.688-.414c-.14-.209-.202-.465-.162-.66.085-.422.392-.823.883-1.214.372-.295.815-.562 1.384-.856.426-.75 1.061-2.093 1.542-3.239-.377-1.461-.482-2.318-.304-2.97.11-.402.538-.662 1.003-.643.499.02.895.348.994.907q.08.39.055.843c-.02.402-.09.8-.22 1.346l-.069.288c.35.911.843 1.532 1.575 1.983m-1.99-2.675.145-.12c.235-.196.38-.644.366-1.074-.016-.49-.214-.815-.647-.815-.309 0-.386.275-.34.733.04.402.186.848.386 1.144zm-.32 1.518-.046.122c-.37.978-.714 1.756-1.086 2.403l-.085.147.159-.06c.173-.067.836-.338.836-.339l-.004.002c.627-.253 1.085-.406 1.577-.507l.132-.027-.109-.08c-.502-.373-.959-.906-1.311-1.546zm4.701 2.844c-.236.17-.746.018-1.643-.683l-.228-.178.247-.033c.702-.095 1.2-.024 1.489.17a.57.57 0 0 1 .242.306c.04.128.021.265-.041.347a.2.2 0 0 1-.066.07m-8.366 2.092v-.011l.004-.01q.058-.154.169-.324.195-.296.526-.629c.118-.119.241-.235.385-.365l.277-.248.337-.314-.245.39c-.371.591-.706 1.017-.994 1.295a2 2 0 0 1-.274.226.5.5 0 0 1-.079.043.1.1 0 0 1-.034.01.1.1 0 0 1-.033-.006.06.06 0 0 1-.039-.057"
+                                            fill="#FF4D4F"
+                                            fill-rule="evenodd"
+                                          />
+                                          <path
+                                            d="m15 2 5 5h-3c-.7 0-1.058-.001-1.324-.14a1.26 1.26 0 0 1-.536-.536C15 6.058 15 5.7 15 5z"
+                                            fill="#F8BBBF"
+                                            fill-rule="evenodd"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <div
+                                        class="ant-agentic-md-editor-file-view-list-item-file-info"
+                                      >
+                                        <div
+                                          class="ant-agentic-md-editor-file-view-list-item-file-name"
+                                        >
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-file-name-text"
+                                            title="产品说明书.pdf"
+                                          >
+                                            产品说明书
+                                          </span>
+                                        </div>
+                                        <div
+                                          class="ant-agentic-md-editor-file-view-list-item-file-name-extension-container"
+                                        >
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-file-name-extension"
+                                          >
+                                            pdf
+                                          </span>
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-separator"
+                                          >
+                                            |
+                                          </span>
+                                          <div
+                                            class="ant-agentic-md-editor-file-view-list-item-file-size"
+                                          >
+                                            1 MB
+                                          </div>
+                                          <span
+                                            class="ant-agentic-md-editor-file-view-list-item-separator"
+                                          >
+                                            |
+                                          </span>
+                                          <div>
+                                            09:50
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                class="ant-chat-item-extra"
+                                style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                              >
+                                <div
+                                  animate="visible"
+                                  class="ant-chat-item-extra-action-box"
+                                  initial="hidden"
+                                  style="display: flex; gap: 8px; align-items: center;"
+                                  variants="[object Object]"
+                                  whileinview="visible"
+                                >
+                                  <span
+                                    aria-describedby="test-id"
+                                    aria-label="复制"
+                                    class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                    data-testid="chat-item-copy-button"
+                                    data-title="复制"
+                                    role="button"
+                                    tabindex="0"
+                                  >
+                                    <div
+                                      aria-hidden="true"
+                                      class="ant-bubble-actions-lottie"
+                                      data-autoplay="false"
+                                      data-loop="false"
+                                      data-testid="lottie-animation"
+                                      lottieref="[object Object]"
+                                      style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                                    />
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div
+                  class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user ant-flex ant-flex-align-stretch ant-flex-vertical"
+                  style="gap: 12px;"
+                >
+                  <div
+                    class="ant-agentic-bubble-container"
+                  >
+                    <div
+                      class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user"
+                      data-testid="chat-message"
+                      style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+                    >
+                      <div
+                        class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+                      >
+                        <div
+                          class="ant-agentic-bubble-title ant-flex"
+                          data-testid="bubble-title"
+                          style="flex-direction: row-reverse; display: flex; align-items: center; gap: 8px;"
+                        >
+                          <time
+                            class="ant-agentic-bubble-title-time"
+                            data-testid="bubble-time"
+                          >
+                            2024-02-27 17:20:00
+                          </time>
+                        </div>
+                      </div>
+                      <div
+                        class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user"
+                        data-testid="message-content"
+                        style="min-width: 0px;"
+                      >
+                        <div
+                          class="agent-item-default-content ant-agentic-ui-messages-content-message"
+                          data-testid="message-box-content"
+                        >
+                          <div
+                            aria-describedby="test-id"
+                            style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                          >
+                            <div
+                              class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                              style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                            >
+                              <div
+                                class="ant-agentic-md-editor-container"
+                                style="height: 100%; color: rgb(52, 58, 69);"
+                                tabindex="-1"
+                              >
+                                <div
+                                  autocapitalize="false"
+                                  autocorrect="false"
+                                  class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                                  contenteditable="false"
+                                  data-slate-editor="true"
+                                  data-slate-node="value"
+                                  spellcheck="false"
+                                  style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                                  translate="no"
+                                  zindex="-1"
+                                >
+                                  <div
+                                    class=""
+                                    data-be="paragraph"
+                                    data-slate-node="element"
+                                  >
+                                    <span
+                                      data-slate-node="text"
+                                    >
+                                      <span
+                                        data-be="text"
+                                        data-slate-leaf="true"
+                                        draggable="false"
+                                      >
+                                        <span
+                                          data-slate-string="true"
+                                        >
+                                          收到。
+                                        </span>
+                                      </span>
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div
+                  class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+                  style="gap: 12px;"
+                >
+                  <div
+                    class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+                  >
+                    <div
+                      class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+                    >
+                      <span
+                        class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                        data-testid="bubble-avatar"
+                        style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                      >
+                        <img
+                          alt="avatar"
+                          src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                        />
+                      </span>
+                      <div
+                        class="ant-agentic-bubble-title ant-flex"
+                        data-testid="bubble-title"
+                        style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                      >
+                        <span>
+                          Ant Design Assistant
+                        </span>
+                        <time
+                          class="ant-agentic-bubble-title-time"
+                          data-testid="bubble-time"
+                        >
+                          2024-02-27 17:20:00
+                        </time>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                      data-testid="chat-message"
+                      style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+                    >
+                      <div
+                        class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                        data-testid="message-content"
+                        style="min-width: 0px;"
+                      >
+                        <div
+                          style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                        >
+                          <div
+                            class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                            style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                          >
+                            <div
+                              class="ant-agentic-md-editor-container"
+                              style="height: 100%;"
+                              tabindex="-1"
+                            >
+                              <div
+                                autocapitalize="false"
+                                autocorrect="false"
+                                class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                                contenteditable="false"
+                                data-slate-editor="true"
+                                data-slate-node="value"
+                                spellcheck="false"
+                                style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                                translate="no"
+                                zindex="-1"
+                              >
+                                <div
+                                  class=""
+                                  data-be="paragraph"
+                                  data-slate-node="element"
+                                >
+                                  <span
+                                    data-slate-node="text"
+                                  >
+                                    <span
+                                      data-be="text"
+                                      data-slate-leaf="true"
+                                      draggable="false"
+                                    >
+                                      <span
+                                        data-slate-string="true"
+                                      >
+                                        我在浏览器里整理了几条可参考的网页来源（可从右侧工作空间定位到这里）。
+                                      </span>
+                                    </span>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            id="chat-web-results"
+                            style="padding: 16px;"
+                          >
+                            <div
+                              class="visual-list-container visual-list-default"
+                            >
+                              <ul
+                                class="visual-list"
+                              >
+                                <li
+                                  class="visual-list-item visual-list-item-circle"
+                                >
+                                  <a
+                                    class="visual-list-link"
+                                    href="https://docs.example.com/product-manual"
+                                  >
+                                    <img
+                                      alt="产品说明书（PDF）下载与预览"
+                                      class="visual-list-image"
+                                      src="https://avatars.githubusercontent.com/u/507615?s=40&v=4"
+                                      title="产品说明书（PDF）下载与预览"
+                                    />
+                                  </a>
+                                </li>
+                                <li
+                                  class="visual-list-item visual-list-item-circle"
+                                >
+                                  <a
+                                    class="visual-list-link"
+                                    href="https://kb.example.com/params"
+                                  >
+                                    <img
+                                      alt="关键参数速查表（2026）"
+                                      class="visual-list-image"
+                                      src="https://avatars.githubusercontent.com/u/49217418?s=40&v=4"
+                                      title="关键参数速查表（2026）"
+                                    />
+                                  </a>
+                                </li>
+                                <li
+                                  class="visual-list-item visual-list-item-circle"
+                                >
+                                  <a
+                                    class="visual-list-link"
+                                    href="https://support.example.com/compat"
+                                  >
+                                    <img
+                                      alt="兼容性与约束说明"
+                                      class="visual-list-image"
+                                      src="https://avatars.githubusercontent.com/u/27722486?s=40&v=4"
+                                      title="兼容性与约束说明"
+                                    />
+                                  </a>
+                                </li>
+                                <li
+                                  class="visual-list-item visual-list-item-circle"
+                                >
+                                  <a
+                                    class="visual-list-link"
+                                    href="https://guide.example.com/pdf-reading"
+                                  >
+                                    <img
+                                      alt="PDF 阅读与标注最佳实践"
+                                      class="visual-list-image"
+                                      src="https://avatars.githubusercontent.com/u/5378891?s=40&v=4"
+                                      title="PDF 阅读与标注最佳实践"
+                                    />
+                                  </a>
+                                </li>
+                                <li
+                                  class="visual-list-item visual-list-item-circle"
+                                >
+                                  <a
+                                    class="visual-list-link"
+                                    href="https://faq.example.com/params"
+                                  >
+                                    <img
+                                      alt="产品参数 FAQ（常见问题）"
+                                      class="visual-list-image"
+                                      src="https://avatars.githubusercontent.com/u/3580607?s=40&v=4"
+                                      title="产品参数 FAQ（常见问题）"
+                                    />
+                                  </a>
+                                </li>
+                                <li
+                                  class="visual-list-item visual-list-item-circle"
+                                >
+                                  <a
+                                    class="visual-list-link"
+                                    href="https://wiki.example.com/meeting-notes"
+                                  >
+                                    <img
+                                      alt="会议纪要模板与最佳实践"
+                                      class="visual-list-image"
+                                      src="https://avatars.githubusercontent.com/u/13595509?s=40&v=4"
+                                      title="会议纪要模板与最佳实践"
+                                    />
+                                  </a>
+                                </li>
+                                <li
+                                  class="visual-list-item visual-list-item-circle"
+                                >
+                                  <a
+                                    class="visual-list-link"
+                                    href="https://process.example.com/review-checklist"
+                                  >
+                                    <img
+                                      alt="需求评审 Checklist"
+                                      class="visual-list-image"
+                                      src="https://avatars.githubusercontent.com/u/49827327?s=40&v=4"
+                                      title="需求评审 Checklist"
+                                    />
+                                  </a>
+                                </li>
+                                <li
+                                  class="visual-list-item visual-list-item-circle"
+                                >
+                                  <a
+                                    class="visual-list-link"
+                                    href="https://pm.example.com/risk"
+                                  >
+                                    <img
+                                      alt="风险登记与跟踪方法"
+                                      class="visual-list-image"
+                                      src="https://avatars.githubusercontent.com/u/465125?s=40&v=4"
+                                      title="风险登记与跟踪方法"
+                                    />
+                                  </a>
+                                </li>
+                                <li
+                                  class="visual-list-item visual-list-item-circle"
+                                >
+                                  <a
+                                    class="visual-list-link"
+                                    href="https://writing.example.com/action-items"
+                                  >
+                                    <img
+                                      alt="会议纪要：行动项如何写得可执行"
+                                      class="visual-list-image"
+                                      src="https://avatars.githubusercontent.com/u/29775873?s=40&v=4"
+                                      title="会议纪要：行动项如何写得可执行"
+                                    />
+                                  </a>
+                                </li>
+                                <li
+                                  class="visual-list-item visual-list-item-circle"
+                                >
+                                  <a
+                                    class="visual-list-link"
+                                    href="https://facilitation.example.com/review"
+                                  >
+                                    <img
+                                      alt="评审会议主持与节奏控制"
+                                      class="visual-list-image"
+                                      src="https://avatars.githubusercontent.com/u/8358236?s=40&v=4"
+                                      title="评审会议主持与节奏控制"
+                                    />
+                                  </a>
+                                </li>
+                              </ul>
+                              <div
+                                style="width: 4px;"
+                              />
+                              <div
+                                class="visual-list-description"
+                              >
+                                10 个网页
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            class="ant-chat-item-extra"
+                            style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                          >
+                            <div
+                              animate="visible"
+                              class="ant-chat-item-extra-action-box"
+                              initial="hidden"
+                              style="display: flex; gap: 8px; align-items: center;"
+                              variants="[object Object]"
+                              whileinview="visible"
+                            >
+                              <span
+                                aria-describedby="test-id"
+                                aria-label="复制"
+                                class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                data-testid="chat-item-copy-button"
+                                data-title="复制"
+                                role="button"
+                                tabindex="0"
+                              >
+                                <div
+                                  aria-hidden="true"
+                                  class="ant-bubble-actions-lottie"
+                                  data-autoplay="false"
+                                  data-loop="false"
+                                  data-testid="lottie-animation"
+                                  lottieref="[object Object]"
+                                  style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                                />
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          style="flex: 1 1 0%; min-width: 0;"
+        >
+          <div
+            class="ant-workspace"
+            data-testid="workspace"
+          >
+            <div
+              class="ant-workspace-header"
+              data-testid="workspace-header"
+            >
+              <div
+                class="ant-workspace-title"
+                data-testid="workspace-title"
+              >
+                工作空间
+              </div>
+              <div
+                class="ant-workspace-header-right"
+              />
+            </div>
+            <div
+              class="ant-workspace-tabs"
+              data-testid="workspace-tabs"
+            >
+              <div
+                aria-label="segmented control"
+                aria-orientation="horizontal"
+                class="ant-segmented ant-workspace-segmented ant-segmented-block"
+                data-testid="workspace-segmented"
+                role="radiogroup"
+                tabindex="0"
+              >
+                <div
+                  class="ant-segmented-group"
+                >
+                  <label
+                    class="ant-segmented-item ant-segmented-item-selected"
+                  >
+                    <input
+                      checked=""
+                      class="ant-segmented-item-input"
+                      name="test-id"
+                      type="radio"
+                    />
+                    <div
+                      class="ant-segmented-item-label"
+                    >
+                      <span
+                        class="ant-segmented-item-icon"
+                      >
+                        <svg
+                          class="sofa-icons-icon"
+                          fill="currentColor"
+                          fill-rule="evenodd"
+                          height="1em"
+                          style="vertical-align: -0.125em;"
+                          viewBox="0 0 16 16"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <defs>
+                            <clippath
+                              id="Language-master_svg0_280_00713"
+                            >
+                              <rect
+                                height="16"
+                                rx="0"
+                                width="16"
+                              />
+                            </clippath>
+                          </defs>
+                          <g
+                            clip-path="url(#Language-master_svg0_280_00713)"
+                          >
+                            <path
+                              d="M9.54 13.02a5.26 5.26 0 0 0 3.668-4.353h-2.231q-.098 1.396-.605 2.71-.337.87-.831 1.643m1.437-5.687h2.23A5.26 5.26 0 0 0 9.542 2.98q.494.773.83 1.644.508 1.313.606 2.71M7.998 1.417a6.583 6.583 0 0 0 0 13.166h.003a6.583 6.583 0 0 0 0-13.166h-.003M6.46 2.98q-.494.773-.831 1.644-.508 1.313-.605 2.71H2.792A5.26 5.26 0 0 1 6.459 2.98M6.36 7.333q.094-1.147.512-2.228Q7.292 4.017 8 3.107q.708.91 1.128 1.998.418 1.08.512 2.228zm0 1.334h3.28q-.094 1.147-.512 2.228-.42 1.088-1.128 1.997-.708-.91-1.128-1.997-.418-1.08-.512-2.228m-1.337 0H2.792a5.26 5.26 0 0 0 3.667 4.353q-.494-.773-.831-1.644-.508-1.313-.605-2.71"
+                              style="mix-blend-mode: passthrough;"
+                            />
+                          </g>
+                        </svg>
+                      </span>
+                      <span>
+                        <div
+                          class="ant-workspace-tab-item"
+                        >
+                          <span
+                            class="ant-workspace-tab-title"
+                          >
+                            浏览器
+                          </span>
+                        </div>
+                      </span>
+                    </div>
+                  </label>
+                  <label
+                    class="ant-segmented-item"
+                  >
+                    <input
+                      class="ant-segmented-item-input"
+                      name="test-id"
+                      type="radio"
+                    />
+                    <div
+                      class="ant-segmented-item-label"
+                    >
+                      <span
+                        class="ant-segmented-item-icon"
+                      >
+                        <svg
+                          class="sofa-icons-icon"
+                          fill="currentColor"
+                          fill-rule="evenodd"
+                          height="1em"
+                          style="vertical-align: -0.125em;"
+                          viewBox="0 0 24 24"
+                          width="1em"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <defs>
+                            <clippath
+                              id="FileStack-master_svg0_2432_15948"
+                            >
+                              <rect
+                                height="24"
+                                rx="0"
+                                width="24"
+                              />
+                            </clippath>
+                          </defs>
+                          <g
+                            clip-path="url(#FileStack-master_svg0_2432_15948)"
+                          >
+                            <path
+                              d="m17.707 1.293 4 4A1 1 0 0 1 22 6v6.5q0 1.014-.743 1.757T19.5 15h-7q-1.014 0-1.757-.743T10 12.5v-9q0-1.014.743-1.757T12.5 1H17a1 1 0 0 1 .707.293M15 3h-2.5q-.186 0-.343.157T12 3.5v9q0 .186.157.343T12.5 13h7q.186 0 .343-.157T20 12.5V8h-2q-1.243 0-2.121-.879Q15 6.243 15 5zm4.586 3H18q-.414 0-.707-.293T17 5V3.414zM7 7a1 1 0 0 0-1 1v8.8q0 .814.693 1.507T8.2 19H15a1 1 0 1 0 0-2H8.247l-.006-.003q-.066-.036-.134-.104t-.104-.134L8 16.753V8a1 1 0 0 0-1-1m-5 5a1 1 0 1 1 2 0v8.753l.003.006q.036.066.104.134t.134.104l.006.003H11a1 1 0 1 1 0 2H4.2q-.814 0-1.507-.693T2 20.8z"
+                              style="mix-blend-mode: passthrough;"
+                            />
+                          </g>
+                        </svg>
+                      </span>
+                      <span>
+                        <div
+                          class="ant-workspace-tab-item"
+                        >
+                          <span
+                            class="ant-workspace-tab-title"
+                          >
+                            文件
+                          </span>
+                          <span
+                            class="ant-workspace-tab-count"
+                          >
+                            3
+                          </span>
+                        </div>
+                      </span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div
+              class="ant-workspace-content"
+              data-testid="workspace-content"
+            >
+              <div>
+                <div>
+                  <div
+                    class="ant-list"
+                  >
+                    <div
+                      class="ant-spin-nested-loading"
+                    >
+                      <div
+                        class="ant-spin-container"
+                      >
+                        <ul
+                          class="ant-list-items"
+                        >
+                          <li
+                            class="ant-list-item ant-browser-suggestion"
+                            style="padding: 4px; margin: 4px 0px; cursor: pointer;"
+                          >
+                            <div
+                              class="ant-browser-suggestion-content"
+                            >
+                              <div
+                                class="ant-browser-suggestion-icon"
+                              >
+                                <svg
+                                  class="sofa-icons-icon"
+                                  fill="currentColor"
+                                  fill-rule="evenodd"
+                                  height="1em"
+                                  style="vertical-align: -0.125em;"
+                                  viewBox="0 0 16 16"
+                                  width="1em"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <defs>
+                                    <clippath
+                                      id="Search-master_svg0_339_8615"
+                                    >
+                                      <rect
+                                        height="16"
+                                        rx="0"
+                                        width="16"
+                                      />
+                                    </clippath>
+                                  </defs>
+                                  <g
+                                    clip-path="url(#Search-master_svg0_339_8615)"
+                                  >
+                                    <path
+                                      d="M11.078 12.021a6 6 0 1 1 .943-.943l2.45 2.45a.666.666 0 1 1-.943.943zM12 7.333a4.667 4.667 0 1 0-9.333 0 4.667 4.667 0 0 0 9.333 0"
+                                    />
+                                  </g>
+                                </svg>
+                              </div>
+                              <div
+                                aria-describedby="test-id"
+                                class="ant-browser-suggestion-text"
+                              >
+                                搜索产品说明书与关键参数
+                              </div>
+                            </div>
+                            <ul
+                              class="ant-list-item-action"
+                            >
+                              <li>
+                                <div>
+                                  <span
+                                    class="ant-tag"
+                                    style="height: 20px; background: var(--color-gray-control-fill-active); border-radius: 200px; display: flex; align-items: center; font: var(--font-text-number-xs); color: var(--color-gray-text-secondary); padding: 2px; margin-right: -8px;"
+                                  >
+                                    共5个结果
+                                  </span>
+                                </div>
+                              </li>
+                            </ul>
+                          </li>
+                          <li
+                            class="ant-list-item ant-browser-suggestion"
+                            style="padding: 4px; margin: 4px 0px; cursor: pointer;"
+                          >
+                            <div
+                              class="ant-browser-suggestion-content"
+                            >
+                              <div
+                                class="ant-browser-suggestion-icon"
+                              >
+                                <svg
+                                  class="sofa-icons-icon"
+                                  fill="currentColor"
+                                  fill-rule="evenodd"
+                                  height="1em"
+                                  style="vertical-align: -0.125em;"
+                                  viewBox="0 0 16 16"
+                                  width="1em"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <defs>
+                                    <clippath
+                                      id="Search-master_svg0_339_8615"
+                                    >
+                                      <rect
+                                        height="16"
+                                        rx="0"
+                                        width="16"
+                                      />
+                                    </clippath>
+                                  </defs>
+                                  <g
+                                    clip-path="url(#Search-master_svg0_339_8615)"
+                                  >
+                                    <path
+                                      d="M11.078 12.021a6 6 0 1 1 .943-.943l2.45 2.45a.666.666 0 1 1-.943.943zM12 7.333a4.667 4.667 0 1 0-9.333 0 4.667 4.667 0 0 0 9.333 0"
+                                    />
+                                  </g>
+                                </svg>
+                              </div>
+                              <div
+                                aria-describedby="test-id"
+                                class="ant-browser-suggestion-text"
+                              >
+                                搜索会议纪要相关的背景资料
+                              </div>
+                            </div>
+                            <ul
+                              class="ant-list-item-action"
+                            >
+                              <li>
+                                <div>
+                                  <span
+                                    class="ant-tag"
+                                    style="height: 20px; background: var(--color-gray-control-fill-active); border-radius: 200px; display: flex; align-items: center; font: var(--font-text-number-xs); color: var(--color-gray-text-secondary); padding: 2px; margin-right: -8px;"
+                                  >
+                                    共5个结果
+                                  </span>
+                                </div>
+                              </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
