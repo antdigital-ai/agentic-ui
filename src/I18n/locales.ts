@@ -342,6 +342,8 @@ export const cnLabels = {
     '支持上传文件，每个文件不超过 ${maxSize}，支持 ${extensions}等格式。',
   'input.sendButtonTooltip.send': '按 Enter 键发送',
   'input.sendButtonTooltip.newline': '按 Shift+Enter 键换行',
+  'input.sendButtonTooltip.send.mod': '按 Cmd/Ctrl+Enter 键发送',
+  'input.sendButtonTooltip.newline.mod': '按 Enter 键换行',
   // Other translations
   'common.name': '名称',
   'common.updateTime': '更新时间',
@@ -727,6 +729,8 @@ export const enLabels: typeof cnLabels = {
     'Supports file upload, each file not exceeding ${maxSize}, formats such as ${extensions}.',
   'input.sendButtonTooltip.send': 'Press Enter to send',
   'input.sendButtonTooltip.newline': 'Press Shift+Enter for new line',
+  'input.sendButtonTooltip.send.mod': 'Press Cmd/Ctrl+Enter to send',
+  'input.sendButtonTooltip.newline.mod': 'Press Enter for new line',
   // Other translations
   'common.name': 'Name',
   'common.updateTime': 'Update Time',

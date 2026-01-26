@@ -86,6 +86,9 @@ export interface SendActionsProps {
 
   /** 发送按钮配置 */
   sendButtonProps?: SendButtonCustomizationProps;
+
+  /** 触发发送的快捷键 */
+  triggerSendKey?: 'Enter' | 'Mod+Enter';
 }
 
 /**
@@ -115,6 +118,7 @@ export const SendActions: React.FC<SendActionsProps> = ({
   hasTools = false,
   onResize,
   sendButtonProps,
+  triggerSendKey,
 }) => {
   const fileMap = attachment?.fileMap;
 
@@ -178,6 +182,7 @@ export const SendActions: React.FC<SendActionsProps> = ({
           }
           onSend?.();
         }}
+        triggerSendKey={triggerSendKey}
         {...sendButtonProps}
       />,
     ].filter(Boolean);
@@ -199,6 +204,7 @@ export const SendActions: React.FC<SendActionsProps> = ({
     onStop,
     fileMap,
     sendButtonProps,
+    triggerSendKey,
   ]);
 
   const actionsList = actionsRender

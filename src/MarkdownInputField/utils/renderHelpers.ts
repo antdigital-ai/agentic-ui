@@ -82,6 +82,7 @@ interface UseSendActionsNodeParams {
     | 'actionsRender'
     | 'toolsRender'
     | 'sendButtonProps'
+    | 'triggerSendKey'
   >;
   fileMap?: Map<string, AttachmentFile>;
   setFileMap?: (fileMap?: Map<string, AttachmentFile>) => void;
@@ -158,6 +159,7 @@ export const useSendActionsNode = ({
         hasTools: !!sendProps.toolsRender,
         onResize: setRightPadding,
         sendButtonProps: sendProps.sendButtonProps,
+        triggerSendKey: sendProps.triggerSendKey,
       }),
     [
       sendProps.attachment,
@@ -169,6 +171,7 @@ export const useSendActionsNode = ({
       sendProps.actionsRender,
       sendProps.toolsRender,
       sendProps.sendButtonProps,
+      sendProps.triggerSendKey,
       fileMap,
       setFileMap,
       supportedFormat,

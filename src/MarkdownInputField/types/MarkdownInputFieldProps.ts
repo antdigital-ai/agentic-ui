@@ -71,10 +71,10 @@ export type MarkdownInputFieldProps = {
   /**
    * 触发发送操作的键盘快捷键。
    * - 'Enter': 回车键触发发送，Shift+Enter 换行
-   * @deprecated 此属性已废弃，现在固定使用 Enter 发送，Shift+Enter 换行
-   * @example triggerSendKey="Enter"
+   * - 'Mod+Enter': Command/Ctrl + Enter 发送，Enter 换行
+   * @default 'Enter'
    */
-  triggerSendKey?: 'Enter';
+  triggerSendKey?: 'Enter' | 'Mod+Enter';
 
   /**
    * 当内容发送时触发的异步回调函数。

@@ -18,6 +18,7 @@ interface UseMarkdownInputFieldHandlersParams {
     | 'allowEmptySubmit'
     | 'markdownProps'
     | 'attachment'
+    | 'triggerSendKey'
   >;
   markdownEditorRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
   inputRef: React.RefObject<HTMLDivElement>;
@@ -175,12 +176,30 @@ export const useMarkdownInputFieldHandlers = ({
         return; // 让编辑器正常处理换行
       }
 
-      // Enter 发送，Shift+Enter 换行
-      if (!isEnter || isMod) return;
-      if (isShift) return; // Shift+Enter 时让编辑器处理换行
-      e.stopPropagation();
-      e.preventDefault();
-      if (props.onSend) sendMessage();
+      const triggerKey = props.triggerSendKey || 'Enter';
+
+      if (triggerKey === 'Enter') {
+        // 模式1: Enter 发送，Shift+Enter 换行
+        // 只有纯 Enter 键才触发发送
+        if (isEnter && !isMod && !isShift) {
+          e.stopPropagation();
+          e.preventDefault();
+          if (props.onSend) sendMessage();
+          return;
+        }
+      } else if (triggerKey === 'Mod+Enter') {
+        // 模式2: Mod+Enter (Cmd/Ctrl+Enter) 发送，Enter 换行
+        if (isEnter && isMod) {
+          e.stopPropagation();
+          e.preventDefault();
+          if (props.onSend) sendMessage();
+          return;
+        }
+      }
+
+      // 其他情况（如 Shift+Enter，或非触发键的 Enter 组合）让编辑器正常处理换行
+      // 这里不需要显式 return，函数结束自然会继续执行（但这里是 void，所以 return 也无妨）
+      // 注意：上面的 return 是阻止了默认行为并发送，这里的 implicit return 是允许默认行为（换行）
     },
   );
 
