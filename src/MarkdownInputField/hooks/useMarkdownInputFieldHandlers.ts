@@ -135,7 +135,11 @@ export const useMarkdownInputFieldHandlers = ({
   // 键盘事件：早返回减少嵌套
   const handleKeyDown = useRefFunction(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (markdownEditorRef?.current?.store.inputComposition) return;
+      if (
+        markdownEditorRef?.current?.store.inputComposition ||
+        e.nativeEvent.isComposing
+      )
+        return;
 
       const editor = markdownEditorRef?.current?.markdownEditorRef?.current;
       const isEnter = e.key === 'Enter';
@@ -171,14 +175,12 @@ export const useMarkdownInputFieldHandlers = ({
         return;
       }
 
-      // 手机端禁用 Enter 键发送
-      if (isEnter && !isMod && !isShift && isMobileDevice()) {
-        return; // 让编辑器正常处理换行
-      }
+      // 移动端强制使用 Mod+Enter 模式，避免 Enter 误触
+      const effectiveTriggerKey = isMobileDevice()
+        ? 'Mod+Enter'
+        : props.triggerSendKey || 'Enter';
 
-      const triggerKey = props.triggerSendKey || 'Enter';
-
-      if (triggerKey === 'Enter') {
+      if (effectiveTriggerKey === 'Enter') {
         // 模式1: Enter 发送，Shift+Enter 换行
         // 只有纯 Enter 键才触发发送
         if (isEnter && !isMod && !isShift) {
@@ -187,7 +189,7 @@ export const useMarkdownInputFieldHandlers = ({
           if (props.onSend) sendMessage();
           return;
         }
-      } else if (triggerKey === 'Mod+Enter') {
+      } else if (effectiveTriggerKey === 'Mod+Enter') {
         // 模式2: Mod+Enter (Cmd/Ctrl+Enter) 发送，Enter 换行
         if (isEnter && isMod) {
           e.stopPropagation();
