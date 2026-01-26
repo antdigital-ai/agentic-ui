@@ -5,9 +5,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     // 定位高亮动画关键帧
     '@keyframes flash-shadow': {
-      '0%, 100%': {
+      '0%,100%': {
         boxShadow:
           '-5.23px -3.23px 12px 0 rgba(229, 255, 115, 40%), 4.23px 5.23px 16px 0 rgba(0, 206, 255, 24.12%)',
+      },
+
+      '50%': {
+        boxShadow: 'none',
       },
     },
 
@@ -212,9 +216,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           color: 'var(--color-gray-text-light)',
         },
         [`.ant-btn:hover, .ant-btn:focus, .ant-btn:active, .ant-btn:hover .anticon, .ant-btn:focus .anticon, .ant-btn:active .anticon`]:
-          {
-            color: 'var(--color-gray-text-light)',
-          },
+        {
+          color: 'var(--color-gray-text-light)',
+        },
       },
 
       // 文件项动作按钮（预览/下载等）图标颜色保持一致
@@ -338,9 +342,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           color: '#767E8B',
         },
         [`.ant-btn:hover, .ant-btn:focus, .ant-btn:active, .ant-btn:hover .anticon, .ant-btn:focus .anticon, .ant-btn:active .anticon`]:
-          {
-            color: '#767E8B',
-          },
+        {
+          color: '#767E8B',
+        },
       },
 
       // 预览内容区域

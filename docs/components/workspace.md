@@ -40,6 +40,7 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 <code src="../demos/workspace-file-custom-preview-flow.tsx">文件-自定义预览</code>
 <code src="../demos/workspace-file-actionref-demo.tsx">actionRef外部打开</code>
 <code src="../demos/workspace-file-search-demo.tsx">文件-搜索</code>
+<code src="../demos/workspace-locate-demo.tsx">文件、网页定位到对话</code>
 <code src="../demos/workspace-file-custom-render-demo.tsx">文件-自定义渲染</code>
 
 <!-- <code src="../demos/workspace-file-previewComponent.tsx">导出文件预览组件</code> -->
@@ -293,6 +294,7 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 | countFormatter | 结果数量展示文案格式化函数                                     | `(count: number) => string`                                                      | `-`        |
 | emptyText      | 结果列表为空时的展示文案                                       | `string`                                                                         | 国际化文案 |
 | loadingText    | 结果加载中时的展示文案                                         | `string`                                                                         | 国际化文案 |
+| onLocate       | 点击结果项的“定位”按钮回调（需配合 `BrowserItem.canLocate`）   | `(item: BrowserItem) => void`                                                    | `-`        |
 | tab            | 标签页配置                                                     | `TabConfiguration`                                                               | `-`        |
 
 #### BrowserSuggestion
@@ -305,14 +307,15 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 #### BrowserItem
 
-| 参数        | 说明                                             | 类型     |
-| ----------- | ------------------------------------------------ | -------- |
-| id          | 唯一标识                                         | `string` |
-| title       | 结果标题                                         | `string` |
-| site        | 站点展示文案（如域名）                           | `string` |
-| url         | 结果链接                                         | `string` |
-| icon        | 站点图标地址（可选）                             | `string` |
-| description | 结果摘要（当前 UI 未直接使用，可用于自定义扩展） | `string` |
+| 参数        | 说明                                             | 类型      |
+| ----------- | ------------------------------------------------ | --------- |
+| id          | 唯一标识                                         | `string`  |
+| title       | 结果标题                                         | `string`  |
+| site        | 站点展示文案（如域名）                           | `string`  |
+| url         | 结果链接                                         | `string`  |
+| icon        | 站点图标地址（可选）                             | `string`  |
+| description | 结果摘要（当前 UI 未直接使用，可用于自定义扩展） | `string`  |
+| canLocate   | 是否展示“定位”按钮（展示后会触发 `onLocate`）    | `boolean` |
 
 ### Workspace.Custom
 

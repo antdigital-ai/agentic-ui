@@ -33,12 +33,14 @@ describe('BrowserList Component', () => {
       title: '结果标题1',
       site: 'example.com',
       url: 'https://example.com',
+      canLocate: true,
     },
     {
       id: '2',
       title: '结果标题2',
       site: 'foo.bar',
       url: 'https://foo.bar',
+      canLocate: false,
     },
   ];
 
@@ -70,6 +72,23 @@ describe('BrowserList Component', () => {
     );
 
     openSpy.mockRestore();
+  });
+
+  it('仅在 canLocate=true 时展示定位按钮，并触发 onLocate 回调', async () => {
+    const user = userEvent.setup();
+    const onLocate = vi.fn();
+
+    renderWithProvider(
+      <BrowserList items={mockItems} activeLabel="搜索定位" onLocate={onLocate} />,
+    );
+
+    // 只有第一条可定位
+    const locateButtons = screen.getAllByLabelText('定位');
+    expect(locateButtons).toHaveLength(1);
+
+    await user.click(locateButtons[0]!);
+    expect(onLocate).toHaveBeenCalledTimes(1);
+    expect(onLocate).toHaveBeenCalledWith(mockItems[0]);
   });
 
   it('应该使用自定义计数格式化函数', () => {
@@ -230,5 +249,43 @@ describe('Browser Component', () => {
     await user.click(backButton);
 
     expect(screen.getByText('搜索建议1')).toBeInTheDocument();
+  });
+
+  it('结果列表中点击定位按钮应触发 onLocate', async () => {
+    const user = userEvent.setup();
+    const suggestions = createSuggestions();
+    const onLocate = vi.fn();
+
+    const request = vi.fn().mockReturnValue({
+      items: [
+        {
+          id: '1',
+          title: '结果标题1',
+          site: 'example.com',
+          url: 'https://example.com',
+          canLocate: true,
+        },
+      ] satisfies BrowserItem[],
+      loading: false,
+    });
+
+    renderBrowserWithProvider(
+      <Browser
+        suggestions={suggestions}
+        request={request}
+        suggestionIcon={null}
+        onLocate={onLocate}
+      />,
+    );
+
+    await user.click(screen.getByText('搜索建议1'));
+    const locateButtons = screen.getAllByLabelText('定位');
+    expect(locateButtons).toHaveLength(1);
+    await user.click(locateButtons[0]!);
+
+    expect(onLocate).toHaveBeenCalledTimes(1);
+    expect(onLocate).toHaveBeenCalledWith(
+      expect.objectContaining({ id: '1', title: '结果标题1' }),
+    );
   });
 });

@@ -1,4 +1,4 @@
-import { ArrowLeft, Search } from '@sofa-design/icons';
+import { ArrowLeft, Locate, Search } from '@sofa-design/icons';
 import {
   Avatar,
   Button,
@@ -12,6 +12,7 @@ import {
 } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useMemo, useState } from 'react';
+import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext, compileTemplate } from '../../I18n';
 import { useBrowserStyle } from './style';
 
@@ -22,6 +23,7 @@ export type BrowserItem = {
   url: string;
   icon?: string;
   description?: string;
+  canLocate?: boolean;
 };
 
 export type BrowserSuggestion = {
@@ -75,21 +77,46 @@ export interface BrowserItemProps {
   item: BrowserItem;
   itemStyle?: React.CSSProperties;
   className?: string;
+  onLocate?: (item: BrowserItem) => void;
 }
 
 export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
   item,
   itemStyle = SUGGESTION_ITEM_STYLE,
   className,
+  onLocate,
 }) => {
   const { prefixCls, wrapSSR, hashId } = useBrowserContext();
+  const { locale } = useContext(I18nContext);
 
   const handleSiteClick = () => {
     window.open(item.url, '_blank', 'noopener,noreferrer');
   };
 
+  const handleLocate = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onLocate?.(item);
+  };
+
   return wrapSSR(
-    <List.Item className={className} style={itemStyle}>
+    <List.Item
+      className={className}
+      style={itemStyle}
+      actions={
+        item.canLocate
+          ? [
+            <ActionIconBox
+              key="locate"
+              title={locale?.['workspace.file.location'] || '定位'}
+              onClick={handleLocate}
+              tooltipProps={{ mouseEnterDelay: 0.3 }}
+            >
+              <Locate />
+            </ActionIconBox>,
+          ]
+          : []
+      }
+    >
       <div style={{ width: '100%' }}>
         <div
           className={classNames(
@@ -174,6 +201,7 @@ export interface BrowserListProps {
   emptyText?: string;
   loading?: boolean;
   loadingText?: string;
+  onLocate?: (item: BrowserItem) => void;
 }
 
 export const BrowserList: React.FC<BrowserListProps> = ({
@@ -186,6 +214,7 @@ export const BrowserList: React.FC<BrowserListProps> = ({
   emptyText,
   loading = false,
   loadingText,
+  onLocate,
 }) => {
   const { prefixCls, wrapSSR, hashId } = useBrowserContext();
   const { locale } = useContext(I18nContext);
@@ -218,8 +247,8 @@ export const BrowserList: React.FC<BrowserListProps> = ({
                 {typeof countFormatter === 'function'
                   ? countFormatter(safeItems.length)
                   : compileTemplate(totalResultsTemplate, {
-                      count: String(safeItems.length),
-                    })}
+                    count: String(safeItems.length),
+                  })}
               </Tag>
             </div>
           ))}
@@ -245,6 +274,7 @@ export const BrowserList: React.FC<BrowserListProps> = ({
             item={item}
             className={classNames(`${prefixCls}-result-item`, hashId)}
             itemStyle={SUGGESTION_ITEM_STYLE}
+            onLocate={onLocate}
           />
         )}
         footer={null}
@@ -269,6 +299,7 @@ export type BrowserProps = {
   countFormatter?: (count: number) => string;
   emptyText?: string;
   loadingText?: string;
+  onLocate?: (item: BrowserItem) => void;
 };
 
 const Browser: React.FC<BrowserProps> = ({
@@ -278,6 +309,7 @@ const Browser: React.FC<BrowserProps> = ({
   countFormatter,
   emptyText,
   loadingText,
+  onLocate,
 }) => {
   const [currentView, setCurrentView] = useState<'suggestions' | 'results'>(
     'suggestions',
@@ -329,8 +361,8 @@ const Browser: React.FC<BrowserProps> = ({
                       {typeof countFormatter === 'function'
                         ? countFormatter(item.count)
                         : compileTemplate(totalResultsTemplate, {
-                            count: String(item.count),
-                          })}
+                          count: String(item.count),
+                        })}
                     </Tag>
                   </div>,
                 ]}
@@ -375,6 +407,7 @@ const Browser: React.FC<BrowserProps> = ({
           emptyText={emptyText}
           loading={loading}
           loadingText={loadingText}
+          onLocate={onLocate}
         />
       )}
     </div>,
