@@ -54,7 +54,7 @@ export const Schema: React.FC<RenderElementProps> = (props) => {
 
   const { bubble } = useContext(BubbleConfigContext) || {};
 
-  return useMemo(() => {
+  const defaultDom = useMemo(() => {
     if (apaasify?.enable && apaasify.render) {
       const renderedContent = apaasify.render(props, bubble?.originData);
       return (
@@ -155,4 +155,23 @@ export const Schema: React.FC<RenderElementProps> = (props) => {
       </div>
     );
   }, [node.value, bubble, apaasify]);
+
+  const customRender = editorProps?.codeProps?.render;
+  if (!customRender) {
+    return defaultDom;
+  }
+
+  try {
+    const renderContent = customRender(props as any, defaultDom, editorProps?.codeProps);
+    // 返回 undefined 表示“不覆盖”，回退内部默认渲染
+    if (renderContent === undefined) {
+      return defaultDom;
+    }
+    return renderContent;
+  } catch (error) {
+    debugInfo('Schema - codeProps.render 执行异常，回退默认渲染', {
+      error: (error as any)?.message || String(error),
+    });
+    return defaultDom;
+  }
 };

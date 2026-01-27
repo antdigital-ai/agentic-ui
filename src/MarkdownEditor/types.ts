@@ -214,6 +214,17 @@ export type MarkdownEditorProps = {
    * @property {boolean} [wrap] - 是否自动换行，默认 true
    */
   codeProps?: {
+    render?: (
+      props: CustomLeaf<Record<string, any>> & { children: React.ReactNode },
+      defaultDom: React.ReactNode,
+      codeProps?: MarkdownEditorProps['codeProps'],
+    ) => React.ReactNode;
+    /**
+     * 自定义节点渲染函数
+     *
+     * 约定：当 `render` 返回 `undefined` 时，表示“不覆盖默认渲染”，组件会回退到内部默认的卡片/渲染逻辑；
+     * 若需要“不渲染任何内容”，请显式返回 `null`。
+     */
     Languages?: string[];
     hideToolBar?: boolean;
     alwaysExpandedDeepThink?: boolean;

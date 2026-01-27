@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { BubbleConfigContext } from '../../../../Bubble/BubbleConfigProvide';
 import { SchemaRenderer } from '../../../../Schema';
+import { debugInfo } from '../../../../Utils/debugUtils';
 import { useEditorStore } from '../../store';
 
 /**
@@ -42,85 +43,110 @@ export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
 
     const { bubble } = useContext(BubbleConfigContext) || {};
 
-    if (apaasify?.enable && apaasify.render) {
-      const renderedContent = apaasify.render(props, bubble?.originData);
-      return (
-        <div
-          {...node.attributes}
-          data-testid="schema-container"
-          contentEditable={false}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            userSelect: 'text',
-            WebkitUserSelect: 'text',
-          }}
-        >
-          {renderedContent}
+    const defaultDom = (() => {
+      if (apaasify?.enable && apaasify.render) {
+        const renderedContent = apaasify.render(props, bubble?.originData);
+        return (
           <div
-            data-testid="schema-hidden-json"
+            {...node.attributes}
+            data-testid="schema-container"
+            contentEditable={false}
             style={{
-              height: 1,
-              opacity: 0,
-              userSelect: 'none',
-              pointerEvents: 'none',
-              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              userSelect: 'text',
+              WebkitUserSelect: 'text',
             }}
           >
-            {JSON.stringify(props.element.value, null, 2)}
+            {renderedContent}
+            <div
+              data-testid="schema-hidden-json"
+              style={{
+                height: 1,
+                opacity: 0,
+                userSelect: 'none',
+                pointerEvents: 'none',
+                overflow: 'hidden',
+              }}
+            >
+              {JSON.stringify(props.element.value, null, 2)}
+            </div>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    if (node.language === 'agentar-card') {
+      if (node.language === 'agentar-card') {
+        return (
+          <div
+            data-testid="agentar-card-container"
+            style={{
+              padding: '0.5em',
+            }}
+            data-agentar-card
+          >
+            <SchemaRenderer
+              schema={props.element.value}
+              values={props.element.value?.initialValues || {}}
+              useDefaultValues={false}
+              debug={false}
+              fallbackContent={null}
+            />
+          </div>
+        );
+      }
+
       return (
-        <div
-          data-testid="agentar-card-container"
+        <pre
+          {...props.attributes}
           style={{
-            padding: '0.5em',
+            background: 'rgb(242, 241, 241)',
+            color: 'rgb(27, 27, 27)',
+            padding: '1em',
+            borderRadius: '0.5em',
+            margin: '1em 0',
+            fontSize: '0.8em',
+            fontFamily: 'monospace',
+            lineHeight: '1.5',
+            overflowX: 'auto',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-all',
+            wordWrap: 'break-word',
           }}
-          data-agentar-card
         >
-          <SchemaRenderer
-            schema={props.element.value}
-            values={props.element.value?.initialValues || {}}
-            useDefaultValues={false}
-            debug={false}
-            fallbackContent={null}
-          />
-        </div>
+          <code>{JSON.stringify(props.element.value, null, 2)}</code>
+          <div
+            style={{
+              display: 'none',
+            }}
+          >
+            {props.children}
+          </div>
+        </pre>
       );
+    })();
+
+    const customRender = editorProps?.codeProps?.render;
+    if (!customRender) {
+      return defaultDom;
     }
 
-    return (
-      <pre
-        {...props.attributes}
-        style={{
-          background: 'rgb(242, 241, 241)',
-          color: 'rgb(27, 27, 27)',
-          padding: '1em',
-          borderRadius: '0.5em',
-          margin: '1em 0',
-          fontSize: '0.8em',
-          fontFamily: 'monospace',
-          lineHeight: '1.5',
-          overflowX: 'auto',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-all',
-          wordWrap: 'break-word',
-        }}
-      >
-        <code>{JSON.stringify(props.element.value, null, 2)}</code>
-        <div
-          style={{
-            display: 'none',
-          }}
-        >
-          {props.children}
-        </div>
-      </pre>
-    );
+    try {
+      const renderContent = customRender(
+        props as any,
+        defaultDom,
+        editorProps?.codeProps,
+      );
+      // 返回 undefined 表示“不覆盖”，回退内部默认渲染
+      if (renderContent === undefined) {
+        return defaultDom;
+      }
+      return renderContent;
+    } catch (error) {
+      debugInfo('ReadonlySchema - codeProps.render 执行异常，回退默认渲染', {
+        error: (error as any)?.message || String(error),
+      });
+      return defaultDom;
+    }
   },
 );
 
