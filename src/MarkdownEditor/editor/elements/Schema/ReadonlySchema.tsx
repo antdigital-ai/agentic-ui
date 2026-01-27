@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { BubbleConfigContext } from '../../../../Bubble/BubbleConfigProvide';
-import { SchemaRenderer } from '../../../../Schema';
+import { SchemaRenderer, useCardRenderers } from '../../../../Schema';
 import { useEditorStore } from '../../store';
 
 /**
@@ -39,6 +39,7 @@ export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
     const { element: node } = props;
     const { editorProps } = useEditorStore();
     const apaasify = editorProps?.apaasify || editorProps?.apassify;
+    const contextCardRenderers = useCardRenderers();
 
     const { bubble } = useContext(BubbleConfigContext) || {};
 
@@ -74,6 +75,18 @@ export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
     }
 
     if (node.language === 'agentar-card') {
+      const cardType = props.element.value?.cardType;
+      const renderer =
+        editorProps?.cardRenderers?.[cardType] ||
+        contextCardRenderers?.[cardType];
+
+      if (renderer) {
+        return (
+          <div {...node.attributes} data-testid={`agentar-card-${cardType}-container`}>
+            {renderer(props)}
+          </div>
+        );
+      }
       return (
         <div
           data-testid="agentar-card-container"

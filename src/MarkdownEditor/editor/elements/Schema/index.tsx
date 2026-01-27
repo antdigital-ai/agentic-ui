@@ -1,19 +1,20 @@
 import React, { useContext, useMemo } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { BubbleConfigContext } from '../../../../Bubble/BubbleConfigProvide';
-import { SchemaRenderer } from '../../../../Schema';
+import { SchemaRenderer, useCardRenderers } from '../../../../Schema';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { useEditorStore } from '../../store';
 
 /**
  * Schema 组件 - 模式渲染组件
  *
- * 该组件用于渲染 Schema 类型的代码节点，支持自定义渲染、AgentAR 卡片渲染和默认渲染模式。
+ * 该组件用于渲染 Schema 类型的代码节点，支持自定义渲染、AgentAR 卡片渲染、自定义卡片渲染器和默认渲染模式。
  * 根据不同的配置和节点类型提供不同的渲染方式。
  *
  * 功能特性：
  * - 支持自定义 apaasify/apassify 渲染模式
  * - 支持 AgentAR 卡片渲染
+ * - 支持可注入的自定义卡片渲染器 (基于 cardType)
  * - 提供默认的 JSON 字符串渲染
  * - 包含隐藏的 JSON 数据用于调试和编辑
  * - 支持点击和键盘事件处理
@@ -39,8 +40,9 @@ import { useEditorStore } from '../../store';
  * @remarks
  * 渲染优先级：
  * 1. 自定义 apaasify 渲染器
- * 2. AgentAR 卡片渲染
- * 3. 默认 JSON 字符串渲染
+ * 2. 自定义 cardRenderers (匹配 cardType)
+ * 3. 默认 AgentAR 卡片渲染
+ * 4. 默认 JSON 字符串渲染
  */
 export const Schema: React.FC<RenderElementProps> = (props) => {
   debugInfo('Schema - 渲染 Schema', {
@@ -51,6 +53,7 @@ export const Schema: React.FC<RenderElementProps> = (props) => {
   const { element: node } = props;
   const { editorProps } = useEditorStore();
   const apaasify = editorProps?.apaasify || editorProps?.apassify;
+  const contextCardRenderers = useCardRenderers();
 
   const { bubble } = useContext(BubbleConfigContext) || {};
 
@@ -87,6 +90,22 @@ export const Schema: React.FC<RenderElementProps> = (props) => {
     }
 
     if (node.language === 'agentar-card') {
+      const cardType = props.element.value?.cardType;
+      const renderer =
+        editorProps?.cardRenderers?.[cardType] ||
+        contextCardRenderers?.[cardType];
+
+      if (renderer) {
+        return (
+          <div
+            {...node.attributes}
+            contentEditable={false}
+            data-testid={`agentar-card-${cardType}-container`}
+          >
+            {renderer(props)}
+          </div>
+        );
+      }
       return (
         <div
           data-testid="agentar-card-container"
@@ -154,5 +173,5 @@ export const Schema: React.FC<RenderElementProps> = (props) => {
         </span>
       </div>
     );
-  }, [node.value, bubble, apaasify]);
+  }, [node.value, bubble, apaasify, editorProps?.cardRenderers, contextCardRenderers]);
 };

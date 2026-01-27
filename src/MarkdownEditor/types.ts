@@ -483,6 +483,15 @@ export type MarkdownEditorProps = {
   children?: React.ReactNode;
 
   /**
+   * 卡片渲染器配置
+   * @description 用于自定义渲染不同类型的卡片，目前主要用于 agentar-card
+   */
+  cardRenderers?: Record<
+    string,
+    (props: import('slate-react').RenderElementProps) => React.ReactNode
+  >;
+
+  /**
    * 其他属性
    */
   [key: string]: any;

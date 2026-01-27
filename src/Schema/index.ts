@@ -8,19 +8,29 @@
 import { SchemaEditor } from './SchemaEditor';
 import { SchemaForm } from './SchemaForm';
 import { SchemaRenderer, TemplateEngine } from './SchemaRenderer';
+import {
+  CardRenderersContext,
+  useCardRenderers,
+} from './SchemaRenderer/CardRenderersContext';
 import { SchemaValidator, mdDataSchemaValidator } from './validator';
 
 export type { LowCodeSchema } from './types';
+export type {
+  CardRenderer,
+  CardRenderers,
+} from './SchemaRenderer/CardRenderersContext';
 
 // 导出组件类型
 export type { SchemaEditorProps, SchemaEditorRef } from './SchemaEditor';
 export type { SchemaFormProps } from './SchemaForm';
 
 export {
+  CardRenderersContext,
   SchemaEditor,
   SchemaForm,
   SchemaRenderer,
   SchemaValidator,
   TemplateEngine,
+  useCardRenderers,
   mdDataSchemaValidator as validator,
 };
