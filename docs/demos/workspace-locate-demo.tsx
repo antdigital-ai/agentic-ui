@@ -1,7 +1,7 @@
 import {
-  Bubble,
   type AttachmentFile,
   type BrowserItem,
+  Bubble,
   type MessageBubbleData,
   VisualList,
   type VisualListItem,
@@ -218,7 +218,7 @@ const WorkspaceFileLocateDemo: React.FC = () => {
     triggerHighlight(el, 'workspace-file-locate-chat-file--highlight');
   };
 
-  const handleLocateWeb = (item: BrowserItem) => {
+  const handleLocateWeb = () => {
     // 网页定位：效果参考脚注示例，定位到“网页聚合视图（VisualList）”
     const el = document.getElementById(CHAT_WEB_RESULTS_ANCHOR_ID);
     el?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
@@ -409,17 +409,17 @@ const WorkspaceFileLocateDemo: React.FC = () => {
 
                 const avatar = isUser
                   ? ({
-                    avatar:
-                      'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-                    title: '开发者',
-                    description: '前端工程师',
-                  } as const)
+                      avatar:
+                        'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+                      title: '开发者',
+                      description: '前端工程师',
+                    } as const)
                   : ({
-                    avatar:
-                      'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original',
-                    title: 'Ant Design Assistant',
-                    description: 'AI 助手',
-                  } as const);
+                      avatar:
+                        'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original',
+                      title: 'Ant Design Assistant',
+                      description: 'AI 助手',
+                    } as const);
 
                 const originData: MessageBubbleData = {
                   id: item.id,
@@ -498,9 +498,7 @@ const WorkspaceFileLocateDemo: React.FC = () => {
                                       : 1024 * 1024,
                                     fileName.toLowerCase().endsWith('.png') ||
                                       fileName.toLowerCase().endsWith('.jpg') ||
-                                      fileName
-                                        .toLowerCase()
-                                        .endsWith('.jpeg')
+                                      fileName.toLowerCase().endsWith('.jpeg')
                                       ? 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png'
                                       : `https://example.com/${encodeURIComponent(fileName)}`,
                                   ),
@@ -553,7 +551,8 @@ const WorkspaceFileLocateDemo: React.FC = () => {
                   originData={{
                     id: 'm-web',
                     role: 'assistant',
-                    content: '我在浏览器里整理了几条可参考的网页来源（可从右侧工作空间定位到这里）。',
+                    content:
+                      '我在浏览器里整理了几条可参考的网页来源（可从右侧工作空间定位到这里）。',
                     createAt: MOCK_TIME + 1000,
                     updateAt: MOCK_TIME + 1000,
                     isFinished: true,

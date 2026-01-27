@@ -117,9 +117,7 @@ describe('TabKey', () => {
         children: [
           {
             type: 'table-row',
-            children: [
-              { type: 'table-cell', children: [{ text: 'cell1' }] },
-            ],
+            children: [{ type: 'table-cell', children: [{ text: 'cell1' }] }],
           },
         ],
       };
@@ -501,15 +499,11 @@ describe('TabKey', () => {
         children: [
           {
             type: 'table-row',
-            children: [
-              { type: 'table-cell', children: [{ text: 'cell1' }] },
-            ],
+            children: [{ type: 'table-cell', children: [{ text: 'cell1' }] }],
           },
           {
             type: 'table-row',
-            children: [
-              { type: 'table-cell', children: [{ text: 'cell2' }] },
-            ],
+            children: [{ type: 'table-cell', children: [{ text: 'cell2' }] }],
           },
         ],
       };
@@ -590,15 +584,11 @@ describe('TabKey', () => {
         children: [
           {
             type: 'table-row',
-            children: [
-              { type: 'table-cell', children: [{ text: 'cell1' }] },
-            ],
+            children: [{ type: 'table-cell', children: [{ text: 'cell1' }] }],
           },
           {
             type: 'table-row',
-            children: [
-              { type: 'table-cell', children: [{ text: 'cell2' }] },
-            ],
+            children: [{ type: 'table-cell', children: [{ text: 'cell2' }] }],
           },
         ],
       };
@@ -652,9 +642,7 @@ describe('TabKey', () => {
         children: [
           {
             type: 'table-row',
-            children: [
-              { type: 'table-cell', children: [{ text: 'cell1' }] },
-            ],
+            children: [{ type: 'table-cell', children: [{ text: 'cell1' }] }],
           },
         ],
       };
@@ -1771,7 +1759,10 @@ describe('TabKey', () => {
         children: [{ text: 'console.log("hello");' }],
       };
 
-      editor.children = [codeBlock, { type: 'paragraph', children: [{ text: 'text' }] }];
+      editor.children = [
+        codeBlock,
+        { type: 'paragraph', children: [{ text: 'text' }] },
+      ];
       // 选择跨越代码块和段落
       Transforms.select(editor, {
         anchor: { path: [0, 0], offset: 10 },
@@ -1842,7 +1833,10 @@ describe('TabKey', () => {
         children: [{ text: 'console.log("hello");' }],
       };
 
-      editor.children = [codeBlock, { type: 'paragraph', children: [{ text: 'text' }] }];
+      editor.children = [
+        codeBlock,
+        { type: 'paragraph', children: [{ text: 'text' }] },
+      ];
       // 选择跨越代码块和段落
       Transforms.select(editor, {
         anchor: { path: [0, 0], offset: 10 },

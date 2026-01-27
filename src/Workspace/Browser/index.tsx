@@ -105,15 +105,15 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
       actions={
         item.canLocate
           ? [
-            <ActionIconBox
-              key="locate"
-              title={locale?.['workspace.file.location'] || '定位'}
-              onClick={handleLocate}
-              tooltipProps={{ mouseEnterDelay: 0.3 }}
-            >
-              <Locate />
-            </ActionIconBox>,
-          ]
+              <ActionIconBox
+                key="locate"
+                title={locale?.['workspace.file.location'] || '定位'}
+                onClick={handleLocate}
+                tooltipProps={{ mouseEnterDelay: 0.3 }}
+              >
+                <Locate />
+              </ActionIconBox>,
+            ]
           : []
       }
     >
@@ -247,8 +247,8 @@ export const BrowserList: React.FC<BrowserListProps> = ({
                 {typeof countFormatter === 'function'
                   ? countFormatter(safeItems.length)
                   : compileTemplate(totalResultsTemplate, {
-                    count: String(safeItems.length),
-                  })}
+                      count: String(safeItems.length),
+                    })}
               </Tag>
             </div>
           ))}
@@ -361,8 +361,8 @@ const Browser: React.FC<BrowserProps> = ({
                       {typeof countFormatter === 'function'
                         ? countFormatter(item.count)
                         : compileTemplate(totalResultsTemplate, {
-                          count: String(item.count),
-                        })}
+                            count: String(item.count),
+                          })}
                     </Tag>
                   </div>,
                 ]}

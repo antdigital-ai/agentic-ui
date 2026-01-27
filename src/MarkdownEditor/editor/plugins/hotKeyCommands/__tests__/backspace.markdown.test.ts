@@ -1,4 +1,11 @@
-import { BaseEditor, createEditor, Editor, Point, Range, Transforms } from 'slate';
+import {
+  BaseEditor,
+  createEditor,
+  Editor,
+  Point,
+  Range,
+  Transforms,
+} from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -183,7 +190,7 @@ describe('BackspaceKey - Markdown 输出测试', () => {
       // Range.edges 会确保 start <= end（按路径顺序）
       const docStart = Editor.start(editor, []);
       const docEnd = Editor.end(editor, []);
-      
+
       // 确保 anchor 在 focus 之前（或相等）
       Transforms.select(editor, {
         anchor: docStart,
@@ -192,16 +199,16 @@ describe('BackspaceKey - Markdown 输出测试', () => {
 
       // 确保选择已设置
       expect(editor.selection).not.toBeNull();
-      
+
       // 代码使用 Range.edges(sel) 获取 start 和 end，然后与 Editor.start/end 比较
       // 需要确保选择确实覆盖了整个文档
       // 验证选择的实际范围
       const [start, end] = Range.edges(editor.selection!);
-      
+
       // 确保选择覆盖了整个文档（使用之前定义的 docStart 和 docEnd）
       expect(Point.equals(start, docStart)).toBe(true);
       expect(Point.equals(end, docEnd)).toBe(true);
-      
+
       const result = backspaceKey.range();
       // 如果 Point.equals 比较成功，应该返回 true
       expect(result).toBe(true);
@@ -214,9 +221,7 @@ describe('BackspaceKey - Markdown 输出测试', () => {
     });
 
     it('应该在非全选时返回 false', () => {
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'Test' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: 'Test' }] }];
 
       Transforms.select(editor, {
         anchor: { path: [0, 0], offset: 0 },
@@ -230,9 +235,7 @@ describe('BackspaceKey - Markdown 输出测试', () => {
 
   describe('head 元素处理', () => {
     it('应该将空标题转换为段落', () => {
-      editor.children = [
-        { type: 'head', level: 1, children: [{ text: '' }] },
-      ];
+      editor.children = [{ type: 'head', level: 1, children: [{ text: '' }] }];
 
       Transforms.select(editor, {
         anchor: { path: [0, 0], offset: 0 },
@@ -314,7 +317,7 @@ describe('BackspaceKey - Markdown 输出测试', () => {
       // 所以这个分支可能不会执行
       // 让我们测试实际的逻辑
       const paragraphPath = [0, 0, 0, 0];
-      
+
       Transforms.select(editor, {
         anchor: { path: paragraphPath, offset: 0 },
         focus: { path: paragraphPath, offset: 0 },
@@ -371,9 +374,7 @@ describe('BackspaceKey - Markdown 输出测试', () => {
               children: [
                 {
                   type: 'table-cell',
-                  children: [
-                    { type: 'paragraph', children: [{ text: '' }] },
-                  ],
+                  children: [{ type: 'paragraph', children: [{ text: '' }] }],
                 },
               ],
             },
@@ -429,9 +430,7 @@ describe('BackspaceKey - Markdown 输出测试', () => {
       editor.children = [
         {
           type: 'blockquote',
-          children: [
-            { type: 'paragraph', children: [{ text: 'Quote' }] },
-          ],
+          children: [{ type: 'paragraph', children: [{ text: 'Quote' }] }],
         },
       ];
 
@@ -559,9 +558,7 @@ describe('BackspaceKey - Markdown 输出测试', () => {
     });
 
     it('应该处理非 paragraph 且不在 list-item 中的元素', () => {
-      editor.children = [
-        { type: 'code', children: [{ text: 'code' }] },
-      ];
+      editor.children = [{ type: 'code', children: [{ text: 'code' }] }];
 
       Transforms.select(editor, {
         anchor: { path: [0, 0], offset: 0 },

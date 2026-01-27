@@ -216,9 +216,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           color: 'var(--color-gray-text-light)',
         },
         [`.ant-btn:hover, .ant-btn:focus, .ant-btn:active, .ant-btn:hover .anticon, .ant-btn:focus .anticon, .ant-btn:active .anticon`]:
-        {
-          color: 'var(--color-gray-text-light)',
-        },
+          {
+            color: 'var(--color-gray-text-light)',
+          },
       },
 
       // 文件项动作按钮（预览/下载等）图标颜色保持一致
@@ -342,9 +342,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           color: '#767E8B',
         },
         [`.ant-btn:hover, .ant-btn:focus, .ant-btn:active, .ant-btn:hover .anticon, .ant-btn:focus .anticon, .ant-btn:active .anticon`]:
-        {
-          color: '#767E8B',
-        },
+          {
+            color: '#767E8B',
+          },
       },
 
       // 预览内容区域
