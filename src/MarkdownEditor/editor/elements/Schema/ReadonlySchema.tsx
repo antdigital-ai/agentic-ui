@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { RenderElementProps } from 'slate-react';
 import { BubbleConfigContext } from '../../../../Bubble/BubbleConfigProvide';
 import { SchemaRenderer } from '../../../../Schema';
@@ -43,7 +43,7 @@ export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
 
     const { bubble } = useContext(BubbleConfigContext) || {};
 
-    const defaultDom = (() => {
+    const defaultDom = useMemo(() => {
       if (apaasify?.enable && apaasify.render) {
         const renderedContent = apaasify.render(props, bubble?.originData);
         return (
@@ -123,7 +123,7 @@ export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
           </div>
         </pre>
       );
-    })();
+    }, [node.value, node.language, bubble, apaasify]);
 
     const customRender = editorProps?.codeProps?.render;
     if (!customRender) {
