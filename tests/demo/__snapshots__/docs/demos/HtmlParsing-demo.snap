@@ -87,6 +87,7 @@
               <div
                 class="select-none"
                 contenteditable="false"
+                data-be="hr"
                 data-slate-node="element"
                 data-slate-void="true"
                 style="height: 1px; background-color: rgb(229, 231, 235); margin: 2em 0px;"
@@ -413,6 +414,7 @@ console.log('嵌套的代码');
               <div
                 class="select-none"
                 contenteditable="false"
+                data-be="hr"
                 data-slate-node="element"
                 data-slate-void="true"
                 style="height: 1px; background-color: rgb(229, 231, 235); margin: 2em 0px;"
@@ -1196,6 +1198,7 @@ console.log('嵌套的代码');
               <div
                 class="select-none"
                 contenteditable="false"
+                data-be="hr"
                 data-slate-node="element"
                 data-slate-void="true"
                 style="height: 1px; background-color: rgb(229, 231, 235); margin: 2em 0px;"
@@ -1689,6 +1692,7 @@ console.log('嵌套的代码');
               <div
                 class="select-none"
                 contenteditable="false"
+                data-be="hr"
                 data-slate-node="element"
                 data-slate-void="true"
                 style="height: 1px; background-color: rgb(229, 231, 235); margin: 2em 0px;"
@@ -1765,6 +1769,7 @@ console.log('嵌套的代码');
               <div
                 class="select-none"
                 contenteditable="false"
+                data-be="hr"
                 data-slate-node="element"
                 data-slate-void="true"
                 style="height: 1px; background-color: rgb(229, 231, 235); margin: 2em 0px;"
@@ -1885,6 +1890,7 @@ console.log('嵌套的代码');
               <div
                 class="select-none"
                 contenteditable="false"
+                data-be="hr"
                 data-slate-node="element"
                 data-slate-void="true"
                 style="height: 1px; background-color: rgb(229, 231, 235); margin: 2em 0px;"
@@ -3105,6 +3111,7 @@ console.log('嵌套的代码');
               <div
                 class="select-none"
                 contenteditable="false"
+                data-be="hr"
                 data-slate-node="element"
                 data-slate-void="true"
                 style="height: 1px; background-color: rgb(229, 231, 235); margin: 2em 0px;"
