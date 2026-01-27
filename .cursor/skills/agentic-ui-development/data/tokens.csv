@@ -1,0 +1,52 @@
+category,token,type,description,example_value
+color,colorPrimary,color,主色调,#1677ff
+color,colorPrimaryHover,color,主色悬停,#4096ff
+color,colorPrimaryActive,color,主色激活,#0958d9
+color,colorPrimaryBg,color,主色背景,#e6f4ff
+color,colorSuccess,color,成功色,#52c41a
+color,colorWarning,color,警告色,#faad14
+color,colorError,color,错误色,#ff4d4f
+color,colorInfo,color,信息色,#1677ff
+color,colorText,color,主文本色,rgba(0 0 0 / 88%)
+color,colorTextSecondary,color,次要文本,rgba(0 0 0 / 65%)
+color,colorTextTertiary,color,三级文本,rgba(0 0 0 / 45%)
+color,colorTextDisabled,color,禁用文本,rgba(0 0 0 / 25%)
+color,colorBgContainer,color,容器背景,#ffffff
+color,colorBgLayout,color,布局背景,#f5f5f5
+color,colorBgElevated,color,浮层背景,#ffffff
+color,colorBorder,color,默认边框,#d9d9d9
+color,colorBorderSecondary,color,次要边框,#f0f0f0
+spacing,paddingXXS,number,极小内边距,4
+spacing,paddingXS,number,小内边距,8
+spacing,paddingSM,number,中小内边距,12
+spacing,padding,number,默认内边距,16
+spacing,paddingMD,number,中内边距,20
+spacing,paddingLG,number,大内边距,24
+spacing,paddingXL,number,超大内边距,32
+spacing,marginXXS,number,极小外边距,4
+spacing,marginXS,number,小外边距,8
+spacing,marginSM,number,中小外边距,12
+spacing,margin,number,默认外边距,16
+spacing,marginMD,number,中外边距,20
+spacing,marginLG,number,大外边距,24
+spacing,marginXL,number,超大外边距,32
+typography,fontSizeSM,number,小字号,12
+typography,fontSize,number,正文字号,14
+typography,fontSizeLG,number,大字号,16
+typography,fontSizeXL,number,标题字号,20
+typography,fontSizeHeading1,number,H1字号,38
+typography,fontSizeHeading2,number,H2字号,30
+typography,fontSizeHeading3,number,H3字号,24
+typography,fontWeightStrong,number,加粗字重,600
+typography,lineHeight,number,默认行高,1.5714
+radius,borderRadiusXS,number,极小圆角,2
+radius,borderRadiusSM,number,小圆角,4
+radius,borderRadius,number,默认圆角,6
+radius,borderRadiusLG,number,大圆角,8
+shadow,boxShadow,string,一级阴影,0 6px 16px rgba(0 0 0 / 8%)
+shadow,boxShadowSecondary,string,二级阴影,0 6px 16px rgba(0 0 0 / 12%)
+motion,motionDurationFast,string,快速动画,0.1s
+motion,motionDurationMid,string,中等动画,0.2s
+motion,motionDurationSlow,string,慢速动画,0.3s
+motion,motionEaseInOut,string,缓动函数,ease-in-out
+motion,motionEaseOut,string,出场缓动,ease-out

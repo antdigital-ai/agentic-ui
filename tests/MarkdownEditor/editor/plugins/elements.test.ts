@@ -97,11 +97,11 @@ describe('elements.ts', () => {
       expect(MdElements.inlineCode.matchKey).toBe('`');
       expect(MdElements.boldAndItalic.matchKey).toBe('*');
       expect(MdElements.strikethrough.matchKey).toBe('~');
+      expect(MdElements.code.matchKey).toBe(' ');
+      expect(MdElements.hr.matchKey).toBe(' ');
       
       // 检查没有 matchKey 的元素
       expect(MdElements.table.matchKey).toBeUndefined();
-      expect(MdElements.code.matchKey).toBeUndefined();
-      expect(MdElements.hr.matchKey).toBeUndefined();
       expect(MdElements.frontmatter.matchKey).toBeUndefined();
     });
 

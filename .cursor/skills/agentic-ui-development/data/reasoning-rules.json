@@ -1,0 +1,554 @@
+{
+  "version": "1.0.0",
+  "description": "Agentic UI 组件选择推理规则",
+  "rules": [
+    {
+      "id": "chat-interface",
+      "trigger_keywords": [
+        "chat",
+        "conversation",
+        "message",
+        "dialogue",
+        "对话"
+      ],
+      "recommended_components": [
+        "Bubble",
+        "ChatLayout",
+        "MarkdownInputField",
+        "History"
+      ],
+      "recommended_hooks": [
+        "useAutoScroll",
+        "useLanguage"
+      ],
+      "style_priority": [
+        "clean",
+        "minimal",
+        "accessible"
+      ],
+      "key_tokens": [
+        "colorBgContainer",
+        "colorText",
+        "padding",
+        "borderRadius"
+      ],
+      "anti_patterns": [
+        "Hardcoded colors",
+        "Inline styles",
+        "Missing loading states"
+      ]
+    },
+    {
+      "id": "ai-assistant",
+      "trigger_keywords": [
+        "ai",
+        "assistant",
+        "bot",
+        "copilot",
+        "agent",
+        "智能体"
+      ],
+      "recommended_components": [
+        "Bubble.AIBubble",
+        "ThoughtChainList",
+        "ToolUseBar",
+        "WelcomeMessage"
+      ],
+      "recommended_hooks": [
+        "useAutoScroll",
+        "useSpeechSynthesis"
+      ],
+      "style_priority": [
+        "modern",
+        "glassmorphism",
+        "dark-mode"
+      ],
+      "key_tokens": [
+        "colorPrimary",
+        "colorSuccess",
+        "motionDurationMid"
+      ],
+      "anti_patterns": [
+        "No thought chain for AI",
+        "Missing streaming support",
+        "No tool call visibility"
+      ]
+    },
+    {
+      "id": "thinking-process",
+      "trigger_keywords": [
+        "thought",
+        "thinking",
+        "reasoning",
+        "chain",
+        "step",
+        "process",
+        "思维",
+        "推理"
+      ],
+      "recommended_components": [
+        "ThoughtChainList",
+        "TaskList",
+        "ToolUseBar"
+      ],
+      "recommended_hooks": [],
+      "style_priority": [
+        "hierarchical",
+        "progressive",
+        "collapsible"
+      ],
+      "key_tokens": [
+        "colorTextSecondary",
+        "paddingSM",
+        "borderRadiusSM"
+      ],
+      "anti_patterns": [
+        "Flat display without hierarchy",
+        "No status indicators",
+        "Missing cost/time info"
+      ]
+    },
+    {
+      "id": "tool-calling",
+      "trigger_keywords": [
+        "tool",
+        "api",
+        "call",
+        "function",
+        "execute",
+        "action",
+        "工具",
+        "调用"
+      ],
+      "recommended_components": [
+        "ToolUseBar",
+        "ToolUseBarThink",
+        "AnswerAlert"
+      ],
+      "recommended_hooks": [],
+      "style_priority": [
+        "expandable",
+        "technical",
+        "detailed"
+      ],
+      "key_tokens": [
+        "colorInfo",
+        "colorSuccess",
+        "colorError"
+      ],
+      "anti_patterns": [
+        "No params display",
+        "Missing result preview",
+        "No error handling display"
+      ]
+    },
+    {
+      "id": "markdown-editing",
+      "trigger_keywords": [
+        "markdown",
+        "editor",
+        "rich",
+        "text",
+        "content",
+        "wysiwyg",
+        "编辑"
+      ],
+      "recommended_components": [
+        "MarkdownEditor",
+        "MarkdownInputField"
+      ],
+      "recommended_plugins": [
+        "code",
+        "katex",
+        "mermaid",
+        "chart"
+      ],
+      "style_priority": [
+        "clean",
+        "readable",
+        "focused"
+      ],
+      "key_tokens": [
+        "fontSize",
+        "lineHeight",
+        "colorText"
+      ],
+      "anti_patterns": [
+        "No plugin support",
+        "Missing toolbar",
+        "No streaming capability"
+      ]
+    },
+    {
+      "id": "workspace-panel",
+      "trigger_keywords": [
+        "workspace",
+        "panel",
+        "tab",
+        "browser",
+        "file",
+        "preview",
+        "工作区"
+      ],
+      "recommended_components": [
+        "Workspace",
+        "Workspace.Browser",
+        "Workspace.File",
+        "Workspace.Task"
+      ],
+      "recommended_hooks": [
+        "useElementSize"
+      ],
+      "style_priority": [
+        "tabbed",
+        "resizable",
+        "responsive"
+      ],
+      "key_tokens": [
+        "colorBgElevated",
+        "boxShadow",
+        "borderRadius"
+      ],
+      "anti_patterns": [
+        "Fixed size",
+        "No tab management",
+        "Missing close functionality"
+      ]
+    },
+    {
+      "id": "task-management",
+      "trigger_keywords": [
+        "task",
+        "todo",
+        "step",
+        "progress",
+        "checklist",
+        "任务"
+      ],
+      "recommended_components": [
+        "TaskList",
+        "ThoughtChainList"
+      ],
+      "recommended_hooks": [],
+      "style_priority": [
+        "list",
+        "status-driven",
+        "interactive"
+      ],
+      "key_tokens": [
+        "colorSuccess",
+        "colorWarning",
+        "colorError"
+      ],
+      "anti_patterns": [
+        "No status colors",
+        "Missing progress indication",
+        "Static display"
+      ]
+    },
+    {
+      "id": "history-management",
+      "trigger_keywords": [
+        "history",
+        "session",
+        "conversation",
+        "list",
+        "archive",
+        "历史"
+      ],
+      "recommended_components": [
+        "History",
+        "History.HistoryList",
+        "History.HistoryItem"
+      ],
+      "recommended_hooks": [
+        "useClickAway"
+      ],
+      "style_priority": [
+        "list",
+        "searchable",
+        "grouped"
+      ],
+      "key_tokens": [
+        "colorBgContainer",
+        "colorBorder",
+        "paddingSM"
+      ],
+      "anti_patterns": [
+        "No search",
+        "No grouping",
+        "Missing delete functionality"
+      ]
+    },
+    {
+      "id": "welcome-onboarding",
+      "trigger_keywords": [
+        "welcome",
+        "start",
+        "onboarding",
+        "guide",
+        "intro",
+        "欢迎"
+      ],
+      "recommended_components": [
+        "WelcomeMessage",
+        "SuggestionList"
+      ],
+      "recommended_hooks": [],
+      "style_priority": [
+        "friendly",
+        "clean",
+        "inviting"
+      ],
+      "key_tokens": [
+        "colorPrimary",
+        "fontSizeLG",
+        "paddingLG"
+      ],
+      "anti_patterns": [
+        "No suggestions",
+        "Missing call-to-action",
+        "Too much text"
+      ]
+    },
+    {
+      "id": "loading-feedback",
+      "trigger_keywords": [
+        "loading",
+        "spinner",
+        "wait",
+        "progress",
+        "加载"
+      ],
+      "recommended_components": [
+        "Loading",
+        "TextLoading",
+        "Robot"
+      ],
+      "recommended_hooks": [],
+      "style_priority": [
+        "animated",
+        "informative",
+        "non-blocking"
+      ],
+      "key_tokens": [
+        "colorPrimary",
+        "motionDurationMid"
+      ],
+      "anti_patterns": [
+        "No loading text",
+        "Blocking UI",
+        "Infinite without timeout"
+      ]
+    },
+    {
+      "id": "data-visualization",
+      "trigger_keywords": [
+        "chart",
+        "graph",
+        "data",
+        "visualization",
+        "analytics",
+        "图表"
+      ],
+      "recommended_components": [
+        "MarkdownEditor with chart plugin"
+      ],
+      "recommended_plugins": [
+        "chart"
+      ],
+      "chart_types": [
+        "AreaChart",
+        "BarChart",
+        "LineChart",
+        "DonutChart",
+        "RadarChart"
+      ],
+      "style_priority": [
+        "clear",
+        "labeled",
+        "interactive"
+      ],
+      "key_tokens": [
+        "colorPrimary",
+        "colorSuccess",
+        "colorWarning",
+        "colorError"
+      ],
+      "anti_patterns": [
+        "No legends",
+        "Missing labels",
+        "Poor color contrast"
+      ]
+    },
+    {
+      "id": "code-display",
+      "trigger_keywords": [
+        "code",
+        "syntax",
+        "highlight",
+        "programming",
+        "代码"
+      ],
+      "recommended_components": [
+        "MarkdownEditor with code plugin"
+      ],
+      "recommended_plugins": [
+        "code"
+      ],
+      "style_priority": [
+        "monospace",
+        "dark-theme",
+        "line-numbers"
+      ],
+      "key_tokens": [
+        "fontSizeSM",
+        "borderRadius"
+      ],
+      "anti_patterns": [
+        "No line numbers",
+        "No copy button",
+        "Poor syntax colors"
+      ]
+    },
+    {
+      "id": "math-formula",
+      "trigger_keywords": [
+        "math",
+        "formula",
+        "equation",
+        "latex",
+        "katex",
+        "公式"
+      ],
+      "recommended_components": [
+        "MarkdownEditor with katex plugin"
+      ],
+      "recommended_plugins": [
+        "katex"
+      ],
+      "style_priority": [
+        "readable",
+        "centered",
+        "formatted"
+      ],
+      "key_tokens": [
+        "fontSize",
+        "lineHeight"
+      ],
+      "anti_patterns": [
+        "Raw latex display",
+        "Broken rendering",
+        "Poor spacing"
+      ]
+    },
+    {
+      "id": "diagram-flowchart",
+      "trigger_keywords": [
+        "diagram",
+        "flowchart",
+        "sequence",
+        "uml",
+        "mermaid",
+        "流程图"
+      ],
+      "recommended_components": [
+        "MarkdownEditor with mermaid plugin"
+      ],
+      "recommended_plugins": [
+        "mermaid"
+      ],
+      "style_priority": [
+        "clear",
+        "responsive",
+        "interactive"
+      ],
+      "key_tokens": [
+        "colorPrimary",
+        "colorBgContainer"
+      ],
+      "anti_patterns": [
+        "Text overflow",
+        "No zoom",
+        "Broken on mobile"
+      ]
+    },
+    {
+      "id": "agentic-layout",
+      "trigger_keywords": [
+        "layout",
+        "app",
+        "structure",
+        "frame",
+        "布局"
+      ],
+      "recommended_components": [
+        "AgenticLayout",
+        "ChatLayout",
+        "LayoutHeader"
+      ],
+      "recommended_hooks": [
+        "useElementSize"
+      ],
+      "style_priority": [
+        "responsive",
+        "sidebar",
+        "header-content"
+      ],
+      "key_tokens": [
+        "colorBgLayout",
+        "colorBgContainer",
+        "paddingLG"
+      ],
+      "anti_patterns": [
+        "Fixed layout",
+        "No responsive",
+        "Missing header"
+      ]
+    }
+  ],
+  "anti_patterns_global": [
+    {
+      "id": "hardcoded-colors",
+      "description": "使用硬编码颜色值而非 token",
+      "bad_example": "color: '#1890ff'",
+      "good_example": "color: token.colorPrimary"
+    },
+    {
+      "id": "inline-styles",
+      "description": "使用内联样式而非 CSS-in-JS",
+      "bad_example": "style={{ padding: 16 }}",
+      "good_example": "className={styles.container}"
+    },
+    {
+      "id": "any-types",
+      "description": "使用 any 类型而非具体类型",
+      "bad_example": "props: any",
+      "good_example": "props: ComponentProps"
+    },
+    {
+      "id": "wrong-event-naming",
+      "description": "事件命名不符合规范",
+      "bad_example": "handleClick, clickHandler",
+      "good_example": "onClick"
+    },
+    {
+      "id": "missing-accessibility",
+      "description": "缺少无障碍属性",
+      "bad_example": "<div onClick={...}>",
+      "good_example": "<button onClick={...} aria-label='...'>"
+    }
+  ],
+  "pre_delivery_checklist": [
+    "Uses @ant-design/cssinjs createStyles",
+    "All colors from token system",
+    "TypeScript types complete (no any)",
+    "Event handlers with 'on' prefix",
+    "BEM class naming",
+    "Unit tests included (≥80% coverage)",
+    "Proper error boundaries",
+    "Accessibility (aria-* attributes)",
+    "Performance optimization (memo, useMemo, useCallback)",
+    "Responsive design support"
+  ]
+}

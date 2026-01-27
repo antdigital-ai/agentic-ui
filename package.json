@@ -1,6 +1,6 @@
 {
   "name": "@ant-design/agentic-ui",
-  "version": "2.29.15",
+  "version": "2.29.16",
   "description": "面向智能体的 UI 组件库，提供多步推理可视化、工具调用展示、任务执行协同等 Agentic UI 能力",
   "repository": "git@github.com:ant-design/agentic-ui.git",
   "license": "MIT",

@@ -107,6 +107,7 @@ export const MdElements: Record<string, MdNode> = {
     },
   },
   code: {
+    matchKey: ' ',
     reg: /^\s*(```|···)([\w#\-+*]{1,30})?\s*$/,
     run: ({ editor, path, match }) => {
       const lang = match[2];
@@ -296,7 +297,8 @@ export const MdElements: Record<string, MdNode> = {
     },
   },
   hr: {
-    reg: /^\s*\*\*\*|___|---\s*/,
+    matchKey: ' ',
+    reg: /^\s*(\*\*\*|___|---)\s*$/,
     checkAllow: (ctx) =>
       ctx.node?.[0]?.type === 'paragraph' && ctx.node[1][0] !== 0,
     run: ({ editor, path }) => {
@@ -307,6 +309,7 @@ export const MdElements: Record<string, MdNode> = {
         { at: path },
       );
       insertAfter(editor, path);
+      return true;
     },
   },
   hrSpace: {
@@ -427,7 +430,7 @@ export const MdElements: Record<string, MdNode> = {
 };
 
 export const BlockMathNodes = Object.entries(MdElements)
-  .filter((c) => !c[1].matchKey)
+  .filter((c) => !c[1].matchKey || ['code', 'hr'].includes(c[0]))
   .map((c) => Object.assign(c[1], { type: c[0] }));
 export const TextMatchNodes = Object.entries(MdElements)
   .filter((c) => !!c[1].matchKey)

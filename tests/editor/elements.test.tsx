@@ -1,9 +1,11 @@
 import { createEditor, Editor, Element, Range } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  BlockMathNodes,
   CheckMdParams,
   insertAfter,
   MdElements,
+  TextMatchNodes,
 } from '../../src/MarkdownEditor/editor/plugins/elements';
 
 // Mock EditorUtils
@@ -390,18 +392,14 @@ describe('elements.ts', () => {
 
   describe('BlockMathNodes and TextMatchNodes', () => {
     it('should filter block nodes correctly', () => {
-      const blockNodes = Object.entries(MdElements)
-        .filter((c) => !c[1].matchKey)
-        .map((c) => Object.assign(c[1], { type: c[0] }));
-
-      expect(blockNodes).toContainEqual(
+      expect(BlockMathNodes).toContainEqual(
         expect.objectContaining({
           type: 'table',
           reg: expect.any(RegExp),
         }),
       );
 
-      expect(blockNodes).toContainEqual(
+      expect(BlockMathNodes).toContainEqual(
         expect.objectContaining({
           type: 'code',
           reg: expect.any(RegExp),
@@ -410,11 +408,7 @@ describe('elements.ts', () => {
     });
 
     it('should filter text match nodes correctly', () => {
-      const textMatchNodes = Object.entries(MdElements)
-        .filter((c) => !!c[1].matchKey)
-        .map((c) => Object.assign(c[1], { type: c[0] }));
-
-      expect(textMatchNodes).toContainEqual(
+      expect(TextMatchNodes).toContainEqual(
         expect.objectContaining({
           type: 'head',
           matchKey: ' ',
@@ -422,7 +416,7 @@ describe('elements.ts', () => {
         }),
       );
 
-      expect(textMatchNodes).toContainEqual(
+      expect(TextMatchNodes).toContainEqual(
         expect.objectContaining({
           type: 'link',
           matchKey: ')',

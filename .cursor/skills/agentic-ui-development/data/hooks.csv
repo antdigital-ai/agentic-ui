@@ -1,0 +1,13 @@
+id,name,keywords,source_path,description,returns
+1,useAutoScroll,auto scroll messages chat,src/Hooks/useAutoScroll.tsx,自动滚动到底部,"ref,scrollToBottom"
+2,useLanguage,language locale i18n translate,src/Hooks/useLanguage.ts,多语言支持,"locale,t,setLocale"
+3,useRefFunction,ref callback stable function,src/Hooks/useRefFunction/,创建稳定的回调函数引用,stableCallback
+4,useThrottleFn,throttle debounce rate limit,src/Hooks/useThrottleFn/,函数节流,"throttledFn,cancel"
+5,useDebounceFn,debounce delay wait,src/Hooks/useDebounceFn/,函数防抖,"debouncedFn,cancel"
+6,useClickAway,click outside close modal,src/Hooks/useClickAway.ts,点击外部区域检测,void
+7,useCopied,copy clipboard text,src/Hooks/useCopied.ts,复制到剪贴板,"copied,copy"
+8,useElementSize,size width height resize,src/Hooks/useElementSize.ts,元素尺寸监听,"width,height"
+9,useSpeechSynthesis,speech voice tts,src/Hooks/useSpeechSynthesis.ts,语音合成,"speak,cancel,speaking"
+10,useSelStatus,selection slate editor,src/MarkdownEditor/hooks/editor.ts,编辑器选区状态,selStatus
+11,useIntersectionOnce,intersection observer visible once,src/Hooks/useIntersectionOnce.ts,一次性交叉观察器检测元素可见性,"ref,isVisible"
+12,useStyle,style css theme token,src/Hooks/useStyle/,样式生成Hook基于token系统,"styles,cx,hashId"

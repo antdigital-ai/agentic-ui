@@ -1,0 +1,6 @@
+id,name,name_cn,keywords,source_path,description,dependencies
+1,chart,图表插件,"chart,graph,visualization,bar,line,pie,area",src/Plugins/chart/,数据可视化图表插件支持多种图表类型,"chart.js,react-chartjs-2"
+2,code,代码插件,"code,syntax,highlight,programming,language",src/Plugins/code/,代码高亮和编辑支持130+语言,"ace-builds"
+3,katex,公式插件,"math,formula,latex,equation,katex",src/Plugins/katex/,LaTeX数学公式渲染,"katex"
+4,mermaid,图表插件,"mermaid,diagram,flowchart,sequence,uml",src/Plugins/mermaid/,Mermaid图表渲染,"mermaid"
+5,formatter,格式化插件,"format,code,prettier,beautify",src/Plugins/formatter/,代码格式化工具,""

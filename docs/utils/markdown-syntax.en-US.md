@@ -15,6 +15,8 @@ This document introduces common Markdown syntax to help you get started with wri
 
 Use `#` to denote headers level 1-6.
 
+**Quick Input Tip**: Type 1-6 `#` characters at the beginning of a line followed by a **Space** to automatically convert it to the corresponding header style.
+
 ```markdown
 # Header 1
 
@@ -88,6 +90,8 @@ Use `console.log()` to output logs.
 
 Use three backticks \`\`\` to wrap code blocks, and specify the language.
 
+**Quick Input Tip**: Type \`\`\` (optional language name) at the beginning of a line followed by a **Space** to automatically convert it to a code block.
+
 ````markdown
 ```javascript
 function hello() {
@@ -124,6 +128,8 @@ Use `|` to separate cells, and `-` to separate headers and content.
 ## Horizontal Rules
 
 Use three or more `-`, `*`, or `_`.
+
+**Quick Input Tip**: Type `---`, `***`, or `___` at the beginning of a line (except the very first line of the document) followed by a **Space** to automatically convert it to a horizontal rule.
 
 ```markdown
 ---
