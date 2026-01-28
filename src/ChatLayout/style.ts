@@ -125,14 +125,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '&-content': {
+        position: 'relative',
+        zIndex: 1,
         width: '100%',
-
         paddingBottom: 'var(--radius-xl)',
         flex: 1,
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        position: 'relative',
 
         '&-scrollable': {
           flex: 1,
@@ -169,8 +169,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background:
-          'linear-gradient(to bottom, #fff0 20%, var(--color-gray-bg-card-white) 70%)',
         width: '100%',
         paddingTop: 8,
         paddingBottom: 24,
@@ -183,11 +181,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-footer-background': {
         position: 'absolute',
-        top: 0,
         left: 0,
         right: 0,
         bottom: 0,
+        width: '100%',
+        height: 146,
         pointerEvents: 'none',
+        overflow: 'hidden',
       },
       [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
         '&-header': {

@@ -10,7 +10,7 @@ import React, {
 import { LayoutHeader } from '../Components/LayoutHeader';
 import useAutoScroll from '../Hooks/useAutoScroll';
 import { useElementSize } from '../Hooks/useElementSize';
-import FooterBackgroundLottie from './components/FooterBackgroundLottie';
+import FooterBackground from './components/FooterBackground';
 import { useStyle } from './style';
 import type { ChatLayoutProps, ChatLayoutRef } from './types';
 
@@ -153,15 +153,15 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
             )}
           </div>
         </div>
+        {showFooterBackground && (
+          <FooterBackground className={footerBackgroundClassName} />
+        )}
         {footer && (
           <div
             ref={footerRef}
             className={footerClassName}
             style={{ minHeight: footerHeight, ...styles?.footer }}
           >
-            {showFooterBackground && (
-              <FooterBackgroundLottie className={footerBackgroundClassName} />
-            )}
             {footer}
           </div>
         )}
