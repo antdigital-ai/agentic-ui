@@ -374,7 +374,7 @@ export class EditorStore {
 
     const chunkSize = options?.chunkSize ?? 5000;
     const separator = options?.separator ?? /\n\n/;
-    const useRAF = options?.useRAF ?? true;
+    const useRAF = options?.useRAF ?? false;
     const batchSize = options?.batchSize ?? 50;
     const targetPlugins = plugins || this.plugins;
 
