@@ -94,6 +94,34 @@ describe('BaseMarkdownEditor', () => {
       });
     });
 
+    it('应该在 initValue 为空字符串时正常渲染', async () => {
+      const { container } = render(
+        <BaseMarkdownEditor initValue="" onChange={vi.fn()} />,
+      );
+      await waitFor(() => {
+        expect(container.querySelector('.markdown-editor')).toBeInTheDocument();
+        expect(screen.getByTestId('slate-markdown-editor')).toBeInTheDocument();
+      });
+    });
+
+    it('应该在 initValue 为 undefined 时正常渲染', async () => {
+      const { container } = render(
+        <BaseMarkdownEditor initValue={undefined} onChange={vi.fn()} />,
+      );
+      await waitFor(() => {
+        expect(container.querySelector('.markdown-editor')).toBeInTheDocument();
+        expect(screen.getByTestId('slate-markdown-editor')).toBeInTheDocument();
+      });
+    });
+
+    it('应该在不传 initValue 时正常渲染', async () => {
+      const { container } = render(<BaseMarkdownEditor onChange={vi.fn()} />);
+      await waitFor(() => {
+        expect(container.querySelector('.markdown-editor')).toBeInTheDocument();
+        expect(screen.getByTestId('slate-markdown-editor')).toBeInTheDocument();
+      });
+    });
+
     it('应该应用自定义 className 和样式', () => {
       const { container } = render(
         <BaseMarkdownEditor

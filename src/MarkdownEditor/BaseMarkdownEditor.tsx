@@ -222,14 +222,21 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
    * 初始化 schema
    */
   const initSchemaValue = useMemo(() => {
-    let list = parserMdToSchema(initValue!, props.plugins)?.schema;
+    // 安全地获取解析结果，确保 list 始终是数组
+    const parseResult = parserMdToSchema(initValue || '', props.plugins);
+    let list = parseResult?.schema || [];
+
+    // 如果不是只读模式，添加一个空段落以便编辑
     if (!props.readonly) {
-      list.push(EditorUtils.p);
+      list = [...list, EditorUtils.p];
     }
+
+    // 优先使用外部传入的 initSchemaValue，否则根据 initValue 决定
     const schema =
       props.initSchemaValue ||
       (initValue ? list : JSON.parse(JSON.stringify([EditorUtils.p])));
 
+    // 过滤掉无效的空节点
     return schema?.filter((item: any) => {
       if (item.type === 'p' && item.children.length === 0) {
         return false;
