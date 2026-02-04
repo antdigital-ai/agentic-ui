@@ -238,7 +238,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
 
     // 过滤掉无效的空节点
     return schema?.filter((item: any) => {
-      if (item.type === 'p' && item.children.length === 0) {
+      if (item.type === 'paragraph' && item.children.length === 0) {
         return false;
       }
       if (
