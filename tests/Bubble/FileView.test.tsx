@@ -17,6 +17,9 @@ vi.mock('../../src/MarkdownInputField/FileMapView', () => ({
       <div data-testid="file-map-showMoreButton">
         {String(props.showMoreButton ?? '')}
       </div>
+      <div data-testid="file-map-style">
+        {props.style ? JSON.stringify(props.style) : 'none'}
+      </div>
       <div data-testid="file-map-fileCount">{props.fileMap?.size || 0}</div>
       {props.onPreview && (
         <button
@@ -64,10 +67,17 @@ vi.mock('../../src/MarkdownInputField/FileMapView', () => ({
           const file = new File([], 'test.pdf') as AttachmentFile;
           file.uuid = 'file-1';
           const action = props.renderMoreAction(file);
-          return action ? <div data-testid="more-action">{action}</div> : null;
+          // 即使是空字符串也应该渲染
+          return action !== undefined && action !== null ? (
+            <div data-testid="more-action">{action}</div>
+          ) : null;
         })()}
       {props.customSlot && (
-        <div data-testid="custom-slot">{props.customSlot}</div>
+        <div data-testid="custom-slot">
+          {typeof props.customSlot === 'function'
+            ? props.customSlot(new File([], 'test.pdf') as AttachmentFile)
+            : props.customSlot}
+        </div>
       )}
     </div>
   ),
@@ -193,7 +203,7 @@ describe('BubbleFileView', () => {
       );
     });
 
-    it('应该传递 showMoreButton', () => {
+    it('应该传递 showMoreButton 为 true', () => {
       const props = {
         ...defaultProps,
         bubble: {
@@ -207,6 +217,40 @@ describe('BubbleFileView', () => {
       render(<BubbleFileView {...props} />);
       expect(screen.getByTestId('file-map-showMoreButton')).toHaveTextContent(
         'true',
+      );
+    });
+
+    it('应该传递 showMoreButton 为 false', () => {
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewConfig: {
+            showMoreButton: false,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.getByTestId('file-map-showMoreButton')).toHaveTextContent(
+        'false',
+      );
+    });
+
+    it('应该处理 showMoreButton 为 undefined', () => {
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewConfig: {
+            showMoreButton: undefined,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.getByTestId('file-map-showMoreButton')).toHaveTextContent(
+        '',
       );
     });
 
@@ -225,6 +269,44 @@ describe('BubbleFileView', () => {
       render(<BubbleFileView {...props} />);
       expect(screen.getByTestId('custom-slot')).toHaveTextContent(
         'Custom Slot Content',
+      );
+    });
+
+    it('应该处理函数形式的 customSlot', () => {
+      const customSlot = (file: AttachmentFile) => (
+        <div>Custom Slot for {file.name}</div>
+      );
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewConfig: {
+            customSlot,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.getByTestId('custom-slot')).toHaveTextContent(
+        'Custom Slot for test.pdf',
+      );
+    });
+
+    it('应该传递 style 属性', () => {
+      const customStyle = { backgroundColor: 'red', width: '100px' };
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewConfig: {
+            style: customStyle,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.getByTestId('file-map-style')).toHaveTextContent(
+        JSON.stringify(customStyle),
       );
     });
   });
@@ -328,6 +410,77 @@ describe('BubbleFileView', () => {
       render(<BubbleFileView {...defaultProps} />);
       expect(screen.queryByTestId('more-action')).not.toBeInTheDocument();
     });
+
+    it('应该处理返回 null 的 renderFileMoreAction 函数', () => {
+      const renderFn = () => null;
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewConfig: {
+            renderFileMoreAction: renderFn,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.queryByTestId('more-action')).not.toBeInTheDocument();
+    });
+
+    it('应该处理返回 undefined 的 renderFileMoreAction 函数', () => {
+      const renderFn = () => undefined;
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewConfig: {
+            renderFileMoreAction: renderFn,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.queryByTestId('more-action')).not.toBeInTheDocument();
+    });
+
+    it('应该处理返回空字符串的 renderFileMoreAction 函数', () => {
+      const renderFn = () => '';
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewConfig: {
+            renderFileMoreAction: renderFn,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.getByTestId('more-action')).toHaveTextContent('');
+    });
+
+    it('应该处理复杂的嵌套函数形式的 renderFileMoreAction', () => {
+      const renderFn = () => (file: AttachmentFile) => (
+        <div>
+          <span>File: {file.name}</span>
+          <button type="button">操作</button>
+        </div>
+      );
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewConfig: {
+            renderFileMoreAction: renderFn,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.getByTestId('more-action')).toHaveTextContent(
+        'File: test.pdf操作',
+      );
+    });
   });
 
   describe('fileViewEvents 事件处理', () => {
@@ -419,6 +572,52 @@ describe('BubbleFileView', () => {
       expect(screen.queryByTestId('preview-button')).not.toBeInTheDocument();
       expect(screen.queryByTestId('download-button')).not.toBeInTheDocument();
       expect(screen.queryByTestId('view-all-button')).not.toBeInTheDocument();
+    });
+
+    it('应该处理 fileViewEvents 抛出异常的情况', () => {
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewEvents: () => {
+            throw new Error('Test error');
+          },
+        },
+      };
+
+      // 不应该抛出异常，而应该静默处理
+      expect(() => render(<BubbleFileView {...props} />)).not.toThrow();
+      expect(screen.getByTestId('file-map-view')).toBeInTheDocument();
+    });
+
+    it('应该处理 fileViewEvents 返回 undefined 的情况', () => {
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewEvents: () => undefined,
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.getByTestId('file-map-view')).toBeInTheDocument();
+      expect(screen.queryByTestId('preview-button')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('download-button')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('view-all-button')).not.toBeInTheDocument();
+    });
+
+    it('应该处理 fileViewEvents 返回非对象的情况', () => {
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewEvents: () => 'not-an-object' as any,
+        },
+      };
+
+      // 不应该抛出异常
+      expect(() => render(<BubbleFileView {...props} />)).not.toThrow();
+      expect(screen.getByTestId('file-map-view')).toBeInTheDocument();
     });
 
     it('应该正确传递 defaultHandlers 给 fileViewEvents', () => {
@@ -596,6 +795,129 @@ describe('BubbleFileView', () => {
       render(<BubbleFileView {...props} />);
       expect(capturedDefaults).toHaveBeenCalled();
     });
+
+    it('默认 onPreview 应该在没有 window 对象时静默处理', () => {
+      // 使用 spy 来模拟 window.open 为 null
+      const openSpy = vi
+        .spyOn(window, 'open')
+        .mockImplementation(() => null as any);
+
+      const capturedDefaults = vi.fn((defaults) => {
+        const file = new File([], 'test.pdf') as AttachmentFile;
+        file.uuid = 'file-no-window';
+        file.url = 'http://example.com/test.pdf';
+        file.previewUrl = 'http://example.com/preview/test.pdf';
+
+        // 模拟 window 为 undefined 的情况
+        const originalWindow = window;
+        Object.defineProperty(globalThis, 'window', {
+          value: undefined,
+          writable: true,
+        });
+
+        defaults.onPreview(file);
+
+        // 恢复原始 window 对象
+        Object.defineProperty(globalThis, 'window', {
+          value: originalWindow,
+          writable: true,
+        });
+
+        return {};
+      });
+
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewEvents: capturedDefaults,
+        },
+      };
+
+      // 不应该抛出异常
+      expect(() => render(<BubbleFileView {...props} />)).not.toThrow();
+
+      // 恢复 spy
+      openSpy.mockRestore();
+    });
+
+    it('默认 onDownload 应该在没有 document 对象时静默处理', () => {
+      const capturedDefaults = vi.fn((defaults) => {
+        const file = new File([], 'test.pdf') as AttachmentFile;
+        file.uuid = 'file-no-document';
+        file.url = 'http://example.com/test.pdf';
+
+        // 模拟 document 为 undefined 的情况
+        const originalDocument = document;
+        Object.defineProperty(globalThis, 'document', {
+          value: undefined,
+          writable: true,
+        });
+
+        defaults.onDownload(file);
+
+        // 恢复原始 document 对象
+        Object.defineProperty(globalThis, 'document', {
+          value: originalDocument,
+          writable: true,
+        });
+
+        return {};
+      });
+
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewEvents: capturedDefaults,
+        },
+      };
+
+      // 不应该抛出异常
+      expect(() => render(<BubbleFileView {...props} />)).not.toThrow();
+    });
+
+    it('默认 onPreview 应该在文件没有 url 和 previewUrl 时静默处理', () => {
+      const capturedDefaults = vi.fn((defaults) => {
+        const file = new File([], 'test.pdf') as AttachmentFile;
+        file.uuid = 'file-no-url';
+        // 不设置 url 和 previewUrl
+        defaults.onPreview(file);
+        return {};
+      });
+
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewEvents: capturedDefaults,
+        },
+      };
+
+      // 不应该抛出异常
+      expect(() => render(<BubbleFileView {...props} />)).not.toThrow();
+    });
+
+    it('默认 onDownload 应该在文件没有 url 时静默处理', () => {
+      const capturedDefaults = vi.fn((defaults) => {
+        const file = new File([], 'test.pdf') as AttachmentFile;
+        file.uuid = 'file-no-url';
+        // 不设置 url
+        defaults.onDownload(file);
+        return {};
+      });
+
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewEvents: capturedDefaults,
+        },
+      };
+
+      // 不应该抛出异常
+      expect(() => render(<BubbleFileView {...props} />)).not.toThrow();
+    });
   });
 
   describe('边界情况', () => {
@@ -648,6 +970,90 @@ describe('BubbleFileView', () => {
 
       render(<BubbleFileView {...props} />);
       expect(screen.getByTestId('file-map-fileCount')).toHaveTextContent('3');
+    });
+
+    it('应该处理不同类型的文件', () => {
+      const createTypedMockFile = (
+        uuid: string,
+        name: string,
+        type: string,
+      ): AttachmentFile => {
+        const file = new File([], name, {
+          type,
+        }) as AttachmentFile;
+        file.uuid = uuid;
+        file.url = `http://example.com/${name}`;
+        file.previewUrl = `http://example.com/preview/${name}`;
+        file.status = 'done';
+        return file;
+      };
+
+      const fileMap = new Map([
+        [
+          'file-1',
+          createTypedMockFile('file-1', 'document.pdf', 'application/pdf'),
+        ],
+        ['file-2', createTypedMockFile('file-2', 'image.jpg', 'image/jpeg')],
+        [
+          'file-3',
+          createTypedMockFile('file-3', 'data.json', 'application/json'),
+        ],
+        [
+          'file-4',
+          createTypedMockFile(
+            'file-4',
+            'sheet.xlsx',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          ),
+        ],
+        ['file-5', createTypedMockFile('file-5', 'text.txt', 'text/plain')],
+      ]);
+
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          originData: {
+            ...defaultProps.bubble.originData,
+            fileMap,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.getByTestId('file-map-fileCount')).toHaveTextContent('5');
+    });
+
+    it('应该处理空文件名的情况', () => {
+      const createEmptyNameFile = (uuid: string): AttachmentFile => {
+        const file = new File([], '', {
+          type: 'application/pdf',
+        }) as AttachmentFile;
+        file.uuid = uuid;
+        file.url = `http://example.com/${uuid}.pdf`;
+        file.previewUrl = `http://example.com/preview/${uuid}.pdf`;
+        file.status = 'done';
+        return file;
+      };
+
+      const fileMap = new Map([
+        ['file-1', createEmptyNameFile('file-1')],
+        ['file-2', createEmptyNameFile('file-2')],
+      ]);
+
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          originData: {
+            ...defaultProps.bubble.originData,
+            fileMap,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(screen.getByTestId('file-map-fileCount')).toHaveTextContent('2');
     });
   });
 });

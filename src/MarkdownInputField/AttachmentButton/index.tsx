@@ -1,7 +1,8 @@
 import { Paperclip } from '@sofa-design/icons';
 import { ConfigProvider, message } from 'antd';
 import classNames from 'classnames';
-import { default as React, useContext } from 'react';
+import React, { useContext } from 'react';
+import type { LocalKeys } from '../../I18n';
 import { compileTemplate } from '../../I18n';
 import AttachmentButtonPopover, {
   AttachmentButtonPopoverProps,
@@ -33,10 +34,13 @@ export type AttachmentButtonProps = {
   supportedFormat?: AttachmentButtonPopoverProps['supportedFormat'];
   /** 是否禁用按钮 */
   disabled?: boolean;
+  /** 国际化文案，会传递给 AttachmentButtonPopover。支持 `input.openGallery`、`input.openFile`、`input.supportedFormatMessage` 等 */
+  locale?: Partial<LocalKeys>;
   /** 自定义渲染函数，用于替换默认的 Popover */
   render?: (props: {
     children: React.ReactNode;
     supportedFormat?: AttachmentButtonPopoverProps['supportedFormat'];
+    locale?: Partial<LocalKeys>;
   }) => React.ReactElement;
   /** 删除文件回调 */
   onDelete?: (file: AttachmentFile) => Promise<void>;
@@ -109,8 +113,14 @@ const getLocaleMessage = (locale: any, key: string, defaultMsg: string) => {
   return locale?.[key] || defaultMsg;
 };
 
-const validateFileCount = (fileCount: number, props: UploadProps): boolean => {
-  if (props.maxFileCount && fileCount > props.maxFileCount) {
+const validateFileCount = (
+  newFileCount: number,
+  existingFileCount: number,
+  props: UploadProps,
+): boolean => {
+  const totalFileCount = newFileCount + existingFileCount;
+
+  if (props.maxFileCount && totalFileCount > props.maxFileCount) {
     const msg = props.locale?.['markdownInput.maxFileCountExceeded']
       ? compileTemplate(props.locale['markdownInput.maxFileCountExceeded'], {
           maxFileCount: String(props.maxFileCount),
@@ -120,7 +130,7 @@ const validateFileCount = (fileCount: number, props: UploadProps): boolean => {
     return false;
   }
 
-  if (props.minFileCount && fileCount < props.minFileCount) {
+  if (props.minFileCount && totalFileCount < props.minFileCount) {
     const msg = props.locale?.['markdownInput.minFileCountRequired']
       ? compileTemplate(props.locale['markdownInput.minFileCountRequired'], {
           minFileCount: String(props.minFileCount),
@@ -277,18 +287,22 @@ export const upLoadFileToServer = async (
   props: UploadProps,
 ) => {
   const map = props.fileMap || new Map<string, AttachmentFile>();
+  const existingFileCount = map.size;
   const hideLoading = message.loading(
     getLocaleMessage(props.locale, 'uploading', DEFAULT_MESSAGES.uploading),
   );
 
   const fileList = Array.from(files) as AttachmentFile[];
   fileList.forEach(prepareFile);
-  fileList.forEach((file) => updateFileMap(map, file, props.onFileMapChange));
 
-  if (!validateFileCount(fileList.length, props)) {
+  // 在添加到 fileMap 之前先验证文件数量
+  if (!validateFileCount(fileList.length, existingFileCount, props)) {
     hideLoading();
     return;
   }
+
+  // 验证通过后再添加到 fileMap
+  fileList.forEach((file) => updateFileMap(map, file, props.onFileMapChange));
 
   try {
     for (let i = 0; i < fileList.length; i++) {
@@ -327,7 +341,9 @@ const ButtonContent: React.FC<{ title?: React.ReactNode }> = ({ title }) => {
   return (
     <>
       <Paperclip />
-      {title !== null && <div style={BUTTON_TITLE_STYLE}>{title}</div>}
+      {title !== null && title ? (
+        <div style={BUTTON_TITLE_STYLE}>{title}</div>
+      ) : null}
     </>
   );
 };
@@ -351,11 +367,11 @@ const ButtonContent: React.FC<{ title?: React.ReactNode }> = ({ title }) => {
 export const AttachmentButton: React.FC<
   AttachmentButtonProps & {
     /** 上传图片的处理函数 */
-    uploadImage(): Promise<void>;
+    uploadImage(forGallery?: boolean): Promise<void>;
     /** 按钮标题文本 */
     title?: React.ReactNode;
   }
-> = ({ disabled, uploadImage, title, supportedFormat, render }) => {
+> = ({ disabled, uploadImage, title, supportedFormat, locale, render }) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const prefix = context?.getPrefixCls('agentic-md-editor-attachment-button');
   const { wrapSSR, hashId } = useStyle(prefix);
@@ -377,9 +393,14 @@ export const AttachmentButton: React.FC<
     render({
       children: buttonWithStyle,
       supportedFormat: format,
+      locale,
     })
   ) : (
-    <AttachmentButtonPopover supportedFormat={format}>
+    <AttachmentButtonPopover
+      supportedFormat={format}
+      uploadImage={uploadImage}
+      locale={locale}
+    >
       {buttonWithStyle}
     </AttachmentButtonPopover>
   );

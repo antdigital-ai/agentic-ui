@@ -17,6 +17,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
+import { resolveCssVariable } from '../utils';
 import {
   SINGLE_MODE_DESKTOP_CUTOUT,
   SINGLE_MODE_MOBILE_CUTOUT,
@@ -85,6 +86,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   width = 200,
   height = 200,
   className,
+  classNames: classNamesProp,
   title,
   showToolbar = true,
   onDownload,
@@ -97,6 +99,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   toolbarExtra,
   renderFilterInToolbar = false,
   statistic: statisticConfig,
+  loading = false,
   ...props
 }) => {
   useMemo(() => {
@@ -295,10 +298,12 @@ const DonutChart: React.FC<DonutChartProps> = ({
   return (
     <ChartContainer
       baseClassName={baseClassName}
-      className={className}
+      className={classNames(classNamesProp?.root, className)}
       variant={props.variant}
       style={{
         ['--donut-item-min-width' as any]: `${dimensions.width}px`,
+        ...props.style,
+        ...props.styles?.root,
       }}
     >
       {showToolbar && (
@@ -312,6 +317,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
               onDownload={handleDownload}
               extra={toolbarExtra}
               dataTime={dataTime}
+              loading={loading}
               filter={
                 renderFilterInToolbar && shouldShowFilter ? (
                   <ChartFilter
@@ -337,10 +343,9 @@ const DonutChart: React.FC<DonutChartProps> = ({
           )}
           {statistics && (
             <div
-              className={classNames(
-                `${baseClassName}-statistic-container`,
-                hashId,
-              )}
+              className={[`${baseClassName}-statistic-container`, hashId]
+                .filter(Boolean)
+                .join(' ')}
             >
               {statistics.map((config, index) => (
                 <ChartStatistic
@@ -417,9 +422,15 @@ const DonutChart: React.FC<DonutChartProps> = ({
           );
           const backgroundColors = cfg.backgroundColor || defaultColorList;
 
+          // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+          const resolvedBackgroundColors = backgroundColors.map((color) =>
+            resolveCssVariable(color),
+          );
+
           const mainColor =
             cfg.backgroundColor?.[0] ??
             defaultColorList[idx % defaultColorList.length];
+          const resolvedMainColor = resolveCssVariable(mainColor);
 
           const chartJsData = {
             labels,
@@ -427,14 +438,14 @@ const DonutChart: React.FC<DonutChartProps> = ({
               {
                 data: safeValues,
                 backgroundColor: isSingleValueMode
-                  ? [mainColor, 'transparent']
-                  : backgroundColors.slice(0, values.length),
+                  ? [resolvedMainColor, 'transparent']
+                  : resolvedBackgroundColors.slice(0, values.length),
                 borderColor: isSingleValueMode
                   ? [cfg.borderColor || '#fff', 'transparent']
                   : cfg.borderColor || '#fff',
                 hoverBackgroundColor: isSingleValueMode
-                  ? [mainColor, 'transparent']
-                  : backgroundColors.slice(0, values.length),
+                  ? [resolvedMainColor, 'transparent']
+                  : resolvedBackgroundColors.slice(0, values.length),
                 hoverBorderColor: isSingleValueMode
                   ? [cfg.borderColor || '#fff', 'transparent']
                   : cfg.borderColor || '#fff',
@@ -520,7 +531,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
               },
             },
             animation: {
-              duration: isMobile ? 200 : 1000,
+              duration: isMobile ? 200 : 400,
             },
             interaction: {
               mode: 'point',

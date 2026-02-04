@@ -1,4 +1,4 @@
-﻿import { LoadingOutlined } from '@ant-design/icons';
+import { LoadingOutlined } from '@ant-design/icons';
 import { useMountMergeState } from '@ant-design/pro-components';
 import { Checkbox, ConfigProvider, Dropdown, Space } from 'antd';
 import classNames from 'classnames';
@@ -6,7 +6,6 @@ import React, { useContext, useEffect, useMemo } from 'react';
 import { ElementProps, ListItemNode } from '../../../el';
 import { useMEditor } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
-import { ListContext } from './List';
 
 type Mentions = { name: string; avatar?: string; id: string };
 
@@ -193,7 +192,6 @@ export const ListItem = ({
   const isTask = typeof element.checked === 'boolean';
   const context = useContext(ConfigProvider.ConfigContext);
   const listItemRender = editorProps?.comment?.listItemRender;
-  const { hashId = '' } = useContext(ListContext) || {};
   const baseCls = context.getPrefixCls('agentic-md-editor-list');
 
   const checkbox = React.useMemo(() => {
@@ -201,11 +199,14 @@ export const ListItem = ({
     return (
       <span
         contentEditable={false}
-        className={classNames(`${baseCls}-check-item`, hashId)}
+        data-check-item
+        className={classNames(`${baseCls}-check-item`)}
       >
         <Checkbox
           checked={element.checked}
-          onChange={(e) => update({ checked: e.target.checked })}
+          onChange={(e) => {
+            update({ checked: e.target.checked });
+          }}
         />
       </span>
     );
@@ -234,11 +235,13 @@ export const ListItem = ({
       };
       return (
         <li
-          className={classNames(`${baseCls}-item`, hashId, {
+          className={classNames(`${baseCls}-item`, {
             [`${baseCls}-task`]: isTask,
           })}
           data-be={'list-item'}
-          onDragStart={(e) => store.dragStart(e, markdownContainerRef.current!)}
+          onDragStart={(e) => {
+            store.dragStart(e, markdownContainerRef.current!);
+          }}
           {...attributes}
         >
           {listItemRender(props, { element, children, attributes })}
@@ -247,11 +250,13 @@ export const ListItem = ({
     }
     return (
       <li
-        className={classNames(`${baseCls}-item`, hashId, {
+        className={classNames(`${baseCls}-item`, {
           [`${baseCls}-task`]: isTask,
         })}
         data-be={'list-item'}
-        onDragStart={(e) => store.dragStart(e, markdownContainerRef.current!)}
+        onDragStart={(e) => {
+          store.dragStart(e, markdownContainerRef.current!);
+        }}
         {...attributes}
       >
         {checkbox}

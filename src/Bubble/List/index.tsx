@@ -1,14 +1,18 @@
 import SkeletonList from './SkeletonList';
+export { PureBubbleList } from './PureBubbleList';
 
-import { MutableRefObject, useContext, useMemo } from 'react';
+import { MutableRefObject, useContext, useMemo, useRef } from 'react';
 
 import type { BubbleMetaData, BubbleProps, MessageBubbleData } from '../type';
 
 import { ConfigProvider } from 'antd';
 import cx from 'classnames';
+import { nanoid } from 'nanoid';
 import React from 'react';
+import { LazyElement } from '../../MarkdownEditor/editor/components/LazyElement';
 import { Bubble } from '../Bubble';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
+import { LOADING_FLAT } from '../MessagesContent';
 import { useStyle } from './style';
 
 export type BubbleListProps = {
@@ -190,9 +194,19 @@ export type BubbleListProps = {
     bubbleListItemAvatarClassName?: string;
   };
 
+  /**
+   * @deprecated 请使用 onDislike 替代（符合命名规范）
+   */
   onDisLike?: BubbleProps['onDisLike'];
+  /** 不喜欢回调 */
+  onDislike?: BubbleProps['onDislike'];
   onLike?: BubbleProps['onLike'];
+  /**
+   * @deprecated 请使用 onLikeCancel 替代（符合命名规范）
+   */
   onCancelLike?: BubbleProps['onCancelLike'];
+  /** Like 子组件取消事件 */
+  onLikeCancel?: BubbleProps['onLikeCancel'];
   onReply?: BubbleProps['onReply'];
   onAvatarClick?: BubbleProps['onAvatarClick'];
   onDoubleClick?: BubbleProps['onDoubleClick'];
@@ -230,6 +244,48 @@ export type BubbleListProps = {
     e: React.TouchEvent<HTMLDivElement>,
     bubbleListRef: HTMLDivElement | null,
   ) => void;
+
+  /**
+   * 懒加载配置
+   * @description 启用后，只有进入视口的气泡才会被渲染，提升长列表性能
+   */
+  lazy?: {
+    /**
+     * 是否启用懒加载
+     */
+    enable: boolean;
+    /**
+     * 占位符高度（单位：px），默认 100px
+     */
+    placeholderHeight?: number;
+    /**
+     * 提前加载距离，默认 '200px'
+     * @description 元素距离视口多远时开始加载
+     */
+    rootMargin?: string;
+    /**
+     * 自定义占位符渲染函数
+     */
+    renderPlaceholder?: (props: {
+      height: number;
+      style: React.CSSProperties;
+      isIntersecting: boolean;
+      elementInfo?: {
+        type: string;
+        index: number;
+        total: number;
+        role?: 'user' | 'assistant';
+      };
+    }) => React.ReactNode;
+    /**
+     * 判断是否应该对指定索引的消息启用懒加载
+     * @description 返回 false 时，该消息将不启用懒加载，优先渲染
+     * @param index 消息索引
+     * @param total 消息总数
+     * @returns 是否启用懒加载
+     */
+    shouldLazyLoad?: (index: number, total: number) => boolean;
+  };
 };
 
 /**
@@ -257,9 +313,11 @@ export type BubbleListProps = {
  * @param {Function} [props.onWheel] - 滚轮事件回调
  * @param {Function} [props.onTouchMove] - 触摸移动事件回调
  * @param {Function} [props.onLike] - 点赞事件回调
- * @param {Function} [props.onDisLike] - 点踩事件回调
+ * @param {Function} [props.onDislike] - 点踩事件回调（符合命名规范）
+ * @param {Function} [props.onDisLike] - 点踩事件回调（已废弃，请使用 onDislike）
  * @param {Function} [props.onReply] - 回复事件回调
- * @param {Function} [props.onCancelLike] - 取消点赞事件回调
+ * @param {Function} [props.onLikeCancel] - 取消点赞事件回调（符合命名规范）
+ * @param {Function} [props.onCancelLike] - 取消点赞事件回调（已废弃，请使用 onLikeCancel）
  * @param {Function} [props.onAvatarClick] - 头像点击事件回调
  * @param {Function} [props.onDoubleClick] - 双击事件回调
  * @param {boolean|Function} [props.shouldShowCopy] - 是否显示复制按钮
@@ -318,16 +376,35 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
   const { wrapSSR, hashId } = useStyle(prefixClass);
   const deps = useMemo(() => [props.style], [JSON.stringify(props.style)]);
 
+  // 为 loading 项生成唯一的 key，使用 ref 缓存以确保稳定性
+  // 使用 item 的唯一标识（index + createAt）作为缓存 key
+  const loadingKeysRef = useRef<Map<string, string>>(new Map());
+
   const bubbleListDom = useMemo(() => {
+    const isLazyEnabled = props.lazy?.enable;
+    const totalCount = bubbleList.length;
+
     return bubbleList.map((item, index) => {
       const isLast = bubbleList.length - 1 === index;
       const placement = item.role === 'user' ? 'right' : 'left';
       // 保持向后兼容性，设置isLatest
       (item as any).isLatest = isLast;
       (item as any).isLast = isLast;
-      return (
+
+      // 如果 id 是 LOADING_FLAT，使用 uuid 作为 key
+      // 使用 index 和 createAt 的组合作为缓存 key，确保同一项在重新渲染时保持相同的 key
+      let itemKey = item.id;
+      if (item.id === LOADING_FLAT) {
+        const cacheKey = `${index}-${item.createAt || Date.now()}`;
+        if (!loadingKeysRef.current.has(cacheKey)) {
+          loadingKeysRef.current.set(cacheKey, nanoid());
+        }
+        itemKey = loadingKeysRef.current.get(cacheKey)!;
+      }
+
+      const bubbleElement = (
         <Bubble
-          key={item.id}
+          key={itemKey}
           data-id={item.id}
           avatar={{
             ...(item.role === 'user' ? userMeta : assistantMeta),
@@ -361,8 +438,10 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
           readonly={props.readonly}
           onReply={props.onReply}
           onDisLike={props.onDisLike}
+          onDislike={props.onDislike}
           onLike={props.onLike}
           onCancelLike={props.onCancelLike}
+          onLikeCancel={props.onLikeCancel}
           onAvatarClick={props.onAvatarClick}
           onDoubleClick={props.onDoubleClick}
           customConfig={props?.bubbleRenderConfig?.customConfig}
@@ -370,8 +449,57 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
           shouldShowVoice={props.shouldShowVoice}
         />
       );
+
+      // 如果启用了懒加载，用 LazyElement 包裹
+      if (isLazyEnabled) {
+        // 检查是否应该对该消息启用懒加载
+        const shouldLazyLoad =
+          props.lazy?.shouldLazyLoad?.(index, totalCount) ?? true;
+
+        // 如果不需要懒加载，直接返回元素
+        if (!shouldLazyLoad) {
+          return bubbleElement;
+        }
+
+        // 创建适配的 renderPlaceholder，将 role 信息添加到 elementInfo
+        const adaptedRenderPlaceholder = props.lazy?.renderPlaceholder
+          ? (
+              lazyProps: Parameters<
+                NonNullable<typeof props.lazy.renderPlaceholder>
+              >[0],
+            ) => {
+              return props.lazy!.renderPlaceholder!({
+                ...lazyProps,
+                elementInfo: lazyProps.elementInfo
+                  ? {
+                      ...lazyProps.elementInfo,
+                      role: item.role as 'user' | 'assistant',
+                    }
+                  : undefined,
+              });
+            }
+          : undefined;
+
+        return (
+          <LazyElement
+            key={itemKey}
+            placeholderHeight={props.lazy?.placeholderHeight ?? 100}
+            rootMargin={props.lazy?.rootMargin ?? '200px'}
+            renderPlaceholder={adaptedRenderPlaceholder}
+            elementInfo={{
+              type: 'bubble',
+              index,
+              total: totalCount,
+            }}
+          >
+            {bubbleElement}
+          </LazyElement>
+        );
+      }
+
+      return bubbleElement;
     });
-  }, [bubbleList, props.style]);
+  }, [bubbleList, props.style, props.lazy]);
 
   if (loading)
     return wrapSSR(

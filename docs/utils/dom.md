@@ -1,9 +1,9 @@
 ---
 nav:
-  title: 工具函数
+  title: 基础能力
   order: 5
 group:
-  title: 工具函数
+  title: 基础能力
   order: 5
 ---
 
@@ -167,7 +167,7 @@ if (selection && !selection.isCollapsed) {
 
 ```typescript | pure
 // 计算工具栏位置
-const editorElement = document.querySelector('.md-editor');
+const editorElement = document.querySelector('.agentic-ui');
 const toolbarElement = document.querySelector('.toolbar');
 
 if (editorElement && toolbarElement) {

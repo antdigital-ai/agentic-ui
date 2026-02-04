@@ -49,9 +49,12 @@ describe('History actionRef', () => {
     render(<TestComponent actionRef={actionRef} />);
 
     // 等待组件初始化
-    await waitFor(() => {
-      expect(mockRequest).toHaveBeenCalledWith({ agentId: 'test-agent' });
-    });
+    await waitFor(
+      () => {
+        expect(mockRequest).toHaveBeenCalledWith({ agentId: 'test-agent' });
+      },
+      { timeout: 1000 },
+    );
 
     // 验证 actionRef 被正确设置
     expect(actionRef.current).toBeDefined();
@@ -64,9 +67,12 @@ describe('History actionRef', () => {
     actionRef.current?.reload();
 
     // 验证 reload 方法被调用
-    await waitFor(() => {
-      expect(mockRequest).toHaveBeenCalledWith({ agentId: 'test-agent' });
-    });
+    await waitFor(
+      () => {
+        expect(mockRequest).toHaveBeenCalledWith({ agentId: 'test-agent' });
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('should reload data when actionRef.reload is called', async () => {
@@ -77,9 +83,12 @@ describe('History actionRef', () => {
     render(<TestComponent actionRef={actionRef} />);
 
     // 等待初始加载
-    await waitFor(() => {
-      expect(mockRequest).toHaveBeenCalledTimes(1);
-    });
+    await waitFor(
+      () => {
+        expect(mockRequest).toHaveBeenCalledTimes(1);
+      },
+      { timeout: 1000 },
+    );
 
     // 清空调用记录
     mockRequest.mockClear();
@@ -88,10 +97,13 @@ describe('History actionRef', () => {
     actionRef.current?.reload();
 
     // 验证重新加载
-    await waitFor(() => {
-      expect(mockRequest).toHaveBeenCalledTimes(1);
-      expect(mockRequest).toHaveBeenCalledWith({ agentId: 'test-agent' });
-    });
+    await waitFor(
+      () => {
+        expect(mockRequest).toHaveBeenCalledTimes(1);
+        expect(mockRequest).toHaveBeenCalledWith({ agentId: 'test-agent' });
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('should work without actionRef', async () => {
@@ -105,8 +117,11 @@ describe('History actionRef', () => {
     );
 
     // 验证组件正常工作
-    await waitFor(() => {
-      expect(mockRequest).toHaveBeenCalledWith({ agentId: 'test-agent' });
-    });
+    await waitFor(
+      () => {
+        expect(mockRequest).toHaveBeenCalledWith({ agentId: 'test-agent' });
+      },
+      { timeout: 1000 },
+    );
   });
 });

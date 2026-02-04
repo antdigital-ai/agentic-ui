@@ -1,4 +1,4 @@
-﻿import { CloseCircleFilled } from '@ant-design/icons';
+import { CloseCircleFilled } from '@ant-design/icons';
 import { Typography } from 'antd';
 import React, { useContext, useMemo } from 'react';
 import { LoadingSpinnerIcon } from '../Components/icons/LoadingSpinnerIcon';
@@ -20,7 +20,7 @@ import { WhiteBoxProcessInterface } from './types';
  * @param {string} [props['data-testid']] - 测试ID
  * @param {boolean} [props.isFinished] - 是否已完成
  * @param {MarkdownEditorProps} [props.markdownRenderProps] - Markdown渲染配置
- * @param {Function} [props.onChangeItem] - 项目变更回调
+ * @param {Function} [props.onItemChange] - 项目变更回调（Item 子组件事件）
  * @param {Object} [props.output] - 输出结果
  * @param {Object} [props.output.response] - 响应数据
  * @param {string} [props.output.errorMsg] - 错误消息
@@ -54,7 +54,20 @@ export const DeepThink = (
     'data-testid'?: string;
     isFinished?: boolean;
     markdownRenderProps?: MarkdownEditorProps;
+    /**
+     * Item 子组件变更事件
+     * @deprecated 请使用 onItemChange 替代（符合命名规范）
+     */
     onChangeItem?: (
+      item: WhiteBoxProcessInterface,
+      changeProps: {
+        feedbackContent: string;
+        feedbackType: 'sql' | 'toolArg';
+        feedbackRunId: string;
+      },
+    ) => void;
+    /** Item 子组件变更事件 */
+    onItemChange?: (
       item: WhiteBoxProcessInterface,
       changeProps: {
         feedbackContent: string;

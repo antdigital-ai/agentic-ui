@@ -1,7 +1,7 @@
 ---
 nav:
   title: Demo
-  order: 2
+  order: 5
 group:
   title: 通用
   order: 10
@@ -20,6 +20,10 @@ group:
 ### 图片
 
 <code src="../demos/image.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+### 图片错误处理
+
+<code src="../demos/image-error-handling.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ### 视频
 
@@ -59,6 +63,14 @@ group:
 
 <code src="../demos/toc-simple-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+### 列表代码
+
+<code src="../demos/li-code.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+### 表格行
+
+<code src="../demos/table_line.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 ## AI 辅助功能
 
 ### 思考过程展示
@@ -68,6 +80,10 @@ group:
 两种格式都会被渲染为相同的思考块组件，在只读模式下显示为美观的思考块 UI。
 
 <code src="../demos/ThinkTagDemo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+### 思考块自定义渲染
+
+<code src="../demos/eleItemRender-think-block-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ### HTML 标签解析
 

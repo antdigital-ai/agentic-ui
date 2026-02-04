@@ -12,7 +12,15 @@ import {
 } from '@sofa-design/icons';
 import { Empty } from 'antd';
 import classNames from 'classnames';
-import React, { type FC, useContext, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, {
+  type FC,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor';
@@ -164,21 +172,13 @@ const SearchInput: FC<SearchInputProps> = React.memo(
         <Input
           ref={inputRef}
           key="file-search-input" // 添加稳定的 key
-          style={{ marginBottom: 8 }}
           allowClear
           placeholder={
             searchPlaceholder ||
             locale?.['workspace.searchPlaceholder'] ||
             '搜索文件名'
           }
-          prefix={
-            <Search
-              style={{
-                color: 'var(--color-gray-text-secondary)',
-                fontSize: 16,
-              }}
-            />
-          }
+          prefix={<Search />}
           value={keyword ?? ''}
           onChange={(e) => onChange?.(e.target.value)}
         />
@@ -222,7 +222,13 @@ const FileItemComponent: FC<{
   const fileWithId = ensureNodeWithId(file);
   const fileTypeInfo = fileTypeProcessor.inferFileType(fileWithId);
 
+  // 禁用状态
+  const isDisabled = fileWithId.disabled === true;
+
   const handleClick = () => {
+    // 禁用状态下不响应点击
+    if (isDisabled) return;
+
     // 如果有传入 onClick 事件，优先使用
     if (onClick) {
       onClick(fileWithId);
@@ -305,6 +311,68 @@ const FileItemComponent: FC<{
     onLocate?.(fileWithId);
   };
 
+  // 内置操作按钮
+  const actionBtnClass = classNames(
+    `${finalPrefixCls}-item-action-btn`,
+    hashId,
+  );
+
+  const builtinActions = {
+    preview: showPreviewButton ? (
+      <ActionIconBox
+        key="preview"
+        title={locale?.['workspace.file.preview'] || '预览'}
+        onClick={handlePreview}
+        tooltipProps={{ mouseEnterDelay: 0.3 }}
+        className={actionBtnClass}
+      >
+        <EyeIcon />
+      </ActionIconBox>
+    ) : null,
+    locate: showLocationButton ? (
+      <ActionIconBox
+        key="locate"
+        title={locale?.['workspace.file.location'] || '定位'}
+        onClick={handleLocate}
+        tooltipProps={{ mouseEnterDelay: 0.3 }}
+        className={actionBtnClass}
+      >
+        <Locate />
+      </ActionIconBox>
+    ) : null,
+    share: showShareButton ? (
+      <ActionIconBox
+        key="share"
+        title={locale?.['workspace.file.share'] || '分享'}
+        onClick={handleShare}
+        tooltipProps={{ mouseEnterDelay: 0.3 }}
+        className={actionBtnClass}
+      >
+        <ShareIcon />
+      </ActionIconBox>
+    ) : null,
+    download: showDownloadButton ? (
+      <ActionIconBox
+        key="download"
+        title={locale?.['workspace.file.download'] || '下载'}
+        onClick={handleDownload}
+        tooltipProps={{ mouseEnterDelay: 0.3 }}
+        className={actionBtnClass}
+      >
+        <DownloadIcon />
+      </ActionIconBox>
+    ) : null,
+  };
+
+  // 自定义渲染上下文
+  const renderContext = {
+    file: fileWithId,
+    prefixCls: finalPrefixCls,
+    hashId: hashId || '',
+    disabled: isDisabled,
+    actions: builtinActions,
+  };
+
   return (
     <AccessibleButton
       icon={
@@ -318,123 +386,96 @@ const FileItemComponent: FC<{
           </div>
           <div className={classNames(`${finalPrefixCls}-item-info`, hashId)}>
             <div className={classNames(`${finalPrefixCls}-item-name`, hashId)}>
-              <Typography.Text ellipsis={{ tooltip: fileWithId.name }}>
-                {fileWithId.name}
-              </Typography.Text>
+              {fileWithId.renderName ? (
+                fileWithId.renderName(renderContext)
+              ) : (
+                <Typography.Text ellipsis={{ tooltip: fileWithId.name }}>
+                  {fileWithId.name}
+                </Typography.Text>
+              )}
             </div>
             <div
               className={classNames(`${finalPrefixCls}-item-details`, hashId)}
             >
-              <Typography.Text type="secondary" ellipsis>
-                <span
-                  className={classNames(`${finalPrefixCls}-item-type`, hashId)}
-                >
-                  {fileTypeInfo.displayType || fileTypeInfo.fileType}
-                </span>
-                {fileWithId.size && (
-                  <>
-                    <span
-                      className={classNames(
-                        `${finalPrefixCls}-item-separator`,
-                        hashId,
-                      )}
-                    >
-                      |
-                    </span>
-                    <span
-                      className={classNames(
-                        `${finalPrefixCls}-item-size`,
-                        hashId,
-                      )}
-                    >
-                      {formatFileSize(fileWithId.size)}
-                    </span>
-                  </>
-                )}
-                {fileWithId.lastModified && (
-                  <>
-                    <span
-                      className={classNames(
-                        `${finalPrefixCls}-item-separator`,
-                        hashId,
-                      )}
-                    >
-                      |
-                    </span>
-                    <span
-                      className={classNames(
-                        `${finalPrefixCls}-item-time`,
-                        hashId,
-                      )}
-                    >
-                      {formatLastModified(fileWithId.lastModified)}
-                    </span>
-                  </>
-                )}
-              </Typography.Text>
+              {fileWithId.renderDetails ? (
+                fileWithId.renderDetails(renderContext)
+              ) : (
+                <Typography.Text type="secondary" ellipsis>
+                  <span
+                    className={classNames(
+                      `${finalPrefixCls}-item-type`,
+                      hashId,
+                    )}
+                  >
+                    {fileTypeInfo.displayType || fileTypeInfo.fileType}
+                  </span>
+                  {fileWithId.size && (
+                    <>
+                      <span
+                        className={classNames(
+                          `${finalPrefixCls}-item-separator`,
+                          hashId,
+                        )}
+                      >
+                        |
+                      </span>
+                      <span
+                        className={classNames(
+                          `${finalPrefixCls}-item-size`,
+                          hashId,
+                        )}
+                      >
+                        {formatFileSize(fileWithId.size)}
+                      </span>
+                    </>
+                  )}
+                  {fileWithId.lastModified && (
+                    <>
+                      <span
+                        className={classNames(
+                          `${finalPrefixCls}-item-separator`,
+                          hashId,
+                        )}
+                      >
+                        |
+                      </span>
+                      <span
+                        className={classNames(
+                          `${finalPrefixCls}-item-time`,
+                          hashId,
+                        )}
+                      >
+                        {formatLastModified(fileWithId.lastModified)}
+                      </span>
+                    </>
+                  )}
+                </Typography.Text>
+              )}
             </div>
           </div>
           <div
             className={classNames(`${finalPrefixCls}-item-actions`, hashId)}
             onClick={(e) => e.stopPropagation()}
           >
-            {showPreviewButton && (
-              <ActionIconBox
-                title={locale?.['workspace.file.preview'] || '预览'}
-                onClick={handlePreview}
-                tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${finalPrefixCls}-item-action-btn`,
-                  hashId,
-                )}
-              >
-                <EyeIcon />
-              </ActionIconBox>
-            )}
-            {showLocationButton && (
-              <ActionIconBox
-                title={locale?.['workspace.file.location'] || '定位'}
-                onClick={handleLocate}
-                tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${finalPrefixCls}-item-action-btn`,
-                  hashId,
-                )}
-              >
-                <Locate />
-              </ActionIconBox>
-            )}
-            {showShareButton && (
-              <ActionIconBox
-                title={locale?.['workspace.file.share'] || '分享'}
-                onClick={handleShare}
-                tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${finalPrefixCls}-item-action-btn`,
-                  hashId,
-                )}
-              >
-                <ShareIcon />
-              </ActionIconBox>
-            )}
-            {showDownloadButton && (
-              <ActionIconBox
-                title={locale?.['workspace.file.download'] || '下载'}
-                onClick={handleDownload}
-                tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${finalPrefixCls}-item-action-btn`,
-                  hashId,
-                )}
-              >
-                <DownloadIcon />
-              </ActionIconBox>
-            )}
+            {fileWithId.renderActions ? (
+              fileWithId.renderActions(renderContext)
+            ) : !isDisabled ? (
+              <>
+                {builtinActions.preview}
+                {builtinActions.locate}
+                {builtinActions.share}
+                {builtinActions.download}
+              </>
+            ) : null}
           </div>
         </>
       }
       onClick={handleClick}
-      className={classNames(`${finalPrefixCls}-item`, hashId)}
+      className={classNames(
+        `${finalPrefixCls}-item`,
+        { [`${finalPrefixCls}-item-disabled`]: isDisabled },
+        hashId,
+      )}
       ariaLabel={`${locale?.['workspace.file'] || '文件'}：${fileWithId.name}`}
       id={bindDomId ? fileWithId.id : undefined}
     />
@@ -474,7 +515,16 @@ const GroupHeader: FC<{
     if (group.canDownload !== undefined) {
       return group.canDownload;
     }
-    return Boolean(onGroupDownload);
+    if (!onGroupDownload) {
+      return false;
+    }
+    // 如果组内所有文件都明确禁止下载，则不显示分组下载
+    return group.children.some(
+      (child) =>
+        child.canDownload === true ||
+        (child.canDownload !== false &&
+          Boolean(child.url || child.content || child.file)),
+    );
   })();
 
   return (
@@ -575,6 +625,33 @@ const FileGroupComponent: FC<{
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const finalPrefixCls = prefixCls || getPrefixCls('workspace-file');
+  const contentVariants = useMemo(
+    () => ({
+      expanded: {
+        height: 'auto',
+        opacity: 1,
+      },
+      collapsed: {
+        height: 0,
+        opacity: 0,
+      },
+    }),
+    [],
+  );
+
+  const contentTransition = useMemo(
+    () => ({
+      height: {
+        duration: 0.26,
+        ease: [0.4, 0, 0.2, 1],
+      },
+      opacity: {
+        duration: 0.2,
+        ease: 'linear',
+      },
+    }),
+    [],
+  );
   return (
     <div className={classNames(`${finalPrefixCls}-container--group`, hashId)}>
       <GroupHeader
@@ -584,24 +661,34 @@ const FileGroupComponent: FC<{
         prefixCls={finalPrefixCls}
         hashId={hashId}
       />
-      {!group.collapsed && (
-        <div className={classNames(`${finalPrefixCls}-group-content`, hashId)}>
-          {group.children.map((file) => (
-            <FileItemComponent
-              key={file.id}
-              file={file}
-              onClick={onFileClick}
-              onDownload={onDownload}
-              onPreview={onPreview}
-              onShare={onShare}
-              onLocate={onLocate}
-              prefixCls={finalPrefixCls}
-              hashId={hashId}
-              bindDomId={!!bindDomId}
-            />
-          ))}
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {!group.collapsed && (
+          <motion.div
+            key="group-content"
+            variants={contentVariants}
+            initial="collapsed"
+            animate="expanded"
+            exit="collapsed"
+            transition={contentTransition}
+            className={classNames(`${finalPrefixCls}-group-content`, hashId)}
+          >
+            {group.children.map((file) => (
+              <FileItemComponent
+                key={file.id}
+                file={file}
+                onClick={onFileClick}
+                onDownload={onDownload}
+                onPreview={onPreview}
+                onShare={onShare}
+                onLocate={onLocate}
+                prefixCls={finalPrefixCls}
+                hashId={hashId}
+                bindDomId={!!bindDomId}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -613,7 +700,13 @@ export const FileComponent: FC<{
   onShare?: FileProps['onShare'];
   onFileClick?: FileProps['onFileClick'];
   onLocate?: FileProps['onLocate'];
+  /**
+   * Group 子组件切换事件
+   * @deprecated 请使用 onGroupToggle 替代（符合命名规范）
+   */
   onToggleGroup?: FileProps['onToggleGroup'];
+  /** Group 子组件切换事件 */
+  onGroupToggle?: FileProps['onGroupToggle'];
   onPreview?: FileProps['onPreview'];
   onBack?: FileProps['onBack'];
   /** 重置标识，用于重置预览状态（内部使用） */
@@ -652,6 +745,7 @@ export const FileComponent: FC<{
   onFileClick,
   onLocate,
   onToggleGroup,
+  onGroupToggle,
   onPreview,
   onBack,
   resetKey,
@@ -782,8 +876,12 @@ export const FileComponent: FC<{
       ...prev,
       [groupId]: collapsed,
     }));
-    // 如果外部提供了回调，也调用它
-    onToggleGroup?.(type, collapsed);
+    // 优先使用新的事件名，保持向后兼容
+    if (onGroupToggle) {
+      onGroupToggle(type, collapsed);
+    } else if (onToggleGroup) {
+      onToggleGroup(type, collapsed);
+    }
   };
 
   // 包装后的返回逻辑，允许外部拦截
@@ -814,9 +912,7 @@ export const FileComponent: FC<{
   const handlePreview = async (file: FileNode) => {
     // 如果用户提供了预览方法，尝试使用用户的方法
     if (onPreview) {
-      // 立刻进入预览页并展示 loading
       const currentCallId = ++previewRequestIdRef.current;
-      setPreviewFile(file);
 
       try {
         const previewData = await onPreview(file);
@@ -828,6 +924,7 @@ export const FileComponent: FC<{
           setPreviewFile(null);
           return;
         }
+        // 只有当返回结果不是 false 时，才设置预览文件并处理预览数据
         if (previewData) {
           // 区分返回类型：ReactNode -> 自定义内容；FileNode -> 新文件预览
           if (
@@ -836,6 +933,7 @@ export const FileComponent: FC<{
             typeof previewData === 'number' ||
             typeof previewData === 'boolean'
           ) {
+            setPreviewFile(file);
             const content = React.isValidElement(previewData)
               ? React.cloneElement(previewData as React.ReactElement, {
                   setPreviewHeader: (header: React.ReactNode) =>
@@ -869,6 +967,7 @@ export const FileComponent: FC<{
           }
           return;
         }
+        // previewData 为 undefined 或 null，使用默认预览
         setCustomPreviewContent(null);
         setPreviewFile(file);
         return;
@@ -957,7 +1056,7 @@ export const FileComponent: FC<{
   // 图片预览组件
   const ImagePreviewComponent = (
     <Image
-      style={{ display: 'none' }}
+      className={classNames(`${prefixCls}-hidden-image`, hashId)}
       src={imagePreview.src}
       preview={{
         visible: imagePreview.visible,

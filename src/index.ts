@@ -1,4 +1,6 @@
 export type { RenderElementProps } from 'slate-react';
+import './root.css';
+
 // 统一类型导出 - 最优先导出，避免循环依赖
 export * from './AgenticLayout';
 export * from './AgentRunBar';
@@ -31,9 +33,11 @@ export * from './MarkdownEditor/editor/store';
 export * from './MarkdownEditor/editor/utils';
 export * from './MarkdownEditor/editor/utils/docx/index';
 export * from './MarkdownEditor/editor/utils/markdownToHtml';
+export * from './ToolUseBarThink';
 export * from './Types';
 export { default as Workspace } from './Workspace';
 // HTML to Markdown conversion utilities
+export * from './AILabel';
 export * from './AnswerAlert';
 export * from './BackTo';
 export { ActionItemBox } from './Components/ActionItemBox';
@@ -59,6 +63,7 @@ export { default as Robot } from './Components/Robot';
 
 // Quote 组件导出
 export { default as Quote } from './Quote';
+export type { QuoteProps } from './Quote';
 
 // 新增：图表插件对外导出
 export * from './Plugins/chart';
@@ -137,3 +142,9 @@ export * from './MarkdownInputField/AttachmentButton/AttachmentFileList/Attachme
 
 export * from './MarkdownInputField/AttachmentButton/AttachmentFileList';
 export * from './MarkdownInputField/AttachmentButton/utils';
+
+/**
+ * Schema Element Editor Chrome 插件底层 SDK
+ * @description 原始 SDK 导出，一般用户无需直接使用
+ */
+export * from '@schema-element-editor/host-sdk';

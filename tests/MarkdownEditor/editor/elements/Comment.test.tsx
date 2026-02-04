@@ -90,8 +90,9 @@ describe('Comment', () => {
           comment={{}}
           commentItem={mockCommentItem}
           id="test-id"
-          hashId="test-hash"
+         
         >
+          
           <span>Test content</span>
         </CommentView>,
       );
@@ -109,7 +110,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={mockCommentItem}
           id="test-id"
-          hashId="test-hash"
+         
         >
           <span>Test content</span>
         </CommentView>,
@@ -131,7 +132,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={mockCommentItem}
           id="test-id"
-          hashId="test-hash"
+         
         >
           <span>Test content</span>
         </CommentView>,
@@ -155,7 +156,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-          hashId="test-hash"
+         
         >
           <span>Test content</span>
         </CommentView>,
@@ -173,7 +174,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={undefined as any}
           id="test-id"
-          hashId="test-hash"
+         
         >
           <span>Test content</span>
         </CommentView>,
@@ -191,7 +192,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-          hashId="test-hash"
+         
         >
           <span>Test content</span>
         </CommentView>,
@@ -208,7 +209,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={mockCommentItem}
           id="test-id"
-          hashId="test-hash"
+         
         >
           <div>
             <span>Complex content</span>
@@ -270,7 +271,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={multipleCommentItems}
           id="test-id"
-          hashId="test-hash"
+         
         >
           <span>Test content</span>
         </CommentView>,
@@ -396,7 +397,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-          hashId="test-hash"
+         
         >
           {null}
         </CommentView>,
@@ -411,7 +412,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-          hashId="test-hash"
+         
         >
           {''}
         </CommentView>,
@@ -426,7 +427,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-          hashId="test-hash"
+         
         >
           {123}
         </CommentView>,
@@ -441,7 +442,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-          hashId="test-hash"
+         
         >
           {true}
         </CommentView>,

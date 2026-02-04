@@ -6,7 +6,7 @@
 
 import { SearchOutlined } from '@ant-design/icons';
 import { AutoComplete, Button, Input, Popover } from 'antd';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { I18nContext } from '../../../I18n';
 import { langIconMap } from '../langIconMap';
 import { langOptions } from '../utils/langOptions';
@@ -61,13 +61,39 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
   const i18n = useContext(I18nContext);
   // 搜索关键字状态
   const [keyword, setKeyword] = useState('');
+  // Popover 打开状态
+  const [open, setOpen] = useState(false);
+  // 跟踪用户是否手动关闭过弹层
+  const hasUserClosedRef = useRef(false);
+  // 跟踪上一次的语言值
+  const prevLanguageRef = useRef<string | undefined>(undefined);
 
   // 处理未定义的 element
   const safeElement = props.element || { language: undefined, katex: false };
 
+  // 如果语言为空且用户未手动关闭过，自动打开下拉框
+  useEffect(() => {
+    const currentLanguage = safeElement.language;
+    const prevLanguage = prevLanguageRef.current;
+
+    // 如果语言从有值变为空，重置关闭标记
+    if (prevLanguage && !currentLanguage && !safeElement.katex) {
+      hasUserClosedRef.current = false;
+    }
+
+    // 如果语言为空且用户未手动关闭过，自动打开下拉框
+    if (!currentLanguage && !safeElement.katex && !hasUserClosedRef.current) {
+      setOpen(true);
+    }
+
+    // 更新上一次的语言值
+    prevLanguageRef.current = currentLanguage;
+  }, [safeElement.language, safeElement.katex]);
+
   return (
     <Popover
       arrow={false}
+      open={open}
       styles={{
         body: {
           padding: 8,
@@ -76,6 +102,7 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
       trigger={['click']}
       placement={'bottomLeft'}
       onOpenChange={(visible) => {
+        setOpen(visible);
         if (visible) {
           // 弹层打开时，延时聚焦到搜索框
           setTimeout(() => {
@@ -86,39 +113,50 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
             )?.focus();
           });
         } else {
-          // 弹层关闭时清空搜索关键字
+          // 弹层关闭时清空搜索关键字，并标记用户已手动关闭
           setKeyword('');
+          hasUserClosedRef.current = true;
         }
       }}
       content={
-        <AutoComplete
-          value={keyword}
-          options={langOptions}
-          autoFocus={true}
-          style={{ width: 200 }}
-          filterOption={(text, item) => {
-            // 根据输入的文本过滤语言选项
-            return item?.value.includes(text) || false;
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
           }}
-          onSelect={(selectedLanguage) => {
-            // 选择语言后执行回调
-            props.setLanguage?.(selectedLanguage);
-          }}
-          onChange={(inputValue) => {
-            // 更新搜索关键字
-            setKeyword(inputValue);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              // 阻止 Enter 键的默认行为
-              e.preventDefault();
-              e.stopPropagation();
-            }
-          }}
-          className={'lang-select'}
         >
-          <Input prefix={<SearchOutlined />} placeholder={'Search'} />
-        </AutoComplete>
+          <AutoComplete
+            value={keyword}
+            options={langOptions}
+            autoFocus={true}
+            style={{ width: 200 }}
+            filterOption={(text, item) => {
+              // 根据输入的文本过滤语言选项
+              return item?.value.includes(text) || false;
+            }}
+            onSelect={(selectedLanguage) => {
+              // 选择语言后执行回调并关闭弹层
+              props.setLanguage?.(selectedLanguage);
+              setOpen(false);
+              // 重置关闭标记，以便下次语言为空时能再次自动打开
+              hasUserClosedRef.current = false;
+            }}
+            onChange={(inputValue) => {
+              // 更新搜索关键字
+              setKeyword(inputValue);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                // 阻止 Enter 键的默认行为
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }}
+            className={'lang-select'}
+          >
+            <Input prefix={<SearchOutlined />} placeholder={'Search'} />
+          </AutoComplete>
+        </div>
       }
     >
       <Button

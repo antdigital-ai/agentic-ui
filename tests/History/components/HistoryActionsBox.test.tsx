@@ -112,18 +112,24 @@ describe('HistoryActionsBox', () => {
     expect(favoriteButton).toBeInTheDocument();
     fireEvent.click(favoriteButton);
 
-    await waitFor(() => {
-      expect(onFavorite).toHaveBeenCalledWith('session-1', true);
-    });
+    await waitFor(
+      () => {
+        expect(onFavorite).toHaveBeenCalledWith('session-1', true);
+      },
+      { timeout: 1000 },
+    );
 
     // 点击后应该变成已收藏状态
-    await waitFor(() => {
-      const updatedButtons = screen.getAllByTestId('action-icon-box');
-      const favoritedButton = updatedButtons.find(
-        (btn) => btn.getAttribute('data-title') === '已收藏',
-      );
-      expect(favoritedButton).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        const updatedButtons = screen.getAllByTestId('action-icon-box');
+        const favoritedButton = updatedButtons.find(
+          (btn) => btn.getAttribute('data-title') === '已收藏',
+        );
+        expect(favoritedButton).toBeInTheDocument();
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该处理取消收藏', async () => {
@@ -149,9 +155,12 @@ describe('HistoryActionsBox', () => {
     expect(favoriteButton).toBeInTheDocument();
     fireEvent.click(favoriteButton);
 
-    await waitFor(() => {
-      expect(onFavorite).toHaveBeenCalledWith('session-1', false);
-    });
+    await waitFor(
+      () => {
+        expect(onFavorite).toHaveBeenCalledWith('session-1', false);
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该显示删除确认对话框', async () => {
@@ -176,9 +185,12 @@ describe('HistoryActionsBox', () => {
     fireEvent.click(deleteButton);
 
     // 应该显示确认对话框
-    await waitFor(() => {
-      expect(screen.getByText('确定删除该消息吗？')).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText('确定删除该消息吗？')).toBeInTheDocument();
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该处理删除操作', async () => {
@@ -207,9 +219,12 @@ describe('HistoryActionsBox', () => {
     });
     fireEvent.click(confirmButton);
 
-    await waitFor(() => {
-      expect(onDeleteItem).toHaveBeenCalled();
-    });
+    await waitFor(
+      () => {
+        expect(onDeleteItem).toHaveBeenCalled();
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('应该处理取消删除', async () => {
@@ -297,14 +312,20 @@ describe('HistoryActionsBox', () => {
     expect(favoriteButton).toBeInTheDocument();
     fireEvent.click(favoriteButton);
 
-    await waitFor(() => {
-      expect(onFavorite).toHaveBeenCalled();
-    });
+    await waitFor(
+      () => {
+        expect(onFavorite).toHaveBeenCalled();
+      },
+      { timeout: 1000 },
+    );
 
     // 即使出错，loading 状态也应该被重置
-    await waitFor(() => {
-      expect(favoriteButton).not.toHaveAttribute('disabled');
-    });
+    await waitFor(
+      () => {
+        expect(favoriteButton).not.toHaveAttribute('disabled');
+      },
+      { timeout: 1000 },
+    );
 
     consoleError.mockRestore();
   });
@@ -338,9 +359,12 @@ describe('HistoryActionsBox', () => {
     });
     fireEvent.click(confirmButton);
 
-    await waitFor(() => {
-      expect(onDeleteItem).toHaveBeenCalled();
-    });
+    await waitFor(
+      () => {
+        expect(onDeleteItem).toHaveBeenCalled();
+      },
+      { timeout: 1000 },
+    );
 
     consoleError.mockRestore();
   });

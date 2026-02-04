@@ -49,7 +49,7 @@ const mockData: VisualListItem[] = [
  */
 export default function VisualListDemo() {
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h2>基础用法</h2>
       <VisualList data={mockData} />
 

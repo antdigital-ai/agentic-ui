@@ -2,8 +2,8 @@
 title: TextLoading 文字加载
 atomId: TextLoading
 group:
-  title: 通用
-  order: 5
+  title: 对话流
+  order: 3
 ---
 
 # TextLoading 文字加载

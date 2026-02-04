@@ -23,7 +23,13 @@ import {
 } from '../components';
 import { defaultColorList } from '../const';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
-import { findDataPointByXValue, isXValueEqual, toNumber } from '../utils';
+import type { ChartClassNames, ChartStyles } from '../types/classNames';
+import {
+  findDataPointByXValue,
+  isXValueEqual,
+  resolveCssVariable,
+  toNumber,
+} from '../utils';
 import { useStyle } from './style';
 
 let funnelChartComponentsRegistered = false;
@@ -54,6 +60,8 @@ export interface FunnelChartProps extends ChartContainerProps {
   height?: number | string;
   /** 自定义CSS类名 */
   className?: string;
+  /** 自定义CSS类名（支持对象格式，为每层DOM设置类名） */
+  classNames?: ChartClassNames;
   /** 数据时间 */
   dataTime?: string;
   /** 图表主题 */
@@ -82,6 +90,10 @@ export interface FunnelChartProps extends ChartContainerProps {
     /** 类型名称，用于图例和数据集标签 */
     name: string;
   };
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
+  /** 自定义样式对象（支持对象格式，为每层DOM设置样式） */
+  styles?: ChartStyles;
 }
 
 const FunnelChart: React.FC<FunnelChartProps> = ({
@@ -91,6 +103,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   width = 600,
   height = 400,
   className,
+  classNames: classNamesProp,
   dataTime,
   theme = 'light',
   showLegend = true,
@@ -102,6 +115,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   bottomLayerMinWidth = 0,
   typeNames,
   statistic: statisticConfig,
+  loading = false,
   ...props
 }) => {
   useMemo(() => {
@@ -143,7 +157,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('funnel-chart-container');
-  const { hashId, wrapSSR } = useStyle(baseClassName);
+  const { wrapSSR } = useStyle(baseClassName);
 
   const chartRef = useRef<ChartJS<'bar'>>(null);
   const [showTrapezoid, setShowTrapezoid] = useState(true);
@@ -252,6 +266,8 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     string
   > = useMemo(() => {
     const baseColor = color || defaultColorList[0];
+    // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+    const resolvedBaseColor = resolveCssVariable(baseColor);
     const labels = stages.map((x) => x.toString());
 
     const values = stages.map((x) => {
@@ -276,7 +292,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
 
       const maxValue = Math.max(...values);
       const minValue = Math.min(...values);
-      
+
       // 如果最小值已经满足最小宽度要求，无需调整
       if (minValue >= maxValue * bottomLayerMinWidth) {
         return values;
@@ -285,7 +301,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
       // 线性映射到 [minWidth, maxValue] 区间
       const minWidth = bottomLayerMinWidth * maxValue;
       const range = maxValue - minValue;
-      
+
       return values.map((v) => {
         if (range === 0) return maxValue;
         const normalized = (v - minValue) / range;
@@ -326,7 +342,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     const count = Math.max(1, stages.length - 1);
     const colorList = stages.map((_, i) => {
       const t = (i / count) * 0.6; // 限制变浅上限，避免变白
-      return lighten(baseColor, t);
+      return lighten(resolvedBaseColor, t);
     });
 
     return {
@@ -549,6 +565,9 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
         border: { display: false },
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   const handleDownload = () => downloadChart(chartRef.current, 'funnel-chart');
@@ -716,14 +735,20 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     return undefined;
   }, [isMobile, width]);
 
+  const classNamesObj = classNamesProp;
+
   return wrapSSR(
     <ChartContainer
       baseClassName={baseClassName}
-      className={`${className || ''} ${containerClassName}`.trim()}
+      className={classNames(classNamesObj?.root, className, containerClassName)}
       theme={theme}
       isMobile={isMobile}
       variant={props.variant}
-      style={containerStyle}
+      style={{
+        ...containerStyle,
+        ...props.style,
+        ...props.styles?.root,
+      }}
     >
       <ChartToolBar
         title={title}
@@ -731,6 +756,9 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
         onDownload={handleDownload}
         dataTime={dataTime}
         extra={toolbarExtra}
+        loading={loading}
+        className={classNames(classNamesObj?.toolbar)}
+        style={props.styles?.toolbar}
         filter={
           renderFilterInToolbar && filterOptions && filterOptions.length > 1 ? (
             <ChartFilter
@@ -766,7 +794,11 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
       {/* 统计数据组件 */}
       {statistics && (
         <div
-          className={classNames(`${baseClassName}-statistic-container`, hashId)}
+          className={classNames(
+            classNamesObj?.statisticContainer,
+            `${baseClassName}-statistic-container`,
+          )}
+          style={props.styles?.statisticContainer}
         >
           {statistics.map((config, index) => (
             <ChartStatistic key={index} {...config} theme={theme} />
@@ -775,8 +807,14 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
       )}
 
       <div
-        className={classNames(`${baseClassName}-wrapper`, hashId)}
-        style={{ height: finalHeight }}
+        className={classNames(
+          classNamesObj?.wrapper,
+          `${baseClassName}-wrapper`,
+        )}
+        style={{
+          height: finalHeight,
+          ...props.styles?.wrapper,
+        }}
       >
         <Bar
           key={`funnel-${pluginToggleKey}`}

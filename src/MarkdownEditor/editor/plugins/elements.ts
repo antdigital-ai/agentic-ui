@@ -10,7 +10,7 @@ import {
 } from 'slate';
 import { Elements, ListNode } from '../../el';
 import { TrNode } from '../elements/Table';
-import { decodeURIComponentUrl } from '../parser/parserMarkdownToSlateNode';
+import { decodeURIComponentUrl } from '../parser/parse/parseHtml';
 import { EditorUtils } from '../utils/editorUtils';
 
 export const insertAfter = (
@@ -107,6 +107,25 @@ export const MdElements: Record<string, MdNode> = {
     },
   },
   code: {
+    matchKey: ' ',
+    reg: /^\s*(```|···)([\w#\-+*]{1,30})?\s*$/,
+    run: ({ editor, path, match }) => {
+      const lang = match[2];
+      Transforms.delete(editor, { at: path });
+      Transforms.insertNodes(
+        editor,
+        {
+          type: 'code',
+          language: lang,
+          value: '',
+        },
+        { at: path, select: true },
+      );
+      return true;
+    },
+  },
+  codeSpace: {
+    matchKey: ' ',
     reg: /^\s*(```|···)([\w#\-+*]{1,30})?\s*$/,
     run: ({ editor, path, match }) => {
       const lang = match[2];
@@ -216,7 +235,7 @@ export const MdElements: Record<string, MdNode> = {
       Transforms.insertNodes(
         ctx.editor,
         {
-          type: 'list',
+          type: 'bulleted-list',
           task: true,
           children: [
             {
@@ -255,12 +274,12 @@ export const MdElements: Record<string, MdNode> = {
         at: path,
       });
       const start = match[1].match(/^\s*(\d+)\./);
+      const listType = start ? 'numbered-list' : 'bulleted-list';
       Transforms.insertNodes(
         editor,
         {
-          type: 'list',
-          order: !!start,
-          start: start ? +start[1] : undefined,
+          type: listType,
+          ...(start && { start: +start[1] }),
           children: [
             {
               type: 'list-item',
@@ -278,7 +297,24 @@ export const MdElements: Record<string, MdNode> = {
     },
   },
   hr: {
-    reg: /^\s*\*\*\*|___|---\s*/,
+    matchKey: ' ',
+    reg: /^\s*(\*\*\*|___|---)\s*$/,
+    checkAllow: (ctx) =>
+      ctx.node?.[0]?.type === 'paragraph' && ctx.node[1][0] !== 0,
+    run: ({ editor, path }) => {
+      Transforms.delete(editor, { at: path });
+      Transforms.insertNodes(
+        editor,
+        { type: 'hr', children: [{ text: '' }] },
+        { at: path },
+      );
+      insertAfter(editor, path);
+      return true;
+    },
+  },
+  hrSpace: {
+    matchKey: ' ',
+    reg: /^\s*(\*\*\*|___|---)\s*/,
     checkAllow: (ctx) =>
       ctx.node?.[0]?.type === 'paragraph' && ctx.node[1][0] !== 0,
     run: ({ editor, path }) => {
@@ -394,7 +430,7 @@ export const MdElements: Record<string, MdNode> = {
 };
 
 export const BlockMathNodes = Object.entries(MdElements)
-  .filter((c) => !c[1].matchKey)
+  .filter((c) => !c[1].matchKey || ['code', 'hr'].includes(c[0]))
   .map((c) => Object.assign(c[1], { type: c[0] }));
 export const TextMatchNodes = Object.entries(MdElements)
   .filter((c) => !!c[1].matchKey)

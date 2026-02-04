@@ -279,8 +279,14 @@ export const isXValueEqual = (
 export const extractAndSortXValues = (
   data: ChartDataItem[],
 ): Array<number | string> => {
-  // 提取所有 x 值并归一化
-  const normalizedValues = data.map((item) => normalizeXValue(item.x));
+  // 提取所有 x 值并归一化，同时过滤掉空值（null/undefined/空字符串）
+  const normalizedValues = data
+    .map((item) => item.x)
+    .filter(
+      (x) =>
+        x !== null && x !== undefined && x !== '' && String(x).trim() !== '',
+    )
+    .map((x) => normalizeXValue(x));
 
   // 去重并排序
   const uniqueValues = [...new Set(normalizedValues)];
@@ -376,3 +382,214 @@ export const toNumber = (val: any, fallback: number): number => {
 export const isNotEmpty = (val: any) => {
   return val !== null && val !== undefined;
 };
+
+/**
+ * 生成数据数组的快速哈希值
+ *
+ * 用于优化 useMemo 的依赖项比较，避免使用 JSON.stringify 的性能开销。
+ * 通过比较数组长度和最后一个元素的引用来快速判断数据是否变化。
+ * 适用于流式数据场景，当数据频繁追加时性能更好。
+ *
+ * @param {any[]} data - 数据数组
+ * @returns {string} 哈希值字符串
+ *
+ * @example
+ * ```typescript
+ * const hash1 = getDataHash([{ x: 1, y: 2 }]);
+ * const hash2 = getDataHash([{ x: 1, y: 2 }, { x: 3, y: 4 }]);
+ * // hash1 !== hash2
+ * ```
+ *
+ * @since 1.0.0
+ */
+export const getDataHash = (data: any[]): string => {
+  if (!Array.isArray(data) || data.length === 0) {
+    return `0-${data?.length || 0}`;
+  }
+  // 使用长度和最后一个元素的引用作为快速哈希
+  // 对于流式数据，通常只有新增，所以比较最后一个元素即可
+  const lastItem = data[data.length - 1];
+  const firstItem = data[0];
+  // 使用简单的哈希：长度 + 首尾元素的简单标识
+  const firstKey = firstItem ? Object.keys(firstItem).join(',') : '';
+  const lastKey = lastItem ? Object.keys(lastItem).join(',') : '';
+  return `${data.length}-${firstKey}-${lastKey}`;
+};
+
+/**
+ * 深度比较两个配置对象的关键字段
+ *
+ * 用于优化 useMemo 的依赖项比较，只比较配置的关键字段，
+ * 避免对整个配置对象进行深度比较的性能开销。
+ *
+ * @param {any} config1 - 第一个配置对象
+ * @param {any} config2 - 第二个配置对象
+ * @returns {boolean} 是否相等
+ *
+ * @example
+ * ```typescript
+ * const config1 = { x: 'date', y: 'value', height: 400 };
+ * const config2 = { x: 'date', y: 'value', height: 400 };
+ * isConfigEqual(config1, config2); // true
+ * ```
+ *
+ * @since 1.0.0
+ */
+export const isConfigEqual = (config1: any, config2: any): boolean => {
+  if (config1 === config2) return true;
+  if (!config1 || !config2) return false;
+
+  const keys1 = Object.keys(config1);
+  const keys2 = Object.keys(config2);
+
+  if (keys1.length !== keys2.length) return false;
+
+  // 只比较关键字段
+  const keyFields = ['x', 'y', 'height', 'index', 'rest'];
+  for (const key of keyFields) {
+    if (config1[key] !== config2[key]) {
+      // 对于 rest 对象，进行浅比较
+      if (key === 'rest' && config1[key] && config2[key]) {
+        const rest1 = config1[key];
+        const rest2 = config2[key];
+        const restKeys1 = Object.keys(rest1);
+        const restKeys2 = Object.keys(rest2);
+        if (restKeys1.length !== restKeys2.length) return false;
+        for (const restKey of restKeys1) {
+          if (rest1[restKey] !== rest2[restKey]) return false;
+        }
+      } else {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * 将 RGB/RGBA 颜色字符串转换为十六进制格式
+ *
+ * @param {string} rgb - RGB/RGBA 颜色字符串（如 'rgb(29, 122, 252)' 或 'rgba(29, 122, 252, 0.5)'）
+ * @returns {string} 十六进制颜色值（如 '#1d7afc'）
+ *
+ * @since 1.0.0
+ */
+const rgbToHex = (rgb: string): string => {
+  const match = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (!match) return rgb;
+
+  const r = parseInt(match[1], 10);
+  const g = parseInt(match[2], 10);
+  const b = parseInt(match[3], 10);
+
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+};
+
+/**
+ * 从浏览器 DOM 中解析 CSS 变量的实际颜色值
+ *
+ * @param {string} cssVar - CSS 变量表达式（如 'var(--color-blue)'）
+ * @returns {string} 解析后的颜色值（如 '#1d7afc'）或原值
+ *
+ * @example
+ * ```typescript
+ * resolveCssVariable('var(--color-blue-control-fill-primary)'); // '#1d7afc'
+ * resolveCssVariable('#ff0000'); // '#ff0000'
+ * ```
+ *
+ * @since 1.0.0
+ */
+export const resolveCssVariable = (() => {
+  const cssVariableCache = new Map<string, string>();
+
+  return (cssVar: string): string => {
+    // 如果不是 CSS 变量，直接返回
+    if (!cssVar.trim().startsWith('var(')) {
+      return cssVar;
+    }
+
+    if (cssVariableCache.has(cssVar)) {
+      return cssVariableCache.get(cssVar)!;
+    }
+
+    // 提取变量名，如 'var(--color-blue)' => '--color-blue'
+    const match = cssVar.match(/var\((--[^)]+)\)/);
+    if (!match) {
+      // 无法匹配也缓存，避免重复解析
+      cssVariableCache.set(cssVar, cssVar);
+      return cssVar;
+    }
+
+    let resolvedColor = cssVar;
+    // 从 DOM 中获取计算后的样式值
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      try {
+        // 创建临时元素来获取计算后的颜色值
+        const tempEl = document.createElement('div');
+        tempEl.style.color = cssVar;
+        document.body.appendChild(tempEl);
+        const computedColor = window.getComputedStyle(tempEl).color;
+        document.body.removeChild(tempEl);
+
+        // 如果解析成功，将 rgb/rgba 转换为十六进制
+        if (computedColor && computedColor !== cssVar) {
+          resolvedColor = rgbToHex(computedColor);
+        }
+      } catch (e) {
+        console.warn(`Failed to resolve CSS variable: ${cssVar}`, e);
+      }
+    }
+
+    cssVariableCache.set(cssVar, resolvedColor);
+    return resolvedColor;
+  };
+})();
+
+/**
+ * 将十六进制颜色或CSS变量转换为带透明度的 RGBA 字符串
+ *
+ * 支持3位和6位十六进制颜色格式、CSS变量（如 var(--color-name)），并添加透明度。
+ *
+ * @param {string} color - 颜色值（如 '#ff0000'、'#f00' 或 'var(--color-blue)'）
+ * @param {number} alpha - 透明度值（0-1之间）
+ * @returns {string} RGBA 颜色字符串
+ *
+ * @example
+ * ```typescript
+ * hexToRgba('#ff0000', 0.5); // 'rgba(255, 0, 0, 0.5)'
+ * hexToRgba('#f00', 0.8); // 'rgba(255, 0, 0, 0.8)'
+ * hexToRgba('var(--color-blue)', 0.5); // 'rgba(29, 122, 252, 0.5)'
+ * ```
+ *
+ * @since 1.0.0
+ */
+export const hexToRgba = (color: string, alpha: number): string => {
+  // 解析 CSS 变量为实际颜色值
+  const resolvedColor = resolveCssVariable(color);
+
+  // 处理十六进制颜色
+  const sanitized = resolvedColor.replace('#', '');
+  const isShort = sanitized.length === 3;
+  const r = parseInt(
+    isShort ? sanitized[0] + sanitized[0] : sanitized.slice(0, 2),
+    16,
+  );
+  const g = parseInt(
+    isShort ? sanitized[1] + sanitized[1] : sanitized.slice(2, 4),
+    16,
+  );
+  const b = parseInt(
+    isShort ? sanitized[2] + sanitized[2] : sanitized.slice(4, 6),
+    16,
+  );
+  const a = Math.max(0, Math.min(1, alpha));
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+};
+
+// 导出 Chart.js 注册相关函数
+export {
+  registerBarChartComponents,
+  registerChartComponents,
+  registerLineChartComponents,
+} from './utils/registerChart';

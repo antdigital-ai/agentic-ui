@@ -27,6 +27,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         whiteSpace: 'nowrap',
         marginRight: '16px',
         minWidth: 0, // 确保 flex 项可以缩小到小于内容宽度
+        display: 'flex',
+        alignItems: 'center',
       },
 
       [`${token.componentCls}-header-actions`]: {

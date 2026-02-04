@@ -27,6 +27,7 @@ import { parserMdToSchema } from './parser/parserMdToSchema';
 import { KeyboardTask, Methods, parserSlateNodeToMarkdown } from './utils';
 import { getOffsetLeft, getOffsetTop } from './utils/dom';
 import { EditorUtils, findByPathAndText } from './utils/editorUtils';
+import type { MarkdownToHtmlOptions } from './utils/markdownToHtml';
 import { markdownToHtmlSync } from './utils/markdownToHtml';
 const { createContext, useContext } = React;
 
@@ -166,6 +167,7 @@ export class EditorStore {
 
   /** 当前 setMDContent 操作的 AbortController */
   private _currentAbortController: AbortController | null = null;
+  private markdownToHtmlOptions?: MarkdownToHtmlOptions;
 
   /**
    * 获取当前编辑器实例。
@@ -179,10 +181,12 @@ export class EditorStore {
   constructor(
     _editor: React.MutableRefObject<BaseEditor & ReactEditor & HistoryEditor>,
     plugins?: MarkdownEditorPlugin[],
+    markdownToHtmlOptions?: MarkdownToHtmlOptions,
   ) {
     this.dragStart = this.dragStart.bind(this);
     this._editor = _editor;
     this.plugins = plugins;
+    this.markdownToHtmlOptions = markdownToHtmlOptions;
   }
 
   /**
@@ -364,83 +368,31 @@ export class EditorStore {
     },
   ): void | Promise<void> {
     if (md === undefined) return;
+    if (this._shouldSkipSetContent(md)) return;
 
-    // 安全地比较当前内容，避免解析异常导致失效
-    try {
-      const currentMD = parserSlateNodeToMarkdown(
-        this._editor.current.children,
-      );
-      // 使用 trim 和规范化比较，避免空白字符差异
-      if (md.trim() === currentMD.trim()) return;
-    } catch (error) {
-      // 如果解析当前内容失败，继续执行设置新内容
-      console.warn(
-        'Failed to compare current content, proceeding with setMDContent:',
-        error,
-      );
-    }
-
-    // 取消之前的操作，避免竞态条件
     this.cancelSetMDContent();
 
     const chunkSize = options?.chunkSize ?? 5000;
     const separator = options?.separator ?? /\n\n/;
-    const useRAF = options?.useRAF ?? true;
+    const useRAF = options?.useRAF ?? false;
     const batchSize = options?.batchSize ?? 50;
     const targetPlugins = plugins || this.plugins;
 
-    // 如果内容较短，直接处理
     if (md.length <= chunkSize) {
-      try {
-        const nodeList = parserMdToSchema(md, targetPlugins).schema;
-        this.setContent(nodeList);
-        this._editor.current.children = nodeList;
-        ReactEditor.deselect(this._editor.current);
-        // 调用进度回调
-        if (options?.onProgress) {
-          options.onProgress(1);
-        }
-      } catch (error) {
-        console.error('Failed to set MD content:', error);
-        throw error;
-      }
-      return;
+      return this._setShortContent(md, targetPlugins, options?.onProgress);
     }
 
-    // 内容较长时，按指定分隔符拆分并分批处理
     const chunks = this._splitMarkdown(md, separator);
 
-    // 如果禁用 RAF，使用同步模式处理长内容
     if (!useRAF) {
-      try {
-        const allNodes: Node[] = [];
-        for (const chunk of chunks) {
-          if (chunk.trim()) {
-            const { schema } = parserMdToSchema(chunk, targetPlugins);
-            allNodes.push(...schema);
-          }
-        }
-
-        if (allNodes.length > 0) {
-          this.setContent(allNodes);
-          this._editor.current.children = allNodes;
-          ReactEditor.deselect(this._editor.current);
-        }
-
-        // 调用进度回调
-        if (options?.onProgress) {
-          options.onProgress(1);
-        }
-      } catch (error) {
-        console.error('Failed to set MD content synchronously:', error);
-        throw error;
-      }
-      return;
+      return this._setLongContentSync(
+        chunks,
+        targetPlugins,
+        options?.onProgress,
+      );
     }
 
-    // 如果使用 RAF 且分块数量较多，异步解析和插入
     if (chunks.length > 10) {
-      // 创建新的 AbortController
       this._currentAbortController = new AbortController();
       return this._parseAndSetContentWithRAF(
         chunks,
@@ -451,30 +403,84 @@ export class EditorStore {
       );
     }
 
-    // 如果分块数量 <= 10，使用同步模式处理（修复：之前这里直接返回 undefined）
-    try {
-      const allNodes: Node[] = [];
-      for (const chunk of chunks) {
-        if (chunk.trim()) {
-          const { schema } = parserMdToSchema(chunk, targetPlugins);
-          allNodes.push(...schema);
-        }
-      }
+    return this._setLongContentSync(chunks, targetPlugins, options?.onProgress);
+  }
 
+  /**
+   * 检查是否应该跳过设置内容
+   */
+  private _shouldSkipSetContent(md: string): boolean {
+    try {
+      const currentMD = parserSlateNodeToMarkdown(
+        this._editor.current.children,
+      );
+      return md.trim() === currentMD.trim();
+    } catch (error) {
+      console.warn(
+        'Failed to compare current content, proceeding with setMDContent:',
+        error,
+      );
+      return false;
+    }
+  }
+
+  /**
+   * 设置短内容（直接处理）
+   */
+  private _setShortContent(
+    md: string,
+    plugins: MarkdownEditorPlugin[] | undefined,
+    onProgress?: (progress: number) => void,
+  ): void {
+    try {
+      const nodeList = parserMdToSchema(md, plugins).schema;
+      this.setContent(nodeList);
+      this._editor.current.children = nodeList;
+      ReactEditor.deselect(this._editor.current);
+      onProgress?.(1);
+    } catch (error) {
+      console.error('Failed to set MD content:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 同步设置长内容
+   */
+  private _setLongContentSync(
+    chunks: string[],
+    plugins: MarkdownEditorPlugin[] | undefined,
+    onProgress?: (progress: number) => void,
+  ): void {
+    try {
+      const allNodes = this._parseChunksToNodes(chunks, plugins);
       if (allNodes.length > 0) {
         this.setContent(allNodes);
         this._editor.current.children = allNodes;
         ReactEditor.deselect(this._editor.current);
       }
-
-      // 调用进度回调
-      if (options?.onProgress) {
-        options.onProgress(1);
-      }
+      onProgress?.(1);
     } catch (error) {
-      console.error('Failed to set MD content with small chunks:', error);
+      console.error('Failed to set MD content synchronously:', error);
       throw error;
     }
+  }
+
+  /**
+   * 解析分块为节点列表
+   */
+  private _parseChunksToNodes(
+    chunks: string[],
+    plugins: MarkdownEditorPlugin[] | undefined,
+  ): Node[] {
+    const allNodes: Node[] = [];
+    for (const chunk of chunks) {
+      if (chunk.trim()) {
+        const { schema } = parserMdToSchema(chunk, plugins);
+        allNodes.push(...schema);
+      }
+    }
+    return allNodes;
   }
 
   /**
@@ -604,71 +610,6 @@ export class EditorStore {
 
       // 开始处理
       rafId = requestAnimationFrame(parseAndInsertNextBatch);
-    });
-  }
-
-  /**
-   * 使用 requestAnimationFrame 分批设置内容
-   * 每帧插入一批节点，避免长时间阻塞主线程
-   *
-   * @param allNodes - 所有要插入的节点
-   * @param batchSize - 每帧处理的节点数量
-   * @param onProgress - 进度回调函数
-   * @returns Promise，在所有节点插入完成后 resolve
-   * @private
-   */
-  private _setContentWithRAF(
-    allNodes: Node[],
-    batchSize: number,
-    onProgress?: (progress: number) => void,
-  ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      let currentIndex = 0;
-      const totalNodes = allNodes.length;
-      let rafId: number | null = null;
-
-      const insertBatch = () => {
-        try {
-          const endIndex = Math.min(currentIndex + batchSize, totalNodes);
-          const batch = allNodes.slice(currentIndex, endIndex);
-
-          if (currentIndex === 0) {
-            // 第一批：清空并插入
-            this._editor.current.children = batch;
-            this._editor.current.onChange();
-          } else {
-            // 后续批次：追加节点
-            this._editor.current.children.push(...batch);
-            this._editor.current.onChange();
-          }
-
-          currentIndex = endIndex;
-          const progress = currentIndex / totalNodes;
-
-          // 直接调用进度回调，避免嵌套 requestAnimationFrame
-          onProgress?.(progress);
-
-          if (currentIndex < totalNodes) {
-            // 还有节点未处理，继续下一帧
-            rafId = requestAnimationFrame(insertBatch);
-          } else {
-            // 所有节点处理完成
-            ReactEditor.deselect(this._editor.current);
-            rafId = null;
-            resolve();
-          }
-        } catch (error) {
-          // 清理资源并拒绝 Promise
-          if (rafId) {
-            cancelAnimationFrame(rafId);
-            rafId = null;
-          }
-          reject(error);
-        }
-      };
-
-      // 开始第一帧
-      rafId = requestAnimationFrame(insertBatch);
     });
   }
 
@@ -872,9 +813,60 @@ export class EditorStore {
    *
    * @returns 转换为 HTML 的当前编辑器内容
    */
-  getHtmlContent() {
+  getHtmlContent(options?: MarkdownToHtmlOptions) {
     const markdown = this.getMDContent();
-    return markdownToHtmlSync(markdown);
+    const appliedOptions = options ?? this.markdownToHtmlOptions;
+    if (options) {
+      this.markdownToHtmlOptions = options;
+    }
+    return markdownToHtmlSync(markdown, appliedOptions);
+  }
+
+  /**
+   * 获取节点的 finished 属性
+   *
+   * @param node - 节点对象
+   * @returns finished 属性值
+   * @private
+   */
+  private _getNodeFinished(node: any): boolean | undefined {
+    return node?.finished ?? (node?.otherProps as any)?.finished;
+  }
+
+  /**
+   * 比较两个节点的 hash 和 finished 是否相同
+   *
+   * @param newNode - 新节点
+   * @param oldNode - 旧节点
+   * @returns 如果 hash 和 finished 都相同返回 true，否则返回 false
+   * @private
+   */
+  private _isNodeEqual(newNode: any, oldNode: any): boolean {
+    const newHash = newNode?.hash;
+    const oldHash = oldNode?.hash;
+    const newFinished = this._getNodeFinished(newNode);
+    const oldFinished = this._getNodeFinished(oldNode);
+
+    return (
+      newHash !== undefined &&
+      oldHash !== undefined &&
+      newHash === oldHash &&
+      newFinished !== undefined &&
+      oldFinished !== undefined &&
+      newFinished === oldFinished
+    );
+  }
+
+  /**
+   * 替换指定位置的节点
+   *
+   * @param path - 节点路径
+   * @param newNode - 新节点
+   * @private
+   */
+  private _replaceNodeAt(path: Path, newNode: Node): void {
+    Transforms.removeNodes(this._editor.current, { at: path });
+    Transforms.insertNodes(this._editor.current, newNode, { at: path });
   }
 
   /**
@@ -883,16 +875,16 @@ export class EditorStore {
    * @param nodeList - 要设置为编辑器内容的节点列表
    */
   setContent(nodeList: Node[]) {
+    const currentChildren = this._editor.current.children;
     this._editor.current.children = nodeList;
     this._editor.current.onChange();
-
     // 检查最后一个节点是否以换行符结尾
-    const lastNode = nodeList[nodeList.length - 1];
+    const lastNode = currentChildren[currentChildren.length - 1];
     if (lastNode && Text.isText(lastNode)) {
       const text = Node.string(lastNode);
       if (!text.endsWith('\n')) {
         this._editor.current.insertText('\n', {
-          at: [nodeList.length - 1],
+          at: [currentChildren.length - 1],
         });
       }
     }
@@ -905,9 +897,10 @@ export class EditorStore {
    *
    * 优化步骤：
    * 1. 过滤无效节点
-   * 2. 生成差异操作
-   * 3. 执行优化后的操作
-   * 4. 处理可能的错误情况
+   * 2. 计算 hash 并检查是否需要更新
+   * 3. 生成差异操作
+   * 4. 执行优化后的操作
+   * 5. 处理可能的错误情况
    *
    * 过滤规则：
    * - 移除空的段落节点
@@ -923,47 +916,50 @@ export class EditorStore {
   updateNodeList(nodeList: Node[]): void {
     if (!nodeList || !Array.isArray(nodeList)) return;
 
-    // 过滤无效节点
-    const filteredNodes = nodeList.filter((item) => {
-      if (!item) return false;
-      if (item.type === 'p' && (!item.children || item.children.length === 0))
-        return false;
-      if (
-        item.type === 'list' &&
-        (!item.children || item.children.length === 0)
-      )
-        return false;
-      if (
-        item.type === 'listItem' &&
-        (!item.children || item.children.length === 0)
-      )
-        return false;
-      if (
-        item.type === 'code' &&
-        item.language === 'code' &&
-        (!item.otherProps || item.otherProps.length === 0)
-      )
-        return false;
-      if (item.type === 'image' && !item.src) return false;
-      return true;
-    });
+    const filteredNodes = nodeList.filter((item) => this._isValidNode(item));
 
     try {
-      // 生成差异操作
       const operations = this.generateDiffOperations(
         filteredNodes,
         this._editor.current.children,
       );
 
-      // 执行差异操作
       if (operations.length > 0) {
         this.executeOperations(operations);
       }
     } catch (error) {
       console.error('Failed to update nodes with optimized method:', error);
-      // 回退：如果优化方法失败，使用直接替换
       this._editor.current.children = nodeList;
     }
+  }
+
+  /**
+   * 检查节点是否有效
+   */
+  private _isValidNode(item: Node): boolean {
+    if (!item) return false;
+    if (item.type === 'p' && (!item.children || item.children.length === 0))
+      return false;
+    if (
+      (item.type === 'list' ||
+        item.type === 'bulleted-list' ||
+        item.type === 'numbered-list') &&
+      (!item.children || item.children.length === 0)
+    )
+      return false;
+    if (
+      item.type === 'listItem' &&
+      (!item.children || item.children.length === 0)
+    )
+      return false;
+    if (
+      item.type === 'code' &&
+      item.language === 'code' &&
+      (!item.otherProps || item.otherProps.length === 0)
+    )
+      return false;
+    if (item.type === 'image' && !item.src) return false;
+    return true;
   }
 
   /**
@@ -983,9 +979,22 @@ export class EditorStore {
     newNodes: Node[],
     oldNodes: Node[],
   ): UpdateOperation[] {
-    if (!newNodes || !oldNodes) return [];
-
     const operations: UpdateOperation[] = [];
+    this.generateDiffOperationsInternal(newNodes, oldNodes, operations);
+    // 只在最外层排序一次
+    return operations.sort((a, b) => a.priority - b.priority);
+  }
+
+  /**
+   * 内部方法：生成差异操作，不进行排序。
+   * 递归调用时使用此方法，避免重复排序。
+   */
+  private generateDiffOperationsInternal(
+    newNodes: Node[],
+    oldNodes: Node[],
+    operations: UpdateOperation[],
+  ): void {
+    if (!newNodes || !oldNodes) return;
 
     // 第一阶段：处理节点数量不同的情况
     const lengthDiff = newNodes.length - oldNodes.length;
@@ -1018,11 +1027,13 @@ export class EditorStore {
       const newNode = newNodes[i];
       const oldNode = oldNodes[i];
 
+      // 提前检查 hash，相同则跳过
+      if (newNode.hash && oldNode.hash && newNode.hash === oldNode.hash) {
+        continue;
+      }
+
       this.compareNodes(newNode, oldNode, [i], operations);
     }
-
-    // 按优先级排序操作队列
-    return operations.sort((a, b) => a.priority - b.priority);
   }
 
   /**
@@ -1034,11 +1045,12 @@ export class EditorStore {
    * @param operations - 操作队列，用于存储发现的差异操作
    *
    * 比较过程包括：
-   * 1. 检查节点类型是否相同
-   * 2. 特殊处理表格节点
-   * 3. 比较文本节点内容
-   * 4. 比较节点属性
-   * 5. 递归比较子节点
+   * 1. 检查节点 hash 是否相同（相同则跳过比较）
+   * 2. 检查节点类型是否相同
+   * 3. 特殊处理表格节点
+   * 4. 比较文本节点内容
+   * 5. 比较节点属性
+   * 6. 递归比较子节点
    * @private
    */
   private compareNodes(
@@ -1047,8 +1059,16 @@ export class EditorStore {
     path: Path,
     operations: UpdateOperation[],
   ): void {
+    // 如果两个节点的 hash 相同，跳过比较
+    if (newNode.hash && oldNode.hash && newNode.hash === oldNode.hash) {
+      return;
+    }
+
     // 如果节点类型不同，直接替换整个节点
-    if (newNode.type !== oldNode.type) {
+    if (
+      newNode.type !== oldNode.type ||
+      newNode.finished !== oldNode.finished
+    ) {
       operations.push({
         type: 'replace',
         path,
@@ -1108,9 +1128,11 @@ export class EditorStore {
     // 递归比较子节点
     if (newNode.children && oldNode.children) {
       // 特殊处理列表、引用等可能有嵌套结构的节点
-      const childrenOps = this.generateDiffOperations(
+      const childrenOps: UpdateOperation[] = [];
+      this.generateDiffOperationsInternal(
         newNode.children,
         oldNode.children,
+        childrenOps,
       );
 
       // 将子节点的操作添加到队列中，调整路径
@@ -1148,180 +1170,265 @@ export class EditorStore {
     const newRows = newTable.children || [];
     const oldRows = oldTable.children || [];
 
-    // 检查是否是同一个表格的更新（检查表格的关键属性）
-    const isSameTableStructure = () => {
-      // 如果有表格ID或其他唯一标识符，优先比较这些
-      if (newTable.id && oldTable.id) {
-        return newTable.id === oldTable.id;
-      }
+    if (this._isSameTableStructure(newTable, oldTable, newRows, oldRows)) {
+      this._updateSameStructureTable(
+        newTable,
+        oldTable,
+        newRows,
+        oldRows,
+        path,
+        operations,
+      );
+    } else {
+      this._updateDifferentStructureTable(
+        newTable,
+        oldTable,
+        newRows,
+        oldRows,
+        path,
+        operations,
+      );
+    }
+  }
 
-      // 表格结构基本一致的情况（行数相同）
-      if (newRows.length === oldRows.length) {
-        // 检查每行的单元格数量
-        for (let i = 0; i < newRows.length; i++) {
-          const newRow = newRows[i];
-          const oldRow = oldRows[i];
-          if (
-            !newRow.children ||
-            !oldRow.children ||
-            newRow.children.length !== oldRow.children.length
-          ) {
-            return false;
-          }
-        }
-        return true;
-      }
+  /**
+   * 检查表格结构是否相同
+   */
+  private _isSameTableStructure(
+    newTable: Node,
+    oldTable: Node,
+    newRows: Node[],
+    oldRows: Node[],
+  ): boolean {
+    if (newTable.id && oldTable.id) {
+      return newTable.id === oldTable.id;
+    }
 
+    if (newRows.length !== oldRows.length) {
       return false;
-    };
+    }
 
-    // 非结构化属性对比（排除children）
-    const tablePropsChanged = () => {
-      const newProps = { ...newTable };
-      const oldProps = { ...oldTable };
-      delete newProps.children;
-      delete oldProps.children;
+    for (let i = 0; i < newRows.length; i++) {
+      const newRow = newRows[i];
+      const oldRow = oldRows[i];
+      if (
+        !newRow.children ||
+        !oldRow.children ||
+        newRow.children.length !== oldRow.children.length
+      ) {
+        return false;
+      }
+    }
 
-      return !isEqual(newProps, oldProps);
-    };
+    return true;
+  }
 
-    // 检查表格是否只有内容变化而结构相同
-    if (isSameTableStructure()) {
-      // 只更新表格属性（不包括子节点）
-      if (tablePropsChanged()) {
-        const newTableProps = { ...newTable, children: undefined };
+  /**
+   * 更新结构相同的表格
+   */
+  private _updateSameStructureTable(
+    newTable: Node,
+    oldTable: Node,
+    newRows: Node[],
+    oldRows: Node[],
+    path: Path,
+    operations: UpdateOperation[],
+  ): void {
+    if (this._tablePropsChanged(newTable, oldTable)) {
+      operations.push({
+        type: 'update',
+        path,
+        properties: { ...newTable, children: undefined },
+        priority: 7,
+      });
+    }
+
+    for (let rowIdx = 0; rowIdx < newRows.length; rowIdx++) {
+      this._updateTableRow(
+        newRows[rowIdx],
+        oldRows[rowIdx],
+        [...path, rowIdx],
+        operations,
+      );
+    }
+  }
+
+  /**
+   * 更新结构不同的表格
+   */
+  private _updateDifferentStructureTable(
+    newTable: Node,
+    oldTable: Node,
+    newRows: Node[],
+    oldRows: Node[],
+    path: Path,
+    operations: UpdateOperation[],
+  ): void {
+    if (Math.abs(newRows.length - oldRows.length) <= 2) {
+      this._updateTableWithRowChanges(
+        newTable,
+        oldTable,
+        newRows,
+        oldRows,
+        path,
+        operations,
+      );
+    } else {
+      operations.push({
+        type: 'replace',
+        path,
+        node: newTable,
+        priority: 5,
+      });
+    }
+  }
+
+  /**
+   * 检查表格属性是否变化
+   */
+  private _tablePropsChanged(newTable: Node, oldTable: Node): boolean {
+    const newProps = { ...newTable };
+    const oldProps = { ...oldTable };
+    delete newProps.children;
+    delete oldProps.children;
+    return !isEqual(newProps, oldProps);
+  }
+
+  /**
+   * 更新表格行
+   */
+  private _updateTableRow(
+    newRow: Node,
+    oldRow: Node,
+    rowPath: Path,
+    operations: UpdateOperation[],
+  ): void {
+    const newRowProps = { ...newRow, children: undefined };
+    const oldRowProps = { ...oldRow, children: undefined };
+
+    if (!isEqual(newRowProps, oldRowProps)) {
+      operations.push({
+        type: 'update',
+        path: rowPath,
+        properties: newRowProps,
+        priority: 7,
+      });
+    }
+
+    const newCells = newRow.children || [];
+    const oldCells = oldRow.children || [];
+    const minCellCount = Math.min(newCells.length, oldCells.length);
+
+    for (let cellIdx = 0; cellIdx < minCellCount; cellIdx++) {
+      this.compareCells(
+        newCells[cellIdx],
+        oldCells[cellIdx],
+        [...rowPath, cellIdx],
+        operations,
+      );
+    }
+
+    this._handleCellCountChanges(newCells, oldCells, rowPath, operations);
+  }
+
+  /**
+   * 处理单元格数量变化
+   */
+  private _handleCellCountChanges(
+    newCells: Node[],
+    oldCells: Node[],
+    rowPath: Path,
+    operations: UpdateOperation[],
+  ): void {
+    if (newCells.length > oldCells.length) {
+      for (
+        let cellIdx = oldCells.length;
+        cellIdx < newCells.length;
+        cellIdx++
+      ) {
         operations.push({
-          type: 'update',
-          path,
-          properties: newTableProps,
-          priority: 7,
+          type: 'insert',
+          path: [...rowPath, cellIdx],
+          node: newCells[cellIdx],
+          priority: 6,
         });
       }
-
-      // 逐行比较和更新
-      for (let rowIdx = 0; rowIdx < newRows.length; rowIdx++) {
-        const rowPath = [...path, rowIdx];
-        const newRow = newRows[rowIdx];
-        const oldRow = oldRows[rowIdx];
-
-        // 更新行属性（不包括子节点）
-        const newRowProps = { ...newRow, children: undefined };
-        const oldRowProps = { ...oldRow, children: undefined };
-
-        if (!isEqual(newRowProps, oldRowProps)) {
-          operations.push({
-            type: 'update',
-            path: rowPath,
-            properties: newRowProps,
-            priority: 7,
-          });
-        }
-
-        // 单元格比较和更新
-        const newCells = newRow.children || [];
-        const oldCells = oldRow.children || [];
-        const minCellCount = Math.min(newCells.length, oldCells.length);
-
-        // 更新共有的单元格
-        for (let cellIdx = 0; cellIdx < minCellCount; cellIdx++) {
-          const cellPath = [...rowPath, cellIdx];
-          const newCell = newCells[cellIdx];
-          const oldCell = oldCells[cellIdx];
-
-          this.compareCells(newCell, oldCell, cellPath, operations);
-        }
-
-        // 处理单元格数量变化
-        if (newCells.length > oldCells.length) {
-          // 添加新单元格
-          for (
-            let cellIdx = oldCells.length;
-            cellIdx < newCells.length;
-            cellIdx++
-          ) {
-            operations.push({
-              type: 'insert',
-              path: [...rowPath, cellIdx],
-              node: newCells[cellIdx],
-              priority: 6,
-            });
-          }
-        } else if (newCells.length < oldCells.length) {
-          // 删除多余单元格（从后向前删除）
-          for (
-            let cellIdx = oldCells.length - 1;
-            cellIdx >= newCells.length;
-            cellIdx--
-          ) {
-            operations.push({
-              type: 'remove',
-              path: [...rowPath, cellIdx],
-              priority: 1,
-            });
-          }
-        }
-      }
-    } else {
-      // 表格结构发生了变化，检查变化情况决定更新策略
-
-      // 如果是简单的行增减，采用行级更新而非整表替换
-      if (Math.abs(newRows.length - oldRows.length) <= 2) {
-        // 行数量变化较小，尝试行级别更新
-
-        // 先更新表格属性
-        if (tablePropsChanged()) {
-          operations.push({
-            type: 'update',
-            path,
-            properties: { ...newTable, children: undefined },
-            priority: 7,
-          });
-        }
-
-        // 更新共有的行
-        const minRowCount = Math.min(newRows.length, oldRows.length);
-        for (let rowIdx = 0; rowIdx < minRowCount; rowIdx++) {
-          const rowPath = [...path, rowIdx];
-          this.compareNodes(
-            newRows[rowIdx],
-            oldRows[rowIdx],
-            rowPath,
-            operations,
-          );
-        }
-
-        // 处理行数变化
-        if (newRows.length > oldRows.length) {
-          // 添加新行
-          for (let rowIdx = oldRows.length; rowIdx < newRows.length; rowIdx++) {
-            operations.push({
-              type: 'insert',
-              path: [...path, rowIdx],
-              node: newRows[rowIdx],
-              priority: 5,
-            });
-          }
-        } else if (newRows.length < oldRows.length) {
-          // 从后向前删除多余的行
-          for (
-            let rowIdx = oldRows.length - 1;
-            rowIdx >= newRows.length;
-            rowIdx--
-          ) {
-            operations.push({
-              type: 'remove',
-              path: [...path, rowIdx],
-              priority: 1,
-            });
-          }
-        }
-      } else {
-        // 结构变化较大，整表替换可能更高效
+    } else if (newCells.length < oldCells.length) {
+      for (
+        let cellIdx = oldCells.length - 1;
+        cellIdx >= newCells.length;
+        cellIdx--
+      ) {
         operations.push({
-          type: 'replace',
-          path,
-          node: newTable,
+          type: 'remove',
+          path: [...rowPath, cellIdx],
+          priority: 1,
+        });
+      }
+    }
+  }
+
+  /**
+   * 更新有行数变化的表格
+   */
+  private _updateTableWithRowChanges(
+    newTable: Node,
+    oldTable: Node,
+    newRows: Node[],
+    oldRows: Node[],
+    path: Path,
+    operations: UpdateOperation[],
+  ): void {
+    if (this._tablePropsChanged(newTable, oldTable)) {
+      operations.push({
+        type: 'update',
+        path,
+        properties: { ...newTable, children: undefined },
+        priority: 7,
+      });
+    }
+
+    const minRowCount = Math.min(newRows.length, oldRows.length);
+    for (let rowIdx = 0; rowIdx < minRowCount; rowIdx++) {
+      this.compareNodes(
+        newRows[rowIdx],
+        oldRows[rowIdx],
+        [...path, rowIdx],
+        operations,
+      );
+    }
+
+    this._handleRowCountChanges(newRows, oldRows, path, operations);
+  }
+
+  /**
+   * 处理行数变化
+   */
+  private _handleRowCountChanges(
+    newRows: Node[],
+    oldRows: Node[],
+    path: Path,
+    operations: UpdateOperation[],
+  ): void {
+    if (newRows.length > oldRows.length) {
+      for (let rowIdx = oldRows.length; rowIdx < newRows.length; rowIdx++) {
+        operations.push({
+          type: 'insert',
+          path: [...path, rowIdx],
+          node: newRows[rowIdx],
           priority: 5,
+        });
+      }
+    } else if (newRows.length < oldRows.length) {
+      for (
+        let rowIdx = oldRows.length - 1;
+        rowIdx >= newRows.length;
+        rowIdx--
+      ) {
+        operations.push({
+          type: 'remove',
+          path: [...path, rowIdx],
+          priority: 1,
         });
       }
     }
@@ -1406,8 +1513,8 @@ export class EditorStore {
     return (
       newChildren.length === 1 &&
       oldChildren.length === 1 &&
-      typeof newChildren[0].text === 'string' &&
-      typeof oldChildren[0].text === 'string'
+      typeof newChildren?.[0]?.text === 'string' &&
+      typeof oldChildren?.[0]?.text === 'string'
     );
   }
 
@@ -1421,11 +1528,11 @@ export class EditorStore {
     operations: UpdateOperation[],
   ): void {
     // 只有文本内容变化
-    if (newChildren[0].text !== oldChildren[0].text) {
+    if (newChildren?.[0]?.text !== oldChildren?.[0]?.text) {
       operations.push({
         type: 'text',
         path: [...path, 0],
-        text: newChildren[0].text,
+        text: newChildren?.[0]?.text || '',
         priority: 8,
       });
     }
@@ -1520,7 +1627,8 @@ export class EditorStore {
     path: Path,
     operations: UpdateOperation[],
   ): void {
-    const childOps = this.generateDiffOperations(newChildren, oldChildren);
+    const childOps: UpdateOperation[] = [];
+    this.generateDiffOperationsInternal(newChildren, oldChildren, childOps);
 
     // 调整子操作的路径
     childOps.forEach((op) => {
@@ -1567,14 +1675,17 @@ export class EditorStore {
     const editor = this._editor.current;
     if (!editor) return;
 
-    // 使用批处理模式执行所有操作
+    // 使用批处理模式执行所有操作，避免中间状态导致路径变化
     Editor.withoutNormalizing(editor, () => {
       for (const op of operations) {
         try {
           switch (op.type) {
             case 'insert':
               if (op.node && editor.hasPath(Path.parent(op.path))) {
-                Transforms.insertNodes(editor, op.node, { at: op.path });
+                // 检查路径是否仍然有效，避免重复插入
+                if (!editor.hasPath(op.path)) {
+                  Transforms.insertNodes(editor, op.node, { at: op.path });
+                }
               }
               break;
 
@@ -1633,97 +1744,26 @@ export class EditorStore {
    */
   dragStart(e: any, container: HTMLDivElement) {
     e.stopPropagation();
-    const img = document.createElement('img');
-    img.src =
-      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    e.dataTransfer.setDragImage(img, 1, 1);
+    this._setupDragImage(e);
+
     type MovePoint = {
       el: HTMLDivElement;
       direction: 'top' | 'bottom';
       top: number;
       left: number;
     };
-    const ableToEnter =
-      this.draggedElement?.dataset?.be === 'list-item'
-        ? new Set([
-            'paragraph',
-            'head',
-            'blockquote',
-            'code',
-            'table',
-            'list',
-            'list-item',
-            'media',
-            'attach',
-          ])
-        : this.ableToEnter;
-    let mark: null | HTMLDivElement = null;
-    const els = document.querySelectorAll<HTMLDivElement>('[data-be]');
-    const points: MovePoint[] = [];
-    // @ts-ignore
-    for (let el of els) {
-      if (!ableToEnter.has(el.dataset.be!)) continue;
-      if (el.classList.contains('frontmatter')) continue;
-      const pre = el.previousSibling as HTMLElement;
-      if (
-        el.dataset.be === 'paragraph' &&
-        this.draggedElement?.dataset.be === 'list-item' &&
-        (!pre || pre.classList.contains('check-item'))
-      ) {
-        continue;
-      }
-      if (el === this.draggedElement) continue;
-      const top = getOffsetTop(el, container!);
-      const left = getOffsetLeft(el, container!);
-      points.push({
-        el: el,
-        direction: 'top',
-        left: left,
-        top: top,
-      });
-      points.push({
-        el: el,
-        left: left,
-        direction: 'bottom',
-        top: top + el.clientHeight + 2,
-      });
-    }
-    let last: MovePoint | null = null;
-    const dragover = (e: DragEvent) => {
-      e.preventDefault();
-      const top = e.clientY - 40 + container!.scrollTop;
-      let distance = 1000000;
-      let cur: MovePoint | null = null;
-      for (let p of points) {
-        let curDistance = Math.abs(p.top - top);
-        if (curDistance < distance) {
-          cur = p;
-          distance = curDistance;
-        }
-      }
-      if (cur) {
-        const rect = container!.getBoundingClientRect();
-        const scrollTop = container!.scrollTop;
-        const scrollLeft = container!.scrollLeft;
-        last = cur;
-        const width =
-          last.el.dataset.be === 'list-item'
-            ? last.el.clientWidth + 20 + 'px'
-            : last.el.clientWidth + 'px';
-        if (!mark) {
-          mark = document.createElement('div');
-          mark.classList.add('move-mark');
-          mark.style.width = width;
-          mark.style.height = '2px';
 
-          mark.style.transform = `translate(${last.left - rect.left - scrollLeft}px, ${last.top - rect.top - scrollTop}px)`;
-          container?.parentElement!.append(mark);
-        } else {
-          mark.style.width = width;
-          mark.style.transform = `translate(${last.left - rect.left - scrollLeft}px, ${last.top - rect.top - scrollTop}px)`;
-        }
-      }
-    };
+    const ableToEnter = this._getAbleToEnterSet();
+    const points = this._collectMovePoints(container, ableToEnter);
+
+    let mark: HTMLDivElement | null = null;
+    let last: MovePoint | null = null;
+
+    const dragover = this._createDragOverHandler(container, points, (cur) => {
+      last = cur;
+      mark = this._updateDragMark(mark, cur, container);
+    });
+
     window.addEventListener('dragover', dragover);
     window.addEventListener(
       'dragend',
@@ -1732,64 +1772,7 @@ export class EditorStore {
           window.removeEventListener('dragover', dragover);
           if (mark) container?.parentElement!.removeChild(mark);
           if (last && this.draggedElement) {
-            let [dragPath, dragNode] = this.toPath(this.draggedElement);
-            let [targetPath] = this.toPath(last.el);
-            let toPath =
-              last.direction === 'top' ? targetPath : Path.next(targetPath);
-            if (!Path.equals(targetPath, dragPath)) {
-              const parent = Node.parent(this._editor.current, dragPath);
-              if (
-                Path.equals(Path.parent(targetPath), Path.parent(dragPath)) &&
-                Path.compare(dragPath, targetPath) === -1
-              ) {
-                toPath = Path.previous(toPath);
-              }
-              let delPath = Path.parent(dragPath);
-              const targetNode = Node.get(this._editor.current, targetPath);
-              if (dragNode.type === 'list-item') {
-                if (targetNode.type !== 'list-item') {
-                  Transforms.delete(this._editor.current, { at: dragPath });
-                  Transforms.insertNodes(
-                    this._editor.current,
-                    {
-                      ...parent,
-                      children: [EditorUtils.copy(dragNode)],
-                    },
-                    { at: toPath, select: true },
-                  );
-                  if (parent.children?.length === 1) {
-                    if (
-                      EditorUtils.isNextPath(Path.parent(dragPath), targetPath)
-                    ) {
-                      delPath = Path.next(Path.parent(dragPath));
-                    } else {
-                      delPath = Path.parent(dragPath);
-                    }
-                  }
-                } else {
-                  Transforms.moveNodes(this._editor.current, {
-                    at: dragPath,
-                    to: toPath,
-                  });
-                }
-              } else {
-                Transforms.moveNodes(this._editor.current, {
-                  at: dragPath,
-                  to: toPath,
-                });
-              }
-              if (parent.children?.length === 1) {
-                if (
-                  Path.equals(Path.parent(toPath), Path.parent(delPath)) &&
-                  Path.compare(toPath, delPath) !== 1
-                ) {
-                  delPath = Path.next(delPath);
-                }
-                Transforms.delete(this._editor.current, { at: delPath });
-              }
-            }
-            if (dragNode?.type !== 'media')
-              this.draggedElement!.draggable = false;
+            this._handleDragEnd(last);
           }
           this.draggedElement = null;
         } catch (error) {
@@ -1798,6 +1781,301 @@ export class EditorStore {
       },
       { once: true },
     );
+  }
+
+  /**
+   * 设置拖拽图像
+   */
+  private _setupDragImage(e: any): void {
+    const img = document.createElement('img');
+    img.src =
+      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    e.dataTransfer.setDragImage(img, 1, 1);
+  }
+
+  /**
+   * 获取允许进入的元素类型集合
+   */
+  private _getAbleToEnterSet(): Set<string> {
+    if (this.draggedElement?.dataset?.be === 'list-item') {
+      return new Set([
+        'paragraph',
+        'head',
+        'blockquote',
+        'code',
+        'table',
+        'list',
+        'list-item',
+        'media',
+        'attach',
+      ]);
+    }
+    return this.ableToEnter;
+  }
+
+  /**
+   * 收集移动点
+   */
+  private _collectMovePoints(
+    container: HTMLDivElement,
+    ableToEnter: Set<string>,
+  ): Array<{
+    el: HTMLDivElement;
+    direction: 'top' | 'bottom';
+    top: number;
+    left: number;
+  }> {
+    const points: Array<{
+      el: HTMLDivElement;
+      direction: 'top' | 'bottom';
+      top: number;
+      left: number;
+    }> = [];
+    const els = document.querySelectorAll<HTMLDivElement>('[data-be]');
+
+    for (const el of els) {
+      if (!this._shouldIncludeElement(el, ableToEnter)) continue;
+
+      const top = getOffsetTop(el, container);
+      const left = getOffsetLeft(el, container);
+      points.push(
+        { el, direction: 'top', left, top },
+        { el, direction: 'bottom', left, top: top + el.clientHeight + 2 },
+      );
+    }
+
+    return points;
+  }
+
+  /**
+   * 判断是否应该包含元素
+   */
+  private _shouldIncludeElement(
+    el: HTMLDivElement,
+    ableToEnter: Set<string>,
+  ): boolean {
+    if (!ableToEnter.has(el.dataset.be!)) return false;
+    if (el.hasAttribute('data-frontmatter')) return false;
+    if (el === this.draggedElement) return false;
+
+    const pre = el.previousSibling as HTMLElement;
+    if (
+      el.dataset.be === 'paragraph' &&
+      this.draggedElement?.dataset.be === 'list-item' &&
+      (!pre || pre.hasAttribute('data-check-item'))
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * 创建拖拽悬停处理器
+   */
+  private _createDragOverHandler(
+    container: HTMLDivElement,
+    points: Array<{
+      el: HTMLDivElement;
+      direction: 'top' | 'bottom';
+      top: number;
+      left: number;
+    }>,
+    onPointFound: (point: {
+      el: HTMLDivElement;
+      direction: 'top' | 'bottom';
+      top: number;
+      left: number;
+    }) => void,
+  ): (e: DragEvent) => void {
+    return (e: DragEvent) => {
+      e.preventDefault();
+      const top = e.clientY - 40 + container.scrollTop;
+      const cur = this._findClosestPoint(points, top);
+      if (cur) {
+        onPointFound(cur);
+      }
+    };
+  }
+
+  /**
+   * 查找最近的移动点
+   */
+  private _findClosestPoint(
+    points: Array<{
+      el: HTMLDivElement;
+      direction: 'top' | 'bottom';
+      top: number;
+      left: number;
+    }>,
+    targetTop: number,
+  ): {
+    el: HTMLDivElement;
+    direction: 'top' | 'bottom';
+    top: number;
+    left: number;
+  } | null {
+    let distance = 1000000;
+    let closest: (typeof points)[0] | null = null;
+
+    for (const p of points) {
+      const curDistance = Math.abs(p.top - targetTop);
+      if (curDistance < distance) {
+        closest = p;
+        distance = curDistance;
+      }
+    }
+
+    return closest;
+  }
+
+  /**
+   * 更新拖拽标记
+   */
+  private _updateDragMark(
+    mark: HTMLDivElement | null,
+    point: {
+      el: HTMLDivElement;
+      direction: 'top' | 'bottom';
+      top: number;
+      left: number;
+    },
+    container: HTMLDivElement,
+  ): HTMLDivElement {
+    const rect = container.getBoundingClientRect();
+    const scrollTop = container.scrollTop;
+    const scrollLeft = container.scrollLeft;
+    const width =
+      point.el.dataset.be === 'list-item'
+        ? point.el.clientWidth + 20 + 'px'
+        : point.el.clientWidth + 'px';
+
+    if (!mark) {
+      mark = document.createElement('div');
+      mark.setAttribute('data-move-mark', '');
+      mark.style.width = width;
+      mark.style.height = '2px';
+      container?.parentElement!.append(mark);
+    } else {
+      mark.style.width = width;
+    }
+
+    mark.style.transform = `translate(${point.left - rect.left - scrollLeft}px, ${point.top - rect.top - scrollTop}px)`;
+    return mark;
+  }
+
+  /**
+   * 处理拖拽结束
+   */
+  private _handleDragEnd(last: {
+    el: HTMLDivElement;
+    direction: 'top' | 'bottom';
+    top: number;
+    left: number;
+  }): void {
+    if (!this.draggedElement) return;
+
+    const [dragPath, dragNode] = this.toPath(this.draggedElement);
+    const [targetPath] = this.toPath(last.el);
+    let toPath = last.direction === 'top' ? targetPath : Path.next(targetPath);
+
+    if (Path.equals(targetPath, dragPath)) return;
+
+    const parent = Node.parent(this._editor.current, dragPath);
+    if (
+      Path.equals(Path.parent(targetPath), Path.parent(dragPath)) &&
+      Path.compare(dragPath, targetPath) === -1
+    ) {
+      toPath = Path.previous(toPath);
+    }
+
+    const targetNode = Node.get(this._editor.current, targetPath);
+    this._moveNode(dragNode, dragPath, toPath, targetNode, parent, targetPath);
+
+    if (dragNode?.type !== 'media') {
+      this.draggedElement.draggable = false;
+    }
+  }
+
+  /**
+   * 移动节点
+   */
+  private _moveNode(
+    dragNode: Node,
+    dragPath: Path,
+    toPath: Path,
+    targetNode: Node,
+    parent: Node,
+    targetPath: Path,
+  ): void {
+    if (dragNode.type === 'list-item' && targetNode.type !== 'list-item') {
+      const delPath = this._moveListItemToNonListItem(
+        dragNode,
+        dragPath,
+        toPath,
+        parent,
+        targetPath,
+      );
+      if (delPath) {
+        Transforms.delete(this._editor.current, { at: delPath });
+      }
+    } else {
+      Transforms.moveNodes(this._editor.current, {
+        at: dragPath,
+        to: toPath,
+      });
+      this._cleanupEmptyParent(parent, dragPath, toPath);
+    }
+  }
+
+  /**
+   * 移动列表项到非列表项位置
+   * @returns 需要删除的路径，如果不需要删除则返回 null
+   */
+  private _moveListItemToNonListItem(
+    dragNode: Node,
+    dragPath: Path,
+    toPath: Path,
+    parent: Node,
+    targetPath: Path,
+  ): Path | null {
+    Transforms.delete(this._editor.current, { at: dragPath });
+    Transforms.insertNodes(
+      this._editor.current,
+      {
+        ...parent,
+        children: [EditorUtils.copy(dragNode)],
+      },
+      { at: toPath, select: true },
+    );
+
+    if (parent.children?.length !== 1) return null;
+
+    if (EditorUtils.isNextPath(Path.parent(dragPath), targetPath)) {
+      return Path.next(Path.parent(dragPath));
+    }
+    return Path.parent(dragPath);
+  }
+
+  /**
+   * 清理空的父节点
+   */
+  private _cleanupEmptyParent(
+    parent: Node,
+    dragPath: Path,
+    toPath: Path,
+  ): void {
+    if (parent.children?.length !== 1) return;
+
+    let delPath = Path.parent(dragPath);
+    if (
+      Path.equals(Path.parent(toPath), Path.parent(delPath)) &&
+      Path.compare(toPath, delPath) !== 1
+    ) {
+      delPath = Path.next(delPath);
+    }
+
+    Transforms.delete(this._editor.current, { at: delPath });
   }
 
   /**
@@ -1842,9 +2120,6 @@ export class EditorStore {
     if (!searchText) return 0;
 
     const editor = this._editor.current;
-    let replaceCount = 0;
-
-    // 遍历所有文本节点进行替换
     const textNodes = Array.from(
       Editor.nodes(editor, {
         at: [],
@@ -1852,134 +2127,135 @@ export class EditorStore {
       }),
     );
 
+    let replaceCount = 0;
     Editor.withoutNormalizing(editor, () => {
       if (replaceAll) {
-        // 替换所有：从后往前处理，避免路径变化影响前面的操作
-        for (let i = textNodes.length - 1; i >= 0; i--) {
-          const [node, path] = textNodes[i] as [Node, Path];
-          const originalText = node.text;
-          let newText = originalText;
-          let nodeReplaceCount = 0;
-
-          if (caseSensitive) {
-            if (wholeWord) {
-              // 匹配完整单词
-              const regex = new RegExp(
-                `\\b${this.escapeRegExp(searchText)}\\b`,
-                'g',
-              );
-              newText = originalText.replace(regex, () => {
-                nodeReplaceCount++;
-                return replaceText;
-              });
-            } else {
-              // 普通字符串替换
-              newText = originalText.replace(
-                new RegExp(this.escapeRegExp(searchText), 'g'),
-                () => {
-                  nodeReplaceCount++;
-                  return replaceText;
-                },
-              );
-            }
-          } else {
-            if (wholeWord) {
-              // 匹配完整单词，不区分大小写
-              const regex = new RegExp(
-                `\\b${this.escapeRegExp(searchText)}\\b`,
-                'gi',
-              );
-              newText = originalText.replace(regex, () => {
-                nodeReplaceCount++;
-                return replaceText;
-              });
-            } else {
-              // 普通字符串替换，不区分大小写
-              newText = originalText.replace(
-                new RegExp(this.escapeRegExp(searchText), 'gi'),
-                () => {
-                  nodeReplaceCount++;
-                  return replaceText;
-                },
-              );
-            }
-          }
-
-          // 如果文本发生了变化，更新节点
-          if (newText !== originalText) {
-            Transforms.insertText(editor, newText, {
-              at: path,
-              voids: true,
-            });
-            replaceCount += nodeReplaceCount;
-          }
-        }
+        replaceCount = this._replaceAllInNodes(
+          textNodes,
+          searchText,
+          replaceText,
+          caseSensitive,
+          wholeWord,
+        );
       } else {
-        // 只替换第一个：从前往后处理，找到第一个匹配就停止
-        for (let i = 0; i < textNodes.length; i++) {
-          const [node, path] = textNodes[i] as [Node, Path];
-          const originalText = node.text;
-          let newText = originalText;
-          let nodeReplaceCount = 0;
-
-          if (caseSensitive) {
-            if (wholeWord) {
-              // 匹配完整单词
-              const regex = new RegExp(
-                `\\b${this.escapeRegExp(searchText)}\\b`,
-                '',
-              );
-              newText = originalText.replace(regex, () => {
-                nodeReplaceCount++;
-                return replaceText;
-              });
-            } else {
-              // 普通字符串替换
-              newText = originalText.replace(
-                new RegExp(this.escapeRegExp(searchText), ''),
-                () => {
-                  nodeReplaceCount++;
-                  return replaceText;
-                },
-              );
-            }
-          } else {
-            if (wholeWord) {
-              // 匹配完整单词，不区分大小写
-              const regex = new RegExp(
-                `\\b${this.escapeRegExp(searchText)}\\b`,
-                'i',
-              );
-              newText = originalText.replace(regex, () => {
-                nodeReplaceCount++;
-                return replaceText;
-              });
-            } else {
-              // 普通字符串替换，不区分大小写
-              newText = originalText.replace(
-                new RegExp(this.escapeRegExp(searchText), 'i'),
-                () => {
-                  nodeReplaceCount++;
-                  return replaceText;
-                },
-              );
-            }
-          }
-
-          // 如果文本发生了变化，更新节点并停止
-          if (newText !== originalText) {
-            Transforms.insertText(editor, newText, {
-              at: path,
-              voids: true,
-            });
-            replaceCount += nodeReplaceCount;
-            break; // 只替换第一个匹配项
-          }
-        }
+        replaceCount = this._replaceFirstInNodes(
+          textNodes,
+          searchText,
+          replaceText,
+          caseSensitive,
+          wholeWord,
+        );
       }
     });
 
     return replaceCount;
+  }
+
+  /**
+   * 在所有文本节点中替换所有匹配项
+   */
+  private _replaceAllInNodes(
+    textNodes: Array<[Node, Path]>,
+    searchText: string,
+    replaceText: string,
+    caseSensitive: boolean,
+    wholeWord: boolean,
+  ): number {
+    const editor = this._editor.current;
+    let replaceCount = 0;
+
+    for (let i = textNodes.length - 1; i >= 0; i--) {
+      const [node, path] = textNodes[i] as [Node, Path];
+      const result = this._replaceInText(
+        node.text,
+        searchText,
+        replaceText,
+        caseSensitive,
+        wholeWord,
+        true,
+      );
+
+      if (result.newText !== result.originalText) {
+        Transforms.insertText(editor, result.newText, {
+          at: path,
+          voids: true,
+        });
+        replaceCount += result.count;
+      }
+    }
+
+    return replaceCount;
+  }
+
+  /**
+   * 在所有文本节点中替换第一个匹配项
+   */
+  private _replaceFirstInNodes(
+    textNodes: Array<[Node, Path]>,
+    searchText: string,
+    replaceText: string,
+    caseSensitive: boolean,
+    wholeWord: boolean,
+  ): number {
+    const editor = this._editor.current;
+
+    for (let i = 0; i < textNodes.length; i++) {
+      const [node, path] = textNodes[i] as [Node, Path];
+      const result = this._replaceInText(
+        node.text,
+        searchText,
+        replaceText,
+        caseSensitive,
+        wholeWord,
+        false,
+      );
+
+      if (result.newText !== result.originalText) {
+        Transforms.insertText(editor, result.newText, {
+          at: path,
+          voids: true,
+        });
+        return result.count;
+      }
+    }
+
+    return 0;
+  }
+
+  /**
+   * 在单个文本中执行替换
+   */
+  private _replaceInText(
+    originalText: string,
+    searchText: string,
+    replaceText: string,
+    caseSensitive: boolean,
+    wholeWord: boolean,
+    replaceAll: boolean,
+  ): { originalText: string; newText: string; count: number } {
+    const flags = this._buildRegexFlags(caseSensitive, replaceAll);
+    const pattern = wholeWord
+      ? `\\b${this.escapeRegExp(searchText)}\\b`
+      : this.escapeRegExp(searchText);
+    const regex = new RegExp(pattern, flags);
+
+    let count = 0;
+    const newText = originalText.replace(regex, () => {
+      count++;
+      return replaceText;
+    });
+
+    return { originalText, newText, count };
+  }
+
+  /**
+   * 构建正则表达式标志
+   */
+  private _buildRegexFlags(caseSensitive: boolean, global: boolean): string {
+    let flags = '';
+    if (!caseSensitive) flags += 'i';
+    if (global) flags += 'g';
+    return flags;
   }
 
   /**
@@ -2024,9 +2300,6 @@ export class EditorStore {
 
     if (!searchText) return 0;
 
-    let replaceCount = 0;
-
-    // 获取选中区域的文本节点
     const textNodes = Array.from(
       Editor.nodes(editor, {
         at: selection,
@@ -2034,67 +2307,58 @@ export class EditorStore {
       }),
     );
 
+    let replaceCount = 0;
     Editor.withoutNormalizing(editor, () => {
-      // 从后往前处理，避免路径变化影响前面的操作
-      for (let i = textNodes.length - 1; i >= 0; i--) {
-        const [node, path] = textNodes[i] as [Node, Path];
-        const originalText = node.text;
-        let newText = originalText;
-        let nodeReplaceCount = 0;
+      replaceCount = this._replaceInSelectionNodes(
+        textNodes,
+        searchText,
+        replaceText,
+        caseSensitive,
+        wholeWord,
+        replaceAll,
+      );
+    });
 
-        if (caseSensitive) {
-          if (wholeWord) {
-            const regex = new RegExp(
-              `\\b${this.escapeRegExp(searchText)}\\b`,
-              'g',
-            );
-            newText = originalText.replace(regex, () => {
-              nodeReplaceCount++;
-              return replaceText;
-            });
-          } else {
-            newText = originalText.replace(
-              new RegExp(this.escapeRegExp(searchText), 'g'),
-              () => {
-                nodeReplaceCount++;
-                return replaceText;
-              },
-            );
-          }
-        } else {
-          if (wholeWord) {
-            const regex = new RegExp(
-              `\\b${this.escapeRegExp(searchText)}\\b`,
-              'gi',
-            );
-            newText = originalText.replace(regex, () => {
-              nodeReplaceCount++;
-              return replaceText;
-            });
-          } else {
-            newText = originalText.replace(
-              new RegExp(this.escapeRegExp(searchText), 'gi'),
-              () => {
-                nodeReplaceCount++;
-                return replaceText;
-              },
-            );
-          }
-        }
+    return replaceCount;
+  }
 
-        if (newText !== originalText) {
-          Transforms.insertText(editor, newText, {
-            at: path,
-            voids: true,
-          });
-          replaceCount += nodeReplaceCount;
+  /**
+   * 在选中区域的文本节点中执行替换
+   */
+  private _replaceInSelectionNodes(
+    textNodes: Array<[Node, Path]>,
+    searchText: string,
+    replaceText: string,
+    caseSensitive: boolean,
+    wholeWord: boolean,
+    replaceAll: boolean,
+  ): number {
+    const editor = this._editor.current;
+    let replaceCount = 0;
 
-          if (!replaceAll && nodeReplaceCount > 0) {
-            break;
-          }
+    for (let i = textNodes.length - 1; i >= 0; i--) {
+      const [node, path] = textNodes[i] as [Node, Path];
+      const result = this._replaceInText(
+        node.text,
+        searchText,
+        replaceText,
+        caseSensitive,
+        wholeWord,
+        replaceAll,
+      );
+
+      if (result.newText !== result.originalText) {
+        Transforms.insertText(editor, result.newText, {
+          at: path,
+          voids: true,
+        });
+        replaceCount += result.count;
+
+        if (!replaceAll && result.count > 0) {
+          break;
         }
       }
-    });
+    }
 
     return replaceCount;
   }

@@ -21,7 +21,7 @@ export const generateHtmlDocument = (
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
-      padding: 20px;
+      padding: 12px;
       max-width: 900px;
       margin: 0 auto;
       color: #333;
@@ -58,9 +58,15 @@ export const generateHtmlDocument = (
     th, td {
       padding: 8px;
       text-align: left;
+      vertical-align: middle;
     }
     th {
       background-color: #f6f8fa;
+    }
+    @media screen and (max-width: 768px) {
+      th, td {
+        padding: 2px;
+      }
     }
     ${styles}
   </style>

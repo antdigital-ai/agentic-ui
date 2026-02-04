@@ -1,0 +1,922 @@
+{
+  "playerVersion": { "web": "2.7.0", "native": "0.0.1.202311221223" },
+  "images": [],
+  "fonts": [],
+  "version": "3.5",
+  "plugins": [],
+  "type": "ge",
+  "compositions": [
+    {
+      "id": "f099d1a2b8b1480fa2d037efeb52a3df",
+      "name": "single",
+      "duration": 1,
+      "startTime": 0,
+      "endBehavior": 2,
+      "previewSize": [24, 24],
+      "camera": {
+        "fov": 60,
+        "far": 40,
+        "near": 0.1,
+        "clipMode": 1,
+        "position": [0, 0, 8],
+        "rotation": [0, 0, 0]
+      },
+      "components": [{ "id": "b4a139c9cd5e41c7b37cc76bf39ef7c0" }]
+    },
+    {
+      "id": "e5c1358b8f304035a9f959f1d7fd6ccc",
+      "name": "合成",
+      "duration": 2,
+      "startTime": 0,
+      "endBehavior": 2,
+      "previewSize": [24, 24],
+      "camera": {
+        "fov": 60,
+        "far": 40,
+        "near": 0.1,
+        "clipMode": 1,
+        "position": [0, 0, 8],
+        "rotation": [0, 0, 0]
+      },
+      "components": [{ "id": "b887584ee7a244b79addd03364de28cc" }]
+    }
+  ],
+  "components": [
+    {
+      "id": "b887584ee7a244b79addd03364de28cc",
+      "item": { "id": "e5c1358b8f304035a9f959f1d7fd6ccc" },
+      "dataType": "CompositionComponent",
+      "items": [
+        { "id": "3ea1d29f4de14b239734382bbe187179" },
+        { "id": "2532552ec4ce4dc3820a35ae608d1a2a" },
+        { "id": "7634e59408f943bbbb8195d410ae2f4c" },
+        { "id": "90563bd9b10f4d9dba867e52944bed0f" },
+        { "id": "b0eae59b7572415ea450e949f91d4a5d" },
+        { "id": "b7c1485d37964fceb190971f5230d199" },
+        { "id": "bc5eec25e86841e680678c31608c99f6" },
+        { "id": "48a4a1b5ddfc481ba715fbbdc18038ec" }
+      ],
+      "timelineAsset": { "id": "a4c48eecc4694dc5af25948bb1bd42e2" },
+      "sceneBindings": [
+        {
+          "key": { "id": "cbf281adb1004ab5aadd2f391529c738" },
+          "value": { "id": "3ea1d29f4de14b239734382bbe187179" }
+        },
+        {
+          "key": { "id": "8e22dbe5d6e143f2abd4f618372ec40a" },
+          "value": { "id": "2532552ec4ce4dc3820a35ae608d1a2a" }
+        },
+        {
+          "key": { "id": "3534813bb33641609b417aeac3f82d92" },
+          "value": { "id": "7634e59408f943bbbb8195d410ae2f4c" }
+        },
+        {
+          "key": { "id": "c8fc97f7b4034e288d15cb653f488f74" },
+          "value": { "id": "90563bd9b10f4d9dba867e52944bed0f" }
+        },
+        {
+          "key": { "id": "b3622c1be6d944c781c630bc15ee41be" },
+          "value": { "id": "b0eae59b7572415ea450e949f91d4a5d" }
+        },
+        {
+          "key": { "id": "4c8ba6397b6e42618a9fc23faee623d9" },
+          "value": { "id": "b7c1485d37964fceb190971f5230d199" }
+        },
+        {
+          "key": { "id": "9768ab1358f9424f8c3d763f1a65484c" },
+          "value": { "id": "bc5eec25e86841e680678c31608c99f6" }
+        },
+        {
+          "key": { "id": "207e0890e81047569fe3abb8a31b53fb" },
+          "value": { "id": "48a4a1b5ddfc481ba715fbbdc18038ec" }
+        }
+      ]
+    },
+    {
+      "id": "b4a139c9cd5e41c7b37cc76bf39ef7c0",
+      "item": { "id": "f099d1a2b8b1480fa2d037efeb52a3df" },
+      "dataType": "CompositionComponent",
+      "items": [{ "id": "1416d1236de446e6a694bac49e876e7b" }],
+      "timelineAsset": { "id": "0541d730573f4c04949d7f34a199e8c5" },
+      "sceneBindings": [
+        {
+          "key": { "id": "9cd15906bc154daca441bc4942b9988b" },
+          "value": { "id": "057c13b298564086b6dbd43ac9b41f6e" }
+        },
+        {
+          "key": { "id": "68ce9708f1b0473595940633b2223d19" },
+          "value": { "id": "1416d1236de446e6a694bac49e876e7b" }
+        }
+      ]
+    },
+    {
+      "id": "057c13b298564086b6dbd43ac9b41f6e",
+      "item": { "id": "1416d1236de446e6a694bac49e876e7b" },
+      "type": 1,
+      "dataType": "ShapeComponent",
+      "width": 2,
+      "height": 0,
+      "roundness": 100,
+      "fills": [
+        {
+          "type": 0,
+          "color": { "r": 0.2039, "g": 0.2275, "b": 0.2706, "a": 1 }
+        }
+      ],
+      "strokes": [],
+      "strokeWidth": 0,
+      "strokeCap": 0,
+      "strokeJoin": 0,
+      "renderer": { "renderMode": 1 }
+    }
+  ],
+  "geometries": [],
+  "materials": [],
+  "items": [
+    {
+      "id": "3ea1d29f4de14b239734382bbe187179",
+      "components": [],
+      "name": "single",
+      "duration": 1,
+      "dataType": "VFXItemData",
+      "type": "7",
+      "visible": true,
+      "endBehavior": 5,
+      "delay": 0,
+      "renderLevel": "B+",
+      "content": {
+        "options": { "refId": "f099d1a2b8b1480fa2d037efeb52a3df" },
+        "positionOverLifetime": {}
+      },
+      "transform": {
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "eulerHint": { "x": 0, "y": 0, "z": 0 },
+        "scale": { "x": 1.0776, "y": 1.0776, "z": 1 }
+      }
+    },
+    {
+      "id": "1416d1236de446e6a694bac49e876e7b",
+      "name": "rectangle_2",
+      "duration": 1,
+      "type": "shape",
+      "visible": true,
+      "endBehavior": 5,
+      "delay": 0,
+      "renderLevel": "B+",
+      "components": [{ "id": "057c13b298564086b6dbd43ac9b41f6e" }],
+      "transform": {
+        "position": { "x": 0, "y": 2.7254, "z": 0 },
+        "eulerHint": { "x": 0, "y": 0, "z": 0 },
+        "anchor": { "x": 0, "y": 0 },
+        "scale": { "x": 0.3713, "y": 0.3713, "z": 1 }
+      },
+      "dataType": "VFXItemData"
+    },
+    {
+      "id": "2532552ec4ce4dc3820a35ae608d1a2a",
+      "components": [],
+      "name": "single (2)",
+      "duration": 1,
+      "dataType": "VFXItemData",
+      "type": "7",
+      "visible": true,
+      "endBehavior": 5,
+      "delay": 0.11,
+      "renderLevel": "B+",
+      "content": {
+        "options": { "refId": "f099d1a2b8b1480fa2d037efeb52a3df" },
+        "positionOverLifetime": {}
+      },
+      "transform": {
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "eulerHint": { "x": 0, "y": 0, "z": 45 },
+        "scale": { "x": 1.0776, "y": 1.0776, "z": 1 }
+      }
+    },
+    {
+      "id": "7634e59408f943bbbb8195d410ae2f4c",
+      "components": [],
+      "name": "single (3)",
+      "duration": 1,
+      "dataType": "VFXItemData",
+      "type": "7",
+      "visible": true,
+      "endBehavior": 5,
+      "delay": 0.23,
+      "renderLevel": "B+",
+      "content": {
+        "options": { "refId": "f099d1a2b8b1480fa2d037efeb52a3df" },
+        "positionOverLifetime": {}
+      },
+      "transform": {
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "eulerHint": { "x": 0, "y": 0, "z": 90 },
+        "scale": { "x": 1.0776, "y": 1.0776, "z": 1 }
+      }
+    },
+    {
+      "id": "90563bd9b10f4d9dba867e52944bed0f",
+      "components": [],
+      "name": "single (4)",
+      "duration": 1,
+      "dataType": "VFXItemData",
+      "type": "7",
+      "visible": true,
+      "endBehavior": 5,
+      "delay": 0.38,
+      "renderLevel": "B+",
+      "content": {
+        "options": { "refId": "f099d1a2b8b1480fa2d037efeb52a3df" },
+        "positionOverLifetime": {}
+      },
+      "transform": {
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "eulerHint": { "x": 0, "y": 0, "z": 135 },
+        "scale": { "x": 1.0776, "y": 1.0776, "z": 1 }
+      }
+    },
+    {
+      "id": "b0eae59b7572415ea450e949f91d4a5d",
+      "components": [],
+      "name": "single (5)",
+      "duration": 1,
+      "dataType": "VFXItemData",
+      "type": "7",
+      "visible": true,
+      "endBehavior": 5,
+      "delay": 0.49,
+      "renderLevel": "B+",
+      "content": {
+        "options": { "refId": "f099d1a2b8b1480fa2d037efeb52a3df" },
+        "positionOverLifetime": {}
+      },
+      "transform": {
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "eulerHint": { "x": 0, "y": 0, "z": 180 },
+        "scale": { "x": 1.0776, "y": 1.0776, "z": 1 }
+      }
+    },
+    {
+      "id": "b7c1485d37964fceb190971f5230d199",
+      "components": [],
+      "name": "single (6)",
+      "duration": 1,
+      "dataType": "VFXItemData",
+      "type": "7",
+      "visible": true,
+      "endBehavior": 5,
+      "delay": 0.6,
+      "renderLevel": "B+",
+      "content": {
+        "options": { "refId": "f099d1a2b8b1480fa2d037efeb52a3df" },
+        "positionOverLifetime": {}
+      },
+      "transform": {
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "eulerHint": { "x": 0, "y": 0, "z": 225 },
+        "scale": { "x": 1.0776, "y": 1.0776, "z": 1 }
+      }
+    },
+    {
+      "id": "bc5eec25e86841e680678c31608c99f6",
+      "components": [],
+      "name": "single (7)",
+      "duration": 1,
+      "dataType": "VFXItemData",
+      "type": "7",
+      "visible": true,
+      "endBehavior": 5,
+      "delay": 0.73,
+      "renderLevel": "B+",
+      "content": {
+        "options": { "refId": "f099d1a2b8b1480fa2d037efeb52a3df" },
+        "positionOverLifetime": {}
+      },
+      "transform": {
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "eulerHint": { "x": 0, "y": 0, "z": 270 },
+        "scale": { "x": 1.0776, "y": 1.0776, "z": 1 }
+      }
+    },
+    {
+      "id": "48a4a1b5ddfc481ba715fbbdc18038ec",
+      "components": [],
+      "name": "single (8)",
+      "duration": 1,
+      "dataType": "VFXItemData",
+      "type": "7",
+      "visible": true,
+      "endBehavior": 5,
+      "delay": 0.87,
+      "renderLevel": "B+",
+      "content": {
+        "options": { "refId": "f099d1a2b8b1480fa2d037efeb52a3df" },
+        "positionOverLifetime": {}
+      },
+      "transform": {
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "eulerHint": { "x": 0, "y": 0, "z": 315 },
+        "scale": { "x": 1.0776, "y": 1.0776, "z": 1 }
+      }
+    }
+  ],
+  "shaders": [],
+  "bins": [],
+  "textures": [],
+  "animations": [],
+  "miscs": [
+    {
+      "id": "a4c48eecc4694dc5af25948bb1bd42e2",
+      "dataType": "TimelineAsset",
+      "tracks": [
+        { "id": "cbf281adb1004ab5aadd2f391529c738" },
+        { "id": "8e22dbe5d6e143f2abd4f618372ec40a" },
+        { "id": "3534813bb33641609b417aeac3f82d92" },
+        { "id": "c8fc97f7b4034e288d15cb653f488f74" },
+        { "id": "b3622c1be6d944c781c630bc15ee41be" },
+        { "id": "4c8ba6397b6e42618a9fc23faee623d9" },
+        { "id": "9768ab1358f9424f8c3d763f1a65484c" },
+        { "id": "207e0890e81047569fe3abb8a31b53fb" }
+      ]
+    },
+    {
+      "id": "2048f36fef724dbf89a9448b913b9638",
+      "dataType": "ActivationPlayableAsset"
+    },
+    {
+      "id": "2630297fca374fbc80715f0f38bd4c06",
+      "dataType": "TransformPlayableAsset",
+      "positionOverLifetime": {}
+    },
+    {
+      "id": "ca63d60a6d484d52a5e606b2344b347c",
+      "dataType": "SubCompositionPlayableAsset"
+    },
+    {
+      "id": "1f46bae5c4394341a85113eb2adb90f6",
+      "dataType": "ActivationTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "2048f36fef724dbf89a9448b913b9638" }
+        }
+      ]
+    },
+    {
+      "id": "241336b6bbfd49f3bc88ae7199a2393c",
+      "dataType": "TransformTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "2630297fca374fbc80715f0f38bd4c06" }
+        }
+      ]
+    },
+    {
+      "id": "59a1e481e32544369c5bda7decc22429",
+      "dataType": "SubCompositionTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "ca63d60a6d484d52a5e606b2344b347c" }
+        }
+      ]
+    },
+    {
+      "id": "cbf281adb1004ab5aadd2f391529c738",
+      "dataType": "ObjectBindingTrack",
+      "children": [
+        { "id": "1f46bae5c4394341a85113eb2adb90f6" },
+        { "id": "241336b6bbfd49f3bc88ae7199a2393c" },
+        { "id": "59a1e481e32544369c5bda7decc22429" }
+      ],
+      "clips": []
+    },
+    {
+      "id": "0541d730573f4c04949d7f34a199e8c5",
+      "dataType": "TimelineAsset",
+      "tracks": [{ "id": "68ce9708f1b0473595940633b2223d19" }]
+    },
+    {
+      "id": "f1e1c25885fa4464b9e990460ce59d78",
+      "dataType": "ActivationPlayableAsset"
+    },
+    {
+      "id": "fb2475be03b7470f8b2eb7e0b9a627ab",
+      "dataType": "TransformPlayableAsset",
+      "positionOverLifetime": {}
+    },
+    {
+      "id": "cbe980d70f57463a94a03d6e3e0eb844",
+      "dataType": "FloatPropertyPlayableAsset",
+      "curveData": [
+        21,
+        [
+          [3, [0, 6, 0.1067, 6], 1],
+          [1, [0.2133, 2, 0.32, 2, 0.5467, 2], 1],
+          [2, [0.7733, 6, 1, 6], 1]
+        ]
+      ]
+    },
+    {
+      "id": "980910c8792642f3a3be44c99a7a4995",
+      "dataType": "ActivationTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "f1e1c25885fa4464b9e990460ce59d78" }
+        }
+      ]
+    },
+    {
+      "id": "a3319e82b381470382b0fc62b7190a62",
+      "dataType": "TransformTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "fb2475be03b7470f8b2eb7e0b9a627ab" }
+        }
+      ]
+    },
+    {
+      "id": "9cd15906bc154daca441bc4942b9988b",
+      "dataType": "ObjectBindingTrack",
+      "clips": [],
+      "children": [{ "id": "19f6f76a8d394d5e92f5b7fee6bc5de6" }]
+    },
+    {
+      "id": "19f6f76a8d394d5e92f5b7fee6bc5de6",
+      "dataType": "FloatPropertyTrack",
+      "path": "shape.height",
+      "children": [],
+      "clips": [
+        {
+          "start": 0,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "cbe980d70f57463a94a03d6e3e0eb844" }
+        }
+      ]
+    },
+    {
+      "id": "68ce9708f1b0473595940633b2223d19",
+      "dataType": "ObjectBindingTrack",
+      "children": [
+        { "id": "980910c8792642f3a3be44c99a7a4995" },
+        { "id": "a3319e82b381470382b0fc62b7190a62" },
+        { "id": "9cd15906bc154daca441bc4942b9988b" }
+      ],
+      "clips": []
+    },
+    {
+      "id": "1b3d1b4c7e784cb7bae4c40e0f83a504",
+      "dataType": "ActivationPlayableAsset"
+    },
+    {
+      "id": "aa8a196454c145c195b067651b9d3a23",
+      "dataType": "TransformPlayableAsset",
+      "positionOverLifetime": {}
+    },
+    {
+      "id": "c3bb2302b4d246f2866f9a921d2062ad",
+      "dataType": "SubCompositionPlayableAsset"
+    },
+    {
+      "id": "18cda9b289bb4c09ab3f931c0401bb56",
+      "dataType": "ActivationTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.11,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "1b3d1b4c7e784cb7bae4c40e0f83a504" }
+        }
+      ]
+    },
+    {
+      "id": "d18df724a29f437a9b74b5fb5ee627a7",
+      "dataType": "TransformTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.11,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "aa8a196454c145c195b067651b9d3a23" }
+        }
+      ]
+    },
+    {
+      "id": "82840d6767e843c5a0afde3f2309e60d",
+      "dataType": "SubCompositionTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.11,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "c3bb2302b4d246f2866f9a921d2062ad" }
+        }
+      ]
+    },
+    {
+      "id": "8e22dbe5d6e143f2abd4f618372ec40a",
+      "dataType": "ObjectBindingTrack",
+      "children": [
+        { "id": "18cda9b289bb4c09ab3f931c0401bb56" },
+        { "id": "d18df724a29f437a9b74b5fb5ee627a7" },
+        { "id": "82840d6767e843c5a0afde3f2309e60d" }
+      ],
+      "clips": []
+    },
+    {
+      "id": "ba3fd18f10644585b27e61f1e7540ee2",
+      "dataType": "ActivationPlayableAsset"
+    },
+    {
+      "id": "c5728227ef9b4c888c99d3ba87b7914a",
+      "dataType": "TransformPlayableAsset",
+      "positionOverLifetime": {}
+    },
+    {
+      "id": "e8c84d6655274bdca6087432f36b0f80",
+      "dataType": "SubCompositionPlayableAsset"
+    },
+    {
+      "id": "a18f3c60b9d54e8090e1c26c97b52a1c",
+      "dataType": "ActivationTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.23,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "ba3fd18f10644585b27e61f1e7540ee2" }
+        }
+      ]
+    },
+    {
+      "id": "7b7c8d2fda1d47dc87159041ec3acb6d",
+      "dataType": "TransformTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.23,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "c5728227ef9b4c888c99d3ba87b7914a" }
+        }
+      ]
+    },
+    {
+      "id": "3099e23ff2524cbb820ee310fe86b910",
+      "dataType": "SubCompositionTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.23,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "e8c84d6655274bdca6087432f36b0f80" }
+        }
+      ]
+    },
+    {
+      "id": "3534813bb33641609b417aeac3f82d92",
+      "dataType": "ObjectBindingTrack",
+      "children": [
+        { "id": "a18f3c60b9d54e8090e1c26c97b52a1c" },
+        { "id": "7b7c8d2fda1d47dc87159041ec3acb6d" },
+        { "id": "3099e23ff2524cbb820ee310fe86b910" }
+      ],
+      "clips": []
+    },
+    {
+      "id": "88726777c7934f8ba8ef2c08f40102a7",
+      "dataType": "ActivationPlayableAsset"
+    },
+    {
+      "id": "ebd4317491a74b39b6e55a87f29616d6",
+      "dataType": "TransformPlayableAsset",
+      "positionOverLifetime": {}
+    },
+    {
+      "id": "d9776dda256541e2b0b349989bf43c2e",
+      "dataType": "SubCompositionPlayableAsset"
+    },
+    {
+      "id": "a2b0e60b40184ca3b6964a85e96f2847",
+      "dataType": "ActivationTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.38,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "88726777c7934f8ba8ef2c08f40102a7" }
+        }
+      ]
+    },
+    {
+      "id": "879e0ea5a51d438ea69eb8c6c6efe065",
+      "dataType": "TransformTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.38,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "ebd4317491a74b39b6e55a87f29616d6" }
+        }
+      ]
+    },
+    {
+      "id": "6d667d17903a4b9c9c7347b126ab79df",
+      "dataType": "SubCompositionTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.38,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "d9776dda256541e2b0b349989bf43c2e" }
+        }
+      ]
+    },
+    {
+      "id": "c8fc97f7b4034e288d15cb653f488f74",
+      "dataType": "ObjectBindingTrack",
+      "children": [
+        { "id": "a2b0e60b40184ca3b6964a85e96f2847" },
+        { "id": "879e0ea5a51d438ea69eb8c6c6efe065" },
+        { "id": "6d667d17903a4b9c9c7347b126ab79df" }
+      ],
+      "clips": []
+    },
+    {
+      "id": "a6268c0e744c4882aebd596c68293ed6",
+      "dataType": "ActivationPlayableAsset"
+    },
+    {
+      "id": "714a48e893144847a663bce973c42073",
+      "dataType": "TransformPlayableAsset",
+      "positionOverLifetime": {}
+    },
+    {
+      "id": "48f58aa664dd40b0be840225325e08da",
+      "dataType": "SubCompositionPlayableAsset"
+    },
+    {
+      "id": "6cbc6b3c0071434c992a6dd74139594d",
+      "dataType": "ActivationTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.49,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "a6268c0e744c4882aebd596c68293ed6" }
+        }
+      ]
+    },
+    {
+      "id": "612c08232c6a47179575e3a7b274111b",
+      "dataType": "TransformTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.49,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "714a48e893144847a663bce973c42073" }
+        }
+      ]
+    },
+    {
+      "id": "6f13088ae4d642799f1023781490b22c",
+      "dataType": "SubCompositionTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.49,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "48f58aa664dd40b0be840225325e08da" }
+        }
+      ]
+    },
+    {
+      "id": "b3622c1be6d944c781c630bc15ee41be",
+      "dataType": "ObjectBindingTrack",
+      "children": [
+        { "id": "6cbc6b3c0071434c992a6dd74139594d" },
+        { "id": "612c08232c6a47179575e3a7b274111b" },
+        { "id": "6f13088ae4d642799f1023781490b22c" }
+      ],
+      "clips": []
+    },
+    {
+      "id": "861255ee23334165b3a4528d51789731",
+      "dataType": "ActivationPlayableAsset"
+    },
+    {
+      "id": "ebf8b54a534d4e3abc224db49172527d",
+      "dataType": "TransformPlayableAsset",
+      "positionOverLifetime": {}
+    },
+    {
+      "id": "0191d87a2e0c455a9ee80e0c39fbe056",
+      "dataType": "SubCompositionPlayableAsset"
+    },
+    {
+      "id": "d662fd6ab7ed492eb738e1ffd0c1158a",
+      "dataType": "ActivationTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.6,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "861255ee23334165b3a4528d51789731" }
+        }
+      ]
+    },
+    {
+      "id": "8e6242426a344ed9b3dbc8fe74d20830",
+      "dataType": "TransformTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.6,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "ebf8b54a534d4e3abc224db49172527d" }
+        }
+      ]
+    },
+    {
+      "id": "52c260772bbd44099c4b9a61b8e45987",
+      "dataType": "SubCompositionTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.6,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "0191d87a2e0c455a9ee80e0c39fbe056" }
+        }
+      ]
+    },
+    {
+      "id": "4c8ba6397b6e42618a9fc23faee623d9",
+      "dataType": "ObjectBindingTrack",
+      "children": [
+        { "id": "d662fd6ab7ed492eb738e1ffd0c1158a" },
+        { "id": "8e6242426a344ed9b3dbc8fe74d20830" },
+        { "id": "52c260772bbd44099c4b9a61b8e45987" }
+      ],
+      "clips": []
+    },
+    {
+      "id": "b4cadb4cf53a4a8a89b7e8540cd1fcb4",
+      "dataType": "ActivationPlayableAsset"
+    },
+    {
+      "id": "a14cd78bd2e84d3282cde71c453b1dec",
+      "dataType": "TransformPlayableAsset",
+      "positionOverLifetime": {}
+    },
+    {
+      "id": "d995709b9dd94704919c1619f86bc889",
+      "dataType": "SubCompositionPlayableAsset"
+    },
+    {
+      "id": "61eaf497730c49a18417cd87a714717b",
+      "dataType": "ActivationTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.73,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "b4cadb4cf53a4a8a89b7e8540cd1fcb4" }
+        }
+      ]
+    },
+    {
+      "id": "233df52fb1d844eb8c9d341573bb81a1",
+      "dataType": "TransformTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.73,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "a14cd78bd2e84d3282cde71c453b1dec" }
+        }
+      ]
+    },
+    {
+      "id": "25ab35fb207b456b960f381c25c1b82d",
+      "dataType": "SubCompositionTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.73,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "d995709b9dd94704919c1619f86bc889" }
+        }
+      ]
+    },
+    {
+      "id": "9768ab1358f9424f8c3d763f1a65484c",
+      "dataType": "ObjectBindingTrack",
+      "children": [
+        { "id": "61eaf497730c49a18417cd87a714717b" },
+        { "id": "233df52fb1d844eb8c9d341573bb81a1" },
+        { "id": "25ab35fb207b456b960f381c25c1b82d" }
+      ],
+      "clips": []
+    },
+    {
+      "id": "cda7d1e9edae4410b247f97d13726870",
+      "dataType": "ActivationPlayableAsset"
+    },
+    {
+      "id": "a12949c2408a44cd9580c7cf784752a7",
+      "dataType": "TransformPlayableAsset",
+      "positionOverLifetime": {}
+    },
+    {
+      "id": "005d0566916740b49aba8e8fe29be3ff",
+      "dataType": "SubCompositionPlayableAsset"
+    },
+    {
+      "id": "9ad93dfd06d848de8f9368feb14a36ec",
+      "dataType": "ActivationTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.87,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "cda7d1e9edae4410b247f97d13726870" }
+        }
+      ]
+    },
+    {
+      "id": "6f2e4dee13534ce49d4d15041ea52323",
+      "dataType": "TransformTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.87,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "a12949c2408a44cd9580c7cf784752a7" }
+        }
+      ]
+    },
+    {
+      "id": "0605aee6dc0744ab81fe910e0c7a6ed7",
+      "dataType": "SubCompositionTrack",
+      "children": [],
+      "clips": [
+        {
+          "start": 0.87,
+          "duration": 1,
+          "endBehavior": 5,
+          "asset": { "id": "005d0566916740b49aba8e8fe29be3ff" }
+        }
+      ]
+    },
+    {
+      "id": "207e0890e81047569fe3abb8a31b53fb",
+      "dataType": "ObjectBindingTrack",
+      "children": [
+        { "id": "9ad93dfd06d848de8f9368feb14a36ec" },
+        { "id": "6f2e4dee13534ce49d4d15041ea52323" },
+        { "id": "0605aee6dc0744ab81fe910e0c7a6ed7" }
+      ],
+      "clips": []
+    }
+  ],
+  "compositionId": "e5c1358b8f304035a9f959f1d7fd6ccc"
+}

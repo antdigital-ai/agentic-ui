@@ -112,7 +112,7 @@ export default function SimpleToMarkdownExample() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h1>简单的 toMarkdown 插件示例</h1>
 
       <div style={{ marginBottom: '20px' }}>

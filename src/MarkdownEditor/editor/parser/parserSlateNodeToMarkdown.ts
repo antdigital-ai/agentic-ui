@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { Node, Text } from 'slate';
 import stringWidth from 'string-width';
+import { debugInfo } from '../../../Utils/debugUtils';
 import { ChartNode } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
 import { getMediaType } from '../utils/dom';
@@ -213,11 +214,23 @@ const parserNode = (
   plugins?: MarkdownEditorPlugin[],
 ) => {
   let str = '';
-  if (!node) return str;
+  if (!node) {
+    debugInfo('parserSlateNodeToMarkdown.parserNode - 空节点');
+    return str;
+  }
+
+  debugInfo('parserSlateNodeToMarkdown.parserNode - 开始解析节点', {
+    nodeType: node.type,
+    preString,
+    parentType: parent[parent.length - 1]?.type,
+  });
 
   // 首先尝试使用插件处理
   const pluginResult = tryPluginConversion(node, preString, parent, plugins);
   if (pluginResult !== null) {
+    debugInfo('parserSlateNodeToMarkdown.parserNode - 使用插件转换', {
+      resultLength: pluginResult.length,
+    });
     return pluginResult;
   }
 
@@ -250,7 +263,9 @@ const parserNode = (
     case 'media':
       str += handleMedia(node);
       break;
-    case 'list':
+    case 'bulleted-list':
+    case 'numbered-list':
+    case 'list': // 向后兼容
       str += '\n' + handleList(node, preString, parent, plugins) + '\n\n';
       break;
     case 'list-item':
@@ -281,6 +296,13 @@ const parserNode = (
       str += handleDefault(node, parent);
       break;
   }
+
+  debugInfo('parserSlateNodeToMarkdown.parserNode - 节点解析完成', {
+    nodeType: node.type,
+    resultLength: str.length,
+    resultPreview: str.substring(0, 50),
+  });
+
   return str;
 };
 
@@ -302,16 +324,38 @@ export const parserSlateNodeToMarkdown = (
   parent: any[] = [{ root: true }],
   plugins?: MarkdownEditorPlugin[],
 ) => {
+  debugInfo('parserSlateNodeToMarkdown - 开始转换', {
+    treeLength: tree?.length,
+    preString,
+    parentType: parent[parent.length - 1]?.type || 'root',
+    hasPlugins: !!plugins && plugins.length > 0,
+  });
+
   let str = '';
   for (let i = 0; i < tree.length; i++) {
     const node = tree[i];
+    debugInfo(`parserSlateNodeToMarkdown - 处理节点 ${i}/${tree.length}`, {
+      nodeType: node?.type,
+      hasOtherProps: !!node?.otherProps,
+      otherPropsKeys: node?.otherProps ? Object.keys(node.otherProps) : [],
+    });
     if (node.otherProps && Object.keys(node.otherProps).length) {
+      debugInfo(`parserSlateNodeToMarkdown - 处理 otherProps ${i}`, {
+        nodeType: node.type,
+        originalOtherProps: node.otherProps,
+      });
+
       let configProps = {
         ...node.otherProps,
       };
 
       delete configProps['columns'];
       delete configProps['dataSource'];
+      delete configProps['finished'];
+      // paragraph/head 的 align 已输出到 <p align> / <h align>，不再写入注释
+      if (node.type === 'paragraph' || node.type === 'head') {
+        delete configProps['align'];
+      }
 
       if (node.type === 'link-card') {
         configProps.type = 'card';
@@ -319,6 +363,9 @@ export const parserSlateNodeToMarkdown = (
         configProps.name = node.name || node.title || configProps.name;
         configProps.description = node.description || configProps.description;
         configProps.icon = node.icon || configProps.icon;
+        debugInfo(`parserSlateNodeToMarkdown - link-card 转换 ${i}`, {
+          configProps,
+        });
       }
       Object.keys(configProps).forEach((key) => {
         if (typeof configProps[key] === 'object' && configProps[key]) {
@@ -337,12 +384,121 @@ export const parserSlateNodeToMarkdown = (
       });
 
       // 只有当 configProps 不为空对象时才生成注释
-      if (Object.keys(configProps).length > 0) {
-        const propsToSerialize =
-          node.type === 'chart' && configProps.config
-            ? configProps.config
-            : configProps;
-        str += `<!--${JSON.stringify(propsToSerialize)}-->\n`;
+      // 检查 configProps 是否为空对象（删除 finished 后可能变成空对象）
+      const hasValidProps = Object.keys(configProps).length > 0;
+      if (hasValidProps) {
+        /**
+         * 将对象转换为数组（处理 {0: {...}, 1: {...}} 这种错误格式）
+         * @param obj - 要转换的对象
+         * @returns 转换后的数组，如果不是数字键对象则返回原对象
+         */
+        const convertObjectToArray = (obj: any): any => {
+          if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
+            return obj;
+          }
+
+          const keys = Object.keys(obj);
+          // 检查是否所有键都是数字字符串（如 "0", "1", "2"）
+          const allNumericKeys =
+            keys.length > 0 && keys.every((key) => /^\d+$/.test(key));
+
+          if (allNumericKeys) {
+            // 按数字顺序排序并转换为数组
+            const sortedKeys = keys.sort(
+              (a, b) => parseInt(a, 10) - parseInt(b, 10),
+            );
+            return sortedKeys.map((key) => obj[key]);
+          }
+
+          return obj;
+        };
+
+        // 对于图表类型，配置应该总是以数组形式存储在 config 中
+        if (node.type === 'chart') {
+          debugInfo(`parserSlateNodeToMarkdown - 处理图表节点 ${i}`, {
+            originalConfig: configProps.config,
+            hasChartType: !!configProps.chartType,
+          });
+
+          let chartConfig = configProps.config;
+
+          // 如果 config 不存在，但 configProps 看起来像图表配置（有 chartType），使用 configProps
+          if (!chartConfig && configProps.chartType) {
+            chartConfig = configProps;
+          }
+
+          // 如果 chartConfig 是对象且键都是数字（如 {0: {...}}），转换为数组
+          chartConfig = convertObjectToArray(chartConfig);
+          debugInfo(`parserSlateNodeToMarkdown - 图表配置转换后 ${i}`, {
+            chartConfig,
+            isArray: Array.isArray(chartConfig),
+          });
+
+          // 如果 chartConfig 还不是数组，将其包装为数组
+          // 这样可以确保即使只有一个配置项，也会被放入数组中
+          if (!Array.isArray(chartConfig)) {
+            // 如果 chartConfig 是对象，检查是否是 {0: {...}} 格式但转换失败的情况
+            if (chartConfig && typeof chartConfig === 'object') {
+              const keys = Object.keys(chartConfig);
+              // 如果只有一个键且是数字，提取该值
+              if (keys.length === 1 && /^\d+$/.test(keys[0])) {
+                chartConfig = [chartConfig[keys[0]]];
+              } else if (chartConfig.chartType) {
+                // 如果 chartConfig 有 chartType，说明是单个配置对象
+                chartConfig = [chartConfig];
+              } else {
+                // 其他情况，也包装为数组
+                chartConfig = [chartConfig];
+              }
+            } else if (chartConfig) {
+              chartConfig = [chartConfig];
+            } else {
+              chartConfig = [];
+            }
+          }
+
+          // 序列化为 { config: [...] } 格式
+          if (chartConfig.length > 0) {
+            str += `<!--${JSON.stringify({ config: chartConfig })}-->\n`;
+          }
+        } else {
+          // 非图表类型，使用原有逻辑
+          let nodeConfig = configProps;
+
+          // 如果 nodeConfig 是对象且键都是数字（如 {0: {...}}），转换为数组
+          nodeConfig = convertObjectToArray(nodeConfig);
+
+          let propsToSerialize: any;
+
+          // 如果 nodeConfig 是数组，直接使用数组
+          if (Array.isArray(nodeConfig)) {
+            propsToSerialize = nodeConfig;
+          } else {
+            // 如果是对象，过滤掉 undefined 值，但保留 false 值
+            propsToSerialize = Object.keys(nodeConfig).reduce(
+              (acc, key) => {
+                if (nodeConfig[key] !== undefined) {
+                  acc[key] = nodeConfig[key];
+                }
+                return acc;
+              },
+              {} as Record<string, any>,
+            );
+          }
+
+          // 对于数组，直接序列化；对于对象，检查是否为空
+          if (Array.isArray(propsToSerialize)) {
+            if (propsToSerialize.length > 0) {
+              str += `<!--${JSON.stringify({ config: propsToSerialize })}-->\n`;
+            }
+          } else if (
+            propsToSerialize &&
+            typeof propsToSerialize === 'object' &&
+            Object.keys(propsToSerialize).length > 0
+          ) {
+            str += `<!--${JSON.stringify(propsToSerialize)}-->\n`;
+          }
+        }
       }
     }
     const p = parent.at(-1) || ({} as any);
@@ -359,6 +515,12 @@ export const parserSlateNodeToMarkdown = (
         str += '\n' + preString + '> ';
       }
     } else if (node.type === 'blockquote') {
+      debugInfo(`parserSlateNodeToMarkdown - 处理引用块 ${i}`, {
+        childrenCount: node.children?.length,
+        hasNestedBlockquote: node.children?.some(
+          (c: any) => c.type === 'blockquote',
+        ),
+      });
       // Handle blockquotes
       const blockquoteContent = node.children
         .map((child: any) => {
@@ -381,11 +543,26 @@ export const parserSlateNodeToMarkdown = (
         })
         .join('\n');
       str += blockquoteContent;
-    } else if (node.type === 'list') {
+      debugInfo(`parserSlateNodeToMarkdown - 引用块处理完成 ${i}`, {
+        contentLength: blockquoteContent.length,
+      });
+    } else if (
+      node.type === 'bulleted-list' ||
+      node.type === 'numbered-list' ||
+      node.type === 'list' // 向后兼容
+    ) {
+      debugInfo(`parserSlateNodeToMarkdown - 处理列表 ${i}`, {
+        type: node.type,
+        isOrdered: node.type === 'numbered-list' || node.order,
+        start: node.start,
+        childrenCount: node.children?.length,
+      });
       // Handle lists
+      const isOrdered =
+        node.type === 'numbered-list' || (node.type === 'list' && node.order);
       const listItems = node.children
         .map((item: any, index: number) => {
-          const prefix = node.order ? `${index + (node.start || 1)}.` : '-';
+          const prefix = isOrdered ? `${index + (node.start || 1)}.` : '-';
           return (
             prefix +
             ' ' +
@@ -402,10 +579,18 @@ export const parserSlateNodeToMarkdown = (
           str += '\n\n';
         }
       }
+      debugInfo(`parserSlateNodeToMarkdown - 列表处理完成 ${i}`, {
+        listItemsLength: listItems.length,
+        hasContent: !!listItems.trim(),
+      });
     } else if (
       node.type === 'paragraph' &&
-      tree[i - 1]?.type === 'list' &&
-      tree[i + 1]?.type === 'list'
+      (tree[i - 1]?.type === 'list' ||
+        tree[i - 1]?.type === 'bulleted-list' ||
+        tree[i - 1]?.type === 'numbered-list') &&
+      (tree[i + 1]?.type === 'list' ||
+        tree[i + 1]?.type === 'bulleted-list' ||
+        tree[i + 1]?.type === 'numbered-list')
     ) {
       if (!Node.string(node)?.replace(/\s|\t/g, '')) {
         str += '<br/>\n\n';
@@ -432,7 +617,11 @@ export const parserSlateNodeToMarkdown = (
           str += '\n\n';
         }
         // Lists should have double newlines after them
-        else if (node.type === 'list') {
+        else if (
+          node.type === 'list' ||
+          node.type === 'bulleted-list' ||
+          node.type === 'numbered-list'
+        ) {
           str += '\n\n';
         }
         // Most block elements should have double newlines
@@ -448,6 +637,10 @@ export const parserSlateNodeToMarkdown = (
 
   // Clean up trailing newlines and handle special cases
   if (str) {
+    debugInfo('parserSlateNodeToMarkdown - 开始清理换行符', {
+      strLength: str.length,
+      trailingNewlines: (str.match(/\n+$/) || [''])[0].length,
+    });
     // Remove all trailing newlines first
     str = str.replace(/\n+$/, '');
 
@@ -458,6 +651,13 @@ export const parserSlateNodeToMarkdown = (
     const parentType = parent[parent.length - 1]?.type;
     const nextNode = tree[tree.indexOf(lastNode) + 1];
     const isLastNodeInParent = !nextNode;
+    debugInfo('parserSlateNodeToMarkdown - 换行符处理上下文', {
+      lastNodeType: lastNode?.type,
+      isRoot,
+      isConverted,
+      parentType,
+      isLastNodeInParent,
+    });
 
     if (lastNode && lastNode.type && !isConverted) {
       if (parentType === 'blockquote') {
@@ -493,12 +693,28 @@ export const parserSlateNodeToMarkdown = (
   }
 
   // Clean up multiple consecutive newlines
+  const beforeCleanup = str.length;
   str = str.replace(/\n{3,}/g, '\n\n');
+  debugInfo('parserSlateNodeToMarkdown - 清理连续换行符', {
+    beforeLength: beforeCleanup,
+    afterLength: str.length,
+  });
 
   // Remove leading newlines for root level content
   if (parent.length === 1 && parent[0].root) {
+    const beforeLeading = str.length;
     str = str.replace(/^\n+/, '');
+    debugInfo('parserSlateNodeToMarkdown - 清理前导换行符', {
+      beforeLength: beforeLeading,
+      afterLength: str.length,
+    });
   }
+
+  debugInfo('parserSlateNodeToMarkdown - 转换完成', {
+    finalLength: str.length,
+    finalPreview: str.substring(0, 100),
+  });
+
   return str;
 };
 
@@ -559,25 +775,49 @@ const textStyle = (t: Text) => {
   let preStr = '',
     afterStr = '';
 
-  // Extract whitespace
-  if (t.code || t.bold || t.strikethrough || t.italic) {
-    preStr = str.match(/^\s+/)?.[0] || '';
-    afterStr = str.match(/\s+$/)?.[0] || '';
-    str = str.trim();
-  }
-
   // Apply formats in a consistent order:
   // 1. Code (most specific)
   // 2. Bold (strong emphasis)
   // 3. Italic (emphasis)
   // 4. Strikethrough (modification)
   if (t.code && !t.tag) {
+    // Extract whitespace for non-tag code
+    if (t.code || t.bold || t.strikethrough || t.italic) {
+      preStr = str.match(/^\s+/)?.[0] || '';
+      afterStr = str.match(/\s+$/)?.[0] || '';
+      str = str.trim();
+    }
     str = `\`${str}\``;
   } else if (t.tag) {
+    // 如果是 tag，优先检查是否有 value，如果有 value 则使用 value 和 placeholder
+    // 如果没有 value 但有 text（且不为空），则使用 text
+    // 如果没有 text 也没有 value，则使用 placeholder
+    // 对于 tag，如果 text 只是空白字符，不保留空白字符
+    const trimmedStr = str.trim();
+
     if ((t as any).value) {
-      str = `\`${`\${placeholder:${(t as any)?.placeholder || '-'},value:${(t as any).value}}` || ''}\``;
+      // 有 value，优先使用 value 和 placeholder（即使有 text 也使用 value）
+      str = `\`\${placeholder:${(t as any)?.placeholder || '-'},value:${(t as any).value}}\``;
+    } else if (trimmedStr) {
+      // 没有 value 但有 text 且不为空，提取空白字符并使用 text
+      if (t.code || t.bold || t.strikethrough || t.italic) {
+        preStr = str.match(/^\s+/)?.[0] || '';
+        afterStr = str.match(/\s+$/)?.[0] || '';
+      }
+      str = `\`${trimmedStr}\``;
+    } else if ((t as any).placeholder) {
+      // 没有 text 也没有 value，使用 placeholder（不保留空白字符）
+      str = `\`\${placeholder:${(t as any).placeholder}}\``;
     } else {
-      str = `\`${str || `\${placeholder:${(t as any)?.placeholder || '-'}}` || ''}\``;
+      // 都没有，使用默认值（不保留空白字符）
+      str = `\`\${placeholder:-}\``;
+    }
+  } else {
+    // Extract whitespace for other formats
+    if (t.bold || t.strikethrough || t.italic) {
+      preStr = str.match(/^\s+/)?.[0] || '';
+      afterStr = str.match(/\s+$/)?.[0] || '';
+      str = str.trim();
     }
   }
 
@@ -678,9 +918,25 @@ const table = (
   parent: any[],
   plugins?: MarkdownEditorPlugin[],
 ) => {
+  debugInfo('parserSlateNodeToMarkdown.table - 开始处理表格', {
+    elType: el.type,
+    childrenCount: el.children?.length,
+  });
+
   const children = el.children;
   const head = children[0]?.children;
-  if (!children.length || !head.length) return '';
+  if (!children.length || !head.length) {
+    debugInfo('parserSlateNodeToMarkdown.table - 空表格，返回空字符串');
+    return '';
+  }
+
+  debugInfo('parserSlateNodeToMarkdown.table - 表格头部信息', {
+    headLength: head.length,
+    headCells: head.map((h: any) => ({
+      type: h.type,
+      align: h.align,
+    })),
+  });
 
   const data: string[][] = new Array(children.length);
   let maxColumns = 0;
@@ -755,6 +1011,12 @@ const table = (
   const rowCount = processor();
   data.length = rowCount;
 
+  debugInfo('parserSlateNodeToMarkdown.table - 表格数据处理完成', {
+    rowCount,
+    maxColumns,
+    dataPreview: data.slice(0, 2).map((row) => row.slice(0, 3)),
+  });
+
   // 计算列宽
   const colLength = new Array(maxColumns).fill(0);
   for (const row of data) {
@@ -827,7 +1089,14 @@ const table = (
     }
   }
 
-  return output.join('\n');
+  const result = output.join('\n');
+  debugInfo('parserSlateNodeToMarkdown.table - 表格转换完成', {
+    outputRows: output.length,
+    resultLength: result.length,
+    resultPreview: result.substring(0, 200),
+  });
+
+  return result;
 };
 
 /**
@@ -868,9 +1137,17 @@ const handleParagraph = (
 ) => {
   let str = '';
 
-  // 处理对齐注释
-  if (node.align) {
-    str += `<!--${JSON.stringify({ align: node.align })}-->\n${preString}`;
+  // 如果有对齐属性，使用 HTML 标签包裹以支持对齐（兼容 align 在 otherProps 的情况）
+  const align = node.align ?? node.otherProps?.align;
+  if (align) {
+    // 递归处理子节点
+    const content = parserSlateNodeToMarkdown(
+      node?.children,
+      '',
+      [...parent, node],
+      plugins,
+    );
+    return `<p align="${align}">${content}</p>`;
   }
 
   str += parserSlateNodeToMarkdown(
@@ -899,9 +1176,17 @@ const handleHead = (
 ) => {
   let str = '';
 
-  // 处理对齐注释
-  if (node.align) {
-    str += `<!--${JSON.stringify({ align: node.align })}-->\n${preString}`;
+  // 如果有对齐属性，使用 HTML 标签包裹以支持对齐（兼容 align 在 otherProps 的情况）
+  const align = node.align ?? node.otherProps?.align;
+  if (align) {
+    // 递归处理子节点
+    const content = parserSlateNodeToMarkdown(
+      node?.children,
+      '',
+      [...parent, node],
+      plugins,
+    );
+    return `<h${node.level} align="${align}">${content}</h${node.level}>`;
   }
 
   str +=
@@ -1090,7 +1375,7 @@ const handleMedia = (node: any) => {
 
 /**
  * 处理列表节点，递归处理其子节点
- * @param node - 列表节点
+ * @param node - 列表节点（bulleted-list、numbered-list 或 list）
  * @param preString - 前缀字符串，用于处理缩进
  * @param parent - 父节点数组
  * @param plugins - 可选的插件数组
@@ -1102,12 +1387,33 @@ const handleList = (
   parent: any[],
   plugins?: MarkdownEditorPlugin[],
 ) => {
-  return parserSlateNodeToMarkdown(
-    node.children,
-    preString,
-    [...parent, node],
-    plugins,
-  );
+  // 检查是否在嵌套列表中（父节点是 list-item）
+  const isNested =
+    parent.length > 0 && parent[parent.length - 1]?.type === 'list-item';
+
+  // 如果是嵌套列表，需要添加缩进
+  const indent = isNested ? '  ' : '';
+
+  // 递归处理列表项，每个列表项都会添加缩进前缀
+  const listItems = node.children
+    .map((item: any, index: number) => {
+      const isOrdered =
+        node.type === 'numbered-list' || (node.type === 'list' && node.order);
+      const prefix = isOrdered ? `${index + (node.start || 1)}.` : '-';
+
+      // 处理列表项内容，如果是嵌套列表，需要额外缩进
+      const itemContent = parserNode(
+        item,
+        indent + preString,
+        [...parent, node],
+        plugins,
+      ).trimEnd();
+
+      return indent + prefix + ' ' + itemContent;
+    })
+    .join('\n' + indent);
+
+  return listItems;
 };
 
 /**
@@ -1124,12 +1430,38 @@ const handleListItem = (
   parent: any[],
   plugins?: MarkdownEditorPlugin[],
 ) => {
-  return parserSlateNodeToMarkdown(
-    node.children,
-    preString,
-    [...parent, node],
-    plugins,
-  );
+  // 列表项的第一个子节点应该是段落或其他块级元素
+  // 后续子节点可能是嵌套的列表
+  const result: string[] = [];
+
+  for (let i = 0; i < node.children.length; i++) {
+    const child = node.children[i];
+    const childResult = parserNode(
+      child,
+      preString,
+      [...parent, node],
+      plugins,
+    );
+
+    if (i === 0) {
+      // 第一个子节点是主要内容
+      result.push(childResult);
+    } else {
+      // 后续子节点可能是嵌套列表，需要换行并添加缩进
+      if (
+        child.type === 'bulleted-list' ||
+        child.type === 'numbered-list' ||
+        child.type === 'list'
+      ) {
+        result.push('\n' + childResult);
+      } else {
+        // 其他块级元素也需要换行
+        result.push('\n' + childResult);
+      }
+    }
+  }
+
+  return result.join('');
 };
 
 /**

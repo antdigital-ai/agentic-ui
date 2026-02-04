@@ -6,12 +6,14 @@ export const ComponentContainer = ({
   description,
   children,
   style,
+  containerStyle,
 }: {
   paddingInline?: number;
   paddingBlock?: number;
   description?: string;
   children: React.ReactNode;
   style?: React.CSSProperties;
+  containerStyle?: React.CSSProperties;
 }) => {
   return (
     <div
@@ -30,6 +32,7 @@ export const ComponentContainer = ({
           paddingBlock,
           background: 'var(--color-gray-bg-page)',
           borderRadius: 48,
+          ...containerStyle,
         }}
       >
         {children}

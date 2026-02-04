@@ -24,10 +24,13 @@ export type BubbleExtraProps = {
   /**
    * 点踩的回调函数
    * @description 当用户点击点踩按钮时触发
+   * @deprecated 请使用 onDislike 替代（符合命名规范），但为保持兼容性暂时保留
    * @callback
    * @optional
    */
   onDisLike?: () => void;
+  /** 点踩的回调函数 */
+  onDislike?: () => void;
 
   /**
    * 点赞的回调函数
@@ -40,10 +43,16 @@ export type BubbleExtraProps = {
   /**
    * 取消点赞的回调函数
    * @description 当用户点击取消点赞按钮时触发
+   * @deprecated 请使用 onLikeCancel 替代（符合命名规范），但为保持兼容性暂时保留
    * @callback
    * @optional
    */
   onCancelLike?: (bubble: MessageBubbleData<Record<string, any>>) => void;
+  /**
+   * Like 子组件取消事件
+   * @description 当用户点击取消点赞按钮时触发
+   */
+  onLikeCancel?: (bubble: MessageBubbleData<Record<string, any>>) => void;
 
   /**
    * 控制复制按钮的显示

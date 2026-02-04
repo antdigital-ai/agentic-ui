@@ -31,7 +31,7 @@ const ToolUseBarThinkDemo = () => {
 
   const isLoading = currentIndex < fullThinkContent.length;
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h3>ToolUseBarThink 不同状态对比</h3>
 
       <div

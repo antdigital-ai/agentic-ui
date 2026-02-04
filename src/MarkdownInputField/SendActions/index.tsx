@@ -8,6 +8,7 @@ import { I18nContext } from '../../I18n';
 import type { AttachmentButtonProps } from '../AttachmentButton';
 import { AttachmentButton } from '../AttachmentButton';
 import type { AttachmentFile } from '../AttachmentButton/types';
+import type { SendButtonCustomizationProps } from '../SendButton';
 import { SendButton } from '../SendButton';
 import type { CreateRecognizer } from '../VoiceInput';
 import { VoiceInputButton } from '../VoiceInput';
@@ -51,7 +52,7 @@ export interface SendActionsProps {
   allowEmptySubmit?: boolean;
 
   /** 上传图片回调 */
-  uploadImage?: () => Promise<void>;
+  uploadImage?: (forGallery?: boolean) => Promise<void>;
 
   /** 开始录音回调 */
   onStartRecording?: () => Promise<void>;
@@ -82,6 +83,12 @@ export interface SendActionsProps {
 
   /** resize 回调 */
   onResize?: (width: number) => void;
+
+  /** 发送按钮配置 */
+  sendButtonProps?: SendButtonCustomizationProps;
+
+  /** 触发发送的快捷键 */
+  triggerSendKey?: 'Enter' | 'Mod+Enter';
 }
 
 /**
@@ -110,6 +117,8 @@ export const SendActions: React.FC<SendActionsProps> = ({
   hashId = '',
   hasTools = false,
   onResize,
+  sendButtonProps,
+  triggerSendKey,
 }) => {
   const fileMap = attachment?.fileMap;
 
@@ -173,6 +182,8 @@ export const SendActions: React.FC<SendActionsProps> = ({
           }
           onSend?.();
         }}
+        triggerSendKey={triggerSendKey}
+        {...sendButtonProps}
       />,
     ].filter(Boolean);
   }, [
@@ -192,6 +203,8 @@ export const SendActions: React.FC<SendActionsProps> = ({
     onSend,
     onStop,
     fileMap,
+    sendButtonProps,
+    triggerSendKey,
   ]);
 
   const actionsList = actionsRender

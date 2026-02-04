@@ -1,7 +1,16 @@
 import { ConfigProvider } from 'antd';
-import React, { forwardRef, useContext, useImperativeHandle } from 'react';
+import clsx from 'classnames';
+import React, {
+  forwardRef,
+  memo,
+  useContext,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import { LayoutHeader } from '../Components/LayoutHeader';
 import useAutoScroll from '../Hooks/useAutoScroll';
+import { useElementSize } from '../Hooks/useElementSize';
+import FooterBackground from './components/FooterBackground';
 import { useStyle } from './style';
 import type { ChatLayoutProps, ChatLayoutRef } from './types';
 
@@ -70,49 +79,102 @@ import type { ChatLayoutProps, ChatLayoutRef } from './types';
  *
  * @returns {React.ReactElement} 渲染的聊天布局组件
  */
-const ChatLayout = forwardRef<ChatLayoutRef, ChatLayoutProps>(
-  ({ header, children, footer, className, style }, ref) => {
+const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
+  (
+    {
+      header,
+      children,
+      footer,
+      footerHeight = 48,
+      scrollBehavior = 'smooth',
+      className,
+      style,
+      classNames,
+      styles,
+      showFooterBackground = true,
+    },
+    ref,
+  ) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('chat-layout');
     const { wrapSSR, hashId } = useStyle(prefixCls);
-    const { containerRef } = useAutoScroll({
+    const { containerRef, scrollToBottom } = useAutoScroll({
       SCROLL_TOLERANCE: 30,
       onResize: () => {},
       timeout: 200,
+      scrollBehavior,
     });
+
+    const footerRef = useRef<HTMLDivElement>(null);
+    const { height: actualFooterHeight } = useElementSize(footerRef);
 
     useImperativeHandle(ref, () => ({
       scrollContainer: containerRef.current,
+      scrollToBottom,
     }));
 
-    return wrapSSR(
-      <div
-        className={`${prefixCls} ${className || ''} ${hashId}`}
-        style={style}
-      >
-        {/* 头部区域 */}
-        {header && <LayoutHeader {...header} />}
+    const rootClassName = clsx(prefixCls, className, classNames?.root, hashId);
+    const contentClassName = clsx(
+      `${prefixCls}-content`,
+      classNames?.content,
+      hashId,
+    );
+    const scrollableClassName = clsx(
+      `${prefixCls}-content-scrollable`,
+      classNames?.scrollable,
+      hashId,
+    );
+    const footerClassName = clsx(
+      `${prefixCls}-footer`,
+      classNames?.footer,
+      hashId,
+    );
+    const footerBackgroundClassName = clsx(
+      `${prefixCls}-footer-background`,
+      classNames?.footerBackground,
+      hashId,
+    );
 
-        {/* 内容区域 */}
-        <div className={`${prefixCls}-content ${hashId}`}>
+    return wrapSSR(
+      <div className={rootClassName} style={{ ...styles?.root, ...style }}>
+        {header && <LayoutHeader {...header} />}
+        <div className={contentClassName} style={styles?.content}>
           <div
-            className={`${prefixCls}-content-scrollable ${hashId}`}
+            className={scrollableClassName}
             ref={containerRef}
+            style={styles?.scrollable}
           >
             {children}
+            {footer && (
+              <div
+                style={{ height: actualFooterHeight, width: '100%' }}
+                aria-hidden="true"
+              />
+            )}
           </div>
         </div>
-
-        {/* 底部区域 */}
+        {showFooterBackground && (
+          <FooterBackground className={footerBackgroundClassName} />
+        )}
         {footer && (
-          <div className={`${prefixCls}-footer ${hashId}`}>{footer}</div>
+          <div
+            ref={footerRef}
+            className={footerClassName}
+            style={{ minHeight: footerHeight, ...styles?.footer }}
+          >
+            {footer}
+          </div>
         )}
       </div>,
     );
   },
 );
+
+ChatLayoutComponent.displayName = 'ChatLayout';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+export const ChatLayout = memo(ChatLayoutComponent);
 // 保持向后兼容，导出 ChatFlowHeader 作为 LayoutHeader 的别名
 export { LayoutHeader as ChatFlowHeader } from '../Components/LayoutHeader';
 export type { LayoutHeaderProps as ChatFlowHeaderProps } from '../Components/LayoutHeader';
 export type { ChatLayoutProps, ChatLayoutRef } from './types';
-export { ChatLayout };

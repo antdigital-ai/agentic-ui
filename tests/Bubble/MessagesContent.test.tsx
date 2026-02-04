@@ -42,7 +42,7 @@ vi.mock('../../src/Bubble/MessagesContent/MarkdownPreview', () => ({
 vi.mock('../../src/Bubble/MessagesContent/BubbleExtra', () => ({
   BubbleExtra: ({
     onLike,
-    onDisLike,
+    onDislike,
     onReply,
     style,
     readonly,
@@ -57,7 +57,7 @@ vi.mock('../../src/Bubble/MessagesContent/BubbleExtra', () => ({
       <button data-testid="like-btn" onClick={onLike}>
         Like
       </button>
-      <button data-testid="dislike-btn" onClick={onDisLike}>
+      <button data-testid="dislike-btn" onClick={onDislike}>
         Dislike
       </button>
       <button data-testid="reply-btn" onClick={() => onReply?.('test reply')}>
@@ -148,60 +148,64 @@ vi.mock('../../src/MarkdownEditor', () => ({
 }));
 
 // Mock Antd 组件
-vi.mock('antd', () => ({
-  Popover: ({ children, content, title, placement }: any) => (
-    <div data-testid="popover" data-placement={placement}>
-      {title && <div data-testid="popover-title">{title}</div>}
-      {children}
-      {content && <div data-testid="popover-content">{content}</div>}
-    </div>
-  ),
-  Tooltip: ({ children, title }: any) => (
-    <div data-testid="tooltip" title={title}>
-      {children}
-    </div>
-  ),
-  Typography: {
-    Text: ({ children, copyable }: any) => (
-      <span
-        data-testid="typography-text"
-        data-copyable={copyable ? 'true' : 'false'}
-      >
+vi.mock('antd', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('antd')>();
+  return {
+    ...actual,
+    Popover: ({ children, content, title, placement }: any) => (
+      <div data-testid="popover" data-placement={placement}>
+        {title && <div data-testid="popover-title">{title}</div>}
         {children}
-      </span>
+        {content && <div data-testid="popover-content">{content}</div>}
+      </div>
     ),
-  },
-  ConfigProvider: {
-    ConfigContext: {
-      Consumer: ({ children }: any) =>
-        children({ getPrefixCls: () => 'test-prefix' }),
+    Tooltip: ({ children, title }: any) => (
+      <div data-testid="tooltip" title={title}>
+        {children}
+      </div>
+    ),
+    Typography: {
+      Text: ({ children, copyable }: any) => (
+        <span
+          data-testid="typography-text"
+          data-copyable={copyable ? 'true' : 'false'}
+        >
+          {children}
+        </span>
+      ),
     },
-  },
-  Divider: ({ type, style }: any) => (
-    <div data-testid="divider" data-type={type} style={style}>
-      Divider
-    </div>
-  ),
-  Drawer: ({ title, open, onClose, width, children }: any) => (
-    <div data-testid="drawer" data-open={open} data-width={width}>
-      <div data-testid="drawer-title">{title}</div>
-      <button data-testid="drawer-close" onClick={onClose}>
-        Close
-      </button>
-      {children}
-    </div>
-  ),
-  Descriptions: ({ column, items }: any) => (
-    <div data-testid="descriptions" data-column={column}>
-      {items?.map((item: any, index: number) => (
-        <div key={index} data-testid={`desc-item-${index}`}>
-          <span data-testid={`desc-label-${index}`}>{item.label}</span>
-          <span data-testid={`desc-children-${index}`}>{item.children}</span>
-        </div>
-      ))}
-    </div>
-  ),
-}));
+    ConfigProvider: {
+      ...actual.ConfigProvider,
+      ConfigContext: React.createContext({
+        getPrefixCls: (prefix?: string) => prefix || 'ant',
+      }),
+    },
+    Divider: ({ type, style }: any) => (
+      <div data-testid="divider" data-type={type} style={style}>
+        Divider
+      </div>
+    ),
+    Drawer: ({ title, open, onClose, width, children }: any) => (
+      <div data-testid="drawer" data-open={open} data-width={width}>
+        <div data-testid="drawer-title">{title}</div>
+        <button data-testid="drawer-close" onClick={onClose}>
+          Close
+        </button>
+        {children}
+      </div>
+    ),
+    Descriptions: ({ column, items }: any) => (
+      <div data-testid="descriptions" data-column={column}>
+        {items?.map((item: any, index: number) => (
+          <div key={index} data-testid={`desc-item-${index}`}>
+            <span data-testid={`desc-label-${index}`}>{item.label}</span>
+            <span data-testid={`desc-children-${index}`}>{item.children}</span>
+          </div>
+        ))}
+      </div>
+    ),
+  };
+});
 
 // Mock 图标
 vi.mock('@ant-design/icons', () => ({
@@ -283,7 +287,7 @@ describe('BubbleMessageDisplay', () => {
     readonly: false,
     placement: 'left',
     onLike: vi.fn(),
-    onDisLike: vi.fn(),
+    onDislike: vi.fn(),
     onReply: vi.fn(),
     bubbleRenderConfig: {
       extraRender: (props: any, defaultDom: any) => defaultDom, // 返回默认的 BubbleExtra 组件
@@ -483,10 +487,10 @@ describe('BubbleMessageDisplay', () => {
     });
 
     it('应该处理点踩功能', async () => {
-      const onDisLike = vi.fn();
+      const onDislike = vi.fn();
       const props = {
         ...defaultProps,
-        onDisLike,
+        onDislike,
         bubbleRenderConfig: {
           extraRender: (props: any, defaultDom: any) => defaultDom, // 确保 BubbleExtra 被渲染
         },
@@ -498,7 +502,7 @@ describe('BubbleMessageDisplay', () => {
       fireEvent.click(dislikeButton);
 
       await waitFor(() => {
-        expect(onDisLike).toHaveBeenCalled();
+        expect(onDislike).toHaveBeenCalled();
       });
     });
 
@@ -740,7 +744,7 @@ describe('BubbleMessageDisplay', () => {
       const props = {
         ...defaultProps,
         onLike: vi.fn(),
-        onDisLike: vi.fn(),
+        onDislike: vi.fn(),
         bubbleRenderConfig: {
           extraRender: (props: any, defaultDom: any) => defaultDom, // 确保 BubbleExtra 被渲染
         },

@@ -62,7 +62,7 @@ describe('History Running Icon', () => {
       () => {
         expect(screen.getByRole('menu')).toBeInTheDocument();
       },
-      { timeout: 3000 },
+      { timeout: 1000 },
     );
 
     // 验证组件正常渲染
@@ -88,7 +88,7 @@ describe('History Running Icon', () => {
       () => {
         expect(screen.getByRole('menu')).toBeInTheDocument();
       },
-      { timeout: 3000 },
+      { timeout: 1000 },
     );
 
     // 验证组件正常渲染
@@ -113,7 +113,7 @@ describe('History Running Icon', () => {
       () => {
         expect(screen.getByRole('menu')).toBeInTheDocument();
       },
-      { timeout: 3000 },
+      { timeout: 1000 },
     );
 
     // 验证组件正常渲染

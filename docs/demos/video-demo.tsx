@@ -29,7 +29,7 @@ Your browser does not support the video tag.
 `;
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h1>视频支持功能演示</h1>
       <MarkdownEditor
         initValue={markdown}

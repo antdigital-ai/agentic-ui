@@ -373,7 +373,7 @@ export default () => {
               </Popover>
             ),
           }}
-          fileViewEvents={({ onPreview, onDownload, onViewAll }) => ({
+          fileViewEvents={({ onPreview, onDownload }) => ({
             onPreview: (file) => {
               onPreview(file);
               console.log('预览文件:', file);

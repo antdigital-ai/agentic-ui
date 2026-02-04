@@ -42,6 +42,8 @@ export interface MessageBubbleData<
    */
   content?: React.ReactNode;
 
+  preMessage?: MessageBubbleData;
+
   /**
    * @title 原始内容
    * @description 消息的原始文本内容，通常用于存储未经处理的文本

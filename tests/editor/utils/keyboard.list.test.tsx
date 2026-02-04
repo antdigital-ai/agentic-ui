@@ -1,4 +1,4 @@
-import { createEditor, Editor, Path, Transforms } from 'slate';
+import { createEditor, Editor, Element, Node, Path, Range, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   ReactEditor,
@@ -84,6 +84,12 @@ describe('KeyboardTask', () => {
 
   describe('list', () => {
     it('应该插入有序列表', () => {
+      // Set up editor selection
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+
       // Mock curNodes to return a paragraph node
       const mockNode = [
         { type: 'paragraph', children: [{ text: 'Test' }] },
@@ -99,15 +105,29 @@ describe('KeyboardTask', () => {
       ] as any);
 
       vi.spyOn(Path, 'hasPrevious').mockReturnValue(false);
+      vi.spyOn(Path, 'equals').mockReturnValue(true);
+      vi.spyOn(Path, 'parent').mockReturnValue([0]);
+      // Node.get should return a node with valid children (text node)
+      vi.spyOn(Node, 'get').mockReturnValue({ type: 'paragraph', children: [{ text: 'Test' }] });
+      vi.spyOn(Node, 'string').mockReturnValue('Test');
+      vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
+      vi.spyOn(Element, 'isElement').mockReturnValue(true);
 
-      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+      // Mock wrapNodes to prevent actual execution which requires valid editor structure
+      const wrapNodesSpy = vi.spyOn(Transforms, 'wrapNodes').mockImplementation(() => {});
 
       keyboardTask.list('ordered');
 
-      expect(insertNodesSpy).toHaveBeenCalled();
+      expect(wrapNodesSpy).toHaveBeenCalled();
     });
 
     it('应该插入无序列表', () => {
+      // Set up editor selection
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+
       // Mock curNodes to return a paragraph node
       const mockNode = [
         { type: 'paragraph', children: [{ text: 'Test' }] },
@@ -120,15 +140,29 @@ describe('KeyboardTask', () => {
         [0],
       ] as any);
       vi.spyOn(Path, 'hasPrevious').mockReturnValue(false);
+      vi.spyOn(Path, 'equals').mockReturnValue(true);
+      vi.spyOn(Path, 'parent').mockReturnValue([0]);
+      // Node.get should return a node with valid children (text node)
+      vi.spyOn(Node, 'get').mockReturnValue({ type: 'paragraph', children: [{ text: 'Test' }] });
+      vi.spyOn(Node, 'string').mockReturnValue('Test');
+      vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
+      vi.spyOn(Element, 'isElement').mockReturnValue(true);
 
-      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+      // Mock wrapNodes to prevent actual execution which requires valid editor structure
+      const wrapNodesSpy = vi.spyOn(Transforms, 'wrapNodes').mockImplementation(() => {});
 
       keyboardTask.list('unordered');
 
-      expect(insertNodesSpy).toHaveBeenCalled();
+      expect(wrapNodesSpy).toHaveBeenCalled();
     });
 
     it('应该插入任务列表', () => {
+      // Set up editor selection
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+
       // Mock curNodes to return a paragraph node
       const mockNode = [
         { type: 'paragraph', children: [{ text: 'Test' }] },
@@ -140,15 +174,29 @@ describe('KeyboardTask', () => {
         [0],
       ] as any);
       vi.spyOn(Path, 'hasPrevious').mockReturnValue(false);
+      vi.spyOn(Path, 'equals').mockReturnValue(true);
+      vi.spyOn(Path, 'parent').mockReturnValue([0]);
+      // Node.get should return a node with valid children (text node)
+      vi.spyOn(Node, 'get').mockReturnValue({ type: 'paragraph', children: [{ text: 'Test' }] });
+      vi.spyOn(Node, 'string').mockReturnValue('Test');
+      vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
+      vi.spyOn(Element, 'isElement').mockReturnValue(true);
 
-      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+      // Mock wrapNodes to prevent actual execution which requires valid editor structure
+      const wrapNodesSpy = vi.spyOn(Transforms, 'wrapNodes').mockImplementation(() => {});
 
       keyboardTask.list('task');
 
-      expect(insertNodesSpy).toHaveBeenCalled();
+      expect(wrapNodesSpy).toHaveBeenCalled();
     });
 
     it('应该处理列表项节点', () => {
+      // Set up editor selection
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+
       const mockNode = [
         { type: 'list-item', children: [{ text: 'Test' }] },
         [0],
@@ -158,12 +206,20 @@ describe('KeyboardTask', () => {
         [0],
       ] as any);
       vi.spyOn(Editor, 'nodes').mockReturnValue([mockNode] as any);
+      vi.spyOn(Path, 'parent').mockReturnValue([1]);
+      // Node.get should return a node with valid children
+      vi.spyOn(Node, 'get').mockReturnValue({
+        type: 'bulleted-list',
+        children: [{ type: 'list-item', children: [{ text: 'Test' }] }],
+      } as any);
+      vi.spyOn(Element, 'isElement').mockReturnValue(true);
 
-      const insertNodesSpy = vi.spyOn(Transforms, 'setNodes');
+      // Mock setNodes to prevent actual execution
+      const setNodesSpy = vi.spyOn(Transforms, 'setNodes').mockImplementation(() => {});
 
       keyboardTask.list('ordered');
 
-      expect(insertNodesSpy).toHaveBeenCalled();
+      expect(setNodesSpy).toHaveBeenCalled();
     });
 
     it('应该处理任务列表项节点', () => {

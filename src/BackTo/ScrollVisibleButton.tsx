@@ -43,8 +43,10 @@ const EXIT_ANIMATION = { opacity: 0 };
 /**
  * ScrollVisibleButton 组件属性
  */
-export interface ScrollVisibleButtonProps
-  extends Omit<React.DOMAttributes<HTMLButtonElement>, 'onClick'> {
+export interface ScrollVisibleButtonProps extends Omit<
+  React.DOMAttributes<HTMLButtonElement>,
+  'onClick'
+> {
   /** 自定义类名 */
   className?: string;
   /** 自定义样式 */
@@ -57,7 +59,7 @@ export interface ScrollVisibleButtonProps
   shouldVisible?: number | UseScrollVisibleProps['shouldVisible'];
   /** 点击回调 */
   onClick?: (
-    e: React.MouseEvent<HTMLButtonElement>,
+    e: React.MouseEvent<HTMLButtonElement> | undefined,
     container: HTMLElement | Window,
   ) => void;
 }

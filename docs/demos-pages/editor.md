@@ -1,7 +1,7 @@
 ---
 nav:
   title: Demo
-  order: 1
+  order: 5
 group:
   title: 通用
   order: 8
@@ -15,9 +15,13 @@ group:
 
 <code src="../demos/readonly.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+<code src="../demos/markdown-editor-readonly-compare.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 <code src="../demos/comment-highlight-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 <code src="../demos/empty.tsx" background="var(--main-bg-color)" iframe=540 ></code>
+
+<code src="../demos/setmd-content-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ## 编辑器模式
 
@@ -32,6 +36,10 @@ group:
 ### 文本框输入
 
 <code src="../demos/markdownInputField.tsx"  background="var(--main-bg-color)" iframe=540 ></code>
+
+### 只读模式对比
+
+<code src="../demos/markdown-editor-readonly-compare.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ## 自定义渲染
 
@@ -54,3 +62,13 @@ group:
 ### 相同渲染
 
 <code src="../demos/same-render.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## 懒加载渲染
+
+<code src="../demos/lazy-render-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/lazy-render-pdf-jump-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## 内容设置
+
+<code src="../demos/setmd-content-demo.tsx" background="var(--main-bg-color)" iframe=540></code>

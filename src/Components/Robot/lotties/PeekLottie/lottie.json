@@ -1,0 +1,1751 @@
+{
+  "v": "5.9.0",
+  "fr": 60,
+  "ip": 0,
+  "op": 299,
+  "w": 1200,
+  "h": 1200,
+  "nm": "探头@4x",
+  "ddd": 0,
+  "assets": [
+    {
+      "id": "0",
+      "w": 496,
+      "h": 451,
+      "u": "",
+      "p": "data:image/webp;base64,UklGRh4gAABXRUJQVlA4WAoAAAAQAAAA7wEAwgEAQUxQSCsMAAARX6CkkSQ2ebh8oc9O0UdE4JdRXVjDMZC2Tevf9rZfQkRMAGcLqoDxzxPDvxm60va/cRV5nV2dbOg8ZFwxk6HK6QKSO+KO2erk0BE852i3IqO/6Kis3/8KkO5uV/r/f1kmR/SfgiRJiiTJw6M8A5fvsgY+IDe2bVmNfgiEQEgK4YdACGDRpmbxsHruvpcM3s9Ow3/nOmdrcCL678htG0lSpcdQu7rOs72gsGiPfDq9X5blKSxtUS5t+sgjxdjZI++Xp4C0RfnEaLWee/8WkO3O5fMjlPk1BGCwEO7tr41NJoSGA3VY2p3LayNxuhV6xvQY2IcjcHj1ZlgZ7yP02s/7jtd+CoEdo3B49aQKGfCE6YPTa87dLMuQBvAjzPc9PrxZluWcX6HOoby77+9UuUTIQYJlWd5d8za7RJWNRcJyafu+ZnsqgjqPXtLPLEobPuTpZ3KQLRHTYqGXyVcfYL3hQ+00XysTVgkiv8TDrptplwJkUbnIk6QjVFS863o16fMKsZlTSHTPS4SPGF8tkxYCpi6Zmqfpm5cIZ0eeycOGa4456eIInLuOUkYUk/TKKy7vBiZDlzwEPmdnSNMjR51lHtAgJEOPzggwPAhCuz/4VyU4nbV7PJFziXKo0vTMA/oUu04D33XYO4RFGT7kxXs+axsniQP7PmzAdKDRdpysqdx226WWB/vXh3MnJKfkNND8coqTM9gUK40vvybw3teSIbJs33RTxbyDErJynuqx7JxtYqxRR7s9J2inZNXyXatNgdH1ct9mbs7jXeyYLLZC3DCVY622MTNBXcjL+bDHvlN2a+dDdnK4pqZBuyLaT517wOuaCATeXTOWyzj6pJ3zytIP9SqrW6Cl1CBXce5XNYDnXUM5sndLM8JqsNBmDneyw/ncSOoE5ag9tmhj5OogR3bdxKe2dV8ZUE0YV2ISy9cs5KhukPpTr6JyGDfMDUvaYH5IE6yzy+ZBubyKySGyZojt2VZ+Q+Rz3T9ig0hVim+LX2NyebfEGiGr5L7OHIMrNUIPTso1lTOIXN6NEfKsVvKuYiW7qa58Kqy4oVbxuU618V4f3jWgWbfIukZgJba0U29s0itr1ybXZJZI0a5It7esxpVVKj7nDDdUa85NM2D4rmrNuG3WqAUbNrQ1hI5RrKglMooVNZ9CiTJFuwMMGG6oUkLOpdR7OpSY84GYD+RXayo+vEOc8YnzefWwhk9R5BXhHvTUCAkK5GpeMzm3JIRtLR+8nePQWTWekXBPi6Y2p9UTBoRtiG8mq9EeHjmS3ozQJCyTRzY1bA4obTvTpl82lS8xO+PGIrKL94WTW+uILLIrvxmrDsqRfDd2i4eyKbh5nMnYR5HuxrpHrPU074rpYmpbthtfdzF1JNstp6lbSpq/Jt6VPNxSKueom13WCrtt1SrCE1KMpuf6LrqTYQjXhOIKGztZDLItHsf6ZTWO+GNa3WtsilwaQgrraTZ2Re7GARm7CW3hq6TY7mzyxxVe7d3K4mH+OGBhMPIhfxywsaOgh5LxOoZjVzDOVfcYcuE5Uuwx5MKvSNOeVce0Z1URs+nVXNzW02YIhScUdR1HCmLbIR8bjVqk8HX2soTAEdvWOTr2rfd43oVI7wRs+tWyjo69Rnap8FavwV84R7obuwviUp6tVYWOzWrDXTjozeJv5cEdHotu9mBebIZPWwd4w51zOlkcZM/FIqLhsYJ9Za6s41/JlSY3/nWXWjlVQDv0+O0kNyZXK1bYjDLWEyA2GSvr6XoyBVqlkAR6RKzoEOg9WkV3Bt0kVOTdeTFKSwNbxfNLJ9N4lJ/OblzrdCOh0mQWCALhI/andXdNJ1HYj3auO1xxKDReRaJwbAUwCpbO8E1LK6BvS4WdbBsPJbwX9MabYkPxjom/E6O4h+tslQakmKA6RwzSfUFtvC45SLFL7xy4fW2IjU+DhgvmTvvaJFPkzrQPobyJQGUngEKykdgZYDyN6GQhEnDEOWkaAomTaZ+O0jjJTuKQJ37wutYgHIofvOHkaUpnjBxC8YONk0CZzJHj6CQzCQRBNgkYOYcOj9v4yaBjl4CRcxTD1Jf4XclBfgSFSmNc8QjoXckFYFZdVXY6Vzy2kLuCBDR3kG+BkXzsInflCJiizg8+UYE64BEwIIvz5LVBpnsn4gV3bUgW0Jxgrg0BCCQvDrtKY75AcwdzbUhEYA9xbThDcphApUEqYJa/NkTSstJTAtlrQ4xZ7K+zByaD61LFqXRrcF0q7AYYFkSCMrgoXld6qnqvj9vXFymHKUSiMktcE1NZnYFIw4mXRR/n51ZzMu1hm8mN6mQ6WWGGg3JR3MtOoSSoCTJxrBE79IvBd9Hh2Bt3/Kw414GH446/osPNbIX/3GhOs8YbEfcCrFwXPmAFrUdki0jHhE7IOiaRBwskswSgbr0r6JTsIYlnBexILFDEsUaHwHcJwM17Cv3Ll3hmwfLh5efoHhnt2QRJySvPgL5v+JsbMYM9bqTvOz6aAAP6x5KIAqSeKcCocazR8iCRAEB8fgqRCEzojMwSPANISAGUyK+rUWpugBz3dXOacsMykRNJyJSJVwMGBTuqwjju+zv+Y/MXD2BGsjEjoZM4+vtSsfmukmjsjTv2xOz0AVcAHjMxW2OIiMNkhS0cQMBETEEEmC/6+MtGlACYH/bxE+0NU0vCd73Actgjg0t2+pgTTFsi2pkrgHRdmrYRXEQaptbkobqgGODUnhdUgcRiiEedDrVzNsTtC6FxYZLDIa4blUYs9obYN32WjnTWzhBzK6j9hrhr2rbCuHcyptecRWV625BZ1ZqoQCwQaDgAfldiFVUB+F3ZVS1gIhJ2pVYxFUCYTA1WAogiiRNSEQE/mR4kejgSJpODSAUQJtODlTEOYRIzGCSHRspkehCoaCMeXI09cT4V4BDnAPkoSJjEDYayBejdMa6RZAutwnVDRnp3zPPqnzDvjhHAUSB0Zht5NOI78408Hw3wnYRGiojoTnzhrAUHsxXwNyaKwL/8UgpakOwkFBIiAN1JKYQYHB8CUQWYwN+WaAUxIBoiQgyMhlZACHyFWgCIiK/Qwkw1AHwLi6komQynYgscARyx9GtN6EHwVSa9II//UxlC/dbFf0NdGoXo5huG0HxErq3a/y0qk86dhNt65KUbTEJMC+uRBm8BIZYNs3d/iY+lw7QHEGLxMN0lJWYKfQcQYrbQdUTKNFeYpiO2wPlOgP0KG5o4lyN/Xor+EuyzAB47HDgYhkT6laPEHCELwC8ldbM1Nw4LELDFg6Lqw1+JBCwKJnzntESgdqtpBpdy9G6Gu6LLEoHazdTMJBD9Vca7Ip3OKOmOKCJudgFxM78AA1tflfXlwM0jsGxmvjN5yQi0u5KIgJOMVOWWAVw8RCCqjACXmZ+gqow0bDSepaqgONcFQFdB8S0ZqZgVIvh4IIxJj3RLBsUvA+FMtg6ptLg1FDlUWtwaArqK4WAgXh2AbhM5FN/0hJ2Gphh+CEk7rSUEwIpz5cRGGuiJP13AgS1ZFL/XoZEQAAf8sBDGwSlIsTXgHC8E8qnl049kXE1w5+QuD3UdaiG2UV37sMY2I56qoG569KAdeF1Dqln1WGbMZAVykremVI+d/7DG5O8z8J/gqUKL/QJ1CI0pRkj1pWbZcyp6wmoBGGKEFQDazCx7TkkPLBeAHfZ+l3v/7ZR1NT0BzDB2/d5WDE8UuuyX1XJB8O7Iz8s3yd+TGwiNCSz3iLtC1hY47NDQpGqBjaNDXhRfNY2BW1NU5LqWL7VRPyzvWlmLLrbg06JQzEY5oortaovKGaVdOXVfmuTdqSNPWnbCMWp3v9iyVETdM2rGVmHFDqog8mARQTfERiTU+pgt3RJPg8pQ2f83HbkrxxY06rSwZ49UEkd9uki0GeuS6NGms0lh1L7RJlGqzWjScjAbtJlNqgp0ZN26QhAhkjWerDihJV4kPyfh5VBLUpkp+0P32R4q/HhSuGIHpfiB7zT8QVxpEAZrh8+HlhDwnZw6fHOq97GYFs7ZI6XOx/EThYN28Gmp7XE8ze927UfSg0Um4+S4Bhw/MSlctmfvl5Iop48Urtuzn5Wn/FgcJ2vOt954MBglvw4tyun02WJ07Jlnb9z5NYTwRx6/hRDu3Hnx2fViFO2ZZ5e2Xoy2/e8/Ps4UAFZQOCDMEwAAsIYAnQEq8AHDAT6hTqBOJiO/oiG2KMPwFAlnbt9qH5RDo42ozVMl/krDf6DP7ra/e/al2w/u59wP9Kv9R1P/269Qf89/yv/W/xXvHf4j/M/473Rf231AP5v/qfS39hf0DP2t9NX9r/gt/an9xPgR/mn+A/8HsAegB1X/Vr+hfh9+nXmH/cvyG5Jf9VfeCyZ3O9oHsP2td2zAB3lM0pU12p6iHRp/cH//+6b+rgXkfLum1YVrbUvV2yArOrZhqu9TYJTR8sJy+1YVr8sKqKvdH4TfVtX5YFxm/dSRZGfraolb6D1hWvysBXZvlmL+caBTMGo2Kec5116uCaTBhU+usBpI3Gs4FsoP9jucXph3/TqOzZqQK1+PCWrEkJid3AAFMYDC3NnWBGGFgXFaFzSX+eul8lADe89ZGAVlxu9zcGVlb1dWSp8MwYPB2KOsYUqeRWSXwT1h0UF1f1xhH2zLM4tVA+Sb4Uw8DdWkwnGnEpZBXeeM4udS/rYMZCFxpP4wzzWkCErHeuyy1Yv+ZRUvtbylJEoDdbxBpM+lC87z9xNiAYkHBJTjPgVRWy1GSBD////pJSWvrY8crtVRSyA9ljLT3Gv5////8OqlcNNqNS91lNSdWXZvN/96i6xlp85g/kDRfOdyAmBBqA9JXwS9m8S5vimoKkV4+kiT2tjpL0VVflAUXur7X4wz7j4/Ax/FGiu7ekfL1M9o6dWLT8QL2rzMQDB+6fJPaqz3TB1H30uneDku6u8huDEIxAW/LDUc4uSZCwP4D5xVARo78hi81FkiqT58q/nYmV7Di0rcUMbjv1yc4+FNLRC5caSLd4uqyXOobOaxAmos00tpEEHjp5iUTMbqmP//1Pn11BWmjhmEt/0jw+r2tbeVQO6MW0j6+qkXmi7L93/Ncb4+lwCDWY1WB1CZpj43kdS1eKxBxR840JD1yVVcIC9Wv6mIf/waAfSeN9cL10NgVFY/4WhiqJhIdWUR7VOJrQ478XA4fdazCl0/+ubTcHprEoPJ124ZzFgHwc7Bar6/6vDsMtqfyDkE3moOjTMghyMIMPMGX8LmqqZXUctSN7RCHYctC7Iph1cJ7KSAu8jg5GDAWp/NzZ+anCDIMwj6+te/eRhBRD6ZqUQ3gfR9lCFJXdh+BrOXb3ltHB1LQ78rYkBB+KDYgBIu+ckkEAeeb9YKhcJq3Py/QDKboJ/ltmPW5rCtaqi7jz7cakUTmZwEET+wA9cigH7Q36WVzNcZSmk2Ls0HabfqYz4cjXgY94i7VUavEkephOGz0ym1T3PFh6qOMM2aupMXcoNOrCtfRIcBrVWL3b5JyMeGDPrNfWPEAJ7O15AQNxEzpYwmPQDErWynPSHc64bhiQsSTXdBj0gAyDH1L4k+rNOamH94v48K0IBVRdsyDzFx0jjXIT1J3J/3S3CD3HrZk19xxLTIPWFa/HAAAPy2HgAADxnB///OTf/5Uz6xV9zYzqqilLbR/GMGWAAAAACO2Rtu37wWvnUMMLxa0mSJsGCWxA7KAAAAAJjREX/Hr1mCJQHXvYd6OjoZ8u5CGd3hm87olbwAAAgtk2cEq75pnTU4x2jH6SqenzaSGq4tN1ODNw4204saMHeScZNy9Y/yEVZFAADsuWHlEx58DFXKqsm/Ix86EotaX4oxQgOU/1hDg4EdEIuf84mQtVcgAGR9Y8//5ydATj8OG7i4IaXZqP0+Ot1ueT2w3W0pQ4JI+UfNTiUgRTqvoBS6Ii/+TzNaNCjL4atnpmJnyPFPcKX5N80Opy6xEE+QU6CUxvXhecyUabdHtvNwzP2OPt5UjKpCkyPJsuVIHuoXnGzu8nwS3XBom4FE4GdDL8eRBOLF0IzEBrv0wMoRHGDUWsL+GPydcD3n1pYBGjXfZs+Fxk0J3jvon+A6opAI+LjqOanvEE7KED5XVt7iI5Ujb9yxA9HxjfOt6WvQM6+oSuON6ZCYB41yAQzP7wjpy0XpbHPgNM/No8l04FiHb3/jNVUeWdSn3jtr2TIFFtb9yTWbH5GCPAUqBQVyDUmBPq/fTHpRDHojdNmdRFwlgUmiufaXZL0Mu9v6KKaEUX3P3Inf/+YGdoP/yBznIyZubvqmCA4flaNxKt/92ar9Y3DLgm2mcXJaW7ZxFuNfBZruCpTLxdyShNJNXLgVmIGOgawGpheuH90HsF6sphcQfqqCYafebc8aBPElmbOgtlIf25nVdNlMa+QX02oJ18mVfmgqogGNd9JrZc9sOU+CB9JlDgT6GfO8DCUW3337RNRLQjIkfUSRggwX+r85QNe6IF4az0E+PUDtvCnh4GgxuymCsPl/EhGnYrFFEvGAgfah8km4rYn1D8JWnYm6nHexEuT5B8o/3KYqVlruzXY5SQGPsaWkrleXnSBdV6rTTIi/mdKGtf5S8gdbt0gGTdJ+x+Xtt3hyp2xKaiTny+Lv/3ybSQTKA/YToLBkb5Ga1i2u7FsnfgkYQZolGh540o6QNOMfRpo4rlnw2OHzAbknW51eVI2nez/FrhH//rr12D19cu1Ixp3n5v7n/0BZIoSFhGKTwDah3CzevJ+fl+RWs0AoaF2oQ1H7X5jRhhMknaUrMrnUeenO1rBjYciXUFFXCfWZRO7hrkCv3/6vJbshjZXssXjsBAJhjdtgVSUQx9H6Zbqu4ooBEb1S8837CVp0Xq++4JZEpM8x0y2BEc5TL7ZlYYV42B6SQPR3509WRiqhy779K0wztMaXiEyvJmLYf6XW0fkKAYfO4ITq6HuYIAdN5jinI2NJ09tzowEKB8Os3nj7HPMZFT7NKehc/AAdqWbl3B18GUfxdrfujbML0d8UQxbnmS3KSDjq0DRxXqtedq9nTFPznR5YaFMd7Mn9M//EqBnnc86g9Ic+TZKscwbyi0HeF92n51l6cUENUZfHIgF++OCpKECm52sbe3zP35oHl5x4NRkTuDNPioAaN2wAQPrSmlyzdb/8pFN/kmroP6iA682Tl7hBrAuCCBZbQOW3RISS60W8fkQ2nNxXHTA2grq+p1RlGeO8VyGjPHoclwZaaFL8SBv0P/CO/YdI10YZtmbMrSQir8UdaCwAk9Yg8sO9j0/jo4s/1zeC9YYvtHSBjWAbdj9a3RveEUgKJaD3LPIIDCUsH672iaw850ymVJsCf3mFoS2JFL57vFlH9p/u7Glsr3VbVMX4Ql+jQVY3LtI4xgqx0jl1AcxrKMALtQx63MFEuj1d0muimFoXabAlforvD59HJIyTjo9Gii60puuu3ONgS8eF6DeJi6RlkzVItTiqBNRZ3kN0ZY54FTd4ahY5sDXGt7ulmlkJpuwjR3uRHYfRH3uHDx/XpY+mt5kO5dz8oFVVdfpnUC3MKg67VUcay416DGhSj+CsSIjmKQJjoGZBTV8GLMQLj72P4LqEs5ODb8r0E5Ewy23IKBnux6aoPk/kk7ziTI/lFj8Xm1AO5W8ODzpuLVU9Kn0oFA6VzZva1uiunkrWAkUWDQcZIHmaRcLhgzwn+Nz7HY96cObptmCSMW12Rk6gZbkcoV+7RNbZZHUigcJ2FZNqBxw6rEkJVrU4BSChdtw1eeR+0VWaSt258iE8z0gkOJJN/OKjCv/nEu14ABuX/nGfNi7/4MLMIkC602B4Yn0C2Vwe7TNc50EU8F/9hSD99jcDP4GWFbsg1SZN9Sc4/G2LLbUp72puREHoln/Sn9nDah93hQtscynns+9vkNf/P//BtGGNFThhb6pWBaSL94IfjnDCdi0VNzktsiBO4GKf4i4x1gDV7gzKcv0QOwJY7foRHg74nUIo1+LTfkiI2DUizcrx+O6dIpaW5hO1Lo7lWYjG8JtntXvnAwwjzNArtbHfc0JZpB3nDSW86NMv7AseFAO/9pmkkWbl97i2AH7dqLAyZLQf0KdA/cAhcwZUPzfDyEFMmcAghTlI/h++THGrqXJw6LTMKoZRgkCpkLknrpkwdZYyxR54GnRSHY4B0eQiWGo+DdrJlnRTpoDKsGVtn+9/tGNsMDP4x8S1pUpLi9SHJ18QvrhseQJY9znAwCpKLPzvDLM1cSXjoH6BWni8FtnkeRDs92XQE2tRhMQbVx/Yp7McQcs0IRInrqs22oPBE3FPBKVokuLWjbRdJqHgwtIzcl282K+sGwuyAg1FqWzktDVs5U2s9hCOrwLvMZJvihFa6E7hyd4mQNWafqdx+rblnyHnIB4QBcKN3X9DdCMnZS62daCG5n1soRx09Ow2npMydTxAPJhMsrCmYz64+2BcZ7ClIWQH3suxpWHTtgN3JH5xnQFhLAp4eKnY20QyYX//AqMb6nfSx0l7FyP2UgPTTdiZ4UMnsrOpYp4GbK66fpD0MQpU5nJ26eGGpmETjHjPLOKx2wcEz8GXfhuHZhUhOg0ysiwLmHiffDgpsxW2E5vD5g6YwpyM2SUyNLFzMmbvOKpLDWWJnOZhJof/8xMohC2eQCXxKGGA14D0uXaOLfL3tZMS+N12jV9zY/PAzPH5L3/FNJfOB5jYTFvQyKhTzNfbpmWgX7eZAUAVxWiJT+5ZOfdhj/CYoxIXq8c9H9P1EN0NVsX4AKTxW6879FlUMBl0wwsatG+kTDY8Z8t8Bd9dQEco9wyNPbDuFRrraZbZzGmuOnKkrhWsT6qCBQHlIHjJgUhDSQhNLzqNnx9de73AvXK1GMO4ZCv4gNrLR7Q86mzAFQHu1h34UppiKs+t3QH63wRwV2yeJPHEG3aWmumYeG+OiLV9ngHj/GeRkAOeIYqoYXWWAOJqMPYQxEUFOP15FZVucaCzgKtflkl2sdKRkr+wrZP94tV7ES/VquuX8+bm8P9m1PMG+wpCunBA2HuSvzKkjFrjRraEG11rGoNOZGNwynajVPzl8QL3+7QSF1XbO1FlBjV1mZIq6Wnot53dZRI1AhHenjTiMaoc2MTTpkt204MkDM9rl2xPLXLsOnP9RWSlP6IJQCbSopqXjDjfvjFmvLkPxfSeAd+YEl1MgQuF1+cAUC832JPsmOPOmEdCBB2N+Fe38J9E+fZ8Ixr7nXtd/Jml5iIGMwMpCLdHdTZq7UG9UWHT03JKcaLuzMV57tmv+TgrJLpCOTIGhm6434ntmgP6NLDp+5A7Pj6TbCD5EM0YBo8CSsYkntbkid3u6j6UwRvvm1hLstIHHs76NgMvEZ8QB1XxHuDZstm7gW2x4z5tI3DFIf+r003D2WrFp8Ro7tTPPJzZreSj/EJV2Og+QPTDdDYij8uhNre/2JBOxuT433HA7S+3T1vA4b1BLI1qQqPAq4ad9hdoCfzzLTbNZijWTsTnfSveVMkO4oIkLYHQ1Uv77r1QS1HrCvaMf3Lobg+NkW3d0XN5+XhSI5JQPH2lj2G64dy6d4K1Th/7cowHbQuf3q4a+iKXtfMc/qyNIBOl3aYcwtGMzocl/+HV5skhYl5eZ4mYa8UyvkLnySqKNmY/NwN/CkIVcmcRB3Z+mpTywYTSdBE978lkNV39dZbUOvpxZj5o7tyTvV9Kt91j6TT6zAIhKau5p3yTKqvvAlDghv0aHszEPcwR4o1rBq63ANZ70VmEH9uM7LaezkpCIh7r4DmJDtlJV53BaRs3eOTRwtpHj+iHqAcXA1IXXmHNWD+D4QUovN0lyzGp0ck2d+fhD5Lf7od9Uqx4fDiAWtgRj3QaLFb3MYsuqaZapP4KHELUdKup2dGOyUcWL2ne1zcUxFqP/5Vq7Dj8xaiA4YACUio5rnc/bAwW3WKTCHJjLYnP8IB3ZpeY2/Nig7UFMNCzB1spkQzOQLFDDCefR5gVriwoecTDmOEwywKwRfqfcrlt4uUh7XZE+hbmufURzjXo9NjNMExqDuWwvyJMCd5FzIn8Ci9/X3mlkzG//UdkdBG3y7G+YZjMKLcdXNUW45CbUjjGQZjWm+Rqg3oyevDz9De5aESq3cxqNd+4BY4CrdNf82KDrrqIqQrd/jGl6HnDw7jnqPo1pzxAs/DSI6ExjERkb1+6NJKOJ+j6GY2STPpd1xsFyerj/iqi9z0HYauwgZ/UY6bXqKbtWblmcRyQmG3VW6tCJTF1xv4h9HJE+xkDH1odUkhERBlGNRextq9YBWVjIrBEVouYEYv2xkKWp9Yfsk9qPAPAHl2cBweBb2EbZ8Jo93NN2Fmfiw/dwkYkrl2V4lJKrsnR1IkMGD3kK9/ykY2Ghsgt2vNZ5AREV7hsdmKAuG9yuw9jqhdI3z0PQpFUtKtfxZxVxbCr6eGaGeqi9EkezeG6FCyhsnWmkV+t/S/UWhG0y0vQLwdFW7GarC8/tCSfUx7UL6igO9i9a1HzEscobphAZgHCVz7v5PLQn5MateEVN0jyvm/Jvb9YUR8phmVRLojp7LZWszwsOZrfzu/yjmbw/2MAALRvtt3FPHvjVU2V1L1MVU8OQcij1alZWg6BVWMSUwVPYo1FJGRQflV0VnnrOZN9evri2Ctv4WXgjQebJqQgV7u/hUKdA3pf3/btCEfXAdPfy8zmUxCpvTjZ2qH8t/i8n79T5uHl/dOvey+Z/Xf2KjcVyoGOUeSRWtsAAAx4AAA95Nya20bdwB62pb/26YKM/QKrnURPjfzt1oNUXu8Xbb3Bz+fw8ITeOCg0g/4KqcV1LNDNqsqdfwpQrAWY54+s4BdskrW/AJN3nUJgntPkm4Qw9GPWs29+SoyC4g/dpdHaqcD1Xr90ioZit1voX91WZ0I47R5VfLmTyWaWiEipXo83Q3TY/mr/rziLQyTKEbeyAAAAAAAAAA==",
+      "e": 1
+    },
+    {
+      "id": "1",
+      "w": 344,
+      "h": 236,
+      "u": "",
+      "p": "data:image/webp;base64,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",
+      "e": 1
+    },
+    {
+      "id": "2",
+      "nm": "眨眼睛",
+      "fr": 60,
+      "layers": [
+        {
+          "ddd": 0,
+          "ind": 1,
+          "ty": 4,
+          "nm": "左眼外 7",
+          "td": 1,
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [171.637, 66.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 1,
+                  "s": {
+                    "a": 1,
+                    "k": [
+                      {
+                        "i": { "x": [0.833, 0.833], "y": [1, 1] },
+                        "o": { "x": [0.62, 0.62], "y": [0, 0] },
+                        "t": 2,
+                        "s": [80, 106]
+                      },
+                      {
+                        "i": { "x": [0.23, 0.23], "y": [1, 1] },
+                        "o": { "x": [0.62, 0.62], "y": [0, 0] },
+                        "t": 7,
+                        "s": [80, 20]
+                      },
+                      {
+                        "i": { "x": [0.23, 0.23], "y": [1, 1] },
+                        "o": { "x": [0.167, 0.167], "y": [0, 0] },
+                        "t": 9,
+                        "s": [80, 20]
+                      },
+                      { "t": 14, "s": [80, 106] }
+                    ],
+                    "ix": 2
+                  },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.98, 0.992, 1, 0.5, 0.99, 0.996, 1, 1, 1, 1, 1, 0,
+                        0.9, 0.5, 0.95, 1, 1
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [-16.25, 45.902], "ix": 5 },
+                  "e": { "a": 0, "k": [12.957, -46.082], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 1",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 18,
+          "st": -28,
+          "bm": 0
+        },
+        {
+          "ddd": 0,
+          "ind": 2,
+          "ty": 4,
+          "nm": "左眼内 2",
+          "tt": 1,
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [171.637, 66.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 1,
+                  "s": { "a": 0, "k": [52, 76], "ix": 2 },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.051, 0.071, 0.169, 0.5, 0.104, 0.125, 0.257, 1,
+                        0.157, 0.18, 0.345
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [9.223, -30.82], "ix": 5 },
+                  "e": { "a": 0, "k": [-8.926, 32.973], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 3",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 18,
+          "st": -28,
+          "bm": 0
+        },
+        {
+          "ddd": 0,
+          "ind": 3,
+          "ty": 4,
+          "nm": "左眼外 6",
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [171.637, 66.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 1,
+                  "s": {
+                    "a": 1,
+                    "k": [
+                      {
+                        "i": { "x": [0.833, 0.833], "y": [1, 1] },
+                        "o": { "x": [0.62, 0.62], "y": [0, 0] },
+                        "t": 2,
+                        "s": [80, 106]
+                      },
+                      {
+                        "i": { "x": [0.23, 0.23], "y": [1, 1] },
+                        "o": { "x": [0.62, 0.62], "y": [0, 0] },
+                        "t": 7,
+                        "s": [80, 20]
+                      },
+                      {
+                        "i": { "x": [0.23, 0.23], "y": [1, 1] },
+                        "o": { "x": [0.167, 0.167], "y": [0, 0] },
+                        "t": 9,
+                        "s": [80, 20]
+                      },
+                      { "t": 14, "s": [80, 106] }
+                    ],
+                    "ix": 2
+                  },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.98, 0.992, 1, 0.5, 0.99, 0.996, 1, 1, 1, 1, 1, 0,
+                        0.6, 0.5, 0.8, 1, 1
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [-16.25, 45.902], "ix": 5 },
+                  "e": { "a": 0, "k": [12.957, -46.082], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 2",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 18,
+          "st": -28,
+          "bm": 0
+        },
+        {
+          "ddd": 0,
+          "ind": 4,
+          "ty": 4,
+          "nm": "左眼外 5",
+          "td": 1,
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [65.637, 57.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 1,
+                  "s": {
+                    "a": 1,
+                    "k": [
+                      {
+                        "i": { "x": [0.833, 0.833], "y": [1, 1] },
+                        "o": { "x": [0.94, 0.94], "y": [0, 0] },
+                        "t": 2,
+                        "s": [80, 106]
+                      },
+                      {
+                        "i": { "x": [0.25, 0.25], "y": [1, 1] },
+                        "o": { "x": [0.94, 0.94], "y": [0, 0] },
+                        "t": 7,
+                        "s": [80, 20]
+                      },
+                      {
+                        "i": { "x": [0.25, 0.25], "y": [1, 1] },
+                        "o": { "x": [0.167, 0.167], "y": [0, 0] },
+                        "t": 9,
+                        "s": [80, 20]
+                      },
+                      { "t": 14, "s": [80, 106] }
+                    ],
+                    "ix": 2
+                  },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.98, 0.992, 1, 0.5, 0.99, 0.996, 1, 1, 1, 1, 1, 0,
+                        0.9, 0.5, 0.95, 1, 1
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [-16.25, 45.902], "ix": 5 },
+                  "e": { "a": 0, "k": [12.957, -46.082], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 4",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 18,
+          "st": -28,
+          "bm": 0
+        },
+        {
+          "ddd": 0,
+          "ind": 5,
+          "ty": 4,
+          "nm": "左眼内",
+          "tt": 1,
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [65.637, 57.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 1,
+                  "s": { "a": 0, "k": [52, 76], "ix": 2 },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.051, 0.071, 0.169, 0.5, 0.104, 0.125, 0.257, 1,
+                        0.157, 0.18, 0.345
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [9.223, -30.82], "ix": 5 },
+                  "e": { "a": 0, "k": [-8.926, 32.973], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 5",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 18,
+          "st": -28,
+          "bm": 0
+        },
+        {
+          "ddd": 0,
+          "ind": 6,
+          "ty": 4,
+          "nm": "左眼外",
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [65.637, 57.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 3,
+                  "s": {
+                    "a": 1,
+                    "k": [
+                      {
+                        "i": { "x": [0.833, 0.833], "y": [1, 1] },
+                        "o": { "x": [0.94, 0.94], "y": [0, 0] },
+                        "t": 2,
+                        "s": [80, 106]
+                      },
+                      {
+                        "i": { "x": [0.25, 0.25], "y": [1, 1] },
+                        "o": { "x": [0.94, 0.94], "y": [0, 0] },
+                        "t": 7,
+                        "s": [80, 20]
+                      },
+                      {
+                        "i": { "x": [0.25, 0.25], "y": [1, 1] },
+                        "o": { "x": [0.167, 0.167], "y": [0, 0] },
+                        "t": 9,
+                        "s": [80, 20]
+                      },
+                      { "t": 14, "s": [80, 106] }
+                    ],
+                    "ix": 2
+                  },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.98, 0.992, 1, 0.5, 0.99, 0.996, 1, 1, 1, 1, 1, 0,
+                        0.6, 0.5, 0.8, 1, 1
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [-16.25, 45.902], "ix": 5 },
+                  "e": { "a": 0, "k": [12.957, -46.082], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 6",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 18,
+          "st": -28,
+          "bm": 0
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "nm": "不眨眼睛",
+      "fr": 60,
+      "layers": [
+        {
+          "ddd": 0,
+          "ind": 1,
+          "ty": 4,
+          "nm": "左眼外 7",
+          "td": 1,
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [171.637, 66.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 1,
+                  "s": { "a": 0, "k": [80, 106], "ix": 2 },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.98, 0.992, 1, 0.5, 0.99, 0.996, 1, 1, 1, 1, 1, 0,
+                        0.9, 0.5, 0.95, 1, 1
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [-16.25, 45.902], "ix": 5 },
+                  "e": { "a": 0, "k": [12.957, -46.082], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 1",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 240,
+          "st": 0,
+          "bm": 0
+        },
+        {
+          "ddd": 0,
+          "ind": 2,
+          "ty": 4,
+          "nm": "左眼内 2",
+          "tt": 1,
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [171.637, 66.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 1,
+                  "s": { "a": 0, "k": [52, 76], "ix": 2 },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.051, 0.071, 0.169, 0.5, 0.104, 0.125, 0.257, 1,
+                        0.157, 0.18, 0.345
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [9.223, -30.82], "ix": 5 },
+                  "e": { "a": 0, "k": [-8.926, 32.973], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 3",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 240,
+          "st": 0,
+          "bm": 0
+        },
+        {
+          "ddd": 0,
+          "ind": 3,
+          "ty": 4,
+          "nm": "左眼外 6",
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [171.637, 66.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 1,
+                  "s": { "a": 0, "k": [80, 106], "ix": 2 },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.98, 0.992, 1, 0.5, 0.99, 0.996, 1, 1, 1, 1, 1, 0,
+                        0.6, 0.5, 0.8, 1, 1
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [-16.25, 45.902], "ix": 5 },
+                  "e": { "a": 0, "k": [12.957, -46.082], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 2",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 240,
+          "st": 0,
+          "bm": 0
+        },
+        {
+          "ddd": 0,
+          "ind": 4,
+          "ty": 4,
+          "nm": "左眼外 5",
+          "td": 1,
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [65.637, 57.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 1,
+                  "s": { "a": 0, "k": [80, 106], "ix": 2 },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.98, 0.992, 1, 0.5, 0.99, 0.996, 1, 1, 1, 1, 1, 0,
+                        0.9, 0.5, 0.95, 1, 1
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [-16.25, 45.902], "ix": 5 },
+                  "e": { "a": 0, "k": [12.957, -46.082], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 4",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 240,
+          "st": 0,
+          "bm": 0
+        },
+        {
+          "ddd": 0,
+          "ind": 5,
+          "ty": 4,
+          "nm": "左眼内",
+          "tt": 1,
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [65.637, 57.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 1,
+                  "s": { "a": 0, "k": [52, 76], "ix": 2 },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.051, 0.071, 0.169, 0.5, 0.104, 0.125, 0.257, 1,
+                        0.157, 0.18, 0.345
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [9.223, -30.82], "ix": 5 },
+                  "e": { "a": 0, "k": [-8.926, 32.973], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 5",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 240,
+          "st": 0,
+          "bm": 0
+        },
+        {
+          "ddd": 0,
+          "ind": 6,
+          "ty": 4,
+          "nm": "左眼外",
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 5, "ix": 10 },
+            "p": { "a": 0, "k": [65.637, 57.984, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [-72.363, 23.984, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "shapes": [
+            {
+              "ty": "gr",
+              "it": [
+                {
+                  "ty": "rc",
+                  "d": 3,
+                  "s": { "a": 0, "k": [80, 106], "ix": 2 },
+                  "p": { "a": 0, "k": [0, 0], "ix": 3 },
+                  "r": { "a": 0, "k": 100, "ix": 4 },
+                  "nm": "矩形路径 1",
+                  "hd": false
+                },
+                {
+                  "ty": "gf",
+                  "o": { "a": 0, "k": 100, "ix": 10 },
+                  "r": 1,
+                  "bm": 0,
+                  "g": {
+                    "p": 3,
+                    "k": {
+                      "a": 0,
+                      "k": [
+                        0, 0.98, 0.992, 1, 0.5, 0.99, 0.996, 1, 1, 1, 1, 1, 0,
+                        0.6, 0.5, 0.8, 1, 1
+                      ],
+                      "ix": 9
+                    }
+                  },
+                  "s": { "a": 0, "k": [-16.25, 45.902], "ix": 5 },
+                  "e": { "a": 0, "k": [12.957, -46.082], "ix": 6 },
+                  "t": 1,
+                  "nm": "Gradient Fill 6",
+                  "hd": false
+                },
+                {
+                  "ty": "tr",
+                  "p": { "a": 0, "k": [-72.363, 23.984], "ix": 2 },
+                  "a": { "a": 0, "k": [0, 0], "ix": 1 },
+                  "s": { "a": 0, "k": [100, 100], "ix": 3 },
+                  "r": { "a": 0, "k": 0, "ix": 6 },
+                  "o": { "a": 0, "k": 100, "ix": 7 },
+                  "sk": { "a": 0, "k": 0, "ix": 4 },
+                  "sa": { "a": 0, "k": 0, "ix": 5 },
+                  "nm": "变换"
+                }
+              ],
+              "nm": "矩形 1",
+              "np": 3,
+              "cix": 2,
+              "bm": 0,
+              "ix": 1,
+              "hd": false
+            }
+          ],
+          "ip": 0,
+          "op": 240,
+          "st": 0,
+          "bm": 0
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "nm": "身体-探头",
+      "fr": 60,
+      "layers": [
+        {
+          "ddd": 0,
+          "ind": 4,
+          "ty": 2,
+          "nm": "组 121081@3x.png",
+          "cl": "png",
+          "refId": "0",
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 0, "ix": 10 },
+            "p": { "a": 0, "k": [452, 450, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [225, 278, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [105.755, 105.755, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "ip": 0,
+          "op": 360,
+          "st": 0,
+          "bm": 0
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "nm": "气泡@4x.png 合成 1",
+      "fr": 60,
+      "layers": [
+        {
+          "ddd": 0,
+          "ind": 1,
+          "ty": 2,
+          "nm": "气泡@4x.png",
+          "cl": "png",
+          "refId": "1",
+          "sr": 1,
+          "ks": {
+            "o": { "a": 0, "k": 100, "ix": 11 },
+            "r": { "a": 0, "k": 0, "ix": 10 },
+            "p": { "a": 0, "k": [172, 118, 0], "ix": 2, "l": 2 },
+            "a": { "a": 0, "k": [172, 118, 0], "ix": 1, "l": 2 },
+            "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+          },
+          "ao": 0,
+          "ip": 0,
+          "op": 360,
+          "st": 0,
+          "bm": 0
+        }
+      ]
+    }
+  ],
+  "layers": [
+    {
+      "ddd": 0,
+      "ind": 1,
+      "ty": 0,
+      "nm": "眨眼睛",
+      "parent": 4,
+      "refId": "2",
+      "sr": 1,
+      "ks": {
+        "o": { "a": 0, "k": 100, "ix": 11 },
+        "r": { "a": 0, "k": 15, "ix": 10 },
+        "p": { "a": 0, "k": [550, 406, 0], "ix": 2, "l": 2 },
+        "a": { "a": 0, "k": [118, 61, 0], "ix": 1, "l": 2 },
+        "s": { "a": 0, "k": [150, 150, 100], "ix": 6, "l": 2 }
+      },
+      "ao": 0,
+      "w": 236,
+      "h": 122,
+      "ip": 52,
+      "op": 70,
+      "st": 52,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 2,
+      "ty": 0,
+      "nm": "不眨眼睛",
+      "parent": 4,
+      "refId": "3",
+      "sr": 1,
+      "ks": {
+        "o": { "a": 0, "k": 100, "ix": 11 },
+        "r": { "a": 0, "k": 15, "ix": 10 },
+        "p": {
+          "a": 1,
+          "k": [
+            {
+              "i": { "x": 0.441, "y": 1 },
+              "o": { "x": 0.527, "y": 0 },
+              "t": 71,
+              "s": [550, 406, 0],
+              "to": [0, 0, 0],
+              "ti": [0, 0, 0]
+            },
+            {
+              "i": { "x": 0.667, "y": 0.667 },
+              "o": { "x": 0.371, "y": 0.371 },
+              "t": 81,
+              "s": [564, 382.398, 0],
+              "to": [0, 0, 0],
+              "ti": [0, 0, 0]
+            },
+            {
+              "i": { "x": 0.502, "y": 1 },
+              "o": { "x": 0.513, "y": 0 },
+              "t": 139,
+              "s": [564, 382.398, 0],
+              "to": [0, 0, 0],
+              "ti": [0, 0, 0]
+            },
+            { "t": 149, "s": [550, 406, 0] }
+          ],
+          "ix": 2,
+          "l": 2
+        },
+        "a": { "a": 0, "k": [118, 61, 0], "ix": 1, "l": 2 },
+        "s": {
+          "a": 1,
+          "k": [
+            {
+              "i": { "x": [0.789, 0.789, 0.667], "y": [1, 1, 1] },
+              "o": { "x": [0.935, 0.935, 0.333], "y": [0, 0, 0] },
+              "t": 71,
+              "s": [150, 150, 100]
+            },
+            {
+              "i": { "x": [0.833, 0.833, 0.833], "y": [1, 0.99, 1] },
+              "o": { "x": [0.935, 0.935, 0.333], "y": [0, 0, 0] },
+              "t": 81,
+              "s": [150, 140, 100]
+            },
+            {
+              "i": { "x": [0.667, 0.667, 0.667], "y": [1, 1, 1] },
+              "o": { "x": [0.167, 0.167, 0.167], "y": [0, 0, 0] },
+              "t": 86,
+              "s": [150, 150, 100]
+            },
+            {
+              "i": { "x": [0.796, 0.791, 0.667], "y": [1, 1, 1] },
+              "o": { "x": [1, 1, 0.333], "y": [0, 0, 0] },
+              "t": 139,
+              "s": [150, 150, 100]
+            },
+            { "t": 149, "s": [150, 150, 100] }
+          ],
+          "ix": 6,
+          "l": 2
+        }
+      },
+      "ao": 0,
+      "w": 236,
+      "h": 122,
+      "ip": 70,
+      "op": 310,
+      "st": 70,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 3,
+      "ty": 0,
+      "nm": "不眨眼睛",
+      "parent": 4,
+      "refId": "3",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 1,
+          "k": [
+            {
+              "i": { "x": [0.833], "y": [0.833] },
+              "o": { "x": [0.167], "y": [0.167] },
+              "t": 0,
+              "s": [0]
+            },
+            { "t": 3, "s": [100] }
+          ],
+          "ix": 11
+        },
+        "r": { "a": 0, "k": 15, "ix": 10 },
+        "p": { "a": 0, "k": [550, 406, 0], "ix": 2, "l": 2 },
+        "a": { "a": 0, "k": [118, 61, 0], "ix": 1, "l": 2 },
+        "s": { "a": 0, "k": [150, 150, 100], "ix": 6, "l": 2 }
+      },
+      "ao": 0,
+      "w": 236,
+      "h": 122,
+      "ip": 0,
+      "op": 52,
+      "st": 0,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 4,
+      "ty": 0,
+      "nm": "身体-探头",
+      "refId": "4",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 1,
+          "k": [
+            {
+              "i": { "x": [0.833], "y": [0.833] },
+              "o": { "x": [0.167], "y": [0.167] },
+              "t": 0,
+              "s": [0]
+            },
+            { "t": 3, "s": [100] }
+          ],
+          "ix": 11
+        },
+        "r": {
+          "a": 1,
+          "k": [
+            {
+              "i": { "x": [0.133], "y": [1] },
+              "o": { "x": [0.389], "y": [0] },
+              "t": 0,
+              "s": [-6]
+            },
+            { "t": 45, "s": [4] }
+          ],
+          "ix": 10
+        },
+        "p": {
+          "a": 1,
+          "k": [
+            {
+              "i": { "x": 0.252, "y": 1 },
+              "o": { "x": 0.288, "y": 0 },
+              "t": 0,
+              "s": [-76, 652, 0],
+              "to": [0, 0, 0],
+              "ti": [0, 0, 0]
+            },
+            { "t": 45, "s": [180, 660, 0] }
+          ],
+          "ix": 2,
+          "l": 2
+        },
+        "a": { "a": 0, "k": [486, 384, 0], "ix": 1, "l": 2 },
+        "s": { "a": 0, "k": [100, 100, 100], "ix": 6, "l": 2 }
+      },
+      "ao": 0,
+      "ef": [
+        {
+          "ty": 34,
+          "nm": "操控",
+          "np": 6,
+          "ix": 1,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 7,
+              "nm": "人偶引擎",
+              "ix": 1,
+              "v": { "a": 0, "k": 2, "ix": 1 }
+            },
+            {
+              "ty": 0,
+              "nm": "网格旋转调整",
+              "ix": 2,
+              "v": { "a": 0, "k": 20, "ix": 2 }
+            },
+            {
+              "ty": 7,
+              "nm": "在透明背景上",
+              "ix": 3,
+              "v": { "a": 0, "k": 0, "ix": 3 }
+            },
+            {
+              "ty": "",
+              "nm": "arap",
+              "np": 3,
+              "ix": 4,
+              "en": 1,
+              "ef": [
+                { "ty": 6, "nm": "自动追踪形状", "ix": 1, "v": 0 },
+                {
+                  "ty": "",
+                  "nm": "网格",
+                  "np": 2,
+                  "ix": 2,
+                  "en": 1,
+                  "ef": [
+                    {
+                      "ty": "",
+                      "nm": "网格 1",
+                      "np": 8,
+                      "ix": 1,
+                      "en": 1,
+                      "ef": [
+                        { "ty": 6, "nm": "网格", "ix": 1, "v": 0 },
+                        {
+                          "ty": 0,
+                          "nm": "三角形",
+                          "ix": 2,
+                          "v": { "a": 0, "k": 50, "ix": 2 }
+                        },
+                        {
+                          "ty": 0,
+                          "nm": "密度",
+                          "ix": 3,
+                          "v": { "a": 0, "k": 10, "ix": 3 }
+                        },
+                        {
+                          "ty": 0,
+                          "nm": "扩展",
+                          "ix": 4,
+                          "v": { "a": 0, "k": 3, "ix": 4 }
+                        },
+                        {
+                          "ty": "",
+                          "nm": "变形",
+                          "np": 5,
+                          "ix": 5,
+                          "en": 1,
+                          "ef": [
+                            {
+                              "ty": "",
+                              "nm": "操控点 4",
+                              "np": 7,
+                              "ix": 1,
+                              "en": 1,
+                              "ef": [
+                                {
+                                  "ty": 3,
+                                  "nm": "顶点位移",
+                                  "ix": 1,
+                                  "v": { "a": 0, "k": [0, 0], "ix": 1 }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "顶点索引",
+                                  "ix": 2,
+                                  "v": { "a": 0, "k": 38, "ix": 2 }
+                                },
+                                {
+                                  "ty": 7,
+                                  "nm": "固定类型",
+                                  "ix": 3,
+                                  "v": { "a": 0, "k": 1, "ix": 3 }
+                                },
+                                {
+                                  "ty": 3,
+                                  "nm": "位置",
+                                  "ix": 4,
+                                  "v": {
+                                    "a": 1,
+                                    "k": [
+                                      {
+                                        "i": { "x": 0.833, "y": 0.833 },
+                                        "o": { "x": 0.167, "y": 0.167 },
+                                        "t": 73,
+                                        "s": [683.029, 506.554],
+                                        "to": [0, 0],
+                                        "ti": [0, 0]
+                                      },
+                                      { "t": 151, "s": [683.029, 506.554] }
+                                    ],
+                                    "ix": 4
+                                  }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "缩放",
+                                  "ix": 5,
+                                  "v": { "a": 0, "k": 100, "ix": 5 }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "旋转",
+                                  "ix": 6,
+                                  "v": { "a": 0, "k": 0, "ix": 6 }
+                                }
+                              ]
+                            },
+                            {
+                              "ty": "",
+                              "nm": "操控点 3",
+                              "np": 7,
+                              "ix": 2,
+                              "en": 1,
+                              "ef": [
+                                {
+                                  "ty": 3,
+                                  "nm": "顶点位移",
+                                  "ix": 1,
+                                  "v": { "a": 0, "k": [0, 0], "ix": 1 }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "顶点索引",
+                                  "ix": 2,
+                                  "v": { "a": 0, "k": 39, "ix": 2 }
+                                },
+                                {
+                                  "ty": 7,
+                                  "nm": "固定类型",
+                                  "ix": 3,
+                                  "v": { "a": 0, "k": 1, "ix": 3 }
+                                },
+                                {
+                                  "ty": 3,
+                                  "nm": "位置",
+                                  "ix": 4,
+                                  "v": {
+                                    "a": 1,
+                                    "k": [
+                                      {
+                                        "i": { "x": 0.833, "y": 0.833 },
+                                        "o": { "x": 0.167, "y": 0.167 },
+                                        "t": 73,
+                                        "s": [400.516, 566.407],
+                                        "to": [0, 0],
+                                        "ti": [0, 0]
+                                      },
+                                      { "t": 151, "s": [400.516, 566.407] }
+                                    ],
+                                    "ix": 4
+                                  }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "缩放",
+                                  "ix": 5,
+                                  "v": { "a": 0, "k": 100, "ix": 5 }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "旋转",
+                                  "ix": 6,
+                                  "v": { "a": 0, "k": 0, "ix": 6 }
+                                }
+                              ]
+                            },
+                            {
+                              "ty": "",
+                              "nm": "操控点 2",
+                              "np": 7,
+                              "ix": 3,
+                              "en": 1,
+                              "ef": [
+                                {
+                                  "ty": 3,
+                                  "nm": "顶点位移",
+                                  "ix": 1,
+                                  "v": { "a": 0, "k": [0, 0], "ix": 1 }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "顶点索引",
+                                  "ix": 2,
+                                  "v": { "a": 0, "k": 40, "ix": 2 }
+                                },
+                                {
+                                  "ty": 7,
+                                  "nm": "固定类型",
+                                  "ix": 3,
+                                  "v": { "a": 0, "k": 1, "ix": 3 }
+                                },
+                                {
+                                  "ty": 3,
+                                  "nm": "位置",
+                                  "ix": 4,
+                                  "v": {
+                                    "a": 1,
+                                    "k": [
+                                      {
+                                        "i": { "x": 0.833, "y": 0.833 },
+                                        "o": { "x": 0.167, "y": 0.167 },
+                                        "t": 73,
+                                        "s": [315.158, 377.902],
+                                        "to": [0, 0],
+                                        "ti": [0, 0]
+                                      },
+                                      {
+                                        "i": { "x": 0.833, "y": 0.833 },
+                                        "o": { "x": 0.167, "y": 0.167 },
+                                        "t": 88,
+                                        "s": [311.908, 360.086],
+                                        "to": [0, 0],
+                                        "ti": [0, 0]
+                                      },
+                                      {
+                                        "i": { "x": 0.833, "y": 0.833 },
+                                        "o": { "x": 0.167, "y": 0.167 },
+                                        "t": 139,
+                                        "s": [311.908, 360.086],
+                                        "to": [0, 0],
+                                        "ti": [0, 0]
+                                      },
+                                      { "t": 151, "s": [315.158, 377.902] }
+                                    ],
+                                    "ix": 4
+                                  }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "缩放",
+                                  "ix": 5,
+                                  "v": { "a": 0, "k": 100, "ix": 5 }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "旋转",
+                                  "ix": 6,
+                                  "v": { "a": 0, "k": 0, "ix": 6 }
+                                }
+                              ]
+                            },
+                            {
+                              "ty": "",
+                              "nm": "操控点 1",
+                              "np": 7,
+                              "ix": 4,
+                              "en": 1,
+                              "ef": [
+                                {
+                                  "ty": 3,
+                                  "nm": "顶点位移",
+                                  "ix": 1,
+                                  "v": { "a": 0, "k": [0, 0], "ix": 1 }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "顶点索引",
+                                  "ix": 2,
+                                  "v": { "a": 0, "k": 41, "ix": 2 }
+                                },
+                                {
+                                  "ty": 7,
+                                  "nm": "固定类型",
+                                  "ix": 3,
+                                  "v": { "a": 0, "k": 1, "ix": 3 }
+                                },
+                                {
+                                  "ty": 3,
+                                  "nm": "位置",
+                                  "ix": 4,
+                                  "v": {
+                                    "a": 1,
+                                    "k": [
+                                      {
+                                        "i": { "x": 0.833, "y": 0.833 },
+                                        "o": { "x": 0.167, "y": 0.167 },
+                                        "t": 73,
+                                        "s": [575.349, 285.527],
+                                        "to": [0, 0],
+                                        "ti": [0, 0]
+                                      },
+                                      {
+                                        "i": { "x": 0.833, "y": 0.833 },
+                                        "o": { "x": 0.167, "y": 0.167 },
+                                        "t": 88,
+                                        "s": [590.193, 268.45],
+                                        "to": [0, 0],
+                                        "ti": [0, 0]
+                                      },
+                                      {
+                                        "i": { "x": 0.833, "y": 0.833 },
+                                        "o": { "x": 0.167, "y": 0.167 },
+                                        "t": 139,
+                                        "s": [590.193, 268.45],
+                                        "to": [0, 0],
+                                        "ti": [0, 0]
+                                      },
+                                      { "t": 151, "s": [575.349, 285.527] }
+                                    ],
+                                    "ix": 4
+                                  }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "缩放",
+                                  "ix": 5,
+                                  "v": { "a": 0, "k": 100, "ix": 5 }
+                                },
+                                {
+                                  "ty": 0,
+                                  "nm": "旋转",
+                                  "ix": 6,
+                                  "v": { "a": 0, "k": 0, "ix": 6 }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "ty": "",
+                          "nm": "重叠",
+                          "np": 1,
+                          "ix": 6,
+                          "en": 1,
+                          "ef": []
+                        },
+                        {
+                          "ty": "",
+                          "nm": "硬度",
+                          "np": 1,
+                          "ix": 7,
+                          "en": 1,
+                          "ef": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "w": 972,
+      "h": 768,
+      "ip": 0,
+      "op": 360,
+      "st": 0,
+      "bm": 0
+    },
+    {
+      "ddd": 0,
+      "ind": 5,
+      "ty": 0,
+      "nm": "气泡@4x.png 合成 1",
+      "cl": "png",
+      "refId": "5",
+      "sr": 1,
+      "ks": {
+        "o": {
+          "a": 1,
+          "k": [
+            {
+              "i": { "x": [0.766], "y": [1] },
+              "o": { "x": [1], "y": [0] },
+              "t": 71,
+              "s": [0]
+            },
+            { "t": 88, "s": [100] }
+          ],
+          "ix": 11
+        },
+        "r": { "a": 0, "k": 0, "ix": 10 },
+        "p": {
+          "a": 0,
+          "k": [408, 538, 0],
+          "ix": 2,
+          "l": 2,
+          "x": "var $bm_rt;\nvar Ax, Ay, fx, fy, dx, dy;\nAx = 10;\nAy = 12;\nfx = 0.2;\nfy = 0.3;\ndx = $bm_mul(Ax, Math.sin($bm_mul($bm_mul($bm_mul(2, Math.PI), fx), time)));\ndy = $bm_mul(Ay, Math.sin($bm_mul($bm_mul($bm_mul(2, Math.PI), fy), time)));\n$bm_rt = $bm_sum(value, [\n    dx,\n    dy\n]);"
+        },
+        "a": { "a": 0, "k": [0, 236, 0], "ix": 1, "l": 2 },
+        "s": {
+          "a": 1,
+          "k": [
+            {
+              "i": { "x": [0.766, 0.766, 0.667], "y": [1, 1, 1] },
+              "o": { "x": [1, 1, 0.333], "y": [0, 0, 0] },
+              "t": 71,
+              "s": [0, 0, 100]
+            },
+            { "t": 88, "s": [100, 100, 100] }
+          ],
+          "ix": 6,
+          "l": 2,
+          "x": "var $bm_rt;\nvar base, n, tF, amp, freq, decay, t, b;\nbase = value;\n$bm_rt = n = numKeys;\nif (n == 0) {\n    $bm_rt = base;\n} else {\n    $bm_rt = tF = key(n).time;\n    if (time < tF) {\n        $bm_rt = base;\n    } else {\n        amp = 16;\n        freq = 2;\n        decay = 4;\n        t = $bm_sub(time, tF);\n        b = $bm_mul($bm_mul(amp, Math.exp($bm_mul($bm_neg(decay), t))), Math.sin($bm_mul($bm_mul($bm_mul(2, Math.PI), freq), t)));\n        $bm_rt = $bm_sum(base, [\n            b,\n            b\n        ]);\n    }\n}"
+        }
+      },
+      "ao": 0,
+      "ef": [
+        {
+          "ty": 5,
+          "nm": "Elastic: 缩放",
+          "np": 5,
+          "ix": 1,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 0,
+              "nm": "Amplitude",
+              "ix": 1,
+              "v": { "a": 0, "k": 20, "ix": 1 }
+            },
+            {
+              "ty": 0,
+              "nm": "Frequency",
+              "ix": 2,
+              "v": { "a": 0, "k": 40, "ix": 2 }
+            },
+            {
+              "ty": 0,
+              "nm": "Decay",
+              "ix": 3,
+              "v": { "a": 0, "k": 60, "ix": 3 }
+            }
+          ]
+        }
+      ],
+      "w": 344,
+      "h": 236,
+      "ip": 0,
+      "op": 360,
+      "st": 0,
+      "bm": 0
+    }
+  ],
+  "markers": [],
+  "tiny": 0.55
+}

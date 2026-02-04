@@ -36,49 +36,93 @@ vi.mock('classnames', () => ({
   default: vi.fn(() => 'test-class'),
 }));
 
+// Mock @ant-design/agentic-ui (别名指向 ./src)
+vi.mock('@ant-design/agentic-ui', async () => {
+  const actual = await vi.importActual('@ant-design/agentic-ui');
+  // Mock Lottie 组件
+  const mockPlayLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'voice-play-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  const mockCopyLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'copy-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  const mockLikeLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'like-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  const mockDislikeLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'dislike-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  const mockRefreshLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'refresh-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  return {
+    ...actual,
+    PlayLottie: mockPlayLottie,
+    CopyLottie: mockCopyLottie,
+    LikeLottie: mockLikeLottie,
+    DislikeLottie: mockDislikeLottie,
+    RefreshLottie: mockRefreshLottie,
+  };
+});
+
 // Mock ActionIconBox and CopyButton
-vi.mock('../src/index', () => ({
-  ActionIconBox: ({
-    children,
-    onClick,
-    title,
-    style,
-    scale,
-    'data-testid': dataTestid,
-    ...props
-  }: any) => (
-    <span
-      data-testid={dataTestid || 'action-icon-box'}
-      onClick={onClick}
-      style={style}
-      title={title}
-      data-scale={scale ? 'true' : 'false'}
-      {...props}
-    >
-      {children}
-    </span>
-  ),
-  CopyButton: ({
-    children,
-    onClick,
-    title,
-    style,
-    scale,
-    'data-testid': dataTestid,
-    ...props
-  }: any) => (
-    <span
-      data-testid={dataTestid || 'copy-button'}
-      onClick={onClick}
-      style={style}
-      title={title}
-      data-scale={scale ? 'true' : 'false'}
-      {...props}
-    >
-      {children || '复制'}
-    </span>
-  ),
-}));
+vi.mock('../src/index', async () => {
+  const actual = await vi.importActual('../src/index');
+  return {
+    ...actual,
+    ActionIconBox: ({
+      children,
+      onClick,
+      title,
+      style,
+      scale,
+      'data-testid': dataTestid,
+      ...props
+    }: any) => (
+      <span
+        data-testid={dataTestid || 'action-icon-box'}
+        onClick={onClick}
+        style={style}
+        title={title}
+        data-scale={scale ? 'true' : 'false'}
+        data-title={title}
+        {...props}
+      >
+        {children}
+      </span>
+    ),
+    CopyButton: ({
+      children,
+      onClick,
+      title,
+      style,
+      scale,
+      'data-testid': dataTestid,
+      ...props
+    }: any) => (
+      <span
+        data-testid={dataTestid || 'copy-button'}
+        onClick={onClick}
+        style={style}
+        title={title}
+        data-scale={scale ? 'true' : 'false'}
+        {...props}
+      >
+        {children || '复制'}
+      </span>
+    ),
+  };
+});
 
 // Mock clipboard API
 Object.assign(navigator, {
@@ -87,7 +131,7 @@ Object.assign(navigator, {
   },
 });
 
-describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
+describe('BubbleExtra - shouldShowCopy and onLikeCancel Tests', () => {
   const defaultBubbleProps = {
     id: 'test-id',
     content: 'Test message content',
@@ -103,6 +147,35 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
     },
   };
 
+  it('should render retry container with data attribute when preMessage exists', () => {
+    const bubbleWithPreMessage = {
+      ...defaultBubbleProps,
+      originData: {
+        ...defaultBubbleProps.originData,
+        extra: {
+          preMessage: {
+            content: '重新生成内容',
+          },
+        },
+      },
+    };
+
+    const { container } = render(
+      <BubbleConfigProvide>
+        <BubbleExtra
+          bubble={bubbleWithPreMessage as any}
+          onLike={vi.fn()}
+          onDislike={vi.fn()}
+          onReply={vi.fn()}
+        />
+      </BubbleConfigProvide>,
+    );
+
+    expect(
+      container.querySelector('[data-messages-content-retry]'),
+    ).toBeInTheDocument();
+  });
+
   describe('shouldShowCopy Tests', () => {
     it('should show copy button by default when shouldShowCopy is undefined', () => {
       render(
@@ -110,7 +183,7 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={defaultBubbleProps as any}
             onLike={vi.fn()}
-            onDisLike={vi.fn()}
+            onDislike={vi.fn()}
           />
         </BubbleConfigProvide>,
       );
@@ -126,7 +199,7 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={defaultBubbleProps as any}
             onLike={vi.fn()}
-            onDisLike={vi.fn()}
+            onDislike={vi.fn()}
             shouldShowCopy={true}
           />
         </BubbleConfigProvide>,
@@ -143,7 +216,7 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={defaultBubbleProps as any}
             onLike={vi.fn()}
-            onDisLike={vi.fn()}
+            onDislike={vi.fn()}
             shouldShowCopy={false}
           />
         </BubbleConfigProvide>,
@@ -161,7 +234,7 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={defaultBubbleProps as any}
             onLike={vi.fn()}
-            onDisLike={vi.fn()}
+            onDislike={vi.fn()}
             shouldShowCopy={shouldShowCopyFn}
           />
         </BubbleConfigProvide>,
@@ -183,7 +256,7 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={defaultBubbleProps as any}
             onLike={vi.fn()}
-            onDisLike={vi.fn()}
+            onDislike={vi.fn()}
             shouldShowCopy={shouldShowCopyFn}
           />
         </BubbleConfigProvide>,
@@ -213,7 +286,7 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={customBubbleProps as any}
             onLike={vi.fn()}
-            onDisLike={vi.fn()}
+            onDislike={vi.fn()}
             shouldShowCopy={shouldShowCopyFn}
           />
         </BubbleConfigProvide>,
@@ -244,7 +317,7 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={bubbleWithEmptyContent as any}
             onLike={vi.fn()}
-            onDisLike={vi.fn()}
+            onDislike={vi.fn()}
             shouldShowCopy={true}
           />
         </BubbleConfigProvide>,
@@ -256,9 +329,9 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
     });
   });
 
-  describe('onCancelLike Tests', () => {
-    it('should call onCancelLike when cancel like button is clicked', async () => {
-      const onCancelLike = vi.fn();
+  describe('onLikeCancel Tests', () => {
+    it('should call onLikeCancel when cancel like button is clicked', async () => {
+      const onLikeCancel = vi.fn();
       const onLike = vi.fn();
 
       const bubbleWithFeedback = {
@@ -274,8 +347,8 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={bubbleWithFeedback as any}
             onLike={onLike}
-            onDisLike={vi.fn()}
-            onCancelLike={onCancelLike}
+            onDislike={vi.fn()}
+            onLikeCancel={onLikeCancel}
           />
         </BubbleConfigProvide>,
       );
@@ -288,13 +361,13 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
       if (likeButton) {
         fireEvent.click(likeButton);
         await waitFor(() => {
-          expect(onCancelLike).toHaveBeenCalled();
+          expect(onLikeCancel).toHaveBeenCalled();
         });
       }
     });
 
-    it('should show "cancel like" title when onCancelLike is provided and already liked', () => {
-      const onCancelLike = vi.fn();
+    it('should show "cancel like" title when onLikeCancel is provided and already liked', () => {
+      const onLikeCancel = vi.fn();
       const onLike = vi.fn();
 
       const bubbleWithFeedback = {
@@ -310,8 +383,8 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={bubbleWithFeedback as any}
             onLike={onLike}
-            onDisLike={vi.fn()}
-            onCancelLike={onCancelLike}
+            onDislike={vi.fn()}
+            onLikeCancel={onLikeCancel}
           />
         </BubbleConfigProvide>,
       );
@@ -321,7 +394,7 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
       expect(likeButton).toHaveAttribute('data-title', '取消点赞');
     });
 
-    it('should show "already feedback" title when onCancelLike is not provided and already liked', () => {
+    it('should show "already feedback" title when onLikeCancel is not provided and already liked', () => {
       const onLike = vi.fn();
 
       const bubbleWithFeedback = {
@@ -337,8 +410,8 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={bubbleWithFeedback as any}
             onLike={onLike}
-            onDisLike={vi.fn()}
-            // 没有提供 onCancelLike
+            onDislike={vi.fn()}
+            // 没有提供 onLikeCancel
           />
         </BubbleConfigProvide>,
       );
@@ -348,8 +421,8 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
       expect(likeButton).toHaveAttribute('data-title', '已经反馈过了哦');
     });
 
-    it('should handle onCancelLike error gracefully', async () => {
-      const onCancelLike = vi
+    it('should handle onLikeCancel error gracefully', async () => {
+      const onLikeCancel = vi
         .fn()
         .mockRejectedValue(new Error('Cancel like failed'));
       const onLike = vi.fn();
@@ -370,8 +443,8 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={bubbleWithFeedback as any}
             onLike={onLike}
-            onDisLike={vi.fn()}
-            onCancelLike={onCancelLike}
+            onDislike={vi.fn()}
+            onLikeCancel={onLikeCancel}
           />
         </BubbleConfigProvide>,
       );
@@ -380,15 +453,15 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
       if (likeButton) {
         fireEvent.click(likeButton);
         await waitFor(() => {
-          expect(onCancelLike).toHaveBeenCalled();
+          expect(onLikeCancel).toHaveBeenCalled();
         });
       }
 
       consoleSpy.mockRestore();
     });
 
-    it('should not call onCancelLike when not already liked', async () => {
-      const onCancelLike = vi.fn();
+    it('should not call onLikeCancel when not already liked', async () => {
+      const onLikeCancel = vi.fn();
       const onLike = vi.fn();
 
       const bubbleWithoutFeedback = {
@@ -404,8 +477,8 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={bubbleWithoutFeedback as any}
             onLike={onLike}
-            onDisLike={vi.fn()}
-            onCancelLike={onCancelLike}
+            onDislike={vi.fn()}
+            onLikeCancel={onLikeCancel}
           />
         </BubbleConfigProvide>,
       );
@@ -414,15 +487,15 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
       if (likeButton) {
         fireEvent.click(likeButton);
         await waitFor(() => {
-          // 应该调用 onLike 而不是 onCancelLike
+          // 应该调用 onLike 而不是 onLikeCancel
           expect(onLike).toHaveBeenCalled();
-          expect(onCancelLike).not.toHaveBeenCalled();
+          expect(onLikeCancel).not.toHaveBeenCalled();
         });
       }
     });
 
-    it('should not call onCancelLike when feedback is thumbsDown', async () => {
-      const onCancelLike = vi.fn();
+    it('should not call onLikeCancel when feedback is thumbsDown', async () => {
+      const onLikeCancel = vi.fn();
       const onLike = vi.fn();
 
       const bubbleWithDislike = {
@@ -438,8 +511,8 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={bubbleWithDislike as any}
             onLike={onLike}
-            onDisLike={vi.fn()}
-            onCancelLike={onCancelLike}
+            onDislike={vi.fn()}
+            onLikeCancel={onLikeCancel}
           />
         </BubbleConfigProvide>,
       );
@@ -448,17 +521,17 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
       if (likeButton) {
         fireEvent.click(likeButton);
         await waitFor(() => {
-          // 在已经点踩的情况下，点击点赞不应该调用 onCancelLike
-          expect(onCancelLike).not.toHaveBeenCalled();
+          // 在已经点踩的情况下，点击点赞不应该调用 onLikeCancel
+          expect(onLikeCancel).not.toHaveBeenCalled();
         });
       }
     });
   });
 
-  describe('Combined shouldShowCopy and onCancelLike Tests', () => {
-    it('should work correctly when both shouldShowCopy and onCancelLike are provided', async () => {
+  describe('Combined shouldShowCopy and onLikeCancel Tests', () => {
+    it('should work correctly when both shouldShowCopy and onLikeCancel are provided', async () => {
       const shouldShowCopyFn = vi.fn().mockReturnValue(true);
-      const onCancelLike = vi.fn();
+      const onLikeCancel = vi.fn();
       const onLike = vi.fn();
 
       const bubbleWithFeedback = {
@@ -474,8 +547,8 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={bubbleWithFeedback as any}
             onLike={onLike}
-            onDisLike={vi.fn()}
-            onCancelLike={onCancelLike}
+            onDislike={vi.fn()}
+            onLikeCancel={onLikeCancel}
             shouldShowCopy={shouldShowCopyFn}
           />
         </BubbleConfigProvide>,
@@ -495,14 +568,14 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
       if (likeButton) {
         fireEvent.click(likeButton);
         await waitFor(() => {
-          expect(onCancelLike).toHaveBeenCalled();
+          expect(onLikeCancel).toHaveBeenCalled();
         });
       }
     });
 
     it('should hide copy button but show cancel like when configured accordingly', () => {
       const shouldShowCopyFn = vi.fn().mockReturnValue(false);
-      const onCancelLike = vi.fn();
+      const onLikeCancel = vi.fn();
       const onLike = vi.fn();
 
       const bubbleWithFeedback = {
@@ -518,8 +591,8 @@ describe('BubbleExtra - shouldShowCopy and onCancelLike Tests', () => {
           <BubbleExtra
             bubble={bubbleWithFeedback as any}
             onLike={onLike}
-            onDisLike={vi.fn()}
-            onCancelLike={onCancelLike}
+            onDislike={vi.fn()}
+            onLikeCancel={onLikeCancel}
             shouldShowCopy={shouldShowCopyFn}
           />
         </BubbleConfigProvide>,

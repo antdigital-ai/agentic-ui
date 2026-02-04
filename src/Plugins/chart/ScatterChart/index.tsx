@@ -22,6 +22,8 @@ import {
 } from '../components';
 import { defaultColorList } from '../const';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
+import type { ChartClassNames, ChartStyles } from '../types/classNames';
+import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
 
 let scatterChartComponentsRegistered = false;
@@ -46,6 +48,8 @@ export interface ScatterChartProps extends ChartContainerProps {
   height?: number | string;
   /** 自定义CSS类名 */
   className?: string;
+  /** 自定义CSS类名（支持对象格式，为每层DOM设置类名） */
+  classNames?: ChartClassNames;
   /** 数据时间 */
   dataTime?: string;
   /** 自定义主色（可选），支持 string 或 string[]；数组按序对应各数据序列 */
@@ -76,6 +80,10 @@ export interface ScatterChartProps extends ChartContainerProps {
   statistic?: StatisticConfigType;
   /** 图例文字最大宽度（像素），超出则显示省略号，默认80px */
   textMaxWidth?: number;
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
+  /** 自定义样式对象（支持对象格式，为每层DOM设置样式） */
+  styles?: ChartStyles;
 }
 
 const ScatterChart: React.FC<ScatterChartProps> = ({
@@ -83,6 +91,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   width = 600,
   height = 400,
   className,
+  classNames: classNamesProp,
   title,
   toolbarExtra,
   renderFilterInToolbar = false,
@@ -99,6 +108,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   color,
   statistic: statisticConfig,
   textMaxWidth = 80,
+  loading = false,
   ...props
 }) => {
   useMemo(() => {
@@ -223,18 +233,22 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     ),
   );
 
+  const classNamesObj = classNamesProp;
+
   // 如果没有有效数据，返回空状态
   if (safeData.length === 0 || datasetTypes.length === 0) {
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={'light'}
-        className={classNames(hashId, className)}
+        className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
         style={{
           width: responsiveWidth,
           height: responsiveHeight,
+          ...props.style,
+          ...props.styles?.root,
         }}
       >
         <ChartToolBar
@@ -242,6 +256,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}
+          loading={loading}
         />
         <div
           className={classNames(`${prefixCls}-empty-wrapper`, hashId)}
@@ -311,11 +326,14 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
 
     const finalColor = baseColor || safeDefaultColor;
 
+    // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+    const resolvedColor = resolveCssVariable(finalColor);
+
     return {
       label: type || '默认',
       data: coordinates,
-      backgroundColor: `${finalColor}99`,
-      borderColor: finalColor,
+      backgroundColor: hexToRgba(resolvedColor, 0.6),
+      borderColor: resolvedColor,
       pointRadius: isMobile ? 4 : 6,
       pointHoverRadius: isMobile ? 6 : 8,
     };
@@ -671,6 +689,9 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         hoverRadius: isMobile ? 6 : 8,
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   const handleDownload = () => {
@@ -689,12 +710,14 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={currentConfig.theme}
-        className={classNames(hashId, className)}
+        className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
         style={{
           width: responsiveWidth,
           height: responsiveHeight,
+          ...props.style,
+          ...props.styles?.root,
         }}
       >
         <ChartToolBar
@@ -702,6 +725,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
           onDownload={handleDownload}
           extra={toolbarExtra}
           dataTime={dataTime}
+          loading={loading}
           filter={
             renderFilterInToolbar && filterEnum.length > 0 ? (
               <ChartFilter
@@ -737,7 +761,11 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         {/* 统计数据组件 */}
         {statistics && (
           <div
-            className={classNames(`${prefixCls}-statistic-container`, hashId)}
+            className={classNames(
+              classNamesObj?.statisticContainer,
+              `${prefixCls}-statistic-container`,
+            )}
+            style={props.styles?.statisticContainer}
           >
             {statistics.map((config, index) => (
               <ChartStatistic
@@ -750,8 +778,14 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         )}
 
         <div
-          className={classNames(`${prefixCls}-chart-wrapper`, hashId)}
-          style={{ height: responsiveHeight }}
+          className={classNames(
+            classNamesObj?.wrapper,
+            `${prefixCls}-chart-wrapper`,
+          )}
+          style={{
+            height: responsiveHeight,
+            ...props.styles?.wrapper,
+          }}
         >
           <Scatter ref={chartRef} data={processedData} options={options} />
         </div>
@@ -769,6 +803,8 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         style={{
           width: responsiveWidth,
           height: responsiveHeight,
+          ...props.style,
+          ...props.styles?.root,
         }}
       >
         <ChartToolBar
@@ -776,6 +812,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}
+          loading={loading}
         />
         <div
           className={classNames(`${prefixCls}-error-wrapper`, hashId)}

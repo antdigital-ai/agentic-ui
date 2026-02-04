@@ -35,7 +35,20 @@ export const TableSql = (
   props: {
     'data-testid'?: string;
     isFinished?: boolean;
+    /**
+     * Item 子组件变更事件
+     * @deprecated 请使用 onItemChange 替代（符合命名规范）
+     */
     onChangeItem?: (
+      item: WhiteBoxProcessInterface,
+      changeProps: {
+        feedbackContent: string;
+        feedbackType: 'sql' | 'toolArg';
+        feedbackRunId: string;
+      },
+    ) => void;
+    /** Item 子组件变更事件 */
+    onItemChange?: (
       item: WhiteBoxProcessInterface,
       changeProps: {
         feedbackContent: string;
@@ -152,11 +165,20 @@ export const TableSql = (
                   ?.replaceAll('```sql\n', '')
                   .replaceAll('\n```', '')
                   .replaceAll('<!--{}-->\n', '');
-                props.onChangeItem?.(props, {
-                  feedbackContent: value || '',
-                  feedbackType: 'sql',
-                  feedbackRunId: props.runId || '',
-                });
+                // 优先使用新的事件名，保持向后兼容
+                if (props.onItemChange) {
+                  props.onItemChange(props, {
+                    feedbackContent: value || '',
+                    feedbackType: 'sql',
+                    feedbackRunId: props.runId || '',
+                  });
+                } else if (props.onChangeItem) {
+                  props.onChangeItem(props, {
+                    feedbackContent: value || '',
+                    feedbackType: 'sql',
+                    feedbackRunId: props.runId || '',
+                  });
+                }
               }}
             >
               {locale?.retry}
@@ -245,7 +267,7 @@ export const TableSql = (
                 >
                   <Copy />
                 </ActionIconBox>
-                {props.onChangeItem ? (
+                {props.onItemChange || props.onChangeItem ? (
                   <ActionIconBox
                     title={locale?.edit}
                     onClick={() => {

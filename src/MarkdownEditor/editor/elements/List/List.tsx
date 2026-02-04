@@ -1,13 +1,8 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { createElement, useContext } from 'react';
 import { ElementProps, ListNode } from '../../../el';
 import { useEditorStore } from '../../store';
-import { useStyle } from './style';
-
-export const ListContext = React.createContext<{
-  hashId: string;
-} | null>(null);
 
 /**
  * 列表组件，用于渲染有序或无序列表。
@@ -33,36 +28,48 @@ export const List = ({
   const { store, markdownContainerRef } = useEditorStore();
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context.getPrefixCls('agentic-md-editor-list');
-  const { wrapSSR, hashId } = useStyle(baseCls);
-  return React.useMemo(() => {
-    const tag = element.order ? 'ol' : 'ul';
-    return wrapSSR(
-      <ListContext.Provider
-        value={{
-          hashId,
+
+  const listContent = React.useMemo(() => {
+    // 支持新的列表类型和向后兼容
+    const isOrdered =
+      element.type === 'numbered-list' ||
+      ((element as any).type === 'list' && (element as any).order === true);
+    const task = (element as any).task;
+    const start = isOrdered ? (element as any).start : undefined;
+    const tag = isOrdered ? 'ol' : 'ul';
+
+    return (
+      <div
+        className={classNames(`${baseCls}-container`, 'relative')}
+        data-be={'list'}
+        {...attributes}
+        onDragStart={(e) => {
+          store.dragStart(e, markdownContainerRef.current!);
         }}
       >
-        <div
-          className={classNames(`${baseCls}-container`, hashId, 'relative')}
-          data-be={'list'}
-          {...attributes}
-          onDragStart={(e) => store.dragStart(e, markdownContainerRef.current!)}
-        >
-          {createElement(
-            tag,
-            {
-              className: classNames(
-                baseCls,
-                hashId,
-                element.order ? 'ol' : 'ul',
-              ),
-              start: element.start,
-              ['data-task']: element.task ? 'true' : undefined,
-            },
-            children,
-          )}
-        </div>
-      </ListContext.Provider>,
+        {createElement(
+          tag,
+          {
+            className: classNames(baseCls, isOrdered ? 'ol' : 'ul'),
+            ...(start !== undefined && { start }),
+            ...(task && { 'data-task': 'true' }),
+          },
+          children,
+        )}
+      </div>
     );
-  }, [element.task, element.order, element.start, element.children]);
+  }, [
+    element.type,
+    (element as any).order,
+    (element as any).task,
+    (element as any).start,
+    element.children,
+    baseCls,
+    attributes,
+    children,
+    store,
+    markdownContainerRef,
+  ]);
+
+  return listContent;
 };

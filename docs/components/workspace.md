@@ -19,6 +19,14 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 - 🎛️ **自定义内容**: 支持自定义组件和内容渲染（通过 customContent 或 Workspace.Custom）
 - 📱 **响应式设计**: 适配不同屏幕尺寸，提供良好的用户体验
 
+## ⚠️ 事件命名变更说明
+
+为了符合组件事件命名规范，以下事件名已更新（旧的事件名仍然支持，但建议使用新的事件名）：
+
+- `onToggleGroup` → `onGroupToggle`（Group 子组件切换事件，符合命名规范）
+
+> **注意**：旧的事件名仍然支持，以保持向后兼容性。新代码建议使用新的事件名。
+
 ## 代码演示
 
 ### 基础用法
@@ -32,12 +40,18 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 <code src="../demos/workspace-file-custom-preview-flow.tsx">文件-自定义预览</code>
 <code src="../demos/workspace-file-actionref-demo.tsx">actionRef外部打开</code>
 <code src="../demos/workspace-file-search-demo.tsx">文件-搜索</code>
+<code src="../demos/workspace-locate-demo.tsx">文件、网页定位到对话</code>
+<code src="../demos/workspace-file-custom-render-demo.tsx">文件-自定义渲染</code>
 
 <!-- <code src="../demos/workspace-file-previewComponent.tsx">导出文件预览组件</code> -->
 
 ### 实时跟随
 
 <code src="../demos/workspace-realtime-demo.tsx" description="展示实时内容更新和跟随功能"></code>
+
+### 浏览器
+
+<code src="../demos/workspace-browser-demo.tsx" description="展示浏览器搜索结果"></code>
 
 ### 任务管理
 
@@ -55,18 +69,24 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 <code src="../demos/workspace-advanced-demo.tsx" description="展示复杂场景下的工作空间配置和使用"></code>
 
+### Header 右侧自定义
+
+<code src="../demos/workspace-header-extra-demo.tsx" description="展示如何自定义 header 右侧区域，添加自定义按钮或操作"></code>
+
 ## API
 
 ### Workspace
 
-| 参数         | 说明                   | 类型                       | 默认值        |
-| ------------ | ---------------------- | -------------------------- | ------------- |
-| activeTabKey | 当前激活的标签页 key   | `string`                   | -             |
-| onTabChange  | 切换标签页的回调函数   | `(tabKey: string) => void` | -             |
-| style        | 自定义样式             | `React.CSSProperties`      | -             |
-| className    | 自定义 CSS 类名        | `string`                   | -             |
-| title        | 工作空间标题           | `ReactNode`                | `'Workspace'` |
-| onClose      | 关闭工作空间的回调函数 | `() => void`               | -             |
+| 参数         | 说明                       | 类型                       | 默认值        |
+| ------------ | -------------------------- | -------------------------- | ------------- |
+| activeTabKey | 当前激活的标签页 key       | `string`                   | -             |
+| onTabChange  | 切换标签页的回调函数       | `(tabKey: string) => void` | -             |
+| style        | 自定义样式                 | `React.CSSProperties`      | -             |
+| className    | 自定义 CSS 类名            | `string`                   | -             |
+| title        | 工作空间标题               | `ReactNode`                | `'Workspace'` |
+| onClose      | 关闭工作空间的回调函数     | `() => void`               | -             |
+| headerExtra  | 自定义 header 右侧区域内容 | `ReactNode`                | -             |
+| pure         | 纯净模式，关闭阴影和边框   | `boolean`                  | `false`       |
 
 ### Workspace.Realtime
 
@@ -116,10 +136,11 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 任务组件，用于展示任务列表。
 
-| 参数 | 说明       | 类型               | 默认值 |
-| ---- | ---------- | ------------------ | ------ |
-| data | 任务数据   | `TaskItemInput`    | -      |
-| tab  | 标签页配置 | `TabConfiguration` | -      |
+| 参数        | 说明               | 类型                       | 默认值 |
+| ----------- | ------------------ | -------------------------- | ------ |
+| data        | 任务数据           | `TaskItemInput`            | -      |
+| tab         | 标签页配置         | `TabConfiguration`         | -      |
+| onItemClick | 点击任务项时的回调 | `(item: TaskItem) => void` | -      |
 
 #### TaskItemInput
 
@@ -132,7 +153,7 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 | 参数    | 说明         | 类型                                             | 默认值 |
 | ------- | ------------ | ------------------------------------------------ | ------ |
 | key     | 任务唯一标识 | `string`                                         | -      |
-| title   | 任务标题     | `string`                                         | -      |
+| title   | 任务标题     | `React.ReactNode`                                | -      |
 | content | 任务内容     | `React.ReactNode \| React.ReactNode[]`           | -      |
 | status  | 任务状态     | `'success' \| 'pending' \| 'loading' \| 'error'` | -      |
 
@@ -146,7 +167,8 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 | onGroupDownload     | 组下载回调                                                    | `(files: FileNode[], groupType: FileType) => void`                                                              | -       |
 | onDownload          | 单文件下载回调                                                | `(file: FileNode) => void`                                                                                      | -       |
 | onFileClick         | 文件点击回调                                                  | `(file: FileNode) => void`                                                                                      | -       |
-| onToggleGroup       | 组展开/收起回调                                               | `(groupType: FileType, collapsed: boolean) => void`                                                             | -       |
+| onGroupToggle       | Group 子组件切换事件（符合命名规范）                          | `(groupType: FileType, collapsed: boolean) => void`                                                             | -       |
+| onToggleGroup       | 组展开/收起回调（已废弃，请使用 onGroupToggle）               | `(groupType: FileType, collapsed: boolean) => void`                                                             | -       |
 | onPreview           | 文件预览回调（返回替换预览内容或异步返回）                    | `(file: FileNode) => void \| false \| FileNode \| ReactNode \| Promise<void \| false \| FileNode \| ReactNode>` | -       |
 | onBack              | 预览页返回回调（返回 false 阻止默认返回）                     | `(file: FileNode) => void \| boolean \| Promise<void \| boolean>`                                               | -       |
 | onShare             | 分享回调（列表与预览页均会触发）                              | `(file: FileNode, ctx?: { anchorEl?: HTMLElement; origin: 'list' \| 'preview' }) => void`                       | -       |
@@ -173,25 +195,52 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 #### FileNode
 
-| 参数         | 说明                                                       | 类型                       |
-| ------------ | ---------------------------------------------------------- | -------------------------- |
-| id           | 唯一标识（可选）                                           | `string`                   |
-| name         | 文件名                                                     | `string \| ReactNode`      |
-| icon         | 自定义图标（可选）                                         | `ReactNode`                |
-| displayType  | 展示在文件标题下方的类型（如类型/大小/更新时间等）         | `string`                   |
-| type         | 文件类型                                                   | `FileType`                 |
-| size         | 文件大小                                                   | `string \| number`         |
-| lastModified | 最后修改时间                                               | `string \| number \| Date` |
-| url          | 文件下载地址（或预览地址）                                 | `string`                   |
-| file         | 文件二进制内容（浏览器环境）                               | `File \| Blob`             |
-| previewUrl   | 预览地址（优先用于图片类预览）                             | `string`                   |
-| content      | 文本内容（如 md/html 等，优先用于内置预览）                | `string`                   |
-| metadata     | 额外元数据                                                 | `Record<string, unknown>`  |
-| canPreview   | 是否允许预览（用户自定义开关，默认由系统推断是否可预览）   | `boolean`                  |
-| canDownload  | 是否在文件列表页面展示下载图标（用户自定义开关，默认展示） | `boolean`                  |
-| canShare     | 是否在文件列表/预览页展示分享按钮（默认隐藏）              | `boolean`                  |
-| canLocate    | 是否在文件列表/预览页展示“定位”按钮（默认隐藏）            | `boolean`                  |
-| loading      | 文件是否处于加载中状态                                     | `boolean`                  |
+| 参数          | 说明                                                       | 类型                                    |
+| ------------- | ---------------------------------------------------------- | --------------------------------------- |
+| id            | 唯一标识（可选）                                           | `string`                                |
+| name          | 文件名                                                     | `string \| ReactNode`                   |
+| icon          | 自定义图标（可选）                                         | `ReactNode`                             |
+| displayType   | 展示在文件标题下方的类型（如类型/大小/更新时间等）         | `string`                                |
+| type          | 文件类型                                                   | `FileType`                              |
+| size          | 文件大小                                                   | `string \| number`                      |
+| lastModified  | 最后修改时间                                               | `string \| number \| Date`              |
+| url           | 文件下载地址（或预览地址）                                 | `string`                                |
+| file          | 文件二进制内容（浏览器环境）                               | `File \| Blob`                          |
+| previewUrl    | 预览地址（优先用于图片类预览）                             | `string`                                |
+| content       | 文本内容（如 md/html 等，优先用于内置预览）                | `string`                                |
+| metadata      | 额外元数据                                                 | `Record<string, unknown>`               |
+| canPreview    | 是否允许预览（用户自定义开关，默认由系统推断是否可预览）   | `boolean`                               |
+| canDownload   | 是否在文件列表页面展示下载图标（用户自定义开关，默认展示） | `boolean`                               |
+| canShare      | 是否在文件列表/预览页展示分享按钮（默认隐藏）              | `boolean`                               |
+| canLocate     | 是否在文件列表/预览页展示“定位”按钮（默认隐藏）            | `boolean`                               |
+| loading       | 文件是否处于加载中状态                                     | `boolean`                               |
+| disabled      | 是否禁用文件卡片（禁用后不可点击，操作按钮隐藏）           | `boolean`                               |
+| renderName    | 自定义渲染文件名区域                                       | `(ctx: FileRenderContext) => ReactNode` |
+| renderDetails | 自定义渲染详情行区域（类型、大小、时间等）                 | `(ctx: FileRenderContext) => ReactNode` |
+| renderActions | 自定义渲染操作按钮区域（预览、下载、分享等）               | `(ctx: FileRenderContext) => ReactNode` |
+
+#### FileRenderContext
+
+自定义渲染函数的参数类型：
+
+| 参数      | 说明                                    | 类型                 |
+| --------- | --------------------------------------- | -------------------- |
+| file      | 当前文件节点                            | `FileNode`           |
+| prefixCls | 样式前缀                                | `string`             |
+| hashId    | 样式 hash                               | `string`             |
+| disabled  | 是否禁用                                | `boolean`            |
+| actions   | 内置操作按钮，可在 renderActions 中复用 | `FileBuiltinActions` |
+
+#### FileBuiltinActions
+
+内置操作按钮类型，用于在 `renderActions` 中复用：
+
+| 参数     | 说明     | 类型        |
+| -------- | -------- | ----------- |
+| preview  | 预览按钮 | `ReactNode` |
+| locate   | 定位按钮 | `ReactNode` |
+| share    | 分享按钮 | `ReactNode` |
+| download | 下载按钮 | `ReactNode` |
 
 #### GroupNode
 
@@ -235,12 +284,38 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 
 ### Workspace.Browser
 
-浏览器组件，用于展示浏览器内容。
+浏览器组件，用于展示浏览器搜索建议和搜索结果列表，适合承接「联网搜索 / WebSearch」等智能体工具输出。
 
-| 参数 | 说明       | 类型               | 默认值 |
-| ---- | ---------- | ------------------ | ------ |
-| data | 浏览器数据 | `BrowserItemInput` | -      |
-| tab  | 标签页配置 | `TabConfiguration` | -      |
+| 参数           | 说明                                                           | 类型                                                                             | 默认值     |
+| -------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------- |
+| suggestions    | 搜索建议列表（左侧展示的查询列表）                             | `BrowserSuggestion[]`                                                            | `[]`       |
+| request        | 根据选中的搜索建议获取对应结果列表的数据函数，支持返回加载状态 | `(suggestion: BrowserSuggestion) => { items: BrowserItem[]; loading?: boolean }` | `-`        |
+| suggestionIcon | 搜索建议左侧图标                                               | `React.ReactNode`                                                                | `-`        |
+| countFormatter | 结果数量展示文案格式化函数                                     | `(count: number) => string`                                                      | `-`        |
+| emptyText      | 结果列表为空时的展示文案                                       | `string`                                                                         | 国际化文案 |
+| loadingText    | 结果加载中时的展示文案                                         | `string`                                                                         | 国际化文案 |
+| onLocate       | 点击结果项的“定位”按钮回调（需配合 `BrowserItem.canLocate`）   | `(item: BrowserItem) => void`                                                    | `-`        |
+| tab            | 标签页配置                                                     | `TabConfiguration`                                                               | `-`        |
+
+#### BrowserSuggestion
+
+| 参数  | 说明           | 类型     |
+| ----- | -------------- | -------- |
+| id    | 唯一标识       | `string` |
+| label | 建议展示文案   | `string` |
+| count | 该查询下结果数 | `number` |
+
+#### BrowserItem
+
+| 参数        | 说明                                             | 类型      |
+| ----------- | ------------------------------------------------ | --------- |
+| id          | 唯一标识                                         | `string`  |
+| title       | 结果标题                                         | `string`  |
+| site        | 站点展示文案（如域名）                           | `string`  |
+| url         | 结果链接                                         | `string`  |
+| icon        | 站点图标地址（可选）                             | `string`  |
+| description | 结果摘要（当前 UI 未直接使用，可用于自定义扩展） | `string`  |
+| canLocate   | 是否展示“定位”按钮（展示后会触发 `onLocate`）    | `boolean` |
 
 ### Workspace.Custom
 

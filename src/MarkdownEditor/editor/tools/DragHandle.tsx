@@ -13,7 +13,7 @@ export const DragHandle = (props: { style?: CSSProperties }) => {
   return (
     <Tooltip title="拖拽移动">
       <span
-        className={'ant-agentic-md-editor-drag-handle'}
+        data-drag-handle
         data-testid="drag-handle"
         style={{ ...props.style }}
         contentEditable={false}
@@ -23,8 +23,8 @@ export const DragHandle = (props: { style?: CSSProperties }) => {
           if (parent.parentElement?.dataset.be === 'list-item') {
             if (
               !parent.previousSibling ||
-              (parent.previousSibling as HTMLElement).classList.contains(
-                'check-item',
+              (parent.previousSibling as HTMLElement).hasAttribute(
+                'data-check-item',
               )
             ) {
               parent = parent.parentElement;
@@ -35,7 +35,7 @@ export const DragHandle = (props: { style?: CSSProperties }) => {
           store.draggedElement = parent;
         }}
       >
-        <div className="ant-agentic-md-editor-drag-icon">
+        <div data-drag-icon>
           <HolderOutlined />
         </div>
       </span>

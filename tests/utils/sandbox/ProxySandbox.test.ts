@@ -411,7 +411,7 @@ describe('ProxySandbox', () => {
 
   describe('超时机制测试', () => {
     it('应该在超时时中断死循环执行', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
       const startTime = Date.now();
 
       const result = await sandbox.execute('while(true) { /* 死循环 */ }');
@@ -419,13 +419,13 @@ describe('ProxySandbox', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.message).toMatch(/timeout|instruction/i);
-      expect(executionTime).toBeLessThan(500); // 应该在合理时间内超时
+      expect(executionTime).toBeLessThan(200); // 应该在合理时间内超时
 
       sandbox.destroy();
-    });
+    }, 1000); // 测试用例超时时间设为1秒
 
     it('应该能够配置自定义超时时间', async () => {
-      const customTimeout = 50;
+      const customTimeout = 30;
       const sandbox = new ProxySandbox({ timeout: customTimeout });
 
       const result = await sandbox.execute('while(true) { /* 死循环 */ }');
@@ -434,10 +434,10 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 500); // 测试用例超时时间设为500ms
 
     it('应该能够中断复杂的死循环', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
 
       const result = await sandbox.execute(`
         let i = 0;
@@ -453,10 +453,10 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 1000); // 测试用例超时时间设为1秒
 
     it('应该能够中断嵌套循环', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
 
       const result = await sandbox.execute(`
         while(true) {
@@ -470,7 +470,7 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 1000); // 测试用例超时时间设为1秒
 
     it('应该允许正常的短时间循环', async () => {
       const sandbox = new ProxySandbox({ timeout: 1000 });
@@ -490,7 +490,7 @@ describe('ProxySandbox', () => {
     });
 
     it('应该检测 for(;;) 形式的死循环', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
 
       const result = await sandbox.execute('for(;;) { /* 死循环 */ }');
 
@@ -498,10 +498,10 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 500); // 测试用例超时时间设为500ms
 
     it('应该检测 while(1) 形式的死循环', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
 
       const result = await sandbox.execute('while(1) { /* 死循环 */ }');
 
@@ -509,10 +509,10 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 500); // 测试用例超时时间设为500ms
 
     it('应该检测 do-while 死循环', async () => {
-      const sandbox = new ProxySandbox({ timeout: 100 });
+      const sandbox = new ProxySandbox({ timeout: 50 });
 
       const result = await sandbox.execute('do { /* 死循环 */ } while(true);');
 
@@ -520,7 +520,7 @@ describe('ProxySandbox', () => {
       expect(result.error?.message).toMatch(/timeout|instruction/i);
 
       sandbox.destroy();
-    });
+    }, 500); // 测试用例超时时间设为500ms
   });
 
   describe('自定义全局变量测试', () => {
@@ -1137,5 +1137,158 @@ describe('边界情况测试', () => {
     expect(result.result).toBeUndefined();
 
     sandbox.destroy();
+  });
+
+  describe('validateCode 测试', () => {
+    it('应该拒绝包含 eval 的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('return eval("1+1")');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('dangerous pattern');
+
+      sandbox.destroy();
+    });
+
+    it('应该拒绝包含 Function 构造函数的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('return new Function("return 1")()');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('dangerous pattern');
+
+      sandbox.destroy();
+    });
+
+    it('应该拒绝包含 globalThis 属性访问的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('return globalThis.window');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('globalThis property access');
+
+      sandbox.destroy();
+    });
+
+    it('应该拒绝包含 require 的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('return require("fs")');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('dangerous pattern');
+
+      sandbox.destroy();
+    });
+
+    it('应该拒绝包含 process 访问的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('return process.env');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('dangerous pattern');
+
+      sandbox.destroy();
+    });
+
+    it('应该拒绝包含 XMLHttpRequest 的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('return new XMLHttpRequest()');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('not allowed');
+
+      sandbox.destroy();
+    });
+
+    it('应该拒绝包含 fetch 的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute(
+        'return fetch("http://example.com")',
+      );
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('not allowed');
+
+      sandbox.destroy();
+    });
+
+    it('应该拒绝包含 WebSocket 的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute(
+        'return new WebSocket("ws://example.com")',
+      );
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('not allowed');
+
+      sandbox.destroy();
+    });
+
+    it('应该拒绝包含 Worker 的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('return new Worker("script.js")');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('not allowed');
+
+      sandbox.destroy();
+    });
+
+    it('应该拒绝包含 return globalThis 的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('return globalThis');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('globalThis property access');
+
+      sandbox.destroy();
+    });
+
+    it('应该拒绝包含 = globalThis 的代码', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('const x = globalThis; return x');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('globalThis property access');
+
+      sandbox.destroy();
+    });
+  });
+
+  describe('getMemoryUsage 测试', () => {
+    it('应该返回内存使用情况', async () => {
+      const sandbox = new ProxySandbox();
+      const result = await sandbox.execute('return 1 + 1');
+
+      expect(result.memoryUsage).toBeDefined();
+      expect(typeof result.memoryUsage).toBe('number');
+
+      sandbox.destroy();
+    });
+  });
+
+  describe('ReferenceError 处理测试', () => {
+    it('应该在访问被禁止的全局变量时抛出正确的错误', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('return eval');
+      expect(result.success).toBe(false);
+      expect(result.error).toBeInstanceOf(ReferenceError);
+      expect(result.error?.message).toContain('not allowed');
+
+      sandbox.destroy();
+    });
+
+    it('应该处理 ReferenceError 中的变量名匹配', async () => {
+      const sandbox = new ProxySandbox({
+        forbiddenGlobals: ['testVar'],
+      });
+
+      const result = await sandbox.execute('return testVar');
+      expect(result.success).toBe(false);
+      expect(result.error).toBeInstanceOf(ReferenceError);
+
+      sandbox.destroy();
+    });
   });
 });

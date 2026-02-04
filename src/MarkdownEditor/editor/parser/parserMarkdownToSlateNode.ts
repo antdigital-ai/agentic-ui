@@ -1,1873 +1,572 @@
-/**
- * 此文件包含大量相互依赖的函数，为了保持代码的可读性和逻辑分组，
- * 我们允许函数在定义前使用（函数提升）
- */
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-
-import json5 from 'json5';
-import type { Root, RootContent, Table } from 'mdast';
-//@ts-ignore
-import rehypeKatex from 'rehype-katex';
-import rehypeRaw from 'rehype-raw';
-import { remark } from 'remark';
-import remarkFrontmatter from 'remark-frontmatter';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import remarkParse from 'remark-parse';
-import remarkRehype from 'remark-rehype';
+import type { RootContent } from 'mdast';
 import { Element } from 'slate';
-import { fixStrongWithSpecialChars } from './remarkParse';
 
-import {
-  CardNode,
-  ChartNode,
-  CustomLeaf,
-  Elements,
-  InlineKatexNode,
-} from '../../el';
+import { ChartTypeConfig, Elements } from '../../el';
 import { MarkdownEditorPlugin } from '../../plugin';
-import { htmlToFragmentList } from '../plugins/insertParsedHtmlNodes';
-import { TableNode, TrNode as TableRowNode } from '../types/Table';
-import { EditorUtils } from '../utils';
-import partialJsonParse from './json-parse';
+import { applyContextPropsAndConfig } from './parse/applyContextPropsAndConfig';
+import {
+  handleBlockquote,
+  handleFootnoteDefinition,
+  handleHeading,
+  handleList,
+  handleListItem,
+  handleParagraph,
+  handleTextAndInlineElements,
+} from './parse/parseBlockElements';
+import { handleCode, handleYaml } from './parse/parseCode';
+import {
+  handleDefinition,
+  handleInlineCode,
+  handleThematicBreak,
+} from './parse/parseElements';
+import { addEmptyLinesIfNeeded } from './parse/parseEmptyLines';
+import { handleFootnoteReference } from './parse/parseFootnote';
+import {
+  handleHtml,
+  preprocessNonStandardHtmlTags,
+  preprocessThinkTags,
+} from './parse/parseHtml';
+import { handleInlineMath, handleMath } from './parse/parseMath';
+import { handleImage } from './parse/parseMedia';
+import {
+  parseTableOrChart,
+  preprocessMarkdownTableNewlines,
+} from './parse/parseTable';
 import mdastParser from './remarkParse';
 
-// 常量定义
-const EMPTY_LINE_DISTANCE_THRESHOLD = 4; // 两个元素之间的行距阈值
-const EMPTY_LINE_CALCULATION_OFFSET = 2; // 计算空行数量时的偏移量
-const EMPTY_LINE_DIVISOR = 2; // 计算空行数量的除数
-const MIN_TABLE_CELL_LENGTH = 5; // 表格单元格最小长度
-const INLINE_MATH_SUFFIX_PATTERN = '(?:%|[kKmMbB]|千|万|亿|兆|万亿|百万|亿万)?';
-const INLINE_MATH_CURRENCY_PATTERN = new RegExp(
-  `^[+-]?\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?${INLINE_MATH_SUFFIX_PATTERN}$`,
-);
-const INLINE_MATH_SIMPLE_NUMBER_PATTERN = new RegExp(
-  `^[+-]?\\d+(?:\\.\\d+)?${INLINE_MATH_SUFFIX_PATTERN}$`,
-);
+// 全局解析缓存
+const parseCache = new Map<string, Elements[]>();
 
-const shouldTreatInlineMathAsText = (rawValue: string): boolean => {
-  const trimmedValue = rawValue.trim();
-  if (!trimmedValue) {
-    return true;
-  }
-  if (/[=^_\\{}]/.test(trimmedValue)) {
-    return false;
-  }
-  return (
-    INLINE_MATH_CURRENCY_PATTERN.test(trimmedValue) ||
-    INLINE_MATH_SIMPLE_NUMBER_PATTERN.test(trimmedValue)
-  );
-};
-
-// 类型定义
-type CodeElement = {
-  type: string;
-  language?: string | null;
-  render?: boolean;
-  value: any;
-  isConfig?: boolean;
-  children: Array<{ text: string }>;
-};
-
-type LanguageHandler = (element: CodeElement, value: string) => CodeElement;
-
-// 处理schema类型语言的辅助函数
-const processSchemaLanguage = (
-  element: CodeElement,
-  value: string,
-): CodeElement => {
-  let json = [];
-  try {
-    json = json5.parse(value || '[]');
-  } catch (error) {
-    try {
-      json = partialJsonParse(value || '[]');
-    } catch (error) {
-      json = value as any;
-      console.error('parse schema error', error);
-    }
-  }
-  return {
-    ...element,
-    type: 'apaasify',
-    value: json,
-    children: [{ text: value }],
-  };
-};
-
-// 语言类型处理策略配置
-const LANGUAGE_HANDLERS: Record<string, LanguageHandler> = {
-  mermaid: (element) => ({
-    ...element,
-    type: 'mermaid',
-  }),
-  schema: processSchemaLanguage,
-  apaasify: processSchemaLanguage,
-  apassify: processSchemaLanguage,
-  katex: (element) => ({
-    ...element,
-    type: 'katex',
-  }),
-  'agentar-card': processSchemaLanguage,
-};
-
-const advancedNumericCheck = (value: string | number) => {
-  const numericPattern = /^[-+]?[0-9,]*\.?[0-9]+([eE][-+]?[0-9]+)?$/;
-  return (
-    typeof value === 'number' ||
-    (typeof value === 'string' && numericPattern.test(value))
-  );
-};
-const isNumericValue = (value: string | number) => {
-  return (
-    typeof value === 'number' ||
-    (!isNaN(parseFloat(value)) && isFinite(value as unknown as number)) ||
-    advancedNumericCheck(value)
-  );
+/**
+ * 清空解析缓存
+ */
+export const clearParseCache = (): void => {
+  parseCache.clear();
 };
 
 /**
- * 判断是否包含不完整输入
- * 如果一行中包含可能尚未完成的数字输入，返回 true
+ * Markdown 块信息
  */
-const hasIncompleteNumericInput = (values: any[]): boolean => {
-  // 检查是否有可能是正在输入的不完整数字
-  // 例如: '12.' 或 '0.' 或 '-' 或 仅有一个数字字符的情况
-  return values.some((val) => {
-    if (typeof val !== 'string') return false;
-    return (
-      (val.endsWith('.') && /\d/.test(val)) || // 以小数点结尾
-      val === '-' || // 只有负号
-      val === '+' || // 只有正号
-      (val.length === 1 && /\d/.test(val)) // 只有一个数字
-    );
-  });
+interface MarkdownBlock {
+  content: string;
+  hash: string;
+}
+
+type HtmlTagInfo = { tag: string; color?: string; url?: string };
+
+type ParseContext = {
+  preNode: RootContent | null;
+  preElement: Element | null;
+  htmlTag: HtmlTagInfo[];
+  contextProps: Record<string, unknown>;
 };
 
-// 获取文件中定义的AlignType类型或声明一个等效类型
-type AlignType = 'left' | 'center' | 'right' | null;
+interface HandleSingleElementParams {
+  currentElement: RootContent;
+  config: Record<string, unknown>;
+  parent?: RootContent;
+  htmlTag: HtmlTagInfo[];
+  preElement: Element | null;
+}
 
-const getColumnAlignment = (
-  data: any[],
-  columns: {
-    dataIndex: string;
-  }[],
-): AlignType[] => {
-  if (!data.length) return [];
+interface ElementHandlerContext {
+  config: Record<string, unknown>;
+  parent?: RootContent;
+  htmlTag: HtmlTagInfo[];
+  preElement: Element | null;
+}
 
-  // 缓存上一次的对齐结果，避免频繁切换
-  const prevAlignments: AlignType[] = [];
+/**
+ * 生成简单的字符串哈希
+ */
+export const simpleHash = (str: string): string => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return hash.toString(36);
+};
 
-  return columns.map((col, index) => {
-    const values = data
-      .map((row: { [x: string]: any }) => row[col.dataIndex])
-      .filter(Boolean);
-    values?.pop();
-    // 如果检测到可能正在输入的数字，保持当前对齐状态
-    if (hasIncompleteNumericInput(values)) {
-      return prevAlignments[index] || null;
+/**
+ * 将 Markdown 文本按块分割
+ * 正确处理代码块、HTML 标签、脚注等内容
+ * 返回带有内容和哈希的块数组
+ */
+const splitMarkdownIntoBlocks = (
+  md: string,
+  config?: ParserMarkdownToSlateNodeConfig,
+  plugins?: MarkdownEditorPlugin[],
+): MarkdownBlock[] => {
+  const blocks: string[] = [];
+  let currentBlock = '';
+  let inCodeBlock = false;
+  let htmlTagDepth = 0;
+
+  const lines = md.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // 检测代码块开始/结束
+    if (line.trim().startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
     }
 
-    const alignment: AlignType = values.every(isNumericValue) ? 'right' : null;
-    prevAlignments[index] = alignment;
-    return alignment;
-  });
-};
-
-const stringifyObj = remark()
-  .use(remarkParse)
-  .use(fixStrongWithSpecialChars)
-  .use(remarkMath as any, {
-    singleDollarTextMath: false,
-  })
-  .use(remarkRehype as any, { allowDangerousHtml: true })
-  .use(rehypeRaw)
-  .use(rehypeKatex as any)
-  .use(remarkGfm)
-  .use(remarkFrontmatter, ['yaml']);
-
-const myRemark = {
-  stringify: (obj: Root) => {
-    const mdStr = stringifyObj.stringify(obj);
-    return mdStr;
-  },
-};
-
-/**
- * 检测和解析 think 标签
- * @param str - 要检测的字符串
- * @returns think 标签的内容，如果不是 think 标签则返回 null
- */
-const findThinkElement = (str: string) => {
-  try {
-    // 匹配 <think>内容</think> 格式
-    const thinkMatch = str.match(/^\s*<think>([\s\S]*?)<\/think>\s*$/);
-    if (thinkMatch) {
-      return {
-        content: thinkMatch[1].trim(),
-      };
+    // 检测 HTML 标签深度（非代码块时）
+    if (!inCodeBlock) {
+      const openTags = (line.match(/<[a-zA-Z][^/>]*>/g) || []).length;
+      const closeTags = (line.match(/<\/[a-zA-Z][^>]*>/g) || []).length;
+      const selfClosing = (line.match(/<[^>]*\/>/g) || []).length;
+      htmlTagDepth += openTags - closeTags - selfClosing;
+      htmlTagDepth = Math.max(0, htmlTagDepth);
     }
-    return null;
-  } catch (e) {
-    return null;
-  }
-};
 
-/**
- * 检测和解析 answer 标签
- * @param str - 要检测的字符串
- * @returns answer 标签的内容，如果不是 answer 标签则返回 null
- */
-const findAnswerElement = (str: string) => {
-  try {
-    // 匹配 <answer>内容</answer> 格式
-    const answerMatch = str.match(/^\s*<answer>([\s\S]*?)<\/answer>\s*$/);
-    if (answerMatch) {
-      return {
-        content: answerMatch[1].trim(),
-      };
-    }
-    return null;
-  } catch (e) {
-    return null;
-  }
-};
-
-/**
- * 从 HTML 字符串中提取媒体元素属性
- */
-const extractMediaAttributes = (str: string) => {
-  return {
-    height: str.match(/height="(\d+)"/)?.[1],
-    width: str.match(/width="(\d+)"/)?.[1],
-    align: str.match(/data-align="(\w+)"/)?.[1],
-    alt: str.match(/alt="([^"\n]+)"/)?.[1],
-    controls: str.match(/controls/),
-    autoplay: str.match(/autoplay/),
-    loop: str.match(/loop/),
-    muted: str.match(/muted/),
-    poster: str.match(/poster="([^"\n]+)"/)?.[1],
-  };
-};
-
-/**
- * 构建媒体元素对象
- */
-const buildMediaElement = (
-  url: string | undefined,
-  tagName: string,
-  attrs: ReturnType<typeof extractMediaAttributes>,
-) => {
-  return {
-    url,
-    height: attrs.height ? +attrs.height : undefined,
-    width: attrs.width ? +attrs.width : undefined,
-    align: attrs.align,
-    alt: attrs.alt,
-    tagName,
-    controls: !!attrs.controls,
-    autoplay: !!attrs.autoplay,
-    loop: !!attrs.loop,
-    muted: !!attrs.muted,
-    poster: attrs.poster,
-  };
-};
-
-/**
- * 从字符串中提取视频源 URL
- */
-const extractVideoSource = (str: string, tagName: string | undefined) => {
-  // 首先尝试从标签本身获取 src 属性
-  let url = str.match(/src="([^"\n]+)"/);
-
-  // 如果是 video 标签且没有找到 src，尝试从 source 标签中获取
-  if (tagName === 'video' && !url) {
-    const sourceMatch = str.match(/<source[^>]*src="([^"\n]+)"[^>]*>/);
-    if (sourceMatch) {
-      url = sourceMatch;
-    }
-  }
-
-  return url?.[1];
-};
-
-/**
- * 查找并解析媒体元素（img/video/iframe）
- */
-const findImageElement = (str: string) => {
-  try {
-    // 首先尝试匹配包含 source 标签的 video 格式
-    const videoWithSourceMatch = str.match(
-      /^\s*<video[^>\n]*>[\s\S]*?<source[^>]*src="([^"\n]+)"[^>]*>[\s\S]*?<\/video>\s*$/,
+    // 检查当前块是否以 HTML 结尾（注释或标签）
+    const blockEndsWithHtml = /<!--[\s\S]*?-->$|<[^>]+>$/.test(
+      currentBlock.trim(),
     );
 
-    if (videoWithSourceMatch) {
-      const attrs = extractMediaAttributes(str);
-      return buildMediaElement(videoWithSourceMatch[1], 'video', attrs);
-    }
+    // 检查当前块是否包含脚注引用（需要和脚注定义一起解析）
+    const hasFootnoteRef = /\[\^[^\]]+\]/.test(currentBlock);
+    // 检查下一行是否是脚注定义
+    const nextLineIsFootnoteDef =
+      i + 1 < lines.length && /^\[\^[^\]]+\]:/.test(lines[i + 1].trim());
 
-    // 尝试匹配各种媒体标签格式
-    const patterns = [
-      /^\s*<(img|video|iframe)[^>\n]*>.*?<\/(?:img|video|iframe)>\s*$/, // 完整标签对
-      /^\s*<(img|video|iframe)[^>\n]*\/?>(.*<\/(?:img|video|iframe)>)?\s*$/, // 完整标签
-      /^\s*<(img|video|iframe)[^>\n]*\/>\s*$/, // 自闭合标签
-      /^\s*<(img|video|iframe)[^>\n]*>\s*$/, // 仅开始标签
-    ];
+    // 只有在非代码块、非 HTML 块、且当前块不以 HTML 结尾、且不涉及脚注时，连续空行才作为分割点
+    const isBlockBoundary =
+      line === '' &&
+      !inCodeBlock &&
+      htmlTagDepth === 0 &&
+      !blockEndsWithHtml &&
+      !hasFootnoteRef &&
+      !nextLineIsFootnoteDef &&
+      currentBlock.endsWith('\n');
 
-    for (const pattern of patterns) {
-      const match = str.match(pattern);
-      if (match) {
-        const tagName = match[0].match(/<(img|video|iframe)/)?.[1];
-        const url = extractVideoSource(match[0], tagName);
-        const attrs = extractMediaAttributes(match[0]);
-        return buildMediaElement(url, tagName!, attrs);
+    if (isBlockBoundary) {
+      if (currentBlock.trim()) {
+        blocks.push(currentBlock.trim());
       }
+      currentBlock = '';
+      continue;
     }
 
-    return null;
-  } catch (e) {
-    console.error('Failed to parse media element:', e);
-    return null;
-  }
-};
-
-/**
- * 根据媒体元素信息创建编辑器节点
- */
-const createMediaNodeFromElement = (
-  mediaElement: ReturnType<typeof findImageElement>,
-) => {
-  if (!mediaElement) return null;
-
-  // 根据标签类型确定媒体类型
-  const mediaTypeMap: Record<string, string> = {
-    video: 'video',
-    iframe: 'iframe',
-    img: 'image',
-  };
-
-  const mediaType = mediaTypeMap[mediaElement.tagName] || 'image';
-
-  return EditorUtils.createMediaNode(
-    decodeURIComponentUrl(mediaElement.url || ''),
-    mediaType,
-    {
-      align: mediaElement.align,
-      alt: mediaElement.alt,
-      height: mediaElement.height,
-      width: mediaElement.width,
-      controls: mediaElement.controls,
-      autoplay: mediaElement.autoplay,
-      loop: mediaElement.loop,
-      muted: mediaElement.muted,
-      poster: mediaElement.poster,
-    },
-  );
-};
-
-const findAttachment = (str: string) => {
-  try {
-    const match = str.match(/^\s*<a[^>\n]*download[^>\n]*\/?>(.*<\/a>:?)?\s*$/);
-    if (match) {
-      const url = match[0].match(/href="([^"\n]+)"/);
-      const size = match[0].match(/data-size="(\d+)"/);
-      if (url) {
-        return { url: url[1], size: Number(size?.[1] || 0) };
-      }
-    }
-    return null;
-  } catch (e) {
-    return null;
-  }
-};
-
-const parseText = (
-  els: RootContent[],
-  leaf: CustomLeaf = {
-    data: {},
-  },
-) => {
-  let leafs: CustomLeaf[] = [];
-  for (let n of els) {
-    if (n.type === 'strong')
-      leafs = leafs.concat(parseText(n.children, { ...leaf, bold: true }));
-    if (n.type === 'emphasis')
-      leafs = leafs.concat(parseText(n.children, { ...leaf, italic: true }));
-    if (n.type === 'delete')
-      leafs = leafs.concat(
-        parseText(n.children, { ...leaf, strikethrough: true }),
-      );
-    if (n.type === 'link') {
-      leafs = leafs.concat(parseText(n.children, { ...leaf, url: n?.url }));
-    }
-    if (n.type === 'inlineCode')
-      leafs.push({ ...leaf, text: (n as any).value, code: true });
-    if (n.type === 'inlineMath') {
-      const inlineMathValue =
-        typeof (n as any).value === 'string'
-          ? ((n as any).value as string)
-          : '';
-      if (shouldTreatInlineMathAsText(inlineMathValue)) {
-        leafs.push({ ...leaf, text: `$${inlineMathValue}$` });
-        continue;
-      }
-      // 处理内联数学公式，返回一个特殊的节点而不是叶子节点
-      leafs.push({
-        ...leaf,
-        type: 'inline-katex',
-        children: [{ text: inlineMathValue }],
-      } as any);
-      continue; // 跳过后面的默认处理
-    }
-    // @ts-ignore
-    leafs.push({ ...leaf, text: (n as any).value || '' });
-  }
-  return leafs;
-};
-
-const parseTableOrChart = (
-  table: Table,
-  preNode: RootContent,
-  plugins: MarkdownEditorPlugin[],
-): CardNode => {
-  const keyMap = new Map<string, string>();
-
-  // @ts-ignore
-  const config =
-    // @ts-ignore
-    preNode?.type === 'code' && // @ts-ignore
-    preNode?.language === 'html' && // @ts-ignore
-    preNode?.otherProps
-      ? // @ts-ignore
-        preNode?.otherProps
-      : {};
-
-  const tableHeader = table?.children?.at(0);
-  const columns =
-    tableHeader?.children
-      ?.map((node) => {
-        return myRemark
-          .stringify({
-            type: 'root',
-            children: [node],
-          })
-          ?.replace(/\n/g, '')
-          .trim();
-      })
-      .map((title) => title?.replaceAll('\\', '') || ' ')
-      .map((title, index) => {
-        if (keyMap.has(title)) {
-          keyMap.set(title, keyMap.get(title) + '_' + index);
-          return {
-            title: title
-              ?.replace(/\n/g, '')
-              ?.replace(/\\(?=")/g, '')
-              ?.replace(/\\_/g, '')
-              ?.trim(),
-            dataIndex: title + '_' + index,
-            key: title + '_' + index,
-          };
-        }
-        keyMap.set(title, title);
-        return {
-          title: title,
-          dataIndex: title,
-          key: title,
-        };
-      }) || [];
-
-  const dataSource =
-    table?.children?.slice(1)?.map((row) => {
-      return row.children?.reduce((acc, cell, index) => {
-        // 如果数据列数超出表头列数，舍弃多余的数据
-        if (index >= columns.length) {
-          return acc;
-        }
-        acc[columns[index].dataIndex] = myRemark
-          .stringify({
-            type: 'root',
-            children: [cell],
-          })
-          ?.replace(/\n/g, '')
-          ?.replace(/\\(?=")/g, '')
-          ?.replace(/\\_/g, '')
-          ?.trim();
-        return acc;
-      }, {} as any);
-    }) || [];
-
-  if (table.align?.every((item) => !item)) {
-    const aligns = getColumnAlignment(dataSource, columns);
-    table.align = aligns;
+    currentBlock += line + '\n';
   }
 
-  const aligns = table.align;
-
-  const isChart = config?.chartType || config?.at?.(0)?.chartType;
-
-  /**
-   * 如果是分栏，将表格转换为分栏节点
-   */
-
-  // 计算合并单元格信息
-  const mergeCells = config.mergeCells || [];
-
-  // 创建合并单元格映射，用于快速查找
-  const mergeMap = new Map<
-    string,
-    { rowSpan: number; colSpan: number; hidden?: boolean }
-  >();
-  mergeCells?.forEach(
-    ({ row, col, rowSpan, rowspan, colSpan, colspan }: any) => {
-      let rawRowSpan = rowSpan || rowspan;
-      let rawColSpan = colSpan || colspan;
-      // 主单元格
-      mergeMap.set(`${row}-${col}`, {
-        rowSpan: rawRowSpan,
-        colSpan: rawColSpan,
-      });
-
-      // 被合并的单元格标记为隐藏
-      for (let r = row; r < row + rawRowSpan; r++) {
-        for (let c = col; c < col + rawColSpan; c++) {
-          if (r !== row || c !== col) {
-            mergeMap.set(`${r}-${c}`, { rowSpan: 1, colSpan: 1, hidden: true });
-          }
-        }
-      }
-    },
-  );
-
-  const children = table.children.map((r: { children: any[] }, l: number) => {
-    return {
-      type: 'table-row',
-      align: aligns?.[l] || undefined,
-      children: r.children.map(
-        (c: { children: string | any[] }, i: string | number) => {
-          const mergeInfo = mergeMap.get(`${l}-${i}`);
-          return {
-            type: 'table-cell',
-            align: aligns?.[i as number] || undefined,
-            title: l === 0,
-            rows: l,
-            cols: i,
-            // 直接设置 rowSpan 和 colSpan
-            ...(mergeInfo?.rowSpan && mergeInfo.rowSpan > 1
-              ? { rowSpan: mergeInfo.rowSpan }
-              : {}),
-            ...(mergeInfo?.colSpan && mergeInfo.colSpan > 1
-              ? { colSpan: mergeInfo.colSpan }
-              : {}),
-            // 如果是被合并的单元格，标记为隐藏
-            ...(mergeInfo?.hidden ? { hidden: true } : {}),
-            children: c.children?.length
-              ? [
-                  {
-                    type: 'paragraph',
-                    children: parseNodes(
-                      c.children as any,
-                      plugins,
-                      false,
-                      c as any,
-                    ),
-                  },
-                ]
-              : [
-                  {
-                    type: 'paragraph',
-                    children: [{ text: '' }],
-                  },
-                ],
-          };
-        },
-      ),
-    };
-  }) as TableRowNode[];
-  const otherProps = {
-    ...(isChart
-      ? {
-          config,
-        }
-      : config),
-    columns,
-    dataSource: dataSource.map((item) => {
-      delete item?.chartType;
-      return {
-        ...item,
-      };
-    }),
-  };
-
-  const node: TableNode | ChartNode = {
-    type: isChart ? 'chart' : 'table',
-    children: children,
-    otherProps,
-  } as any;
-  return EditorUtils.wrapperCardNode(node);
-};
-
-/**
- * 处理标题节点
- * @param currentElement - 当前处理的标题元素，包含depth和children属性
- * @returns 返回格式化的标题节点对象
- */
-const handleHeading = (
-  currentElement: any,
-  plugins: MarkdownEditorPlugin[],
-) => {
-  return {
-    type: 'head',
-    level: currentElement.depth,
-    children: currentElement.children?.length
-      ? parseNodes(currentElement.children, plugins, false, currentElement)
-      : [{ text: '' }],
-  };
-};
-
-export const decodeURIComponentUrl = (url: string) => {
-  try {
-    return decodeURIComponent(url);
-  } catch (e) {
-    console.error('Failed to decode URI component:', e);
-    return url;
-  }
-};
-
-/**
- * 处理HTML节点
- * @param currentElement - 当前处理的HTML元素
- * @param parent - 父级元素，用于判断上下文
- * @param htmlTag - HTML标签栈，用于跟踪嵌套的HTML标签
- * @returns 返回包含解析后元素和上下文属性的对象
- */
-const handleHtml = (currentElement: any, parent: any, htmlTag: any[]) => {
-  const value =
-    currentElement?.value?.replace('<!--', '').replace('-->', '').trim() ||
-    '{}';
-
-  let contextProps = {};
-  if (
-    value &&
-    currentElement?.value?.trim()?.endsWith('-->') &&
-    currentElement?.value.trim()?.startsWith('<!--')
-  ) {
-    try {
-      contextProps = json5.parse(value);
-    } catch (e) {
-      try {
-        contextProps = partialJsonParse(value);
-      } catch (parseError) {
-        console.warn('Failed to parse HTML comment as JSON or partial JSON:', {
-          value,
-          error: parseError,
-        });
-      }
-      console.warn('HTML comment parse fallback attempted:', e);
-    }
+  if (currentBlock.trim()) {
+    blocks.push(currentBlock.trim());
   }
 
-  let el: any;
-  if (!parent || ['listItem', 'blockquote'].includes(parent.type)) {
-    // 检查是否为 <think> 标签
-    const thinkElement = findThinkElement(currentElement.value);
-    if (thinkElement) {
-      // 将 <think> 标签转换为 think 类型的代码块
-      el = {
-        type: 'code',
-        language: 'think',
-        value: thinkElement.content,
-        children: [
-          {
-            text: thinkElement.content,
-          },
-        ],
-      };
-    } else {
-      // 检查是否为 <answer> 标签
-      const answerElement = findAnswerElement(currentElement.value);
-      if (answerElement) {
-        // 将 <answer> 标签的内容作为普通文本
-        el = { text: answerElement.content };
-      } else {
-        const mediaElement = findImageElement(currentElement.value);
-        if (mediaElement) {
-          el = createMediaNodeFromElement(mediaElement);
-        } else if (currentElement.value === '<br/>') {
-          el = { type: 'paragraph', children: [{ text: '' }] };
-        } else if (currentElement.value.match(/^<\/(img|video|iframe)>/)) {
-          // 如果是媒体标签的结束标签，跳过处理
-          el = null;
-        } else {
-          // 检查是否为注释（注释需要特殊处理以提取配置）
-          const isComment =
-            currentElement.value.trim().startsWith('<!--') &&
-            currentElement.value.trim().endsWith('-->');
+  // 合并小于 100 个字符的块到下一个块，同时处理包含 --- 的块
+  const MIN_BLOCK_SIZE = 100;
+  const mergedBlocks: string[] = [];
 
-          // 检查是否为标准 HTML 元素或注释
-          if (isComment || isStandardHtmlElement(currentElement.value)) {
-            // 标准 HTML 元素或注释：按原逻辑处理
-            el = currentElement.value.match(
-              /<\/?(table|div|ul|li|ol|p|strong)[^\n>]*?>/,
-            )
-              ? htmlToFragmentList(currentElement.value, '')
-              : {
-                  type: 'code',
-                  language: 'html',
-                  render: true,
-                  value: currentElement.value,
-                  children: [
-                    {
-                      text: currentElement.value,
-                    },
-                  ],
-                };
-          } else {
-            // 非标准元素（如自定义标签）：当作普通文本处理
-            el = { text: currentElement.value };
-          }
-        }
-      }
-    }
-  } else {
-    el = processInlineHtml(currentElement, htmlTag);
-  }
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
 
-  if (el && !Array.isArray(el)) {
-    // 只有非文本节点才设置 isConfig 和 otherProps
-    if (!('text' in el && Object.keys(el).length === 1)) {
-      el.isConfig = currentElement?.value?.trim()?.startsWith('<!--');
-      el.otherProps = contextProps;
-    }
-  }
-
-  return { el, contextProps };
-};
-
-/**
- * 处理内联HTML元素
- * @param currentElement - 当前处理的HTML元素
- * @param htmlTag - HTML标签栈
- * @returns 返回处理后的元素对象，如果是标签则返回null
- */
-const processInlineHtml = (currentElement: any, htmlTag: any[]) => {
-  const breakMatch = currentElement.value.match(/<br\/?>/);
-  if (breakMatch) {
-    return { type: 'break', children: [{ text: '\n' }] };
-  }
-
-  // 检查是否为 <answer> 标签（内联场景）
-  const answerElement = findAnswerElement(currentElement.value);
-  if (answerElement) {
-    // 将 <answer> 标签的内容作为普通文本
-    return { text: answerElement.content };
-  }
-
-  // 检查是否为非标准 HTML 元素，如果是则直接当作文本
-  if (!isStandardHtmlElement(currentElement.value)) {
-    return { text: currentElement.value };
-  }
-
-  const htmlMatch = currentElement.value.match(
-    /<\/?(b|i|del|font|code|span|sup|sub|strong|a)[^\n>]*?>/,
-  );
-
-  if (htmlMatch) {
-    const [str, tag] = htmlMatch;
-    if (
-      str.startsWith('</') &&
-      htmlTag.length &&
-      htmlTag[htmlTag.length - 1].tag === tag
-    ) {
-      htmlTag.pop();
-    }
-    if (!str.startsWith('</')) {
-      processHtmlTag(str, tag, htmlTag);
-    }
-    return null;
-  } else {
-    const mediaElement = findImageElement(currentElement.value);
-    if (mediaElement) {
-      return createMediaNodeFromElement(mediaElement);
-    } else {
-      return { text: currentElement.value };
-    }
-  }
-};
-
-/**
- * 处理HTML标签并添加到标签栈中
- * @param str - HTML标签字符串
- * @param tag - 标签名称
- * @param htmlTag - HTML标签栈
- */
-const processHtmlTag = (str: string, tag: string, htmlTag: any[]) => {
-  if (tag === 'span') {
-    try {
-      const styles = str.match(/style="([^"\n]+)"/);
-      if (styles) {
-        const stylesMap = new Map(
-          styles[1]
-            .split(';')
-            .map((item: string) =>
-              item.split(':').map((item: string) => item.trim()),
-            ) as [string, string][],
-        );
-        if (stylesMap.get('color')) {
-          htmlTag.push({
-            tag: tag,
-            color: stylesMap.get('color') as string,
-          });
-        }
-      }
-    } catch (e) {
-      console.warn('Failed to parse span style attribute:', { str, error: e });
-    }
-  } else if (tag === 'a') {
-    const url = str.match(/href="([\w:./_\-#\\]+)"/);
-    if (url) {
-      htmlTag.push({
-        tag: tag,
-        url: url[1],
-      });
-    }
-  } else if (tag === 'font') {
-    let color = str.match(/color="([^"\n]+)"/);
-    if (!color) {
-      color = str.match(/color=([^"\n]+)/);
-    }
-    if (color) {
-      htmlTag.push({
-        tag: tag,
-        color: color[1].replaceAll('>', ''),
-      });
-    }
-  } else {
-    htmlTag.push({ tag: tag });
-  }
-};
-
-/**
- * 处理图片节点
- * @param currentElement - 当前处理的图片元素，包含url和alt属性
- * @returns 返回格式化的图片节点对象
- */
-const handleImage = (currentElement: any) => {
-  return EditorUtils.createMediaNode(
-    decodeURIComponent(currentElement?.url),
-    'image',
-    {
-      alt: currentElement.alt,
-    },
-  );
-};
-
-/**
- * 处理内联数学公式
- * @param currentElement - 当前处理的内联数学公式元素
- * @returns 返回格式化的内联KaTeX节点对象
- */
-const handleInlineMath = (currentElement: any) => {
-  const inlineMathValue =
-    typeof currentElement?.value === 'string' ? currentElement.value : '';
-  if (shouldTreatInlineMathAsText(inlineMathValue)) {
-    return {
-      type: 'paragraph',
-      children: [{ text: `$${inlineMathValue}$` }],
-    } as any;
-  }
-  return {
-    type: 'inline-katex',
-    children: [{ text: inlineMathValue }],
-  } as InlineKatexNode;
-};
-
-/**
- * 处理数学公式块
- * @param currentElement - 当前处理的数学公式块元素
- * @returns 返回格式化的KaTeX块节点对象
- */
-const handleMath = (currentElement: any) => {
-  return {
-    type: 'katex',
-    language: 'latex',
-    katex: true,
-    value: currentElement.value,
-    children: [{ text: '' }],
-  };
-};
-
-/**
- * 处理列表节点
- * @param currentElement - 当前处理的列表元素，包含ordered、start等属性
- * @returns 返回格式化的列表节点对象
- */
-const handleList = (currentElement: any, plugins: MarkdownEditorPlugin[]) => {
-  const el: any = {
-    type: 'list',
-    order: currentElement.ordered,
-    start: currentElement.start,
-    children: parseNodes(
-      currentElement.children,
-      plugins,
-      false,
-      currentElement,
-    ),
-  };
-  el.task = el.children?.some((s: any) => typeof s.checked === 'boolean');
-  return el;
-};
-
-/**
- * 处理脚注引用
- * @param currentElement - 当前处理的脚注引用元素
- * @returns 返回格式化的脚注引用节点对象
- */
-const handleFootnoteReference = (currentElement: any) => {
-  return {
-    text: `${currentElement.identifier?.toUpperCase()}`,
-    identifier: currentElement.identifier,
-    type: 'footnoteReference',
-  };
-};
-
-/**
- * 处理脚注定义
- * @param currentElement - 当前处理的脚注定义元素
- * @returns 返回格式化的脚注定义节点对象
- */
-const handleFootnoteDefinition = (
-  currentElement: any,
-  plugins: MarkdownEditorPlugin[],
-) => {
-  const linkNode = parseNodes(
-    currentElement.children,
-    plugins,
-    false,
-    currentElement,
-  )?.at(0) as any;
-
-  const cellNode = linkNode?.children?.at(0) as any;
-
-  return {
-    value: cellNode?.text,
-    url: cellNode?.url,
-    type: 'footnoteDefinition',
-    identifier: currentElement.identifier,
-    children: [cellNode],
-  };
-};
-
-/**
- * 处理列表项节点
- * @param currentElement - 当前处理的列表项元素
- * @returns 返回格式化的列表项节点对象，包含复选框状态和提及信息
- */
-const handleListItem = (
-  currentElement: any,
-  plugins: MarkdownEditorPlugin[],
-) => {
-  const children = currentElement.children?.length
-    ? parseNodes(currentElement.children, plugins, false, currentElement)
-    : ([{ type: 'paragraph', children: [{ text: '' }] }] as any);
-
-  let mentions = undefined;
-  if (
-    currentElement.children?.[0]?.children?.[0]?.type === 'link' &&
-    currentElement.children?.[0]?.children?.length > 1
-  ) {
-    const item = children?.[0]?.children?.[0] as any;
-    const label = item?.text;
-    if (label) {
-      mentions = [
-        {
-          avatar: item?.url,
-          name: label,
-          id:
-            new URLSearchParams('?' + item?.url?.split('?')[1]).get('id') ||
-            undefined,
-        },
-      ];
-      delete children?.[0]?.children?.[0];
-      if (children?.[0]?.children) {
-        children[0].children = children?.[0]?.children?.filter(Boolean);
-      }
-    }
-  }
-
-  if (children[0].type === 'paragraph' && children[0].children[0]?.text) {
-    const text = children[0].children[0]?.text;
-    const m = text.match(/^\[([x\s])]/);
-
-    if (m) {
-      children[0].children[0].text = text.replace(/^\[([x\s])]/, '');
-      return {
-        type: 'list-item',
-        checked: m ? m[1] === 'x' : undefined,
-        children: children,
-        mentions,
-      };
-    }
-  }
-
-  return {
-    type: 'list-item',
-    checked: currentElement.checked,
-    children: children,
-    mentions,
-  };
-};
-
-/**
- * 处理附件链接
- */
-const handleAttachmentLink = (currentElement: any) => {
-  const text = currentElement.children
-    .map((n: any) => (n as any).value || '')
-    .join('');
-  const attach = findAttachment(text);
-
-  if (!attach) return null;
-
-  const name = text.match(/>(.*)<\/a>/);
-  return {
-    type: 'attach',
-    url: decodeURIComponentUrl(attach?.url),
-    size: attach.size,
-    children: [
-      {
-        type: 'card-before',
-        children: [{ text: '' }],
-      },
-      {
-        type: 'card-after',
-        children: [{ text: '' }],
-      },
-    ],
-    name: name ? name[1] : attach?.url,
-  };
-};
-
-/**
- * 处理链接卡片
- */
-const handleLinkCard = (currentElement: any, config: any) => {
-  const link = currentElement?.children?.at(0) as {
-    type: 'link';
-    url: string;
-    title: string;
-  };
-
-  return {
-    ...config,
-    type: 'link-card',
-    url: decodeURIComponentUrl(link?.url),
-    children: [
-      {
-        type: 'card-before',
-        children: [{ text: '' }],
-      },
-      {
-        type: 'card-after',
-        children: [{ text: '' }],
-      },
-    ],
-    name: link.title,
-  };
-};
-
-/**
- * 处理段落中的子元素
- */
-const processParagraphChildren = (
-  currentElement: any,
-  plugins: MarkdownEditorPlugin[],
-) => {
-  const elements = [];
-  let textNodes: any[] = [];
-
-  for (let currentChild of currentElement.children || []) {
-    if (currentChild.type === 'image') {
-      // 将累积的文本节点生成段落
-      if (textNodes.length) {
-        elements.push({
-          type: 'paragraph',
-          children: parseNodes(textNodes, plugins, false, currentElement),
-        });
-        textNodes = [];
-      }
-      // 添加图片节点
-      elements.push(
-        EditorUtils.createMediaNode(
-          decodeURIComponentUrl(currentChild?.url),
-          'image',
-          {
-            alt: currentChild.alt,
-          },
-        ),
-      );
-    } else if (currentChild.type === 'html') {
-      // 跳过媒体标签的结束标签
-      if (currentChild.value.match(/^<\/(img|video|iframe)>/)) {
-        continue;
-      }
-
-      const mediaElement = findImageElement(currentChild.value);
-      if (mediaElement) {
-        const node = createMediaNodeFromElement(mediaElement);
-        if (node) {
-          elements.push(node);
-        }
-      } else {
-        textNodes.push({ type: 'html', value: currentChild.value });
-      }
-    } else {
-      textNodes.push(currentChild);
-    }
-  }
-
-  // 处理剩余的文本节点
-  if (textNodes.length) {
-    elements.push({
-      type: 'paragraph',
-      children: parseNodes(textNodes, plugins, false, currentElement),
-    });
-  }
-
-  return elements;
-};
-
-/**
- * 处理段落节点
- * @param currentElement - 当前处理的段落元素
- * @param config - 配置对象，包含样式和行为设置
- * @param plugins - 插件数组
- * @returns 返回格式化的段落节点对象或元素数组
- */
-const handleParagraph = (
-  currentElement: any,
-  config: any,
-  plugins: MarkdownEditorPlugin[],
-) => {
-  // 检查是否是附件链接
-  if (
-    currentElement.children?.[0].type === 'html' &&
-    currentElement.children[0].value.startsWith('<a')
-  ) {
-    const attachNode = handleAttachmentLink(currentElement);
-    if (attachNode) return attachNode;
-  }
-
-  // 检查是否是链接卡片
-  if (
-    currentElement?.children?.at(0)?.type === 'link' &&
-    config.type === 'card'
-  ) {
-    return handleLinkCard(currentElement, config);
-  }
-
-  // 处理混合内容段落
-  return processParagraphChildren(currentElement, plugins);
-};
-
-/**
- * 处理内联代码节点
- * @param currentElement - 当前处理的内联代码元素
- * @returns 返回格式化的内联代码节点对象，支持占位符和初始值
- */
-const handleInlineCode = (currentElement: any) => {
-  const hasPlaceHolder = currentElement.value?.match(/\$\{(.*?)\}/);
-  const values = hasPlaceHolder
-    ? hasPlaceHolder[1]
-        .split(';')
-        .map((item: string) => {
-          const values = item?.split(':');
-          return {
-            [values?.at(0) || '']: values?.at(1),
-          };
-        })
-        .reduce((acc: any, item: any) => {
-          return {
-            ...acc,
-            ...item,
-          };
-        }, {})
-    : undefined;
-
-  return {
-    text: values ? values?.initialValue || ' ' : currentElement.value,
-    tag: currentElement.value?.startsWith('${'),
-    placeholder: values?.placeholder || undefined,
-    initialValue: values?.initialValue || undefined,
-    code: true,
-  };
-};
-
-/**
- * 处理分割线节点
- * @returns 返回格式化的分割线节点对象
- */
-const handleThematicBreak = () => {
-  return { type: 'hr', children: [{ text: '' }] };
-};
-
-/**
- * 处理代码块节点
- * @param currentElement - 当前处理的代码块元素，包含语言和内容
- * @returns 返回格式化的代码块节点对象，根据语言类型进行特殊处理
- */
-const handleCode = (currentElement: any) => {
-  const baseCodeElement = {
-    type: 'code',
-    language:
-      currentElement.lang === 'apaasify' ? 'apaasify' : currentElement.lang,
-    render: currentElement.meta === 'render',
-    value: currentElement.value,
-    isConfig: currentElement?.value.trim()?.startsWith('<!--'),
-    children: [{ text: currentElement.value }],
-  };
-
-  const handler =
-    LANGUAGE_HANDLERS[currentElement.lang as keyof typeof LANGUAGE_HANDLERS];
-
-  return handler
-    ? handler(baseCodeElement, currentElement.value)
-    : baseCodeElement;
-};
-
-/**
- * 处理YAML节点
- * @param currentElement - 当前处理的YAML元素
- * @returns 返回格式化的YAML代码块节点对象
- */
-const handleYaml = (currentElement: any) => {
-  return {
-    type: 'code',
-    language: 'yaml',
-    value: currentElement.value,
-    frontmatter: true,
-    children: [{ text: currentElement.value }],
-  };
-};
-
-/**
- * 处理引用块节点
- * @param currentElement - 当前处理的引用块元素
- * @returns 返回格式化的引用块节点对象
- */
-const handleBlockquote = (
-  currentElement: any,
-  plugins: MarkdownEditorPlugin[],
-) => {
-  return {
-    type: 'blockquote',
-    children: currentElement.children?.length
-      ? parseNodes(currentElement.children, plugins, false, currentElement)
-      : [{ type: 'paragraph', children: [{ text: '' }] }],
-  };
-};
-
-/**
- * 处理定义节点
- * @param currentElement - 当前处理的定义元素，包含标签和URL
- * @returns 返回格式化的定义段落节点对象
- */
-const handleDefinition = (currentElement: any) => {
-  return {
-    type: 'paragraph',
-    children: [
-      {
-        text:
-          `[${currentElement.label}]: ` +
-          (currentElement.url ? `${currentElement.url}` : ''),
-      },
-    ],
-  };
-};
-
-/**
- * 处理文本和内联元素节点
- * @param currentElement - 当前处理的文本或内联元素
- * @param htmlTag - HTML标签栈，用于应用样式
- * @returns 返回格式化的文本或内联元素节点对象
- */
-const handleTextAndInlineElements = (
-  currentElement: any,
-  htmlTag: any[],
-  plugins: MarkdownEditorPlugin[],
-) => {
-  if (currentElement.type === 'text' && htmlTag.length) {
-    const el = { text: currentElement.value };
-    if (currentElement.value) {
-      applyHtmlTagsToElement(el, htmlTag);
-    }
-    return el;
-  }
-
-  if (
-    ['strong', 'link', 'text', 'emphasis', 'delete', 'inlineCode'].includes(
-      currentElement.type,
-    )
-  ) {
-    if (currentElement.type === 'text') {
-      return { text: currentElement.value };
+    // 检查当前块是否包含 --- (frontmatter 分隔符或 thematic break)
+    // 如果包含 ---，且有上一个块，则合并到上一个块
+    const containsHr = /^---\s*$/m.test(block);
+    if (containsHr && mergedBlocks.length > 0) {
+      mergedBlocks[mergedBlocks.length - 1] += '\n\n' + block;
+      continue;
     }
 
-    const leaf: CustomLeaf = {};
-    applyInlineFormatting(leaf, currentElement);
-    applyHtmlTagsToElement(leaf, htmlTag);
-
-    if (
-      (currentElement as any)?.children?.some((n: any) => n.type === 'html')
-    ) {
-      return {
-        ...parseNodes(
-          (currentElement as any)?.children,
-          plugins,
-          false,
-          currentElement,
-        )?.at(0),
-        url: leaf.url,
-      };
-    } else {
-      return parseText(
-        currentElement.children?.length
-          ? currentElement.children
-          : [{ value: leaf?.url || '' }],
-        leaf,
-      );
+    // 如果当前块小于 100 个字符，且有下一个块，则合并到下一个块
+    if (block.length < MIN_BLOCK_SIZE && i + 1 < blocks.length) {
+      blocks[i + 1] = block + '\n\n' + blocks[i + 1];
+      continue;
     }
-  }
-  if (currentElement.type === 'break') {
-    return { text: '\n' };
+
+    mergedBlocks.push(block);
   }
 
-  return { text: '' };
+  // 生成带哈希的块数组
+  const configStr = config ? JSON.stringify(config) : '';
+  const pluginsCount = plugins?.length || 0;
+  const configHash = simpleHash(`${configStr}_${pluginsCount}`);
+
+  return mergedBlocks.map((content, index) => ({
+    content,
+    hash: `${simpleHash(content)}_${configHash}_${index}`,
+  }));
 };
-
 /**
- * 应用内联格式到叶子节点
- * @param leaf - 目标叶子节点对象
- * @param currentElement - 当前处理的元素，包含格式信息
+ * 解析Markdown字符串的配置选项
  */
-const applyInlineFormatting = (leaf: CustomLeaf, currentElement: any) => {
-  if (currentElement.type === 'strong') leaf.bold = true;
-  if (currentElement.type === 'emphasis') leaf.italic = true;
-  if (currentElement.type === 'delete') leaf.strikethrough = true;
-  if (currentElement.type === 'link') {
-    try {
-      leaf.url = currentElement?.url;
-    } catch (error) {
-      leaf.url = currentElement?.url;
-    }
-  }
-};
+export interface ParserMarkdownToSlateNodeConfig {
+  /** 是否在新标签页打开链接 */
+  openLinksInNewTab?: boolean;
+  /** 自定义段落标签（在 Slate 中可能不适用，保留用于兼容性） */
+  paragraphTag?: string;
+  /** 是否正在输入中（打字机模式） */
+  typing?: boolean;
 
-/**
- * 应用HTML标签样式到元素
- * @param el - 目标元素对象
- * @param htmlTag - HTML标签数组，包含样式信息
- */
-const applyHtmlTagsToElement = (el: any, htmlTag: any[]) => {
-  for (let t of htmlTag) {
-    if (t.tag === 'font') {
-      el.color = t.color;
-    }
-    if (t.tag === 'sup') el.identifier = el.text;
-    if (t.tag === 'sub') el.identifier = el.text;
-    if (t.tag === 'code') el.code = true;
-    if (t.tag === 'i') el.italic = true;
-    if (t.tag === 'b' || t.tag === 'strong') el.bold = true;
-    if (t.tag === 'del') el.strikethrough = true;
-    if ((t.tag === 'span' || t.tag === 'font') && t.color)
-      el.highColor = t.color;
-    if (t.tag === 'a' && t?.url) {
-      el.url = t?.url;
-    }
-  }
-};
-
-/**
- * 应用上下文属性和配置到元素
- * @param el - 目标元素或元素数组
- * @param contextProps - 上下文属性对象
- * @param config - 配置对象
- * @returns 返回应用了属性和配置的元素
- */
-const applyContextPropsAndConfig = (
-  el: any,
-  contextProps: any,
-  config: any,
-) => {
-  if (Array.isArray(el)) {
-    return (el as Element[]).map((item) => {
-      if (Object.keys(contextProps || {}).length) {
-        item.contextProps = contextProps;
-      }
-      if (Object.keys(config || {}).length && !item.otherProps) {
-        item.otherProps = config;
-      }
-      return item;
-    }) as Element[];
-  } else {
-    if (Object.keys(contextProps || {}).length) {
-      el.contextProps = contextProps;
-    }
-    if (Object.keys(config || {}).length && !el.otherProps) {
-      el.otherProps = config;
-    }
-    return el;
-  }
-};
-
-/**
- * 根据行间距添加空行元素
- * @param els - 目标元素数组
- * @param preNode - 前一个节点
- * @param currentElement - 当前处理的元素
- * @param top - 是否为顶级解析
- */
-const addEmptyLinesIfNeeded = (
-  els: any[],
-  preNode: any,
-  currentElement: any,
-  top: boolean,
-) => {
-  if (preNode && top) {
-    const distance =
-      (currentElement.position?.start.line || 0) -
-      (preNode.position?.end.line || 0);
-    if (distance >= EMPTY_LINE_DISTANCE_THRESHOLD) {
-      const lines = Math.floor(
-        (distance - EMPTY_LINE_CALCULATION_OFFSET) / EMPTY_LINE_DIVISOR,
-      );
-      Array.from(new Array(lines)).forEach(() => {
-        els.push({ type: 'paragraph', children: [{ text: '' }] });
-      });
-    }
-  }
-};
+  config?: ChartTypeConfig[];
+}
 
 /**
  * 元素类型处理器映射表
  * 将元素类型映射到对应的处理函数
+ * 注意：parserConfig 需要通过 handleSingleElement 传递，不在这里传递
  */
 type ElementHandler = {
   handler: (
     element: any,
-    plugins: MarkdownEditorPlugin[],
-    config?: any,
-    parent?: RootContent,
-    htmlTag?: { tag: string; color?: string; url?: string }[],
-    preElement?: Element | null,
+    context: ElementHandlerContext,
   ) => Element | Element[] | null;
   needsHtmlResult?: boolean;
 };
 
-/**
- * 元素处理器映射表
- */
-const elementHandlers: Record<string, ElementHandler> = {
-  heading: { handler: (el, plugins) => handleHeading(el, plugins) },
-  html: { handler: () => null, needsHtmlResult: true },
-  image: { handler: (el) => handleImage(el) },
-  inlineMath: { handler: (el) => handleInlineMath(el) },
-  math: { handler: (el) => handleMath(el) },
-  list: { handler: (el, plugins) => handleList(el, plugins) },
-  footnoteReference: { handler: (el) => handleFootnoteReference(el) },
-  footnoteDefinition: {
-    handler: (el, plugins) => handleFootnoteDefinition(el, plugins),
-  },
-  listItem: { handler: (el, plugins) => handleListItem(el, plugins) },
-  paragraph: {
-    handler: (el, plugins, config) => handleParagraph(el, config, plugins),
-  },
-  inlineCode: { handler: (el) => handleInlineCode(el) },
-  thematicBreak: { handler: () => handleThematicBreak() },
-  code: { handler: (el) => handleCode(el) },
-  yaml: { handler: (el) => handleYaml(el) },
-  blockquote: { handler: (el, plugins) => handleBlockquote(el, plugins) },
-  table: {
-    handler: (el, plugins, config, parent, htmlTag, preElement) =>
-      parseTableOrChart(el, preElement, plugins),
-  },
-  definition: { handler: (el) => handleDefinition(el) },
+// 删除 <answer> 和 </answer> 标签，保留中间内容
+const removeAnswerTags = (text: string): string => {
+  return text.replace(/<answer>\s*/g, '').replace(/\s*<\/answer>/g, '');
 };
 
 /**
- * 处理单个元素
+ * Markdown 到 Slate 节点解析器类
+ *
+ * 将 Markdown 字符串解析为 Slate 编辑器节点，支持配置选项和插件。
+ * 使用类形式可以避免在函数调用链中传递配置参数和插件。
  */
-const handleSingleElement = (
-  currentElement: RootContent,
-  config: any,
-  plugins: MarkdownEditorPlugin[],
-  parent: RootContent | undefined,
-  htmlTag: { tag: string; color?: string; url?: string }[],
-  preElement: Element | null,
-): { el: Element | Element[] | null; contextProps?: any } => {
-  const elementType = currentElement.type;
-  const handlerInfo = elementHandlers[elementType];
+export class MarkdownToSlateParser {
+  private config: ParserMarkdownToSlateNodeConfig;
+  private readonly plugins: MarkdownEditorPlugin[];
 
-  // 特殊处理 html 类型
-  if (handlerInfo?.needsHtmlResult) {
-    const htmlResult = handleHtml(currentElement, parent, htmlTag);
-    return {
-      el: htmlResult.el,
-      contextProps: htmlResult.contextProps,
-    };
+  constructor(
+    config: ParserMarkdownToSlateNodeConfig = {},
+    plugins: MarkdownEditorPlugin[] = [],
+  ) {
+    this.config = config;
+    this.plugins = plugins;
   }
 
-  // 使用处理器映射表
-  if (handlerInfo) {
-    return {
-      el: handlerInfo.handler(
-        currentElement,
-        plugins || [],
-        config,
-        parent,
-        htmlTag,
-        preElement,
-      ),
-    };
+  private preprocessMarkdown(md: string): string {
+    const thinkProcessed = removeAnswerTags(preprocessThinkTags(md || ''));
+    const nonStandardProcessed = removeAnswerTags(
+      preprocessNonStandardHtmlTags(thinkProcessed),
+    );
+    return preprocessMarkdownTableNewlines(nonStandardProcessed);
   }
 
-  // 默认处理
-  return {
-    el: handleTextAndInlineElements(currentElement, htmlTag, plugins || []),
-  };
-};
+  private buildMarkdownRoot(md: string): RootContent[] {
+    const preprocessedMarkdown = this.preprocessMarkdown(md);
+    const ast = mdastParser.parse(preprocessedMarkdown) as any;
+    const processedMarkdown = mdastParser.runSync(ast) as any;
+    return processedMarkdown.children as RootContent[];
+  }
 
-/**
- * 解析Markdown节点块为Slate节点数组
- * 这是核心的解析函数，负责将各种类型的Markdown节点转换为对应的Slate编辑器节点
- *
- * @param nodes - 要解析的Markdown节点数组
- * @param top - 是否为顶级解析，影响空行处理逻辑
- * @param parent - 父级节点，用于上下文判断
- * @returns 返回解析后的Slate节点数组
- *
- * @example
- * ```typescript
- * const markdownNodes = [
- *   { type: 'heading', depth: 1, children: [...] },
- *   { type: 'paragraph', children: [...] }
- * ];
- * const slateNodes = parseNodes(markdownNodes, true);
- * ```
- */
-/**
- * 解析 Markdown AST 节点为 Slate 节点
- * - 当有插件时，优先使用插件处理
- * - 插件未处理时，使用默认处理逻辑
- */
-const parseNodes = (
-  nodes: RootContent[],
-  plugins: MarkdownEditorPlugin[],
-  top = false,
-  parent?: RootContent,
-): (Elements | Text)[] => {
-  if (!nodes?.length) return [{ type: 'paragraph', children: [{ text: '' }] }];
+  private filterTopLevelSchema(schema: Elements[]): Elements[] {
+    return schema?.filter((item) => {
+      if (item.type === 'paragraph' && !item.children?.length) {
+        return false;
+      }
+      if (item.type === 'paragraph' && item.children?.length === 1) {
+        if (
+          item.children[0].text === '\n' ||
+          item.children[0].text === undefined
+        ) {
+          return false;
+        }
+        return true;
+      }
+      return true;
+    });
+  }
 
-  let els: (Elements | Text)[] = [];
-  let preNode: null | RootContent = null;
-  let preElement: Element = null;
-  let htmlTag: { tag: string; color?: string; url?: string }[] = [];
-  let contextProps = {};
+  private createEmptyParagraph(): Elements {
+    return { type: 'paragraph', children: [{ text: '' }] };
+  }
 
-  for (let i = 0; i < nodes.length; i++) {
-    const currentElement = nodes[i] as any;
-    let el: Element | null | Element[] = null;
-    let pluginHandled = false;
+  private createParseContext(): ParseContext {
+    return { preNode: null, preElement: null, htmlTag: [], contextProps: {} };
+  }
 
-    const config =
+  private parseHtmlCommentProps(
+    currentElement: RootContent,
+  ): Record<string, unknown> | null {
+    const htmlValue = (currentElement as any)?.value;
+    const isHtmlComment =
+      currentElement.type === 'html' &&
+      typeof htmlValue === 'string' &&
+      htmlValue.trim().startsWith('<!--') &&
+      htmlValue.trim().endsWith('-->');
+    if (!isHtmlComment) {
+      return null;
+    }
+
+    try {
+      const commentContent = htmlValue
+        .replace('<!--', '')
+        .replace('-->', '')
+        .trim();
+      const parsed = JSON.parse(commentContent) as Record<string, unknown>;
+      if (Array.isArray(parsed)) {
+        return { config: parsed as ChartTypeConfig[] };
+      }
+      if (parsed && Object.keys(parsed).length > 0) {
+        return parsed;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  private resolveConfig(
+    preElement: Element | null,
+    contextProps: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const baseConfig =
       preElement?.type === 'code' &&
       preElement?.language === 'html' &&
       preElement?.otherProps
         ? preElement?.otherProps
         : {};
+    if (contextProps && Object.keys(contextProps).length > 0) {
+      return { ...baseConfig, ...contextProps };
+    }
+    return baseConfig;
+  }
 
-    // 首先尝试使用插件处理
-    for (const plugin of plugins) {
+  private parseWithPlugins(currentElement: RootContent): {
+    handled: boolean;
+    el: Element | Element[] | null;
+  } {
+    for (const plugin of this.plugins) {
       const rule = plugin.parseMarkdown?.find((r) => r.match(currentElement));
       if (rule) {
         const converted = rule.convert(currentElement);
-        // 检查转换结果是否为 NodeEntry<Text> 格式
         if (Array.isArray(converted) && converted.length === 2) {
-          // NodeEntry<Text> 格式: [node, path]
-          el = converted[0] as Element;
-        } else {
-          // Elements 格式
-          el = converted as Element;
+          return { handled: true, el: converted[0] as Element };
         }
-        pluginHandled = true;
-        break;
+        return { handled: true, el: converted as Element };
       }
     }
+    return { handled: false, el: null };
+  }
 
-    // 如果插件没有处理，使用默认处理逻辑
-    if (!pluginHandled) {
-      // 使用统一的处理函数
-      const result = handleSingleElement(
-        currentElement,
-        config,
-        plugins,
-        parent,
-        htmlTag,
-        preElement,
+  /**
+   * 解析 Markdown 字符串并返回解析后的结构和链接信息
+   *
+   * @param md - 要解析的 Markdown 字符串
+   * @returns 一个包含解析后的元素数组和链接信息的对象
+   */
+  parse(md: string): {
+    schema: Elements[];
+    links: { path: number[]; target: string }[];
+  } {
+    const markdownRoot = this.buildMarkdownRoot(md);
+    const schema = this.parseNodes(markdownRoot, true, undefined) as Elements[];
+    const filteredSchema = this.filterTopLevelSchema(schema);
+
+    return {
+      schema: filteredSchema,
+      links: [],
+    };
+  }
+
+  /**
+   * 解析 Markdown AST 节点为 Slate 节点（类方法版本）
+   * - 当有插件时，优先使用插件处理
+   * - 插件未处理时，使用默认处理逻辑
+   */
+  private parseNodes(
+    nodes: RootContent[],
+    top = false,
+    parent?: RootContent,
+  ): (Elements | Text)[] {
+    if (!nodes?.length) {
+      return [this.createEmptyParagraph()];
+    }
+
+    let els: (Elements | Text)[] = [];
+    const context = this.createParseContext();
+
+    for (const currentElement of nodes) {
+      const htmlCommentProps = this.parseHtmlCommentProps(currentElement);
+      if (htmlCommentProps) {
+        // 将注释属性存储到 contextProps 中，供下一个元素使用
+        context.contextProps = { ...context.contextProps, ...htmlCommentProps };
+        // 跳过 HTML 注释本身，避免生成独立的 HTML 代码节点
+        //
+        // 【为何 preNode 里拿不到图表配置】
+        // continue 后不会 push 任何 el，也不会执行 preNode=currentElement、preElement=el。
+        // 下一轮处理表格时，preElement 仍是「注释前」的节点（如 paragraph/heading），
+        // 不可能是 type='code' 且 language='html' 的节点，parseTableOrChart 里
+        // 从 preNode（实为 preElement）取 otherProps 会得到 {}。
+        // 因此图表配置必须通过 contextProps，由 table handler 以
+        // contextChartConfig 传入 parseTableOrChart。
+        continue;
+      }
+
+      const config = this.resolveConfig(
+        context.preElement,
+        context.contextProps,
       );
+      const pluginResult = this.parseWithPlugins(currentElement);
+      let el: Element | Element[] | null = pluginResult.el;
 
-      el = result.el;
-      if (result.contextProps) {
-        contextProps = { ...contextProps, ...result.contextProps };
+      if (Object.keys(config).length > 0) {
+        this.config = { ...this.config, ...config };
       }
-    }
 
-    addEmptyLinesIfNeeded(els, preNode, currentElement, top);
+      if (!pluginResult.handled) {
+        const result = this.handleSingleElement({
+          currentElement,
+          config,
+          parent,
+          htmlTag: context.htmlTag,
+          preElement: context.preElement,
+        });
 
-    if (el) {
-      el = applyContextPropsAndConfig(el, contextProps, config);
-      Array.isArray(el) ? els.push(...el) : els.push(el);
-    }
-
-    preNode = currentElement;
-    preElement = el as Element;
-  }
-
-  return els;
-};
-
-const tableRegex = /^\|.*\|\s*\n\|[-:| ]+\|/m;
-
-/**
- * 标准 HTML 元素列表
- * 这些标签会被正常解析为 HTML，其他标签会被当作普通文本处理
- */
-const STANDARD_HTML_ELEMENTS = new Set([
-  // 文档结构
-  'html',
-  'head',
-  'body',
-  'title',
-  'meta',
-  'link',
-  'style',
-  'script',
-  // 内容分区
-  'header',
-  'nav',
-  'main',
-  'section',
-  'article',
-  'aside',
-  'footer',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  // 文本内容
-  'div',
-  'p',
-  'hr',
-  'pre',
-  'blockquote',
-  // 列表
-  'ul',
-  'ol',
-  'li',
-  'dl',
-  'dt',
-  'dd',
-  // 表格
-  'table',
-  'thead',
-  'tbody',
-  'tfoot',
-  'tr',
-  'th',
-  'td',
-  'caption',
-  'colgroup',
-  'col',
-  // 表单
-  'form',
-  'input',
-  'textarea',
-  'button',
-  'select',
-  'option',
-  'label',
-  'fieldset',
-  'legend',
-  // 内联文本语义
-  'a',
-  'em',
-  'strong',
-  'small',
-  'mark',
-  'del',
-  'ins',
-  'sub',
-  'sup',
-  'i',
-  'b',
-  'u',
-  's',
-  'code',
-  'kbd',
-  'samp',
-  'var',
-  'span',
-  'br',
-  'wbr',
-  // 图片和多媒体
-  'img',
-  'video',
-  'audio',
-  'source',
-  'track',
-  'iframe',
-  'embed',
-  'object',
-  'param',
-  'picture',
-  // 其他
-  'canvas',
-  'svg',
-  'math',
-  'details',
-  'summary',
-  'dialog',
-  'menu',
-  'menuitem',
-  // 字体
-  'font',
-]);
-
-/**
- * 检查 HTML 标签是否为标准元素
- * @param htmlString - HTML 字符串
- * @returns 是否为标准 HTML 元素
- */
-function isStandardHtmlElement(htmlString: string): boolean {
-  // 提取标签名（支持开始标签和结束标签）
-  const tagMatch = htmlString.match(/<\/?(\w+)/);
-  if (!tagMatch) return false;
-
-  const tagName = tagMatch[1].toLowerCase();
-  return STANDARD_HTML_ELEMENTS.has(tagName);
-}
-
-/**
- * 预处理特殊标签（think/answer），将其转换为代码块格式
- * @param markdown - 原始 Markdown 字符串
- * @param tagName - 标签名称（think 或 answer）
- * @returns 处理后的 Markdown 字符串
- */
-function preprocessSpecialTags(
-  markdown: string,
-  tagName: 'think' | 'answer',
-): string {
-  const tagRegex = new RegExp(`<${tagName}>([\\s\\S]*?)<\\/${tagName}>`, 'g');
-
-  return markdown?.replace(tagRegex, (match, content) => {
-    const trimmedContent = content.trim();
-
-    // 如果内容中包含代码块标记（三个反引号），需要进行转义
-    // 策略：使用特殊标记替换代码块，保持原始格式
-    const processedContent = trimmedContent?.replace(
-      /```(\w*)\n?([\s\S]*?)```/g,
-      (_: string, lang: string, code: string) => {
-        // 使用特殊标记包裹，保留语言和代码内容
-        // 格式：【CODE_BLOCK:lang】code【/CODE_BLOCK】
-        const marker = '\u200B'; // 零宽空格，用于标记
-        return `${marker}【CODE_BLOCK:${lang || ''}】\n${code}\n【/CODE_BLOCK】${marker}`;
-      },
-    );
-
-    // 构建对应类型的代码块
-    return `\`\`\`${tagName}\n${processedContent}\n\`\`\``;
-  });
-}
-
-/**
- * 预处理 <think> 标签，将其转换为 ```think 代码块格式
- * @param markdown - 原始 Markdown 字符串
- * @returns 处理后的 Markdown 字符串
- */
-function preprocessThinkTags(markdown: string): string {
-  return preprocessSpecialTags(markdown, 'think');
-}
-
-/**
- * 预处理所有非标准 HTML 标签，提取其内容（删除标签本身）
- * @param markdown - 原始 Markdown 字符串
- * @returns 处理后的 Markdown 字符串
- */
-function preprocessNonStandardHtmlTags(markdown: string): string {
-  let result = markdown;
-  let hasNonStandardTags = true;
-
-  // 循环处理，直到没有非标准标签（处理嵌套情况）
-  while (hasNonStandardTags) {
-    const before = result;
-
-    // 匹配所有 HTML 标签对：<tagname>content</tagname>
-    result = result.replace(
-      /<(\w+)>([\s\S]*?)<\/\1>/g,
-      (match, tagName, content) => {
-        // 检查是否为标准 HTML 元素
-        if (STANDARD_HTML_ELEMENTS.has(tagName.toLowerCase())) {
-          // 标准元素保持不变
-          return match;
+        el = result.el;
+        if (result.contextProps) {
+          context.contextProps = {
+            ...context.contextProps,
+            ...result.contextProps,
+          };
         }
-        // 非标准元素只保留内容（不 trim，保持原始格式）
-        return content;
-      },
-    );
+        // 更新 htmlTag 数组，以便后续节点可以使用
+        if (result.htmlTag) {
+          context.htmlTag = result.htmlTag;
+        }
+      }
 
-    // 如果没有变化，说明处理完成
-    hasNonStandardTags = before !== result;
+      els = addEmptyLinesIfNeeded(els, context.preNode, currentElement, top);
+
+      if (el) {
+        const appliedElement = applyContextPropsAndConfig(
+          el,
+          context.contextProps,
+          config,
+        );
+        // 使用 if-else 而不是条件表达式，避免类型错误
+        if (Array.isArray(appliedElement)) {
+          els = [...els, ...appliedElement];
+        } else {
+          els = [...els, appliedElement];
+        }
+      }
+
+      context.preNode = currentElement;
+      context.preElement = el as Element;
+    }
+
+    return els;
   }
 
-  return result;
-}
+  /**
+   * 处理单个元素（类方法版本）
+   */
+  /**
+   * 获取统一的元素处理器映射表
+   */
+  private getElementHandlers(): Record<string, ElementHandler> {
+    const parseNodesFn = (nodes: any[], top: boolean, parent: any) =>
+      this.parseNodes(nodes, top, parent);
 
-function preprocessMarkdownTableNewlines(markdown: string) {
-  // 检查是否包含表格
-  if (!tableRegex.test(markdown)) return markdown; // 如果没有表格，直接返回原始字符串
+    const parseNodesForTable = (
+      nodes: RootContent[],
+      _plugins: MarkdownEditorPlugin[],
+      top?: boolean,
+      parent?: RootContent,
+    ) => this.parseNodes(nodes, top || false, parent);
 
-  // 处理表格结尾的换行符：
-  // 1. 如果只有一个换行符，改成两个
-  // 2. 如果有两个以上换行符，改成两个
-  // 3. 如果已经是两个换行符，保持不变
-  let processedMarkdown = markdown
-    .replace(
-      /(\|[^|\n]*\|)\n(?!\n|\|)/g, // 匹配表格行后面跟着单个换行符（不是两个），但下一行不是表格行
-      '$1\n\n', // 替换为两个换行符
-    )
-    .replace(
-      /(\|[^|\n]*\|)\n{3,}(?!\|)/g, // 匹配表格行后面跟着3个或更多换行符，但下一行不是表格行
-      '$1\n\n', // 替换为两个换行符
-    );
+    return {
+      html: { handler: () => null, needsHtmlResult: true },
+      image: { handler: (el) => handleImage(el) },
+      inlineMath: { handler: (el) => handleInlineMath(el) },
+      math: { handler: (el) => handleMath(el) },
+      footnoteReference: { handler: (el) => handleFootnoteReference(el) },
+      inlineCode: { handler: (el) => handleInlineCode(el) },
+      thematicBreak: { handler: () => handleThematicBreak() },
+      code: { handler: (el, context) => handleCode(el, context.config) },
+      yaml: { handler: (el) => handleYaml(el) },
+      definition: { handler: (el) => handleDefinition(el) },
+      heading: {
+        handler: (el) => handleHeading(el, parseNodesFn),
+      },
+      list: {
+        handler: (el) => handleList(el, parseNodesFn),
+      },
+      listItem: {
+        handler: (el) => handleListItem(el, parseNodesFn),
+      },
+      blockquote: {
+        handler: (el) => handleBlockquote(el, parseNodesFn),
+      },
+      footnoteDefinition: {
+        handler: (el) => handleFootnoteDefinition(el, parseNodesFn),
+      },
+      paragraph: {
+        handler: (el, context) =>
+          handleParagraph(el, context.config, parseNodesFn),
+      },
+      table: {
+        // 传入 config：当上一条是图表注释且被 continue 掉时，config 来自 contextProps，
+        // 作为 contextChartConfig 供 parseTableOrChart 在 preNode 无 html 配置时使用
+        handler: (el, context) =>
+          parseTableOrChart(
+            el,
+            context.preElement || (context.parent as any),
+            this.plugins,
+            parseNodesForTable,
+            this.config,
+            context.config as Record<string, unknown>,
+          ),
+      },
+    };
+  }
 
-  // 如果包含表格，处理换行符
-  return processedMarkdown
-    ?.split('\n\n')
-    .map((line) => {
-      if (line.includes('```')) return line; // 如果包含代码块，直接返回原始字符串
-      // 检查是否包含表格
-      if (!tableRegex.test(line)) return line; // 如果没有表格，直接返回原始字符串
-      // 匹配所有表格的行（确保我们在表格行内匹配换行符）
-      return line.replace(/\|([^|]+)\|/g, (match) => {
-        if (match.replaceAll('\n', '')?.length < MIN_TABLE_CELL_LENGTH)
-          return match;
-        // 只替换每个表格单元格内的换行符
-        return match.split('\n').join('<br>');
-      });
-    })
-    .join('\n\n');
+  private handleSingleElement(params: HandleSingleElementParams): {
+    el: Element | Element[] | null;
+    contextProps?: any;
+    htmlTag?: any[];
+  } {
+    const { currentElement, config, parent, htmlTag, preElement } = params;
+    const elementType = currentElement.type;
+    const elementHandlers = this.getElementHandlers();
+    const handlerInfo = elementHandlers[elementType];
+
+    if (handlerInfo?.needsHtmlResult) {
+      const htmlResult = handleHtml(currentElement, parent, htmlTag, (md) => ({
+        schema: this.parse(md).schema,
+      }));
+      const result: any = {
+        el: htmlResult.el,
+      };
+      if (htmlResult.contextProps) {
+        result.contextProps = htmlResult.contextProps;
+      }
+      if (htmlResult.htmlTag) {
+        result.htmlTag = htmlResult.htmlTag;
+      }
+      return result;
+    }
+
+    if (!handlerInfo) {
+      return {
+        el: handleTextAndInlineElements(
+          currentElement,
+          htmlTag,
+          (nodes, top, parent) => this.parseNodes(nodes, top, parent),
+          this.config,
+        ),
+      };
+    }
+
+    const handlerResult = handlerInfo.handler(currentElement, {
+      config,
+      parent,
+      htmlTag,
+      preElement,
+    });
+
+    return { el: handlerResult };
+  }
 }
 
 /**
@@ -1875,39 +574,90 @@ function preprocessMarkdownTableNewlines(markdown: string) {
  *
  * @param md - 要解析的Markdown字符串。
  * @param plugins - 可选的Markdown编辑器插件数组，用于扩展解析功能。
+ * @param config - 可选的解析配置选项。
  * @returns 一个包含解析后的元素数组和链接信息的对象。
  *
  * @property schema - 解析后的元素数组。
  * @property links - 包含路径和目标链接的对象数组。
+ *
+ * @example
+ * ```typescript
+ * // 使用函数形式（向后兼容）
+ * const result = parserMarkdownToSlateNode(markdown, plugins, { openLinksInNewTab: true });
+ *
+ * // 使用类形式（推荐，避免配置传递问题）
+ * const parser = new MarkdownToSlateParser(
+ *   { openLinksInNewTab: true },
+ *   plugins
+ * );
+ * const result = parser.parse(markdown);
+ * ```
  */
 export const parserMarkdownToSlateNode = (
   md: string,
   plugins?: MarkdownEditorPlugin[],
+  config?: ParserMarkdownToSlateNodeConfig,
 ): {
   schema: Elements[];
   links: { path: number[]; target: string }[];
 } => {
-  // 先预处理 <think> 标签，再预处理其他非标准 HTML 标签，最后处理表格换行
-  const thinkProcessed = preprocessThinkTags(md || '');
-  const nonStandardProcessed = preprocessNonStandardHtmlTags(thinkProcessed);
-  const processedMarkdown = mdastParser.parse(
-    preprocessMarkdownTableNewlines(nonStandardProcessed),
-  ) as any;
+  // 将 markdown 按块分割，同时生成哈希
+  const blocks = splitMarkdownIntoBlocks(md || '', config, plugins);
 
-  const markdownRoot = processedMarkdown.children;
-  const pluginList = plugins || [];
+  // 复用同一个 parser 实例
+  const parser = new MarkdownToSlateParser(config || {}, plugins || []);
 
-  const schema = parseNodes(markdownRoot, pluginList, true) as Elements[];
-  return {
-    schema: schema?.filter((item) => {
-      if (item.type === 'paragraph' && item.children?.length === 1) {
-        if (item.children[0].text === '\n') {
-          return false;
-        }
-        return true;
+  // 如果只有一个块，直接解析
+  if (blocks.length <= 1) {
+    const result = parser.parse(md);
+    const blockHash = blocks[0]?.hash || simpleHash(md || '');
+    // 为 schema 元素添加 hash
+    return {
+      schema: result.schema.map((s, index) => ({
+        ...s,
+        hash: blockHash + '-' + index,
+      })),
+      links: result.links,
+    };
+  }
+
+  // 对每个块进行缓存查找或解析
+  const allSchemas: Elements[] = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const { content, hash } = blocks[i];
+
+    // 检查缓存
+    if (parseCache.has(hash)) {
+      const cachedSchema = parseCache.get(hash)!;
+      allSchemas.push(...cachedSchema);
+      continue;
+    }
+
+    // 缓存未命中，解析块
+    const result = parser.parse(content);
+
+    // 为 schema 元素添加 hash
+    const schemaWithHash = result.schema.map((s, index) => ({
+      ...s,
+      hash: `${hash}-${index}`,
+    }));
+
+    // 存入缓存（带 hash）
+    parseCache.set(hash, schemaWithHash);
+
+    // 限制缓存大小（最多 100 个条目）
+    if (parseCache.size > 100) {
+      const firstKey = parseCache.keys().next().value;
+      if (firstKey) {
+        parseCache.delete(firstKey);
       }
-      return true;
-    }),
+    }
+
+    allSchemas.push(...schemaWithHash);
+  }
+
+  return {
+    schema: allSchemas,
     links: [],
   };
 };

@@ -1,5 +1,6 @@
 import { ExportOutlined } from '@ant-design/icons';
-import { Popover, Tooltip, Typography } from 'antd';
+import { ConfigProvider, Popover, Tooltip, Typography } from 'antd';
+import classNames from 'classnames';
 import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
@@ -11,6 +12,7 @@ import { BubbleExtra } from './BubbleExtra';
 import { DocInfoList } from './DocInfo';
 import { EXCEPTION } from './EXCEPTION';
 import { MarkdownPreview } from './MarkdownPreview';
+import { useMessagesContentStyle } from './style';
 
 export const LOADING_FLAT = '...';
 
@@ -75,6 +77,10 @@ export const BubbleMessageDisplay: React.FC<
       origin_url: any;
     }[]
   >([]);
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  const chatCls = getPrefixCls('agentic-ui');
+  const baseChatCls = `${chatCls}-display`;
+  const { hashId, wrapSSR } = useMessagesContentStyle(baseChatCls);
 
   const funRender = useRefFunction((props: { identifier?: any }) => {
     const node = nodeList.find((item) => item.placeholder === props.identifier);
@@ -99,7 +105,12 @@ export const BubbleMessageDisplay: React.FC<
     return props.bubbleRenderConfig?.beforeMessageRender
       ? props.bubbleRenderConfig.beforeMessageRender(props, null)
       : null;
-  }, [props.bubbleRenderConfig?.beforeMessageRender, typing, props.originData]);
+  }, [
+    props.bubbleRenderConfig?.beforeMessageRender,
+    typing,
+    props.originData,
+    props.originData?.isLast,
+  ]);
 
   const afterContent = useMemo(() => {
     const userAfter = props.bubbleRenderConfig?.afterMessageRender
@@ -110,9 +121,8 @@ export const BubbleMessageDisplay: React.FC<
     props.bubbleRenderConfig?.afterMessageRender,
     typing,
     props.originData,
-    props.bubbleRenderConfig?.afterMessageRender,
+    props.originData?.isLast,
     contentAfterDom,
-    typing,
   ]);
 
   const memo = useMemo(() => {
@@ -121,20 +131,20 @@ export const BubbleMessageDisplay: React.FC<
       (!props.originData?.isFinished && !content)
     ) {
       if (context?.thoughtChain?.alwaysRender !== true) {
-        return (
+        return wrapSSR(
           <div
-            style={{
-              padding: context?.compact ? '8px' : '12px',
-              lineHeight: '24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-            className="agent-item-default-content"
+            className={classNames(
+              'agent-item-default-content',
+              `${baseChatCls}-messages-content-loading`,
+              context?.compact
+                ? `${baseChatCls}-messages-content-loading-compact`
+                : `${baseChatCls}-messages-content-loading-default`,
+              hashId,
+            )}
             data-testid="message-content"
           >
             {locale?.['chat.message.thinking'] || '思考中...'}
-          </div>
+          </div>,
         );
       }
       return null;
@@ -149,6 +159,7 @@ export const BubbleMessageDisplay: React.FC<
           rightRender={props?.bubbleRenderConfig?.extraRightRender}
           onReply={props.onReply}
           onCancelLike={props.onCancelLike}
+          onLikeCancel={props.onLikeCancel}
           shouldShowCopy={props.shouldShowCopy}
           useSpeech={props.useSpeech}
           shouldShowVoice={props.shouldShowVoice}
@@ -157,6 +168,18 @@ export const BubbleMessageDisplay: React.FC<
               ? async () => {
                   try {
                     await props.onDisLike?.(props.originData as any);
+                    bubbleRef?.current?.setMessageItem?.(props.id!, {
+                      feedback: 'thumbsDown',
+                    } as any);
+                  } catch (error) {}
+                }
+              : undefined
+          }
+          onDislike={
+            props.onDislike
+              ? async () => {
+                  try {
+                    await props.onDislike?.(props.originData as any);
                     bubbleRef?.current?.setMessageItem?.(props.id!, {
                       feedback: 'thumbsDown',
                     } as any);
@@ -197,12 +220,13 @@ export const BubbleMessageDisplay: React.FC<
       props?.originData?.extra?.tags?.includes?.('REJECT_TO_ANSWER') ||
       props.originData?.role === 'bot'
     ) {
-      return (
+      return wrapSSR(
         <div
-          style={{
-            lineHeight: '24px',
-          }}
-          className="agent-item-default-content"
+          className={classNames(
+            'agent-item-default-content',
+            `${baseChatCls}-messages-content-message`,
+            hashId,
+          )}
           data-testid="message-box-content"
           onDoubleClick={props.onDoubleClick}
         >
@@ -213,18 +237,14 @@ export const BubbleMessageDisplay: React.FC<
             markdownRenderConfig={props.markdownRenderConfig}
             isFinished={true}
             style={
-              props.originData?.role === 'bot'
-                ? {}
-                : {
-                    color: '#343A45',
-                  }
+              props.originData?.role === 'bot' ? {} : { color: '#343A45' } // 使用类名方式需要传递className，这里保留style以兼容现有API
             }
             extra={extra}
             typing={false}
             originData={props.originData}
             content={props.originData?.content as string}
           />
-        </div>
+        </div>,
       );
     }
     // answerStatus= 'EXCEPTION'时 一定是异常情况
@@ -232,12 +252,12 @@ export const BubbleMessageDisplay: React.FC<
       props.originData?.extra?.answerStatus === 'EXCEPTION' ||
       (props.originData?.extra?.answerStatus && !props.originData?.content)
     ) {
-      return (
+      return wrapSSR(
         <EXCEPTION
           content={props.originData.content as string}
           originData={props.originData}
           extra={isExtraNull ? null : extra}
-        />
+        />,
       );
     }
 
@@ -270,7 +290,7 @@ export const BubbleMessageDisplay: React.FC<
       );
     }
 
-    return (
+    return wrapSSR(
       <MarkdownPreview
         markdownRenderConfig={props.markdownRenderConfig}
         isFinished={props.originData?.isFinished}
@@ -293,13 +313,11 @@ export const BubbleMessageDisplay: React.FC<
               <Popover
                 title={
                   <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      fontSize: '1em',
-                      ...(props?.customConfig?.PopoverProps?.titleStyle || {}),
-                    }}
+                    className={classNames(
+                      `${baseChatCls}-messages-content-popover-title`,
+                      hashId,
+                    )}
+                    style={props?.customConfig?.PopoverProps?.titleStyle}
                   >
                     <div>
                       {locale?.['chat.message.referenceDocument'] || '参考文档'}
@@ -330,16 +348,11 @@ export const BubbleMessageDisplay: React.FC<
                 }
                 content={
                   <div
-                    style={{
-                      width: 400,
-                      display: 'flex',
-                      maxHeight: 400,
-                      overflow: 'auto',
-                      flexDirection: 'column',
-                      gap: 12,
-                      ...(props?.customConfig?.PopoverProps?.contentStyle ||
-                        {}),
-                    }}
+                    className={classNames(
+                      `${baseChatCls}-messages-content-popover-content`,
+                      hashId,
+                    )}
+                    style={props?.customConfig?.PopoverProps?.contentStyle}
                   >
                     <MarkdownEditor
                       style={{
@@ -368,36 +381,25 @@ export const BubbleMessageDisplay: React.FC<
                         }
                       >
                         <div
-                          style={{
-                            borderRadius: '20px',
-                            opacity: 1,
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            padding: '10px',
-                            gap: '10px',
-                            alignSelf: 'stretch',
-                            background: '#FBFCFD',
-                            cursor: 'pointer',
-                            zIndex: 1,
-                          }}
+                          className={classNames(
+                            `${baseChatCls}-messages-content-doc-tag`,
+                            hashId,
+                          )}
                         >
                           <img
-                            style={{
-                              width: 24,
-                            }}
+                            className={classNames(
+                              `${baseChatCls}-messages-content-doc-tag-icon`,
+                              hashId,
+                            )}
                             src={
                               'https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*kF_GTppRbp4AAAAAAAAAAAAADkN6AQ/original'
                             }
                           />
                           <div
-                            style={{
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              WebkitBoxOrient: 'vertical',
-                              WebkitLineClamp: 2,
-                              display: '-webkit-box',
-                            }}
+                            className={classNames(
+                              `${baseChatCls}-messages-content-doc-name`,
+                              hashId,
+                            )}
                           >
                             {item?.doc_name}
                           </div>
@@ -429,13 +431,14 @@ export const BubbleMessageDisplay: React.FC<
             : (props.originData?.content as string) || ''
         }
         originData={props.originData}
-      />
+      />,
     );
   }, [
     content,
     props?.originData?.feedback,
     props.originData?.isFinished,
     props.originData?.isAborted,
+    props.originData?.isLast,
     isExtraNull,
     props.deps,
     props.bubbleRenderConfig?.beforeMessageRender,

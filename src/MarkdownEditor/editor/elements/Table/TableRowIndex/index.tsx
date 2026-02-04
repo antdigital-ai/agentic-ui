@@ -2,7 +2,6 @@ import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { useContext } from 'react';
 import { TableCellIndexSpacer } from '../TableCellIndexSpacer';
-import { useStyle } from './style';
 
 /**
  * TableRowIndex 组件的属性接口
@@ -60,11 +59,10 @@ export const TableRowIndex: React.FC<TableRowIndexProps> = ({
   const baseClassName = context?.getPrefixCls(
     'agentic-md-editor-table-row-index',
   );
-  const { wrapSSR, hashId } = useStyle(baseClassName);
 
-  return wrapSSR(
+  return (
     <tr
-      className={classNames(baseClassName, hashId, className, 'config-tr')}
+      className={classNames(baseClassName, className, 'config-tr')}
       style={style}
     >
       <TableCellIndexSpacer
@@ -86,6 +84,6 @@ export const TableRowIndex: React.FC<TableRowIndexProps> = ({
           tablePath={tablePath}
         />
       ))}
-    </tr>,
+    </tr>
   );
 };

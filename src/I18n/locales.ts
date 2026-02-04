@@ -285,6 +285,10 @@ export const cnLabels = {
   'workspace.title': '工作空间',
   'workspace.searchPlaceholder': '搜索文件名',
   'workspace.noResultsFor': '未找到与「${keyword}」匹配的结果',
+  // 新增：文件预览相关
+  'workspace.file.generating': '正在生成',
+  'workspace.file.processing': '正在处理文件...',
+  'workspace.file.processFailed': '文件处理失败',
   // 工具栏相关
   'toolbar.bold': '加粗',
   'toolbar.italic': '斜体',
@@ -331,6 +335,15 @@ export const cnLabels = {
   'input.voiceInput': '语音输入',
   'input.voiceInputting': '语音输入中，点击可停止。',
   'input.placeholder': '请输入',
+  'input.selectFile': '选择文件',
+  'input.openGallery': '打开相册',
+  'input.openFile': '打开文件',
+  'input.supportedFormatMessage':
+    '支持上传文件，每个文件不超过 ${maxSize}，支持 ${extensions}等格式。',
+  'input.sendButtonTooltip.send': '按 Enter 键发送',
+  'input.sendButtonTooltip.newline': '按 Shift+Enter 键换行',
+  'input.sendButtonTooltip.send.mod': '按 Cmd/Ctrl+Enter 键发送',
+  'input.sendButtonTooltip.newline.mod': '按 Enter 键换行',
   // Other translations
   'common.name': '名称',
   'common.updateTime': '更新时间',
@@ -359,6 +372,12 @@ export const cnLabels = {
   // Upload related
   'upload.notConfigured': '图片上传功能未配置',
   'upload.failed': '图片上传失败',
+  'browser.noResults': '暂无结果',
+  'browser.totalResults': '共${count}个结果',
+  'browser.searching': '搜索中...',
+  'layout.header.title': 'AI 助手',
+  theme: '主题',
+  expandCollapse: '展开/收起',
 };
 
 /**
@@ -651,6 +670,10 @@ export const enLabels: typeof cnLabels = {
   'workspace.title': 'Workspace',
   'workspace.searchPlaceholder': 'Search file name',
   'workspace.noResultsFor': 'No results for "${keyword}"',
+  // New: File preview related
+  'workspace.file.generating': 'Generating',
+  'workspace.file.processing': 'Processing file...',
+  'workspace.file.processFailed': 'File processing failed',
   // Toolbar related
   'toolbar.bold': 'Bold',
   'toolbar.italic': 'Italic',
@@ -699,6 +722,15 @@ export const enLabels: typeof cnLabels = {
   'input.voiceInput': 'Voice input',
   'input.voiceInputting': 'Voice input in progress, click to stop.',
   'input.placeholder': 'Please input',
+  'input.selectFile': 'Select File',
+  'input.openGallery': 'Open Gallery',
+  'input.openFile': 'Open File',
+  'input.supportedFormatMessage':
+    'Supports file upload, each file not exceeding ${maxSize}, formats such as ${extensions}.',
+  'input.sendButtonTooltip.send': 'Press Enter to send',
+  'input.sendButtonTooltip.newline': 'Press Shift+Enter for new line',
+  'input.sendButtonTooltip.send.mod': 'Press Cmd/Ctrl+Enter to send',
+  'input.sendButtonTooltip.newline.mod': 'Press Enter for new line',
   // Other translations
   'common.name': 'Name',
   'common.updateTime': 'Update Time',
@@ -727,4 +759,10 @@ export const enLabels: typeof cnLabels = {
   // Upload related
   'upload.notConfigured': 'Image upload function not configured',
   'upload.failed': 'Image upload failed',
+  'browser.noResults': 'No results found',
+  'browser.totalResults': 'Total ${count} results',
+  'browser.searching': 'Searching...',
+  'layout.header.title': 'AI Assistant',
+  theme: 'Theme',
+  expandCollapse: 'Expand/Collapse',
 };

@@ -40,10 +40,15 @@ export function useOnchange(
     onChange?.(parserSlateNodeToMarkdown(editor.children), editor.children);
   }, 16);
 
-  const { setRefreshFloatBar, setDomRect, refreshFloatBar } = useEditorStore();
+  const { setRefreshFloatBar, setDomRect, refreshFloatBar, readonly } =
+    useEditorStore();
 
   return React.useMemo(() => {
     return (_value: any, _operations: BaseOperation[]) => {
+      // 只读且仅选区变化时，跳过 Editor.nodes、selChange$、setDomRect 等，提升性能
+      if (readonly && _operations.every((o) => o.type === 'set_selection')) {
+        return;
+      }
       if (
         onChangeDebounce &&
         _operations.some((o) => o.type !== 'set_selection')
@@ -103,5 +108,5 @@ export function useOnchange(
         }
       } catch (error) {}
     };
-  }, [editor]);
+  }, [editor, readonly]);
 }

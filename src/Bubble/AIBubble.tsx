@@ -1,6 +1,5 @@
 import { memo, MutableRefObject, useContext } from 'react';
 
-import { Loader } from '@sofa-design/icons';
 import { ConfigProvider, Flex } from 'antd';
 import cx from 'classnames';
 import React from 'react';
@@ -25,15 +24,6 @@ export const runRender = (
   ...rest: undefined[]
 ) => {
   return render ? render(props, defaultDom, ...rest) : defaultDom;
-};
-
-const isTyping = (originData: any) => {
-  return (
-    originData?.isAborted !== true &&
-    originData?.isFinished === false &&
-    originData?.extra?.isHistory === undefined &&
-    originData?.isFinished !== undefined
-  );
 };
 
 const isSameRoleAsPrevious = (preMessage: any, originData: any) => {
@@ -101,7 +91,6 @@ export const AIBubble: React.FC<
   const prefixClass = getPrefixCls('agentic');
   const { wrapSSR, hashId } = useStyle(prefixClass);
 
-  const typing = isTyping(originData);
   const preMessageSameRole = isSameRoleAsPrevious(preMessage, originData);
   const time = originData?.createAt || props.time;
   const avatar = originData?.meta || props.avatar;
@@ -153,10 +142,12 @@ export const AIBubble: React.FC<
       placement={placement}
       time={props.originData?.updateAt || props.originData?.createAt}
       onDisLike={props.onDisLike}
+      onDislike={props.onDislike}
       onLike={props.onLike}
       customConfig={props?.bubbleRenderConfig?.customConfig}
       pure={props.pure}
       onCancelLike={props.onCancelLike}
+      onLikeCancel={props.onLikeCancel}
       shouldShowCopy={props.shouldShowCopy}
       fileViewEvents={props.fileViewEvents}
       fileViewConfig={props.fileViewConfig}
@@ -374,7 +365,6 @@ export const AIBubble: React.FC<
                 )}
               >
                 {avatarDom}
-                {typing && <Loader style={{ fontSize: 16 }} />}
                 {titleDom}
               </div>
             ),
@@ -387,6 +377,7 @@ export const AIBubble: React.FC<
                   rightRender={props?.bubbleRenderConfig?.extraRightRender}
                   onReply={props.onReply}
                   onCancelLike={props.onCancelLike}
+                  onLikeCancel={props.onLikeCancel}
                   shouldShowCopy={props.shouldShowCopy}
                   useSpeech={props.useSpeech}
                   shouldShowVoice={props.shouldShowVoice}
@@ -395,6 +386,21 @@ export const AIBubble: React.FC<
                       ? async () => {
                           try {
                             await props.onDisLike?.(props.originData as any);
+                            props.bubbleRef?.current?.setMessageItem?.(
+                              props.id!,
+                              {
+                                feedback: 'thumbsDown',
+                              } as any,
+                            );
+                          } catch (error) {}
+                        }
+                      : undefined
+                  }
+                  onDislike={
+                    props.onDislike
+                      ? async () => {
+                          try {
+                            await props.onDislike?.(props.originData as any);
                             props.bubbleRef?.current?.setMessageItem?.(
                               props.id!,
                               {

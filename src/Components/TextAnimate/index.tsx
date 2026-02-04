@@ -421,6 +421,7 @@ const TextAnimateBase = ({
             variants={finalVariants.item}
             custom={i * staggerTimings[by]}
             className={classNames(
+              `${prefixCls}-item`,
               `${prefixCls}-item-${by}`,
               hashId,
               segmentClassName,

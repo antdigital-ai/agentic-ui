@@ -1,0 +1,3464 @@
+<DocumentFragment>
+  <div
+    class="ant-app"
+  >
+    <div>
+      test
+    </div>
+    <div
+      style="border-radius: var(--radius-modal-base); background: var(color-gray-bg-page-light); box-shadow: var(--shadow-control-base); width: min(830px,100%); display: flex; flex-direction: column; justify-content: space-between; padding: 0px; z-index: 0; margin: 24px auto;"
+    >
+      <div
+        style="padding: 16px; display: flex; flex-direction: row; align-items: center; box-sizing: border-box; border-width: 0px 0px 1px 0px; border-style: solid; border-color: rgba(0, 16, 32, 0.063);"
+      >
+        <span
+          style="font-size: 13px; color: rgba(0, 0, 0, 0.45);"
+        >
+          🚀 BubbleList 懒加载示例
+        </span>
+        <div
+          style="font-size: 12px; color: rgba(0, 0, 0, 0.45);"
+        >
+          共 200 条消息（用户: 100，助手: 100）
+        </div>
+      </div>
+      <div>
+        <div
+          style="padding: 24px 24px 16px 24px; border-bottom: 1px solid rgb(240, 240, 240);"
+        >
+          <div
+            class="ant-space ant-space-vertical ant-space-gap-row-middle ant-space-gap-col-middle"
+            style="width: 100%;"
+          >
+            <div
+              class="ant-space-item"
+            >
+              <div
+                style="display: flex; justify-content: space-between; align-items: center;"
+              >
+                <div>
+                  <strong>
+                    启用懒加载：
+                  </strong>
+                  <span
+                    style="margin-left: 8px; color: rgb(102, 102, 102); font-size: 12px;"
+                  >
+                    只渲染可见区域内的气泡，提升性能
+                  </span>
+                </div>
+                <button
+                  aria-checked="true"
+                  class="ant-switch ant-switch-checked"
+                  role="switch"
+                  type="button"
+                >
+                  <div
+                    class="ant-switch-handle"
+                  />
+                  <span
+                    class="ant-switch-inner"
+                  >
+                    <span
+                      class="ant-switch-inner-checked"
+                    >
+                      开启
+                    </span>
+                    <span
+                      class="ant-switch-inner-unchecked"
+                    >
+                      关闭
+                    </span>
+                  </span>
+                </button>
+              </div>
+            </div>
+            <div
+              class="ant-space-item"
+            >
+              <div
+                class="ant-space ant-space-horizontal ant-space-align-center ant-space-gap-row-large ant-space-gap-col-large"
+              >
+                <div
+                  class="ant-space-item"
+                >
+                  <div
+                    class="ant-statistic"
+                  >
+                    <div
+                      class="ant-statistic-title"
+                    >
+                      消息总数
+                    </div>
+                    <div
+                      class="ant-statistic-content"
+                      style="font-size: 16px;"
+                    >
+                      <span
+                        class="ant-statistic-content-value"
+                      >
+                        <span
+                          class="ant-statistic-content-value-int"
+                        >
+                          200
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="ant-space-item"
+                >
+                  <div
+                    class="ant-statistic"
+                  >
+                    <div
+                      class="ant-statistic-title"
+                    >
+                      用户消息
+                    </div>
+                    <div
+                      class="ant-statistic-content"
+                      style="font-size: 16px;"
+                    >
+                      <span
+                        class="ant-statistic-content-value"
+                      >
+                        <span
+                          class="ant-statistic-content-value-int"
+                        >
+                          100
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="ant-space-item"
+                >
+                  <div
+                    class="ant-statistic"
+                  >
+                    <div
+                      class="ant-statistic-title"
+                    >
+                      助手消息
+                    </div>
+                    <div
+                      class="ant-statistic-content"
+                      style="font-size: 16px;"
+                    >
+                      <span
+                        class="ant-statistic-content-value"
+                      >
+                        <span
+                          class="ant-statistic-content-value-int"
+                        >
+                          100
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="ant-agentic-bubble-list"
+          data-chat-list="200"
+          style="height: 600px; overflow: auto;"
+        >
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (1/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (2/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (3/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (4/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (5/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (6/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (7/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (8/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (9/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (10/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (11/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (12/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (13/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (14/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (15/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (16/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (17/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (18/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (19/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (20/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (21/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (22/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (23/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (24/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (25/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (26/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (27/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (28/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (29/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (30/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (31/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (32/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (33/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (34/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (35/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (36/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (37/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (38/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (39/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (40/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (41/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (42/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (43/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (44/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (45/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (46/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (47/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (48/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (49/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (50/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (51/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (52/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (53/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (54/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (55/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (56/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (57/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (58/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (59/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (60/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (61/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (62/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (63/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (64/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (65/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (66/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (67/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (68/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (69/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (70/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (71/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (72/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (73/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (74/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (75/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (76/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (77/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (78/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (79/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (80/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (81/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (82/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (83/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (84/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (85/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (86/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (87/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (88/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (89/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (90/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (91/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (92/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (93/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (94/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (95/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (96/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (97/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (98/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (99/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (100/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (101/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (102/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (103/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (104/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (105/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (106/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (107/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (108/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (109/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (110/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (111/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (112/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (113/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (114/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (115/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (116/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (117/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (118/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (119/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (120/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (121/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (122/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (123/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (124/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (125/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (126/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (127/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (128/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (129/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (130/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (131/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (132/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (133/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (134/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (135/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (136/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (137/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (138/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (139/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (140/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (141/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (142/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (143/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (144/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (145/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (146/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (147/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (148/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (149/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (150/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (151/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (152/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (153/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (154/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (155/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (156/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (157/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (158/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (159/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (160/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (161/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (162/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (163/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (164/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (165/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (166/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (167/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (168/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (169/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (170/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (171/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (172/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (173/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (174/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (175/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (176/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (177/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (178/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (179/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (180/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (181/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (182/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (183/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (184/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (185/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (186/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (187/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (188/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                🤖 加载中... (189/200)
+              </span>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+          >
+            <div
+              style="min-height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; color: rgb(153, 153, 153); font-size: 12px;"
+            >
+              <span>
+                👤 加载中... (190/200)
+              </span>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="msg-190"
+            id="msg-190"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+            >
+              <div
+                class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+              >
+                <span
+                  class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                  data-testid="bubble-avatar"
+                  style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                >
+                  <img
+                    alt="avatar"
+                    src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                  />
+                </span>
+                <div
+                  class="ant-agentic-bubble-title ant-flex"
+                  data-testid="bubble-title"
+                  style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                >
+                  <span>
+                    AI助手
+                  </span>
+                  <time
+                    class="ant-agentic-bubble-title-time"
+                    data-testid="bubble-time"
+                  >
+                    2024-02-27 17:20:00
+                  </time>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+              >
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                  >
+                    <div
+                      class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                      style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor-container"
+                        style="height: 100%;"
+                        tabindex="-1"
+                      >
+                        <div
+                          autocapitalize="false"
+                          autocorrect="false"
+                          class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                          contenteditable="false"
+                          data-slate-editor="true"
+                          data-slate-node="value"
+                          spellcheck="false"
+                          style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                          translate="no"
+                          zindex="-1"
+                        >
+                          <div
+                            class=""
+                            data-be="paragraph"
+                            data-slate-node="element"
+                          >
+                            <span
+                              data-slate-node="text"
+                            >
+                              <span
+                                data-be="text"
+                                data-slate-leaf="true"
+                                draggable="false"
+                              >
+                                <span
+                                  data-slate-string="true"
+                                >
+                                  [消息 191] 这是一条测试消息，用于展示懒加载功能。
+                                </span>
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-chat-item-extra"
+                      style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                    >
+                      <div
+                        animate="visible"
+                        class="ant-chat-item-extra-action-box"
+                        initial="hidden"
+                        style="display: flex; gap: 8px; align-items: center;"
+                        variants="[object Object]"
+                        whileinview="visible"
+                      >
+                        <span
+                          aria-describedby="test-id"
+                          aria-label="复制"
+                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                          data-testid="chat-item-copy-button"
+                          data-title="复制"
+                          role="button"
+                          tabindex="0"
+                        >
+                          <div
+                            aria-hidden="true"
+                            class="ant-bubble-actions-lottie"
+                            data-autoplay="false"
+                            data-loop="false"
+                            data-testid="lottie-animation"
+                            lottieref="[object Object]"
+                            style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="msg-191"
+            id="msg-191"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container"
+            >
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+              >
+                <div
+                  class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+                >
+                  <div
+                    class="ant-agentic-bubble-title ant-flex"
+                    data-testid="bubble-title"
+                    style="flex-direction: row-reverse; display: flex; align-items: center; gap: 8px;"
+                  >
+                    <time
+                      class="ant-agentic-bubble-title-time"
+                      data-testid="bubble-time"
+                    >
+                      2024-02-27 17:20:00
+                    </time>
+                  </div>
+                </div>
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    class="agent-item-default-content ant-agentic-ui-display-messages-content-message"
+                    data-testid="message-box-content"
+                  >
+                    <div
+                      aria-describedby="test-id"
+                      style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                        style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                      >
+                        <div
+                          class="ant-agentic-md-editor-container"
+                          style="height: 100%; color: rgb(52, 58, 69);"
+                          tabindex="-1"
+                        >
+                          <div
+                            autocapitalize="false"
+                            autocorrect="false"
+                            class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                            contenteditable="false"
+                            data-slate-editor="true"
+                            data-slate-node="value"
+                            spellcheck="false"
+                            style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                            translate="no"
+                            zindex="-1"
+                          >
+                            <div
+                              class=""
+                              data-be="paragraph"
+                              data-slate-node="element"
+                            >
+                              <span
+                                data-slate-node="text"
+                              >
+                                <span
+                                  data-be="text"
+                                  data-slate-leaf="true"
+                                  draggable="false"
+                                >
+                                  <span
+                                    data-slate-string="true"
+                                  >
+                                    [消息 192] 懒加载可以显著提升长列表的渲染性能。
+                                  </span>
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="msg-192"
+            id="msg-192"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+            >
+              <div
+                class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+              >
+                <span
+                  class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                  data-testid="bubble-avatar"
+                  style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                >
+                  <img
+                    alt="avatar"
+                    src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                  />
+                </span>
+                <div
+                  class="ant-agentic-bubble-title ant-flex"
+                  data-testid="bubble-title"
+                  style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                >
+                  <span>
+                    AI助手
+                  </span>
+                  <time
+                    class="ant-agentic-bubble-title-time"
+                    data-testid="bubble-time"
+                  >
+                    2024-02-27 17:20:00
+                  </time>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+              >
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                  >
+                    <div
+                      class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                      style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor-container"
+                        style="height: 100%;"
+                        tabindex="-1"
+                      >
+                        <div
+                          autocapitalize="false"
+                          autocorrect="false"
+                          class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                          contenteditable="false"
+                          data-slate-editor="true"
+                          data-slate-node="value"
+                          spellcheck="false"
+                          style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                          translate="no"
+                          zindex="-1"
+                        >
+                          <div
+                            class=""
+                            data-be="paragraph"
+                            data-slate-node="element"
+                          >
+                            <span
+                              data-slate-node="text"
+                            >
+                              <span
+                                data-be="text"
+                                data-slate-leaf="true"
+                                draggable="false"
+                              >
+                                <span
+                                  data-slate-string="true"
+                                >
+                                  [消息 193] 只有进入视口的气泡才会被渲染。
+                                </span>
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-chat-item-extra"
+                      style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                    >
+                      <div
+                        animate="visible"
+                        class="ant-chat-item-extra-action-box"
+                        initial="hidden"
+                        style="display: flex; gap: 8px; align-items: center;"
+                        variants="[object Object]"
+                        whileinview="visible"
+                      >
+                        <span
+                          aria-describedby="test-id"
+                          aria-label="复制"
+                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                          data-testid="chat-item-copy-button"
+                          data-title="复制"
+                          role="button"
+                          tabindex="0"
+                        >
+                          <div
+                            aria-hidden="true"
+                            class="ant-bubble-actions-lottie"
+                            data-autoplay="false"
+                            data-loop="false"
+                            data-testid="lottie-animation"
+                            lottieref="[object Object]"
+                            style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="msg-193"
+            id="msg-193"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container"
+            >
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+              >
+                <div
+                  class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+                >
+                  <div
+                    class="ant-agentic-bubble-title ant-flex"
+                    data-testid="bubble-title"
+                    style="flex-direction: row-reverse; display: flex; align-items: center; gap: 8px;"
+                  >
+                    <time
+                      class="ant-agentic-bubble-title-time"
+                      data-testid="bubble-time"
+                    >
+                      2024-02-27 17:20:00
+                    </time>
+                  </div>
+                </div>
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    class="agent-item-default-content ant-agentic-ui-display-messages-content-message"
+                    data-testid="message-box-content"
+                  >
+                    <div
+                      aria-describedby="test-id"
+                      style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                        style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                      >
+                        <div
+                          class="ant-agentic-md-editor-container"
+                          style="height: 100%; color: rgb(52, 58, 69);"
+                          tabindex="-1"
+                        >
+                          <div
+                            autocapitalize="false"
+                            autocorrect="false"
+                            class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                            contenteditable="false"
+                            data-slate-editor="true"
+                            data-slate-node="value"
+                            spellcheck="false"
+                            style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                            translate="no"
+                            zindex="-1"
+                          >
+                            <div
+                              class=""
+                              data-be="paragraph"
+                              data-slate-node="element"
+                            >
+                              <span
+                                data-slate-node="text"
+                              >
+                                <span
+                                  data-be="text"
+                                  data-slate-leaf="true"
+                                  draggable="false"
+                                >
+                                  <span
+                                    data-slate-string="true"
+                                  >
+                                    [消息 194] 这样可以减少初始渲染时间，提升用户体验。
+                                  </span>
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="msg-194"
+            id="msg-194"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+            >
+              <div
+                class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+              >
+                <span
+                  class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                  data-testid="bubble-avatar"
+                  style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                >
+                  <img
+                    alt="avatar"
+                    src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                  />
+                </span>
+                <div
+                  class="ant-agentic-bubble-title ant-flex"
+                  data-testid="bubble-title"
+                  style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                >
+                  <span>
+                    AI助手
+                  </span>
+                  <time
+                    class="ant-agentic-bubble-title-time"
+                    data-testid="bubble-time"
+                  >
+                    2024-02-27 17:20:00
+                  </time>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+              >
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                  >
+                    <div
+                      class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                      style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor-container"
+                        style="height: 100%;"
+                        tabindex="-1"
+                      >
+                        <div
+                          autocapitalize="false"
+                          autocorrect="false"
+                          class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                          contenteditable="false"
+                          data-slate-editor="true"
+                          data-slate-node="value"
+                          spellcheck="false"
+                          style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                          translate="no"
+                          zindex="-1"
+                        >
+                          <div
+                            class=""
+                            data-be="paragraph"
+                            data-slate-node="element"
+                          >
+                            <span
+                              data-slate-node="text"
+                            >
+                              <span
+                                data-be="text"
+                                data-slate-leaf="true"
+                                draggable="false"
+                              >
+                                <span
+                                  data-slate-string="true"
+                                >
+                                  [消息 195] IntersectionObserver API 用于检测元素是否进入视口。
+                                </span>
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-chat-item-extra"
+                      style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                    >
+                      <div
+                        animate="visible"
+                        class="ant-chat-item-extra-action-box"
+                        initial="hidden"
+                        style="display: flex; gap: 8px; align-items: center;"
+                        variants="[object Object]"
+                        whileinview="visible"
+                      >
+                        <span
+                          aria-describedby="test-id"
+                          aria-label="复制"
+                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                          data-testid="chat-item-copy-button"
+                          data-title="复制"
+                          role="button"
+                          tabindex="0"
+                        >
+                          <div
+                            aria-hidden="true"
+                            class="ant-bubble-actions-lottie"
+                            data-autoplay="false"
+                            data-loop="false"
+                            data-testid="lottie-animation"
+                            lottieref="[object Object]"
+                            style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="msg-195"
+            id="msg-195"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container"
+            >
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+              >
+                <div
+                  class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+                >
+                  <div
+                    class="ant-agentic-bubble-title ant-flex"
+                    data-testid="bubble-title"
+                    style="flex-direction: row-reverse; display: flex; align-items: center; gap: 8px;"
+                  >
+                    <time
+                      class="ant-agentic-bubble-title-time"
+                      data-testid="bubble-time"
+                    >
+                      2024-02-27 17:20:00
+                    </time>
+                  </div>
+                </div>
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    class="agent-item-default-content ant-agentic-ui-display-messages-content-message"
+                    data-testid="message-box-content"
+                  >
+                    <div
+                      aria-describedby="test-id"
+                      style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                        style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                      >
+                        <div
+                          class="ant-agentic-md-editor-container"
+                          style="height: 100%; color: rgb(52, 58, 69);"
+                          tabindex="-1"
+                        >
+                          <div
+                            autocapitalize="false"
+                            autocorrect="false"
+                            class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                            contenteditable="false"
+                            data-slate-editor="true"
+                            data-slate-node="value"
+                            spellcheck="false"
+                            style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                            translate="no"
+                            zindex="-1"
+                          >
+                            <div
+                              class=""
+                              data-be="paragraph"
+                              data-slate-node="element"
+                            >
+                              <span
+                                data-slate-node="text"
+                              >
+                                <span
+                                  data-be="text"
+                                  data-slate-leaf="true"
+                                  draggable="false"
+                                >
+                                  <span
+                                    data-slate-string="true"
+                                  >
+                                    [消息 196] 占位符保持布局稳定，避免滚动时的跳动。
+                                  </span>
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="msg-196"
+            id="msg-196"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+            >
+              <div
+                class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+              >
+                <span
+                  class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                  data-testid="bubble-avatar"
+                  style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                >
+                  <img
+                    alt="avatar"
+                    src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                  />
+                </span>
+                <div
+                  class="ant-agentic-bubble-title ant-flex"
+                  data-testid="bubble-title"
+                  style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                >
+                  <span>
+                    AI助手
+                  </span>
+                  <time
+                    class="ant-agentic-bubble-title-time"
+                    data-testid="bubble-time"
+                  >
+                    2024-02-27 17:20:00
+                  </time>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+              >
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                  >
+                    <div
+                      class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                      style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor-container"
+                        style="height: 100%;"
+                        tabindex="-1"
+                      >
+                        <div
+                          autocapitalize="false"
+                          autocorrect="false"
+                          class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                          contenteditable="false"
+                          data-slate-editor="true"
+                          data-slate-node="value"
+                          spellcheck="false"
+                          style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                          translate="no"
+                          zindex="-1"
+                        >
+                          <div
+                            class=""
+                            data-be="paragraph"
+                            data-slate-node="element"
+                          >
+                            <span
+                              data-slate-node="text"
+                            >
+                              <span
+                                data-be="text"
+                                data-slate-leaf="true"
+                                draggable="false"
+                              >
+                                <span
+                                  data-slate-string="true"
+                                >
+                                  [消息 197] 支持自定义占位符高度和提前加载距离。
+                                </span>
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-chat-item-extra"
+                      style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                    >
+                      <div
+                        animate="visible"
+                        class="ant-chat-item-extra-action-box"
+                        initial="hidden"
+                        style="display: flex; gap: 8px; align-items: center;"
+                        variants="[object Object]"
+                        whileinview="visible"
+                      >
+                        <span
+                          aria-describedby="test-id"
+                          aria-label="复制"
+                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                          data-testid="chat-item-copy-button"
+                          data-title="复制"
+                          role="button"
+                          tabindex="0"
+                        >
+                          <div
+                            aria-hidden="true"
+                            class="ant-bubble-actions-lottie"
+                            data-autoplay="false"
+                            data-loop="false"
+                            data-testid="lottie-animation"
+                            lottieref="[object Object]"
+                            style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="msg-197"
+            id="msg-197"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container"
+            >
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+              >
+                <div
+                  class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+                >
+                  <div
+                    class="ant-agentic-bubble-title ant-flex"
+                    data-testid="bubble-title"
+                    style="flex-direction: row-reverse; display: flex; align-items: center; gap: 8px;"
+                  >
+                    <time
+                      class="ant-agentic-bubble-title-time"
+                      data-testid="bubble-time"
+                    >
+                      2024-02-27 17:20:00
+                    </time>
+                  </div>
+                </div>
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    class="agent-item-default-content ant-agentic-ui-display-messages-content-message"
+                    data-testid="message-box-content"
+                  >
+                    <div
+                      aria-describedby="test-id"
+                      style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                        style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                      >
+                        <div
+                          class="ant-agentic-md-editor-container"
+                          style="height: 100%; color: rgb(52, 58, 69);"
+                          tabindex="-1"
+                        >
+                          <div
+                            autocapitalize="false"
+                            autocorrect="false"
+                            class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                            contenteditable="false"
+                            data-slate-editor="true"
+                            data-slate-node="value"
+                            spellcheck="false"
+                            style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                            translate="no"
+                            zindex="-1"
+                          >
+                            <div
+                              class=""
+                              data-be="paragraph"
+                              data-slate-node="element"
+                            >
+                              <span
+                                data-slate-node="text"
+                              >
+                                <span
+                                  data-be="text"
+                                  data-slate-leaf="true"
+                                  draggable="false"
+                                >
+                                  <span
+                                    data-slate-string="true"
+                                  >
+                                    [消息 198] 适用于包含大量消息的聊天场景。
+                                  </span>
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="msg-198"
+            id="msg-198"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+            >
+              <div
+                class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+              >
+                <span
+                  class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                  data-testid="bubble-avatar"
+                  style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+                >
+                  <img
+                    alt="avatar"
+                    src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                  />
+                </span>
+                <div
+                  class="ant-agentic-bubble-title ant-flex"
+                  data-testid="bubble-title"
+                  style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+                >
+                  <span>
+                    AI助手
+                  </span>
+                  <time
+                    class="ant-agentic-bubble-title-time"
+                    data-testid="bubble-time"
+                  >
+                    2024-02-27 17:20:00
+                  </time>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+              >
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                  >
+                    <div
+                      class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                      style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor-container"
+                        style="height: 100%;"
+                        tabindex="-1"
+                      >
+                        <div
+                          autocapitalize="false"
+                          autocorrect="false"
+                          class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                          contenteditable="false"
+                          data-slate-editor="true"
+                          data-slate-node="value"
+                          spellcheck="false"
+                          style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                          translate="no"
+                          zindex="-1"
+                        >
+                          <div
+                            class=""
+                            data-be="paragraph"
+                            data-slate-node="element"
+                          >
+                            <span
+                              data-slate-node="text"
+                            >
+                              <span
+                                data-be="text"
+                                data-slate-leaf="true"
+                                draggable="false"
+                              >
+                                <span
+                                  data-slate-string="true"
+                                >
+                                  [消息 199] 性能优化是前端开发的重要课题。
+                                </span>
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-chat-item-extra"
+                      style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                    >
+                      <div
+                        animate="visible"
+                        class="ant-chat-item-extra-action-box"
+                        initial="hidden"
+                        style="display: flex; gap: 8px; align-items: center;"
+                        variants="[object Object]"
+                        whileinview="visible"
+                      >
+                        <span
+                          aria-describedby="test-id"
+                          aria-label="复制"
+                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                          data-testid="chat-item-copy-button"
+                          data-title="复制"
+                          role="button"
+                          tabindex="0"
+                        >
+                          <div
+                            aria-hidden="true"
+                            class="ant-bubble-actions-lottie"
+                            data-autoplay="false"
+                            data-loop="false"
+                            data-testid="lottie-animation"
+                            lottieref="[object Object]"
+                            style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user ant-flex ant-flex-align-stretch ant-flex-vertical"
+            data-id="msg-199"
+            id="msg-199"
+            style="gap: 12px;"
+          >
+            <div
+              class="ant-agentic-bubble-container"
+            >
+              <div
+                class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user"
+                data-testid="chat-message"
+                style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+              >
+                <div
+                  class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+                >
+                  <div
+                    class="ant-agentic-bubble-title ant-flex"
+                    data-testid="bubble-title"
+                    style="flex-direction: row-reverse; display: flex; align-items: center; gap: 8px;"
+                  >
+                    <time
+                      class="ant-agentic-bubble-title-time"
+                      data-testid="bubble-time"
+                    >
+                      2024-02-27 17:20:00
+                    </time>
+                  </div>
+                </div>
+                <div
+                  class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user"
+                  data-testid="message-content"
+                  style="min-width: 0px;"
+                >
+                  <div
+                    class="agent-item-default-content ant-agentic-ui-display-messages-content-message"
+                    data-testid="message-box-content"
+                  >
+                    <div
+                      aria-describedby="test-id"
+                      style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                        style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                      >
+                        <div
+                          class="ant-agentic-md-editor-container"
+                          style="height: 100%; color: rgb(52, 58, 69);"
+                          tabindex="-1"
+                        >
+                          <div
+                            autocapitalize="false"
+                            autocorrect="false"
+                            class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                            contenteditable="false"
+                            data-slate-editor="true"
+                            data-slate-node="value"
+                            spellcheck="false"
+                            style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                            translate="no"
+                            zindex="-1"
+                          >
+                            <div
+                              class=""
+                              data-be="paragraph"
+                              data-slate-node="element"
+                            >
+                              <span
+                                data-slate-node="text"
+                              >
+                                <span
+                                  data-be="text"
+                                  data-slate-leaf="true"
+                                  draggable="false"
+                                >
+                                  <span
+                                    data-slate-string="true"
+                                  >
+                                    [消息 200] 通过懒加载可以减少 DOM 节点数量。
+                                  </span>
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          style="padding: 16px; background: rgb(230, 247, 255); border-radius: 8px; font-size: 14px; margin: 16px;"
+        >
+          <strong>
+            📖 懒加载功能说明：
+          </strong>
+          <ul
+            style="margin: 8px 0px 0px 0px; padding-left: 20px;"
+          >
+            <li>
+              <strong>
+                性能优化：
+              </strong>
+              只渲染可见区域内的气泡，减少初始 DOM 节点数量
+            </li>
+            <li>
+              <strong>
+                占位符：
+              </strong>
+              使用占位符保持布局稳定，避免滚动时的布局跳动
+            </li>
+            <li>
+              <strong>
+                提前加载：
+              </strong>
+              通过 rootMargin 配置提前加载距离（默认 200px）
+            </li>
+            <li>
+              <strong>
+                自定义占位符：
+              </strong>
+              支持通过 renderPlaceholder 自定义占位符渲染
+            </li>
+            <li>
+              <strong>
+                元素信息：
+              </strong>
+              占位符渲染函数可以获取气泡的索引、总数和角色信息
+            </li>
+            <li>
+              <strong>
+                适用场景：
+              </strong>
+              适用于包含大量消息的长列表场景，如聊天记录、消息历史等
+            </li>
+          </ul>
+        </div>
+        <style>
+          
+          @keyframes loading {
+            0% {
+              background-position: 200% 0;
+            }
+            100% {
+              background-position: -200% 0;
+            }
+          }
+        
+        </style>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>

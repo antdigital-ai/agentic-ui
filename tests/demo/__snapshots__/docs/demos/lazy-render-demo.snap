@@ -48,10 +48,11 @@
       </div>
       <div
         class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
-        style="width: 100%; height: 600px; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default); border: 1px solid rgb(217, 217, 217); border-radius: 8px;"
+        style="width: 100%; height: 600px; border: 1px solid rgb(217, 217, 217); border-radius: 8px;"
       >
         <div
-          style="padding: 4px 20px; overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none;"
+          class="ant-agentic-md-editor-container"
+          style="height: 100%;"
           tabindex="-1"
         >
           <div
@@ -62,7 +63,8 @@
             data-slate-editor="true"
             data-slate-node="value"
             spellcheck="false"
-            style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+            style="position: relative; white-space: pre-wrap; word-wrap: break-word;"
+            translate="no"
             zindex="-1"
           >
             <div

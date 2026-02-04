@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -38,16 +38,21 @@ describe('ActionIconBox 组件', () => {
     );
 
     const button = screen.getByTestId('action-icon-box');
-    fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(handleClick).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      fireEvent.click(button);
+      // 等待 Promise 完成
+      await Promise.resolve();
     });
+
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it('应该处理异步点击事件', async () => {
     const asyncClick = vi.fn(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
     });
 
     render(
@@ -59,14 +64,19 @@ describe('ActionIconBox 组件', () => {
     const button = screen.getByTestId('action-icon-box');
     fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(asyncClick).toHaveBeenCalledTimes(1);
+    // 等待真实的 setTimeout 完成
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
+
+    expect(asyncClick).toHaveBeenCalledTimes(1);
   });
 
   it('应该在加载时显示加载图标', async () => {
     const handleClick = vi.fn(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
     });
 
     const { container } = render(
@@ -79,10 +89,12 @@ describe('ActionIconBox 组件', () => {
     fireEvent.click(button);
 
     // 检查是否显示加载图标
-    await waitFor(() => {
-      const loadingIcon = container.querySelector('.anticon-loading');
-      expect(loadingIcon).toBeInTheDocument();
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
     });
+
+    const loadingIcon = container.querySelector('.anticon-loading');
+    expect(loadingIcon).toBeInTheDocument();
   });
 
   it('应该支持受控的加载状态', () => {
@@ -98,7 +110,9 @@ describe('ActionIconBox 组件', () => {
 
   it('应该在加载时阻止重复点击', async () => {
     const handleClick = vi.fn(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
     });
 
     render(
@@ -114,10 +128,12 @@ describe('ActionIconBox 组件', () => {
     fireEvent.click(button);
     fireEvent.click(button);
 
-    await waitFor(() => {
-      // 应该只被调用一次
-      expect(handleClick).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
     });
+
+    // 应该只被调用一次
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it('应该支持 danger 类型', () => {
@@ -242,11 +258,14 @@ describe('ActionIconBox 组件', () => {
     );
 
     const button = screen.getByTestId('action-icon-box');
-    fireEvent.keyDown(button, { key: 'Enter' });
 
-    await waitFor(() => {
-      expect(handleClick).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      fireEvent.keyDown(button, { key: 'Enter' });
+      // 等待 Promise 完成
+      await Promise.resolve();
     });
+
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it('应该支持键盘导航（空格键）', async () => {
@@ -259,11 +278,14 @@ describe('ActionIconBox 组件', () => {
     );
 
     const button = screen.getByTestId('action-icon-box');
-    fireEvent.keyDown(button, { key: ' ' });
 
-    await waitFor(() => {
-      expect(handleClick).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      fireEvent.keyDown(button, { key: ' ' });
+      // 等待 Promise 完成
+      await Promise.resolve();
     });
+
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it('应该忽略其他键盘按键', () => {
@@ -339,7 +361,7 @@ describe('ActionIconBox 组件', () => {
   });
 
   it('应该支持自定义图标样式', () => {
-    const { container } = render(
+    render(
       <ActionIconBox title="图标样式" iconStyle={{ fontSize: '20px' }}>
         <TestIcon />
       </ActionIconBox>,
@@ -390,7 +412,9 @@ describe('ActionIconBox 组件', () => {
   it('应该触发 onLoadingChange 回调', async () => {
     const handleLoadingChange = vi.fn();
     const handleClick = vi.fn(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
     });
 
     render(
@@ -406,8 +430,10 @@ describe('ActionIconBox 组件', () => {
     const button = screen.getByTestId('action-icon-box');
     fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(handleLoadingChange).toHaveBeenCalled();
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
     });
+
+    expect(handleLoadingChange).toHaveBeenCalled();
   });
 });

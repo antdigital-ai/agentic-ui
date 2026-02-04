@@ -225,7 +225,11 @@ export class EditorUtils {
         const [selectNodes, selectPath] = nodeEntries[0];
 
         // 处理列表转段落的特殊情况
-        if ((selectNodes as any).type === 'list') {
+        if (
+          (selectNodes as any).type === 'list' ||
+          (selectNodes as any).type === 'bulleted-list' ||
+          (selectNodes as any).type === 'numbered-list'
+        ) {
           Transforms.removeNodes(editor, {
             at: selectPath,
             voids: true,
@@ -276,7 +280,11 @@ export class EditorUtils {
         item.children.forEach((child: any) => {
           if (child.type === 'paragraph') {
             paragraphNodes.push(child);
-          } else if (child.type === 'list') {
+          } else if (
+            child.type === 'list' ||
+            child.type === 'bulleted-list' ||
+            child.type === 'numbered-list'
+          ) {
             // 递归处理嵌套列表
             const nestedParagraphs = EditorUtils.listToParagraph(editor, child);
             paragraphNodes.push(...nestedParagraphs);

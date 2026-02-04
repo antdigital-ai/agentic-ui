@@ -1,8 +1,10 @@
 import React, { type ReactNode } from 'react';
 import type { MarkdownEditorProps } from '../MarkdownEditor';
-import type { BrowserItemInput } from './Browser';
+import type { BrowserProps as InternalBrowserProps } from './Browser';
 import type { RealtimeFollowData } from './RealtimeFollow';
-import type { TaskItemInput } from './Task';
+import type { TaskItem, TaskItemInput } from './Task';
+
+export type { BrowserItem, BrowserSuggestion } from './Browser';
 
 // 标签页配置
 export interface TabConfiguration {
@@ -33,6 +35,8 @@ export interface WorkspaceProps {
   children?: React.ReactNode;
   /** 纯净模式，关闭阴影和边框 */
   pure?: boolean;
+  /** 自定义 header 右侧区域内容 */
+  headerExtra?: ReactNode;
 }
 
 // 子组件基础属性
@@ -45,14 +49,16 @@ export interface RealtimeProps extends BaseChildProps {
   data?: RealtimeFollowData;
 }
 
-export interface BrowserProps extends BaseChildProps {
-  data?: BrowserItemInput;
-}
+// Browser 使用 Browser 组件自身的 props 类型，并额外支持 tab 配置
+export interface BrowserProps extends BaseChildProps, InternalBrowserProps {}
 
 export interface TaskProps extends BaseChildProps {
   data?: TaskItemInput;
+  /** 点击任务项时的回调 */
+  onItemClick?: (item: TaskItem) => void;
 }
 
+// ... (rest of the file content unchanged)
 // 文件类型分类
 export enum FileCategory {
   Text = 'text',
@@ -306,6 +312,36 @@ export interface BaseNode {
   icon?: ReactNode;
 }
 
+/**
+ * 内置操作按钮
+ */
+export interface FileBuiltinActions {
+  /** 预览按钮 */
+  preview: ReactNode;
+  /** 定位按钮 */
+  locate: ReactNode;
+  /** 分享按钮 */
+  share: ReactNode;
+  /** 下载按钮 */
+  download: ReactNode;
+}
+
+/**
+ * 文件卡片自定义渲染函数参数
+ */
+export interface FileRenderContext {
+  /** 当前文件节点 */
+  file: FileNode;
+  /** 样式前缀 */
+  prefixCls: string;
+  /** 样式 hash */
+  hashId: string;
+  /** 是否禁用 */
+  disabled: boolean;
+  /** 内置操作按钮，可在 renderActions 中复用 */
+  actions: FileBuiltinActions;
+}
+
 // 文件节点（叶子节点）
 export interface FileNode extends BaseNode {
   displayType?: string; // 用于展示在文件标题下方的类型：文件类型、文件大小、文件更新时间
@@ -324,6 +360,26 @@ export interface FileNode extends BaseNode {
   /** 用户自定义是否可以定位（默认隐藏，设置为 true 显示） */
   canLocate?: boolean;
   loading?: boolean; // 文件是否处于加载中
+  /**
+   * 是否禁用文件卡片
+   * @description 禁用后文件卡片不可点击，操作按钮也会隐藏
+   */
+  disabled?: boolean;
+  /**
+   * 自定义渲染文件名区域
+   * @description 传入后将替换默认的文件名渲染
+   */
+  renderName?: (ctx: FileRenderContext) => ReactNode;
+  /**
+   * 自定义渲染详情行区域
+   * @description 传入后将替换默认的详情行（类型、大小、时间等）渲染
+   */
+  renderDetails?: (ctx: FileRenderContext) => ReactNode;
+  /**
+   * 自定义渲染操作按钮区域
+   * @description 传入后将替换默认的操作按钮（预览、下载、分享等）渲染
+   */
+  renderActions?: (ctx: FileRenderContext) => ReactNode;
 }
 
 // 分组节点
@@ -348,11 +404,20 @@ export interface FileActionRef {
 // 文件组件属性
 export interface FileProps extends BaseChildProps {
   nodes: (GroupNode | FileNode)[];
+  /** Group 子组件下载事件 */
   onGroupDownload?: (files: FileNode[], groupType: FileType) => void;
+  /** 文件下载事件 */
   onDownload?: (file: FileNode) => void;
+  /** File 子组件点击事件 */
   onFileClick?: (file: FileNode) => void;
   onLocate?: (file: FileNode) => void;
+  /**
+   * Group 子组件切换事件
+   * @deprecated 请使用 onGroupToggle 替代（符合命名规范），但为保持兼容性暂时保留
+   */
   onToggleGroup?: (groupType: FileType, collapsed: boolean) => void;
+  /** Group 子组件切换事件 */
+  onGroupToggle?: (groupType: FileType, collapsed: boolean) => void;
   /** 重置标识，用于重置预览状态（内部使用） */
   resetKey?: number;
   onPreview?: (

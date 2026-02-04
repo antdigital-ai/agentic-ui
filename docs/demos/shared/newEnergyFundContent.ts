@@ -1,5 +1,54 @@
-export const newEnergyFundContent = `<!-- {"MarkdownType": "report", "id": "new-energy-fund-report", "section_ids": "[1, 2, 3]"} -->
-# 新能源基金现状及投资
+export const newEnergyFundContent = `# 新能源基金现状及投资
+
+![头图](https://mdn.alipayobjects.com/huamei_gcee1x/afts/img/A*VctTQoYxOzYAAAAAAAAAAAAADml6AQ/original)
+
+[受产业链价格战影响，部分产品出现降价，产能过剩问题凸显](https://example.com/report)
+
+<think>
+这是一段思考内容
+</think>
+<answer>
+这是一段答案内容
+</answer>
+
+
+## 生意模式介绍
+
+Microsoft Corporation 是一家领先的技术公司，专注于云计算、生产力软件、业务应用程序和消费技术。公司的核心业务模式围绕三大分部展开：Productivity and Business Processes（生产力和业务流程）、Intelligent Cloud（智能云）、以及 More Personal Computing（更多个人计算）。[^1]
+
+公司的主要收入来源包括 Microsoft 365 商业和消费者订阅服务、Azure 云服务、Windows 操作系统、Xbox 内容和服务、LinkedIn、Dynamics 365 以及搜索和广告业务。截至 2024-09-30 (Q1 2025)，公司季度营业收入达 776.73 亿美元，净利润 277.47 亿美元。[^2] Microsoft Cloud 已成为公司的核心增长引擎，在 Q1 2025 达到 389 亿美元收入，同比增长 22%。[^3]
+
+## 近期业务亮点
+
+**AI 业务快速增长**：Microsoft 的 AI 业务增长迅猛，即将在下个季度超越 100 亿美元的年化收入运行率，这将使其成为公司历史上最快达到这一里程碑的业务。[^4] Azure AI 使用量在过去六个月中翻了一倍多，包括 Grammarly、Harvey 等数字原生公司以及 Bajaj Finance、日立、KT 和 LG 等知名企业都将应用从测试转向生产。[^5]
+
+**Copilot 生态系统快速扩张**：Microsoft 365 Copilot 的采用率持续加速，近 70%的财富 500 强企业现在使用 Microsoft 365 Copilot，客户继续以比任何其他新 Microsoft 365 套件更快的速度采用它。[^6] GitHub Copilot 企业客户季度环比增长 55%，AMD 和 Flutter Entertainment 等公司正在将 Copilot 定制到自己的代码库。[^7]
+
+**游戏业务强劲表现**：《使命召唤：黑色行动 6》的发布创下了有史以来最大的《使命召唤》发布记录，创下了首日玩家数以及 Game Pass 订阅者首日新增的记录。[^8]
+
+## 重要议题变化分析
+
+基于对过去 5 期电话会议的分析（2023 Q4 至 2024 Q1），以下是管理层关注的核心议题演变：
+
+| 议题 | 2023 Q4 | 2024 Q2 | 2024 Q3 | 2024 Q4 | 2024 Q1 |
+| :---------------- | :-------------------------------------------------- | :---------------------------------------------------------------- | :------------------------------------------ | :--------------------------------------------------- | :-------------------------------------------------------------- |
+| AI 投资与基础设施 |"accelerate investment in our cloud infrastructure" |"scaling our AI infrastructure" |"significant AI infrastructure investments" |"cloud and AI infrastructure investments" |"expand our capacity in line with our long-term demand signals" |
+| 容量限制 |"meet growing demand" |"near-term AI demand is a bit higher than our available capacity" |"capacity constraints" |"demand remained higher than our available capacity" |"Demand continues to be higher than our available capacity" |
+| 运营杠杆 |"driving operating leverage" |"deliver on our financial commitments" |"maintain disciplined cost management" |"driving operating leverage" |"drive efficiencies across our businesses" |
+| 新工作负载增长 |"born-in-the-cloud AI-first workloads" |"Azure AI customers continues to grow" |"AI projects start with calls to AI models" |"new AI applications" |"new cloud and AI infrastructure investments" |
+| Security 优先级 |"1 million organizations count on our security" |"security above all else" |"Security underpins every layer" |"prioritize security above all else" |"prioritize security above all else" |
+
+## 风险因素
+
+**容量约束**：管理层持续提到 AI 需求高于可用容量的挑战。Amy Hood 在 Q1 2025 电话会议中表示："We expect the contribution from AI services to be similar to last quarter, given the continued capacity constraints as well as some capacity that shifted out of Q2."[^9]
+
+**外部供应链限制**：Satya Nadella 指出："Even in Q2, for example, some of the demand issues we have or our ability to fulfill demand is because of, in fact, external third-party stuff that we leased moving up."[^10] 这些外部约束包括数据中心建设、电力供应等基础设施限制。
+
+**监管风险**：在 Q4 2023 电话会议中，公司提到了与爱尔兰数据保护委员会事务相关的费用，表明监管合规仍是持续关注的风险因素。[^11]
+
+**成本上升压力**：随着 AI 基础设施的大规模投资，Microsoft Cloud 毛利率面临压力。Q1 2025 Microsoft Cloud 毛利率同比下降 2 个百分点至 71%，主要由于 AI 基础设施扩展的影响。[^12]
+
+**竞争加剧**：在快速发展的 AI 市场中，公司需要持续创新以保持领先地位，同时面临来自其他云服务提供商和 AI 技术公司的激烈竞争。
 
 ## 一、新能源板块现状：机遇与挑战并存
 
@@ -7,7 +56,7 @@ export const newEnergyFundContent = `<!-- {"MarkdownType": "report", "id": "new-
 
 **政策驱动与估值博弈：** 新能源主题基金呈现显著分化态势。
 
-- **新能源汽车基金表现亮眼：** 天弘中证新能源汽车A基金一年期收益率达12.54%，受益于2025年1-5月新能源汽车销量同比增长44%
+- **新能源汽车基金表现亮眼：** 天弘中证新能源汽车A基金一年期收益率达12.54%，受益于2025年1-5月新能源汽车销量同比增长44%，对应同比增速 $g = (S_{2025}-S_{2024})/S_{2024} = 44%$
 - **光伏设备基金承压：** [受产业链价格战影响，部分产品出现降价，产能过剩问题凸显](https://example.com/report)
 
 **ETF份额逆势增长：** 近半年份额增长3600万份，规模显著扩张。跟踪的中证新能源指数PB估值仅2.08倍，低于近5年85%的时间，估值吸引力突出。
@@ -23,6 +72,16 @@ export const newEnergyFundContent = `<!-- {"MarkdownType": "report", "id": "new-
 | 光伏设备基金 | -5.10      | 美国   |
 | 储能主题基金 | 4.02       | 美国   |
 | 氢能主题基金 | 2.15       | 美国   |
+
+\`\`\`mermaid
+flowchart TD
+    A[Christmas] -->|Get money| B(Go shopping)
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[fa:fa-car Car]
+ 
+\`\`\`
 
 ### 1.2 高估值与产能过剩的双重压力
 
@@ -94,6 +153,7 @@ export const newEnergyFundContent = `<!-- {"MarkdownType": "report", "id": "new-
 
 ### 1.4 指标散点分布
 
+[核心能力]
 截至2025年6月19日，新能源板块当日收跌-1.28%。行业市盈率高于近10年60%的时间，估值偏高。新能源汽车行业产能过剩问题突出，技术迭代过快可能制约长期发展。
 
 <!-- {"chartType":"scatter","title":"KPI 指标分布","x":"月份","y":"值","groupBy":"分类","colorLegend":"系列","filterBy":"region","dataTime":"2025-10-30 10:00:00"} -->

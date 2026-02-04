@@ -20,7 +20,7 @@ const processEntry = async (entry: FileSystemEntry): Promise<File[]> => {
 export const getFileListFromDataTransferItems = async (
   event: React.ClipboardEvent<HTMLDivElement>,
 ) => {
-  const items = Array.from(event.clipboardData?.items);
+  const items = Array.from(event.clipboardData?.items || []);
   if (items.length === 0) {
     return [];
   }

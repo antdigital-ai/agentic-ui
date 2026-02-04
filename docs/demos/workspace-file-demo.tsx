@@ -376,7 +376,7 @@ graph TD
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h2>文件组件演示</h2>
 
       <div style={{ marginBottom: '16px' }}>

@@ -1,9 +1,9 @@
-import { ChevronDown, Pause, Play } from '@sofa-design/icons';
+import { PlayLottie } from '@ant-design/agentic-ui';
+import { ChevronDown, Pause } from '@sofa-design/icons';
 import { ConfigProvider, Dropdown, Flex, Tooltip } from 'antd';
 import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { useSpeechSynthesis } from '../../../Hooks/useSpeechSynthesis';
-import VoicePlayLottie from '../../../Icons/animated/VoicePlayLottie';
 import VoicingLottie from '../../../Icons/animated/VoicingLottie';
 import { useStyle } from './style';
 import { UseSpeechAdapter } from './types';
@@ -132,11 +132,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
         >
           <Tooltip title={tooltipText} mouseEnterDelay={0.1}>
             <Flex align="center" justify="center">
-              {isPlayHover ? (
-                <VoicePlayLottie size={16} autoplay={true} loop={false} />
-              ) : (
-                <Play fontSize={14} />
-              )}
+              <PlayLottie active={isPlayHover} />
             </Flex>
           </Tooltip>
         </div>

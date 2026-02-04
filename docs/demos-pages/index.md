@@ -1,7 +1,7 @@
 ---
 nav:
   title: Demo
-  order: 1
+  order: 5
 group:
   title: 通用
   order: 5
@@ -27,9 +27,19 @@ group:
 
 <code src="../demos/tool-use-bar-active-keys.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+<code src="../demos/tool-use-bar-expanded-keys.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 <code src="../demos/tool-use-bar-all.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 <code src="../demos/tool-use-bar.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+### 工具使用栏 - 思考模式
+
+<code src="../demos/tool-use-bar-think.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/tool-use-bar-think-simple.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/tool-use-bar-think-standalone.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ### 卡片交互
 
@@ -49,13 +59,57 @@ group:
 
 ## 气泡组件
 
+### 基础用法
+
 <code src="../demos/bubble/basic.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/pure.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+### 气泡列表
+
+<code src="../demos/bubble/bubblelist-basic-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/bubblelist-config-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/bubblelist-interaction-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/bubblelist-lazy-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/bubblelist-performance-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+### 自定义渲染
 
 <code src="../demos/bubble/extra-render.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+<code src="../demos/bubble/content-render-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/avatar-render-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/title-render-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/custom-title-render.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+### 扩展功能
+
+<code src="../demos/bubble/beforeMessage-afterMessage-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/afterContent-beforeContent-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/preMessageSameRole.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/classnames-extended-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+### 文件与媒体
+
 <code src="../demos/bubble/file-view.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-<code src="../demos/bubble/pure.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/bubble/file-loading-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/message-loading-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/voice.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/bubble/footnote-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ## 表单与Schema
 
@@ -85,4 +139,4 @@ group:
 
 ## 加载状态
 
-<code src="../demos/loading.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/loading/index.tsx" background="var(--main-bg-color)" iframe=540></code>

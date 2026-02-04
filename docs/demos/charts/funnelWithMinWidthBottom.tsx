@@ -45,14 +45,15 @@ const FunnelMinWidthDemo: React.FC = () => {
   const [minWidth, setMinWidth] = useState<number>(0.1);
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h2 style={{ marginBottom: 16 }}>漏斗图 - 最小宽度控制</h2>
       <p style={{ marginBottom: 16, color: '#666' }}>
         当数据跨度很大时（如 100000 → 1000），最底层会变得很窄难以交互。
         <br />
-        使用 <code>bottomLayerMinWidth</code> 可以保证底层最小宽度，便于鼠标悬停查看数据。
+        使用 <code>bottomLayerMinWidth</code>{' '}
+        可以保证底层最小宽度，便于鼠标悬停查看数据。
       </p>
-      
+
       <div style={{ marginBottom: 24, maxWidth: 400 }}>
         <div style={{ marginBottom: 8 }}>
           最小宽度占比: <strong>{(minWidth * 100).toFixed(0)}%</strong>
@@ -100,11 +101,23 @@ const FunnelMinWidthDemo: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ marginTop: 24, padding: 16, background: '#f5f5f5', borderRadius: 4 }}>
+      <div
+        style={{
+          marginTop: 24,
+          padding: 16,
+          background: '#f5f5f5',
+          borderRadius: 4,
+        }}
+      >
         <h4>说明：</h4>
         <ul style={{ marginBottom: 0, paddingLeft: 20 }}>
-          <li>左侧图表未使用最小宽度限制，底层（1000）相对顶层（100000）非常窄</li>
-          <li>右侧图表使用了 <code>bottomLayerMinWidth</code>，视觉宽度被调整以保证可交互性</li>
+          <li>
+            左侧图表未使用最小宽度限制，底层（1000）相对顶层（100000）非常窄
+          </li>
+          <li>
+            右侧图表使用了 <code>bottomLayerMinWidth</code>
+            ，视觉宽度被调整以保证可交互性
+          </li>
           <li>Tooltip 和标签仍然显示真实数据值（1000），不受视觉调整影响</li>
           <li>推荐值：0.1 ~ 0.2（10% ~ 20%）</li>
           <li>仅接受 0-1 之间的合法值，非法值（≤0 或 &gt;1）将被视为不限制</li>
@@ -115,4 +128,3 @@ const FunnelMinWidthDemo: React.FC = () => {
 };
 
 export default FunnelMinWidthDemo;
-

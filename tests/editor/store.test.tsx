@@ -1,5 +1,10 @@
 import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
+import remarkFrontmatter from 'remark-frontmatter';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
 import {
   BaseEditor,
   createEditor,
@@ -10,10 +15,14 @@ import {
 } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
+import type { Plugin } from 'unified';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { parserMdToSchema } from '../../src';
+import { fixStrongWithSpecialChars } from '../../src/MarkdownEditor/editor/parser/remarkParse';
 import { withMarkdown } from '../../src/MarkdownEditor/editor/plugins/withMarkdown';
 import { EditorStore } from '../../src/MarkdownEditor/editor/store';
+import type { MarkdownToHtmlOptions } from '../../src/MarkdownEditor/editor/utils/markdownToHtml';
+import * as markdownToHtmlUtils from '../../src/MarkdownEditor/editor/utils/markdownToHtml';
 
 // Mock ReactEditor DOM methods
 vi.mock('slate-react', () => ({
@@ -343,6 +352,63 @@ describe('EditorStore', () => {
       const html = store.getHtmlContent();
       expect(typeof html).toBe('string');
     });
+
+    it('应该使用构造函数传入的 markdownToHtmlOptions', () => {
+      const markdownToHtmlSyncSpy = vi.spyOn(
+        markdownToHtmlUtils,
+        'markdownToHtmlSync',
+      );
+      const options: MarkdownToHtmlOptions = [
+        remarkParse,
+        fixStrongWithSpecialChars,
+        [remarkMath as unknown as Plugin, { singleDollarTextMath: true }],
+        [remarkFrontmatter, ['yaml']],
+        [remarkRehype as unknown as Plugin, { allowDangerousHtml: true }],
+      ];
+      const storeWithOptions = new EditorStore(editorRef, undefined, options);
+
+      storeWithOptions.getHtmlContent();
+
+      expect(markdownToHtmlSyncSpy).toHaveBeenCalled();
+      const lastCall =
+        markdownToHtmlSyncSpy.mock.calls[
+          markdownToHtmlSyncSpy.mock.calls.length - 1
+        ]!;
+      const [, receivedOptions] = lastCall;
+      expect(receivedOptions).toBe(options);
+    });
+
+    it('应该允许在调用 getHtmlContent 时覆盖 markdownToHtmlOptions', () => {
+      const markdownToHtmlSyncSpy = vi.spyOn(
+        markdownToHtmlUtils,
+        'markdownToHtmlSync',
+      );
+      const initialOptions: MarkdownToHtmlOptions = [
+        remarkParse,
+        remarkGfm,
+        fixStrongWithSpecialChars,
+      ];
+      const overrideOptions: MarkdownToHtmlOptions = [
+        remarkParse,
+        fixStrongWithSpecialChars,
+        [remarkMath as unknown as Plugin, { singleDollarTextMath: false }],
+      ];
+
+      const storeWithInitialOptions = new EditorStore(
+        editorRef,
+        undefined,
+        initialOptions,
+      );
+
+      storeWithInitialOptions.getHtmlContent(overrideOptions);
+
+      const lastCall =
+        markdownToHtmlSyncSpy.mock.calls[
+          markdownToHtmlSyncSpy.mock.calls.length - 1
+        ]!;
+      const [, receivedOptions] = lastCall;
+      expect(receivedOptions).toBe(overrideOptions);
+    });
   });
 
   describe('setContent 方法', () => {
@@ -351,9 +417,41 @@ describe('EditorStore', () => {
         { type: 'paragraph', children: [{ text: 'new content' }] },
       ];
 
+      // Mock Transforms 来确保它们能够正确更新 editor.children
+      const originalInsertNodes = Transforms.insertNodes;
+      const originalRemoveNodes = Transforms.removeNodes;
+      
+      Transforms.insertNodes = vi.fn((editor, nodes, options) => {
+        if (options?.at) {
+          const at = options.at[0];
+          if (Array.isArray(nodes)) {
+            editor.children.splice(at, 0, ...nodes);
+          } else {
+            editor.children.splice(at, 0, nodes);
+          }
+        } else {
+          if (Array.isArray(nodes)) {
+            editor.children.push(...nodes);
+          } else {
+            editor.children.push(nodes);
+          }
+        }
+      });
+      
+      Transforms.removeNodes = vi.fn((editor, options) => {
+        if (options?.at) {
+          const at = options.at[0];
+          editor.children.splice(at, 1);
+        }
+      });
+
       store.setContent(newContent);
 
-      expect(editor.children).toBe(newContent);
+      // 恢复原始方法
+      Transforms.insertNodes = originalInsertNodes;
+      Transforms.removeNodes = originalRemoveNodes;
+
+      expect(editor.children).toEqual(newContent);
     });
 
     it('应该调用 onChange', () => {

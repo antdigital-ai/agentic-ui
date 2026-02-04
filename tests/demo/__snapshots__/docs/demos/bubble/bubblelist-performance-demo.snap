@@ -120,17 +120,10 @@
         style="border: 1px solid rgb(233, 236, 239); border-radius: 8px; overflow: hidden;"
       >
         <div
-          assistantmeta="[object Object]"
-          bubblelist=""
-          bubblelistref="[object Object]"
-          bubbleref="[object Object]"
-          data-testid="bubble-list"
-          markdownrenderconfig="[object Object]"
+          class="ant-agentic-bubble-list"
+          data-chat-list="0"
           style="height: 500px; overflow: auto;"
-          usermeta="[object Object]"
-        >
-          bubble-list
-        </div>
+        />
       </div>
       <div
         style="margin-top: 16px; padding: 12px; background: rgb(246, 255, 237); border-radius: 6px; font-size: 14px;"

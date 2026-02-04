@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -14,18 +18,27 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@@/*": [".dumi/tmp/*"],
-      "@ant-design/agentic-ui": ["./src"],
-      "@ant-design/agentic-ui/*": ["src/*", "*"]
+      "@@/*": [
+        ".dumi/tmp/*"
+      ],
+      "@ant-design/agentic-ui": [
+        "./src"
+      ],
+      "@ant-design/agentic-ui/*": [
+        "src/*",
+        "*"
+      ]
     }
   },
   "include": [
     ".dumirc.ts",
+    ".dumi/typing.d.ts",
     "docs/demos/**/*",
     "docs/components/**/*",
     "src/**/**/*",
     "src/MarkDown/demos/.tsx",
     "tests/**/*",
-    "docs/pure.tsx"
+    "docs/pure.tsx",
+    "home/**/*"
   ]
 }

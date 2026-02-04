@@ -18,7 +18,7 @@ import { MarkdownEditorUpdate } from './MarkdownEditor';
  * @description 网络搜索组件，显示网络搜索过程和结果
  * @param {Object} props - 组件属性
  * @param {boolean} [props.isFinished] - 是否已完成
- * @param {Function} [props.onChangeItem] - 项目变更回调
+ * @param {Function} [props.onItemChange] - 项目变更回调（Item 子组件事件）
  * @param {MarkdownEditorProps} [props.markdownRenderProps] - Markdown渲染配置
  * @param {Object} [props.output] - 输出结果
  * @param {Object} [props.output.response] - 响应数据
@@ -51,7 +51,20 @@ import { MarkdownEditorUpdate } from './MarkdownEditor';
 export const WebSearch = (
   props: {
     isFinished?: boolean;
+    /**
+     * Item 子组件变更事件
+     * @deprecated 请使用 onItemChange 替代（符合命名规范）
+     */
     onChangeItem?: (
+      item: WhiteBoxProcessInterface,
+      changeProps: {
+        feedbackContent: string;
+        feedbackType: 'sql' | 'toolArg';
+        feedbackRunId: string;
+      },
+    ) => void;
+    /** Item 子组件变更事件 */
+    onItemChange?: (
       item: WhiteBoxProcessInterface,
       changeProps: {
         feedbackContent: string;

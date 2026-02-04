@@ -46,15 +46,3 @@
 .sidebar-left.collapsed .sidebar-left-content {
   display: none;
 }
-
-.custom-chat-container-demo .chat-flow-container-footer::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url(https://console.sofa.antdigital.com/playground/static/task-running-bg.118417dc.png)
-    no-repeat center center;
-  background-size: 100% 100%;
-}

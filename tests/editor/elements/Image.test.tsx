@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { ImageAndError } from '../../../src/MarkdownEditor/editor/elements/Image';
+import { ReadonlyImage } from '../../../src/MarkdownEditor/editor/elements/Image';
 
 // Mock the editor store
 vi.mock('../../../src/MarkdownEditor/editor/store', () => ({
@@ -29,7 +29,7 @@ vi.mock('../../../src/I18n', () => ({
 }));
 
 describe('Image Components', () => {
-  describe('ImageAndError', () => {
+  describe('ReadonlyImage', () => {
     it('应该显示图片链接当图片加载失败时', async () => {
       const mockElement = {
         url: 'https://invalid-image-url.com/image.jpg',
@@ -39,7 +39,7 @@ describe('Image Components', () => {
       };
 
       render(
-        <ImageAndError
+        <ReadonlyImage
           src={mockElement.url}
           alt={mockElement.alt}
           width={mockElement.width}
@@ -55,16 +55,14 @@ describe('Image Components', () => {
       await waitFor(() => {
         const linkElement = screen.getByText(mockElement.alt);
         expect(linkElement).toBeInTheDocument();
-        expect(linkElement.tagName).toBe('A');
-        expect(linkElement).toHaveAttribute('href', mockElement.url);
-        expect(linkElement).toHaveAttribute('target', '_blank');
+        expect(linkElement.tagName).toBe('SPAN');
       });
     });
 
     it('应该显示URL作为链接文本当没有alt属性时', async () => {
       const mockUrl = 'https://example.com/image.jpg';
 
-      render(<ImageAndError src={mockUrl} width={400} height={300} />);
+      render(<ReadonlyImage src={mockUrl} width={400} height={300} />);
 
       // 找到图片元素并触发错误事件
       const imgElement = screen
@@ -75,12 +73,12 @@ describe('Image Components', () => {
       await waitFor(() => {
         const linkElement = screen.getByText(mockUrl);
         expect(linkElement).toBeInTheDocument();
-        expect(linkElement.tagName).toBe('A');
+        expect(linkElement.tagName).toBe('SPAN');
       });
     });
 
     it('应该显示默认文本当没有alt和src时', async () => {
-      render(<ImageAndError width={400} height={300} />);
+      render(<ReadonlyImage width={400} height={300} />);
 
       // 找到图片元素并触发错误事件
       const imgElement = screen
@@ -91,7 +89,7 @@ describe('Image Components', () => {
       await waitFor(() => {
         const linkElement = screen.getByText('图片链接');
         expect(linkElement).toBeInTheDocument();
-        expect(linkElement.tagName).toBe('A');
+        expect(linkElement.tagName).toBe('SPAN');
       });
     });
   });

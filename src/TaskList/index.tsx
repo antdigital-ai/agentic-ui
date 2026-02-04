@@ -1,10 +1,12 @@
 import { ChevronUp, CircleDashed, SuccessFill, X } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
-import React, { memo, useCallback, useContext } from 'react';
+import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { ActionIconBox } from '../Components/ActionIconBox';
 import { Loading } from '../Components/Loading';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { I18nContext } from '../I18n';
 import { useStyle } from './style';
 
@@ -24,7 +26,7 @@ type TaskStatus = 'success' | 'pending' | 'loading' | 'error';
 
 type TaskItem = {
   key: string;
-  title?: string;
+  title?: React.ReactNode;
   content: React.ReactNode | React.ReactNode[];
   status: TaskStatus;
 };
@@ -45,13 +47,14 @@ type ThoughtChainProps = {
 
 const getArrowRotation = (collapsed: boolean): React.CSSProperties => ({
   transform: collapsed ? 'rotate(0deg)' : 'rotate(180deg)',
+  transition: 'transform 0.3s ease',
 });
 
 const StatusIcon: React.FC<{
   status: TaskStatus;
   prefixCls: string;
   hashId: string;
-}> = ({ status, prefixCls, hashId }) => {
+}> = memo(({ status, prefixCls, hashId }) => {
   const statusMap: Record<TaskStatus, React.ReactNode> = {
     success: <SuccessFill />,
     loading: <Loading size={LOADING_SIZE} />,
@@ -75,7 +78,9 @@ const StatusIcon: React.FC<{
       {statusMap[status]}
     </div>
   );
-};
+});
+
+StatusIcon.displayName = 'StatusIcon';
 
 interface TaskListItemProps {
   item: TaskItem;
@@ -86,85 +91,125 @@ interface TaskListItemProps {
   onToggle: (key: string) => void;
 }
 
-const TaskListItem: React.FC<TaskListItemProps> = ({
-  item,
-  isLast,
-  prefixCls,
-  hashId,
-  expandedKeys,
-  onToggle,
-}) => {
-  const { locale } = useContext(I18nContext);
-  const isCollapsed = !expandedKeys.includes(item.key);
-  const hasContent = hasTaskContent(item.content);
+const TaskListItem: React.FC<TaskListItemProps> = memo(
+  ({ item, isLast, prefixCls, hashId, expandedKeys, onToggle }) => {
+    const { locale } = useContext(I18nContext);
+    const isCollapsed = !expandedKeys.includes(item.key);
+    const hasContent = hasTaskContent(item.content);
 
-  const handleToggle = () => onToggle(item.key);
+    // 使用 useCallback 优化切换处理函数
+    const handleToggle = useCallback(() => {
+      onToggle(item.key);
+    }, [item.key, onToggle]);
 
-  const arrowTitle = isCollapsed
-    ? locale?.['taskList.expand'] || '展开'
-    : locale?.['taskList.collapse'] || '收起';
+    const arrowTitle = isCollapsed
+      ? locale?.['taskList.expand'] || '展开'
+      : locale?.['taskList.collapse'] || '收起';
 
-  return (
-    <div
-      key={item.key}
-      className={buildClassName(`${prefixCls}-thoughtChainItem`, hashId)}
-      data-testid="task-list-thoughtChainItem"
-    >
+    const contentVariants = useMemo(
+      () => ({
+        expanded: {
+          height: 'auto',
+          opacity: 1,
+        },
+        collapsed: {
+          height: 0,
+          opacity: 0,
+        },
+      }),
+      [],
+    );
+
+    const contentTransition = useMemo(
+      () => ({
+        height: {
+          duration: 0.26,
+          ease: [0.4, 0, 0.2, 1],
+        },
+        opacity: {
+          duration: 0.2,
+          ease: 'linear',
+        },
+      }),
+      [],
+    );
+    return (
       <div
-        className={buildClassName(`${prefixCls}-left`, hashId)}
-        onClick={handleToggle}
-        data-testid="task-list-left"
+        key={item.key}
+        className={buildClassName(`${prefixCls}-thoughtChainItem`, hashId)}
+        data-testid="task-list-thoughtChainItem"
       >
-        <StatusIcon
-          status={item.status}
-          prefixCls={prefixCls}
-          hashId={hashId}
-        />
-        <div className={buildClassName(`${prefixCls}-content-left`, hashId)}>
-          {!isLast && (
-            <div
-              className={buildClassName(`${prefixCls}-dash-line`, hashId)}
-              data-testid="task-list-dash-line"
-            />
-          )}
-        </div>
-      </div>
-      <div className={buildClassName(`${prefixCls}-right`, hashId)}>
         <div
-          className={buildClassName(`${prefixCls}-top`, hashId)}
+          className={buildClassName(`${prefixCls}-left`, hashId)}
           onClick={handleToggle}
+          data-testid="task-list-left"
         >
-          <div className={buildClassName(`${prefixCls}-title`, hashId)}>
-            {item.title}
+          <StatusIcon
+            status={item.status}
+            prefixCls={prefixCls}
+            hashId={hashId}
+          />
+          <div className={buildClassName(`${prefixCls}-content-left`, hashId)}>
+            {!isLast && (
+              <div
+                className={buildClassName(`${prefixCls}-dash-line`, hashId)}
+                data-testid="task-list-dash-line"
+              />
+            )}
           </div>
-          {hasContent && (
-            <div
-              className={buildClassName(`${prefixCls}-arrowContainer`, hashId)}
-              onClick={handleToggle}
-              data-testid="task-list-arrowContainer"
-            >
-              <ActionIconBox
-                title={arrowTitle}
-                iconStyle={getArrowRotation(isCollapsed)}
-                loading={false}
-                onClick={handleToggle}
-              >
-                <ChevronUp data-testid="task-list-arrow" />
-              </ActionIconBox>
-            </div>
-          )}
         </div>
-        {!isCollapsed && (
-          <div className={buildClassName(`${prefixCls}-body`, hashId)}>
-            <div className={buildClassName(`${prefixCls}-content`, hashId)}>
-              {item.content}
+        <div className={buildClassName(`${prefixCls}-right`, hashId)}>
+          <div
+            className={buildClassName(`${prefixCls}-top`, hashId)}
+            onClick={handleToggle}
+          >
+            <div className={buildClassName(`${prefixCls}-title`, hashId)}>
+              {item.title}
             </div>
+            {hasContent && (
+              <div
+                className={buildClassName(
+                  `${prefixCls}-arrowContainer`,
+                  hashId,
+                )}
+                onClick={handleToggle}
+                data-testid="task-list-arrowContainer"
+              >
+                <ActionIconBox
+                  title={arrowTitle}
+                  iconStyle={getArrowRotation(isCollapsed)}
+                  loading={false}
+                  onClick={handleToggle}
+                >
+                  <ChevronUp data-testid="task-list-arrow" />
+                </ActionIconBox>
+              </div>
+            )}
           </div>
-        )}
+          <AnimatePresence initial={false}>
+            {!isCollapsed && (
+              <motion.div
+                key="task-content"
+                variants={contentVariants}
+                initial="collapsed"
+                animate="expanded"
+                exit="collapsed"
+                transition={contentTransition}
+                className={buildClassName(`${prefixCls}-body`, hashId)}
+              >
+                <div className={buildClassName(`${prefixCls}-content`, hashId)}>
+                  {item.content}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  },
+);
+
+TaskListItem.displayName = 'TaskListItem';
 
 const getDefaultExpandedKeys = (
   items: TaskItem[],
@@ -217,23 +262,15 @@ export const TaskList = memo(
       onChange: onExpandedKeysChange,
     });
 
-    const handleToggle = useCallback(
-      (key: string) => {
-        const currentExpanded = isControlled
-          ? expandedKeys
-          : internalExpandedKeys;
-        const newExpandedKeys = currentExpanded.includes(key)
-          ? currentExpanded.filter((k) => k !== key)
-          : [...currentExpanded, key];
-        setInternalExpandedKeys(newExpandedKeys);
-      },
-      [
-        expandedKeys,
-        internalExpandedKeys,
-        isControlled,
-        setInternalExpandedKeys,
-      ],
-    );
+    const handleToggle = useRefFunction((key: string) => {
+      const currentExpanded = isControlled
+        ? expandedKeys
+        : internalExpandedKeys;
+      const newExpandedKeys = currentExpanded.includes(key)
+        ? currentExpanded.filter((k) => k !== key)
+        : [...currentExpanded, key];
+      setInternalExpandedKeys(newExpandedKeys);
+    });
 
     return wrapSSR(
       <div className={className}>

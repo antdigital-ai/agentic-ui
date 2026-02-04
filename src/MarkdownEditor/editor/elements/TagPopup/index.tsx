@@ -13,7 +13,6 @@ import React, {
 import { BaseEditor } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
 import { SuggestionConnext } from '../../../../MarkdownInputField/Suggestion';
-import { useStyle } from './style';
 
 type TagPopupItem = Array<{
   label: string;
@@ -160,8 +159,14 @@ const getNodePath = (
   domRef: React.RefObject<HTMLDivElement>,
 ) => {
   if (!domRef.current) return null;
-  const slateNode = ReactEditor.toSlateNode(editor, domRef.current);
-  return ReactEditor.findPath(editor, slateNode);
+  try {
+    const slateNode = ReactEditor.toSlateNode(editor, domRef.current);
+    return ReactEditor.findPath(editor, slateNode);
+  } catch (error) {
+    // 如果无法从 DOM 节点解析 Slate 节点，返回 null
+    // 这在测试环境或某些边缘情况下可能会发生
+    return null;
+  }
 };
 
 const updateNodeContext = (
@@ -231,19 +236,18 @@ const initializeAutoOpen = (
 const handleMouseEnter = (domRef: React.RefObject<HTMLDivElement>) => {
   const target = domRef.current;
   if (!target) return;
-  target.classList.remove('no-focus');
+  target.removeAttribute('data-no-focus');
 };
 
 const handleMouseLeave = (domRef: React.RefObject<HTMLDivElement>) => {
   const target = domRef.current;
   if (!target) return;
-  target.classList.add('no-focus');
+  target.setAttribute('data-no-focus', '');
 };
 
 const createDefaultDom = (
   domRef: React.RefObject<HTMLDivElement>,
   baseCls: string,
-  hashId: string,
   loading: boolean,
   selectedItems: TagPopupItem,
   children: React.ReactNode,
@@ -257,10 +261,12 @@ const createDefaultDom = (
   return (
     <div
       ref={domRef}
-      className={classNames(`${baseCls}-tag-popup-input`, 'no-focus', hashId, {
+      data-tag-popup-input
+      data-no-focus
+      className={classNames(`${baseCls}-input`, {
         empty: isEmpty,
-        [`${baseCls}-tag-popup-input-loading`]: loading,
-        [`${baseCls}-tag-popup-input-has-arrow`]: hasItems,
+        [`${baseCls}-loading`]: loading,
+        [`${baseCls}-has-arrow`]: hasItems,
       })}
       onMouseEnter={() => handleMouseEnter(domRef)}
       onMouseLeave={() => handleMouseLeave(domRef)}
@@ -270,7 +276,7 @@ const createDefaultDom = (
       {children}
       {hasItems && (
         <ChevronDown
-          className={classNames(`${baseCls}-tag-popup-input-arrow `, hashId, {
+          className={classNames(`${baseCls}-arrow`, {
             empty: isEmpty,
             open: isOpen,
           })}
@@ -363,10 +369,7 @@ export const TagPopup = (props: RenderProps) => {
   const domRef = useRef<HTMLDivElement>(null);
   const suggestionConnext = useContext(SuggestionConnext);
   const antdContext = useContext(ConfigProvider.ConfigContext);
-  const baseCls = antdContext?.getPrefixCls(
-    'agentic-md-editor-tag-popup-input',
-  );
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const baseCls = antdContext?.getPrefixCls('agentic-md-editor-tag-popup');
   const currentNodePath = useRef<number[]>();
 
   useEffect(() => {
@@ -403,7 +406,7 @@ export const TagPopup = (props: RenderProps) => {
         onSelect?.(value?.trim() || '', currentNodePath.current || []);
       },
     });
-  }, [props.text, suggestionConnext.open]);
+  }, [props.text, suggestionConnext?.open]);
 
   useEffect(() => {
     initializeAutoOpen(props.autoOpen, type, setOpen, suggestionConnext);
@@ -414,7 +417,6 @@ export const TagPopup = (props: RenderProps) => {
   const defaultDom = createDefaultDom(
     domRef,
     baseCls,
-    hashId,
     loading,
     selectedItems,
     children,
@@ -429,54 +431,64 @@ export const TagPopup = (props: RenderProps) => {
     onSelect,
     currentNodePath,
   );
+  // 预先计算容器 className 与 style，减少 JSX 中的嵌套
+  const containerClassName = classNames(
+    baseCls,
+    props.className,
+    props.prefixCls,
+    props.tagTextClassName,
+    `${baseCls}-type-${type}`,
+  );
 
-  return wrapSSR(
-    <div
-      className={classNames(
-        baseCls,
-        hashId,
-        props.className,
-        props.prefixCls,
-        props.tagTextClassName,
-        `${baseCls}-type-${type}`,
-      )}
-      style={{
-        ...runFunction(props.tagTextStyle, {
-          ...props,
-          text: props.text,
-          placeholder,
-        }),
-      }}
-      onClick={(e) =>
-        handleClick(
-          e,
-          props,
-          placeholder,
-          type,
-          suggestionConnext,
-          onSelect,
-          currentNodePath,
-        )
-      }
+  const containerStyle = {
+    ...runFunction(props.tagTextStyle, {
+      ...props,
+      text: props.text,
+      placeholder,
+    }),
+  };
+
+  const handleContainerClick = (e: MouseEvent) =>
+    handleClick(
+      e,
+      props,
+      placeholder,
+      type,
+      suggestionConnext,
+      onSelect,
+      currentNodePath,
+    );
+
+  const isDropdown = type === 'dropdown';
+
+  const dropdownMenu = {
+    items: selectedItems as MenuProps['items'],
+    onClick: (e: any) => {
+      onSelect?.(e.key?.trim() || '', currentNodePath.current || []);
+      suggestionConnext?.setOpen?.(false);
+    },
+  } as MenuProps;
+
+  const content = isDropdown ? (
+    <Dropdown
+      trigger={['click']}
+      open={open}
+      onOpenChange={setOpen}
+      menu={dropdownMenu}
     >
-      {type === 'dropdown' ? (
-        <Dropdown
-          trigger={['click']}
-          open={open}
-          onOpenChange={setOpen}
-          menu={{
-            items: selectedItems as MenuProps['items'],
-            onClick: (e) => {
-              onSelect?.(e.key?.trim() || '', currentNodePath.current || []);
-              suggestionConnext?.setOpen?.(false);
-            },
-          }}
-        >
-          {renderDom}
-        </Dropdown>
-      ) : (
-        renderDom
-      )}
-    </div>,
+      {renderDom}
+    </Dropdown>
+  ) : (
+    renderDom
+  );
+
+  return (
+    <div
+      className={containerClassName}
+      style={containerStyle}
+      onClick={handleContainerClick}
+    >
+      {content}
+    </div>
   );
 };

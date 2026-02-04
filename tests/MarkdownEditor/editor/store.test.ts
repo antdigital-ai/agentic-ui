@@ -19,7 +19,28 @@ vi.mock('slate', () => ({
     hasPath: vi.fn(() => true),
   })),
   Transforms: {
-    insertNodes: vi.fn(),
+    insertNodes: vi.fn((editor, nodes, options) => {
+      if (options?.at) {
+        const at = options.at[0];
+        if (Array.isArray(nodes)) {
+          editor.children.splice(at, 0, ...nodes);
+        } else {
+          editor.children.splice(at, 0, nodes);
+        }
+      } else {
+        if (Array.isArray(nodes)) {
+          editor.children.push(...nodes);
+        } else {
+          editor.children.push(nodes);
+        }
+      }
+    }),
+    removeNodes: vi.fn((editor, options) => {
+      if (options?.at) {
+        const at = options.at[0];
+        editor.children.splice(at, 1);
+      }
+    }),
     insertText: vi.fn(),
     delete: vi.fn(),
   },

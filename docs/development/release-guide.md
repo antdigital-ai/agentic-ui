@@ -9,7 +9,7 @@ group:
 
 # 发布测试版本指南
 
-本指南详细介绍了如何发布 md-editor 的测试版本，包括版本管理、发布流程和测试验证。
+本指南详细介绍了如何发布 agentic-ui 的测试版本，包括版本管理、发布流程和测试验证。
 
 ## 🚀 快速发布
 
@@ -569,10 +569,10 @@ pnpm test -- --testNamePattern="specific test"
 如果在发布过程中遇到问题：
 
 1. 查看 [npm 文档](https://docs.npmjs.com/)
-2. 检查 [GitHub Actions 日志](https://github.com/ant-design/md-editor/actions)
+2. 检查 [GitHub Actions 日志](https://github.com/ant-design/agentic-ui/actions)
 3. 联系项目维护者
-4. 在 [Issues](https://github.com/ant-design/md-editor/issues) 中报告问题
+4. 在 [Issues](https://github.com/ant-design/agentic-ui/issues) 中报告问题
 
 ---
 
-通过规范的测试版本发布流程，我们可以确保 md-editor 的质量和稳定性。🚀
+通过规范的测试版本发布流程，我们可以确保 agentic-ui 的质量和稳定性。🚀

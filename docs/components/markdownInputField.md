@@ -208,32 +208,143 @@ export default () => {
 };
 ```
 
+## 快捷键
+
+组件支持以下快捷键操作，可以通过 `triggerSendKey` 属性配置发送行为。
+
+### 发送与换行
+
+| 模式             | 发送快捷键                                          | 换行快捷键                          | 适用场景                       |
+| :--------------- | :-------------------------------------------------- | :---------------------------------- | :----------------------------- |
+| `'Enter'` (默认) | <kbd>Enter</kbd>                                    | <kbd>Shift</kbd> + <kbd>Enter</kbd> | 适合短文本对话，按回车直接发送 |
+| `'Mod+Enter'`    | <kbd>Cmd</kbd> / <kbd>Ctrl</kbd> + <kbd>Enter</kbd> | <kbd>Enter</kbd>                    | 适合长文本编辑，需要频繁换行   |
+
+> **特殊说明**：
+>
+> 1.  **移动端适配**：在移动设备上，为防止误触，强制使用 `'Mod+Enter'` 模式（即点击键盘回车键仅换行，不发送）。
+> 2.  **输入法兼容**：在中文输入法（IME）组字/选词过程中，按 <kbd>Enter</kbd> 键不会触发发送。
+
+### 编辑器通用快捷键
+
+除了发送快捷键外，组件还支持以下 Markdown 编辑常用的快捷键：
+
+| 快捷键 (Mac / Windows)                                                                               | 功能                 |
+| :--------------------------------------------------------------------------------------------------- | :------------------- |
+| <kbd>Cmd</kbd> + <kbd>B</kbd> / <kbd>Ctrl</kbd> + <kbd>B</kbd>                                       | 加粗                 |
+| <kbd>Cmd</kbd> + <kbd>I</kbd> / <kbd>Ctrl</kbd> + <kbd>I</kbd>                                       | 斜体                 |
+| <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> | 删除线               |
+| <kbd>Option</kbd> + <kbd>`</kbd> / <kbd>Alt</kbd> + <kbd>`</kbd>                                     | 行内代码             |
+| <kbd>Cmd</kbd> + <kbd>\</kbd> / <kbd>Ctrl</kbd> + <kbd>\</kbd>                                       | 清除格式             |
+| <kbd>Cmd</kbd> + <kbd>1</kbd>~<kbd>4</kbd> / <kbd>Ctrl</kbd> + <kbd>1</kbd>~<kbd>4</kbd>             | 标题 H1 ~ H4         |
+| <kbd>Cmd</kbd> + <kbd>0</kbd> / <kbd>Ctrl</kbd> + <kbd>0</kbd>                                       | 转换为普通段落       |
+| <kbd>Cmd</kbd> + <kbd>]</kbd> / <kbd>Ctrl</kbd> + <kbd>]</kbd>                                       | 增加标题级别（变小） |
+| <kbd>Cmd</kbd> + <kbd>[</kbd> / <kbd>Ctrl</kbd> + <kbd>[</kbd>                                       | 降低标题级别（变大） |
+| <kbd>Option</kbd> + <kbd>Q</kbd> / <kbd>Alt</kbd> + <kbd>Q</kbd>                                     | 引用块               |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>O</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>O</kbd>     | 有序列表             |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>U</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd>     | 无序列表             |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>S</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd>     | 任务列表             |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>C</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd>     | 代码块               |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>T</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd>     | 表格                 |
+| <kbd>Cmd</kbd> + <kbd>Opt</kbd> + <kbd>/</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>/</kbd>     | 分割线               |
+| <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> | 选择当前行           |
+| <kbd>Cmd</kbd> + <kbd>D</kbd> / <kbd>Ctrl</kbd> + <kbd>D</kbd>                                       | 选择当前单词/汉字    |
+| <kbd>Cmd</kbd> + <kbd>Z</kbd> / <kbd>Ctrl</kbd> + <kbd>Z</kbd>                                       | 撤销                 |
+| <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> | 重做                 |
+
 ## API
 
-| 属性名                  | 类型                                             | 默认值    | 描述                               |
-| ----------------------- | ------------------------------------------------ | --------- | ---------------------------------- |
-| `value`                 | `string`                                         | -         | 当前的 markdown 文本值             |
-| `onChange`              | `(value: string) => void`                        | -         | 当输入值改变时触发的回调函数       |
-| `placeholder`           | `string`                                         | -         | 输入字段的占位文本                 |
-| `style`                 | `React.CSSProperties`                            | -         | 应用于输入字段的内联样式           |
-| `className`             | `string`                                         | -         | 应用于输入字段的 CSS 类名          |
-| `disabled`              | `boolean`                                        | -         | 是否禁用输入字段                   |
-| `typing`                | `boolean`                                        | -         | 用户是否正在输入的状态标志         |
-| `allowEmptySubmit`      | `boolean`                                        | `false`   | 是否允许在内容为空时也触发发送     |
-| `triggerSendKey`        | `'Enter' \| 'Mod+Enter'`                         | `'Enter'` | 触发发送操作的键盘快捷键           |
-| `onSend`                | `(value: string) => Promise<void>`               | -         | 当内容发送时触发的异步回调函数     |
-| `onStop`                | `() => void`                                     | -         | 正在输入中时点击发送按钮的回调函数 |
-| `onFocus`               | `(value: string, schema: Elements[]) => void`    | -         | 当输入字段获得焦点时触发的回调函数 |
-| `tagInputProps`         | `MarkdownEditorProps['tagInputProps']`           | -         | 标签输入的相关属性                 |
-| `borderRadius`          | `number`                                         | `12`      | 边框圆角大小                       |
-| `attachment`            | `{ enable?: boolean } & AttachmentButtonProps`   | -         | 附件配置                           |
-| `actionsRender`         | `(props, defaultActions) => React.ReactNode[]`   | -         | 自定义渲染操作按钮的函数           |
-| `toolsRender`           | `(props) => React.ReactNode[]`                   | -         | 自定义渲染操作按钮前内容的函数     |
-| `leafRender`            | `(props, defaultDom) => React.ReactElement`      | -         | 自定义叶子节点渲染函数             |
-| `inputRef`              | `React.MutableRefObject<MarkdownEditorInstance>` | -         | 输入框引用                         |
-| `skillMode`             | `SkillModeConfig`                                | -         | 技能模式配置                       |
-| `onSkillModeOpenChange` | `(open: boolean) => void`                        | -         | 技能模式状态变化回调               |
-| `pasteConfig`           | `{ enabled?: boolean; allowedTypes?: string[] }` | -         | 粘贴配置                           |
+| 属性名                   | 类型                                                                 | 默认值    | 描述                                        |
+| ------------------------ | -------------------------------------------------------------------- | --------- | ------------------------------------------- |
+| `value`                  | `string`                                                             | -         | 当前的 markdown 文本值                      |
+| `onChange`               | `(value: string) => void`                                            | -         | 当输入值改变时触发的回调函数                |
+| `placeholder`            | `string`                                                             | -         | 输入字段的占位文本                          |
+| `style`                  | `React.CSSProperties`                                                | -         | 应用于输入字段的内联样式                    |
+| `className`              | `string`                                                             | -         | 应用于输入字段的 CSS 类名                   |
+| `disabled`               | `boolean`                                                            | -         | 是否禁用输入字段                            |
+| `typing`                 | `boolean`                                                            | -         | 用户是否正在输入的状态标志                  |
+| `allowEmptySubmit`       | `boolean`                                                            | `false`   | 是否允许在内容为空时也触发发送              |
+| `triggerSendKey`         | `'Enter' \| 'Mod+Enter'`                                             | `'Enter'` | 触发发送操作的键盘快捷键                    |
+| `onSend`                 | `(value: string) => Promise<void>`                                   | -         | 当内容发送时触发的异步回调函数              |
+| `onStop`                 | `() => void`                                                         | -         | 正在输入中时点击发送按钮的回调函数          |
+| `onFocus`                | `(value: string, schema: Elements[], e: FocusEvent) => void`         | -         | 当输入字段获得焦点时触发的回调函数          |
+| `onBlur`                 | `(value: string, schema: Elements[], e: MouseEvent) => void`         | -         | 当输入字段失去焦点时触发的回调函数          |
+| `tagInputProps`          | `MarkdownEditorProps['tagInputProps']`                               | -         | 标签输入的相关属性                          |
+| `borderRadius`           | `number`                                                             | `12`      | 边框圆角大小                                |
+| `attachment`             | `{ enable?: boolean } & AttachmentButtonProps`                       | -         | 附件配置                                    |
+| `voiceRecognizer`        | `CreateRecognizer`                                                   | -         | 语音输入配置                                |
+| `actionsRender`          | `(props, defaultActions) => React.ReactNode[]`                       | -         | 自定义渲染操作按钮的函数                    |
+| `toolsRender`            | `(props) => React.ReactNode[]`                                       | -         | 自定义渲染操作按钮前内容的函数              |
+| `beforeToolsRender`      | `(props) => React.ReactNode`                                         | -         | 自定义渲染输入框上方的工具栏区域            |
+| `quickActionRender`      | `(props) => React.ReactNode[]`                                       | -         | 自定义右上操作按钮渲染函数                  |
+| `leafRender`             | `(props, defaultDom) => React.ReactElement`                          | -         | 自定义叶子节点渲染函数                      |
+| `inputRef`               | `React.MutableRefObject<MarkdownEditorInstance>`                     | -         | 输入框引用                                  |
+| `skillMode`              | `SkillModeConfig`                                                    | -         | 技能模式配置                                |
+| `onSkillModeOpenChange`  | `(open: boolean) => void`                                            | -         | 技能模式状态变化回调                        |
+| `pasteConfig`            | `{ enabled?: boolean; allowedTypes?: string[] }`                     | -         | 粘贴配置                                    |
+| `refinePrompt`           | `{ enable: boolean; onRefine: (input: string) => Promise<string>; }` | -         | 提示词优化配置                              |
+| `enlargeable`            | `{ enable?: boolean; height?: number; }`                             | -         | 放大功能配置                                |
+| `isShowTopOperatingArea` | `boolean`                                                            | `false`   | 是否显示顶部操作区域                        |
+| `targetRef`              | `React.RefObject<HTMLDivElement>`                                    | -         | 顶部操作区域回到顶部/底部功能的目标元素引用 |
+| `operationBtnRender`     | `() => React.ReactNode`                                              | -         | 顶部操作区域自定义操作按钮渲染函数          |
+| `isShowBackTo`           | `boolean`                                                            | `true`    | 是否在顶部操作区域显示回到顶部/底部按钮     |
+| `maxHeight`              | `number \| string`                                                   | -         | 输入框的最大高度                            |
+| `maxLength`              | `number`                                                             | -         | 输入文本的最大字符数限制                    |
+| `onMaxLengthExceeded`    | `(value: string) => void`                                            | -         | 当输入达到最大长度限制时的回调函数          |
+| `sendButtonProps`        | `SendButtonCustomizationProps`                                       | -         | 发送按钮配置                                |
+| `disableHoverAnimation`  | `boolean`                                                            | `false`   | 是否禁用 hover 动画                         |
+| `bgColorList`            | `string[]`                                                           | -         | 背景颜色列表                                |
+
+### 类型定义
+
+#### AttachmentButtonProps
+
+附件按钮配置属性。
+
+| 属性名               | 类型                                                               | 说明                                                |
+| -------------------- | ------------------------------------------------------------------ | --------------------------------------------------- |
+| `upload`             | `(file: AttachmentFile, index: number) => Promise<string>`         | 文件上传处理函数，返回文件 URL                      |
+| `uploadWithResponse` | `(file: AttachmentFile, index: number) => Promise<UploadResponse>` | 文件上传处理函数（返回完整响应），优先级高于 upload |
+| `fileMap`            | `Map<string, AttachmentFile>`                                      | 文件映射表，用于存储已上传的文件                    |
+| `onFileMapChange`    | `(files?: Map<string, AttachmentFile>) => void`                    | 文件映射表变更时的回调                              |
+| `supportedFormat`    | `SupportedFileFormats`                                             | 支持的文件格式配置                                  |
+| `disabled`           | `boolean`                                                          | 是否禁用按钮                                        |
+| `maxFileSize`        | `number`                                                           | 单个文件最大大小（字节）                            |
+| `maxFileCount`       | `number`                                                           | 最大文件数量                                        |
+| `allowMultiple`      | `boolean`                                                          | 是否允许一次选择多个文件（默认：true）              |
+
+#### SkillModeConfig
+
+技能模式配置接口。
+
+| 属性名         | 类型                                   | 默认值  | 说明                                              |
+| -------------- | -------------------------------------- | ------- | ------------------------------------------------- |
+| `enable`       | `boolean`                              | `true`  | 是否启用技能模式组件，当为 false 时组件完全不渲染 |
+| `open`         | `boolean`                              | `false` | 是否打开技能模式                                  |
+| `title`        | `React.ReactNode`                      | -       | 技能模式标题                                      |
+| `rightContent` | `React.ReactNode \| React.ReactNode[]` | -       | 右侧自定义内容，支持单个节点或数组                |
+| `closable`     | `boolean`                              | `true`  | 是否显示默认关闭按钮                              |
+| `style`        | `React.CSSProperties`                  | -       | 技能模式容器样式                                  |
+| `className`    | `string`                               | -       | 技能模式容器类名                                  |
+
+#### SendButtonCustomizationProps
+
+发送按钮自定义配置。
+
+| 属性名    | 类型               | 说明                     |
+| --------- | ------------------ | ------------------------ |
+| `compact` | `boolean`          | 是否使用紧凑模式显示按钮 |
+| `colors`  | `SendButtonColors` | 自定义按钮颜色配置       |
+
+#### SendButtonColors
+
+发送按钮颜色配置。
+
+| 属性名            | 类型     | 说明                   |
+| ----------------- | -------- | ---------------------- |
+| `icon`            | `string` | 默认状态下的图标颜色   |
+| `iconHover`       | `string` | Hover 状态下的图标颜色 |
+| `background`      | `string` | 默认状态下的背景颜色   |
+| `backgroundHover` | `string` | Hover 状态下的背景颜色 |
 
 ## 示例
 
@@ -248,7 +359,14 @@ const App = () => {
   const [value, setValue] = React.useState('');
 
   return (
-    <div>
+    <div
+      style={{
+        padding: 12,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+      }}
+    >
       <MarkdownInputField
         value={value}
         toolsRender={() => [
@@ -272,6 +390,15 @@ const App = () => {
             联网搜索
           </ToggleButton>,
         ]}
+        onChange={(newValue) => setValue(newValue)}
+        placeholder="请输入内容..."
+        onSend={async (text) => {
+          console.log('发送内容:', text);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }}
+      />
+      <MarkdownInputField
+        value={value}
         onChange={(newValue) => setValue(newValue)}
         placeholder="请输入内容..."
         onSend={async (text) => {
@@ -578,8 +705,8 @@ export default () => {
       <MarkdownInputField
         value={value}
         onChange={setValue}
-        placeholder="按Ctrl+Enter发送消息..."
-        triggerSendKey="Mod+Enter"
+        placeholder="按Enter发送消息，Shift+Enter换行..."
+        triggerSendKey="Enter"
         style={{ minHeight: '200px' }}
         borderRadius={8}
       />
@@ -616,7 +743,7 @@ export default () => {
     <div>
       <div
         style={{
-          padding: 20,
+          padding: 12,
         }}
       >
         <MarkdownInputField
@@ -1054,7 +1181,7 @@ export default () => {
     <>
       <div
         style={{
-          padding: 20,
+          padding: 12,
         }}
       >
         <MarkdownInputField
@@ -1504,17 +1631,6 @@ export default () => {
   );
 };
 ```
-
-> 交互说明：
->
-> - **功能开关**: `enable` 参数控制整个技能模式功能的启用状态
->   - 当 `enable={false}`时，组件完全不渲染，不执行任何逻辑，提供最佳性能
->   - 当 `enable={true}`时，组件正常工作，可通过 `open` 参数控制显示/隐藏
-> - **显示控制**: `open` 参数控制技能模式的显示与隐藏状态
-> - **动画效果**: 支持流畅的上下滑动动画效果（300ms 缓动动画）
-> - **自定义内容**: 支持自定义标题和右侧内容，可以显示版本、设置按钮等
-> - **状态监听**: `onSkillModeOpenChange` 监听所有状态变化，包括点击关闭按钮和外部代码修改
-> - **交互演示**: 通过控制面板可以实时体验不同参数的效果，状态变化日志实时记录所有操作
 
 ### 粘贴配置
 

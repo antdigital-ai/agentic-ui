@@ -15,4 +15,8 @@ export {
   type LanguageSelectorProps,
 } from './LanguageSelector';
 export { LoadImage } from './LoadImage';
-export { ThinkBlock } from './ThinkBlock';
+export {
+  ThinkBlock,
+  ThinkBlockProvider,
+  type ThinkBlockContextType,
+} from './ThinkBlock';

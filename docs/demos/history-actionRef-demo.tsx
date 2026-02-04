@@ -50,7 +50,7 @@ const HistoryActionRefDemo: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h2>History 组件 actionRef 示例</h2>
 
       <Space style={{ marginBottom: 16 }}>

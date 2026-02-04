@@ -1,5 +1,6 @@
 ---
 title: Button 按钮
+atomId: Button
 group:
   title: 通用
   order: 1

@@ -123,6 +123,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
     },
     editorStyle,
     height,
+    children,
     ...rest
   } = props;
   // 是否挂载
@@ -208,27 +209,44 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
   }, []);
 
   const store = useMemo(
-    () => new EditorStore(markdownEditorRef, props.plugins),
-    [props.plugins],
+    () =>
+      new EditorStore(
+        markdownEditorRef,
+        props.plugins,
+        props.markdownToHtmlOptions,
+      ),
+    [props.plugins, props.markdownToHtmlOptions],
   );
 
   /**
    * 初始化 schema
    */
   const initSchemaValue = useMemo(() => {
-    let list = parserMdToSchema(initValue!, props.plugins)?.schema;
+    // 安全地获取解析结果，确保 list 始终是数组
+    const parseResult = parserMdToSchema(initValue || '', props.plugins);
+    let list = parseResult?.schema || [];
+
+    // 如果不是只读模式，添加一个空段落以便编辑
     if (!props.readonly) {
-      list.push(EditorUtils.p);
+      list = [...list, EditorUtils.p];
     }
+
+    // 优先使用外部传入的 initSchemaValue，否则根据 initValue 决定
     const schema =
       props.initSchemaValue ||
       (initValue ? list : JSON.parse(JSON.stringify([EditorUtils.p])));
 
+    // 过滤掉无效的空节点
     return schema?.filter((item: any) => {
-      if (item.type === 'p' && item.children.length === 0) {
+      if (item.type === 'paragraph' && item.children.length === 0) {
         return false;
       }
-      if (item.type === 'list' && item.children.length === 0) {
+      if (
+        (item.type === 'list' ||
+          item.type === 'bulleted-list' ||
+          item.type === 'numbered-list') &&
+        item.children.length === 0
+      ) {
         return false;
       }
       if (item.type === 'listItem' && item.children.length === 0) {
@@ -327,24 +345,11 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
             style={{
               width: width || '100%',
               height: height || 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              maxHeight: '100%',
-              font: 'var(--font-text-paragraph-lg)',
-              letterSpacing: 'var(--letter-spacing-paragraph-lg, normal)',
-              color: 'var(--color-gray-text-default)',
               ...style,
             }}
           >
             {!readonly && toolBar?.enable === true ? (
               <div
-                style={{
-                  width: '100%',
-                  maxWidth: '100%',
-                  position: 'sticky',
-                  zIndex: 99,
-                  top: 0,
-                }}
                 className={classNames(`${baseClassName}-toolbar-container`, {
                   [`${baseClassName}-min-toolbar`]: toolBar.min,
                 })}
@@ -357,15 +362,26 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
               </div>
             ) : readonly ? null : null}
             <div
+              className={classNames(
+                `${baseClassName}-container`,
+                props.containerClassName,
+                hashId,
+              )}
               style={{
-                padding: '4px 20px',
-                overflow: 'auto',
-                display: 'flex',
                 height:
                   !readonly && toolBar?.enable ? `calc(100% - 56px)` : '100%',
-                position: 'relative',
-                gap: 24,
-                outline: 'none',
+                // 如果 contentStyle 中设置了 padding，设置 CSS 变量和内联样式
+                ...(contentStyle?.padding !== undefined
+                  ? {
+                      '--content-padding': `${
+                        typeof contentStyle.padding === 'number'
+                          ? `${contentStyle.padding}px`
+                          : contentStyle.padding
+                      }`,
+                      padding: contentStyle.padding,
+                    }
+                  : {}),
+                // contentStyle 放在最后，确保能够覆盖默认样式（包括 padding）
                 ...contentStyle,
               }}
               ref={(dom) => {
@@ -421,12 +437,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
             {readonly ||
             props?.textAreaProps?.enable ||
             props?.reportMode ? null : (
-              <div
-                className={classNames(`${baseClassName}-focus`)}
-                style={{
-                  height: 64,
-                }}
-              />
+              <div className={classNames(`${baseClassName}-focus`)} />
             )}
             {readonly ? (
               <></>
@@ -438,6 +449,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 />
               </>
             )}
+            {children}
           </div>
         </EditorStoreContext.Provider>
       </PluginContext.Provider>

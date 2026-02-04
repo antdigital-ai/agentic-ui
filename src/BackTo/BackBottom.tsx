@@ -1,12 +1,16 @@
-import React, { forwardRef, useCallback } from 'react';
+import React, { forwardRef, memo, useCallback } from 'react';
 import { getScrollRailHeight } from '../Utils/getScroll';
 import scrollTo from '../Utils/scrollTo';
+import { BottomIcon } from './icons/BottomIcon';
 import {
   ScrollVisibleButton,
   ScrollVisibleButtonProps,
   ScrollVisibleButtonRef,
 } from './ScrollVisibleButton';
-import { BottomIcon } from './icons/BottomIcon';
+
+// 常量定义
+const DEFAULT_DURATION = 450;
+const DEFAULT_VISIBLE_THRESHOLD = 400;
 
 /**
  * BackBottom 组件属性接口
@@ -72,10 +76,10 @@ export interface BackBottomProps extends ScrollVisibleButtonProps {
  * - 使用 forwardRef 支持 ref 传递
  * - 提供完整的无障碍支持
  */
-export const BackBottom = forwardRef<ScrollVisibleButtonRef, BackBottomProps>(
+const BackBottomComponent = forwardRef<ScrollVisibleButtonRef, BackBottomProps>(
   (props, ref) => {
     const {
-      duration = 450,
+      duration = DEFAULT_DURATION,
       onClick,
       shouldVisible: propsShouldVisible,
       ...rest
@@ -89,19 +93,28 @@ export const BackBottom = forwardRef<ScrollVisibleButtonRef, BackBottomProps>(
           return propsShouldVisible(scrollTop, container);
         }
         const scrollRailHeight = getScrollRailHeight(container);
-        return scrollRailHeight - scrollTop >= (propsShouldVisible ?? 400);
+        return (
+          scrollRailHeight - scrollTop >=
+          (propsShouldVisible ?? DEFAULT_VISIBLE_THRESHOLD)
+        );
       },
       [propsShouldVisible],
     );
 
-    const scrollToBottom: ScrollVisibleButtonProps['onClick'] = (
-      e,
-      container,
-    ) => {
-      const scrollRailHeight = getScrollRailHeight(container);
-      scrollTo(scrollRailHeight, { container, duration });
-      onClick?.(e, container);
-    };
+    // 使用 useCallback 优化滚动到底部处理函数
+    const scrollToBottom = useCallback<
+      (
+        e: React.MouseEvent<HTMLButtonElement> | undefined,
+        container: HTMLElement | Window,
+      ) => void
+    >(
+      (e, container) => {
+        const scrollRailHeight = getScrollRailHeight(container);
+        scrollTo(scrollRailHeight, { container, duration });
+        onClick?.(e, container);
+      },
+      [duration, onClick],
+    );
 
     return (
       <ScrollVisibleButton
@@ -115,3 +128,8 @@ export const BackBottom = forwardRef<ScrollVisibleButtonRef, BackBottomProps>(
     );
   },
 );
+
+BackBottomComponent.displayName = 'BackBottom';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+export const BackBottom = memo(BackBottomComponent);

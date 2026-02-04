@@ -36,6 +36,14 @@ vi.mock('react-chartjs-2', () => ({
   )),
 }));
 
+// Mock utils
+vi.mock('../../../src/Plugins/chart/utils', () => ({
+  hexToRgba: vi.fn((color, alpha) => `rgba(0,0,0,${alpha})`),
+  resolveCssVariable: vi.fn((color) =>
+    typeof color === 'string' && color.startsWith('var(') ? '#1d7afc' : color,
+  ),
+}));
+
 // Mock components
 vi.mock('../../../src/Plugins/chart/components', () => ({
   ChartContainer: ({ children, ...props }: any) => (
@@ -509,6 +517,132 @@ describe('ScatterChart', () => {
       );
 
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+  });
+
+  describe('classNames 和 styles 支持', () => {
+    it('应该支持 ChartClassNames 对象格式的 classNames', () => {
+      const classNames = {
+        root: 'custom-root-class',
+        toolbar: 'custom-toolbar-class',
+        statisticContainer: 'custom-statistic-class',
+        wrapper: 'custom-wrapper-class',
+      };
+
+      render(<ScatterChart data={sampleData} classNames={classNames} />);
+
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
+    it('应该支持 ChartStyles 对象格式的 styles', () => {
+      const styles = {
+        root: { width: '500px', height: '300px' },
+        toolbar: { padding: '10px' },
+        statisticContainer: { display: 'flex' },
+        wrapper: { marginTop: '20px' },
+      };
+
+      render(<ScatterChart data={sampleData} styles={styles} />);
+
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
+    it('应该合并 classNames 和 className', () => {
+      const classNames = {
+        root: 'custom-root-class',
+      };
+
+      render(
+        <ScatterChart
+          data={sampleData}
+          classNames={classNames}
+          className="additional-class"
+        />,
+      );
+
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
+    it('应该合并 styles 和 style', () => {
+      const styles = {
+        root: { width: '500px', height: '300px' },
+      };
+
+      render(
+        <ScatterChart
+          data={sampleData}
+          styles={styles}
+          style={{ padding: '10px' }}
+        />,
+      );
+
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
+    it('应该正确处理 styles?.root 的合并顺序', () => {
+      const styles = {
+        root: { backgroundColor: 'red' },
+      };
+
+      render(
+        <ScatterChart
+          data={sampleData}
+          styles={styles}
+          style={{ width: '500px', height: '300px' }}
+        />,
+      );
+
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
+    it('应该处理 classNames 为 undefined 的情况', () => {
+      render(<ScatterChart data={sampleData} classNames={undefined} />);
+
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
+    it('应该处理 styles 为 undefined 的情况', () => {
+      render(<ScatterChart data={sampleData} styles={undefined} />);
+
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+  });
+
+  describe('CSS 变量颜色支持测试', () => {
+    it('应该支持单个 CSS 变量颜色', () => {
+      render(
+        <ScatterChart
+          data={sampleData}
+          color="var(--color-blue-control-fill-primary)"
+        />,
+      );
+
+      expect(screen.getByTestId('scatter-chart')).toBeInTheDocument();
+    });
+
+    it('应该支持多个 CSS 变量颜色', () => {
+      render(
+        <ScatterChart
+          data={sampleData}
+          color={[
+            'var(--color-blue-control-fill-primary)',
+            'var(--color-green-control-fill-primary)',
+          ]}
+        />,
+      );
+
+      expect(screen.getByTestId('scatter-chart')).toBeInTheDocument();
+    });
+
+    it('应该支持混合使用 CSS 变量和十六进制颜色', () => {
+      render(
+        <ScatterChart
+          data={sampleData}
+          color={['var(--color-blue-control-fill-primary)', '#ff0000']}
+        />,
+      );
+
+      expect(screen.getByTestId('scatter-chart')).toBeInTheDocument();
     });
   });
 });

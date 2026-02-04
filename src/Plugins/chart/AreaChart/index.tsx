@@ -1,19 +1,12 @@
 import { ConfigProvider } from 'antd';
 import {
-  CategoryScale,
   ChartData,
   Chart as ChartJS,
   ChartOptions,
-  Filler,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
   ScriptableContext,
-  Tooltip,
 } from 'chart.js';
 import classNames from 'classnames';
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext, useMemo, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   ChartContainer,
@@ -24,11 +17,21 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
+import {
+  useChartDataFilter,
+  useChartStatistics,
+  useChartTheme,
+  useResponsiveSize,
+} from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
+import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
   ChartDataItem,
   extractAndSortXValues,
   findDataPointByXValue,
+  hexToRgba,
+  registerLineChartComponents,
+  resolveCssVariable,
 } from '../utils';
 import { useStyle } from './style';
 
@@ -42,8 +45,6 @@ import { useStyle } from './style';
  * @version 1.0.0
  * @since 2024
  */
-
-let areaChartComponentsRegistered = false;
 
 /**
  * 面积图数据项类型
@@ -143,6 +144,8 @@ export interface AreaChartProps extends ChartContainerProps {
   height?: number | string;
   /** 自定义CSS类名 */
   className?: string;
+  /** 自定义CSS类名（支持对象格式，为每层DOM设置类名） */
+  classNames?: ChartClassNames;
   /** 数据时间 */
   dataTime?: string;
   /** 图表主题 */
@@ -171,43 +174,11 @@ export interface AreaChartProps extends ChartContainerProps {
   renderFilterInToolbar?: boolean;
   /** ChartStatistic组件配置：object表示单个配置，array表示多个配置 */
   statistic?: StatisticConfigType;
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
+  /** 自定义样式对象（支持对象格式，为每层DOM设置样式） */
+  styles?: ChartStyles;
 }
-
-/**
- * 将十六进制颜色转换为带透明度的 RGBA 字符串
- *
- * 支持3位和6位十六进制颜色格式，并添加透明度。
- *
- * @param {string} hex - 十六进制颜色值（如 '#ff0000' 或 '#f00'）
- * @param {number} alpha - 透明度值（0-1之间）
- * @returns {string} RGBA 颜色字符串
- *
- * @example
- * ```typescript
- * hexToRgba('#ff0000', 0.5); // 'rgba(255, 0, 0, 0.5)'
- * hexToRgba('#f00', 0.8); // 'rgba(255, 0, 0, 0.8)'
- * ```
- *
- * @since 1.0.0
- */
-const hexToRgba = (hex: string, alpha: number): string => {
-  const sanitized = hex.replace('#', '');
-  const isShort = sanitized.length === 3;
-  const r = parseInt(
-    isShort ? sanitized[0] + sanitized[0] : sanitized.slice(0, 2),
-    16,
-  );
-  const g = parseInt(
-    isShort ? sanitized[1] + sanitized[1] : sanitized.slice(2, 4),
-    16,
-  );
-  const b = parseInt(
-    isShort ? sanitized[2] + sanitized[2] : sanitized.slice(4, 6),
-    16,
-  );
-  const a = Math.max(0, Math.min(1, alpha));
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-};
 
 /**
  * 面积图组件
@@ -242,6 +213,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
   width = 600,
   height = 400,
   className,
+  classNames: classNamesProp,
+  style,
+  styles: stylesProp,
   dataTime,
   theme = 'light',
   color,
@@ -257,49 +231,16 @@ const AreaChart: React.FC<AreaChartProps> = ({
   renderFilterInToolbar = false,
   statistic: statisticConfig,
   variant,
+  loading = false,
 }) => {
-  useMemo(() => {
-    if (areaChartComponentsRegistered) {
-      return undefined;
-    }
+  // 注册 Chart.js 组件
+  registerLineChartComponents();
 
-    if (typeof window === 'undefined') {
-      return undefined;
-    }
-
-    ChartJS.register(
-      CategoryScale,
-      LinearScale,
-      PointElement,
-      LineElement,
-      Filler,
-      Tooltip,
-      Legend,
-    );
-    areaChartComponentsRegistered = true;
-    return undefined;
-  }, []);
-
-  const safeData = Array.isArray(data) ? data : [];
-  // 响应式尺寸计算
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 768,
+  // 响应式尺寸
+  const { responsiveWidth, responsiveHeight, isMobile } = useResponsiveSize(
+    width,
+    height,
   );
-  const isMobile = windowWidth <= 768;
-  const responsiveWidth = isMobile ? '100%' : width;
-  const responsiveHeight = isMobile ? Math.min(windowWidth * 0.8, 400) : height;
-
-  // 监听窗口大小变化
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, []);
 
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
@@ -309,65 +250,22 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const chartRef = useRef<ChartJS<'line'>>(null);
 
   // 处理 ChartStatistic 组件配置
-  const statistics = useMemo(() => {
-    if (!statisticConfig) return null;
-    return Array.isArray(statisticConfig) ? statisticConfig : [statisticConfig];
-  }, [statisticConfig]);
+  const statistics = useChartStatistics(statisticConfig);
 
-  // 从数据中提取唯一的类别作为筛选选项
-  const categories = useMemo(() => {
-    const uniqueCategories = [
-      ...new Set(safeData.map((item) => item.category)),
-    ].filter(Boolean);
-    return uniqueCategories;
-  }, [safeData]);
+  // 数据筛选
+  const {
+    filteredData,
+    filterOptions,
+    filterLabels,
+    selectedFilter,
+    setSelectedFilter,
+    selectedFilterLabel,
+    setSelectedFilterLabel,
+    filteredDataByFilterLabel,
+  } = useChartDataFilter(data);
 
-  // 从数据中提取 filterLabel，过滤掉 undefined 值
-  const validFilterLabels = useMemo(() => {
-    return safeData
-      .map((item) => item.filterLabel)
-      .filter(
-        (filterLabel): filterLabel is string => filterLabel !== undefined,
-      );
-  }, [safeData]);
-
-  const filterLabels = useMemo(() => {
-    return validFilterLabels.length > 0
-      ? [...new Set(validFilterLabels)]
-      : undefined;
-  }, [validFilterLabels]);
-
-  // 状态管理
-  const [selectedFilter, setSelectedFilter] = useState<string>(
-    categories.find(Boolean) || '',
-  );
-  const [selectedFilterLabel, setSelectedFilterLabel] = useState(
-    filterLabels && filterLabels.length > 0 ? filterLabels[0] : undefined,
-  );
-
-  // 当数据变化导致当前选中分类失效时，自动回退到首个有效分类或空（显示全部）
-  useEffect(() => {
-    if (selectedFilter && !categories.includes(selectedFilter)) {
-      setSelectedFilter(categories.find(Boolean) || '');
-    }
-  }, [categories, selectedFilter]);
-
-  // 筛选数据
-  const filteredData = useMemo(() => {
-    const base = selectedFilter
-      ? safeData.filter((item) => item.category === selectedFilter)
-      : safeData;
-
-    const withFilterLabel =
-      !filterLabels || !selectedFilterLabel
-        ? base
-        : base.filter((item) => item.filterLabel === selectedFilterLabel);
-
-    // 统一过滤掉 x 为空（null/undefined）的数据，避免后续 toString 报错
-    return withFilterLabel.filter(
-      (item) => item.x !== null && item.x !== undefined,
-    );
-  }, [safeData, selectedFilter, filterLabels, selectedFilterLabel]);
+  // 主题颜色
+  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
 
   // 从数据中提取唯一的类型
   const types = useMemo(() => {
@@ -405,6 +303,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
           defaultColorList[index % defaultColorList.length]
         : provided || defaultColorList[index % defaultColorList.length];
 
+      // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+      const resolvedColor = resolveCssVariable(baseColor);
+
       // 为每个类型收集数据点
       const typeData = xValues.map((x) => {
         const dataPoint = findDataPointByXValue(filteredData, x, type);
@@ -416,20 +317,22 @@ const AreaChart: React.FC<AreaChartProps> = ({
       return {
         label: type || '默认',
         data: typeData,
-        borderColor: baseColor,
+        borderColor: resolvedColor,
         backgroundColor: (ctx: ScriptableContext<'line'>) => {
           const chart = ctx.chart;
           const chartArea = chart.chartArea;
-          if (!chartArea) return hexToRgba(baseColor, 0.2);
+
+          // 对于所有颜色（包括解析后的 CSS 变量），使用渐变效果
+          if (!chartArea) return hexToRgba(resolvedColor, 0.2);
 
           const { top, bottom } = chartArea;
           const gradient = chart.ctx.createLinearGradient(0, top, 0, bottom);
           // 顶部颜色更实，向下逐渐透明，形成柔和的面积过渡
-          gradient.addColorStop(0, hexToRgba(baseColor, 0.28));
-          gradient.addColorStop(1, hexToRgba(baseColor, 0.05));
+          gradient.addColorStop(0, hexToRgba(resolvedColor, 0.28));
+          gradient.addColorStop(1, hexToRgba(resolvedColor, 0.05));
           return gradient;
         },
-        pointBackgroundColor: baseColor,
+        pointBackgroundColor: resolvedColor,
         pointBorderColor: '#fff',
         pointBorderWidth: 1,
         borderWidth: 3,
@@ -439,29 +342,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
     });
 
     return { labels, datasets };
-  }, [filteredData, types, xValues]);
-
-  // 筛选器选项
-  const filterOptions = useMemo(() => {
-    return categories.map((category) => ({
-      label: category || '默认',
-      value: category || '默认',
-    }));
-  }, [categories]);
-
-  // 根据 filterLabel 筛选数据 - 只有当 filterLabels 存在时才生成
-  const filteredDataByFilterLabel = useMemo(() => {
-    return filterLabels?.map((item) => ({
-      key: item,
-      label: item,
-    }));
-  }, [filterLabels]);
-
-  const isLight = theme === 'light';
-  const axisTextColor = isLight
-    ? 'rgba(0, 25, 61, 0.3255)'
-    : 'rgba(255, 255, 255, 0.8)';
-  const gridColor = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.2)';
+  }, [filteredData, types, xValues, color]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,
@@ -480,6 +361,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
         },
       },
       tooltip: {
+        // 与交互保持一致：不要求点相交，并按 x 索引联动
+        intersect: false,
+        mode: 'index',
         backgroundColor: isLight
           ? 'rgba(255,255,255,0.95)'
           : 'rgba(0,0,0,0.85)',
@@ -564,30 +448,44 @@ const AreaChart: React.FC<AreaChartProps> = ({
         borderWidth: 3,
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   const handleDownload = () => {
     downloadChart(chartRef.current, 'area-chart');
   };
 
+  const rootClassName = classNames(classNamesProp?.root, className);
+  const rootStyle = {
+    width: responsiveWidth,
+    height: responsiveHeight,
+    ...style,
+    ...stylesProp?.root,
+  };
+
+  const toolbarClassName = classNames(classNamesProp?.toolbar);
+  const toolbarStyle = stylesProp?.toolbar;
+
   return wrapSSR(
     <ChartContainer
       baseClassName={baseClassName}
-      className={className}
+      className={rootClassName}
       theme={theme}
       isMobile={isMobile}
       variant={variant}
-      style={{
-        width: responsiveWidth,
-        height: responsiveHeight,
-      }}
+      style={rootStyle}
     >
       <ChartToolBar
         title={title}
         theme={theme}
         onDownload={handleDownload}
+        className={toolbarClassName}
+        style={toolbarStyle}
         extra={toolbarExtra}
         dataTime={dataTime}
+        loading={loading}
         filter={
           renderFilterInToolbar && filterOptions && filterOptions.length > 1 ? (
             <ChartFilter

@@ -1,114 +1,127 @@
-import { ActionIconBox, Workspace } from '@ant-design/agentic-ui';
-import { DownloadOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import {
-  Copy,
-  Expand,
-  MousePointerClick,
-  SwitchToWindow,
-} from '@sofa-design/icons';
-import { message, Space } from 'antd';
+import { BrowserItem, Workspace } from '@ant-design/agentic-ui';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { defaultValue } from './shared/defaultValue';
 
 const Demo = () => {
   const [mdContent, setMdContent] = useState('');
-  const [htmlContent, setHtmlContent] = useState<string>('');
-  const [htmlStatus, setHtmlStatus] = useState<'loading' | 'done' | 'error'>(
-    'loading',
-  );
+  const [suggestions] = useState([
+    {
+      id: '1',
+      label: '搜索2025年稳定币市场规模数据',
+      count: 3,
+    },
+    {
+      id: '2',
+      label: '搜索USDT USDC BUSD 最新发行量',
+      count: 3,
+    },
+    {
+      id: '3',
+      label: '搜索全球主要司法管辖区稳定币监管政策动态 2025',
+      count: 3,
+    },
+    {
+      id: '4',
+      label: '搜索最近3个月稳定币市场波动性数据',
+      count: 3,
+    },
+  ]);
 
-  const sampleHtml = `<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>报告示例</title>
-</head>
-<body>
-  <h1>模型推理报告</h1>
-  <p>这是一个使用 iframe 渲染的 HTML 预览示例。</p>
-  <h2>步骤</h2>
-  <ol>
-    <li>准备数据</li>
-    <li>运行分析</li>
-    <li>生成结果</li>
-  </ol>
-</body>
-</html>`;
-
-  const segmentedContent = (
-    <Space size={8}>
-      <div
-        style={{
-          height: '20px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '4px 6px',
-          borderRadius: '200px',
-          background: 'rgba(0, 16, 32, 0.0627)',
-        }}
-      >
-        <div
-          style={{
-            fontSize: '10px',
-            fontWeight: 500,
-            lineHeight: '7px',
-            color: 'rgba(84, 93, 109, 0.8)',
-          }}
-        >
-          {sampleHtml.split('\n').length}
-        </div>
-      </div>
-      <ActionIconBox
-        title="复制"
-        onClick={() => {
-          console.log('复制');
-          message.success('复制');
-        }}
-      >
-        <Copy />
-      </ActionIconBox>
-      <ActionIconBox
-        title="下载"
-        onClick={() => {
-          console.log('下载');
-          message.success('下载');
-        }}
-      >
-        <DownloadOutlined />
-      </ActionIconBox>
-      <ActionIconBox
-        title="切换"
-        onClick={() => {
-          console.log('切换');
-          message.success('切换');
-        }}
-      >
-        <SwitchToWindow />
-      </ActionIconBox>
-      <ActionIconBox
-        title="全屏"
-        onClick={() => {
-          console.log('全屏');
-          message.success('全屏');
-        }}
-      >
-        <Expand />
-      </ActionIconBox>
-    </Space>
-  );
-
-  const handleBack = () => {
-    console.log('返回');
-    message.success(`返回`);
-    return true;
+  const resultsMap: Record<string, BrowserItem[]> = {
+    '1': [
+      {
+        id: '1-1',
+        title: '2025年稳定币市场规模预测报告',
+        site: 'www.report.com',
+        url: 'https://www.report.com',
+      },
+      {
+        id: '1-2',
+        title: '全球稳定币市场分析',
+        site: 'www.analysis.com',
+        url: 'https://www.analysis.com',
+      },
+      {
+        id: '1-3',
+        title: '稳定币发展趋势',
+        site: 'www.trend.com',
+        url: 'https://www.trend.com',
+      },
+    ],
+    '2': [
+      {
+        id: '2-1',
+        title: 'USDT 和USDC 的总量达到了2050 亿美元— 2025 年稳定币发生了什么',
+        site: 'www.binance.com',
+        url: 'https://www.binance.com',
+        icon: 'https://bin.bnbstatic.com/static/images/common/favicon.ico',
+      },
+      {
+        id: '2-2',
+        title: '全球usdt的总量有多少？ 2025年最新数据别被FUD带偏了-多特软件站',
+        site: 'm.duote.com',
+        url: 'https://m.duote.com',
+        icon: 'https://www.duote.com/favicon.ico',
+      },
+      {
+        id: '2-3',
+        title: '全球USDT目前发行的总量:2025年最新数据解析',
+        site: 'www.duote.com',
+        url: 'https://www.duote.com',
+        icon: 'https://www.duote.com/favicon.ico',
+      },
+    ],
+    '3': [
+      {
+        id: '3-1',
+        title: '2025年全球稳定币监管政策概览',
+        site: 'www.policy.com',
+        url: 'https://www.policy.com',
+      },
+      {
+        id: '3-2',
+        title: '主要司法管辖区稳定币法规',
+        site: 'www.law.com',
+        url: 'https://www.law.com',
+      },
+      {
+        id: '3-3',
+        title: '监管动态更新',
+        site: 'www.news.com',
+        url: 'https://www.news.com',
+      },
+    ],
+    '4': [
+      {
+        id: '4-1',
+        title: '近3个月稳定币波动性分析',
+        site: 'www.volatility.com',
+        url: 'https://www.volatility.com',
+      },
+      {
+        id: '4-2',
+        title: '市场数据报告',
+        site: 'www.marketdata.com',
+        url: 'https://www.marketdata.com',
+      },
+      {
+        id: '4-3',
+        title: '稳定币价格走势',
+        site: 'www.price.com',
+        url: 'https://www.price.com',
+      },
+    ],
   };
+
+  const request = (suggestion: { id: string }) => ({
+    items: resultsMap[suggestion.id] || [],
+    loading: false,
+  });
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'test') {
       setMdContent(defaultValue);
-      setHtmlContent(sampleHtml);
-      setHtmlStatus('done');
     } else {
       let md = '';
       const list = defaultValue.split('');
@@ -124,15 +137,9 @@ const Demo = () => {
         }
       };
       run();
-
-      setHtmlStatus('loading');
-      const timer = setTimeout(() => {
-        setHtmlContent(sampleHtml);
-        setHtmlStatus('done');
-      }, 3000);
-      return () => clearTimeout(timer);
     }
   }, []);
+
   return (
     <div style={{ height: 600, width: '100%' }}>
       <Workspace
@@ -150,27 +157,6 @@ const Demo = () => {
             type: 'md',
             content: mdContent,
             title: '深度思考',
-          }}
-        />
-
-        {/* 实时监控标签页 - HTML 预览（内容区域渲染 HtmlPreview）*/}
-        <Workspace.Realtime
-          tab={{
-            key: 'realtimeHtml',
-            title: '实时跟随（HTML）',
-            icon: <MousePointerClick />,
-          }}
-          data={{
-            type: 'html',
-            content: htmlContent,
-            title: '创建 HTML 文件',
-            subTitle: 'report.html',
-            defaultViewMode: 'preview',
-            labels: { preview: '预览', code: '代码' },
-            iframeProps: { sandbox: 'allow-scripts' },
-            status: htmlStatus,
-            segmentedExtra: segmentedContent,
-            onBack: handleBack,
           }}
         />
 
@@ -202,7 +188,7 @@ const Demo = () => {
               {
                 key: '3',
                 title: '提取下载的视频帧',
-                status: 'pending',
+                status: 'loading',
               },
               {
                 key: '4',
@@ -223,7 +209,17 @@ const Demo = () => {
           }}
         />
 
-        {/* 文件管理标签页（列表里包含 .html，预览时将自动用 HtmlPreview 渲染） */}
+        {/* 浏览器标签页 */}
+        <Workspace.Browser
+          tab={{
+            key: 'browser',
+            title: '浏览器',
+          }}
+          suggestions={suggestions}
+          request={request}
+        />
+
+        {/* 文件管理标签页 */}
         <Workspace.File
           tab={{
             key: 'files',
@@ -276,7 +272,8 @@ const Demo = () => {
               type: 'code',
               size: '0.1MB',
               lastModified: '2025-08-11 10:00:00',
-              content: htmlContent,
+              content:
+                '<!DOCTYPE html><html><body><h1>Hello</h1></body></html>',
             },
           ]}
         />

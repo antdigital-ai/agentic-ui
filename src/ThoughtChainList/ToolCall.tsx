@@ -26,7 +26,7 @@ import { DotLoading } from './DotAni';
  * @param {Object} props - 组件属性
  * @param {string} [props['data-testid']] - 测试ID
  * @param {boolean} [props.isFinished] - 是否已完成
- * @param {Function} [props.onChangeItem] - 项目变更回调
+ * @param {Function} [props.onItemChange] - 项目变更回调（Item 子组件事件）
  * @param {MarkdownEditorProps} [props.markdownRenderProps] - Markdown渲染配置
  * @param {Object} props.input - 输入参数
  * @param {Object} props.input.inputArgs - 输入参数对象
@@ -65,7 +65,20 @@ export const ToolCall = (
   props: {
     'data-testid'?: string;
     isFinished?: boolean;
+    /**
+     * Item 子组件变更事件
+     * @deprecated 请使用 onItemChange 替代（符合命名规范）
+     */
     onChangeItem?: (
+      item: WhiteBoxProcessInterface,
+      changeProps: {
+        feedbackContent: string;
+        feedbackType: 'sql' | 'toolArg';
+        feedbackRunId: string;
+      },
+    ) => void;
+    /** Item 子组件变更事件 */
+    onItemChange?: (
       item: WhiteBoxProcessInterface,
       changeProps: {
         feedbackContent: string;
@@ -198,11 +211,20 @@ export const ToolCall = (
                   ?.replaceAll('```json\n', '')
                   .replaceAll('\n```', '')
                   .replaceAll('<!--{}-->\n', '');
-                props.onChangeItem?.(props, {
-                  feedbackContent: value || '',
-                  feedbackType: 'toolArg',
-                  feedbackRunId: props.runId || '',
-                });
+                // 优先使用新的事件名，保持向后兼容
+                if (props.onItemChange) {
+                  props.onItemChange(props, {
+                    feedbackContent: value || '',
+                    feedbackType: 'toolArg',
+                    feedbackRunId: props.runId || '',
+                  });
+                } else if (props.onChangeItem) {
+                  props.onChangeItem(props, {
+                    feedbackContent: value || '',
+                    feedbackType: 'toolArg',
+                    feedbackRunId: props.runId || '',
+                  });
+                }
               }}
             >
               {locale?.retry}
@@ -273,7 +295,7 @@ export const ToolCall = (
                 >
                   <Copy />
                 </ActionIconBox>
-                {props.onChangeItem ? (
+                {props.onItemChange || props.onChangeItem ? (
                   <ActionIconBox
                     title={locale?.edit}
                     onClick={() => {

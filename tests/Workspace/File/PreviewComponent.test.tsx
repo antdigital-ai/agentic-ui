@@ -474,6 +474,53 @@ describe('PreviewComponent', () => {
     });
   });
 
+  describe('音频预览', () => {
+    it('应该显示音频预览组件', async () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'audio.mp3',
+        type: 'audio',
+        url: 'https://example.com/audio.mp3',
+      };
+
+      const { container } = render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(container.firstChild).toBeTruthy();
+        const fileNames = screen.getAllByText('audio.mp3');
+        expect(fileNames.length).toBeGreaterThan(0);
+      });
+    });
+
+    it('应该处理没有预览URL的音频', async () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'audio.mp3',
+        type: 'audio',
+      };
+
+      const { container } = render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      await waitFor(
+        () => {
+          const placeholder = container.querySelector(
+            '.ant-workspace-file-preview-placeholder',
+          );
+          expect(placeholder).toBeTruthy();
+        },
+        { timeout: 2000 },
+      );
+    });
+  });
+
   describe('不支持的文件类型', () => {
     it('应该显示不支持预览的提示', async () => {
       const file: FileNode = {
@@ -717,6 +764,48 @@ describe('PreviewComponent', () => {
     });
   });
 
+  describe('操作按钮', () => {
+    it('应该显示定位按钮并触发回调', () => {
+      const handleLocate = vi.fn();
+      const file: FileNode = {
+        id: 'f1',
+        name: 'locate.txt',
+        content: 'Locate me',
+        canLocate: true,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onLocate={handleLocate} />
+        </TestWrapper>,
+      );
+
+      const locateBtn = screen.getByLabelText('定位');
+      expect(locateBtn).toBeInTheDocument();
+
+      fireEvent.click(locateBtn);
+      expect(handleLocate).toHaveBeenCalledWith(file);
+    });
+
+    it('canDownload 为 false 时不显示下载按钮', () => {
+      const handleDownload = vi.fn();
+      const file: FileNode = {
+        id: 'f1',
+        name: 'secret.txt',
+        content: 'Top secret',
+        canDownload: false,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onDownload={handleDownload} />
+        </TestWrapper>,
+      );
+
+      expect(screen.queryByLabelText('下载')).not.toBeInTheDocument();
+    });
+  });
+
   describe('边缘情况', () => {
     it('应该处理空内容', () => {
       const file: FileNode = {
@@ -869,6 +958,203 @@ describe('PreviewComponent', () => {
       expect(container.firstChild).toBeTruthy();
       const fileNames = screen.getAllByText('video.mp4');
       expect(fileNames.length).toBeGreaterThan(0);
+    });
+
+    it('应该为定位按钮提供aria-label', () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.txt',
+        content: 'Hello',
+        canLocate: true,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onLocate={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByLabelText('定位')).toBeInTheDocument();
+    });
+  });
+
+  describe('定位功能', () => {
+    it('应该触发定位回调', () => {
+      const handleLocate = vi.fn();
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.txt',
+        content: 'Hello',
+        canLocate: true,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onLocate={handleLocate} />
+        </TestWrapper>,
+      );
+
+      const locateBtn = screen.getByLabelText('定位');
+      fireEvent.click(locateBtn);
+
+      expect(handleLocate).toHaveBeenCalledWith(file);
+    });
+
+    it('不应该显示定位按钮当canLocate为false', () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.txt',
+        content: 'Hello',
+        canLocate: false,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onLocate={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      expect(screen.queryByLabelText('定位')).not.toBeInTheDocument();
+    });
+
+    it('不应该显示定位按钮当未提供onLocate', () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.txt',
+        content: 'Hello',
+        canLocate: true,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      expect(screen.queryByLabelText('定位')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('代码文件预览', () => {
+    it('应该预览代码文件', () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'index.js',
+        type: 'code',
+        content: 'console.log("Hello");',
+      };
+
+      const { container } = render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      expect(container.firstChild).toBeTruthy();
+      expect(screen.getByText('index.js')).toBeInTheDocument();
+    });
+
+    it('应该从URL加载代码文件', async () => {
+      (global.fetch as any).mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve('const x = 1;'),
+      });
+
+      const file: FileNode = {
+        id: 'f1',
+        name: 'app.ts',
+        type: 'code',
+        url: 'https://example.com/app.ts',
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith('https://example.com/app.ts');
+      });
+    });
+  });
+
+  describe('下载控制', () => {
+    it('canDownload为false时不显示下载按钮', () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.txt',
+        content: 'Hello',
+        canDownload: false,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onDownload={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      expect(screen.queryByLabelText('下载')).not.toBeInTheDocument();
+    });
+
+    it('canDownload为true时显示下载按钮', () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.txt',
+        content: 'Hello',
+        canDownload: true,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onDownload={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByLabelText('下载')).toBeInTheDocument();
+    });
+
+    it('canDownload未设置时默认显示下载按钮（当有onDownload）', () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.txt',
+        content: 'Hello',
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onDownload={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByLabelText('下载')).toBeInTheDocument();
+    });
+  });
+
+  describe('Markdown编辑器配置', () => {
+    it('应该传递markdownEditorProps到编辑器', () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.md',
+        type: 'markdown',
+        content: '# Title',
+      };
+
+      const markdownEditorProps = {
+        theme: 'dark' as const,
+        contentStyle: { padding: '10px' },
+      };
+
+      const { container } = render(
+        <TestWrapper>
+          <PreviewComponent
+            file={file}
+            markdownEditorProps={markdownEditorProps}
+          />
+        </TestWrapper>,
+      );
+
+      expect(container.firstChild).toBeTruthy();
     });
   });
 });

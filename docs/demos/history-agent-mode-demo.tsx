@@ -110,9 +110,11 @@ const AgentModeHistoryDemo = () => {
   };
 
   // 处理选择会话
-  const handleSelected = async (sessionId: string) => {
-    setCurrentSessionId(sessionId);
-    message.success(`选择了会话: ${sessionId}`);
+  const handleSelected = (item: HistoryDataType) => {
+    if (item.sessionId) {
+      setCurrentSessionId(item.sessionId);
+      message.success(`选择了会话: ${item.sessionId}`);
+    }
   };
 
   // 处理删除会话
@@ -125,7 +127,7 @@ const AgentModeHistoryDemo = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h3>History Agent 模式</h3>
       <p>当前会话ID: {currentSessionId}</p>
       <p>搜索关键词: {searchKeyword}</p>

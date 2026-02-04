@@ -1,3 +1,4 @@
+import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -124,20 +125,22 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '&-content': {
+        position: 'relative',
+        zIndex: 1,
         width: '100%',
-
         paddingBottom: 'var(--radius-xl)',
         flex: 1,
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        position: 'relative',
 
         '&-scrollable': {
           flex: 1,
           overflowY: 'auto',
           overflowX: 'hidden',
-          padding: 'var(--padding-2x)',
+          paddingTop: 'var(--padding-2x)',
+          paddingLeft: 'var(--padding-2x)',
+          paddingRight: 'var(--padding-2x)',
           '&::-webkit-scrollbar': {
             width: '6px',
           },
@@ -162,15 +165,44 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '&-footer': {
-        padding: 'var(--padding-4x)',
-        background:
-          'linear-gradient(to bottom, #fff0 20%, var(--color-gray-bg-card-white) 70%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: '100%',
+        paddingTop: 8,
+        paddingBottom: 24,
+        gap: 24,
         position: 'absolute',
         bottom: 0,
         zIndex: 100,
         borderBottomLeftRadius: 'var(--radius-xl)',
         borderBottomRightRadius: 'var(--radius-xl)',
+      },
+      '&-footer-background': {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100%',
+        height: 146,
+        pointerEvents: 'none',
+        overflow: 'hidden',
+      },
+      [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+        '&-header': {
+          padding: `0 ${MOBILE_PADDING}`,
+        },
+        '&-content': {
+          '&-scrollable': {
+            paddingTop: MOBILE_PADDING,
+            paddingLeft: MOBILE_PADDING,
+            paddingRight: MOBILE_PADDING,
+          },
+        },
+        '&-footer': {
+          padding: MOBILE_PADDING,
+        },
       },
     },
   };

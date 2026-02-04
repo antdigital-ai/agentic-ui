@@ -1,9 +1,15 @@
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
+import { ReactEditor } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownEditor } from '../src';
-import { ReactEditor } from 'slate-react';
 
 // 扩展 fireEvent 类型
 type CustomFireEvent = typeof fireEvent & {
@@ -242,5 +248,40 @@ describe('Readonly Mode Tests', () => {
       toolbar = document.querySelector('[class*="md-editor-float-bar"]');
       expect(toolbar).not.toBeNull();
     }
+  });
+
+  describe('fnc（脚注）在只读模式下的展示', () => {
+    const footnoteContent = `# 脚注测试
+这是一段包含脚注引用的文本[^1]，不配置 fncProps 时也应正确展示。`;
+
+    it('只读模式下应正确展示 fnc（脚注），无需配置 fncProps', async () => {
+      const { container } = render(
+        <MarkdownEditor readonly initValue={footnoteContent} reportMode />,
+      );
+
+      await waitFor(
+        () => {
+          const fncElement = container.querySelector('[data-fnc="fnc"]');
+          expect(fncElement).toBeInTheDocument();
+        },
+        { timeout: 2000 },
+      );
+    });
+
+    it('只读模式下无评论时也应正确展示 fnc（脚注）', async () => {
+      const { container } = render(
+        <MarkdownEditor readonly initValue={footnoteContent} reportMode />,
+      );
+
+      await waitFor(
+        () => {
+          const fncElement = container.querySelector('[data-fnc="fnc"]');
+          expect(fncElement).toBeInTheDocument();
+          // 脚注应显示格式化后的数字（如 1），而非原始 [^1]
+          expect(container.textContent).toContain('1');
+        },
+        { timeout: 2000 },
+      );
+    });
   });
 });

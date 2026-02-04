@@ -17,7 +17,6 @@ import { TableNode } from '../../types/Table';
 import { parserSlateNodeToMarkdown } from '../../utils';
 
 interface ReadonlyTableComponentProps {
-  hashId: string;
   children: React.ReactNode;
   element: TableNode;
   baseCls: string;
@@ -28,7 +27,7 @@ interface ReadonlyTableComponentProps {
  * 移除了不必要的滚动监听和复杂的宽度计算
  */
 export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
-  React.memo(({ hashId, children, element, baseCls }) => {
+  React.memo(({ children, element, baseCls }) => {
     const { editorProps } = useEditorStore();
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const {
@@ -55,7 +54,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
       if (columnCount === 0) return [];
 
       // 使用固定宽度避免复杂计算
-      const defaultWidth = 120;
+      const defaultWidth = 80;
       return Array(columnCount).fill(defaultWidth);
     }, [element?.otherProps, element?.children?.[0]?.children?.length]);
 
@@ -110,7 +109,6 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
           className={classNames(
             `${baseCls}-editor-table`,
             'readonly',
-            hashId,
             `${baseCls}-readonly-table`,
             {
               [`${baseCls}-readonly-pure`]: editorProps?.tableConfig?.pure,
@@ -118,30 +116,34 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
           )}
         >
           <colgroup>
-            {colWidths.map((colWidth: number, index: number) => (
-              <col
-                key={index}
-                style={{
-                  width: colWidth,
-                  minWidth: colWidth,
-                  maxWidth: colWidth,
-                }}
-              />
-            ))}
+            {colWidths.map((colWidth: number, index: number) => {
+              const isLastCol = index === colWidths.length - 1;
+              return (
+                <col
+                  key={index}
+                  style={
+                    isLastCol
+                      ? { minWidth: 60 }
+                      : {
+                          width: colWidth,
+                          minWidth: colWidth,
+                          maxWidth: colWidth,
+                        }
+                  }
+                />
+              );
+            })}
           </colgroup>
           <tbody>{children}</tbody>
         </table>
       ),
-      [colWidths, children, hashId, baseCls],
+      [colWidths, children, baseCls],
     );
 
     // 缓存操作按钮内容
     const popoverContent = useMemo(
       () => (
-        <div
-          style={{ display: 'flex', gap: 8 }}
-          className={classNames(hashId, `${baseCls}-readonly-table-actions`)}
-        >
+        <div className={classNames(`${baseCls}-readonly-table-actions`)}>
           {actions?.fullScreen && (
             <ActionIconBox
               title={i18n?.locale?.fullScreen || '全屏'}
@@ -171,20 +173,15 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
 
     return (
       <>
-        <div
-          className={classNames(baseCls, hashId)}
-          style={{
-            flex: 1,
-            minWidth: 0,
-          }}
-        >
-          {tableDom}
-          {popoverContent}
-        </div>
-
+        <div className={classNames(baseCls)}>{tableDom}</div>
+        {popoverContent}
         {previewOpen && (
           <Modal
-            title={editorProps?.tableConfig?.previewTitle || '预览表格'}
+            title={
+              editorProps?.tableConfig?.previewTitle ||
+              i18n?.locale?.previewTable ||
+              '预览表格'
+            }
             open={previewOpen}
             closable
             footer={null}
@@ -195,7 +192,6 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
             <div
               className={classNames(
                 baseCls,
-                hashId,
                 getPrefixCls('agentic-md-editor-content'),
               )}
               style={{

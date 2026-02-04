@@ -1,6 +1,7 @@
 import { memo, useContext } from 'react';
 
 import { CheckCircleFilled } from '@ant-design/icons';
+import { isFunction } from 'lodash';
 import React from 'react';
 import {
   ActionIconBox,
@@ -69,7 +70,7 @@ export const CopyIcon = (
 export type CopyButtonProps = {
   className?: string;
   onClick?: (e: any) => any;
-  children?: any;
+  children?: ((isHovered: boolean) => React.ReactNode) | React.ReactNode;
   'data-testid'?: string;
 } & Omit<ActionIconBoxProps, 'children'>;
 
@@ -137,7 +138,17 @@ export const CopyButton = memo<CopyButtonProps>(
           )
         }
       >
-        {props.children || <CopyIcon className={className} />}
+        {(isHovered) =>
+          props.children ? (
+            isFunction(props.children) ? (
+              props.children(isHovered)
+            ) : (
+              props.children
+            )
+          ) : (
+            <CopyIcon className={className} />
+          )
+        }
       </ActionIconBox>
     );
   },

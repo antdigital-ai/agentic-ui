@@ -9,7 +9,7 @@ group:
 
 # 项目技术栈与架构说明
 
-> **项目简介**：`md-editor` 是一个基于 React + TypeScript 的现代化 Markdown 编辑器，提供丰富的编辑功能和插件系统，支持实时预览、语法高亮、数学公式渲染等特性。
+> **项目简介**：`agentic-ui` 是一个基于 React + TypeScript 的现代化 Markdown 编辑器，提供丰富的编辑功能和插件系统，支持实时预览、语法高亮、数学公式渲染等特性。
 
 <!--
   项目概述：
@@ -81,7 +81,7 @@ group:
 ### 整体架构
 
 ```
-md-editor/
+agentic-ui/
 ├── 核心编辑器 (Slate.js)
 │   ├── 基础编辑器组件
 │   ├── 工具栏和菜单
@@ -129,7 +129,7 @@ graph TD
 ### 根目录结构
 
 ```
-md-editor/
+agentic-ui/
 ├── src/                    # 源代码目录
 │   ├── components/         # 全局组件
 │   ├── MarkdownEditor/     # 核心编辑器模块
@@ -691,7 +691,7 @@ if ('serviceWorker' in navigator) {
   - 良好的可维护性
 -->
 
-`md-editor` 项目采用现代化的技术栈和架构设计，具有以下特点：
+`agentic-ui` 项目采用现代化的技术栈和架构设计，具有以下特点：
 
 ### 技术优势
 

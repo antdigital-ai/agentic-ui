@@ -5,9 +5,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     // 定位高亮动画关键帧
     '@keyframes flash-shadow': {
-      '0%, 100%': {
+      '0%,100%': {
         boxShadow:
           '-5.23px -3.23px 12px 0 rgba(229, 255, 115, 40%), 4.23px 5.23px 16px 0 rgba(0, 206, 255, 24.12%)',
+      },
+
+      '50%': {
+        boxShadow: 'none',
       },
     },
 
@@ -180,6 +184,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         letterSpacing: 'var(--letter-spacing-body-sm, normal)',
       },
 
+      // 禁用状态
+      [`&-disabled`]: {
+        cursor: 'not-allowed',
+        opacity: 0.5,
+
+        '&:hover': {
+          background: 'transparent',
+        },
+      },
+
       // 分割符
       [`&-separator`]: {
         fontSize: 'var(--font-size-xs)',
@@ -235,8 +249,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
-      marginLeft: -16,
-      marginRight: -16,
+      marginLeft: '-12px',
+      marginRight: '-12px',
       background: '#fff',
       position: 'relative',
 
@@ -245,7 +259,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         gap: '4px',
-        padding: '8px 12px 8px 8px',
+        padding: '8px 12px',
         borderBottom: '1px solid rgba(20, 22, 28, 0.07)',
         background: '#fff',
         flexShrink: 0,
@@ -467,6 +481,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         borderColor: 'transparent',
         background: 'var(--color-gray-bg-card-light)',
         boxShadow: 'var(--shadow-border-base)',
+        marginBottom: 8,
       },
 
       '.ant-input-outlined:hover, .ant-input-outlined:focus-within': {
@@ -478,6 +493,35 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         font: 'var(--font-text-body-base)',
         letterSpacing: 'var(--letter-spacing-body-base, normal)',
       },
+
+      // 搜索图标样式
+      '.anticon': {
+        color: 'var(--color-gray-text-secondary)',
+        fontSize: 16,
+      },
+    },
+
+    // 成功消息图标样式
+    [`${token.componentCls}-success-icon`]: {
+      fontSize: 16,
+      marginRight: 8,
+      color: 'var(--color-green-control-fill-primary)',
+    },
+
+    // 成功消息文本样式
+    [`${token.componentCls}-message-text`]: {
+      font: 'var(--font-text-body-emphasized-base)',
+      color: 'var(--color-gray-text-default)',
+    },
+
+    // 分组内容容器（用于motion.div）
+    [`${token.componentCls}-group-content`]: {
+      overflow: 'hidden',
+    },
+
+    // 隐藏的图片预览组件
+    [`${token.componentCls}-hidden-image`]: {
+      display: 'none',
     },
   };
 };

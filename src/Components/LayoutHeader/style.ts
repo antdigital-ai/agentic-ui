@@ -31,6 +31,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           margin: 0,
           lineHeight: '1.4',
         },
+
+        '&-separator': {
+          width: '1px',
+          height: '24px',
+          backgroundColor: 'var(--color-gray-border-light)',
+        },
       },
 
       // 右侧区域样式

@@ -8,13 +8,59 @@ import { CloseCircleOutlined } from '@ant-design/icons';
 import { ChevronsUpDown, Copy, Moon } from '@sofa-design/icons';
 import { message, Segmented } from 'antd';
 import copy from 'copy-to-clipboard';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../../Components/ActionIconBox';
 import { I18nContext } from '../../../I18n';
+import { useEditorStore } from '../../../MarkdownEditor/editor/store';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { langIconMap } from '../langIconMap';
 import { LanguageSelector, LanguageSelectorProps } from './LanguageSelector';
 import { LoadImage } from './LoadImage';
+
+/**
+ * 检测 HTML 代码中是否包含 JavaScript
+ * @param htmlCode HTML 代码字符串
+ * @returns 如果包含 JavaScript 返回 true，否则返回 false
+ */
+function containsJavaScript(htmlCode: string): boolean {
+  if (!htmlCode || typeof htmlCode !== 'string') {
+    return false;
+  }
+
+  const code = htmlCode.toLowerCase().trim();
+
+  // 检测 <script> 标签
+  if (/<script[\s>]/.test(code) || /<\/script>/.test(code)) {
+    return true;
+  }
+
+  // 检测事件处理器属性（onclick, onerror, onload 等）
+  if (/on\w+\s*=/i.test(code)) {
+    return true;
+  }
+
+  // 检测 javascript: URL
+  if (/javascript\s*:/i.test(code)) {
+    return true;
+  }
+
+  // 检测 eval() 调用
+  if (/\beval\s*\(/i.test(code)) {
+    return true;
+  }
+
+  // 检测 Function() 构造函数
+  if (/\bFunction\s*\(/i.test(code)) {
+    return true;
+  }
+
+  // 检测 setTimeout/setInterval 中的字符串代码
+  if (/(setTimeout|setInterval)\s*\([^,]*['"`]/i.test(code)) {
+    return true;
+  }
+
+  return false;
+}
 /**
  * 代码工具栏组件的属性接口
  */
@@ -73,6 +119,10 @@ export interface CodeToolbarProps {
 export const CodeToolbar = (props: CodeToolbarProps) => {
   // 获取国际化上下文
   const i18n = useContext(I18nContext);
+  // 获取编辑器配置
+  const { editorProps } = useEditorStore();
+  const disableHtmlPreview = editorProps.codeProps?.disableHtmlPreview ?? false;
+  const viewModeLabels = editorProps.codeProps?.viewModeLabels;
 
   const {
     element,
@@ -87,6 +137,17 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
     viewMode = 'code',
   } = props;
 
+  // 检测 HTML 代码中是否包含 JavaScript
+  const hasJavaScript = useMemo(() => {
+    const language = element?.language?.toLowerCase();
+    if (language === 'html') {
+      return containsJavaScript(element?.value || '');
+    }
+    return false;
+  }, [element?.language, element?.value]);
+
+  // 如果禁用了 HTML 预览或包含 JavaScript，则禁用预览
+  const shouldDisablePreview = disableHtmlPreview || hasJavaScript;
   return (
     <div
       data-testid="code-toolbar"
@@ -122,59 +183,67 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
       }}
     >
       {/* 左侧：语言选择器或语言显示 */}
-      {readonly ? (
-        // 只读模式：仅显示当前语言信息
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            cursor: 'pointer',
-            gap: 4,
-            font: 'inherit',
-            color: 'inherit',
-            userSelect: 'none',
-          }}
-          contentEditable={false}
-        >
-          {/* 语言图标（如果存在且不是公式） */}
-          {langIconMap.get(element.language?.toLowerCase() || '') &&
-            !element.katex && (
-              <div
-                style={{
-                  height: '1em',
-                  width: '1em',
-                  fontSize: '16px',
-                  display: 'flex',
-                }}
-              >
-                <LoadImage
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+      >
+        {readonly ? (
+          // 只读模式：仅显示当前语言信息
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              gap: 4,
+              font: 'inherit',
+              color: 'inherit',
+              userSelect: 'none',
+            }}
+            contentEditable={false}
+          >
+            {/* 语言图标（如果存在且不是公式） */}
+            {langIconMap.get(element.language?.toLowerCase() || '') &&
+              !element.katex && (
+                <div
                   style={{
                     height: '1em',
                     width: '1em',
+                    fontSize: '16px',
+                    display: 'flex',
                   }}
-                  src={langIconMap.get(element.language?.toLowerCase() || '')}
-                />
-              </div>
-            )}
-          <div>
-            {element.language ? (
-              <span>
-                {/* 根据代码类型显示不同标签 */}
-                {element.katex
-                  ? 'Formula'
-                  : element.language === 'html' && element.render
-                    ? 'Html Renderer'
-                    : element.language}
-              </span>
-            ) : (
-              <span>{'plain text'}</span>
-            )}
+                >
+                  <LoadImage
+                    style={{
+                      height: '1em',
+                      width: '1em',
+                    }}
+                    src={langIconMap.get(element.language?.toLowerCase() || '')}
+                  />
+                </div>
+              )}
+            <div>
+              {element.language ? (
+                <span>
+                  {/* 根据代码类型显示不同标签 */}
+                  {element.katex
+                    ? 'Formula'
+                    : element.language === 'html' && element.render
+                      ? 'Html Renderer'
+                      : element.language}
+                </span>
+              ) : (
+                <span>{'plain text'}</span>
+              )}
+            </div>
           </div>
-        </div>
-      ) : (
-        // 非只读模式：显示语言选择器
-        <LanguageSelector {...languageSelectorProps} />
-      )}
+        ) : (
+          // 非只读模式：显示语言选择器
+          <LanguageSelector {...languageSelectorProps} />
+        )}
+      </div>
 
       {/* 右侧：操作按钮组 */}
       <div
@@ -196,17 +265,19 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
         ) : null}
 
         {/* HTML/Markdown 视图模式切换按钮 */}
-        {element?.language === 'html' || element?.language === 'markdown' ? (
+        {/* 如果禁用了 HTML 预览或包含 JavaScript，则不显示切换按钮 */}
+        {(element?.language === 'html' && !shouldDisablePreview) ||
+        element?.language === 'markdown' ? (
           <Segmented
             className={theme === 'chaos' ? 'chaos-segmented' : ''}
             data-testid="preview"
             options={[
               {
-                label: '预览',
+                label: viewModeLabels?.preview || '预览',
                 value: 'preview',
               },
               {
-                label: '代码',
+                label: viewModeLabels?.code || '代码',
                 value: 'code',
               },
             ]}
@@ -217,7 +288,7 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
           />
         ) : null}
         <ActionIconBox
-          title="主题"
+          title={i18n?.locale?.theme || '主题'}
           theme={theme === 'chaos' ? 'dark' : 'light'}
           onClick={() => {
             setTheme(theme === 'github' ? 'chaos' : 'github');
@@ -251,7 +322,7 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
           <Copy />
         </ActionIconBox>
         <ActionIconBox
-          title="展开/收起"
+          title={i18n?.locale?.expandCollapse || '展开/收起'}
           theme={theme === 'chaos' ? 'dark' : 'light'}
           onClick={() => {
             onExpandToggle?.();

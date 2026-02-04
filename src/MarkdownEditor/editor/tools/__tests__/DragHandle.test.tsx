@@ -30,12 +30,10 @@ describe('DragHandle Component', () => {
   it('renders drag handle when enabled and not readonly', () => {
     render(<DragHandle />);
 
-    const dragHandle = document.querySelector(
-      '.ant-agentic-md-editor-drag-handle',
-    );
+    const dragHandle = document.querySelector('[data-drag-handle]');
     expect(dragHandle).toBeInTheDocument();
 
-    const dragIcon = document.querySelector('.ant-agentic-md-editor-drag-icon');
+    const dragIcon = document.querySelector('[data-drag-icon]');
     expect(dragIcon).toBeInTheDocument();
   });
 
@@ -54,9 +52,7 @@ describe('DragHandle Component', () => {
 
     render(<DragHandle />);
 
-    const dragHandle = document.querySelector(
-      '.ant-agentic-md-editor-drag-handle',
-    );
+    const dragHandle = document.querySelector('[data-drag-handle]');
     expect(dragHandle).not.toBeInTheDocument();
   });
 
@@ -75,9 +71,7 @@ describe('DragHandle Component', () => {
 
     render(<DragHandle />);
 
-    const dragHandle = document.querySelector(
-      '.ant-agentic-md-editor-drag-handle',
-    );
+    const dragHandle = document.querySelector('[data-drag-handle]');
     expect(dragHandle).not.toBeInTheDocument();
   });
 
@@ -94,9 +88,7 @@ describe('DragHandle Component', () => {
 
     render(<DragHandle />);
 
-    const dragHandle = document.querySelector(
-      '.ant-agentic-md-editor-drag-handle',
-    );
+    const dragHandle = document.querySelector('[data-drag-handle]');
     expect(dragHandle).not.toBeInTheDocument();
   });
 
@@ -104,9 +96,7 @@ describe('DragHandle Component', () => {
     const customStyle = { backgroundColor: 'red' };
     render(<DragHandle style={customStyle} />);
 
-    const dragHandle = document.querySelector(
-      '.ant-agentic-md-editor-drag-handle',
-    );
+    const dragHandle = document.querySelector('[data-drag-handle]');
     expect(dragHandle).toHaveStyle('background-color: rgb(255, 0, 0)');
   });
 
@@ -127,9 +117,7 @@ describe('DragHandle Component', () => {
 
     render(<DragHandle />);
 
-    const dragHandle = document.querySelector(
-      '.ant-agentic-md-editor-drag-handle',
-    );
+    const dragHandle = document.querySelector('[data-drag-handle]');
     expect(dragHandle).toBeInTheDocument();
 
     if (dragHandle) {
@@ -149,22 +137,18 @@ describe('DragHandle Component', () => {
     render(<DragHandle />);
 
     // Check that the drag handle exists and has the correct structure
-    const dragHandle = document.querySelector(
-      '.ant-agentic-md-editor-drag-handle',
-    );
+    const dragHandle = document.querySelector('[data-drag-handle]');
     expect(dragHandle).toBeInTheDocument();
 
     // Check that the drag icon exists
-    const dragIcon = document.querySelector('.ant-agentic-md-editor-drag-icon');
+    const dragIcon = document.querySelector('[data-drag-icon]');
     expect(dragIcon).toBeInTheDocument();
   });
 
   it('has contentEditable set to false', () => {
     render(<DragHandle />);
 
-    const dragHandle = document.querySelector(
-      '.ant-agentic-md-editor-drag-handle',
-    );
+    const dragHandle = document.querySelector('[data-drag-handle]');
     expect(dragHandle).toHaveAttribute('contenteditable', 'false');
   });
 });

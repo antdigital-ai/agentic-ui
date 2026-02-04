@@ -5,11 +5,17 @@ import { Plus } from '@sofa-design/icons';
 import { Button, Card, Form, Input, InputNumber, Select, Space } from 'antd';
 import type { Rule } from 'antd/es/form';
 import { merge } from 'lodash-es';
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from 'react';
 import { I18nContext, cnLabels } from '../../I18n';
 import { LowCodeSchema, SchemaProperty } from '../types';
 
-interface SchemaFormProps {
+export interface SchemaFormProps {
   schema: LowCodeSchema;
   onValuesChange?: (
     _: Record<string, any>,
@@ -70,7 +76,7 @@ interface SchemaFormProps {
  * - 提供动态字段添加/删除
  * - 响应式布局适配
  */
-export const SchemaForm: React.FC<SchemaFormProps> = ({
+const SchemaFormComponent: React.FC<SchemaFormProps> = ({
   schema,
   onValuesChange,
   initialValues,
@@ -414,3 +420,8 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
     </Form>
   );
 };
+
+SchemaFormComponent.displayName = 'SchemaForm';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+export const SchemaForm = memo(SchemaFormComponent);

@@ -68,7 +68,7 @@ const CustomSendButtonDemo: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h3>自定义发送按钮示例</h3>
       <p>
         这个示例展示了如何使用 <code>actionsRender</code> 属性来自定义发送按钮。

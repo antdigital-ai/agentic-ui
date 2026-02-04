@@ -33,14 +33,15 @@ vi.mock('@ant-design/agentic-ui/schema', () => ({
 }));
 
 // Mock store
+const mockEditorProps: any = {
+  apaasify: {
+    enable: false,
+    render: null,
+  },
+};
 vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/store', () => ({
   useEditorStore: () => ({
-    editorProps: {
-      apaasify: {
-        enable: false,
-        render: null,
-      },
-    },
+    editorProps: mockEditorProps,
   }),
 }));
 
@@ -69,6 +70,8 @@ describe('Schema', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // 每个用例重置，避免相互污染
+    mockEditorProps.codeProps = undefined;
   });
 
   describe('基本渲染测试', () => {
@@ -157,48 +160,11 @@ describe('Schema', () => {
       );
 
       const container = screen.getByTestId('agentar-card-container');
-      expect(container).toHaveClass('md-editor-agentar-card');
-      expect(container).toHaveStyle({ padding: '0.5em' });
+      expect(container).toHaveAttribute('data-agentar-card');
     });
   });
 
   describe('样式测试', () => {
-    it('应该应用正确的容器样式', () => {
-      renderWithProvider(
-        <Schema element={mockElement} attributes={mockAttributes}>
-          {null}
-        </Schema>,
-      );
-
-      const container = screen.getByTestId('schema-container');
-      expect(container).toHaveStyle({
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-      });
-    });
-
-    it('应该应用正确的可点击区域样式', () => {
-      renderWithProvider(
-        <Schema element={mockElement} attributes={mockAttributes}>
-          {null}
-        </Schema>,
-      );
-
-      const clickableDiv = screen.getByTestId('schema-clickable');
-      expect(clickableDiv).toHaveStyle({
-        padding: '8px',
-        width: '100%',
-        cursor: 'pointer',
-        position: 'relative',
-        display: 'flex',
-        borderRadius: '8px',
-        flex: '1',
-        border: '1px solid rgb(209 213 219 / 0.8)',
-        alignItems: 'center',
-      });
-    });
-
     it('应该隐藏子元素', () => {
       renderWithProvider(
         <Schema element={mockElement} attributes={mockAttributes}>
@@ -267,6 +233,37 @@ describe('Schema', () => {
 
       const container = screen.getByTestId('schema-container');
       expect(container).toBeInTheDocument();
+    });
+  });
+
+  describe('codeProps.render 自定义渲染测试', () => {
+    it('render 返回 undefined 时应回退内部默认渲染', () => {
+      mockEditorProps.codeProps = {
+        render: vi.fn(() => undefined),
+      };
+
+      renderWithProvider(
+        <Schema element={mockElement} attributes={mockAttributes}>
+          {null}
+        </Schema>,
+      );
+
+      expect(screen.getByTestId('schema-container')).toBeInTheDocument();
+      expect(mockEditorProps.codeProps.render).toHaveBeenCalled();
+    });
+
+    it('render 返回自定义节点时应使用自定义渲染', () => {
+      mockEditorProps.codeProps = {
+        render: vi.fn(() => <div data-testid="custom-render">Custom</div>),
+      };
+
+      renderWithProvider(
+        <Schema element={mockElement} attributes={mockAttributes}>
+          {null}
+        </Schema>,
+      );
+
+      expect(screen.getByTestId('custom-render')).toBeInTheDocument();
     });
   });
 });

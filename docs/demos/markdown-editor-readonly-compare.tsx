@@ -13,6 +13,13 @@ const defaultMarkdown = `# Markdown 编辑器示例
 - *斜体文本*
 - ~~删除线~~
 
+## 表格
+
+| Syntax | Description | Test Text |
+| :--- | :----: | ---: |
+| Header | Title | Here's this |
+| Paragraph | Text | And more |
+
 ## 代码块
 
 

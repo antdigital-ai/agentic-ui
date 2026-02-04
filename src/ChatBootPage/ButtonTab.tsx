@@ -1,4 +1,5 @@
-import React from 'react';
+import classNames from 'classnames';
+import React, { memo, useCallback } from 'react';
 import { useStyle } from './ButtonTabStyle';
 
 export interface ButtonTabProps {
@@ -18,7 +19,7 @@ export interface ButtonTabProps {
   prefixCls?: string;
 }
 
-const ButtonTab: React.FC<ButtonTabProps> = ({
+const ButtonTabComponent: React.FC<ButtonTabProps> = ({
   children,
   selected = false,
   onClick,
@@ -29,36 +30,62 @@ const ButtonTab: React.FC<ButtonTabProps> = ({
 }) => {
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
-  const handleClick = () => {
+  // 使用 useCallback 优化事件处理函数
+  const handleClick = useCallback(() => {
     onClick?.();
-  };
+  }, [onClick]);
 
-  const handleIconClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onIconClick?.();
-  };
+  const handleIconClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onIconClick?.();
+    },
+    [onIconClick],
+  );
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onClick?.();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick?.();
+      }
+    },
+    [onClick],
+  );
+
+  const buttonClassName = classNames(
+    prefixCls,
+    {
+      [`${prefixCls}-selected`]: selected,
+    },
+    className,
+    hashId,
+  );
+
+  const iconClassName = classNames(
+    `${prefixCls}-icon`,
+    {
+      [`${prefixCls}-icon-clickable`]: !!onIconClick,
+    },
+    hashId,
+  );
 
   return wrapSSR(
     <button
       type="button"
-      className={`${prefixCls} ${selected ? `${prefixCls}-selected` : ''} ${className || ''} ${hashId}`}
+      className={buttonClassName}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
       {children && (
-        <span className={`${prefixCls}-text ${hashId}`}>{children}</span>
+        <span className={classNames(`${prefixCls}-text`, hashId)}>
+          {children}
+        </span>
       )}
       {icon && (
         <span
-          className={`${prefixCls}-icon ${onIconClick ? `${prefixCls}-icon-clickable` : ''} ${hashId}`}
+          className={iconClassName}
           onClick={onIconClick ? handleIconClick : undefined}
         >
           {icon}
@@ -67,5 +94,10 @@ const ButtonTab: React.FC<ButtonTabProps> = ({
     </button>,
   );
 };
+
+ButtonTabComponent.displayName = 'ButtonTab';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+const ButtonTab = memo(ButtonTabComponent);
 
 export default ButtonTab;

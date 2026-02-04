@@ -103,15 +103,19 @@ export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
   classNames,
   titleAnimateProps,
   descriptionAnimateProps,
-  style,
+  style: customStyle,
   rootClassName,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-welcome');
   const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { ...restStyle } = customStyle || {};
 
   return wrapSSR(
-    <div className={classnames(prefixCls, hashId, rootClassName)} style={style}>
+    <div
+      className={classnames(prefixCls, hashId, rootClassName)}
+      style={restStyle}
+    >
       {/* Title */}
       {title && (
         <TypingAnimation

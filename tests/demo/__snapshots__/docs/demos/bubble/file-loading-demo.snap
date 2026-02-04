@@ -86,24 +86,669 @@
         style="display: flex; flex-direction: column; gap: 16px;"
       >
         <div
-          avatar="[object Object]"
-          bubbleref="[object Object]"
-          data-testid="bubble"
-          markdownrenderconfig="[object Object]"
-          origindata="[object Object]"
-          placement="left"
+          class="ant-agentic-bubble ant-agentic-bubble-left ant-agentic-bubble-ai ant-flex ant-flex-align-stretch ant-flex-vertical"
+          style="gap: 12px;"
         >
-          bubble
+          <div
+            class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-pure"
+          >
+            <div
+              class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+            >
+              <span
+                class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
+                data-testid="bubble-avatar"
+                style="width: 24px; height: 24px; font-size: 18px; cursor: default;"
+              >
+                <img
+                  alt="avatar"
+                  src="https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original"
+                />
+              </span>
+              <div
+                class="ant-agentic-bubble-title ant-flex"
+                data-testid="bubble-title"
+                style="flex-direction: row; display: flex; align-items: center; gap: 8px;"
+              >
+                <span>
+                  Ant Design Assistant
+                </span>
+                <time
+                  class="ant-agentic-bubble-title-time"
+                  data-testid="bubble-time"
+                >
+                  2024-02-27 17:20:00
+                </time>
+              </div>
+            </div>
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-left ant-agentic-bubble-container-ai ant-agentic-bubble-container-pure"
+              data-testid="chat-message"
+              style="display: flex; gap: 4px; flex-direction: column; align-items: flex-start;"
+            >
+              <div
+                class="ant-agentic-bubble-content ant-agentic-bubble-content-left ant-agentic-bubble-content-ai ant-agentic-bubble-content-pure"
+                data-testid="message-content"
+                style="min-width: 0px;"
+              >
+                <div
+                  style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                >
+                  <div
+                    class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                    style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                  >
+                    <div
+                      class="ant-agentic-md-editor-container"
+                      style="height: 100%;"
+                      tabindex="-1"
+                    >
+                      <div
+                        autocapitalize="false"
+                        autocorrect="false"
+                        class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                        contenteditable="false"
+                        data-slate-editor="true"
+                        data-slate-node="value"
+                        spellcheck="false"
+                        style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                        translate="no"
+                        zindex="-1"
+                      >
+                        <h2
+                          class=""
+                          data-be="head"
+                          data-head="文件上传加载状态演示"
+                          data-slate-node="element"
+                          data-title="true"
+                          id="文件上传加载状态演示"
+                        >
+                          <span
+                            data-slate-node="text"
+                          >
+                            <span
+                              data-be="text"
+                              data-slate-leaf="true"
+                              draggable="false"
+                            >
+                              <span
+                                data-slate-string="true"
+                              >
+                                文件上传加载状态演示
+                              </span>
+                            </span>
+                          </span>
+                        </h2>
+                        <div
+                          class=""
+                          data-be="paragraph"
+                          data-slate-node="element"
+                        >
+                          <span
+                            data-slate-node="text"
+                          >
+                            <span
+                              data-be="text"
+                              data-slate-leaf="true"
+                              draggable="false"
+                            >
+                              <span
+                                data-slate-string="true"
+                              >
+                                当文件正在上传或处理时，Bubble 组件会显示加载状态。
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                        <div
+                          class=""
+                          data-be="paragraph"
+                          data-slate-node="element"
+                        >
+                          <span
+                            data-slate-node="text"
+                          >
+                            <span
+                              data-be="text"
+                              data-slate-leaf="true"
+                              draggable="false"
+                            >
+                              <span
+                                data-slate-string="true"
+                              >
+                                支持的文件类型：
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                        <div
+                          class="ant-agentic-md-editor-list-container relative"
+                          data-be="list"
+                          data-slate-node="element"
+                        >
+                          <ul
+                            class="ant-agentic-md-editor-list ul"
+                          >
+                            <li
+                              class="ant-agentic-md-editor-list-item"
+                              data-be="list-item"
+                              data-slate-node="element"
+                            >
+                              <div
+                                class=""
+                                data-be="paragraph"
+                                data-slate-node="element"
+                              >
+                                <span
+                                  data-slate-node="text"
+                                >
+                                  <span
+                                    data-be="text"
+                                    data-slate-leaf="true"
+                                    draggable="false"
+                                  >
+                                    <span
+                                      data-slate-string="true"
+                                    >
+                                      图片文件 (PNG, JPG, GIF, SVG)
+                                    </span>
+                                  </span>
+                                </span>
+                              </div>
+                            </li>
+                            <li
+                              class="ant-agentic-md-editor-list-item"
+                              data-be="list-item"
+                              data-slate-node="element"
+                            >
+                              <div
+                                class=""
+                                data-be="paragraph"
+                                data-slate-node="element"
+                              >
+                                <span
+                                  data-slate-node="text"
+                                >
+                                  <span
+                                    data-be="text"
+                                    data-slate-leaf="true"
+                                    draggable="false"
+                                  >
+                                    <span
+                                      data-slate-string="true"
+                                    >
+                                      文档文件 (PDF, DOC, TXT, MD)
+                                    </span>
+                                  </span>
+                                </span>
+                              </div>
+                            </li>
+                            <li
+                              class="ant-agentic-md-editor-list-item"
+                              data-be="list-item"
+                              data-slate-node="element"
+                            >
+                              <div
+                                class=""
+                                data-be="paragraph"
+                                data-slate-node="element"
+                              >
+                                <span
+                                  data-slate-node="text"
+                                >
+                                  <span
+                                    data-be="text"
+                                    data-slate-leaf="true"
+                                    draggable="false"
+                                  >
+                                    <span
+                                      data-slate-string="true"
+                                    >
+                                      代码文件 (JS, TS, PY, JAVA)
+                                    </span>
+                                  </span>
+                                </span>
+                              </div>
+                            </li>
+                            <li
+                              class="ant-agentic-md-editor-list-item"
+                              data-be="list-item"
+                              data-slate-node="element"
+                            >
+                              <div
+                                class=""
+                                data-be="paragraph"
+                                data-slate-node="element"
+                              >
+                                <span
+                                  data-slate-node="text"
+                                >
+                                  <span
+                                    data-be="text"
+                                    data-slate-leaf="true"
+                                    draggable="false"
+                                  >
+                                    <span
+                                      data-slate-string="true"
+                                    >
+                                      其他格式文件
+                                    </span>
+                                  </span>
+                                </span>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                        <div
+                          class=""
+                          data-be="paragraph"
+                          data-slate-node="element"
+                        >
+                          <span
+                            data-slate-node="text"
+                          >
+                            <span
+                              data-be="text"
+                              data-slate-leaf="true"
+                              draggable="false"
+                            >
+                              <span
+                                data-slate-string="true"
+                              >
+                                文件上传完成后，用户可以预览和下载文件。
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="ant-agentic-bubble-after ant-agentic-bubble-after-left ant-agentic-bubble-after-ai"
+                    data-testid="message-after"
+                    style="min-width: 0px; padding-left: 12px; max-width: 100%; width: 100%;"
+                  >
+                    <div
+                      style="display: flex; flex-direction: column; gap: 4px; max-width: 100%; min-width: 0; align-items: flex-start; width: max-content;"
+                    >
+                      <div
+                        animate="visible"
+                        class="ant-agentic-md-editor-file-view-list ant-agentic-md-editor-file-view-list-left"
+                        initial="hidden"
+                        variants="[object Object]"
+                        whileinview="visible"
+                      >
+                        <div
+                          class="ant-image ant-agentic-md-editor-file-view-list-image"
+                          style="width: 124px; height: 124px;"
+                        >
+                          <img
+                            class="ant-image-img"
+                            height="124"
+                            src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png"
+                            style="height: 124px;"
+                            width="124"
+                          />
+                          <div
+                            class="ant-image-mask"
+                          >
+                            <div
+                              class="ant-image-mask-info"
+                            >
+                              <span
+                                aria-label="eye"
+                                class="anticon anticon-eye"
+                                role="img"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  data-icon="eye"
+                                  fill="currentColor"
+                                  focusable="false"
+                                  height="1em"
+                                  viewBox="64 64 896 896"
+                                  width="1em"
+                                >
+                                  <path
+                                    d="M942.2 486.2C847.4 286.5 704.1 186 512 186c-192.2 0-335.4 100.5-430.2 300.3a60.3 60.3 0 000 51.5C176.6 737.5 319.9 838 512 838c192.2 0 335.4-100.5 430.2-300.3 7.7-16.2 7.7-35 0-51.5zM512 766c-161.3 0-279.4-81.8-362.7-254C232.6 339.8 350.7 258 512 258c161.3 0 279.4 81.8 362.7 254C791.5 684.2 673.4 766 512 766zm-4-430c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176zm0 288c-61.9 0-112-50.1-112-112s50.1-112 112-112 112 50.1 112 112-50.1 112-112 112z"
+                                  />
+                                </svg>
+                              </span>
+                              Preview
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        animate="visible"
+                        class="ant-agentic-md-editor-file-view-list ant-agentic-md-editor-file-view-list-left ant-agentic-md-editor-file-view-list-vertical"
+                        initial="hidden"
+                        variants="[object Object]"
+                        whileinview="visible"
+                      >
+                        <div
+                          aria-describedby="test-id"
+                          class="ant-agentic-md-editor-file-view-list-item"
+                          data-testid="file-item"
+                          exit="[object Object]"
+                          variants="[object Object]"
+                        >
+                          <div
+                            class="ant-agentic-md-editor-file-view-list-item-file-icon"
+                          >
+                            <svg
+                              class="sofa-icons-icon"
+                              fill="none"
+                              height="1em"
+                              style="vertical-align: -0.125em;"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M8 2h7l5 5v11c0 1.4-.003 2.116-.279 2.649a2.5 2.5 0 0 1-1.072 1.072C18.116 21.997 17.4 22 16 22H8c-1.4 0-2.116-.003-2.649-.279a2.5 2.5 0 0 1-1.072-1.072C4.003 20.116 4 19.4 4 18V6c0-1.4.003-2.116.279-2.649A2.5 2.5 0 0 1 5.351 2.28C5.884 2.003 6.6 2 8 2m6.23 11.368a9.6 9.6 0 0 1 1.495-.09c.643.021 1.117.143 1.375.396.25.249.341.699.225 1.087-.132.442-.498.722-1.04.722-.655 0-1.63-.296-2.472-.747-.485.083-1.019.228-1.723.457-.163.053-.327.108-.554.184l-.358.122-.333.11c-.986 1.695-1.88 2.445-2.608 2.388a.9.9 0 0 1-.688-.414c-.14-.209-.202-.465-.162-.66.085-.422.392-.823.883-1.214.372-.295.815-.562 1.384-.856.426-.75 1.061-2.093 1.542-3.239-.377-1.461-.482-2.318-.304-2.97.11-.402.538-.662 1.003-.643.499.02.895.348.994.907q.08.39.055.843c-.02.402-.09.8-.22 1.346l-.069.288c.35.911.843 1.532 1.575 1.983m-1.99-2.675.145-.12c.235-.196.38-.644.366-1.074-.016-.49-.214-.815-.647-.815-.309 0-.386.275-.34.733.04.402.186.848.386 1.144zm-.32 1.518-.046.122c-.37.978-.714 1.756-1.086 2.403l-.085.147.159-.06c.173-.067.836-.338.836-.339l-.004.002c.627-.253 1.085-.406 1.577-.507l.132-.027-.109-.08c-.502-.373-.959-.906-1.311-1.546zm4.701 2.844c-.236.17-.746.018-1.643-.683l-.228-.178.247-.033c.702-.095 1.2-.024 1.489.17a.57.57 0 0 1 .242.306c.04.128.021.265-.041.347a.2.2 0 0 1-.066.07m-8.366 2.092v-.011l.004-.01q.058-.154.169-.324.195-.296.526-.629c.118-.119.241-.235.385-.365l.277-.248.337-.314-.245.39c-.371.591-.706 1.017-.994 1.295a2 2 0 0 1-.274.226.5.5 0 0 1-.079.043.1.1 0 0 1-.034.01.1.1 0 0 1-.033-.006.06.06 0 0 1-.039-.057"
+                                fill="#FF4D4F"
+                                fill-rule="evenodd"
+                              />
+                              <path
+                                d="m15 2 5 5h-3c-.7 0-1.058-.001-1.324-.14a1.26 1.26 0 0 1-.536-.536C15 6.058 15 5.7 15 5z"
+                                fill="#F8BBBF"
+                                fill-rule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                          <div
+                            class="ant-agentic-md-editor-file-view-list-item-file-info"
+                          >
+                            <div
+                              class="ant-agentic-md-editor-file-view-list-item-file-name"
+                            >
+                              <span
+                                class="ant-agentic-md-editor-file-view-list-item-file-name-text"
+                                title="example-document.pdf"
+                              >
+                                example-document
+                              </span>
+                            </div>
+                            <div
+                              class="ant-agentic-md-editor-file-view-list-item-file-name-extension-container"
+                            >
+                              <span
+                                class="ant-agentic-md-editor-file-view-list-item-file-name-extension"
+                              >
+                                pdf
+                              </span>
+                              <span
+                                class="ant-agentic-md-editor-file-view-list-item-separator"
+                              >
+                                |
+                              </span>
+                              <div
+                                class="ant-agentic-md-editor-file-view-list-item-file-size"
+                              >
+                                1.95 MB
+                              </div>
+                              <span
+                                class="ant-agentic-md-editor-file-view-list-item-separator"
+                              >
+                                |
+                              </span>
+                              <div>
+                                10:30
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          aria-describedby="test-id"
+                          class="ant-agentic-md-editor-file-view-list-item"
+                          data-testid="file-item"
+                          exit="[object Object]"
+                          variants="[object Object]"
+                        >
+                          <div
+                            class="ant-agentic-md-editor-file-view-list-item-file-icon"
+                          >
+                            <svg
+                              class="sofa-icons-icon"
+                              fill="none"
+                              height="1em"
+                              style="vertical-align: -0.125em;"
+                              viewBox="0 0 24 24"
+                              width="1em"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M15 2H8c-1.4 0-2.116.003-2.649.279A2.5 2.5 0 0 0 4.28 3.351C4.003 3.884 4 4.6 4 6v12c0 1.4.003 2.116.279 2.649.238.459.613.834 1.072 1.072C5.884 21.997 6.6 22 8 22h8c1.4 0 2.116-.003 2.649-.279a2.5 2.5 0 0 0 1.072-1.072C19.997 20.116 20 19.4 20 18V7zm-1.273 6.15a.5.5 0 1 0-.954-.3l-2.5 8a.5.5 0 1 0 .954.3zm-4.373 2.204a.5.5 0 1 0-.708-.708l-2 2a.5.5 0 0 0 0 .708l2 2a.5.5 0 1 0 .707-.708L7.707 12zm6-.708 2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.707-.708L16.293 12l-1.647-1.646a.5.5 0 0 1 .708-.708"
+                                fill="#00B5FD"
+                                fill-rule="evenodd"
+                                style="mix-blend-mode: passthrough;"
+                              />
+                              <path
+                                d="m15 2 5 5h-3c-.7 0-1.058-.001-1.324-.14a1.26 1.26 0 0 1-.536-.536C15 6.058 15 5.7 15 5z"
+                                fill="#CDF0FF"
+                                fill-rule="evenodd"
+                                style="mix-blend-mode: passthrough;"
+                              />
+                            </svg>
+                          </div>
+                          <div
+                            class="ant-agentic-md-editor-file-view-list-item-file-info"
+                          >
+                            <div
+                              class="ant-agentic-md-editor-file-view-list-item-file-name"
+                            >
+                              <span
+                                class="ant-agentic-md-editor-file-view-list-item-file-name-text"
+                                title="code-example.js"
+                              >
+                                code-example
+                              </span>
+                            </div>
+                            <div
+                              class="ant-agentic-md-editor-file-view-list-item-file-name-extension-container"
+                            >
+                              <span
+                                class="ant-agentic-md-editor-file-view-list-item-file-name-extension"
+                              >
+                                js
+                              </span>
+                              <span
+                                class="ant-agentic-md-editor-file-view-list-item-separator"
+                              >
+                                |
+                              </span>
+                              <div
+                                class="ant-agentic-md-editor-file-view-list-item-file-size"
+                              >
+                                500 KB
+                              </div>
+                              <span
+                                class="ant-agentic-md-editor-file-view-list-item-separator"
+                              >
+                                |
+                              </span>
+                              <div>
+                                10:30
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="ant-chat-item-extra"
+                    style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: var(--padding-5x); padding-right: var(--padding-5x); padding-top: var(--padding-1x); padding-bottom: var(--padding-2x); color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                  >
+                    <div
+                      animate="visible"
+                      class="ant-chat-item-extra-action-box"
+                      initial="hidden"
+                      style="display: flex; gap: 8px; align-items: center;"
+                      variants="[object Object]"
+                      whileinview="visible"
+                    >
+                      <span
+                        aria-describedby="test-id"
+                        aria-label="复制"
+                        class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                        data-testid="chat-item-copy-button"
+                        data-title="复制"
+                        role="button"
+                        tabindex="0"
+                      >
+                        <div
+                          aria-hidden="true"
+                          class="ant-bubble-actions-lottie"
+                          data-autoplay="false"
+                          data-loop="false"
+                          data-testid="lottie-animation"
+                          lottieref="[object Object]"
+                          style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                        />
+                      </span>
+                      <div
+                        class="ant-divider ant-divider-vertical"
+                        role="separator"
+                        style="margin: 0px 2px;"
+                      />
+                      <span
+                        aria-describedby="test-id"
+                        aria-label="喜欢"
+                        class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                        data-testid="like-button"
+                        data-title="喜欢"
+                        role="button"
+                        tabindex="0"
+                      >
+                        <div
+                          aria-hidden="true"
+                          class="ant-bubble-actions-lottie"
+                          data-autoplay="false"
+                          data-loop="false"
+                          data-testid="lottie-animation"
+                          lottieref="[object Object]"
+                          style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                        />
+                      </span>
+                      <span
+                        aria-describedby="test-id"
+                        aria-label="不喜欢"
+                        class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                        data-testid="dislike-button"
+                        data-title="不喜欢"
+                        role="button"
+                        tabindex="0"
+                      >
+                        <div
+                          aria-hidden="true"
+                          class="ant-bubble-actions-lottie"
+                          data-autoplay="false"
+                          data-loop="false"
+                          data-testid="lottie-animation"
+                          lottieref="[object Object]"
+                          style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                        />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div
-          avatar="[object Object]"
-          bubbleref="[object Object]"
-          data-testid="bubble"
-          markdownrenderconfig="[object Object]"
-          origindata="[object Object]"
-          placement="right"
+          class="ant-agentic-bubble ant-agentic-bubble-right ant-agentic-bubble-user ant-flex ant-flex-align-stretch ant-flex-vertical"
+          style="gap: 12px;"
         >
-          bubble
+          <div
+            class="ant-agentic-bubble-container"
+          >
+            <div
+              class="ant-agentic-bubble-container ant-agentic-bubble-container-right ant-agentic-bubble-container-user"
+              data-testid="chat-message"
+              style="display: flex; gap: 4px; flex-direction: column; align-items: flex-end;"
+            >
+              <div
+                class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+              >
+                <div
+                  class="ant-agentic-bubble-title ant-flex"
+                  data-testid="bubble-title"
+                  style="flex-direction: row-reverse; display: flex; align-items: center; gap: 8px;"
+                >
+                  <time
+                    class="ant-agentic-bubble-title-time"
+                    data-testid="bubble-time"
+                  >
+                    2024-02-27 17:20:00
+                  </time>
+                </div>
+              </div>
+              <div
+                class="ant-agentic-bubble-content ant-agentic-bubble-content-right ant-agentic-bubble-content-user"
+                data-testid="message-content"
+                style="min-width: 0px;"
+              >
+                <div
+                  class="agent-item-default-content ant-agentic-ui-display-messages-content-message"
+                  data-testid="message-box-content"
+                >
+                  <div
+                    aria-describedby="test-id"
+                    style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
+                  >
+                    <div
+                      class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+                      style="width: 100%; height: auto; padding: 0px; margin: 0px;"
+                    >
+                      <div
+                        class="ant-agentic-md-editor-container"
+                        style="height: 100%; color: rgb(52, 58, 69);"
+                        tabindex="-1"
+                      >
+                        <div
+                          autocapitalize="false"
+                          autocorrect="false"
+                          class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                          contenteditable="false"
+                          data-slate-editor="true"
+                          data-slate-node="value"
+                          spellcheck="false"
+                          style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                          translate="no"
+                          zindex="-1"
+                        >
+                          <div
+                            class=""
+                            data-be="paragraph"
+                            data-slate-node="element"
+                          >
+                            <span
+                              data-slate-node="text"
+                            >
+                              <span
+                                data-be="text"
+                                data-slate-leaf="true"
+                                draggable="false"
+                              >
+                                <span
+                                  data-slate-string="true"
+                                >
+                                  请展示一下文件上传加载状态的效果
+                                </span>
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div

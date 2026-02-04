@@ -1,6 +1,6 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
-import React, { useContext } from 'react';
+import React, { memo, useContext } from 'react';
 import { useStyle } from './style';
 
 export interface TitleProps {
@@ -26,7 +26,7 @@ export interface TitleProps {
   prefixCls?: string;
 }
 
-const Title: React.FC<TitleProps> = ({
+const TitleComponent: React.FC<TitleProps> = ({
   title,
   subtitle,
   style,
@@ -37,6 +37,7 @@ const Title: React.FC<TitleProps> = ({
   const prefixCls = getPrefixCls('agentic-chatboot-title', customPrefixCls);
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
+  // 使用提前返回优化
   if (!title && !subtitle) {
     return null;
   }
@@ -51,5 +52,10 @@ const Title: React.FC<TitleProps> = ({
     </div>,
   );
 };
+
+TitleComponent.displayName = 'Title';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+const Title = memo(TitleComponent);
 
 export default Title;

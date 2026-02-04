@@ -439,7 +439,7 @@ export default () => {
       <div
         style={{
           marginTop: 32,
-          padding: 20,
+          padding: 12,
           background: '#fff7e6',
           borderRadius: 8,
           border: '1px solid #ffd591',
@@ -471,7 +471,7 @@ export default () => {
       <div
         style={{
           marginTop: 16,
-          padding: 20,
+          padding: 12,
           background: '#f6ffed',
           borderRadius: 8,
           border: '1px solid #b7eb8f',

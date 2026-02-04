@@ -8,6 +8,66 @@ import { setupLottieMock } from './_mocks_/lottieMock';
 import { setupGlobalMocks } from './_mocks_/sharedMocks';
 MotionGlobalConfig.skipAnimations = true;
 
+// Mock ace-builds 模块，避免在测试环境中加载真实的 ace 库
+vi.mock('ace-builds/src-noconflict/ext-modelist', () => ({
+  default: {
+    modes: [
+      { name: 'javascript', extensions: ['js', 'jsx'] },
+      { name: 'typescript', extensions: ['ts', 'tsx'] },
+      { name: 'python', extensions: ['py'] },
+      { name: 'java', extensions: ['java'] },
+      { name: 'html', extensions: ['html'] },
+      { name: 'css', extensions: ['css'] },
+      { name: 'json', extensions: ['json'] },
+    ],
+    getModeForPath: vi.fn(() => ({ name: 'text' })),
+  },
+}));
+
+// 设置全局 ace 对象，用于 ace-builds 模块
+// ace-builds 的某些模块（如 ext-modelist）期望 ace 全局变量存在
+(globalThis as any).ace = {
+  define: vi.fn((name: string, deps: string[], factory: any) => {
+    // Mock ace.define 函数，正确处理模块导出
+    if (typeof factory === 'function') {
+      const module = { exports: {} };
+      const require = (dep: string) => {
+        // Mock require 函数
+        return {};
+      };
+      try {
+        factory(require, module.exports, module);
+      } catch (e) {
+        // 忽略错误，仅用于避免测试环境报错
+      }
+      return module.exports;
+    }
+    return {};
+  }),
+  require: vi.fn((module: string) => {
+    // Mock ace.require 函数
+    return {};
+  }),
+};
+
+// Mock @galacean/effects 模块，避免在测试环境中访问 DOM 属性导致错误
+vi.mock('@galacean/effects', () => {
+  const mockPlayer = vi.fn().mockImplementation(() => ({
+    loadScene: vi.fn(),
+    dispose: vi.fn(),
+    resume: vi.fn(),
+    pause: vi.fn(),
+    resize: vi.fn(),
+  }));
+
+  return {
+    Player: mockPlayer,
+    Scene: {
+      LoadType: {},
+    },
+  };
+});
+
 // 设置全局mocks
 setupGlobalMocks();
 setupLottieMock();
@@ -40,9 +100,47 @@ Object.defineProperty(global, 'navigator', {
   },
 });
 
+// Mock requestIdleCallback 和 cancelIdleCallback
+// 在测试环境中立即同步执行，避免异步操作导致测试无法结束
+let idleCallbackIdCounter = 0;
+const idleCallbacks = new Map<number, () => void>();
+
 vi.stubGlobal(
   'requestIdleCallback',
-  vi.fn((cb) => cb()),
+  vi.fn((cb: () => void, options?: { timeout?: number }) => {
+    const id = ++idleCallbackIdCounter;
+    idleCallbacks.set(id, cb);
+    // 在测试环境中立即同步执行，避免异步操作阻塞测试
+    // 使用 process.nextTick 确保在当前执行栈完成后执行
+    if (typeof process !== 'undefined' && process.nextTick) {
+      process.nextTick(() => {
+        if (idleCallbacks.has(id)) {
+          try {
+            cb();
+          } catch (e) {
+            // 忽略执行错误
+          }
+          idleCallbacks.delete(id);
+        }
+      });
+    } else {
+      // 降级到同步执行
+      try {
+        cb();
+      } catch (e) {
+        // 忽略执行错误
+      }
+      idleCallbacks.delete(id);
+    }
+    return id;
+  }),
+);
+
+vi.stubGlobal(
+  'cancelIdleCallback',
+  vi.fn((id: number) => {
+    idleCallbacks.delete(id);
+  }),
 );
 
 // 重写 console.error 来过滤 act() 警告和其他测试警告

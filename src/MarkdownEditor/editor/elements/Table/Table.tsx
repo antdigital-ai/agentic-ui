@@ -1,9 +1,13 @@
-﻿import { ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { Node } from 'slate';
 import { RenderElementProps } from 'slate-react';
 import stringWidth from 'string-width';
+import {
+  MOBILE_BREAKPOINT,
+  MOBILE_TABLE_MIN_COLUMN_WIDTH,
+} from '../../../../Constants/mobile';
 import { useEditorStore } from '../../store';
 import { ReadonlyTableComponent } from './ReadonlyTableComponent';
 import { TablePropsContext } from './TableContext';
@@ -37,12 +41,10 @@ import useScrollShadow from './useScrollShadow';
  * @see https://reactjs.org/docs/hooks-intro.html React Hooks
  */
 export const SlateTable = ({
-  hashId,
   children,
   ...props
 }: {
   children: React.ReactNode;
-  hashId: string;
 } & RenderElementProps) => {
   const { readonly, markdownContainerRef } = useEditorStore();
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
@@ -50,6 +52,8 @@ export const SlateTable = ({
 
   const baseCls = getPrefixCls('agentic-md-editor-content-table');
   const tableTargetRef = useRef<HTMLTableElement>(null);
+  const columnCount = props.element?.children?.[0]?.children?.length || 0;
+  const mobileBreakpointValue = parseInt(MOBILE_BREAKPOINT, 10) || 768;
 
   // 总是调用 hooks，避免条件调用
   const [tableRef, scrollState] = useScrollShadow();
@@ -64,7 +68,7 @@ export const SlateTable = ({
       }
       const columnCount = props.element?.children?.[0]?.children?.length || 0;
       if (columnCount === 0) return [];
-      return Array(columnCount).fill(120); // 固定宽度
+      return Array(columnCount).fill(80); // 固定宽度
     }
 
     // 如果在props中存在，直接使用以避免计算
@@ -85,10 +89,9 @@ export const SlateTable = ({
       )?.clientWidth || 400) -
       32 -
       12;
-    const maxColumnWidth = containerWidth / 4;
-    const minColumnWidth = 60;
-
-    const columnCount = tableRows?.[0]?.children?.length || 0;
+    const isMobileLayout = containerWidth <= mobileBreakpointValue;
+    const minColumnWidth = isMobileLayout ? MOBILE_TABLE_MIN_COLUMN_WIDTH : 60;
+    const maxColumnWidth = isMobileLayout ? containerWidth : containerWidth / 4;
     const rowsToSample = Math.min(5, tableRows.length);
 
     // 一次性计算宽度
@@ -113,7 +116,7 @@ export const SlateTable = ({
     );
 
     // 如果表格少于5行且总宽度超过容器宽度，则均匀分配宽度
-    if (tableRows.length < 5) {
+    if (tableRows.length < 5 && columnCount > 0) {
       const totalWidth = calculatedWidths.reduce(
         (sum, width) => sum + width,
         0,
@@ -132,7 +135,7 @@ export const SlateTable = ({
     readonly,
     props.element?.otherProps?.colWidths,
     props.element?.children?.length,
-    props.element?.children?.[0]?.children?.length,
+    columnCount,
     markdownContainerRef,
   ]);
 
@@ -142,7 +145,7 @@ export const SlateTable = ({
 
     const resize = () => {
       if (process.env.NODE_ENV === 'test') return;
-      let maxWidth = colWidths
+      const maxWidth = colWidths
         ? colWidths?.reduce((a: number, b: number) => a + b, 0) + 8
         : 0;
 
@@ -153,7 +156,27 @@ export const SlateTable = ({
       const dom = tableRef.current as HTMLDivElement;
       if (dom) {
         setTimeout(() => {
-          dom.style.minWidth = `min(${((minWidth || 200) * 0.95).toFixed(0)}px,${maxWidth || minWidth || 'xxx'}px,200px)`;
+          const containerWidthForBreakpoint =
+            (markdownContainerRef?.current?.querySelector(
+              '.ant-agentic-md-editor-content',
+            )?.clientWidth || 400) -
+            32 -
+            12;
+          const isMobileLayout =
+            containerWidthForBreakpoint <= mobileBreakpointValue;
+          const computedMinColumnWidth = isMobileLayout
+            ? MOBILE_TABLE_MIN_COLUMN_WIDTH
+            : 60;
+          const fallbackMinWidth = Number(
+            ((minWidth || 200) * 0.95).toFixed(0),
+          );
+          const requiredMinWidth = Math.max(
+            columnCount * computedMinColumnWidth,
+            maxWidth,
+            fallbackMinWidth,
+            200,
+          );
+          dom.style.minWidth = `${requiredMinWidth}px`;
         }, 200);
       }
     };
@@ -180,7 +203,7 @@ export const SlateTable = ({
     () => (
       <table
         ref={tableTargetRef}
-        className={classNames(`${baseCls}-editor-table`, hashId)}
+        className={classNames(`${baseCls}-editor-table`)}
         onDragStart={(e) => {
           // 阻止拖拽开始事件
           e.preventDefault();
@@ -196,14 +219,19 @@ export const SlateTable = ({
             }}
           />
           {(colWidths || []).map((colWidth: number, index: number) => {
+            const isLastCol = index === (colWidths?.length ?? 0) - 1;
             return (
               <col
                 key={index}
-                style={{
-                  width: colWidth,
-                  minWidth: colWidth,
-                  maxWidth: colWidth,
-                }}
+                style={
+                  isLastCol
+                    ? { minWidth: 60 }
+                    : {
+                        width: colWidth,
+                        minWidth: colWidth,
+                        maxWidth: colWidth,
+                      }
+                }
               />
             );
           }) || null}
@@ -216,7 +244,7 @@ export const SlateTable = ({
         </tbody>
       </table>
     ),
-    [colWidths, children, hashId, baseCls],
+    [colWidths, children, baseCls],
   );
 
   // 缓存boxShadow样式，只在scrollState变化时重新计算
@@ -236,14 +264,10 @@ export const SlateTable = ({
     [scrollState, readonly],
   );
 
-  // readonly 模式渲染 - 使用优化的组件
+  // readonly 模式渲染 - 使用优化的组件（早期返回）
   if (readonly) {
     return (
-      <ReadonlyTableComponent
-        hashId={hashId}
-        element={props.element}
-        baseCls={baseCls}
-      >
+      <ReadonlyTableComponent element={props.element} baseCls={baseCls}>
         {children}
       </ReadonlyTableComponent>
     );
@@ -252,9 +276,12 @@ export const SlateTable = ({
   // 编辑模式渲染
   return (
     <div
-      className={classNames(baseCls, hashId)}
+      className={classNames(baseCls)}
       ref={tableRef}
-      style={boxShadowStyle}
+      style={{
+        ...boxShadowStyle,
+        position: 'relative',
+      }}
       onDragStart={(e) => {
         // 阻止拖拽开始时的文字选择
         e.preventDefault();

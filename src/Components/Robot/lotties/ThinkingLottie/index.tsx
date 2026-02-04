@@ -31,8 +31,8 @@ export interface ThinkingLottieProps {
  * 该组件使用Lottie动画库提供流畅的加载动画效果，支持自定义尺寸、播放控制等。
  *
  * @component
- * @description Lottie语音播报动画组件，提供流畅的语音播报动画效果
- * @param {LottieVoiceProps} props - 组件属性
+ * @description Lottie眨眼跑+追星星动画组件，提供流畅的眨眼跑+追星星动画效果
+ * @param {ThinkingLottieProps} props - 组件属性
  * @param {boolean} [props.autoplay=true] - 是否自动播放动画
  * @param {boolean} [props.loop=true] - 是否循环播放动画
  * @param {string} [props.className] - 动画容器类名
@@ -49,7 +49,7 @@ export interface ThinkingLottieProps {
  * />
  * ```
  *
- * @returns {React.ReactElement} 渲染的Lottie语音播报动画组件
+ * @returns {React.ReactElement} 渲染的Lottie眨眼跑+追星星动画组件
  *
  * @remarks
  * - 使用Lottie动画库
@@ -57,14 +57,13 @@ export interface ThinkingLottieProps {
  * - 支持自定义尺寸
  * - 支持播放控制
  * - 支持自定义样式
- * - 提供默认的加载动画
  */
 export const ThinkingLottie: React.FC<ThinkingLottieProps> = ({
   autoplay = true,
   loop = true,
   className,
   style,
-  size,
+  size = 32,
 }) => {
   const containerStyle: React.CSSProperties = {
     width: size,

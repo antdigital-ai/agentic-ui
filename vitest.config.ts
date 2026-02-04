@@ -14,8 +14,17 @@ export default defineConfig({
     globals: true,
     setupFiles: './tests/setupTests.ts',
     testTimeout: 500000,
+    exclude: ['**/node_modules/**', '**/dist/**'],
     alias: {
       '@ant-design/agentic-ui': path.resolve(__dirname, './src'),
+      '@schema-element-editor/host-sdk/core': path.resolve(
+        __dirname,
+        './tests/_mocks_/schemaEditorHostSdkMock.ts',
+      ),
+      '@schema-element-editor/host-sdk': path.resolve(
+        __dirname,
+        './tests/_mocks_/schemaEditorHostSdkMock.ts',
+      ),
     },
     coverage: {
       provider: 'istanbul',

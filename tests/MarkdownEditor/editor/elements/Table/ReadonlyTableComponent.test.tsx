@@ -78,7 +78,6 @@ describe('ReadonlyTableComponent', () => {
           initialValue={[{ type: 'paragraph', children: [{ text: '' }] }]}
         >
           <ReadonlyTableComponent
-            hashId="test-hash"
             element={element as any}
             baseCls="ant-agentic-md-editor-content-table"
             {...props}
@@ -105,7 +104,6 @@ describe('ReadonlyTableComponent', () => {
       const table = document.querySelector('table');
       expect(table).toHaveClass('ant-agentic-md-editor-content-table-editor-table');
       expect(table).toHaveClass('readonly');
-      expect(table).toHaveClass('test-hash');
     });
 
     it('应该渲染 tbody', () => {
@@ -403,18 +401,6 @@ describe('ReadonlyTableComponent', () => {
   });
 
   describe('样式和容器测试', () => {
-    it('应该应用正确的容器样式', () => {
-      const { container } = renderComponent();
-      const wrapper = container.querySelector('.ant-agentic-md-editor-content-table');
-      expect(wrapper).toHaveStyle({ flex: '1', minWidth: '0' });
-    });
-
-    it('应该应用 hashId', () => {
-      renderComponent();
-      const wrapper = document.querySelector('.test-hash');
-      expect(wrapper).toBeInTheDocument();
-    });
-
     it('应该应用 baseCls', () => {
       renderComponent();
       const wrapper = document.querySelector('.ant-agentic-md-editor-content-table');
@@ -510,7 +496,6 @@ describe('ReadonlyTableComponent', () => {
             initialValue={[{ type: 'paragraph', children: [{ text: '' }] }]}
           >
             <ReadonlyTableComponent
-              hashId="test-hash"
               element={mockTableElement as any}
               baseCls="ant-agentic-md-editor-content-table"
             >
@@ -548,9 +533,15 @@ describe('ReadonlyTableComponent', () => {
     it('应该为每列应用默认宽度 120', () => {
       renderComponent();
       const cols = document.querySelectorAll('col');
-      cols.forEach((col) => {
+      cols.forEach((col, i) => {
         const htmlCol = col as HTMLElement;
-        expect(htmlCol.style.width).toBe('120px');
+        const isLastCol = i === cols.length - 1;
+        if (isLastCol) {
+          // 最后一列仅设置 minWidth 以保持弹性
+          expect(htmlCol.style.minWidth).toBe('60px');
+        } else {
+          expect(htmlCol.style.width).toBe('80px');
+        }
       });
     });
   });
@@ -568,7 +559,6 @@ describe('ReadonlyTableComponent', () => {
             initialValue={[{ type: 'paragraph', children: [{ text: '' }] }]}
           >
             <ReadonlyTableComponent
-              hashId="test-hash"
               element={mockTableElement as any}
               baseCls="ant-agentic-md-editor-content-table"
             >

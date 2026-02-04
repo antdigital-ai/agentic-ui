@@ -93,7 +93,6 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     htmlRef,
     fncProps,
     docListNode,
-    isFinished,
     beforeContent,
     afterContent,
   } = props;
@@ -105,13 +104,6 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
 
   const { locale, standalone } = useContext(BubbleConfigContext) || {};
   const { token } = theme.useToken();
-
-  useEffect(() => {
-    if (isFinished) {
-      MarkdownEditorRef.current?.store.setMDContent(content);
-      return;
-    }
-  }, [isFinished]);
 
   const isPaddingHidden = useMemo(() => {
     return !!extra;
@@ -144,21 +136,28 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           },
           ...(props.markdownRenderConfig?.tableConfig || {}),
         }}
+        deps={[
+          String(props.originData?.isLast),
+          String(props.originData?.isFinished),
+          String(props.originData?.isAborted),
+        ]}
         rootContainer={htmlRef as any}
         editorStyle={{
           fontSize: 14,
+          ...(props.markdownRenderConfig?.editorStyle || {}),
         }}
-        typewriter={typing}
+        typewriter={props.markdownRenderConfig?.typewriter ?? typing}
         style={{
           minWidth: minWidth ? `min(${minWidth}px,100%)` : undefined,
           maxWidth: standalone ? '100%' : undefined,
           padding: isPaddingHidden ? 0 : undefined,
           margin: isPaddingHidden ? 0 : undefined,
+          ...(props.markdownRenderConfig?.style || {}),
         }}
         readonly
       />
     );
-  }, [hidePadding, typing, isPaddingHidden, content]);
+  }, [hidePadding, typing, props.originData?.isLast, isPaddingHidden, content]);
 
   const errorDom = (
     <div

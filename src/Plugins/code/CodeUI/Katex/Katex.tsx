@@ -1,22 +1,47 @@
 import classNames from 'classnames';
-import katex from 'katex';
-import React, { useEffect, useRef } from 'react';
+import React, { startTransition, useEffect, useRef, useState } from 'react';
 import { useGetSetState } from 'react-use';
 import { CodeNode } from '../../../../MarkdownEditor/el';
-import './katex.min.css';
+import { loadKatex } from '../../../katex/loadKatex';
 
 export const Katex = (props: { el?: CodeNode }) => {
   const [state, setState] = useGetSetState({
     code: '',
     error: '',
   });
+  const [katexLoaded, setKatexLoaded] = useState(false);
+  const katexRef = useRef<typeof import('katex').default | null>(null);
   const divRef = useRef<HTMLDivElement>(null);
   const timer = useRef(0);
 
   // 处理未定义的 el
   const safeEl = props.el || { value: '', type: 'code', language: 'katex' };
 
+  // 异步加载 Katex 库和 CSS
   useEffect(() => {
+    if (process.env.NODE_ENV === 'test') {
+      setKatexLoaded(true);
+      return;
+    }
+
+    startTransition(() => {
+      // 异步加载在 startTransition 外部执行
+      (async () => {
+        try {
+          const katexModule = await loadKatex();
+          katexRef.current = katexModule.default;
+          setKatexLoaded(true);
+        } catch (error) {
+          console.error('Failed to load Katex:', error);
+          setKatexLoaded(true);
+        }
+      })();
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!katexLoaded || !katexRef.current) return;
+
     const code = safeEl.value || '';
     clearTimeout(timer.current);
     timer.current = window.setTimeout(
@@ -26,8 +51,8 @@ export const Katex = (props: { el?: CodeNode }) => {
         });
         if (state().code) {
           try {
-            if (divRef.current) {
-              katex.render(state().code, divRef.current!, {
+            if (divRef.current && katexRef.current) {
+              katexRef.current.render(state().code, divRef.current!, {
                 strict: false,
                 output: 'htmlAndMathml',
                 throwOnError: false,
@@ -45,7 +70,7 @@ export const Katex = (props: { el?: CodeNode }) => {
       !state().code ? 0 : 300,
     );
     return () => window.clearTimeout(timer.current);
-  }, [safeEl]);
+  }, [safeEl, katexLoaded, state]);
   return (
     <div
       style={{

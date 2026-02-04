@@ -1,11 +1,10 @@
-﻿import React from 'react';
-import { RenderElementProps, useSlate } from 'slate-react';
+import React from 'react';
+import { RenderElementProps } from 'slate-react';
 import { useSelStatus } from '../../../../MarkdownEditor/hooks/editor';
 import { useEditorStore } from '../../store';
 
 export const WarpCard = (props: RenderElementProps) => {
   const [selected, path] = useSelStatus(props.element);
-  const editor = useSlate();
   const { readonly } = useEditorStore();
 
   return React.useMemo(() => {
@@ -37,5 +36,5 @@ export const WarpCard = (props: RenderElementProps) => {
         {props.children}
       </div>
     );
-  }, [props.element.children, selected, path, props.element.block, editor]);
+  }, [props.element.hash, selected, path, props.element.block]);
 };

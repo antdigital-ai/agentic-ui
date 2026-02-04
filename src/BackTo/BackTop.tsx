@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, memo, useCallback } from 'react';
 import scrollTo from '../Utils/scrollTo';
 import {
   ScrollVisibleButton,
@@ -7,6 +7,7 @@ import {
 } from './ScrollVisibleButton';
 import { TopIcon } from './icons/TopIcon';
 
+// 常量定义
 const DEFAULT_DURATION = 450;
 const DEFAULT_VISIBLE_THRESHOLD = 400;
 
@@ -76,7 +77,7 @@ export interface BackTopProps extends ScrollVisibleButtonProps {
  * - 使用 forwardRef 支持 ref 传递
  * - 提供完整的无障碍支持
  */
-export const BackTop = forwardRef<ScrollVisibleButtonRef, BackTopProps>(
+const BackTopComponent = forwardRef<ScrollVisibleButtonRef, BackTopProps>(
   (props, ref) => {
     const {
       duration = DEFAULT_DURATION,
@@ -87,10 +88,17 @@ export const BackTop = forwardRef<ScrollVisibleButtonRef, BackTopProps>(
 
     const shouldVisible = getShouldVisible(propsShouldVisible);
 
-    const handleClick: ScrollVisibleButtonProps['onClick'] = (e, container) => {
-      scrollTo(0, { container, duration });
-      onClick?.(e, container);
-    };
+    // 使用 useCallback 优化点击处理函数
+    const handleClick = useCallback(
+      (
+        e: React.MouseEvent<HTMLButtonElement> | undefined,
+        container: HTMLElement | Window,
+      ) => {
+        scrollTo(0, { container, duration });
+        onClick?.(e, container);
+      },
+      [duration, onClick],
+    );
 
     return (
       <ScrollVisibleButton
@@ -104,3 +112,8 @@ export const BackTop = forwardRef<ScrollVisibleButtonRef, BackTopProps>(
     );
   },
 );
+
+BackTopComponent.displayName = 'BackTop';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+export const BackTop = memo(BackTopComponent);

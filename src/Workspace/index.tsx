@@ -1,9 +1,9 @@
-import { CloseOutlined } from '@ant-design/icons';
 import {
   FileStack,
   Language,
   ListTodo,
   MousePointerClick,
+  X,
 } from '@sofa-design/icons';
 import { ConfigProvider, Segmented } from 'antd';
 import classNames from 'classnames';
@@ -15,8 +15,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { ActionIconBox } from '../Components/ActionIconBox';
 import { I18nContext } from '../I18n';
-import { BrowserList } from './Browser';
+import Browser from './Browser';
 import { File } from './File';
 import { RealtimeFollowList } from './RealtimeFollow';
 import { useWorkspaceStyle } from './style';
@@ -88,10 +89,11 @@ const resolveTabConfig = (
 
 const RealtimeComponent: FC<RealtimeProps> = ({ data }) =>
   data ? <RealtimeFollowList data={data} /> : null;
-const BrowserComponent: FC<BrowserProps> = ({ data }) =>
-  data ? <BrowserList data={data} /> : null;
-const TaskComponent: FC<TaskProps> = ({ data }) =>
-  data ? <TaskList data={data} /> : null;
+
+const BrowserComponent: FC<BrowserProps> = (props) => <Browser {...props} />;
+
+const TaskComponent: FC<TaskProps> = ({ data, onItemClick }) =>
+  data ? <TaskList data={data} onItemClick={onItemClick} /> : null;
 const FileComponent: FC<FileProps> = (props) => <File {...props} />;
 const CustomComponent: FC<CustomProps> = ({ children }) => children || null;
 
@@ -129,6 +131,7 @@ const Workspace: FC<WorkspaceProps> & {
   onClose,
   children,
   pure = false,
+  headerExtra,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
@@ -254,14 +257,19 @@ const Workspace: FC<WorkspaceProps> & {
         >
           {displayTitle}
         </div>
-        {onClose && (
-          <CloseOutlined
-            className={classNames(`${prefixCls}-close`, hashId)}
-            onClick={onClose}
-            aria-label={locale?.['workspace.closeWorkspace'] || '关闭工作空间'}
-            data-testid="workspace-close"
-          />
-        )}
+        <div className={classNames(`${prefixCls}-header-right`, hashId)}>
+          {headerExtra}
+          {onClose && (
+            <ActionIconBox
+              className={classNames(`${prefixCls}-close`, hashId)}
+              onClick={onClose}
+              title={locale?.['workspace.closeWorkspace'] || '关闭工作空间'}
+              data-testid="workspace-close"
+            >
+              <X />
+            </ActionIconBox>
+          )}
+        </div>
       </div>
 
       {availableTabs.length > 1 && (

@@ -26,49 +26,123 @@ vi.mock('framer-motion', () => ({
   },
 }));
 
+// Mock @ant-design/agentic-ui (别名指向 ./src)
+vi.mock('@ant-design/agentic-ui', async () => {
+  const actual = await vi.importActual('@ant-design/agentic-ui');
+  // Mock Lottie 组件，当 active 为 true 时显示 lottie-animation
+  const mockPlayLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'voice-play-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  const mockCopyLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'copy-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  const mockLikeLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'like-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  const mockDislikeLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'dislike-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  const mockRefreshLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'refresh-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  return {
+    ...actual,
+    PlayLottie: mockPlayLottie,
+    CopyLottie: mockCopyLottie,
+    LikeLottie: mockLikeLottie,
+    DislikeLottie: mockDislikeLottie,
+    RefreshLottie: mockRefreshLottie,
+  };
+});
+
 // Mock CopyButton / ActionIconBox，避免依赖样式与外部行为
-vi.mock('../src/index', () => ({
-  ActionIconBox: ({
-    children,
-    onClick,
-    title,
-    style,
-    scale,
-    'data-testid': dataTestid,
-    ...props
-  }: any) => (
-    <span
-      data-testid={dataTestid || 'action-icon-box'}
-      onClick={onClick}
-      style={style}
-      title={title}
-      data-scale={scale ? 'true' : 'false'}
-      {...props}
-    >
-      {children}
+vi.mock('../src/index', async () => {
+  const actual = await vi.importActual('../src/index');
+  // Mock Lottie 组件，当 active 为 true 时显示 lottie-animation
+  const mockPlayLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'voice-play-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
     </span>
-  ),
-  CopyButton: ({
-    children,
-    onClick,
-    title,
-    style,
-    scale,
-    'data-testid': dataTestid,
-    ...props
-  }: any) => (
-    <span
-      data-testid={dataTestid || 'copy-button'}
-      onClick={onClick}
-      style={style}
-      title={title}
-      data-scale={scale ? 'true' : 'false'}
-      {...props}
-    >
-      {children || '复制'}
+  );
+  const mockCopyLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'copy-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
     </span>
-  ),
-}));
+  );
+  const mockLikeLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'like-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  const mockDislikeLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'dislike-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  const mockRefreshLottie = ({ active }: any) => (
+    <span data-testid={active ? 'lottie-animation' : 'refresh-lottie'}>
+      {active ? 'lottie-active' : 'lottie-inactive'}
+    </span>
+  );
+  return {
+    ...actual,
+    ActionIconBox: ({
+      children,
+      onClick,
+      title,
+      style,
+      scale,
+      'data-testid': dataTestid,
+      ...restProps
+    }: any) => (
+      <span
+        data-testid={dataTestid || 'action-icon-box'}
+        onClick={onClick}
+        style={style}
+        title={title}
+        data-scale={scale ? 'true' : 'false'}
+        {...restProps}
+      >
+        {children}
+      </span>
+    ),
+    CopyButton: ({
+      children,
+      onClick,
+      title,
+      style,
+      scale,
+      'data-testid': dataTestid,
+      ...restProps
+    }: any) => (
+      <span
+        data-testid={dataTestid || 'copy-button'}
+        onClick={onClick}
+        style={style}
+        title={title}
+        data-scale={scale ? 'true' : 'false'}
+        {...restProps}
+      >
+        {children || '复制'}
+      </span>
+    ),
+    PlayLottie: mockPlayLottie,
+    CopyLottie: mockCopyLottie,
+    LikeLottie: mockLikeLottie,
+    DislikeLottie: mockDislikeLottie,
+    RefreshLottie: mockRefreshLottie,
+  };
+});
 
 // Mock lottie 相关组件，避免加载动画 JSON（保持默认导出与命名导出一致）
 vi.mock('../src/icons/VoicePlayLottie', () => {
@@ -107,7 +181,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={defaultBubbleProps as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={true}
         />
       </BubbleConfigProvide>,
@@ -125,7 +199,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={defaultBubbleProps as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={false}
         />
       </BubbleConfigProvide>,
@@ -149,7 +223,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={bubbleWithEmpty as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={true}
         />
       </BubbleConfigProvide>,
@@ -188,7 +262,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={defaultBubbleProps as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={true}
         />
       </BubbleConfigProvide>,
@@ -233,7 +307,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={defaultBubbleProps as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={true}
           useSpeech={mockAdapter}
         />
@@ -259,7 +333,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={defaultBubbleProps as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={true}
         />
       </BubbleConfigProvide>,
@@ -298,7 +372,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={defaultBubbleProps as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={true}
         />
       </BubbleConfigProvide>,
@@ -343,7 +417,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={defaultBubbleProps as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={true}
         />
       </BubbleConfigProvide>,
@@ -372,7 +446,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={defaultBubbleProps as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           useSpeech={adapter}
           shouldShowVoice={true}
         />
@@ -398,7 +472,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={defaultBubbleProps as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           useSpeech={adapter}
           shouldShowVoice={true}
         />
@@ -409,10 +483,28 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
   });
 
   it('hover 播放按钮会展示 lottie（非播放态）', () => {
-    // 无需浏览器支持，仅验证 hover 渲染切换
+    // Mock 浏览器 SpeechSynthesis 支持，使得按钮可用
     Object.defineProperty(window, 'speechSynthesis', {
       configurable: true,
-      value: undefined,
+      value: {
+        speak: vi.fn(),
+        cancel: vi.fn(),
+        pause: vi.fn(),
+        resume: vi.fn(),
+      },
+    });
+    const MockUtter = vi.fn().mockImplementation(function (
+      this: any,
+      txt: string,
+    ) {
+      this.text = txt;
+      this.rate = 1;
+      this.onend = null;
+      this.onerror = null;
+    });
+    Object.defineProperty(global, 'SpeechSynthesisUtterance', {
+      configurable: true,
+      value: MockUtter,
     });
 
     render(
@@ -420,7 +512,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={defaultBubbleProps as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={true}
         />
       </BubbleConfigProvide>,
@@ -445,7 +537,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={abortedBubble as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={true}
         />
       </BubbleConfigProvide>,
@@ -468,7 +560,7 @@ describe('BubbleExtra - VoiceButton / shouldShowVoice / useSpeech', () => {
         <BubbleExtra
           bubble={bubbleWithAnswerStatus as any}
           onLike={vi.fn()}
-          onDisLike={vi.fn()}
+          onDislike={vi.fn()}
           shouldShowVoice={true}
         />
       </BubbleConfigProvide>,

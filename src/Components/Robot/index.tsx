@@ -3,7 +3,9 @@ import { isString } from 'lodash-es';
 import React from 'react';
 import { DazingLottie, ThinkingLottie } from './lotties';
 
-export * from './lotties';
+export * from './lotties/BlowingWindLottie';
+export * from './lotties/BouncingLottie';
+export * from './lotties/PeekLottie';
 
 export type RobotStatus = 'default' | 'running';
 

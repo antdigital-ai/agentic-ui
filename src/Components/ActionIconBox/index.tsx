@@ -1,12 +1,13 @@
 import { LoadingOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip, TooltipProps } from 'antd';
 import cx from 'classnames';
+import { isFunction } from 'lodash';
 import { useMergedState } from 'rc-util';
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useStyle } from './style';
 
 export type ActionIconBoxProps = {
-  children: React.ReactNode;
+  children: ((isHovered: boolean) => React.ReactNode) | React.ReactNode;
   showTitle?: boolean;
   onClick?: (e: any) => void;
   tooltipProps?: TooltipProps;
@@ -83,12 +84,12 @@ export type ActionIconBoxProps = {
  * - 响应式交互设计
  */
 export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
-  // 兼容旧属性
   const propLoading = props.isLoading ?? props.loading;
   const [loading, setLoading] = useMergedState(false, {
     value: propLoading,
     onChange: props.onLoadingChange,
   });
+  const [isHovered, setIsHovered] = useState(false);
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-md-editor-action-icon-box');
   const { wrapSSR, hashId } = useStyle(prefixCls);
@@ -102,27 +103,31 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
       return <LoadingOutlined style={props.iconStyle} />;
     }
 
+    const element = isFunction(props.children)
+      ? props.children(isHovered)
+      : props.children;
+
     // 处理单个子元素的情况
-    if (React.isValidElement(props.children)) {
+    if (React.isValidElement(element)) {
       try {
-        return React.cloneElement(props.children as any, {
+        return React.cloneElement(element as any, {
           // @ts-ignore
-          ...props?.children?.props,
+          ...element?.props,
           style: {
             // @ts-ignore
-            ...props?.children?.props?.style,
+            ...element?.props?.style,
             ...props.iconStyle,
           },
         });
       } catch (error) {
         console.error('ActionIconBox: 克隆元素时出错', error);
-        return props.children;
+        return element;
       }
     }
 
     // 处理多个子元素的情况
     try {
-      return React.Children.map(props.children, (child) => {
+      return React.Children.map(element, (child) => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child as any, {
             // @ts-ignore
@@ -138,9 +143,9 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
       });
     } catch (error) {
       console.error('ActionIconBox: 处理子元素时出错', error);
-      return props.children;
+      return element;
     }
-  }, [loading, props.loading, props.iconStyle, props.children]);
+  }, [loading, isHovered, props.loading, props.iconStyle, props.children]);
 
   return wrapSSR(
     props.title ? (
@@ -193,6 +198,8 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
               }
             }
           }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           style={props.style}
         >
           {icon}
@@ -247,6 +254,8 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
             }
           }
         }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         style={props.style}
       >
         {icon}

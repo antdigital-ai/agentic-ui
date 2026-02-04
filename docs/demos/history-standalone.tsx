@@ -89,7 +89,7 @@ const StandaloneHistoryDemo = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h3>History 独立模式</h3>
       <p>当前会话ID: {currentSessionId}</p>
 

@@ -27,7 +27,7 @@ export interface QuoteProps {
   className?: string;
   /** 自定义样式 */
   style?: React.CSSProperties;
-  /** 点击文件名回调 */
+  /** File 子组件点击事件（点击文件名回调） */
   onFileClick?: (fileName: string, lineRange?: string) => void;
 }
 

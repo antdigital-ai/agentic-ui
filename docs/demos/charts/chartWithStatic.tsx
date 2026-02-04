@@ -79,7 +79,7 @@ const ChartWithStaticDemo: React.FC = () => {
   ]);
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h3>单个统计数据组件</h3>
       <AreaChart
         data={data}
@@ -92,7 +92,7 @@ const ChartWithStaticDemo: React.FC = () => {
         }}
         legendAlign="center"
       />
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: '12px' }}>
         <h3>多个统计数据组件</h3>
         <AreaChart
           data={data}
@@ -116,7 +116,7 @@ const ChartWithStaticDemo: React.FC = () => {
         />
       </div>
 
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: '12px' }}>
         <h3>Block 模式</h3>
         <AreaChart
           data={data}

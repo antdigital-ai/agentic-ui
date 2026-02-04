@@ -498,7 +498,7 @@ const DynamicLineChartExample: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h2 style={{ marginBottom: '20px', color: '#333' }}>
         动态折线图使用示例
       </h2>

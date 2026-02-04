@@ -42,7 +42,7 @@ const DemoPreviewComponentInModal: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h3 style={{ marginBottom: 12 }}>暴露文件预览组件</h3>
       <Workspace.File
         nodes={files}

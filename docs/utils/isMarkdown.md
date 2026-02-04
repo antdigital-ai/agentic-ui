@@ -1,9 +1,9 @@
 ---
 nav:
-  title: 工具函数
+  title: 基础能力
   order: 5
 group:
-  title: 工具函数
+  title: 基础能力
   order: 6
 ---
 

@@ -18,8 +18,6 @@ interface CommentViewProps {
   id: string;
   /** Slate.js 选择范围 */
   selection?: BaseRange;
-  /** 哈希标识符用于样式类名 */
-  hashId: string;
   /** 设置显示评论的回调函数 */
   setShowComment?: (comments: CommentDataType[]) => void;
 }
@@ -60,7 +58,7 @@ export const CommentView = (props: CommentViewProps) => {
       data-be="comment-text"
       data-testid="comment-view"
       id={props.id}
-      className={classNames(props.hashId, {
+      className={classNames({
         [`${mdEditorBaseClass}-comment-${type}`]: type,
       })}
       style={{

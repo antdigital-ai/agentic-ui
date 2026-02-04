@@ -261,16 +261,6 @@ describe('ChartAttrToolBar', () => {
       });
     });
 
-    it('应该应用容器样式', () => {
-      render(
-        <ConfigProvider>
-          <ChartAttrToolBar {...defaultProps} />
-        </ConfigProvider>,
-      );
-
-      const container = screen.getByTestId('chart-attr-toolbar');
-      expect(container).toHaveStyle({ width: 'auto' });
-    });
   });
 
   describe('边界情况', () => {

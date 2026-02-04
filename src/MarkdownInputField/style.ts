@@ -1,4 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
+import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -69,41 +70,18 @@ const stopIconRotate = new Keyframes('stopIconRotate', {
     transform: 'rotate(360deg)',
   },
 });
+const genStyle: GenerateStyle<
+  ChatTokenType & { disableHoverAnimation?: boolean }
+> = (token) => {
+  const hoverStyle = token.disableHoverAnimation
+    ? {}
+    : {
+        '&:hover': {
+          boxShadow:
+            '0px 0px 1px 0px rgba(10, 48, 104, 0.25), 0px 2px 7px 0px rgba(10, 48, 104, 0.05), 0px 2px 5px -2px rgba(10, 48, 104, 0.06)',
+        },
+      };
 
-// 背景渐变旋转动画（用于 radial/linear 渐变整体旋转）
-// 使用 CSS 自定义属性驱动角度变化，避免元素本身的 transform 引起的位移
-// const rotateGradientAngle = new Keyframes('rotateGradientAngle', {
-//   '0%': {
-//     '--mif-angle': '42deg',
-//   },
-//   '100%': {
-//     '--mif-angle': 'calc(42deg + 1turn)',
-//   },
-// });
-
-// 背景淡出（只执行一次并保持最终状态）
-// const fadeOutOnce = new Keyframes('fadeOutOnce', {
-//   '0%': {
-//     opacity: 1,
-//   },
-//   '100%': {
-//     opacity: 0,
-//   },
-// });
-
-// 合并旋转与淡出为单一动画：一次性旋转一圈并淡出到 0
-// const rotateFadeOnce = new Keyframes('rotateFadeOnce', {
-//   '0%': {
-//     '--mif-angle': '42deg',
-//     opacity: 1,
-//   },
-//   '100%': {
-//     '--mif-angle': 'calc(42deg + 1turn)',
-//     opacity: 0,
-//   },
-// });
-
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
       width: '100%',
@@ -113,24 +91,30 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       alignItems: 'center',
       justifyContent: 'center',
       padding: INPUT_FIELD_PADDING.NONE,
-      borderRadius: '16px',
+      borderRadius: '12px',
       minHeight: '48px',
       maxWidth: 980,
-      backdropFilter: 'blur(5.44px)',
-      boxShadow: 'var(--shadow-control-lg)',
       position: 'relative',
+      transition: 'box-shadow 0.3s',
       '> * ': {
         boxSizing: 'border-box',
       },
       '&:active,&.active': {
         outline: '1px solid transparent',
+        outlineColor: 'var(--mif-active-outline-color, transparent)',
+      },
+      boxShadow:
+        '0px 0px 1px 0px rgba(10, 48, 104, 0.15), 0px 1.5px 4px -1px rgba(10, 48, 104, 0.04)',
+      ...hoverStyle,
+      '&-focused': {
+        boxShadow:
+          '0px 0px 1px 0px rgba(10, 48, 104, 0.25), 0px 2px 7px 0px rgba(10, 48, 104, 0.05), 0px 2px 5px -2px rgba(10, 48, 104, 0.06)',
       },
 
       '&-enlarged': {
         [`${token.componentCls}-editor`]: {
           flex: 1,
           height: '100%',
-          minHeight: '100%',
           maxHeight: 'none',
           overflow: 'hidden',
           width: '100%',
@@ -180,16 +164,29 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
       '&-editor-content': {
-        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
         maxHeight: 'inherit',
+        minHeight: 0,
         borderRadius: 'inherit',
-        scrollbarColor: 'var(--color-gray-text-tertiary) transparent',
-        scrollbarWidth: 'thin',
+        overflow: 'hidden',
+        [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+          padding: `${MOBILE_PADDING} !important`,
+        },
+      },
+      '&-has-tools-wrapper': {
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
       },
       '&&-disabled': {
         backgroundColor: 'rgba(0,0,0,0.04)',
         cursor: 'not-allowed',
+        opacity: 0.5,
         padding: 0,
+      },
+      '&-loading': {
+        cursor: 'not-allowed',
       },
       '&-send-tools': {
         boxSizing: 'border-box',
@@ -199,15 +196,39 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         font: 'var(--font-text-body-base)',
         color: 'var(--color-gray-text-default)',
       },
+      '&-skill-mode &-editor-content': {
+        borderRadius: 0,
+      },
+      '&-tools-wrapper': {
+        backgroundColor: '#fff',
+        display: 'flex',
+        boxSizing: 'border-box',
+        borderRadius: 0,
+        borderBottomLeftRadius: 'inherit',
+        borderBottomRightRadius: 'inherit',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 8,
+        width: '100%',
+        paddingLeft: 'var(--padding-3x)',
+        paddingRight: 'var(--padding-3x)',
+        paddingBottom: 'var(--padding-3x)',
+        [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
+          paddingLeft: MOBILE_PADDING,
+          paddingRight: MOBILE_PADDING,
+          paddingBottom: MOBILE_PADDING,
+        },
+      },
       '&-send-actions': {
         position: 'absolute',
         userSelect: 'none',
         right: 12,
+        bottom: 8,
         boxSizing: 'border-box',
         zIndex: 99,
-        bottom: 12,
         display: 'flex',
-        gap: '8px',
+        gap: '4px',
         alignItems: 'center',
         font: 'var(--font-text-body-base)',
         color: 'var(--color-gray-text-default)',
@@ -278,13 +299,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 /**
  * Probubble
  * @param prefixCls
+ * @param disableHoverAnimation 是否禁用 hover 动画
  * @returns
  */
-export function useStyle(prefixCls?: string) {
+export function useStyle(prefixCls?: string, disableHoverAnimation?: boolean) {
   return useEditorStyleRegister('MarkdownInputField', (token) => {
     const proChatToken = {
       ...token,
       componentCls: `.${prefixCls}`,
+      disableHoverAnimation,
     };
 
     return [resetComponent(proChatToken), genStyle(proChatToken)];

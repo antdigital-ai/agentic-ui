@@ -1,7 +1,7 @@
 import { ArrowRight } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
-import React, { useContext, useState } from 'react';
+import React, { memo, useCallback, useContext, useState } from 'react';
 import { useStyle } from './CaseReplyStyle';
 
 export interface CaseReplyProps {
@@ -32,7 +32,7 @@ export interface CaseReplyProps {
 
   buttonBar?: React.ReactNode;
   /**
-   * 按钮点击事件
+   * 按钮点击事件（子组件事件）
    */
   onButtonClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   /**
@@ -53,7 +53,7 @@ export interface CaseReplyProps {
   prefixCls?: string;
 }
 
-const CaseReply: React.FC<CaseReplyProps> = ({
+const CaseReplyComponent: React.FC<CaseReplyProps> = ({
   coverBackground = 'rgba(132, 220, 24, 0.15)',
   quoteIconColor = 'rgb(132, 220, 24)',
   quote,
@@ -95,13 +95,14 @@ const CaseReply: React.FC<CaseReplyProps> = ({
   );
   const arrowIconCls = classNames(`${prefixCls}-arrow-icon`, hashId);
 
-  const handleMouseEnter = () => {
+  // 使用 useCallback 优化事件处理函数
+  const handleMouseEnter = useCallback(() => {
     setIsHovered(true);
-  };
+  }, []);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     setIsHovered(false);
-  };
+  }, []);
 
   return wrapSSR(
     <div
@@ -184,5 +185,10 @@ const CaseReply: React.FC<CaseReplyProps> = ({
     </div>,
   );
 };
+
+CaseReplyComponent.displayName = 'CaseReply';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+const CaseReply = memo(CaseReplyComponent);
 
 export default CaseReply;

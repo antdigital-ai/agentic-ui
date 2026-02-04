@@ -23,6 +23,8 @@ import {
 } from '../components';
 import { defaultColorList } from '../const';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
+import type { ChartClassNames, ChartStyles } from '../types/classNames';
+import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
 
 let radarChartComponentsRegistered = false;
@@ -57,6 +59,8 @@ interface RadarChartProps extends ChartContainerProps {
   pointBackgroundColor?: string;
   /** 自定义CSS类名 */
   className?: string;
+  /** 自定义CSS类名（支持对象格式，为每层DOM设置类名） */
+  classNames?: ChartClassNames;
   /** 数据时间 */
   dataTime?: string;
   /** 自定义主色（可选），支持 string 或 string[]；数组按序对应各数据序列 */
@@ -69,6 +73,10 @@ interface RadarChartProps extends ChartContainerProps {
   statistic?: StatisticConfigType;
   /** 图例文字最大宽度（像素），超出则显示省略号，默认80px */
   textMaxWidth?: number;
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
+  /** 自定义样式对象（支持对象格式，为每层DOM设置样式） */
+  styles?: ChartStyles;
 }
 
 const RadarChart: React.FC<RadarChartProps> = ({
@@ -77,12 +85,14 @@ const RadarChart: React.FC<RadarChartProps> = ({
   width = 600,
   height = 400,
   className,
+  classNames: classNamesProp,
   toolbarExtra,
   renderFilterInToolbar = false,
   dataTime,
   color,
   statistic: statisticConfig,
   textMaxWidth = 80,
+  loading = false,
   ...props
 }) => {
   useMemo(() => {
@@ -222,6 +232,8 @@ const RadarChart: React.FC<RadarChartProps> = ({
     ),
   );
 
+  const classNamesObj = classNamesProp;
+
   // 如果没有有效数据，返回空状态
   if (
     safeData.length === 0 ||
@@ -232,12 +244,14 @@ const RadarChart: React.FC<RadarChartProps> = ({
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={'light'}
-        className={classNames(hashId, className)}
+        className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
         style={{
           width: responsiveWidth,
           height: responsiveHeight,
+          ...props.style,
+          ...props.styles?.root,
         }}
       >
         <ChartToolBar
@@ -245,6 +259,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}
+          loading={loading}
         />
         <div
           className={classNames(`${prefixCls}-empty-wrapper`, hashId)}
@@ -300,13 +315,16 @@ const RadarChart: React.FC<RadarChartProps> = ({
 
     const finalColor = baseColor || safeDefaultColor;
 
+    // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+    const resolvedColor = resolveCssVariable(finalColor);
+
     return {
       label: type || '默认',
       data: scores,
-      borderColor: finalColor,
-      backgroundColor: `${finalColor}20`,
+      borderColor: resolvedColor,
+      backgroundColor: hexToRgba(resolvedColor, 0.125),
       borderWidth: isMobile ? 1.5 : 2,
-      pointBackgroundColor: finalColor,
+      pointBackgroundColor: resolvedColor,
       pointBorderColor: '#fff',
       pointBorderWidth: isMobile ? 1 : 2,
       pointRadius: isMobile ? 3 : 4,
@@ -625,6 +643,9 @@ const RadarChart: React.FC<RadarChartProps> = ({
         hoverRadius: isMobile ? 4 : 6,
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   const handleDownload = () => {
@@ -643,12 +664,14 @@ const RadarChart: React.FC<RadarChartProps> = ({
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={currentConfig.theme}
-        className={classNames(hashId, className)}
+        className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
         style={{
           width: responsiveWidth,
           height: responsiveHeight,
+          ...props.style,
+          ...props.styles?.root,
         }}
       >
         <ChartToolBar
@@ -656,6 +679,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
           onDownload={handleDownload}
           extra={toolbarExtra}
           dataTime={dataTime}
+          loading={loading}
           filter={
             renderFilterInToolbar && filterEnum.length > 0 ? (
               <ChartFilter
@@ -714,12 +738,14 @@ const RadarChart: React.FC<RadarChartProps> = ({
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={'light'}
-        className={classNames(hashId, className)}
+        className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
         style={{
           width: responsiveWidth,
           height: responsiveHeight,
+          ...props.style,
+          ...props.styles?.root,
         }}
       >
         <ChartToolBar
@@ -727,6 +753,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}
+          loading={loading}
         />
         <div
           className={classNames(`${prefixCls}-error-wrapper`, hashId)}

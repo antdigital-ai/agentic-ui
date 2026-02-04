@@ -1,6 +1,6 @@
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../src/Bubble/BubbleConfigProvide';
 import { BubbleList } from '../src/Bubble/List';
 import { MessageBubbleData } from '../src/Bubble/type';
@@ -37,6 +37,136 @@ describe('BubbleList', () => {
     content,
     createAt: Date.now(),
     updateAt: Date.now(),
+  });
+
+  describe('isLast property', () => {
+    it('should set isLast to true only for the last bubble in the list', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'First message'),
+        createMockBubbleData('2', 'assistant', 'Second message'),
+        createMockBubbleData('3', 'user', 'Third message'),
+        createMockBubbleData('4', 'assistant', 'Last message'),
+      ];
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证只有最后一个消息的 isLast 为 true
+      expect((bubbleList[0] as any).isLast).toBe(false);
+      expect((bubbleList[1] as any).isLast).toBe(false);
+      expect((bubbleList[2] as any).isLast).toBe(false);
+      expect((bubbleList[3] as any).isLast).toBe(true);
+    });
+
+    it('should set isLast to true for single bubble in the list', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Only message'),
+      ];
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证单个消息的 isLast 为 true
+      expect((bubbleList[0] as any).isLast).toBe(true);
+    });
+
+    it('should update isLast when bubble list changes', () => {
+      const initialBubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'First message'),
+        createMockBubbleData('2', 'assistant', 'Second message'),
+      ];
+
+      const { rerender } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={initialBubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证初始状态
+      expect((initialBubbleList[0] as any).isLast).toBe(false);
+      expect((initialBubbleList[1] as any).isLast).toBe(true);
+
+      // 添加新的消息
+      const updatedBubbleList: MessageBubbleData[] = [
+        ...initialBubbleList,
+        createMockBubbleData('3', 'user', 'Third message'),
+      ];
+
+      rerender(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={updatedBubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证更新后的状态：之前的最后一个消息不再是最后一个
+      expect((updatedBubbleList[0] as any).isLast).toBe(false);
+      expect((updatedBubbleList[1] as any).isLast).toBe(false);
+      expect((updatedBubbleList[2] as any).isLast).toBe(true);
+    });
+
+    it('should update isLast when removing the last bubble', () => {
+      const initialBubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'First message'),
+        createMockBubbleData('2', 'assistant', 'Second message'),
+        createMockBubbleData('3', 'user', 'Third message'),
+      ];
+
+      const { rerender } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={initialBubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证初始状态
+      expect((initialBubbleList[0] as any).isLast).toBe(false);
+      expect((initialBubbleList[1] as any).isLast).toBe(false);
+      expect((initialBubbleList[2] as any).isLast).toBe(true);
+
+      // 移除最后一个消息
+      const updatedBubbleList: MessageBubbleData[] = [
+        initialBubbleList[0],
+        initialBubbleList[1],
+      ];
+
+      rerender(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={updatedBubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证更新后的状态：之前的倒数第二个消息现在成为最后一个
+      expect((updatedBubbleList[0] as any).isLast).toBe(false);
+      expect((updatedBubbleList[1] as any).isLast).toBe(true);
+    });
+
+    it('should maintain isLast property for different roles', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'User message 1'),
+        createMockBubbleData('2', 'user', 'User message 2'),
+        createMockBubbleData('3', 'assistant', 'Assistant message 1'),
+        createMockBubbleData('4', 'assistant', 'Assistant message 2'),
+        createMockBubbleData('5', 'user', 'User message 3'),
+      ];
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证无论角色如何，只有最后一个消息的 isLast 为 true
+      expect((bubbleList[0] as any).isLast).toBe(false);
+      expect((bubbleList[1] as any).isLast).toBe(false);
+      expect((bubbleList[2] as any).isLast).toBe(false);
+      expect((bubbleList[3] as any).isLast).toBe(false);
+      expect((bubbleList[4] as any).isLast).toBe(true);
+    });
   });
 
   describe('isLatest property', () => {
@@ -147,24 +277,24 @@ describe('BubbleList', () => {
     });
   });
 
-  describe('onCancelLike callback', () => {
-    it('should call onCancelLike when provided', () => {
+  describe('onLikeCancel callback', () => {
+    it('should call onLikeCancel when provided', () => {
       const bubbleList: MessageBubbleData[] = [
         createMockBubbleData('1', 'user', 'Test message'),
       ];
-      const mockOnCancelLike = vi.fn();
+      const mockOnLikeCancel = vi.fn();
 
       render(
         <BubbleConfigProvide>
-          <BubbleList bubbleList={bubbleList} onCancelLike={mockOnCancelLike} />
+          <BubbleList bubbleList={bubbleList} onLikeCancel={mockOnLikeCancel} />
         </BubbleConfigProvide>,
       );
 
       // 验证回调函数被正确传递
-      expect(mockOnCancelLike).toBeDefined();
+      expect(mockOnLikeCancel).toBeDefined();
     });
 
-    it('should handle onCancelLike when not provided', () => {
+    it('should handle onLikeCancel when not provided', () => {
       const bubbleList: MessageBubbleData[] = [
         createMockBubbleData('1', 'user', 'Test message'),
       ];
@@ -369,7 +499,7 @@ describe('BubbleList', () => {
       const mockOnScroll = vi.fn();
       const mockOnWheel = vi.fn();
       const mockOnTouchMove = vi.fn();
-      const mockOnCancelLike = vi.fn();
+      const mockOnLikeCancel = vi.fn();
       const mockShouldShowCopy = vi.fn(() => true);
 
       const { container } = render(
@@ -379,7 +509,7 @@ describe('BubbleList', () => {
             onScroll={mockOnScroll}
             onWheel={mockOnWheel}
             onTouchMove={mockOnTouchMove}
-            onCancelLike={mockOnCancelLike}
+            onLikeCancel={mockOnLikeCancel}
             shouldShowCopy={mockShouldShowCopy}
           />
         </BubbleConfigProvide>,
@@ -397,29 +527,29 @@ describe('BubbleList', () => {
       expect(mockOnScroll).toHaveBeenCalledTimes(1);
       expect(mockOnWheel).toHaveBeenCalledTimes(1);
       expect(mockOnTouchMove).toHaveBeenCalledTimes(1);
-      expect(mockOnCancelLike).toBeDefined();
+      expect(mockOnLikeCancel).toBeDefined();
       expect(mockShouldShowCopy).toBeDefined();
     });
   });
 
-  describe('onCancelLike callback', () => {
-    it('should call onCancelLike when provided', () => {
+  describe('onLikeCancel callback', () => {
+    it('should call onLikeCancel when provided', () => {
       const bubbleList: MessageBubbleData[] = [
         createMockBubbleData('1', 'user', 'Test message'),
       ];
-      const mockOnCancelLike = vi.fn();
+      const mockOnLikeCancel = vi.fn();
 
       render(
         <BubbleConfigProvide>
-          <BubbleList bubbleList={bubbleList} onCancelLike={mockOnCancelLike} />
+          <BubbleList bubbleList={bubbleList} onLikeCancel={mockOnLikeCancel} />
         </BubbleConfigProvide>,
       );
 
       // 验证回调函数被正确传递
-      expect(mockOnCancelLike).toBeDefined();
+      expect(mockOnLikeCancel).toBeDefined();
     });
 
-    it('should handle onCancelLike when not provided', () => {
+    it('should handle onLikeCancel when not provided', () => {
       const bubbleList: MessageBubbleData[] = [
         createMockBubbleData('1', 'user', 'Test message'),
       ];
@@ -624,7 +754,7 @@ describe('BubbleList', () => {
       const mockOnScroll = vi.fn();
       const mockOnWheel = vi.fn();
       const mockOnTouchMove = vi.fn();
-      const mockOnCancelLike = vi.fn();
+      const mockOnLikeCancel = vi.fn();
       const mockShouldShowCopy = vi.fn(() => true);
 
       const { container } = render(
@@ -634,7 +764,7 @@ describe('BubbleList', () => {
             onScroll={mockOnScroll}
             onWheel={mockOnWheel}
             onTouchMove={mockOnTouchMove}
-            onCancelLike={mockOnCancelLike}
+            onLikeCancel={mockOnLikeCancel}
             shouldShowCopy={mockShouldShowCopy}
           />
         </BubbleConfigProvide>,
@@ -652,8 +782,536 @@ describe('BubbleList', () => {
       expect(mockOnScroll).toHaveBeenCalledTimes(1);
       expect(mockOnWheel).toHaveBeenCalledTimes(1);
       expect(mockOnTouchMove).toHaveBeenCalledTimes(1);
-      expect(mockOnCancelLike).toBeDefined();
+      expect(mockOnLikeCancel).toBeDefined();
       expect(mockShouldShowCopy).toBeDefined();
+    });
+  });
+
+  describe('isLast and deps relationship', () => {
+    it('should update isLast correctly when new bubble is added', () => {
+      const initialBubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'assistant', 'First message'),
+        createMockBubbleData('2', 'assistant', 'Second message'),
+      ];
+
+      const { rerender } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={initialBubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证初始状态
+      expect((initialBubbleList[0] as any).isLast).toBe(false);
+      expect((initialBubbleList[1] as any).isLast).toBe(true);
+
+      // 添加新的消息
+      const updatedBubbleList: MessageBubbleData[] = [
+        ...initialBubbleList,
+        createMockBubbleData('3', 'assistant', 'Third message'),
+      ];
+
+      rerender(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={updatedBubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证 isLast 值已更新：之前的最后一个消息不再是最后一个
+      expect((updatedBubbleList[0] as any).isLast).toBe(false);
+      expect((updatedBubbleList[1] as any).isLast).toBe(false);
+      expect((updatedBubbleList[2] as any).isLast).toBe(true);
+    });
+
+    it('should update isLast correctly when multiple bubbles are added', () => {
+      const initialBubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'assistant', 'First message'),
+      ];
+
+      const { rerender } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={initialBubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证初始状态：单个消息时是最后一个
+      expect((initialBubbleList[0] as any).isLast).toBe(true);
+
+      // 添加两个新消息
+      const updatedBubbleList: MessageBubbleData[] = [
+        ...initialBubbleList,
+        createMockBubbleData('2', 'assistant', 'Second message'),
+        createMockBubbleData('3', 'assistant', 'Third message'),
+      ];
+
+      rerender(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={updatedBubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证所有消息的 isLast 状态
+      expect((updatedBubbleList[0] as any).isLast).toBe(false);
+      expect((updatedBubbleList[1] as any).isLast).toBe(false);
+      expect((updatedBubbleList[2] as any).isLast).toBe(true);
+    });
+
+    it('should correctly calculate isLast for each bubble in the list', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'assistant', 'Message 1'),
+        createMockBubbleData('2', 'assistant', 'Message 2'),
+        createMockBubbleData('3', 'assistant', 'Message 3'),
+      ];
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证每个消息的 isLast 状态
+      expect((bubbleList[0] as any).isLast).toBe(false);
+      expect((bubbleList[1] as any).isLast).toBe(false);
+      expect((bubbleList[2] as any).isLast).toBe(true);
+
+      // 验证 isLast 和 isLatest 保持一致
+      expect((bubbleList[0] as any).isLast).toBe(bubbleList[0].isLatest);
+      expect((bubbleList[1] as any).isLast).toBe(bubbleList[1].isLatest);
+      expect((bubbleList[2] as any).isLast).toBe(bubbleList[2].isLatest);
+    });
+
+    it('should handle empty bubble list gracefully', () => {
+      const bubbleList: MessageBubbleData[] = [];
+
+      expect(() => {
+        render(
+          <BubbleConfigProvide>
+            <BubbleList bubbleList={bubbleList} />
+          </BubbleConfigProvide>,
+        );
+      }).not.toThrow();
+    });
+
+    it('should update isLast when bubble is removed from the end', () => {
+      const initialBubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'assistant', 'Message 1'),
+        createMockBubbleData('2', 'assistant', 'Message 2'),
+        createMockBubbleData('3', 'assistant', 'Message 3'),
+      ];
+
+      const { rerender } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={initialBubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证初始状态
+      expect((initialBubbleList[0] as any).isLast).toBe(false);
+      expect((initialBubbleList[1] as any).isLast).toBe(false);
+      expect((initialBubbleList[2] as any).isLast).toBe(true);
+
+      // 移除最后一个消息
+      const updatedBubbleList: MessageBubbleData[] = [
+        initialBubbleList[0],
+        initialBubbleList[1],
+      ];
+
+      rerender(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={updatedBubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证更新后的状态
+      expect((updatedBubbleList[0] as any).isLast).toBe(false);
+      expect((updatedBubbleList[1] as any).isLast).toBe(true);
+    });
+  });
+
+  describe('lazy loading', () => {
+    beforeEach(() => {
+      // Mock IntersectionObserver
+      global.IntersectionObserver = class {
+        constructor(
+          public callback: IntersectionObserverCallback,
+          public options?: IntersectionObserverInit,
+        ) {}
+        observe = vi.fn();
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+        takeRecords = vi.fn(() => []);
+        root = null;
+        rootMargin = '';
+        thresholds = [];
+      } as any;
+    });
+
+    it('should render bubbles normally when lazy is not enabled', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Test message'),
+        createMockBubbleData('2', 'assistant', 'Another message'),
+      ];
+
+      const { container } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 应该正常渲染，不创建 IntersectionObserver
+      const bubbles = container.querySelectorAll('[data-id]');
+      expect(bubbles.length).toBeGreaterThan(0);
+    });
+
+    it('should render bubbles normally when lazy.enable is false', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Test message'),
+      ];
+
+      const { container } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} lazy={{ enable: false }} />
+        </BubbleConfigProvide>,
+      );
+
+      const bubbles = container.querySelectorAll('[data-id]');
+      expect(bubbles.length).toBeGreaterThan(0);
+    });
+
+    it('should wrap bubbles with LazyElement when lazy.enable is true', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Test message'),
+        createMockBubbleData('2', 'assistant', 'Another message'),
+      ];
+
+      const observeSpy = vi.fn();
+
+      global.IntersectionObserver = class {
+        constructor(
+          public callback: IntersectionObserverCallback,
+          public options?: IntersectionObserverInit,
+        ) {}
+        observe = observeSpy;
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+        takeRecords = vi.fn(() => []);
+        root = null;
+        rootMargin = '';
+        thresholds = [];
+      } as any;
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} lazy={{ enable: true }} />
+        </BubbleConfigProvide>,
+      );
+
+      // 应该创建 IntersectionObserver 并调用 observe
+      expect(observeSpy).toHaveBeenCalled();
+    });
+
+    it('should use default placeholderHeight when not provided', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Test message'),
+      ];
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} lazy={{ enable: true }} />
+        </BubbleConfigProvide>,
+      );
+
+      // 检查占位符是否存在（默认高度 100px）
+      const placeholder = document.querySelector('[aria-hidden="true"]');
+      expect(placeholder).toBeTruthy();
+      expect(placeholder?.getAttribute('style')).toContain('min-height: 100');
+    });
+
+    it('should use custom placeholderHeight when provided', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Test message'),
+      ];
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList
+            bubbleList={bubbleList}
+            lazy={{ enable: true, placeholderHeight: 200 }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      const placeholder = document.querySelector('[aria-hidden="true"]');
+      expect(placeholder?.getAttribute('style')).toContain('min-height: 200');
+    });
+
+    it('should use default rootMargin when not provided', () => {
+      let capturedOptions: IntersectionObserverInit | undefined;
+
+      global.IntersectionObserver = class {
+        constructor(
+          public callback: IntersectionObserverCallback,
+          public options?: IntersectionObserverInit,
+        ) {
+          capturedOptions = options;
+        }
+        observe = vi.fn();
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+        takeRecords = vi.fn(() => []);
+        root = null;
+        rootMargin = '';
+        thresholds = [];
+      } as any;
+
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Test message'),
+      ];
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} lazy={{ enable: true }} />
+        </BubbleConfigProvide>,
+      );
+
+      expect(capturedOptions?.rootMargin).toBe('200px');
+    });
+
+    it('should use custom rootMargin when provided', () => {
+      let capturedOptions: IntersectionObserverInit | undefined;
+
+      global.IntersectionObserver = class {
+        constructor(
+          public callback: IntersectionObserverCallback,
+          public options?: IntersectionObserverInit,
+        ) {
+          capturedOptions = options;
+        }
+        observe = vi.fn();
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+        takeRecords = vi.fn(() => []);
+        root = null;
+        rootMargin = '';
+        thresholds = [];
+      } as any;
+
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Test message'),
+      ];
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList
+            bubbleList={bubbleList}
+            lazy={{ enable: true, rootMargin: '300px' }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      expect(capturedOptions?.rootMargin).toBe('300px');
+    });
+
+    it('should call custom renderPlaceholder with correct props', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'User message'),
+        createMockBubbleData('2', 'assistant', 'Assistant message'),
+      ];
+
+      const mockRenderPlaceholder = vi.fn(({ style, elementInfo }) => (
+        <div data-testid="custom-placeholder" style={style}>
+          Loading {elementInfo?.role || 'unknown'}
+        </div>
+      ));
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList
+            bubbleList={bubbleList}
+            lazy={{
+              enable: true,
+              renderPlaceholder: mockRenderPlaceholder,
+            }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证 renderPlaceholder 被调用
+      expect(mockRenderPlaceholder).toHaveBeenCalled();
+
+      // 验证传递的参数包含正确的信息
+      const firstCall = mockRenderPlaceholder.mock.calls[0][0];
+      expect(firstCall.height).toBe(100); // 默认高度
+      expect(firstCall.style).toBeDefined();
+      expect(firstCall.elementInfo).toBeDefined();
+      expect(firstCall.elementInfo?.index).toBeDefined();
+      expect(firstCall.elementInfo?.total).toBe(2);
+    });
+
+    it('should pass role information to renderPlaceholder', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'User message'),
+        createMockBubbleData('2', 'assistant', 'Assistant message'),
+      ];
+
+      const capturedProps: any[] = [];
+
+      const mockRenderPlaceholder = vi.fn((props) => {
+        capturedProps.push(props);
+        return <div>Placeholder</div>;
+      });
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList
+            bubbleList={bubbleList}
+            lazy={{
+              enable: true,
+              renderPlaceholder: mockRenderPlaceholder,
+            }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证第一个气泡（user）的 role 信息
+      expect(capturedProps.length).toBeGreaterThan(0);
+      const firstBubbleProps = capturedProps[0];
+      expect(firstBubbleProps.elementInfo?.role).toBe('user');
+
+      // 验证第二个气泡（assistant）的 role 信息
+      if (capturedProps.length > 1) {
+        const secondBubbleProps = capturedProps[1];
+        expect(secondBubbleProps.elementInfo?.role).toBe('assistant');
+      }
+    });
+
+    it('should pass correct elementInfo to renderPlaceholder', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Message 1'),
+        createMockBubbleData('2', 'assistant', 'Message 2'),
+        createMockBubbleData('3', 'user', 'Message 3'),
+      ];
+
+      const capturedProps: any[] = [];
+
+      const mockRenderPlaceholder = vi.fn((props) => {
+        capturedProps.push(props);
+        return <div>Placeholder</div>;
+      });
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList
+            bubbleList={bubbleList}
+            lazy={{
+              enable: true,
+              renderPlaceholder: mockRenderPlaceholder,
+            }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      // 验证 elementInfo 包含正确的索引和总数
+      expect(capturedProps.length).toBeGreaterThan(0);
+      capturedProps.forEach((props, index) => {
+        expect(props.elementInfo?.index).toBe(index);
+        expect(props.elementInfo?.total).toBe(3);
+        expect(props.elementInfo?.type).toBe('bubble');
+      });
+    });
+
+    it('should work with empty bubble list when lazy is enabled', () => {
+      const bubbleList: MessageBubbleData[] = [];
+
+      expect(() => {
+        render(
+          <BubbleConfigProvide>
+            <BubbleList bubbleList={bubbleList} lazy={{ enable: true }} />
+          </BubbleConfigProvide>,
+        );
+      }).not.toThrow();
+    });
+
+    it('should maintain backward compatibility when lazy is undefined', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Test message'),
+      ];
+
+      const { container } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      // 应该正常渲染，不创建 IntersectionObserver
+      const bubbles = container.querySelectorAll('[data-id]');
+      expect(bubbles.length).toBeGreaterThan(0);
+    });
+
+    it('should handle lazy loading with multiple bubbles', () => {
+      const bubbleList: MessageBubbleData[] = Array.from(
+        { length: 10 },
+        (_, i) =>
+          createMockBubbleData(
+            `${i}`,
+            i % 2 === 0 ? 'user' : 'assistant',
+            `Message ${i}`,
+          ),
+      );
+
+      const observeSpy = vi.fn();
+
+      global.IntersectionObserver = class {
+        constructor(
+          public callback: IntersectionObserverCallback,
+          public options?: IntersectionObserverInit,
+        ) {}
+        observe = observeSpy;
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+        takeRecords = vi.fn(() => []);
+        root = null;
+        rootMargin = '';
+        thresholds = [];
+      } as any;
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} lazy={{ enable: true }} />
+        </BubbleConfigProvide>,
+      );
+
+      // 应该为每个气泡创建 observer
+      expect(observeSpy).toHaveBeenCalledTimes(10);
+    });
+
+    it('should combine lazy loading with other props', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Test message'),
+      ];
+
+      const mockOnScroll = vi.fn();
+      const mockOnWheel = vi.fn();
+
+      const { container } = render(
+        <BubbleConfigProvide>
+          <BubbleList
+            bubbleList={bubbleList}
+            lazy={{ enable: true, placeholderHeight: 150 }}
+            onScroll={mockOnScroll}
+            onWheel={mockOnWheel}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      const bubbleListContainer = container.querySelector('[data-chat-list]');
+      expect(bubbleListContainer).toBeTruthy();
+
+      // 验证其他功能仍然正常工作
+      fireEvent.scroll(bubbleListContainer!);
+      expect(mockOnScroll).toHaveBeenCalledTimes(1);
+
+      fireEvent.wheel(bubbleListContainer!);
+      expect(mockOnWheel).toHaveBeenCalledTimes(1);
     });
   });
 });

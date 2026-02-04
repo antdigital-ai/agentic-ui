@@ -1,5 +1,4 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
 import {
   BarElement,
   CategoryScale,
@@ -12,6 +11,7 @@ import {
   Tooltip,
 } from 'chart.js';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
+import classNamesLib from 'classnames';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -24,10 +24,13 @@ import {
 } from '../components';
 import { defaultColorList } from '../const';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
+import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
   ChartDataItem,
   extractAndSortXValues,
   findDataPointByXValue,
+  hexToRgba,
+  resolveCssVariable,
 } from '../utils';
 import { useStyle } from './style';
 
@@ -110,6 +113,8 @@ export interface BarChartConfigItem {
   stacked?: boolean;
   /** 索引轴方向 */
   indexAxis?: 'x' | 'y';
+  /** 柱子最大宽度 */
+  maxBarThickness?: number;
 }
 
 export interface BarChartProps extends ChartContainerProps {
@@ -123,6 +128,8 @@ export interface BarChartProps extends ChartContainerProps {
   height?: number | string;
   /** 自定义CSS类名 */
   className?: string;
+  /** 自定义CSS类名（支持对象格式，为每层DOM设置类名） */
+  classNames?: ChartClassNames;
   /** 数据时间 */
   dataTime?: string;
   /** 图表主题 */
@@ -152,6 +159,8 @@ export interface BarChartProps extends ChartContainerProps {
   stacked?: boolean;
   /** 图表轴向，'x'为垂直柱状图，'y'为水平柱状图 */
   indexAxis?: 'x' | 'y';
+  /** 柱子最大宽度 */
+  maxBarThickness?: number;
   /** 是否显示数据标签，默认false */
   showDataLabels?: boolean;
   /** 数据标签格式化函数 */
@@ -170,27 +179,11 @@ export interface BarChartProps extends ChartContainerProps {
   renderFilterInToolbar?: boolean;
   /** ChartStatistic组件配置：object表示单个配置，array表示多个配置 */
   statistic?: StatisticConfigType;
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
+  /** 自定义样式对象（支持对象格式，为每层DOM设置样式） */
+  styles?: ChartStyles;
 }
-
-// 将十六进制颜色转换为带透明度的 rgba 字符串
-const hexToRgba = (hex: string, alpha: number): string => {
-  const sanitized = hex.replace('#', '');
-  const isShort = sanitized.length === 3;
-  const r = parseInt(
-    isShort ? sanitized[0] + sanitized[0] : sanitized.slice(0, 2),
-    16,
-  );
-  const g = parseInt(
-    isShort ? sanitized[1] + sanitized[1] : sanitized.slice(2, 4),
-    16,
-  );
-  const b = parseInt(
-    isShort ? sanitized[2] + sanitized[2] : sanitized.slice(4, 6),
-    16,
-  );
-  const a = Math.max(0, Math.min(1, alpha));
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-};
 
 // 正负柱状图颜色（与需求给定的 rgba 保持一致）
 const POSITIVE_COLOR_HEX = '#388BFF'; // rgba(56, 139, 255, 1)
@@ -202,6 +195,9 @@ const BarChart: React.FC<BarChartProps> = ({
   width = 600,
   height = 400,
   className,
+  classNames,
+  style,
+  styles,
   dataTime,
   theme = 'light',
   color,
@@ -215,6 +211,7 @@ const BarChart: React.FC<BarChartProps> = ({
   hiddenY = false,
   stacked = false,
   indexAxis = 'x',
+  maxBarThickness,
   toolbarExtra,
   renderFilterInToolbar = false,
   statistic: statisticConfig,
@@ -222,6 +219,7 @@ const BarChart: React.FC<BarChartProps> = ({
   showDataLabels = false,
   dataLabelFormatter,
   chartOptions,
+  loading = false,
 }) => {
   useMemo(() => {
     if (barChartComponentsRegistered) {
@@ -261,7 +259,7 @@ const BarChart: React.FC<BarChartProps> = ({
   // 样式注册
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('bar-chart-container');
-  const { wrapSSR, hashId } = useStyle(baseClassName);
+  const { wrapSSR } = useStyle(baseClassName);
 
   const chartRef = useRef<ChartJS<'bar'>>(null);
 
@@ -274,7 +272,7 @@ const BarChart: React.FC<BarChartProps> = ({
   // 从数据中提取唯一的类别作为筛选选项
   const categories = useMemo(() => {
     const uniqueCategories = [
-      ...new Set(safeData.map((item) => item.category)),
+      ...new Set(safeData.map((item) => item?.category)),
     ].filter(Boolean);
     return uniqueCategories;
   }, [safeData]);
@@ -282,7 +280,7 @@ const BarChart: React.FC<BarChartProps> = ({
   // 从数据中提取 filterLabel，过滤掉 undefined 值
   const validFilterLabels = useMemo(() => {
     return safeData
-      .map((item) => item.filterLabel)
+      .map((item) => item?.filterLabel)
       .filter(
         (filterLabel): filterLabel is string => filterLabel !== undefined,
       );
@@ -321,9 +319,13 @@ const BarChart: React.FC<BarChartProps> = ({
         ? base
         : base.filter((item) => item.filterLabel === selectedFilterLabel);
 
-    // 最终统一过滤掉 x 为空（null/undefined）的数据，避免后续 toString 报错
+    // 最终统一过滤掉 x 为空（null/undefined/空字符串）的数据，避免后续 toString 报错
     return withFilterLabel.filter(
-      (item) => item.x !== null && item.x !== undefined,
+      (item) =>
+        item.x !== null &&
+        item.x !== undefined &&
+        item.x !== '' &&
+        String(item.x).trim() !== '',
     );
   }, [safeData, selectedFilter, filterLabels, selectedFilterLabel]);
 
@@ -340,7 +342,13 @@ const BarChart: React.FC<BarChartProps> = ({
         ...new Set(
           filteredData
             .map((item) => item.x)
-            .filter((x) => x !== null && x !== undefined),
+            .filter(
+              (x) =>
+                x !== null &&
+                x !== undefined &&
+                x !== '' &&
+                String(x).trim() !== '',
+            ),
         ),
       ];
       return uniqueValues;
@@ -392,6 +400,14 @@ const BarChart: React.FC<BarChartProps> = ({
           : provided || defaultColorList[i % defaultColorList.length];
       const baseColor = pickByIndex(index);
 
+      // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
+      const resolvedBaseColor = resolveCssVariable(baseColor);
+      const resolvedProvidedColors = Array.isArray(provided)
+        ? provided.map((c) => resolveCssVariable(c))
+        : provided
+          ? [resolveCssVariable(provided)]
+          : null;
+
       // 为每个类型收集数据点
       const typeData = xValues.map((x) => {
         const dataPoint = findDataPointByXValue(filteredData, x, type);
@@ -413,12 +429,15 @@ const BarChart: React.FC<BarChartProps> = ({
               : typeof parsed?.y === 'number'
                 ? parsed.y
                 : 0;
-          let base = baseColor;
+          let base = resolvedBaseColor;
           if (!color && isDiverging) {
             base = value >= 0 ? POSITIVE_COLOR_HEX : NEGATIVE_COLOR_HEX;
-          } else if (Array.isArray(color) && isDiverging) {
-            const pos = color[0] || baseColor;
-            const neg = color[1] || color[0] || baseColor;
+          } else if (resolvedProvidedColors && isDiverging) {
+            const pos = resolvedProvidedColors[0] || resolvedBaseColor;
+            const neg =
+              resolvedProvidedColors[1] ||
+              resolvedProvidedColors[0] ||
+              resolvedBaseColor;
             base = value >= 0 ? pos : neg;
           }
           return hexToRgba(base, 0.95);
@@ -427,7 +446,7 @@ const BarChart: React.FC<BarChartProps> = ({
           const chart = ctx.chart;
           const chartArea = chart.chartArea;
           const parsed: any = ctx.parsed as any;
-          if (!chartArea) return hexToRgba(baseColor, 0.6);
+          if (!chartArea) return hexToRgba(resolvedBaseColor, 0.6);
 
           const xScale = chart.scales['x'];
           const yScale = chart.scales['y'];
@@ -441,17 +460,20 @@ const BarChart: React.FC<BarChartProps> = ({
             typeof xScale.getPixelForValue !== 'function' ||
             typeof yScale.getPixelForValue !== 'function'
           ) {
-            return hexToRgba(baseColor, 0.6);
+            return hexToRgba(resolvedBaseColor, 0.6);
           }
 
           if (indexAxis === 'y') {
             const value = typeof parsed?.x === 'number' ? parsed.x : 0;
-            let base = baseColor;
+            let base = resolvedBaseColor;
             if (!color && isDiverging) {
               base = value >= 0 ? POSITIVE_COLOR_HEX : NEGATIVE_COLOR_HEX;
-            } else if (Array.isArray(color) && isDiverging) {
-              const pos = color[0] || baseColor;
-              const neg = color[1] || color[0] || baseColor;
+            } else if (resolvedProvidedColors && isDiverging) {
+              const pos = resolvedProvidedColors[0] || resolvedBaseColor;
+              const neg =
+                resolvedProvidedColors[1] ||
+                resolvedProvidedColors[0] ||
+                resolvedBaseColor;
               base = value >= 0 ? pos : neg;
             }
 
@@ -477,12 +499,15 @@ const BarChart: React.FC<BarChartProps> = ({
           }
 
           const value = typeof parsed?.y === 'number' ? parsed.y : 0;
-          let base = baseColor;
+          let base = resolvedBaseColor;
           if (!color && isDiverging) {
             base = value >= 0 ? POSITIVE_COLOR_HEX : NEGATIVE_COLOR_HEX;
-          } else if (Array.isArray(color) && isDiverging) {
-            const pos = color[0] || baseColor;
-            const neg = color[1] || color[0] || baseColor;
+          } else if (resolvedProvidedColors && isDiverging) {
+            const pos = resolvedProvidedColors[0] || resolvedBaseColor;
+            const neg =
+              resolvedProvidedColors[1] ||
+              resolvedProvidedColors[0] ||
+              resolvedBaseColor;
             base = value >= 0 ? pos : neg;
           }
 
@@ -506,8 +531,10 @@ const BarChart: React.FC<BarChartProps> = ({
           return gradient;
         },
         borderWidth: 0,
-        categoryPercentage: 0.7,
-        barPercentage: 0.8,
+        // 当设置了 maxBarThickness 时，使用较大的百分比以允许 maxBarThickness 生效
+        categoryPercentage: maxBarThickness ? 1.0 : 0.7,
+        barPercentage: maxBarThickness ? 1.0 : 0.8,
+        ...(maxBarThickness && { maxBarThickness }),
         stack: stacked ? 'stack' : undefined,
         borderRadius: (ctx: any) => {
           const rawValue = ctx?.raw;
@@ -582,7 +609,7 @@ const BarChart: React.FC<BarChartProps> = ({
     });
 
     return { labels, datasets };
-  }, [filteredData, types, xValues, stacked, indexAxis]);
+  }, [filteredData, types, xValues, stacked, indexAxis, maxBarThickness]);
 
   // 筛选器选项
   const filterOptions = useMemo(() => {
@@ -609,13 +636,18 @@ const BarChart: React.FC<BarChartProps> = ({
   // 标签宽度计算函数
   const calculateLabelWidth = (text: string, fontSize: number = 11): number => {
     // 创建临时canvas来测量文本宽度
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    if (!context) return text.length * fontSize * 0.6; // 备用估算
+    try {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) return text.length * fontSize * 0.6; // 备用估算
 
-    context.font = `${fontSize}px Arial, sans-serif`;
-    const metrics = context.measureText(text);
-    return metrics.width;
+      context.font = `${fontSize}px Arial, sans-serif`;
+      const metrics = context.measureText(text);
+      return metrics.width;
+    } catch (e) {
+      // 在测试环境或无法使用 canvas 时使用备用估算
+      return text.length * fontSize * 0.6;
+    }
   };
 
   // 计算所需的最大标签宽度
@@ -929,6 +961,9 @@ const BarChart: React.FC<BarChartProps> = ({
         },
       },
     },
+    animation: {
+      duration: isMobile ? 200 : 400,
+    },
   };
 
   // 合并外部传入的选项与默认选项
@@ -940,17 +975,44 @@ const BarChart: React.FC<BarChartProps> = ({
     downloadChart(chartRef.current, 'bar-chart');
   };
 
+  const rootClassName = classNamesLib(classNames?.root, className);
+  const rootStyle = {
+    width: responsiveWidth,
+    height: responsiveHeight,
+    ...style,
+    ...styles?.root,
+  };
+
+  const toolbarClassName = classNamesLib(classNames?.toolbar);
+  const toolbarStyle = styles?.toolbar;
+
+  const statisticContainerClassName = classNamesLib(
+    classNames?.statisticContainer,
+    `${baseClassName}-statistic-container`,
+  );
+  const statisticContainerStyle = styles?.statisticContainer;
+
+  const filterClassName = classNamesLib(classNames?.filter);
+  const filterStyle = styles?.filter;
+
+  const wrapperClassName = classNamesLib(
+    classNames?.wrapper,
+    `${baseClassName}-wrapper`,
+  );
+  const wrapperStyle = {
+    marginTop: '20px',
+    height: responsiveHeight,
+    ...styles?.wrapper,
+  };
+
   return wrapSSR(
     <ChartContainer
       baseClassName={baseClassName}
-      className={className}
+      className={rootClassName}
       theme={theme}
       isMobile={isMobile}
       variant={variant}
-      style={{
-        width: responsiveWidth,
-        height: responsiveHeight,
-      }}
+      style={rootStyle}
     >
       <ChartToolBar
         title={title}
@@ -958,6 +1020,9 @@ const BarChart: React.FC<BarChartProps> = ({
         onDownload={handleDownload}
         extra={toolbarExtra}
         dataTime={dataTime}
+        loading={loading}
+        className={toolbarClassName}
+        style={toolbarStyle}
         filter={
           renderFilterInToolbar && filterOptions && filterOptions.length > 1 ? (
             <ChartFilter
@@ -971,6 +1036,8 @@ const BarChart: React.FC<BarChartProps> = ({
               })}
               theme={theme}
               variant="compact"
+              className={filterClassName}
+              style={filterStyle}
             />
           ) : undefined
         }
@@ -978,7 +1045,8 @@ const BarChart: React.FC<BarChartProps> = ({
 
       {statistics && (
         <div
-          className={classNames(`${baseClassName}-statistic-container`, hashId)}
+          className={statisticContainerClassName}
+          style={statisticContainerStyle}
         >
           {statistics.map((config, index) => (
             <ChartStatistic key={index} {...config} theme={theme} />
@@ -997,13 +1065,12 @@ const BarChart: React.FC<BarChartProps> = ({
             onSelectionChange: setSelectedFilterLabel,
           })}
           theme={theme}
+          className={filterClassName}
+          style={filterStyle}
         />
       )}
 
-      <div
-        className={`${baseClassName}-wrapper`}
-        style={{ marginTop: '20px', height: responsiveHeight }}
-      >
+      <div className={wrapperClassName} style={wrapperStyle}>
         <Bar
           ref={chartRef}
           data={processedData}
@@ -1011,7 +1078,7 @@ const BarChart: React.FC<BarChartProps> = ({
           plugins={[ChartDataLabels]}
         />
       </div>
-    </ChartContainer>
+    </ChartContainer>,
   );
 };
 

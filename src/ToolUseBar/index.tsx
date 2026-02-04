@@ -1,16 +1,17 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import { useMergedState } from 'rc-util';
-import React, { memo, useCallback, useContext, useMemo } from 'react';
-import { ToolCall, ToolUseBarItem } from './ToolUseBarItem';
+import React, { memo, useContext, useMemo } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
+import { ToolCall, ToolUseBarItem } from './BarItem';
 import { useStyle } from './style';
-export * from './ToolUseBarItem';
-export * from './ToolUseBarThink';
+export * from './BarItem';
 
 interface ToolUseBarProps {
   tools?: ToolCall[];
   onToolClick?: (id: string) => void;
   className?: string;
+  style?: React.CSSProperties;
   activeKeys?: string[];
   defaultActiveKeys?: string[];
   onActiveKeysChange?: (activeKeys: string[]) => void;
@@ -42,7 +43,7 @@ interface ToolUseBarProps {
  * @param {(keys: string[]) => void} [props.onExpandedKeysChange] - 展开状态变化回调
  * @param {(tool: ToolUseItem) => void} [props.onToolClick] - 工具点击回调
  * @param {string} [props.className] - 自定义CSS类名
- * @param {React.CSSProperties} [props.style] - 自定义样式
+ * @param {React.CSSProperties} [props.style] - 自定义样式，可用于设置固定宽度和高度以防止页面抖动
  *
  * @example
  * ```tsx
@@ -71,6 +72,7 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
   onActiveKeysChange,
   onExpandedKeysChange,
   light = false,
+  style,
   ...props
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
@@ -94,19 +96,16 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
     },
   );
 
-  const handleActiveChange = useCallback(
-    (id: string, active: boolean) => {
-      if (onActiveKeysChange) {
-        const newActiveKeys = active
-          ? [...activeKeys, id]
-          : activeKeys.filter((key) => key !== id);
-        setActiveKeys(newActiveKeys);
-      }
-    },
-    [onActiveKeysChange, activeKeys, setActiveKeys],
-  );
+  const handleActiveChange = useRefFunction((id: string, active: boolean) => {
+    if (onActiveKeysChange) {
+      const newActiveKeys = active
+        ? [...activeKeys, id]
+        : activeKeys.filter((key) => key !== id);
+      setActiveKeys(newActiveKeys);
+    }
+  });
 
-  const handleExpandedChange = useCallback(
+  const handleExpandedChange = useRefFunction(
     (id: string, expanded: boolean) => {
       const newExpandedKeys = expanded
         ? [...expandedKeys, id]
@@ -124,7 +123,6 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
         onExpandedKeysChange(newExpandedKeys, removedKeys);
       }
     },
-    [onExpandedKeysChange, expandedKeys, setExpandedKeys],
   );
 
   // 使用 useMemo 优化工具列表的渲染
@@ -170,10 +168,12 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
   }, [prefixCls, hashId, props.className]);
 
   if (!tools?.length)
-    return <div className={containerClassName} data-testid="ToolUse" />;
+    return (
+      <div className={containerClassName} style={style} data-testid="ToolUse" />
+    );
 
   return wrapSSR(
-    <div className={containerClassName} data-testid="ToolUse">
+    <div className={containerClassName} style={style} data-testid="ToolUse">
       {toolItems}
     </div>,
   );

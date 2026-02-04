@@ -15,6 +15,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 响应式边框样式
       borderRadius: '6px',
       padding: '12px',
+      minWidth: '300px',
 
       // 浅色主题边框
       '&&-light-theme': {
@@ -34,6 +35,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         padding: '12px',
         margin: '0 auto',
         maxWidth: '100%',
+        minWidth: '225px',
       },
 
       // 桌面端适配

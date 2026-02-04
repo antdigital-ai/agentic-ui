@@ -8,11 +8,15 @@
 import { SchemaEditor } from './SchemaEditor';
 import { SchemaForm } from './SchemaForm';
 import { SchemaRenderer, TemplateEngine } from './SchemaRenderer';
-import { LowCodeSchema } from './types';
 import { SchemaValidator, mdDataSchemaValidator } from './validator';
 
+export type { LowCodeSchema } from './types';
+
+// 导出组件类型
+export type { SchemaEditorProps, SchemaEditorRef } from './SchemaEditor';
+export type { SchemaFormProps } from './SchemaForm';
+
 export {
-  LowCodeSchema,
   SchemaEditor,
   SchemaForm,
   SchemaRenderer,

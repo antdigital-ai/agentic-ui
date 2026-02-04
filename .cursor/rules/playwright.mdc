@@ -1,0 +1,235 @@
+---
+description: Playwright 自动化测试编写规范：构建高稳定性（Flaky-Free）的测试体系
+globs: **/*.spec.ts, **/e2e/**/*.ts, **/tests/**/*.ts
+---
+
+# Playwright 自动化测试编写规范：构建高稳定性（Flaky-Free）的测试体系
+
+## 1. 核心原则：为何测试会失败？
+
+在制定规范前，需明确 Playwright 测试失败的三大核心根因。编写"高成功率"测试的本质，就是通过规范消除这三个变量：
+
+### 竞态条件 (Race Conditions)
+
+脚本执行速度快于页面渲染速度（如点击了尚未绑定事件的按钮）。
+
+### DOM 易变性 (DOM Volatility)
+
+页面结构或样式变化导致选择器失效。
+
+### 环境不确定性 (Environmental Flakiness)
+
+网络延迟、API 500 错误或第三方服务宕机。
+
+本规范将围绕**"确定性执行 (Deterministic Execution)"**这一目标展开。
+
+## 2. 目录结构与命名规范 (TypeScript)
+
+采用**领域驱动（Domain-Driven）**结构，将测试与业务逻辑解耦。推荐使用 TypeScript 以获得强类型支持，这直接关联到代码维护的稳定性。
+
+### 2.1 推荐目录结构
+
+```
+tests/
+├── e2e/
+│   ├── auth.setup.ts            # 全局认证设置（生成 storageState）
+│   ├── checkout/                # 业务模块目录
+│   │   ├── guest-checkout.spec.ts
+│   │   └── payment-flow.spec.ts
+│   └── dashboard/
+│       └── analytics.spec.ts
+├── fixtures/                    # 自定义测试夹具 (Dependency Injection)
+│   ├── db-fixture.ts            # 数据库操作封装
+│   └── page-fixture.ts          # Page Object 自动注入
+├── pages/                       # Page Object Models (POM)
+│   ├── CheckoutPage.ts
+│   └── components/              # 可复用组件 (如 DatePicker, Modal)
+├── test-data/                   # 静态测试数据
+├── playwright.config.ts         # 全局配置
+└── .eslintrc.json               # 强制代码规范配置
+```
+
+### 2.2 命名规范
+
+- **文件命名**：使用 kebab-case，后缀为 `.spec.ts`。例如 `user-login.spec.ts`。
+- **类命名 (POM)**：使用 PascalCase。例如 `LoginPage`, `ShoppingCartPage`。
+- **测试标题**：必须表达业务价值而非操作细节。
+  - ❌ `test('click button and check div')`
+  - ✅ `test('should display order confirmation after successful payment')`
+
+## 3. 高稳定性选择器策略 (Selector Strategy)
+
+稳定性黄金法则：测试应当像用户一样通过"视觉"和"内容"来寻找元素，严禁依赖页面内部实现（CSS 类名、XPath）。
+
+### 3.1 优先级金字塔
+
+请严格按照以下顺序选用 Locator：
+
+#### `page.getByRole()` (最高优先级)
+
+**理由**：它是最稳定的选择器。它模拟用户和辅助技术（Screen Readers）的交互。如果页面样式变了但功能没变（例如"登录"按钮变成了一个图标但 ARIA 角色还是 button），测试依然通过。
+
+**示例**：
+
+```typescript
+await page.getByRole('button', { name: 'Submit' }).click();
+```
+
+#### `page.getByText()`
+
+**理由**：适用于非交互性文本内容的验证。
+
+**示例**：
+
+```typescript
+await expect(page.getByText('Welcome, User')).toBeVisible();
+```
+
+#### `page.getByTestId()` (特定场景)
+
+**理由**：当元素没有任何语义（如纯 div 容器）且必须定位时使用。需在前端代码中添加 `data-testid` 属性。
+
+**示例**：
+
+```typescript
+await page.getByTestId('order-summary-container').click();
+```
+
+### 3.2 严禁使用的反模式 (Anti-Patterns)
+
+🚫 **禁止 XPath**：`/html/body/div[1]/div/span` —— 只要开发调整一个 div 层级，测试即挂。
+
+🚫 **禁止 CSS 样式类**：`page.locator('.btn-primary.active')` —— 样式重构是常态，不要让测试因此失败。
+
+## 4. 彻底消除"竞态条件"：等待与断言
+
+这是 Playwright 区别于 Selenium/Cypress 的核心优势。编写高成功率测试的关键在于：信任 Playwright 的自动等待机制，杜绝人工干预。
+
+### 4.1 绝对禁令：`page.waitForTimeout()`
+
+**规范**：代码中严禁出现 `await page.waitForTimeout(5000)`（死等）。
+
+**后果**：这是测试不稳定的最大元凶。本地跑可能够用，CI 机器稍微慢一点就会报错；或者 CI 很快，测试却白白浪费时间。
+
+**替代方案**：使用 Web-First Assertions（智能断言）。
+
+### 4.2 Web-First Assertions (智能重试断言)
+
+Playwright 的断言会自动重试，直到条件满足或超时。这能完美解决"元素尚未渲染完成"的问题。
+
+❌ **错误写法 (非重试)**：
+
+```typescript
+const isVisible = await page.isVisible('.success-msg');
+expect(isVisible).toBe(true); // 如果元素在 10ms 后才出现，这里会直接失败
+```
+
+✅ **正确写法 (自动重试)**：
+
+```typescript
+// Playwright 会在超时时间内（默认5s）不断轮询，直到元素出现
+await expect(page.locator('.success-msg')).toBeVisible();
+```
+
+### 4.3 处理复杂异步状态
+
+对于复杂的加载动画或数据请求，使用特定状态等待：
+
+- **等待请求完成**：`await page.waitForResponse(resp => resp.url().includes('/api/buy') && resp.status() === 200);`
+- **等待状态分离**：当元素存在但不可见（如动画渐入），显式等待其状态：`await expect(locator).toBeVisible({ timeout: 10000 });`
+
+## 5. 架构设计：隔离与复用
+
+### 5.1 认证状态复用 (Storage State)
+
+不要在每个测试用例中都 UI 登录一遍。这既慢又增加了测试对登录接口的依赖风险。
+
+**最佳实践**：
+
+- 使用 `globalSetup` 或独立的 `auth.setup.ts` 项目进行一次登录。
+- 将 Cookies/LocalStorage 保存到 `playwright/.auth/user.json`。
+- 在 `playwright.config.ts` 中配置 `storageState`，让所有测试默认处于登录状态。
+
+### 5.2 数据库与数据隔离
+
+**原则**：每个测试必须拥有独立的数据环境，或者在测试前通过 API 重置数据。
+
+**Fixture 模式**：利用 Playwright 的 Fixtures 机制，在测试执行前自动准备数据。
+
+```typescript
+// 示例：自动创建一个新订单，并在测试结束后自动删除
+test('cancel order', async ({ page, orderFixture }) => {
+  // orderFixture 已经在后台通过 API 创建好了订单
+  await page.goto(`/orders/${orderFixture.id}`);
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.getByText('Order Cancelled')).toBeVisible();
+});
+```
+
+## 6. 网络层稳定性治理
+
+当后端 API 不稳定或需测试极端场景（如支付失败）时，**网络拦截（Network Interception）**是提升稳定性的杀手锏。
+
+### 6.1 Mock 外部依赖
+
+对于不可控的第三方服务（如 Google Analytics, Intercom 聊天窗, 支付网关），建议直接 Abort 或 Mock，避免因为外网波动导致测试失败。
+
+```typescript
+// 屏蔽无用的第三方请求，提升速度和稳定性
+await page.route('**/*analytics.com*', (route) => route.abort());
+await page.route('**/*.png', (route) => route.abort()); // 甚至可以屏蔽图片
+```
+
+### 6.2 模拟 API 响应
+
+不要依赖特定的后端数据（后端数据可能会被其他人修改）。使用 `page.route` 制造"完美数据"。
+
+```typescript
+// 强制 API 返回特定数据，确保 UI 测试不受后端数据变化影响
+await page.route('**/api/users/1', (route) =>
+  route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ name: 'Test User', role: 'admin' }),
+  }),
+);
+```
+
+## 7. 代码质量与 Linting 强制规范
+
+引入 `eslint-plugin-playwright` 并在 CI 中强制检查，从代码层面杜绝不稳定写法。
+
+### 7.1 必须开启的 ESLint 规则
+
+在 `.eslintrc` 中配置：
+
+- `playwright/no-wait-for-timeout`: 报错，禁止硬等待。
+- `playwright/no-page-pause`: 报错，防止提交调试代码。
+- `playwright/missing-playwright-await`: 报错，防止忘记写 await（Playwright 是全异步的，漏写 await 会导致操作未执行但测试假通过，极度危险）。
+- `playwright/no-element-handle`: 警告，鼓励使用 Locator 而非 ElementHandle（后者不会自动重试）。
+
+## 8. CI/CD 集成与调试策略
+
+### 8.1 调试三件套
+
+在 `playwright.config.ts` 中配置，确保 CI 失败时能"时光倒流"查错：
+
+- **Trace Viewer**: `trace: 'on-first-retry'`。这是最重要的调试工具，记录了每一步的 DOM 快照、网络请求和控制台日志。
+- **Screenshot**: `screenshot: 'only-on-failure'`。
+- **Video**: `video: 'retain-on-failure'`。
+
+### 8.2 重试与分片 (Sharding)
+
+**Flaky Test 治理**：设置 `retries: 2`。如果第一次失败、第二次通过，CI 标记为通过但警告（Flaky）。这保证了流水线不被偶发网络抖动阻塞。
+
+**速度优化**：使用 Sharding 将 1000 个测试分发到 5 台机器并行执行：`npx playwright test --shard=1/5`。
+
+## 总结：高成功率 Checklist
+
+在提交代码前，请对照此清单：
+
+- [ ] **无硬等待**：全局搜索 `waitForTimeout` 确保结果为 0。
+- [ ] **全异步**：所有的 `expect`, `click`, `fill` 前面都加了 `await`。
+- [ ] **选择器健壮性**：优先使用了 `getByRole` 或 `getByText`，未使用 XPath。
+- [ ] **数据独立**：测试不依赖上一个测试遗留的数据。
+- [ ] **断言正确**：使用了 `await expect().toBeVisible()` 等重试断言，而非 `toBe(true)`。

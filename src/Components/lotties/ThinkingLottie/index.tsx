@@ -32,7 +32,7 @@ export interface ThinkingLottieProps {
  *
  * @component
  * @description Lottie语音播报动画组件，提供流畅的语音播报动画效果
- * @param {LottieVoiceProps} props - 组件属性
+ * @param {ThinkingLottieProps} props - 组件属性
  * @param {boolean} [props.autoplay=true] - 是否自动播放动画
  * @param {boolean} [props.loop=true] - 是否循环播放动画
  * @param {string} [props.className] - 动画容器类名

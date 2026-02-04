@@ -15,7 +15,7 @@ const CardIMEDemo = () => {
 `;
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <div style={{ marginBottom: '20px' }}>
         <h2>中文输入法 Card-After 测试</h2>
         <div

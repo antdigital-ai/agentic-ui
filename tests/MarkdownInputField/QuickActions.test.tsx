@@ -1,7 +1,13 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { QuickActions } from '../../src/MarkdownInputField/QuickActions';
 
 // Mock RefinePromptButton
@@ -78,6 +84,13 @@ describe('QuickActions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockEditorRef.current.store.getMDContent.mockReturnValue('test value');
+  });
+
+  afterEach(async () => {
+    // 等待所有挂起的 Promise 完成，避免在测试清理后仍有异步操作
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
   });
 
   describe('基本渲染', () => {
@@ -188,14 +201,25 @@ describe('QuickActions', () => {
       );
 
       const refineButton = screen.getByTestId('refine-prompt-button');
-      fireEvent.click(refineButton);
 
-      await waitFor(() => {
-        expect(mockOnRefine).toHaveBeenCalledWith('original text');
-        expect(mockEditorRef.current.store.setMDContent).toHaveBeenCalledWith(
-          'refined text',
-        );
-        expect(mockOnValueChange).toHaveBeenCalledWith('refined text');
+      await act(async () => {
+        fireEvent.click(refineButton);
+      });
+
+      await waitFor(
+        () => {
+          expect(mockOnRefine).toHaveBeenCalledWith('original text');
+          expect(mockEditorRef.current.store.setMDContent).toHaveBeenCalledWith(
+            'refined text',
+          );
+          expect(mockOnValueChange).toHaveBeenCalledWith('refined text');
+        },
+        { timeout: 1000 },
+      );
+
+      // 确保所有异步操作完成
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
       });
     });
 
@@ -217,10 +241,21 @@ describe('QuickActions', () => {
       );
 
       const refineButton = screen.getByTestId('refine-prompt-button');
-      fireEvent.click(refineButton);
 
-      await waitFor(() => {
-        expect(mockOnRefine).toHaveBeenCalledWith('editor content');
+      await act(async () => {
+        fireEvent.click(refineButton);
+      });
+
+      await waitFor(
+        () => {
+          expect(mockOnRefine).toHaveBeenCalledWith('editor content');
+        },
+        { timeout: 1000 },
+      );
+
+      // 确保所有异步操作完成
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
       });
     });
 
@@ -240,10 +275,21 @@ describe('QuickActions', () => {
       );
 
       const refineButton = screen.getByTestId('refine-prompt-button');
-      fireEvent.click(refineButton);
 
-      await waitFor(() => {
-        expect(mockOnRefine).toHaveBeenCalledWith('fallback value');
+      await act(async () => {
+        fireEvent.click(refineButton);
+      });
+
+      await waitFor(
+        () => {
+          expect(mockOnRefine).toHaveBeenCalledWith('fallback value');
+        },
+        { timeout: 1000 },
+      );
+
+      // 确保所有异步操作完成
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
       });
     });
 
@@ -263,12 +309,25 @@ describe('QuickActions', () => {
       );
 
       const refineButton = screen.getByTestId('refine-prompt-button');
-      fireEvent.click(refineButton);
 
-      await waitFor(() => {
-        expect(mockOnRefine).toHaveBeenCalled();
-        // 应该不会更新内容
-        expect(mockEditorRef.current.store.setMDContent).not.toHaveBeenCalled();
+      await act(async () => {
+        fireEvent.click(refineButton);
+      });
+
+      await waitFor(
+        async () => {
+          expect(mockOnRefine).toHaveBeenCalled();
+          // 应该不会更新内容
+          expect(
+            mockEditorRef.current.store.setMDContent,
+          ).not.toHaveBeenCalled();
+        },
+        { timeout: 1000 },
+      );
+
+      // 确保所有异步操作完成
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
       });
     });
 
@@ -292,13 +351,24 @@ describe('QuickActions', () => {
 
       const refineButton = screen.getByTestId('refine-prompt-button');
 
-      // 快速点击两次
-      fireEvent.click(refineButton);
-      fireEvent.click(refineButton);
+      // 第一次点击
+      await act(async () => {
+        fireEvent.click(refineButton);
+        // 等待状态更新完成（refineStatus 变为 'loading'）
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      });
 
-      await waitFor(() => {
-        // 应该只调用一次
-        expect(mockOnRefine).toHaveBeenCalledTimes(1);
+      // 第二次点击（此时应该被阻止，因为状态已经是 'loading'）
+      await act(async () => {
+        fireEvent.click(refineButton);
+      });
+
+      // 验证只调用了一次
+      expect(mockOnRefine).toHaveBeenCalledTimes(1);
+
+      // 等待所有异步操作完成
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 150));
       });
     });
 
@@ -316,13 +386,24 @@ describe('QuickActions', () => {
       );
 
       const refineButton = screen.getByTestId('refine-prompt-button');
-      fireEvent.click(refineButton);
 
-      await waitFor(() => {
-        expect(mockEditorRef.current.store.setMDContent).toHaveBeenCalledWith(
-          '',
-        );
-        expect(mockOnValueChange).toHaveBeenCalledWith('');
+      await act(async () => {
+        fireEvent.click(refineButton);
+      });
+
+      await waitFor(
+        () => {
+          expect(mockEditorRef.current.store.setMDContent).toHaveBeenCalledWith(
+            '',
+          );
+          expect(mockOnValueChange).toHaveBeenCalledWith('');
+        },
+        { timeout: 1000 },
+      );
+
+      // 确保所有异步操作完成
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
       });
     });
   });

@@ -28,7 +28,7 @@ const WorkspaceTaskDemo: React.FC = () => {
       {
         key: '3',
         title: '提取下载的视频帧',
-        status: 'pending',
+        status: 'loading',
       },
       {
         key: '4',
@@ -45,6 +45,11 @@ const WorkspaceTaskDemo: React.FC = () => {
         title: '报告结果并将Word文档发送给用户',
         status: 'pending',
       },
+      {
+        key: '7',
+        title: <span>用户可自定义title</span>,
+        status: 'pending',
+      },
     ];
 
     setTasks(initialTasks);
@@ -57,12 +62,12 @@ const WorkspaceTaskDemo: React.FC = () => {
           tab={{
             key: 'tasks',
             title: '任务列表',
-            count: tasks.filter((t) => t.status === 'loading').length,
           }}
           data={{
             items: tasks,
           }}
         />
+        <Workspace.File nodes={[]} />
       </Workspace>
     </div>
   );

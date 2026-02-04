@@ -6,6 +6,7 @@ import {
 import { Checkbox, ConfigProvider, Divider, Tooltip } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import React, { useContext } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { useStyle } from '../style';
 import {
@@ -98,6 +99,9 @@ const useTextOverflow = (text: React.ReactNode) => {
         EXTRA_SCROLL_OFFSET
       );
       el.style.setProperty('--scroll-width', `${scrollDistance}px`);
+      // 根据滚动距离动态计算动画时长，保持恒定滚动速度（每 100px 约 1.5s）
+      const duration = Math.max(2, (Math.abs(scrollDistance) / 100) * 1.5);
+      el.style.setProperty('--scroll-duration', `${duration}s`);
     }
   }, [text]); // 仅在文本内容变化时重新计算
 
@@ -195,35 +199,29 @@ const HistoryItemSingle = React.memo<HistoryItemProps>(
       [selectedIds, item.sessionId],
     );
 
-    const handleClick = React.useCallback(
-      (e: React.MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        onClick(item.sessionId!, item);
-      },
-      [onClick, item],
-    );
+    const handleClick = useRefFunction((e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      onClick(item.sessionId!, item);
+    });
 
     /**
      * 处理复选框状态变化事件
      * @param e - 复选框变化事件对象
      */
-    const handleCheckboxChange = React.useCallback(
-      (e: CheckboxChangeEvent) => {
-        e.stopPropagation();
-        onSelectionChange(item.sessionId!, e.target.checked);
-      },
-      [onSelectionChange, item.sessionId],
-    );
+    const handleCheckboxChange = useRefFunction((e: CheckboxChangeEvent) => {
+      e.stopPropagation();
+      onSelectionChange(item.sessionId!, e.target.checked);
+    });
 
     /**
      * 处理删除历史记录项事件
      */
-    const handleDelete = React.useCallback(async () => {
+    const handleDelete = useRefFunction(async () => {
       if (onDeleteItem) {
         await onDeleteItem(item.sessionId!);
       }
-    }, [onDeleteItem, item.sessionId]);
+    });
 
     /**
      * 渲染单行模式的历史记录项
@@ -407,35 +405,29 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
      * 处理点击事件
      * @param e - 鼠标点击事件对象
      */
-    const handleClick = React.useCallback(
-      (e: React.MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        onClick(item.sessionId!, item);
-      },
-      [onClick, item],
-    );
+    const handleClick = useRefFunction((e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      onClick(item.sessionId!, item);
+    });
 
     /**
      * 处理复选框状态变化事件
      * @param e - 复选框变化事件对象
      */
-    const handleCheckboxChange = React.useCallback(
-      (e: CheckboxChangeEvent) => {
-        e.stopPropagation();
-        onSelectionChange(item.sessionId!, e.target.checked);
-      },
-      [onSelectionChange, item.sessionId],
-    );
+    const handleCheckboxChange = useRefFunction((e: CheckboxChangeEvent) => {
+      e.stopPropagation();
+      onSelectionChange(item.sessionId!, e.target.checked);
+    });
 
     /**
      * 处理删除事件
      */
-    const handleDelete = React.useCallback(async () => {
+    const handleDelete = useRefFunction(async () => {
       if (onDeleteItem) {
         await onDeleteItem(item.sessionId!);
       }
-    }, [onDeleteItem, item.sessionId]);
+    });
 
     /**
      * 渲染多行模式的历史记录项

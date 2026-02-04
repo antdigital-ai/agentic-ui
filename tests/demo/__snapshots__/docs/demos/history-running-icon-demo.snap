@@ -200,13 +200,848 @@
                 style="height: 400px; border: 1px solid rgb(240, 240, 240); border-radius: 16px;"
               >
                 <div
-                  agent="[object Object]"
-                  agentid="demo-agent"
-                  data-testid="history"
-                  sessionid="current-session"
-                  type="task"
+                  style="display: flex; flex-direction: column; height: 100%;"
                 >
-                  history
+                  <div
+                    class="ant-agentic-chat-history-menu-scroll-container"
+                    style="flex: 1 1 0%; overflow: auto; min-height: 0;"
+                  >
+                    <div
+                      aria-label="菜单"
+                      class="ant-agentic-chat-history-menu ant-agentic-chat-history-menu"
+                      role="menu"
+                      tabindex="0"
+                    >
+                      <div
+                        class="ant-agentic-chat-history-menu-submenu"
+                      >
+                        <div
+                          class="ant-agentic-chat-history-menu-item-group"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            30分钟前
+                          </div>
+                        </div>
+                        <div
+                          aria-selected="false"
+                          class="ant-agentic-chat-history-menu-item"
+                          role="menuitem"
+                          tabindex="0"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            <div
+                              style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                            >
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;"
+                              >
+                                <div
+                                  class="ant-agentic-chat-history-menu-task-icon "
+                                >
+                                  <svg
+                                    color="var(--color-primary-text-secondary)"
+                                    fill="none"
+                                    height="16"
+                                    style="animation: history-running-u97npihld 2s linear infinite;"
+                                    viewBox="0 0 16 16"
+                                    width="16"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="history-running-u97npihld-clip"
+                                      >
+                                        <rect
+                                          height="16"
+                                          rx="0"
+                                          width="16"
+                                        />
+                                      </clippath>
+                                      <lineargradient
+                                        id="history-running-u97npihld-gradient"
+                                        x1="-0.17775046825408936"
+                                        x2="0.8258928656578064"
+                                        y1="1"
+                                        y2="-0.11863356828689575"
+                                      >
+                                        <stop
+                                          offset="21.42857164144516%"
+                                          stop-color="#D7B9FF"
+                                        />
+                                        <stop
+                                          offset="62.14284896850586%"
+                                          stop-color="#9BA0FF"
+                                        />
+                                        <stop
+                                          offset="100%"
+                                          stop-color="#09B1FF"
+                                        />
+                                      </lineargradient>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#history-running-u97npihld-clip)"
+                                    >
+                                      <path
+                                        d="M5.671 4.729L3.738 2.795a.667.667 0 10-.943.943L4.73 5.671a.667.667 0 00.942-.942zM1.333 7.333H4a.667.667 0 110 1.334H1.333a.667.667 0 010-1.334zM5.867 10.8c0 .177-.07.346-.196.471l-1.933 1.933a.667.667 0 11-.943-.942l1.933-1.933a.667.667 0 011.139.471zM7.333 12a.667.667 0 111.334 0v2.667a.667.667 0 11-1.334 0V12zm5.872.262l-1.934-1.933a.667.667 0 00-.942.942l1.933 1.934a.667.667 0 00.943-.943zM12 7.333h2.667a.667.667 0 110 1.334H12a.667.667 0 010-1.334zm1.4-4.066c0 .176-.07.346-.195.471l-1.933 1.933a.667.667 0 01-.943-.942l1.933-1.934a.667.667 0 011.138.472zM7.333 1.333a.667.667 0 111.334 0V4a.667.667 0 01-1.334 0V1.333z"
+                                        fill="var(--color-primary-text-secondary)"
+                                        fill-rule="evenodd"
+                                      />
+                                    </g>
+                                  </svg>
+                                </div>
+                              </div>
+                              <div
+                                style="display: flex; align-items: flex-start; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                              >
+                                <div
+                                  style="flex: 1 1 0%; min-width: 0; overflow: hidden; display: flex; flex-direction: column;"
+                                >
+                                  <div
+                                    data-overflow="false"
+                                    style="position: relative; max-width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      style="white-space: nowrap; font: var(--font-text-body-base); color: var(--color-gray-text-default);"
+                                    >
+                                      数据分析任务
+                                    </div>
+                                  </div>
+                                  <div
+                                    aria-describedby="test-id"
+                                    style="display: flex; align-items: center; font: var(--font-text-body-xs); color: var(--color-gray-text-secondary); letter-spacing: var(--letter-spacing-body-xs, normal);"
+                                  >
+                                    <div
+                                      style="flex: 1 1 0%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                                    >
+                                      正在分析用户行为数据
+                                    </div>
+                                    <div
+                                      class="ant-divider ant-divider-vertical"
+                                      role="separator"
+                                    />
+                                    <span
+                                      style="min-width: 26px;"
+                                    >
+                                      今日
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                              >
+                                <div
+                                  style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                                >
+                                  <div
+                                    style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                                  >
+                                    <div
+                                      class="ant-space ant-space-horizontal ant-space-align-center"
+                                      style="column-gap: 4px; row-gap: 4px;"
+                                    >
+                                      <div
+                                        class="ant-space-item"
+                                      >
+                                        <span
+                                          aria-describedby="test-id"
+                                          aria-label="删除"
+                                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                          data-testid="action-icon-box"
+                                          data-title="删除"
+                                          role="button"
+                                          style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                          tabindex="0"
+                                        >
+                                          <svg
+                                            class="sofa-icons-icon"
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            height="1em"
+                                            style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                            viewBox="0 0 16 16"
+                                            width="1em"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <defs>
+                                              <clippath
+                                                id="Trash2-master_svg0_308_02283"
+                                              >
+                                                <rect
+                                                  height="16"
+                                                  rx="0"
+                                                  width="16"
+                                                />
+                                              </clippath>
+                                            </defs>
+                                            <g
+                                              clip-path="url(#Trash2-master_svg0_308_02283)"
+                                            >
+                                              <path
+                                                d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                                style="mix-blend-mode: passthrough;"
+                                              />
+                                            </g>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style="opacity: 1; transition: opacity 0.2s ease;"
+                                  >
+                                    <span
+                                      style="width: 20px; height: 20px;"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          aria-selected="false"
+                          class="ant-agentic-chat-history-menu-item"
+                          role="menuitem"
+                          tabindex="0"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            <div
+                              style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                            >
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;"
+                              >
+                                <div
+                                  class="ant-agentic-chat-history-menu-task-icon "
+                                >
+                                  <svg
+                                    color="var(--color-primary-text-secondary)"
+                                    fill="none"
+                                    height="16"
+                                    style="animation: history-running-u97npihld 2s linear infinite;"
+                                    viewBox="0 0 16 16"
+                                    width="16"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="history-running-u97npihld-clip"
+                                      >
+                                        <rect
+                                          height="16"
+                                          rx="0"
+                                          width="16"
+                                        />
+                                      </clippath>
+                                      <lineargradient
+                                        id="history-running-u97npihld-gradient"
+                                        x1="-0.17775046825408936"
+                                        x2="0.8258928656578064"
+                                        y1="1"
+                                        y2="-0.11863356828689575"
+                                      >
+                                        <stop
+                                          offset="21.42857164144516%"
+                                          stop-color="#D7B9FF"
+                                        />
+                                        <stop
+                                          offset="62.14284896850586%"
+                                          stop-color="#9BA0FF"
+                                        />
+                                        <stop
+                                          offset="100%"
+                                          stop-color="#09B1FF"
+                                        />
+                                      </lineargradient>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#history-running-u97npihld-clip)"
+                                    >
+                                      <path
+                                        d="M5.671 4.729L3.738 2.795a.667.667 0 10-.943.943L4.73 5.671a.667.667 0 00.942-.942zM1.333 7.333H4a.667.667 0 110 1.334H1.333a.667.667 0 010-1.334zM5.867 10.8c0 .177-.07.346-.196.471l-1.933 1.933a.667.667 0 11-.943-.942l1.933-1.933a.667.667 0 011.139.471zM7.333 12a.667.667 0 111.334 0v2.667a.667.667 0 11-1.334 0V12zm5.872.262l-1.934-1.933a.667.667 0 00-.942.942l1.933 1.934a.667.667 0 00.943-.943zM12 7.333h2.667a.667.667 0 110 1.334H12a.667.667 0 010-1.334zm1.4-4.066c0 .176-.07.346-.195.471l-1.933 1.933a.667.667 0 01-.943-.942l1.933-1.934a.667.667 0 011.138.472zM7.333 1.333a.667.667 0 111.334 0V4a.667.667 0 01-1.334 0V1.333z"
+                                        fill="var(--color-primary-text-secondary)"
+                                        fill-rule="evenodd"
+                                      />
+                                    </g>
+                                  </svg>
+                                </div>
+                              </div>
+                              <div
+                                style="display: flex; align-items: flex-start; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                              >
+                                <div
+                                  style="flex: 1 1 0%; min-width: 0; overflow: hidden; display: flex; flex-direction: column;"
+                                >
+                                  <div
+                                    data-overflow="false"
+                                    style="position: relative; max-width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      style="white-space: nowrap; font: var(--font-text-body-base); color: var(--color-gray-text-default);"
+                                    >
+                                      模型训练任务
+                                    </div>
+                                  </div>
+                                  <div
+                                    aria-describedby="test-id"
+                                    style="display: flex; align-items: center; font: var(--font-text-body-xs); color: var(--color-gray-text-secondary); letter-spacing: var(--letter-spacing-body-xs, normal);"
+                                  >
+                                    <div
+                                      style="flex: 1 1 0%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                                    >
+                                      深度学习模型训练中
+                                    </div>
+                                    <div
+                                      class="ant-divider ant-divider-vertical"
+                                      role="separator"
+                                    />
+                                    <span
+                                      style="min-width: 26px;"
+                                    >
+                                      今日
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                              >
+                                <div
+                                  style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                                >
+                                  <div
+                                    style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                                  >
+                                    <div
+                                      class="ant-space ant-space-horizontal ant-space-align-center"
+                                      style="column-gap: 4px; row-gap: 4px;"
+                                    >
+                                      <div
+                                        class="ant-space-item"
+                                      >
+                                        <span
+                                          aria-describedby="test-id"
+                                          aria-label="删除"
+                                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                          data-testid="action-icon-box"
+                                          data-title="删除"
+                                          role="button"
+                                          style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                          tabindex="0"
+                                        >
+                                          <svg
+                                            class="sofa-icons-icon"
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            height="1em"
+                                            style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                            viewBox="0 0 16 16"
+                                            width="1em"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <defs>
+                                              <clippath
+                                                id="Trash2-master_svg0_308_02283"
+                                              >
+                                                <rect
+                                                  height="16"
+                                                  rx="0"
+                                                  width="16"
+                                                />
+                                              </clippath>
+                                            </defs>
+                                            <g
+                                              clip-path="url(#Trash2-master_svg0_308_02283)"
+                                            >
+                                              <path
+                                                d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                                style="mix-blend-mode: passthrough;"
+                                              />
+                                            </g>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style="opacity: 1; transition: opacity 0.2s ease;"
+                                  >
+                                    <span
+                                      style="width: 20px; height: 20px;"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          aria-selected="false"
+                          class="ant-agentic-chat-history-menu-item"
+                          role="menuitem"
+                          tabindex="0"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            <div
+                              style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                            >
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;"
+                              >
+                                <div
+                                  class="ant-agentic-chat-history-menu-task-icon "
+                                >
+                                  <svg
+                                    color="var(--color-primary-text-secondary)"
+                                    fill="none"
+                                    height="16"
+                                    style="animation: history-running-u97npihld 2s linear infinite;"
+                                    viewBox="0 0 16 16"
+                                    width="16"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <defs>
+                                      <clippath
+                                        id="history-running-u97npihld-clip"
+                                      >
+                                        <rect
+                                          height="16"
+                                          rx="0"
+                                          width="16"
+                                        />
+                                      </clippath>
+                                      <lineargradient
+                                        id="history-running-u97npihld-gradient"
+                                        x1="-0.17775046825408936"
+                                        x2="0.8258928656578064"
+                                        y1="1"
+                                        y2="-0.11863356828689575"
+                                      >
+                                        <stop
+                                          offset="21.42857164144516%"
+                                          stop-color="#D7B9FF"
+                                        />
+                                        <stop
+                                          offset="62.14284896850586%"
+                                          stop-color="#9BA0FF"
+                                        />
+                                        <stop
+                                          offset="100%"
+                                          stop-color="#09B1FF"
+                                        />
+                                      </lineargradient>
+                                    </defs>
+                                    <g
+                                      clip-path="url(#history-running-u97npihld-clip)"
+                                    >
+                                      <path
+                                        d="M5.671 4.729L3.738 2.795a.667.667 0 10-.943.943L4.73 5.671a.667.667 0 00.942-.942zM1.333 7.333H4a.667.667 0 110 1.334H1.333a.667.667 0 010-1.334zM5.867 10.8c0 .177-.07.346-.196.471l-1.933 1.933a.667.667 0 11-.943-.942l1.933-1.933a.667.667 0 011.139.471zM7.333 12a.667.667 0 111.334 0v2.667a.667.667 0 11-1.334 0V12zm5.872.262l-1.934-1.933a.667.667 0 00-.942.942l1.933 1.934a.667.667 0 00.943-.943zM12 7.333h2.667a.667.667 0 110 1.334H12a.667.667 0 010-1.334zm1.4-4.066c0 .176-.07.346-.195.471l-1.933 1.933a.667.667 0 01-.943-.942l1.933-1.934a.667.667 0 011.138.472zM7.333 1.333a.667.667 0 111.334 0V4a.667.667 0 01-1.334 0V1.333z"
+                                        fill="var(--color-primary-text-secondary)"
+                                        fill-rule="evenodd"
+                                      />
+                                    </g>
+                                  </svg>
+                                </div>
+                              </div>
+                              <div
+                                style="display: flex; align-items: flex-start; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                              >
+                                <div
+                                  style="flex: 1 1 0%; min-width: 0; overflow: hidden; display: flex; flex-direction: column;"
+                                >
+                                  <div
+                                    data-overflow="false"
+                                    style="position: relative; max-width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      style="white-space: nowrap; font: var(--font-text-body-base); color: var(--color-gray-text-default);"
+                                    >
+                                      代码部署
+                                    </div>
+                                  </div>
+                                  <div
+                                    aria-describedby="test-id"
+                                    style="display: flex; align-items: center; font: var(--font-text-body-xs); color: var(--color-gray-text-secondary); letter-spacing: var(--letter-spacing-body-xs, normal);"
+                                  >
+                                    <div
+                                      style="flex: 1 1 0%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                                    >
+                                      新版本代码部署到生产环境
+                                    </div>
+                                    <div
+                                      class="ant-divider ant-divider-vertical"
+                                      role="separator"
+                                    />
+                                    <span
+                                      style="min-width: 26px;"
+                                    >
+                                      今日
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                              >
+                                <div
+                                  style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                                >
+                                  <div
+                                    style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                                  >
+                                    <div
+                                      class="ant-space ant-space-horizontal ant-space-align-center"
+                                      style="column-gap: 4px; row-gap: 4px;"
+                                    >
+                                      <div
+                                        class="ant-space-item"
+                                      >
+                                        <span
+                                          aria-describedby="test-id"
+                                          aria-label="删除"
+                                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                          data-testid="action-icon-box"
+                                          data-title="删除"
+                                          role="button"
+                                          style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                          tabindex="0"
+                                        >
+                                          <svg
+                                            class="sofa-icons-icon"
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            height="1em"
+                                            style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                            viewBox="0 0 16 16"
+                                            width="1em"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <defs>
+                                              <clippath
+                                                id="Trash2-master_svg0_308_02283"
+                                              >
+                                                <rect
+                                                  height="16"
+                                                  rx="0"
+                                                  width="16"
+                                                />
+                                              </clippath>
+                                            </defs>
+                                            <g
+                                              clip-path="url(#Trash2-master_svg0_308_02283)"
+                                            >
+                                              <path
+                                                d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                                style="mix-blend-mode: passthrough;"
+                                              />
+                                            </g>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style="opacity: 1; transition: opacity 0.2s ease;"
+                                  >
+                                    <span
+                                      style="width: 20px; height: 20px;"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          aria-selected="false"
+                          class="ant-agentic-chat-history-menu-item"
+                          role="menuitem"
+                          tabindex="0"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            <div
+                              style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                            >
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;"
+                              >
+                                <div
+                                  class="ant-agentic-chat-history-menu-task-icon "
+                                >
+                                  💾
+                                </div>
+                              </div>
+                              <div
+                                style="display: flex; align-items: flex-start; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                              >
+                                <div
+                                  style="flex: 1 1 0%; min-width: 0; overflow: hidden; display: flex; flex-direction: column;"
+                                >
+                                  <div
+                                    data-overflow="false"
+                                    style="position: relative; max-width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      style="white-space: nowrap; font: var(--font-text-body-base); color: var(--color-gray-text-default);"
+                                    >
+                                      系统备份
+                                    </div>
+                                  </div>
+                                  <div
+                                    aria-describedby="test-id"
+                                    style="display: flex; align-items: center; font: var(--font-text-body-xs); color: var(--color-gray-text-secondary); letter-spacing: var(--letter-spacing-body-xs, normal);"
+                                  >
+                                    <div
+                                      style="flex: 1 1 0%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                                    >
+                                      定期系统数据备份
+                                    </div>
+                                    <div
+                                      class="ant-divider ant-divider-vertical"
+                                      role="separator"
+                                    />
+                                    <span
+                                      style="min-width: 26px;"
+                                    >
+                                      今日
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                              >
+                                <div
+                                  style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                                >
+                                  <div
+                                    style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                                  >
+                                    <div
+                                      class="ant-space ant-space-horizontal ant-space-align-center"
+                                      style="column-gap: 4px; row-gap: 4px;"
+                                    >
+                                      <div
+                                        class="ant-space-item"
+                                      >
+                                        <span
+                                          aria-describedby="test-id"
+                                          aria-label="删除"
+                                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                          data-testid="action-icon-box"
+                                          data-title="删除"
+                                          role="button"
+                                          style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                          tabindex="0"
+                                        >
+                                          <svg
+                                            class="sofa-icons-icon"
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            height="1em"
+                                            style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                            viewBox="0 0 16 16"
+                                            width="1em"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <defs>
+                                              <clippath
+                                                id="Trash2-master_svg0_308_02283"
+                                              >
+                                                <rect
+                                                  height="16"
+                                                  rx="0"
+                                                  width="16"
+                                                />
+                                              </clippath>
+                                            </defs>
+                                            <g
+                                              clip-path="url(#Trash2-master_svg0_308_02283)"
+                                            >
+                                              <path
+                                                d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                                style="mix-blend-mode: passthrough;"
+                                              />
+                                            </g>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style="opacity: 1; transition: opacity 0.2s ease;"
+                                  >
+                                    <span
+                                      style="width: 20px; height: 20px;"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="ant-agentic-chat-history-menu-submenu"
+                      >
+                        <div
+                          class="ant-agentic-chat-history-menu-item-group"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            1天前
+                          </div>
+                        </div>
+                        <div
+                          aria-selected="false"
+                          class="ant-agentic-chat-history-menu-item"
+                          role="menuitem"
+                          tabindex="0"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            <div
+                              style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                            >
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;"
+                              >
+                                <div
+                                  class="ant-agentic-chat-history-menu-task-icon "
+                                >
+                                  📄
+                                </div>
+                              </div>
+                              <div
+                                style="display: flex; align-items: flex-start; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                              >
+                                <div
+                                  style="flex: 1 1 0%; min-width: 0; overflow: hidden; display: flex; flex-direction: column;"
+                                >
+                                  <div
+                                    data-overflow="false"
+                                    style="position: relative; max-width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      style="white-space: nowrap; font: var(--font-text-body-base); color: var(--color-gray-text-default);"
+                                    >
+                                      报告生成
+                                    </div>
+                                  </div>
+                                  <div
+                                    aria-describedby="test-id"
+                                    style="display: flex; align-items: center; font: var(--font-text-body-xs); color: var(--color-gray-text-secondary); letter-spacing: var(--letter-spacing-body-xs, normal);"
+                                  >
+                                    <div
+                                      style="flex: 1 1 0%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                                    >
+                                      已完成的月度报告
+                                    </div>
+                                    <div
+                                      class="ant-divider ant-divider-vertical"
+                                      role="separator"
+                                    />
+                                    <span
+                                      style="min-width: 26px;"
+                                    >
+                                      昨日
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                              >
+                                <div
+                                  style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                                >
+                                  <div
+                                    style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                                  >
+                                    <div
+                                      class="ant-space ant-space-horizontal ant-space-align-center"
+                                      style="column-gap: 4px; row-gap: 4px;"
+                                    >
+                                      <div
+                                        class="ant-space-item"
+                                      >
+                                        <span
+                                          aria-describedby="test-id"
+                                          aria-label="删除"
+                                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                          data-testid="action-icon-box"
+                                          data-title="删除"
+                                          role="button"
+                                          style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                          tabindex="0"
+                                        >
+                                          <svg
+                                            class="sofa-icons-icon"
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            height="1em"
+                                            style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                            viewBox="0 0 16 16"
+                                            width="1em"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <defs>
+                                              <clippath
+                                                id="Trash2-master_svg0_308_02283"
+                                              >
+                                                <rect
+                                                  height="16"
+                                                  rx="0"
+                                                  width="16"
+                                                />
+                                              </clippath>
+                                            </defs>
+                                            <g
+                                              clip-path="url(#Trash2-master_svg0_308_02283)"
+                                            >
+                                              <path
+                                                d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                                style="mix-blend-mode: passthrough;"
+                                              />
+                                            </g>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style="opacity: 1; transition: opacity 0.2s ease;"
+                                  >
+                                    <span
+                                      style="width: 20px; height: 20px;"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -238,13 +1073,720 @@
                 style="height: 300px; border: 1px solid rgb(240, 240, 240); border-radius: 6px;"
               >
                 <div
-                  agent="[object Object]"
-                  agentid="demo-agent"
-                  data-testid="history"
-                  sessionid="current-session"
-                  type="chat"
+                  style="display: flex; flex-direction: column; height: 100%;"
                 >
-                  history
+                  <div
+                    class="ant-agentic-chat-history-menu-scroll-container"
+                    style="flex: 1 1 0%; overflow: auto; min-height: 0;"
+                  >
+                    <div
+                      aria-label="菜单"
+                      class="ant-agentic-chat-history-menu ant-agentic-chat-history-menu"
+                      role="menu"
+                      tabindex="0"
+                    >
+                      <div
+                        class="ant-agentic-chat-history-menu-submenu"
+                      >
+                        <div
+                          class="ant-agentic-chat-history-menu-item-group"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            今日
+                          </div>
+                        </div>
+                        <div
+                          aria-selected="false"
+                          class="ant-agentic-chat-history-menu-item"
+                          role="menuitem"
+                          tabindex="0"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            <div
+                              style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                            >
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;"
+                              >
+                                <svg
+                                  fill="none"
+                                  height="16"
+                                  style="animation: history-running-u97npihld 2s linear infinite;"
+                                  viewBox="0 0 16 16"
+                                  width="16"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <defs>
+                                    <clippath
+                                      id="history-running-u97npihld-clip"
+                                    >
+                                      <rect
+                                        height="16"
+                                        rx="0"
+                                        width="16"
+                                      />
+                                    </clippath>
+                                    <lineargradient
+                                      id="history-running-u97npihld-gradient"
+                                      x1="-0.17775046825408936"
+                                      x2="0.8258928656578064"
+                                      y1="1"
+                                      y2="-0.11863356828689575"
+                                    >
+                                      <stop
+                                        offset="21.42857164144516%"
+                                        stop-color="#D7B9FF"
+                                      />
+                                      <stop
+                                        offset="62.14284896850586%"
+                                        stop-color="#9BA0FF"
+                                      />
+                                      <stop
+                                        offset="100%"
+                                        stop-color="#09B1FF"
+                                      />
+                                    </lineargradient>
+                                  </defs>
+                                  <g
+                                    clip-path="url(#history-running-u97npihld-clip)"
+                                  >
+                                    <path
+                                      d="M5.671 4.729L3.738 2.795a.667.667 0 10-.943.943L4.73 5.671a.667.667 0 00.942-.942zM1.333 7.333H4a.667.667 0 110 1.334H1.333a.667.667 0 010-1.334zM5.867 10.8c0 .177-.07.346-.196.471l-1.933 1.933a.667.667 0 11-.943-.942l1.933-1.933a.667.667 0 011.139.471zM7.333 12a.667.667 0 111.334 0v2.667a.667.667 0 11-1.334 0V12zm5.872.262l-1.934-1.933a.667.667 0 00-.942.942l1.933 1.934a.667.667 0 00.943-.943zM12 7.333h2.667a.667.667 0 110 1.334H12a.667.667 0 010-1.334zm1.4-4.066c0 .176-.07.346-.195.471l-1.933 1.933a.667.667 0 01-.943-.942l1.933-1.934a.667.667 0 011.138.472zM7.333 1.333a.667.667 0 111.334 0V4a.667.667 0 01-1.334 0V1.333z"
+                                      fill="url(#history-running-u97npihld-gradient)"
+                                      fill-rule="evenodd"
+                                    />
+                                  </g>
+                                </svg>
+                              </div>
+                              <div
+                                style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                              >
+                                <div
+                                  style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                                >
+                                  <div
+                                    data-overflow="false"
+                                    style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                                    >
+                                      聊天: 数据分析任务
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                              >
+                                <div
+                                  style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                                >
+                                  <div
+                                    style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                                  >
+                                    <div
+                                      class="ant-space ant-space-horizontal ant-space-align-center"
+                                      style="column-gap: 4px; row-gap: 4px;"
+                                    >
+                                      <div
+                                        class="ant-space-item"
+                                      >
+                                        <span
+                                          aria-describedby="test-id"
+                                          aria-label="删除"
+                                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                          data-testid="action-icon-box"
+                                          data-title="删除"
+                                          role="button"
+                                          style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                          tabindex="0"
+                                        >
+                                          <svg
+                                            class="sofa-icons-icon"
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            height="1em"
+                                            style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                            viewBox="0 0 16 16"
+                                            width="1em"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <defs>
+                                              <clippath
+                                                id="Trash2-master_svg0_308_02283"
+                                              >
+                                                <rect
+                                                  height="16"
+                                                  rx="0"
+                                                  width="16"
+                                                />
+                                              </clippath>
+                                            </defs>
+                                            <g
+                                              clip-path="url(#Trash2-master_svg0_308_02283)"
+                                            >
+                                              <path
+                                                d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                                style="mix-blend-mode: passthrough;"
+                                              />
+                                            </g>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style="opacity: 1; transition: opacity 0.2s ease;"
+                                  >
+                                    <span
+                                      style="width: 20px; height: 20px;"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          aria-selected="false"
+                          class="ant-agentic-chat-history-menu-item"
+                          role="menuitem"
+                          tabindex="0"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            <div
+                              style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                            >
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;"
+                              >
+                                <svg
+                                  fill="none"
+                                  height="16"
+                                  style="animation: history-running-u97npihld 2s linear infinite;"
+                                  viewBox="0 0 16 16"
+                                  width="16"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <defs>
+                                    <clippath
+                                      id="history-running-u97npihld-clip"
+                                    >
+                                      <rect
+                                        height="16"
+                                        rx="0"
+                                        width="16"
+                                      />
+                                    </clippath>
+                                    <lineargradient
+                                      id="history-running-u97npihld-gradient"
+                                      x1="-0.17775046825408936"
+                                      x2="0.8258928656578064"
+                                      y1="1"
+                                      y2="-0.11863356828689575"
+                                    >
+                                      <stop
+                                        offset="21.42857164144516%"
+                                        stop-color="#D7B9FF"
+                                      />
+                                      <stop
+                                        offset="62.14284896850586%"
+                                        stop-color="#9BA0FF"
+                                      />
+                                      <stop
+                                        offset="100%"
+                                        stop-color="#09B1FF"
+                                      />
+                                    </lineargradient>
+                                  </defs>
+                                  <g
+                                    clip-path="url(#history-running-u97npihld-clip)"
+                                  >
+                                    <path
+                                      d="M5.671 4.729L3.738 2.795a.667.667 0 10-.943.943L4.73 5.671a.667.667 0 00.942-.942zM1.333 7.333H4a.667.667 0 110 1.334H1.333a.667.667 0 010-1.334zM5.867 10.8c0 .177-.07.346-.196.471l-1.933 1.933a.667.667 0 11-.943-.942l1.933-1.933a.667.667 0 011.139.471zM7.333 12a.667.667 0 111.334 0v2.667a.667.667 0 11-1.334 0V12zm5.872.262l-1.934-1.933a.667.667 0 00-.942.942l1.933 1.934a.667.667 0 00.943-.943zM12 7.333h2.667a.667.667 0 110 1.334H12a.667.667 0 010-1.334zm1.4-4.066c0 .176-.07.346-.195.471l-1.933 1.933a.667.667 0 01-.943-.942l1.933-1.934a.667.667 0 011.138.472zM7.333 1.333a.667.667 0 111.334 0V4a.667.667 0 01-1.334 0V1.333z"
+                                      fill="url(#history-running-u97npihld-gradient)"
+                                      fill-rule="evenodd"
+                                    />
+                                  </g>
+                                </svg>
+                              </div>
+                              <div
+                                style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                              >
+                                <div
+                                  style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                                >
+                                  <div
+                                    data-overflow="false"
+                                    style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                                    >
+                                      聊天: 模型训练任务
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                              >
+                                <div
+                                  style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                                >
+                                  <div
+                                    style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                                  >
+                                    <div
+                                      class="ant-space ant-space-horizontal ant-space-align-center"
+                                      style="column-gap: 4px; row-gap: 4px;"
+                                    >
+                                      <div
+                                        class="ant-space-item"
+                                      >
+                                        <span
+                                          aria-describedby="test-id"
+                                          aria-label="删除"
+                                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                          data-testid="action-icon-box"
+                                          data-title="删除"
+                                          role="button"
+                                          style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                          tabindex="0"
+                                        >
+                                          <svg
+                                            class="sofa-icons-icon"
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            height="1em"
+                                            style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                            viewBox="0 0 16 16"
+                                            width="1em"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <defs>
+                                              <clippath
+                                                id="Trash2-master_svg0_308_02283"
+                                              >
+                                                <rect
+                                                  height="16"
+                                                  rx="0"
+                                                  width="16"
+                                                />
+                                              </clippath>
+                                            </defs>
+                                            <g
+                                              clip-path="url(#Trash2-master_svg0_308_02283)"
+                                            >
+                                              <path
+                                                d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                                style="mix-blend-mode: passthrough;"
+                                              />
+                                            </g>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style="opacity: 1; transition: opacity 0.2s ease;"
+                                  >
+                                    <span
+                                      style="width: 20px; height: 20px;"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          aria-selected="false"
+                          class="ant-agentic-chat-history-menu-item"
+                          role="menuitem"
+                          tabindex="0"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            <div
+                              style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                            >
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;"
+                              >
+                                <svg
+                                  fill="none"
+                                  height="16"
+                                  style="animation: history-running-u97npihld 2s linear infinite;"
+                                  viewBox="0 0 16 16"
+                                  width="16"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <defs>
+                                    <clippath
+                                      id="history-running-u97npihld-clip"
+                                    >
+                                      <rect
+                                        height="16"
+                                        rx="0"
+                                        width="16"
+                                      />
+                                    </clippath>
+                                    <lineargradient
+                                      id="history-running-u97npihld-gradient"
+                                      x1="-0.17775046825408936"
+                                      x2="0.8258928656578064"
+                                      y1="1"
+                                      y2="-0.11863356828689575"
+                                    >
+                                      <stop
+                                        offset="21.42857164144516%"
+                                        stop-color="#D7B9FF"
+                                      />
+                                      <stop
+                                        offset="62.14284896850586%"
+                                        stop-color="#9BA0FF"
+                                      />
+                                      <stop
+                                        offset="100%"
+                                        stop-color="#09B1FF"
+                                      />
+                                    </lineargradient>
+                                  </defs>
+                                  <g
+                                    clip-path="url(#history-running-u97npihld-clip)"
+                                  >
+                                    <path
+                                      d="M5.671 4.729L3.738 2.795a.667.667 0 10-.943.943L4.73 5.671a.667.667 0 00.942-.942zM1.333 7.333H4a.667.667 0 110 1.334H1.333a.667.667 0 010-1.334zM5.867 10.8c0 .177-.07.346-.196.471l-1.933 1.933a.667.667 0 11-.943-.942l1.933-1.933a.667.667 0 011.139.471zM7.333 12a.667.667 0 111.334 0v2.667a.667.667 0 11-1.334 0V12zm5.872.262l-1.934-1.933a.667.667 0 00-.942.942l1.933 1.934a.667.667 0 00.943-.943zM12 7.333h2.667a.667.667 0 110 1.334H12a.667.667 0 010-1.334zm1.4-4.066c0 .176-.07.346-.195.471l-1.933 1.933a.667.667 0 01-.943-.942l1.933-1.934a.667.667 0 011.138.472zM7.333 1.333a.667.667 0 111.334 0V4a.667.667 0 01-1.334 0V1.333z"
+                                      fill="url(#history-running-u97npihld-gradient)"
+                                      fill-rule="evenodd"
+                                    />
+                                  </g>
+                                </svg>
+                              </div>
+                              <div
+                                style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                              >
+                                <div
+                                  style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                                >
+                                  <div
+                                    data-overflow="false"
+                                    style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                                    >
+                                      聊天: 代码部署
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                              >
+                                <div
+                                  style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                                >
+                                  <div
+                                    style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                                  >
+                                    <div
+                                      class="ant-space ant-space-horizontal ant-space-align-center"
+                                      style="column-gap: 4px; row-gap: 4px;"
+                                    >
+                                      <div
+                                        class="ant-space-item"
+                                      >
+                                        <span
+                                          aria-describedby="test-id"
+                                          aria-label="删除"
+                                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                          data-testid="action-icon-box"
+                                          data-title="删除"
+                                          role="button"
+                                          style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                          tabindex="0"
+                                        >
+                                          <svg
+                                            class="sofa-icons-icon"
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            height="1em"
+                                            style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                            viewBox="0 0 16 16"
+                                            width="1em"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <defs>
+                                              <clippath
+                                                id="Trash2-master_svg0_308_02283"
+                                              >
+                                                <rect
+                                                  height="16"
+                                                  rx="0"
+                                                  width="16"
+                                                />
+                                              </clippath>
+                                            </defs>
+                                            <g
+                                              clip-path="url(#Trash2-master_svg0_308_02283)"
+                                            >
+                                              <path
+                                                d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                                style="mix-blend-mode: passthrough;"
+                                              />
+                                            </g>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style="opacity: 1; transition: opacity 0.2s ease;"
+                                  >
+                                    <span
+                                      style="width: 20px; height: 20px;"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          aria-selected="false"
+                          class="ant-agentic-chat-history-menu-item"
+                          role="menuitem"
+                          tabindex="0"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            <div
+                              style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                            >
+                              <div
+                                style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                              >
+                                <div
+                                  style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                                >
+                                  <div
+                                    data-overflow="false"
+                                    style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                                    >
+                                      聊天: 系统备份
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                              >
+                                <div
+                                  style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                                >
+                                  <div
+                                    style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                                  >
+                                    <div
+                                      class="ant-space ant-space-horizontal ant-space-align-center"
+                                      style="column-gap: 4px; row-gap: 4px;"
+                                    >
+                                      <div
+                                        class="ant-space-item"
+                                      >
+                                        <span
+                                          aria-describedby="test-id"
+                                          aria-label="删除"
+                                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                          data-testid="action-icon-box"
+                                          data-title="删除"
+                                          role="button"
+                                          style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                          tabindex="0"
+                                        >
+                                          <svg
+                                            class="sofa-icons-icon"
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            height="1em"
+                                            style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                            viewBox="0 0 16 16"
+                                            width="1em"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <defs>
+                                              <clippath
+                                                id="Trash2-master_svg0_308_02283"
+                                              >
+                                                <rect
+                                                  height="16"
+                                                  rx="0"
+                                                  width="16"
+                                                />
+                                              </clippath>
+                                            </defs>
+                                            <g
+                                              clip-path="url(#Trash2-master_svg0_308_02283)"
+                                            >
+                                              <path
+                                                d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                                style="mix-blend-mode: passthrough;"
+                                              />
+                                            </g>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style="opacity: 1; transition: opacity 0.2s ease;"
+                                  >
+                                    <span
+                                      style="width: 20px; height: 20px;"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="ant-agentic-chat-history-menu-submenu"
+                      >
+                        <div
+                          class="ant-agentic-chat-history-menu-item-group"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            昨日
+                          </div>
+                        </div>
+                        <div
+                          aria-selected="false"
+                          class="ant-agentic-chat-history-menu-item"
+                          role="menuitem"
+                          tabindex="0"
+                        >
+                          <div
+                            class="ant-agentic-chat-history-menu-item-content"
+                          >
+                            <div
+                              style="display: flex; justify-content: space-between; gap: 8px; min-width: 140px; align-items: center; width: 100%;"
+                            >
+                              <div
+                                style="display: flex; align-items: center; flex: 1 1 0%; min-width: 0; gap: 8px;"
+                              >
+                                <div
+                                  style="flex: 1 1 0%; min-width: 0; overflow: hidden;"
+                                >
+                                  <div
+                                    data-overflow="false"
+                                    style="position: relative; width: calc(100% - 10px); overflow: hidden; mask-image: none;"
+                                  >
+                                    <div
+                                      aria-describedby="test-id"
+                                      style="white-space: nowrap; font: var(--font-text-body-base); letter-spacing: var(--letter-spacing-body-base, normal); color: var(--color-gray-text-default);"
+                                    >
+                                      聊天: 报告生成
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div
+                                style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
+                              >
+                                <div
+                                  style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                                >
+                                  <div
+                                    style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
+                                  >
+                                    <div
+                                      class="ant-space ant-space-horizontal ant-space-align-center"
+                                      style="column-gap: 4px; row-gap: 4px;"
+                                    >
+                                      <div
+                                        class="ant-space-item"
+                                      >
+                                        <span
+                                          aria-describedby="test-id"
+                                          aria-label="删除"
+                                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                                          data-testid="action-icon-box"
+                                          data-title="删除"
+                                          role="button"
+                                          style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-control-sm);"
+                                          tabindex="0"
+                                        >
+                                          <svg
+                                            class="sofa-icons-icon"
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            height="1em"
+                                            style="vertical-align: -0.125em; font-size: 14px; color: var(--color-gray-text-secondary);"
+                                            viewBox="0 0 16 16"
+                                            width="1em"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <defs>
+                                              <clippath
+                                                id="Trash2-master_svg0_308_02283"
+                                              >
+                                                <rect
+                                                  height="16"
+                                                  rx="0"
+                                                  width="16"
+                                                />
+                                              </clippath>
+                                            </defs>
+                                            <g
+                                              clip-path="url(#Trash2-master_svg0_308_02283)"
+                                            >
+                                              <path
+                                                d="M10 2.667q0-.224-.221-.446Q9.557 2 9.333 2H6.667q-.224 0-.446.221Q6 2.443 6 2.667v.666h4zm1.333.666v-.666q0-.777-.612-1.388Q10.11.667 9.333.667H6.667q-.777 0-1.388.612-.612.611-.612 1.388v.666H2a.667.667 0 1 0 0 1.334h.667v8.666q0 .776.612 1.388.611.612 1.388.612h6.666q.776 0 1.388-.612t.612-1.388V4.667H14a.667.667 0 0 0 0-1.334zm-.666 1.334H4v8.666q0 .224.221.446.222.22.446.22h6.666q.224 0 .446-.22.221-.222.221-.446V4.667zm-3.334 6.666v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 1 0 1.333 0m2.667 0v-4a.667.667 0 0 0-1.333 0v4a.667.667 0 0 0 1.333 0"
+                                                style="mix-blend-mode: passthrough;"
+                                              />
+                                            </g>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    style="opacity: 1; transition: opacity 0.2s ease;"
+                                  >
+                                    <span
+                                      style="width: 20px; height: 20px;"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

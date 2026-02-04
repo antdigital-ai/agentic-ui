@@ -1,9 +1,11 @@
-import { memo, MutableRefObject } from 'react';
+import { memo, MutableRefObject, useMemo } from 'react';
 
-import React, { useMemo } from 'react';
+import React from 'react';
+import { debugInfo } from '../Utils/debugUtils';
 import { AIBubble } from './AIBubble';
-import { UserBubble } from './UserBubble';
+import { useSchemaEditorBridge } from './schema-editor';
 import type { BubbleProps } from './type';
+import { UserBubble } from './UserBubble';
 
 /**
  * Bubble 组件 - 聊天气泡组件（智能分发器）
@@ -28,7 +30,6 @@ import type { BubbleProps } from './type';
  * @param {any[]} [props.deps] - 依赖数组
  * @param {MutableRefObject} [props.bubbleRef] - 气泡引用
  * @param {MessageBubbleData} [props.originData] - 消息数据，包含角色信息
- *
  * @example
  * ```tsx
  * // 用户消息会自动使用 UserBubble
@@ -42,35 +43,75 @@ import type { BubbleProps } from './type';
  *   originData={{ role: 'assistant', content: '你好！有什么可以帮助你的吗？' }}
  *   avatar={{ avatar: "ai.jpg", title: "AI助手" }}
  * />
+ *
+ * // Schema Editor 在开发环境下自动启用
+ * // 需要传入 id 以支持插件识别
+ * <Bubble
+ *   id="msg-1"
+ *   originData={{ id: 'msg-1', role: 'assistant', originContent: '# Hello' }}
+ * />
  * ```
  *
  * @returns {React.ReactElement} 渲染的聊天气泡组件
  */
-export const Bubble: React.FC<
+const BubbleComponent: React.FC<
   BubbleProps & {
     deps?: any[];
     bubbleRef?: MutableRefObject<any | undefined>;
   }
-> = memo((props) => {
-  // 根据角色自动选择组件
-  const isUserMessage = useMemo(() => {
-    if (props.placement === undefined) {
-      return props.originData?.role === 'user';
-    }
-    return props.placement === 'right';
-  }, [props.placement, props.originData?.role]);
+> = (props) => {
+  const { originData } = props;
+  const isStringContent = typeof originData?.content === 'string';
 
-  // 自动设置正确的 placement，确保类型安全
+  // Schema Editor Bridge - 开发环境自动启用
+  const { content } = useSchemaEditorBridge(
+    props.id,
+    isStringContent ? (originData.content as string) : '',
+  );
+
+  debugInfo('useSchemaEditorBridge', content);
+
+  // 根据角色自动选择组件
+  const isUserMessage =
+    props.placement === undefined
+      ? originData?.role === 'user'
+      : props.placement === 'right';
+
+  // 稳定 originData 引用
+  const memoizedOriginData = useMemo(
+    () =>
+      originData
+        ? { ...originData, ...(isStringContent && { content }) }
+        : undefined,
+    [originData, isStringContent, originData?.isLast, content],
+  );
+
+  // 计算 placement
+  const placement = props.placement || (isUserMessage ? 'right' : 'left');
+
+  // 构建传递给子组件的 props（避免使用 useMemo，因为 props 对象每次都会变化）
   const bubbleProps = {
     ...props,
-    placement:
-      props.placement ||
-      ((isUserMessage ? 'right' : 'left') as 'left' | 'right'),
+    placement,
+    originData: memoizedOriginData,
   };
-  // 根据角色分发到对应的子组件
+
+  debugInfo('bubbleProps', {
+    isUserMessage,
+    bubbleProps,
+  });
+
+  // 使用提前返回优化
   if (isUserMessage) {
-    return <UserBubble {...bubbleProps} pure={false} />;
+    return (
+      <UserBubble {...bubbleProps} pure={false} {...props.userBubbleProps} />
+    );
   }
 
-  return <AIBubble {...bubbleProps} />;
-});
+  return <AIBubble {...bubbleProps} {...props.aIBubbleProps} />;
+};
+
+BubbleComponent.displayName = 'Bubble';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+export const Bubble = memo(BubbleComponent);

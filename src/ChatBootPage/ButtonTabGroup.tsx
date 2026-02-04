@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import ButtonTab from './ButtonTab';
 import { useStyle } from './ButtonTabGroupStyle';
 
@@ -30,7 +30,7 @@ export interface ButtonTabGroupProps {
   prefixCls?: string;
 }
 
-const ButtonTabGroup: React.FC<ButtonTabGroupProps> = ({
+const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
   items = [],
   activeKey,
   defaultActiveKey,
@@ -46,15 +46,19 @@ const ButtonTabGroup: React.FC<ButtonTabGroupProps> = ({
   const currentActiveKey =
     activeKey !== undefined ? activeKey : internalActiveKey;
 
-  const handleTabClick = (key: string, disabled?: boolean) => {
-    if (disabled) return;
+  // 使用 useCallback 优化点击处理函数
+  const handleTabClick = useCallback(
+    (key: string, disabled?: boolean) => {
+      if (disabled) return;
 
-    if (activeKey === undefined) {
-      setInternalActiveKey(key);
-    }
+      if (activeKey === undefined) {
+        setInternalActiveKey(key);
+      }
 
-    onChange?.(key);
-  };
+      onChange?.(key);
+    },
+    [activeKey, onChange],
+  );
 
   return wrapSSR(
     <div
@@ -77,5 +81,10 @@ const ButtonTabGroup: React.FC<ButtonTabGroupProps> = ({
     </div>,
   );
 };
+
+ButtonTabGroupComponent.displayName = 'ButtonTabGroup';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+const ButtonTabGroup = memo(ButtonTabGroupComponent);
 
 export default ButtonTabGroup;

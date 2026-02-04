@@ -148,7 +148,7 @@ export const FloatBar = (props: { readonly: boolean }) => {
         className={classNames(baseClassName, hashId)}
       >
         {props.readonly ? (
-          <ReadonlyBaseBar prefix={baseClassName} hashId={hashId} />
+          <ReadonlyBaseBar prefix={baseClassName} />
         ) : (
           <BaseToolBar prefix={baseClassName} hashId={hashId} />
         )}

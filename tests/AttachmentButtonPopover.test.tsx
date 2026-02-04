@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { enLabels } from '../src/I18n';
 import AttachmentButtonPopover, {
   AttachmentSupportedFormatsContent,
   SupportedFileFormats,
@@ -62,6 +63,50 @@ describe('AttachmentButtonPopover', () => {
       expect(screen.getByText(/jpg, jpeg, png, gif/)).toBeInTheDocument();
     });
 
+    it('should use custom format message when locale.input.supportedFormatMessage is provided', () => {
+      render(
+        <AttachmentSupportedFormatsContent
+          supportedFormat={SupportedFileFormats.image}
+          locale={{
+            'input.supportedFormatMessage':
+              'Max ${maxSize}, formats: ${extensions}.',
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByText(/Max 10 MB, formats: jpg, jpeg, png, gif\./),
+      ).toBeInTheDocument();
+    });
+
+    it('should fallback to default format message when locale has no input.supportedFormatMessage', () => {
+      render(
+        <AttachmentSupportedFormatsContent
+          supportedFormat={SupportedFileFormats.document}
+          locale={{ 'input.openGallery': 'Other key only' }}
+        />,
+      );
+
+      expect(screen.getByText(/每个文件不超过/)).toBeInTheDocument();
+      expect(screen.getByText(/pdf/)).toBeInTheDocument();
+    });
+
+    it('should use English format message when locale has enLabels input.supportedFormatMessage', () => {
+      const enTemplate = enLabels['input.supportedFormatMessage'];
+      render(
+        <AttachmentSupportedFormatsContent
+          supportedFormat={SupportedFileFormats.image}
+          locale={{ 'input.supportedFormatMessage': enTemplate }}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          /Supports file upload, each file not exceeding 10 MB, formats such as jpg, jpeg, png, gif\./,
+        ),
+      ).toBeInTheDocument();
+    });
+
     it('should render document format content', () => {
       render(
         <AttachmentSupportedFormatsContent
@@ -111,6 +156,10 @@ describe('AttachmentButtonPopover', () => {
   });
 
   describe('AttachmentButtonPopover Component', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
     it('should render popover with children when format provided', () => {
       render(
         <AttachmentButtonPopover supportedFormat={SupportedFileFormats.image}>
@@ -158,6 +207,65 @@ describe('AttachmentButtonPopover', () => {
       // The popover should be rendered (we can check for the presence of the trigger)
       expect(container.querySelector('.ant-popover')).toBeFalsy(); // Popover content is not visible by default
       expect(screen.getByText('Upload File')).toBeInTheDocument();
+    });
+
+    describe('locale prop', () => {
+      it('should render without error when locale is provided', () => {
+        const { container } = render(
+          <AttachmentButtonPopover
+            supportedFormat={SupportedFileFormats.image}
+            locale={{
+              'input.openGallery': 'Open Gallery',
+              'input.openFile': 'Open File',
+              'input.supportedFormatMessage':
+                'Custom: ${maxSize}, exts ${extensions}',
+            }}
+          >
+            <button type="button">Attach</button>
+          </AttachmentButtonPopover>,
+        );
+
+        expect(container).toBeInTheDocument();
+        expect(screen.getByText('Attach')).toBeInTheDocument();
+      });
+    });
+
+    describe('uploadImage prop', () => {
+      it('应该在没有 uploadImage 时不会报错', () => {
+        const { container } = render(
+          <AttachmentButtonPopover>
+            <button type="button">Upload</button>
+          </AttachmentButtonPopover>,
+        );
+
+        expect(container).toBeInTheDocument();
+        expect(screen.getByText('Upload')).toBeInTheDocument();
+      });
+
+      it('应该在 uploadImage 为 undefined 时正常渲染', () => {
+        const { container } = render(
+          <AttachmentButtonPopover uploadImage={undefined}>
+            <button type="button">Upload</button>
+          </AttachmentButtonPopover>,
+        );
+
+        expect(container).toBeInTheDocument();
+        expect(screen.getByText('Upload')).toBeInTheDocument();
+      });
+
+      it('应该正确传递 uploadImage 函数', () => {
+        const mockUploadImage = vi.fn().mockResolvedValue(undefined);
+
+        render(
+          <AttachmentButtonPopover uploadImage={mockUploadImage}>
+            <button type="button">Upload</button>
+          </AttachmentButtonPopover>,
+        );
+
+        expect(screen.getByText('Upload')).toBeInTheDocument();
+        // uploadImage 函数应该被正确传递，但只有在特定设备上才会被调用
+        expect(mockUploadImage).not.toHaveBeenCalled();
+      });
     });
   });
 

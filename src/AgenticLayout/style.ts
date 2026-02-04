@@ -46,11 +46,17 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         border: 'none !important',
       },
 
+      // 右侧边栏包装器
+      [`&-sidebar-wrapper-right`]: {
+        display: 'flex',
+        alignItems: 'stretch',
+        height: '100%',
+      },
+
       // 右侧边栏特殊样式
       [`&-sidebar-right`]: {
         borderRight: 'none',
         height: '100%',
-        marginLeft: 8,
       },
 
       // 折叠状态样式
@@ -64,6 +70,32 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         [`${token.componentCls}-sidebar-content`]: {
           display: 'none',
+        },
+      },
+
+      // 拖拽手柄样式
+      [`&-resize-handle`]: {
+        width: '6px',
+        cursor: 'col-resize',
+        backgroundColor: 'transparent',
+        position: 'relative',
+        zIndex: 10,
+        flexShrink: 0,
+        marginLeft: '1px',
+        marginRight: '1px',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          left: '50%',
+          top: 0,
+          bottom: 0,
+          width: '6px',
+          backgroundColor: 'transparent',
+          transform: 'translateX(-50%)',
+          transition: 'background-color 0.2s ease',
+        },
+        '&:hover::before': {
+          backgroundColor: 'var(--color-primary-9, #1d7afc)',
         },
       },
 

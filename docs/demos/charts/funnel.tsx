@@ -182,7 +182,7 @@ const FunnelDemo: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h2 style={{ marginBottom: 16 }}>漏斗图使用示例</h2>
       <div style={{ marginBottom: 16 }}>
         <Button type="primary" onClick={handleShuffle}>

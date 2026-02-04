@@ -1,7 +1,7 @@
 ---
 nav:
   title: Demo
-  order: 2
+  order: 5
 group:
   title: 通用
   order: 7
@@ -16,21 +16,41 @@ group:
 <code src="../demos/charts/donut/donut-multi.tsx" background="var(--main-bg-color)"  title="多值饼图" iframe=540></code>
 <code src="../demos/charts/donut/donut-multi-categorized.tsx" background="var(--main-bg-color)"  title="带分类的多值饼图" iframe=400></code>
 
+<code src="../demos/charts/donut/donut-statistic.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/donut/donut-toolbar-filter.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 ## 折线图
 
 <code src="../demos/charts/line.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/line-statistic.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/line-toolbar-filter.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ## 面积图
 
 <code src="../demos/charts/area.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+<code src="../demos/charts/area-statistic.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/area-toolbar-filter.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 ## 雷达图
 
 <code src="../demos/charts/radar.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+<code src="../demos/charts/radar-statistic.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/radar-toolbar-filter.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 ## 散点图
 
 <code src="../demos/charts/scatter.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/scatter-statistic.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/scatter-toolbar-filter.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ## 柱状图
 
@@ -52,9 +72,23 @@ group:
 
 <code src="../demos/charts/bar/bar-horizontal-stacked.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+### 柱状图扩展
+
+<code src="../demos/charts/bar/bar-with-labels.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/bar/bar-with-statistic.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/bar/bar-max-thickness.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 ## 漏斗图
 
 <code src="../demos/charts/funnel.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/funnel-statistic.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/funnel-toolbar-filter.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+<code src="../demos/charts/funnelWithMinWidthBottom.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ## 指标卡
 
@@ -65,3 +99,7 @@ group:
 ## 带指标卡的图表
 
 <code src="../demos/charts/chartWithStatic.tsx" background="var(--main-bg-color)" iframe=1000></code>
+
+## Mermaid 图表
+
+<code src="../demos/charts/mermaid.tsx" background="var(--main-bg-color)" iframe=540></code>

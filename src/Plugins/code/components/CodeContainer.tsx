@@ -68,13 +68,11 @@ export function CodeContainer({
           height: hide ? 0 : 'auto',
           opacity: hide ? 0 : 1,
         }}
+        data-frontmatter={safeElement.frontmatter ? '' : undefined}
         className={classNames(
           'ace-container',
           'code-editor-container',
           'drag-el',
-          {
-            frontmatter: safeElement.frontmatter,
-          },
         )}
       >
         {children}

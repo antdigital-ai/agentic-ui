@@ -1,7 +1,7 @@
 import { DownloadOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
-import classNames from 'classnames';
-import { default as React, useContext } from 'react';
+import React, { useContext } from 'react';
+import { Loading } from '../../../../Components/Loading';
 import { I18nContext } from '../../../../I18n';
 import TimeIcon from '../icons/TimeIcon';
 import { useStyle } from './style';
@@ -42,6 +42,10 @@ export interface ChartToolBarProps {
   dataTime?: string;
   /** 自定义CSS类名 */
   className?: string;
+  /** 自定义CSS类名（支持多个类名） */
+  classNames?: string | string[] | Record<string, boolean | undefined>;
+  /** 样式对象 */
+  style?: React.CSSProperties;
   /** 图表主题 */
   theme?: 'light' | 'dark';
   /** 下载回调函数 */
@@ -50,6 +54,10 @@ export interface ChartToolBarProps {
   extra?: React.ReactNode;
   /** 过滤器内容 */
   filter?: React.ReactNode;
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
+  /** 自定义样式对象（支持多个样式对象） */
+  styles?: React.CSSProperties | React.CSSProperties[];
 }
 
 /**
@@ -79,10 +87,14 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
   title,
   dataTime,
   className = '',
+  classNames,
+  style,
+  styles,
   theme = 'light',
   onDownload,
   extra,
   filter,
+  loading = false,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const i18n = useContext(I18nContext);
@@ -99,28 +111,58 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
     return null;
   }
 
+  const mergedClassName = [
+    prefixCls,
+    `${prefixCls}-${theme}`,
+    hashId,
+    className,
+    classNames,
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const mergedStyle = {
+    ...style,
+    ...(Array.isArray(styles) ? Object.assign({}, ...styles) : styles || {}),
+  };
+
   return wrapSSR(
-    <div
-      className={classNames(
-        prefixCls,
-        `${prefixCls}-${theme}`,
-        hashId,
-        className,
-      )}
-    >
+    <div className={mergedClassName} style={mergedStyle}>
       {/* 左侧标题 */}
-      <div className={classNames(`${prefixCls}-header-title`, hashId)}>
+      <div
+        className={[`${prefixCls}-header-title`, hashId]
+          .filter(Boolean)
+          .join(' ')}
+      >
         {title}
+        {loading && (
+          <Loading
+            style={{
+              fontSize: '14px',
+              marginLeft: '8px',
+              flexShrink: 0,
+            }}
+          />
+        )}
       </div>
 
       {/* 右侧时间+下载按钮 */}
-      <div className={classNames(`${prefixCls}-header-actions`, hashId)}>
+      <div
+        className={[`${prefixCls}-header-actions`, hashId]
+          .filter(Boolean)
+          .join(' ')}
+      >
         {dataTime ? (
           <>
             <TimeIcon
-              className={classNames(`${prefixCls}-time-icon`, hashId)}
+              className={[`${prefixCls}-time-icon`, hashId]
+                .filter(Boolean)
+                .join(' ')}
             />
-            <span className={classNames(`${prefixCls}-data-time`, hashId)}>
+            <span
+              className={[`${prefixCls}-data-time`, hashId]
+                .filter(Boolean)
+                .join(' ')}
+            >
               {i18n?.locale?.dataTime || '数据时间'}: {dataTime}
             </span>
           </>
@@ -133,7 +175,9 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
             title={i18n?.locale?.download || '下载'}
           >
             <DownloadOutlined
-              className={classNames(`${prefixCls}-download-btn`, hashId)}
+              className={[`${prefixCls}-download-btn`, hashId]
+                .filter(Boolean)
+                .join(' ')}
               onClick={handleDownload}
             />
           </Tooltip>

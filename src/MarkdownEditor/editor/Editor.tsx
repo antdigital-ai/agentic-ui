@@ -1,13 +1,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/no-children-prop */
+import { useDebounceFn } from '@ant-design/pro-components';
 import classNames from 'classnames';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
   BaseRange,
@@ -17,8 +12,17 @@ import {
   Range,
   Transforms,
 } from 'slate';
+import {
+  Editable,
+  ReactEditor,
+  RenderElementProps,
+  RenderLeafProps,
+  Slate,
+} from 'slate-react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { parserMdToSchema } from '../BaseMarkdownEditor';
 import { Elements } from '../el';
+import { PluginContext } from '../plugin';
 import {
   CommentDataType,
   MarkdownEditorInstance,
@@ -26,11 +30,6 @@ import {
 } from '../types';
 import { LazyElement } from './components/LazyElement';
 import { MElement, MLeaf } from './elements';
-
-import { useDebounceFn } from '@ant-design/pro-components';
-import { Editable, ReactEditor, RenderElementProps, Slate } from 'slate-react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
-import { PluginContext } from '../plugin';
 import {
   handleFilesPaste,
   handleHtmlPaste,
@@ -57,6 +56,14 @@ import {
   isPath,
 } from './utils/editorUtils';
 
+// 默认允许的类型
+const defaultAllowedTypes = [
+  'application/x-slate-md-fragment',
+  'text/html',
+  'Files',
+  'text/markdown',
+  'text/plain',
+];
 /**
  * Markdown 编辑器组件的属性接口
  *
@@ -168,7 +175,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
   const hasResetIndexRef = useRef(false);
 
   // 计算懒加载元素总数的函数
-  const countLazyElements = useCallback((nodes: any[]): number => {
+  const countLazyElements = useRefFunction((nodes: any[]): number => {
     let count = 0;
     const traverse = (nodeList: any[]) => {
       nodeList.forEach((node) => {
@@ -184,7 +191,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
     };
     traverse(nodes);
     return count;
-  }, []);
+  });
 
   const changedMark = useRef(false);
   const value = useRef<any[]>([EditorUtils.p]);
@@ -247,6 +254,15 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
 
   const handleSelectionChange = useDebounceFn(
     async (e: React.ReactEventHandler<HTMLDivElement>) => {
+      // 只读且不需要选区（无 onSelectionChange、无 FloatBar）时，跳过选区同步与 DOM 测量，提升性能
+      if (
+        readonly &&
+        !props.onSelectionChange &&
+        (!props.reportMode || props.floatBar?.enable === false)
+      ) {
+        setDomRect?.(null);
+        return;
+      }
       const currentSelection = markdownEditorRef.current.selection;
 
       // 获取选中内容的 markdown 和节点
@@ -660,18 +676,12 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
       }
     }
 
-    props.onPaste?.(event);
+    const result = props.onPaste?.(event);
+    if (result === false) {
+      return;
+    }
 
     const types = event.clipboardData?.types || ['text/plain'];
-
-    // 默认允许的类型
-    const defaultAllowedTypes = [
-      'application/x-slate-md-fragment',
-      'text/html',
-      'Files',
-      'text/markdown',
-      'text/plain',
-    ];
 
     // 获取允许的类型
     const allowedTypes = pasteConfig?.allowedTypes || defaultAllowedTypes;
@@ -694,13 +704,12 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
 
     // 2. 然后尝试处理 HTML
     if (types.includes('text/html') && allowedTypes.includes('text/html')) {
-      if (
-        await handleHtmlPaste(
-          markdownEditorRef.current,
-          event.clipboardData,
-          props,
-        )
-      ) {
+      const result = await handleHtmlPaste(
+        markdownEditorRef.current,
+        event.clipboardData,
+        props,
+      );
+      if (result === false) {
         return;
       }
     }
@@ -787,7 +796,9 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
    * 处理输入法开始事件
    */
   const onCompositionStart = (e: React.CompositionEvent) => {
-    markdownContainerRef.current?.classList.add('composition');
+    if (markdownContainerRef.current) {
+      markdownContainerRef.current.setAttribute('data-composition', '');
+    }
     store.inputComposition = true;
 
     const focusPath = markdownEditorRef.current.selection?.focus.path || [];
@@ -799,9 +810,10 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
       if (node) {
         const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
         if (dom) {
-          dom
-            .querySelector('.tag-popup-input')
-            ?.classList.add('tag-popup-input-composition');
+          const tagInput = dom.querySelector('[data-tag-popup-input]');
+          if (tagInput) {
+            tagInput.setAttribute('data-composition', '');
+          }
         }
       }
     }
@@ -819,7 +831,9 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
    */
   const onCompositionEnd = () => {
     store.inputComposition = false;
-    markdownContainerRef.current?.classList.remove('composition');
+    if (markdownContainerRef.current) {
+      markdownContainerRef.current.removeAttribute('data-composition');
+    }
 
     const focusPath = markdownEditorRef.current.selection?.focus.path || [];
     if (focusPath.length > 0) {
@@ -830,15 +844,16 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
       if (node) {
         const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
         if (dom) {
-          dom
-            .querySelector('.tag-popup-input')
-            ?.classList.remove('tag-popup-input-composition');
+          const tagInput = dom.querySelector('[data-tag-popup-input]');
+          if (tagInput) {
+            tagInput.removeAttribute('data-composition');
+          }
         }
       }
     }
   };
 
-  const elementRenderElement = useCallback(
+  const elementRenderElement = useRefFunction(
     (eleProps: RenderElementProps) => {
       // 在每个渲染周期的第一次调用时重置索引
       if (!hasResetIndexRef.current) {
@@ -860,6 +875,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
             {...eleProps}
             children={eleProps.children}
             readonly={readonly}
+            deps={props.deps}
           />
         </ErrorBoundary>
       );
@@ -922,36 +938,39 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
 
       return renderedDom;
     },
-    [props.eleItemRender, props.lazy, plugins, readonly, countLazyElements],
   );
 
-  const renderMarkdownLeaf = useRefFunction((leafComponentProps) => {
-    const defaultDom = (
-      <MLeaf
-        {...leafComponentProps}
-        fncProps={props.fncProps}
-        comment={props?.comment}
-        children={leafComponentProps.children}
-        hashId={hashId}
-        tagInputProps={props.tagInputProps}
-      />
-    );
+  const renderMarkdownLeaf = useRefFunction(
+    (leafComponentProps: RenderLeafProps) => {
+      const defaultDom = (
+        <MLeaf
+          {...leafComponentProps}
+          fncProps={props.fncProps}
+          comment={props?.comment}
+          children={leafComponentProps.children}
+          tagInputProps={props.tagInputProps}
+          linkConfig={props.linkConfig}
+          readonly={readonly}
+        />
+      );
 
-    if (!props.leafRender) return defaultDom;
+      if (!props.leafRender) return defaultDom;
 
-    return props.leafRender(
-      {
-        ...leafComponentProps,
-        fncProps: props.fncProps,
-        comment: props?.comment,
-        hashId: hashId,
-        tagInputProps: props.tagInputProps,
-      },
-      defaultDom,
-    ) as React.ReactElement;
-  });
+      return props.leafRender(
+        {
+          ...leafComponentProps,
+          fncProps: props.fncProps,
+          comment: props?.comment,
+          hashId: hashId,
+          tagInputProps: props.tagInputProps,
+        },
+        defaultDom,
+      ) as React.ReactElement;
+    },
+  );
 
   const decorateFn = (e: any) => {
+    // 始终运行 useHighlight，以支持 fnc（脚注）、链接等基础展示
     const decorateList: any[] | undefined = high(e) || [];
     if (!props?.comment) return decorateList;
     if (props?.comment?.enable === false) return decorateList;
@@ -1102,11 +1121,20 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
     }
   };
 
+  // 在 SSR 环境下，如果有 initSchemaValue，直接使用它作为初始值
+  // 因为 useEffect 在 SSR 环境下不会执行，initialNote 不会被调用
+  const initialValue = useMemo(() => {
+    if (props.initSchemaValue?.length) {
+      return props.initSchemaValue;
+    }
+    return [EditorUtils.p];
+  }, [props.initSchemaValue]);
+
   return wrapSSR(
     <>
       <Slate
         editor={markdownEditorRef.current}
-        initialValue={[EditorUtils.p]}
+        initialValue={initialValue}
         onChange={onSlateChange}
       >
         <Editable
@@ -1129,17 +1157,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
             },
             hashId,
           )}
-          style={
-            props.reportMode
-              ? {
-                  fontSize: 16,
-                  ...props.style,
-                }
-              : {
-                  fontSize: 14,
-                  ...props.style,
-                }
-          }
+          style={props.style}
           onSelect={handleSelectionChange.run}
           onCut={(event: React.ClipboardEvent<HTMLDivElement>) => {
             const handled = handleClipboardCopy(event, 'cut');
@@ -1171,8 +1189,8 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
             }
           }}
           renderElement={elementRenderElement}
-          onKeyDown={handleKeyDown}
           renderLeaf={renderMarkdownLeaf}
+          onKeyDown={handleKeyDown}
         />
       </Slate>
     </>,

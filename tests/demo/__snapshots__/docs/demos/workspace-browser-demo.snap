@@ -9,10 +9,75 @@
       style="height: 600px; width: 100%;"
     >
       <div
+        class="ant-workspace"
         data-testid="workspace"
-        title="浏览器工作空间"
       >
-        workspace
+        <div
+          class="ant-workspace-header"
+          data-testid="workspace-header"
+        >
+          <div
+            class="ant-workspace-title"
+            data-testid="workspace-title"
+          >
+            浏览器工作空间
+          </div>
+        </div>
+        <div
+          class="ant-workspace-content"
+          data-testid="workspace-content"
+        >
+          <div
+            class="ant-workspace-browser"
+            data-testid="browser-list"
+          >
+            <div
+              class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
+              style="width: 100%; height: auto; display: flex; flex-direction: column; max-height: 100%; font: var(--font-text-paragraph-lg); letter-spacing: var(--letter-spacing-paragraph-lg, normal); color: var(--color-gray-text-default);"
+            >
+              <div
+                class="ant-agentic-md-editor-container"
+                style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none; --content-padding: 0px; padding: 0px;"
+                tabindex="-1"
+              >
+                <div
+                  autocapitalize="false"
+                  autocorrect="false"
+                  class="ant-agentic-md-editor-content ant-agentic-md-editor-content-readonly"
+                  contenteditable="false"
+                  data-slate-editor="true"
+                  data-slate-node="value"
+                  spellcheck="false"
+                  style="position: relative; white-space: pre-wrap; word-wrap: break-word; font-size: 14px;"
+                  zindex="-1"
+                >
+                  <div
+                    class=""
+                    data-be="paragraph"
+                    data-drag-el="true"
+                    data-slate-node="element"
+                  >
+                    <span
+                      data-slate-node="text"
+                    >
+                      <span
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                          浏览器数据内容
+                        </span>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

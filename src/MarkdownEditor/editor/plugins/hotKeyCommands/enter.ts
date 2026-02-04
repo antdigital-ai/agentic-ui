@@ -184,6 +184,8 @@ export class EnterKey {
           );
         } else if (!Path.hasPrevious(path)) {
           e.preventDefault();
+          // 在列表项开头按回车时，只创建新的空列表项，不移动任何节点
+          // 这样可以避免将嵌套列表或其他节点移动到新列表项内部，导致缩进
           Transforms.insertNodes(
             this.editor,
             {
@@ -193,9 +195,6 @@ export class EnterKey {
             },
             { at: Path.next(parentPath), select: true },
           );
-          let cur = Path.next(path);
-          let index = 1;
-          EditorUtils.moveNodes(this.editor, cur, Path.next(parentPath), index);
         }
       }
     }
@@ -446,14 +445,8 @@ export class EnterKey {
           );
         }
 
-        if (Editor.hasPath(this.editor, Path.next(node[1]))) {
-          EditorUtils.moveNodes(
-            this.editor,
-            Path.next(node[1]),
-            Path.next(parent[1]),
-            1,
-          );
-        }
+        // 不再移动任何节点到新列表项内部，避免导致新列表项被缩进
+        // 嵌套列表应该保留在原列表项中
         return true;
       }
     }

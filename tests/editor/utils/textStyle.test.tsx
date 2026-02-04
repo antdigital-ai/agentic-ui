@@ -73,6 +73,7 @@ describe('textStyle function - tag and value handling', () => {
     ];
 
     const markdown = parserSlateNodeToMarkdown(schema);
+    // value 优先级高于 text，即使有 text 也使用 value
     expect(markdown).toBe('`${placeholder:请输入姓名,value:李四}`');
   });
 

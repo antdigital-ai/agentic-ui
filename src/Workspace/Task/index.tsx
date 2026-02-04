@@ -1,21 +1,32 @@
-import { Loading } from '../../Components/Loading';
 import { Check, CircleDashed, OctagonX } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { type FC, useContext } from 'react';
+import { LoadingEffect } from '../../Components/effects';
 import { useTaskStyle } from './style';
 
+type TaskStatus = 'success' | 'pending' | 'loading' | 'error';
+
+export interface TaskItem {
+  key: string;
+  title?: React.ReactNode;
+  content?: React.ReactNode | React.ReactNode[];
+  status: TaskStatus;
+}
+
 export interface TaskItemInput {
-  items: {
-    key: string;
-    title?: string;
-    content?: React.ReactNode | React.ReactNode[];
-    status: 'success' | 'pending' | 'loading' | 'error';
-  }[];
+  items: TaskItem[];
+}
+
+export interface TaskListProps {
+  /** 任务列表数据 */
+  data: TaskItemInput;
+  /** 点击任务项时的回调 */
+  onItemClick?: (item: TaskItem) => void;
 }
 
 const StatusIcon: FC<{
-  status: 'success' | 'pending' | 'loading' | 'error';
+  status: TaskStatus;
 }> = ({ status }) => {
   switch (status) {
     case 'success':
@@ -27,7 +38,14 @@ const StatusIcon: FC<{
         <OctagonX style={{ color: 'var(--color-red-control-fill-primary)' }} />
       );
     case 'loading':
-      return <Loading style={{ color: 'var(--color-gray-text-disabled)' }} />;
+      return (
+        <LoadingEffect
+          style={{
+            color: 'var(--color-gray-text-disabled)',
+            transform: 'scale(1.1)',
+          }}
+        />
+      );
     case 'pending':
     default:
       return (
@@ -36,10 +54,14 @@ const StatusIcon: FC<{
   }
 };
 
-export const TaskList: FC<{ data: TaskItemInput }> = ({ data }) => {
+export const TaskList: FC<TaskListProps> = ({ data, onItemClick }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-workspace-task');
   const { wrapSSR, hashId } = useTaskStyle(prefixCls);
+
+  const handleItemClick = (item: TaskItem) => {
+    onItemClick?.(item);
+  };
 
   return wrapSSR(
     <div className={classNames(prefixCls, hashId)} data-testid="task-list">
@@ -51,6 +73,20 @@ export const TaskList: FC<{ data: TaskItemInput }> = ({ data }) => {
             `${prefixCls}-item-${item.status}`,
             hashId,
           )}
+          role={onItemClick ? 'button' : undefined}
+          tabIndex={onItemClick ? 0 : undefined}
+          onClick={onItemClick ? () => handleItemClick(item) : undefined}
+          onKeyDown={
+            onItemClick
+              ? (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleItemClick(item);
+                  }
+                }
+              : undefined
+          }
+          style={{ cursor: onItemClick ? 'pointer' : undefined }}
         >
           <div className={classNames(`${prefixCls}-status`, hashId)}>
             <StatusIcon status={item.status} />

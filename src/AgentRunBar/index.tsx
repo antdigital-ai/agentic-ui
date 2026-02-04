@@ -2,7 +2,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Button, ConfigProvider, Tooltip, Typography } from 'antd';
 import classNames from 'classnames';
 import { motion } from 'framer-motion';
-import React, { useContext, useMemo } from 'react';
+import React, { memo, useContext, useMemo } from 'react';
 import { I18nContext } from '../I18n';
 import {
   PauseIcon,
@@ -14,6 +14,7 @@ import {
 } from './icons';
 import Robot from './Robot';
 import { useStyle } from './style';
+export * from './Robot';
 
 /**
  * 任务状态枚举
@@ -111,6 +112,8 @@ export interface TaskRunningProps {
 
 /**
  * 渲染按钮组的函数
+ * 使用提前返回优化代码可读性
+ *
  * @param status 任务状态
  * @param runningStatus 运行状态
  * @param callbacks 回调函数对象
@@ -161,47 +164,99 @@ const renderButtonGroup = ({
     (taskStatus === TASK_STATUS.RUNNING &&
       taskRunningStatus === TASK_RUNNING_STATUS.PAUSE);
 
-  let actionNode: React.ReactNode = null;
-
-  // 自定义操作按钮
-  if (actionsRender || actionsRender === false) {
-    actionNode =
+  // 处理自定义操作按钮（提前返回）
+  if (actionsRender !== undefined) {
+    const actionNode =
       typeof actionsRender === 'function'
         ? actionsRender({
             status: taskStatus,
             runningStatus: taskRunningStatus,
           })
         : actionsRender;
-  }
-  // 任务已暂停状态
-  else if (isPause) {
-    actionNode = onCreateNewTask && (
-      <Button
-        onClick={onCreateNewTask}
-        icon={<PlusOutlined />}
-        color="default"
-        variant="solid"
-      >
-        {locale?.agentRunBar?.newTask}
-      </Button>
+
+    return (
+      <div className={classNames(`${baseCls}-button-wrapper`, hashId)}>
+        {actionNode}
+        {/* 控制按钮（停止、暂停、继续） */}
+        {(isRunning || isPause) && onStop && (
+          <Tooltip mouseEnterDelay={0.3} title={locale?.agentRunBar?.stop}>
+            <div
+              className={classNames(`${baseCls}-pause`, hashId)}
+              role="button"
+              tabIndex={0}
+              aria-label={locale?.agentRunBar?.stop}
+              onClick={onStop}
+            >
+              {variant === 'simple' ? <SimpleStopIcon /> : <StopIcon />}
+            </div>
+          </Tooltip>
+        )}
+        {isRunning && onPause && (
+          <Tooltip title={locale?.agentRunBar?.pause} mouseEnterDelay={0.3}>
+            <div
+              className={classNames(`${baseCls}-pause`, hashId)}
+              role="button"
+              tabIndex={0}
+              aria-label={locale?.agentRunBar?.pause}
+              onClick={onPause}
+            >
+              {variant === 'simple' ? <SimplePauseIcon /> : <PauseIcon />}
+            </div>
+          </Tooltip>
+        )}
+        {isPause && onResume && (
+          <Tooltip title={locale?.agentRunBar?.play} mouseEnterDelay={0.3}>
+            <div
+              className={classNames(`${baseCls}-play`, hashId)}
+              role="button"
+              tabIndex={0}
+              aria-label={locale?.agentRunBar?.play}
+              onClick={onResume}
+            >
+              {variant === 'simple' ? <SimplePlayIcon /> : <PlayIcon />}
+            </div>
+          </Tooltip>
+        )}
+      </div>
     );
+  }
+
+  // 根据任务状态渲染不同的操作按钮
+  let actionNode: React.ReactNode = null;
+
+  // 任务已暂停状态
+  if (isPause) {
+    if (onCreateNewTask) {
+      actionNode = (
+        <Button
+          onClick={onCreateNewTask}
+          icon={<PlusOutlined />}
+          color="default"
+          variant="solid"
+        >
+          {locale?.agentRunBar?.newTask}
+        </Button>
+      );
+    }
   }
   // 任务已停止状态
   else if (
     taskStatus === TASK_STATUS.STOPPED ||
     taskStatus === TASK_STATUS.CANCELLED
   ) {
-    actionNode = onCreateNewTask && (
-      <Button
-        type="primary"
-        onClick={onCreateNewTask}
-        icon={<PlusOutlined />}
-        color="default"
-        variant="solid"
-      >
-        {locale?.agentRunBar?.createNewTask}
-      </Button>
-    );
+    if (onCreateNewTask) {
+      actionNode = (
+        <Button
+          type="primary"
+          onClick={onCreateNewTask}
+          icon={<PlusOutlined />}
+          color="default"
+          variant="solid"
+        >
+          {locale?.agentRunBar?.createNewTask}
+        </Button>
+      );
+    }
   }
   // 任务已完成状态
   else if (
@@ -260,18 +315,20 @@ const renderButtonGroup = ({
       </>
     );
   }
-  // 默认状态
+  // 默认状态（非运行中且非暂停）
   else if (!isRunning && !isPause) {
-    actionNode = onCreateNewTask && (
-      <Button
-        onClick={onCreateNewTask}
-        icon={<PlusOutlined />}
-        color="default"
-        variant="solid"
-      >
-        {locale?.agentRunBar?.createNewTask}
-      </Button>
-    );
+    if (onCreateNewTask) {
+      actionNode = (
+        <Button
+          onClick={onCreateNewTask}
+          icon={<PlusOutlined />}
+          color="default"
+          variant="solid"
+        >
+          {locale?.agentRunBar?.createNewTask}
+        </Button>
+      );
+    }
   }
 
   const stopTitle = locale?.agentRunBar?.stop;
@@ -381,7 +438,7 @@ const renderButtonGroup = ({
  * - 支持自定义图标和图标提示
  * - 提供机器人状态动画
  */
-export const TaskRunning: React.FC<TaskRunningProps> = (rest) => {
+const TaskRunningComponent: React.FC<TaskRunningProps> = (rest) => {
   const {
     className,
     taskRunningStatus,
@@ -493,3 +550,6 @@ export const TaskRunning: React.FC<TaskRunningProps> = (rest) => {
     </motion.div>,
   );
 };
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+export const TaskRunning = memo(TaskRunningComponent);

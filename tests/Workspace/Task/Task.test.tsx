@@ -362,7 +362,7 @@ describe('TaskList Component', () => {
         items: [
           {
             key: '1',
-            title: 12345 as any,
+            title: 12345,
             status: 'success' as const,
           },
         ],
@@ -377,7 +377,7 @@ describe('TaskList Component', () => {
         items: [
           {
             key: '1',
-            title: (<span data-testid="custom-title">自定义标题</span>) as any,
+            title: <span data-testid="custom-title">自定义标题</span>,
             status: 'success' as const,
           },
         ],

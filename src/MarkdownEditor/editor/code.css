@@ -5,7 +5,7 @@
   margin-top: 8px;
 }
 
-.ace-container.frontmatter:before {
+.ace-container[data-frontmatter]:before {
   top: 3px;
   content: 'Front Matter';
   width: 100%;
@@ -19,7 +19,7 @@
   color: var(--color-gray-text-secondary);
 }
 
-.ace-container.frontmatter:is(.dark *):before {
+.ace-container[data-frontmatter]:is(.dark *):before {
   color: var(--color-gray-text-secondary);
 }
 

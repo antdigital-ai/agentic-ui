@@ -204,7 +204,10 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
     'preview',
   );
 
+  const canDownload = file.canDownload !== false;
+
   const handleDownload = () => {
+    if (!canDownload) return;
     onDownload?.(file);
   };
 
@@ -227,7 +230,10 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
     } catch (err) {
       setContentState({
         status: 'error',
-        error: err instanceof Error ? err.message : '文件处理失败',
+        error:
+          err instanceof Error
+            ? err.message
+            : locale?.['workspace.file.processFailed'] || '文件处理失败',
       });
     }
   }, [file, customContent]);
@@ -310,7 +316,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
             className={classNames(`${prefixCls}-content-loading-tip`, hashId)}
           >
             <LoadingOutlined />
-            正在生成
+            {locale?.['workspace.file.generating'] || '正在生成'}
           </span>
           <div
             className={classNames(`${prefixCls}-content-loading-inner`, hashId)}
@@ -332,7 +338,10 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
     if (!processResult) {
       return (
         <PlaceholderContent prefixCls={prefixCls} hashId={hashId}>
-          <Spin size="large" tip="正在处理文件..." />
+          <Spin
+            size="large"
+            tip={locale?.['workspace.file.processing'] || '正在处理文件...'}
+          />
         </PlaceholderContent>
       );
     }
@@ -341,7 +350,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
       return (
         <PlaceholderContent prefixCls={prefixCls} hashId={hashId}>
           <Alert
-            message="文件处理失败"
+            message={locale?.['workspace.file.processFailed'] || '文件处理失败'}
             description={contentState.error}
             type="error"
             showIcon
@@ -448,21 +457,26 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                 </div>
               </div>
             </div>
-            <div
-              className={classNames(`${prefixCls}-unsupported-text`, hashId)}
-            >
-              此文件无法预览，请下载查看。
-            </div>
-            {onDownload && (
-              <Button
-                color="default"
-                variant="solid"
-                icon={<DownloadIcon />}
-                onClick={handleDownload}
-                aria-label={locale?.['workspace.file.download'] || '下载'}
-              >
-                下载
-              </Button>
+            {canDownload && onDownload && (
+              <>
+                <div
+                  className={classNames(
+                    `${prefixCls}-unsupported-text`,
+                    hashId,
+                  )}
+                >
+                  此文件无法预览，请下载查看。
+                </div>
+                <Button
+                  color="default"
+                  variant="solid"
+                  icon={<DownloadIcon />}
+                  onClick={handleDownload}
+                  aria-label={locale?.['workspace.file.download'] || '下载'}
+                >
+                  下载
+                </Button>
+              </>
             )}
           </div>
         </PlaceholderContent>
@@ -598,7 +612,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
           <PlaceholderContent
             file={file}
             showFileInfo
-            onDownload={onDownload ? handleDownload : undefined}
+            onDownload={canDownload && onDownload ? handleDownload : undefined}
             locale={locale}
             prefixCls={prefixCls}
             hashId={hashId}
@@ -718,7 +732,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                 <ShareIcon />
               </ActionIconBox>
             )}
-            {onDownload && (
+            {canDownload && onDownload && (
               <ActionIconBox
                 title={locale?.['workspace.file.download'] || '下载'}
                 onClick={handleDownload}

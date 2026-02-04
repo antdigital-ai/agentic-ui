@@ -96,4 +96,24 @@ describe('Editor Alignment Tests', () => {
     Transforms.insertText(editor, ' with more content');
     expect(EditorUtils.isAlignmentActive(editor, 'center')).toBeTruthy();
   });
+
+  it('should parse and render HTML paragraph with align="right" from api.md example', async () => {
+    const markdown =
+      '<p align="right">\nFor it will surely sprout wings and fly off to the sky like an eagle</p>';
+    const { container } = render(
+      <BaseMarkdownEditor initValue={markdown} onChange={() => {}} />,
+    );
+
+    await waitFor(
+      () => {
+        const paragraph = container.querySelector('[data-be="paragraph"]');
+        expect(paragraph).toBeTruthy();
+        expect(paragraph).toHaveAttribute('data-align', 'right');
+        expect(paragraph).toHaveTextContent(
+          'For it will surely sprout wings and fly off to the sky like an eagle',
+        );
+      },
+      { timeout: 3000 },
+    );
+  });
 });

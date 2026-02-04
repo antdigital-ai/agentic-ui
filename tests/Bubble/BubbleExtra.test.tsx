@@ -73,7 +73,7 @@ vi.mock('../../../index', () => ({
 describe('BubbleExtra', () => {
   const defaultProps = {
     onLike: vi.fn(),
-    onDisLike: vi.fn(),
+    onDislike: vi.fn(),
     onReply: vi.fn(),
     onOpenSlidesMode: vi.fn(),
     onRenderExtraNull: vi.fn(),
@@ -179,10 +179,10 @@ describe('BubbleExtra', () => {
     });
 
     it('应该处理点踩操作', async () => {
-      const onDisLike = vi.fn();
+      const onDislike = vi.fn();
       const props = {
         ...defaultProps,
-        onDisLike,
+        onDislike,
       };
 
       render(<BubbleExtra {...props} />);
@@ -191,7 +191,7 @@ describe('BubbleExtra', () => {
       fireEvent.click(dislikeButton);
 
       await waitFor(() => {
-        expect(onDisLike).toHaveBeenCalled();
+        expect(onDislike).toHaveBeenCalled();
       });
     });
 

@@ -659,7 +659,7 @@ console.log(sum(1, 2));`}
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <div
         style={{
           maxWidth: '600px',

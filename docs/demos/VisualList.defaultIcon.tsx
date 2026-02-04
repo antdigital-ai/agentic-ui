@@ -24,7 +24,7 @@ const DefaultIconDemo: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h3>VisualList 默认图标演示</h3>
       <p>当图片加载失败时，会自动显示浏览器图标作为默认图标。</p>
 

@@ -104,7 +104,7 @@ const ExtraHistoryDemo = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <h3>History 额外内容</h3>
       <p>当前会话ID: {currentSessionId}</p>
 

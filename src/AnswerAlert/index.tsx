@@ -1,6 +1,12 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
-import React, { isValidElement, useContext, useState } from 'react';
+import React, {
+  isValidElement,
+  memo,
+  useCallback,
+  useContext,
+  useState,
+} from 'react';
 import { CloseIcon } from './components/CloseIcon';
 import { ErrorIcon } from './components/ErrorIcon';
 import { InfoIcon } from './components/InfoIcon';
@@ -49,9 +55,11 @@ interface IconNodeProps {
   hashId: string;
 }
 
-const IconNode: React.FC<IconNodeProps> = (props) => {
+const IconNode: React.FC<IconNodeProps> = memo((props) => {
   const { icon, prefixCls, type, hashId } = props;
   const iconType = type ? iconMapFilled[type] : null;
+
+  // 使用提前返回优化
   if (icon) {
     if (!isValidElement(icon)) {
       return (
@@ -59,17 +67,20 @@ const IconNode: React.FC<IconNodeProps> = (props) => {
       );
     }
     return React.cloneElement(icon as React.ReactElement<any>, {
-      className: classNames(
-        `${prefixCls}-icon ${hashId}`,
-        icon.props.className,
-      ),
+      className: classNames(`${prefixCls}-icon`, hashId, icon.props.className),
     });
   }
-  if (!iconType) return null;
+
+  if (!iconType) {
+    return null;
+  }
+
   return React.createElement(iconType, {
-    className: `${prefixCls}-icon ${hashId}`,
+    className: classNames(`${prefixCls}-icon`, hashId),
   });
-};
+});
+
+IconNode.displayName = 'IconNode';
 
 /**
  * AnswerAlert 组件 - 答案提示组件
@@ -114,7 +125,7 @@ const IconNode: React.FC<IconNodeProps> = (props) => {
  * - 支持自定义样式和类名
  * - 响应式布局适配
  */
-export function AnswerAlert({
+const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
   className,
   style,
   message,
@@ -125,31 +136,36 @@ export function AnswerAlert({
   action,
   closable,
   onClose,
-}: AnswerAlertProps) {
+}) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('answer-alert');
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
   const [closed, setClosed] = useState(false);
 
-  const handleClose = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setClosed(true);
-    onClose?.(e);
-  };
+  // 使用 useCallback 优化关闭处理函数
+  const handleClose = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      setClosed(true);
+      onClose?.(e);
+    },
+    [onClose],
+  );
+
+  // 使用提前返回优化
+  if (closed) {
+    return null;
+  }
 
   const alertCls = classNames(
     prefixCls,
     className,
     {
-      [`${prefixCls}-${type}`]: type,
+      [`${prefixCls}-${type}`]: !!type,
       [`${prefixCls}-with-description`]: !!description,
     },
     hashId,
   );
-
-  if (closed) {
-    return null;
-  }
 
   return wrapSSR(
     <div className={alertCls} style={style}>
@@ -186,4 +202,9 @@ export function AnswerAlert({
       </div>
     </div>,
   );
-}
+};
+
+AnswerAlertComponent.displayName = 'AnswerAlert';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+export const AnswerAlert = memo(AnswerAlertComponent);

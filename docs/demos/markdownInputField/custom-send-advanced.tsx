@@ -139,7 +139,7 @@ const CustomSendButtonDemo: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h2>自定义发送按钮示例</h2>
       <p>
         通过 <code>actionsRender</code>{' '}

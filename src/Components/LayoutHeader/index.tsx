@@ -1,6 +1,7 @@
 import {
-  AlignLeft,
   LaptopMinimal,
+  PanelLeftFill,
+  PanelLeftFillFold,
   SquareArrowOutUpRight,
 } from '@sofa-design/icons';
 import { Button, ConfigProvider } from 'antd';
@@ -64,8 +65,8 @@ import type { LayoutHeaderProps } from './types';
  */
 const LayoutHeader: React.FC<LayoutHeaderProps> = ({
   title = 'AI 助手',
-  showShare = true,
-  leftCollapsible = true,
+  showShare = false,
+  leftCollapsible = false,
   rightCollapsible = false,
   leftCollapsed: controlledLeftCollapsed,
   rightCollapsed: controlledRightCollapsed,
@@ -122,13 +123,18 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = ({
       {/* 左侧区域：标题和左侧折叠按钮 */}
       <div className={classNames(`${prefixCls}-left`, hashId)}>
         {leftCollapsible && (
-          <ActionIconBox
-            onClick={handleLeftCollapse}
-            aria-label={locale?.['chatFlow.collapseLeft'] || '折叠左侧边栏'}
-            title={locale?.['chatFlow.collapseLeft'] || '折叠左侧边栏'}
-          >
-            <AlignLeft />
-          </ActionIconBox>
+          <>
+            <ActionIconBox
+              onClick={handleLeftCollapse}
+              aria-label={locale?.['chatFlow.collapseLeft'] || '折叠左侧边栏'}
+              title={locale?.['chatFlow.collapseLeft'] || '折叠左侧边栏'}
+            >
+              {leftCollapsed ? <PanelLeftFill /> : <PanelLeftFillFold />}
+            </ActionIconBox>
+            <div
+              className={classNames(`${prefixCls}-left-separator`, hashId)}
+            />
+          </>
         )}
         <h1 className={classNames(`${prefixCls}-left-title`, hashId)}>
           {title}

@@ -13,6 +13,10 @@ export interface HistoryProps {
   /** @deprecated 请使用 onClick 替代 */
   onSelected?: (item: HistoryDataType) => void;
   onClick?: (sessionId: string, item: HistoryDataType) => void;
+  /**
+   * 删除历史记录项时的回调函数
+   * @deprecated 建议使用 onDelete 替代（符合命名规范），但为保持兼容性暂时保留
+   */
   onDeleteItem?: (sessionId: string) => void;
   customDateFormatter?: (date: number | string | Date) => string;
   itemDateFormatter?: (date: number | string | Date) => string;

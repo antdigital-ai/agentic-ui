@@ -6,7 +6,7 @@
       test
     </div>
     <div
-      style="padding: 20px; background-color: rgb(245, 245, 245);"
+      style="padding: 12px; background-color: rgb(245, 245, 245);"
     >
       <h2>
         ChartContainer 边框演示
@@ -36,7 +36,7 @@
             class="demo-chart-container demo-chart-container-light-theme demo-chart-container-desktop"
           >
             <div
-              style="padding: 20px; text-align: center; background-color: rgb(255, 255, 255); color: rgb(51, 51, 51);"
+              style="padding: 12px; text-align: center; background-color: rgb(255, 255, 255); color: rgb(51, 51, 51);"
             >
               基础图表容器
             </div>
@@ -51,7 +51,7 @@
             style="width: 100%; min-height: 200px;"
           >
             <div
-              style="padding: 20px; text-align: center; background-color: rgb(255, 255, 255); color: rgb(51, 51, 51);"
+              style="padding: 12px; text-align: center; background-color: rgb(255, 255, 255); color: rgb(51, 51, 51);"
             >
               自定义样式容器
             </div>
@@ -65,7 +65,7 @@
             class="demo-chart-container demo-chart-container-light-theme demo-chart-container-desktop custom-border-demo"
           >
             <div
-              style="padding: 20px; text-align: center; background-color: rgb(255, 255, 255); color: rgb(51, 51, 51);"
+              style="padding: 12px; text-align: center; background-color: rgb(255, 255, 255); color: rgb(51, 51, 51);"
             >
               自定义类名容器
             </div>
@@ -79,7 +79,7 @@
             class="demo-chart-container demo-chart-container-light-theme demo-chart-container-desktop"
           >
             <div
-              style="padding: 20px; background-color: rgb(255, 255, 255); color: rgb(51, 51, 51);"
+              style="padding: 12px; background-color: rgb(255, 255, 255); color: rgb(51, 51, 51);"
             >
               <div
                 style="height: 150px; background: linear-gradient(45deg, #1890ff, #52c41a); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: rgb(255, 255, 255); font-size: 18px; font-weight: bold;"

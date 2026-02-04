@@ -125,7 +125,7 @@ describe('SlateMarkdownEditor', () => {
   };
 
   const renderEditor = (props: {
-    initValue?: Elements[];
+    initSchemaValue?: Elements[];
     plugins?: any[];
     eleItemRender?: typeof customEleItemRender;
   }) => {
@@ -151,7 +151,7 @@ describe('SlateMarkdownEditor', () => {
             <SlateMarkdownEditor
               prefixCls="ant-agentic-md-editor"
               instance={mockInstance}
-              initSchemaValue={props.initValue}
+              initSchemaValue={props.initSchemaValue}
               plugins={props.plugins}
               eleItemRender={props.eleItemRender}
             />
@@ -169,7 +169,7 @@ describe('SlateMarkdownEditor', () => {
       } as ParagraphNode,
     ];
 
-    renderEditor({ initValue });
+    renderEditor({ initSchemaValue: initValue });
     expect(screen.getByText('Hello World')).toBeDefined();
   });
 
@@ -183,7 +183,7 @@ describe('SlateMarkdownEditor', () => {
       } as CodeNode,
     ];
 
-    renderEditor({ initValue, plugins: [codeBlockPlugin] });
+    renderEditor({ initSchemaValue: initValue, plugins: [codeBlockPlugin] });
 
     const codeBlock = screen.getByTestId('plugin-code-block');
     expect(codeBlock).toBeDefined();
@@ -201,7 +201,7 @@ describe('SlateMarkdownEditor', () => {
     ];
 
     renderEditor({
-      initValue,
+      initSchemaValue: initValue,
       plugins: [codeBlockPlugin],
       eleItemRender: customEleItemRender,
     });
@@ -230,7 +230,7 @@ describe('SlateMarkdownEditor', () => {
     ];
 
     renderEditor({
-      initValue,
+      initSchemaValue: initValue,
       plugins: [codeBlockPlugin, customBlockPlugin],
       eleItemRender: customEleItemRender,
     });
@@ -259,7 +259,10 @@ describe('SlateMarkdownEditor', () => {
       },
     ];
 
-    renderEditor({ initValue, eleItemRender: customEleItemRender });
+    renderEditor({
+      initSchemaValue: initValue,
+      eleItemRender: customEleItemRender,
+    });
     expect(screen.getByText('Cell content')).toBeDefined();
     expect(screen.queryByTestId('custom-block-wrapper')).toBeNull();
   });
@@ -274,7 +277,7 @@ describe('SlateMarkdownEditor', () => {
       } as CodeNode,
     ];
 
-    renderEditor({ initValue, plugins: [codeBlockPlugin] });
+    renderEditor({ initSchemaValue: initValue, plugins: [codeBlockPlugin] });
 
     const pluginBlock = screen.getByTestId('plugin-code-block');
     expect(pluginBlock).toBeDefined();
@@ -291,7 +294,7 @@ describe('SlateMarkdownEditor', () => {
     ];
 
     renderEditor({
-      initValue,
+      initSchemaValue: initValue,
       plugins: [customBlockPlugin],
       eleItemRender: customEleItemRender,
     });
@@ -299,5 +302,54 @@ describe('SlateMarkdownEditor', () => {
     expect(screen.getByTestId('custom-block-wrapper')).toBeDefined();
     expect(screen.getByTestId('plugin-custom-block')).toBeDefined();
     expect(screen.getByText('★')).toBeDefined();
+  });
+
+  describe('initialValue 逻辑测试', () => {
+    it('应该优先使用 initSchemaValue，无论是否在 SSR 环境', () => {
+      const initSchemaValue: Elements[] = [
+        {
+          type: 'paragraph',
+          children: [{ text: 'From Schema' }],
+        } as ParagraphNode,
+      ];
+
+      renderEditor({ initSchemaValue });
+
+      expect(screen.getByText('From Schema')).toBeDefined();
+    });
+
+    it('当 initSchemaValue 不存在时，应该使用默认值', () => {
+      renderEditor({});
+
+      // 默认值应该是一个空的段落
+      const editor = screen.getByRole('textbox');
+      expect(editor).toBeDefined();
+    });
+
+    it('当 initSchemaValue 为空数组时，应该使用默认值', () => {
+      renderEditor({ initSchemaValue: [] });
+
+      // 空数组应该使用默认值
+      const editor = screen.getByRole('textbox');
+      expect(editor).toBeDefined();
+    });
+
+    it('应该正确处理 initSchemaValue 包含多个元素的情况', () => {
+      const initSchemaValue: Elements[] = [
+        {
+          type: 'paragraph',
+          children: [{ text: 'First paragraph' }],
+        } as ParagraphNode,
+        {
+          type: 'paragraph',
+          children: [{ text: 'Second paragraph' }],
+        } as ParagraphNode,
+      ];
+
+      renderEditor({ initSchemaValue });
+
+      expect(screen.getByText('First paragraph')).toBeDefined();
+      expect(screen.getByText('Second paragraph')).toBeDefined();
+    });
   });
 });

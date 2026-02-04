@@ -80,6 +80,9 @@ export const useKeyboard = (
     const enter = new EnterKey(store, backspace);
     const match = new MatchKey(markdownEditorRef.current);
     return (e: React.KeyboardEvent) => {
+      // 只读模式下跳过所有键盘处理，提升性能
+      if (props.readonly) return;
+
       // 处理表格键盘事件
       if (NativeTableKeyboard.shouldHandle(markdownEditorRef.current)) {
         if (
@@ -135,8 +138,7 @@ export const useKeyboard = (
       }
 
       if (props?.markdown?.matchInputToNode) {
-        match.run(e);
-        return;
+        if (match.run(e)) return;
       }
 
       if (e.key.toLowerCase().startsWith('arrow')) {
@@ -179,27 +181,33 @@ export const useKeyboard = (
 
       if (e.key === 'Tab') tab.run(e);
 
-      if (props.textAreaProps?.triggerSendKey === 'Enter') {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          e.stopPropagation();
-          e.preventDefault();
-          enter.run(e);
-          return;
-        }
-        return;
-      }
-      if (props.textAreaProps?.triggerSendKey === 'Mod+Enter') {
-        if (e.key === 'Enter' && !(e.ctrlKey || e.metaKey)) {
-          e.stopPropagation();
-          e.preventDefault();
-          enter.run(e);
-        }
-        return;
-      }
-      if (e.key === 'Enter' && !(e.ctrlKey || e.metaKey)) {
+      // Enter 发送，Shift+Enter 换行
+      if (e.key === 'Enter' && e.shiftKey && !(e.ctrlKey || e.metaKey)) {
         e.stopPropagation();
         e.preventDefault();
         enter.run(e);
+        return;
+      }
+      // Enter 键（无 Shift）处理：如果在列表项中，让 EnterKey 处理；否则由 MarkdownInputField 处理发送
+      if (e.key === 'Enter' && !(e.ctrlKey || e.metaKey) && !e.shiftKey) {
+        // 检查当前是否在列表项中
+        const selection = markdownEditorRef.current.selection;
+        if (selection && Range.isCollapsed(selection)) {
+          const [node] = Editor.nodes(markdownEditorRef.current, {
+            at: selection.focus.path,
+            match: (n) => Element.isElement(n) && n.type === 'list-item',
+            mode: 'lowest',
+          });
+          if (node) {
+            // 在列表项中，让 EnterKey 处理
+            e.stopPropagation();
+            e.preventDefault();
+            enter.run(e);
+            return;
+          }
+        }
+        // 不在列表项中，让 MarkdownInputField 处理发送
+        return;
       }
 
       const [node] = Editor.nodes<any>(markdownEditorRef.current, {
@@ -240,5 +248,5 @@ export const useKeyboard = (
         }
       }
     };
-  }, [markdownEditorRef.current]);
+  }, [markdownEditorRef.current, props?.readonly]);
 };

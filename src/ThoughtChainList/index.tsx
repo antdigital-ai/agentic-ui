@@ -382,7 +382,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
       loading,
       //@ts-ignore
       bubble = props.chatItem,
-      style,
+      style: customStyle,
       compact,
       markdownRenderProps,
       finishAutoCollapse = true,
@@ -392,6 +392,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
     const [collapse, setCollapse] = React.useState<boolean>(false);
     const prefixCls = context?.getPrefixCls('thought-chain-list');
     const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { ...restStyle } = customStyle || {};
     const [docMeta, setDocMeta] = React.useState<Partial<DocMeta> | null>(null);
 
     // 为组件实例生成唯一ID，避免多个实例间的key冲突
@@ -489,7 +490,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
           locale={locale}
         />
 
-        <div className={classNames(`${prefixCls}`, hashId)} style={style}>
+        <div className={classNames(`${prefixCls}`, hashId)} style={restStyle}>
           <motion.div
             transition={{ duration: 0.3 }}
             className={classNames(`${prefixCls}-container`, hashId, {

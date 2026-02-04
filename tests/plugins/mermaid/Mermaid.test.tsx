@@ -18,19 +18,17 @@ vi.mock('mermaid', () => ({
 
 // Mock react-use
 vi.mock('react-use', () => ({
-  useGetSetState: vi.fn(() => {
-    const state = {
-      code: '',
-      error: '',
-    };
+  useGetSetState: vi.fn((initialState) => {
+    let state = { ...initialState };
     const setState = vi.fn((update) => {
       if (typeof update === 'function') {
-        update(state);
+        state = { ...state, ...update(state) };
       } else {
-        Object.assign(state, update);
+        state = { ...state, ...update };
       }
     });
-    return [() => state, setState];
+    const getState = vi.fn(() => state);
+    return [getState, setState];
   }),
 }));
 
@@ -102,16 +100,17 @@ describe('Mermaid Component', () => {
 
     it('应该处理 mermaid.parse 失败', async () => {
       const mermaid = await import('mermaid');
+      vi.clearAllMocks();
 
       renderMermaid();
 
-      // 等待组件渲染完成
-      await waitFor(() => {
-        expect(document.body).toBeInTheDocument();
-      });
-
-      // 检查 mermaid 方法是否被调用（可能不是 parse，而是 render）
-      expect(mermaid.default.render).toHaveBeenCalled();
+      // 等待 mermaid 渲染完成
+      await waitFor(
+        () => {
+          expect(mermaid.default.render).toHaveBeenCalled();
+        },
+        { timeout: 3000 },
+      );
     });
   });
 

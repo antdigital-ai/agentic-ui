@@ -3,7 +3,6 @@ import classNames from 'classnames';
 import React, { useContext, useMemo } from 'react';
 import { ReactEditor, RenderElementProps, useSlate } from 'slate-react';
 import { TableNode } from '../../types/Table';
-import { useTableStyle } from './style';
 import { SlateTable } from './Table';
 import { TablePropsProvider } from './TableContext';
 
@@ -15,14 +14,13 @@ export const SimpleTable = (props: RenderElementProps) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const baseCls = getPrefixCls('agentic-md-editor-content-table');
   const editor = useSlate();
-  const { wrapSSR, hashId } = useTableStyle(baseCls, {});
 
   const tablePath = useMemo(
     () => ReactEditor.findPath(editor, props.element),
     [props.element],
   );
 
-  return wrapSSR(
+  return (
     <TablePropsProvider
       tablePath={tablePath}
       tableNode={props.element as TableNode}
@@ -31,12 +29,11 @@ export const SimpleTable = (props: RenderElementProps) => {
         {...props.attributes}
         data-be={'table'}
         draggable={false}
-        className={classNames(`${baseCls}-container`, hashId)}
+        className={classNames(`${baseCls}-container`)}
+        style={{ position: 'relative' }}
       >
-        <SlateTable {...props} hashId={hashId}>
-          {props.children}
-        </SlateTable>
+        <SlateTable {...props}>{props.children}</SlateTable>
       </div>
-    </TablePropsProvider>,
+    </TablePropsProvider>
   );
 };

@@ -34,16 +34,17 @@ export const Container: React.FC<{
         height: naturalHeight,
       };
 
+      // 增加阈值，减少频繁调整导致的抖动
       if (
-        Math.abs(preSize.width - newSize.width) > 20 ||
-        Math.abs(preSize.height - newSize.height) > 20
+        Math.abs(preSize.width - newSize.width) > 30 || // 从 20 增加到 30
+        Math.abs(preSize.height - newSize.height) > 30 // 从 20 增加到 30
       ) {
         chart.resize(newSize.width, newSize.height);
         sizeRef.current = newSize;
         return;
       }
     },
-    160 + props.index * 16,
+    300 + props.index * 20, // 增加防抖延迟，从 160 增加到 300
   );
 
   useEffect(() => {

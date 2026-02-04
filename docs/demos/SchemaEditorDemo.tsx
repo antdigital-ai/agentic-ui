@@ -65,7 +65,7 @@ export default function SchemaEditorDemo() {
         name: '基础HTML示例',
         component: {
           type: 'html',
-          schema: `<div style="padding: 20px; background: #f5f5f5; border-radius: 8px;">
+          schema: `<div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
   <h1 style="color: #333;">{{title}}</h1>
   <p style="color: #666;">{{content}}</p>
 </div>`,
@@ -83,7 +83,7 @@ export default function SchemaEditorDemo() {
         name: '表单组件示例',
         component: {
           type: 'html',
-          schema: `<form style="max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+          schema: `<form style="max-width: 400px; margin: 20px auto; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
   <h2>{{formTitle}}</h2>
   <div style="margin-bottom: 15px;">
     <label style="display: block; margin-bottom: 5px;">{{nameLabel}}</label>
@@ -115,7 +115,7 @@ export default function SchemaEditorDemo() {
         name: '数据表格示例',
         component: {
           type: 'html',
-          schema: `<div style="padding: 20px;">
+          schema: `<div style="padding: 12px;">
   <h2>{{tableTitle}}</h2>
   <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
     <thead>

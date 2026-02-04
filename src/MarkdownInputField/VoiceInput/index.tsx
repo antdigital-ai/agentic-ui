@@ -42,7 +42,6 @@ export const VoiceInputButton: React.FC<VoiceInputButtonProps> = (props) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const baseCls = getPrefixCls('agentic-md-input-field-voice-button');
   const { wrapSSR, hashId } = useStyle(baseCls);
-
   const dom = props.title ? (
     <div
       style={{

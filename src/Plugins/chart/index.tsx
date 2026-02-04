@@ -5,7 +5,9 @@ import { ErrorBoundary } from '../../MarkdownEditor/editor/elements/ErrorBoundar
 import { TableNode } from '../../MarkdownEditor/editor/elements/Table';
 import { useEditorStore } from '../../MarkdownEditor/editor/store';
 import { DragHandle } from '../../MarkdownEditor/editor/tools/DragHandle';
+import { useMEditor } from '../../MarkdownEditor/hooks/editor';
 import { ChartRender } from './ChartRender';
+import { getDataHash } from './utils';
 
 /**
  * @fileoverview 图表插件主入口文件
@@ -70,6 +72,13 @@ export type { ScatterChartDataItem, ScatterChartProps } from './ScatterChart';
 // 工具与常量导出
 export { defaultColorList } from './const';
 export { debounce as chartDebounce, stringFormatNumber } from './utils';
+
+// 类型导出
+export type {
+  ChartClassNames,
+  ChartStyles,
+  ClassNameType,
+} from './types/classNames';
 
 // 复用组件与类型导出
 export { ChartFilter, ChartToolBar, downloadChart } from './components';
@@ -198,16 +207,107 @@ export const ChartElement = (props: RenderElementProps) => {
     useEditorStore();
   const editor = useSlate();
   const { element: node, attributes, children } = props;
+
+  // 使用更高效的依赖项比较，避免 JSON.stringify 的性能开销
+  const dataSourceHash = useMemo(
+    () => getDataHash(node.otherProps?.dataSource || []),
+    [node.otherProps?.dataSource],
+  );
+
   let chartData = useMemo(() => {
-    return (node.otherProps?.dataSource?.map((item: any) => {
+    const dataSource = node.otherProps?.dataSource || [];
+    if (dataSource.length === 0) {
+      return [];
+    }
+
+    // 获取第一行的 keys 作为参考
+    const firstRowKeys = Object.keys(dataSource[0]).sort();
+
+    // 处理数据并过滤掉最后一行（如果它的 keys 和第一行不同）
+    const processed = dataSource.map((item: any) => {
       return {
         ...item,
         column_list: Object.keys(item),
       };
-    }) || []) as any[];
-  }, [node.otherProps?.dataSource]);
+    });
+
+    // 检查最后一行是否完整
+    if (processed.length > 1) {
+      const lastRow = processed[processed.length - 1];
+      const lastRowKeys = Object.keys(lastRow)
+        .filter((key) => key !== 'column_list')
+        .sort();
+
+      // 如果最后一行的 keys 和第一行不同，丢弃最后一行
+      if (
+        lastRowKeys.length !== firstRowKeys.length ||
+        !lastRowKeys.every((key, index) => key === firstRowKeys[index])
+      ) {
+        return processed.slice(0, -1);
+      }
+    }
+
+    return processed;
+  }, [dataSourceHash, node.otherProps?.dataSource]);
 
   const columns = (node as TableNode).otherProps?.columns || [];
+
+  // 检查图表是否未闭合
+  const isUnclosed = node?.otherProps?.finished === false;
+
+  // 获取编辑器更新函数
+  const [, update] = useMEditor(node);
+
+  // 判断是否是最后一个节点
+  const isLastNode = useMemo(() => {
+    try {
+      return store.isLatestNode(node);
+    } catch {
+      return false;
+    }
+  }, [store, node]);
+
+  // 如果不是最后一个节点，且未闭合，立即设置为完成
+  useEffect(() => {
+    if (isUnclosed && !readonly && !isLastNode) {
+      // 检查 finished 是否仍然是 false（可能已经被其他逻辑更新）
+      if (node?.otherProps?.finished === false) {
+        update(
+          {
+            otherProps: {
+              ...node?.otherProps,
+              finished: true,
+            },
+          },
+          node,
+        );
+      }
+    }
+  }, [isUnclosed, readonly, isLastNode, node, update]);
+
+  // 5 秒超时机制：如果是最后一个节点且未闭合，5 秒后自动设置为完成
+  useEffect(() => {
+    if (isUnclosed && !readonly && isLastNode) {
+      const timer = setTimeout(() => {
+        // 检查 finished 是否仍然是 false（可能已经被其他逻辑更新）
+        if (node?.otherProps?.finished === false) {
+          update(
+            {
+              otherProps: {
+                ...node?.otherProps,
+                finished: true,
+              },
+            },
+            node,
+          );
+        }
+      }, 5000); // 5 秒超时
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [isUnclosed, readonly, isLastNode, node, update]);
 
   const [columnLength, setColumnLength] = React.useState(2);
   const config = [node.otherProps?.config || node.otherProps].flat(1);
@@ -215,34 +315,42 @@ export const ChartElement = (props: RenderElementProps) => {
   const [minWidth, setMinWidth] = React.useState(256);
 
   useEffect(() => {
-    const width = Math.max(
-      rootContainer?.current?.clientWidth ||
-        htmlRef.current?.parentElement?.clientWidth ||
+    const updateWidth = () => {
+      const width = Math.max(
+        rootContainer?.current?.clientWidth ||
+          htmlRef.current?.parentElement?.clientWidth ||
+          256,
         256,
-      256,
-    );
-    setMinWidth(width || 256);
-    setColumnLength(Math.min(Math.floor(width / 256), config.length));
-  }, []);
+      );
+      setMinWidth(width || 256);
+      setColumnLength(Math.min(Math.floor(width / 256), config.length));
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, [config.length]);
 
   return useMemo(
     () => (
       <div
-        className={'ant-agentic-md-editor-drag-el'}
+        data-drag-el
         {...attributes}
         data-be={'chart'}
         style={{
           flex: 1,
-          minWidth: `min(${Math.min(minWidth, 856)}px, 100%)`,
+          minWidth: 0,
+          width: '100%',
           maxWidth: '100%',
           margin: '1em 0',
+          overflow: 'hidden',
         }}
         ref={htmlRef}
         onDragStart={(e) => store.dragStart(e, markdownContainerRef.current!)}
       >
         <DragHandle />
         <div
-          className="ant-agentic-md-editor-chart-box"
+          data-chart-box
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -324,7 +432,7 @@ export const ChartElement = (props: RenderElementProps) => {
                           [y]: numberString(item[y]),
                         };
                       })
-                      .sort((a, b) => {
+                      .sort((a: any, b: any) => {
                         if (dayjs(a[x]).isValid() && dayjs(b[x]).isValid()) {
                           return dayjs(a[x]).valueOf() - dayjs(b[x]).valueOf();
                         }
@@ -360,6 +468,7 @@ export const ChartElement = (props: RenderElementProps) => {
                             groupBy={rest?.groupBy}
                             filterBy={rest?.filterBy}
                             colorLegend={rest?.colorLegend}
+                            loading={isUnclosed}
                           />
                         );
                         return dom;
@@ -376,6 +485,7 @@ export const ChartElement = (props: RenderElementProps) => {
                         title={rest?.title}
                         dataTime={rest?.dataTime}
                         groupBy={rest?.groupBy}
+                        loading={isUnclosed}
                         filterBy={rest?.filterBy}
                         colorLegend={rest?.colorLegend}
                         config={{
@@ -398,7 +508,12 @@ export const ChartElement = (props: RenderElementProps) => {
                             key={index + subIndex}
                             style={{
                               margin: 'auto',
-                              minWidth: `max(calc(${100 / columnLength}% - 16px), 600px)`,
+                              minWidth: 0,
+                              width:
+                                columnLength === 1
+                                  ? '100%'
+                                  : `calc(${100 / columnLength}% - 8px)`,
+                              maxWidth: '100%',
                               flex: 1,
                               userSelect: 'none',
                             }}
@@ -416,7 +531,12 @@ export const ChartElement = (props: RenderElementProps) => {
                         style={{
                           userSelect: 'none',
                           margin: 'auto',
-                          minWidth: `max(calc(${100 / columnLength}% - 16px), 600px)`,
+                          minWidth: 0,
+                          width:
+                            columnLength === 1
+                              ? '100%'
+                              : `calc(${100 / columnLength}% - 8px)`,
+                          maxWidth: '100%',
                           flex: 1,
                         }}
                         onClick={(e) => {
@@ -435,7 +555,10 @@ export const ChartElement = (props: RenderElementProps) => {
     ),
     [
       attributes,
-      JSON.stringify((node as TableNode).otherProps),
+      // 使用更高效的依赖项比较
+      dataSourceHash,
+      (node as TableNode).otherProps?.config,
+      (node as TableNode).otherProps?.columns?.length,
       editor,
       columnLength,
       readonly,

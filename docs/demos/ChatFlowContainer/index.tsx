@@ -10,6 +10,7 @@ import {
   TASK_STATUS,
   TaskRunning,
 } from '@ant-design/agentic-ui';
+import { Flex } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   assistantMeta,
@@ -21,9 +22,15 @@ import {
 } from './data';
 import './style.css';
 
-const StandaloneHistoryDemo = () => {
-  const [currentSessionId, setCurrentSessionId] = useState('session-2');
+interface StandaloneHistoryDemoProps {
+  currentSessionId: string;
+  onSelect: (sessionId: string) => void;
+}
 
+const StandaloneHistoryDemo: React.FC<StandaloneHistoryDemoProps> = ({
+  currentSessionId,
+  onSelect,
+}) => {
   // 模拟请求函数
   const mockRequest = async ({ agentId }: { agentId: string }) => {
     // 模拟 API 请求
@@ -74,11 +81,6 @@ const StandaloneHistoryDemo = () => {
     ] as HistoryDataType[];
   };
 
-  const handleSelected = (sessionId: string) => {
-    setCurrentSessionId(sessionId);
-    console.log('选择会话:', sessionId);
-  };
-
   // 处理加载更多
   const handleLoadMore = async () => {
     // 模拟加载更多
@@ -92,7 +94,7 @@ const StandaloneHistoryDemo = () => {
       agentId="test-agent"
       sessionId={currentSessionId}
       request={mockRequest}
-      onClick={handleSelected}
+      onClick={onSelect}
       standalone
       type="chat"
       agent={{
@@ -121,6 +123,7 @@ const StandaloneHistoryDemo = () => {
  */
 const ChatLayoutDemo: React.FC = () => {
   const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState('session-2');
   const [bubbleList, setBubbleList] = useState<MessageBubbleData[]>(() => {
     const messages: MessageBubbleData[] = [];
 
@@ -135,6 +138,16 @@ const ChatLayoutDemo: React.FC = () => {
   });
 
   const containerRef = useRef<ChatLayoutRef>(null);
+
+  // 处理会话切换
+  const handleSessionSelect = (sessionId: string) => {
+    setCurrentSessionId(sessionId);
+    // 切换会话后，使用 scrollToBottom 滚动到底部
+    // 使用 setTimeout 确保在数据更新后再滚动
+    setTimeout(() => {
+      containerRef.current?.scrollToBottom();
+    }, 100);
+  };
 
   // 使用 useRef 管理重试状态，避免全局污染
   const isRetryingRef = useRef(false);
@@ -224,7 +237,10 @@ const ChatLayoutDemo: React.FC = () => {
         {/* 左侧边栏 */}
         <div className={`sidebar-left ${leftCollapsed ? 'collapsed' : ''}`}>
           <div className="sidebar-left-content">
-            <StandaloneHistoryDemo />
+            <StandaloneHistoryDemo
+              currentSessionId={currentSessionId}
+              onSelect={handleSessionSelect}
+            />
           </div>
         </div>
 
@@ -244,27 +260,8 @@ const ChatLayoutDemo: React.FC = () => {
               onShare: handleShare,
             }}
             footer={
-              <div
-                style={{
-                  position: 'relative',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '-16px',
-                    left: '50%',
-                    transform: 'translate(-50%, -100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 16,
-                  }}
-                >
+              <Flex vertical align="center" justify="center" gap={24}>
+                <Flex gap={8} align="center" justify="center">
                   <BackTo.Top
                     tooltip="去顶部"
                     shouldVisible={200}
@@ -289,7 +286,7 @@ const ChatLayoutDemo: React.FC = () => {
                       insetInlineEnd: 0,
                     }}
                   />
-                </div>
+                </Flex>
                 <TaskRunning
                   title={`任务已完成, 耗时03分00秒`}
                   taskStatus={TASK_STATUS.SUCCESS}
@@ -301,13 +298,10 @@ const ChatLayoutDemo: React.FC = () => {
                   onReplay={handleRetry}
                   onViewResult={handleViewResult}
                 />
-              </div>
+              </Flex>
             }
           >
             <BubbleList
-              style={{
-                paddingBottom: '60px',
-              }}
               pure
               onLike={() => {}}
               onDisLike={() => {}}

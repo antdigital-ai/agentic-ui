@@ -3,9 +3,9 @@ import { isString } from 'lodash-es';
 import React from 'react';
 import RobotIcon from '../Components/Robot';
 
-export type RobotStatus = 'default' | 'thinking' | 'dazing' | 'pause';
+type RobotStatus = 'default' | 'thinking' | 'dazing' | 'pause';
 
-export interface RobotProps {
+interface RobotProps {
   /** 机器人状态 */
   status?: RobotStatus;
   /** 机器人大小 */

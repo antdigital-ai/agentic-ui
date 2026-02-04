@@ -1,15 +1,26 @@
 import { message } from 'antd';
 import copy from 'copy-to-clipboard';
 import isHotkey from 'is-hotkey';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Subject } from 'rxjs';
-import { Editor, Element, Node, Path, Range, Text, Transforms } from 'slate';
+import { Editor, Element, Node, Path, Range, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { MarkdownEditorProps } from '../../BaseMarkdownEditor';
-import { AttachNode, ListItemNode, MediaNode } from '../../el';
+import { AttachNode, MediaNode } from '../../el';
 import { useSubject } from '../../hooks/subscribe';
-import { NativeTableEditor } from '../../utils/native-table';
 import { EditorStore } from '../store';
+import {
+  convertToParagraph,
+  createList,
+  decreaseHeadingLevel,
+  increaseHeadingLevel,
+  insertCodeBlock,
+  insertHorizontalLine,
+  insertTable as insertTableCommand,
+  setHeading,
+  toggleQuote,
+} from './editorCommands';
 import { EditorUtils } from './editorUtils';
 
 export type Methods<T> = {
@@ -242,22 +253,11 @@ export class KeyboardTask {
    * @param level 标题级别（1-3）或4（表示普通段落）
    */
   head(level: number) {
-    const [node] = this.curNodes;
     if (level === 4) {
       this.paragraph();
       return;
     }
-    if (
-      node &&
-      ['paragraph', 'head'].includes(node?.[0]?.type) &&
-      EditorUtils.isTop(this.editor, node[1])
-    ) {
-      Transforms.setNodes(
-        this.editor,
-        { type: 'head', level },
-        { at: node[1] },
-      );
-    }
+    setHeading(this.editor, level);
   }
 
   /**
@@ -266,10 +266,7 @@ export class KeyboardTask {
    * 如果当前节点是标题类型，将其转换为普通段落
    */
   paragraph() {
-    const [node] = this.curNodes;
-    if (node && ['head'].includes(node?.[0]?.type)) {
-      Transforms.setNodes(this.editor, { type: 'paragraph' }, { at: node[1] });
-    }
+    convertToParagraph(this.editor);
   }
 
   /**
@@ -280,32 +277,7 @@ export class KeyboardTask {
    * 或将其他级别标题升级一级（数字变小）
    */
   increaseHead() {
-    const [node] = this.curNodes;
-    if (
-      node &&
-      ['paragraph', 'head'].includes(node?.[0]?.type) &&
-      EditorUtils.isTop(this.editor, node[1])
-    ) {
-      if (node?.[0]?.type === 'paragraph') {
-        Transforms.setNodes(
-          this.editor,
-          { type: 'head', level: 4 },
-          { at: node[1] },
-        );
-      } else if (node[0].level === 1) {
-        Transforms.setNodes(
-          this.editor,
-          { type: 'paragraph' },
-          { at: node[1] },
-        );
-      } else {
-        Transforms.setNodes(
-          this.editor,
-          { level: node[0].level - 1 },
-          { at: node[1] },
-        );
-      }
-    }
+    increaseHeadingLevel(this.editor);
   }
 
   /**
@@ -316,32 +288,7 @@ export class KeyboardTask {
    * 或将其他级别标题降级一级（数字变大）
    */
   decreaseHead() {
-    const [node] = this.curNodes;
-    if (
-      node &&
-      ['paragraph', 'head'].includes(node?.[0]?.type) &&
-      EditorUtils.isTop(this.editor, node[1])
-    ) {
-      if (node?.[0]?.type === 'paragraph') {
-        Transforms.setNodes(
-          this.editor,
-          { type: 'head', level: 1 },
-          { at: node[1] },
-        );
-      } else if (node[0].level === 4) {
-        Transforms.setNodes(
-          this.editor,
-          { type: 'paragraph' },
-          { at: node[1] },
-        );
-      } else {
-        Transforms.setNodes(
-          this.editor,
-          { level: node[0].level + 1 },
-          { at: node[1] },
-        );
-      }
-    }
+    decreaseHeadingLevel(this.editor);
   }
 
   /**
@@ -353,24 +300,7 @@ export class KeyboardTask {
    */
   insertQuote() {
     const [node] = this.curNodes;
-    if (!['paragraph', 'head'].includes(node?.[0]?.type)) return;
-    if (Node.parent(this.editor, node[1]).type === 'blockquote') {
-      Transforms.unwrapNodes(this.editor, { at: Path.parent(node[1]) });
-      return;
-    }
-    if (node?.[0]?.type === 'head') {
-      Transforms.setNodes(
-        this.editor,
-        {
-          type: 'paragraph',
-        },
-        { at: node[1] },
-      );
-    }
-    Transforms.wrapNodes(this.editor, {
-      type: 'blockquote',
-      children: [],
-    });
+    toggleQuote(this.editor, node);
   }
 
   /**
@@ -382,32 +312,7 @@ export class KeyboardTask {
    */
   insertTable() {
     const [node] = this.curNodes;
-    if (node && ['paragraph', 'head'].includes(node?.[0]?.type)) {
-      const path =
-        node?.[0]?.type === 'paragraph' && !Node.string(node[0])
-          ? node[1]
-          : Path.next(node[1]);
-
-      // 使用原生表格编辑器插入表格
-      NativeTableEditor.insertTable(this.editor, {
-        rows: 3,
-        cols: 3,
-        at: path,
-      });
-
-      if (node?.[0]?.type === 'paragraph' && !Node.string(node[0])) {
-        Transforms.delete(this.editor, { at: Path.next(path) });
-      }
-      Transforms.select(this.editor, Editor.start(this.editor, path));
-    }
-
-    if (node && ['column-cell'].includes(node?.[0]?.type)) {
-      NativeTableEditor.insertTable(this.editor, {
-        rows: 3,
-        cols: 3,
-        at: [...node[1], 0],
-      });
-    }
+    insertTableCommand(this.editor, node);
   }
 
   /**
@@ -427,33 +332,7 @@ export class KeyboardTask {
    */
   insertCode(type?: 'mermaid' | 'html') {
     const [node] = this.curNodes;
-    if (node && node[0] && ['paragraph', 'head'].includes(node[0].type)) {
-      const path =
-        node[0].type === 'paragraph' && !Node.string(node[0])
-          ? node[1]
-          : Path.next(node[1]);
-      let lang = '';
-      if (type === 'mermaid') {
-        lang = 'mermaid';
-      }
-
-      Transforms.insertNodes(
-        this.editor,
-        {
-          type: 'code',
-          language: lang ? lang : undefined,
-          children: [
-            {
-              text: `flowchart TD\n    Start --> Stop`,
-            },
-          ],
-          render: type === 'html' ? true : undefined,
-        },
-        { at: path },
-      );
-
-      Transforms.select(this.editor, Editor.end(this.editor, path));
-    }
+    insertCodeBlock(this.editor, type, node);
   }
 
   /**
@@ -464,35 +343,7 @@ export class KeyboardTask {
    */
   horizontalLine() {
     const [node] = this.curNodes;
-    if (node && ['paragraph', 'head'].includes(node?.[0]?.type)) {
-      const path =
-        node?.[0]?.type === 'paragraph' && !Node.string(node[0])
-          ? node[1]
-          : Path.next(node[1]);
-      Transforms.insertNodes(
-        this.editor,
-        {
-          type: 'hr',
-          children: [{ text: '' }],
-        },
-        { at: path },
-      );
-      if (Editor.hasPath(this.editor, Path.next(path))) {
-        Transforms.select(
-          this.editor,
-          Editor.start(this.editor, Path.next(path)),
-        );
-      } else {
-        Transforms.insertNodes(
-          this.editor,
-          {
-            type: 'paragraph',
-            children: [{ text: '' }],
-          },
-          { at: Path.next(path), select: true },
-        );
-      }
-    }
+    insertHorizontalLine(this.editor, node);
   }
 
   /**
@@ -504,172 +355,7 @@ export class KeyboardTask {
    * @param mode 列表类型 'ordered'(有序列表), 'unordered'(无序列表), 'task'(任务列表)
    */
   list(mode: 'ordered' | 'unordered' | 'task') {
-    const [curNode] = this.curNodes;
-    if (curNode && ['paragraph', 'head'].includes(curNode[0].type)) {
-      const parent = Editor.parent(this.editor, curNode[1]);
-
-      if (parent[0].type === 'list-item' && !Path.hasPrevious(curNode[1])) {
-        Transforms.setNodes(
-          this.editor,
-          {
-            order: mode === 'ordered',
-            task: mode === 'task',
-          },
-          { at: Path.parent(parent[1]) },
-        );
-        const listItems = Array.from<any>(
-          Editor.nodes(this.editor, {
-            match: (n) => n.type === 'list-item',
-            at: Path.parent(parent[1]),
-            reverse: true,
-            mode: 'lowest',
-          }),
-        );
-        Transforms.setNodes(
-          this.editor,
-          { start: undefined },
-          { at: Path.parent(parent[1]) },
-        );
-        for (let l of listItems) {
-          Transforms.setNodes(
-            this.editor,
-            { checked: mode === 'task' ? l[0].checked || false : undefined },
-            { at: l[1] },
-          );
-        }
-      } else {
-        const childrenList: ListItemNode[] = [];
-        const selection = this.editor.selection;
-
-        if (!selection || Range.isCollapsed(selection)) {
-          // 如果没有选区或选区已折叠，使用当前节点
-          const textNodes =
-            curNode[0].type === 'paragraph'
-              ? curNode[0].children
-              : [{ text: Node.string(curNode[0]) }];
-
-          const item = {
-            type: 'list-item',
-            checked: mode === 'task' ? false : undefined,
-            children: [
-              {
-                type: 'paragraph',
-                children: textNodes,
-              },
-            ],
-          } as ListItemNode;
-          childrenList.push(item);
-
-          // 删除原节点
-          Transforms.delete(this.editor, { at: curNode[1] });
-        } else {
-          // 有选区时，获取选区内的所有节点
-          const selectedNodes = Array.from(
-            Editor.nodes(this.editor, {
-              at: selection,
-              match: (n) =>
-                Element.isElement(n) && ['paragraph', 'head'].includes(n.type),
-            }),
-          ) as Array<[Element & { type: string; children: any[] }, Path]>;
-
-          if (selectedNodes.length === 0) {
-            // 如果没有选中块级元素，尝试选中文本节点
-            const textNodes = Array.from(
-              Editor.nodes(this.editor, {
-                at: selection,
-                match: (n) => Text.isText(n),
-              }),
-            );
-
-            if (textNodes.length > 0) {
-              // 获取文本节点的父节点
-              const parentPath = Path.parent(textNodes[0][1]);
-              const [parentNode] = Editor.node(this.editor, parentPath);
-
-              if (
-                Element.isElement(parentNode) &&
-                ['paragraph', 'head'].includes(parentNode.type)
-              ) {
-                selectedNodes.push([
-                  parentNode as Element & { type: string; children: any[] },
-                  parentPath,
-                ]);
-              }
-            }
-          }
-
-          // 处理选中的节点
-          for (const [node, path] of selectedNodes as Array<
-            [Element & { type: string; children: any[] }, Path]
-          >) {
-            // 检查节点是否完全被选中
-            const nodeRange = Editor.range(this.editor, path);
-            const isFullySelected =
-              Range.equals(selection, nodeRange) ||
-              (Range.includes(selection, nodeRange) &&
-                Range.includes(nodeRange, selection));
-
-            if (isFullySelected) {
-              // 完全选中的节点，直接删除并转换为列表项
-              const textNodes =
-                (node as any).type === 'paragraph'
-                  ? (node as any).children
-                  : [{ text: Node.string(node) }];
-
-              const item = {
-                type: 'list-item',
-                checked: mode === 'task' ? false : undefined,
-                children: [
-                  {
-                    type: 'paragraph',
-                    children: textNodes,
-                  },
-                ],
-              } as ListItemNode;
-              childrenList.push(item);
-
-              Transforms.delete(this.editor, { at: path });
-            } else {
-              // 部分选中的节点，使用选区内容创建列表项
-              const selectedText = Editor.string(this.editor, selection);
-
-              if (selectedText.trim()) {
-                const item = {
-                  type: 'list-item',
-                  checked: mode === 'task' ? false : undefined,
-                  children: [
-                    {
-                      type: 'paragraph',
-                      children: [{ text: selectedText }],
-                    },
-                  ],
-                } as ListItemNode;
-                childrenList.push(item);
-                // 删除选中的内容
-                Transforms.delete(this.editor, { at: selection });
-              }
-            }
-          }
-        }
-
-        Transforms.insertNodes(
-          this.editor,
-          {
-            type: 'list',
-            order: mode === 'ordered',
-            task: mode === 'task',
-            children: childrenList,
-          },
-          { at: this.editor.selection || curNode[1], select: true },
-        );
-      }
-    } else if (curNode && curNode[0].type === 'list-item') {
-      Transforms.setNodes(
-        this.editor,
-        { order: mode === 'ordered', task: mode === 'task' },
-        { at: curNode[1] },
-      );
-    }
+    createList(this.editor, mode);
   }
 
   /**
@@ -800,7 +486,7 @@ export const useSystemKeyboard = (
   });
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const keydown = useCallback((e: KeyboardEvent) => {
+  const keydown = useRefFunction((e: KeyboardEvent) => {
     if (!store) return;
 
     if (isHotkey('mod+c', e) || isHotkey('mod+x', e)) {
@@ -879,7 +565,7 @@ export const useSystemKeyboard = (
         break;
       }
     }
-  }, []);
+  });
 
   useEffect(() => {
     if (props.readonly) return;

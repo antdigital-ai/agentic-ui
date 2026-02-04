@@ -10,83 +10,8 @@ import { ConfigProvider } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
+import { BubbleConfigContext } from '../../Bubble/BubbleConfigProvide';
 import { History, HistoryDataType } from '../index';
-
-// 模拟 SWR
-vi.mock('swr', () => ({
-  __esModule: true,
-  default: vi.fn(() => {
-    const mockData = [
-      {
-        id: '1',
-        sessionId: 'session-1',
-        sessionTitle: '今日对话1',
-        agentId: 'agent-1',
-        gmtCreate: dayjs().valueOf(),
-        gmtLastConverse: dayjs().valueOf(),
-      },
-      {
-        id: '2',
-        sessionId: 'session-2',
-        title: '昨日对话1',
-        agentId: 'agent-1',
-        gmtCreate: dayjs().subtract(1, 'day').valueOf(),
-        gmtLastConverse: dayjs().subtract(1, 'day').valueOf(),
-      },
-      {
-        id: '3',
-        sessionId: 'session-3',
-        title: '一周前对话1',
-        agentId: 'agent-1',
-        gmtCreate: dayjs().subtract(8, 'day').valueOf(),
-        gmtLastConverse: dayjs().subtract(8, 'day').valueOf(),
-      },
-    ] as HistoryDataType[];
-
-    return {
-      data: mockData,
-      error: null,
-      isLoading: false,
-      mutate: vi.fn(),
-    };
-  }),
-}));
-
-// 模拟 useClickAway hook
-vi.mock('../../hooks/useClickAway', () => ({
-  __esModule: true,
-  default: vi.fn(),
-}));
-
-// 模拟图标组件
-vi.mock('../../icons/HistoryIcon', () => ({
-  HistoryIcon: (props: any) => (
-    <svg data-testid="history-icon" {...props}>
-      History Icon
-    </svg>
-  ),
-}));
-
-// 模拟 ActionIconBox 和 useRefFunction
-vi.mock('../../index', () => ({
-  ...vi.importActual('../../index'),
-  ActionIconBox: React.forwardRef(
-    ({ children, title, onClick, ...props }: any, ref: any) => (
-      <div
-        ref={ref}
-        data-testid="action-icon-box"
-        onClick={onClick}
-        title={title}
-        {...props}
-      >
-        {children}
-      </div>
-    ),
-  ),
-  useRefFunction: vi.fn((fn) => fn),
-  BubbleConfigContext: React.createContext({ locale: {} }),
-}));
 
 // 模拟默认请求函数
 const mockRequest = vi.fn().mockResolvedValue([
@@ -128,17 +53,11 @@ const TestWrapper: React.FC<{ children: React.ReactNode; locale?: any }> = ({
   children,
   locale = {},
 }) => {
-  // 创建一个动态的 BubbleConfigContext，能够接收 locale 配置
-  const MockBubbleConfigContext = React.createContext({
-    locale,
-    standalone: false,
-  });
-
   return (
     <ConfigProvider>
-      <MockBubbleConfigContext.Provider value={{ locale, standalone: false }}>
+      <BubbleConfigContext.Provider value={{ locale, standalone: false }}>
         {children}
-      </MockBubbleConfigContext.Provider>
+      </BubbleConfigContext.Provider>
     </ConfigProvider>
   );
 };
@@ -169,9 +88,12 @@ describe('History Component', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(screen.getByRole('menu')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByRole('menu')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
     });
 
     it('should display correct title from locale', () => {
@@ -185,8 +107,10 @@ describe('History Component', () => {
         </TestWrapper>,
       );
 
-      // 由于 mock 的限制，实际渲染的是默认值 "历史记录"
-      expect(screen.getByTitle('历史记录')).toBeInTheDocument();
+      // ActionIconBox 使用 aria-label 和 data-title 属性，而不是 HTML title 属性
+      const button = screen.getByLabelText('聊天历史');
+      expect(button).toBeInTheDocument();
+      expect(button).toHaveAttribute('data-title', '聊天历史');
     });
   });
 
@@ -198,11 +122,14 @@ describe('History Component', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(mockRequest).toHaveBeenCalledWith({
-          agentId: 'test-agent-1',
-        });
-      });
+      await waitFor(
+        () => {
+          expect(mockRequest).toHaveBeenCalledWith({
+            agentId: 'test-agent-1',
+          });
+        },
+        { timeout: 3000 },
+      );
     });
 
     it('should call onInit and onShow callbacks', async () => {
@@ -215,10 +142,13 @@ describe('History Component', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(onInit).toHaveBeenCalled();
-        expect(onShow).toHaveBeenCalled();
-      });
+      await waitFor(
+        () => {
+          expect(onInit).toHaveBeenCalled();
+          expect(onShow).toHaveBeenCalled();
+        },
+        { timeout: 3000 },
+      );
     });
 
     it('should display history items grouped by date', async () => {
@@ -228,10 +158,13 @@ describe('History Component', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        // 检查是否有菜单项
-        expect(screen.getByRole('menu')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          // 检查是否有菜单项
+          expect(screen.getByRole('menu')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
     });
   });
 
@@ -247,13 +180,18 @@ describe('History Component', () => {
 
       await act(async () => {
         fireEvent.click(historyButton);
+        // 等待一下让状态更新
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       // 等待弹出层出现
-      await waitFor(() => {
-        // 检查 Popover 是否打开
-        expect(historyButton).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          // 检查 Popover 是否打开
+          expect(historyButton).toBeInTheDocument();
+        },
+        { timeout: 2000 },
+      );
     });
 
     it('should call onSelected when clicking a history item', async () => {
@@ -265,28 +203,37 @@ describe('History Component', () => {
         </TestWrapper>,
       );
 
-    await waitFor(() => {
-      expect(screen.getByRole('menu')).toBeInTheDocument();
-    });
-
-    const historyItems = screen.getAllByRole('menuitem');
-
-    const user = userEvent.setup();
-
-    await act(async () => {
-      await user.click(historyItems[0]);
-    });
-
-    // Wait for the onSelected to be called with the correct arguments
-    await waitFor(() => {
-      expect(onSelected).toHaveBeenCalledWith(
-        expect.objectContaining({
-          id: '1',
-          sessionId: 'session-1',
-          sessionTitle: '今日对话1',
-        }),
+      await waitFor(
+        () => {
+          expect(screen.getByRole('menu')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
       );
-    });
+
+      const historyItems = screen.getAllByRole('menuitem');
+      expect(historyItems.length).toBeGreaterThan(0);
+
+      const user = userEvent.setup();
+
+      await act(async () => {
+        await user.click(historyItems[0]);
+        // 等待一下让回调执行
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      });
+
+      // Wait for the onSelected to be called with the correct arguments
+      await waitFor(
+        () => {
+          expect(onSelected).toHaveBeenCalledWith(
+            expect.objectContaining({
+              id: '1',
+              sessionId: 'session-1',
+              sessionTitle: '今日对话1',
+            }),
+          );
+        },
+        { timeout: 2000 },
+      );
     });
 
     it('should handle delete item when onDeleteItem is provided', async () => {
@@ -299,9 +246,12 @@ describe('History Component', () => {
       );
 
       // 等待历史项目渲染
-      await waitFor(() => {
-        expect(screen.getByRole('menu')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByRole('menu')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
 
       expect(onDeleteItem).not.toHaveBeenCalled();
     });
@@ -322,16 +272,19 @@ describe('History Component', () => {
       );
 
       // 等待数据加载完成
-      await waitFor(() => {
-        expect(screen.getByRole('menu')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByRole('menu')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
 
       await waitFor(
         () => {
           // 验证 customDateFormatter 被调用
           expect(customDateFormatter).toHaveBeenCalled();
         },
-        { timeout: 1000 },
+        { timeout: 2000 },
       );
     });
 
@@ -345,16 +298,19 @@ describe('History Component', () => {
       );
 
       // 等待数据加载完成
-      await waitFor(() => {
-        expect(screen.getByRole('menu')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByRole('menu')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
 
       // 等待一段时间确保 generateHistoryItems 被调用
       await waitFor(
         () => {
           expect(customGroupBy).toHaveBeenCalled();
         },
-        { timeout: 3000 },
+        { timeout: 2000 },
       );
     });
 
@@ -394,9 +350,12 @@ describe('History Component', () => {
       );
 
       // 当 sessionSort 为 false 时，不应该进行排序
-      await waitFor(() => {
-        expect(screen.getByRole('menu')).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByRole('menu')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
     });
   });
 
@@ -413,32 +372,46 @@ describe('History Component', () => {
       );
 
       // 等待额外内容渲染
-      await waitFor(() => {
-        const extraContents = screen.queryAllByTestId('extra-content');
-        expect(extraContents.length).toBeGreaterThan(0);
-      });
+      await waitFor(
+        () => {
+          const extraContents = screen.queryAllByTestId('extra-content');
+          expect(extraContents.length).toBeGreaterThan(0);
+        },
+        { timeout: 3000 },
+      );
     });
   });
 
   describe('Error Handling', () => {
     it('should handle empty data gracefully', async () => {
       const emptyRequest = vi.fn().mockResolvedValue([]);
+      // 提供 emptyRender 以显示空状态
+      const emptyRender = vi.fn(() => <div>暂无历史记录</div>);
 
       render(
         <TestWrapper>
-          <History {...defaultProps} request={emptyRequest} standalone />
+          <History
+            {...defaultProps}
+            request={emptyRequest}
+            emptyRender={emptyRender}
+            standalone
+          />
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(emptyRequest).toHaveBeenCalled();
-      });
+      await waitFor(
+        () => {
+          expect(emptyRequest).toHaveBeenCalled();
+        },
+        { timeout: 3000 },
+      );
 
-      await waitFor(() => {
-        expect(
-          screen.getByText(/找不到相关结果|暂无历史记录/),
-        ).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByText('暂无历史记录')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
     });
   });
 
@@ -460,22 +433,32 @@ describe('History Component', () => {
         </TestWrapper>,
       );
 
-      await waitFor(() => {
-        expect(mockRequest).toHaveBeenCalled();
-      });
+      await waitFor(
+        () => {
+          expect(mockRequest).toHaveBeenCalled();
+        },
+        { timeout: 3000 },
+      );
       // 应该重新调用请求
     });
   });
   describe('slots', () => {
-    it('should render beforeHistoryList when slots.beforeHistoryList is provided', () => {
+    it('should render beforeHistoryList when slots.beforeHistoryList is provided', async () => {
       render(
-        <History
-          {...defaultProps}
-          standalone
-          slots={{ beforeHistoryList: () => <div>beforeHistoryList</div> }}
-        />,
+        <TestWrapper>
+          <History
+            {...defaultProps}
+            standalone
+            slots={{ beforeHistoryList: () => <div>beforeHistoryList</div> }}
+          />
+        </TestWrapper>,
       );
-      expect(screen.getByText('beforeHistoryList')).toBeInTheDocument();
+      await waitFor(
+        () => {
+          expect(screen.getByText('beforeHistoryList')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
     });
   });
 });

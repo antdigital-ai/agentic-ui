@@ -3,7 +3,8 @@
 import { message } from 'antd';
 import { Editor, Element, Node, Path, Range, Transforms } from 'slate';
 import { jsx } from 'slate-hyperscript';
-import { debugLog, EditorUtils } from '../utils';
+import { debugInfo } from '../../../Utils/debugUtils';
+import { EditorUtils } from '../utils';
 import { docxDeserializer } from '../utils/docx/docxDeserializer';
 
 import { BackspaceKey } from './hotKeyCommands/backspace';
@@ -13,6 +14,23 @@ const BATCH_SIZE = 10; // 每批处理的节点数量
 const BATCH_DELAY = 16; // 每批之间的延迟时间(ms)，约60fps
 const MAX_SYNC_SIZE = 1000; // 同步处理的最大字符数
 
+/** 文件上传时排除的片段类型 */
+const UPLOAD_EXCLUDED_FRAGMENT_TYPES = ['media', 'image'];
+
+/** card 的第二个子节点为 media/image 时排除上传 */
+const CARD_CONTENT_EXCLUDED_TYPES = ['media', 'image'];
+
+const shouldExcludeFromUpload = (fragment: any): boolean => {
+  if (UPLOAD_EXCLUDED_FRAGMENT_TYPES.includes(fragment?.type)) {
+    return true;
+  }
+  if (fragment?.type === 'card') {
+    const secondNode = fragment?.children?.[1];
+    return CARD_CONTENT_EXCLUDED_TYPES.includes(secondNode?.type);
+  }
+  return false;
+};
+
 const findElementByNode = (node: ChildNode) => {
   const index = Array.prototype.indexOf.call(node.parentNode!.childNodes, node);
   return node.parentElement!.children[index] as HTMLElement;
@@ -21,16 +39,86 @@ const fragment = new Set(['body', 'figure', 'div']);
 
 export const ELEMENT_TAGS = {
   BLOCKQUOTE: () => ({ type: 'blockquote' }),
-  H1: () => ({ type: 'head', level: 1 }),
-  H2: () => ({ type: 'head', level: 2 }),
-  H3: () => ({ type: 'head', level: 3 }),
-  H4: () => ({ type: 'head', level: 4 }),
-  H5: () => ({ type: 'head', level: 5 }),
+  H1: (el: HTMLElement) => {
+    const align =
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('align')
+        : null) ||
+      el?.style?.textAlign ||
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('data-align')
+        : null);
+    return {
+      type: 'head',
+      level: 1,
+      ...(align ? { align } : {}),
+    };
+  },
+  H2: (el: HTMLElement) => {
+    const align =
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('align')
+        : null) ||
+      el?.style?.textAlign ||
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('data-align')
+        : null);
+    return {
+      type: 'head',
+      level: 2,
+      ...(align ? { align } : {}),
+    };
+  },
+  H3: (el: HTMLElement) => {
+    const align =
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('align')
+        : null) ||
+      el?.style?.textAlign ||
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('data-align')
+        : null);
+    return {
+      type: 'head',
+      level: 3,
+      ...(align ? { align } : {}),
+    };
+  },
+  H4: (el: HTMLElement) => {
+    const align =
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('align')
+        : null) ||
+      el?.style?.textAlign ||
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('data-align')
+        : null);
+    return {
+      type: 'head',
+      level: 4,
+      ...(align ? { align } : {}),
+    };
+  },
+  H5: (el: HTMLElement) => {
+    const align =
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('align')
+        : null) ||
+      el?.style?.textAlign ||
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('data-align')
+        : null);
+    return {
+      type: 'head',
+      level: 5,
+      ...(align ? { align } : {}),
+    };
+  },
   TABLE: () => ({ type: 'table' }),
   IMG: (el: HTMLImageElement) => {
     // 添加更严格的图片URL验证，避免将普通URL误识别为图片
-    const src = el.src;
-    const alt = el.alt;
+    const src = el?.src;
+    const alt = el?.alt;
 
     // 检查是否为有效的图片URL
     const isValidImageUrl = (url: string): boolean => {
@@ -100,16 +188,34 @@ export const ELEMENT_TAGS = {
   TD: () => ({ type: 'table-cell' }),
   LI: () => ({ type: 'list-item' }),
   OL: () => ({ type: 'list', order: true }),
-  P: () => ({ type: 'paragraph' }),
+  P: (el: HTMLElement) => {
+    const align =
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('align')
+        : null) ||
+      el?.style?.textAlign ||
+      (el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('data-align')
+        : null);
+    return {
+      type: 'paragraph',
+      ...(align ? { align } : {}),
+    };
+  },
   PRE: () => ({ type: 'code' }),
-  UL: () => ({ type: 'list' }),
+  UL: () => ({ type: 'bulleted-list' }),
 };
 
 export const TEXT_TAGS = {
-  A: (el: HTMLElement) => ({ url: el.getAttribute('href') }),
+  A: (el: HTMLElement) => ({
+    url:
+      el && typeof el.getAttribute === 'function'
+        ? el.getAttribute('href')
+        : null,
+  }),
   CODE: () => ({ code: true }),
   KBD: () => ({ code: true }),
-  SPAN: (el: HTMLElement) => ({ text: el.textContent }),
+  SPAN: (el: HTMLElement) => ({ text: el?.textContent }),
   DEL: () => ({ strikethrough: true }),
   EM: () => ({ italic: true }),
   I: () => ({ italic: true }),
@@ -122,18 +228,18 @@ export const deserialize = (
   el: ChildNode,
   parentTag: string = '',
 ): string | any[] | null | Record<string, any> => {
-  if (el.nodeName.toLowerCase() === 'script') return [];
-  if (el.nodeName.toLowerCase() === 'style') return [];
-  if (el.nodeName.toLowerCase() === 'meta') return [];
-  if (el.nodeName.toLowerCase() === 'link') return [];
-  if (el.nodeName.toLowerCase() === 'head') return [];
-  if (el.nodeName.toLowerCase() === 'colgroup') return [];
-  if (el.nodeName.toLowerCase() === 'noscript') return [];
-  if (el.nodeType === 3) {
-    return el.textContent;
-  } else if (el.nodeType !== 1) {
+  if (el?.nodeName.toLowerCase() === 'script') return [];
+  if (el?.nodeName.toLowerCase() === 'style') return [];
+  if (el?.nodeName.toLowerCase() === 'meta') return [];
+  if (el?.nodeName.toLowerCase() === 'link') return [];
+  if (el?.nodeName.toLowerCase() === 'head') return [];
+  if (el?.nodeName.toLowerCase() === 'colgroup') return [];
+  if (el?.nodeName.toLowerCase() === 'noscript') return [];
+  if (el?.nodeType === 3) {
+    return el?.textContent;
+  } else if (el?.nodeType !== 1) {
     return null;
-  } else if (el.nodeName === 'BR') {
+  } else if (el?.nodeName === 'BR') {
     return '\n';
   }
 
@@ -141,10 +247,10 @@ export const deserialize = (
   let target = el;
   if (
     nodeName === 'PRE' &&
-    el.childNodes[0] &&
-    el.childNodes[0].nodeName === 'CODE'
+    el?.childNodes[0] &&
+    el?.childNodes[0].nodeName === 'CODE'
   ) {
-    target = el.childNodes[0];
+    target = el?.childNodes[0];
   }
   let children = Array.from(target.childNodes)
     .map((n) => {
@@ -153,15 +259,15 @@ export const deserialize = (
     .flat();
 
   if (children.length === 0) {
-    children = [{ text: el.textContent || '' }];
+    children = [{ text: el?.textContent || '' }];
   }
 
-  if (fragment.has(el.nodeName.toLowerCase())) {
+  if (fragment.has(el?.nodeName.toLowerCase())) {
     return jsx('fragment', {}, children);
   }
   if (
     TEXT_TAGS[nodeName as 'A'] &&
-    Array.from(el.childNodes).some(
+    Array.from(el?.childNodes).some(
       (e) => e.nodeType !== 3 && !TEXT_TAGS[e.nodeName as 'A'],
     )
   ) {
@@ -224,8 +330,9 @@ export const deserialize = (
 };
 
 const parserCodeText = (el: HTMLElement) => {
-  el.innerHTML = el.innerHTML.replace(/<br\/?>|<\/div>(?=\S)/g, '\n');
-  return el.innerText;
+  if (!el) return '';
+  el.innerHTML = el?.innerHTML.replace(/<br\/?>|<\/div>(?=\S)/g, '\n');
+  return el?.innerText;
 };
 
 const getTextsNode = (nodes: any[]) => {
@@ -248,9 +355,31 @@ const blobToFile = async (blobUrl: string, fileName: string) => {
 };
 
 /**
+ * 从片段列表中递归移除所有媒体类型的片段（图片、视频、音频等）
+ */
+const removeMediaFragments = (fragments: any[]): void => {
+  for (let i = fragments.length - 1; i >= 0; i--) {
+    const fragment = fragments[i];
+    if (fragment.type === 'media') {
+      fragments.splice(i, 1);
+      continue;
+    }
+    if (fragment?.children) {
+      removeMediaFragments(fragment.children);
+    }
+  }
+};
+
+/**
  * 分段处理文件上传，避免阻塞主线程
  */
 const upLoadFileBatch = async (fragmentList: any[], editorProps: any) => {
+  // 如果没有配置 upload，过滤掉所有媒体类型的片段
+  if (!editorProps.image?.upload) {
+    removeMediaFragments(fragmentList);
+    return;
+  }
+
   const mediaFragments: any[] = [];
 
   // 收集所有需要上传的媒体文件
@@ -372,9 +501,20 @@ const insertNodesBatch = async (
  * 优化的HTML解析函数，支持分段处理
  */
 const parseHtmlOptimized = async (html: string, rtf: string) => {
+  debugInfo('parseHtmlOptimized - 开始解析', {
+    htmlLength: html.length,
+    rtfLength: rtf.length,
+    useSync: html.length < MAX_SYNC_SIZE,
+  });
+
   // 对于小内容，使用同步处理
   if (html.length < MAX_SYNC_SIZE) {
-    return docxDeserializer(rtf, html.trim());
+    const result = docxDeserializer(rtf, html.trim());
+    debugInfo('parseHtmlOptimized - 同步解析完成', {
+      resultLength: result?.length,
+      resultTypes: result?.map((r) => r?.type),
+    });
+    return result;
   }
 
   // 对于大内容，使用异步处理
@@ -382,10 +522,16 @@ const parseHtmlOptimized = async (html: string, rtf: string) => {
     // 使用 requestIdleCallback 在空闲时间处理
     const processInIdle = () => {
       try {
+        debugInfo('parseHtmlOptimized - 异步解析开始');
         const result = docxDeserializer(rtf, html.trim());
+        debugInfo('parseHtmlOptimized - 异步解析完成', {
+          resultLength: result?.length,
+          resultTypes: result?.map((r) => r?.type),
+        });
         resolve(result);
       } catch (error) {
         console.error('HTML解析失败:', error);
+        debugInfo('parseHtmlOptimized - 解析失败', { error });
         resolve([]);
       }
     };
@@ -406,9 +552,18 @@ const parseHtmlOptimized = async (html: string, rtf: string) => {
  * @returns
  */
 export const htmlToFragmentList = (html: string, rtl: string) => {
-  let fragmentList = docxDeserializer(rtl, html.trim());
+  debugInfo('htmlToFragmentList - 开始转换', {
+    htmlLength: html.length,
+    rtlLength: rtl.length,
+  });
 
-  return fragmentList.map((fragment) => {
+  let fragmentList = docxDeserializer(rtl, html.trim());
+  debugInfo('htmlToFragmentList - 反序列化完成', {
+    fragmentListLength: fragmentList?.length,
+    fragmentTypes: fragmentList?.map((f) => f?.type),
+  });
+
+  const result = fragmentList.map((fragment) => {
     if (fragment.type === 'table') {
       return EditorUtils.wrapperCardNode(fragment);
     }
@@ -420,6 +575,13 @@ export const htmlToFragmentList = (html: string, rtl: string) => {
     }
     return fragment;
   });
+
+  debugInfo('htmlToFragmentList - 转换完成', {
+    resultLength: result.length,
+    resultTypes: result.map((r) => r?.type),
+  });
+
+  return result;
 };
 
 export const insertParsedHtmlNodes = async (
@@ -428,29 +590,34 @@ export const insertParsedHtmlNodes = async (
   editorProps: any,
   rtl: string,
 ) => {
+  debugInfo('insertParsedHtmlNodes - 开始插入 HTML 节点', {
+    htmlLength: html?.length,
+    htmlPreview: html?.substring(0, 200),
+    rtlLength: rtl?.length,
+    hasEditorProps: !!editorProps,
+  });
+
   // 1. 基础检查
   if (
     html.startsWith('<html>\r\n<body>\r\n\x3C!--StartFragment--><img src="')
   ) {
+    debugInfo('insertParsedHtmlNodes - 跳过特殊格式的 HTML');
     return false;
   }
-
-  // 2. 显示解析提示
-  const hideLoading = message.loading('parsing...', 0);
 
   try {
     // 3. 异步解析 HTML
     const fragmentList = await parseHtmlOptimized(html, rtl);
+
     if (!fragmentList?.length) {
-      hideLoading();
       return false;
     }
 
-    // 4. 异步处理文件上传
-    await upLoadFileBatch(fragmentList, editorProps);
-
-    debugLog('wordFragmentList', fragmentList);
-    hideLoading();
+    // 4. 异步处理文件上传（排除 media、image；card 需判断第二个节点类型）
+    const fragmentsToUpload = fragmentList.filter(
+      (f) => !shouldExcludeFromUpload(f),
+    );
+    await upLoadFileBatch(fragmentsToUpload, editorProps);
 
     // 5. 获取当前节点
     let [node] = Editor.nodes<Element>(editor, {
@@ -461,19 +628,32 @@ export const insertParsedHtmlNodes = async (
 
     // 6. 如果没有选区或路径无效，直接插入
     if (!selection || !Editor.hasPath(editor, selection.anchor.path)) {
-      const processedNodes = fragmentList?.map((item) => {
+      debugInfo('insertParsedHtmlNodes - 无有效选区，直接插入');
+      const processedNodes = fragmentsToUpload?.map((item) => {
         if (!item.type) {
           return { type: 'paragraph', children: [item] };
         }
         return item;
       });
 
+      debugInfo('insertParsedHtmlNodes - 处理后的节点', {
+        processedNodesLength: processedNodes?.length,
+        processedTypes: processedNodes?.map((n) => n?.type),
+      });
+
       await insertNodesBatch(editor, processedNodes);
+      debugInfo('insertParsedHtmlNodes - 节点插入完成');
       return true;
     }
 
     // 7. 处理非折叠选区
     if (!Range.isCollapsed(selection)) {
+      debugInfo('insertParsedHtmlNodes - 处理非折叠选区', {
+        selectionRange: {
+          anchor: selection.anchor,
+          focus: selection.focus,
+        },
+      });
       const back = new BackspaceKey(editor);
       back.range();
       Transforms.select(editor, Range.start(selection));
@@ -506,16 +686,34 @@ export const insertParsedHtmlNodes = async (
     // 9. 处理代码块和表格单元格
     const parsed = new DOMParser().parseFromString(html, 'text/html').body;
     const inner = !!parsed.querySelector('[data-be]');
+    debugInfo('insertParsedHtmlNodes - DOM 解析完成', {
+      hasDataBe: inner,
+      parsedBodyChildren: parsed.children.length,
+    });
 
     // 对于代码块，检查是否包含代码相关的标签
     if (node?.[0].type === 'code') {
+      debugInfo('insertParsedHtmlNodes - 当前节点是代码块', {
+        nodeType: node[0].type,
+      });
       const hasCodeTags =
         html.includes('<pre>') || html.includes('<code>') || inner;
+      debugInfo('insertParsedHtmlNodes - 代码块检查', {
+        hasPreTag: html.includes('<pre>'),
+        hasCodeTag: html.includes('<code>'),
+        hasDataBe: inner,
+        hasCodeTags,
+      });
       if (hasCodeTags) {
         // 从 HTML 中提取纯文本内容
         const textContent = parsed.textContent || '';
+        debugInfo('insertParsedHtmlNodes - 提取文本内容', {
+          textContentLength: textContent.length,
+          textContentPreview: textContent.substring(0, 100),
+        });
         if (textContent.trim()) {
           Transforms.insertText(editor, textContent.trim(), { at: selection! });
+          debugInfo('insertParsedHtmlNodes - 代码块文本插入完成');
           return true;
         }
       }
@@ -527,9 +725,22 @@ export const insertParsedHtmlNodes = async (
     }
 
     // 10. 处理列表项
-    if (node?.[0].type === 'list-item' && fragmentList[0].type === 'list') {
-      const children = fragmentList[0].children || [];
+    if (
+      node?.[0].type === 'list-item' &&
+      (fragmentsToUpload[0].type === 'list' ||
+        fragmentsToUpload[0].type === 'bulleted-list' ||
+        fragmentsToUpload[0].type === 'numbered-list')
+    ) {
+      debugInfo('insertParsedHtmlNodes - 处理列表项', {
+        currentNodeType: node[0].type,
+        fragmentListType: fragmentsToUpload[0].type,
+      });
+      const children = fragmentsToUpload[0].children || [];
+      debugInfo('insertParsedHtmlNodes - 列表项子节点', {
+        childrenCount: children.length,
+      });
       if (!children.length) {
+        debugInfo('insertParsedHtmlNodes - 列表项无子节点');
         return false;
       }
 
@@ -567,10 +778,10 @@ export const insertParsedHtmlNodes = async (
           });
         }
 
-        if (fragmentList.length > 1) {
+        if (fragmentsToUpload.length > 1) {
           await insertNodesBatch(
             editor,
-            fragmentList.slice(1),
+            fragmentsToUpload.slice(1),
             selection!.anchor.path,
             { select: true },
           );
@@ -581,7 +792,7 @@ export const insertParsedHtmlNodes = async (
 
     // 11. 处理表格单元格
     if (node?.[0].type === 'table-cell') {
-      Transforms.insertFragment(editor, getTextsNode(fragmentList), {
+      Transforms.insertFragment(editor, getTextsNode(fragmentsToUpload), {
         at: selection!,
       });
       return true;
@@ -589,8 +800,8 @@ export const insertParsedHtmlNodes = async (
 
     // 12. 处理标题
     if (node?.[0].type === 'head') {
-      if (fragmentList[0].type) {
-        if (fragmentList[0].type !== 'paragraph') {
+      if (fragmentsToUpload[0].type) {
+        if (fragmentsToUpload[0].type !== 'paragraph') {
           Transforms.insertNodes(
             editor,
             {
@@ -604,7 +815,7 @@ export const insertParsedHtmlNodes = async (
         return false;
       }
 
-      const texts = fragmentList.filter((c) => c.text);
+      const texts = fragmentsToUpload.filter((c) => c.text);
       if (texts.length) {
         await insertNodesBatch(editor, texts, selection!.anchor.path);
         return true;
@@ -614,11 +825,12 @@ export const insertParsedHtmlNodes = async (
 
     // 13. 处理单个段落的特殊情况
     if (
-      fragmentList.length === 1 &&
-      (fragmentList[0].type === 'paragraph' || !fragmentList[0].type) &&
+      fragmentsToUpload.length === 1 &&
+      (fragmentsToUpload[0].type === 'paragraph' ||
+        !fragmentsToUpload[0].type) &&
       node
     ) {
-      const text = Node.string(fragmentList[0]);
+      const text = Node.string(fragmentsToUpload[0]);
       if (text) {
         Transforms.insertText(editor, text, {
           at: selection!,
@@ -628,7 +840,8 @@ export const insertParsedHtmlNodes = async (
     }
 
     // 14. 默认情况：替换选中节点
-    const processedNodes = fragmentList?.map((item) => {
+    debugInfo('insertParsedHtmlNodes - 使用默认处理方式');
+    const processedNodes = fragmentsToUpload?.map((item) => {
       if (!item.type) {
         return { type: 'paragraph', children: [item] };
       }
@@ -642,12 +855,16 @@ export const insertParsedHtmlNodes = async (
       }
       return item;
     });
+    debugInfo('insertParsedHtmlNodes - 默认处理节点准备完成', {
+      processedNodesLength: processedNodes?.length,
+      processedTypes: processedNodes?.map((n) => n?.type),
+    });
     await insertNodesBatch(editor, processedNodes);
+    debugInfo('insertParsedHtmlNodes - 默认处理完成');
 
     return true;
   } catch (error) {
     console.error('插入HTML节点失败:', error);
-    hideLoading();
     message.error('Content parsing failed, please try again');
 
     return false;

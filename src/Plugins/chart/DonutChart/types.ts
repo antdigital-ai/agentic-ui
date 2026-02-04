@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChartContainerProps } from '../components';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
+import type { ChartClassNames, ChartStyles } from '../types/classNames';
 
 export interface DonutChartData {
   category?: string; // 分类
@@ -28,6 +29,8 @@ export interface DonutChartProps extends ChartContainerProps {
   width?: number | string;
   height?: number | string;
   className?: string;
+  /** 自定义CSS类名（支持对象格式，为每层DOM设置类名） */
+  classNames?: ChartClassNames;
   title?: string;
   showToolbar?: boolean;
   onDownload?: () => void;
@@ -49,4 +52,8 @@ export interface DonutChartProps extends ChartContainerProps {
   renderFilterInToolbar?: boolean;
   /** ChartStatistic组件配置：object表示单个配置，array表示多个配置 */
   statistic?: StatisticConfigType;
+  /** 是否显示加载状态（当图表未闭合时显示） */
+  loading?: boolean;
+  /** 自定义样式对象（支持对象格式，为每层DOM设置样式） */
+  styles?: ChartStyles;
 }

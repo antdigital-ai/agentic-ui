@@ -2,13 +2,32 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { message } from 'antd';
 import copy from 'copy-to-clipboard';
-import React from 'react';
+import React, { createContext } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CodeNode } from '../../../../src/MarkdownEditor/el';
 import {
   CodeToolbar,
   CodeToolbarProps,
 } from '../../../../src/Plugins/code/components/CodeToolbar';
+
+// 使用 vi.hoisted() 定义变量，使其与 vi.mock 一起被提升
+const { mockEditorStore } = vi.hoisted(() => {
+  return {
+    mockEditorStore: {
+      editorProps: {
+        codeProps: {
+          disableHtmlPreview: false,
+        },
+      },
+    },
+  };
+});
+
+vi.mock('../../../../src/MarkdownEditor/editor/store', () => ({
+  useEditorStore: () => mockEditorStore,
+  EditorStore: class EditorStore {},
+  EditorStoreContext: createContext(mockEditorStore),
+}));
 
 // Mock 依赖
 vi.mock('copy-to-clipboard');
@@ -91,6 +110,8 @@ describe('CodeToolbar', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // 重置 mockEditorStore 的配置
+    mockEditorStore.editorProps.codeProps.disableHtmlPreview = false;
   });
 
   describe('基本渲染测试', () => {
@@ -257,6 +278,253 @@ describe('CodeToolbar', () => {
       fireEvent.click(copyButton);
 
       expect(mockCopy).toHaveBeenCalledWith('');
+    });
+  });
+
+  describe('disableHtmlPreview 功能测试', () => {
+    it('当 disableHtmlPreview 为 false 时，HTML 代码块应该显示预览/代码切换按钮', () => {
+      mockEditorStore.editorProps.codeProps.disableHtmlPreview = false;
+      const htmlElement = { ...defaultElement, language: 'html' };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      expect(screen.getByTestId('segmented')).toBeInTheDocument();
+      expect(screen.getByText('预览')).toBeInTheDocument();
+      expect(screen.getByText('代码')).toBeInTheDocument();
+    });
+
+    it('当 disableHtmlPreview 为 true 时，HTML 代码块不应该显示预览/代码切换按钮', () => {
+      mockEditorStore.editorProps.codeProps.disableHtmlPreview = true;
+      const htmlElement = { ...defaultElement, language: 'html' };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      // 不应该显示预览/代码切换按钮
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 disableHtmlPreview 为 true 时，Markdown 代码块仍然显示预览/代码切换按钮', () => {
+      mockEditorStore.editorProps.codeProps.disableHtmlPreview = true;
+      const markdownElement = { ...defaultElement, language: 'markdown' };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={markdownElement}
+          isSelected={true}
+        />,
+      );
+
+      // Markdown 代码块应该仍然显示切换按钮
+      expect(screen.getByTestId('segmented')).toBeInTheDocument();
+      expect(screen.getByText('预览')).toBeInTheDocument();
+      expect(screen.getByText('代码')).toBeInTheDocument();
+    });
+
+    it('当 disableHtmlPreview 为 true 时，非 HTML/Markdown 代码块不受影响', () => {
+      mockEditorStore.editorProps.codeProps.disableHtmlPreview = true;
+      render(<CodeToolbar {...defaultProps} isSelected={true} />);
+
+      // JavaScript 代码块不应该显示切换按钮（这是正常行为）
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 disableHtmlPreview 未设置时，HTML 代码块应该显示预览/代码切换按钮', () => {
+      // @ts-ignore
+      mockEditorStore.editorProps.codeProps.disableHtmlPreview = undefined;
+      const htmlElement = { ...defaultElement, language: 'html' };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      // 默认情况下应该显示切换按钮
+      expect(screen.getByTestId('segmented')).toBeInTheDocument();
+      expect(screen.getByText('预览')).toBeInTheDocument();
+      expect(screen.getByText('代码')).toBeInTheDocument();
+    });
+  });
+
+  describe('JavaScript 自动检测功能测试', () => {
+    beforeEach(() => {
+      // 重置 mockEditorStore 的配置
+      mockEditorStore.editorProps.codeProps.disableHtmlPreview = false;
+    });
+
+    it('当 HTML 代码包含 <script> 标签时，应该隐藏预览/代码切换按钮', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value: '<script>alert("xss")</script><div>Content</div>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      // 不应该显示预览/代码切换按钮
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 HTML 代码包含事件处理器时，应该隐藏预览/代码切换按钮', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value: '<div onclick="alert(\'xss\')">Click me</div>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      // 不应该显示预览/代码切换按钮
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 HTML 代码包含 onerror 事件处理器时，应该隐藏预览/代码切换按钮', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value: '<img src="x" onerror="alert(\'xss\')">',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      // 不应该显示预览/代码切换按钮
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 HTML 代码包含 javascript: URL 时，应该隐藏预览/代码切换按钮', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value: '<a href="javascript:alert(\'xss\')">Link</a>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      // 不应该显示预览/代码切换按钮
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 HTML 代码包含 eval() 调用时，应该隐藏预览/代码切换按钮', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value: '<div>eval("alert(\'xss\')")</div>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      // 不应该显示预览/代码切换按钮
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 HTML 代码不包含 JavaScript 时，应该显示预览/代码切换按钮', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value: '<div><h1>Hello World</h1><p>Safe content</p></div>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      // 应该显示预览/代码切换按钮
+      expect(screen.getByTestId('segmented')).toBeInTheDocument();
+      expect(screen.getByText('预览')).toBeInTheDocument();
+      expect(screen.getByText('代码')).toBeInTheDocument();
+    });
+
+    it('当 HTML 代码包含纯 CSS 时，应该显示预览/代码切换按钮', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value:
+          '<style>.test { color: red; }</style><div class="test">Content</div>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      // 应该显示预览/代码切换按钮
+      expect(screen.getByTestId('segmented')).toBeInTheDocument();
+      expect(screen.getByText('预览')).toBeInTheDocument();
+      expect(screen.getByText('代码')).toBeInTheDocument();
+    });
+
+    it('当非 HTML 代码包含 JavaScript 时，不应该隐藏切换按钮（因为不是 HTML）', () => {
+      const jsElement = {
+        ...defaultElement,
+        language: 'javascript',
+        value: 'function test() { alert("xss"); }',
+      };
+      render(
+        <CodeToolbar {...defaultProps} element={jsElement} isSelected={true} />,
+      );
+
+      // JavaScript 代码块不应该显示切换按钮（这是正常行为，因为只有 HTML/Markdown 才显示）
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 HTML 代码包含多种 JavaScript 模式时，应该隐藏预览/代码切换按钮', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value:
+          '<script>alert("xss")</script><div onclick="test()">Click</div><a href="javascript:void(0)">Link</a>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+
+      // 不应该显示预览/代码切换按钮
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
     });
   });
 });

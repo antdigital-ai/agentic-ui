@@ -21,12 +21,8 @@ import {
  * @param props
  * @returns
  */
-export const ReadonlyBaseBar = (props: {
-  prefix?: string;
-  hashId?: string;
-}) => {
+export const ReadonlyBaseBar = (props: { prefix?: string }) => {
   const baseClassName = props.prefix || `toolbar-action`;
-  const { hashId } = props;
 
   const { refreshFloatBar, markdownEditorRef, editorProps } = useEditorStore();
 
@@ -52,7 +48,7 @@ export const ReadonlyBaseBar = (props: {
         <div
           role="button"
           key="highlight"
-          className={classnames(`${baseClassName}-item`, hashId)}
+          className={classnames(`${baseClassName}-item`)}
           onClick={async () => {
             if (typeof window === 'undefined') return;
             const domSelection = window.getSelection();
@@ -118,7 +114,7 @@ export const ReadonlyBaseBar = (props: {
         <div
           role="button"
           key="comment"
-          className={classnames(`${baseClassName}-item`, hashId)}
+          className={classnames(`${baseClassName}-item`)}
           onClick={() => {
             if (typeof window === 'undefined') return;
             const domSelection = window.getSelection();
@@ -173,6 +169,12 @@ export const ReadonlyBaseBar = (props: {
                     height: 100,
                     resize: 'none',
                   }}
+                  placeholder={
+                    editorProps?.comment?.placeholder ||
+                    editorProps?.titlePlaceholderContent ||
+                    i18n.locale?.inputPlaceholder ||
+                    '请输入内容...'
+                  }
                   onChange={(e) => {
                     comment.content = e.target.value;
                   }}
@@ -212,7 +214,7 @@ export const ReadonlyBaseBar = (props: {
       <div
         role="button"
         key="insert"
-        className={classnames(`${baseClassName}-item`, hashId)}
+        className={classnames(`${baseClassName}-item`)}
         onClick={() => {
           const domSelection = window.getSelection();
           const editor = markdownEditorRef.current;

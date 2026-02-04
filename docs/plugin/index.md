@@ -320,7 +320,7 @@ console.log("这是普通的 JavaScript 代码");
 `;
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h1>简单的 toMarkdown 插件示例</h1>
 
       <div style={{ marginBottom: '20px' }}>
@@ -510,7 +510,7 @@ console.log("这是普通的 JavaScript 代码");
 `;
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '12px' }}>
       <h1>复杂插件演示</h1>
 
       <div style={{ border: '1px solid #d9d9d9', borderRadius: '6px' }}>

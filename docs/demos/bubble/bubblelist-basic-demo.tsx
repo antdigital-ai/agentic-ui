@@ -63,6 +63,10 @@ export default () => {
       bubbleList.length % 2 === 0 ? 'user' : 'assistant',
       `这是第 ${bubbleList.length + 1} 条消息`,
     );
+    newMessage.extra = {
+      ...newMessage.extra,
+      preMessage: bubbleList.at(-1) || undefined,
+    };
     setBubbleList((prev) => [...prev, newMessage]);
     message.success('消息已添加');
   }, [bubbleList.length]);

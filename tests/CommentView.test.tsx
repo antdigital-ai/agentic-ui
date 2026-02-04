@@ -119,7 +119,6 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={[]}
           id="test-id"
-          hashId="test-hash"
         >
           <span>测试文本</span>
         </CommentView>,
@@ -137,7 +136,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={mockCommentData}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -157,7 +156,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={[]}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -175,7 +174,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={undefined as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -193,7 +192,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={null as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -211,7 +210,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={mockCommentData}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <div>
             <span>复杂</span>
@@ -253,7 +252,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={multipleComments}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -272,7 +271,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={mockCommentData}
           id="test-id"
-          hashId="test-hash"
+          
         >
           {null}
         </CommentView>,
@@ -291,7 +290,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={mockCommentData}
           id="test-id"
-          hashId="test-hash"
+          
         >
           {42}
         </CommentView>,
@@ -310,7 +309,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={mockCommentData}
           id="test-id"
-          hashId="test-hash"
+          
         >
           {true}
         </CommentView>,
@@ -331,7 +330,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={mockCommentData}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -354,7 +353,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={[]}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -372,7 +371,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={undefined as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -390,7 +389,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={null as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -408,7 +407,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={false as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -426,7 +425,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={0 as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -444,7 +443,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={'' as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -462,7 +461,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={NaN as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -480,7 +479,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={Infinity as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -498,7 +497,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={-Infinity as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -516,7 +515,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={-1 as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -534,7 +533,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={0.5 as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -552,7 +551,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={{ length: 0 } as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -570,7 +569,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={(() => []) as any}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,
@@ -588,7 +587,7 @@ describe('CommentView Component', () => {
           comment={mockComment}
           commentItem={mockCommentData}
           id="test-id"
-          hashId="test-hash"
+          
         >
           <span>测试文本</span>
         </CommentView>,

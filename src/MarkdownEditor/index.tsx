@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { standardPlugins } from '../Plugins/defaultPlugins';
 import { BaseMarkdownEditor, MarkdownEditorProps } from './BaseMarkdownEditor';
 export * from './BaseMarkdownEditor';
@@ -42,7 +42,7 @@ export * from './BaseMarkdownEditor';
  * - 支持内容变化监听
  * - 提供编辑器引用
  */
-export const MarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
+const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = (props) => {
   return (
     <BaseMarkdownEditor
       {...props}
@@ -50,3 +50,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
     />
   );
 };
+
+MarkdownEditorComponent.displayName = 'MarkdownEditor';
+
+// 使用 React.memo 优化性能，避免不必要的重新渲染
+export const MarkdownEditor = memo(MarkdownEditorComponent);

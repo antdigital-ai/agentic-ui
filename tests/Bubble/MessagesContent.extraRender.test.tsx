@@ -234,7 +234,7 @@ describe('BubbleMessageDisplay - extraRender 功能测试', () => {
       const props = {
         ...defaultProps,
         onLike: vi.fn(),
-        onDisLike: vi.fn(),
+        onDislike: vi.fn(),
         onReply: vi.fn(),
         bubbleRenderConfig: {
           extraRender: customExtraRender,

@@ -48,7 +48,7 @@ export const EXCEPTION = ({
         style={{
           color: token.colorError,
           lineHeight: '24px',
-          padding: '4px 20px',
+          padding: '4px var(--padding-3x)',
           wordBreak: 'break-all',
           textWrap: 'wrap',
         }}

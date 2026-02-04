@@ -80,7 +80,7 @@ const HistoryEmptyRenderDemo = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 12 }}>
       <div style={{ marginBottom: 20 }}>
         <h3>History 组件 - emptyRender 空状态渲染</h3>
         <p style={{ color: 'var(--color-gray-text-secondary)' }}>

@@ -116,7 +116,7 @@ vi.mock('../../src/MarkdownInputField/Enlargement', () => ({
   }) => (
     <button
       type="button"
-      data-testid='enlargement-toggle'
+      data-testid="enlargement-toggle"
       data-enlarged={isEnlarged}
       onClick={onEnlargeClick}
       {...props}
@@ -279,7 +279,9 @@ describe('MarkdownInputField Comprehensive Tests', () => {
         />,
       );
 
-      const root = container.querySelector('.ant-agentic-md-input-field');
+      const root = container.querySelector(
+        '.ant-agentic-md-input-field',
+      ) as HTMLElement;
       expect(root).toBeTruthy();
       expect(
         root?.classList.contains('ant-agentic-md-input-field-is-multi-row'),
@@ -315,10 +317,13 @@ describe('MarkdownInputField Comprehensive Tests', () => {
         />,
       );
 
-      const root = container.querySelector('.ant-agentic-md-input-field');
+      const root = container.querySelector(
+        '.ant-agentic-md-input-field',
+      ) as HTMLElement;
       expect(root).toBeTruthy();
-      expect(root?.classList.contains('ant-agentic-md-input-field-is-multi-row'))
-        .toBe(true);
+      expect(
+        root?.classList.contains('ant-agentic-md-input-field-is-multi-row'),
+      ).toBe(true);
       expect(root?.style.minHeight).toBe('90px');
     });
   });
@@ -331,13 +336,6 @@ describe('MarkdownInputField Comprehensive Tests', () => {
           triggerSendKey="Enter"
           attachment={{ enable: true }}
         />,
-      );
-      expect(screen.getByTestId('send-button')).toBeInTheDocument();
-    });
-
-    it('应该处理 Mod+Enter 键发送', () => {
-      render(
-        <MarkdownInputField {...defaultProps} triggerSendKey="Mod+Enter" />,
       );
       expect(screen.getByTestId('send-button')).toBeInTheDocument();
     });

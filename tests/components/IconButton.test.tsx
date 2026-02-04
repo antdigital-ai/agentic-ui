@@ -1,11 +1,19 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { IconButton } from '../../src/Components/Button/IconButton';
 
 describe('IconButton 组件', () => {
   const TestIcon = () => <span data-testid="test-icon">📌</span>;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   it('应该渲染基本的图标按钮', () => {
     const { container } = render(<IconButton icon={<TestIcon />} />);
@@ -33,7 +41,9 @@ describe('IconButton 组件', () => {
 
   it('应该处理异步点击事件', async () => {
     const asyncClick = vi.fn(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
     });
 
     render(<IconButton icon={<TestIcon />} onClick={asyncClick} />);
@@ -41,9 +51,11 @@ describe('IconButton 组件', () => {
     const button = screen.getByRole('button');
     fireEvent.click(button);
 
-    await waitFor(() => {
-      expect(asyncClick).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      vi.advanceTimersByTime(100);
     });
+
+    expect(asyncClick).toHaveBeenCalledTimes(1);
   });
 
   it('应该在禁用状态下阻止点击', () => {

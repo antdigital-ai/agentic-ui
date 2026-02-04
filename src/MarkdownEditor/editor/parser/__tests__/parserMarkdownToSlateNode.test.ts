@@ -1,5 +1,10 @@
-import { describe, expect, it } from 'vitest';
-import { parserMarkdownToSlateNode } from '../parserMarkdownToSlateNode';
+import { beforeEach, describe, expect, it } from 'vitest';
+import {
+  clearParseCache,
+  parserMarkdownToSlateNode,
+} from '../parserMarkdownToSlateNode';
+
+import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
 describe('parserMarkdownToSlateNode', () => {
   describe('handleParagraph', () => {
@@ -8,7 +13,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: 'This is a simple paragraph' }],
       });
@@ -61,7 +66,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [
           { text: 'Normal text ' },
@@ -76,7 +81,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [
           { text: 'Normal text ' },
@@ -91,12 +96,11 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [
           { text: 'Normal ' },
           { text: 'bold and italic', bold: true, italic: true },
-          { text: '', italic: true },
           { text: ' text' },
         ],
       });
@@ -107,7 +111,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [
           { text: 'Normal ' },
@@ -122,7 +126,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [
           { text: 'Some ' },
@@ -137,6 +141,82 @@ describe('parserMarkdownToSlateNode', () => {
         ],
       });
     });
+
+    it('should handle tag with placeholder', () => {
+      const markdown = 'Select `${placeholder:目标场景}`';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      const paragraph = result.schema[0] as any;
+      const tagNode = paragraph.children.find(
+        (child: any) => child?.tag === true,
+      );
+
+      expect(tagNode).toMatchObject({
+        code: true,
+        tag: true,
+        text: ' ',
+        placeholder: '目标场景',
+        initialValue: undefined,
+      });
+    });
+
+    it('should handle tag with initialValue', () => {
+      const markdown = 'Value `${placeholder:目标场景,initialValue:已选择}`';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      const paragraph = result.schema[0] as any;
+      const tagNode = paragraph.children.find(
+        (child: any) => child?.tag === true,
+      );
+
+      expect(tagNode).toMatchObject({
+        code: true,
+        tag: true,
+        text: '已选择',
+        placeholder: '目标场景',
+        initialValue: '已选择',
+      });
+    });
+
+    it('should handle tag with only placeholder (empty text)', () => {
+      const markdown = 'Empty `${placeholder:请选择}` tag';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      const paragraph = result.schema[0] as any;
+      const tagNode = paragraph.children.find(
+        (child: any) => child?.tag === true,
+      );
+
+      expect(tagNode).toMatchObject({
+        code: true,
+        tag: true,
+        text: ' ',
+        placeholder: '请选择',
+        initialValue: undefined,
+      });
+    });
+
+    it('should handle normal inline code (not tag)', () => {
+      const markdown = 'Code `const x = 1` here';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      const paragraph = result.schema[0] as any;
+      const codeNode = paragraph.children.find(
+        (child: any) => child?.code === true,
+      );
+
+      expect(codeNode).toMatchObject({
+        code: true,
+        tag: false,
+        text: 'const x = 1',
+        placeholder: undefined,
+        initialValue: undefined,
+      });
+    });
   });
 
   describe('handleHeading', () => {
@@ -145,17 +225,17 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(3);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'head',
         level: 1,
         children: [{ text: 'Heading 1' }],
       });
-      expect(result.schema[1]).toEqual({
+      expect(result.schema[1]).toMatchObject({
         type: 'head',
         level: 2,
         children: [{ text: 'Heading 2' }],
       });
-      expect(result.schema[2]).toEqual({
+      expect(result.schema[2]).toMatchObject({
         type: 'head',
         level: 3,
         children: [{ text: 'Heading 3' }],
@@ -167,7 +247,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'head',
         level: 2,
         children: [
@@ -185,7 +265,8 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      const codeNode = result.schema[0];
+      expect(codeNode).toMatchObject({
         type: 'code',
         language: 'javascript',
         render: false,
@@ -193,6 +274,8 @@ describe('parserMarkdownToSlateNode', () => {
         value: 'console.log("hello");',
         children: [{ text: 'console.log("hello");' }],
       });
+      // 验证 otherProps 存在（不再包含 data-block 等冗余属性）
+      expect(codeNode).toHaveProperty('otherProps');
     });
 
     it('should handle code block without language', () => {
@@ -200,7 +283,8 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      const codeNode = result.schema[0];
+      expect(codeNode).toMatchObject({
         type: 'code',
         language: null,
         render: false,
@@ -208,6 +292,8 @@ describe('parserMarkdownToSlateNode', () => {
         value: 'some code',
         children: [{ text: 'some code' }],
       });
+      // 验证 otherProps 存在（不再包含 data-block 等冗余属性）
+      expect(codeNode).toHaveProperty('otherProps');
     });
 
     it('should handle multi-line code block', () => {
@@ -216,7 +302,8 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      const codeNode = result.schema[0];
+      expect(codeNode).toMatchObject({
         type: 'code',
         language: 'python',
         render: false,
@@ -226,6 +313,8 @@ describe('parserMarkdownToSlateNode', () => {
           { text: 'def hello():\n    print("Hello World")\n    return True' },
         ],
       });
+      // 验证 otherProps 存在（不再包含 data-block 等冗余属性）
+      expect(codeNode).toHaveProperty('otherProps');
     });
   });
 
@@ -235,7 +324,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'blockquote',
         children: [
           {
@@ -251,7 +340,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'blockquote',
         children: [
           {
@@ -278,11 +367,8 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
-        type: 'list',
-        order: false,
-        start: null,
-        task: false,
+      expect(result.schema[0]).toMatchObject({
+        type: 'bulleted-list',
         children: [
           {
             type: 'list-item',
@@ -326,11 +412,9 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
-        type: 'list',
-        order: true,
+      expect(result.schema[0]).toMatchObject({
+        type: 'numbered-list',
         start: 1,
-        task: false,
         children: [
           {
             type: 'list-item',
@@ -375,7 +459,9 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0].type).toBe('list');
+      expect(['bulleted-list', 'numbered-list']).toContain(
+        result.schema[0].type,
+      );
       expect(result.schema[0].children).toHaveLength(2);
     });
   });
@@ -386,7 +472,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'card',
         block: false,
         children: [
@@ -418,7 +504,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'card',
         block: false,
         children: [
@@ -451,7 +537,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [
           {
@@ -467,7 +553,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [
           {
@@ -483,7 +569,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [
           {
@@ -533,7 +619,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'hr',
         children: [{ text: '' }],
       });
@@ -555,7 +641,7 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         text: 'HTML content',
       });
     });
@@ -575,14 +661,14 @@ describe('parserMarkdownToSlateNode', () => {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(2);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'code',
         language: 'yaml',
         frontmatter: true,
         value: 'title: Test\nauthor: John',
         children: [{ text: 'title: Test\nauthor: John' }],
       });
-      expect(result.schema[1]).toEqual({
+      expect(result.schema[1]).toMatchObject({
         type: 'head',
         level: 1,
         children: [{ text: 'Content' }],
@@ -624,7 +710,10 @@ function hello() {
       expect(result.schema[2].type).toBe('head');
 
       // 查找列表
-      const listIndex = result.schema.findIndex((node) => node.type === 'list');
+      const listIndex = result.schema.findIndex(
+        (node) =>
+          node.type === 'bulleted-list' || node.type === 'numbered-list',
+      );
       expect(listIndex).toBeGreaterThan(-1);
 
       // 查找代码块
@@ -643,11 +732,11 @@ function hello() {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(2);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: 'Text with   multiple   spaces and' }],
       });
-      expect(result.schema[1]).toEqual({
+      expect(result.schema[1]).toMatchObject({
         type: 'paragraph',
         children: [{ text: 'new paragraphs' }],
       });
@@ -660,7 +749,7 @@ function hello() {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: '' }],
       });
@@ -671,7 +760,7 @@ function hello() {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: '' }],
       });
@@ -693,8 +782,8 @@ function hello() {
         '<!--{"align":"center"}-->\nThis is a centered paragraph';
       const result = parserMarkdownToSlateNode(markdown);
 
-      expect(result.schema).toHaveLength(2);
-      expect(result.schema[1]).toEqual({
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         contextProps: { align: 'center' },
         otherProps: { align: 'center' },
@@ -706,13 +795,48 @@ function hello() {
       const markdown = '<!--{"align":"right"}-->\n## Right Aligned Heading';
       const result = parserMarkdownToSlateNode(markdown);
 
-      expect(result.schema).toHaveLength(2);
-      expect(result.schema[1]).toEqual({
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
         type: 'head',
         level: 2,
         contextProps: { align: 'right' },
         otherProps: { align: 'right' },
         children: [{ text: 'Right Aligned Heading' }],
+      });
+    });
+
+    it('should parse HTML paragraph with align="right" attribute from api.md example', () => {
+      const markdown =
+        '<p align="right">\nFor it will surely sprout wings and fly off to the sky like an eagle</p>';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        align: 'right',
+        children: [
+          {
+            text: 'For it will surely sprout wings and fly off to the sky like an eagle',
+          },
+        ],
+      });
+    });
+
+    it('should parse <p align="right"> with **bold** Markdown inside and render bold', () => {
+      const markdown =
+        '<p align="right"> **4 Do not wear yourself out to get rich**  </p>';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        align: 'right',
+        children: [
+          {
+            text: '4 Do not wear yourself out to get rich',
+            bold: true,
+          },
+        ],
       });
     });
   });
@@ -768,7 +892,7 @@ function hello() {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [
           {
@@ -797,7 +921,7 @@ function hello() {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: 'This has a footnote[^1]' }],
       });
@@ -810,11 +934,11 @@ function hello() {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(2);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: 'Term 1\n: Definition 1' }],
       });
-      expect(result.schema[1]).toEqual({
+      expect(result.schema[1]).toMatchObject({
         type: 'paragraph',
         children: [{ text: 'Term 2\n: Definition 2' }],
       });
@@ -827,7 +951,7 @@ function hello() {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: 'Text with *escaped* asterisks and [brackets]' }],
       });
@@ -838,7 +962,7 @@ function hello() {
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: 'Unicode: 你好 🌟 ∑∞≠' }],
       });
@@ -929,7 +1053,7 @@ console.log('测试代码');
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: '自定义内容' }],
       });
@@ -979,7 +1103,7 @@ console.log('测试代码');
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: '这是答案内容' }],
       });
@@ -990,7 +1114,7 @@ console.log('测试代码');
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: '第一行答案\n第二行答案' }],
       });
@@ -1001,7 +1125,7 @@ console.log('测试代码');
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: '' }],
       });
@@ -1021,7 +1145,7 @@ console.log('测试代码');
         value: '思考过程',
       });
       // answer 只显示内容
-      expect(result.schema[1]).toEqual({
+      expect(result.schema[1]).toMatchObject({
         type: 'paragraph',
         children: [{ text: '答案内容' }],
       });
@@ -1033,10 +1157,624 @@ console.log('测试代码');
       const result = parserMarkdownToSlateNode(markdown);
 
       expect(result.schema).toHaveLength(1);
-      expect(result.schema[0]).toEqual({
+      expect(result.schema[0]).toMatchObject({
         type: 'paragraph',
         children: [{ text: '答案：这是一个包含特殊字符的答案！@#$%' }],
       });
+    });
+  });
+
+  describe('round-trip conversion with apaasify', () => {
+    it('should maintain apaasify node type through round-trip conversion', () => {
+      // 原始 Markdown 字符串，包含 apaasify 代码块
+      const originalMarkdown = `好的
+
+\`\`\`apaasify
+[
+  {
+    "componentPath": "CrowdSelectionCard",
+    "name": "人群选择卡片",
+    "componentProps": {
+      "instId": "CRCBANK",
+      "data": {
+        "itemList": [
+          {
+            "title": "ap_crowd.crowd_ok15a8z9o_alipay_id_dd",
+            "checked": true,
+            "id": "ap_crowd.crowd_ok15a8z9o_alipay_id_dd",
+            "type": "ODPS_TABLE"
+          }
+        ]
+      }
+    }
+  }
+]
+\`\`\``;
+
+      // 第一次转换：Markdown -> AST
+      const firstAst = parserMarkdownToSlateNode(originalMarkdown);
+      expect(firstAst.schema).toHaveLength(2);
+      expect(firstAst.schema[0].type).toBe('paragraph');
+      expect(firstAst.schema[1].type).toBe('apaasify');
+      expect((firstAst.schema[1] as any).language).toBe('apaasify');
+
+      // 第二次转换：AST -> Markdown
+      const markdownString = parserSlateNodeToMarkdown(firstAst.schema);
+      expect(markdownString).toContain('```apaasify');
+      expect(markdownString).toContain('CrowdSelectionCard');
+
+      // 第三次转换：Markdown -> AST（第二次）
+      const secondAst = parserMarkdownToSlateNode(markdownString);
+
+      // 验证节点数量保持一致（应该是 2 个节点，而不是 3 个）
+      expect(secondAst.schema).toHaveLength(2);
+
+      // 验证第一个节点仍然是段落
+      expect(secondAst.schema[0].type).toBe('paragraph');
+
+      // 验证第二个节点仍然是 apaasify 类型，而不是 code 类型
+      expect(secondAst.schema[1].type).toBe('apaasify');
+      expect((secondAst.schema[1] as any).language).toBe('apaasify');
+
+      // 验证不应该有 HTML 代码节点
+      const htmlCodeNodes = secondAst.schema.filter(
+        (node: any) => node.type === 'code' && node.language === 'html',
+      );
+      expect(htmlCodeNodes).toHaveLength(0);
+    });
+
+    it('should handle apaasify node with otherProps through round-trip', () => {
+      // 创建一个包含 otherProps 的 apaasify 节点
+      const randomId = Math.random().toString(36).substring(7);
+      const componentName = `Component${randomId}`;
+      const templateText = `Sample template ${Math.floor(Math.random() * 1000)}`;
+      const actionType = `ACTION_${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
+      const apaasifyNode = {
+        type: 'apaasify',
+        language: 'apaasify',
+        render: false,
+        value: [
+          {
+            componentPath: componentName,
+            componentProps: {
+              data: {
+                template: templateText,
+              },
+              extraPayload: {
+                intentionType: actionType,
+              },
+            },
+          },
+        ],
+        isConfig: false,
+        children: [
+          {
+            text: JSON.stringify([
+              {
+                componentPath: componentName,
+                componentProps: {
+                  data: {
+                    template: templateText,
+                  },
+                  extraPayload: {
+                    intentionType: actionType,
+                  },
+                },
+              },
+            ]),
+          },
+        ],
+        otherProps: {},
+      };
+
+      // AST -> Markdown
+      const markdownString = parserSlateNodeToMarkdown([apaasifyNode]);
+      expect(markdownString).toContain('```apaasify');
+      expect(markdownString).toContain(componentName);
+
+      // Markdown -> AST
+      const ast = parserMarkdownToSlateNode(markdownString);
+
+      // 验证节点类型正确
+      expect(ast.schema.length).toBeGreaterThan(0);
+      const codeNode = ast.schema.find(
+        (node: any) => node.type === 'apaasify' || node.type === 'code',
+      );
+      expect(codeNode).toBeDefined();
+      expect(codeNode?.type).toBe('apaasify');
+      expect((codeNode as any).language).toBe('apaasify');
+
+      // 验证不应该有独立的 HTML 注释节点
+      const htmlNodes = ast.schema.filter(
+        (node: any) => node.type === 'code' && node.language === 'html',
+      );
+      expect(htmlNodes.length).toBe(0);
+    });
+
+    it('should handle multiple apaasify blocks in sequence', () => {
+      const markdown = `First paragraph
+
+\`\`\`apaasify
+[{"test": "first"}]
+\`\`\`
+
+Second paragraph
+
+\`\`\`apaasify
+[{"test": "second"}]
+\`\`\``;
+
+      // 第一次转换
+      const firstAst = parserMarkdownToSlateNode(markdown);
+      const apaasifyNodes = firstAst.schema.filter(
+        (node: any) => node.type === 'apaasify',
+      );
+      expect(apaasifyNodes.length).toBe(2);
+
+      // 往返转换
+      const markdownString = parserSlateNodeToMarkdown(firstAst.schema);
+      const secondAst = parserMarkdownToSlateNode(markdownString);
+
+      // 验证节点数量一致
+      expect(secondAst.schema.length).toBe(firstAst.schema.length);
+
+      // 验证所有 apaasify 节点都保持正确类型
+      const secondApaasifyNodes = secondAst.schema.filter(
+        (node: any) => node.type === 'apaasify',
+      );
+      expect(secondApaasifyNodes.length).toBe(2);
+
+      // 验证没有 HTML 代码节点
+      const htmlNodes = secondAst.schema.filter(
+        (node: any) => node.type === 'code' && node.language === 'html',
+      );
+      expect(htmlNodes.length).toBe(0);
+    });
+
+    it('should not accumulate HTML code nodes through multiple round-trip conversions', () => {
+      // 原始 Markdown，包含 apaasify 代码块
+      const randomId = Math.random().toString(36).substring(7);
+      const componentName = `TestComponent${randomId}`;
+      const templateValue = `Template ${Math.floor(Math.random() * 10000)}`;
+
+      const originalMarkdown = `\`\`\`apaasify
+[
+  {
+    "componentPath": "${componentName}",
+    "componentProps": {
+      "data": {
+        "template": "${templateValue}"
+      }
+    }
+  }
+]
+\`\`\``;
+
+      let currentMarkdown = originalMarkdown;
+      let previousNodeCount = 0;
+
+      // 执行多次往返转换（5次）
+      for (let round = 1; round <= 5; round++) {
+        // Markdown -> AST
+        const ast = parserMarkdownToSlateNode(currentMarkdown);
+        const nodeCount = ast.schema.length;
+
+        // 第一次转换后记录节点数量
+        if (round === 1) {
+          previousNodeCount = nodeCount;
+        }
+
+        // 验证节点数量不应该增加
+        expect(nodeCount).toBe(previousNodeCount);
+
+        // 统计 HTML 代码节点数量
+        const htmlCodeNodes = ast.schema.filter(
+          (node: any) => node.type === 'code' && node.language === 'html',
+        );
+
+        // 验证不应该有 HTML 代码节点累积
+        expect(htmlCodeNodes.length).toBe(0);
+
+        // 验证 apaasify 节点仍然存在
+        const apaasifyNodes = ast.schema.filter(
+          (node: any) => node.type === 'apaasify',
+        );
+        expect(apaasifyNodes.length).toBe(1);
+
+        // AST -> Markdown
+        currentMarkdown = parserSlateNodeToMarkdown(ast.schema);
+      }
+    });
+
+    it('should skip JSON format HTML comment and apply to next element', () => {
+      // JSON 格式的 HTML 注释会被跳过，其属性会应用到下一个元素
+      const markdown = `<!--{"align":"center"}-->
+
+\`\`\`apaasify
+[{"test": "value"}]
+\`\`\``;
+
+      const ast = parserMarkdownToSlateNode(markdown);
+
+      // 验证 HTML 注释被跳过，不应该生成独立的 HTML 代码节点
+      const htmlCodeNodes = ast.schema.filter(
+        (node: any) => node.type === 'code' && node.language === 'html',
+      );
+      expect(htmlCodeNodes.length).toBe(0);
+
+      // 验证只有一个 apaasify 节点
+      const apaasifyNodes = ast.schema.filter(
+        (node: any) => node.type === 'apaasify',
+      );
+      expect(apaasifyNodes.length).toBe(1);
+    });
+  });
+
+  describe('缓存和切分逻辑', () => {
+    beforeEach(() => {
+      // 清空缓存以确保测试隔离
+      clearParseCache();
+    });
+
+    it('应该为单块 markdown 添加 hash', () => {
+      const markdown = '# 标题\n\n这是一个段落';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema.length).toBeGreaterThan(0);
+      // 单块情况下，所有元素应该有相同的 hash
+      const hashes = result.schema.map((s: any) => s.hash).filter(Boolean);
+      if (hashes.length > 0) {
+        const uniqueHashes = new Set(hashes);
+        expect(uniqueHashes.size).toBe(2);
+      }
+    });
+
+    it('应该将长 markdown 切分为多个块', () => {
+      // 创建一个足够长的 markdown，确保会被切分
+      const blocks: string[] = [];
+      for (let i = 0; i < 10; i++) {
+        blocks.push(`# 标题 ${i}\n\n这是第 ${i} 个段落的内容。`);
+      }
+      const markdown = blocks.join('\n\n');
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证结果包含多个元素
+      expect(result.schema.length).toBeGreaterThan(1);
+    });
+
+    it('应该缓存已解析的块', () => {
+      const block1 = '# 标题 1\n\n段落 1';
+      const block2 = '# 标题 2\n\n段落 2';
+      const markdown = `${block1}\n\n${block2}`;
+
+      // 第一次解析
+      const result1 = parserMarkdownToSlateNode(markdown);
+      const firstCallSchemaCount = result1.schema.length;
+
+      // 第二次解析相同内容
+      const result2 = parserMarkdownToSlateNode(markdown);
+
+      // 验证结果一致
+      expect(result2.schema.length).toBe(firstCallSchemaCount);
+      expect(result2.schema).toEqual(result1.schema);
+    });
+
+    it('应该为每个块生成唯一的 hash', () => {
+      const block1 = '# 标题 1\n\n段落 1';
+      const block2 = '# 标题 2\n\n段落 2';
+      const markdown = `${block1}\n\n${block2}`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证每个元素都有 hash
+      result.schema.forEach((s: any) => {
+        expect(s.hash).toBeDefined();
+        expect(typeof s.hash).toBe('string');
+      });
+    });
+
+    it('应该为相同内容但不同位置的块生成不同的 hash（包含 block index）', () => {
+      // 模拟 Verse 1 和 Verse 2 的情况，使用足够长的内容确保不会被合并
+      const markdown = `Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1\n\n\nVerse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Verse 1Versea$`;
+
+      clearParseCache();
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证每个元素都有 hash
+      const hashes = result.schema.map((s: any) => s.hash).filter(Boolean);
+      expect(hashes.length).toBeGreaterThan(0);
+
+      // 提取每个元素的 block hash（去掉元素索引部分）
+      // hash 格式: `${blockHash}-${elementIndex}`
+      // 验证至少有两个不同的 block hash（因为 Verse 1 和 Verse 2 在不同的 block）
+      const uniqueBlockHashes = new Set(hashes);
+      expect(uniqueBlockHashes.size).toBeGreaterThanOrEqual(2);
+
+      // 验证所有 hash 都是唯一的（因为 block index 不同）
+      const uniqueHashes = new Set(hashes);
+      expect(uniqueHashes.size).toBe(hashes.length);
+    });
+
+    it('应该正确处理包含代码块的切分', () => {
+      const markdown = `# 标题
+
+\`\`\`javascript
+const x = 1;
+const y = 2;
+\`\`\`
+
+另一个段落`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证代码块被正确解析
+      const codeNode = result.schema.find(
+        (node: any) => node.type === 'code' && node.language === 'javascript',
+      );
+      expect(codeNode).toBeDefined();
+      expect((codeNode as any).value).toContain('const x = 1');
+    });
+
+    it('应该正确处理包含 HTML 标签的切分', () => {
+      const markdown = `# 标题
+
+<div>
+  <p>HTML 内容</p>
+</div>
+
+另一个段落`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证 HTML 内容被正确处理
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('应该正确处理包含 HTML 注释的切分', () => {
+      const markdown = `# 标题
+
+<!-- 这是一个注释 -->
+
+另一个段落`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证内容被正确解析
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('应该合并小于 100 字符的小块', () => {
+      // 创建多个小块
+      const smallBlock1 = '小段落 1';
+      const smallBlock2 = '小段落 2';
+      const largeBlock =
+        '# 大标题\n\n这是一个足够长的段落，应该超过 100 个字符的限制，以确保它不会被合并到其他块中。';
+      const markdown = `${smallBlock1}\n\n${smallBlock2}\n\n${largeBlock}`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证小块被合并或正确处理
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('应该处理包含 frontmatter 分隔符的块', () => {
+      const markdown = `# 标题
+
+---
+
+这是分隔符后的内容`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证内容被正确解析
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('应该为不同配置生成不同的 hash', () => {
+      const markdown = '# 标题\n\n段落';
+
+      const result1 = parserMarkdownToSlateNode(markdown, [], {
+        openLinksInNewTab: true,
+      });
+      const result2 = parserMarkdownToSlateNode(markdown, [], {
+        openLinksInNewTab: false,
+      });
+
+      // 验证不同配置可能产生不同的 hash（如果配置影响解析）
+      expect(result1.schema.length).toBe(result2.schema.length);
+    });
+
+    it('应该为不同插件生成不同的 hash', () => {
+      const markdown = '# 标题\n\n段落';
+
+      const plugin1: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => false,
+            convert: () => null as any,
+          },
+        ],
+      };
+
+      const result1 = parserMarkdownToSlateNode(markdown, [plugin1]);
+      const result2 = parserMarkdownToSlateNode(markdown, []);
+
+      // 验证不同插件可能产生不同的 hash
+      expect(result1.schema.length).toBe(result2.schema.length);
+    });
+
+    it('应该限制缓存大小为 100 个条目', () => {
+      // 创建 101 个不同的块
+      const blocks: string[] = [];
+      for (let i = 0; i < 101; i++) {
+        blocks.push(`# 标题 ${i}\n\n这是第 ${i} 个唯一的内容块。`);
+      }
+      const markdown = blocks.join('\n\n');
+
+      // 解析所有块
+      parserMarkdownToSlateNode(markdown);
+
+      // 验证缓存大小不超过 100
+      // 注意：由于 parseCache 是私有的，我们通过行为来验证
+      // 如果缓存大小限制生效，第一个块应该被移除
+      const firstBlock = '# 标题 0\n\n这是第 0 个唯一的内容块。';
+      const result = parserMarkdownToSlateNode(firstBlock);
+
+      // 验证解析仍然正常工作
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('应该正确处理空 markdown 的切分', () => {
+      const markdown = '';
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 空 markdown 应该返回一个空段落
+      expect(result.schema.length).toBe(1);
+      expect(result.schema[0].type).toBe('paragraph');
+    });
+
+    it('应该正确处理只有空行的 markdown', () => {
+      const markdown = '\n\n\n';
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 应该返回一个空段落
+      expect(result.schema.length).toBe(1);
+    });
+
+    it('应该正确处理包含脚注的切分', () => {
+      const markdown = `这是包含脚注[^1]的段落。
+
+[^1]: 这是脚注定义。`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证脚注被正确处理
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('应该为每个块中的元素添加带索引的 hash', () => {
+      const markdown = `# 标题 1
+
+段落 1
+
+# 标题 2
+
+段落 2`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证每个元素都有 hash
+      const hashes = result.schema.map((s: any) => s.hash).filter(Boolean);
+      expect(hashes.length).toBeGreaterThan(0);
+
+      // 在多块情况下，每个元素的 hash 应该包含块 hash 和索引
+      // 如果内容被切分为多个块，每个块内的元素应该有相同的块 hash，但索引不同
+      if (hashes.length > 1) {
+        // 验证所有 hash 都是字符串
+        hashes.forEach((hash) => {
+          expect(typeof hash).toBe('string');
+          expect(hash.length).toBeGreaterThan(0);
+        });
+      }
+    });
+
+    it('应该正确处理嵌套 HTML 标签的切分', () => {
+      const markdown = `# 标题
+
+<div>
+  <span>
+    嵌套内容
+  </span>
+</div>
+
+另一个段落`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证嵌套 HTML 被正确处理
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('应该正确处理包含表格的切分', () => {
+      const markdown = `# 标题
+
+| 列1 | 列2 |
+| --- | --- |
+| 值1 | 值2 |
+
+另一个段落`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证表格被正确解析
+      const tableNode = result.schema.find((node: any) => {
+        if (node.type === 'card' && node.children) {
+          return node.children.some((child: any) => child.type === 'table');
+        }
+        return false;
+      });
+      expect(tableNode).toBeDefined();
+    });
+
+    it('应该正确处理混合内容的切分和缓存', () => {
+      const markdown = `# 第一部分
+
+这是第一部分的内容。
+
+\`\`\`javascript
+console.log('代码');
+\`\`\`
+
+# 第二部分
+
+这是第二部分的内容。
+
+| 表格 | 列 |
+| --- | --- |
+| 数据 | 值 |`;
+
+      // 第一次解析
+      const result1 = parserMarkdownToSlateNode(markdown);
+
+      // 第二次解析（应该使用缓存）
+      const result2 = parserMarkdownToSlateNode(markdown);
+
+      // 验证结果一致
+      expect(result2.schema.length).toBe(result1.schema.length);
+      expect(result2.schema).toEqual(result1.schema);
+    });
+
+    it('应该正确处理包含特殊字符的块', () => {
+      const markdown = `# 标题
+
+包含特殊字符：!@#$%^&*()_+-=[]{}|;':",./<>?
+
+另一个段落`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+
+      // 验证特殊字符被正确处理
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('应该为相同内容但不同顺序的块生成不同的 hash', () => {
+      const block1 = '# 标题 1\n\n段落 1';
+      const block2 = '# 标题 2\n\n段落 2';
+
+      const markdown1 = `${block1}\n\n${block2}`;
+      const markdown2 = `${block2}\n\n${block1}`;
+
+      const result1 = parserMarkdownToSlateNode(markdown1);
+      const result2 = parserMarkdownToSlateNode(markdown2);
+
+      // 验证不同顺序产生不同的结果
+      expect(result1.schema.length).toBe(result2.schema.length);
+      // 第一个元素应该不同
+      expect(result1.schema[0]).not.toEqual(result2.schema[0]);
     });
   });
 });

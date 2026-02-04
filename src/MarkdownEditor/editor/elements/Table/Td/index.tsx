@@ -2,7 +2,6 @@ import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import React, { useContext, useRef } from 'react';
 import { RenderElementProps, useSlateSelection } from 'slate-react';
-import { useStyle } from './style';
 
 /**
  * Td 组件的属性接口
@@ -71,8 +70,6 @@ export const Td: React.FC<TdProps> = ({
   const prefix = getPrefixCls('agentic-md-editor-table-td');
   const tdRef = useRef<HTMLTableDataCellElement | null>(null);
 
-  const { wrapSSR, hashId } = useStyle(prefix);
-
   // 创建 ref 回调函数来处理 ref 冲突
   const handleRef = (node: HTMLTableDataCellElement | null) => {
     tdRef.current = node;
@@ -84,18 +81,18 @@ export const Td: React.FC<TdProps> = ({
   };
 
   if (element.hidden) {
-    return wrapSSR(
+    return (
       <td
         ref={tdRef}
-        className={classNames(hashId, prefix)}
+        className={classNames(prefix)}
         style={{ display: 'none' }}
-      />,
+      />
     );
   }
 
-  return wrapSSR(
+  return (
     <td
-      className={classNames(hashId, prefix)}
+      className={classNames(prefix)}
       style={{
         textAlign: align || 'left', // 默认左对齐
         width: width || 'auto', // 如果有指定宽度则使用，否则自动
@@ -107,6 +104,6 @@ export const Td: React.FC<TdProps> = ({
       ref={handleRef}
     >
       {children}
-    </td>,
+    </td>
   );
 };

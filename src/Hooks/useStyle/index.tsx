@@ -1,9 +1,5 @@
 import type { CSSInterpolation } from '@ant-design/cssinjs';
-import {
-  ComponentToken,
-  createStyleRegister,
-  globalThemeToken,
-} from '@ant-design/theme-token';
+import { ComponentToken, createStyleRegister } from '@ant-design/theme-token';
 import { ConfigProvider as AntdConfigProvider, theme as antdTheme } from 'antd';
 import { useContext } from 'react';
 
@@ -61,7 +57,7 @@ export function useEditorStyleRegister(
   componentName: string,
   styleFn: (token: ComponentToken) => CSSInterpolation,
 ) {
-  const { token, hashId, theme } = antdTheme?.useToken?.() || {};
+  const { token, theme } = antdTheme?.useToken?.() || {};
   const chatToken = {
     ...token,
     chatCls: '',
@@ -72,15 +68,18 @@ export function useEditorStyleRegister(
   chatToken.chatCls = `.${getPrefixCls('agentic-ui')}`;
   chatToken.antCls = `.${getPrefixCls()}`;
 
+  // 组件库默认关闭 hashId，避免与宿主页面的 antd hashId 叠加导致选择器不生效；传入 '' 后 createStyleRegister 与返回的 hashId 均为空
   const genStyles = createStyleRegister({
-    hashId: hashId || '',
+    hashId: '',
     token: chatToken,
     theme: theme,
-    cssVariables: globalThemeToken,
+    cssVariables: {},
   });
 
   const result = genStyles(componentName, styleFn);
 
-  // 确保总是返回一个有效的对象
-  return result || { wrapSSR: (node: any) => node, hashId: '' };
+  // 确保总是返回一个有效的对象，且 hashId 保持关闭
+  return result
+    ? { ...result, hashId: '' }
+    : { wrapSSR: (node: any) => node, hashId: '' };
 }

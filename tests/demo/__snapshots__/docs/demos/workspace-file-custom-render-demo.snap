@@ -1,0 +1,747 @@
+<DocumentFragment>
+  <div
+    class="ant-app"
+  >
+    <div>
+      test
+    </div>
+    <div
+      style="height: 500px;"
+    >
+      <div
+        class="ant-workspace"
+        data-testid="workspace"
+      >
+        <div
+          class="ant-workspace-header"
+          data-testid="workspace-header"
+        >
+          <div
+            class="ant-workspace-title"
+            data-testid="workspace-title"
+          >
+            文件自定义渲染演示
+          </div>
+          <div
+            class="ant-workspace-header-right"
+          />
+        </div>
+        <div
+          class="ant-workspace-content"
+          data-testid="workspace-content"
+        >
+          <div
+            class="ant-spin-nested-loading"
+          >
+            <div
+              class="ant-spin-container"
+            >
+              <div
+                class="ant-workspace-file-container"
+                data-testid="file-component"
+              >
+                <div
+                  aria-label="文件：XXXXX企业尽调报告.docx"
+                  class="ant-workspace-file-item"
+                  role="button"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-workspace-file-item-icon"
+                  >
+                    <svg
+                      class="sofa-icons-icon"
+                      fill="none"
+                      height="1em"
+                      style="vertical-align: -0.125em;"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 2h7l5 5v11c0 1.4-.003 2.116-.279 2.649a2.5 2.5 0 0 1-1.072 1.072C18.116 21.997 17.4 22 16 22H8c-1.4 0-2.116-.003-2.649-.279a2.5 2.5 0 0 1-1.072-1.072C4.003 20.116 4 19.4 4 18V6c0-1.4.003-2.116.279-2.649A2.5 2.5 0 0 1 5.351 2.28C5.884 2.003 6.6 2 8 2m2.966 13.5h-1.71L7.897 9.254h1.431l.9 4.617h.054l.954-4.014h1.584l.9 4.014h.054l.918-4.617h1.413l-1.43 6.246h-1.71L12 11.54h-.054z"
+                        fill="#1677FF"
+                        fill-rule="evenodd"
+                      />
+                      <path
+                        d="m15 2 5 5h-3c-.7 0-1.058-.001-1.324-.14a1.26 1.26 0 0 1-.536-.536C15 6.058 15 5.7 15 5z"
+                        fill="#BCD4F6"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    class="ant-workspace-file-item-info"
+                  >
+                    <div
+                      class="ant-workspace-file-item-name"
+                    >
+                      <span
+                        aria-describedby="test-id"
+                        class="ant-typography ant-typography-ellipsis ant-typography-ellipsis-single-line"
+                        style="color: rgb(24, 144, 255);"
+                      >
+                        <strong>
+                          XXXXX企业尽调报告.docx
+                        </strong>
+                      </span>
+                    </div>
+                    <div
+                      class="ant-workspace-file-item-details"
+                    >
+                      <div
+                        style="display: flex; align-items: center; gap: 8px;"
+                      >
+                        <span
+                          style="color: rgb(153, 153, 153); font-size: 12px;"
+                        >
+                          2025-10-01 12:30 · 已编辑
+                        </span>
+                        <span
+                          class="ant-tag ant-tag-blue"
+                          style="margin: 0px;"
+                        >
+                          自定义标签
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="ant-workspace-file-item-actions"
+                  >
+                    <span
+                      aria-describedby="test-id"
+                      aria-label="下载"
+                      class="ant-agentic-md-editor-action-icon-box ant-workspace-file-item-action-btn ant-agentic-md-editor-action-icon-box-light"
+                      data-testid="action-icon-box"
+                      data-title="下载"
+                      role="button"
+                      tabindex="0"
+                    >
+                      <svg
+                        class="sofa-icons-icon"
+                        fill="currentColor"
+                        fill-rule="evenodd"
+                        height="1em"
+                        style="vertical-align: -0.125em;"
+                        viewBox="0 0 16 16"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <defs>
+                          <clippath
+                            id="Download-master_svg0_308_02297"
+                          >
+                            <rect
+                              height="16"
+                              rx="0"
+                              width="16"
+                            />
+                          </clippath>
+                        </defs>
+                        <g
+                          clip-path="url(#Download-master_svg0_308_02297)"
+                        >
+                          <path
+                            d="M7.333 2v6.39L5.138 6.196a.667.667 0 1 0-.943.943l3.333 3.333a.665.665 0 0 0 .943 0l3.333-3.333a.667.667 0 0 0-.942-.943L8.667 8.391V2a.667.667 0 1 0-1.334 0m-6 8a.667.667 0 1 1 1.334 0v2.667q0 .276.195.471t.471.195h9.334q.276 0 .471-.195t.195-.471V10a.667.667 0 0 1 1.334 0v2.667q0 .828-.586 1.414t-1.414.586H3.333q-.828 0-1.414-.586t-.586-1.414z"
+                          />
+                        </g>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+                <div
+                  aria-label="文件：自定义操作按钮.pdf"
+                  class="ant-workspace-file-item"
+                  role="button"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-workspace-file-item-icon"
+                  >
+                    <svg
+                      class="sofa-icons-icon"
+                      fill="none"
+                      height="1em"
+                      style="vertical-align: -0.125em;"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 2h7l5 5v11c0 1.4-.003 2.116-.279 2.649a2.5 2.5 0 0 1-1.072 1.072C18.116 21.997 17.4 22 16 22H8c-1.4 0-2.116-.003-2.649-.279a2.5 2.5 0 0 1-1.072-1.072C4.003 20.116 4 19.4 4 18V6c0-1.4.003-2.116.279-2.649A2.5 2.5 0 0 1 5.351 2.28C5.884 2.003 6.6 2 8 2m6.23 11.368a9.6 9.6 0 0 1 1.495-.09c.643.021 1.117.143 1.375.396.25.249.341.699.225 1.087-.132.442-.498.722-1.04.722-.655 0-1.63-.296-2.472-.747-.485.083-1.019.228-1.723.457-.163.053-.327.108-.554.184l-.358.122-.333.11c-.986 1.695-1.88 2.445-2.608 2.388a.9.9 0 0 1-.688-.414c-.14-.209-.202-.465-.162-.66.085-.422.392-.823.883-1.214.372-.295.815-.562 1.384-.856.426-.75 1.061-2.093 1.542-3.239-.377-1.461-.482-2.318-.304-2.97.11-.402.538-.662 1.003-.643.499.02.895.348.994.907q.08.39.055.843c-.02.402-.09.8-.22 1.346l-.069.288c.35.911.843 1.532 1.575 1.983m-1.99-2.675.145-.12c.235-.196.38-.644.366-1.074-.016-.49-.214-.815-.647-.815-.309 0-.386.275-.34.733.04.402.186.848.386 1.144zm-.32 1.518-.046.122c-.37.978-.714 1.756-1.086 2.403l-.085.147.159-.06c.173-.067.836-.338.836-.339l-.004.002c.627-.253 1.085-.406 1.577-.507l.132-.027-.109-.08c-.502-.373-.959-.906-1.311-1.546zm4.701 2.844c-.236.17-.746.018-1.643-.683l-.228-.178.247-.033c.702-.095 1.2-.024 1.489.17a.57.57 0 0 1 .242.306c.04.128.021.265-.041.347a.2.2 0 0 1-.066.07m-8.366 2.092v-.011l.004-.01q.058-.154.169-.324.195-.296.526-.629c.118-.119.241-.235.385-.365l.277-.248.337-.314-.245.39c-.371.591-.706 1.017-.994 1.295a2 2 0 0 1-.274.226.5.5 0 0 1-.079.043.1.1 0 0 1-.034.01.1.1 0 0 1-.033-.006.06.06 0 0 1-.039-.057"
+                        fill="#FF4D4F"
+                        fill-rule="evenodd"
+                      />
+                      <path
+                        d="m15 2 5 5h-3c-.7 0-1.058-.001-1.324-.14a1.26 1.26 0 0 1-.536-.536C15 6.058 15 5.7 15 5z"
+                        fill="#F8BBBF"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    class="ant-workspace-file-item-info"
+                  >
+                    <div
+                      class="ant-workspace-file-item-name"
+                    >
+                      <span
+                        aria-describedby="test-id"
+                        class="ant-typography ant-typography-ellipsis ant-typography-ellipsis-single-line"
+                      >
+                        自定义操作按钮.pdf
+                      </span>
+                    </div>
+                    <div
+                      class="ant-workspace-file-item-details"
+                    >
+                      <span
+                        class="ant-typography ant-typography-secondary ant-typography-ellipsis ant-typography-ellipsis-single-line"
+                      >
+                        <span
+                          class="ant-workspace-file-item-type"
+                        >
+                          pdf
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-separator"
+                        >
+                          |
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-size"
+                        >
+                          1.5MB
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-separator"
+                        >
+                          |
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-time"
+                        >
+                          10-02 14:00:00
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    class="ant-workspace-file-item-actions"
+                  >
+                    <div
+                      class="ant-space ant-space-horizontal ant-space-align-center"
+                      style="column-gap: 4px; row-gap: 4px;"
+                    >
+                      <div
+                        class="ant-space-item"
+                      >
+                        <button
+                          class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-sm ant-btn-icon-only"
+                          type="button"
+                        >
+                          <span
+                            class="ant-btn-icon"
+                          >
+                            <span
+                              aria-label="eye"
+                              class="anticon anticon-eye"
+                              role="img"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                data-icon="eye"
+                                fill="currentColor"
+                                focusable="false"
+                                height="1em"
+                                viewBox="64 64 896 896"
+                                width="1em"
+                              >
+                                <path
+                                  d="M942.2 486.2C847.4 286.5 704.1 186 512 186c-192.2 0-335.4 100.5-430.2 300.3a60.3 60.3 0 000 51.5C176.6 737.5 319.9 838 512 838c192.2 0 335.4-100.5 430.2-300.3 7.7-16.2 7.7-35 0-51.5zM512 766c-161.3 0-279.4-81.8-362.7-254C232.6 339.8 350.7 258 512 258c161.3 0 279.4 81.8 362.7 254C791.5 684.2 673.4 766 512 766zm-4-430c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176zm0 288c-61.9 0-112-50.1-112-112s50.1-112 112-112 112 50.1 112 112-50.1 112-112 112z"
+                                />
+                              </svg>
+                            </span>
+                          </span>
+                        </button>
+                      </div>
+                      <div
+                        class="ant-space-item"
+                      >
+                        <button
+                          class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-sm ant-btn-icon-only"
+                          type="button"
+                        >
+                          <span
+                            class="ant-btn-icon"
+                          >
+                            <span
+                              aria-label="edit"
+                              class="anticon anticon-edit"
+                              role="img"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                data-icon="edit"
+                                fill="currentColor"
+                                focusable="false"
+                                height="1em"
+                                viewBox="64 64 896 896"
+                                width="1em"
+                              >
+                                <path
+                                  d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 000-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 009.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"
+                                />
+                              </svg>
+                            </span>
+                          </span>
+                        </button>
+                      </div>
+                      <div
+                        class="ant-space-item"
+                      >
+                        <button
+                          class="ant-btn ant-btn-text ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-text ant-btn-sm ant-btn-icon-only"
+                          type="button"
+                        >
+                          <span
+                            class="ant-btn-icon"
+                          >
+                            <span
+                              aria-label="delete"
+                              class="anticon anticon-delete"
+                              role="img"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                data-icon="delete"
+                                fill="currentColor"
+                                focusable="false"
+                                height="1em"
+                                viewBox="64 64 896 896"
+                                width="1em"
+                              >
+                                <path
+                                  d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z"
+                                />
+                              </svg>
+                            </span>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  aria-label="文件：复用内置按钮+追加.docx"
+                  class="ant-workspace-file-item"
+                  role="button"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-workspace-file-item-icon"
+                  >
+                    <svg
+                      class="sofa-icons-icon"
+                      fill="none"
+                      height="1em"
+                      style="vertical-align: -0.125em;"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 2h7l5 5v11c0 1.4-.003 2.116-.279 2.649a2.5 2.5 0 0 1-1.072 1.072C18.116 21.997 17.4 22 16 22H8c-1.4 0-2.116-.003-2.649-.279a2.5 2.5 0 0 1-1.072-1.072C4.003 20.116 4 19.4 4 18V6c0-1.4.003-2.116.279-2.649A2.5 2.5 0 0 1 5.351 2.28C5.884 2.003 6.6 2 8 2m2.966 13.5h-1.71L7.897 9.254h1.431l.9 4.617h.054l.954-4.014h1.584l.9 4.014h.054l.918-4.617h1.413l-1.43 6.246h-1.71L12 11.54h-.054z"
+                        fill="#1677FF"
+                        fill-rule="evenodd"
+                      />
+                      <path
+                        d="m15 2 5 5h-3c-.7 0-1.058-.001-1.324-.14a1.26 1.26 0 0 1-.536-.536C15 6.058 15 5.7 15 5z"
+                        fill="#BCD4F6"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    class="ant-workspace-file-item-info"
+                  >
+                    <div
+                      class="ant-workspace-file-item-name"
+                    >
+                      <span
+                        aria-describedby="test-id"
+                        class="ant-typography ant-typography-ellipsis ant-typography-ellipsis-single-line"
+                      >
+                        复用内置按钮+追加.docx
+                      </span>
+                    </div>
+                    <div
+                      class="ant-workspace-file-item-details"
+                    >
+                      <span
+                        class="ant-typography ant-typography-secondary ant-typography-ellipsis ant-typography-ellipsis-single-line"
+                      >
+                        <span
+                          class="ant-workspace-file-item-type"
+                        >
+                          word
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-separator"
+                        >
+                          |
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-size"
+                        >
+                          3.2MB
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-separator"
+                        >
+                          |
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-time"
+                        >
+                          10-05 10:00:00
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    class="ant-workspace-file-item-actions"
+                  >
+                    <span
+                      aria-describedby="test-id"
+                      aria-label="下载"
+                      class="ant-agentic-md-editor-action-icon-box ant-workspace-file-item-action-btn ant-agentic-md-editor-action-icon-box-light"
+                      data-testid="action-icon-box"
+                      data-title="下载"
+                      role="button"
+                      tabindex="0"
+                    >
+                      <svg
+                        class="sofa-icons-icon"
+                        fill="currentColor"
+                        fill-rule="evenodd"
+                        height="1em"
+                        style="vertical-align: -0.125em;"
+                        viewBox="0 0 16 16"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <defs>
+                          <clippath
+                            id="Download-master_svg0_308_02297"
+                          >
+                            <rect
+                              height="16"
+                              rx="0"
+                              width="16"
+                            />
+                          </clippath>
+                        </defs>
+                        <g
+                          clip-path="url(#Download-master_svg0_308_02297)"
+                        >
+                          <path
+                            d="M7.333 2v6.39L5.138 6.196a.667.667 0 1 0-.943.943l3.333 3.333a.665.665 0 0 0 .943 0l3.333-3.333a.667.667 0 0 0-.942-.943L8.667 8.391V2a.667.667 0 1 0-1.334 0m-6 8a.667.667 0 1 1 1.334 0v2.667q0 .276.195.471t.471.195h9.334q.276 0 .471-.195t.195-.471V10a.667.667 0 0 1 1.334 0v2.667q0 .828-.586 1.414t-1.414.586H3.333q-.828 0-1.414-.586t-.586-1.414z"
+                          />
+                        </g>
+                      </svg>
+                    </span>
+                    <button
+                      class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-sm ant-btn-icon-only"
+                      type="button"
+                    >
+                      <span
+                        class="ant-btn-icon"
+                      >
+                        <span
+                          aria-label="edit"
+                          class="anticon anticon-edit"
+                          role="img"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            data-icon="edit"
+                            fill="currentColor"
+                            focusable="false"
+                            height="1em"
+                            viewBox="64 64 896 896"
+                            width="1em"
+                          >
+                            <path
+                              d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 000-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 009.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"
+                            />
+                          </svg>
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+                <div
+                  aria-label="文件：禁用状态的文件.xlsx"
+                  class="ant-workspace-file-item ant-workspace-file-item-disabled"
+                  role="button"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-workspace-file-item-icon"
+                  >
+                    <svg
+                      class="sofa-icons-icon"
+                      fill="none"
+                      height="1em"
+                      style="vertical-align: -0.125em;"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8 2h7l5 5v11c0 1.4-.003 2.116-.279 2.649a2.5 2.5 0 0 1-1.072 1.072C18.116 21.997 17.4 22 16 22H8c-1.4 0-2.116-.003-2.649-.279a2.5 2.5 0 0 1-1.072-1.072C4.003 20.116 4 19.4 4 18V6c0-1.4.003-2.116.279-2.649A2.5 2.5 0 0 1 5.351 2.28C5.884 2.003 6.6 2 8 2m5.93 6.156-1.633 2.728-1.649-2.73A.32.32 0 0 0 10.375 8H9.35a.32.32 0 0 0-.271.49l2.196 3.479-2.226 3.54A.32.32 0 0 0 9.32 16h.92a.32.32 0 0 0 .271-.152l1.673-2.706 1.66 2.706a.32.32 0 0 0 .274.152h1a.32.32 0 0 0 .268-.493l-2.235-3.481 2.274-3.533A.32.32 0 0 0 15.156 8h-.952a.32.32 0 0 0-.274.156"
+                        fill="#22B35E"
+                        fill-rule="evenodd"
+                      />
+                      <path
+                        d="m15 2 5 5h-3c-.7 0-1.058-.001-1.324-.14a1.26 1.26 0 0 1-.536-.536C15 6.058 15 5.7 15 5z"
+                        fill="#D9F7BE"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    class="ant-workspace-file-item-info"
+                  >
+                    <div
+                      class="ant-workspace-file-item-name"
+                    >
+                      <span
+                        aria-describedby="test-id"
+                        class="ant-typography ant-typography-ellipsis ant-typography-ellipsis-single-line"
+                      >
+                        禁用状态的文件.xlsx
+                      </span>
+                    </div>
+                    <div
+                      class="ant-workspace-file-item-details"
+                    >
+                      <span
+                        class="ant-typography ant-typography-secondary ant-typography-ellipsis ant-typography-ellipsis-single-line"
+                      >
+                        <span
+                          class="ant-workspace-file-item-type"
+                        >
+                          excel
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-separator"
+                        >
+                          |
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-size"
+                        >
+                          856KB
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-separator"
+                        >
+                          |
+                        </span>
+                        <span
+                          class="ant-workspace-file-item-time"
+                        >
+                          10-03 09:15:00
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    class="ant-workspace-file-item-actions"
+                  />
+                </div>
+                <div
+                  aria-label="文件：仅自定义详情行.txt"
+                  class="ant-workspace-file-item"
+                  role="button"
+                  tabindex="0"
+                >
+                  <div
+                    class="ant-workspace-file-item-icon"
+                  >
+                    <svg
+                      class="sofa-icons-icon"
+                      fill="none"
+                      height="1em"
+                      style="vertical-align: -0.125em;"
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15 2H8c-1.4 0-2.116.003-2.649.279A2.5 2.5 0 0 0 4.28 3.351C4.003 3.884 4 4.6 4 6v12c0 1.4.003 2.116.279 2.649.238.459.613.834 1.072 1.072C5.884 21.997 6.6 22 8 22h8c1.4 0 2.116-.003 2.649-.279a2.5 2.5 0 0 0 1.072-1.072C19.997 20.116 20 19.4 20 18V7zM8.352 9.426h7.546v1.593H8.352zm5.59 3.555h-5.59v1.593h5.59z"
+                        fill="#8C8C8C"
+                        fill-rule="evenodd"
+                      />
+                      <path
+                        d="m15 2 5 5h-3c-.7 0-1.058-.001-1.324-.14a1.26 1.26 0 0 1-.536-.536C15 6.058 15 5.7 15 5z"
+                        fill="#DBDBDB"
+                        fill-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    class="ant-workspace-file-item-info"
+                  >
+                    <div
+                      class="ant-workspace-file-item-name"
+                    >
+                      <span
+                        aria-describedby="test-id"
+                        class="ant-typography ant-typography-ellipsis ant-typography-ellipsis-single-line"
+                      >
+                        仅自定义详情行.txt
+                      </span>
+                    </div>
+                    <div
+                      class="ant-workspace-file-item-details"
+                    >
+                      <span
+                        class="ant-typography ant-typography-secondary"
+                        style="font-size: 12px;"
+                      >
+                        创建于 2025-10-04 16:20 | 版本 v1.2.3
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    class="ant-workspace-file-item-actions"
+                  >
+                    <span
+                      aria-describedby="test-id"
+                      aria-label="预览"
+                      class="ant-agentic-md-editor-action-icon-box ant-workspace-file-item-action-btn ant-agentic-md-editor-action-icon-box-light"
+                      data-testid="action-icon-box"
+                      data-title="预览"
+                      role="button"
+                      tabindex="0"
+                    >
+                      <svg
+                        class="sofa-icons-icon"
+                        fill="currentColor"
+                        fill-rule="evenodd"
+                        height="1em"
+                        style="vertical-align: -0.125em;"
+                        viewBox="0 0 24 24"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <defs>
+                          <clippath
+                            id="Eye-master_svg0_2080_41784"
+                          >
+                            <rect
+                              height="24"
+                              rx="0"
+                              width="24"
+                            />
+                          </clippath>
+                        </defs>
+                        <g
+                          clip-path="url(#Eye-master_svg0_2080_41784)"
+                        >
+                          <path
+                            d="M5.465 18.014Q8.43 20 12 20t6.535-1.986q2.967-1.985 4.327-5.285l.014-.033q.258-.696 0-1.392l-.014-.033q-1.36-3.3-4.327-5.285T12 4.001Q8.43 4 5.465 5.986q-2.967 1.985-4.327 5.285l-.013.033q-.259.696 0 1.392l.013.033q1.36 3.3 4.327 5.285m11.958-1.662Q14.962 18 12 18t-5.423-1.648Q4.131 14.715 3 12q1.13-2.715 3.577-4.352Q9.038 6.001 12 6.001t5.423 1.647Q19.87 9.285 21 12q-1.13 2.715-3.577 4.352M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0m-2 0a2 2 0 1 0-4 0 2 2 0 0 0 4 0"
+                            style="mix-blend-mode: passthrough;"
+                          />
+                        </g>
+                      </svg>
+                    </span>
+                    <span
+                      aria-describedby="test-id"
+                      aria-label="下载"
+                      class="ant-agentic-md-editor-action-icon-box ant-workspace-file-item-action-btn ant-agentic-md-editor-action-icon-box-light"
+                      data-testid="action-icon-box"
+                      data-title="下载"
+                      role="button"
+                      tabindex="0"
+                    >
+                      <svg
+                        class="sofa-icons-icon"
+                        fill="currentColor"
+                        fill-rule="evenodd"
+                        height="1em"
+                        style="vertical-align: -0.125em;"
+                        viewBox="0 0 16 16"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <defs>
+                          <clippath
+                            id="Download-master_svg0_308_02297"
+                          >
+                            <rect
+                              height="16"
+                              rx="0"
+                              width="16"
+                            />
+                          </clippath>
+                        </defs>
+                        <g
+                          clip-path="url(#Download-master_svg0_308_02297)"
+                        >
+                          <path
+                            d="M7.333 2v6.39L5.138 6.196a.667.667 0 1 0-.943.943l3.333 3.333a.665.665 0 0 0 .943 0l3.333-3.333a.667.667 0 0 0-.942-.943L8.667 8.391V2a.667.667 0 1 0-1.334 0m-6 8a.667.667 0 1 1 1.334 0v2.667q0 .276.195.471t.471.195h9.334q.276 0 .471-.195t.195-.471V10a.667.667 0 0 1 1.334 0v2.667q0 .828-.586 1.414t-1.414.586H3.333q-.828 0-1.414-.586t-.586-1.414z"
+                          />
+                        </g>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-image ant-image-error"
+          >
+            <img
+              class="ant-image-img ant-workspace-file-hidden-image"
+              src=""
+            />
+            <div
+              class="ant-image-mask"
+            >
+              <div
+                class="ant-image-mask-info"
+              >
+                <span
+                  aria-label="eye"
+                  class="anticon anticon-eye"
+                  role="img"
+                >
+                  <svg
+                    aria-hidden="true"
+                    data-icon="eye"
+                    fill="currentColor"
+                    focusable="false"
+                    height="1em"
+                    viewBox="64 64 896 896"
+                    width="1em"
+                  >
+                    <path
+                      d="M942.2 486.2C847.4 286.5 704.1 186 512 186c-192.2 0-335.4 100.5-430.2 300.3a60.3 60.3 0 000 51.5C176.6 737.5 319.9 838 512 838c192.2 0 335.4-100.5 430.2-300.3 7.7-16.2 7.7-35 0-51.5zM512 766c-161.3 0-279.4-81.8-362.7-254C232.6 339.8 350.7 258 512 258c161.3 0 279.4 81.8 362.7 254C791.5 684.2 673.4 766 512 766zm-4-430c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176zm0 288c-61.9 0-112-50.1-112-112s50.1-112 112-112 112 50.1 112 112-50.1 112-112 112z"
+                    />
+                  </svg>
+                </span>
+                Preview
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
