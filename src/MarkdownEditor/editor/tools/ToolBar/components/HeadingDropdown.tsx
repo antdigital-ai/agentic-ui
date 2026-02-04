@@ -3,14 +3,6 @@ import classnames from 'classnames';
 import React from 'react';
 import { ToolBarItem } from './ToolBarItem';
 
-const HeatTextMap = {
-  1: '大标题',
-  2: '段落标题',
-  3: '小标题',
-  4: '正文',
-  Text: '正文',
-} as const;
-
 interface HeadingDropdownProps {
   baseClassName: string;
   hashId?: string;
@@ -22,6 +14,30 @@ interface HeadingDropdownProps {
 
 export const HeadingDropdown = React.memo<HeadingDropdownProps>(
   ({ baseClassName, hashId, i18n, node, hideTools, onHeadingChange }) => {
+    const getHeadingText = React.useCallback(
+      (level: number | string) => {
+        const locale = i18n?.locale || {};
+        switch (level) {
+          case 1:
+          case '1':
+            return locale.largeTitle || '大标题';
+          case 2:
+          case '2':
+            return locale.paragraphTitle || '段落标题';
+          case 3:
+          case '3':
+            return locale.smallTitle || '小标题';
+          case 4:
+          case '4':
+          case 'Text':
+            return locale.bodyText || '正文';
+          default:
+            return `H${level}`;
+        }
+      },
+      [i18n],
+    );
+
     const headingItems = React.useMemo(
       () =>
         ['H1', 'H2', 'H3', 'Text']
@@ -30,21 +46,21 @@ export const HeadingDropdown = React.memo<HeadingDropdownProps>(
               return null;
             }
             return {
-              label: HeatTextMap[item.replace('H', '') as '1'] || item,
+              label: getHeadingText(item.replace('H', '')),
               key: `head-${item}`,
               onClick: () => onHeadingChange(index + 1),
             };
           })
           .filter(Boolean),
-      [hideTools, onHeadingChange],
+      [hideTools, onHeadingChange, getHeadingText],
     );
 
     const currentText = React.useMemo(() => {
       if (node?.[0]?.level) {
-        return HeatTextMap[(node[0].level + '') as '1'] || `H${node[0].level}`;
+        return getHeadingText(node[0].level);
       }
-      return '正文';
-    }, [node]);
+      return getHeadingText('Text');
+    }, [node, getHeadingText]);
 
     return (
       <Dropdown menu={{ items: headingItems }}>
