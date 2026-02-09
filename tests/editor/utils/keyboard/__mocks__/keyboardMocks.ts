@@ -26,7 +26,7 @@ export const mockNavigatorClipboard = () => {
   });
 };
 
-export const mockInputElement = {
+export const mockInputElement: Record<string, any> = {
   id: '',
   type: 'file',
   accept: 'image/*',

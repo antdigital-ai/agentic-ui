@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 
 // 共享的 EditorStore mock
-export const mockEditorStore = {
+export const mockEditorStore: Record<string, any> = {
   markdownEditorRef: { current: { focus: vi.fn() } },
   markdownContainerRef: { current: document.createElement('div') },
   readonly: false,
@@ -21,7 +21,7 @@ export const mockEditorStore = {
 };
 
 // 共享的 Slate React mock
-export const mockSlateReact = {
+export const mockSlateReact: Record<string, any> = {
   ReactEditor: {
     findPath: vi.fn().mockReturnValue([0, 0]),
   },
@@ -31,19 +31,19 @@ export const mockSlateReact = {
 };
 
 // 共享的 Editor Utils mock
-export const mockEditorUtils = {
+export const mockEditorUtils: Record<string, any> = {
   EditorUtils: {
     isDirtLeaf: vi.fn().mockReturnValue(false),
   },
 };
 
 // 共享的 DOM Utils mock
-export const mockDomUtils = {
+export const mockDomUtils: Record<string, any> = {
   slugify: vi.fn().mockReturnValue('test-slug'),
 };
 
 // 共享的 Slate mock
-export const mockSlate = {
+export const mockSlate: Record<string, any> = {
   Editor: {
     nodes: (editor: any) => {
       if (editor.selection?.focus?.path?.[0] === 1) {
@@ -69,7 +69,7 @@ export const mockSlate = {
 };
 
 // 共享的 Chart.js mock
-export const mockChartJs = {
+export const mockChartJs: Record<string, any> = {
   Chart: vi.fn().mockImplementation(() => ({
     render: vi.fn(),
     destroy: vi.fn(),
@@ -77,16 +77,16 @@ export const mockChartJs = {
 };
 
 // 共享的 KaTeX mock
-export const mockKatex = {
+export const mockKatex: Record<string, any> = {
   renderToString: vi.fn().mockReturnValue('<span>rendered-katex</span>'),
   render: vi.fn(),
 };
 
 // 共享的 Copy to Clipboard mock
-export const mockCopyToClipboard = vi.fn().mockReturnValue(true);
+export const mockCopyToClipboard: (...args: any[]) => any = vi.fn().mockReturnValue(true);
 
 // 共享的 Day.js mock
-export const mockDayjs = {
+export const mockDayjs: Record<string, any> = {
   default: vi.fn().mockImplementation(() => ({
     format: vi.fn().mockReturnValue('2024-01-01'),
     toDate: vi.fn().mockReturnValue(new Date('2024-01-01')),
@@ -94,7 +94,7 @@ export const mockDayjs = {
 };
 
 // 共享的 Mermaid mock
-export const mockMermaid = {
+export const mockMermaid: Record<string, any> = {
   render: vi.fn().mockResolvedValue({ svg: '<svg>mermaid</svg>' }),
   initialize: vi.fn(),
   getConfig: vi.fn().mockReturnValue({}),
@@ -102,7 +102,7 @@ export const mockMermaid = {
 };
 
 // 共享的 Resize Observer mock
-export const mockResizeObserver = {
+export const mockResizeObserver: Record<string, any> = {
   ResizeObserver: vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),

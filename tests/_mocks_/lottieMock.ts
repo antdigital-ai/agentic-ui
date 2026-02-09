@@ -2,7 +2,7 @@ import React from 'react';
 import { vi } from 'vitest';
 
 // Mock lottie-react 组件
-export const mockLottie = vi
+export const mockLottie: (...args: any[]) => any = vi
   .fn()
   .mockImplementation(({ animationData, loop, autoplay, ...props }) => {
     return React.createElement('div', {
