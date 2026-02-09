@@ -21,8 +21,67 @@ import { DocInfoListProps } from './types/DocInfo';
 export type BubbleStyleProps = BaseStyleProps;
 
 /**
+ * 气泡样式配置（简洁版）
+ * @description 推荐使用的气泡样式配置接口，属性名不带 bubble 前缀
+ */
+export interface BubbleSlotStyles {
+  /** 气泡根容器 */
+  root?: React.CSSProperties;
+  /** 头像标题区域 */
+  avatarTitle?: React.CSSProperties;
+  /** 主容器 */
+  container?: React.CSSProperties;
+  /** 加载图标 */
+  loadingIcon?: React.CSSProperties;
+  /** 名称区域 */
+  name?: React.CSSProperties;
+  /** 内容 */
+  content?: React.CSSProperties;
+  /** 内容前置区域 */
+  before?: React.CSSProperties;
+  /** 内容后置区域 */
+  after?: React.CSSProperties;
+  /** 标题 */
+  title?: React.CSSProperties;
+  /** 头像 */
+  avatar?: React.CSSProperties;
+  /** 额外内容 */
+  extra?: React.CSSProperties;
+}
+
+/**
+ * 气泡类名配置（简洁版）
+ * @description 推荐使用的气泡类名配置接口，属性名不带 bubble 前缀
+ */
+export interface BubbleSlotClassNames {
+  /** 气泡根容器 */
+  root?: string;
+  /** 头像标题区域 */
+  avatarTitle?: string;
+  /** 主容器 */
+  container?: string;
+  /** 加载图标 */
+  loadingIcon?: string;
+  /** 名称区域 */
+  name?: string;
+  /** 内容 */
+  content?: string;
+  /** 内容前置区域 */
+  before?: string;
+  /** 内容后置区域 */
+  after?: string;
+  /** 标题 */
+  title?: string;
+  /** 头像 */
+  avatar?: string;
+  /** 额外内容 */
+  extra?: string;
+}
+
+/**
  * 气泡样式配置
  * @description 气泡组件各部分的样式配置
+ * @deprecated 属性名带有冗余的 bubble 前缀，建议使用 BubbleSlotStyles 替代
  */
 export interface BubbleStyles {
   /**
@@ -84,6 +143,7 @@ export interface BubbleStyles {
 /**
  * 气泡类名配置
  * @description 气泡组件各部分的类名配置
+ * @deprecated 属性名带有冗余的 bubble 前缀，建议使用 BubbleSlotClassNames 替代
  */
 export interface BubbleClassNames {
   /**
