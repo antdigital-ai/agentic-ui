@@ -1,6 +1,7 @@
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/es/locale/zh_CN';
 import React, { useEffect } from 'react';
+import { I18nProvide } from '../src/I18n';
 
 // quicklink for prefetching in-viewport links when network is good
 //@ts-ignore
@@ -23,11 +24,15 @@ const AppWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 export function rootContainer(container: any) {
   return React.createElement(
-    ConfigProvider,
-    {
-      locale: zhCN,
-      prefixCls: 'otk',
-    },
-    React.createElement(AppWrapper, null, container),
+    I18nProvide,
+    { defaultLanguage: 'zh-CN', autoDetect: true },
+    React.createElement(
+      ConfigProvider,
+      {
+        locale: zhCN,
+        prefixCls: 'otk',
+      },
+      React.createElement(AppWrapper, null, container),
+    ),
   );
 }
