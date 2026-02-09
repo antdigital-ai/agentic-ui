@@ -6,10 +6,10 @@
       test
     </div>
     <div
-      style="border-radius: var(--radius-modal-base); background: var(color-gray-bg-page-light); box-shadow: var(--shadow-control-base); width: min(830px,100%); display: flex; flex-direction: column; justify-content: space-between; padding: 0px; z-index: 0; margin: 24px auto;"
+      style="border-radius: var(--radius-modal-base); background: var(color-gray-bg-page-light); box-shadow: var(--shadow-control-base); display: flex; flex-direction: column; justify-content: space-between; padding: 0px; z-index: 0; margin: 24px auto;"
     >
       <div
-        style="padding: 16px; display: flex; flex-direction: row; align-items: center; box-sizing: border-box; border-width: 0px 0px 1px 0px; border-style: solid; border-color: rgba(0, 16, 32, 0.063);"
+        style="padding: 16px; display: flex; flex-direction: row; align-items: center; box-sizing: border-box; border-width: 0px 0px 1px; border-style: solid; border-color: rgba(0, 16, 32, 0.063);"
       >
         <span
           style="font-size: 13px; color: rgba(0, 0, 0, 0.45);"
@@ -330,7 +330,7 @@
                                   >
                                     <div
                                       contenteditable="false"
-                                      style="display: flex; align-items: center; cursor: pointer; gap: 4px; color: inherit; user-select: none;"
+                                      style="display: flex; align-items: center; cursor: pointer; gap: 4px; font: inherit; color: inherit; user-select: none;"
                                     >
                                       <div
                                         style="height: 1em; width: 1em; font-size: 16px; display: flex;"
@@ -393,7 +393,6 @@
                                           <g>
                                             <path
                                               d="M2,12.000000476837158Q2,7.857860476837158,4.928929999999999,4.928930476837158Q7.85786,2.000000298023158,12,2.000000596046158C12.2652,2.000000476837158,12.5196,2.1053574768371583,12.7071,2.292893476837158C12.8946,2.480429476837158,13,2.7347834768371584,13,3.000000476837158C13,3.2652204768371584,12.8946,3.519570476837158,12.7071,3.7071104768371583Q11.13604,5.278170476837158,11.13604,7.500000476837158Q11.13604,9.72182047683716,12.7071,11.292890476837158Q14.2782,12.864000476837159,16.5,12.864000476837159Q18.7218,12.864000476837159,20.2929,11.292890476837158C20.6834,10.902370476837158,21.3166,10.902370476837158,21.7071,11.292890476837158C21.8946,11.480430476837158,22,11.734780476837159,22,12.000000476837158Q22,16.142100476837157,19.0711,19.07110047683716Q16.1421,22.000000476837158,12,22.000000476837158Q7.85786,22.000000476837158,4.928929999999999,19.07110047683716Q2,16.142100476837157,2,12.000000476837158ZM4,12.000000476837158Q4,15.313700476837159,6.34315,17.65690047683716Q8.68629,20.000000476837158,12,20.000000476837158Q15.3137,20.000000476837158,17.6569,17.65690047683716Q19.2026,16.11110047683716,19.7287,14.142900476837157Q18.2637,14.864000476837159,16.5,14.864000476837159Q13.4497,14.864000476837159,11.2929,12.707100476837159Q9.136040000000001,10.550250476837158,9.136040000000001,7.500000476837158Q9.136040000000001,5.736330476837159,9.85712,4.271340476837159Q7.88893,4.797360476837158,6.34315,6.343150476837158Q4,8.686290476837158,4,12.000000476837158Z"
-                                              style="mix-blend-mode: passthrough;"
                                             />
                                           </g>
                                         </g>
@@ -474,7 +473,6 @@
                                         >
                                           <path
                                             d="M10.862 6.471 8 3.61 5.138 6.471a.667.667 0 1 1-.943-.942L7.53 2.195a.667.667 0 0 1 .942 0l3.334 3.334a.667.667 0 1 1-.943.942M8 12.391 5.138 9.529a.667.667 0 1 0-.943.942l3.334 3.334a.666.666 0 0 0 .942 0l3.333-3.333a.667.667 0 1 0-.942-.943z"
-                                            style="mix-blend-mode: passthrough;"
                                           />
                                         </g>
                                       </svg>
@@ -607,7 +605,7 @@
             📖 功能说明：
           </strong>
           <ul
-            style="margin: 8px 0px 0px 0px; padding-left: 20px;"
+            style="margin: 8px 0px 0px; padding-left: 20px;"
           >
             <li>
               <strong>
@@ -649,7 +647,7 @@
           💻 代码示例：
         </strong>
         <pre
-          style="margin: 8px 0px 0px 0px; overflow: auto;"
+          style="margin: 8px 0px 0px; overflow: auto;"
         >
           // 自定义 beforeContent 渲染函数
 const customBeforeContentRender = (props) =&gt; {

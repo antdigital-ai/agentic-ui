@@ -2,7 +2,7 @@ import React from 'react';
 import { vi } from 'vitest';
 
 // 简单的 Framer Motion Mock - 避免JSX语法问题
-export const framerMotionMock = {
+export const framerMotionMock: Record<string, any> = {
   motion: {
     div: vi.fn().mockImplementation(({ children, ...props }: any) => {
       return React.createElement('div', props, children);

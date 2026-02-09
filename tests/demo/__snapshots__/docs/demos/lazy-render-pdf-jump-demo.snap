@@ -722,7 +722,7 @@
           >
             <div
               class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-readonly"
-              style="width: 100%; height: auto; min-height: 100%;"
+              style="width: 100%; height: auto; border: medium; min-height: 100%;"
             >
               <div
                 class="ant-agentic-md-editor-container"

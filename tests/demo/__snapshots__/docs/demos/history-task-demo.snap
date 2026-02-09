@@ -250,7 +250,7 @@
                         style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
                       >
                         <div
-                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; position: relative;"
                         >
                           <div
                             style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
@@ -360,7 +360,6 @@
                             >
                               <path
                                 d="M13 1H6q-1.243 0-2.121.879Q3 2.757 3 4v16q0 1.243.879 2.121Q4.757 23 6 23h12q1.243 0 2.121-.879Q21 21.243 21 20V9h-5q-1.243 0-2.121-.879Q13 7.243 13 6zm8 6h-5q-.414 0-.707-.293T15 6V1a1 1 0 0 1 .707.293l5 5A1 1 0 0 1 21 7m-5.293 6.707a1 1 0 1 0-1.415-1.414L11 15.586l-1.293-1.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0z"
-                                style="mix-blend-mode: passthrough;"
                               />
                             </g>
                           </svg>
@@ -408,7 +407,7 @@
                         style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
                       >
                         <div
-                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; position: relative;"
                         >
                           <div
                             style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
@@ -565,7 +564,7 @@
                         style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
                       >
                         <div
-                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; position: relative;"
                         >
                           <div
                             style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"
@@ -662,7 +661,6 @@
                             >
                               <path
                                 d="M12 23C5.925 23 1 18.075 1 12S5.925 1 12 1s11 4.925 11 11-4.925 11-11 11m0-12.555L8.89 7.333 7.332 8.889 10.445 12l-3.112 3.11 1.556 1.557L12 13.555l3.11 3.112 1.557-1.556L13.555 12l3.112-3.11-1.556-1.557z"
-                                style="mix-blend-mode: passthrough;"
                               />
                             </g>
                           </svg>
@@ -710,7 +708,7 @@
                         style="flex-shrink: 0; display: flex; align-items: center; gap: 4px;"
                       >
                         <div
-                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; max-width: min(860px,100%); position: relative;"
+                          style="color: var(--color-gray-text-light); font: var(--font-text-body-sm); line-height: 1; display: flex; align-items: center; justify-content: center; width: max-content; position: relative;"
                         >
                           <div
                             style="position: absolute; right: 0px; top: 50%; transform: translateY(-50%); opacity: 1; transition: opacity 0.2s ease; pointer-events: auto; display: flex; align-items: center; background: transparent; z-index: 1;"

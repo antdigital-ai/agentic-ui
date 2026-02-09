@@ -84,10 +84,10 @@ describe('DazingLottie Component', () => {
 
     const lottieAnimation = screen.getByTestId('lottie-animation');
     expect(lottieAnimation).toHaveStyle({
-      border: '1px solid red',
       margin: '10px',
       display: 'flex',
     });
+    expect(lottieAnimation.style.border).toBe('1px solid red');
   });
 
   it('should merge custom style with default container style', () => {

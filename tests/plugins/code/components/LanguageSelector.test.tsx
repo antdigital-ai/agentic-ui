@@ -401,8 +401,9 @@ describe('LanguageSelector Component', () => {
       expect(button).toHaveStyle({
         display: 'flex',
         cursor: 'pointer',
-        color: 'inherit',
       });
+      // jsdom 28 将 color: inherit 计算为具体的 rgb 值
+      expect(button.style.color).toBe('inherit');
     });
 
     it('应该应用正确的图标容器样式', () => {

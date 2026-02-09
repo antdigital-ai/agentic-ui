@@ -1,4 +1,4 @@
-﻿import '@testing-library/jest-dom';
+import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -11,8 +11,8 @@ import {
 const simulateLinkClick = (
   linkConfig: MarkdownEditorProps['linkConfig'] | undefined,
   url: string,
-  mockWindowOpen: ReturnType<typeof vi.fn>,
-  mockLocationHref: ReturnType<typeof vi.fn>,
+  mockWindowOpen: (...args: any[]) => any,
+  mockLocationHref: (...args: any[]) => any,
 ) => {
   // 模拟 MLeaf 组件的点击逻辑
   if (linkConfig?.onClick) {
