@@ -35,7 +35,7 @@ export type BubbleListProps = {
 
   bubbleRef?: MutableRefObject<BubbleImperativeHandle | null | undefined>;
   /**
-   * @deprecated 请使用 isLoading 代替
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除
    */
   loading?: boolean;
@@ -200,14 +200,14 @@ export type BubbleListProps = {
   };
 
   /**
-   * @deprecated 请使用 onDislike 替代（符合命名规范）
+   * @deprecated @since 2.29.0 请使用 onDislike 替代（符合命名规范）
    */
   onDisLike?: BubbleProps['onDisLike'];
   /** 不喜欢回调 */
   onDislike?: BubbleProps['onDislike'];
   onLike?: BubbleProps['onLike'];
   /**
-   * @deprecated 请使用 onLikeCancel 替代（符合命名规范）
+   * @deprecated @since 2.29.0 请使用 onLikeCancel 替代（符合命名规范）
    */
   onCancelLike?: BubbleProps['onCancelLike'];
   /** Like 子组件取消事件 */

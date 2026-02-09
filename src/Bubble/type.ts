@@ -28,7 +28,7 @@ export interface BubbleImperativeHandle {
 
 /**
  * 基础样式属性
- * @deprecated 请使用 BaseStyleProps from '../Types'
+ * @deprecated @since 2.29.0 请使用 BaseStyleProps from '../Types'
  */
 export type BubbleStyleProps = BaseStyleProps;
 
@@ -93,7 +93,7 @@ export interface BubbleSlotClassNames {
 /**
  * 气泡样式配置
  * @description 气泡组件各部分的样式配置
- * @deprecated 属性名带有冗余的 bubble 前缀，建议使用 BubbleSlotStyles 替代
+ * @deprecated @since 2.30.0 属性名带有冗余的 bubble 前缀，建议使用 BubbleSlotStyles 替代
  */
 export interface BubbleStyles {
   /**
@@ -170,7 +170,7 @@ export interface BubbleStyles {
 /**
  * 气泡类名配置
  * @description 气泡组件各部分的类名配置
- * @deprecated 属性名带有冗余的 bubble 前缀，建议使用 BubbleSlotClassNames 替代
+ * @deprecated @since 2.30.0 属性名带有冗余的 bubble 前缀，建议使用 BubbleSlotClassNames 替代
  */
 export interface BubbleClassNames {
   /**
@@ -394,7 +394,7 @@ export interface BubbleProps<
 
   /**
    * 不喜欢回调
-   * @deprecated 请使用 onDislike 替代（符合命名规范），但为保持兼容性暂时保留
+   * @deprecated @since 2.29.0 请使用 onDislike 替代（符合命名规范），但为保持兼容性暂时保留
    */
   onDisLike?: (
     bubble: MessageBubbleData<Record<string, any>>,
@@ -414,7 +414,7 @@ export interface BubbleProps<
   /**
    * 取消点赞的回调函数
    * @description 当用户点击取消点赞按钮时触发
-   * @deprecated 请使用 onLikeCancel 替代（符合命名规范），但为保持兼容性暂时保留
+   * @deprecated @since 2.29.0 请使用 onLikeCancel 替代（符合命名规范），但为保持兼容性暂时保留
    * @callback
    * @optional
    */
@@ -526,7 +526,7 @@ export interface BubbleProps<
    */
   aiBubbleProps?: BubbleProps;
   /**
-   * @deprecated 请使用 aiBubbleProps 替代（符合命名规范）
+   * @deprecated @since 2.30.0 请使用 aiBubbleProps 替代（符合命名规范）
    */
   aIBubbleProps?: BubbleProps;
 }

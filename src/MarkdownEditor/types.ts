@@ -481,7 +481,7 @@ export type MarkdownEditorProps = {
   /**
    * Apassify 自定义渲染配置（兼容旧版本）
    * @description 与 apaasify 功能相同，用于向后兼容
-   * @deprecated 请使用 apaasify 代替
+   * @deprecated @since 2.29.0 请使用 apaasify 代替
    */
   apassify?: {
     enable?: boolean;

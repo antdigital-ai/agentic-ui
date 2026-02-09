@@ -135,6 +135,6 @@ export * from './Utils/proxySandbox/SecurityContextManager';
 /**
  * Schema Element Editor Chrome 插件底层 SDK
  * @description 原始 SDK 导出，一般用户无需直接使用
- * @deprecated 建议直接从 @schema-element-editor/host-sdk 导入
+ * @deprecated @since 2.30.0 建议直接从 @schema-element-editor/host-sdk 导入
  */
 export * from '@schema-element-editor/host-sdk';

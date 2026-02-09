@@ -46,7 +46,7 @@ export type TaskListProps = {
 };
 
 /**
- * @deprecated 请使用 TaskListProps 替代
+ * @deprecated @since 2.30.0 请使用 TaskListProps 替代
  */
 export type ThoughtChainProps = TaskListProps;
 

@@ -37,7 +37,7 @@ export interface VisualListProps {
   /** 自定义列表项渲染函数 */
   renderItem?: (item: VisualListItem, index: number) => React.ReactNode;
   /**
-   * @deprecated 请使用 isLoading 代替
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除
    */
   loading?: boolean;

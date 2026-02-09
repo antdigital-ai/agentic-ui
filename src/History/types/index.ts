@@ -10,12 +10,12 @@ export interface HistoryProps {
   onInit?: () => void;
   onShow?: () => void;
   request: (params: { agentId: string }) => Promise<HistoryDataType[]>;
-  /** @deprecated 请使用 onClick 替代 */
+  /** @deprecated @since 2.29.0 请使用 onClick 替代 */
   onSelected?: (item: HistoryDataType) => void;
   onClick?: (sessionId: string, item: HistoryDataType) => void;
   /**
    * 删除历史记录项时的回调函数
-   * @deprecated 建议使用 onDelete 替代（符合命名规范），但为保持兼容性暂时保留
+   * @deprecated @since 2.29.0 建议使用 onDelete 替代（符合命名规范），但为保持兼容性暂时保留
    */
   onDeleteItem?: (sessionId: string) => void;
   customDateFormatter?: (date: number | string | Date) => string;
@@ -66,7 +66,7 @@ export interface HistoryProps {
   /** 空状态渲染函数，当历史记录为空时显示 */
   emptyRender?: () => React.ReactNode;
   /**
-   * @deprecated 请使用 isLoading 代替
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除
    */
   loading?: boolean;
@@ -104,9 +104,9 @@ export interface HistoryActionsBoxProps {
 }
 
 /**
- * @deprecated 请使用 HistoryActionsBoxProps 替代
+ * @deprecated @since 2.29.0 请使用 HistoryActionsBoxProps 替代
  */
 export interface ActionsBoxProps extends HistoryActionsBoxProps {
-  /** @deprecated 请使用 onClick 替代 */
+  /** @deprecated @since 2.29.0 请使用 onClick 替代 */
   onSelected?: (item: HistoryDataType) => void;
 }

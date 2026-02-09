@@ -218,7 +218,7 @@ export interface MessageBubbleData<
   fileMap?: Map<string, AttachmentFile>;
 
   /**
-   * @deprecated 已废弃，请使用 isLast 代替
+   * @deprecated @since 2.29.0 已废弃，请使用 isLast 代替
    * @description 已废弃，请使用 isLast 代替
    * @example true
    */

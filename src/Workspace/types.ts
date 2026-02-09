@@ -413,7 +413,7 @@ export interface FileProps extends BaseChildProps {
   onLocate?: (file: FileNode) => void;
   /**
    * Group 子组件切换事件
-   * @deprecated 请使用 onGroupToggle 替代（符合命名规范），但为保持兼容性暂时保留
+   * @deprecated @since 2.29.0 请使用 onGroupToggle 替代（符合命名规范），但为保持兼容性暂时保留
    */
   onToggleGroup?: (groupType: FileType, collapsed: boolean) => void;
   /** Group 子组件切换事件 */
@@ -459,7 +459,7 @@ export interface FileProps extends BaseChildProps {
    */
   actionRef?: React.MutableRefObject<FileActionRef | null>;
   /**
-   * @deprecated 请使用 isLoading 代替
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除
    */
   loading?: boolean;

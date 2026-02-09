@@ -702,7 +702,7 @@ export const FileComponent: FC<{
   onLocate?: FileProps['onLocate'];
   /**
    * Group 子组件切换事件
-   * @deprecated 请使用 onGroupToggle 替代（符合命名规范）
+   * @deprecated @since 2.29.0 请使用 onGroupToggle 替代（符合命名规范）
    */
   onToggleGroup?: FileProps['onToggleGroup'];
   /** Group 子组件切换事件 */

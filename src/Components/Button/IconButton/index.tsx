@@ -12,7 +12,7 @@ export interface IconButtonProps {
   elevated?: boolean;
   size?: 'base' | 'sm' | 'xs';
   /**
-   * @deprecated 请使用 isLoading 代替
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除
    */
   loading?: boolean;

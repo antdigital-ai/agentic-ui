@@ -96,6 +96,6 @@ export const HistoryNewChat: React.FC<HistoryNewChatProps> = ({
 };
 
 /**
- * @deprecated 请使用 HistoryNewChat 替代
+ * @deprecated @since 2.29.0 请使用 HistoryNewChat 替代
  */
 export const NewChatComponent: React.FC<HistoryNewChatProps> = HistoryNewChat;
