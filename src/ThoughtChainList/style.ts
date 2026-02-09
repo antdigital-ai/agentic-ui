@@ -77,6 +77,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontSize: '1em',
         borderTopLeftRadius: 6,
         borderTopRightRadius: 12,
+        '&-icon': {
+          width: 15,
+          height: 15,
+          color: token.colorSuccess || '#0CE0AD',
+        },
         '&&-collapse': {
           borderRadius: '6px 12px 12px 12px',
         },
@@ -107,6 +112,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           alignItems: 'center',
           flex: 1,
         },
+      },
+      '&-content-wrapper': {
+        backgroundColor: token.colorBgContainer || '#FFF',
+        position: 'relative',
+        borderRadius: '6px 12px 12px 12px',
+        zIndex: 9,
       },
       '&-content': {
         backgroundColor: 'var(--color-gray-bg-card-white)',

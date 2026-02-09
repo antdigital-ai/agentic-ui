@@ -84,17 +84,10 @@ const ThoughtChainTitle = React.memo<{
         <div className={classNames(`${prefixCls}-title-content`, hashId)}>
           <Sparkles
             data-testid="magic-icon"
-            style={{
-              width: 15,
-              height: 15,
-              color: '#0CE0AD',
-            }}
+            className={classNames(`${prefixCls}-title-icon`, hashId)}
           />
           <span
             className={classNames(`${prefixCls}-title-progress`, hashId)}
-            style={{
-              fontSize: '1em',
-            }}
           >
             {endStatusDisplay}
           </span>
@@ -519,12 +512,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
               }
             />
             <div
-              style={{
-                backgroundColor: '#FFF',
-                position: 'relative',
-                borderRadius: '6px 12px 12px 12px',
-                zIndex: 9,
-              }}
+              className={classNames(`${prefixCls}-content-wrapper`, hashId)}
             >
               <ThoughtChainContent
                 prefixCls={prefixCls}
