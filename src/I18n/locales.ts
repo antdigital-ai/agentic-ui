@@ -42,9 +42,9 @@ export const cnLabels = {
   columnChart: '柱状图',
   areaChart: '面积图',
   descriptions: '定义列表',
-  dataTime: 'Data Time',
-  columns: 'Columns',
-  all: 'All',
+  dataTime: '数据时间',
+  columns: '列',
+  all: '全部',
   TableSql: '表查询',
   ToolCall: '工具查询',
   RagRetrieval: '文档查询',
@@ -378,6 +378,23 @@ export const cnLabels = {
   'layout.header.title': 'AI 助手',
   theme: '主题',
   expandCollapse: '展开/收起',
+  moreActions: '更多操作',
+  clickToRetry: '点击重试',
+  // 表格操作相关
+  'table.insertColumnBefore': '在前面增加一列',
+  'table.deleteColumn': '删除整列',
+  'table.insertColumnAfter': '在后面增加一列',
+  'table.insertRowBefore': '在上面增加一行',
+  'table.deleteRow': '删除整行',
+  'table.insertRowAfter': '在下面增加一行',
+  'table.clickToShowActions': '点击显示操作按钮',
+  // 评论相关
+  'comment.delete': '删除评论',
+  'comment.edit': '编辑评论',
+  'comment.jumpTo': '跳转到评论位置',
+  // 图表错误相关
+  'chart.renderFailed': '图表渲染失败',
+  'chart.renderFailedSubTitle': '图表组件遇到了一个错误，请稍后重试',
 };
 
 /**
@@ -765,4 +782,22 @@ export const enLabels: typeof cnLabels = {
   'layout.header.title': 'AI Assistant',
   theme: 'Theme',
   expandCollapse: 'Expand/Collapse',
+  moreActions: 'More Actions',
+  clickToRetry: 'Click to Retry',
+  // Table operation related
+  'table.insertColumnBefore': 'Insert Column Before',
+  'table.deleteColumn': 'Delete Column',
+  'table.insertColumnAfter': 'Insert Column After',
+  'table.insertRowBefore': 'Insert Row Before',
+  'table.deleteRow': 'Delete Row',
+  'table.insertRowAfter': 'Insert Row After',
+  'table.clickToShowActions': 'Click to show actions',
+  // Comment related
+  'comment.delete': 'Delete Comment',
+  'comment.edit': 'Edit Comment',
+  'comment.jumpTo': 'Jump to Comment',
+  // Chart error related
+  'chart.renderFailed': 'Chart Rendering Failed',
+  'chart.renderFailedSubTitle':
+    'The chart component encountered an error, please try again later',
 };

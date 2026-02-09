@@ -10,6 +10,7 @@ import { Editor, Transforms } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
 import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { useRefFunction } from '../../../../../Hooks/useRefFunction';
+import { I18nContext } from '../../../../../I18n';
 import { NativeTableEditor } from '../../../../utils/native-table';
 import { TablePropsContext } from '../TableContext';
 
@@ -70,6 +71,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
   rowIndex,
   tablePath,
 }) => {
+  const { locale } = useContext(I18nContext);
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(
     'agentic-md-editor-table-cell-index',
@@ -358,7 +360,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
         ...style,
       }}
       onClick={handleClick}
-      title={rowIndex !== undefined ? '点击显示操作按钮' : undefined}
+      title={rowIndex !== undefined ? (locale?.['table.clickToShowActions'] || '点击显示操作按钮') : undefined}
     >
       <div
         className={classNames(
@@ -374,7 +376,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
               `${baseClassName}-insert-row-before`,
             )}
             onClick={handleInsertRowBefore}
-            title="在上面增加一行"
+            title={locale?.['table.insertRowBefore'] || '在上面增加一行'}
           >
             <InsertRowAboveOutlined />
           </div>
@@ -385,7 +387,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
             `${baseClassName}-delete-icon`,
           )}
           onClick={handleDeleteClick}
-          title="删除整行"
+          title={locale?.['table.deleteRow'] || '删除整行'}
         >
           <DeleteOutlined />
         </div>
@@ -397,7 +399,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
               `${baseClassName}-insert-row-after`,
             )}
             onClick={handleInsertRowAfter}
-            title="在下面增加一行"
+            title={locale?.['table.insertRowAfter'] || '在下面增加一行'}
           >
             <InsertRowBelowOutlined />
           </div>

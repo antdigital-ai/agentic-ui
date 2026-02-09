@@ -1,4 +1,4 @@
-﻿import {
+import {
   CloseOutlined,
   DeleteFilled,
   EditOutlined,
@@ -15,6 +15,7 @@ import {
   MarkdownEditorProps,
 } from '../../../BaseMarkdownEditor';
 
+import { I18nContext } from '../../../../I18n';
 import { EditorStoreContext, useEditorStore } from '../../store';
 import { useStyle } from './style';
 
@@ -98,6 +99,7 @@ export const CommentList: React.FC<{
   pure?: boolean;
 }> = (props) => {
   const { markdownEditorRef } = useEditorStore();
+  const { locale } = useContext(I18nContext);
   const context = useContext(ConfigProvider.ConfigContext);
   const { setShowComment } = useContext(EditorStoreContext) || {};
   const baseCls = context?.getPrefixCls('agentic-md-editor-comment-view');
@@ -221,7 +223,7 @@ export const CommentList: React.FC<{
                             } catch (error) {}
                           }}
                         >
-                          <Tooltip title="删除评论">
+                          <Tooltip title={locale?.['comment.delete'] || '删除评论'}>
                             <span
                               className={classNames(
                                 `${baseCls}-item-header-action-item`,
@@ -234,7 +236,7 @@ export const CommentList: React.FC<{
                         </Popconfirm>
                       ) : null}
                       {props.comment?.onEdit ? (
-                        <Tooltip title="编辑评论">
+                        <Tooltip title={locale?.['comment.edit'] || '编辑评论'}>
                           <span
                             className={classNames(
                               `${baseCls}-item-header-action-item`,
@@ -250,7 +252,7 @@ export const CommentList: React.FC<{
                           </span>
                         </Tooltip>
                       ) : null}
-                      <Tooltip title="跳转到评论位置">
+                      <Tooltip title={locale?.['comment.jumpTo'] || '跳转到评论位置'}>
                         <span
                           className={classNames(
                             `${baseCls}-item-header-action-item`,

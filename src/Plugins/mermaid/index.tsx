@@ -146,7 +146,7 @@ export function MermaidElement(props: ElementProps<CodeNode>) {
               }}
             >
               <ActionIconBox
-                title="关闭"
+                title={i18n.locale?.close || '关闭'}
                 onClick={() => {
                   setState({
                     hide: props.element.language === 'mermaid',
@@ -156,7 +156,7 @@ export function MermaidElement(props: ElementProps<CodeNode>) {
                 <CloseCircleOutlined />
               </ActionIconBox>
               <ActionIconBox
-                title="复制"
+                title={i18n.locale?.copy || '复制'}
                 style={{
                   fontSize: '0.9em',
                   lineHeight: '1.75em',

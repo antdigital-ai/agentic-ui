@@ -232,7 +232,7 @@ export const FileMapViewItem: React.FC<{
                 )}
                 {props.renderMoreAction && (
                   <ActionIconBox
-                    title="更多操作"
+                    title={locale?.moreActions || '更多操作'}
                     onClick={(e) => {
                       e.stopPropagation();
                     }}

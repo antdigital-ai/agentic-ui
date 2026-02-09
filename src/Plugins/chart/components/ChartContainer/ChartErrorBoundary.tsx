@@ -1,5 +1,6 @@
 import { Result } from 'antd';
 import React, { ErrorInfo, ReactNode } from 'react';
+import { I18nContext } from '../../../../I18n';
 
 export interface ChartErrorBoundaryProps {
   /** 子元素 */
@@ -46,6 +47,9 @@ class ChartErrorBoundary extends React.Component<
   ChartErrorBoundaryProps,
   ChartErrorBoundaryState
 > {
+  static contextType = I18nContext;
+  declare context: React.ContextType<typeof I18nContext>;
+
   constructor(props: ChartErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -86,11 +90,12 @@ class ChartErrorBoundary extends React.Component<
       }
 
       // 使用 antd Result 组件的简洁错误UI
+      const locale = this.context?.locale;
       return (
         <Result
           status="error"
-          title="图表渲染失败"
-          subTitle="图表组件遇到了一个错误，请稍后重试"
+          title={locale?.['chart.renderFailed'] || '图表渲染失败'}
+          subTitle={locale?.['chart.renderFailedSubTitle'] || '图表组件遇到了一个错误，请稍后重试'}
         />
       );
     }

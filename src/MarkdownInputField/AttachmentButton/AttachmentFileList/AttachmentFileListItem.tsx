@@ -2,7 +2,8 @@ import { FileFailed, FileUploadingSpin, X } from '@sofa-design/icons';
 import { Tooltip } from 'antd';
 import classNames from 'clsx';
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useContext } from 'react';
+import { I18nContext } from '../../../I18n';
 import { AttachmentFile } from '../types';
 import { kbToSize } from '../utils';
 import { AttachmentFileIcon } from './AttachmentFileIcon';
@@ -142,6 +143,7 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   onDelete,
   className,
 }) => {
+  const { locale } = useContext(I18nContext);
   const isErrorStatus = file.status === 'error';
   const isDoneStatus = file.status === 'done';
   const canDelete = file.status !== 'uploading';
@@ -162,7 +164,7 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   };
 
   return (
-    <Tooltip title="点击重试" open={isErrorStatus ? undefined : false}>
+    <Tooltip title={locale?.clickToRetry || '点击重试'} open={isErrorStatus ? undefined : false}>
       <motion.div
         variants={ANIMATION_VARIANTS}
         onClick={handleFileClick}

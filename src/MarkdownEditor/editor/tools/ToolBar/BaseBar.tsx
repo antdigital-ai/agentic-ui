@@ -391,7 +391,7 @@ export const BaseToolBar = React.memo<{
     return (
       <>
         <ToolBarItem
-          title="更多操作"
+          title={i18n.locale?.moreActions || '更多操作'}
           icon={<Plus />}
           className={classnames(
             `${baseClassName}-item`,

@@ -10,6 +10,7 @@ import { Editor, Transforms } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
 import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { useRefFunction } from '../../../../../Hooks/useRefFunction';
+import { I18nContext } from '../../../../../I18n';
 import { NativeTableEditor } from '../../../../utils/native-table';
 import { TablePropsContext } from '../TableContext';
 
@@ -70,6 +71,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
   columnIndex,
   tablePath,
 }) => {
+  const { locale } = useContext(I18nContext);
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(
     'agentic-md-editor-table-cell-index-spacer',
@@ -347,8 +349,8 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
       title={
         columnIndex !== undefined
           ? columnIndex === -1
-            ? '点击选中整个表格'
-            : '点击选中整列，显示操作按钮'
+            ? locale?.['table.clickToShowActions'] || '点击显示操作按钮'
+            : locale?.['table.clickToShowActions'] || '点击显示操作按钮'
           : undefined
       }
     >
@@ -366,7 +368,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
               `${baseClassName}-insert-column-before`,
             )}
             onClick={handleInsertColumnBefore}
-            title="在前面增加一列"
+            title={locale?.['table.insertColumnBefore'] || '在前面增加一列'}
           >
             <InsertRowLeftOutlined />
           </div>
@@ -377,7 +379,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
             `${baseClassName}-delete-icon`,
           )}
           onClick={handleDeleteClick}
-          title="删除整列"
+          title={locale?.['table.deleteColumn'] || '删除整列'}
         >
           <DeleteOutlined />
         </div>
@@ -389,7 +391,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
               `${baseClassName}-insert-column-after`,
             )}
             onClick={handleInsertColumnAfter}
-            title="在后面增加一列"
+            title={locale?.['table.insertColumnAfter'] || '在后面增加一列'}
           >
             <InsertRowRightOutlined />
           </div>
