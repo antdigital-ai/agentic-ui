@@ -9,6 +9,126 @@ group:
 
 # Changelog
 
+## v2.29.26
+
+- Bubble
+  - 🛠 Refactor Bubble component to integrate `useMergedLocale` for consistent locale handling across components. ([6647b12b](https://github.com/ant-design/agentic-ui/commit/6647b12b))
+
+## v2.29.25
+
+- MarkdownInputField
+  - 🌐 Internationalize upload status, optimize "Uploading..." and "Upload failed" text multilingual display. [#301](https://github.com/ant-design/agentic-ui/pull/301) [@陈帅]
+
+- I18n
+  - 🌐 Improve internationalization, fix translation errors in `cnLabels`, add 17 missing i18n keys, and update 9 components to use internationalization. [#299](https://github.com/ant-design/agentic-ui/pull/299) [@陈帅]
+
+📚 API documentation update, improve design issues documentation. [#298](https://github.com/ant-design/agentic-ui/pull/298) [@陈帅]
+
+## v2.29.24
+
+- Bubble
+  - 🐞 Fix style class name prefix, prepend dot to class name in `useMessagesContentStyle` for correct styling. ([2f496852](https://github.com/ant-design/agentic-ui/commit/2f496852))
+
+- MarkdownPreview
+  - 🛠 Simplify rendering logic and enhance Popover behavior based on `placement` and extra content. ([d9cf641c](https://github.com/ant-design/agentic-ui/commit/d9cf641c))
+
+- Workspace
+  - 🛠 Update demo file reference and remove obsolete demo. ([fc4ffb27](https://github.com/ant-design/agentic-ui/commit/fc4ffb27))
+
+✅ Test optimization, update type assertions and mock implementations in various test files for better type safety and consistency. ([4d5634b1](https://github.com/ant-design/agentic-ui/commit/4d5634b1))
+
+## v2.29.23
+
+- MarkdownEditor
+  - 🌐 Support internationalization for editor toolbar titles, headings, subheadings, and body text. [#296](https://github.com/ant-design/agentic-ui/pull/296) [@shuyan]
+
+- MarkdownEditor
+  - 🐞 Fix initialization issue when Markdown content is empty, ensure proper rendering when `initValue` is empty or `undefined`. [#294](https://github.com/ant-design/agentic-ui/pull/294) [@陈帅]
+
+## v2.29.22
+
+- Bubble
+  - 🛠 Refactor class naming for improved style encapsulation in BubbleMessageDisplay. ([e734568c](https://github.com/ant-design/agentic-ui/commit/e734568c))
+
+## v2.29.21
+
+- Bubble
+  - 🆕 Add `wrapSSR` support for improved rendering in BubbleMessageDisplay. ([8dd08a01](https://github.com/ant-design/agentic-ui/commit/8dd08a01))
+
+## v2.29.20
+
+- Bubble
+  - 💄 Update MessagesContent styles, optimize `padding` and `gap` values for consistency. ([4578a647](https://github.com/ant-design/agentic-ui/commit/4578a647))
+  - 🆕 Enhance bubble message handling with `preMessage` support and retry UI. ([8b56ebe3](https://github.com/ant-design/agentic-ui/commit/8b56ebe3))
+
+✅ MarkdownEditor: Add tests for footnote rendering in readonly mode. ([2ca9faee](https://github.com/ant-design/agentic-ui/commit/2ca9faee))
+
+## v2.29.19
+
+- MarkdownEditor
+  - 🐞 Disable RAF by default in `setMDContent` to prevent rendering stop on browser alerts. [#293](https://github.com/ant-design/agentic-ui/pull/293) [@陈帅]
+
+- ChatLayout
+  - 💄 Optimize bottom animation background to fill the entire container. [#292](https://github.com/ant-design/agentic-ui/pull/292) [@不见月]
+
+## v2.29.18
+
+- MarkdownEditor
+  - 🐞 Fix paste handling logic, update `onPaste` handler to return boolean and enhance paste handling. ([af8cff63](https://github.com/ant-design/agentic-ui/commit/af8cff63))
+
+## v2.29.17
+
+- Workspace
+  - 🆕 Support card custom rendering. [#291](https://github.com/ant-design/agentic-ui/pull/291) [@shuyan]
+
+- MarkdownEditor
+  - 🆕 Enhance quick input tips for code and horizontal rule blocks. [#289](https://github.com/ant-design/agentic-ui/pull/289) [@222]
+  - 🐞 Optimize key matching and space trigger logic. [#288](https://github.com/ant-design/agentic-ui/pull/288) [@陈帅]
+  - 🆕 Support double hash (##) heading input. [#284](https://github.com/ant-design/agentic-ui/pull/284) [@陈帅]
+
+✅ Improve test case coverage. [#287](https://github.com/ant-design/agentic-ui/pull/287) [@222]
+
+## v2.29.16
+
+- Workspace
+  - 🆕 Support file and web page reverse location, click files or web pages in workspace to locate corresponding position in conversation. [#286](https://github.com/ant-design/agentic-ui/pull/286) [@shuyan]
+  - 🆕 Task name supports ReactNode, support custom `title`. [#279](https://github.com/ant-design/agentic-ui/pull/279) [@shuyan]
+
+📚 Design guidelines improvement, add Figma design system guidelines. [#285](https://github.com/ant-design/agentic-ui/pull/285) [@陈帅]
+
+📚 Add AGENTS.md file to improve project documentation. [#283](https://github.com/ant-design/agentic-ui/pull/283) [@陈帅]
+
+📚 Add Markdown input shortcuts documentation. [#282](https://github.com/ant-design/agentic-ui/pull/282) [@陈帅]
+
+📚 Improve component library specification documentation. [#281](https://github.com/ant-design/agentic-ui/pull/281) [@陈帅]
+
+📚 Add `atomId` documentation for button. [#280](https://github.com/ant-design/agentic-ui/pull/280) [@遇见同学]
+
+## v2.29.15
+
+📦 Add guidelines directory to package files. ([895d20fc](https://github.com/ant-design/agentic-ui/commit/895d20fc))
+
+## v2.29.14
+
+🆕 Sofa icon page launched. [#278](https://github.com/ant-design/agentic-ui/pull/278) [@陈帅]
+
+🛠 ParseMd code structure optimization. [#277](https://github.com/ant-design/agentic-ui/pull/277) [@陈帅]
+
+## v2.29.12
+
+- MarkdownInputField
+  - 💄 Animation optimization, adjust beam to left side for better visual guidance. [#276](https://github.com/ant-design/agentic-ui/pull/276) [@不见月]
+
+- ChatFlowContainer
+  - 🛠 Update animation duration for scroll elements. [#275](https://github.com/ant-design/agentic-ui/pull/275) [@不见月]
+
+⚡️ Elements style performance optimization. [#274](https://github.com/ant-design/agentic-ui/pull/274) [@陈帅]
+
+## v2.29.9
+
+- TagPopup
+  - 🐞 Fix 'path' is null error when selecting dropdown options consecutively. [#269](https://github.com/ant-design/agentic-ui/pull/269) [@222]
+
 ## v2.29.7
 
 🆕 FooterBackgroundLottie: Add Lottie animation configuration file. ([a77e7f6a](https://github.com/ant-design/agentic-ui/commit/a77e7f6a))

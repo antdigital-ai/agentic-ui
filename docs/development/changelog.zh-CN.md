@@ -9,6 +9,126 @@ group:
 
 # Changelog
 
+## v2.29.26
+
+- Bubble
+  - 🛠 重构 Bubble 组件，集成 `useMergedLocale` 以实现统一的国际化处理。 ([6647b12b](https://github.com/ant-design/agentic-ui/commit/6647b12b))
+
+## v2.29.25
+
+- MarkdownInputField
+  - 🌐 上传状态国际化支持，优化 "上传中..." 和 "上传失败" 文本的多语言显示。 [#301](https://github.com/ant-design/agentic-ui/pull/301) [@陈帅]
+
+- I18n
+  - 🌐 国际化完善，修复 `cnLabels` 中的翻译错误，新增 17 个缺失的 i18n 键，并更新 9 个组件以使用国际化。 [#299](https://github.com/ant-design/agentic-ui/pull/299) [@陈帅]
+
+📚 API 文档更新，完善设计问题说明。 [#298](https://github.com/ant-design/agentic-ui/pull/298) [@陈帅]
+
+## v2.29.24
+
+- Bubble
+  - 🐞 修复样式类名前缀，在 `useMessagesContentStyle` 中为类名添加点号以确保正确应用样式。 ([2f496852](https://github.com/ant-design/agentic-ui/commit/2f496852))
+
+- MarkdownPreview
+  - 🛠 简化渲染逻辑，根据 `placement` 和额外内容优化 Popover 行为。 ([d9cf641c](https://github.com/ant-design/agentic-ui/commit/d9cf641c))
+
+- Workspace
+  - 🛠 更新 demo 文件引用，移除过时的 demo。 ([fc4ffb27](https://github.com/ant-design/agentic-ui/commit/fc4ffb27))
+
+✅ 测试优化，更新多个测试文件的类型断言和 mock 实现，提升类型安全性和一致性。 ([4d5634b1](https://github.com/ant-design/agentic-ui/commit/4d5634b1))
+
+## v2.29.23
+
+- MarkdownEditor
+  - 🌐 编辑器操作栏标题支持国际化，标题、小标题、正文等支持多语言。 [#296](https://github.com/ant-design/agentic-ui/pull/296) [@shuyan]
+
+- MarkdownEditor
+  - 🐞 修复 Markdown 内容为空时的初始化问题，确保 `initValue` 为空或 `undefined` 时也能正常渲染。 [#294](https://github.com/ant-design/agentic-ui/pull/294) [@陈帅]
+
+## v2.29.22
+
+- Bubble
+  - 🛠 重构类名命名以改进样式封装，优化 BubbleMessageDisplay 的样式隔离。 ([e734568c](https://github.com/ant-design/agentic-ui/commit/e734568c))
+
+## v2.29.21
+
+- Bubble
+  - 🆕 添加 `wrapSSR` 支持，改进 BubbleMessageDisplay 的渲染能力。 ([8dd08a01](https://github.com/ant-design/agentic-ui/commit/8dd08a01))
+
+## v2.29.20
+
+- Bubble
+  - 💄 更新 MessagesContent 样式，优化 `padding` 和 `gap` 值以保持一致性。 ([4578a647](https://github.com/ant-design/agentic-ui/commit/4578a647))
+  - 🆕 增强气泡消息处理，支持 `preMessage` 和重试 UI。 ([8b56ebe3](https://github.com/ant-design/agentic-ui/commit/8b56ebe3))
+
+✅ MarkdownEditor: 添加只读模式下的脚注渲染测试用例。 ([2ca9faee](https://github.com/ant-design/agentic-ui/commit/2ca9faee))
+
+## v2.29.19
+
+- MarkdownEditor
+  - 🐞 默认禁用 `setMDContent` 中的 RAF 优化，防止浏览器原生弹窗阻塞主线程时 Markdown 渲染停止。 [#293](https://github.com/ant-design/agentic-ui/pull/293) [@陈帅]
+
+- ChatLayout
+  - 💄 优化底部动画背景铺满整个容器。 [#292](https://github.com/ant-design/agentic-ui/pull/292) [@不见月]
+
+## v2.29.18
+
+- MarkdownEditor
+  - 🐞 修复粘贴处理逻辑，更新 `onPaste` 处理器返回布尔值并增强粘贴处理。 ([af8cff63](https://github.com/ant-design/agentic-ui/commit/af8cff63))
+
+## v2.29.17
+
+- Workspace
+  - 🆕 支持卡片自定义渲染。 [#291](https://github.com/ant-design/agentic-ui/pull/291) [@shuyan]
+
+- MarkdownEditor
+  - 🆕 增强快捷输入提示，支持代码块和分割线的快捷输入。 [#289](https://github.com/ant-design/agentic-ui/pull/289) [@222]
+  - 🐞 优化按键匹配与空格触发逻辑。 [#288](https://github.com/ant-design/agentic-ui/pull/288) [@陈帅]
+  - 🆕 支持双井号（##）标题输入。 [#284](https://github.com/ant-design/agentic-ui/pull/284) [@陈帅]
+
+✅ 提升测试用例覆盖率。 [#287](https://github.com/ant-design/agentic-ui/pull/287) [@222]
+
+## v2.29.16
+
+- Workspace
+  - 🆕 支持文件和网页反向定位，点击工作空间的文件、网页可以反向定位到对话中的位置。 [#286](https://github.com/ant-design/agentic-ui/pull/286) [@shuyan]
+  - 🆕 任务名称支持 ReactNode，支持自定义 `title`。 [#279](https://github.com/ant-design/agentic-ui/pull/279) [@shuyan]
+
+📚 设计指南完善，添加 Figma 设计系统指南。 [#285](https://github.com/ant-design/agentic-ui/pull/285) [@陈帅]
+
+📚 添加 AGENTS.md 文件，完善项目文档。 [#283](https://github.com/ant-design/agentic-ui/pull/283) [@陈帅]
+
+📚 添加 Markdown 输入快捷键文档。 [#282](https://github.com/ant-design/agentic-ui/pull/282) [@陈帅]
+
+📚 完善组件库规范说明。 [#281](https://github.com/ant-design/agentic-ui/pull/281) [@陈帅]
+
+📚 为按钮文档添加 `atomId` 说明。 [#280](https://github.com/ant-design/agentic-ui/pull/280) [@遇见同学]
+
+## v2.29.15
+
+📦 添加 guidelines 目录到 package 文件列表。 ([895d20fc](https://github.com/ant-design/agentic-ui/commit/895d20fc))
+
+## v2.29.14
+
+🆕 Sofa 图标页面上线。 [#278](https://github.com/ant-design/agentic-ui/pull/278) [@陈帅]
+
+🛠 ParseMd 代码结构优化。 [#277](https://github.com/ant-design/agentic-ui/pull/277) [@陈帅]
+
+## v2.29.12
+
+- MarkdownInputField
+  - 💄 动效优化，将光条调整到左侧，优化视线引导效果。 [#276](https://github.com/ant-design/agentic-ui/pull/276) [@不见月]
+
+- ChatFlowContainer
+  - 🛠 更新滚动元素的动画持续时间。 [#275](https://github.com/ant-design/agentic-ui/pull/275) [@不见月]
+
+⚡️ Elements 样式性能优化。 [#274](https://github.com/ant-design/agentic-ui/pull/274) [@陈帅]
+
+## v2.29.9
+
+- TagPopup
+  - 🐞 修复连续选择下拉选项时抛出 'path' is null 错误。 [#269](https://github.com/ant-design/agentic-ui/pull/269) [@222]
+
 ## v2.29.7
 
 🆕 FooterBackgroundLottie: 添加 Lottie 动画配置文件。 ([a77e7f6a](https://github.com/ant-design/agentic-ui/commit/a77e7f6a))
