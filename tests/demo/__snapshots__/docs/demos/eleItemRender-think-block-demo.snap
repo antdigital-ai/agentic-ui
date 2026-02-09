@@ -35,7 +35,7 @@
       >
         <div
           class="ant-agentic-md-editor markdown-editor ant-agentic-md-editor-edit"
-          style="width: 100%; height: auto; min-height: 600px;"
+          style="width: 100%; height: auto; min-height: 600px; border: medium;"
         >
           <div
             class="ant-agentic-md-editor-container"
@@ -189,7 +189,7 @@
 通常用于显示 AI 的思考过程
                   </div>
                   <div
-                    style="position: absolute; bottom: 0px; left: 0px; right: 0px; height: 4px; background: linear-gradient(90deg, #007bff, #28a745, #ffc107, #dc3545); border-radius: 0 0 6px 6px;"
+                    style="position: absolute; bottom: 0px; left: 0px; right: 0px; height: 4px; background: linear-gradient(90deg, rgb(0, 123, 255), rgb(40, 167, 69), rgb(255, 193, 7), rgb(220, 53, 69)); border-radius: 0 0 6px 6px;"
                   />
                 </div>
                 <span
@@ -242,7 +242,7 @@
                   style="background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 12px; padding: 16px; margin: 16px 0px; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"
                 >
                   <div
-                    style="position: absolute; top: 0px; left: 0px; right: 0px; height: 4px; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);"
+                    style="position: absolute; top: 0px; left: 0px; right: 0px; height: 4px; background: linear-gradient(90deg, rgb(102, 126, 234), rgb(118, 75, 162), rgb(240, 147, 251), rgb(245, 87, 108));"
                   />
                   <div
                     style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;"
@@ -260,7 +260,7 @@
                       </span>
                     </div>
                     <button
-                      style="background: none; color: rgb(102, 126, 234); cursor: pointer; font-size: 12px; font-weight: 500; padding: 4px 8px; border-radius: 4px; transition: background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);"
+                      style="background: none; border: medium; color: rgb(102, 126, 234); cursor: pointer; font-size: 12px; font-weight: 500; padding: 4px 8px; border-radius: 4px; transition: background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);"
                       type="button"
                     >
                       展开
@@ -275,7 +275,7 @@
 ...
                   </div>
                   <div
-                    style="position: absolute; bottom: 40px; left: 16px; right: 16px; height: 20px; background: linear-gradient(transparent, #fff); pointer-events: none;"
+                    style="position: absolute; bottom: 40px; left: 16px; right: 16px; height: 20px; background: linear-gradient(transparent, rgb(255, 255, 255)); pointer-events: none;"
                   />
                 </div>
                 <span
@@ -333,7 +333,7 @@
                   style="background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 12px; padding: 16px; margin: 16px 0px; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"
                 >
                   <div
-                    style="position: absolute; top: 0px; left: 0px; right: 0px; height: 4px; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);"
+                    style="position: absolute; top: 0px; left: 0px; right: 0px; height: 4px; background: linear-gradient(90deg, rgb(102, 126, 234), rgb(118, 75, 162), rgb(240, 147, 251), rgb(245, 87, 108));"
                   />
                   <div
                     style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;"
@@ -351,7 +351,7 @@
                       </span>
                     </div>
                     <button
-                      style="background: none; color: rgb(102, 126, 234); cursor: pointer; font-size: 12px; font-weight: 500; padding: 4px 8px; border-radius: 4px; transition: background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);"
+                      style="background: none; border: medium; color: rgb(102, 126, 234); cursor: pointer; font-size: 12px; font-weight: 500; padding: 4px 8px; border-radius: 4px; transition: background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);"
                       type="button"
                     >
                       展开
@@ -366,7 +366,7 @@
 ...
                   </div>
                   <div
-                    style="position: absolute; bottom: 40px; left: 16px; right: 16px; height: 20px; background: linear-gradient(transparent, #fff); pointer-events: none;"
+                    style="position: absolute; bottom: 40px; left: 16px; right: 16px; height: 20px; background: linear-gradient(transparent, rgb(255, 255, 255)); pointer-events: none;"
                   />
                 </div>
                 <span
@@ -521,7 +521,6 @@
                               <g>
                                 <path
                                   d="M2,12.000000476837158Q2,7.857860476837158,4.928929999999999,4.928930476837158Q7.85786,2.000000298023158,12,2.000000596046158C12.2652,2.000000476837158,12.5196,2.1053574768371583,12.7071,2.292893476837158C12.8946,2.480429476837158,13,2.7347834768371584,13,3.000000476837158C13,3.2652204768371584,12.8946,3.519570476837158,12.7071,3.7071104768371583Q11.13604,5.278170476837158,11.13604,7.500000476837158Q11.13604,9.72182047683716,12.7071,11.292890476837158Q14.2782,12.864000476837159,16.5,12.864000476837159Q18.7218,12.864000476837159,20.2929,11.292890476837158C20.6834,10.902370476837158,21.3166,10.902370476837158,21.7071,11.292890476837158C21.8946,11.480430476837158,22,11.734780476837159,22,12.000000476837158Q22,16.142100476837157,19.0711,19.07110047683716Q16.1421,22.000000476837158,12,22.000000476837158Q7.85786,22.000000476837158,4.928929999999999,19.07110047683716Q2,16.142100476837157,2,12.000000476837158ZM4,12.000000476837158Q4,15.313700476837159,6.34315,17.65690047683716Q8.68629,20.000000476837158,12,20.000000476837158Q15.3137,20.000000476837158,17.6569,17.65690047683716Q19.2026,16.11110047683716,19.7287,14.142900476837157Q18.2637,14.864000476837159,16.5,14.864000476837159Q13.4497,14.864000476837159,11.2929,12.707100476837159Q9.136040000000001,10.550250476837158,9.136040000000001,7.500000476837158Q9.136040000000001,5.736330476837159,9.85712,4.271340476837159Q7.88893,4.797360476837158,6.34315,6.343150476837158Q4,8.686290476837158,4,12.000000476837158Z"
-                                  style="mix-blend-mode: passthrough;"
                                 />
                               </g>
                             </g>
@@ -602,7 +601,6 @@
                             >
                               <path
                                 d="M10.862 6.471 8 3.61 5.138 6.471a.667.667 0 1 1-.943-.942L7.53 2.195a.667.667 0 0 1 .942 0l3.334 3.334a.667.667 0 1 1-.943.942M8 12.391 5.138 9.529a.667.667 0 1 0-.943.942l3.334 3.334a.666.666 0 0 0 .942 0l3.333-3.333a.667.667 0 1 0-.942-.943z"
-                                style="mix-blend-mode: passthrough;"
                               />
                             </g>
                           </svg>

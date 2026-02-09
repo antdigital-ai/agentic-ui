@@ -20,7 +20,7 @@
           style="background-color: rgb(246, 248, 250); padding: 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgb(209, 217, 224);"
         >
           <h3
-            style="margin: 0px 0px 12px 0px; color: rgb(3, 102, 214);"
+            style="margin: 0px 0px 12px; color: rgb(3, 102, 214);"
           >
             ✨ 功能特性
           </h3>
@@ -78,7 +78,7 @@
             💡 使用说明：
           </strong>
           <ul
-            style="margin: 8px 0px 0px 0px; padding-left: 20px;"
+            style="margin: 8px 0px 0px; padding-left: 20px;"
           >
             <li>
               此演示处于只读模式，展示评论高亮效果
@@ -112,7 +112,7 @@
       >
         <div
           class="ant-agentic-md-editor markdown-editor chunk-content-editor ant-agentic-md-editor-readonly ant-agentic-md-editor-report"
-          style="width: 100%; height: auto; min-height: 600px;"
+          style="width: 100%; height: auto; min-height: 600px; border: medium;"
         >
           <div
             class="ant-agentic-md-editor-container"
@@ -2280,7 +2280,7 @@
         style="margin-top: 20px; padding: 16px; background-color: rgb(248, 249, 250); border-radius: 8px; border: 1px solid rgb(222, 226, 230);"
       >
         <h3
-          style="margin: 0px 0px 12px 0px;"
+          style="margin: 0px 0px 12px;"
         >
           🔧 技术实现
         </h3>
@@ -2289,7 +2289,7 @@
         >
           <div>
             <h4
-              style="margin: 0px 0px 8px 0px; color: rgb(73, 80, 87);"
+              style="margin: 0px 0px 8px; color: rgb(73, 80, 87);"
             >
               Props 配置：
             </h4>
@@ -2330,7 +2330,7 @@
           </div>
           <div>
             <h4
-              style="margin: 0px 0px 8px 0px; color: rgb(73, 80, 87);"
+              style="margin: 0px 0px 8px; color: rgb(73, 80, 87);"
             >
               评论功能：
             </h4>

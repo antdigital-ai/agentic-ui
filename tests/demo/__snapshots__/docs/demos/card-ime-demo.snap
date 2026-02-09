@@ -21,7 +21,7 @@
             🧪 测试步骤：
           </strong>
           <ol
-            style="margin: 12px 0px 0px 0px; padding-left: 20px;"
+            style="margin: 12px 0px 0px; padding-left: 20px;"
           >
             <li>
               点击任意卡片，会自动选中到 card-after
@@ -44,7 +44,7 @@
             ⚡ 预期行为：
           </strong>
           <ul
-            style="margin: 12px 0px 0px 0px; padding-left: 20px;"
+            style="margin: 12px 0px 0px; padding-left: 20px;"
           >
             <li>
               点击卡片后，在 card-after 区域使用中文输入法输入
@@ -67,7 +67,7 @@
             🔧 技术说明：
           </strong>
           <ul
-            style="margin: 12px 0px 0px 0px; padding-left: 20px;"
+            style="margin: 12px 0px 0px; padding-left: 20px;"
           >
             <li>
               修复了中文输入法通过 

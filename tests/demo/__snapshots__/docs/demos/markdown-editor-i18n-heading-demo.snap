@@ -188,7 +188,7 @@
                       </div>
                       <div
                         role="button"
-                        style="display: flex; height: 100%; align-items: center; text-decoration: underline solid null; text-decoration-thickness: 2px; line-height: 1;"
+                        style="display: flex; height: 100%; align-items: center; text-decoration-thickness: 2px; line-height: 1;"
                       >
                         <span
                           aria-label="highlight"

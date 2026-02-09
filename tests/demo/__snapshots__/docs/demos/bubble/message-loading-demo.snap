@@ -514,7 +514,7 @@
         style="margin-top: 32px; padding: 16px; background-color: rgb(248, 249, 250); border-radius: 8px; font-size: 14px; line-height: 1.6;"
       >
         <h4
-          style="margin: 0px 0px 12px 0px;"
+          style="margin: 0px 0px 12px;"
         >
           🔄 消息加载状态功能说明
         </h4>
@@ -563,7 +563,7 @@
         style="margin-top: 24px; padding: 16px; background-color: rgb(230, 247, 255); border-radius: 8px; font-size: 14px; line-height: 1.6;"
       >
         <h4
-          style="margin: 0px 0px 12px 0px;"
+          style="margin: 0px 0px 12px;"
         >
           📖 API 说明
         </h4>

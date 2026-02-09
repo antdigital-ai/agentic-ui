@@ -133,8 +133,8 @@ describe('AILabel 组件', () => {
       <AILabel style={{ border: '2px solid red' }} />,
     );
 
-    const dot = container.querySelector('.ant-ai-label-dot');
-    expect(dot).toHaveStyle({ border: '2px solid red' });
+    const dot = container.querySelector('.ant-ai-label-dot') as HTMLElement;
+    expect(dot.style.border).toBe('2px solid red');
   });
 
   it('应该支持 HTML 属性', () => {
@@ -203,9 +203,9 @@ describe('AILabel 组件', () => {
     expect(label).toHaveStyle({ margin: '10px' });
     expect(label).toHaveAttribute('data-testid', 'full-config-label');
 
-    const dot = container.querySelector('.ant-ai-label-dot');
+    const dot = container.querySelector('.ant-ai-label-dot') as HTMLElement;
     expect(dot).toHaveStyle({ marginTop: '-8px', insetInlineEnd: '-5px' });
-    expect(dot).toHaveStyle({ border: '1px solid blue' });
+    expect(dot.style.border).toBe('1px solid blue');
 
     expect(screen.getByText('子元素')).toBeInTheDocument();
   });
