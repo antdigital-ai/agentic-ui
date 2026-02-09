@@ -388,6 +388,8 @@ export const cnLabels = {
   'table.deleteRow': '删除整行',
   'table.insertRowAfter': '在下面增加一行',
   'table.clickToShowActions': '点击显示操作按钮',
+  'table.clickToSelectColumn': '点击选中整列，显示操作按钮',
+  'table.clickToSelectTable': '点击选中整个表格',
   // 评论相关
   'comment.delete': '删除评论',
   'comment.edit': '编辑评论',
@@ -792,6 +794,8 @@ export const enLabels: typeof cnLabels = {
   'table.deleteRow': 'Delete Row',
   'table.insertRowAfter': 'Insert Row After',
   'table.clickToShowActions': 'Click to show actions',
+  'table.clickToSelectColumn': 'Click to select column and show actions',
+  'table.clickToSelectTable': 'Click to select entire table',
   // Comment related
   'comment.delete': 'Delete Comment',
   'comment.edit': 'Edit Comment',
