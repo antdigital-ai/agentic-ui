@@ -28,7 +28,7 @@ export type BubbleListProps = {
    */
   bubbleListRef?: MutableRefObject<HTMLDivElement | null>;
 
-  bubbleRef?: MutableRefObject<any | undefined>;
+  bubbleRef?: MutableRefObject<HTMLDivElement | undefined>;
   /**
    * @deprecated 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除

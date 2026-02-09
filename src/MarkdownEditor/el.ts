@@ -118,7 +118,7 @@ export type ChartTypeConfig<T = Record<string, any>> = {
   chartType: string;
   x?: string;
   y?: string;
-  [key: string]: any;
+  extra?: Record<string, unknown>;
 };
 
 export type ChartNode<T = Record<string, any>> = {

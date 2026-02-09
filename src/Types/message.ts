@@ -23,9 +23,10 @@ export interface BubbleMetaData {
   title?: string;
 
   /**
-   * 其他元数据
+   * 扩展元数据
+   * @description 用于存放自定义的额外信息，避免使用索引签名
    */
-  [key: string]: any;
+  metadata?: Record<string, unknown>;
 }
 
 /**

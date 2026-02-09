@@ -1,28 +1,72 @@
-export type { RenderElementProps } from 'slate-react';
+/**
+ * @ant-design/agentic-ui 公共 API 入口
+ *
+ * 导出规则：
+ *   1. 每个组件仅通过其 index 导出，不深入引用内部子模块
+ *   2. 需要向外暴露的内部工具 / 类型，先在各组件 index 中 re-export，再由此处统一引用
+ *   3. 第三方类型不直接 re-export，使用自定义类型包装
+ *   4. 按功能分区，便于维护
+ */
+
 import './root.css';
 
-// 统一类型导出 - 最优先导出，避免循环依赖
+// ─── Slate 类型 re-export（唯一的第三方类型例外） ───────────────────────────
+export type { RenderElementProps } from 'slate-react';
+
+// ─── 通用类型 ────────────────────────────────────────────────────────────────
+export * from './Types';
+
+// ─── 布局组件 ────────────────────────────────────────────────────────────────
 export * from './AgenticLayout';
-export * from './AgentRunBar';
+export { default as Workspace } from './Workspace';
+export * from './Workspace';
+export type {
+  BrowserProps,
+  CustomProps,
+  FileActionRef,
+  FileProps,
+  RealtimeProps,
+  TabConfiguration,
+  TabItem,
+  TaskProps,
+  WorkspaceProps,
+} from './Workspace/types';
+
+// ─── 聊天气泡 ────────────────────────────────────────────────────────────────
 export * from './Bubble';
 export * from './Bubble/List';
 export * from './Bubble/type';
+export * from './Bubble/types/DocInfo';
+export * from './Bubble/MessagesContent/VoiceButton/types';
+
+// ─── 聊天启动页 ──────────────────────────────────────────────────────────────
 export * from './ChatBootPage';
 export * from './ChatLayout';
-export * from './Components/ActionIconBox';
-export * from './Components/Button';
-export * from './Components/LayoutHeader';
-export * from './Components/Loading';
-export * from './Components/lotties';
-export * from './Components/SuggestionList';
-export * from './Components/VisualList';
-export * from './Hooks/useAutoScroll';
-export { useLanguage } from './Hooks/useLanguage';
-export * from './Hooks/useRefFunction';
-export * from './Hooks/useStyle';
-export * from './Hooks/useThrottleFn';
-export * from './I18n';
+
+// ─── 思维链 / 工具调用 ──────────────────────────────────────────────────────
+export * from './ThoughtChainList';
+export * from './ThoughtChainList/types';
+export * from './ToolUseBar';
+export * from './ToolUseBarThink';
+
+// ─── 任务相关 ────────────────────────────────────────────────────────────────
+export * from './AgentRunBar';
+export * from './TaskList';
+
+// ─── 历史记录 ────────────────────────────────────────────────────────────────
+export * from './History';
+export * from './History/types';
+export * from './History/types/HistoryData';
+export * from './History/types/HistoryList';
+
+// ─── Markdown 编辑器 ─────────────────────────────────────────────────────────
 export * from './MarkdownEditor';
+export * from './MarkdownEditor/types';
+export * from './MarkdownEditor/el';
+export * from './MarkdownEditor/plugin';
+export { useSelStatus } from './MarkdownEditor/hooks/editor';
+
+// MarkdownEditor 内部工具（保持向后兼容，后续版本考虑收敛）
 export * from './MarkdownEditor/editor/components/index';
 export * from './MarkdownEditor/editor/elements/Table/Table';
 export * from './MarkdownEditor/editor/elements/Table/TableContext';
@@ -33,118 +77,74 @@ export * from './MarkdownEditor/editor/store';
 export * from './MarkdownEditor/editor/utils';
 export * from './MarkdownEditor/editor/utils/docx/index';
 export * from './MarkdownEditor/editor/utils/markdownToHtml';
-export * from './ToolUseBarThink';
-export * from './Types';
-export { default as Workspace } from './Workspace';
-// HTML to Markdown conversion utilities
+export * from './MarkdownEditor/editor/utils/htmlToMarkdown';
+export * from './MarkdownEditor/utils/native-table/native-table-editor';
+
+// ─── Markdown 输入框 ─────────────────────────────────────────────────────────
+export * from './MarkdownInputField/MarkdownInputField';
+export * from './MarkdownInputField/AttachmentButton';
+export * from './MarkdownInputField/AttachmentButton/types';
+export * from './MarkdownInputField/AttachmentButton/AttachmentFileList';
+export * from './MarkdownInputField/AttachmentButton/AttachmentFileList/AttachmentFileListItem';
+export * from './MarkdownInputField/AttachmentButton/utils';
+export * from './MarkdownInputField/FileMapView';
+export * from './MarkdownInputField/VoiceInput';
+export { ActionItemContainer } from './MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
+
+// ─── Schema ──────────────────────────────────────────────────────────────────
+export * from './Schema';
+export * from './Schema/types';
+export * from './Schema/SchemaRenderer/templateEngine';
+export * from './Schema/validator';
+
+// ─── 插件 ────────────────────────────────────────────────────────────────────
+export * from './Plugins/formatter';
+export * from './Plugins/chart';
+export * from './Plugins/mermaid';
+export * from './Plugins/code/components';
+
+// ─── 基础 UI 组件 ────────────────────────────────────────────────────────────
 export * from './AILabel';
 export * from './AnswerAlert';
 export * from './BackTo';
-export { ActionItemBox } from './Components/ActionItemBox';
-export * from './History';
-export * from './MarkdownEditor/editor/utils/htmlToMarkdown';
-export * from './MarkdownEditor/el';
-export { useSelStatus } from './MarkdownEditor/hooks/editor';
-export * from './MarkdownEditor/plugin';
-export * from './MarkdownInputField/AttachmentButton';
-export { ActionItemContainer } from './MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
-export * from './MarkdownInputField/FileMapView';
-export * from './MarkdownInputField/MarkdownInputField';
-export * from './Plugins/formatter';
-export * from './Schema';
-export * from './TaskList';
-export * from './ThoughtChainList';
-export * from './ToolUseBar';
 export * from './WelcomeMessage';
-export * from './Workspace';
-// Robot 组件
-export * from './Components/Robot';
-export { default as Robot } from './Components/Robot';
-
-// Quote 组件导出
 export { default as Quote } from './Quote';
 export type { QuoteProps } from './Quote';
 
-// 新增：图表插件对外导出
-export * from './Plugins/chart';
-export * from './Plugins/mermaid';
-
-export * from './MarkdownEditor/types';
-
-// Bubble 相关类型
-export type {
-  BubbleClassNames,
-  BubbleItemStyleProps,
-  BubbleRenderConfig,
-  BubbleStyleProps,
-  BubbleStyles,
-  CustomConfig,
-  WithFalse,
-} from './Bubble/type';
-
-// Bubble 额外类型
-export type { CustomConfig as BubbleCustomConfig } from './Bubble/type';
-export * from './Bubble/types/DocInfo';
-
-export * from './ThoughtChainList/types';
-
-// History 相关类型
-export * from './History/types';
-export * from './History/types/HistoryData';
-export * from './History/types/HistoryList';
-
-// Schema 相关类型
-export * from './Schema/types';
-
-// Workspace 相关类型
-export * from './Workspace/types';
-
-// AttachmentButton 相关类型
-export * from './MarkdownInputField/AttachmentButton/types';
-
-// ProxySandbox 相关类型
-export * from './Utils/proxySandbox/ProxySandbox';
-export * from './Utils/proxySandbox/SecurityContextManager';
-
-// 代理沙箱相关类型别名
-export * from './Utils/proxySandbox';
-
-// 代码插件相关类型
-export * from './Plugins/code/components';
-
-// Slate Table 相关类型
-export * from './MarkdownEditor/utils/native-table/native-table-editor';
-
-// MarkdownEditor 元素类型
-export * from './MarkdownEditor/el';
-
-// 语音相关类型
-export * from './Bubble/MessagesContent/VoiceButton/types';
-
-// MarkdownInputField 语音识别相关类型
-export * from './MarkdownInputField/VoiceInput';
-
-// 模板引擎类
-export * from './Schema/SchemaRenderer/templateEngine';
-
-// Schema 验证器类
-export * from './Schema/validator';
-
-// 沙箱健康检查器
-export * from './Utils/proxySandbox';
-
-// 文字动画组件导出
+// ─── 通用子组件 ──────────────────────────────────────────────────────────────
+export * from './Components/ActionIconBox';
+export { ActionItemBox } from './Components/ActionItemBox';
+export * from './Components/Button';
+export * from './Components/LayoutHeader';
+export * from './Components/Loading';
+export * from './Components/lotties';
+export * from './Components/SuggestionList';
+export * from './Components/VisualList';
+export * from './Components/Robot';
+export { default as Robot } from './Components/Robot';
 export * from './Components/GradientText';
 export * from './Components/TextAnimate';
 export * from './Components/TypingAnimation';
 
-export * from './MarkdownInputField/AttachmentButton/AttachmentFileList/AttachmentFileListItem';
+// ─── Hooks ───────────────────────────────────────────────────────────────────
+export * from './Hooks/useAutoScroll';
+export { useLanguage } from './Hooks/useLanguage';
+export * from './Hooks/useRefFunction';
+export * from './Hooks/useStyle';
+export * from './Hooks/useThrottleFn';
 
-export * from './MarkdownInputField/AttachmentButton/AttachmentFileList';
-export * from './MarkdownInputField/AttachmentButton/utils';
+// ─── 国际化 ──────────────────────────────────────────────────────────────────
+export * from './I18n';
 
+// ─── 工具 / 沙箱 ────────────────────────────────────────────────────────────
+export * from './Utils/proxySandbox';
+export * from './Utils/proxySandbox/ProxySandbox';
+export * from './Utils/proxySandbox/SecurityContextManager';
+
+// ─── 第三方 SDK re-export（向后兼容，后续版本考虑移除） ───────────────────────
 /**
  * Schema Element Editor Chrome 插件底层 SDK
  * @description 原始 SDK 导出，一般用户无需直接使用
+ * @deprecated 建议直接从 @schema-element-editor/host-sdk 导入
  */
 export * from '@schema-element-editor/host-sdk';

@@ -4,7 +4,9 @@ import { MessageBubbleData, WithFalse } from '../../Types';
 // 简化的 BubbleProps 类型，避免循环依赖
 export interface SimpleBubbleProps<T = Record<string, any>> {
   originData?: T & MessageBubbleData;
-  [key: string]: any;
+  id?: string;
+  placement?: 'left' | 'right';
+  readonly?: boolean;
 }
 
 /**

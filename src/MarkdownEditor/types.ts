@@ -494,7 +494,8 @@ export type MarkdownEditorProps = {
   children?: React.ReactNode;
 
   /**
-   * 其他属性
+   * 扩展属性
+   * @description 用于传递不在类型定义中的自定义属性
    */
-  [key: string]: any;
+  extra?: Record<string, unknown>;
 };

@@ -25,7 +25,6 @@ export type BubbleStyleProps = BaseStyleProps;
  * @description 气泡组件各部分的样式配置
  */
 export interface BubbleStyles {
-  [key: string]: React.CSSProperties | undefined;
   /**
    * 气泡根容器的自定义样式
    */
@@ -87,7 +86,6 @@ export interface BubbleStyles {
  * @description 气泡组件各部分的类名配置
  */
 export interface BubbleClassNames {
-  [key: string]: string | undefined;
   /**
    * 气泡根容器的自定义类名
    */
@@ -280,7 +278,7 @@ export interface BubbleProps<
   /**
    * 列表引用
    */
-  bubbleListRef?: any;
+  bubbleListRef?: React.RefObject<HTMLDivElement>;
 
   /**
    * 是否只读
@@ -300,7 +298,7 @@ export interface BubbleProps<
   /**
    * 依赖项数组
    */
-  deps?: any[];
+  deps?: unknown[];
 
   /**
    * 不喜欢回调
@@ -350,7 +348,7 @@ export interface BubbleProps<
   /**
    * 气泡引用
    */
-  bubbleRef?: any;
+  bubbleRef?: React.RefObject<HTMLDivElement>;
 
   /**
    * 控制复制按钮的显示
@@ -430,5 +428,12 @@ export interface BubbleProps<
       | (() => (file: AttachmentFile) => React.ReactNode);
   };
   userBubbleProps?: BubbleProps;
+  /**
+   * AI 气泡的属性配置
+   */
+  aiBubbleProps?: BubbleProps;
+  /**
+   * @deprecated 请使用 aiBubbleProps 替代（符合命名规范）
+   */
   aIBubbleProps?: BubbleProps;
 }
