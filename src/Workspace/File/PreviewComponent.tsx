@@ -503,7 +503,10 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
       if (contentState.status === 'loading') {
         return (
           <PlaceholderContent prefixCls={prefixCls} hashId={hashId}>
-            <Spin size="large" tip="正在加载文件内容..." />
+            <Spin
+              size="large"
+              tip={locale?.['workspace.loadingFileContent'] || '正在加载文件内容...'}
+            />
           </PlaceholderContent>
         );
       }
