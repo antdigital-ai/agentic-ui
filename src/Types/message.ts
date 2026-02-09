@@ -23,6 +23,16 @@ export interface BubbleMetaData {
   title?: string;
 
   /**
+   * 名称（别名）
+   */
+  name?: string;
+
+  /**
+   * 描述信息
+   */
+  description?: string;
+
+  /**
    * 扩展元数据
    * @description 用于存放自定义的额外信息，避免使用索引签名
    */

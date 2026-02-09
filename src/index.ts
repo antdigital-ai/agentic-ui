@@ -20,17 +20,7 @@ export * from './Types';
 export * from './AgenticLayout';
 export { default as Workspace } from './Workspace';
 export * from './Workspace';
-export type {
-  BrowserProps,
-  CustomProps,
-  FileActionRef,
-  FileProps,
-  RealtimeProps,
-  TabConfiguration,
-  TabItem,
-  TaskProps,
-  WorkspaceProps,
-} from './Workspace/types';
+export * from './Workspace/types';
 
 // ─── 聊天气泡 ────────────────────────────────────────────────────────────────
 export * from './Bubble';

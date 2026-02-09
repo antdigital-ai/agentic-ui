@@ -771,11 +771,9 @@ describe('useKeyboard Hook Tests', () => {
       const customProps: MarkdownEditorProps = {
         textAreaProps: {
           enable: true,
-          triggerSendKey: 'Enter',
           placeholder: 'Custom placeholder',
         },
         markdown: {
-          enable: true,
           matchInputToNode: false,
         },
       };

@@ -129,7 +129,7 @@ export const useMarkdownInputFieldHandlers = ({
       upLoadFileToServer(imageFiles, {
         ...attachmentConfig,
         fileMap,
-        onFileMapChange: setFileMap,
+        onFileMapChange: setFileMap as any,
       });
     },
   );

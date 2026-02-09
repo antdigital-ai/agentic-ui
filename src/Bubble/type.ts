@@ -15,6 +15,18 @@ import { BubbleExtraProps } from './types/BubbleExtra';
 import { DocInfoListProps } from './types/DocInfo';
 
 /**
+ * 气泡命令式操作句柄
+ * @description 通过 bubbleRef 暴露给父组件的命令式方法
+ */
+export interface BubbleImperativeHandle {
+  /** 更新消息项数据 */
+  setMessageItem?: (
+    id: string,
+    data: Partial<MessageBubbleData>,
+  ) => void;
+}
+
+/**
  * 基础样式属性
  * @deprecated 请使用 BaseStyleProps from '../Types'
  */
@@ -138,6 +150,21 @@ export interface BubbleStyles {
    * 额外内容的自定义样式
    */
   bubbleListItemExtraStyle?: React.CSSProperties;
+
+  /**
+   * 气泡列表项的自定义样式
+   */
+  bubbleListItemStyle?: React.CSSProperties;
+
+  /**
+   * 左侧气泡内容的自定义样式
+   */
+  bubbleListLeftItemContentStyle?: React.CSSProperties;
+
+  /**
+   * 右侧气泡内容的自定义样式
+   */
+  bubbleListRightItemContentStyle?: React.CSSProperties;
 }
 
 /**
@@ -200,6 +227,11 @@ export interface BubbleClassNames {
    * 额外内容的自定义类名
    */
   bubbleListItemExtraClassName?: string;
+
+  /**
+   * 气泡列表项的自定义类名
+   */
+  bubbleListItemClassName?: string;
 }
 
 /**
@@ -407,8 +439,9 @@ export interface BubbleProps<
 
   /**
    * 气泡引用
+   * @description 支持命令式操作的气泡实例引用，包含 setMessageItem 等方法
    */
-  bubbleRef?: React.RefObject<HTMLDivElement>;
+  bubbleRef?: React.MutableRefObject<BubbleImperativeHandle | null | undefined>;
 
   /**
    * 控制复制按钮的显示

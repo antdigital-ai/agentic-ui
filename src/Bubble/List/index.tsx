@@ -3,7 +3,12 @@ export { PureBubbleList } from './PureBubbleList';
 
 import { MutableRefObject, useContext, useMemo, useRef } from 'react';
 
-import type { BubbleMetaData, BubbleProps, MessageBubbleData } from '../type';
+import type {
+  BubbleImperativeHandle,
+  BubbleMetaData,
+  BubbleProps,
+  MessageBubbleData,
+} from '../type';
 
 import { ConfigProvider } from 'antd';
 import cx from 'classnames';
@@ -28,7 +33,7 @@ export type BubbleListProps = {
    */
   bubbleListRef?: MutableRefObject<HTMLDivElement | null>;
 
-  bubbleRef?: MutableRefObject<HTMLDivElement | undefined>;
+  bubbleRef?: MutableRefObject<BubbleImperativeHandle | null | undefined>;
   /**
    * @deprecated 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除

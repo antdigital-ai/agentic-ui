@@ -279,10 +279,13 @@ export const parseTableOrChart = (
   const getChartType = (): string | undefined => {
     return (
       (chartConfig as ChartTypeConfig)?.chartType ||
-      (Array.isArray(chartConfig) &&
-        (chartConfig?.[0] as ChartTypeConfig)?.chartType) ||
+      (Array.isArray(chartConfig)
+        ? (chartConfig?.[0] as ChartTypeConfig)?.chartType
+        : undefined) ||
       (config as ChartTypeConfig)?.chartType ||
-      (config as ChartTypeConfig)?.at?.(0)?.chartType
+      (Array.isArray(config)
+        ? (config as ChartTypeConfig[])?.at?.(0)?.chartType
+        : undefined)
     );
   };
 

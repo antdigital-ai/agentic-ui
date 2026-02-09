@@ -1732,7 +1732,7 @@ describe('FileComponent', () => {
         { id: 'f1', name: 'test.md', content: '# Hello' },
       ];
 
-      const markdownEditorProps = {
+      const markdownEditorProps: any = {
         theme: 'dark' as const,
       };
 

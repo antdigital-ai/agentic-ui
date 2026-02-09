@@ -370,7 +370,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 })}
               >
                 <ToolBar
-                  hideTools={toolBar.hideTools}
+                  hideTools={toolBar.hideTools as any}
                   extra={toolBar.extra}
                   min={toolBar.min}
                 />

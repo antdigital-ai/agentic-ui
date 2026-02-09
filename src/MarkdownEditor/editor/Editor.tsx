@@ -946,7 +946,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
         <MLeaf
           {...leafComponentProps}
           fncProps={props.fncProps}
-          comment={props?.comment}
+          comment={props?.comment as any}
           children={leafComponentProps.children}
           tagInputProps={props.tagInputProps}
           linkConfig={props.linkConfig}
@@ -960,7 +960,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
         {
           ...leafComponentProps,
           fncProps: props.fncProps,
-          comment: props?.comment,
+          comment: props?.comment as any,
           hashId: hashId,
           tagInputProps: props.tagInputProps,
         },

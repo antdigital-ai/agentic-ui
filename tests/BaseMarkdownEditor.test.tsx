@@ -391,7 +391,7 @@ describe('BaseMarkdownEditor', () => {
 
     it('应该将数字 ID 转换为字符串', () => {
       const { container } = render(
-        <BaseMarkdownEditor {...defaultProps} id={123} />,
+        <BaseMarkdownEditor {...defaultProps} id={'123'} />,
       );
       const editorElement = container.querySelector('.markdown-editor');
       expect(editorElement).toHaveAttribute('id', '123');

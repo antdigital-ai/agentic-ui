@@ -77,15 +77,9 @@ importers:
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
       copy-to-clipboard:
         specifier: ^3.3.3
         version: 3.3.3
-      cross-env:
-        specifier: ^7.0.3
-        version: 7.0.3
       dayjs:
         specifier: ^1.11.19
         version: 1.11.19
@@ -113,9 +107,6 @@ importers:
       katex:
         specifier: ^0.16.28
         version: 0.16.28
-      lodash:
-        specifier: ^4.17.23
-        version: 4.17.23
       lodash-es:
         specifier: ^4.17.23
         version: 4.17.23
@@ -270,9 +261,6 @@ importers:
       '@types/less':
         specifier: ^3.0.8
         version: 3.0.8
-      '@types/lodash':
-        specifier: ^4.17.23
-        version: 4.17.23
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -312,6 +300,9 @@ importers:
       '@vitest/ui':
         specifier: 2.1.9
         version: 2.1.9(vitest@2.1.9)
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
       dumi:
         specifier: ^2.4.21
         version: 2.4.21(@babel/core@7.28.6)(@types/node@25.1.0)(@types/react@18.3.27)(@types/webpack@5.28.5(@swc/core@1.15.11))(eslint@8.57.1)(less-loader@12.3.0(less@4.5.1)(webpack@5.104.1(@swc/core@1.15.11)))(less@4.5.1)(lightningcss@1.22.1)(prettier@3.8.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(resolve-url-loader@5.0.0)(rollup@3.29.5)(sass-loader@16.0.6(sass@1.97.3)(webpack@5.104.1(@swc/core@1.15.11)))(stylelint@14.16.1)(terser@5.46.0)(type-fest@1.4.0)(typescript@5.9.3)(webpack@5.104.1(@swc/core@1.15.11))

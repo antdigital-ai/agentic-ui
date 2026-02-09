@@ -494,8 +494,138 @@ export type MarkdownEditorProps = {
   children?: React.ReactNode;
 
   /**
-   * 扩展属性
-   * @description 用于传递不在类型定义中的自定义属性
+   * 编辑器实例引用
+   * @description 用于获取编辑器实例，可调用 store、exportHtml 等方法
    */
-  extra?: Record<string, unknown>;
+  editorRef?: React.Ref<MarkdownEditorInstance | undefined>;
+
+  /**
+   * 报告模式
+   * @description 启用后将使用报告模式样式
+   */
+  reportMode?: boolean;
+
+  /**
+   * 是否显示目录
+   * @default false
+   */
+  toc?: boolean;
+
+  /**
+   * 工具栏配置
+   * @description 配置编辑器顶部的工具栏
+   */
+  toolBar?: {
+    enable?: boolean;
+    min?: boolean;
+    hideTools?: (
+      | 'bold'
+      | 'italic'
+      | 'underline'
+      | 'strikethrough'
+      | 'code'
+      | 'heading'
+      | 'link'
+      | 'color'
+      | 'clearFormat'
+      | 'undo'
+      | 'redo'
+      | string
+    )[];
+    extra?: React.ReactNode[];
+  };
+
+  /**
+   * 编辑器唯一标识
+   */
+  id?: string;
+
+  /**
+   * 初始 Schema 值
+   * @description 直接传入 Slate schema 格式的数据，优先级高于 initValue
+   */
+  initSchemaValue?: Elements[];
+
+  /**
+   * 自定义叶子节点渲染函数
+   * @description 用于自定义文本节点的渲染方式
+   * @param props - 叶子节点属性
+   * @param defaultDom - 默认渲染 DOM
+   * @returns 自定义渲染结果
+   */
+  leafRender?: (
+    props: Record<string, any> & { children: React.ReactNode },
+    defaultDom: React.ReactNode,
+  ) => React.ReactNode;
+
+  /**
+   * 打字机效果
+   * @description 启用后编辑器将具有打字机效果的滚动行为
+   */
+  typewriter?: boolean;
+
+  /**
+   * 根容器引用
+   * @description 编辑器根容器的 DOM 引用
+   */
+  rootContainer?: React.MutableRefObject<HTMLDivElement | undefined>;
+
+  /**
+   * 幻灯片模式
+   * @description 启用后编辑器将使用幻灯片模式样式
+   */
+  slideMode?: boolean;
+
+  /**
+   * 容器自定义类名
+   * @description 编辑器内容容器的类名
+   */
+  containerClassName?: string;
+
+  /**
+   * 浮动工具栏配置
+   */
+  floatBar?: {
+    enable?: boolean;
+  };
+
+  /**
+   * 文本区域配置
+   */
+  textAreaProps?: {
+    enable?: boolean;
+    placeholder?: string;
+  };
+
+  /**
+   * 标题占位符文本
+   */
+  titlePlaceholderContent?: string;
+
+  /**
+   * Markdown 输入配置
+   */
+  markdown?: {
+    matchLeaf?: boolean;
+    matchInputToNode?: boolean;
+  };
+
+  /**
+   * 拖拽配置
+   */
+  drag?: {
+    enable?: boolean;
+  };
+
+  /**
+   * 紧凑模式
+   * @description 启用后编辑器将使用更紧凑的间距
+   */
+  compact?: boolean;
+
+  /**
+   * 附件配置
+   * @description 配置附件上传功能
+   */
+  attachment?: Record<string, unknown>;
 };

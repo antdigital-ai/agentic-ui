@@ -2,7 +2,12 @@ import SkeletonList from './SkeletonList';
 
 import { MutableRefObject, useContext, useMemo, useRef } from 'react';
 
-import type { BubbleMetaData, BubbleProps, MessageBubbleData } from '../type';
+import type {
+  BubbleImperativeHandle,
+  BubbleMetaData,
+  BubbleProps,
+  MessageBubbleData,
+} from '../type';
 
 import { ConfigProvider } from 'antd';
 import cx from 'classnames';
@@ -18,7 +23,7 @@ export interface PureBubbleListProps {
   bubbleList: MessageBubbleData[];
   readonly?: boolean;
   bubbleListRef?: MutableRefObject<HTMLDivElement | null>;
-  bubbleRef?: MutableRefObject<any | undefined>;
+  bubbleRef?: MutableRefObject<BubbleImperativeHandle | null | undefined>;
   isLoading?: boolean;
   className?: string;
   bubbleRenderConfig?: BubbleProps['bubbleRenderConfig'];

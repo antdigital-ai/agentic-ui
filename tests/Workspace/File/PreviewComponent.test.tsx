@@ -677,7 +677,7 @@ describe('PreviewComponent', () => {
         content: '# Hello',
       };
 
-      const markdownEditorProps = {
+      const markdownEditorProps: any = {
         theme: 'dark' as const,
       };
 
@@ -1140,7 +1140,7 @@ describe('PreviewComponent', () => {
         content: '# Title',
       };
 
-      const markdownEditorProps = {
+      const markdownEditorProps: any = {
         theme: 'dark' as const,
         contentStyle: { padding: '10px' },
       };

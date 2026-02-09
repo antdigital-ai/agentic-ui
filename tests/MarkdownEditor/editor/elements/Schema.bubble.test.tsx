@@ -338,7 +338,7 @@ describe('Schema - BubbleConfigContext 功能', () => {
           value={{
             standalone: true,
             locale: {} as any,
-            bubble: complexBubbleData,
+            bubble: complexBubbleData as any,
           }}
         >
           <EditorStoreContext.Provider value={mockEditorStore as any}>

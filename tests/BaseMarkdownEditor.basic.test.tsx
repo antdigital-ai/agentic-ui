@@ -292,7 +292,7 @@ describe('BaseMarkdownEditor - 基本功能测试', () => {
 
     it('应该将数字 ID 转换为字符串', () => {
       const { container } = render(
-        <BaseMarkdownEditor {...defaultProps} id={123} />,
+        <BaseMarkdownEditor {...defaultProps} id={'123'} />,
       );
 
       const editorElement = container.querySelector('.markdown-editor');
