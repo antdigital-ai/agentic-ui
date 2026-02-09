@@ -1,6 +1,6 @@
 import { GripVertical, Menu } from '@sofa-design/icons';
 import { ConfigProvider, Popover } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useStyle } from '../../Components/ActionItemBox';
 import { useRefFunction } from '../../Hooks/useRefFunction';

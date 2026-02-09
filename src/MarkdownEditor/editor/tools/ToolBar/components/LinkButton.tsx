@@ -1,5 +1,5 @@
 import { LinkOutlined } from '@ant-design/icons';
-import classnames from 'classnames';
+import classnames from 'clsx';
 import React from 'react';
 import { ToolBarItem } from './ToolBarItem';
 

@@ -1,7 +1,7 @@
 import { PlayLottie } from '@ant-design/agentic-ui';
 import { ChevronDown, Pause } from '@sofa-design/icons';
 import { ConfigProvider, Dropdown, Flex, Tooltip } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useMemo, useState } from 'react';
 import { useSpeechSynthesis } from '../../../Hooks/useSpeechSynthesis';
 import VoicingLottie from '../../../Icons/animated/VoicingLottie';

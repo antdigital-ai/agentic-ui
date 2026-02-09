@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
 import React, { memo, useContext, useMemo } from 'react';
 import { useRefFunction } from '../Hooks/useRefFunction';

@@ -3,7 +3,7 @@
  * 负责代码编辑器的布局、样式和状态管理
  */
 
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { ReactNode, useRef } from 'react';
 import { CodeNode } from '../../../MarkdownEditor/el';
 

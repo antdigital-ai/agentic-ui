@@ -1,6 +1,6 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { ConfigProvider, Divider, Flex } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { useSkillModeState } from './hooks';

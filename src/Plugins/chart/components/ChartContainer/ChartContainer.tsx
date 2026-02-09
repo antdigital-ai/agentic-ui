@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React from 'react';
 import type { ChartClassNames, ChartStyles } from '../../types/classNames';
 import ChartErrorBoundary from './ChartErrorBoundary';

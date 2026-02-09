@@ -1,6 +1,6 @@
 import { CircleDashed, Copy, Play } from '@sofa-design/icons';
 import { Button, ConfigProvider, message } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
 import React, {
   forwardRef,

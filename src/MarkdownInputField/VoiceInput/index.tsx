@@ -1,6 +1,6 @@
 import { Mic } from '@sofa-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { I18nContext } from '../../I18n';

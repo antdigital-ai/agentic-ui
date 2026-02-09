@@ -10,7 +10,7 @@ import type {
 } from '../type';
 
 import { ConfigProvider } from 'antd';
-import cx from 'classnames';
+import cx from 'clsx';
 import { nanoid } from 'nanoid';
 import React from 'react';
 import { LazyElement } from '../../MarkdownEditor/editor/components/LazyElement';

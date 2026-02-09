@@ -1,5 +1,5 @@
 import { ConfigProvider, Skeleton } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useState } from 'react';
 import { ElementProps, LinkCardNode } from '../../../el';
 import { AvatarList } from '../../components/ContributorAvatar';

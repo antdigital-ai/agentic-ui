@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classnames from 'clsx';
 import { useMergedState } from 'rc-util';
 import React, { memo, useMemo } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';

@@ -1,6 +1,6 @@
 import { EllipsisVertical } from '@sofa-design/icons';
 import { Popover } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import RcResizeObserver from 'rc-resize-observer';
 import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';

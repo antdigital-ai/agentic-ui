@@ -1,5 +1,5 @@
 import { Flex } from 'antd';
-import cx from 'classnames';
+import cx from 'clsx';
 import React from 'react';
 
 import {

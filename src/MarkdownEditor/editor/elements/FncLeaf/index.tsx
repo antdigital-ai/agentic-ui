@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { CSSProperties, useCallback, useContext, useMemo } from 'react';
 import { RenderLeafProps } from 'slate-react';
 

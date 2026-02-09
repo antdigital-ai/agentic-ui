@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { isString } from 'lodash-es';
 import React, { useContext } from 'react';
 import { TextLoading } from '../lotties';

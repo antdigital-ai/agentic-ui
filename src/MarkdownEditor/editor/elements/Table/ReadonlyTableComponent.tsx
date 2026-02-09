@@ -1,7 +1,7 @@
 import { FullscreenOutlined } from '@ant-design/icons';
 import { Copy } from '@sofa-design/icons';
 import { ConfigProvider, Modal } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
 import React, {
   useCallback,

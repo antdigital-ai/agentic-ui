@@ -1,5 +1,5 @@
 import { ConfigProvider, Tooltip } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useContext, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';

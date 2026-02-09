@@ -6,7 +6,7 @@ import {
   X,
 } from '@sofa-design/icons';
 import { ConfigProvider, Segmented } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, {
   FC,
   useContext,

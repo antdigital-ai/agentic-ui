@@ -1,5 +1,5 @@
 import { Api, ChevronUp, X } from '@sofa-design/icons';
-import classnames from 'classnames';
+import classnames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { memo, useMemo } from 'react';
 import { ToolCall } from '.';

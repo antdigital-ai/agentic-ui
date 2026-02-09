@@ -1,6 +1,6 @@
 import { FileFailed, FileUploadingSpin, X } from '@sofa-design/icons';
 import { Tooltip } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { motion } from 'framer-motion';
 import React from 'react';
 import { AttachmentFile } from '../types';

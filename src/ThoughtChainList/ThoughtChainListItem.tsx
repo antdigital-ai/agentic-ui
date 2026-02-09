@@ -1,4 +1,4 @@
-﻿import classNames from 'classnames';
+﻿import classNames from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';

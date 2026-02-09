@@ -5,7 +5,7 @@ import {
   ChevronsUpDown,
 } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
 import React, { memo, useContext, useEffect, useMemo } from 'react';

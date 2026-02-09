@@ -1,5 +1,5 @@
 import { ConfigProvider, Spin } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext } from 'react';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { useStyle } from './style';

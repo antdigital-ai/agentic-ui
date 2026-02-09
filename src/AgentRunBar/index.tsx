@@ -1,6 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, ConfigProvider, Tooltip, Typography } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { motion } from 'framer-motion';
 import React, { memo, useContext, useMemo } from 'react';
 import { I18nContext } from '../I18n';

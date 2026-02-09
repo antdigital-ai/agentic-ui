@@ -1,7 +1,7 @@
 import { memo, MutableRefObject, useContext } from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
-import cx from 'classnames';
+import cx from 'clsx';
 import React from 'react';
 import { WhiteBoxProcessInterface } from '../ThoughtChainList/types';
 import { BubbleAvatar } from './Avatar';

@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { startTransition, useEffect, useRef, useState } from 'react';
 import { Editor, Node, Transforms } from 'slate';
 import { useEditorStore } from '../../MarkdownEditor/editor/store';

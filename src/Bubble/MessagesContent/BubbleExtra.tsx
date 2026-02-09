@@ -6,7 +6,7 @@ import {
 } from '@ant-design/agentic-ui';
 import { DislikeFilled, LikeFilled } from '@ant-design/icons';
 import { ConfigProvider, Divider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
 import { motion } from 'framer-motion';
 

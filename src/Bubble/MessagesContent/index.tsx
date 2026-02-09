@@ -1,6 +1,6 @@
 import { ExportOutlined } from '@ant-design/icons';
 import { ConfigProvider, Popover, Tooltip, Typography } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';

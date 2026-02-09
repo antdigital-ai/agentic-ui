@@ -10,7 +10,7 @@ import {
   Tag,
   Tooltip,
 } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext, compileTemplate } from '../../I18n';

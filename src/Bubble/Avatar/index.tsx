@@ -1,6 +1,6 @@
 import { Avatar, theme, type AvatarProps } from 'antd';
 
-import cx from 'classnames';
+import cx from 'clsx';
 import React from 'react';
 import { isEmoji } from './isEmoji';
 

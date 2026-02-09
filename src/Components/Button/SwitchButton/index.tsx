@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronUp } from '@sofa-design/icons';
 import { Button, ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useState } from 'react';
 import { useStyle } from './style';
 

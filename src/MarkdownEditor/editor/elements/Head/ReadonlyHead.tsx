@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { createElement } from 'react';
 import { Node } from 'slate';
 import { debugInfo } from '../../../../Utils/debugUtils';

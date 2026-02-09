@@ -1,6 +1,6 @@
 import { FileSearch } from '@sofa-design/icons';
 import { ConfigProvider, Image } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useContext, useMemo, useState } from 'react';
 import { AttachmentFile } from '../AttachmentButton/types';

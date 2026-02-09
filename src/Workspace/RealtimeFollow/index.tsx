@@ -5,7 +5,7 @@ import {
   SquareTerminal,
 } from '@sofa-design/icons';
 import { ConfigProvider, Empty, Segmented, Spin } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import useAutoScroll from '../../Hooks/useAutoScroll';
 import { I18nContext } from '../../I18n';

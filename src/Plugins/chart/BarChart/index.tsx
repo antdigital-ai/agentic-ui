@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from 'chart.js';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
-import classNamesLib from 'classnames';
+import classNamesLib from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {

@@ -1,6 +1,6 @@
 import { ChevronUp, CircleDashed, SuccessFill, X } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
 import React, { memo, useCallback, useContext, useMemo } from 'react';

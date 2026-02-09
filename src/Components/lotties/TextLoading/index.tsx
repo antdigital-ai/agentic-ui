@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import cx from 'classnames';
+import cx from 'clsx';
 import React, { useContext } from 'react';
 import { useStyle } from './style';
 

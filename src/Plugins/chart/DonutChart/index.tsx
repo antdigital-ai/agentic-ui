@@ -6,7 +6,7 @@ import {
   Legend,
   Tooltip,
 } from 'chart.js';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useMemo, useRef, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import {

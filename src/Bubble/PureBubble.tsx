@@ -1,7 +1,7 @@
 import { memo, MutableRefObject, useContext } from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
-import cx from 'classnames';
+import cx from 'clsx';
 import React from 'react';
 import { BaseMarkdownEditor } from '../MarkdownEditor/BaseMarkdownEditor';
 import { runRender } from './AIBubble';

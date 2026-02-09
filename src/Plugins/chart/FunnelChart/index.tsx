@@ -10,7 +10,7 @@ import {
   LinearScale,
   Tooltip,
 } from 'chart.js';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import ChartStatistic from '../ChartStatistic';

@@ -7,7 +7,7 @@ import {
   Sparkles,
 } from '@sofa-design/icons';
 import { ConfigProvider, Descriptions, Drawer, Typography } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { motion } from 'framer-motion';

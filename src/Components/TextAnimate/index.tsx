@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { AnimatePresence, motion, MotionProps, Variants } from 'framer-motion';
 import { isNumber, isObject, isString } from 'lodash-es';
 import toArray from 'rc-util/lib/Children/toArray';

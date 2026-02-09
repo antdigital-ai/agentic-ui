@@ -1,6 +1,6 @@
 import { Download, EllipsisVertical, Eye } from '@sofa-design/icons';
 import { Tooltip } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
 import React, { useContext } from 'react';

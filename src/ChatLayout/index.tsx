@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import clsx from 'classnames';
+import clsx from 'clsx';
 import React, {
   forwardRef,
   memo,

@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { Node } from 'slate';
 import { RenderElementProps } from 'slate-react';

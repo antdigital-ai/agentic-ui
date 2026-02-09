@@ -6,7 +6,7 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownInputField } from '../../src/MarkdownInputField/MarkdownInputField';

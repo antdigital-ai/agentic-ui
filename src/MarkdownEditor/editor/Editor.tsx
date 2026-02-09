@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/no-children-prop */
 import { useDebounceFn } from '@ant-design/pro-components';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {

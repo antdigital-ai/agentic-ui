@@ -1,6 +1,6 @@
 import { ConfigProvider } from 'antd';
 import { ChartData, Chart as ChartJS, ChartOptions } from 'chart.js';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useMemo, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import {

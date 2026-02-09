@@ -1,6 +1,6 @@
 ﻿import { HistoryOutlined } from '@ant-design/icons';
 import { ConfigProvider, Popover } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { memo, useContext, useMemo, useRef } from 'react';
 import useClickAway from '../Hooks/useClickAway';
 import { ActionIconBox, BubbleConfigContext } from '../index';

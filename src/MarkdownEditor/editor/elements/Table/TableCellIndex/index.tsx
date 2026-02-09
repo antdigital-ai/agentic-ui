@@ -4,7 +4,7 @@ import {
   InsertRowBelowOutlined,
 } from '@ant-design/icons';
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useRef } from 'react';
 import { Editor, Transforms } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';

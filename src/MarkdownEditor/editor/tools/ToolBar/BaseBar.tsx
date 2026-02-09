@@ -1,6 +1,6 @@
 import { Plus } from '@sofa-design/icons';
 import { Divider, Dropdown } from 'antd';
-import classnames from 'classnames';
+import classnames from 'clsx';
 import React, { useContext, useMemo } from 'react';
 import { I18nContext } from '../../../../I18n';
 import { useEditorStore } from '../../store';

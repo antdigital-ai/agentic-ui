@@ -14,7 +14,7 @@ import {
   Spin,
   Typography,
 } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';

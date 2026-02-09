@@ -11,7 +11,7 @@ import {
   SquareArrowOutUpRight as ShareIcon,
 } from '@sofa-design/icons';
 import { Empty } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, {
   type FC,

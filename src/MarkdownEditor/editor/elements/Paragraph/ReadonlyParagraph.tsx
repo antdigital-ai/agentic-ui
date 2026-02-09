@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React from 'react';
 import { Node } from 'slate';
 import { ElementProps, ParagraphNode } from '../../../el';

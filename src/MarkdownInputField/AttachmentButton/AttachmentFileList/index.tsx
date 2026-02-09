@@ -1,6 +1,6 @@
 import { X } from '@sofa-design/icons';
 import { ConfigProvider, Image } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { ActionIconBox } from '../../../Components/ActionIconBox';

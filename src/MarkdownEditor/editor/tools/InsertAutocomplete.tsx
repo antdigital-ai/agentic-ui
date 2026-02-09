@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import { Button, ConfigProvider, Input, Menu, Tabs } from 'antd';
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import isHotkey from 'is-hotkey';
 import React, {
   useCallback,

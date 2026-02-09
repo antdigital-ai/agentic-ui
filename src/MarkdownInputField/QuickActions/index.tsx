@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classNames from 'clsx';
 import RcResizeObserver from 'rc-resize-observer';
 import React, { useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
