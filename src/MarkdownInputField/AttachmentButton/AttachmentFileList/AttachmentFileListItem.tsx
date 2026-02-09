@@ -69,12 +69,13 @@ const FileSizeInfo: React.FC<{
   file: AttachmentFile;
   prefixCls?: string;
   hashId?: string;
-}> = ({ file, prefixCls, hashId }) => {
+  locale?: typeof import('../../../I18n').cnLabels;
+}> = ({ file, prefixCls, hashId, locale }) => {
   const status = file.status || 'done';
   const baseClassName = buildClassName(`${prefixCls}-file-size`, hashId);
 
   const statusContentMap: Record<FileStatus, React.ReactNode> = {
-    uploading: '上传中...',
+    uploading: locale?.uploading || '上传中...',
     error: (
       <div
         className={buildClassName(
@@ -82,7 +83,7 @@ const FileSizeInfo: React.FC<{
           `${prefixCls}-file-size-error`,
         )}
       >
-        上传失败
+        {locale?.uploadFailed || '上传失败'}
       </div>
     ),
     done: (() => {
@@ -183,7 +184,7 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
               {getFileNameWithoutExtension(file.name)}
             </span>
           </div>
-          <FileSizeInfo file={file} prefixCls={prefixCls} hashId={hashId} />
+          <FileSizeInfo file={file} prefixCls={prefixCls} hashId={hashId} locale={locale} />
         </div>
         <DeleteButton
           isVisible={canDelete}
