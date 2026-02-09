@@ -1,7 +1,7 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'classnames';
 import { AnimatePresence, motion, MotionProps, Variants } from 'framer-motion';
-import { isNumber, isObject, isString } from 'lodash';
+import { isNumber, isObject, isString } from 'lodash-es';
 import toArray from 'rc-util/lib/Children/toArray';
 import React, { ElementType, memo, useContext } from 'react';
 import { useTextAnimateStyle } from './style';

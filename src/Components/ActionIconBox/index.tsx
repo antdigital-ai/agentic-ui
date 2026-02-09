@@ -1,7 +1,7 @@
 import { LoadingOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip, TooltipProps } from 'antd';
 import cx from 'classnames';
-import { isFunction } from 'lodash';
+import { isFunction } from 'lodash-es';
 import { useMergedState } from 'rc-util';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useStyle } from './style';

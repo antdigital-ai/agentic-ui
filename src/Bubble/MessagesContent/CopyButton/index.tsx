@@ -1,7 +1,7 @@
 import { memo, useContext } from 'react';
 
 import { CheckCircleFilled } from '@ant-design/icons';
-import { isFunction } from 'lodash';
+import { isFunction } from 'lodash-es';
 import React from 'react';
 import {
   ActionIconBox,
