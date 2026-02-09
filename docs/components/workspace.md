@@ -175,7 +175,8 @@ Workspace 是一个功能强大的工作空间组件，提供了标签页式的�
 | onLocate            | 定位回调（列表与预览页均会触发，需配合文件 `canLocate` 开启） | `(file: FileNode) => void`                                                                                      | -       |
 | markdownEditorProps | Markdown 编辑器配置（覆盖默认预览配置，内部会忽略只读等字段） | `Partial<Omit<MarkdownEditorProps, 'editorRef' \| 'initValue' \| 'readonly'>>`                                  | -       |
 | actionRef           | 对外操作引用（打开预览/返回/更新预览标题）                    | `React.MutableRefObject<FileActionRef \| null>`                                                                 | -       |
-| loading             | 是否显示加载状态                                              | `boolean`                                                                                                       | -       |
+| loading _(deprecated)_ | 已废弃，请使用 `isLoading`                                 | `boolean`                                                                                                       | -       |
+| isLoading           | 是否显示加载状态                                              | `boolean`                                                                                                       | -       |
 | loadingRender       | 自定义加载渲染函数，非必传                                    | `() => React.ReactNode`                                                                                         | -       |
 | emptyRender         | 自定义空状态渲染（列表为空且非 loading 时优先显示）           | `React.ReactNode \| () => React.ReactNode`                                                                      | -       |
 | keyword             | 搜索关键字（受控）                                            | `string`                                                                                                        | -       |

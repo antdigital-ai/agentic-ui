@@ -155,6 +155,34 @@ For it will surely sprout wings and fly off to the sky like an eagle
 | reportMode      | `boolean`             | `false`  | 是否开启报告模式       |
 | slideMode       | `boolean`             | `false`  | 是否开启 PPT 模式      |
 | typewriter      | `boolean`             | `false`  | 是否开启打字机模式     |
+| compact         | `boolean`             | `false`  | 是否启用紧凑模式       |
+| id              | `string`              | -        | 编辑器唯一标识         |
+
+### 浮动工具栏配置 (floatBar)
+
+| 属性   | 类型      | 默认值 | 描述               |
+| ------ | --------- | ------ | ------------------ |
+| enable | `boolean` | -      | 是否启用浮动工具栏 |
+
+### 文本区域配置 (textAreaProps)
+
+| 属性        | 类型      | 默认值 | 描述             |
+| ----------- | --------- | ------ | ---------------- |
+| enable      | `boolean` | -      | 是否启用文本区域 |
+| placeholder | `string`  | -      | 占位符文本       |
+
+### 拖拽配置 (drag)
+
+| 属性   | 类型      | 默认值 | 描述             |
+| ------ | --------- | ------ | ---------------- |
+| enable | `boolean` | -      | 是否启用拖拽功能 |
+
+### Markdown 输入配置 (markdown)
+
+| 属性             | 类型      | 默认值 | 描述                   |
+| ---------------- | --------- | ------ | ---------------------- |
+| matchLeaf        | `boolean` | -      | 是否启用叶子节点匹配   |
+| matchInputToNode | `boolean` | -      | 是否启用输入到节点匹配 |
 
 ### 工具栏配置 (toolBar)
 
@@ -231,8 +259,9 @@ For it will surely sprout wings and fly off to the sky like an eagle
 | 属性                    | 类型                                                                          | 描述               |
 | ----------------------- | ----------------------------------------------------------------------------- | ------------------ |
 | **引用和回调**          |
-| editorRef               | `React.MutableRefObject<MarkdownEditorInstance>`                              | 编辑器实例引用     |
+| editorRef               | `React.Ref<MarkdownEditorInstance>`                                           | 编辑器实例引用     |
 | rootContainer           | `React.MutableRefObject<HTMLDivElement>`                                      | 根容器引用         |
+| containerClassName      | `string`                                                                      | 容器自定义类名     |
 | onChange                | `(value: string, schema: Elements[]) => void`                                 | 内容变化回调       |
 | onSelectionChange       | `(selection: Selection \| null, markdown: string, nodes: Elements[]) => void` | 选区变化回调       |
 | **自定义渲染**          |
@@ -243,6 +272,7 @@ For it will surely sprout wings and fly off to the sky like an eagle
 | **其他功能**            |
 | insertAutocompleteProps | `InsertAutocompleteProps`                                                     | 插入自动补全配置   |
 | titlePlaceholderContent | `string`                                                                      | 标题占位符内容     |
+| attachment              | `Record<string, unknown>`                                                     | 附件配置           |
 | anchorProps             | `AnchorProps`                                                                 | 锚点链接配置       |
 | fncProps                | `FootnoteProps`                                                               | 脚注配置           |
 

@@ -413,7 +413,7 @@ export default () => (
 | 属性          | 说明            | 类型                               | 默认值 |
 | ------------- | --------------- | ---------------------------------- | ------ |
 | bubbleListRef | 列表容器引用    | `MutableRefObject<HTMLDivElement>` | -      |
-| bubbleRef     | 气泡组件引用    | `MutableRefObject<any>`            | -      |
+| bubbleRef     | 气泡组件引用    | `MutableRefObject<BubbleImperativeHandle>` | -      |
 | className     | 自定义 CSS 类名 | `string`                           | -      |
 | style         | 自定义内联样式  | `React.CSSProperties`              | -      |
 | styles        | 详细样式配置    | `BubbleListStylesConfig`           | -      |
@@ -444,11 +444,14 @@ interface MessageBubbleData {
 interface BubbleMetaData {
   avatar?: string; // 头像 URL
   title?: string; // 显示名称
+  name?: string; // 名称（别名）
   description?: string; // 描述信息
   backgroundColor?: string; // 背景色
-  [key: string]: any; // 其他自定义字段
+  metadata?: Record<string, unknown>; // 扩展元数据
 }
 ```
+
+> **变更说明**：移除了 `[key: string]: any` 索引签名，新增 `name` 和 `metadata` 属性。如需传递自定义数据，请使用 `metadata` 字段。
 
 #### BubbleRenderConfig
 
@@ -470,6 +473,46 @@ type CustomRenderFunction = (
   defaultDom: ReactNode,
 ) => ReactNode;
 ```
+
+#### BubbleImperativeHandle
+
+通过 `bubbleRef` 暴露的命令式方法：
+
+```typescript
+interface BubbleImperativeHandle {
+  /** 更新消息项数据 */
+  setMessageItem?: (id: string, data: Partial<MessageBubbleData>) => void;
+}
+```
+
+#### BubbleSlotStyles（推荐）
+
+简洁版样式配置接口，属性名不带 `bubble` 前缀：
+
+```typescript
+interface BubbleSlotStyles {
+  root?: React.CSSProperties;        // 气泡根容器
+  avatarTitle?: React.CSSProperties;  // 头像标题区域
+  container?: React.CSSProperties;    // 主容器
+  loadingIcon?: React.CSSProperties;  // 加载图标
+  name?: React.CSSProperties;         // 名称区域
+  content?: React.CSSProperties;      // 内容
+  before?: React.CSSProperties;       // 内容前置区域
+  after?: React.CSSProperties;        // 内容后置区域
+  title?: React.CSSProperties;        // 标题
+  avatar?: React.CSSProperties;       // 头像
+  extra?: React.CSSProperties;        // 额外内容
+}
+```
+
+> **变更说明**：新增 `BubbleSlotStyles` / `BubbleSlotClassNames` 作为推荐的样式接口，属性名更简洁。原 `BubbleStyles` / `BubbleClassNames`（带 `bubble` 前缀）仍可使用，但已标记为 deprecated。
+
+#### AI 气泡属性
+
+| 属性 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| aiBubbleProps | AI 气泡的属性配置 | `BubbleProps` | - |
+| ~~aIBubbleProps~~ | ~~已废弃，请使用 `aiBubbleProps`~~ | `BubbleProps` | - |
 
 ## 🎯 功能特性详解
 

@@ -92,6 +92,7 @@ export default App;
 | `isLoading`              | `boolean`                          | 否   | 表示组件是否处于加载状态       |
 | `loading`                | `boolean`                          | 否   | **已废弃**，请使用 `isLoading` |
 | `bubble`                 | `object`                           | 否   | 聊天状态信息                   |
+| `chatItem`               | `object`                           | 否   | **已废弃**，请使用 `bubble`    |
 | `bubble.isFinished`      | `boolean`                          | 否   | 聊天/任务是否已完成            |
 | `bubble.endTime`         | `number`                           | 否   | 聊天结束的时间戳               |
 | `bubble.createAt`        | `number`                           | 否   | 聊天创建的时间戳               |

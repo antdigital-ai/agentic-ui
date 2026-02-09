@@ -78,7 +78,8 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 | emptyRender               | 空状态渲染函数，当历史记录为空时显示               | `() => React.ReactNode`                                                            | -       |
 | agent                     | Agent 模式配置，详见 Agent 配置说明                | `AgentConfig`                                                                      | -       |
 | slots                     | 插槽配置                                           | `{ beforeHistoryList?: (list: HistoryDataType[]) => React.ReactNode }`             | -       |
-| loading                   | 加载状态，显示在 GroupMenu 区域                    | `boolean`                                                                          | `false` |
+| loading _(deprecated)_    | 已废弃，请使用 `isLoading`                         | `boolean`                                                                          | `false` |
+| isLoading                 | 加载状态，显示在 GroupMenu 区域                    | `boolean`                                                                          | `false` |
 
 ### HistoryDataType
 

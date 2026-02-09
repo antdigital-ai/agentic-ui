@@ -16,7 +16,9 @@ group:
 
 ## API
 
-### TaskList
+### TaskList (TaskListProps)
+
+> **类型名变更**：Props 类型已从 `ThoughtChainProps` 重命名为 `TaskListProps`。旧类型名仍可使用但已标记 deprecated。
 
 | 参数                 | 说明                                | 类型                               | 默认值 |
 | -------------------- | ----------------------------------- | ---------------------------------- | ------ |
