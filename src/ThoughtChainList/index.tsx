@@ -380,14 +380,16 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
     const {
       thoughtChainList,
       loading,
-      //@ts-ignore
-      bubble = props.chatItem,
+      bubble: bubbleProp,
+      chatItem,
       style: customStyle,
       compact,
       markdownRenderProps,
       finishAutoCollapse = true,
       onDocMetaClick,
     } = props;
+    // 兼容旧版 chatItem 属性，优先使用 bubble
+    const bubble = bubbleProp ?? chatItem;
     const context = useContext(ConfigProvider.ConfigContext);
     const [collapse, setCollapse] = React.useState<boolean>(false);
     const prefixCls = context?.getPrefixCls('thought-chain-list');

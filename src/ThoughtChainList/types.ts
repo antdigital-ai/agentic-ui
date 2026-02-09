@@ -155,6 +155,16 @@ export interface ThoughtChainListProps extends BaseStyleProps {
     createAt?: number;
     isAborted?: boolean;
   };
+  /**
+   * @deprecated 请使用 bubble 代替
+   * @description 旧版本兼容属性，将在未来版本移除
+   */
+  chatItem?: {
+    isFinished?: boolean;
+    endTime?: number;
+    createAt?: number;
+    isAborted?: boolean;
+  };
   compact?: boolean;
   markdownRenderProps?: MarkdownEditorProps;
   finishAutoCollapse?: boolean;
