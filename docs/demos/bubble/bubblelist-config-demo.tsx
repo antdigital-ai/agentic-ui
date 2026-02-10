@@ -30,9 +30,21 @@ const createMockMessage = (
 
 // 示例消息
 const sampleMessages: MessageBubbleData[] = [
-  createMockMessage('1', 'assistant', '这是第一条助手消息'),
-  createMockMessage('2', 'user', '这是用户消息'),
-  createMockMessage('3', 'assistant', '这是第二条助手消息'),
+  createMockMessage(
+    '1',
+    'assistant',
+    '你好！我可以帮你进行代码审查、性能优化建议和技术方案设计。',
+  ),
+  createMockMessage(
+    '2',
+    'user',
+    '请帮我看一下这个 React 组件的渲染性能问题。',
+  ),
+  createMockMessage(
+    '3',
+    'assistant',
+    '好的，建议你先使用 React DevTools 的 Profiler 定位重渲染的组件，然后针对性地使用 `React.memo` 进行优化。',
+  ),
 ];
 
 export default () => {

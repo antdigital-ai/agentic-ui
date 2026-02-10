@@ -5,48 +5,57 @@ import React, { useState } from 'react';
 const tools = [
   {
     id: 'tool1',
-    toolName: 'Search Code',
-    toolTarget: 'baidu.com',
+    toolName: 'web_search',
+    toolTarget: '搜索「TypeScript 5.0 新特性」',
     time: '1.3s',
-    status: 'success' as const,
-    content: <div>这是搜索代码的详细内容，包含了一些执行结果和相关信息。</div>,
-  },
-  {
-    id: 'tool2',
-    toolName: 'Read File',
-    toolTarget: 'xxx.docx',
-    time: '2.3s',
-    status: 'error' as const,
-    errorMessage: '文件读取失败：文件不存在或无权限访问',
-  },
-  {
-    id: 'tool3',
-    toolName: 'Edit File',
-    toolTarget: 'xx.md',
-    time: '2.3s',
     status: 'success' as const,
     content: (
       <div>
-        <p>文件编辑成功，修改了以下内容：</p>
-        <ul>
-          <li>添加了新的章节标题</li>
-          <li>更新了代码示例</li>
-          <li>修复了格式问题</li>
+        找到 8 个相关结果，已提取核心内容：
+        <ul style={{ margin: '8px 0 0', paddingLeft: 20 }}>
+          <li>装饰器（Decorators）正式进入 Stage 3</li>
+          <li>const 类型参数支持</li>
+          <li>枚举类型增强和多配置文件继承</li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    id: 'tool2',
+    toolName: 'read_file',
+    toolTarget: 'tsconfig.json',
+    time: '0.3s',
+    status: 'error' as const,
+    errorMessage: '文件读取失败：tsconfig.json 存在 JSON 语法错误（第 15 行）',
+  },
+  {
+    id: 'tool3',
+    toolName: 'edit_file',
+    toolTarget: 'src/types/api.d.ts',
+    time: '1.8s',
+    status: 'success' as const,
+    content: (
+      <div>
+        <p>类型定义文件已更新，修改内容：</p>
+        <ul style={{ margin: '4px 0 0', paddingLeft: 20 }}>
+          <li>新增 UserProfile 接口定义</li>
+          <li>更新 ApiResponse 泛型约束</li>
+          <li>修复 Pagination 类型的可选属性标注</li>
         </ul>
       </div>
     ),
   },
   {
     id: 'tool4',
-    toolName: 'Generate Report',
-    toolTarget: 'report.pdf',
-    time: '5.1s',
+    toolName: 'generate_report',
+    toolTarget: '生成类型覆盖率报告',
+    time: '8.5s',
     status: 'loading' as const,
   },
   {
     id: 'tool5',
-    toolName: 'Generate Report',
-    toolTarget: 'report.pdf',
+    toolName: 'run_type_check',
+    toolTarget: '执行全量 TypeScript 类型检查',
     status: 'loading' as const,
   },
 ];
@@ -99,67 +108,6 @@ const ToolUseBarExpandedKeysDemo: React.FC = () => {
         onExpandedKeysChange={setExpandedKeys}
         onToolClick={(id: string) => console.log('Tool clicked:', id)}
       />
-
-      <div style={{ marginTop: '20px', padding: '20px' }}>
-        <h4>Props 说明：</h4>
-        <ul>
-          <li>
-            <strong>tools</strong>: 工具列表数组，每个工具包含
-            id、toolName、toolTarget、time、status、content、errorMessage 等属性
-          </li>
-          <li>
-            <strong>expandedKeys</strong>: 当前展开的工具 ID 数组，受控模式
-          </li>
-          <li>
-            <strong>onExpandedKeysChange</strong>: 展开状态变化时的回调函数
-          </li>
-          <li>
-            <strong>onToolClick</strong>: 点击工具项时的回调函数
-          </li>
-          <li>
-            <strong>content</strong>: 工具项的详细内容，React 节点
-          </li>
-          <li>
-            <strong>errorMessage</strong>: 错误信息，当 status 为
-            &apos;error&apos; 时显示
-          </li>
-        </ul>
-      </div>
-
-      <div
-        style={{
-          marginTop: 16,
-          padding: 16,
-          background: '#f5f5f5',
-          borderRadius: 8,
-        }}
-      >
-        <h4>功能说明</h4>
-        <ul>
-          <li>
-            🎛️ <strong>受控展开</strong> - 通过 <code>expandedKeys</code>{' '}
-            完全控制展开状态
-          </li>
-          <li>
-            📝 <strong>状态同步</strong> - <code>onExpandedKeysChange</code>{' '}
-            回调确保状态同步
-          </li>
-          <li>
-            🔄 <strong>批量操作</strong> - 支持批量展开/收起多个工具项
-          </li>
-          <li>
-            📊 <strong>状态监控</strong> - 实时显示当前展开的工具列表
-          </li>
-          <li>
-            🎯 <strong>精确控制</strong> - 可以单独控制任意工具项的展开状态
-          </li>
-        </ul>
-        <p>
-          <strong>操作提示:</strong>
-          使用上方按钮控制展开状态，或直接点击工具项的展开按钮。
-          注意只有包含内容或错误信息的工具项才会显示展开按钮。
-        </p>
-      </div>
     </div>
   );
 };

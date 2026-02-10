@@ -31,8 +31,16 @@ const createMockMessage = (
 
 // 初始消息
 const initialMessages: MessageBubbleData[] = [
-  createMockMessage('1', 'assistant', '欢迎使用 BubbleList 组件！'),
-  createMockMessage('2', 'user', '这个组件功能很强大！'),
+  createMockMessage(
+    '1',
+    'assistant',
+    '你好！我是 AI 助手，可以帮你解答技术问题、编写代码和分析数据。有什么我能帮助你的吗？',
+  ),
+  createMockMessage(
+    '2',
+    'user',
+    '帮我解释一下 React 的 useMemo 和 useCallback 有什么区别？',
+  ),
 ];
 
 export default () => {
@@ -61,7 +69,9 @@ export default () => {
     const newMessage = createMockMessage(
       `msg-${Date.now()}`,
       bubbleList.length % 2 === 0 ? 'user' : 'assistant',
-      `这是第 ${bubbleList.length + 1} 条消息`,
+      bubbleList.length % 2 === 0
+        ? '那它们在性能优化中应该怎么配合使用？'
+        : '`useMemo` 用于缓存计算结果，`useCallback` 用于缓存函数引用。两者配合可以有效减少子组件的不必要重渲染。',
     );
     newMessage.extra = {
       ...newMessage.extra,

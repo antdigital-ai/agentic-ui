@@ -30,9 +30,21 @@ const createMockMessage = (
 
 // 示例消息
 const sampleMessages: MessageBubbleData[] = [
-  createMockMessage('1', 'assistant', '点击下方的 👍 和 👎 按钮体验点赞功能'),
-  createMockMessage('2', 'assistant', '点击"回复"按钮可以回复这条消息'),
-  createMockMessage('3', 'user', '这是用户消息，可以双击体验双击事件'),
+  createMockMessage(
+    '1',
+    'assistant',
+    '根据你的描述，推荐使用 TanStack Query 来管理服务端状态，它提供了自动缓存、请求去重和乐观更新等开箱即用的功能。',
+  ),
+  createMockMessage(
+    '2',
+    'assistant',
+    '另外，对于表单状态管理，建议使用 React Hook Form 搭配 Zod 做类型安全的表单校验。',
+  ),
+  createMockMessage(
+    '3',
+    'user',
+    '好的，那如果我需要在多个页面间共享用户偏好设置，应该用什么方案？',
+  ),
 ];
 
 export default () => {

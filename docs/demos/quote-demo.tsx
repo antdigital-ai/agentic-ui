@@ -3,7 +3,6 @@ import { ConfigProvider, message } from 'antd';
 import React from 'react';
 
 export default function QuoteDemo() {
-  // 处理文件名点击
   const handleFileClick = (fileName: string, lineRange?: string) => {
     console.log('点击文件:', fileName, lineRange ? `行号: ${lineRange}` : '');
     message.success(
@@ -12,7 +11,7 @@ export default function QuoteDemo() {
   };
 
   const handleClose = () => {
-    message.success('Quote closed');
+    message.success('引用已关闭');
   };
 
   return (
@@ -30,17 +29,27 @@ export default function QuoteDemo() {
         <div>
           <h3>基础用法</h3>
           <Quote
-            fileName="utils/helper.ts"
-            lineRange="12-25"
-            quoteDescription="这是一个工具函数的引用，用于处理数据格式化"
-            popupDetail="export const formatData = (data: any) => {
-  if (!data) return null;
-  return {
-    id: data.id,
-    name: data.name,
-    createdAt: new Date(data.created_at)
-  };
-};"
+            fileName="src/hooks/useAuth.ts"
+            lineRange="18-32"
+            quoteDescription="用户认证状态管理 Hook，处理 Token 刷新和登录态维护"
+            popupDetail={`export const useAuth = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      validateToken(token)
+        .then(setUser)
+        .catch(() => localStorage.removeItem('auth_token'))
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  return { user, loading, isAuthenticated: !!user };
+};`}
             onFileClick={handleFileClick}
           />
         </div>
@@ -48,9 +57,9 @@ export default function QuoteDemo() {
         <div>
           <h3>可关闭的引用</h3>
           <Quote
-            fileName="components/Button.tsx"
-            lineRange="45-60"
-            quoteDescription="Button组件的点击事件处理逻辑"
+            fileName="src/components/DataTable.tsx"
+            lineRange="56-78"
+            quoteDescription="数据表格组件的分页和排序逻辑"
             closable={true}
             onClose={handleClose}
             onFileClick={handleFileClick}
@@ -60,18 +69,21 @@ export default function QuoteDemo() {
         <div>
           <h3>不传文件名</h3>
           <Quote
-            quoteDescription="这是一个没有文件来源的引用内容"
-            popupDetail="这里是详细的说明文本，可以包含多行内容。
-当内容过多时，会出现滚动条。
-用户可以通过滚动查看完整内容。"
+            quoteDescription="项目采用微前端架构，主应用负责路由调度和公共状态管理"
+            popupDetail={`架构设计说明：
+
+1. 主应用（Shell）：基于 qiankun 框架，负责子应用的生命周期管理
+2. 子应用通过 props 和 globalState 与主应用通信
+3. 公共依赖通过 externals 方式共享，避免重复打包
+4. 每个子应用独立部署，支持灰度发布`}
           />
         </div>
 
         <div>
           <h3>纯内容引用</h3>
           <Quote
-            fileName="README.md"
-            quoteDescription="项目使用说明和API文档"
+            fileName="docs/deployment-guide.md"
+            quoteDescription="生产环境部署流程和注意事项"
             onFileClick={handleFileClick}
           />
         </div>
@@ -79,14 +91,16 @@ export default function QuoteDemo() {
         <div>
           <h3>长文件名测试</h3>
           <Quote
-            fileName="src/components/ComplexComponent/SubComponent/VeryLongFileName.tsxsrc/components/ComplexComponent/SubComponent/VeryLongFileName.tsx"
-            lineRange="100-150"
-            quoteDescription="这是一个很长的文件路径，用来测试文件名的省略效果"
-            popupDetail="interface VeryLongInterfaceName {
-  propertyWithVeryLongName: string;
-  anotherPropertyWithEvenLongerName: number;
-  yetAnotherPropertyThatIsEvenLonger: boolean;
-}"
+            fileName="src/modules/analytics/components/RealtimeDashboard/charts/MultiAxisTimeSeriesChart.tsx"
+            lineRange="120-185"
+            quoteDescription="实时数据大盘的多轴时序图组件，包含数据聚合和自动刷新逻辑"
+            popupDetail={`interface MultiAxisChartConfig {
+  axes: AxisConfig[];
+  refreshInterval: number;
+  aggregation: 'sum' | 'avg' | 'max' | 'min';
+  timeRange: TimeRange;
+  dataSource: DataSourceConfig;
+}`}
             onFileClick={handleFileClick}
           />
         </div>
@@ -97,34 +111,41 @@ export default function QuoteDemo() {
             <div style={{ flex: 1, minWidth: '300px' }}>
               <h4>左侧弹出（默认）</h4>
               <Quote
-                fileName="src/utils/leftAlign.ts"
-                lineRange="1-20"
-                quoteDescription="左侧对齐的工具函数"
+                fileName="src/utils/format.ts"
+                lineRange="1-15"
+                quoteDescription="日期和数字格式化工具函数"
                 popupDirection="left"
-                popupDetail="export const leftAlign = (text: string, width: number) => {
-  return text.padEnd(width, ' ');
+                popupDetail={`export const formatCurrency = (amount: number, currency = 'CNY') => {
+  return new Intl.NumberFormat('zh-CN', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+  }).format(amount);
 };
 
-// 使用示例
-const aligned = leftAlign('Hello', 10);
-// 'Hello     '"
+export const formatDate = (date: Date, pattern = 'YYYY-MM-DD') => {
+  return dayjs(date).format(pattern);
+};`}
                 onFileClick={handleFileClick}
               />
             </div>
             <div style={{ flex: 1, minWidth: '300px' }}>
               <h4>右侧弹出</h4>
               <Quote
-                fileName="src/utils/rightAlign.ts"
-                lineRange="1-20"
-                quoteDescription="右侧对齐的工具函数"
+                fileName="src/utils/validator.ts"
+                lineRange="1-18"
+                quoteDescription="表单校验规则和自定义校验器"
                 popupDirection="right"
-                popupDetail="export const rightAlign = (text: string, width: number) => {
-  return text.padStart(width, ' ');
-};
-
-// 使用示例
-const aligned = rightAlign('Hello', 10);
-// '     Hello'"
+                popupDetail={`export const validators = {
+  email: (value: string) =>
+    /^[\\w.-]+@[\\w.-]+\\.\\w+$/.test(value) || '请输入有效的邮箱地址',
+  phone: (value: string) =>
+    /^1[3-9]\\d{9}$/.test(value) || '请输入有效的手机号码',
+  password: (value: string) =>
+    value.length >= 8 || '密码长度不能少于 8 位',
+  required: (value: string) =>
+    !!value?.trim() || '此字段为必填项',
+};`}
                 onFileClick={handleFileClick}
               />
             </div>
