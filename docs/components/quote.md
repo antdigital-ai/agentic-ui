@@ -27,13 +27,13 @@ Quote 组件是一个现代化的文件引用卡片组件，为代码引用和�
 
 展示 Quote 组件的基础功能，包括文件信息显示、内容预览和关闭操作。
 
-<code src="../demos/quote-demo.tsx"></code>
+<code src="../demos/quote-demo.tsx">基础用法 - 文件引用与弹出详情</code>
 
 ### 在 MarkdownInputField 中使用
 
 在输入框中使用 Quote 组件展示代码引用上下文，通过 `skillMode` 配合 `beforeTools` 属性实现。
 
-<code src="../demos/quote-with-input-demo.tsx" iframe="600"></code>
+<code src="../demos/quote-with-input-demo.tsx" iframe="600">输入框集成 - 代码上下文引用</code>
 
 ## 📖 API 参考
 

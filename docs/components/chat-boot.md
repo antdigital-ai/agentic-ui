@@ -12,7 +12,7 @@ group:
 
 ## 基础用法
 
-<code src="../demos/ChatBootPage/index.tsx" iframe=800></code>
+<code src="../demos/ChatBootPage/index.tsx" iframe=800>完整对话启动页 - 侧边栏 + 欢迎页 + 推荐卡片</code>
 
 ## 组件概览
 

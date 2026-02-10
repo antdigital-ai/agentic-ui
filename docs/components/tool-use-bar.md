@@ -53,15 +53,15 @@ export default () => {
 };
 ```
 
-<code src="../demos/tool-use-bar-basic.tsx">基础用法</code>
+<code src="../demos/tool-use-bar-basic.tsx">基础用法 - 多状态工具列表</code>
 
-<code src="../demos/tool-use-bar-active-keys.tsx">activeKeys 功能演示</code>
+<code src="../demos/tool-use-bar-active-keys.tsx">受控激活 - activeKeys</code>
 
-<code src="../demos/tool-use-bar-expanded-keys.tsx">expandedKeys 功能演示</code>
+<code src="../demos/tool-use-bar-expanded-keys.tsx">受控展开 - expandedKeys</code>
 
-<code src="../demos/tool-use-bar-think-standalone.tsx">ToolUseBarThink 独立组件</code>
+<code src="../demos/tool-use-bar-think-standalone.tsx">深度思考 - ToolUseBarThink</code>
 
-<code src="../demos/tool-use-bar-think-simple.tsx">ToolUseBarThink 简单示例</code>
+<code src="../demos/tool-use-bar-think-simple.tsx">深度思考 - 多状态对比</code>
 
 ## API
 

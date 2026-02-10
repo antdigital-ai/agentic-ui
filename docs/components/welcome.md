@@ -12,7 +12,7 @@ group:
 
 ## 代码演示
 
-<code src="../demos/welcome/index.tsx" background="var(--main-bg-color)" iframe=600></code>
+<code src="../demos/welcome/index.tsx" background="var(--main-bg-color)" iframe=600>欢迎语 - 品牌引导与输入框</code>
 
 ## API
 

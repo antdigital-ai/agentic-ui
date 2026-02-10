@@ -12,7 +12,7 @@ group:
 
 ## 代码演示
 
-<code src="../demos/visual-list.tsx">基础用法</code>
+<code src="../demos/visual-list.tsx">基础用法 - 头像列表与形状</code>
 
 ## API
 

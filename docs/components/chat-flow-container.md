@@ -12,7 +12,7 @@ group:
 
 ## 基础用法
 
-<code src="../demos/ChatFlowContainer/index.tsx" iframe=620></code>
+<code src="../demos/ChatFlowContainer/index.tsx" iframe=620>对话流容器 - 头部 + 内容 + 底部</code>
 
 ## API 参考
 

@@ -990,6 +990,6 @@ export default function CompactDemo() {
 }
 ````
 
-### 复杂demo
+### 综合示例 - 多类型思维链
 
-<code src="./thought-chain-list/big.tsx" background="var(--main-bg-color)"  iframe="540"></code>
+<code src="./thought-chain-list/big.tsx" background="var(--main-bg-color)"  iframe="540">综合示例 - SQL查询 / 文档检索 / 深度思考 / 工具调用</code>

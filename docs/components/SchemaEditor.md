@@ -25,7 +25,7 @@ SchemaEditor 是一个强大的 schema 编辑和预览工具，提供 HTML 模�
 
 ## 基本用法
 
-<code src="../demos/SchemaEditorBasicDemo.tsx"></code>
+<code src="../demos/SchemaEditorBasicDemo.tsx">Schema 编辑器基础用法</code>
 
 ## API 参考
 

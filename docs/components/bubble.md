@@ -254,103 +254,103 @@ export default () => (
 
 展示气泡组件的基础功能，包括消息布局、加载状态、文件附件和交互操作。
 
-<code src="../demos/bubble/basic.tsx"></code>
+<code src="../demos/bubble/basic.tsx">基础用法 - 消息布局与交互</code>
 
 ### 消息加载状态演示
 
 演示 Bubble 组件的消息加载状态功能，包括消息生成时的加载效果和交互控制。
 
-<code src="../demos/bubble/message-loading-demo.tsx"></code>
+<code src="../demos/bubble/message-loading-demo.tsx">消息加载状态</code>
 
 ### 文件加载状态演示
 
 演示 Bubble 组件的文件上传加载状态功能，包括文件处理时的加载效果和文件类型支持。
 
-<code src="../demos/bubble/file-loading-demo.tsx"></code>
+<code src="../demos/bubble/file-loading-demo.tsx">文件上传加载状态</code>
 
 ### 标题自定义渲染
 
 专门演示 `titleRender` 功能，展示如何自定义消息标题的显示方式。
 
-<code src="../demos/bubble/title-render-demo.tsx"></code>
+<code src="../demos/bubble/title-render-demo.tsx">自定义渲染 - 标题 titleRender</code>
 
 ### 内容自定义渲染
 
 专门演示 `contentRender` 功能，展示如何自定义消息内容的显示方式。
 
-<code src="../demos/bubble/content-render-demo.tsx"></code>
+<code src="../demos/bubble/content-render-demo.tsx">自定义渲染 - 内容 contentRender</code>
 
 ### 头像自定义渲染
 
 专门演示 `avatarRender` 功能，展示如何自定义头像的显示方式。
 
-<code src="../demos/bubble/avatar-render-demo.tsx"></code>
+<code src="../demos/bubble/avatar-render-demo.tsx">自定义渲染 - 头像 avatarRender</code>
 
 ### 脚注（Footnote）
 
 展示如何实现脚注弹框及消息底部的脚注汇总功能。
 
-<code src="../demos/bubble/footnote-demo.tsx"></code>
+<code src="../demos/bubble/footnote-demo.tsx">脚注引用 - Footnote</code>
 
 ### 操作区域定制
 
 展示 `extraRender` 功能，自定义气泡的操作按钮和交互区域。
 
-<code src="../demos/bubble/extra-render.tsx"></code>
+<code src="../demos/bubble/extra-render.tsx">自定义渲染 - 操作区 extraRender</code>
 
 ### 语音播报（TTS）
 
 展示内置的语音播报按钮及倍速选择功能：
 
-<code src="../demos/bubble/voice.tsx"></code>
+<code src="../demos/bubble/voice.tsx">语音播报 - TTS</code>
 
 ### 文件附件处理
 
 演示如何处理和展示不同类型的文件附件，支持多种文件格式。
 
-<code src="../demos/bubble/file-view.tsx"></code>
+<code src="../demos/bubble/file-view.tsx">文件附件 - 多格式预览</code>
 
 ### Pure 简洁模式
 
 展示 Pure 模式的使用，提供无边框的简洁设计，适合嵌入式场景。
 
-<code src="../demos/bubble/pure.tsx"></code>
+<code src="../demos/bubble/pure.tsx">Pure 简洁模式</code>
 
 ### 消息连续性优化
 
 演示 `preMessageSameRole` 功能，展示如何通过传入前一条消息来优化连续对话的视觉体验。
 
-<code src="../demos/bubble/preMessageSameRole.tsx"></code>
+<code src="../demos/bubble/preMessageSameRole.tsx">连续消息合并 - preMessageSameRole</code>
 
 ### BubbleList 基础用法
 
 演示 BubbleList 组件的基础用法，包括消息列表的创建和管理。
 
-<code src="../demos/bubble/bubblelist-basic-demo.tsx"></code>
+<code src="../demos/bubble/bubblelist-basic-demo.tsx">BubbleList 基础用法</code>
 
 ### BubbleList 交互功能
 
 演示 BubbleList 组件的交互功能，包括点赞、点踩、回复等操作。
 
-<code src="../demos/bubble/bubblelist-interaction-demo.tsx"></code>
+<code src="../demos/bubble/bubblelist-interaction-demo.tsx">BubbleList 交互 - 点赞回复</code>
 
 ### BubbleList 配置选项
 
 演示 BubbleList 组件的配置选项，包括加载状态、只读模式等。
 
-<code src="../demos/bubble/bubblelist-config-demo.tsx"></code>
+<code src="../demos/bubble/bubblelist-config-demo.tsx">BubbleList 配置 - 加载与只读</code>
 
 ### BubbleList 性能优化
 
 演示 BubbleList 组件的性能优化特性，包括虚拟滚动和大数据量处理。
 
-<code src="../demos/bubble/bubblelist-performance-demo.tsx"></code>
+<code src="../demos/bubble/bubblelist-performance-demo.tsx">BubbleList 性能优化</code>
 
 ### BubbleList 懒加载
 
 演示 BubbleList 组件的懒加载功能，包含 200 条消息，展示如何通过懒加载提升长列表的渲染性能。只有进入视口的气泡才会被渲染，减少初始 DOM 节点数量。
 
-<code src="../demos/bubble/bubblelist-lazy-demo.tsx"></code>
+<code src="../demos/bubble/bubblelist-lazy-demo.tsx">BubbleList 懒加载 - 200条消息</code>
 
 ## 📖 API 参考
 

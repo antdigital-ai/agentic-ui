@@ -16,45 +16,45 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 
 展示基本的历史记录下拉菜单功能。
 
-<code src="../demos/history-basic.tsx">基础用法</code>
+<code src="../demos/history-basic.tsx">基础用法 - 下拉菜单</code>
 
 ### 独立菜单模式
 
 使用 `standalone` 属性直接显示历史记录菜单。
 
-<code src="../demos/history-standalone.tsx">独立菜单模式</code>
+<code src="../demos/history-standalone.tsx">独立模式 - 侧边栏会话列表</code>
 
 ### 自定义日期格式化和分组
 
 使用 `customDateFormatter` 和 `groupBy` 属性自定义日期显示和分组逻辑。
 
-<code src="../demos/history-custom.tsx">自定义日期格式化和分组</code>
+<code src="../demos/history-custom.tsx">自定义分组与排序</code>
 
 ### 自定义额外内容
 
 使用 `extra` 属性为每个历史记录项添加自定义内容。
 
-<code src="../demos/history-extra.tsx">自定义额外内容</code>
+<code src="../demos/history-extra.tsx">自定义额外操作</code>
 
 ### Agent 模式
 
 启用 Agent 模式后，支持搜索、收藏、多选与加载更多等增强能力。
 
-<code src="../demos/history-agent-mode-demo.tsx">Agent 模式</code>
+<code src="../demos/history-agent-mode-demo.tsx">Agent 模式 - 搜索收藏多选</code>
 
-<code src="../demos/history-task-demo.tsx">Agent 任务模式</code>
+<code src="../demos/history-task-demo.tsx">Agent 模式 - 任务管理</code>
 
 ### ActionRef 外部控制
 
 使用 `actionRef` 可以外部触发历史记录重新加载。
 
-<code src="../demos/history-actionRef-demo.tsx">ActionRef 外部控制</code>
+<code src="../demos/history-actionRef-demo.tsx">外部控制 - ActionRef</code>
 
 ### 空状态渲染与搜索触发方式
 
 使用 `emptyRender` 自定义空状态显示，使用 `searchOptions.trigger` 配置搜索触发方式。
 
-<code src="../demos/history-empty-render.tsx">空状态渲染与搜索触发</code>
+<code src="../demos/history-empty-render.tsx">空状态与搜索触发配置</code>
 
 ## API
 
