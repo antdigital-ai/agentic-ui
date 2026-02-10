@@ -100,39 +100,39 @@ const mockInlineFileMap = new Map<string, AttachmentFile>([
     ),
   ],
   [
-    'api-reference-henchangehnchangmingzichang.json',
+    'component-api-reference.json',
     createMockFile(
-      'api-reference-henchangehnchangmingzichang.json',
+      'component-api-reference.json',
       'application/json',
       512000,
-      'https://example.com/api-reference-henchangehnchangmingzichang.json',
+      'https://example.com/component-api-reference.json',
     ),
   ],
   [
-    'more-example.docx',
+    '组件使用说明.docx',
     createMockFile(
-      'more-example.docx',
+      '组件使用说明.docx',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       8847360,
-      'https://example.com/more-example.docx',
+      'https://example.com/component-guide.docx',
     ),
   ],
   [
-    'more-example.xlsx',
+    '接口测试报告.xlsx',
     createMockFile(
-      'more-example.xlsx',
+      '接口测试报告.xlsx',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       6647360,
-      'https://example.com/more-example.xlsx',
+      'https://example.com/api-test-report.xlsx',
     ),
   ],
   [
-    'more-example.pptx',
+    '技术方案演示.pptx',
     createMockFile(
-      'more-example.pptx',
+      '技术方案演示.pptx',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation',
       7747360,
-      'https://example.com/more-example.pptx',
+      'https://example.com/tech-proposal.pptx',
     ),
   ],
 ]);

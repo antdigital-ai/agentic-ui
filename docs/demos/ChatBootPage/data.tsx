@@ -58,39 +58,39 @@ export const mockInlineFileMap = new Map<string, AttachmentFile>([
     ),
   ],
   [
-    'api-reference-henchangehnchangmingzichang.json',
+    'api-reference.json',
     createMockFile(
-      'api-reference-henchangehnchangmingzichang.json',
+      'api-reference.json',
       'application/json',
       512000,
-      'https://example.com/api-reference-henchangehnchangmingzichang.json',
+      'https://example.com/api-reference.json',
     ),
   ],
   [
-    'more-example.docx',
+    '投资分析报告.docx',
     createMockFile(
-      'more-example.docx',
+      '投资分析报告.docx',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       8847360,
-      'https://example.com/more-example.docx',
+      'https://example.com/investment-report.docx',
     ),
   ],
   [
-    'more-example.xlsx',
+    '市场数据汇总.xlsx',
     createMockFile(
-      'more-example.xlsx',
+      '市场数据汇总.xlsx',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       6647360,
-      'https://example.com/more-example.xlsx',
+      'https://example.com/market-data.xlsx',
     ),
   ],
   [
-    'more-example.pptx',
+    '季度路演材料.pptx',
     createMockFile(
-      'more-example.pptx',
+      '季度路演材料.pptx',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation',
       7747360,
-      'https://example.com/more-example.pptx',
+      'https://example.com/quarterly-roadshow.pptx',
     ),
   ],
 ]);
@@ -127,7 +127,7 @@ export const INITIAL_MESSAGES = {
 
 你想了解什么呢？`,
 
-  user: `这是第 2 条消息, 生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。`,
+  user: `请帮我分析一下当前 A 股市场中新能源板块的投资机会，重点关注光伏和锂电池两个细分赛道。我想了解：1) 目前的估值水平是否合理；2) 未来 6-12 个月的行业催化剂有哪些；3) 推荐的配置策略和标的筛选逻辑。`,
 
   bubbleDoc: `## Bubble 组件功能文档
 

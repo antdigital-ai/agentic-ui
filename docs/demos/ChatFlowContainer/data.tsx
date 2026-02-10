@@ -58,39 +58,39 @@ export const mockInlineFileMap = new Map<string, AttachmentFile>([
     ),
   ],
   [
-    'api-reference-henchangehnchangmingzichang.json',
+    'api-reference.json',
     createMockFile(
-      'api-reference-henchangehnchangmingzichang.json',
+      'api-reference.json',
       'application/json',
       512000,
-      'https://example.com/api-reference-henchangehnchangmingzichang.json',
+      'https://example.com/api-reference.json',
     ),
   ],
   [
-    'more-example.docx',
+    '需求分析文档.docx',
     createMockFile(
-      'more-example.docx',
+      '需求分析文档.docx',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       8847360,
-      'https://example.com/more-example.docx',
+      'https://example.com/requirements.docx',
     ),
   ],
   [
-    'more-example.xlsx',
+    '测试用例清单.xlsx',
     createMockFile(
-      'more-example.xlsx',
+      '测试用例清单.xlsx',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       6647360,
-      'https://example.com/more-example.xlsx',
+      'https://example.com/test-cases.xlsx',
     ),
   ],
   [
-    'more-example.pptx',
+    '技术方案评审.pptx',
     createMockFile(
-      'more-example.pptx',
+      '技术方案评审.pptx',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation',
       7747360,
-      'https://example.com/more-example.pptx',
+      'https://example.com/tech-review.pptx',
     ),
   ],
 ]);
@@ -127,7 +127,7 @@ export const INITIAL_MESSAGES = {
 
 你想了解什么呢？`,
 
-  user: `这是第 2 条消息, 生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。`,
+  user: `我正在开发一个电商后台管理系统，需要实现以下功能：1) 商品列表的虚拟滚动，数据量约 10 万条；2) 订单状态的实时推送更新；3) 多条件筛选和导出 Excel。请帮我设计一下技术方案，重点关注性能优化和用户体验。`,
 
   bubbleDoc: `## Bubble 组件功能文档
 

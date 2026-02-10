@@ -27,18 +27,18 @@ const StandaloneHistoryDemo = () => {
       {
         id: '1',
         sessionId: 'session-1',
-        sessionTitle: '让黄河成为造福人民的幸福河',
+        sessionTitle: '新能源汽车板块近期走势分析',
         agentId: agentId,
-        gmtCreate: 1703123456789, // 2023-12-21 10:30:56
+        gmtCreate: 1703123456789,
         gmtLastConverse: 1703123456789,
         isFavorite: true,
       },
       {
         id: '2',
         sessionId: 'session-2',
-        sessionTitle: '才读昔楚雄，又见今人勇。',
+        sessionTitle: '半导体ETF定投策略咨询',
         agentId: agentId,
-        gmtCreate: 1703037056789, // 2023-12-20 10:30:56
+        gmtCreate: 1703037056789,
         gmtLastConverse: 1703037056789,
         isFavorite: false,
       },
@@ -46,25 +46,25 @@ const StandaloneHistoryDemo = () => {
         id: '3',
         sessionId: 'session-3',
         sessionTitle:
-          '金山银山不如绿水青山，生态环境保护是一个长期任务，要久久为功。',
+          '对比分析沪深300和中证500指数基金的长期收益与风险表现',
         agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
+        gmtCreate: 1702950656789,
         gmtLastConverse: 1702950656789,
       },
       {
         id: '4',
         sessionId: 'session-4',
-        sessionTitle: '才读昔楚雄，又见今人勇。',
+        sessionTitle: '可转债投资入门指南',
         agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
+        gmtCreate: 1702950656789,
         gmtLastConverse: 1702950656789,
       },
       {
         id: '5',
         sessionId: 'session-5',
-        sessionTitle: '县县通高速，铺就乡村幸福路',
+        sessionTitle: '港股通标的筛选与估值分析',
         agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
+        gmtCreate: 1702950656789,
         gmtLastConverse: 1702950656789,
       },
     ] as HistoryDataType[];
