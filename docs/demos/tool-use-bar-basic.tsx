@@ -8,76 +8,70 @@ const ToolUseBarBasicDemo = () => {
   const tools = [
     {
       id: 'search',
-      toolName: '文件搜索',
-      toolTarget: '搜索 "react" 相关文件',
-      time: '3',
+      toolName: 'web_search',
+      toolTarget: '搜索「Next.js 14 App Router 迁移指南」',
+      time: '2.1',
       status: 'success' as const,
       content: (
         <ul style={{ paddingLeft: 20, margin: 0 }}>
-          <li>分析插件需求及目标功能</li>
-          <li>设计Chrome扩展插件架构 实现核心截图和检测逻辑</li>
-          <li>Manus 正在工作：开发图片输出和导出功能</li>
-          <li>验证插件功能是否正常</li>
-          <li>报告并将插件发送给用户</li>
+          <li>解析用户搜索意图和关键词</li>
+          <li>向搜索引擎发送结构化查询请求</li>
+          <li>对返回结果进行相关性排序和去重</li>
+          <li>提取核心信息片段并生成摘要</li>
+          <li>返回 Top 5 最相关的搜索结果</li>
         </ul>
       ),
     },
     {
       id: 'analyze',
-      toolName: '代码分析',
-      toolTarget: '分析 src/components 目录',
+      toolName: 'code_analysis',
+      toolTarget: '分析 src/app/ 目录结构',
       status: 'loading' as const,
       content: (
         <ul style={{ paddingLeft: 20, margin: 0 }}>
-          <li>分析插件需求及目标功能</li>
-          <li>设计Chrome扩展插件架构 实现核心截图和检测逻辑</li>
-          <li>Manus 正在工作：开发图片输出和导出功能</li>
-          <li>验证插件功能是否正常</li>
-          <li>报告并将插件发送给用户</li>
+          <li>扫描目录结构和文件依赖关系</li>
+          <li>识别路由层级和页面组件</li>
+          <li>检测 Server/Client Component 使用情况</li>
+          <li>分析 Data Fetching 模式和缓存策略</li>
+          <li>生成项目架构分析报告</li>
         </ul>
       ),
     },
     {
       id: 'format',
-      toolName: '代码格式化',
-      toolTarget: '格式化 TypeScript 文件',
-      time: '3',
-      errorMessage: '网络请求异常，工具调用失败',
+      toolName: 'eslint_fix',
+      toolTarget: '修复 TypeScript 类型错误',
+      time: '1.5',
+      errorMessage: '检测到 3 个无法自动修复的类型错误，需要手动处理',
       status: 'error' as const,
     },
     {
       id: 'test',
-      toolName: '单元测试',
+      toolName: 'run_tests',
       toolTarget: (
         <Space size={8}>
-          <span>运行 Jest 测试套件</span>
-          <span>2.3s</span>
+          <span>执行 Vitest 测试套件</span>
+          <span>4.2s</span>
         </Space>
       ),
-      time: '3',
+      time: '4.2',
       status: 'idle' as const,
     },
     {
-      id: 'test2',
-      toolName: '工具类/工具名称',
+      id: 'deploy',
+      toolName: 'create_pr',
       toolTarget: (
         <Space size={8}>
-          <span>操作对象</span>
-          <span>2.3s</span>
+          <span>创建 Pull Request</span>
+          <span>1.0s</span>
         </Space>
       ),
       status: 'idle' as const,
     },
     {
-      id: 'test3',
-      toolName: '工具类/工具名称',
-      toolTarget: '操作对象',
-      status: 'idle' as const,
-    },
-    {
-      id: 'test4',
-      toolName: '工具类/工具名称',
-      toolTarget: '操作对象',
+      id: 'notify',
+      toolName: 'send_notification',
+      toolTarget: '通知代码审查人员',
       status: 'idle' as const,
     },
   ];
@@ -114,25 +108,6 @@ const ToolUseBarBasicDemo = () => {
           onToolClick={handleToolClick}
           light={true}
         />
-      </div>
-
-      <div style={{ marginTop: '20px' }}>
-        <h4>Props 说明：</h4>
-        <ul>
-          <li>
-            <strong>tools</strong>: 工具列表数组，每个工具包含
-            id、toolName、toolTarget、time、status 等属性
-          </li>
-          <li>
-            <strong>activeKeys</strong>: 当前激活的工具 ID 数组
-          </li>
-          <li>
-            <strong>onActiveKeysChange</strong>: 激活工具变化时的回调函数
-          </li>
-          <li>
-            <strong>onToolClick</strong>: 点击工具项时的回调函数
-          </li>
-        </ul>
       </div>
     </div>
   );

@@ -8,22 +8,22 @@ const Demo = () => {
   const [suggestions] = useState([
     {
       id: '1',
-      label: '搜索2025年稳定币市场规模数据',
+      label: '搜索 2025 年大语言模型技术趋势报告',
       count: 3,
     },
     {
       id: '2',
-      label: '搜索USDT USDC BUSD 最新发行量',
+      label: '搜索 GPT-4o Claude Gemini 模型能力对比',
       count: 3,
     },
     {
       id: '3',
-      label: '搜索全球主要司法管辖区稳定币监管政策动态 2025',
+      label: '搜索 AI Agent 框架选型与最佳实践',
       count: 3,
     },
     {
       id: '4',
-      label: '搜索最近3个月稳定币市场波动性数据',
+      label: '搜索 RAG 检索增强生成技术最新进展',
       count: 3,
     },
   ]);
@@ -32,84 +32,82 @@ const Demo = () => {
     '1': [
       {
         id: '1-1',
-        title: '2025年稳定币市场规模预测报告',
-        site: 'www.report.com',
-        url: 'https://www.report.com',
+        title: '2025 年大语言模型技术趋势白皮书',
+        site: 'arxiv.org',
+        url: 'https://arxiv.org',
       },
       {
         id: '1-2',
-        title: '全球稳定币市场分析',
-        site: 'www.analysis.com',
-        url: 'https://www.analysis.com',
+        title: 'State of AI Report 2025 — AI 行业全景分析',
+        site: 'www.stateof.ai',
+        url: 'https://www.stateof.ai',
       },
       {
         id: '1-3',
-        title: '稳定币发展趋势',
-        site: 'www.trend.com',
-        url: 'https://www.trend.com',
+        title: 'LLM 发展路线图：从预训练到多模态',
+        site: 'huggingface.co',
+        url: 'https://huggingface.co',
       },
     ],
     '2': [
       {
         id: '2-1',
-        title: 'USDT 和USDC 的总量达到了2050 亿美元— 2025 年稳定币发生了什么',
-        site: 'www.binance.com',
-        url: 'https://www.binance.com',
-        icon: 'https://bin.bnbstatic.com/static/images/common/favicon.ico',
+        title: 'GPT-4o vs Claude 3.5 vs Gemini 2.0 全面基准测试',
+        site: 'lmsys.org',
+        url: 'https://lmsys.org',
+        icon: 'https://lmsys.org/favicon.ico',
       },
       {
         id: '2-2',
-        title: '全球usdt的总量有多少？ 2025年最新数据别被FUD带偏了-多特软件站',
-        site: 'm.duote.com',
-        url: 'https://m.duote.com',
-        icon: 'https://www.duote.com/favicon.ico',
+        title: '主流大模型在代码生成任务上的性能对比评测',
+        site: 'evalplus.github.io',
+        url: 'https://evalplus.github.io',
       },
       {
         id: '2-3',
-        title: '全球USDT目前发行的总量:2025年最新数据解析',
-        site: 'www.duote.com',
-        url: 'https://www.duote.com',
-        icon: 'https://www.duote.com/favicon.ico',
+        title: '企业级 LLM 选型指南：成本、延迟与质量的平衡',
+        site: 'www.anthropic.com',
+        url: 'https://www.anthropic.com',
       },
     ],
     '3': [
       {
         id: '3-1',
-        title: '2025年全球稳定币监管政策概览',
-        site: 'www.policy.com',
-        url: 'https://www.policy.com',
+        title: 'LangChain vs CrewAI vs AutoGen：多智能体框架深度对比',
+        site: 'blog.langchain.dev',
+        url: 'https://blog.langchain.dev',
       },
       {
         id: '3-2',
-        title: '主要司法管辖区稳定币法规',
-        site: 'www.law.com',
-        url: 'https://www.law.com',
+        title: 'Building Production AI Agents — 实战经验总结',
+        site: 'docs.anthropic.com',
+        url: 'https://docs.anthropic.com',
       },
       {
         id: '3-3',
-        title: '监管动态更新',
-        site: 'www.news.com',
-        url: 'https://www.news.com',
+        title: 'AI Agent 设计模式与架构最佳实践',
+        site: 'www.deeplearning.ai',
+        url: 'https://www.deeplearning.ai',
       },
     ],
     '4': [
       {
         id: '4-1',
-        title: '近3个月稳定币波动性分析',
-        site: 'www.volatility.com',
-        url: 'https://www.volatility.com',
+        title: 'RAG 技术演进：从基础检索到 Agentic RAG',
+        site: 'arxiv.org',
+        url: 'https://arxiv.org',
       },
       {
         id: '4-2',
-        title: '市场数据报告',
-        site: 'www.marketdata.com',
-        url: 'https://www.marketdata.com',
+        title: '向量数据库选型对比：Milvus、Pinecone、Weaviate',
+        site: 'benchmark.vectorview.ai',
+        url: 'https://benchmark.vectorview.ai',
       },
       {
         id: '4-3',
-        title: '稳定币价格走势',
-        site: 'www.price.com',
-        url: 'https://www.price.com',
+        title: '企业知识库 RAG 方案落地实践',
+        site: 'www.llamaindex.ai',
+        url: 'https://www.llamaindex.ai',
       },
     ],
   };
@@ -143,7 +141,7 @@ const Demo = () => {
   return (
     <div style={{ height: 600, width: '100%' }}>
       <Workspace
-        title="开发工作空间"
+        title="AI 研究助手工作台"
         onTabChange={(key: string) => console.log('切换到标签页:', key)}
         onClose={() => console.log('关闭工作空间')}
       >
@@ -156,7 +154,7 @@ const Demo = () => {
           data={{
             type: 'md',
             content: mdContent,
-            title: '深度思考',
+            title: '深度分析报告',
           }}
         />
 
@@ -170,39 +168,38 @@ const Demo = () => {
             items: [
               {
                 key: '1',
-                title: '创建全面的 Tesla 股票分析任务列表',
+                title: '收集各大模型的基准测试数据',
                 status: 'success',
               },
               {
                 key: '2',
-                title: '下载指定的Bilibili视频分集并确保唯一文件名',
+                title: '下载并解析目标论文 PDF 全文',
                 content: (
                   <div>
-                    任务已停止
+                    PDF 解析失败：文件格式不支持
                     <QuestionCircleOutlined style={{ marginLeft: 4 }} />
                   </div>
                 ),
                 status: 'error',
               },
-
               {
                 key: '3',
-                title: '提取下载的视频帧',
+                title: '对比分析各框架的核心特性差异',
                 status: 'loading',
               },
               {
                 key: '4',
-                title: '对提取的视频帧进行文字识别',
+                title: '生成技术选型建议矩阵',
                 status: 'pending',
               },
               {
                 key: '5',
-                title: '筛选掉OCR识别结果为乱码的图片',
+                title: '撰写最终分析报告文档',
                 status: 'pending',
               },
               {
                 key: '6',
-                title: '报告结果并将Word文档发送给用户',
+                title: '导出报告并通知相关人员',
                 status: 'pending',
               },
             ],
@@ -228,52 +225,52 @@ const Demo = () => {
           nodes={[
             {
               id: '1',
-              name: '项目计划.txt',
-              size: '2.5MB',
-              lastModified: '2025-08-11 10:00:00',
-              url: '/docs/project-plan.txt',
+              name: 'AI技术选型分析报告.md',
+              size: '45KB',
+              lastModified: '2025-02-10 09:30:00',
+              url: '/docs/ai-tech-report.md',
               displayType: 'txt',
             },
             {
               id: '2',
-              name: '数据分析.xlsx',
+              name: '模型评测数据汇总.xlsx',
               type: 'excel',
-              size: '1.8MB',
-              lastModified: '2025-08-11 10:00:00',
-              url: '/docs/data-analysis.xlsx',
+              size: '1.2MB',
+              lastModified: '2025-02-10 09:15:00',
+              url: '/docs/benchmark-data.xlsx',
             },
             {
               id: '3',
-              name: '技术文档.pdf',
+              name: 'LLM技术白皮书-2025.pdf',
               type: 'pdf',
-              size: '3.2MB',
-              lastModified: '2025-08-11 10:00:00',
-              url: '/docs/technical-doc.pdf',
+              size: '3.8MB',
+              lastModified: '2025-02-09 16:00:00',
+              url: '/docs/llm-whitepaper.pdf',
             },
             {
               id: '4',
-              name: '系统架构图.png',
+              name: '框架架构对比图.png',
               type: 'image',
-              size: '0.5MB',
-              lastModified: '2025-08-11 10:00:00',
-              url: '/images/architecture.png',
+              size: '680KB',
+              lastModified: '2025-02-09 14:30:00',
+              url: '/images/framework-comparison.png',
             },
             {
               id: '5',
-              name: '接口文档.md',
+              name: 'RAG实践笔记.md',
               type: 'markdown',
-              size: '0.3MB',
-              lastModified: '2025-08-11 10:00:00',
-              url: '/docs/api.md',
+              size: '28KB',
+              lastModified: '2025-02-08 11:00:00',
+              url: '/docs/rag-notes.md',
             },
             {
               id: '6',
-              name: '配置说明.html',
+              name: 'API接口文档.html',
               type: 'code',
-              size: '0.1MB',
-              lastModified: '2025-08-11 10:00:00',
+              size: '15KB',
+              lastModified: '2025-02-08 09:00:00',
               content:
-                '<!DOCTYPE html><html><body><h1>Hello</h1></body></html>',
+                '<!DOCTYPE html><html><body><h1>API Reference</h1><p>AI Agent API Documentation</p></body></html>',
             },
           ]}
         />

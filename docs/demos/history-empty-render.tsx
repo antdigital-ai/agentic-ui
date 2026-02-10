@@ -14,7 +14,7 @@ const HistoryEmptyRenderDemo = () => {
       {
         id: '1',
         sessionId: 'session-1',
-        sessionTitle: '这是一个有数据的示例',
+        sessionTitle: '帮我分析这份销售数据的趋势',
         agentId: 'demo-agent',
         gmtCreate: Date.now(),
         gmtLastConverse: Date.now(),
@@ -28,14 +28,14 @@ const HistoryEmptyRenderDemo = () => {
   };
 
   const items = [
-    { key: '1', text: '💸 关税对消费类基金的影响' },
+    { key: '1', text: '📊 帮我分析最近的行业市场数据' },
     {
       key: '2',
-      text: '📝 恒生科技指数基金相关新闻',
+      text: '📝 生成一份项目周报总结',
     },
     {
       key: '3',
-      text: '📊 数据分析与可视化',
+      text: '🔍 对比几款主流 AI 编程助手',
     },
   ];
 
@@ -120,7 +120,7 @@ const HistoryEmptyRenderDemo = () => {
             searchOptions: {
               placeholder: '搜索历史记录',
               text: '历史对话',
-              trigger: 'enter', // 回车触发搜索
+              trigger: 'enter',
             },
           }}
           onClick={(sessionId, item) => {
@@ -128,22 +128,6 @@ const HistoryEmptyRenderDemo = () => {
             setCurrentSessionId(sessionId);
           }}
         />
-      </div>
-
-      <div style={{ marginTop: 20 }}>
-        <h4>功能说明：</h4>
-        <ul style={{ color: 'var(--color-gray-text-secondary)', fontSize: 14 }}>
-          <li>
-            <strong>emptyRender</strong>: 当历史记录为空时，显示自定义空状态组件
-          </li>
-          <li>
-            <strong>searchOptions.trigger</strong>: 配置搜索触发方式
-            <ul>
-              <li>'change' (默认): 输入时实时搜索（防抖 360ms）</li>
-              <li>'enter': 按回车键时触发搜索</li>
-            </ul>
-          </li>
-        </ul>
       </div>
     </div>
   );
