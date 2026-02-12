@@ -1,10 +1,64 @@
-import { Eye, FileFailed, FileUploadingSpin } from '@sofa-design/icons';
+import { Eye, FileFailed, FileUploadingSpin, Play } from '@sofa-design/icons';
 import { Image } from 'antd';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { getFileTypeIcon } from '../../../Workspace/File/utils';
 import { FileType } from '../../../Workspace/types';
 import { AttachmentFile } from '../types';
-import { isImageFile } from '../utils';
+import { isImageFile, isVideoFile } from '../utils';
+
+const VideoThumbnail: React.FC<{
+  src: string;
+  className: string;
+  style: React.CSSProperties;
+  isObjectUrl?: boolean;
+}> = ({ src, className, style, isObjectUrl }) => {
+  useEffect(() => {
+    return () => {
+      if (isObjectUrl && src) {
+        URL.revokeObjectURL(src);
+      }
+    };
+  }, [isObjectUrl, src]);
+
+  return (
+    <div
+      className={className}
+      style={{
+        ...style,
+        position: 'relative',
+        overflow: 'hidden',
+        borderRadius: 'var(--radius-base)',
+        flexShrink: 0,
+      }}
+    >
+      <video
+        src={src}
+        preload="metadata"
+        muted
+        playsInline
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          display: 'block',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(0, 0, 0, 0.35)',
+          pointerEvents: 'none',
+        }}
+      >
+        <Play style={{ width: 24, height: 24, color: '#fff' }} />
+      </div>
+    </div>
+  );
+};
 
 /**
  * AttachmentFileIcon 组件 - 附件文件图标组件
@@ -82,6 +136,22 @@ export const AttachmentFileIcon: React.FC<{
         alt={file.name}
       />
     );
+  }
+
+  // 视频文件缩略图预览（与图片类似，带播放按钮）
+  if (isVideoFile(file)) {
+    const videoUrl =
+      file.previewUrl || file.url || (file.size ? URL.createObjectURL(file) : '');
+    if (videoUrl) {
+      return (
+        <VideoThumbnail
+          src={videoUrl}
+          className={className}
+          style={IMAGE_STYLE}
+          isObjectUrl={!file.previewUrl && !file.url}
+        />
+      );
+    }
   }
 
   // 其他类型文件图标

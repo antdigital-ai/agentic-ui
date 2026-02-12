@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   isImageFile,
+  isMediaFile,
+  isVideoFile,
   kbToSize,
 } from '../../../src/MarkdownInputField/AttachmentButton/utils';
 
@@ -96,6 +98,59 @@ describe('AttachmentButton Utils', () => {
         type: 'application/unknown',
       });
       expect(isImageFile(unknownFile)).toBe(false);
+    });
+  });
+
+  describe('isVideoFile', () => {
+    it('应该正确识别视频文件', () => {
+      const mp4File = new File([''], 'video.mp4', { type: 'video/mp4' });
+      const webmFile = new File([''], 'video.webm', { type: 'video/webm' });
+      const movFile = new File([''], 'clip.mov', { type: 'video/quicktime' });
+
+      expect(isVideoFile(mp4File)).toBe(true);
+      expect(isVideoFile(webmFile)).toBe(true);
+      expect(isVideoFile(movFile)).toBe(true);
+    });
+
+    it('应该根据扩展名识别视频', () => {
+      const mp4ByName = new File([''], 'demo.mp4', { type: '' });
+      const webmByName = new File([''], 'tutorial.webm', { type: 'application/octet-stream' });
+
+      expect(isVideoFile(mp4ByName)).toBe(true);
+      expect(isVideoFile(webmByName)).toBe(true);
+    });
+
+    it('应该根据 URL 识别 AttachmentFile 中的视频', () => {
+      const fileWithVideoUrl = new File([''], 'file', { type: '' }) as File & {
+        url?: string;
+        previewUrl?: string;
+      };
+      fileWithVideoUrl.previewUrl = 'https://example.com/demo.mp4';
+
+      expect(isVideoFile(fileWithVideoUrl)).toBe(true);
+    });
+
+    it('应该正确识别非视频文件', () => {
+      const pdfFile = new File([''], 'doc.pdf', { type: 'application/pdf' });
+      const imageFile = new File([''], 'img.png', { type: 'image/png' });
+
+      expect(isVideoFile(pdfFile)).toBe(false);
+      expect(isVideoFile(imageFile)).toBe(false);
+    });
+  });
+
+  describe('isMediaFile', () => {
+    it('应该识别图片和视频为媒体文件', () => {
+      const pngFile = new File([''], 'img.png', { type: 'image/png' });
+      const mp4File = new File([''], 'video.mp4', { type: 'video/mp4' });
+
+      expect(isMediaFile(pngFile)).toBe(true);
+      expect(isMediaFile(mp4File)).toBe(true);
+    });
+
+    it('应该识别非媒体文件', () => {
+      const pdfFile = new File([''], 'doc.pdf', { type: 'application/pdf' });
+      expect(isMediaFile(pdfFile)).toBe(false);
     });
   });
 });
