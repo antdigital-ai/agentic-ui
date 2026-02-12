@@ -208,8 +208,8 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           animate="visible"
           className={classNames(
             `${prefix}-video-row`,
+            `${prefix}-video-row-${placement}`,
             hashId,
-            `${prefix}-${placement}`,
           )}
           style={props.style}
         >

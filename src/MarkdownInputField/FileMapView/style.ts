@@ -99,7 +99,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         flexDirection: 'column',
         gap: 8,
-        width: '100%',
+        width: 'fit-content',
+        '&-right': {
+          alignSelf: 'flex-end',
+        },
       },
       '&-video-thumb': {
         position: 'relative',
