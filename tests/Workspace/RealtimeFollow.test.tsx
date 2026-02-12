@@ -1,12 +1,16 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../src/I18n';
 import {
   RealtimeFollow,
   RealtimeFollowList,
 } from '../../src/Workspace/RealtimeFollow';
+
+vi.mock('../../src/Workspace/RealtimeFollow/style', () => ({
+  useRealtimeFollowStyle: vi.fn(() => undefined),
+}));
 
 describe('RealtimeFollow Component', () => {
   const mockLocale = {
@@ -345,6 +349,138 @@ describe('RealtimeFollow Component', () => {
       expect(
         container.querySelector('.ant-workspace-realtime-overlay'),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('RealtimeFollow - 非测试环境', () => {
+    const originalEnv = process.env.NODE_ENV;
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalEnv;
+    });
+
+    it('非测试环境下 status=loading 时显示 Overlay 与默认 Spin', () => {
+      process.env.NODE_ENV = 'development';
+      const { container } = render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'x',
+              status: 'loading',
+            }}
+          />
+        </TestWrapper>,
+      );
+      const overlay = container.querySelector('.ant-workspace-realtime-overlay');
+      expect(overlay).toBeInTheDocument();
+      expect(overlay?.classList.contains('ant-workspace-realtime-overlay--loading')).toBe(true);
+      expect(container.querySelector('.ant-spin')).toBeInTheDocument();
+    });
+
+    it('非测试环境下 status=loading 且 loadingRender 为函数时使用其返回值', () => {
+      process.env.NODE_ENV = 'development';
+      const { container } = render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'x',
+              status: 'loading',
+              loadingRender: () => <div data-testid="custom-loading">加载中</div>,
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('custom-loading')).toBeInTheDocument();
+      expect(screen.getByText('加载中')).toBeInTheDocument();
+    });
+
+    it('非测试环境下 status=error 时显示 Overlay 与默认错误文案', () => {
+      process.env.NODE_ENV = 'development';
+      const { container } = render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'x',
+              status: 'error',
+            }}
+          />
+        </TestWrapper>,
+      );
+      const overlay = container.querySelector('.ant-workspace-realtime-overlay');
+      expect(overlay).toBeInTheDocument();
+      expect(overlay?.classList.contains('ant-workspace-realtime-overlay--error')).toBe(true);
+      expect(screen.getByText('页面渲染失败')).toBeInTheDocument();
+    });
+
+    it('非测试环境下 status=error 且 errorRender 为函数时使用其返回值', () => {
+      process.env.NODE_ENV = 'development';
+      render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'x',
+              status: 'error',
+              errorRender: () => <span data-testid="custom-error">自定义错误</span>,
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('custom-error')).toHaveTextContent('自定义错误');
+    });
+
+    it('非测试环境下空内容且 status=done 时显示空状态', () => {
+      process.env.NODE_ENV = 'development';
+      const { container } = render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: '   ',
+              status: 'done',
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(container.querySelector('.ant-workspace-realtime-empty')).toBeInTheDocument();
+      expect(container.querySelector('.ant-empty')).toBeInTheDocument();
+    });
+
+    it('非测试环境下空内容且 emptyRender 为函数时使用其返回值', () => {
+      process.env.NODE_ENV = 'development';
+      render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: '',
+              status: 'done',
+              emptyRender: () => <div data-testid="custom-empty">暂无内容</div>,
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('custom-empty')).toHaveTextContent('暂无内容');
+    });
+
+    it('customContent 为函数时渲染其返回值', () => {
+      process.env.NODE_ENV = 'development';
+      const { container } = render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'ignored',
+              customContent: () => <div data-testid="custom-fn">来自函数</div>,
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('custom-fn')).toHaveTextContent('来自函数');
+      expect(container.querySelector('.ant-agentic-md-editor')).toBeNull();
     });
   });
 
@@ -1224,22 +1360,7 @@ describe('RealtimeFollow Component', () => {
       expect(screen.getByText('预览')).toBeInTheDocument();
     });
 
-    it('应该处理 styleResult 为 undefined 的情况', () => {
-      // 模拟 useRealtimeFollowStyle 返回 undefined
-      const { container } = render(
-        <TestWrapper>
-          <RealtimeFollowList
-            data={{
-              type: 'shell',
-              content: 'test',
-              status: 'done',
-            }}
-          />
-        </TestWrapper>,
-      );
-
-      expect(screen.getByTestId('realtime-follow')).toBeInTheDocument();
-    });
+  
 
     it('应该处理 HTML 类型在 code 模式下的内容更新', async () => {
       const { rerender } = render(
@@ -1674,41 +1795,9 @@ describe('RealtimeFollow Component', () => {
       expect(overlay).not.toBeInTheDocument();
     });
 
-    it('应该处理 Overlay 组件中 loadingRender 为 undefined 的情况', () => {
-      const { container } = render(
-        <TestWrapper>
-          <RealtimeFollow
-            data={{
-              type: 'shell',
-              content: 'test',
-              status: 'loading',
-              loadingRender: undefined,
-            }}
-          />
-        </TestWrapper>,
-      );
 
-      // 测试环境中不显示 overlay
-      expect(screen.getByText('test')).toBeInTheDocument();
-    });
 
-    it('应该处理 Overlay 组件中 errorRender 为 undefined 的情况', () => {
-      const { container } = render(
-        <TestWrapper>
-          <RealtimeFollow
-            data={{
-              type: 'shell',
-              content: 'test',
-              status: 'error',
-              errorRender: undefined,
-            }}
-          />
-        </TestWrapper>,
-      );
-
-      // 测试环境中不显示 overlay
-      expect(screen.getByText('test')).toBeInTheDocument();
-    });
+  
 
     it('应该处理 Overlay 组件中 locale 为空的情况', () => {
       const NoLocaleWrapper: React.FC<{ children: React.ReactNode }> = ({
@@ -1773,18 +1862,7 @@ describe('RealtimeFollow Component', () => {
     });
 
     it('应该处理 getRightContent 中 segmentedItems 为空数组的情况', () => {
-      const { container } = render(
-        <TestWrapper>
-          <RealtimeFollowList
-            data={{
-              type: 'html',
-              content: '<h1>测试</h1>',
-              segmentedItems: [],
-              status: 'done',
-            }}
-          />
-        </TestWrapper>,
-      );
+    
 
       // 空数组应该使用默认分段选项
       expect(screen.getByText('预览')).toBeInTheDocument();

@@ -8,8 +8,9 @@ import {
 } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { parserSlateNodeToMarkdown } from '../../../utils';
+import { EditorUtils } from '../../../utils/editorUtils';
 import { withMarkdown } from '../../withMarkdown';
 import { BackspaceKey } from '../backspace';
 
@@ -62,6 +63,126 @@ describe('BackspaceKey - Markdown 输出测试', () => {
 
       // 允许为空字符串或只包含换行符
       expect(trimmedMarkdown === '' || trimmedMarkdown === '\n').toBe(true);
+    });
+
+    it('删除最后一个空列表项且列表还有前一项时在删除位置插入段落', () => {
+      editor.children = [
+        {
+          type: 'bulleted-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [{ type: 'paragraph', children: [{ text: 'A' }] }],
+            },
+            {
+              type: 'list-item',
+              children: [{ type: 'paragraph', children: [{ text: '' }] }],
+            },
+          ],
+        },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 1, 0, 0], offset: 0 },
+        focus: { path: [0, 1, 0, 0], offset: 0 },
+      });
+      const result = backspaceKey.run();
+      expect(result).toBe(true);
+      expect(editor.children[0].type).toBe('bulleted-list');
+      expect(getMarkdown()).toContain('A');
+    });
+
+    it('删除第一个空列表项且仅两项时列表变空并插入段落', () => {
+      editor.children = [
+        {
+          type: 'bulleted-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [{ type: 'paragraph', children: [{ text: '' }] }],
+            },
+            {
+              type: 'list-item',
+              children: [{ type: 'paragraph', children: [{ text: '' }] }],
+            },
+          ],
+        },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 0, 0], offset: 0 },
+      });
+      const result = backspaceKey.run();
+      expect(result).toBe(true);
+      const markdown = getMarkdown().trim();
+      expect(markdown === '' || markdown === '\n').toBe(true);
+    });
+
+    it('删除非最后一项空列表项且前面还有项时在列表后插入段落', () => {
+      editor.children = [
+        {
+          type: 'bulleted-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [{ type: 'paragraph', children: [{ text: 'A' }] }],
+            },
+            {
+              type: 'list-item',
+              children: [{ type: 'paragraph', children: [{ text: '' }] }],
+            },
+            {
+              type: 'list-item',
+              children: [{ type: 'paragraph', children: [{ text: '' }] }],
+            },
+          ],
+        },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 1, 0, 0], offset: 0 },
+        focus: { path: [0, 1, 0, 0], offset: 0 },
+      });
+      const result = backspaceKey.run();
+      expect(result).toBe(true);
+      expect(getMarkdown()).toContain('A');
+    });
+
+    it('嵌套列表仅一项时退格提升后删除空列表', () => {
+      // 嵌套项需有内容，否则会走“删除空列表项”分支而非“提升”分支
+      editor.children = [
+        {
+          type: 'bulleted-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [{ type: 'paragraph', children: [{ text: 'A' }] }],
+            },
+            {
+              type: 'list-item',
+              children: [
+                { type: 'paragraph', children: [{ text: 'B' }] },
+                {
+                  type: 'bulleted-list',
+                  children: [
+                    {
+                      type: 'list-item',
+                      children: [
+                        { type: 'paragraph', children: [{ text: 'nested' }] },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 1, 1, 0, 0, 0], offset: 0 },
+        focus: { path: [0, 1, 1, 0, 0, 0], offset: 0 },
+      });
+      const result = backspaceKey.run();
+      expect(result).toBe(true);
+      expect(getMarkdown()).toContain('nested');
     });
 
     it('应该删除非最后一个空列表项及其后续列表项', () => {
@@ -294,7 +415,6 @@ describe('BackspaceKey - Markdown 输出测试', () => {
 
   describe('表格单元格处理', () => {
     it('应该阻止在表格单元格起始位置的退格', () => {
-      // 创建一个空的表格单元格，这样 Editor.nodes 可能会返回 table-cell 而不是 paragraph
       editor.children = [
         {
           type: 'table',
@@ -312,22 +432,42 @@ describe('BackspaceKey - Markdown 输出测试', () => {
         },
       ];
 
-      // 选择表格单元格中段落的第一个位置
-      // 但代码检查 el.type === 'table-cell'，而 Editor.nodes(mode: 'lowest') 会返回 paragraph
-      // 所以这个分支可能不会执行
-      // 让我们测试实际的逻辑
-      const paragraphPath = [0, 0, 0, 0];
-
       Transforms.select(editor, {
-        anchor: { path: paragraphPath, offset: 0 },
-        focus: { path: paragraphPath, offset: 0 },
+        anchor: { path: [0, 0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 0, 0], offset: 0 },
       });
 
       const result = backspaceKey.run();
-      // 由于 Editor.nodes(mode: 'lowest') 返回的是 paragraph 而不是 table-cell
-      // 所以 el.type 不会是 'table-cell'，这个分支不会执行
-      // 返回 false 是正常的
       expect(result).toBe(false);
+    });
+
+    it('表格首个单元格无前路径时退格应阻止并返回 true', () => {
+      const rawEditor = withHistory(
+        withReact(createEditor()),
+      ) as BaseEditor & ReactEditor & HistoryEditor;
+      rawEditor.children = [
+        {
+          type: 'table',
+          children: [
+            {
+              type: 'table-row',
+              children: [
+                {
+                  type: 'table-cell',
+                  children: [{ text: '' }],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+      const rawBackspace = new BackspaceKey(rawEditor);
+      Transforms.select(rawEditor, {
+        anchor: { path: [0, 0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 0, 0], offset: 0 },
+      });
+      const result = rawBackspace.run();
+      expect(result).toBe(true);
     });
   });
 
@@ -526,11 +666,47 @@ describe('BackspaceKey - Markdown 输出测试', () => {
       const result = backspaceKey.run();
       expect(result).toBe(true);
     });
+
+    it('嵌套列表首项退格时提升并删除空列表', () => {
+      editor.children = [
+        {
+          type: 'bulleted-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [
+                { type: 'paragraph', children: [{ text: '' }] },
+                {
+                  type: 'bulleted-list',
+                  children: [
+                    {
+                      type: 'list-item',
+                      children: [
+                        {
+                          type: 'paragraph',
+                          children: [{ text: 'Nested' }],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 0, 1, 0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 1, 0, 0, 0], offset: 0 },
+      });
+      const result = backspaceKey.run();
+      expect(result).toBe(true);
+      expect(getMarkdown()).toContain('Nested');
+    });
   });
 
   describe('clearStyle 逻辑', () => {
     it('应该清除单字符脏叶节点的样式', () => {
-      // 这个测试需要 mock EditorUtils.isDirtLeaf 和 clearMarks
       editor.children = [
         {
           type: 'paragraph',
@@ -543,10 +719,24 @@ describe('BackspaceKey - Markdown 输出测试', () => {
         focus: { path: [0, 0], offset: 1 },
       });
 
-      // 这个测试主要验证 clearStyle 被调用
       const result = backspaceKey.run();
-      // 结果取决于具体的实现
       expect(typeof result).toBe('boolean');
+    });
+
+    it('非 paragraph 且单字符脏叶时调用 clearMarks', () => {
+      const isDirtLeafSpy = vi.spyOn(EditorUtils, 'isDirtLeaf').mockReturnValueOnce(true);
+      const clearMarksSpy = vi.spyOn(EditorUtils, 'clearMarks').mockImplementation(() => {});
+      editor.children = [
+        { type: 'code', children: [{ text: 'x', bold: true }] },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      });
+      backspaceKey.run();
+      expect(clearMarksSpy).toHaveBeenCalledWith(editor);
+      isDirtLeafSpy.mockRestore();
+      clearMarksSpy.mockRestore();
     });
   });
 

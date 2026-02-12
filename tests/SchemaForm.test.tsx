@@ -494,6 +494,30 @@ describe('SchemaForm', () => {
     expect(document.querySelector('form')).toBeInTheDocument();
   });
 
+  it('renders Input for unknown property type (default branch in renderBasicFormItem)', () => {
+    // 使用非 string/number 的类型（如 integer）触发 renderBasicFormItem 的 default 分支
+    const schemaWithUnknownType: LowCodeSchema = {
+      ...mockSchema,
+      component: {
+        properties: {
+          customField: {
+            type: 'integer' as 'number',
+            title: '自定义整型',
+            description: '走 default 分支',
+          },
+        },
+      },
+    };
+
+    render(<SchemaForm schema={schemaWithUnknownType} />);
+
+    expect(screen.getByText('自定义整型')).toBeInTheDocument();
+    // default 分支渲染的是 Input，应存在占位符
+    expect(
+      screen.getByPlaceholderText(/请输入.*自定义整型/),
+    ).toBeInTheDocument();
+  });
+
   // New test cases for optimized code
   describe('Edge Cases and Optimized Features', () => {
     it('handles array without items definition', async () => {

@@ -18,9 +18,11 @@ import { ReactEditor, withReact } from 'slate-react';
 import type { Plugin } from 'unified';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { parserMdToSchema } from '../../src';
+import * as parserMdToSchemaModule from '../../src/MarkdownEditor/editor/parser/parserMdToSchema';
 import { fixStrongWithSpecialChars } from '../../src/MarkdownEditor/editor/parser/remarkParse';
 import { withMarkdown } from '../../src/MarkdownEditor/editor/plugins/withMarkdown';
 import { EditorStore } from '../../src/MarkdownEditor/editor/store';
+import * as editorUtils from '../../src/MarkdownEditor/editor/utils';
 import type { MarkdownToHtmlOptions } from '../../src/MarkdownEditor/editor/utils/markdownToHtml';
 import * as markdownToHtmlUtils from '../../src/MarkdownEditor/editor/utils/markdownToHtml';
 
@@ -420,7 +422,7 @@ describe('EditorStore', () => {
       // Mock Transforms 来确保它们能够正确更新 editor.children
       const originalInsertNodes = Transforms.insertNodes;
       const originalRemoveNodes = Transforms.removeNodes;
-      
+
       Transforms.insertNodes = vi.fn((editor, nodes, options) => {
         if (options?.at) {
           const at = options.at[0];
@@ -437,7 +439,7 @@ describe('EditorStore', () => {
           }
         }
       });
-      
+
       Transforms.removeNodes = vi.fn((editor, options) => {
         if (options?.at) {
           const at = options.at[0];
@@ -884,6 +886,169 @@ describe('EditorStore', () => {
         expect.any(Function),
         { once: true },
       );
+    });
+
+    it('draggedElement 为 list-item 时 _getAbleToEnterSet 应返回 list-item 可进入集合', () => {
+      const listItemEl = document.createElement('div');
+      listItemEl.setAttribute('data-be', 'list-item');
+      store.draggedElement = listItemEl as any;
+      const mockContainer = document.createElement('div');
+      vi.spyOn(document, 'querySelectorAll').mockReturnValue([] as any);
+
+      store.dragStart(
+        {
+          stopPropagation: vi.fn(),
+          dataTransfer: { setDragImage: vi.fn() },
+        } as any,
+        mockContainer,
+      );
+
+      expect(store.draggedElement?.dataset?.be).toBe('list-item');
+      store.draggedElement = null;
+      vi.mocked(document.querySelectorAll).mockRestore();
+    });
+  });
+
+  describe('拖拽私有方法 _updateDragMark _shouldIncludeElement', () => {
+    it('_updateDragMark 在 point.el 为 list-item 时应使用加宽 width', () => {
+      const container = document.createElement('div');
+      container.getBoundingClientRect = () => ({ left: 0, top: 0 }) as DOMRect;
+      Object.defineProperty(container, 'scrollTop', { value: 0 });
+      Object.defineProperty(container, 'scrollLeft', { value: 0 });
+      const parent = document.createElement('div');
+      parent.appendChild(container);
+      const listItemEl = document.createElement('div');
+      listItemEl.setAttribute('data-be', 'list-item');
+      Object.defineProperty(listItemEl, 'clientWidth', { value: 100 });
+
+      const mark = (store as any)._updateDragMark(
+        null,
+        { el: listItemEl, direction: 'top', top: 10, left: 0 },
+        container,
+      );
+
+      expect(mark).not.toBeNull();
+      expect(mark.getAttribute('data-move-mark')).toBe('');
+      expect(mark.style.width).toBe('120px');
+    });
+
+    it('_shouldIncludeElement 在 paragraph + list-item 且前兄弟为 data-check-item 时应排除', () => {
+      const paragraphEl = document.createElement('div');
+      paragraphEl.setAttribute('data-be', 'paragraph');
+      const pre = document.createElement('div');
+      pre.setAttribute('data-check-item', '');
+      Object.defineProperty(paragraphEl, 'previousSibling', { get: () => pre });
+      const listItemEl = document.createElement('div');
+      listItemEl.setAttribute('data-be', 'list-item');
+      store.draggedElement = listItemEl as any;
+      const ableToEnter = new Set(['paragraph', 'list-item']);
+
+      const result = (store as any)._shouldIncludeElement(
+        paragraphEl as any,
+        ableToEnter,
+      );
+
+      expect(result).toBe(false);
+      store.draggedElement = null;
+    });
+  });
+
+  describe('_handleDragEnd 与 _moveNode（mock toPath）', () => {
+    it('list-item 拖到 paragraph 时应走 _moveListItemToNonListItem', () => {
+      editor.children = [
+        {
+          type: 'list',
+          children: [{ type: 'list-item', children: [{ text: 'item' }] }],
+        },
+        { type: 'paragraph', children: [{ text: 'target' }] },
+      ];
+      const listItemNode = editor.children[0].children[0] as any;
+      const paragraphNode = editor.children[1] as any;
+      listItemNode.__path = [0, 0];
+      paragraphNode.__path = [1];
+      const dragEl = document.createElement('div');
+      const targetEl = document.createElement('div');
+      (dragEl as any).__node = listItemNode;
+      (targetEl as any).__node = paragraphNode;
+
+      vi.mocked(ReactEditor.toSlateNode).mockImplementation(
+        (_, el: any) => el.__node,
+      );
+      vi.mocked(ReactEditor.findPath).mockImplementation((_, node: any) =>
+        node?.__path ? node.__path : [0],
+      );
+
+      store.draggedElement = dragEl as any;
+      expect(() => {
+        (store as any)._handleDragEnd({
+          el: targetEl,
+          direction: 'top',
+          top: 0,
+          left: 0,
+        });
+      }).not.toThrow();
+      store.draggedElement = null;
+      delete listItemNode.__path;
+      delete paragraphNode.__path;
+      vi.mocked(ReactEditor.toSlateNode).mockReturnValue({
+        type: 'paragraph',
+        children: [{ text: '' }],
+      } as any);
+      vi.mocked(ReactEditor.findPath).mockReturnValue([0]);
+    });
+
+    it('非 list-item 拖到另一位置时应走 moveNodes 与 _cleanupEmptyParent', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'a' }] },
+        { type: 'paragraph', children: [{ text: 'b' }] },
+      ];
+      const dragNode = editor.children[0];
+      const targetNode = editor.children[1];
+      const dragEl = document.createElement('div');
+      const targetEl = document.createElement('div');
+      (dragEl as any).__node = dragNode;
+      (targetEl as any).__node = targetNode;
+
+      vi.mocked(ReactEditor.toSlateNode).mockImplementation(
+        (_, el: any) => el.__node,
+      );
+      vi.mocked(ReactEditor.findPath).mockImplementation((_, node: any) => {
+        if (node === dragNode) return [0];
+        if (node === targetNode) return [1];
+        return [0];
+      });
+
+      store.draggedElement = dragEl as any;
+      (store as any)._handleDragEnd({
+        el: targetEl,
+        direction: 'bottom',
+        top: 0,
+        left: 0,
+      });
+
+      expect(editor.children.length).toBe(2);
+      store.draggedElement = null;
+      vi.mocked(ReactEditor.toSlateNode).mockReturnValue({
+        type: 'paragraph',
+        children: [{ text: '' }],
+      } as any);
+      vi.mocked(ReactEditor.findPath).mockReturnValue([0]);
+    });
+  });
+
+  describe('_cleanupEmptyParent 私有方法', () => {
+    it('parent 仅有一子时应删除 delPath 并触发 Transforms.delete', () => {
+      editor.children = [
+        {
+          type: 'list',
+          children: [{ type: 'list-item', children: [{ text: 'only' }] }],
+        },
+        { type: 'paragraph', children: [{ text: 'p' }] },
+      ];
+      const parent = editor.children[0] as any;
+      (store as any)._cleanupEmptyParent(parent, [0, 0], [1]);
+      expect(editor.children.length).toBe(1);
+      expect(editor.children[0].type).toBe('paragraph');
     });
   });
 
@@ -2015,6 +2180,488 @@ describe('EditorStore', () => {
       expect(result).toBeUndefined();
       expect(rafSpy).not.toHaveBeenCalled();
 
+      vi.restoreAllMocks();
+    });
+  });
+
+  describe('insertLink 在 code/table/head 节点时插入到下一段', () => {
+    it('当前节点为 code 时应在下一位置插入段落链接', () => {
+      editor.children = [
+        { type: 'code', language: 'js', children: [{ text: '' }] },
+        { type: 'paragraph', children: [{ text: '' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+
+      vi.spyOn(Editor, 'nodes').mockImplementation(function* () {
+        yield [
+          { type: 'code', language: 'js', children: [{ text: '' }] },
+          [0],
+        ] as any;
+      });
+      vi.spyOn(Path, 'next').mockReturnValue([1]);
+
+      store.insertLink('https://link.com');
+
+      expect(Transforms.insertNodes).toHaveBeenCalledWith(
+        editor,
+        {
+          type: 'paragraph',
+          children: [{ text: 'https://link.com', url: 'https://link.com' }],
+        },
+        expect.objectContaining({ at: [1], select: true }),
+      );
+    });
+  });
+
+  describe('_shouldSkipSetContent 与 setMDContent 异常分支', () => {
+    it('_shouldSkipSetContent 比较抛错时应继续设置内容', () => {
+      const parserSpy = vi.spyOn(editorUtils, 'parserSlateNodeToMarkdown');
+      parserSpy.mockImplementationOnce(() => {
+        throw new Error('compare error');
+      });
+      store.setMDContent('# new');
+      expect(editor.children.length).toBeGreaterThan(0);
+      parserSpy.mockRestore();
+    });
+
+    it('cancelSetMDContent 应取消进行中的 setMDContent', async () => {
+      const longContent = Array(120)
+        .fill(0)
+        .map(
+          (_, i) =>
+            `段落${i}：足够长的内容以触发长文本拆分，需要超过五千字符才能进入 RAF 分支，这里增加足够多的文字以满足长度要求。`,
+        )
+        .join('\n\n');
+      expect(longContent.length).toBeGreaterThan(5000);
+      vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+        setTimeout(() => cb(0), 0);
+        return 1;
+      });
+      const promise = store.setMDContent(longContent, undefined, {
+        useRAF: true,
+        batchSize: 10,
+      });
+      expect(promise).toBeInstanceOf(Promise);
+      store.cancelSetMDContent();
+      await expect(promise).rejects.toThrow();
+      vi.restoreAllMocks();
+    });
+  });
+
+  describe('setMDContent _setShortContent 解析失败', () => {
+    it('parserMdToSchema 抛错时应向上抛出', () => {
+      const parserSpy = vi.spyOn(parserMdToSchemaModule, 'parserMdToSchema');
+      parserSpy.mockImplementationOnce(() => {
+        throw new Error('parse error');
+      });
+      expect(() => store.setMDContent('# bad')).toThrow('parse error');
+      parserSpy.mockRestore();
+    });
+  });
+
+  describe('setContent 与 setMDContent 同步长内容', () => {
+    it('_setLongContentSync 解析失败时应抛出', () => {
+      const parserSpy = vi.spyOn(parserMdToSchemaModule, 'parserMdToSchema');
+      let callCount = 0;
+      parserSpy.mockImplementation((md: string, plugins?: any) => {
+        callCount += 1;
+        if (callCount > 5) throw new Error('chunk error');
+        return parserMdToSchema(md, plugins);
+      });
+      const longContent = Array(80)
+        .fill(0)
+        .map((_, i) => `段落${i}：内容`)
+        .join('\n\n');
+      expect(() =>
+        store.setMDContent(longContent, undefined, { useRAF: false }),
+      ).toThrow();
+      parserSpy.mockRestore();
+    });
+  });
+
+  describe('executeOperations replace 与 text 类型', () => {
+    it('应执行 replace 操作', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'old' }] }];
+      const removeSpy = vi.spyOn(Transforms, 'removeNodes');
+      const insertSpy = vi.spyOn(Transforms, 'insertNodes');
+      store.updateNodeList([
+        { type: 'paragraph', children: [{ text: 'new' }] },
+      ] as any);
+      expect(editor.children.length).toBeGreaterThanOrEqual(1);
+      removeSpy.mockRestore?.();
+      insertSpy.mockRestore?.();
+    });
+
+    it('executeOperations 应执行 insert/remove/update/replace/text 五种类型', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'a' }] },
+        { type: 'paragraph', children: [{ text: 'b' }] },
+      ];
+      (store as any).executeOperations([
+        {
+          type: 'insert',
+          path: [2],
+          node: { type: 'paragraph', children: [{ text: 'c' }] },
+          priority: 10,
+        },
+        { type: 'remove', path: [1], priority: 0 },
+      ]);
+      expect(editor.children.length).toBe(2);
+      (store as any).executeOperations([
+        {
+          type: 'update',
+          path: [0],
+          properties: { type: 'paragraph' },
+          priority: 7,
+        },
+      ]);
+      (store as any).executeOperations([
+        {
+          type: 'replace',
+          path: [0],
+          node: { type: 'paragraph', children: [{ text: 'replaced' }] },
+          priority: 5,
+        },
+      ]);
+      expect(Node.string(editor.children[0])).toBe('replaced');
+      (store as any).executeOperations([
+        { type: 'text', path: [0, 0], text: 'x', priority: 8 },
+      ]);
+      expect(Node.string(editor.children[0])).toBe('x');
+    });
+
+    it('executeOperations 单步抛错时应捕获并继续', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }];
+      const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const removeSpy = vi
+        .spyOn(Transforms, 'removeNodes')
+        .mockImplementationOnce(() => {
+          throw new Error('remove error');
+        });
+      (store as any).executeOperations([
+        { type: 'remove', path: [0], priority: 0 },
+      ]);
+      expect(errSpy).toHaveBeenCalled();
+      removeSpy.mockRestore();
+      errSpy.mockRestore();
+    });
+  });
+
+  describe('findByPathAndText', () => {
+    it('searchText 为空或仅空白时应返回空数组', () => {
+      expect(store.findByPathAndText([], '')).toEqual([]);
+      expect(store.findByPathAndText([], '   ')).toEqual([]);
+    });
+
+    it('应支持 caseSensitive、wholeWord、maxResults 选项', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'Hello world' }] },
+      ];
+      const result = store.findByPathAndText([], 'hello', {
+        caseSensitive: true,
+        wholeWord: false,
+        maxResults: 10,
+      });
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('不传 options 时应使用默认 maxResults 并调用工具函数', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'target word' }] },
+      ];
+      const result = store.findByPathAndText([], 'word');
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('传空对象 options 时应走默认 caseSensitive wholeWord maxResults', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'abc' }] }];
+      const result = store.findByPathAndText([], 'abc', {});
+      expect(Array.isArray(result)).toBe(true);
+    });
+  });
+
+  describe('replaceTextInSelection replaceAll false', () => {
+    it('replaceAll 为 false 时只替换第一个匹配后 break', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'foo bar foo' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 11 },
+      };
+      const count = store.replaceTextInSelection('foo', 'x', {
+        replaceAll: false,
+      });
+      expect(count).toBe(1);
+      expect(editor.children[0].children[0].text).toBe('x bar foo');
+    });
+
+    it('有选区但 searchText 为空时应 return 0', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'abc' }] }];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 3 },
+      };
+      const count = store.replaceTextInSelection('', 'x');
+      expect(count).toBe(0);
+    });
+
+    it('replaceAll 为 false 且选区内有匹配时应只替换一处后 break（_replaceInSelectionNodes）', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'a ab a' }] }];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 6 },
+      };
+      const count = store.replaceTextInSelection('a', 'z', {
+        replaceAll: false,
+      });
+      expect(count).toBe(1);
+      expect(editor.children[0].children[0].text).toBe('z ab a');
+    });
+  });
+
+  describe('setMDContent 含代码块围栏不拆分', () => {
+    it('应调用 _splitMarkdown 且遇到 ``` 围栏时不拆分', () => {
+      const md = [
+        '```js',
+        'code line 1',
+        'code line 2',
+        '```',
+        '',
+        'after fence',
+      ].join('\n');
+      const filler = Array(200)
+        .fill(0)
+        .map(
+          (_, i) =>
+            `段落${i}：足够长的内容以触发长文本拆分，需要超过五千字符才能进入长文本分支。`,
+        )
+        .join('\n\n');
+      const longMd = md + '\n\n' + filler;
+      expect(longMd.length).toBeGreaterThan(5000);
+      store.setMDContent(longMd, undefined, { useRAF: false });
+      expect(editor.children.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('updateNodeList 异常回退', () => {
+    it('executeOperations 抛错时应回退为直接替换 children', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'old' }] }];
+      const execSpy = vi
+        .spyOn(store as any, 'executeOperations')
+        .mockImplementationOnce(() => {
+          throw new Error('execute error');
+        });
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      store.updateNodeList([
+        { type: 'paragraph', children: [{ text: 'new' }] },
+      ] as any);
+      expect(editor.children).toHaveLength(1);
+      expect(editor.children[0].children[0].text).toBe('new');
+      execSpy.mockRestore();
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('_isValidNode 过滤与 generateDiff', () => {
+    it('updateNodeList 应过滤无效节点（空 p、空 list、无 src 的 image 等）', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }];
+      store.updateNodeList([
+        { type: 'p', children: [] },
+        { type: 'paragraph', children: [{ text: 'valid' }] },
+      ] as any);
+      expect(editor.children.length).toBeGreaterThanOrEqual(1);
+      expect(Node.string(editor)).toContain('valid');
+    });
+
+    it('generateDiff 旧节点多于新节点时应生成 remove 操作', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'a' }] },
+        { type: 'paragraph', children: [{ text: 'b' }] },
+        { type: 'paragraph', children: [{ text: 'c' }] },
+      ];
+      store.updateNodeList([
+        { type: 'paragraph', children: [{ text: 'a' }] },
+        { type: 'paragraph', children: [{ text: 'b' }] },
+      ] as any);
+      expect(editor.children.length).toBe(2);
+    });
+
+    it('compareNodes 类型不同时应生成 replace 操作', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'old' }] }];
+      store.updateNodeList([
+        { type: 'heading', level: 1, children: [{ text: 'new' }] },
+      ] as any);
+      expect(editor.children[0].type).toBe('heading');
+    });
+  });
+
+  describe('表格 diff _updateTableWithRowChanges _handleRowCountChanges _handleCellCountChanges', () => {
+    const tableRow = (cells: string[]) => ({
+      type: 'table-row',
+      children: cells.map((t) => ({
+        type: 'table-cell',
+        children: [{ text: t }],
+      })),
+    });
+
+    it('表格行数增加时应通过 _updateTableWithRowChanges 与 _handleRowCountChanges 更新', () => {
+      editor.children = [
+        {
+          type: 'table',
+          children: [tableRow(['a', 'b']), tableRow(['c', 'd'])],
+        } as any,
+      ];
+      store.updateNodeList([
+        {
+          type: 'table',
+          children: [
+            tableRow(['a', 'b']),
+            tableRow(['c', 'd']),
+            tableRow(['e', 'f']),
+          ],
+        } as any,
+      ]);
+      expect(editor.children[0].children.length).toBe(3);
+    });
+
+    it('表格行数减少时应执行 remove 行操作', () => {
+      editor.children = [
+        {
+          type: 'table',
+          children: [tableRow(['a', 'b']), tableRow(['c', 'd'])],
+        } as any,
+      ];
+      store.updateNodeList([
+        { type: 'table', children: [tableRow(['a', 'b'])] } as any,
+      ]);
+      expect(editor.children[0].children.length).toBe(1);
+    });
+
+    it('表格单元格数增加时应通过 _handleCellCountChanges 更新', () => {
+      editor.children = [
+        { type: 'table', children: [tableRow(['x', 'y'])] } as any,
+      ];
+      store.updateNodeList([
+        { type: 'table', children: [tableRow(['x', 'y', 'z'])] } as any,
+      ]);
+      expect(editor.children[0].children[0].children.length).toBe(3);
+    });
+  });
+
+  describe('replaceText 触发 _replaceAllInNodes 与 _replaceFirstInNodes insertText', () => {
+    it('replaceAll 时多节点有匹配应逐节点替换', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'aa' }] },
+        { type: 'paragraph', children: [{ text: 'aa' }] },
+      ];
+      const count = store.replaceText('a', 'b', { replaceAll: true });
+      expect(count).toBe(4);
+      expect(editor.children[0].children[0].text).toBe('bb');
+      expect(editor.children[1].children[0].text).toBe('bb');
+    });
+
+    it('replaceAll 为 false 时仅第一处匹配替换', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'needle x needle' }] },
+      ];
+      const count = store.replaceText('needle', 'y', { replaceAll: false });
+      expect(count).toBe(1);
+      expect(editor.children[0].children[0].text).toBe('y x needle');
+    });
+
+    it('replaceAll 为 false 且第一个文本节点无匹配时在后续节点替换', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'no match here' }] },
+        { type: 'paragraph', children: [{ text: 'needle in second' }] },
+      ];
+      const count = store.replaceText('needle', 'x', { replaceAll: false });
+      expect(count).toBe(1);
+      expect(editor.children[0].children[0].text).toBe('no match here');
+      expect(editor.children[1].children[0].text).toBe('x in second');
+    });
+
+    it('replaceAll 为 false 时应在第一个匹配节点上执行 Transforms.insertText', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'prefix word suffix' }] },
+      ];
+      const insertSpy = vi.spyOn(Transforms, 'insertText');
+      const count = store.replaceText('word', 'X', { replaceAll: false });
+      expect(count).toBe(1);
+      expect(insertSpy).toHaveBeenCalledWith(
+        editor,
+        'prefix X suffix',
+        expect.objectContaining({ at: [0, 0], voids: true }),
+      );
+      insertSpy.mockRestore();
+    });
+  });
+
+  describe('dragend 回调触发 _handleDragEnd', () => {
+    it('dragStart 后触发 dragend 应执行 removeEventListener 并清理 mark 与 draggedElement', () => {
+      const parent = document.createElement('div');
+      const mockContainer = document.createElement('div');
+      parent.appendChild(mockContainer);
+      const dragEl = document.createElement('div');
+      dragEl.setAttribute('data-be', 'list-item');
+      store.draggedElement = dragEl as any;
+      vi.spyOn(document, 'querySelectorAll').mockReturnValue([] as any);
+
+      let dragendCallback: () => void;
+      vi.spyOn(window, 'addEventListener').mockImplementation(
+        (event, handler) => {
+          if (event === 'dragend') dragendCallback = handler as () => void;
+        },
+      );
+      const removeSpy = vi.spyOn(window, 'removeEventListener');
+
+      store.dragStart(
+        {
+          stopPropagation: vi.fn(),
+          dataTransfer: { setDragImage: vi.fn() },
+        } as any,
+        mockContainer,
+      );
+
+      dragendCallback!();
+      expect(store.draggedElement).toBeNull();
+      expect(removeSpy).toHaveBeenCalledWith('dragover', expect.any(Function));
+
+      vi.mocked(document.querySelectorAll).mockRestore();
+      removeSpy.mockRestore();
+      vi.mocked(window.addEventListener).mockRestore();
+    });
+  });
+
+  describe('dragStart dragend 与进度回调异常', () => {
+    it('RAF 进度回调抛错时不应中断流程', async () => {
+      const content = Array(120)
+        .fill(0)
+        .map(
+          (_, i) =>
+            `段落${i}：足够长的内容以触发 RAF，需要超过五千字符，添加更多文字以满足长度。`,
+        )
+        .join('\n\n');
+      expect(content.length).toBeGreaterThan(5000);
+      const onProgress = vi.fn((p: number) => {
+        if (p > 0.5) throw new Error('progress error');
+      });
+      vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+        setTimeout(() => cb(0), 0);
+        return 1;
+      });
+      const result = store.setMDContent(content, undefined, {
+        useRAF: true,
+        batchSize: 10,
+        onProgress,
+      });
+      await result;
+      expect(editor.children.length).toBeGreaterThan(0);
       vi.restoreAllMocks();
     });
   });

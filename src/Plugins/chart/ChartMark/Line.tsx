@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import React, { useImperativeHandle, useRef } from 'react';
 import { Line as ChartLine } from 'react-chartjs-2';
+import { isWindowDefined } from '../env';
 import { stringFormatNumber } from '../utils';
 import { Container } from './Container';
 import { ChartProps } from './useChart';
@@ -22,7 +23,7 @@ export const Line: React.FC<ChartProps> = (props) => {
       return undefined;
     }
 
-    if (typeof window === 'undefined') {
+    if (!isWindowDefined()) {
       return undefined;
     }
 

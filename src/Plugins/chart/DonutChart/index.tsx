@@ -16,6 +16,7 @@ import {
   ChartToolBar,
   downloadChart,
 } from '../components';
+import { isWindowDefined } from '../env';
 import { defaultColorList } from '../const';
 import { resolveCssVariable } from '../utils';
 import {
@@ -107,7 +108,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
       return undefined;
     }
 
-    if (typeof window === 'undefined') {
+    if (!isWindowDefined()) {
       return undefined;
     }
 

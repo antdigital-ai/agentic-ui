@@ -436,6 +436,43 @@ describe('ThoughtChainList Props API Tests', () => {
     });
   });
 
+  it('item.info 为空时 return null', () => {
+    const listWithNoInfo: WhiteBoxProcessInterface[] = [
+      {
+        category: 'ToolCall',
+        info: undefined as any,
+        runId: 'x',
+        output: { type: 'END', response: {} },
+      },
+    ];
+
+    const { container } = render(
+      <ThoughtChainList thoughtChainList={listWithNoInfo} collapse={false} />,
+    );
+    expect(container).toBeInTheDocument();
+  });
+
+  it('endStatusDisplay time>0 且 isFinished 第二次为 false 时返回 FlipText', () => {
+    let isFinishedReadCount = 0;
+    const bubbleWithGetter = {
+      get isFinished() {
+        isFinishedReadCount += 1;
+        return isFinishedReadCount === 1;
+      },
+      endTime: 1000,
+      createAt: 0,
+    };
+
+    render(
+      <ThoughtChainList
+        thoughtChainList={mockThoughtChain}
+        bubble={bubbleWithGetter as any}
+        loading={false}
+      />,
+    );
+    expect(screen.getByText(/调用用户API|任务已完成|全部完成/)).toBeTruthy();
+  });
+
   describe('locale prop', () => {
     it('should use custom locale strings', () => {
       const customLocale = {

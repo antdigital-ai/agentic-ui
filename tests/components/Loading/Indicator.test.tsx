@@ -12,4 +12,11 @@ describe('Indicator', () => {
     );
     expect(screen.getByTestId('custom-ind')).toBeInTheDocument();
   });
+
+  it('indicator 为 React 元素时应走 cloneElement 分支', () => {
+    const { container } = render(
+      <Indicator indicator={<span data-testid="spinner">Loading</span>} />,
+    );
+    expect(screen.getByTestId('spinner')).toHaveTextContent('Loading');
+  });
 });

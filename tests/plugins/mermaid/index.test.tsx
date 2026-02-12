@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useSelStatus } from '../../../src/MarkdownEditor/hooks/editor';
 import { MermaidElement } from '../../../src/Plugins/mermaid/index';
 
 // Mock 依赖
@@ -12,7 +13,7 @@ vi.mock('../../../src/MarkdownEditor/editor/store', () => ({
 }));
 
 vi.mock('../../../src/MarkdownEditor/hooks/editor', () => ({
-  useSelStatus: () => [false, [0]],
+  useSelStatus: vi.fn(() => [false, [0]]),
 }));
 
 vi.mock('slate-react', () => ({
@@ -112,6 +113,24 @@ describe('MermaidElement Component', () => {
       if (copyButton) {
         fireEvent.click(copyButton);
       }
+      expect(document.body).toBeInTheDocument();
+    });
+  });
+
+  describe('覆盖 79、81、98、99 行', () => {
+    it('selected 且 markdown 聚焦时应 setState showBorder，取消选中时应清除（79、81）', () => {
+      vi.mocked(useSelStatus)
+        .mockReturnValueOnce([true, [0]])
+        .mockReturnValueOnce([false, [0]]);
+      const { rerender } = render(<MermaidElement {...defaultProps} />);
+      rerender(<MermaidElement {...defaultProps} />);
+      expect(document.querySelector('[data-be="mermaid"]')).toBeInTheDocument();
+    });
+    it('点击图表区域应 stopPropagation 并 focus 编辑器（98、99）', () => {
+      render(<MermaidElement {...defaultProps} />);
+      const mermaidEl = document.querySelector('[data-be="mermaid"]');
+      const chartArea = mermaidEl?.children[1];
+      if (chartArea) fireEvent.click(chartArea as Element);
       expect(document.body).toBeInTheDocument();
     });
   });

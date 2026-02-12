@@ -1291,4 +1291,429 @@ describe('边界情况测试', () => {
       sandbox.destroy();
     });
   });
+
+  describe('覆盖率补充：document Proxy', () => {
+    it('document 危险属性 has 应返回 false', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute(`
+        return {
+          hasLocation: 'location' in document,
+          hasWrite: 'write' in document,
+          hasImplementation: 'implementation' in document,
+          hasTitle: 'title' in document
+        };
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result.hasLocation).toBe(false);
+      expect(result.result.hasWrite).toBe(false);
+      expect(result.result.hasImplementation).toBe(false);
+      expect(result.result.hasTitle).toBe(true);
+
+      sandbox.destroy();
+    });
+
+    it('document 未定义属性 get 应返回 undefined', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute(
+        'return document.nonExistentProp',
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.result).toBeUndefined();
+
+      sandbox.destroy();
+    });
+
+    it('document 只读属性 set 应静默失败', async () => {
+      const sandbox = new ProxySandbox({ strictMode: false });
+
+      const result = await sandbox.execute(`
+        document.readyState = 'loading';
+        return document.readyState;
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result).toBe('complete');
+      sandbox.destroy();
+    });
+  });
+
+  describe('覆盖率补充：safeWindow Proxy', () => {
+    it('window 敏感属性 set 应静默失败', async () => {
+      const sandbox = new ProxySandbox({ strictMode: false });
+
+      const result = await sandbox.execute(`
+        window.cookie = 'x=1';
+        return window.cookie;
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result).toBe('');
+
+      sandbox.destroy();
+    });
+
+    it('window 敏感属性 has 应返回 false', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute(`
+        return 'cookie' in window;
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result).toBe(false);
+
+      sandbox.destroy();
+    });
+  });
+
+  describe('覆盖率补充：console 与定时器', () => {
+    it('应调用 console.info 和 console.debug', async () => {
+      const infoSpy = vi.spyOn(console, 'info');
+      const debugSpy = vi.spyOn(console, 'debug');
+      const sandbox = new ProxySandbox({ allowConsole: true });
+
+      await sandbox.execute('console.info("info"); console.debug("debug");');
+
+      expect(infoSpy).toHaveBeenCalledWith('[Sandbox]', 'info');
+      expect(debugSpy).toHaveBeenCalledWith('[Sandbox]', 'debug');
+
+      infoSpy.mockRestore();
+      debugSpy.mockRestore();
+      sandbox.destroy();
+    });
+
+    it('setInterval 非函数回调应抛出', async () => {
+      const sandbox = new ProxySandbox({ allowTimers: true });
+
+      const result = await sandbox.execute(`
+        try {
+          setInterval("not a function", 100);
+          return false;
+        } catch (e) {
+          return e.message && e.message.includes('function');
+        }
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result).toBe(true);
+
+      sandbox.destroy();
+    });
+
+    it('setInterval 回调中错误应被捕获', async () => {
+      const errorSpy = vi.spyOn(console, 'error');
+      const sandbox = new ProxySandbox({ allowTimers: true });
+
+      await sandbox.execute(`
+        setInterval(function() { throw new Error("interval error"); }, 50);
+      `);
+
+      await new Promise((r) => setTimeout(r, 150));
+
+      expect(errorSpy).toHaveBeenCalled();
+      errorSpy.mockRestore();
+      sandbox.destroy();
+    });
+  });
+
+  describe('覆盖率补充：非序列化参数回退', () => {
+    it('注入不可序列化参数时应回退到同步执行', async () => {
+      const sandbox = new ProxySandbox();
+      const fn = () => {};
+      const result = await sandbox.execute(
+        'return typeof injectedFn',
+        { injectedFn: fn },
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.result).toBe('function');
+      sandbox.destroy();
+    });
+  });
+
+  describe('覆盖率补充：validateCode 危险模式', () => {
+    it('应拒绝 .constructor 调用', async () => {
+      const sandbox = new ProxySandbox();
+      const result = await sandbox.execute('return ({}).constructor');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toMatch(/dangerous pattern/);
+      sandbox.destroy();
+    });
+
+    it('应拒绝 global 属性访问', async () => {
+      const sandbox = new ProxySandbox();
+      const result = await sandbox.execute('return global.process');
+      expect(result.success).toBe(false);
+      sandbox.destroy();
+    });
+
+    it('应拒绝 self 属性访问', async () => {
+      const sandbox = new ProxySandbox();
+      const result = await sandbox.execute('return self.location');
+      expect(result.success).toBe(false);
+      sandbox.destroy();
+    });
+
+    it('应拒绝 = globalThis 赋值', async () => {
+      const sandbox = new ProxySandbox();
+      const result = await sandbox.execute('const g = globalThis; return g');
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('globalThis');
+      sandbox.destroy();
+    });
+  });
+
+  describe('覆盖率补充：getMemoryUsage', () => {
+    it('有 performance.memory 时应返回堆大小', async () => {
+      const origPerf = globalThis.performance as any;
+      const hadMemory = 'memory' in origPerf;
+      const backupMemory = origPerf.memory;
+      try {
+        origPerf.memory = { usedJSHeapSize: 1024 };
+
+        const sandbox = new ProxySandbox();
+        const result = await sandbox.execute('return 1');
+        expect(result.memoryUsage).toBe(1024);
+        sandbox.destroy();
+      } finally {
+        if (hadMemory) {
+          origPerf.memory = backupMemory;
+        } else {
+          delete origPerf.memory;
+        }
+      }
+    });
+  });
+
+  describe('覆盖率补充：Worker 创建失败回退', () => {
+    it('Worker 不可用时应回退到同步执行', async () => {
+      const OriginalWorker = (globalThis as any).Worker;
+      try {
+        (globalThis as any).Worker = undefined;
+
+        const sandbox = new ProxySandbox();
+        const result = await sandbox.execute('return 2 + 3');
+        expect(result.success).toBe(true);
+        expect(result.result).toBe(5);
+        sandbox.destroy();
+      } finally {
+        (globalThis as any).Worker = OriginalWorker;
+      }
+    });
+  });
+
+  describe('覆盖率补充：safeDocument 方法与 Proxy', () => {
+    it('应调用 document.getElementsByTagName 和 getElementsByName', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute(`
+        const byTag = document.getElementsByTagName('div');
+        const byName = document.getElementsByName('input');
+        return { byTagLength: byTag.length, byNameLength: byName.length };
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result.byTagLength).toBe(0);
+      expect(result.result.byNameLength).toBe(0);
+      sandbox.destroy();
+    });
+
+    it('createElement 返回对象应支持 setAttribute getAttribute removeAttribute addEventListener removeEventListener', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute(`
+        const el = document.createElement('span');
+        el.setAttribute('id', 'x');
+        const a = el.getAttribute('id');
+        el.removeAttribute('id');
+        el.addEventListener('click', function(){});
+        el.removeEventListener('click', function(){});
+        return { tagName: el.tagName, getAttributeType: typeof el.getAttribute };
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result.tagName).toBe('SPAN');
+      expect(result.result.getAttributeType).toBe('function');
+      sandbox.destroy();
+    });
+
+    it('document 危险属性 get 应返回 undefined', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute(`
+        return {
+          documentURI: document.documentURI,
+          execCommand: document.execCommand,
+          writeln: document.writeln,
+          open: document.open,
+          close: document.close,
+          evaluate: document.evaluate,
+          createRange: document.createRange,
+          getSelection: document.getSelection,
+          elementsFromPoint: document.elementsFromPoint,
+          elementFromPoint: document.elementFromPoint,
+          hasFocus: document.hasFocus,
+          hidden: document.hidden,
+          visibilityState: document.visibilityState
+        };
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result.documentURI).toBeUndefined();
+      expect(result.result.execCommand).toBeUndefined();
+      expect(result.result.writeln).toBeUndefined();
+      expect(result.result.open).toBeUndefined();
+      expect(result.result.close).toBeUndefined();
+      expect(result.result.evaluate).toBeUndefined();
+      expect(result.result.createRange).toBeUndefined();
+      expect(result.result.getSelection).toBeUndefined();
+      expect(result.result.elementsFromPoint).toBeUndefined();
+      expect(result.result.elementFromPoint).toBeUndefined();
+      expect(result.result.hasFocus).toBeUndefined();
+      expect(result.result.hidden).toBeUndefined();
+      expect(result.result.visibilityState).toBeUndefined();
+      sandbox.destroy();
+    });
+
+    it('document 只读属性 set 应静默失败（readyState URL domain origin）', async () => {
+      const sandbox = new ProxySandbox({ strictMode: false });
+
+      const result = await sandbox.execute(`
+        document.readyState = 'loading';
+        document.URL = 'http://x';
+        document.domain = 'x';
+        document.origin = 'x';
+        return {
+          readyState: document.readyState,
+          URL: document.URL,
+          domain: document.domain,
+          origin: document.origin
+        };
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result.readyState).toBe('complete');
+      expect(result.result.URL).toBe('about:blank');
+      expect(result.result.domain).toBe('');
+      expect(result.result.origin).toBe('null');
+      sandbox.destroy();
+    });
+  });
+
+  describe('覆盖率补充：safeWindow set/has', () => {
+    it('window.title 设置应静默失败', async () => {
+      const sandbox = new ProxySandbox({ strictMode: false });
+
+      const result = await sandbox.execute(`
+        window.title = 'hacked';
+        return window.title;
+      `);
+
+      expect(result.success).toBe(true);
+      sandbox.destroy();
+    });
+
+    it('window 敏感属性 has 应返回 false（location）', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute(`
+        return 'location' in window;
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result).toBe(false);
+      sandbox.destroy();
+    });
+  });
+
+  describe('覆盖率补充：createGlobalProxy', () => {
+    it('访问禁止的全局变量应抛出 ReferenceError', async () => {
+      const sandbox = new ProxySandbox({
+        forbiddenGlobals: ['customForbidden'],
+      });
+
+      const result = await sandbox.execute('return customForbidden');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBeInstanceOf(ReferenceError);
+      expect(result.error?.message).toContain('not allowed');
+      sandbox.destroy();
+    });
+
+    it('ownKeys 应过滤禁止属性', async () => {
+      const sandbox = new ProxySandbox({ strictMode: false });
+
+      const result = await sandbox.execute(`
+        var g = (function(){ return this; })();
+        if (g === undefined) return false;
+        var keys = Object.keys(g);
+        return keys.indexOf('eval') === -1;
+      `);
+
+      expect(result.success).toBe(true);
+      expect(result.result).toBe(true);
+      sandbox.destroy();
+    });
+  });
+
+  describe('覆盖率补充：executeWithInstructionLimit 与 instrumentCode', () => {
+    it('do-while 死循环应被指令限制中断', async () => {
+      const sandbox = new ProxySandbox({ timeout: 50 });
+
+      const result = await sandbox.execute(
+        'do { } while(true);',
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toMatch(/timeout|instruction/i);
+      sandbox.destroy();
+    }, 500);
+
+    it('execute 抛出时应在 finally 中 cleanup', async () => {
+      const sandbox = new ProxySandbox();
+
+      const result = await sandbox.execute('throw new Error("abort");');
+
+      expect(result.success).toBe(false);
+      expect(sandbox.isRunning()).toBe(false);
+      sandbox.destroy();
+    });
+  });
+
+  describe('覆盖率补充：Worker 创建异常回退', () => {
+    it('Worker 和 URL 不可用时使用同步执行路径', async () => {
+      const OrigWorker = (globalThis as any).Worker;
+      const OrigURL = (globalThis as any).URL;
+      try {
+        (globalThis as any).Worker = undefined;
+        (globalThis as any).URL = undefined;
+
+        const sandbox = new ProxySandbox();
+        const result = await sandbox.execute('return 1 + 2');
+        expect(result.success).toBe(true);
+        expect(result.result).toBe(3);
+        sandbox.destroy();
+      } finally {
+        (globalThis as any).Worker = OrigWorker;
+        (globalThis as any).URL = OrigURL;
+      }
+    });
+  });
+
+  describe('覆盖率补充：cleanup 与 destroy', () => {
+    it('destroy 应清理 sandboxGlobal 键', () => {
+      const sandbox = new ProxySandbox({
+        customGlobals: { keyA: 1, keyB: 2 },
+      });
+
+      sandbox.destroy();
+      sandbox.destroy();
+
+      expect(() => sandbox.destroy()).not.toThrow();
+    });
+  });
 });

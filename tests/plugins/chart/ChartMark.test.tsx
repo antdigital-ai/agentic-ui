@@ -1,7 +1,12 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Mock chart env
+vi.mock('../../../src/Plugins/chart/env', () => ({
+  isWindowDefined: vi.fn(() => true),
+}));
 
 // Mock Chart.js with all required components
 vi.mock('chart.js', () => ({
@@ -25,36 +30,77 @@ vi.mock('chart.js', () => ({
   Zoom: vi.fn(),
 }));
 
-// Mock react-chartjs-2
-vi.mock('react-chartjs-2', () => ({
-  Line: ({ data }: any) => (
-    <div
-      data-testid="line-chart"
-      data-labels={JSON.stringify(data?.labels)}
-      data-datasets={JSON.stringify(data?.datasets)}
-    >
-      Line Chart
-    </div>
-  ),
-  Bar: ({ data }: any) => (
-    <div
-      data-testid="bar-chart"
-      data-labels={JSON.stringify(data?.labels)}
-      data-datasets={JSON.stringify(data?.datasets)}
-    >
-      Bar Chart
-    </div>
-  ),
-  Doughnut: ({ data }: any) => (
-    <div
-      data-testid="doughnut-chart"
-      data-labels={JSON.stringify(data?.labels)}
-      data-datasets={JSON.stringify(data?.datasets)}
-    >
-      Doughnut Chart
-    </div>
-  ),
-}));
+// Mock react-chartjs-2（Line/Doughnut 使用 forwardRef 以便 Area/Pie 的 chartRef 同步）
+vi.mock('react-chartjs-2', () => {
+  const R = require('react');
+  return {
+    Line: R.forwardRef(({ data, options }: any, ref: any) => {
+      R.useEffect(() => {
+        if (ref) ref.current = {};
+      }, [ref]);
+      // 覆盖 Line.tsx 148,149,160：调用 scales ticks callback
+      R.useEffect(() => {
+        if (options?.scales?.x?.ticks?.callback && data?.labels) {
+          data.labels.forEach((_: any, index: number) => {
+            options.scales.x.ticks.callback(null, index);
+          });
+        }
+        if (options?.scales?.y?.ticks?.callback) {
+          options.scales.y.ticks.callback(10);
+          options.scales.y.ticks.callback(100);
+        }
+      }, [options, data]);
+      return R.createElement('div', {
+        'data-testid': 'line-chart',
+        'data-labels': JSON.stringify(data?.labels),
+        'data-datasets': JSON.stringify(data?.datasets),
+        children: 'Line Chart',
+      });
+    }),
+    Bar: R.forwardRef(({ data, options }: any, ref: any) => {
+      R.useEffect(() => {
+        if (ref) ref.current = {};
+      }, [ref]);
+      // 覆盖 Column.tsx 154,155,166,177 与 Bar.tsx 155,166,167,177：调用 scales ticks callback 并设置 ref
+      R.useEffect(() => {
+        const xCallback = options?.scales?.x?.ticks?.callback;
+        const yCallback = options?.scales?.y?.ticks?.callback;
+        const labels = data?.labels || [];
+        if (xCallback) {
+          xCallback(10);
+          xCallback(100);
+          labels.forEach((_: any, index: number) => {
+            xCallback(null, index);
+          });
+        }
+        if (yCallback) {
+          yCallback(10);
+          yCallback(100);
+          labels.forEach((_: any, index: number) => {
+            yCallback(null, index);
+          });
+        }
+      }, [options, data]);
+      return R.createElement('div', {
+        'data-testid': 'bar-chart',
+        'data-labels': JSON.stringify(data?.labels),
+        'data-datasets': JSON.stringify(data?.datasets),
+        children: 'Bar Chart',
+      });
+    }),
+    Doughnut: R.forwardRef(({ data }: any, ref: any) => {
+      R.useEffect(() => {
+        if (ref) ref.current = {};
+      }, [ref]);
+      return R.createElement('div', {
+        'data-testid': 'doughnut-chart',
+        'data-labels': JSON.stringify(data?.labels),
+        'data-datasets': JSON.stringify(data?.datasets),
+        children: 'Doughnut Chart',
+      });
+    }),
+  };
+});
 
 // Mock rc-resize-observer
 vi.mock('rc-resize-observer', () => ({
@@ -94,9 +140,6 @@ describe('ChartMark Components', () => {
     chartRef: { current: null } as any,
   } as any;
 
-  const mockChartRef = { current: null } as any;
-  const mockHtmlRef = { current: null } as any;
-
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock clientWidth for container
@@ -108,6 +151,48 @@ describe('ChartMark Components', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  describe('SSR / isWindowDefined 分支覆盖', () => {
+    it('Area: isWindowDefined 为 false 时不注册 Chart', async () => {
+      const { isWindowDefined } =
+        await import('../../../src/Plugins/chart/env');
+      vi.mocked(isWindowDefined).mockReturnValueOnce(false);
+      render(<Area {...defaultProps} />);
+      expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+    });
+
+    it('Bar: isWindowDefined 为 false 时不注册 Chart', async () => {
+      const { isWindowDefined } =
+        await import('../../../src/Plugins/chart/env');
+      vi.mocked(isWindowDefined).mockReturnValueOnce(false);
+      render(<Bar {...defaultProps} />);
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+    });
+
+    it('Column: isWindowDefined 为 false 时不注册 Chart', async () => {
+      const { isWindowDefined } =
+        await import('../../../src/Plugins/chart/env');
+      vi.mocked(isWindowDefined).mockReturnValueOnce(false);
+      render(<Column {...defaultProps} />);
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+    });
+
+    it('Line: isWindowDefined 为 false 时不注册 Chart', async () => {
+      const { isWindowDefined } =
+        await import('../../../src/Plugins/chart/env');
+      vi.mocked(isWindowDefined).mockReturnValueOnce(false);
+      render(<Line {...defaultProps} />);
+      expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+    });
+
+    it('Pie: isWindowDefined 为 false 时不注册 Chart', async () => {
+      const { isWindowDefined } =
+        await import('../../../src/Plugins/chart/env');
+      vi.mocked(isWindowDefined).mockReturnValueOnce(false);
+      render(<Pie {...defaultProps} />);
+      expect(screen.getByTestId('doughnut-chart')).toBeInTheDocument();
+    });
   });
 
   describe('Line Chart Component', () => {
@@ -336,6 +421,48 @@ describe('ChartMark Components', () => {
         </Container>,
       );
       expect(screen.getByText('Index 5 Content')).toBeInTheDocument();
+    });
+
+    it('inView 为 true 且尺寸变化超过阈值时应调用 chart.resize', () => {
+      vi.useFakeTimers();
+      const resizeFn = vi.fn();
+      mockChartRef.current = { resize: resizeFn };
+      render(
+        <Container chartRef={mockChartRef} htmlRef={mockHtmlRef} index={0}>
+          <div>Chart</div>
+        </Container>,
+      );
+      const div = mockHtmlRef.current;
+      expect(div).toBeTruthy();
+      Object.defineProperty(div, 'clientWidth', {
+        value: 500,
+        configurable: true,
+      });
+      vi.advanceTimersByTime(400);
+      expect(resizeFn).toHaveBeenCalledWith(500, 300);
+      vi.useRealTimers();
+    });
+
+    it('点击容器应触发 onSize', () => {
+      vi.useFakeTimers();
+      const resizeFn = vi.fn();
+      mockChartRef.current = { resize: resizeFn };
+      render(
+        <Container chartRef={mockChartRef} htmlRef={mockHtmlRef} index={0}>
+          <div>Chart</div>
+        </Container>,
+      );
+      const div = mockHtmlRef.current;
+      if (div) {
+        Object.defineProperty(div, 'clientWidth', {
+          value: 600,
+          configurable: true,
+        });
+        fireEvent.click(div);
+      }
+      vi.advanceTimersByTime(400);
+      expect(resizeFn).toHaveBeenCalledWith(600, 360);
+      vi.useRealTimers();
     });
   });
 

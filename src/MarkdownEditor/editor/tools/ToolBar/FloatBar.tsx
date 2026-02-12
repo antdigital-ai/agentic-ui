@@ -122,7 +122,7 @@ export const FloatBar = (props: { readonly: boolean }) => {
     };
     window.addEventListener('resize', change);
     return () => window.removeEventListener('resize', change);
-  }, []);
+  }, [isOpen]);
 
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(`md-editor-float-bar`);

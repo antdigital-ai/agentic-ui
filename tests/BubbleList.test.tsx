@@ -4,6 +4,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../src/Bubble/BubbleConfigProvide';
 import { BubbleList } from '../src/Bubble/List';
+import { LOADING_FLAT } from '../src/Bubble/MessagesContent';
 import { MessageBubbleData } from '../src/Bubble/type';
 
 const BubbleConfigProvide: React.FC<{
@@ -38,6 +39,23 @@ describe('BubbleList', () => {
     content,
     createAt: Date.now(),
     updateAt: Date.now(),
+  });
+
+  describe('loading 状态', () => {
+    it('loading 为 true 时应渲染加载骨架', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'msg'),
+      ];
+
+      const { container } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} loading={true} />
+        </BubbleConfigProvide>,
+      );
+
+      const loadingEl = container.querySelector('[class*="-loading"]');
+      expect(loadingEl).toBeInTheDocument();
+    });
   });
 
   describe('isLast property', () => {
@@ -1014,6 +1032,63 @@ describe('BubbleList', () => {
 
       const bubbles = container.querySelectorAll('[data-id]');
       expect(bubbles.length).toBeGreaterThan(0);
+    });
+
+    it('should use stable key for item with id LOADING_FLAT (cover 403-407)', () => {
+      const bubbleList: MessageBubbleData[] = [
+        {
+          ...createMockBubbleData(LOADING_FLAT, 'assistant', 'Loading...'),
+          createAt: 12345,
+        },
+      ];
+
+      const { container } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} />
+        </BubbleConfigProvide>,
+      );
+
+      const bubbles = container.querySelectorAll('[data-id]');
+      expect(bubbles.length).toBe(1);
+      expect(bubbles[0]).toHaveAttribute('data-id', LOADING_FLAT);
+    });
+
+    it('should return bubbleElement without LazyElement when shouldLazyLoad returns false (cover 510)', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'First'),
+        createMockBubbleData('2', 'assistant', 'Second'),
+      ];
+
+      const observeSpy = vi.fn();
+      global.IntersectionObserver = class {
+        constructor(
+          public callback: IntersectionObserverCallback,
+          public options?: IntersectionObserverInit,
+        ) {}
+        observe = observeSpy;
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+        takeRecords = vi.fn(() => []);
+        root = null;
+        rootMargin = '';
+        thresholds = [];
+      } as any;
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList
+            bubbleList={bubbleList}
+            lazy={{
+              enable: true,
+              shouldLazyLoad: (index) => index !== 0,
+            }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      expect(observeSpy).toHaveBeenCalled();
+      const bubbles = document.querySelectorAll('[data-id]');
+      expect(bubbles.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should wrap bubbles with LazyElement when lazy.enable is true', () => {

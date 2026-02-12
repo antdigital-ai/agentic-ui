@@ -170,6 +170,40 @@ describe('History Component', () => {
     });
   });
 
+  describe('LoadMore 与 Popover', () => {
+    it('应使用 loadMoreRender 时调用并渲染自定义 LoadMore', () => {
+      const loadMoreRender = vi.fn(() => (
+        <div data-testid="custom-load-more">自定义加载更多</div>
+      ));
+
+      render(
+        <TestWrapper>
+          <History {...defaultProps} loadMoreRender={loadMoreRender} />
+        </TestWrapper>,
+      );
+
+      expect(loadMoreRender).toHaveBeenCalled();
+    });
+
+    it('Popover 打开时 getPopupContainer 可被调用', async () => {
+      render(
+        <TestWrapper>
+          <History {...defaultProps} />
+        </TestWrapper>,
+      );
+
+      const historyButton = screen.getByTestId('history-button');
+      fireEvent.click(historyButton);
+
+      await waitFor(
+        () => {
+          expect(document.querySelector('.ant-popover-open')).toBeInTheDocument();
+        },
+        { timeout: 2000 },
+      );
+    });
+  });
+
   describe('User Interactions', () => {
     it('should open dropdown when clicking history button', async () => {
       render(

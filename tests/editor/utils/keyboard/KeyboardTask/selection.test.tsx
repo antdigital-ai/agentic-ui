@@ -150,6 +150,14 @@ describe('KeyboardTask - Selection Methods', () => {
     });
   });
 
+  describe('curNodes getter', () => {
+    it('应返回元素节点迭代器并执行 match 回调', () => {
+      const nodes = [...keyboardTask.curNodes];
+      expect(nodes).toBeDefined();
+      expect(Array.isArray(nodes)).toBe(true);
+    });
+  });
+
   describe('selectWord', () => {
     it('应该选择英文单词', () => {
       const mockSelection = {
@@ -194,6 +202,48 @@ describe('KeyboardTask - Selection Methods', () => {
       expect(selectSpy).toHaveBeenCalledWith(editor, {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 4 },
+      });
+    });
+
+    it('应覆盖 selectWord 中文 pre 结尾分支（中中 offset 1）', () => {
+      const mockSelection = {
+        anchor: { path: [0, 0], offset: 1 },
+        focus: { path: [0, 0], offset: 1 },
+      };
+      editor.selection = mockSelection;
+      editor.children = [
+        {
+          type: 'paragraph',
+          children: [{ text: '中中' }],
+        },
+      ];
+
+      const selectSpy = vi.spyOn(Transforms, 'select');
+      keyboardTask.selectWord();
+      expect(selectSpy).toHaveBeenCalledWith(editor, {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 2 },
+      });
+    });
+
+    it('应覆盖 selectWord 仅 pre 有匹配时的分支（a 后空格 offset 1）', () => {
+      const mockSelection = {
+        anchor: { path: [0, 0], offset: 1 },
+        focus: { path: [0, 0], offset: 1 },
+      };
+      editor.selection = mockSelection;
+      editor.children = [
+        {
+          type: 'paragraph',
+          children: [{ text: 'a ' }],
+        },
+      ];
+
+      const selectSpy = vi.spyOn(Transforms, 'select');
+      keyboardTask.selectWord();
+      expect(selectSpy).toHaveBeenCalledWith(editor, {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 1 },
       });
     });
 

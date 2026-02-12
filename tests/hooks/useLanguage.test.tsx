@@ -5,19 +5,14 @@ import { useLanguage } from '../../src/Hooks/useLanguage';
 import { I18nProvide } from '../../src/I18n';
 
 describe('useLanguage Hook', () => {
-  it('应该在没有 I18nProvide 时抛出错误', () => {
-    const originalError = console.error;
-    console.error = vi.fn();
-
-    try {
-      renderHook(() => useLanguage());
-    } catch (e) {
-      expect((e as Error).message).toContain(
-        'useLanguage must be used within I18nProvide',
-      );
-    }
-
-    console.error = originalError;
+  it('应该在没有 I18nProvide 时使用 context 默认值', () => {
+    // I18nContext 有默认值，无 Provider 时 useContext 返回默认值，不会走到 throw 分支
+    const { result } = renderHook(() => useLanguage());
+    expect(result.current.language).toBeDefined();
+    expect(result.current.locale).toBeDefined();
+    // 默认 context 可能不包含 setLanguage（为 undefined）
+    expect(result.current.toggleLanguage).toBeDefined();
+    expect(typeof result.current.isChinese).toBe('boolean');
   });
 
   it('应该返回语言状态和方法', () => {

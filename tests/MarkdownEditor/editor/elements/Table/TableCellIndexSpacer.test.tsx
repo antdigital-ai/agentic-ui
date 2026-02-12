@@ -129,6 +129,8 @@ describe('TableCellIndexSpacer 组件测试', () => {
       ...contextValue,
     };
 
+    testEditorInstance = editor;
+
     return render(
       <ConfigProvider>
         <TablePropsContext.Provider value={defaultContextValue}>
@@ -370,10 +372,13 @@ describe('TableCellIndexSpacer 组件测试', () => {
   // 新增测试用例以提高覆盖率
 
   it('应该正确清除选中状态', () => {
-    // 重置 mock 函数
     mockSetDeleteIconPosition.mockClear();
 
-    // 先设置 deleteIconPosition 为非空值，模拟已选中状态
+    let clickAwayCallback: (() => void) | null = null;
+    vi.mocked(useClickAway).mockImplementation(((cb: () => void) => {
+      clickAwayCallback = cb;
+    }) as any);
+
     renderTableCellIndexSpacer(
       { tablePath: [0], columnIndex: 0 },
       {
@@ -382,11 +387,9 @@ describe('TableCellIndexSpacer 组件测试', () => {
       },
     );
 
-    // 直接调用 clearSelect 函数来模拟点击外部区域的效果
-    // 在组件中，这会通过 useClickAway 触发
-    mockSetDeleteIconPosition(null);
-
-    // 验证 clearSelect 是否被调用（通过 setDeleteIconPosition(null)）
+    if (clickAwayCallback) {
+      clickAwayCallback();
+    }
     expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
   });
   it('应该在删除按钮点击时删除列', () => {
@@ -399,12 +402,11 @@ describe('TableCellIndexSpacer 组件测试', () => {
     const deleteButton = document.querySelector(
       '.ant-agentic-md-editor-table-cell-index-spacer-delete-icon',
     );
-
-    if (deleteButton) {
-      fireEvent.click(deleteButton);
-    }
-
     expect(deleteButton).toBeInTheDocument();
+    fireEvent.click(deleteButton!);
+
+    expect(mockRemoveNodes).toHaveBeenCalled();
+    expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
     mockRemoveNodes.mockRestore();
   });
 
@@ -468,21 +470,19 @@ describe('TableCellIndexSpacer 组件测试', () => {
       .spyOn(Transforms, 'insertNodes')
       .mockImplementation(() => {});
 
-    renderTableCellIndexSpacer({ columnIndex: 0, tablePath: [0] });
+    renderTableCellIndexSpacer(
+      { columnIndex: 0, tablePath: [0] },
+      { deleteIconPosition: { columnIndex: 0 } },
+    );
 
     const insertBeforeButton = document.querySelector(
       '.ant-agentic-md-editor-table-cell-index-spacer-insert-column-before',
     );
+    expect(insertBeforeButton).toBeInTheDocument();
+    fireEvent.click(insertBeforeButton!);
 
-    if (insertBeforeButton) {
-      fireEvent.click(insertBeforeButton);
-    }
-
-    // 检查是否有插入按钮元素（即使不可见）
-    const actionButtons = document.querySelectorAll(
-      '.ant-agentic-md-editor-table-cell-index-spacer-action-button',
-    );
-    expect(actionButtons.length).toBeGreaterThan(0);
+    expect(mockInsertNodes).toHaveBeenCalled();
+    expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
     mockInsertNodes.mockRestore();
   });
 
@@ -491,75 +491,61 @@ describe('TableCellIndexSpacer 组件测试', () => {
       .spyOn(Transforms, 'insertNodes')
       .mockImplementation(() => {});
 
-    renderTableCellIndexSpacer({ columnIndex: 0, tablePath: [0] });
+    renderTableCellIndexSpacer(
+      { columnIndex: 0, tablePath: [0] },
+      { deleteIconPosition: { columnIndex: 0 } },
+    );
 
     const insertAfterButton = document.querySelector(
       '.ant-agentic-md-editor-table-cell-index-spacer-insert-column-after',
     );
+    expect(insertAfterButton).toBeInTheDocument();
+    fireEvent.click(insertAfterButton!);
 
-    if (insertAfterButton) {
-      fireEvent.click(insertAfterButton);
-    }
-
-    // 检查是否有插入按钮元素（即使不可见）
-    const actionButtons = document.querySelectorAll(
-      '.ant-agentic-md-editor-table-cell-index-spacer-action-button',
-    );
-    expect(actionButtons.length).toBeGreaterThan(0);
+    expect(mockInsertNodes).toHaveBeenCalled();
+    expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
     mockInsertNodes.mockRestore();
   });
 
   it('应该处理插入列前的异常情况', () => {
-    // 模拟 Editor.node 抛出异常
     const originalNode = Editor.node;
     Editor.node = vi.fn(() => {
       throw new Error('Test error');
     });
 
-    renderTableCellIndexSpacer({ columnIndex: 0, tablePath: [0] });
+    renderTableCellIndexSpacer(
+      { columnIndex: 0, tablePath: [0] },
+      { deleteIconPosition: { columnIndex: 0 } },
+    );
 
     const insertBeforeButton = document.querySelector(
       '.ant-agentic-md-editor-table-cell-index-spacer-insert-column-before',
     );
-
     if (insertBeforeButton) {
       fireEvent.click(insertBeforeButton);
     }
-
-    // 检查是否有插入按钮元素（即使不可见）
-    const actionButtons = document.querySelectorAll(
-      '.ant-agentic-md-editor-table-cell-index-spacer-action-button',
-    );
-    expect(actionButtons.length).toBeGreaterThan(0);
-
-    // 恢复原始函数
+    expect(insertBeforeButton).toBeInTheDocument();
     Editor.node = originalNode;
   });
 
   it('应该处理插入列后的异常情况', () => {
-    // 模拟 Editor.node 抛出异常
     const originalNode = Editor.node;
     Editor.node = vi.fn(() => {
       throw new Error('Test error');
     });
 
-    renderTableCellIndexSpacer({ columnIndex: 0, tablePath: [0] });
+    renderTableCellIndexSpacer(
+      { columnIndex: 0, tablePath: [0] },
+      { deleteIconPosition: { columnIndex: 0 } },
+    );
 
     const insertAfterButton = document.querySelector(
       '.ant-agentic-md-editor-table-cell-index-spacer-insert-column-after',
     );
-
     if (insertAfterButton) {
       fireEvent.click(insertAfterButton);
     }
-
-    // 检查是否有插入按钮元素（即使不可见）
-    const actionButtons = document.querySelectorAll(
-      '.ant-agentic-md-editor-table-cell-index-spacer-action-button',
-    );
-    expect(actionButtons.length).toBeGreaterThan(0);
-
-    // 恢复原始函数
+    expect(insertAfterButton).toBeInTheDocument();
     Editor.node = originalNode;
   });
 
@@ -917,6 +903,46 @@ describe('TableCellIndexSpacer 组件测试', () => {
       }
       expect(td).toBeInTheDocument();
     });
+
+    it('应该处理 handleClick 时 rowCount 为 0 的表格', () => {
+      const editor = createTestEditor();
+      editor.children = [
+        {
+          type: 'table',
+          children: [],
+        },
+      ];
+      testEditorInstance = editor;
+
+      render(
+        <ConfigProvider>
+          <TablePropsContext.Provider
+            value={{
+              deleteIconPosition: null,
+              setDeleteIconPosition: mockSetDeleteIconPosition,
+            }}
+          >
+            <Slate editor={editor} initialValue={editor.children as any}>
+              <table>
+                <tbody>
+                  <tr>
+                    <TableCellIndexSpacer columnIndex={0} tablePath={[0]} />
+                  </tr>
+                </tbody>
+              </table>
+            </Slate>
+          </TablePropsContext.Provider>
+        </ConfigProvider>,
+      );
+
+      const td = document.querySelector('td');
+      if (td) {
+        fireEvent.click(td);
+      }
+      expect(mockSetDeleteIconPosition).toHaveBeenCalledWith({
+        columnIndex: 0,
+      });
+    });
   });
 
   describe('handleDeleteClick 函数', () => {
@@ -928,6 +954,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
           children: [{ text: 'Not a table' }],
         },
       ];
+      testEditorInstance = editor;
 
       render(
         <ConfigProvider>
@@ -1048,6 +1075,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
           children: [{ text: 'Not a table' }],
         },
       ];
+      testEditorInstance = editor;
 
       render(
         <ConfigProvider>
@@ -1089,6 +1117,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
           children: [{ text: 'Not a table' }],
         },
       ];
+      testEditorInstance = editor;
 
       render(
         <ConfigProvider>
@@ -1207,6 +1236,35 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       // 不应该清除，因为 columnIndex 不匹配
       expect(mockSetDeleteIconPosition).not.toHaveBeenCalledWith(null);
+    });
+
+    it('点击外部且匹配时应调用 clearSelect 并清除单元格 data-select', () => {
+      const mockRemoveAttribute = vi.fn();
+      vi.mocked(ReactEditor.toDOMNode).mockImplementation(() => {
+        const el = document.createElement('td');
+        el.removeAttribute = mockRemoveAttribute;
+        return el as any;
+      });
+
+      let clickAwayCallback: (() => void) | null = null;
+      vi.mocked(useClickAway).mockImplementation(((cb: () => void) => {
+        clickAwayCallback = cb;
+      }) as any);
+
+      renderTableCellIndexSpacer(
+        { columnIndex: 0, tablePath: [0] },
+        {
+          deleteIconPosition: { columnIndex: 0 },
+          setDeleteIconPosition: mockSetDeleteIconPosition,
+        },
+      );
+
+      if (clickAwayCallback) {
+        clickAwayCallback();
+      }
+
+      expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
+      expect(mockRemoveAttribute).toHaveBeenCalledWith('data-select');
     });
   });
 });

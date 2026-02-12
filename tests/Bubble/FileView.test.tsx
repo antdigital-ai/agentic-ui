@@ -1,4 +1,4 @@
-﻿import '@testing-library/jest-dom';
+import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -135,6 +135,21 @@ describe('BubbleFileView', () => {
 
       const { container } = render(<BubbleFileView {...props} />);
       expect(container.firstChild).toBeNull();
+    });
+
+    it('renderFileMoreAction 为非函数非元素时应走 cfg 分支返回 ReactNode', () => {
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          originData: defaultProps.bubble.originData,
+          fileViewConfig: { renderFileMoreAction: 'extra' as any },
+        },
+      };
+
+      const { getByTestId } = render(<BubbleFileView {...props} />);
+      const moreAction = getByTestId('more-action');
+      expect(moreAction).toHaveTextContent('extra');
     });
 
     it('应该在 fileMap 为空时返回 null', () => {
@@ -365,6 +380,22 @@ describe('BubbleFileView', () => {
       render(<BubbleFileView {...props} />);
       expect(screen.getByTestId('more-action')).toHaveTextContent(
         'Static Action',
+      );
+    });
+
+    it('应该处理非函数且非 Element 的 renderFileMoreAction（如字符串）', () => {
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewConfig: {
+            renderFileMoreAction: 'plain-text-more' as any,
+          },
+        },
+      };
+      render(<BubbleFileView {...props} />);
+      expect(screen.getByTestId('more-action')).toHaveTextContent(
+        'plain-text-more',
       );
     });
 

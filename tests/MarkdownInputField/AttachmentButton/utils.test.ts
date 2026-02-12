@@ -1,6 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  getDeviceBrand,
   isImageFile,
+  isMobileDevice,
+  isOppoDevice,
+  isVivoDevice,
+  isVivoOrOppoDevice,
+  isWeChat,
   kbToSize,
 } from '../../../src/MarkdownInputField/AttachmentButton/utils';
 
@@ -96,6 +102,107 @@ describe('AttachmentButton Utils', () => {
         type: 'application/unknown',
       });
       expect(isImageFile(unknownFile)).toBe(false);
+    });
+  });
+
+  describe('getDeviceBrand', () => {
+    it('navigator 未定义且未传 ua 时返回 false', () => {
+      const origNavigator = global.navigator;
+      vi.stubGlobal('navigator', undefined);
+      expect(getDeviceBrand()).toBe(false);
+      vi.stubGlobal('navigator', origNavigator);
+    });
+
+    it('传入 ua 匹配 UA_MATCH_LIST 时返回品牌名', () => {
+      expect(getDeviceBrand('Mozilla/5.0 iPhone')).toBe('iphone');
+      expect(getDeviceBrand('Mozilla/5.0 (Linux; vivo V1981A')).toBe('vivo');
+      expect(getDeviceBrand('Mozilla/5.0 OPPO PBCM00')).toBe('oppo');
+    });
+
+    it('ua 匹配 Build 正则时返回 Build 中品牌', () => {
+      expect(getDeviceBrand('Mozilla/5.0; SomeBrand Build/123')).toBe(
+        'SomeBrand',
+      );
+    });
+
+    it('无匹配时返回 false', () => {
+      expect(getDeviceBrand('Mozilla/5.0 UnknownDevice/1.0')).toBe(false);
+    });
+  });
+
+  describe('isVivoDevice', () => {
+    it('ua 为 vivo 时返回 true', () => {
+      expect(isVivoDevice('Mozilla/5.0 vivo V1981A')).toBe(true);
+    });
+    it('ua 非 vivo 时返回 false', () => {
+      expect(isVivoDevice('Mozilla/5.0 iPhone')).toBe(false);
+    });
+  });
+
+  describe('isOppoDevice', () => {
+    it('ua 为 oppo 时返回 true', () => {
+      expect(isOppoDevice('Mozilla/5.0 OPPO PBCM00')).toBe(true);
+    });
+    it('ua 非 oppo 时返回 false', () => {
+      expect(isOppoDevice('Mozilla/5.0 iPhone')).toBe(false);
+    });
+  });
+
+  describe('isVivoOrOppoDevice', () => {
+    it('vivo 或 oppo 时返回 true', () => {
+      expect(isVivoOrOppoDevice('Mozilla/5.0 vivo')).toBe(true);
+      expect(isVivoOrOppoDevice('Mozilla/5.0 OPPO')).toBe(true);
+    });
+    it('非 vivo/oppo 时返回 false', () => {
+      expect(isVivoOrOppoDevice('Mozilla/5.0 iPhone')).toBe(false);
+    });
+  });
+
+  describe('isMobileDevice', () => {
+    const origNavigator = global.navigator;
+    const origWindow = global.window;
+
+    afterEach(() => {
+      vi.stubGlobal('navigator', origNavigator);
+      vi.stubGlobal('window', origWindow);
+    });
+
+    it('navigator 未定义时返回 false', () => {
+      vi.stubGlobal('navigator', undefined);
+      expect(isMobileDevice()).toBe(false);
+    });
+
+    it('ua 匹配移动端正则时返回 true', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: 'Mozilla/5.0 Android',
+        maxTouchPoints: 0,
+      });
+      vi.stubGlobal('window', { innerWidth: 800 });
+      expect(isMobileDevice()).toBe(true);
+    });
+
+    it('触摸屏且小屏时返回 true', () => {
+      vi.stubGlobal('navigator', {
+        userAgent: 'Mozilla/5.0 Windows NT 10.0',
+        maxTouchPoints: 1,
+      });
+      vi.stubGlobal('window', { innerWidth: 400 });
+      expect(isMobileDevice()).toBe(true);
+    });
+  });
+
+  describe('isWeChat', () => {
+    it('navigator 未定义且未传 ua 时返回 false', () => {
+      const orig = global.navigator;
+      vi.stubGlobal('navigator', undefined);
+      expect(isWeChat()).toBe(false);
+      vi.stubGlobal('navigator', orig);
+    });
+    it('ua 含 MicroMessenger 时返回 true', () => {
+      expect(isWeChat('Mozilla/5.0 MicroMessenger')).toBe(true);
+    });
+    it('ua 不含 MicroMessenger 时返回 false', () => {
+      expect(isWeChat('Mozilla/5.0 Chrome')).toBe(false);
     });
   });
 });

@@ -241,34 +241,75 @@ describe('arrow.ts', () => {
   });
 
   describe('右箭头处理', () => {
+    it('应该正确处理右箭头键 - Editor.nodes 返回 media 时选中下一节点起点', () => {
+      mockEvent.key = 'ArrowRight';
+      mockEditor.selection = { focus: { path: [0, 0], offset: 4 } };
+      vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
+      vi.spyOn(Node, 'leaf').mockReturnValue({ text: 'test' });
+      (EditorUtils.isDirtLeaf as any).mockReturnValue(false);
+      vi.spyOn(Editor, 'next').mockReturnValue(undefined);
+      vi.spyOn(Editor, 'nodes').mockReturnValue(
+        (function* () {
+          yield [{ type: 'media', children: [{ text: '' }] }, [0, 1]];
+        })(),
+      );
+      vi.spyOn(Path, 'next').mockReturnValue([0, 2]);
+      vi.spyOn(Editor, 'start').mockReturnValue({ path: [0, 2], offset: 0 });
+      const selectSpy = vi.spyOn(Transforms, 'select').mockImplementation(() => {});
+
+      keyArrow(mockStore, mockEvent);
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled();
+      expect(selectSpy).toHaveBeenCalledWith(mockEditor, { path: [0, 2], offset: 0 });
+    });
+
+    it('应该正确处理右箭头键 - Editor.nodes 返回非 media/attach 时调用 moveAfterSpace', () => {
+      mockEvent.key = 'ArrowRight';
+      mockEditor.selection = { focus: { path: [0, 0], offset: 2 } };
+      vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
+      vi.spyOn(Node, 'leaf').mockReturnValue({ text: 'ab' });
+      (EditorUtils.isDirtLeaf as any).mockReturnValue(false);
+      vi.spyOn(Editor, 'next').mockReturnValue(undefined);
+      vi.spyOn(Editor, 'nodes').mockReturnValue(
+        (function* () {
+          yield [{ type: 'link', url: 'x', children: [{ text: '' }] }, [0, 1]];
+        })(),
+      );
+
+      keyArrow(mockStore, mockEvent);
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled();
+      expect(EditorUtils.moveAfterSpace).toHaveBeenCalledWith(mockEditor, [0, 1]);
+    });
+
     it('应该正确处理右箭头键 - media元素后的光标移动', () => {
       mockEvent.key = 'ArrowRight';
-      
+
       // 设置选区
       mockEditor.selection = {
         focus: { path: [0, 0], offset: 4 } // 假设文本长度为4
       };
-      
+
       // Mock Range.isCollapsed
       vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
-      
+
       // Mock Node.leaf
       vi.spyOn(Node, 'leaf').mockReturnValue({ text: 'test' });
-      
+
       // Mock EditorUtils.isDirtLeaf
       (EditorUtils.isDirtLeaf as any).mockReturnValue(false);
-      
+
       // Mock Editor.next
       vi.spyOn(Editor, 'next').mockReturnValue([
         { type: 'media', children: [{ text: '' }] },
         [0, 1]
       ] as any);
-      
+
       // Mock Editor.nodes
       vi.spyOn(Editor, 'nodes').mockReturnValue((function*() {})());
-      
+
       keyArrow(mockStore, mockEvent);
-      
+
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
       // 应该调用 Transforms.select 移动到下一个元素
@@ -426,31 +467,20 @@ describe('arrow.ts', () => {
   describe('上箭头处理', () => {
     it('应该正确处理上箭头键 - media/attach元素的向上移动', () => {
       mockEvent.key = 'ArrowUp';
-      
-      // 设置选区
-      mockEditor.selection = {
-        focus: { path: [1, 0], offset: 0 }
-      };
-      
-      // Mock Range.isCollapsed
+      mockEditor.selection = { focus: { path: [1, 0], offset: 0 } };
       vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
-      
-      // Mock Editor.nodes
-      vi.spyOn(Editor, 'nodes').mockReturnValue((function*() {
-        yield [{ type: 'paragraph' }, [1, 0]] as any;
-      })());
-      
-      // Mock EditorUtils.findPrev
+      vi.spyOn(Editor, 'nodes').mockReturnValue((function* () {
+        yield [{ type: 'paragraph' }, [1, 0]];
+      })() as any);
       (EditorUtils.findPrev as any).mockReturnValue([0, 0]);
-      
-      // Mock Editor.node
       vi.spyOn(Editor, 'node').mockReturnValue([{ type: 'media' }, [0, 0]] as any);
-      
+      const selectSpy = vi.spyOn(Transforms, 'select').mockImplementation(() => {});
+
       keyArrow(mockStore, mockEvent);
-      
+
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
-      // 应该调用 Transforms.select 移动到前一个元素
+      expect(selectSpy).toHaveBeenCalledWith(mockEditor, [0, 0]);
     });
 
     it('应该正确处理上箭头键 - media元素的处理', () => {
@@ -485,61 +515,40 @@ describe('arrow.ts', () => {
   describe('下箭头处理', () => {
     it('应该正确处理下箭头键 - media/attach元素的向下移动', () => {
       mockEvent.key = 'ArrowDown';
-      
-      // 设置选区
-      mockEditor.selection = {
-        focus: { path: [0, 0], offset: 0 }
-      };
-      
-      // Mock Range.isCollapsed
+      mockEditor.selection = { focus: { path: [0, 0], offset: 0 } };
       vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
-      
-      // Mock Editor.nodes
-      vi.spyOn(Editor, 'nodes').mockReturnValue((function*() {
-        yield [{ type: 'paragraph' }, [0, 0]] as any;
-      })());
-      
-      // Mock EditorUtils.findNext
+      vi.spyOn(Editor, 'nodes').mockReturnValue((function* () {
+        yield [{ type: 'paragraph' }, [0, 0]];
+      })() as any);
       (EditorUtils.findNext as any)
-        .mockReturnValueOnce([1, 0]) // 第一次调用
-        .mockReturnValueOnce([1, 0]); // 第二次调用
-      
-      // Mock Editor.node
+        .mockReturnValueOnce([1, 0])
+        .mockReturnValueOnce([1, 0]);
       vi.spyOn(Editor, 'node').mockReturnValue([{ type: 'media' }, [1, 0]] as any);
-      
+      const selectSpy = vi.spyOn(Transforms, 'select').mockImplementation(() => {});
+
       keyArrow(mockStore, mockEvent);
-      
+
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
-      // 应该调用 Transforms.select 移动到下一个元素
+      expect(selectSpy).toHaveBeenCalledWith(mockEditor, [1, 0]);
     });
 
-    it('应该正确处理下箭头键 - media元素的处理', () => {
+    it('应该正确处理下箭头键 - 当前为 media 且下一节点非 media 时选中下一节点起点', () => {
       mockEvent.key = 'ArrowDown';
-      
-      // 设置选区
-      mockEditor.selection = {
-        focus: { path: [0, 0], offset: 0 }
-      };
-      
-      // Mock Range.isCollapsed
+      mockEditor.selection = { focus: { path: [0, 0], offset: 0 } };
       vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
-      
-      // Mock Editor.nodes
-      vi.spyOn(Editor, 'nodes').mockReturnValue((function*() {
-        yield [{ type: 'media' }, [0, 0]] as any;
-      })());
-      
-      // Mock EditorUtils.findNext
+      vi.spyOn(Editor, 'nodes').mockReturnValue((function* () {
+        yield [{ type: 'media' }, [0, 0]];
+      })() as any);
       (EditorUtils.findNext as any).mockReturnValue([1, 0]);
-      
-      // Mock Editor.start
+      vi.spyOn(Editor, 'node').mockReturnValue([{ type: 'paragraph' }, [1, 0]] as any);
       vi.spyOn(Editor, 'start').mockReturnValue({ path: [1, 0], offset: 0 });
-      
+      const selectSpy = vi.spyOn(Transforms, 'select').mockImplementation(() => {});
+
       keyArrow(mockStore, mockEvent);
-      
+
       expect(mockEvent.preventDefault).toHaveBeenCalled();
-      // 应该调用 Transforms.select 移动到下一个元素的开头
+      expect(selectSpy).toHaveBeenCalledWith(mockEditor, { path: [1, 0], offset: 0 });
     });
 
     it('应该正确处理下箭头键 - 空段落的导航', () => {

@@ -4,6 +4,21 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { AILabel } from '../../src/AILabel';
 
+// Mock antd Tooltip 使 mouseEnter/mouseLeave 触发 onOpenChange（jsdom 中真实 Tooltip 不会触发）
+vi.mock('antd', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  const Tooltip = ({ children, onOpenChange, ...rest }: any) => (
+    <span
+      onMouseEnter={() => onOpenChange?.(true)}
+      onMouseLeave={() => onOpenChange?.(false)}
+      {...rest}
+    >
+      {children}
+    </span>
+  );
+  return { ...actual, Tooltip };
+});
+
 // Mock framer-motion 以加快测试速度
 vi.mock('framer-motion', () => ({
   motion: {
@@ -79,6 +94,24 @@ describe('AILabel 组件', () => {
     // Tooltip 会包裹 dot 元素
     const dot = container.querySelector('.ant-ai-label-dot');
     expect(dot).toBeInTheDocument();
+  });
+
+  it('应该在 Tooltip 打开/关闭时调用 tooltip.onOpenChange', () => {
+    const onOpenChange = vi.fn();
+    const { container } = render(
+      <AILabel
+        tooltip={{
+          title: '提示',
+          onOpenChange,
+        }}
+      />,
+    );
+    const dot = container.querySelector('.ant-ai-label-dot');
+    expect(dot).toBeInTheDocument();
+    fireEvent.mouseEnter(dot!);
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+    fireEvent.mouseLeave(dot!);
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
   it('应该支持自定义 tooltip 属性', () => {

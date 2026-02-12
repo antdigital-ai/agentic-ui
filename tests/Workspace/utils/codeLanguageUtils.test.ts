@@ -217,6 +217,17 @@ describe('codeLanguageUtils', () => {
         expect(getLanguageFromFilename('Makefile.include')).toBe('makefile');
         expect(getLanguageFromFilename('makefile.test')).toBe('makefile');
       });
+
+      it('应该识别 CMakeLists.txt', () => {
+        expect(getLanguageFromFilename('CMakeLists.txt')).toBe('cmake');
+        expect(getLanguageFromFilename('cmakelists.txt')).toBe('cmake');
+      });
+    });
+
+    describe('扩展名在 langIconMap 但映射语言未命中时使用扩展名', () => {
+      it('应返回 make 当扩展名为 make 时', () => {
+        expect(getLanguageFromFilename('build.make')).toBe('make');
+      });
     });
 
     describe('边界情况', () => {

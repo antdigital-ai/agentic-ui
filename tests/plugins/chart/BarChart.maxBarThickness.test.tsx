@@ -3,6 +3,16 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+// Mock canvas.getContext so BarChart calculateLabelWidth 不抛错（与 BarChart.coverage 一致）
+HTMLCanvasElement.prototype.getContext = vi.fn(function (this: HTMLCanvasElement) {
+  return {
+    measureText: vi.fn(() => ({ width: 50 })),
+    fillText: vi.fn(),
+    font: '',
+    canvas: this,
+  };
+}) as any;
+
 // Mock Chart.js
 vi.mock('chart.js', () => ({
   Chart: {
@@ -391,7 +401,7 @@ describe('BarChart maxBarThickness 功能测试', () => {
     });
   });
 
-  describe('BarChart 其他功能覆盖测试', () => {
+  describe('BarChart 其他功能测试', () => {
     const mockData = [{ x: 'A', y: 10, type: 'Data' } as BarChartDataItem];
 
     it('应该支持自定义数据标签格式化函数', () => {

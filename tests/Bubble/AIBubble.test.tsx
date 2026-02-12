@@ -1,8 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
+import React, { useContext } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { AIBubble } from '../../src/Bubble/AIBubble';
+import {
+  AIBubble,
+  shouldRenderBeforeContent,
+} from '../../src/Bubble/AIBubble';
 import { BubbleConfigContext } from '../../src/Bubble/BubbleConfigProvide';
+import { MessagesContext } from '../../src/Bubble/MessagesContent/BubbleContext';
 import { RoleType } from '../../src/Types/common';
 
 // Mock framer-motion
@@ -60,12 +64,13 @@ describe('AIBubble', () => {
     expect(screen.getByText('AI Assistant')).toBeInTheDocument();
   });
 
-  // 测试行46: placement !== 'left' 返回 false 的情况
-  // 注意：AIBubble 组件中 placement 被硬编码为 'left'，所以我们需要通过其他方式测试这个逻辑
-  // 我们可以通过 mock shouldRenderBeforeContent 函数来测试这个分支
+  it('shouldRenderBeforeContent returns false when placement is not left', () => {
+    expect(
+      shouldRenderBeforeContent('right', 'assistant', { enable: true }, 1),
+    ).toBe(false);
+  });
+
   it('should not render before content when placement is not left', () => {
-    // 这个测试实际上不会触发，因为在 AIBubble 组件中 placement 被硬编码为 'left'
-    // 但我们仍然保留这个测试用例以确保逻辑正确
     render(
       <BubbleConfigProvide thoughtChain={{ enable: true, alwaysRender: true }}>
         <AIBubble
@@ -81,7 +86,6 @@ describe('AIBubble', () => {
       </BubbleConfigProvide>,
     );
 
-    // 应该渲染 before content，因为 placement 实际上是 'left'
     expect(screen.getByTestId('message-before')).toBeInTheDocument();
   });
 
@@ -139,12 +143,21 @@ describe('AIBubble', () => {
     expect(screen.queryByText('AI message content')).not.toBeInTheDocument();
   });
 
-  // 测试行337: bubbleRef.current.setMessageItem 调用
   it('should call bubbleRef.current.setMessageItem when setMessage is called', () => {
-    const mockBubbleRef = {
-      current: {
-        setMessageItem: vi.fn(),
-      },
+    const setMessageItem = vi.fn();
+    const mockBubbleRef = { current: { setMessageItem } };
+
+    const SetMessageTrigger = () => {
+      const { setMessage } = useContext(MessagesContext);
+      return (
+        <button
+          type="button"
+          data-testid="trigger-set-message"
+          onClick={() => setMessage?.({ content: 'updated' })}
+        >
+          Update
+        </button>
+      );
     };
 
     render(
@@ -153,6 +166,14 @@ describe('AIBubble', () => {
           {...defaultProps}
           bubbleRef={mockBubbleRef as any}
           id="test-id"
+          bubbleRenderConfig={{
+            render: (props, slots) => (
+              <>
+                <SetMessageTrigger />
+                {slots?.messageContent}
+              </>
+            ),
+          }}
           originData={{
             ...defaultProps.originData,
             role: 'assistant' as RoleType,
@@ -161,11 +182,101 @@ describe('AIBubble', () => {
       </BubbleConfigProvide>,
     );
 
-    // 这里我们只是验证组件能正常渲染
-    expect(screen.getByText('AI message content')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('trigger-set-message'));
+
+    expect(setMessageItem).toHaveBeenCalledWith('test-id', { content: 'updated' });
   });
 
-  // 测试行384-386: onDislike 异常处理
+  it('should call setMessageItem with thumbsDown when onDisLike succeeds', async () => {
+    const setMessageItem = vi.fn();
+    const onDisLike = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <BubbleConfigProvide>
+        <AIBubble
+          {...defaultProps}
+          bubbleRef={{ current: { setMessageItem } } as any}
+          id="bubble-1"
+          onDisLike={onDisLike}
+          originData={{
+            ...defaultProps.originData,
+            role: 'assistant' as RoleType,
+          }}
+        />
+      </BubbleConfigProvide>,
+    );
+
+    const dislikeButton = screen.getByTestId('dislike-button');
+    fireEvent.click(dislikeButton);
+
+    await waitFor(() => {
+      expect(onDisLike).toHaveBeenCalled();
+      expect(setMessageItem).toHaveBeenCalledWith('bubble-1', {
+        feedback: 'thumbsDown',
+      });
+    });
+  });
+
+  it('should call setMessageItem with thumbsDown when onDislike succeeds', async () => {
+    const setMessageItem = vi.fn();
+    const onDislike = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <BubbleConfigProvide>
+        <AIBubble
+          {...defaultProps}
+          bubbleRef={{ current: { setMessageItem } } as any}
+          id="bubble-2"
+          onDislike={onDislike}
+          originData={{
+            ...defaultProps.originData,
+            role: 'assistant' as RoleType,
+          }}
+        />
+      </BubbleConfigProvide>,
+    );
+
+    const dislikeButton = screen.getByTestId('dislike-button');
+    fireEvent.click(dislikeButton);
+
+    await waitFor(() => {
+      expect(onDislike).toHaveBeenCalled();
+      expect(setMessageItem).toHaveBeenCalledWith('bubble-2', {
+        feedback: 'thumbsDown',
+      });
+    });
+  });
+
+  it('should call setMessageItem with thumbsUp when onLike succeeds', async () => {
+    const setMessageItem = vi.fn();
+    const onLike = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <BubbleConfigProvide>
+        <AIBubble
+          {...defaultProps}
+          bubbleRef={{ current: { setMessageItem } } as any}
+          id="bubble-3"
+          onLike={onLike}
+          originData={{
+            ...defaultProps.originData,
+            role: 'assistant' as RoleType,
+          }}
+        />
+      </BubbleConfigProvide>,
+    );
+
+    const likeButton = screen.getByTestId('like-button');
+    fireEvent.click(likeButton);
+
+    await waitFor(() => {
+      expect(onLike).toHaveBeenCalled();
+      expect(setMessageItem).toHaveBeenCalledWith('bubble-3', {
+        feedback: 'thumbsUp',
+      });
+    });
+  });
+
   it('should handle onDislike error gracefully', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const onDislike = vi.fn().mockRejectedValue(new Error('Dislike failed'));
@@ -226,7 +337,7 @@ describe('AIBubble', () => {
     consoleSpy.mockRestore();
   });
 
-  // 测试 thoughtChainConfig.enable === false 的情况 (行48相关的另一种情况)
+  // 测试 thoughtChainConfig.enable === false 的情况
   it('should not render before content when thoughtChain is disabled', () => {
     render(
       <BubbleConfigProvide thoughtChain={{ enable: false }}>
@@ -247,7 +358,7 @@ describe('AIBubble', () => {
     expect(screen.queryByTestId('message-before')).not.toBeInTheDocument();
   });
 
-  // 测试 taskListLength >= 1 的情况 (行50相关的另一种情况)
+  // 测试 taskListLength >= 1 的情况
   it('should render before content when task list has items', () => {
     render(
       <BubbleConfigProvide thoughtChain={{ enable: true }}>
@@ -268,7 +379,7 @@ describe('AIBubble', () => {
     expect(screen.getByTestId('message-before')).toBeInTheDocument();
   });
 
-  // 测试 thoughtChainConfig.alwaysRender === true 的情况 (行50相关的另一种情况)
+  // 测试 thoughtChainConfig.alwaysRender === true 的情况
   it('should render before content when alwaysRender is true even with empty task list', () => {
     render(
       <BubbleConfigProvide thoughtChain={{ enable: true, alwaysRender: true }}>

@@ -57,8 +57,20 @@ vi.mock('chart.js', async () => {
   };
 });
 
+// 用于 tooltip callbacks 测试时捕获传入 Line 的 options
+declare global {
+  interface Window {
+    __lineChartOptions?: any;
+  }
+}
+
 vi.mock('react-chartjs-2', () => ({
-  Line: () => <div data-testid="line-chart">Line Chart</div>,
+  Line: (props: any) => {
+    if (props?.options && typeof window !== 'undefined') {
+      window.__lineChartOptions = props.options;
+    }
+    return <div data-testid="line-chart">Line Chart</div>;
+  },
 }));
 
 // Mock antd ConfigProvider
@@ -719,6 +731,65 @@ describe('LineChart', () => {
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
     });
 
+    it('processedData 在 findDataPointByXValue 返回有效点时得到数值', async () => {
+      const chartUtils = await import('../../../../src/Plugins/chart/utils');
+      const filtered = [
+        { x: 1, y: 10, type: 'Series 1' },
+        { x: 2, y: 20, type: 'Series 1' },
+        { x: 1, y: 15, type: 'Series 2' },
+        { x: 2, y: 25, type: 'Series 2' },
+      ];
+      vi.spyOn(hooks, 'useChartDataFilter').mockReturnValue({
+        filteredData: filtered,
+        filterOptions: [],
+        filterLabels: [],
+        selectedFilter: '',
+        setSelectedFilter: vi.fn(),
+        selectedFilterLabel: '',
+        setSelectedFilterLabel: vi.fn(),
+        filteredDataByFilterLabel: [],
+      } as any);
+      vi.mocked(chartUtils.extractAndSortXValues).mockReturnValue([1, 2]);
+      vi.mocked(chartUtils.findDataPointByXValue).mockImplementation(
+        (_data, x, type) => {
+          const y = type === 'Series 1' ? x * 10 : x * 10 + 5;
+          return { x, y, type } as any;
+        },
+      );
+
+      render(<LineChart data={filtered} />);
+
+      expect(chartUtils.findDataPointByXValue).toHaveBeenCalled();
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
+    it('processedData 在 y 为字符串时通过 Number(v) 转为数值', async () => {
+      const chartUtils = await import('../../../../src/Plugins/chart/utils');
+      const filtered = [
+        { x: 1, y: '10', type: 'A' },
+        { x: 2, y: '20', type: 'A' },
+      ];
+      vi.spyOn(hooks, 'useChartDataFilter').mockReturnValue({
+        filteredData: filtered,
+        filterOptions: [],
+        filterLabels: [],
+        selectedFilter: '',
+        setSelectedFilter: vi.fn(),
+        selectedFilterLabel: '',
+        setSelectedFilterLabel: vi.fn(),
+        filteredDataByFilterLabel: [],
+      } as any);
+      vi.mocked(chartUtils.extractAndSortXValues).mockReturnValue([1, 2]);
+      vi.mocked(chartUtils.findDataPointByXValue).mockImplementation(
+        (_, x) => ({ x, y: String(x * 10), type: 'A' } as any),
+      );
+
+      render(<LineChart data={filtered} />);
+
+      expect(chartUtils.findDataPointByXValue).toHaveBeenCalled();
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
     it('应该正确处理自定义颜色配置', () => {
       const mockDataForColor = [
         { x: 1, y: 10, type: 'Series 1' },
@@ -750,6 +821,19 @@ describe('LineChart', () => {
     it('应该正确配置图表选项', () => {
       render(<LineChart data={mockData} />);
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+    });
+
+    it('tooltip callbacks.label 返回 label 与 y 拼接字符串', () => {
+      render(<LineChart data={mockData} />);
+      const options = window.__lineChartOptions;
+      expect(options).toBeDefined();
+      expect(options.plugins?.tooltip?.callbacks?.label).toBeDefined();
+      const labelFn = options.plugins.tooltip.callbacks.label;
+      const result = labelFn({
+        dataset: { label: 'Series 1' },
+        parsed: { y: 10 },
+      } as any);
+      expect(result).toBe('Series 1: 10');
     });
 
     it('应该正确处理图例位置配置', () => {

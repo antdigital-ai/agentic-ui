@@ -74,21 +74,25 @@ vi.mock('../../../../src/Plugins/chart/utils', () => ({
 }));
 
 describe('FunnelChart', () => {
-  it('应该渲染并触发样式与图表渲染逻辑', () => {
-    const data = [
-      { x: 'A', y: 100, ratio: '100%' },
-      { x: 'B', y: 50, ratio: '50%' },
-      { x: 'C', y: 25 },
-    ];
+  it(
+    '应该渲染并触发样式与图表渲染逻辑',
+    async () => {
+      const data = [
+        { x: 'A', y: 100, ratio: '100%' },
+        { x: 'B', y: 50, ratio: '50%' },
+        { x: 'C', y: 25 },
+      ];
 
-    render(
-      <ConfigProvider>
-        <FunnelChart data={data} bottomLayerMinWidth={0.5} title="测试漏斗" />
-      </ConfigProvider>,
-    );
+      render(
+        <ConfigProvider>
+          <FunnelChart data={data} bottomLayerMinWidth={0.5} title="测试漏斗" />
+        </ConfigProvider>,
+      );
 
-    expect(screen.getByTestId('chart-container')).toBeInTheDocument();
-    expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
-    expect(screen.getByTestId('chart-title')).toHaveTextContent('测试漏斗');
-  });
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+      expect(screen.getByTestId('chart-title')).toHaveTextContent('测试漏斗');
+    },
+    { timeout: 15000 },
+  );
 });

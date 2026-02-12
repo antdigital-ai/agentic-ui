@@ -7,9 +7,10 @@ import {
   MarkdownEditorProps,
 } from '../src/MarkdownEditor/BaseMarkdownEditor';
 
-// Mock 依赖
+let capturedInitSchemaValue: any[] = [];
 vi.mock('../src/MarkdownEditor/editor/Editor', () => ({
   SlateMarkdownEditor: ({ onChange, initSchemaValue, ...props }: any) => {
+    capturedInitSchemaValue = initSchemaValue || [];
     React.useEffect(() => {
       onChange?.('test markdown', initSchemaValue || []);
     }, []);
@@ -426,6 +427,31 @@ describe('BaseMarkdownEditor', () => {
       );
       const focusArea = container.querySelector('.md-editor-focus');
       expect(focusArea).not.toBeInTheDocument();
+    });
+  });
+
+  describe('initSchemaValue 过滤', () => {
+    it('应过滤掉空 paragraph、空 list、空 listItem、空 heading', async () => {
+      const schemaWithEmpties = [
+        { type: 'paragraph', children: [] },
+        { type: 'paragraph', children: [{ text: 'keep' }] },
+        { type: 'bulleted-list', children: [] },
+        { type: 'listItem', children: [] },
+        { type: 'heading', children: [] },
+      ];
+      render(
+        <BaseMarkdownEditor
+          {...defaultProps}
+          initValue=""
+          initSchemaValue={schemaWithEmpties as any}
+        />,
+      );
+      await waitFor(() => {
+        expect(capturedInitSchemaValue).toBeDefined();
+      });
+      expect(capturedInitSchemaValue.length).toBe(1);
+      expect(capturedInitSchemaValue[0].type).toBe('paragraph');
+      expect(capturedInitSchemaValue[0].children[0].text).toBe('keep');
     });
   });
 

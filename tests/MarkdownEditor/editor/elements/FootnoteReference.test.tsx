@@ -8,6 +8,7 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FootnoteReference } from '../../../../src/MarkdownEditor/editor/elements/FootnoteReference';
+import { ReadonlyFootnoteReference } from '../../../../src/MarkdownEditor/editor/elements/FootnoteReference/ReadonlyFootnoteReference';
 import { FootnoteDefinitionNode } from '../../../../src/MarkdownEditor/el';
 import { TestSlateWrapper } from './TestSlateWrapper';
 
@@ -31,6 +32,10 @@ vi.mock('../../../../src/MarkdownEditor/editor/store', () => ({
 
 vi.mock('../../../../src/MarkdownEditor/hooks/editor', () => ({
   useSelStatus: vi.fn(() => [false, vi.fn()]),
+}));
+
+vi.mock('../../../../src/Utils/debugUtils', () => ({
+  debugInfo: vi.fn(),
 }));
 
 describe('FootnoteReference', () => {
@@ -241,6 +246,22 @@ describe('FootnoteReference', () => {
       expect(footnoteReference).toBeInTheDocument();
       expect(footnoteReference).toHaveAttribute('data-drag-el');
       expect(footnoteReference).not.toHaveClass('empty');
+    });
+  });
+
+  describe('ReadonlyFootnoteReference', () => {
+    it('应渲染只读脚注引用并调用 debugInfo', () => {
+      renderWithProvider(
+        <ReadonlyFootnoteReference
+          element={mockElement}
+          attributes={mockAttributes}
+        >
+          {null}
+        </ReadonlyFootnoteReference>,
+      );
+      const footnoteReference = screen.getByTestId('footnote-reference');
+      expect(footnoteReference).toBeInTheDocument();
+      expect(footnoteReference).toHaveAttribute('data-be', 'paragraph');
     });
   });
 

@@ -123,6 +123,31 @@ describe('useHistory Hook', () => {
       // 测试收藏功能是否可用
       expect(typeof result.current.handleFavorite).toBe('function');
     });
+
+    it('应调用 onFavorite 并更新本地列表的 isFavorite', async () => {
+      const onFavorite = vi.fn().mockResolvedValue(undefined);
+      const props = {
+        ...defaultProps,
+        agent: { onFavorite },
+      };
+      const { result } = renderHook(() => useHistory(props));
+
+      await act(async () => {
+        await result.current.loadHistory();
+      });
+
+      expect(result.current.filteredList).toHaveLength(2);
+
+      await act(async () => {
+        await result.current.handleFavorite('session1', true);
+      });
+
+      expect(onFavorite).toHaveBeenCalledWith('session1', true);
+      const session1 = result.current.filteredList.find(
+        (item) => item.sessionId === 'session1',
+      );
+      expect(session1?.isFavorite).toBe(true);
+    });
   });
 
   describe('多选功能', () => {

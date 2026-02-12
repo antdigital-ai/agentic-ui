@@ -183,8 +183,8 @@ export const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
                   fileUploadStatus,
                 })
               : []),
-            // 提示词优化按钮
-            ...(refinePrompt?.enable
+            // 提示词优化按钮（有 refinePrompt 即渲染，enable 由 handleRefine 内校验）
+            ...(refinePrompt
               ? [
                   <RefinePromptButton
                     key="refine-prompt"

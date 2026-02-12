@@ -47,6 +47,7 @@ describe('useMermaidRender', () => {
 
   describe('基本功能', () => {
     it('应该在 code 为空时不渲染', async () => {
+      const clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
       const { result } = renderHook(() =>
         useMermaidRender('', divRef, 'test-id', true),
       );
@@ -57,8 +58,9 @@ describe('useMermaidRender', () => {
 
       expect(result.current.error).toBe('');
       expect(result.current.renderedCode).toBe('');
-      // 由于延迟执行，这里主要验证不会立即调用
+      expect(divElement.innerHTML).toBe('');
       expect(mockLoadMermaid).not.toHaveBeenCalled();
+      clearTimeoutSpy.mockRestore();
     });
 
     it('应该在 isVisible 为 false 时不渲染', async () => {
@@ -187,6 +189,31 @@ describe('useMermaidRender', () => {
 
       // 应该调用 render（最后一次）
       expect(mockRender).toHaveBeenCalledWith('test-id', 'graph LR');
+    });
+
+    it('应在 setTimeout 回调内 code 变化时提前返回', async () => {
+      const mockRender = vi.fn().mockImplementation(() => {
+        return new Promise<{ svg: string }>((resolve) => {
+          setTimeout(() => resolve({ svg: '<svg></svg>' }), 50);
+        });
+      });
+      mockLoadMermaid.mockResolvedValue({ render: mockRender });
+
+      const { rerender } = renderHook(
+        ({ code }) => useMermaidRender(code, divRef, 'test-id', true),
+        { initialProps: { code: 'graph TD' } },
+      );
+
+      await act(async () => {
+        vi.advanceTimersByTime(50);
+      });
+      rerender({ code: 'graph LR' });
+      await act(async () => {
+        vi.advanceTimersByTime(200);
+        await vi.runAllTimersAsync();
+      });
+
+      expect(mockRender).toHaveBeenCalled();
     });
   });
 

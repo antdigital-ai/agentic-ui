@@ -64,6 +64,23 @@ describe('TaskList', () => {
       expect(loadingComponents).toHaveLength(0);
     });
 
+    it('应该正确渲染 loading 状态并传入 size', () => {
+      const itemsWithLoading = [
+        ...mockItems,
+        {
+          key: 'loading-1',
+          title: 'Loading Task',
+          content: 'Loading content',
+          status: 'loading' as const,
+        },
+      ];
+      render(<TaskList items={itemsWithLoading} />);
+
+      const loadingEl = screen.getByTestId('task-list-loading');
+      expect(loadingEl).toBeInTheDocument();
+      expect(loadingEl).toHaveAttribute('data-size', '16');
+    });
+
     it('应该正确渲染数组内容的任务', () => {
       render(<TaskList items={mockItems} />);
 
@@ -388,12 +405,13 @@ describe('TaskList', () => {
 
   describe('可访问性测试', () => {
     it('应该为可点击元素提供正确的ARIA标签', () => {
-      render(<TaskList items={mockItems} />);
+      const { container } = render(<TaskList items={mockItems} />);
 
-      // 检查是否有可点击的元素
-      const clickableElements = document.querySelectorAll('[onClick]');
+      // 检查任务列表中的可点击区域（TaskList 使用 data-testid="task-list-left" 等）
+      const clickableElements = container.querySelectorAll(
+        '[data-testid="task-list-left"], [data-testid="task-list-arrowContainer"]',
+      );
 
-      // 如果没有onClick属性，检查是否有其他可交互的元素
       if (clickableElements.length === 0) {
         const interactiveElements = document.querySelectorAll(
           'button, [role="button"], [tabindex]',
@@ -402,6 +420,27 @@ describe('TaskList', () => {
       } else {
         expect(clickableElements.length).toBeGreaterThan(0);
       }
+    });
+
+    it('无 task-list-left/arrowContainer 时走 interactiveElements 分支', () => {
+      const { container } = render(
+        <div>
+          <button type="button" aria-label="dummy">
+            dummy
+          </button>
+          <TaskList items={[]} />
+        </div>,
+      );
+
+      const clickableElements = container.querySelectorAll(
+        '[data-testid="task-list-left"], [data-testid="task-list-arrowContainer"]',
+      );
+      expect(clickableElements.length).toBe(0);
+
+      const interactiveElements = document.querySelectorAll(
+        'button, [role="button"], [tabindex]',
+      );
+      expect(interactiveElements.length).toBeGreaterThan(0);
     });
 
     it('应该支持键盘导航', async () => {

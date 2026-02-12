@@ -5,8 +5,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ScatterChart, {
   ScatterChartDataItem,
 } from '../../../src/Plugins/chart/ScatterChart';
+import { useStyle as useScatterStyle } from '../../../src/Plugins/chart/ScatterChart/style';
 
-// Mock Chart.js
+const lastScatterOptionsRef = vi.hoisted(() => ({ current: null as any }));
+
+// Mock Chart.js - generateLabels 返回长文本以覆盖图例截断逻辑
 vi.mock('chart.js', () => ({
   Chart: {
     register: vi.fn(),
@@ -14,7 +17,14 @@ vi.mock('chart.js', () => ({
       plugins: {
         legend: {
           labels: {
-            generateLabels: vi.fn(() => []),
+            generateLabels: vi.fn(() => [
+              {
+                text: '这是一个非常非常长的产品名称用于测试图例截断功能',
+                fillStyle: '#1677ff',
+                strokeStyle: '#1677ff',
+                index: 0,
+              },
+            ]),
           },
         },
       },
@@ -27,13 +37,16 @@ vi.mock('chart.js', () => ({
   Legend: vi.fn(),
 }));
 
-// Mock react-chartjs-2
+// Mock react-chartjs-2 - 捕获 options 以便测试 tooltip/legend
 vi.mock('react-chartjs-2', () => ({
-  Scatter: React.forwardRef((props: any, ref: any) => (
-    <div data-testid="scatter-chart" ref={ref}>
-      Mocked Scatter Chart
-    </div>
-  )),
+  Scatter: React.forwardRef((props: any, ref: any) => {
+    lastScatterOptionsRef.current = props.options;
+    return (
+      <div data-testid="scatter-chart" ref={ref}>
+        Mocked Scatter Chart
+      </div>
+    );
+  }),
 }));
 
 // Mock utils
@@ -65,10 +78,12 @@ vi.mock('../../../src/Plugins/chart/components', () => ({
       ))}
     </div>
   ),
-  ChartToolBar: ({ title, onDownload, dataTime }: any) => (
+  ChartToolBar: ({ title, onDownload, dataTime, filter, loading }: any) => (
     <div data-testid="chart-toolbar">
       {title && <span data-testid="chart-title">{title}</span>}
       {dataTime && <span data-testid="chart-datatime">{dataTime}</span>}
+      {filter && <div data-testid="toolbar-filter">{filter}</div>}
+      {loading && <span data-testid="chart-loading">loading</span>}
       <button onClick={onDownload} data-testid="download-button">
         下载
       </button>
@@ -643,6 +658,251 @@ describe('ScatterChart', () => {
       );
 
       expect(screen.getByTestId('scatter-chart')).toBeInTheDocument();
+    });
+  });
+
+  describe('覆盖率：statistic/loading/轴/筛选', () => {
+    it('statistic 为空数组时不渲染统计', () => {
+      render(
+        <ScatterChart data={sampleData} statistic={[]} title="空统计配置" />,
+      );
+      expect(screen.getByTestId('chart-container')).toBeInTheDocument();
+      expect(screen.queryByTestId('chart-statistic')).not.toBeInTheDocument();
+    });
+
+    it('loading=true 时工具栏显示加载状态', () => {
+      render(
+        <ScatterChart data={sampleData} loading title="加载中" />,
+      );
+      expect(screen.getByTestId('chart-loading')).toHaveTextContent('loading');
+    });
+
+    it('renderFilterInToolbar 且有多分类与 filterLabel 时筛选在工具栏内', () => {
+      const dataWithFilterLabel: ScatterChartDataItem[] = [
+        { category: 'A组', type: 'T1', x: 1, y: 10, filterLabel: 'PC' },
+        { category: 'B组', type: 'T1', x: 2, y: 20, filterLabel: 'H5' },
+      ];
+      render(
+        <ScatterChart
+          data={dataWithFilterLabel}
+          renderFilterInToolbar
+          title="工具栏筛选"
+        />,
+      );
+      expect(screen.getByTestId('chart-toolbar')).toBeInTheDocument();
+      expect(screen.getByTestId('toolbar-filter')).toBeInTheDocument();
+    });
+
+    it('hiddenX/hiddenY 控制坐标轴显示', () => {
+      render(
+        <ScatterChart
+          data={sampleData}
+          hiddenX
+          hiddenY
+          xAxisLabel="X"
+          yAxisLabel="Y"
+          title="隐藏轴"
+        />,
+      );
+      expect(screen.getByTestId('scatter-chart')).toBeInTheDocument();
+    });
+
+    it('xPosition/yPosition 传入时生效', () => {
+      render(
+        <ScatterChart
+          data={sampleData}
+          xPosition="top"
+          yPosition="right"
+          title="轴位置"
+        />,
+      );
+      expect(lastScatterOptionsRef.current?.scales?.x?.position).toBe('top');
+      expect(lastScatterOptionsRef.current?.scales?.y?.position).toBe('right');
+    });
+
+    it('showGrid=false 时关闭网格', () => {
+      render(
+        <ScatterChart data={sampleData} showGrid={false} title="无网格" />,
+      );
+      expect(lastScatterOptionsRef.current?.scales?.x?.grid?.display).toBe(
+        false,
+      );
+      expect(lastScatterOptionsRef.current?.scales?.y?.grid?.display).toBe(
+        false,
+      );
+    });
+  });
+
+  describe('覆盖率：tooltip external', () => {
+    it('tooltip opacity 为 0 时隐藏自定义 tooltip 元素', () => {
+      const el = document.createElement('div');
+      el.id = 'custom-scatter-tooltip';
+      document.body.appendChild(el);
+
+      render(
+        <ScatterChart
+          data={sampleData}
+          xUnit="月"
+          yUnit="元"
+          title="Tooltip"
+        />,
+      );
+      const external = lastScatterOptionsRef.current?.plugins?.tooltip?.external;
+      expect(external).toBeDefined();
+
+      external({
+        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        tooltip: { opacity: 0, dataPoints: [], caretX: 0, caretY: 0 },
+      });
+      expect(el.style.opacity).toBe('0');
+      document.body.removeChild(el);
+    });
+
+    it('tooltip external 有 dataPoints 时创建并更新 tooltip 内容', () => {
+      render(
+        <ScatterChart
+          data={sampleData}
+          xUnit="月"
+          yUnit="元"
+          title="Tooltip"
+        />,
+      );
+      const external = lastScatterOptionsRef.current?.plugins?.tooltip?.external;
+      expect(external).toBeDefined();
+
+      const mockChart = {
+        canvas: {
+          getBoundingClientRect: () => ({ left: 10, top: 20 }),
+        },
+      };
+      external({
+        chart: mockChart,
+        tooltip: {
+          opacity: 1,
+          dataPoints: [
+            {
+              parsed: { x: 2, y: 25 },
+              dataset: { label: '产品A', borderColor: '#1677ff' },
+            },
+          ],
+          caretX: 50,
+          caretY: 80,
+        },
+      });
+
+      const tooltipEl = document.getElementById('custom-scatter-tooltip');
+      expect(tooltipEl).toBeTruthy();
+      expect(tooltipEl?.innerHTML).toContain('2月');
+      expect(tooltipEl?.innerHTML).toContain('25元');
+      expect(tooltipEl?.innerHTML).toContain('产品A');
+      if (tooltipEl?.parentNode === document.body) {
+        document.body.removeChild(tooltipEl);
+      }
+    });
+
+    it('tooltip external 无 dataPoints 时提前 return', () => {
+      render(<ScatterChart data={sampleData} title="Tooltip" />);
+      const external = lastScatterOptionsRef.current?.plugins?.tooltip?.external;
+      external({
+        chart: { canvas: {} },
+        tooltip: { opacity: 1, dataPoints: [], caretX: 0, caretY: 0 },
+      });
+      const tooltipEl = document.getElementById('custom-scatter-tooltip');
+      expect(tooltipEl?.innerHTML || '').toBe('');
+    });
+
+    it('tooltip external 解析异常时使用 0', () => {
+      render(<ScatterChart data={sampleData} xUnit="月" title="Tooltip" />);
+      const external = lastScatterOptionsRef.current?.plugins?.tooltip?.external;
+      external({
+        chart: {
+          canvas: {
+            getBoundingClientRect: () => ({ left: 0, top: 0 }),
+          },
+        },
+        tooltip: {
+          opacity: 1,
+          dataPoints: [
+            {
+              parsed: { x: NaN, y: undefined },
+              dataset: { label: 'A', borderColor: '#333' },
+            },
+          ],
+          caretX: 0,
+          caretY: 0,
+        },
+      });
+      const tooltipEl = document.getElementById('custom-scatter-tooltip');
+      expect(tooltipEl).toBeTruthy();
+      if (tooltipEl?.parentNode === document.body) {
+        document.body.removeChild(tooltipEl);
+      }
+    });
+  });
+
+  describe('覆盖率：legend generateLabels 截断', () => {
+    it('generateLabels 长文本时截断并加省略号', () => {
+      render(
+        <ScatterChart
+          data={sampleData}
+          textMaxWidth={10}
+          title="图例截断"
+        />,
+      );
+      const generateLabels =
+        lastScatterOptionsRef.current?.plugins?.legend?.labels?.generateLabels;
+      expect(generateLabels).toBeDefined();
+
+      const mockCtx = {
+        measureText: vi.fn((text: string) => ({
+          width: text.length * 2,
+        })),
+        fillText: vi.fn(),
+        canvas: document.createElement('canvas'),
+      };
+      HTMLCanvasElement.prototype.getContext = vi.fn(() => mockCtx) as any;
+
+      const mockChart = {} as any;
+      const result = generateLabels(mockChart);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(0);
+      expect(result[0].text).toContain('...');
+    });
+  });
+
+  describe('覆盖率：handleDownload 与错误边界', () => {
+    it('handleDownload 通过 ToolBar 调用 downloadChart', async () => {
+      const { downloadChart } = await import(
+        '../../../src/Plugins/chart/components'
+      );
+      render(<ScatterChart data={sampleData} title="下载" />);
+      screen.getByTestId('download-button').click();
+      await waitFor(() => {
+        expect(downloadChart).toHaveBeenCalled();
+      });
+    });
+
+    it('wrapSSR 首次调用抛错时显示错误状态', () => {
+      vi.mocked(useScatterStyle).mockImplementationOnce(() => {
+        let firstCall = true;
+        return {
+          wrapSSR: (node: any) => {
+            if (firstCall) {
+              firstCall = false;
+              throw new Error('render error');
+            }
+            return node;
+          },
+          hashId: 'err',
+        };
+      });
+
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      render(<ScatterChart data={sampleData} title="错误" />);
+      expect(
+        screen.getByText('图表渲染失败，请检查数据格式'),
+      ).toBeInTheDocument();
+      consoleSpy.mockRestore();
     });
   });
 });

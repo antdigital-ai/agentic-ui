@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -198,6 +198,61 @@ describe('Workspace Component', () => {
     expect(screen.queryByText('无效组件')).not.toBeInTheDocument();
     // 检查标签页是否存在（即使内容未渲染）
     expect(screen.getByText('浏览器')).toBeInTheDocument();
+  });
+
+  it('子元素为非合法 React 元素时应跳过该子元素 (151)', () => {
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.Realtime
+            data={{ type: 'shell', content: 'realtime content' }}
+          />
+          {'字符串子元素'}
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+    expect(screen.getByTestId('workspace')).toBeInTheDocument();
+    expect(screen.getByText('realtime content')).toBeInTheDocument();
+    expect(screen.getByText('浏览器')).toBeInTheDocument();
+  });
+
+  it('activeTabKey 不在标签列表时应重置为第一项并触发 onTabChange (208-213)', () => {
+    const onTabChange = vi.fn();
+    render(
+      <TestWrapper>
+        <Workspace activeTabKey="nonexistent-key" onTabChange={onTabChange}>
+          <Workspace.Realtime data={{ type: 'shell', content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+    expect(onTabChange).toHaveBeenCalledWith('realtime');
+  });
+
+  it('非受控时点击切换标签应更新内部状态并触发 onTabChange (228-231)', () => {
+    const onTabChange = vi.fn();
+    render(
+      <TestWrapper>
+        <Workspace onTabChange={onTabChange}>
+          <Workspace.Realtime data={{ type: 'shell', content: 'realtime' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+    const segmented = screen.getByTestId('workspace-segmented');
+    const browserTab = within(segmented).getByText('浏览器');
+    fireEvent.click(browserTab);
+    expect(onTabChange).toHaveBeenCalledWith('browser');
   });
 
   it('应该传递正确的props给子组件', () => {

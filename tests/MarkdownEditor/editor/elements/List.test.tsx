@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import { ConfigProvider } from 'antd';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -6,6 +7,8 @@ import {
   List,
   ListItem,
 } from '../../../../src/MarkdownEditor/editor/elements/List';
+import { ReadonlyListItem } from '../../../../src/MarkdownEditor/editor/elements/List/ReadonlyListItem';
+import * as editorHooks from '../../../../src/MarkdownEditor/hooks/editor';
 import * as editorStore from '../../../../src/MarkdownEditor/editor/store';
 
 // Mock dependencies
@@ -207,6 +210,47 @@ describe('List Components', () => {
       });
     });
 
+    describe('ReadonlyListItem', () => {
+      const readonlyProps = (element: any) => ({
+        element,
+        attributes: { 'data-slate-node': 'element' as const, ref: { current: null } },
+        children: [<div key="1">Content</div>],
+      });
+
+      it('非任务项时 checkbox 为 null', () => {
+        const { container } = render(
+          <ConfigProvider>
+            <ReadonlyListItem
+              {...readonlyProps({
+                type: 'list-item',
+                children: [{ text: 'item' }],
+              })}
+            />
+          </ConfigProvider>,
+        );
+        const li = container.querySelector('[data-be="list-item"]');
+        expect(li).toBeInTheDocument();
+        expect(container.querySelector('[data-check-item]')).toBeNull();
+      });
+
+      it('任务项带 mentions 时应渲染 mentionsUser', () => {
+        const { container } = render(
+          <ConfigProvider>
+            <ReadonlyListItem
+              {...readonlyProps({
+                type: 'list-item',
+                checked: true,
+                mentions: [{ id: 'u1', name: 'Alice' }],
+                children: [{ text: 'task' }],
+              })}
+            />
+          </ConfigProvider>,
+        );
+        expect(container.querySelector('[data-be="list-item"]')).toBeInTheDocument();
+        expect(screen.getByText('Alice')).toBeInTheDocument();
+      });
+    });
+
     describe('提及用户测试', () => {
       it('应该为任务列表项显示提及用户组件', () => {
         const taskItemWithMentionsProps = {
@@ -227,6 +271,92 @@ describe('List Components', () => {
         const li = document.querySelector('[data-be="list-item"]');
         expect(li).toBeInTheDocument();
       });
+
+      it('点击提及下拉区域应阻止冒泡和默认行为', async () => {
+        const loadMentions = vi.fn().mockResolvedValue([
+          { id: '1', name: 'Alice', avatar: 'http://example.com/a.png' },
+        ]);
+        vi.mocked(editorStore.useEditorStore).mockReturnValue({
+          store: { dragStart: vi.fn() },
+          markdownContainerRef: { current: document.createElement('div') },
+          readonly: false,
+          editorProps: {
+            comment: { loadMentions, mentionsPlaceholder: '指派给' },
+          },
+        } as any);
+        const taskItemProps = {
+          ...defaultListItemProps,
+          element: {
+            ...defaultListItemProps.element,
+            checked: true,
+            mentions: [],
+            children: [{ text: '' }],
+          },
+        };
+        const { container } = render(<ListItem {...taskItemProps} />);
+        await vi.waitFor(() => {
+          expect(loadMentions).toHaveBeenCalled();
+        });
+        const trigger = container.querySelector('.ant-dropdown-trigger');
+        const wrapperDiv = trigger?.parentElement ?? container.querySelector('[data-be="list-item"]');
+        const e = new MouseEvent('click', { bubbles: true });
+        const stopSpy = vi.spyOn(e, 'stopPropagation');
+        const preventSpy = vi.spyOn(e, 'preventDefault');
+        wrapperDiv?.dispatchEvent(e);
+        expect(stopSpy).toHaveBeenCalled();
+        expect(preventSpy).toHaveBeenCalled();
+      });
+
+      it('应渲染带 http avatar 的菜单项并支持选择', async () => {
+        const users = [
+          { id: '1', name: 'Alice', avatar: 'http://example.com/a.png' },
+          { id: '2', name: 'Bob', avatar: 'https://x.com/b.jpg' },
+        ];
+        const loadMentions = vi.fn().mockResolvedValue(users);
+        const update = vi.fn();
+        vi.mocked(editorStore.useEditorStore).mockReturnValue({
+          store: { dragStart: vi.fn() },
+          markdownContainerRef: { current: document.createElement('div') },
+          readonly: false,
+          editorProps: {
+            comment: { loadMentions, mentionsPlaceholder: '指派给' },
+          },
+        } as any);
+        vi.mocked(editorHooks.useMEditor).mockReturnValue([null, update]);
+        const taskItemProps = {
+          ...defaultListItemProps,
+          element: {
+            ...defaultListItemProps.element,
+            checked: true,
+            mentions: [],
+            children: [{ text: '' }],
+          },
+        };
+        const { container } = render(<ListItem {...taskItemProps} />);
+        await vi.waitFor(() => {
+          expect(loadMentions).toHaveBeenCalled();
+        });
+        const trigger =
+          container.querySelector('.ant-dropdown-trigger') ??
+          container.querySelector('div[style*="cursor: pointer"]');
+        if (trigger) {
+          fireEvent.click(trigger);
+          await vi.waitFor(() => {
+            const menuItem = document.querySelector('.ant-dropdown-menu-item');
+            if (menuItem) {
+              fireEvent.click(menuItem);
+              expect(update).toHaveBeenCalledWith(
+                expect.objectContaining({
+                  mentions: expect.any(Array),
+                }),
+              );
+            }
+          });
+        }
+        expect(
+          container.querySelector('[data-be="list-item"]'),
+        ).toBeInTheDocument();
+      });
     });
 
     describe('自定义渲染测试', () => {
@@ -235,13 +365,56 @@ describe('List Components', () => {
         const li = document.querySelector('[data-be="list-item"]');
         expect(li).toBeInTheDocument();
       });
+
+      it('使用 listItemRender 时应渲染自定义内容并触发拖拽时调用 store.dragStart', () => {
+        const dragStart = vi.fn();
+        const listItemRender = vi.fn((_props: any, _ctx: any) => (
+          <span data-custom="list-item-inner">Custom</span>
+        ));
+        vi.mocked(editorStore.useEditorStore).mockReturnValue({
+          store: { dragStart },
+          markdownContainerRef: { current: document.createElement('div') },
+          readonly: false,
+          editorProps: { comment: { listItemRender } },
+        } as any);
+        const props = {
+          ...defaultListItemProps,
+          element: {
+            ...defaultListItemProps.element,
+            checked: false,
+            children: [{ text: 'x' }],
+          },
+        };
+        const { container } = render(<ListItem {...props} />);
+        expect(listItemRender).toHaveBeenCalledWith(
+          expect.objectContaining({ children: expect.anything() }),
+          expect.objectContaining({ element: props.element, attributes: props.attributes }),
+        );
+        expect(screen.getByText('Custom')).toBeInTheDocument();
+        const li = container.querySelector('[data-be="list-item"]');
+        expect(li).toBeInTheDocument();
+        fireEvent.dragStart(li!);
+        expect(dragStart).toHaveBeenCalledTimes(1);
+        expect(dragStart).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.anything(),
+        );
+      });
     });
 
     describe('拖拽测试', () => {
       it('应该处理拖拽开始事件', () => {
-        render(<ListItem {...defaultListItemProps} />);
-        const li = document.querySelector('[data-be="list-item"]');
+        const dragStart = vi.fn();
+        vi.mocked(editorStore.useEditorStore).mockReturnValue({
+          store: { dragStart },
+          markdownContainerRef: { current: document.createElement('div') },
+          readonly: false,
+        } as any);
+        const { container } = render(<ListItem {...defaultListItemProps} />);
+        const li = container.querySelector('[data-be="list-item"]');
         expect(li).toBeInTheDocument();
+        fireEvent.dragStart(li!);
+        expect(dragStart).toHaveBeenCalled();
       });
     });
 

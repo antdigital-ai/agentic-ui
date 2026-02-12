@@ -1,8 +1,18 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { afterEach, describe, expect, it } from 'vitest';
-import { I18nProvide, cnLabels, compileTemplate, enLabels } from '../src/I18n';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  cnLabels,
+  compileTemplate,
+  detectUserLanguage,
+  enLabels,
+  getLocaleByLanguage,
+  I18nContext,
+  I18nProvide,
+  saveUserLanguage,
+  useMergedLocale,
+} from '../src/I18n';
 
 describe('I18n Provider', () => {
   afterEach(() => {
@@ -113,6 +123,183 @@ describe('Template Compilation', () => {
   it('should handle empty template', () => {
     const result = compileTemplate('');
     expect(result).toBe('');
+  });
+});
+
+describe('detectUserLanguage', () => {
+  const originalLocalStorage = window.localStorage;
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    if (window.document.querySelector('[data-antd-locale]')) {
+      window.document.querySelector('[data-antd-locale]')?.remove();
+    }
+  });
+
+  it('应从 data-antd-locale 读取 zh 返回 zh-CN (40-41)', () => {
+    vi.spyOn(originalLocalStorage, 'getItem').mockReturnValue(null);
+    const el = document.createElement('div');
+    el.setAttribute('data-antd-locale', 'zh-CN');
+    document.body.appendChild(el);
+    expect(detectUserLanguage()).toBe('zh-CN');
+    el.remove();
+  });
+
+  it('应从 data-antd-locale 读取 en 返回 en-US (43-44)', () => {
+    vi.spyOn(originalLocalStorage, 'getItem').mockReturnValue(null);
+    const el = document.createElement('div');
+    el.setAttribute('data-antd-locale', 'en-US');
+    document.body.appendChild(el);
+    expect(detectUserLanguage()).toBe('en-US');
+    el.remove();
+  });
+
+  it('应从 navigator 语言 zh 返回 zh-CN (60-61)', () => {
+    const originalNavigator = window.navigator;
+    vi.spyOn(originalLocalStorage, 'getItem').mockReturnValue(null);
+    Object.defineProperty(window, 'navigator', {
+      value: { languages: ['zh-CN', 'zh', 'en-US'], language: 'zh-CN' },
+      writable: true,
+    });
+    expect(detectUserLanguage()).toBe('zh-CN');
+    Object.defineProperty(window, 'navigator', {
+      value: originalNavigator,
+      writable: true,
+    });
+  });
+
+  it('应从 navigator 语言 en 返回 en-US (67-68)', () => {
+    vi.spyOn(originalLocalStorage, 'getItem').mockReturnValue(null);
+    const origQuery = document.querySelector.bind(document);
+    const querySelector = vi
+      .spyOn(document, 'querySelector')
+      .mockImplementation((sel: string) => {
+        if (sel === '[data-antd-locale]') return null;
+        return origQuery(sel);
+      });
+    const mockNav = { languages: ['en-US', 'en'], language: 'en-US' };
+    vi.stubGlobal('navigator', mockNav);
+    expect(detectUserLanguage()).toBe('en-US');
+    querySelector.mockRestore();
+    vi.unstubAllGlobals();
+  });
+
+  it('测试环境且前序未命中时应返回 en-US', () => {
+    vi.spyOn(originalLocalStorage, 'getItem').mockReturnValue(null);
+    const origQuery = document.querySelector.bind(document);
+    const querySpy = vi
+      .spyOn(document, 'querySelector')
+      .mockImplementation((sel: string) => {
+        if (sel === '[data-antd-locale]') return null;
+        return origQuery(sel);
+      });
+    vi.stubGlobal('navigator', { languages: ['fr-FR'], language: 'fr' });
+    expect(detectUserLanguage()).toBe('en-US');
+    querySpy.mockRestore();
+    vi.unstubAllGlobals();
+  });
+
+  it('非测试环境且前序未命中时应返回 zh-CN', () => {
+    const origEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+    vi.spyOn(originalLocalStorage, 'getItem').mockReturnValue(null);
+    const origQuery = document.querySelector.bind(document);
+    vi.spyOn(document, 'querySelector').mockImplementation((sel: string) => {
+      if (sel === '[data-antd-locale]') return null;
+      return origQuery(sel);
+    });
+    vi.stubGlobal('navigator', { languages: ['fr-FR'], language: 'fr' });
+    expect(detectUserLanguage()).toBe('zh-CN');
+    process.env.NODE_ENV = origEnv;
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+});
+
+describe('getLocaleByLanguage', () => {
+  it('zh-CN 应返回 cnLabels', () => {
+    expect(getLocaleByLanguage('zh-CN')).toBe(cnLabels);
+  });
+  it('en-US 应返回 enLabels', () => {
+    expect(getLocaleByLanguage('en-US')).toBe(enLabels);
+  });
+});
+
+describe('saveUserLanguage', () => {
+  it('应在 window 存在时写入 localStorage', () => {
+    saveUserLanguage('en-US');
+    expect(window.localStorage.getItem('md-editor-language')).toBe('en-US');
+    saveUserLanguage('zh-CN');
+    expect(window.localStorage.getItem('md-editor-language')).toBe('zh-CN');
+  });
+});
+
+describe('useMergedLocale', () => {
+  it('有 override 时应合并返回 (120-122)', () => {
+    const TestComponent = () => {
+      const merged = useMergedLocale({ table: 'OverriddenTable' });
+      return <div data-testid="merged">{merged.table}</div>;
+    };
+    render(
+      <I18nProvide>
+        <TestComponent />
+      </I18nProvide>,
+    );
+    expect(screen.getByTestId('merged')).toHaveTextContent('OverriddenTable');
+  });
+});
+
+describe('I18nProvide setLocale', () => {
+  it('setLocale(cnLabels) 应切换为 zh-CN (213)', () => {
+    const TestComponent = () => {
+      const { setLocale, language } = React.useContext(I18nContext);
+      return (
+        <div>
+          <span data-testid="lang">{language}</span>
+          <button
+            type="button"
+            data-testid="set-cn"
+            onClick={() => setLocale?.(cnLabels)}
+          >
+            Set CN
+          </button>
+        </div>
+      );
+    };
+    render(
+      <I18nProvide defaultLanguage="en-US" autoDetect={false}>
+        <TestComponent />
+      </I18nProvide>,
+    );
+    expect(screen.getByTestId('lang')).toHaveTextContent('en-US');
+    fireEvent.click(screen.getByTestId('set-cn'));
+    expect(screen.getByTestId('lang')).toHaveTextContent('zh-CN');
+  });
+
+  it('setLocale(enLabels) 应切换为 en-US (214)', () => {
+    const TestComponent = () => {
+      const { setLocale, language } = React.useContext(I18nContext);
+      return (
+        <div>
+          <span data-testid="lang">{language}</span>
+          <button
+            type="button"
+            data-testid="set-en"
+            onClick={() => setLocale?.(enLabels)}
+          >
+            Set EN
+          </button>
+        </div>
+      );
+    };
+    render(
+      <I18nProvide defaultLanguage="zh-CN" autoDetect={false}>
+        <TestComponent />
+      </I18nProvide>,
+    );
+    expect(screen.getByTestId('lang')).toHaveTextContent('zh-CN');
+    fireEvent.click(screen.getByTestId('set-en'));
+    expect(screen.getByTestId('lang')).toHaveTextContent('en-US');
   });
 });
 

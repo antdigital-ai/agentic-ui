@@ -1,4 +1,4 @@
-﻿// @ts-nocheck
+// @ts-nocheck
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
@@ -8,25 +8,61 @@ import {
   SuggestionConnext,
 } from '../src/MarkdownInputField/Suggestion';
 
-// Mock antd Dropdown
+// Mock antd Dropdown: support popupRender, menu.items.onClick, onOpenChange
 vi.mock('antd', async () => {
   const actual = await vi.importActual('antd');
   return {
     ...actual,
-    Dropdown: ({ children, menu, open }: any) => (
-      <div>
-        {children}
-        {open && (
-          <div data-testid="dropdown-menu">
-            {menu?.items
-              ? menu.items.map((item: any, index: number) => (
-                  <div key={item.key || index}>{item.label}</div>
-                ))
-              : null}
-          </div>
-        )}
-      </div>
-    ),
+    Dropdown: ({
+      children,
+      menu,
+      open,
+      popupRender,
+      onOpenChange,
+    }: any) => {
+      const content =
+        open && popupRender
+          ? popupRender(
+              menu?.items ? (
+                <div data-testid="dropdown-menu">
+                  {menu.items.map((item: any, index: number) => (
+                    <div
+                      key={item.key || index}
+                      data-testid={`item-${item.key || index}`}
+                      onClick={() => {
+                        item.onClick?.();
+                        onOpenChange?.(false);
+                      }}
+                    >
+                      {item.label}
+                    </div>
+                  ))}
+                </div>
+              ) : null,
+            )
+          : open && menu?.items ? (
+              <div data-testid="dropdown-menu">
+                {menu.items.map((item: any, index: number) => (
+                  <div
+                    key={item.key || index}
+                    data-testid={`item-${item.key || index}`}
+                    onClick={() => {
+                      item.onClick?.();
+                      onOpenChange?.(false);
+                    }}
+                  >
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+            ) : null;
+      return (
+        <div>
+          {children}
+          {content}
+        </div>
+      );
+    },
     Spin: ({ children }: any) => <div data-testid="spin">{children}</div>,
   };
 });
@@ -116,6 +152,24 @@ describe('Suggestion', () => {
 
       expect(onOpenChange).toHaveBeenCalled();
     });
+
+    it('should call setOpen(false) when onOpenChange(false)', () => {
+      const onOpenChange = vi.fn();
+      render(
+        <Suggestion
+          tagInputProps={{
+            open: true,
+            onOpenChange,
+            items: [{ key: 'x', label: 'X' }],
+          }}
+        >
+          <div>Child</div>
+        </Suggestion>,
+      );
+      fireEvent.click(screen.getByTestId('item-x'));
+      expect(onOpenChange).toHaveBeenCalled();
+      expect(onOpenChange.mock.calls.some((c) => c[0] === false)).toBe(true);
+    });
   });
 
   describe('Items Prop', () => {
@@ -132,6 +186,57 @@ describe('Suggestion', () => {
       );
 
       // Items should be available in the suggestion context
+    });
+
+    it('should use empty initial state when items is function', () => {
+      const itemsFn = vi.fn().mockResolvedValue([]);
+      const { container } = render(
+        <Suggestion tagInputProps={{ items: itemsFn, open: false }}>
+          <div>Content</div>
+        </Suggestion>,
+      );
+      expect(container).toBeInTheDocument();
+    });
+
+    it('should call item onClick and onSelectRef when clicking item', async () => {
+      const onSelect = vi.fn();
+      const CaptureRef = () => {
+        const ctx = React.useContext(SuggestionConnext);
+        React.useEffect(() => {
+          if (ctx.onSelectRef) ctx.onSelectRef.current = onSelect;
+        }, [ctx]);
+        return null;
+      };
+      render(
+        <Suggestion
+          tagInputProps={{
+            items: [{ key: 'k1', label: 'Label 1' }],
+            open: true,
+          }}
+        >
+          <CaptureRef />
+        </Suggestion>,
+      );
+      const item = screen.getByTestId('item-k1');
+      fireEvent.click(item);
+      expect(onSelect).toHaveBeenCalledWith('k1');
+    });
+
+    it('should load items when items is function and open', async () => {
+      const loaded = [
+        { key: 'loaded1', label: 'Loaded 1' },
+        { key: 'loaded2', label: 'Loaded 2' },
+      ];
+      const itemsFn = vi.fn().mockResolvedValue(loaded);
+      render(
+        <Suggestion tagInputProps={{ items: itemsFn, open: true }}>
+          <div>Content</div>
+        </Suggestion>,
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Loaded 1')).toBeInTheDocument();
+        expect(screen.getByText('Loaded 2')).toBeInTheDocument();
+      });
     });
 
     it('should handle items as a function', async () => {
@@ -194,6 +299,54 @@ describe('Suggestion', () => {
       );
 
       // Custom dropdown render should be applied
+    });
+
+    it('should call dropdownRender onSelect and close', async () => {
+      const onSelect = vi.fn();
+      const CaptureRef = () => {
+        const ctx = React.useContext(SuggestionConnext);
+        React.useEffect(() => {
+          if (ctx.onSelectRef) ctx.onSelectRef.current = onSelect;
+        }, [ctx]);
+        return null;
+      };
+      const dropdownRender = vi.fn((_content: React.ReactNode, opts: any) => {
+        return (
+          <div data-testid="custom-dd">
+            <button
+              data-testid="invoke-select"
+              type="button"
+              onClick={() => opts.onSelect?.('selected-value', [0, 1])}
+            >
+              Select
+            </button>
+          </div>
+        );
+      });
+      render(
+        <Suggestion
+          tagInputProps={{ dropdownRender, open: true }}
+        >
+          <CaptureRef />
+        </Suggestion>,
+      );
+      fireEvent.click(screen.getByTestId('invoke-select'));
+      expect(onSelect).toHaveBeenCalledWith('selected-value', [0, 1]);
+    });
+
+    it('should pass items and onKeyDown when menu is not provided', () => {
+      render(
+        <Suggestion
+          tagInputProps={{
+            items: [{ key: 'a', label: 'A' }],
+            open: true,
+          }}
+        >
+          <div>Content</div>
+        </Suggestion>,
+      );
+      expect(screen.getByTestId('dropdown-menu')).toBeInTheDocument();
+      expect(screen.getByText('A')).toBeInTheDocument();
     });
 
     it('should render custom menu', () => {
@@ -281,11 +434,10 @@ describe('Suggestion', () => {
         }, [context]);
 
         return (
-          <button
-            type="button"
-            type="button"
-            onClick={() => context.onSelectRef?.current?.('selected value')}
-          >
+        <button
+              type="button"
+              onClick={() => context.onSelectRef?.current?.('selected value')}
+            >
             Select
           </button>
         );

@@ -92,6 +92,24 @@ describe('ReadonlySchema', () => {
     expect(screen.getByTestId('custom-render')).toBeInTheDocument();
   });
 
+  it('codeProps.render 抛出时应回退默认渲染', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mockEditorProps.codeProps = {
+      render: vi.fn(() => {
+        throw new Error('render error');
+      }),
+    };
+
+    renderWithProvider(
+      <ReadonlySchema element={mockElement} attributes={mockAttributes}>
+        {null}
+      </ReadonlySchema>,
+    );
+
+    expect(screen.getByText(/properties/)).toBeInTheDocument();
+    consoleSpy.mockRestore();
+  });
+
   it('agentar-card 默认应渲染 SchemaRenderer', () => {
     const elementWithAgentarCard: CodeNode = {
       ...mockElement,

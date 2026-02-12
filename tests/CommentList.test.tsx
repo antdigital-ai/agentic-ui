@@ -9,6 +9,26 @@ import {
 } from '../src/MarkdownEditor/BaseMarkdownEditor';
 import { CommentList } from '../src/MarkdownEditor/editor/components/CommentList';
 
+const { setShowCommentMock, mockMarkdownEditorRef } = vi.hoisted(() => ({
+  setShowCommentMock: vi.fn(),
+  mockMarkdownEditorRef: { current: {} },
+}));
+
+vi.mock('../src/MarkdownEditor/editor/store', async (importOriginal) => {
+  const actual = (await importOriginal()) as any;
+  const React = await import('react');
+  return {
+    ...actual,
+    useEditorStore: () => ({
+      markdownEditorRef: mockMarkdownEditorRef,
+    }),
+    EditorStoreContext: React.createContext({
+      setShowComment: setShowCommentMock,
+      markdownEditorRef: mockMarkdownEditorRef,
+    }),
+  };
+});
+
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
   motion: {
@@ -190,7 +210,6 @@ describe('CommentList Component', () => {
     const deleteButton = screen.getByLabelText('delete');
     fireEvent.click(deleteButton);
 
-    // 查找并点击确认按钮
     const confirmButton = screen.getByText('OK') || screen.getByText('确定');
     if (confirmButton) {
       fireEvent.click(confirmButton);
@@ -200,6 +219,23 @@ describe('CommentList Component', () => {
       'comment-1',
       mockCommentData[0],
     );
+  });
+
+  it('onDelete 抛出时静默捕获', () => {
+    const onDeleteReject = vi.fn().mockRejectedValue(new Error('delete failed'));
+    renderWithProvider(
+      <CommentList
+        commentList={[mockCommentData[0]]}
+        comment={{ ...mockComment, onDelete: onDeleteReject }}
+        style={{ width: '300px' }}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('delete'));
+    const confirmButton = screen.getByText('OK') || screen.getByText('确定');
+    if (confirmButton) {
+      fireEvent.click(confirmButton);
+    }
+    expect(onDeleteReject).toHaveBeenCalled();
   });
 
   it('should handle empty comment data', () => {
@@ -341,6 +377,18 @@ describe('CommentList Component', () => {
     );
 
     expect(screen.getByLabelText('close')).toBeInTheDocument();
+  });
+
+  it('点击关闭按钮应调用 setShowComment([])', () => {
+    renderWithProvider(
+      <CommentList
+        commentList={mockCommentData}
+        comment={mockComment}
+        style={{ width: '300px' }}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('close'));
+    expect(setShowCommentMock).toHaveBeenCalledWith([]);
   });
 
   it('should handle missing comment prop gracefully', () => {

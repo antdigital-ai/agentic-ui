@@ -40,7 +40,8 @@ describe('scrollTo - 完整功能测试', () => {
       configurable: true,
     });
 
-    // Mock global window
+    // Mock global window; 满足 isWindow(container) 需 container.window === container
+    (mockWindow as any).window = mockWindow;
     global.window = mockWindow as any;
   });
 
@@ -287,6 +288,50 @@ describe('scrollTo - 完整功能测试', () => {
 
       // 验证最终到达目标位置
       expect(positions[positions.length - 1]).toBe(100);
+    });
+  });
+
+  describe('无 window / 无 container 早退与回调', () => {
+    it('无 window 时应调用 callback 后直接返回 (24-27)', () => {
+      const callback = vi.fn();
+      const origWindow = global.window;
+      (global as any).window = undefined;
+      scrollTo(0, { callback });
+      expect(callback).toHaveBeenCalledTimes(1);
+      global.window = origWindow;
+    });
+
+    it('无 window 且无 callback 时不抛错', () => {
+      const origWindow = global.window;
+      (global as any).window = undefined;
+      expect(() => scrollTo(0)).not.toThrow();
+      global.window = origWindow;
+    });
+
+    it('container 为 null 时应调用 callback 后直接返回 (32-35)', () => {
+      const callback = vi.fn();
+      scrollTo(0, { container: null as any, callback });
+      expect(callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('frameFunc 内 window 变为 undefined 时应调用 callback (44-47)', () => {
+      const callback = vi.fn();
+      scrollTo(100, { container: mockElement, callback, duration: 200 });
+      const origWindow = global.window;
+      (global as any).window = undefined;
+      vi.advanceTimersByTime(20);
+      expect(callback).toHaveBeenCalledTimes(1);
+      global.window = origWindow;
+    });
+
+    it('Window 容器应走 scrollTo 分支 (65-67)', () => {
+      const scrollToSpy = vi.fn();
+      (mockWindow as any).scrollTo = scrollToSpy;
+      scrollTo(250, { container: mockWindow as any, duration: 100 });
+      vi.advanceTimersByTime(20);
+      expect(scrollToSpy).toHaveBeenCalled();
+      expect(scrollToSpy.mock.calls[0][0]).toBe(mockWindow.pageXOffset);
+      expect(scrollToSpy.mock.calls[0][1]).toBeDefined();
     });
   });
 

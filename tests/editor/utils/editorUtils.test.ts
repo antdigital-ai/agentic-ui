@@ -3,7 +3,10 @@ import { ReactEditor } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   calcPath,
+  createDomRangeFromNodes,
+  createSelectionFromNodes,
   EditorUtils,
+  escapeRegExp,
   findByPathAndText,
   findLeafPath,
   getDefaultView,
@@ -167,6 +170,12 @@ describe('EditorUtils', () => {
       const result = EditorUtils.findPrev(editor, [2, 0]);
       expect(Array.isArray(result)).toBe(true);
     });
+
+    it('should return [] when no previous path exists', () => {
+      const result = EditorUtils.findPrev(editor, [0, 0]);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(0);
+    });
   });
 
   describe('findMediaInsertPath', () => {
@@ -192,6 +201,25 @@ describe('EditorUtils', () => {
           ],
         },
       ];
+      const result = EditorUtils.findMediaInsertPath(editor);
+      expect(result).toBeDefined();
+    });
+
+    it('should handle head type', () => {
+      editor.children = [
+        { type: 'head', level: 1, children: [{ text: 'Title' }] },
+        { type: 'paragraph', children: [{ text: 'Body' }] },
+      ];
+      editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 5 } };
+      const result = EditorUtils.findMediaInsertPath(editor);
+      expect(result).toBeDefined();
+    });
+
+    it('should handle paragraph with text', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'Hello' }] },
+      ];
+      editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 5 } };
       const result = EditorUtils.findMediaInsertPath(editor);
       expect(result).toBeDefined();
     });
@@ -233,6 +261,12 @@ describe('EditorUtils', () => {
       EditorUtils.moveBeforeSpace(editor, [0, 0]);
       expect(editor.selection).toBeDefined();
     });
+
+    it('moveBeforeSpace when path has no previous should insert node', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }];
+      EditorUtils.moveBeforeSpace(editor, [0, 0]);
+      expect(editor.children).toBeDefined();
+    });
   });
 
   describe('clearMarks', () => {
@@ -249,6 +283,37 @@ describe('EditorUtils', () => {
       editor.selection = null;
       EditorUtils.clearMarks(editor);
       expect(editor.selection).toBeNull();
+    });
+
+    it('should clear marks with split', () => {
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 5 },
+      };
+      EditorUtils.clearMarks(editor, true);
+      expect(editor.selection).toBeDefined();
+    });
+
+    it('should handle list selection and convert to paragraphs', () => {
+      editor.children = [
+        {
+          type: 'bulleted-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [
+                { type: 'paragraph', children: [{ text: 'Item 1' }] },
+              ],
+            },
+          ],
+        },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 0, 0], offset: 6 },
+      };
+      EditorUtils.clearMarks(editor);
+      expect(editor.children).toBeDefined();
     });
   });
 
@@ -277,6 +342,33 @@ describe('EditorUtils', () => {
       const result = EditorUtils.listToParagraph(editor, listNode);
       expect(result).toEqual([]);
     });
+
+    it('should handle nested list', () => {
+      const listNode = {
+        type: 'numbered-list' as const,
+        children: [
+          {
+            type: 'list-item' as const,
+            children: [
+              {
+                type: 'list' as const,
+                children: [
+                  {
+                    type: 'list-item' as const,
+                    children: [
+                      { type: 'paragraph' as const, children: [{ text: 'Nested' }] },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      const result = EditorUtils.listToParagraph(editor, listNode as any);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(0);
+    });
   });
 
   describe('replaceSelectedNode', () => {
@@ -290,8 +382,18 @@ describe('EditorUtils', () => {
 
     it('should handle empty text node', () => {
       editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
+      editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
       const newNode = [
         { type: 'paragraph' as const, children: [{ text: 'New content' }] },
+      ];
+      EditorUtils.replaceSelectedNode(editor, newNode);
+      expect(editor.children).toBeDefined();
+    });
+
+    it('should insert when no node entries', () => {
+      editor.selection = null;
+      const newNode = [
+        { type: 'paragraph' as const, children: [{ text: 'Inserted' }] },
       ];
       EditorUtils.replaceSelectedNode(editor, newNode);
       expect(editor.children).toBeDefined();
@@ -331,6 +433,12 @@ describe('EditorUtils', () => {
       EditorUtils.reset(editor, undefined, true);
       expect(editor.history).toBeDefined();
     });
+
+    it('should reset editor with History object', () => {
+      const history = { undos: [[]], redos: [[]] };
+      EditorUtils.reset(editor, undefined, history as any);
+      expect(editor.history).toBe(history);
+    });
   });
 
   describe('includeAll', () => {
@@ -366,6 +474,14 @@ describe('EditorUtils', () => {
       const result = EditorUtils.copyText(editor, start);
       expect(typeof result).toBe('string');
     });
+
+    it('should copy text across multiple nodes when end in different path', () => {
+      const start: Point = { path: [0, 0], offset: 0 };
+      const end: Point = { path: [1, 0], offset: 3 };
+      const result = EditorUtils.copyText(editor, start, end);
+      expect(typeof result).toBe('string');
+      expect(result.length).toBeGreaterThan(0);
+    });
   });
 
   describe('cutText', () => {
@@ -381,11 +497,28 @@ describe('EditorUtils', () => {
       const result = EditorUtils.cutText(editor, start);
       expect(Array.isArray(result)).toBe(true);
     });
+
+    it('should cut text across multiple nodes when end in different path', () => {
+      const start: Point = { path: [0, 0], offset: 0 };
+      const end: Point = { path: [1, 0], offset: 3 };
+      const result = EditorUtils.cutText(editor, start, end);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(0);
+    });
   });
 
   describe('isFormatActive', () => {
     it('should check if format is active', () => {
       const result = EditorUtils.isFormatActive(editor, 'bold');
+      expect(typeof result).toBe('boolean');
+    });
+
+    it('should check format with value', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'x', color: 'red' }] },
+      ];
+      editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 1 } };
+      const result = EditorUtils.isFormatActive(editor, 'color', 'red');
       expect(typeof result).toBe('boolean');
     });
   });
@@ -394,6 +527,15 @@ describe('EditorUtils', () => {
     it('should get URL from selected text', () => {
       const result = EditorUtils.getUrl(editor);
       expect(typeof result).toBe('string');
+    });
+
+    it('should return url when text has url mark', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'link', url: 'https://example.com' }] },
+      ];
+      editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 4 } };
+      const result = EditorUtils.getUrl(editor);
+      expect(result).toBe('https://example.com');
     });
   });
 
@@ -420,6 +562,15 @@ describe('EditorUtils', () => {
       };
       EditorUtils.toggleFormat(editor, 'bold');
       expect(editor.selection).toBeDefined();
+    });
+
+    it('should remove format when already active', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'Bold', bold: true }] },
+      ];
+      editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 4 } };
+      EditorUtils.toggleFormat(editor, 'bold');
+      expect(editor.children).toBeDefined();
     });
   });
 
@@ -466,12 +617,33 @@ describe('EditorUtils', () => {
       const result = EditorUtils.checkEnd(editor);
       expect(typeof result).toBe('boolean');
     });
+
+    it('should insert paragraph when last node is not paragraph', () => {
+      editor.children = [
+        { type: 'head', level: 1, children: [{ text: 'Title' }] },
+      ];
+      const result = EditorUtils.checkEnd(editor);
+      expect(typeof result).toBe('boolean');
+    });
+
+    it('should insert paragraph when last node has media child', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ type: 'media', url: 'x', children: [{ text: '' }] }] },
+      ];
+      const result = EditorUtils.checkEnd(editor);
+      expect(typeof result).toBe('boolean');
+    });
   });
 
   describe('checkSelEnd', () => {
     it('should check if path is at end', () => {
       const result = EditorUtils.checkSelEnd(editor, [1]);
       expect(typeof result).toBe('boolean');
+    });
+
+    it('should return false when path has next sibling', () => {
+      const result = EditorUtils.checkSelEnd(editor, [0]);
+      expect(result).toBe(false);
     });
   });
 
@@ -514,6 +686,12 @@ describe('EditorUtils', () => {
     it('should handle undefined src', () => {
       const result = EditorUtils.createMediaNode(undefined, 'image');
       expect(result).toEqual({ text: '' });
+    });
+
+    it('should create image node with extraPros alt', () => {
+      const result = EditorUtils.createMediaNode('test.jpg', 'image', { alt: 'My alt' });
+      expect(result).toBeDefined();
+      expect((result as any).children?.[1]?.alt).toBe('My alt');
     });
   });
 
@@ -587,6 +765,24 @@ describe('Utility functions', () => {
       const result = isEventHandled(event);
       expect(result).toBe(false);
     });
+
+    it('should return true when isDefaultPrevented', () => {
+      const event = {
+        isDefaultPrevented: () => true,
+        isPropagationStopped: () => false,
+      } as any;
+      const handler = vi.fn();
+      expect(isEventHandled(event, handler)).toBe(true);
+    });
+
+    it('should return true when isPropagationStopped', () => {
+      const event = {
+        isDefaultPrevented: () => false,
+        isPropagationStopped: () => true,
+      } as any;
+      const handler = vi.fn();
+      expect(isEventHandled(event, handler)).toBe(true);
+    });
   });
 
   describe('hasTarget', () => {
@@ -632,6 +828,12 @@ describe('Utility functions', () => {
       const result = getSelectionFromDomSelection(editor as any, selection);
       expect(result).toBeDefined();
     });
+
+    it('should return null when rangeCount is 0', () => {
+      const selection = { rangeCount: 0 } as Selection;
+      const result = getSelectionFromDomSelection(editor as any, selection);
+      expect(result).toBeNull();
+    });
   });
 
   describe('hasEditableTarget', () => {
@@ -662,6 +864,12 @@ describe('Utility functions', () => {
       const result = getRelativePath([1, 2], [0, 1, 2]);
       expect(Array.isArray(result)).toBe(true);
     });
+
+    it('should handle path shorter than anther', () => {
+      const result = getRelativePath([1], [0, 1, 2]);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toEqual([0, 0, 0]);
+    });
   });
 
   describe('calcPath', () => {
@@ -682,12 +890,51 @@ describe('Utility functions', () => {
       expect(isPath([0, -1, 2])).toBe(false);
       expect(isPath([0, 'string', 2])).toBe(false);
     });
+
+    it('should reject NaN and Infinity', () => {
+      expect(isPath([0, NaN, 1])).toBe(false);
+      expect(isPath([0, Infinity, 1])).toBe(false);
+    });
   });
 
   describe('findLeafPath', () => {
     it('should find leaf path', () => {
       const result = findLeafPath(editor, [0]);
       expect(Array.isArray(result)).toBe(true);
+    });
+  });
+
+  describe('escapeRegExp', () => {
+    it('should escape regex special characters', () => {
+      expect(escapeRegExp('.*+?^${}()|[]\\')).toBe('\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\');
+    });
+
+    it('should leave plain string unchanged for non-special chars', () => {
+      expect(escapeRegExp('hello')).toBe('hello');
+    });
+  });
+
+  describe('createSelectionFromNodes', () => {
+    it('should return null when anchorNode is null', () => {
+      const result = createSelectionFromNodes(null, 0, document.createTextNode('x'), 1);
+      expect(result).toBeNull();
+    });
+
+    it('should return null when focusNode is null', () => {
+      const result = createSelectionFromNodes(document.createTextNode('x'), 0, null, 1);
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('createDomRangeFromNodes', () => {
+    it('should return null when anchorNode is null', () => {
+      const result = createDomRangeFromNodes(null, 0, document.createTextNode('x'), 1);
+      expect(result).toBeNull();
+    });
+
+    it('should return null when focusNode is null', () => {
+      const result = createDomRangeFromNodes(document.createTextNode('x'), 0, null, 1);
+      expect(result).toBeNull();
     });
   });
 

@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { CodeNode } from '../../MarkdownEditor/el';
+import { isBrowser } from './env';
 import { MermaidFallback } from './MermaidFallback';
 import { MermaidRendererImpl } from './MermaidRendererImpl';
 import { loadMermaid } from './utils';
@@ -50,9 +51,7 @@ const MermaidRenderer = lazy(async () => {
  * - 自动生成唯一ID
  */
 export const Mermaid = (props: { element: CodeNode }) => {
-  const isBrowser = typeof window !== 'undefined';
-
-  if (!isBrowser) {
+  if (!isBrowser()) {
     return null;
   }
 

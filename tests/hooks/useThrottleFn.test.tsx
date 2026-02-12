@@ -196,6 +196,33 @@ describe('useThrottleFn', () => {
     expect(clearTimeoutSpy).toHaveBeenCalled();
   });
 
+  it('remainingTime<=0 且存在 pending timeout 时应 clearTimeout 并立即执行', () => {
+    const mockFn = vi.fn();
+    let now = 100;
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+
+    const { result } = renderHook(() => useThrottleFn(mockFn, 100));
+
+    act(() => {
+      result.current('first');
+    });
+    expect(mockFn).toHaveBeenCalledWith('first');
+
+    act(() => {
+      result.current('second');
+    });
+    expect(mockFn).toHaveBeenCalledTimes(1);
+
+    now = 200;
+    act(() => {
+      result.current('third');
+    });
+    expect(mockFn).toHaveBeenCalledWith('third');
+    expect(mockFn).toHaveBeenCalledTimes(2);
+
+    vi.mocked(Date.now).mockRestore();
+  });
+
   it('should handle function with different contexts', () => {
     const mockFn = vi.fn();
     const { result } = renderHook(() => useThrottleFn(mockFn, 100));

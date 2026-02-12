@@ -619,5 +619,37 @@ describe('MarkdownInputField Enhanced Tests', () => {
         expect(screen.getByTestId('base-markdown-editor')).toBeInTheDocument();
       });
     });
+
+    describe('beforeToolsRender 与 attachment.upload 分支覆盖', () => {
+      it('应渲染 beforeToolsRender 返回值', () => {
+        const beforeToolsRender = vi.fn((p: any) => (
+          <div data-testid="before-tools-custom">before tools</div>
+        ));
+
+        render(
+          <MarkdownInputField
+            value=""
+            beforeToolsRender={beforeToolsRender}
+          />,
+        );
+
+        expect(beforeToolsRender).toHaveBeenCalled();
+        expect(screen.getByTestId('before-tools-custom')).toBeInTheDocument();
+        expect(screen.getByText('before tools')).toBeInTheDocument();
+      });
+
+      it('应使用 attachment.upload 时传入 upload 包装', () => {
+        const upload = vi.fn().mockResolvedValue(undefined);
+
+        render(
+          <MarkdownInputField
+            value=""
+            attachment={{ enable: true, upload }}
+          />,
+        );
+
+        expect(screen.getByTestId('base-markdown-editor')).toBeInTheDocument();
+      });
+    });
   });
 });

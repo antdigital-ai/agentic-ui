@@ -170,11 +170,6 @@ describe('proxySandbox/index.ts', () => {
     });
 
     it('应该在没有错误对象时抛出默认错误', async () => {
-      // 模拟一个没有 error 的结果
-      const { runInSandbox } = await import(
-        '../../../src/Utils/proxySandbox/ProxySandbox'
-      );
-      const originalRunInSandbox = runInSandbox;
       vi.spyOn(
         await import('../../../src/Utils/proxySandbox/ProxySandbox'),
         'runInSandbox',
@@ -237,10 +232,6 @@ describe('proxySandbox/index.ts', () => {
     });
 
     it('应该在结果不是有效数字时抛出错误', async () => {
-      // 模拟返回非数字结果
-      const { runInSandbox } = await import(
-        '../../../src/Utils/proxySandbox/ProxySandbox'
-      );
       vi.spyOn(
         await import('../../../src/Utils/proxySandbox/ProxySandbox'),
         'runInSandbox',
@@ -332,6 +323,38 @@ describe('proxySandbox/index.ts', () => {
         // 应该包含 recommendations 数组
         expect(Array.isArray(result.recommendations)).toBe(true);
       });
+
+      it('当 Proxy 不可用时应报告 issue 与 recommendation', () => {
+        const origProxy = (global as any).Proxy;
+        try {
+          (global as any).Proxy = undefined;
+          const checker = SandboxHealthChecker.getInstance();
+          const result = checker.checkEnvironmentSupport();
+          expect(result.issues).toContain(
+            'Proxy is not supported in this environment',
+          );
+          expect(result.recommendations).toContain(
+            'Use a modern browser that supports ES6 Proxy',
+          );
+        } finally {
+          (global as any).Proxy = origProxy;
+        }
+      });
+
+      it('当 performance 不可用时应报告 issue 与 recommendation', () => {
+        const origPerf = (global as any).performance;
+        try {
+          (global as any).performance = undefined;
+          const checker = SandboxHealthChecker.getInstance();
+          const result = checker.checkEnvironmentSupport();
+          expect(result.issues).toContain('Performance API is not available');
+          expect(result.recommendations).toContain(
+            'Performance monitoring will be disabled',
+          );
+        } finally {
+          (global as any).performance = origPerf;
+        }
+      });
     });
 
     describe('testBasicFunctionality', () => {
@@ -373,6 +396,91 @@ describe('proxySandbox/index.ts', () => {
         expect(typeof result.results).toBe('object');
         expect(result).toHaveProperty('errors');
         expect(Array.isArray(result.errors)).toBe(true);
+      });
+
+      it('全局隔离与超时走 catch 时正确设置 results', async () => {
+        const ProxySandboxModule =
+          await import('../../../src/Utils/proxySandbox/ProxySandbox');
+        let callCount = 0;
+        vi.spyOn(ProxySandboxModule, 'runInSandbox').mockImplementation(
+          (code: string, opts?: any) => {
+            callCount += 1;
+            if (callCount === 1) {
+              return Promise.resolve({
+                success: true,
+                result: 2,
+                executionTime: 0,
+              });
+            }
+            if (code.includes('window')) {
+              return Promise.reject(new Error('blocked'));
+            }
+            if (opts?.timeout !== undefined) {
+              return Promise.reject(new Error('Execution timeout'));
+            }
+            return Promise.resolve({ success: false, result: undefined });
+          },
+        );
+
+        const checker = SandboxHealthChecker.getInstance();
+        const result = await checker.testBasicFunctionality();
+
+        expect(result.results.globalIsolation).toBe(true);
+        expect(result.results.timeoutMechanism).toBe(true);
+
+        vi.restoreAllMocks();
+      });
+
+      it('全局隔离 try 成功时 results.globalIsolation 为 false', async () => {
+        const ProxySandboxModule =
+          await import('../../../src/Utils/proxySandbox/ProxySandbox');
+        vi.spyOn(ProxySandboxModule, 'runInSandbox').mockImplementation(
+          (code: string) => {
+            if (code.includes('return 1 + 1'))
+              return Promise.resolve({
+                success: true,
+                result: 2,
+                executionTime: 0,
+              });
+            if (code.includes('window'))
+              return Promise.resolve({
+                success: true,
+                result: true,
+                executionTime: 0,
+              });
+            return Promise.reject(new Error('Execution timeout'));
+          },
+        );
+
+        const checker = SandboxHealthChecker.getInstance();
+        const result = await checker.testBasicFunctionality();
+
+        expect(result.results.globalIsolation).toBe(false);
+        vi.restoreAllMocks();
+      });
+
+      it('全局隔离 catch 时 results.globalIsolation 为 true', async () => {
+        const ProxySandboxModule =
+          await import('../../../src/Utils/proxySandbox/ProxySandbox');
+        vi.spyOn(ProxySandboxModule, 'runInSandbox').mockImplementation(
+          (code: string) => {
+            if (code.includes('return 1 + 1'))
+              return Promise.resolve({
+                success: true,
+                result: 2,
+                executionTime: 0,
+              });
+            if (code.includes('window'))
+              return Promise.reject(new Error('blocked'));
+            return Promise.reject(new Error('Execution timeout'));
+          },
+        );
+
+        const checker = SandboxHealthChecker.getInstance();
+        const result = await checker.testBasicFunctionality();
+
+        expect(result.results.globalIsolation).toBe(true);
+        vi.restoreAllMocks();
       });
     });
   });
