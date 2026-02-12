@@ -180,10 +180,8 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           props.className,
           `${prefix}-${placement}`,
           {
-            [`${prefix}-image-list-view`]:
-              imgList.length + videoList.length > 1,
-            [`${prefix}-image-list-view-${placement}`]:
-              imgList.length + videoList.length > 1,
+            [`${prefix}-image-list-view`]: imgList.length > 1,
+            [`${prefix}-image-list-view-${placement}`]: imgList.length > 1,
           },
         )}
       >
@@ -198,7 +196,24 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
             />
           ))}
         </Image.PreviewGroup>
-        {videoList.map((file, index) => {
+      </motion.div>
+      {videoList.length > 0 && (
+        <motion.div
+          variants={{
+            visible: { opacity: 1 },
+            hidden: { opacity: 0 },
+          }}
+          whileInView="visible"
+          initial="hidden"
+          animate="visible"
+          className={classNames(
+            `${prefix}-video-row`,
+            hashId,
+            `${prefix}-${placement}`,
+          )}
+          style={props.style}
+        >
+          {videoList.map((file, index) => {
           const videoUrl = file.previewUrl || file.url || '';
           return (
             <div
@@ -236,7 +251,8 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
             </div>
           );
         })}
-      </motion.div>
+        </motion.div>
+      )}
       <Modal
         open={videoModalOpen}
         onCancel={handleVideoModalClose}

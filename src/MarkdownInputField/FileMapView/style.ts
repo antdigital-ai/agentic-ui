@@ -95,6 +95,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
         },
       },
+      '&-video-row': {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+        width: '100%',
+      },
       '&-video-thumb': {
         position: 'relative',
         cursor: 'pointer',
