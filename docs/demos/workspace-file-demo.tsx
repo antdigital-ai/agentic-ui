@@ -228,6 +228,13 @@ graph TD
           lastModified: '15:20',
           url: '/downloads/tutorial.webm',
         },
+        {
+          name: '示例视频.mp4',
+          type: 'video',
+          size: '8.2MB',
+          lastModified: '16:45',
+          url: 'https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/90LVRoQeGdkAAAAAAAAAAAAAK4eUAQBr',
+        },
       ],
     },
     {

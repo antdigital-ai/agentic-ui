@@ -52,6 +52,15 @@ const WorkspaceFileShareDemo: React.FC = () => {
         type: 'video',
         canShare: true,
       },
+      {
+        id: 'file-6',
+        name: '示例视频.mp4',
+        size: '8.2MB',
+        lastModified: '2025-08-01 16:45:00',
+        url: 'https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/90LVRoQeGdkAAAAAAAAAAAAAK4eUAQBr',
+        type: 'video',
+        canShare: true,
+      },
     ],
     [],
   );
