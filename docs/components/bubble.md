@@ -319,6 +319,12 @@ export default () => (
 
 <code src="../demos/bubble/file-view.tsx">文件附件 - 多格式预览</code>
 
+### FileMapView 文件展示
+
+消息列表中 FileMapView 的完整展示场景：单独图片、多张图片、单个视频、多个视频、混合文件（图片 + 视频 + 文档）。
+
+<code src="../demos/bubble/fileMapView-demo.tsx">FileMapView - 消息列表展示</code>
+
 ### Pure 简洁模式
 
 展示 Pure 模式的使用，提供无边框的简洁设计，适合嵌入式场景。
