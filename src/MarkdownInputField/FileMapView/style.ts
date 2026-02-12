@@ -97,7 +97,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-video-row': {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
         gap: 8,
         width: 'fit-content',
         '&-right': {
