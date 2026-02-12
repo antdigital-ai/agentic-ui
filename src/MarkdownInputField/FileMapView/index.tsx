@@ -215,6 +215,10 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
         >
           {videoList.map((file, index) => {
           const videoUrl = file.previewUrl || file.url || '';
+          const isSingleVideo = videoList.length === 1;
+          const thumbSize = isSingleVideo
+            ? { width: 330, height: 188 }
+            : { width: 124, height: 124 };
           return (
             <div
               role="button"
@@ -229,7 +233,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
                 }
               }}
               aria-label={`播放视频：${file.name}`}
-              style={{ width: 124, height: 124 }}
+              style={thumbSize}
             >
               <video
                 src={videoUrl}
