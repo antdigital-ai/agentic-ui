@@ -54,7 +54,11 @@ export * from './MarkdownEditor';
 export * from './MarkdownEditor/el';
 export { useSelStatus } from './MarkdownEditor/hooks/editor';
 export * from './MarkdownEditor/plugin';
-export { createJinjaPlugin, jinjaPlugin } from './MarkdownEditor/plugins/jinja';
+export {
+  createJinjaPlugin,
+  jinjaPlugin,
+  type JinjaPluginOptions,
+} from './MarkdownEditor/plugins/jinja';
 export * from './MarkdownEditor/types';
 
 // MarkdownEditor 内部工具（保持向后兼容，后续版本考虑收敛）

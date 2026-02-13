@@ -10,7 +10,6 @@ describe('createJinjaPlugin', () => {
 
   it('returns plugin with jinjaConfig when called with options', () => {
     const plugin = createJinjaPlugin({
-      enable: true,
       docLink: 'https://example.com/jinja',
     });
     expect(plugin.jinja).toBe(true);
@@ -19,7 +18,15 @@ describe('createJinjaPlugin', () => {
     expect(plugin.jinjaConfig!.docLink).toBe('https://example.com/jinja');
   });
 
-  it('merges options into jinjaConfig with enable: true by default', () => {
+  it('always sets enable: true in jinjaConfig (options cannot override)', () => {
+    const plugin = createJinjaPlugin({
+      docLink: 'https://custom.doc',
+      templatePanel: { trigger: '{{', enable: true },
+    });
+    expect(plugin.jinjaConfig!.enable).toBe(true);
+  });
+
+  it('merges options into jinjaConfig with enable: true', () => {
     const plugin = createJinjaPlugin({
       docLink: 'https://custom.doc',
       templatePanel: { trigger: '{{', enable: true },
