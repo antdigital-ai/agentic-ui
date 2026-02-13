@@ -1,6 +1,6 @@
 import { Eye, FileFailed, FileUploadingSpin, Play } from '@sofa-design/icons';
 import { Image } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getFileTypeIcon } from '../../../Workspace/File/utils';
 import { FileType } from '../../../Workspace/types';
 import { AttachmentFile } from '../types';
@@ -10,53 +10,67 @@ const VideoThumbnail: React.FC<{
   src: string;
   className: string;
   style: React.CSSProperties;
-  isObjectUrl?: boolean;
-}> = ({ src, className, style, isObjectUrl }) => {
-  useEffect(() => {
-    return () => {
-      if (isObjectUrl && src) {
-        URL.revokeObjectURL(src);
-      }
-    };
-  }, [isObjectUrl, src]);
-
-  return (
-    <div
-      className={className}
+}> = ({ src, className, style }) => (
+  <div
+    className={className}
+    style={{
+      ...style,
+      position: 'relative',
+      overflow: 'hidden',
+      borderRadius: 'var(--radius-base)',
+      flexShrink: 0,
+    }}
+  >
+    <video
+      src={src}
+      preload="metadata"
+      muted
+      playsInline
       style={{
-        ...style,
-        position: 'relative',
-        overflow: 'hidden',
-        borderRadius: 'var(--radius-base)',
-        flexShrink: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        display: 'block',
+      }}
+    />
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(0, 0, 0, 0.35)',
+        pointerEvents: 'none',
       }}
     >
-      <video
-        src={src}
-        preload="metadata"
-        muted
-        playsInline
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          display: 'block',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'rgba(0, 0, 0, 0.35)',
-          pointerEvents: 'none',
-        }}
-      >
-        <Play style={{ width: 24, height: 24, color: '#fff' }} />
-      </div>
+      <Play style={{ width: 24, height: 24, color: '#fff' }} />
     </div>
+  </div>
+);
+
+/**
+ * 从 File 创建并使用 object URL 的视频缩略图，避免每次渲染都创建新 URL
+ */
+const VideoThumbnailFromBlob: React.FC<{
+  file: File;
+  className: string;
+  style: React.CSSProperties;
+}> = ({ file, className, style }) => {
+  const [objectUrl, setObjectUrl] = useState<string | null>(() => null);
+
+  useEffect(() => {
+    const url = URL.createObjectURL(file);
+    setObjectUrl(url);
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [file]);
+
+  if (!objectUrl) return null;
+
+  return (
+    <VideoThumbnail src={objectUrl} className={className} style={style} />
   );
 };
 
@@ -140,15 +154,19 @@ export const AttachmentFileIcon: React.FC<{
 
   // 视频文件缩略图预览（与图片类似，带播放按钮）
   if (isVideoFile(file)) {
-    const videoUrl =
-      file.previewUrl || file.url || (file.size ? URL.createObjectURL(file) : '');
+    const videoUrl = file.previewUrl || file.url;
     if (videoUrl) {
       return (
-        <VideoThumbnail
-          src={videoUrl}
+        <VideoThumbnail src={videoUrl} className={className} style={IMAGE_STYLE} />
+      );
+    }
+    if (file.size) {
+      return (
+        <VideoThumbnailFromBlob
+          key={`${file.name}-${file.size}-${file.lastModified || 0}`}
+          file={file}
           className={className}
           style={IMAGE_STYLE}
-          isObjectUrl={!file.previewUrl && !file.url}
         />
       );
     }
