@@ -73,7 +73,16 @@ export const useKeyboard = (
     openInsertCompletion,
     insertCompletionText$,
     setOpenInsertCompletion,
+    openJinjaTemplate,
+    setOpenJinjaTemplate,
+    setJinjaAnchorPath,
+    jinjaTemplatePanelEnabled,
   } = useEditorStore();
+  const jinjaTrigger =
+    (props.jinja?.templatePanel &&
+      typeof props.jinja.templatePanel === 'object' &&
+      props.jinja.templatePanel.trigger) ||
+    '{}';
   return useMemo(() => {
     const tab = new TabKey(markdownEditorRef.current);
     const backspace = new BackspaceKey(markdownEditorRef.current);
@@ -96,6 +105,13 @@ export const useKeyboard = (
       }
 
       if (openInsertCompletion && (isHotkey('up', e) || isHotkey('down', e))) {
+        e.preventDefault();
+        return;
+      }
+      if (
+        openJinjaTemplate &&
+        (isHotkey('up', e) || isHotkey('down', e))
+      ) {
         e.preventDefault();
         return;
       }
@@ -230,6 +246,17 @@ export const useKeyboard = (
           const codeMatch = str.match(/^```([\w+\-#]+)$/i);
           if (codeMatch) {
           } else {
+            const strAfterKey = str + (e.key.length === 1 ? e.key : '');
+            if (
+              jinjaTemplatePanelEnabled &&
+              strAfterKey === jinjaTrigger &&
+              setOpenJinjaTemplate &&
+              setJinjaAnchorPath
+            ) {
+              setJinjaAnchorPath(node[1]);
+              setTimeout(() => setOpenJinjaTemplate(true));
+              return;
+            }
             const insertMatch = str.match(/^\/([^\n]+)?$/i);
             if (
               insertMatch &&
@@ -248,5 +275,16 @@ export const useKeyboard = (
         }
       }
     };
-  }, [markdownEditorRef.current, props?.readonly]);
+  }, [
+    markdownEditorRef.current,
+    props?.readonly,
+    openInsertCompletion,
+    insertCompletionText$,
+    setOpenInsertCompletion,
+    openJinjaTemplate,
+    setOpenJinjaTemplate,
+    setJinjaAnchorPath,
+    jinjaTemplatePanelEnabled,
+    jinjaTrigger,
+  ]);
 };

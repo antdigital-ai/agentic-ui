@@ -513,6 +513,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '& &-m-html': {
         color: 'rgba(0,0,0,0.45)',
       },
+      '& &-jinja-variable': {
+        color: 'var(--color-primary-control-fill-primary, #1677ff)',
+      },
+      '& &-jinja-tag': {
+        color: 'var(--color-orange-6, #d46b08)',
+      },
+      '& &-jinja-comment': {
+        color: 'var(--color-text-tertiary, rgba(0,0,0,0.25))',
+        fontStyle: 'italic',
+      },
       '&:not(:last-child)': {
         marginBottom: '0.5em',
       },

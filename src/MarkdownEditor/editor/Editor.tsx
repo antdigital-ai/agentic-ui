@@ -167,6 +167,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
     markdownContainerRef,
     readonly,
     setDomRect,
+    jinjaEnabled,
   } = useEditorStore();
 
   // 懒加载元素索引计数器
@@ -202,7 +203,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
 
   const onKeyDown = useKeyboard(store, markdownEditorRef, props);
   const onChange = useOnchange(markdownEditorRef.current, props.onChange);
-  const high = useHighlight(store);
+  const high = useHighlight(store, jinjaEnabled);
 
   const childrenIsEmpty = useMemo(() => {
     if (!markdownEditorRef.current?.children) return false;

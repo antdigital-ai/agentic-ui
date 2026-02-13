@@ -280,6 +280,10 @@ export type CustomLeaf<T = Record<string, any>> = {
   fnc?: boolean;
   fnd?: boolean;
   comment?: boolean;
+  // Jinja 语法高亮
+  jinjaVariable?: boolean;
+  jinjaTag?: boolean;
+  jinjaComment?: boolean;
   selection?: BaseRange;
   id?: string;
   data?: Record<string, any>;
