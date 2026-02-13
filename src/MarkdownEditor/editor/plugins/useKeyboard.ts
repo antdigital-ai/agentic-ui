@@ -77,11 +77,14 @@ export const useKeyboard = (
     setOpenJinjaTemplate,
     setJinjaAnchorPath,
     jinjaTemplatePanelEnabled,
+    editorProps,
   } = useEditorStore();
+  // 从 editorProps.jinja 读取（BaseMarkdownEditor 已写入 effectiveJinja），支持插件配置的 trigger
+  const effectiveJinja = editorProps?.jinja;
   const jinjaTrigger =
-    (props.jinja?.templatePanel &&
-      typeof props.jinja.templatePanel === 'object' &&
-      props.jinja.templatePanel.trigger) ||
+    (effectiveJinja?.templatePanel &&
+      typeof effectiveJinja.templatePanel === 'object' &&
+      effectiveJinja.templatePanel.trigger) ||
     '{}';
   return useMemo(() => {
     const tab = new TabKey(markdownEditorRef.current);
@@ -244,8 +247,10 @@ export const useKeyboard = (
           if (codeMatch) {
           } else {
             const strAfterKey = str + (e.key.length === 1 ? e.key : '');
+            // 仅在实际输入一个字符且刚好补全 trigger 时打开面板，避免 Backspace 等导致误打开
             if (
               jinjaTemplatePanelEnabled &&
+              e.key.length === 1 &&
               strAfterKey === jinjaTrigger &&
               setOpenJinjaTemplate &&
               setJinjaAnchorPath
