@@ -93,6 +93,31 @@ export default () => {
     ]),
   };
 
+  // 用户消息：上传的视频
+  const mockUserVideoMessage: MessageBubbleData = {
+    id: '3',
+    role: 'user',
+    content: '这个视频讲了什么',
+    createAt: 1703123456789,
+    updateAt: 1703123456789,
+    meta: {
+      avatar:
+        'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+      title: '用户',
+    },
+    fileMap: new Map([
+      [
+        'demo.mp4',
+        createMockFile(
+          'demo.mp4',
+          'video/mp4',
+          8 * 1024 * 1024,
+          'https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/90LVRoQeGdkAAAAAAAAAAAAAK4eUAQBr',
+        ),
+      ],
+    ]),
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Message with multiple files */}
@@ -123,6 +148,21 @@ export default () => {
         bubbleRef={bubbleRef}
         pure
         originData={mockImageMessage}
+      />
+
+      {/* 用户消息：带视频附件 */}
+      <Bubble
+        avatar={mockUserVideoMessage.meta!}
+        placement="right"
+        deps={deps}
+        markdownRenderConfig={{
+          tableConfig: {
+            pure: true,
+          },
+        }}
+        bubbleRef={bubbleRef}
+        pure
+        originData={mockUserVideoMessage}
       />
     </div>
   );

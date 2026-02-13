@@ -8,6 +8,9 @@ const VideoDemo: React.FC = () => {
 ## 基本视频标签
 <video src="https://www.w3schools.com/html/mov_bbb.mp4" controls width="400"></video>
 
+## 阿里云视频
+<video src="https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/90LVRoQeGdkAAAAAAAAAAAAAK4eUAQBr" controls width="400"></video>
+
 ## 带source标签的视频
 <video controls width="600">
 <source src="https://aicomm-dev.oss-cn-shanghai.aliyuncs.com/aico/boss/transfer/wrong_question/Fa892bfbe407045efa56813498df8e508.video/mp4?Expires=1755941235&OSSAccessKeyId=LTAI5tKiBhsKfhwgbsFbC3CL&Signature=0tSi7oBjEXZHjpkSjLCRbkUpmIg%3D" type="video/mp4">

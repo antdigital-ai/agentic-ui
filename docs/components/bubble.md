@@ -150,6 +150,15 @@ const message: MessageBubbleData = {
       ),
     ],
     [
+      'preview.mp4',
+      createMockFile(
+        'preview.mp4',
+        'video/mp4',
+        1048576,
+        'https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/90LVRoQeGdkAAAAAAAAAAAAAK4eUAQBr',
+      ),
+    ],
+    [
       'image.png',
       createMockFile(
         'image.png',
@@ -310,6 +319,12 @@ export default () => (
 
 <code src="../demos/bubble/file-view.tsx">文件附件 - 多格式预览</code>
 
+### FileMapView 文件展示
+
+消息列表中 FileMapView 的完整展示场景：单独图片、多张图片、单个视频、多个视频、混合文件（图片 + 视频 + 文档）。
+
+<code src="../demos/bubble/fileMapView-demo.tsx">FileMapView - 消息列表展示</code>
+
 ### Pure 简洁模式
 
 展示 Pure 模式的使用，提供无边框的简洁设计，适合嵌入式场景。
@@ -360,12 +375,12 @@ export default () => (
 
 | 属性       | 说明                   | 类型                | 默认值   | 废弃版本 |
 | ---------- | ---------------------- | ------------------- | -------- | -------- |
-| originData | 消息的原始数据         | `MessageBubbleData` | -        | - |
-| avatar     | 头像元数据配置         | `BubbleMetaData`    | -        | - |
-| placement  | 消息布局位置           | `'left' \| 'right'` | `'left'` | - |
-| loading    | 加载状态显示           | `boolean`           | `false`  | - |
-| readonly   | 只读模式               | `boolean`           | `false`  | - |
-| pure       | 简洁模式（无边框阴影） | `boolean`           | `false`  | - |
+| originData | 消息的原始数据         | `MessageBubbleData` | -        | -        |
+| avatar     | 头像元数据配置         | `BubbleMetaData`    | -        | -        |
+| placement  | 消息布局位置           | `'left' \| 'right'` | `'left'` | -        |
+| loading    | 加载状态显示           | `boolean`           | `false`  | -        |
+| readonly   | 只读模式               | `boolean`           | `false`  | -        |
+| pure       | 简洁模式（无边框阴影） | `boolean`           | `false`  | -        |
 
 #### 样式配置
 
@@ -384,40 +399,40 @@ export default () => (
 
 #### 交互回调
 
-| 属性          | 说明                                        | 类型                                  | 默认值 | 废弃版本 |
-| ------------- | ------------------------------------------- | ------------------------------------- | ------ | -------- |
-| onLike        | 点赞回调函数                                | `(bubble: MessageBubbleData) => void` | -      | - |
-| onDislike     | 点踩回调函数（符合命名规范）                | `(bubble: MessageBubbleData) => void` | -      | - |
-| ~~onDisLike~~     | 已废弃，请使用 `onDislike`              | `(bubble: MessageBubbleData) => void` | -      | 2.29.0 |
-| onLikeCancel  | Like 子组件取消事件（符合命名规范）         | `(bubble: MessageBubbleData) => void` | -      | - |
-| ~~onCancelLike~~  | 已废弃，请使用 `onLikeCancel`           | `(bubble: MessageBubbleData) => void` | -      | 2.29.0 |
-| onReply       | 回复回调函数                                | `(message: string) => void`           | -      | - |
-| onAvatarClick | 头像点击回调                                | `() => void`                          | -      | - |
-| onDoubleClick | 双击回调函数                                | `() => void`                          | -      | - |
-| preMessage    | 前一条消息数据                              | `MessageBubbleData \| undefined`      | -      | - |
+| 属性             | 说明                                | 类型                                  | 默认值 | 废弃版本 |
+| ---------------- | ----------------------------------- | ------------------------------------- | ------ | -------- |
+| onLike           | 点赞回调函数                        | `(bubble: MessageBubbleData) => void` | -      | -        |
+| onDislike        | 点踩回调函数（符合命名规范）        | `(bubble: MessageBubbleData) => void` | -      | -        |
+| ~~onDisLike~~    | 已废弃，请使用 `onDislike`          | `(bubble: MessageBubbleData) => void` | -      | 2.29.0   |
+| onLikeCancel     | Like 子组件取消事件（符合命名规范） | `(bubble: MessageBubbleData) => void` | -      | -        |
+| ~~onCancelLike~~ | 已废弃，请使用 `onLikeCancel`       | `(bubble: MessageBubbleData) => void` | -      | 2.29.0   |
+| onReply          | 回复回调函数                        | `(message: string) => void`           | -      | -        |
+| onAvatarClick    | 头像点击回调                        | `() => void`                          | -      | -        |
+| onDoubleClick    | 双击回调函数                        | `() => void`                          | -      | -        |
+| preMessage       | 前一条消息数据                      | `MessageBubbleData \| undefined`      | -      | -        |
 
 ### BubbleList 消息列表组件
 
 #### 核心属性
 
-| 属性          | 说明          | 类型                  | 默认值  | 废弃版本 |
-| ------------- | ------------- | --------------------- | ------- | -------- |
-| bubbleList    | 消息列表数据  | `MessageBubbleData[]` | `[]`    | - |
-| assistantMeta | AI 助手元数据 | `BubbleMetaData`      | -       | - |
-| userMeta      | 用户元数据    | `BubbleMetaData`      | -       | - |
-| ~~loading~~   | 已废弃，请使用 `isLoading` | `boolean` | `false` | 2.29.0 |
-| isLoading     | 列表加载状态  | `boolean`             | `false` | - |
-| readonly      | 只读模式      | `boolean`             | `false` | - |
+| 属性          | 说明                       | 类型                  | 默认值  | 废弃版本 |
+| ------------- | -------------------------- | --------------------- | ------- | -------- |
+| bubbleList    | 消息列表数据               | `MessageBubbleData[]` | `[]`    | -        |
+| assistantMeta | AI 助手元数据              | `BubbleMetaData`      | -       | -        |
+| userMeta      | 用户元数据                 | `BubbleMetaData`      | -       | -        |
+| ~~loading~~   | 已废弃，请使用 `isLoading` | `boolean`             | `false` | 2.29.0   |
+| isLoading     | 列表加载状态               | `boolean`             | `false` | -        |
+| readonly      | 只读模式                   | `boolean`             | `false` | -        |
 
 #### 引用和样式
 
-| 属性          | 说明            | 类型                               | 默认值 |
-| ------------- | --------------- | ---------------------------------- | ------ |
-| bubbleListRef | 列表容器引用    | `MutableRefObject<HTMLDivElement>` | -      |
+| 属性          | 说明            | 类型                                       | 默认值 |
+| ------------- | --------------- | ------------------------------------------ | ------ |
+| bubbleListRef | 列表容器引用    | `MutableRefObject<HTMLDivElement>`         | -      |
 | bubbleRef     | 气泡组件引用    | `MutableRefObject<BubbleImperativeHandle>` | -      |
-| className     | 自定义 CSS 类名 | `string`                           | -      |
-| style         | 自定义内联样式  | `React.CSSProperties`              | -      |
-| styles        | 详细样式配置    | `BubbleListStylesConfig`           | -      |
+| className     | 自定义 CSS 类名 | `string`                                   | -      |
+| style         | 自定义内联样式  | `React.CSSProperties`                      | -      |
+| styles        | 详细样式配置    | `BubbleListStylesConfig`                   | -      |
 
 ### 核心数据类型
 
@@ -492,17 +507,17 @@ interface BubbleImperativeHandle {
 
 ```typescript
 interface BubbleSlotStyles {
-  root?: React.CSSProperties;        // 气泡根容器
-  avatarTitle?: React.CSSProperties;  // 头像标题区域
-  container?: React.CSSProperties;    // 主容器
-  loadingIcon?: React.CSSProperties;  // 加载图标
-  name?: React.CSSProperties;         // 名称区域
-  content?: React.CSSProperties;      // 内容
-  before?: React.CSSProperties;       // 内容前置区域
-  after?: React.CSSProperties;        // 内容后置区域
-  title?: React.CSSProperties;        // 标题
-  avatar?: React.CSSProperties;       // 头像
-  extra?: React.CSSProperties;        // 额外内容
+  root?: React.CSSProperties; // 气泡根容器
+  avatarTitle?: React.CSSProperties; // 头像标题区域
+  container?: React.CSSProperties; // 主容器
+  loadingIcon?: React.CSSProperties; // 加载图标
+  name?: React.CSSProperties; // 名称区域
+  content?: React.CSSProperties; // 内容
+  before?: React.CSSProperties; // 内容前置区域
+  after?: React.CSSProperties; // 内容后置区域
+  title?: React.CSSProperties; // 标题
+  avatar?: React.CSSProperties; // 头像
+  extra?: React.CSSProperties; // 额外内容
 }
 ```
 
@@ -510,10 +525,10 @@ interface BubbleSlotStyles {
 
 #### AI 气泡属性
 
-| 属性 | 说明 | 类型 | 默认值 | 废弃版本 |
-| --- | --- | --- | --- | --- |
-| aiBubbleProps | AI 气泡的属性配置 | `BubbleProps` | - | - |
-| ~~aIBubbleProps~~ | 已废弃，请使用 `aiBubbleProps` | `BubbleProps` | - | 2.30.0 |
+| 属性              | 说明                           | 类型          | 默认值 | 废弃版本 |
+| ----------------- | ------------------------------ | ------------- | ------ | -------- |
+| aiBubbleProps     | AI 气泡的属性配置              | `BubbleProps` | -      | -        |
+| ~~aIBubbleProps~~ | 已废弃，请使用 `aiBubbleProps` | `BubbleProps` | -      | 2.30.0   |
 
 ## 🎯 功能特性详解
 
