@@ -8,9 +8,12 @@ const LINK_REG =
   /(https?|ftp):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gi;
 const FOOTNOTE_REG = /\[\^[^\]]+\]/g;
 const TABLE_ROW_REG = /^\|([^|]+\|)+$/;
-const JINJA_VARIABLE_REG = /\{\{[^}]*\}\}/g;
-const JINJA_TAG_REG = /\{%[^%]*%\}/g;
-const JINJA_COMMENT_REG = /\{#[\s\S]*?#\}/g;
+/** 至少一个非 } 字符，避免匹配 {{}}、{{ 等不完整表达式 */
+const JINJA_VARIABLE_REG = /\{\{[^}]+\}\}/g;
+/** 至少一个非 % 字符，避免匹配 {%%} */
+const JINJA_TAG_REG = /\{%[^%]+%\}/g;
+/** 单行内注释，避免跨多行高亮造成大段误匹配（编辑器场景） */
+const JINJA_COMMENT_REG = /\{#[^\n]*?#\}/g;
 
 export const cacheTextNode = new WeakMap<
   object,

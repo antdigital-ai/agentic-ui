@@ -505,7 +505,10 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
           <PlaceholderContent prefixCls={prefixCls} hashId={hashId}>
             <Spin
               size="large"
-              tip={locale?.['workspace.loadingFileContent'] || '正在加载文件内容...'}
+              tip={
+                locale?.['workspace.loadingFileContent'] ||
+                '正在加载文件内容...'
+              }
             />
           </PlaceholderContent>
         );

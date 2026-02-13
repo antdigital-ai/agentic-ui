@@ -350,7 +350,8 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
         columnIndex !== undefined
           ? columnIndex === -1
             ? locale?.['table.clickToSelectTable'] || '点击选中整个表格'
-            : locale?.['table.clickToSelectColumn'] || '点击选中整列，显示操作按钮'
+            : locale?.['table.clickToSelectColumn'] ||
+              '点击选中整列，显示操作按钮'
           : undefined
       }
     >

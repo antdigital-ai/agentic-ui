@@ -23,11 +23,14 @@ import React from 'react';
 import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownEditorProps } from '../../src/MarkdownEditor/BaseMarkdownEditor';
 import { useKeyboard } from '../../src/MarkdownEditor/editor/plugins/useKeyboard';
 import { withMarkdown } from '../../src/MarkdownEditor/editor/plugins/withMarkdown';
-import { EditorStore } from '../../src/MarkdownEditor/editor/store';
+import {
+  EditorStore,
+  useEditorStore,
+} from '../../src/MarkdownEditor/editor/store';
 
 // Mock is-hotkey 库
 vi.mock('is-hotkey', () => ({
@@ -52,13 +55,19 @@ vi.mock('is-hotkey', () => ({
 // Mock 相关模块
 const mockSetOpenInsertCompletion = vi.fn();
 const mockInsertCompletionText$ = { next: vi.fn() };
+const mockSetOpenJinjaTemplate = vi.fn();
+const mockSetJinjaAnchorPath = vi.fn();
 
 vi.mock('../../src/MarkdownEditor/editor/store', () => ({
-  useEditorStore: () => ({
+  useEditorStore: vi.fn(() => ({
     openInsertCompletion: false,
     insertCompletionText$: mockInsertCompletionText$,
     setOpenInsertCompletion: mockSetOpenInsertCompletion,
-  }),
+    openJinjaTemplate: false,
+    setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
+    setJinjaAnchorPath: mockSetJinjaAnchorPath,
+    jinjaTemplatePanelEnabled: false,
+  })),
 }));
 
 describe('useKeyboard Hook Tests', () => {
@@ -453,6 +462,198 @@ describe('useKeyboard Hook Tests', () => {
       // 代码块语法不应该触发插入补全
       // 这个测试验证代码块语法被正确识别和跳过
       expect(typeof keyboardHandler).toBe('function');
+    });
+  });
+
+  describe('Jinja trigger detection', () => {
+    const defaultStoreReturn = {
+      openInsertCompletion: false,
+      insertCompletionText$: mockInsertCompletionText$,
+      setOpenInsertCompletion: mockSetOpenInsertCompletion,
+      openJinjaTemplate: false,
+      setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
+      setJinjaAnchorPath: mockSetJinjaAnchorPath,
+      jinjaTemplatePanelEnabled: false,
+    } as any;
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      vi.useFakeTimers();
+      vi.mocked(useEditorStore).mockReturnValue(defaultStoreReturn);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.mocked(useEditorStore).mockReturnValue(defaultStoreReturn);
+    });
+
+    it('opens Jinja panel and sets anchor path when {} is typed in paragraph', () => {
+      vi.mocked(useEditorStore).mockReturnValue({
+        openInsertCompletion: false,
+        insertCompletionText$: mockInsertCompletionText$,
+        setOpenInsertCompletion: mockSetOpenInsertCompletion,
+        openJinjaTemplate: false,
+        setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
+        setJinjaAnchorPath: mockSetJinjaAnchorPath,
+        jinjaTemplatePanelEnabled: true,
+      } as any);
+
+      editor.children = [
+        { type: 'paragraph', children: [{ text: '{' }] },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 0], offset: 1 },
+        focus: { path: [0, 0], offset: 1 },
+      });
+
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, mockProps),
+      );
+      const keyboardHandler = result.current;
+      const keyEvent = createKeyboardEvent('}');
+
+      act(() => {
+        keyboardHandler(keyEvent);
+      });
+      act(() => {
+        vi.runAllTimers();
+      });
+
+      expect(mockSetJinjaAnchorPath).toHaveBeenCalledWith([0]);
+      expect(mockSetOpenJinjaTemplate).toHaveBeenCalledWith(true);
+    });
+
+    it('sets correct paragraph path as jinja anchor', () => {
+      vi.mocked(useEditorStore).mockReturnValue({
+        openInsertCompletion: false,
+        insertCompletionText$: mockInsertCompletionText$,
+        setOpenInsertCompletion: mockSetOpenInsertCompletion,
+        openJinjaTemplate: false,
+        setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
+        setJinjaAnchorPath: mockSetJinjaAnchorPath,
+        jinjaTemplatePanelEnabled: true,
+      } as any);
+
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'x' }] },
+        { type: 'paragraph', children: [{ text: '{' }] },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [1, 0], offset: 1 },
+        focus: { path: [1, 0], offset: 1 },
+      });
+
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, mockProps),
+      );
+      act(() => {
+        result.current(createKeyboardEvent('}'));
+      });
+      act(() => {
+        vi.runAllTimers();
+      });
+
+      expect(mockSetJinjaAnchorPath).toHaveBeenCalledWith([1]);
+      expect(mockSetOpenJinjaTemplate).toHaveBeenCalledWith(true);
+    });
+
+    it('does not open panel when jinjaTemplatePanelEnabled is false', () => {
+      vi.mocked(useEditorStore).mockReturnValue({
+        openInsertCompletion: false,
+        insertCompletionText$: mockInsertCompletionText$,
+        setOpenInsertCompletion: mockSetOpenInsertCompletion,
+        openJinjaTemplate: false,
+        setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
+        setJinjaAnchorPath: mockSetJinjaAnchorPath,
+        jinjaTemplatePanelEnabled: false,
+      } as any);
+
+      editor.children = [
+        { type: 'paragraph', children: [{ text: '{' }] },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 0], offset: 1 },
+        focus: { path: [0, 0], offset: 1 },
+      });
+
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, mockProps),
+      );
+      act(() => {
+        result.current(createKeyboardEvent('}'));
+      });
+      act(() => {
+        vi.runAllTimers();
+      });
+
+      expect(mockSetJinjaAnchorPath).not.toHaveBeenCalled();
+      expect(mockSetOpenJinjaTemplate).not.toHaveBeenCalled();
+    });
+
+    it('does not open panel when trigger is not matched', () => {
+      vi.mocked(useEditorStore).mockReturnValue({
+        openInsertCompletion: false,
+        insertCompletionText$: mockInsertCompletionText$,
+        setOpenInsertCompletion: mockSetOpenInsertCompletion,
+        openJinjaTemplate: false,
+        setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
+        setJinjaAnchorPath: mockSetJinjaAnchorPath,
+        jinjaTemplatePanelEnabled: true,
+      } as any);
+
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'ab' }] },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 0], offset: 2 },
+        focus: { path: [0, 0], offset: 2 },
+      });
+
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, mockProps),
+      );
+      act(() => {
+        result.current(createKeyboardEvent('c'));
+      });
+      act(() => {
+        vi.runAllTimers();
+      });
+
+      expect(mockSetJinjaAnchorPath).not.toHaveBeenCalled();
+      expect(mockSetOpenJinjaTemplate).not.toHaveBeenCalled();
+    });
+
+    it('does not open panel when readonly', () => {
+      vi.mocked(useEditorStore).mockReturnValue({
+        openInsertCompletion: false,
+        insertCompletionText$: mockInsertCompletionText$,
+        setOpenInsertCompletion: mockSetOpenInsertCompletion,
+        openJinjaTemplate: false,
+        setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
+        setJinjaAnchorPath: mockSetJinjaAnchorPath,
+        jinjaTemplatePanelEnabled: true,
+      } as any);
+
+      editor.children = [
+        { type: 'paragraph', children: [{ text: '{' }] },
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 0], offset: 1 },
+        focus: { path: [0, 0], offset: 1 },
+      });
+
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, { ...mockProps, readonly: true }),
+      );
+      act(() => {
+        result.current(createKeyboardEvent('}'));
+      });
+      act(() => {
+        vi.runAllTimers();
+      });
+
+      expect(mockSetJinjaAnchorPath).not.toHaveBeenCalled();
+      expect(mockSetOpenJinjaTemplate).not.toHaveBeenCalled();
     });
   });
 

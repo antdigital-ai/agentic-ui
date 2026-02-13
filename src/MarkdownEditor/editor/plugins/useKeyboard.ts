@@ -108,10 +108,7 @@ export const useKeyboard = (
         e.preventDefault();
         return;
       }
-      if (
-        openJinjaTemplate &&
-        (isHotkey('up', e) || isHotkey('down', e))
-      ) {
+      if (openJinjaTemplate && (isHotkey('up', e) || isHotkey('down', e))) {
         e.preventDefault();
         return;
       }

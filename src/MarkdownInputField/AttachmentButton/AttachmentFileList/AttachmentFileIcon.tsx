@@ -69,9 +69,7 @@ const VideoThumbnailFromBlob: React.FC<{
 
   if (!objectUrl) return null;
 
-  return (
-    <VideoThumbnail src={objectUrl} className={className} style={style} />
-  );
+  return <VideoThumbnail src={objectUrl} className={className} style={style} />;
 };
 
 /**
@@ -157,7 +155,11 @@ export const AttachmentFileIcon: React.FC<{
     const videoUrl = file.previewUrl || file.url;
     if (videoUrl) {
       return (
-        <VideoThumbnail src={videoUrl} className={className} style={IMAGE_STYLE} />
+        <VideoThumbnail
+          src={videoUrl}
+          className={className}
+          style={IMAGE_STYLE}
+        />
       );
     }
     if (file.size) {

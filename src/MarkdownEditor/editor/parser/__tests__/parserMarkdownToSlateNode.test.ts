@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { parserMdToSchema } from '../parserMdToSchema';
 import {
   clearParseCache,
   parserMarkdownToSlateNode,
 } from '../parserMarkdownToSlateNode';
+import { parserMdToSchema } from '../parserMdToSchema';
 
 import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 

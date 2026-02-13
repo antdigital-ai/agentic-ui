@@ -52,7 +52,10 @@ const messages: MessageBubbleData[] = [
     updateAt: Date.now() - 60000,
     meta: assistantMeta,
     fileMap: new Map([
-      ['img-1', createMockFile('photo.jpg', 'image/jpeg', 512 * 1024, IMAGE_URL)],
+      [
+        'img-1',
+        createMockFile('photo.jpg', 'image/jpeg', 512 * 1024, IMAGE_URL),
+      ],
     ]),
   },
   {
@@ -63,9 +66,18 @@ const messages: MessageBubbleData[] = [
     updateAt: Date.now() - 50000,
     meta: userMeta,
     fileMap: new Map([
-      ['img-1', createMockFile('photo1.jpg', 'image/jpeg', 512 * 1024, IMAGE_URL)],
-      ['img-2', createMockFile('photo2.jpg', 'image/jpeg', 512 * 1024, IMAGE_URL_2)],
-      ['img-3', createMockFile('photo3.png', 'image/png', 512 * 1024, IMAGE_URL_3)],
+      [
+        'img-1',
+        createMockFile('photo1.jpg', 'image/jpeg', 512 * 1024, IMAGE_URL),
+      ],
+      [
+        'img-2',
+        createMockFile('photo2.jpg', 'image/jpeg', 512 * 1024, IMAGE_URL_2),
+      ],
+      [
+        'img-3',
+        createMockFile('photo3.png', 'image/png', 512 * 1024, IMAGE_URL_3),
+      ],
     ]),
   },
   {
@@ -113,7 +125,10 @@ const messages: MessageBubbleData[] = [
     updateAt: Date.now() - 20000,
     meta: assistantMeta,
     fileMap: new Map([
-      ['img-1', createMockFile('photo.jpg', 'image/jpeg', 512 * 1024, IMAGE_URL)],
+      [
+        'img-1',
+        createMockFile('photo.jpg', 'image/jpeg', 512 * 1024, IMAGE_URL),
+      ],
       [
         'video-1',
         createMockFile('demo.mp4', 'video/mp4', 8 * 1024 * 1024, VIDEO_URL),

@@ -18,16 +18,16 @@ export * from './Types';
 
 // ─── 布局组件 ────────────────────────────────────────────────────────────────
 export * from './AgenticLayout';
-export { default as Workspace } from './Workspace';
 export * from './Workspace';
+export { default as Workspace } from './Workspace';
 export * from './Workspace/types';
 
 // ─── 聊天气泡 ────────────────────────────────────────────────────────────────
 export * from './Bubble';
 export * from './Bubble/List';
+export * from './Bubble/MessagesContent/VoiceButton/types';
 export * from './Bubble/type';
 export * from './Bubble/types/DocInfo';
-export * from './Bubble/MessagesContent/VoiceButton/types';
 
 // ─── 聊天启动页 ──────────────────────────────────────────────────────────────
 export * from './ChatBootPage';
@@ -51,14 +51,11 @@ export * from './History/types/HistoryList';
 
 // ─── Markdown 编辑器 ─────────────────────────────────────────────────────────
 export * from './MarkdownEditor';
-export * from './MarkdownEditor/types';
 export * from './MarkdownEditor/el';
-export * from './MarkdownEditor/plugin';
-export {
-  createJinjaPlugin,
-  jinjaPlugin,
-} from './MarkdownEditor/plugins/jinja';
 export { useSelStatus } from './MarkdownEditor/hooks/editor';
+export * from './MarkdownEditor/plugin';
+export { createJinjaPlugin, jinjaPlugin } from './MarkdownEditor/plugins/jinja';
+export * from './MarkdownEditor/types';
 
 // MarkdownEditor 内部工具（保持向后兼容，后续版本考虑收敛）
 export * from './MarkdownEditor/editor/components/index';
@@ -70,55 +67,55 @@ export * from './MarkdownEditor/editor/parser/parserSlateNodeToMarkdown';
 export * from './MarkdownEditor/editor/store';
 export * from './MarkdownEditor/editor/utils';
 export * from './MarkdownEditor/editor/utils/docx/index';
-export * from './MarkdownEditor/editor/utils/markdownToHtml';
 export * from './MarkdownEditor/editor/utils/htmlToMarkdown';
+export * from './MarkdownEditor/editor/utils/markdownToHtml';
 export * from './MarkdownEditor/utils/native-table/native-table-editor';
 
 // ─── Markdown 输入框 ─────────────────────────────────────────────────────────
-export * from './MarkdownInputField/MarkdownInputField';
 export * from './MarkdownInputField/AttachmentButton';
-export * from './MarkdownInputField/AttachmentButton/types';
 export * from './MarkdownInputField/AttachmentButton/AttachmentFileList';
 export * from './MarkdownInputField/AttachmentButton/AttachmentFileList/AttachmentFileListItem';
+export * from './MarkdownInputField/AttachmentButton/types';
 export * from './MarkdownInputField/AttachmentButton/utils';
-export * from './MarkdownInputField/FileMapView';
-export * from './MarkdownInputField/VoiceInput';
 export { ActionItemContainer } from './MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
+export * from './MarkdownInputField/FileMapView';
+export * from './MarkdownInputField/MarkdownInputField';
+export * from './MarkdownInputField/VoiceInput';
 
 // ─── Schema ──────────────────────────────────────────────────────────────────
 export * from './Schema';
-export * from './Schema/types';
 export * from './Schema/SchemaRenderer/templateEngine';
+export * from './Schema/types';
 export * from './Schema/validator';
 
 // ─── 插件 ────────────────────────────────────────────────────────────────────
-export * from './Plugins/formatter';
 export * from './Plugins/chart';
-export * from './Plugins/mermaid';
 export * from './Plugins/code/components';
+export * from './Plugins/formatter';
+export * from './Plugins/mermaid';
 
 // ─── 基础 UI 组件 ────────────────────────────────────────────────────────────
 export * from './AILabel';
 export * from './AnswerAlert';
 export * from './BackTo';
-export * from './WelcomeMessage';
 export { default as Quote } from './Quote';
 export type { QuoteProps } from './Quote';
+export * from './WelcomeMessage';
 
 // ─── 通用子组件 ──────────────────────────────────────────────────────────────
 export * from './Components/ActionIconBox';
 export { ActionItemBox } from './Components/ActionItemBox';
 export * from './Components/Button';
+export * from './Components/GradientText';
 export * from './Components/LayoutHeader';
 export * from './Components/Loading';
 export * from './Components/lotties';
-export * from './Components/SuggestionList';
-export * from './Components/VisualList';
 export * from './Components/Robot';
 export { default as Robot } from './Components/Robot';
-export * from './Components/GradientText';
+export * from './Components/SuggestionList';
 export * from './Components/TextAnimate';
 export * from './Components/TypingAnimation';
+export * from './Components/VisualList';
 
 // ─── Hooks ───────────────────────────────────────────────────────────────────
 export * from './Hooks/useAutoScroll';

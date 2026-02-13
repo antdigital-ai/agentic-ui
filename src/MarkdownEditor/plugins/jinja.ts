@@ -1,5 +1,5 @@
-import type { JinjaConfig } from '../types';
 import type { MarkdownEditorPlugin } from '../plugin';
+import type { JinjaConfig } from '../types';
 
 /**
  * 创建 Jinja 插件，启用模板面板（输入 `{}` 触发）与编辑器内 Jinja 语法高亮。

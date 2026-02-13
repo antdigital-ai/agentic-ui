@@ -97,9 +97,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
 
   // 所有非图片、非视频文件列表
   const allNoMediaFiles = useMemo(() => {
-    return fileList.filter(
-      (file) => !isImageFile(file) && !isVideoFile(file),
-    );
+    return fileList.filter((file) => !isImageFile(file) && !isVideoFile(file));
   }, [fileList]);
 
   // 根据 maxDisplayCount 限制显示的非媒体文件列表
@@ -214,47 +212,51 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           style={props.style}
         >
           {videoList.map((file, index) => {
-          const videoUrl = file.previewUrl || file.url || '';
-          const isSingleVideo = videoList.length === 1;
-          const thumbSize = isSingleVideo
-            ? { width: 330, height: 188 }
-            : { width: 124, height: 124 };
-          return (
-            <div
-              role="button"
-              tabIndex={0}
-              className={classNames(`${prefix}-image`, `${prefix}-video-thumb`, hashId)}
-              key={file.uuid || file.name || index}
-              onClick={() => handleVideoClick(file)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleVideoClick(file);
-                }
-              }}
-              aria-label={`播放视频：${file.name}`}
-              style={thumbSize}
-            >
-              <video
-                src={videoUrl}
-                preload="metadata"
-                muted
-                playsInline
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
-              />
+            const videoUrl = file.previewUrl || file.url || '';
+            const isSingleVideo = videoList.length === 1;
+            const thumbSize = isSingleVideo
+              ? { width: 330, height: 188 }
+              : { width: 124, height: 124 };
+            return (
               <div
-                className={classNames(`${prefix}-video-play-overlay`, hashId)}
-                aria-hidden
+                role="button"
+                tabIndex={0}
+                className={classNames(
+                  `${prefix}-image`,
+                  `${prefix}-video-thumb`,
+                  hashId,
+                )}
+                key={file.uuid || file.name || index}
+                onClick={() => handleVideoClick(file)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleVideoClick(file);
+                  }
+                }}
+                aria-label={`播放视频：${file.name}`}
+                style={thumbSize}
               >
-                <Play />
+                <video
+                  src={videoUrl}
+                  preload="metadata"
+                  muted
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
+                <div
+                  className={classNames(`${prefix}-video-play-overlay`, hashId)}
+                  aria-hidden
+                >
+                  <Play />
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         </motion.div>
       )}
       <Modal

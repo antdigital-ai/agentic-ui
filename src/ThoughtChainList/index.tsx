@@ -86,9 +86,7 @@ const ThoughtChainTitle = React.memo<{
             data-testid="magic-icon"
             className={classNames(`${prefixCls}-title-icon`, hashId)}
           />
-          <span
-            className={classNames(`${prefixCls}-title-progress`, hashId)}
-          >
+          <span className={classNames(`${prefixCls}-title-progress`, hashId)}>
             {endStatusDisplay}
           </span>
         </div>
@@ -511,9 +509,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
                   : undefined
               }
             />
-            <div
-              className={classNames(`${prefixCls}-content-wrapper`, hashId)}
-            >
+            <div className={classNames(`${prefixCls}-content-wrapper`, hashId)}>
               <ThoughtChainContent
                 prefixCls={prefixCls}
                 hashId={hashId}

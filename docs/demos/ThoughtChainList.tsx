@@ -213,7 +213,7 @@ export default function Home() {
             category: 'TableSql',
             info: '正在查询 ${tableName} 数据',
             input: {
-              sql: "SELECT product_name, category, stock_quantity, unit_price FROM inventory WHERE stock_quantity < 100 ORDER BY stock_quantity ASC",
+              sql: 'SELECT product_name, category, stock_quantity, unit_price FROM inventory WHERE stock_quantity < 100 ORDER BY stock_quantity ASC',
             },
             meta: {
               data: {

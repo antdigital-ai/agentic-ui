@@ -55,9 +55,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode; locale?: any }> = ({
 }) => {
   return (
     <ConfigProvider>
-      <I18nContext.Provider
-        value={{ locale, language: 'zh-CN' }}
-      >
+      <I18nContext.Provider value={{ locale, language: 'zh-CN' }}>
         {children}
       </I18nContext.Provider>
     </ConfigProvider>

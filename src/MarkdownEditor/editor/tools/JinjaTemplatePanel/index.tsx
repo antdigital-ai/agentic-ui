@@ -1,12 +1,7 @@
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, Typography } from 'antd';
 import classNames from 'clsx';
 import isHotkey from 'is-hotkey';
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Editor, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
@@ -14,20 +9,16 @@ import type { JinjaTemplateItem } from '../../../types';
 import { useEditorStore } from '../../store';
 import { getOffsetLeft } from '../../utils/dom';
 import { EditorUtils } from '../../utils/editorUtils';
-import {
-  JINJA_DOC_LINK,
-  JINJA_TEMPLATE_DATA,
-} from './templates';
-import {
-  JINJA_PANEL_PREFIX_CLS,
-  useJinjaTemplatePanelStyle,
-} from './style';
+import { JINJA_PANEL_PREFIX_CLS, useJinjaTemplatePanelStyle } from './style';
+import { JINJA_DOC_LINK, JINJA_TEMPLATE_DATA } from './templates';
 
 const PANEL_MAX_HEIGHT = 320;
 
-function getPosition(
-  nodeEl: HTMLElement,
-): { left: number; top?: number; bottom?: number } {
+function getPosition(nodeEl: HTMLElement): {
+  left: number;
+  top?: number;
+  bottom?: number;
+} {
   const rect = nodeEl.getBoundingClientRect();
   const left = getOffsetLeft(nodeEl, document.body) + 0;
   const top = rect.bottom + window.scrollY;
@@ -52,14 +43,12 @@ export const JinjaTemplatePanel: React.FC = () => {
 
   const jinjaConfig = editorProps?.jinja;
   const templatePanelConfig =
-    jinjaConfig?.templatePanel &&
-    typeof jinjaConfig.templatePanel === 'object'
+    jinjaConfig?.templatePanel && typeof jinjaConfig.templatePanel === 'object'
       ? jinjaConfig.templatePanel
       : undefined;
   const trigger = templatePanelConfig?.trigger ?? '{}';
   const docLink = jinjaConfig?.docLink ?? JINJA_DOC_LINK;
-  const notFoundContent =
-    templatePanelConfig?.notFoundContent ?? null;
+  const notFoundContent = templatePanelConfig?.notFoundContent ?? null;
   const itemsConfig = templatePanelConfig?.items;
 
   const [items, setItems] = useState<JinjaTemplateItem[]>(JINJA_TEMPLATE_DATA);
@@ -73,7 +62,8 @@ export const JinjaTemplatePanel: React.FC = () => {
   const domRef = useRef<HTMLDivElement>(null);
 
   const context = React.useContext(ConfigProvider.ConfigContext);
-  const prefixCls = context?.getPrefixCls?.('md-editor-jinja-panel') ?? JINJA_PANEL_PREFIX_CLS;
+  const prefixCls =
+    context?.getPrefixCls?.('md-editor-jinja-panel') ?? JINJA_PANEL_PREFIX_CLS;
   const { wrapSSR, hashId } = useJinjaTemplatePanelStyle(prefixCls);
 
   const close = useCallback(() => {
@@ -100,6 +90,15 @@ export const JinjaTemplatePanel: React.FC = () => {
       itemsConfig({ editor })
         .then((list) => {
           setItems(Array.isArray(list) ? list : JINJA_TEMPLATE_DATA);
+        })
+        .catch((err) => {
+          setItems(JINJA_TEMPLATE_DATA);
+          if (process.env.NODE_ENV !== 'production') {
+            console.error(
+              '[JinjaTemplatePanel] Failed to load template items:',
+              err,
+            );
+          }
         })
         .finally(() => setLoading(false));
     } else if (Array.isArray(itemsConfig)) {
@@ -224,9 +223,14 @@ export const JinjaTemplatePanel: React.FC = () => {
       <div className={`${prefixCls}__content`}>
         {docLink ? (
           <div className={`${prefixCls}__doc-link`}>
-            <a href={docLink} target="_blank" rel="noopener noreferrer">
+            <Typography.Link
+              href={docLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="打开 Jinja 使用说明（新窗口）"
+            >
               使用说明
-            </a>
+            </Typography.Link>
           </div>
         ) : null}
         <div className={`${prefixCls}__list-box`}>
@@ -235,11 +239,13 @@ export const JinjaTemplatePanel: React.FC = () => {
               加载中...
             </div>
           ) : items.length === 0 ? (
-            notFoundContent ?? (
-              <div style={{ padding: 12, color: 'var(--color-text-secondary)' }}>
+            (notFoundContent ?? (
+              <div
+                style={{ padding: 12, color: 'var(--color-text-secondary)' }}
+              >
                 暂无模板
               </div>
-            )
+            ))
           ) : (
             items.map((item, i) => (
               <div

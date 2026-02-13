@@ -326,19 +326,27 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
       props.plugins.some(
         (p) => (p as MarkdownEditorPlugin & { jinja?: boolean }).jinja === true,
       ));
-  const effectiveJinja =
-    props.jinja ??
-    (Array.isArray(props.plugins) &&
-      (props.plugins.find(
-        (p) =>
-          (p as MarkdownEditorPlugin & { jinja?: boolean; jinjaConfig?: any })
-            .jinja === true && (p as any).jinjaConfig,
-      ) as (MarkdownEditorPlugin & { jinjaConfig: any }) | undefined)?.jinjaConfig);
+  const pluginWithJinja = Array.isArray(props.plugins)
+    ? (props.plugins.find(
+        (p) => (p as MarkdownEditorPlugin & { jinja?: boolean }).jinja === true,
+      ) as
+        | (MarkdownEditorPlugin & { jinja?: boolean; jinjaConfig?: any })
+        | undefined)
+    : undefined;
+  const effectiveJinja = props.jinja
+    ? props.jinja
+    : pluginWithJinja?.jinjaConfig
+      ? pluginWithJinja.jinjaConfig
+      : pluginWithJinja
+        ? { enable: true as const }
+        : undefined;
   const jinjaTemplatePanelEnabled =
     jinjaEnabled &&
-    effectiveJinja?.templatePanel !== false &&
-    (typeof effectiveJinja?.templatePanel !== 'object' ||
-      effectiveJinja?.templatePanel?.enable !== false);
+    effectiveJinja !== undefined &&
+    effectiveJinja !== null &&
+    effectiveJinja.templatePanel !== false &&
+    (typeof effectiveJinja.templatePanel !== 'object' ||
+      effectiveJinja.templatePanel?.enable !== false);
 
   const [openJinjaTemplate, setOpenJinjaTemplate] = useState(false);
   const [jinjaAnchorPath, setJinjaAnchorPath] = useState<number[] | null>(null);

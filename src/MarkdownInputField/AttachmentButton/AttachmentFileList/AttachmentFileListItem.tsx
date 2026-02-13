@@ -165,7 +165,10 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   };
 
   return (
-    <Tooltip title={locale?.clickToRetry || '点击重试'} open={isErrorStatus ? undefined : false}>
+    <Tooltip
+      title={locale?.clickToRetry || '点击重试'}
+      open={isErrorStatus ? undefined : false}
+    >
       <motion.div
         variants={ANIMATION_VARIANTS}
         onClick={handleFileClick}
@@ -184,7 +187,12 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
               {getFileNameWithoutExtension(file.name)}
             </span>
           </div>
-          <FileSizeInfo file={file} prefixCls={prefixCls} hashId={hashId} locale={locale} />
+          <FileSizeInfo
+            file={file}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            locale={locale}
+          />
         </div>
         <DeleteButton
           isVisible={canDelete}

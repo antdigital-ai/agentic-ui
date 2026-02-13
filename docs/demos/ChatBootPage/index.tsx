@@ -45,8 +45,7 @@ const StandaloneHistoryDemo = () => {
       {
         id: '3',
         sessionId: 'session-3',
-        sessionTitle:
-          '对比分析沪深300和中证500指数基金的长期收益与风险表现',
+        sessionTitle: '对比分析沪深300和中证500指数基金的长期收益与风险表现',
         agentId: agentId,
         gmtCreate: 1702950656789,
         gmtLastConverse: 1702950656789,

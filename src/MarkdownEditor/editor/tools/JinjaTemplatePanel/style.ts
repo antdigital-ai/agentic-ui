@@ -31,8 +31,16 @@ const genJinjaPanelStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontSize: token.fontSizeSM,
         color: token.colorLink,
         borderBottom: `1px solid ${token.colorBorder}`,
-        'a': { color: 'inherit', textDecoration: 'none' },
-        'a:hover': { textDecoration: 'underline' },
+        a: {
+          color: 'inherit',
+          textDecoration: 'none',
+          '&:hover': { textDecoration: 'underline' },
+          '&:focus-visible': {
+            outline: `2px solid ${token.colorPrimary}`,
+            outlineOffset: 2,
+            borderRadius: token.borderRadiusSM,
+          },
+        },
       },
       '&__list-box': {
         flex: 1,

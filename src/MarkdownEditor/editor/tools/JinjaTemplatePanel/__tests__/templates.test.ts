@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  JINJA_DOC_LINK,
-  JINJA_TEMPLATE_DATA,
-} from '../templates';
+import { JINJA_DOC_LINK, JINJA_TEMPLATE_DATA } from '../templates';
 
 describe('JINJA_TEMPLATE_DATA', () => {
   it('has 5 built-in template items', () => {
@@ -10,13 +7,7 @@ describe('JINJA_TEMPLATE_DATA', () => {
   });
 
   it('each item has title, optional description, and template', () => {
-    const titles = [
-      '变量插值',
-      '条件语句',
-      '循环遍历',
-      '过滤器',
-      '设置变量',
-    ];
+    const titles = ['变量插值', '条件语句', '循环遍历', '过滤器', '设置变量'];
     JINJA_TEMPLATE_DATA.forEach((item, i) => {
       expect(item).toHaveProperty('title', titles[i]);
       expect(item).toHaveProperty('template');

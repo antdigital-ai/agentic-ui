@@ -69,7 +69,9 @@ describe('JinjaTemplatePanel', () => {
 
     render(<JinjaTemplatePanel />);
 
-    expect(screen.getByRole('listbox', { name: 'Jinja template list' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('listbox', { name: 'Jinja template list' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('使用说明')).toBeInTheDocument();
     expect(screen.getByText('变量插值')).toBeInTheDocument();
     expect(screen.getByText('条件语句')).toBeInTheDocument();

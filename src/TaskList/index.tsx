@@ -247,12 +247,7 @@ const getDefaultExpandedKeys = (
  * ```
  */
 export const TaskList = memo(
-  ({
-    items,
-    className,
-    expandedKeys,
-    onExpandedKeysChange,
-  }: TaskListProps) => {
+  ({ items, className, expandedKeys, onExpandedKeysChange }: TaskListProps) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('task-list');
     const { wrapSSR, hashId } = useStyle(prefixCls);

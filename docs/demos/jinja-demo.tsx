@@ -48,7 +48,8 @@ export default () => {
         }}
       />
       <p style={{ marginTop: 16, color: '#666', fontSize: 12 }}>
-        提示：在段落中输入 <kbd>{'{}'}</kbd> 可打开 Jinja 模板面板，使用方向键选择、Enter 确认、Esc 关闭。
+        提示：在段落中输入 <kbd>{'{}'}</kbd> 可打开 Jinja
+        模板面板，使用方向键选择、Enter 确认、Esc 关闭。
       </p>
     </div>
   );

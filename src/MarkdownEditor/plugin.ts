@@ -33,7 +33,7 @@ export type MarkdownEditorPlugin = {
   jinja?: true;
   /** 通过插件启用时的默认 Jinja 配置（当未传 props.jinja 时使用） */
   jinjaConfig?: JinjaConfig;
-}
+};
 
 // 使用 Context 传递插件配置
 export const PluginContext = React.createContext<MarkdownEditorPlugin[]>([]);
