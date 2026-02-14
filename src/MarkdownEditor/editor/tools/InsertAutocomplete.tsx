@@ -666,7 +666,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
   }, [openInsertCompletion]);
 
   const context = useContext(ConfigProvider.ConfigContext);
-  const baseClassName = context?.getPrefixCls(`md-editor-insert-autocomplete`);
+  const baseClassName = context?.getPrefixCls(`agentic-md-editor-insert-autocomplete`);
 
   const { wrapSSR, hashId } = useStyle(baseClassName);
 
