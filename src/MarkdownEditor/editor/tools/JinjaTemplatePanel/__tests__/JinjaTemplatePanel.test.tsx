@@ -26,7 +26,7 @@ vi.mock('../../../utils/editorUtils', () => ({
 }));
 
 vi.mock('../style', () => ({
-  JINJA_PANEL_PREFIX_CLS: 'md-editor-jinja-panel',
+  JINJA_PANEL_PREFIX_CLS: 'agentic-md-editor-jinja-panel',
   useJinjaTemplatePanelStyle: () => ({
     wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash',

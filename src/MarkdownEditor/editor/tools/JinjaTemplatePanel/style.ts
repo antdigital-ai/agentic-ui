@@ -5,7 +5,7 @@ import {
   useEditorStyleRegister,
 } from '../../../../Hooks/useStyle';
 
-export const JINJA_PANEL_PREFIX_CLS = 'md-editor-jinja-panel';
+export const JINJA_PANEL_PREFIX_CLS = 'agentic-md-editor-jinja-panel';
 
 const genJinjaPanelStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {

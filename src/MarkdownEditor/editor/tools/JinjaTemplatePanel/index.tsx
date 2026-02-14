@@ -63,7 +63,7 @@ export const JinjaTemplatePanel: React.FC = () => {
 
   const context = React.useContext(ConfigProvider.ConfigContext);
   const prefixCls =
-    context?.getPrefixCls?.('md-editor-jinja-panel') ?? JINJA_PANEL_PREFIX_CLS;
+    context?.getPrefixCls?.('agentic-md-editor-jinja-panel') ?? JINJA_PANEL_PREFIX_CLS;
   const { wrapSSR, hashId } = useJinjaTemplatePanelStyle(prefixCls);
 
   const close = useCallback(() => {
