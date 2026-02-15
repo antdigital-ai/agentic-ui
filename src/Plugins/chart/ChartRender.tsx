@@ -515,6 +515,8 @@ export const ChartRender: React.FC<{
     loading = false,
   } = props;
   const i18n = useContext(I18nContext);
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  const prefixCls = getPrefixCls('agentic-plugin-chart');
   const [config, setConfig] = useState(() => props.config);
   const [renderKey, setRenderKey] = useState(0);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -929,6 +931,7 @@ export const ChartRender: React.FC<{
       return (
         <div
           key={config?.index}
+          className={`${prefixCls}__table`}
           contentEditable={false}
           style={{
             margin: 12,
@@ -956,6 +959,7 @@ export const ChartRender: React.FC<{
       return (
         <div
           key={config?.index}
+          className={`${prefixCls}__descriptions`}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -1044,7 +1048,12 @@ export const ChartRender: React.FC<{
   ]);
 
   return (
-    <div ref={containerRef} style={{ width: '100%' }} contentEditable={false}>
+    <div
+      ref={containerRef}
+      className={prefixCls}
+      style={{ width: '100%' }}
+      contentEditable={false}
+    >
       {chartDom}
     </div>
   );
