@@ -744,6 +744,10 @@ export const ChartRender: React.FC<{
     }
   }, [dataHash, config, groupBy, colorLegend, filterBy]);
 
+  const chartConfigFormPrefixCls =
+    getPrefixCls('agentic-chart-config-form') ??
+    'ant-agentic-chart-config-form';
+
   /**
    * 图表配置
    */
@@ -836,6 +840,7 @@ export const ChartRender: React.FC<{
         content={
           <ConfigProvider componentSize="small">
             <ProForm
+              prefixCls={chartConfigFormPrefixCls}
               submitter={{
                 searchConfig: {
                   submitText: i18n?.locale?.updateChart || '更新',
@@ -854,12 +859,14 @@ export const ChartRender: React.FC<{
               }}
             >
               <div
+                className={`${chartConfigFormPrefixCls}__content`}
                 style={{
                   maxHeight: '70vh',
                   overflow: 'auto',
                 }}
               >
                 <div
+                  className={`${chartConfigFormPrefixCls}__fields`}
                   style={{
                     display: 'flex',
                     gap: 8,
@@ -919,6 +926,7 @@ export const ChartRender: React.FC<{
     onColumnLengthChange,
     config,
     props.config,
+    chartConfigFormPrefixCls,
   ]);
 
   const chartDom = useMemo(() => {
