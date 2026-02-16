@@ -45,7 +45,8 @@ export const ReadonlyLinkCard: React.FC<
   >
 > = React.memo(({ element, attributes, children }) => {
   const context = useContext(ConfigProvider.ConfigContext);
-  const baseCls = context?.getPrefixCls('agentic-md-editor-link-card');
+  const contentCls = context?.getPrefixCls('agentic-md-editor-content');
+  const blockCls = contentCls ? `${contentCls}-link-card` : '';
   const [showAsText, setShowAsText] = useState(false);
 
   // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
@@ -97,7 +98,7 @@ export const ReadonlyLinkCard: React.FC<
   return (
     <div {...attributes}>
       <div
-        className={classNames(baseCls)}
+        className={classNames(blockCls)}
         data-be="link-card"
         draggable={false}
         style={{
@@ -124,15 +125,15 @@ export const ReadonlyLinkCard: React.FC<
             if (typeof window === 'undefined') return;
             window.open(element?.url);
           }}
-          className={classNames(`${baseCls}-container`)}
+          className={classNames(`${blockCls}__container`)}
         >
           <div
-            className={classNames(`${baseCls}-container-content`)}
+            className={classNames(`${blockCls}__content`)}
             contentEditable={false}
           >
             {element.icon ? (
               <img
-                className={classNames(`${baseCls}-container-content-icon`)}
+                className={classNames(`${blockCls}__icon`)}
                 src={element.icon}
                 width={56}
               />
@@ -145,7 +146,7 @@ export const ReadonlyLinkCard: React.FC<
             >
               <a
                 href={element?.url}
-                className={classNames(`${baseCls}-container-content-title`)}
+                className={classNames(`${blockCls}__title`)}
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
@@ -157,16 +158,12 @@ export const ReadonlyLinkCard: React.FC<
                 {element.title || element.name || 'no title'}
               </a>
               <div
-                className={classNames(
-                  `${baseCls}-container-content-description`,
-                )}
+                className={classNames(`${blockCls}__description`)}
               >
                 {element.description ? element.description : element?.url}
               </div>
               <div
-                className={classNames(
-                  `${baseCls}-container-content-collaborators`,
-                )}
+                className={classNames(`${blockCls}__collaborators`)}
               >
                 {element.otherProps?.collaborators ? (
                   <div>
@@ -189,9 +186,7 @@ export const ReadonlyLinkCard: React.FC<
                 )}
                 {element.otherProps?.updateTime ? (
                   <div
-                    className={classNames(
-                      `${baseCls}-container-content-updateTime`,
-                    )}
+                    className={classNames(`${blockCls}__update-time`)}
                     style={{
                       color: 'rgba(0,0,0,0.45)',
                       fontSize: 12,
