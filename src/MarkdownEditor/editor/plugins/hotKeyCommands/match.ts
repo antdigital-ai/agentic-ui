@@ -3,26 +3,35 @@ import { Editor, Element, Node, NodeEntry, Range } from 'slate';
 import { TextMatchNodes } from '../elements';
 
 export class MatchKey {
-  constructor(private readonly editor: Editor) {}
+  constructor(
+    private readonly editorRef: React.MutableRefObject<Editor | null>,
+  ) {}
 
-  private createParams(node: NodeEntry, match: RegExpMatchArray) {
+  private createParams(
+    editor: Editor,
+    node: NodeEntry,
+    match: RegExpMatchArray,
+  ) {
     return {
       el: node[0],
       path: node[1],
-      editor: this.editor,
-      sel: this.editor.selection!,
+      editor,
+      sel: editor.selection!,
       match,
       startText: match[0],
     };
   }
 
   run(e: React.KeyboardEvent): boolean {
-    const [node] = Editor.nodes<Element>(this.editor, {
+    const editor = this.editorRef.current;
+    if (!editor) return false;
+
+    const [node] = Editor.nodes<Element>(editor, {
       match: (n) => Element.isElement(n),
       mode: 'lowest',
     });
     if (!node || ['code'].includes(node?.[0]?.type)) return false;
-    const sel = this.editor.selection;
+    const sel = editor.selection;
     if (!sel || !Range.isCollapsed(sel)) return false;
     for (let n of TextMatchNodes) {
       if (
@@ -30,16 +39,15 @@ export class MatchKey {
           ? n.matchKey.test(e.key)
           : n.matchKey === e.key
       ) {
-        if (n.checkAllow && !n.checkAllow({ editor: this.editor, node, sel }))
-          continue;
+        if (n.checkAllow && !n.checkAllow({ editor, node, sel })) continue;
         const str =
-          Node.string(Node.leaf(this.editor, sel.anchor.path)).slice(
+          Node.string(Node.leaf(editor, sel.anchor.path)).slice(
             0,
             sel.anchor.offset,
           ) + e.key;
         const m = str.match(n.reg);
         if (m) {
-          if (n.run(this.createParams(node, m))) {
+          if (n.run(this.createParams(editor, node, m))) {
             e.preventDefault();
             return true;
           }

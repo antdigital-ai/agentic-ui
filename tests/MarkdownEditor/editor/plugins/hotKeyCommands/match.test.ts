@@ -56,11 +56,14 @@ vi.mock('slate', () => ({
   },
 }));
 
+const editorRef = { current: mockEditor as any };
+
 describe('MatchKey', () => {
   let matchKey: MatchKey;
 
   beforeEach(() => {
-    matchKey = new MatchKey(mockEditor as any);
+    editorRef.current = mockEditor as any;
+    matchKey = new MatchKey(editorRef);
     vi.clearAllMocks();
   });
 

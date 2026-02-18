@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import React from 'react';
 import { cleanup } from '@testing-library/react';
 import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
@@ -37,6 +38,7 @@ describe('MatchKey', () => {
   });
 
   let editor: BaseEditor & ReactEditor & HistoryEditor;
+  let editorRef: React.MutableRefObject<typeof editor | null>;
   let matchKey: MatchKey;
 
   beforeEach(() => {
@@ -44,7 +46,8 @@ describe('MatchKey', () => {
       ReactEditor &
       HistoryEditor;
     editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
-    matchKey = new MatchKey(editor);
+    editorRef = { current: editor };
+    matchKey = new MatchKey(editorRef);
   });
 
   describe('构造函数', () => {
