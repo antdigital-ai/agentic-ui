@@ -296,7 +296,6 @@ export function AceEditor({
     };
   }, [
     aceLoaded,
-    element.value,
     element.language,
     readonly,
     editorProps.codeProps,
