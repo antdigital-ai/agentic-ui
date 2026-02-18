@@ -159,7 +159,7 @@ const genTableMinSize = (
  * - 支持错误边界
  * - 响应式布局
  */
-export const SlateMarkdownEditor = (props: MEditorProps) => {
+export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   // 所有hooks必须在组件顶部按固定顺序调用
   const {
     store,
@@ -1196,4 +1196,4 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
       </Slate>
     </>,
   );
-};
+});
