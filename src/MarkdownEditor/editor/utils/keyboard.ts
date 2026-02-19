@@ -113,7 +113,8 @@ export class KeyboardTask {
   selectWord() {
     const sel = this.editor.selection;
     if (sel && Range.isCollapsed(sel)) {
-      const text = Node.leaf(this.editor, sel.anchor.path).text || '';
+      const [leaf] = Editor.leaf(this.editor, sel.anchor);
+      const text = leaf?.text || '';
       let start = sel.anchor.offset;
       let end = start;
       const next = text.slice(start);
