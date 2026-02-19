@@ -55,12 +55,16 @@ describe('arrow.ts', () => {
     // Reset all mocks
     vi.clearAllMocks();
     
-    // Create mock editor
+    // Create mock editor（Slate 的 Editor.leaf 会调用 editor.leaf(editor, at)，需提供 leaf 方法）
     mockEditor = {
       selection: null,
       children: [],
       isVoid: vi.fn().mockReturnValue(false),
       hasPath: vi.fn().mockReturnValue(true),
+      leaf: vi.fn((_editor: any, at: any) => {
+        const path = at?.path ?? [0, 0, 0];
+        return [{ text: '' }, path];
+      }),
     };
 
     // Create mock store
@@ -317,29 +321,25 @@ describe('arrow.ts', () => {
 
     it('应该正确处理右箭头键 - 空白节点后的光标移动', () => {
       mockEvent.key = 'ArrowRight';
-      
-      // 设置选区
+
+      // 设置选区（光标在末尾，offset 4 需与 leaf.text 长度一致）
       mockEditor.selection = {
-        focus: { path: [0, 0], offset: 4 } // 假设文本长度为4
+        focus: { path: [0, 0], offset: 4 },
       };
-      
-      // Mock Range.isCollapsed
+
+      // Editor.leaf 通过 mockEditor.leaf 调用，返回带长度的叶子以进入 moveAfterSpace 分支
+      mockEditor.leaf = vi.fn((_e: any, at: any) => [
+        { text: 'test' },
+        at?.path ?? [0, 0, 0],
+      ]);
+
       vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
-      
-      // Mock Node.leaf
-      vi.spyOn(Node, 'leaf').mockReturnValue({ text: 'test' });
-      
-      // Mock EditorUtils.isDirtLeaf 返回true
       (EditorUtils.isDirtLeaf as any).mockReturnValue(true);
-      
-      // Mock Editor.next
       vi.spyOn(Editor, 'next').mockReturnValue(undefined);
-      
-      // Mock Editor.nodes
-      vi.spyOn(Editor, 'nodes').mockReturnValue((function*() {})());
-      
+      vi.spyOn(Editor, 'nodes').mockReturnValue((function* () {})());
+
       keyArrow(mockStore, mockEvent);
-      
+
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
       expect(EditorUtils.moveAfterSpace).toHaveBeenCalled();
@@ -347,51 +347,34 @@ describe('arrow.ts', () => {
 
     it('应该正确处理右箭头键 - void节点后的光标移动', () => {
       mockEvent.key = 'ArrowRight';
-      
-      // 设置选区
+
       mockEditor.selection = {
-        focus: { path: [0, 0], offset: 4 } // 假设文本长度为4
+        focus: { path: [0, 0], offset: 4 },
       };
-      
-      // Mock Range.isCollapsed
+
+      // Editor.leaf 需返回带长度的叶子，以便进入 void 分支
+      mockEditor.leaf = vi.fn((_e: any, at: any) => [
+        { text: 'test' },
+        at?.path ?? [0, 0, 0],
+      ]);
+
       vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
-      
-      // Mock Node.leaf
-      vi.spyOn(Node, 'leaf').mockReturnValue({ text: 'test' });
-      
-      // Mock EditorUtils.isDirtLeaf
       (EditorUtils.isDirtLeaf as any).mockReturnValue(false);
-      
-      // Mock Editor.next
       vi.spyOn(Editor, 'next')
-        .mockReturnValueOnce(undefined) // 第一次调用返回undefined
-        .mockReturnValueOnce([{ type: 'media' }, [0, 1]] as any); // 第二次调用返回节点
-      
-      // Mock Editor.nodes
-      vi.spyOn(Editor, 'nodes').mockReturnValue((function*() {})());
-      
-      // Mock Editor.isVoid
+        .mockReturnValueOnce(undefined)
+        .mockReturnValueOnce([{ type: 'media' }, [0, 1]] as any);
+      vi.spyOn(Editor, 'nodes').mockReturnValue((function* () {})());
       mockEditor.isVoid.mockReturnValue(true);
-      
-      // Mock Node.get
       vi.spyOn(Node, 'get').mockReturnValue({});
-      
-      // Mock Editor.hasPath
       mockEditor.hasPath.mockReturnValue(true);
-      
-      // Mock Path.next
       vi.spyOn(Path, 'next')
-        .mockReturnValueOnce([0, 1]) // 第一次调用
-        .mockReturnValueOnce([0, 2]); // 第二次调用
-      
-      // Mock Editor.start
+        .mockReturnValueOnce([0, 1])
+        .mockReturnValueOnce([0, 2]);
       vi.spyOn(Editor, 'start').mockReturnValue({ path: [0, 2], offset: 0 });
-      
-      // Mock Transforms.select
       const selectSpy = vi.spyOn(Transforms, 'select').mockImplementation(() => {});
-      
+
       keyArrow(mockStore, mockEvent);
-      
+
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockEvent.stopPropagation).toHaveBeenCalled();
       expect(selectSpy).toHaveBeenCalled();
