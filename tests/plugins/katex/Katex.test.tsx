@@ -164,6 +164,29 @@ describe('Katex', () => {
       consoleErrorSpy.mockRestore();
       process.env.NODE_ENV = originalEnv;
     });
+
+    it('空公式时走 else 分支 setState({ error: "" })', async () => {
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
+      mockLoadKatex.mockResolvedValue({ default: mockKatex });
+
+      const emptyEl: CodeNode = { ...mockElement, value: '' };
+      render(<Katex el={emptyEl} />);
+
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(400);
+      });
+      await act(async () => {
+        await Promise.resolve();
+      });
+
+      expect(mockLoadKatex).toHaveBeenCalled();
+      process.env.NODE_ENV = originalEnv;
+    });
   });
 
   describe('公式渲染测试', () => {

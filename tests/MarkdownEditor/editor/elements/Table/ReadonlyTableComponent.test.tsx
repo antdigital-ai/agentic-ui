@@ -310,6 +310,33 @@ describe('ReadonlyTableComponent', () => {
   });
 
   describe('模态框测试', () => {
+    it('全屏模态内 ConfigProvider 的 getPopupContainer/getTargetContainer 被调用时返回 modelTargetRef 或 body', async () => {
+      renderComponent();
+      const fullscreenButton = screen
+        .getAllByTestId('action-icon')
+        .find((el) => el.getAttribute('title') === '全屏');
+      fireEvent.click(fullscreenButton!);
+      await waitFor(() => {
+        expect(document.querySelector('.ant-modal-wrap')).toBeInTheDocument();
+      });
+      const modalBody = document.querySelector(
+        '.ant-modal-content .ant-agentic-md-editor-content-table',
+      ) as HTMLElement;
+      expect(modalBody).toBeInTheDocument();
+      const fiberKey = Object.keys(modalBody).find((k) =>
+        k.startsWith('__reactFiber'),
+      );
+      expect(fiberKey).toBeDefined();
+      const divFiber = (modalBody as any)[fiberKey!];
+      const configProviderFiber = divFiber?.child;
+      expect(configProviderFiber?.memoizedProps?.getPopupContainer).toBeDefined();
+      expect(configProviderFiber?.memoizedProps?.getTargetContainer).toBeDefined();
+      const container = configProviderFiber.memoizedProps.getPopupContainer();
+      const target = configProviderFiber.memoizedProps.getTargetContainer();
+      expect(container === modalBody || container === document.body).toBe(true);
+      expect(target === modalBody || target === document.body).toBe(true);
+    });
+
     it('应该在点击全屏后显示模态框', async () => {
       renderComponent();
       const fullscreenButton = screen
@@ -397,6 +424,44 @@ describe('ReadonlyTableComponent', () => {
           }
         });
       }
+    });
+
+    it('应在模态框内容区触发 onMouseDown/onDragStart/onDoubleClick 时调用 preventDefault', async () => {
+      renderComponent();
+      const fullscreenButton = screen
+        .getAllByTestId('action-icon')
+        .find((el) => el.getAttribute('title') === '全屏');
+      expect(fullscreenButton).toBeDefined();
+      fireEvent.click(fullscreenButton!);
+
+      await waitFor(() => {
+        expect(screen.getByText('预览表格')).toBeInTheDocument();
+      });
+
+      const modalBody = document.querySelector('.ant-modal-body');
+      expect(modalBody).toBeInTheDocument();
+      const contentDiv = modalBody?.querySelector(
+        '.ant-agentic-md-editor-content-table.ant-agentic-md-editor-content',
+      ) || modalBody?.firstElementChild;
+      expect(contentDiv).toBeInTheDocument();
+
+      const preventDefaultSpy = vi.fn();
+      const createEvent = (type: string) => {
+        const e = new Event(type, { bubbles: true }) as MouseEvent;
+        e.preventDefault = preventDefaultSpy;
+        return e;
+      };
+
+      contentDiv!.dispatchEvent(createEvent('mousedown'));
+      expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+
+      preventDefaultSpy.mockClear();
+      contentDiv!.dispatchEvent(createEvent('dragstart'));
+      expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+
+      preventDefaultSpy.mockClear();
+      contentDiv!.dispatchEvent(createEvent('dblclick'));
+      expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
     });
   });
 

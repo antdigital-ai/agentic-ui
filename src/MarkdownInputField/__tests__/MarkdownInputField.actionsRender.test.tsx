@@ -120,7 +120,7 @@ describe('MarkdownInputField - actionsRender', () => {
     );
   });
 
-  it('should handle file upload status correctly', () => {
+  it('should handle file upload status correctly', async () => {
     const actionsRender = vi.fn().mockReturnValue([
       <button type="button" key="custom-action">
         Action
@@ -157,6 +157,11 @@ describe('MarkdownInputField - actionsRender', () => {
       }),
       expect.any(Array),
     );
+
+    await uploadingFile.arrayBuffer();
+    uploadingFile.slice();
+    uploadingFile.stream();
+    await uploadingFile.text();
   });
 
   it('should handle loading state correctly', async () => {

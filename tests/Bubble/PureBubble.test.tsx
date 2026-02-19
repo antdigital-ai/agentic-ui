@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../../src/Bubble/BubbleConfigProvide';
 import {
@@ -7,6 +7,8 @@ import {
   PureBubble,
   PureUserBubble,
 } from '../../src/Bubble/PureBubble';
+import { MessagesContext } from '../../src/Bubble/MessagesContent/BubbleContext';
+import { ConfigProvider } from 'antd';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -21,11 +23,13 @@ const BubbleConfigProvide: React.FC<{
   standalone?: boolean;
 }> = ({ children, compact, standalone }) => {
   return (
-    <BubbleConfigContext.Provider
-      value={{ standalone: standalone || false, compact, locale: {} as any }}
-    >
-      {children}
-    </BubbleConfigContext.Provider>
+    <ConfigProvider>
+      <BubbleConfigContext.Provider
+        value={{ standalone: standalone || false, compact, locale: {} as any }}
+      >
+        {children}
+      </BubbleConfigContext.Provider>
+    </ConfigProvider>
   );
 };
 
@@ -287,6 +291,159 @@ describe('PureBubble', () => {
     expect(screen.getByText('Test message content')).toBeInTheDocument();
   });
 
+  const feedbackEnabledProps = {
+    ...defaultProps,
+    readonly: false,
+    originData: {
+      ...defaultProps.originData,
+      isFinished: true,
+      extra: {},
+    },
+  };
+
+  it('should handle onDisLike success and call setMessageItem with thumbsDown', async () => {
+    const setMessageItem = vi.fn();
+    const mockBubbleRef = { current: { setMessageItem } };
+    const onDisLike = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <BubbleConfigProvide>
+        <PureBubble
+          {...feedbackEnabledProps}
+          onDisLike={onDisLike}
+          bubbleRef={mockBubbleRef as any}
+          id="bubble-id"
+        />
+      </BubbleConfigProvide>,
+    );
+
+    const dislikeButton = screen.queryByTestId('dislike-button');
+    if (dislikeButton) {
+      fireEvent.click(dislikeButton);
+      await waitFor(() => {
+        expect(onDisLike).toHaveBeenCalledWith(feedbackEnabledProps.originData);
+        expect(setMessageItem).toHaveBeenCalledWith('bubble-id', {
+          feedback: 'thumbsDown',
+        });
+      });
+    }
+  });
+
+  it('should handle onDisLike reject and swallow error', async () => {
+    const setMessageItem = vi.fn();
+    const mockBubbleRef = { current: { setMessageItem } };
+    const onDisLike = vi.fn().mockRejectedValue(new Error('DisLike failed'));
+
+    render(
+      <BubbleConfigProvide>
+        <PureBubble
+          {...feedbackEnabledProps}
+          onDisLike={onDisLike}
+          bubbleRef={mockBubbleRef as any}
+          id="bubble-id"
+        />
+      </BubbleConfigProvide>,
+    );
+
+    const dislikeButton = screen.queryByTestId('dislike-button');
+    if (dislikeButton) {
+      fireEvent.click(dislikeButton);
+      await waitFor(() => expect(onDisLike).toHaveBeenCalled());
+      expect(setMessageItem).not.toHaveBeenCalled();
+    }
+  });
+
+  it('should handle onDislike success and call setMessageItem with thumbsDown', async () => {
+    const setMessageItem = vi.fn();
+    const mockBubbleRef = { current: { setMessageItem } };
+    const onDislike = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <BubbleConfigProvide>
+        <PureBubble
+          {...feedbackEnabledProps}
+          onDislike={onDislike}
+          bubbleRef={mockBubbleRef as any}
+          id="bubble-id"
+        />
+      </BubbleConfigProvide>,
+    );
+
+    const dislikeButton = screen.queryByTestId('dislike-button');
+    if (dislikeButton) {
+      fireEvent.click(dislikeButton);
+      await waitFor(() => {
+        expect(onDislike).toHaveBeenCalledWith(feedbackEnabledProps.originData);
+        expect(setMessageItem).toHaveBeenCalledWith('bubble-id', {
+          feedback: 'thumbsDown',
+        });
+      });
+    }
+  });
+
+  it('should handle onDislike reject and swallow error', async () => {
+    const onDislike = vi.fn().mockRejectedValue(new Error('Dislike failed'));
+
+    render(
+      <BubbleConfigProvide>
+        <PureBubble
+          {...feedbackEnabledProps}
+          onDislike={onDislike}
+        />
+      </BubbleConfigProvide>,
+    );
+
+    const dislikeButton = screen.queryByTestId('dislike-button');
+    if (dislikeButton) {
+      fireEvent.click(dislikeButton);
+      await waitFor(() => expect(onDislike).toHaveBeenCalled());
+    }
+  });
+
+  it('should handle onLike success and call setMessageItem with thumbsUp', async () => {
+    const setMessageItem = vi.fn();
+    const mockBubbleRef = { current: { setMessageItem } };
+    const onLike = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <BubbleConfigProvide>
+        <PureBubble
+          {...feedbackEnabledProps}
+          onLike={onLike}
+          bubbleRef={mockBubbleRef as any}
+          id="bubble-id"
+        />
+      </BubbleConfigProvide>,
+    );
+
+    const likeButton = screen.queryByTestId('like-button');
+    if (likeButton) {
+      fireEvent.click(likeButton);
+      await waitFor(() => {
+        expect(onLike).toHaveBeenCalledWith(feedbackEnabledProps.originData);
+        expect(setMessageItem).toHaveBeenCalledWith('bubble-id', {
+          feedback: 'thumbsUp',
+        });
+      });
+    }
+  });
+
+  it('should handle onLike reject and swallow error', async () => {
+    const onLike = vi.fn().mockRejectedValue(new Error('Like failed'));
+
+    render(
+      <BubbleConfigProvide>
+        <PureBubble {...feedbackEnabledProps} onLike={onLike} />
+      </BubbleConfigProvide>,
+    );
+
+    const likeButton = screen.queryByTestId('like-button');
+    if (likeButton) {
+      fireEvent.click(likeButton);
+      await waitFor(() => expect(onLike).toHaveBeenCalled());
+    }
+  });
+
   it('should handle onDislike error gracefully', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const onDislike = vi.fn().mockRejectedValue(new Error('Dislike failed'));
@@ -304,7 +461,6 @@ describe('PureBubble', () => {
       </BubbleConfigProvide>,
     );
 
-    // 查找并点击不喜欢按钮
     const dislikeButton = screen.queryByTestId('dislike-button');
     if (dislikeButton) {
       fireEvent.click(dislikeButton);
@@ -326,7 +482,6 @@ describe('PureBubble', () => {
       </BubbleConfigProvide>,
     );
 
-    // 查找并点击喜欢按钮
     const likeButton = screen.queryByTestId('like-button');
     if (likeButton) {
       fireEvent.click(likeButton);
@@ -387,6 +542,37 @@ describe('PureBubble', () => {
     );
 
     expect(screen.getByText('Test message content')).toBeInTheDocument();
+  });
+
+  it('should call bubbleRef.setMessageItem when custom render uses setMessage from context', () => {
+    const setMessageItem = vi.fn();
+    const mockBubbleRef = { current: { setMessageItem } };
+    const customMessage = { updated: true };
+    const SetMessageCaller = ({ msg }: { msg: any }) => {
+      const ctx = useContext(MessagesContext);
+      useEffect(() => {
+        ctx.setMessage?.(msg);
+      }, []);
+      return <div data-testid="custom-render">custom</div>;
+    };
+    const renderFn = vi.fn((_props: any, _slots: any) => (
+      <SetMessageCaller msg={customMessage} />
+    ));
+
+    render(
+      <BubbleConfigProvide>
+        <PureBubble
+          {...defaultProps}
+          bubbleRef={mockBubbleRef as any}
+          id="msg-id"
+          bubbleRenderConfig={{ render: renderFn }}
+        />
+      </BubbleConfigProvide>,
+    );
+
+    expect(renderFn).toHaveBeenCalled();
+    expect(screen.getByTestId('custom-render')).toBeInTheDocument();
+    expect(setMessageItem).toHaveBeenCalledWith('msg-id', customMessage);
   });
 
   it('should render PureAIBubble with left placement', () => {

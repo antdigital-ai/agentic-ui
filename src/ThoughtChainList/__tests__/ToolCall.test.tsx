@@ -251,6 +251,24 @@ describe('ToolCall Component', () => {
         }),
       );
     });
+    it('仅传 onChangeItem（无 onItemChange）时点击重试应走 onChangeItem 分支', async () => {
+      const onChangeItem = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <ToolCall
+          {...mockProps}
+          onChangeItem={onChangeItem}
+          onItemChange={undefined}
+        />,
+      );
+      const editButton = screen.getByTestId('action-修改');
+      await user.click(editButton);
+      const retryButton = screen.getByText(
+        (c) => c.replace(/\s/g, '') === '重试',
+      );
+      await user.click(retryButton);
+      expect(onChangeItem).toHaveBeenCalled();
+    });
     it('应该在编辑器模式下正确显示编辑器内容', async () => {
       const user = userEvent.setup();
       render(<ToolCall {...mockProps} onChangeItem={vi.fn()} />);
@@ -416,6 +434,54 @@ describe('ToolCall Component', () => {
     });
   });
 
+  describe('复制失败 catch 分支', () => {
+    it('复制入参失败时应捕获错误并 console.error', async () => {
+      const copy = (await import('copy-to-clipboard')).default;
+      vi.mocked(copy).mockImplementationOnce(() => {
+        throw new Error('copy failed');
+      });
+      const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const user = userEvent.setup();
+      render(<ToolCall {...mockProps} />);
+      const copyButtons = screen.getAllByTestId('action-复制');
+      await user.click(copyButtons[0]);
+      expect(errSpy).toHaveBeenCalledWith('复制失败:', expect.any(Error));
+      errSpy.mockRestore();
+    });
+    it('复制执行结果失败时应捕获错误并 console.error', async () => {
+      const copy = (await import('copy-to-clipboard')).default;
+      vi.mocked(copy).mockImplementationOnce(() => {
+        throw new Error('copy failed');
+      });
+      const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const user = userEvent.setup();
+      render(<ToolCall {...mockProps} isFinished={true} />);
+      const copyButtons = screen.getAllByTestId('action-复制');
+      await user.click(copyButtons[1]);
+      expect(errSpy).toHaveBeenCalledWith('复制失败:', expect.any(Error));
+      errSpy.mockRestore();
+    });
+    it('复制错误信息失败时应捕获错误并 console.error', async () => {
+      const copy = (await import('copy-to-clipboard')).default;
+      vi.mocked(copy).mockImplementationOnce(() => {
+        throw new Error('copy failed');
+      });
+      const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const user = userEvent.setup();
+      render(
+        <ToolCall
+          {...mockProps}
+          isFinished={true}
+          output={{ errorMsg: '测试错误' }}
+        />,
+      );
+      const copyButtons = screen.getAllByTestId('action-复制');
+      await user.click(copyButtons[1]);
+      expect(errSpy).toHaveBeenCalledWith('复制失败:', expect.any(Error));
+      errSpy.mockRestore();
+    });
+  });
+
   describe('错误处理测试', () => {
     it('应该处理 JSON.stringify 错误', () => {
       const circularProps = {
@@ -458,11 +524,25 @@ describe('ToolCall Component', () => {
       expect(screen.getByText('执行入参')).toBeInTheDocument();
       expect(screen.getByText('执行结果')).toBeInTheDocument();
     });
+    it('应使用 I18n mock 文案', () => {
+      render(<ToolCall {...mockProps} />);
+      expect(screen.getByText('执行入参')).toBeInTheDocument();
+      expect(screen.getByText('执行结果')).toBeInTheDocument();
+    });
     it('应该处理缺失的国际化文本', () => {
-      // 测试组件在没有国际化文本时的行为
       expect(() => {
         render(<ToolCall {...mockProps} />);
       }).not.toThrow();
+    });
+  });
+
+  describe('ActionIconBox mock 覆盖（60,62,66,67）', () => {
+    it('应渲染带 title 和 onClick 的按钮并支持 children', () => {
+      render(<ToolCall {...mockProps} onChangeItem={vi.fn()} />);
+      const copyButtons = screen.getAllByTestId('action-复制');
+      expect(copyButtons.length).toBeGreaterThanOrEqual(1);
+      expect(copyButtons[0]).toHaveAttribute('title');
+      expect(screen.getByTestId('action-修改')).toBeInTheDocument();
     });
   });
 

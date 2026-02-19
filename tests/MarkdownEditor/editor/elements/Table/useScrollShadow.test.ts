@@ -1,4 +1,5 @@
-import { renderHook } from '@testing-library/react';
+import { render, renderHook } from '@testing-library/react';
+import React, { act, useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import useScrollShadow from '../../../../../src/MarkdownEditor/editor/elements/Table/useScrollShadow';
 
@@ -187,5 +188,74 @@ describe('useScrollShadow Hook', () => {
     const { result } = renderHook(() => useScrollShadow(1000));
 
     expect(result.current).toBeDefined();
+  });
+
+  it('checkScroll 在 element 为 null 时安全返回', async () => {
+    let rafCallback: (() => void) | null = null;
+    vi.spyOn(global, 'requestAnimationFrame').mockImplementation((cb: any) => {
+      rafCallback = cb;
+      return 99;
+    });
+
+    function Wrapper() {
+      const [show, setShow] = useState(true);
+      const [ref] = useScrollShadow();
+      return React.createElement(
+        React.Fragment,
+        null,
+        show && React.createElement('div', { ref, 'data-testid': 'scroll-el' }),
+        React.createElement(
+          'button',
+          { type: 'button', onClick: () => setShow(false) },
+          'hide',
+        ),
+      );
+    }
+
+    const { getByTestId, getByRole } = render(React.createElement(Wrapper));
+    const el = getByTestId('scroll-el');
+    el.dispatchEvent(new Event('scroll', { bubbles: true }));
+    getByRole('button').click();
+    if (rafCallback) rafCallback();
+    expect(rafCallback).toBeDefined();
+  });
+
+  it('ref 挂载到 DOM 后滚动触发 throttledCheck 与 checkScroll', () => {
+    function Wrapper() {
+      const [ref] = useScrollShadow();
+      return React.createElement('div', {
+        ref,
+        'data-testid': 'scroll-target',
+        children: 'content',
+      });
+    }
+    const { getByTestId } = render(React.createElement(Wrapper));
+    const div = getByTestId('scroll-target');
+    act(() => {
+      div.dispatchEvent(new Event('scroll', { bubbles: true }));
+    });
+    expect(global.requestAnimationFrame).toHaveBeenCalled();
+  });
+
+  it('卸载时取消未执行的 requestAnimationFrame', () => {
+    const cancelSpy = vi
+      .spyOn(global, 'cancelAnimationFrame')
+      .mockImplementation(() => {});
+    vi.spyOn(global, 'requestAnimationFrame').mockImplementation(() => 100);
+
+    function Wrapper() {
+      const [ref] = useScrollShadow();
+      return React.createElement('div', { ref, 'data-testid': 'scroll-el' });
+    }
+    const { getByTestId, unmount } = render(React.createElement(Wrapper));
+    act(() => {
+      getByTestId('scroll-el').dispatchEvent(
+        new Event('scroll', { bubbles: true }),
+      );
+    });
+    act(() => {
+      unmount();
+    });
+    expect(cancelSpy).toHaveBeenCalledWith(100);
   });
 });

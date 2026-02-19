@@ -880,6 +880,43 @@ describe('useFileUploadManager', () => {
       vi.restoreAllMocks();
     });
 
+    it('应在 upLoadFileToServer 成功时调用 onFileMapChange', async () => {
+      const { upLoadFileToServer } = await import(
+        '../../src/MarkdownInputField/AttachmentButton'
+      );
+      vi.mocked(upLoadFileToServer).mockImplementation(
+        async (_files: File[], options: any) => {
+          options?.onFileMapChange?.(new Map());
+        },
+      );
+
+      const { result } = renderHook(() => useFileUploadManager(defaultProps), {
+        wrapper,
+      });
+
+      const mockInput = document.createElement('input');
+      mockInput.type = 'file';
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockReturnValue(mockInput);
+      vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
+      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(
+        vi.fn(),
+      );
+
+      await result.current.uploadImage();
+      const changeEvent = {
+        target: {
+          files: [new File(['x'], 'x.png', { type: 'image/png' })],
+        },
+      } as any;
+      await mockInput.onchange?.(changeEvent);
+
+      expect(upLoadFileToServer).toHaveBeenCalled();
+      createElementSpy.mockRestore();
+      vi.restoreAllMocks();
+    });
+
     it('应该处理上传异常', async () => {
       const consoleErrorSpy = vi
         .spyOn(console, 'error')
@@ -966,34 +1003,28 @@ describe('useFileUploadManager', () => {
   });
 
   describe('getAcceptValue 设备类型处理', () => {
-    it('应该在微信环境下返回 *', async () => {
-      vi.mock('../../src/MarkdownInputField/AttachmentButton/utils', () => ({
-        isMobileDevice: vi.fn().mockReturnValue(false),
-        isVivoOrOppoDevice: vi.fn().mockReturnValue(false),
-        isWeChat: vi.fn().mockReturnValue(true),
-      }));
+    const originalCreateElement = document.createElement.bind(document);
+
+    it.each([
+      ['微信', () => { vi.mocked(utils.isWeChat).mockReturnValue(true); vi.mocked(utils.isVivoOrOppoDevice).mockReturnValue(false); vi.mocked(utils.isMobileDevice).mockReturnValue(false); }],
+      ['oppo/vivo', () => { vi.mocked(utils.isWeChat).mockReturnValue(false); vi.mocked(utils.isVivoOrOppoDevice).mockReturnValue(true); vi.mocked(utils.isMobileDevice).mockReturnValue(false); }],
+      ['移动设备', () => { vi.mocked(utils.isWeChat).mockReturnValue(false); vi.mocked(utils.isVivoOrOppoDevice).mockReturnValue(false); vi.mocked(utils.isMobileDevice).mockReturnValue(true); }],
+    ])('%s 环境下 getAcceptValue 应返回 *', async (_name, setMocks) => {
+      setMocks();
+      const created: HTMLInputElement[] = [];
+      vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
+        const el = originalCreateElement(tag) as HTMLInputElement;
+        if (tag === 'input') created.push(el);
+        return el as any;
+      });
 
       const { result } = renderHook(() => useFileUploadManager(defaultProps), {
         wrapper,
       });
-
-      const mockInput = document.createElement('input');
-      const createElementSpy = vi
-        .spyOn(document, 'createElement')
-        .mockReturnValue(mockInput);
-      vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
-      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(
-        vi.fn(),
-      );
-
       await result.current.uploadImage(false);
 
-      // 在微信环境下，accept 应该被设置为 '*'
-      // 注意：由于 mock 的限制，这里主要验证函数能正常执行
-      expect(createElementSpy).toHaveBeenCalled();
-
-      createElementSpy.mockRestore();
-      vi.restoreAllMocks();
+      expect(created.length).toBeGreaterThan(0);
+      expect(created[0].accept).toBe('*');
     });
   });
 });

@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { ToolUseBar } from '../src/ToolUseBar';
@@ -66,6 +66,43 @@ describe('ToolUseBar - Expanded Keys', () => {
 
     expect(mockOnExpandedKeysChange).toHaveBeenCalledWith(['tool1'], []);
   });
+
+  it('收起时应调用 onExpandedKeysChange(newExpandedKeys, removedKeys)', async () => {
+    const mockOnExpandedKeysChange = vi.fn();
+    const TestWrapper = () => {
+      const [expandedKeys, setExpandedKeys] = React.useState(['tool1']);
+      return (
+        <ToolUseBar
+          tools={mockToolsWithContent}
+          expandedKeys={expandedKeys}
+          onExpandedKeysChange={(newKeys, removedKeys) => {
+            mockOnExpandedKeysChange(newKeys, removedKeys);
+            setExpandedKeys(newKeys);
+          }}
+        />
+      );
+    };
+    const { container } = render(<TestWrapper />);
+
+    const firstToolBar = container.querySelector(
+      '[data-testid="tool-user-item-tool-bar"]',
+    );
+    expect(firstToolBar).toBeTruthy();
+    await act(async () => {
+      fireEvent.click(firstToolBar!);
+    });
+
+    await waitFor(() => {
+      expect(mockOnExpandedKeysChange).toHaveBeenCalledWith(
+        expect.any(Array),
+        expect.any(Array),
+      );
+    });
+    const [newKeys, removedKeys] = mockOnExpandedKeysChange.mock.calls[0] ?? [];
+    expect(removedKeys).toContain('tool1');
+    expect(newKeys).not.toContain('tool1');
+  });
+
 
   it('should collapse when clicking expanded item expand button', async () => {
     const mockOnExpandedKeysChange = vi.fn();

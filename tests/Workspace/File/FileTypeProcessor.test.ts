@@ -126,6 +126,20 @@ describe('FileTypeProcessor', () => {
       expect(result.category).toBe(FileCategory.Text);
     });
 
+    it('文件名无有效扩展名时 getTypeFromFileName 返回 null', () => {
+      const file = { id: 'f1', name: '.' };
+      const result = processor.inferFileType(file);
+      expect(result.fileType).toBe('plainText');
+      expect(result.category).toBe(FileCategory.Text);
+    });
+
+    it('URL 无有效扩展名时 getTypeFromUrl 返回 null', () => {
+      const file = { id: 'f1', name: 'x', url: '' };
+      const result = processor.inferFileType(file);
+      expect(result.fileType).toBe('plainText');
+      expect(result.category).toBe(FileCategory.Text);
+    });
+
     it('应该处理各种图片类型', () => {
       const extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
 
@@ -350,7 +364,6 @@ describe('FileTypeProcessor', () => {
       const file = {
         id: 'f1',
         name: 'test.txt',
-        // 没有任何数据源
       };
       const result = processor.processFile(file);
       expect(result.canPreview).toBe(false);
@@ -396,9 +409,21 @@ describe('FileTypeProcessor', () => {
         url: 'https://example.com/archive.zip',
       };
       const result = processor.processFile(file);
-      // URL数据源的压缩文件不支持预览
       expect(result.previewMode).toBe('none');
     });
+
+    it('有内容的压缩文件应返回 modal 预览模式', () => {
+      const file = {
+        id: 'f1',
+        name: 'archive.zip',
+        content: 'PK',
+      };
+      const result = processor.processFile(file);
+      expect(result.typeInference.category).toBe(FileCategory.Archive);
+      expect(result.canPreview).toBe(true);
+      expect(result.previewMode).toBe('modal');
+    });
+
   });
 
   describe('便捷函数', () => {

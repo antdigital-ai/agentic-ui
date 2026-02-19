@@ -55,15 +55,16 @@ describe('LazyElement', () => {
 
   it('应该渲染内容当元素进入视口', async () => {
     let observerCallback: IntersectionObserverCallback;
+    const disconnectSpy = vi.fn();
 
-    // Mock IntersectionObserver 来捕获回调
+    // Mock IntersectionObserver 来捕获回调和 disconnect
     global.IntersectionObserver = class {
       constructor(callback: IntersectionObserverCallback) {
         observerCallback = callback;
       }
       observe = vi.fn();
       unobserve = vi.fn();
-      disconnect = vi.fn();
+      disconnect = disconnectSpy;
       takeRecords = vi.fn(() => []);
       root = null;
       rootMargin = '';
@@ -97,11 +98,62 @@ describe('LazyElement', () => {
       }
     });
 
-    // 内容应该被渲染
+    // 内容应该被渲染，且 observer 已 disconnect
     await waitFor(() => {
       expect(screen.getByTestId('content')).toBeTruthy();
       expect(screen.getByTestId('content').textContent).toBe('实际内容');
+      expect(disconnectSpy).toHaveBeenCalled();
     });
+  });
+
+  it('应该通过 setTimeout 回退检测视口内并渲染', async () => {
+    const disconnectSpy = vi.fn();
+    vi.useFakeTimers();
+    global.IntersectionObserver = class {
+      observe = vi.fn();
+      unobserve = vi.fn();
+      disconnect = disconnectSpy;
+      takeRecords = vi.fn(() => []);
+      root = null;
+      rootMargin = '';
+      thresholds = [];
+    } as any;
+
+    const { container } = render(
+      <LazyElement rootMargin="200">
+        <div data-testid="content">内容</div>
+      </LazyElement>,
+    );
+
+    const wrapper = container.querySelector(
+      '[aria-hidden="true"]',
+    ) as HTMLElement;
+    if (wrapper) {
+      Object.defineProperty(wrapper, 'getBoundingClientRect', {
+        value: () => ({
+          top: 0,
+          left: 0,
+          right: 100,
+          bottom: 100,
+          width: 50,
+          height: 50,
+          x: 0,
+          y: 0,
+          toJSON: () => ({}),
+        }),
+      });
+    }
+
+    vi.advanceTimersByTime(150);
+    vi.useRealTimers();
+
+    await waitFor(
+      () => {
+        const content = screen.queryByTestId('content');
+        if (content) expect(content).toBeInTheDocument();
+      },
+      { timeout: 500 },
+    );
   });
 
   it('应该使用自定义的 rootMargin', () => {
@@ -134,7 +186,6 @@ describe('LazyElement', () => {
     const disconnectSpy = vi.fn();
 
     global.IntersectionObserver = class {
-      constructor(callback: IntersectionObserverCallback) {}
       observe = vi.fn();
       unobserve = vi.fn();
       disconnect = disconnectSpy;

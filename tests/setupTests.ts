@@ -89,7 +89,27 @@ Object.defineProperty(document, 'doctype', {
   },
 });
 
-// 修复canvas相关的问题
+// 修复 canvas 相关的问题：BarChart 等组件会调用 canvas.getContext('2d') 测量文本
+// 同时 patch window.HTMLCanvasElement，确保 document.createElement('canvas') 使用的构造器被 mock
+const installCanvasMock = () => {
+  const mockContext = {
+    measureText: vi.fn(() => ({ width: 50 })),
+    fillText: vi.fn(),
+    font: '',
+    canvas: null as unknown as HTMLCanvasElement,
+  };
+  const getContextFn = vi.fn(function (this: HTMLCanvasElement) {
+    mockContext.canvas = this;
+    return mockContext;
+  }) as any;
+  if (typeof (globalThis as any).window?.HTMLCanvasElement?.prototype !== 'undefined') {
+    (globalThis as any).window.HTMLCanvasElement.prototype.getContext = getContextFn;
+  }
+  if (typeof (globalThis as any).HTMLCanvasElement?.prototype !== 'undefined') {
+    (globalThis as any).HTMLCanvasElement.prototype.getContext = getContextFn;
+  }
+};
+installCanvasMock();
 
 global.window.scrollTo = vi.fn();
 Element.prototype.scrollTo = vi.fn();

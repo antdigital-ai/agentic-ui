@@ -55,6 +55,28 @@ describe('findMatchingClose', () => {
       const closeIdx = findMatchingClose(math, 2, '$$', '$$');
       expect(closeIdx).toBe(-1);
     });
+
+    it('$$ 匹配时偶数个反斜杠应返回位置', () => {
+      const s = 'ab$$cd';
+      const closeIdx = findMatchingClose(s, 0, '$$', '$$');
+      expect(closeIdx).toBe(2);
+      expect(s.slice(closeIdx, closeIdx + 2)).toBe('$$');
+    });
+
+    it('$$ 前有奇数个反斜杠时进入反斜杠统计循环', () => {
+      // \\$$ 中第一个 $$ 被转义，应继续查找，最终无匹配返回 -1
+      const s = '\\$$';
+      const closeIdx = findMatchingClose(s, 0, '$$', '$$');
+      expect(closeIdx).toBe(-1);
+    });
+  });
+
+  describe('多字符闭合序列', () => {
+    it('闭合序列最后一字符单独出现时应减少 depth', () => {
+      const s = '(()x))';
+      const closeIdx = findMatchingClose(s, 0, '(', '))');
+      expect(closeIdx).toBe(-1);
+    });
   });
 
   describe('括号匹配', () => {

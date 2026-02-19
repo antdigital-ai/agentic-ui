@@ -312,6 +312,7 @@ export const resolveSegments = (
   toArray(children).forEach((item) => {
     if (isString(item) || isNumber(item)) {
       const itemString = item.toString();
+      if (itemString === '') return;
       switch (by) {
         case 'word':
           result.push(...itemString.split(/(\s+)/));

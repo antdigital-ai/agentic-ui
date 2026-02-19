@@ -1,4 +1,4 @@
-﻿// @ts-nocheck
+// @ts-nocheck
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
@@ -220,6 +220,98 @@ describe('SendActions', () => {
 
       // More menu should be visible
       expect(container).toBeInTheDocument();
+    });
+
+    it('折叠且多按钮时附件/语音按钮显示短标题', () => {
+      const { container } = render(
+        <SendActions
+          collapseSendActions={true}
+          attachment={{ enable: true }}
+          voiceRecognizer={vi.fn()}
+          onSend={vi.fn()}
+        />,
+      );
+      const sendActions = container.querySelector(
+        '.ant-agentic-md-input-field-send-actions',
+      );
+      expect(sendActions).toBeTruthy();
+      // 折叠时附件/语音在 Popover 内，仅校验发送操作区域已渲染
+      expect(
+        sendActions?.querySelector('[class*="send"]') ||
+          sendActions?.firstElementChild,
+      ).toBeTruthy();
+    });
+  });
+
+  describe('isSendable 与 fileMap/recording', () => {
+    it('fileMap 有内容时发送按钮可点', () => {
+      const fileMap = new Map();
+      fileMap.set('f1', { url: 'u', name: 'n', status: 'done' });
+      const { container } = render(
+        <SendActions
+          value=""
+          fileMap={fileMap}
+          fileUploadDone={true}
+          onSend={vi.fn()}
+        />,
+      );
+      const sendBtn = container.querySelector(
+        '.ant-agentic-md-input-field-send-button',
+      );
+      expect(sendBtn).toBeInTheDocument();
+    });
+
+    it('recording 为 true 时发送按钮可点', () => {
+      const { container } = render(
+        <SendActions
+          value=""
+          recording={true}
+          voiceRecognizer={vi.fn()}
+          onSend={vi.fn()}
+        />,
+      );
+      const sendBtn = container.querySelector(
+        '.ant-agentic-md-input-field-send-button',
+      );
+      expect(sendBtn).toBeInTheDocument();
+    });
+  });
+
+  describe('自定义 actionsRender 与容器事件', () => {
+    it('使用 actionsRender 时传入 defaultActions', () => {
+      const actionsRender = vi.fn(
+        (ctx: any, defaultActions: React.ReactNode[]) => defaultActions,
+      );
+      render(
+        <SendActions
+          attachment={{ enable: true }}
+          actionsRender={actionsRender}
+          onSend={vi.fn()}
+        />,
+      );
+      expect(actionsRender).toHaveBeenCalled();
+      expect(actionsRender.mock.calls[0][1]).toBeDefined();
+      expect(Array.isArray(actionsRender.mock.calls[0][1])).toBe(true);
+    });
+
+    it('点击/按键容器时阻止冒泡', () => {
+      const { container } = render(<SendActions onSend={vi.fn()} />);
+      const wrap = container.querySelector(
+        '.ant-agentic-md-input-field-send-actions',
+      );
+      expect(wrap).toBeInTheDocument();
+      const clickEvent = new MouseEvent('click', { bubbles: true });
+      const stopPropagation = vi.spyOn(clickEvent, 'stopPropagation');
+      const preventDefault = vi.spyOn(clickEvent, 'preventDefault');
+      wrap!.dispatchEvent(clickEvent);
+      expect(stopPropagation).toHaveBeenCalled();
+      expect(preventDefault).toHaveBeenCalled();
+      const keyEvent = new KeyboardEvent('keydown', { bubbles: true });
+      const keyStop = vi.spyOn(keyEvent, 'stopPropagation');
+      const keyPrevent = vi.spyOn(keyEvent, 'preventDefault');
+      wrap!.dispatchEvent(keyEvent);
+      expect(keyStop).toHaveBeenCalled();
+      expect(keyPrevent).toHaveBeenCalled();
     });
   });
 

@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DocInfoList } from '../../src/Bubble/MessagesContent/DocInfo';
@@ -226,6 +227,193 @@ describe('DocInfoList', () => {
       render(<DocInfoList {...defaultProps} />);
 
       expect(screen.getAllByTestId('motion-div')).toHaveLength(3);
+    });
+  });
+
+  describe('交互与分支覆盖', () => {
+    it('点击引用区域 label 应切换展开/收起 (115)', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <DocInfoList
+          {...defaultProps}
+          options={[{ content: 'Only one', docMeta: { doc_name: 'O' }, originUrl: '#' }]}
+          reference_url_info_list={[]}
+        />,
+      );
+      const label = container.querySelector('[class*="doc-info-label"]');
+      expect(label).toBeTruthy();
+      await user.click(label as HTMLElement);
+      await user.click(label as HTMLElement);
+      expect(label).toBeInTheDocument();
+    });
+
+    it('占位符替换函数应被调用 (66)', () => {
+      const props = {
+        ...defaultProps,
+        options: [
+          {
+            content: 'See $[ref1] for more.',
+            docMeta: { doc_name: 'Doc' },
+            originUrl: 'https://example.com/doc',
+          },
+        ],
+        reference_url_info_list: [
+          { placeholder: 'ref1', url: 'https://ref1.com', doc_id: '' },
+        ],
+      };
+      render(<DocInfoList {...props} />);
+      expect(screen.getByText('Doc')).toBeInTheDocument();
+    });
+
+    it('点击列表项且存在 onOriginUrlClick 时应调用回调 (212-213)', async () => {
+      const user = userEvent.setup();
+      const onOriginUrlClick = vi.fn();
+      render(
+        <DocInfoList
+          {...defaultProps}
+          onOriginUrlClick={onOriginUrlClick}
+          options={[
+            {
+              content: 'Test document 1',
+              docMeta: { doc_name: 'Document 1' },
+              originUrl: 'https://example.com/doc1',
+            },
+          ]}
+        />,
+      );
+      const item = screen.getByText('Test document 1').closest('[class*="list-item"]');
+      await user.click(item!);
+      expect(onOriginUrlClick).toHaveBeenCalledWith('https://example.com/doc1');
+    });
+
+    it('点击列表项且无 originUrl 时应调用 window.open (215)', async () => {
+      const user = userEvent.setup();
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      render(
+        <DocInfoList
+          {...defaultProps}
+          onOriginUrlClick={undefined}
+          options={[
+            {
+              content: 'No url doc',
+              docMeta: { doc_name: 'No URL' },
+              originUrl: undefined as any,
+            },
+          ]}
+        />,
+      );
+      const item = screen.getByText('No url doc').closest('[class*="list-item"]');
+      await user.click(item!);
+      expect(openSpy).toHaveBeenCalledWith(undefined);
+      openSpy.mockRestore();
+    });
+
+    it('点击「查看原文」且存在 onOriginUrlClick 时应调用回调 (305-307)', async () => {
+      const user = userEvent.setup();
+      const onOriginUrlClick = vi.fn();
+      render(
+        <DocInfoList
+          {...defaultProps}
+          onOriginUrlClick={onOriginUrlClick}
+          options={[
+            {
+              content: 'Short',
+              docMeta: { doc_name: 'D1' },
+              originUrl: 'https://example.com/d1',
+            },
+          ]}
+        />,
+      );
+      const btn = screen.getByLabelText('查看原文');
+      await user.click(btn);
+      expect(onOriginUrlClick).toHaveBeenCalledWith('https://example.com/d1');
+    });
+
+    it('点击「查看原文」且无 onOriginUrlClick 时不抛错 (308-310)', async () => {
+      const user = userEvent.setup();
+      render(
+        <DocInfoList
+          {...defaultProps}
+          onOriginUrlClick={undefined}
+          options={[
+            {
+              content: 'Short',
+              docMeta: { doc_name: 'D2' },
+              originUrl: 'https://example.com/d2',
+            },
+          ]}
+        />,
+      );
+      const btn = screen.getByLabelText('查看原文');
+      await user.click(btn);
+      expect(btn).toBeInTheDocument();
+    });
+
+    it('内容长度小于 20 时不包 Popover 直接渲染 dom (323)', () => {
+      render(
+        <DocInfoList
+          {...defaultProps}
+          options={[
+            {
+              content: 'Short',
+              docMeta: { doc_name: 'ShortDoc' },
+              originUrl: 'https://example.com/short',
+            },
+          ]}
+        />,
+      );
+      expect(screen.getByText('Short')).toBeInTheDocument();
+      expect(screen.getByText('ShortDoc')).toBeInTheDocument();
+    });
+
+    it('内容长度不小于 20 时包 Popover，悬停后点击 docMeta 区域可设置 docMeta (371)', async () => {
+      const user = userEvent.setup();
+      const longContent = 'A'.repeat(25);
+      const docName = 'LongDocInPopover';
+      const { container } = render(
+        <DocInfoList
+          {...defaultProps}
+          options={[
+            {
+              content: longContent,
+              docMeta: { doc_name: docName, doc_url: 'https://example.com/long' },
+              originUrl: 'https://example.com/long',
+            },
+          ]}
+        />,
+      );
+      expect(screen.getByText(longContent)).toBeInTheDocument();
+      const listItem = screen.getByText(longContent).closest('[class*="list-item"]');
+      await user.hover(listItem as HTMLElement);
+      const popoverContent = document.body.querySelector('[class*="popover"] [class*="content"]') || document.body.querySelector('.ant-popover-content');
+      if (popoverContent) {
+        const docMetaInPopover = within(popoverContent as HTMLElement).getByText(docName);
+        await user.click(docMetaInPopover);
+      }
+      expect(screen.getByText(docName)).toBeInTheDocument();
+    });
+
+    it('传入 render 时使用自定义渲染 (396)', () => {
+      const longContent = 'Custom content that is long enough to trigger Popover';
+      const renderItem = vi.fn((item: any, dom: React.ReactNode) => (
+        <div data-testid="custom-render">{item?.content}</div>
+      ));
+      render(
+        <DocInfoList
+          {...defaultProps}
+          options={[
+            {
+              content: longContent,
+              docMeta: { doc_name: 'C' },
+              originUrl: 'https://example.com/c',
+            },
+          ]}
+          render={renderItem}
+        />,
+      );
+      expect(screen.getByTestId('custom-render')).toBeInTheDocument();
+      expect(screen.getByText(longContent)).toBeInTheDocument();
+      expect(renderItem).toHaveBeenCalled();
     });
   });
 });

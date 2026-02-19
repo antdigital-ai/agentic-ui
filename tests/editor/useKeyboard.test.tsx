@@ -11,7 +11,7 @@
  * - 性能测试
  * - 与其他功能的集成测试
  *
- * 测试覆盖率：针对 useKeyboard.ts 中的核心逻辑进行了全面测试
+ * useKeyboard 核心逻辑测试
  *
  * @author AI Assistant
  * @created 2025-01-07
@@ -55,19 +55,31 @@ vi.mock('is-hotkey', () => ({
 // Mock 相关模块
 const mockSetOpenInsertCompletion = vi.fn();
 const mockInsertCompletionText$ = { next: vi.fn() };
-const mockSetOpenJinjaTemplate = vi.fn();
-const mockSetJinjaAnchorPath = vi.fn();
+const mockStoreState = {
+  openInsertCompletion: false,
+  insertCompletionText$: mockInsertCompletionText$,
+  setOpenInsertCompletion: mockSetOpenInsertCompletion,
+};
 
 vi.mock('../../src/MarkdownEditor/editor/store', () => ({
-  useEditorStore: vi.fn(() => ({
-    openInsertCompletion: false,
-    insertCompletionText$: mockInsertCompletionText$,
-    setOpenInsertCompletion: mockSetOpenInsertCompletion,
-    openJinjaTemplate: false,
-    setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
-    setJinjaAnchorPath: mockSetJinjaAnchorPath,
-    jinjaTemplatePanelEnabled: false,
-  })),
+  useEditorStore: () => mockStoreState,
+}));
+
+const mockNativeTableShouldHandle = vi.fn(() => false);
+const mockNativeTableHandleKeyDown = vi.fn(() => false);
+vi.mock('../../src/MarkdownEditor/utils/native-table', () => ({
+  NativeTableKeyboard: {
+    shouldHandle: (editor: any) => mockNativeTableShouldHandle(editor),
+    handleKeyDown: (editor: any, e: any) =>
+      mockNativeTableHandleKeyDown(editor, e),
+  },
+}));
+
+const mockMatchKeyRun = vi.fn(() => false);
+vi.mock('../../src/MarkdownEditor/editor/plugins/hotKeyCommands/match', () => ({
+  MatchKey: class {
+    run = mockMatchKeyRun;
+  },
 }));
 
 describe('useKeyboard Hook Tests', () => {
@@ -105,6 +117,9 @@ describe('useKeyboard Hook Tests', () => {
     editorRef = { current: editor };
     store = { editor } as EditorStore;
     mockProps = {} as MarkdownEditorProps;
+    mockStoreState.openInsertCompletion = false;
+    mockNativeTableShouldHandle.mockReturnValue(false);
+    mockNativeTableHandleKeyDown.mockReturnValue(false);
   });
 
   describe('Basic keyboard event handling', () => {
@@ -122,6 +137,50 @@ describe('useKeyboard Hook Tests', () => {
       // Tab 键处理不会阻止默认行为，而是由 TabKey 类处理
       // 这里验证事件被正确传递
       expect(typeof keyboardHandler).toBe('function');
+    });
+
+    it('readonly 时跳过所有键盘处理 (84)', () => {
+      const propsReadonly = { ...mockProps, readonly: true };
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, propsReadonly),
+      );
+      const keyboardHandler = result.current;
+      const tabEvent = createKeyboardEvent('Tab');
+      act(() => {
+        keyboardHandler(tabEvent);
+      });
+      expect(tabEvent.preventDefault).not.toHaveBeenCalled();
+    });
+
+    it('NativeTableKeyboard.shouldHandle 且 handleKeyDown 返回 true 时直接 return (88,94)', () => {
+      mockNativeTableShouldHandle.mockReturnValue(true);
+      mockNativeTableHandleKeyDown.mockReturnValue(true);
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, mockProps),
+      );
+      const keyboardHandler = result.current;
+      const keyEvent = createKeyboardEvent('Tab');
+      act(() => {
+        keyboardHandler(keyEvent);
+      });
+      expect(mockNativeTableHandleKeyDown).toHaveBeenCalled();
+      expect(keyEvent.preventDefault).not.toHaveBeenCalled();
+    });
+
+    it('openInsertCompletion 为 true 时 ArrowUp/ArrowDown 阻止默认并 return (99-100)', () => {
+      mockStoreState.openInsertCompletion = true;
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, mockProps),
+      );
+      const keyboardHandler = result.current;
+      const upEvent = createKeyboardEvent('ArrowUp');
+      const downEvent = createKeyboardEvent('ArrowDown');
+      act(() => {
+        keyboardHandler(upEvent);
+        keyboardHandler(downEvent);
+      });
+      expect(upEvent.preventDefault).toHaveBeenCalled();
+      expect(downEvent.preventDefault).toHaveBeenCalled();
     });
 
     it('should handle Enter key without modifiers in normal paragraph (should not prevent default, handled by MarkdownInputField)', () => {
@@ -295,6 +354,59 @@ describe('useKeyboard Hook Tests', () => {
       });
 
       expect(pasteEvent.preventDefault).toHaveBeenCalled();
+    });
+
+    it('Backspace 在折叠选区且 backspace.run() 为 true 时 stopPropagation 并 return (119-121)', () => {
+      editor.children = [
+        { type: 'head', level: 1, children: [{ text: '' }] } as any,
+      ];
+      Transforms.select(editor, {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      });
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, mockProps),
+      );
+      const keyboardHandler = result.current;
+      const backspaceEvent = createKeyboardEvent('Backspace');
+      act(() => {
+        keyboardHandler(backspaceEvent);
+      });
+      expect(backspaceEvent.stopPropagation).toHaveBeenCalled();
+      expect(backspaceEvent.preventDefault).toHaveBeenCalled();
+    });
+
+    it('Backspace 在选区且 backspace.range() 为 true 时 stopPropagation 并 return (125-127)', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: 'ab' }] }];
+      Transforms.select(editor, {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 2 },
+      });
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, mockProps),
+      );
+      const keyboardHandler = result.current;
+      const backspaceEvent = createKeyboardEvent('Backspace');
+      act(() => {
+        keyboardHandler(backspaceEvent);
+      });
+      expect(backspaceEvent.stopPropagation).toHaveBeenCalled();
+      expect(backspaceEvent.preventDefault).toHaveBeenCalled();
+    });
+
+    it('mod+shift+s 时 preventDefault (141)', () => {
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, mockProps),
+      );
+      const keyboardHandler = result.current;
+      const saveEvent = createKeyboardEvent('s', {
+        metaKey: true,
+        shiftKey: true,
+      });
+      act(() => {
+        keyboardHandler(saveEvent);
+      });
+      expect(saveEvent.preventDefault).toHaveBeenCalled();
     });
 
     it('should handle Cmd+Alt+V paste prevention', () => {
@@ -498,9 +610,7 @@ describe('useKeyboard Hook Tests', () => {
         jinjaTemplatePanelEnabled: true,
       } as any);
 
-      editor.children = [
-        { type: 'paragraph', children: [{ text: '{' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: '{' }] }];
       Transforms.select(editor, {
         anchor: { path: [0, 0], offset: 1 },
         focus: { path: [0, 0], offset: 1 },
@@ -568,9 +678,7 @@ describe('useKeyboard Hook Tests', () => {
         jinjaTemplatePanelEnabled: false,
       } as any);
 
-      editor.children = [
-        { type: 'paragraph', children: [{ text: '{' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: '{' }] }];
       Transforms.select(editor, {
         anchor: { path: [0, 0], offset: 1 },
         focus: { path: [0, 0], offset: 1 },
@@ -601,9 +709,7 @@ describe('useKeyboard Hook Tests', () => {
         jinjaTemplatePanelEnabled: true,
       } as any);
 
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'ab' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: 'ab' }] }];
       Transforms.select(editor, {
         anchor: { path: [0, 0], offset: 2 },
         focus: { path: [0, 0], offset: 2 },
@@ -634,9 +740,7 @@ describe('useKeyboard Hook Tests', () => {
         jinjaTemplatePanelEnabled: true,
       } as any);
 
-      editor.children = [
-        { type: 'paragraph', children: [{ text: '{' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: '{' }] }];
       Transforms.select(editor, {
         anchor: { path: [0, 0], offset: 1 },
         focus: { path: [0, 0], offset: 1 },
@@ -675,6 +779,23 @@ describe('useKeyboard Hook Tests', () => {
 
       // 当启用 matchInputToNode 时，应该提前返回
       // 这个测试验证流程被正确截断
+    });
+
+    it('match.run(e) 返回 true 时应提前 return', () => {
+      mockMatchKeyRun.mockReturnValueOnce(true);
+      const propsWithMatch = {
+        markdown: { matchInputToNode: true },
+      } as MarkdownEditorProps;
+
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, propsWithMatch),
+      );
+      const keyEvent = createKeyboardEvent('a');
+      act(() => {
+        result.current(keyEvent);
+      });
+
+      expect(mockMatchKeyRun).toHaveBeenCalledWith(keyEvent);
     });
   });
 

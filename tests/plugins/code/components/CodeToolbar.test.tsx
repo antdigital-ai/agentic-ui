@@ -526,5 +526,115 @@ describe('CodeToolbar', () => {
       // 不应该显示预览/代码切换按钮
       expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
     });
+
+    it('当 HTML 代码为空或非字符串时 containsJavaScript 返回 false', () => {
+      const htmlEmpty = { ...defaultElement, language: 'html', value: '' };
+      render(
+        <CodeToolbar {...defaultProps} element={htmlEmpty} isSelected={true} />,
+      );
+      expect(screen.getByTestId('segmented')).toBeInTheDocument();
+    });
+
+    it('当 HTML 代码包含 Function() 时，应该隐藏预览/代码切换按钮', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value: '<div>Function("return 1")</div>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 HTML 代码包含 setTimeout/setInterval 字符串代码时，应该隐藏预览', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value: '<div>setTimeout(\'alert(1)\')</div>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Markdown 视图模式与主题、复制、展开', () => {
+    it('Markdown 代码块切换预览/代码时调用 onViewModeToggle', () => {
+      const onViewModeToggle = vi.fn();
+      const markdownElement = { ...defaultElement, language: 'markdown' };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={markdownElement}
+          isSelected={true}
+          viewMode="preview"
+          onViewModeToggle={onViewModeToggle}
+        />,
+      );
+      const codeOption = screen.getByTestId('segmented-option-1');
+      fireEvent.click(codeOption);
+      expect(onViewModeToggle).toHaveBeenCalledWith('code');
+    });
+
+    it('点击主题按钮时切换 theme', () => {
+      const setTheme = vi.fn();
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          isSelected={true}
+          theme="github"
+          setTheme={setTheme}
+        />,
+      );
+      const themeButton = screen.getByTitle('主题');
+      fireEvent.click(themeButton);
+      expect(setTheme).toHaveBeenCalledWith('chaos');
+    });
+
+    it('复制成功时显示 message.success', () => {
+      const mockCopy = copy as any;
+      mockCopy.mockReturnValue(true);
+      render(<CodeToolbar {...defaultProps} isSelected={true} />);
+      const copyButton = screen.getByTitle('复制');
+      fireEvent.click(copyButton);
+      expect(message.success).toHaveBeenCalled();
+    });
+
+    it('复制失败时静默处理并输出 console.error', () => {
+      const mockCopy = copy as any;
+      mockCopy.mockImplementation(() => {
+        throw new Error('clipboard unavailable');
+      });
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      render(<CodeToolbar {...defaultProps} isSelected={true} />);
+      const copyButton = screen.getByTitle('复制');
+      fireEvent.click(copyButton);
+      expect(consoleSpy).toHaveBeenCalledWith('复制失败:', expect.any(Error));
+      consoleSpy.mockRestore();
+    });
+
+    it('点击展开/收起按钮时调用 onExpandToggle', () => {
+      const onExpandToggle = vi.fn();
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          isSelected={true}
+          onExpandToggle={onExpandToggle}
+        />,
+      );
+      const expandButton = screen.getByTitle('展开/收起');
+      fireEvent.click(expandButton);
+      expect(onExpandToggle).toHaveBeenCalled();
+    });
   });
 });

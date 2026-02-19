@@ -652,7 +652,9 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
         setupEventListeners();
 
         setTimeout(() => {
-          dom.current?.scroll({ top: 0 });
+          if (dom.current && typeof dom.current.scroll === 'function') {
+            dom.current.scroll({ top: 0 });
+          }
         });
       }
     } else {

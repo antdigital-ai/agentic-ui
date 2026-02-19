@@ -3,6 +3,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { Bubble } from '../src/Bubble';
 import { BubbleConfigContext } from '../src/Bubble/BubbleConfigProvide';
+import { MessagesContext } from '../src/Bubble/MessagesContent/BubbleContext';
 import { BubbleProps } from '../src/Bubble/type';
 
 const BubbleConfigProvide: React.FC<{
@@ -12,7 +13,7 @@ const BubbleConfigProvide: React.FC<{
 }> = ({ children, compact, standalone }) => {
   return (
     <BubbleConfigContext.Provider
-      value={{ standalone: standalone || false, compact, locale: {} as any }}
+      value={{ standalone: standalone || false, compact,}}
     >
       {children}
     </BubbleConfigContext.Provider>
@@ -151,6 +152,64 @@ describe('Bubble', () => {
     );
 
     expect(customTitleRender).toHaveBeenCalled();
+  });
+
+  it('UserBubble 在 bubbleRenderConfig.render === false 时应不渲染', () => {
+    const userProps = {
+      ...defaultProps,
+      originData: {
+        ...defaultProps.originData,
+        role: 'user' as const,
+        id: 'user-msg-1',
+      },
+    };
+    render(
+      <BubbleConfigProvide>
+        <Bubble
+          {...userProps}
+          bubbleRenderConfig={{ render: false }}
+        />
+      </BubbleConfigProvide>,
+    );
+    expect(screen.queryByText('Test message content')).not.toBeInTheDocument();
+  });
+
+  it('UserBubble 内 setMessage 应调用 bubbleRef.setMessageItem', async () => {
+    const setMessageItem = vi.fn();
+    const bubbleRef = { current: { setMessageItem } };
+    const userProps = {
+      ...defaultProps,
+      id: 'user-msg-2',
+      originData: {
+        ...defaultProps.originData,
+        role: 'user' as const,
+        id: 'user-msg-2',
+      },
+      bubbleRef: bubbleRef as any,
+      bubbleRenderConfig: {
+        render: (_p: any, _slots: any) => {
+          const SetMessageTester = () => {
+            const ctx = React.useContext(MessagesContext);
+            React.useEffect(() => {
+              ctx.setMessage?.({ content: 'updated' });
+            }, []);
+            return null;
+          };
+          return <SetMessageTester />;
+        },
+      },
+    };
+    render(
+      <BubbleConfigProvide>
+        <Bubble {...userProps} />
+      </BubbleConfigProvide>,
+    );
+    await waitFor(() => {
+      expect(setMessageItem).toHaveBeenCalledWith(
+        'user-msg-2',
+        expect.objectContaining({ content: 'updated' }),
+      );
+    });
   });
 
   it('should render with custom classNames', () => {

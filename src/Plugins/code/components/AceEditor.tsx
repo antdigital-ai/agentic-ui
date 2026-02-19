@@ -231,6 +231,7 @@ export function AceEditor({
       if (readonly) return;
       clearTimeout(debounceTimer.current);
       debounceTimer.current = window.setTimeout(() => {
+        if (typeof window === 'undefined') return;
         onUpdate({ value: codeEditor.getValue() });
         codeRef.current = codeEditor.getValue();
       }, 100);
@@ -292,6 +293,7 @@ export function AceEditor({
     setupEditorEvents(codeEditor);
 
     return () => {
+      clearTimeout(debounceTimer.current);
       codeEditor.destroy();
     };
   }, [

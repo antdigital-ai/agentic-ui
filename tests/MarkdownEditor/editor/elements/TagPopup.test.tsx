@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
+import { ReactEditor } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TagPopup } from '../../../../src/MarkdownEditor/editor/elements/TagPopup';
 import { SuggestionConnext } from '../../../../src/MarkdownInputField/Suggestion';
@@ -98,6 +99,26 @@ describe('TagPopup 组件测试', () => {
       );
 
       expect(screen.getByTestId('child-content')).toBeInTheDocument();
+    });
+
+    it('getNodePath 在 toSlateNode 抛错时返回 null 且不导致组件崩溃', () => {
+      vi.mocked(ReactEditor.toSlateNode).mockImplementationOnce(() => {
+        throw new Error('Cannot resolve Slate node');
+      });
+
+      const { container } = render(
+        <ConfigProvider>
+          <SuggestionConnext.Provider value={mockSuggestionContext}>
+            <TagPopup text="test">
+              <span>test</span>
+            </TagPopup>
+          </SuggestionConnext.Provider>
+        </ConfigProvider>,
+      );
+
+      expect(
+        container.querySelector('[data-tag-popup-input]'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -584,6 +605,39 @@ describe('TagPopup 组件测试', () => {
       expect(tagRender).toHaveBeenCalled();
       expect(screen.getByTestId('custom-render')).toBeInTheDocument();
     });
+
+    it('tagRender 内调用 onSelect 时应传入 trim 后的 value 与 path', async () => {
+      const onSelect = vi.fn();
+      const tagNode = { key: 'tag1' };
+      const tagRender = vi.fn((props: any, defaultDom: React.ReactNode) => (
+        <div
+          data-testid="custom-select"
+          onClick={() => props.onSelect('  value-with-spaces  ', tagNode)}
+        >
+          {defaultDom}
+        </div>
+      ));
+
+      render(
+        <ConfigProvider>
+          <SuggestionConnext.Provider value={mockSuggestionContext}>
+            <TagPopup text="test" tagRender={tagRender} onSelect={onSelect}>
+              <span>test</span>
+            </TagPopup>
+          </SuggestionConnext.Provider>
+        </ConfigProvider>,
+      );
+
+      fireEvent.click(screen.getByTestId('custom-select'));
+
+      await waitFor(() => {
+        expect(onSelect).toHaveBeenCalledWith(
+          'value-with-spaces',
+          expect.any(Array),
+          tagNode,
+        );
+      });
+    });
   });
 
   describe('鼠标事件', () => {
@@ -667,6 +721,41 @@ describe('TagPopup 组件测试', () => {
       expect(
         container.querySelector('[data-tag-popup-input]'),
       ).toBeInTheDocument();
+    });
+
+    it('dropdown 类型点击菜单项应调用 onSelect 并 setOpen(false)', async () => {
+      const onSelect = vi.fn();
+      const items = [
+        { label: '选项A', key: 'key-a' },
+        { label: '选项B', key: 'key-b' },
+      ] as Array<{ label: string; key: string | number }>;
+
+      render(
+        <ConfigProvider>
+          <SuggestionConnext.Provider value={mockSuggestionContext}>
+            <TagPopup
+              text="test"
+              items={items}
+              type="dropdown"
+              onSelect={onSelect}
+              autoOpen
+            >
+              <span>test</span>
+            </TagPopup>
+          </SuggestionConnext.Provider>
+        </ConfigProvider>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('选项A')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByText('选项A'));
+
+      await waitFor(() => {
+        expect(onSelect).toHaveBeenCalledWith('key-a', expect.any(Array));
+        expect(mockSuggestionContext.setOpen).toHaveBeenCalledWith(false);
+      });
     });
 
     it('应该根据 type 渲染不同的组件（panel）', () => {

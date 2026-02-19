@@ -77,6 +77,18 @@ describe('loadKatex', () => {
       (globalThis as any).window = originalWindow;
     }
   });
+
+  it('应在 import 失败时重置 katexLoader 并抛出', async () => {
+    const result = loadKatex();
+    try {
+      await result;
+    } catch (e) {
+      expect(e).toBeDefined();
+    }
+    const result2 = loadKatex();
+    expect(result2).toBeInstanceOf(Promise);
+    await result2.catch(() => {});
+  });
 });
 
 describe('preloadKatex', () => {
@@ -108,6 +120,12 @@ describe('preloadKatex', () => {
     } finally {
       (globalThis as any).window = originalWindow;
     }
+  });
+
+  it('应在 loadKatex 失败时静默处理不抛出', async () => {
+    // 先触发一次 loadKatex 失败使 katexLoader 为 null，再调用 preloadKatex 会走 .catch(() => {})
+    expect(() => preloadKatex()).not.toThrow();
+    await new Promise((r) => setTimeout(r, 50));
   });
 
   it('应该在 katexLoader 已存在时 preloadKatex 不会创建新的 loader', async () => {

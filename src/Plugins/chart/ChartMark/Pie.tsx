@@ -1,7 +1,8 @@
-﻿import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
 import React, { useImperativeHandle, useRef } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { defaultColorList } from '../const';
+import { isWindowDefined } from '../env';
 import { Container } from './Container';
 import { ChartProps } from './useChart';
 
@@ -13,7 +14,7 @@ export const Pie: React.FC<ChartProps> = (props) => {
       return undefined;
     }
 
-    if (typeof window === 'undefined') {
+    if (!isWindowDefined()) {
       return undefined;
     }
 

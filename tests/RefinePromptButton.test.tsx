@@ -5,6 +5,10 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RefinePromptButton } from '../src/MarkdownInputField/RefinePromptButton';
 
+vi.mock('../src/MarkdownInputField/RefinePromptButton/env', () => ({
+  isBrowserEnv: vi.fn(() => true),
+}));
+
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
   motion: {
@@ -18,6 +22,20 @@ vi.mock('framer-motion', () => ({
 describe('RefinePromptButton', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  describe('SSR / 非浏览器环境', () => {
+    it('isBrowserEnv 为 false 时应 return null', async () => {
+      const { isBrowserEnv } = await import(
+        '../src/MarkdownInputField/RefinePromptButton/env'
+      );
+      vi.mocked(isBrowserEnv).mockReturnValueOnce(false);
+
+      const { container } = render(
+        <RefinePromptButton isHover={false} status="idle" onRefine={vi.fn()} />,
+      );
+      expect(container.firstChild).toBeNull();
+    });
   });
 
   describe('Basic Rendering', () => {

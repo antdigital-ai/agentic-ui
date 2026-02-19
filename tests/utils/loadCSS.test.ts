@@ -171,6 +171,48 @@ describe('loadCSS.ts', () => {
       expect(mockQuerySelector).toHaveBeenCalledWith(`link[href*="${cssPath}"]`);
       expect(result).toBeUndefined();
     }, 10000);
+
+    it('字符串路径加载失败时应触发 onerror', async () => {
+      Object.defineProperty(global, 'window', {
+        value: originalWindow,
+        writable: true,
+      });
+
+      const mockAppendChild = vi.fn().mockImplementation((element: HTMLLinkElement) => {
+        setImmediate(() => {
+          if (element.onerror) element.onerror(new Event('error') as any);
+        });
+      });
+
+      Object.defineProperty(global, 'document', {
+        value: {
+          querySelector: vi.fn().mockReturnValue(null),
+          createElement: vi.fn().mockImplementation((tag: string) => {
+            if (tag === 'link') {
+              return {
+                rel: '',
+                type: '',
+                href: '',
+                onload: null,
+                onerror: null,
+                setAttribute(key: string, value: string) {
+                  (this as any)[key] = value;
+                },
+              };
+            }
+            return {};
+          }),
+          head: { appendChild: mockAppendChild },
+        },
+        writable: true,
+      });
+
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const cssPath = 'https://example.com/fail.css';
+      await loadCSS(cssPath);
+      expect(warnSpy).toHaveBeenCalledWith(`Failed to load CSS: ${cssPath}`);
+      warnSpy.mockRestore();
+    }, 10000);
   });
 
   describe('preloadCSS 函数', () => {
@@ -206,6 +248,18 @@ describe('loadCSS.ts', () => {
       // 预加载已加载的 CSS
       const result = preloadCSS(cssPath);
       expect(result).toBeUndefined();
+    }, 10000);
+
+    it('preloadCSS 在 loadCSS 失败时应静默捕获', async () => {
+      Object.defineProperty(global, 'window', {
+        value: originalWindow,
+        writable: true,
+      });
+
+      const rejectFn = vi.fn().mockRejectedValue(new Error('load failed'));
+      preloadCSS(rejectFn);
+      await new Promise((r) => setImmediate(r));
+      expect(rejectFn).toHaveBeenCalled();
     }, 10000);
   });
 });

@@ -319,4 +319,58 @@ describe('HistoryList - generateHistoryItems', () => {
     expect(items[0].label).toBeNull();
     expect(mockGroupLabelRender).toHaveBeenCalled();
   });
+
+  it('sessionSort 为 false 时排序应返回 0', () => {
+    const items = generateHistoryItems({
+      ...defaultConfig,
+      sessionSort: false,
+    });
+    expect(items).toHaveLength(3);
+    expect(items[0].children!.length).toBe(2);
+  });
+
+  it('sessionSort 为函数且返回 number 时应作为排序结果', () => {
+    const sessionSort = vi.fn((a: HistoryDataType, b: HistoryDataType) => {
+      return dayjs(a.gmtCreate).valueOf() - dayjs(b.gmtCreate).valueOf();
+    });
+    const items = generateHistoryItems({
+      ...defaultConfig,
+      sessionSort,
+    });
+    expect(sessionSort).toHaveBeenCalled();
+    expect(items).toHaveLength(3);
+  });
+
+  it('sessionSort 返回 boolean 时应当作 0 处理', () => {
+    const sessionSort = vi.fn(() => true);
+    const items = generateHistoryItems({
+      ...defaultConfig,
+      sessionSort,
+    });
+    expect(items).toHaveLength(3);
+  });
+
+  it('item 无 sessionId 时 onClick 应直接 return', () => {
+    const onClick = vi.fn();
+    const listWithNoSessionId = [
+      ...mockHistoryData,
+      {
+        id: 'no-session',
+        sessionId: undefined as unknown as string,
+        sessionTitle: '无 session',
+        gmtCreate: dayjs().valueOf(),
+      },
+    ];
+    const items = generateHistoryItems({
+      ...defaultConfig,
+      filteredList: listWithNoSessionId as HistoryDataType[],
+      onClick,
+    });
+    const noSessionItem = items
+      .flatMap((g) => g.children || [])
+      .find((c: any) => c.key === 'item-no-session');
+    expect(noSessionItem).toBeDefined();
+    noSessionItem!.onClick!();
+    expect(onClick).not.toHaveBeenCalled();
+  });
 });

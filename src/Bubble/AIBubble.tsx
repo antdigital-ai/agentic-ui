@@ -37,7 +37,8 @@ const getTaskList = (originData: any): WhiteBoxProcessInterface[] => {
   ).filter((item) => item?.info);
 };
 
-const shouldRenderBeforeContent = (
+/** @internal 供单测覆盖 placement !== 'left' 等分支 */
+export const shouldRenderBeforeContent = (
   placement: string,
   role: string | undefined,
   thoughtChainConfig: any,

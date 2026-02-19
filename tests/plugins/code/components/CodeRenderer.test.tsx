@@ -3,13 +3,13 @@
  */
 
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React, { createContext } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CodeRenderer } from '../../../../src/Plugins/code/components/CodeRenderer';
 
 // 使用 vi.hoisted() 定义变量，使其与 vi.mock 一起被提升
-const { mockEditorStore } = vi.hoisted(() => {
+const { mockEditorStore, mockUpdate } = vi.hoisted(() => {
   return {
     mockEditorStore: {
       store: {
@@ -31,6 +31,7 @@ const { mockEditorStore } = vi.hoisted(() => {
         },
       },
     },
+    mockUpdate: vi.fn(),
   };
 });
 
@@ -53,16 +54,23 @@ vi.mock('../../../../src/MarkdownEditor', () => ({
   ),
 }));
 
+// Mock ThinkBlock
+vi.mock('../../../../src/Plugins/code/components/ThinkBlock', () => ({
+  ThinkBlock: (props: any) => (
+    <div data-testid="think-block-mock">{props.element?.value}</div>
+  ),
+}));
+
 // Mock hooks
 vi.mock('../../../../src/Plugins/code/hooks', () => ({
   useCodeEditorState: () => ({
     state: {
       showBorder: false,
-      htmlStr: '<div>HTML Preview Content</div>', // 添加 HTML 内容以便测试
+      htmlStr: '<div>HTML Preview Content</div>',
       hide: false,
       lang: 'javascript',
     },
-    update: vi.fn(),
+    update: mockUpdate,
     path: [0],
     handleCloseClick: vi.fn(),
     handleRunHtml: vi.fn(),
@@ -77,15 +85,17 @@ vi.mock('../../../../src/Plugins/code/hooks', () => ({
       !(element.language === 'html' && element?.isConfig) &&
       !(element.language === 'think' && readonly),
   }),
-  useToolbarConfig: () => ({
+  useToolbarConfig: (config: any) => ({
     toolbarProps: {
-      element: {},
-      readonly: false,
+      element: config?.element ?? {},
+      readonly: config?.readonly ?? false,
       isFullScreen: false,
-      onCloseClick: vi.fn(),
-      setLanguage: vi.fn(),
-      isSelected: true, // 设置为选中状态以便显示工具栏
-      onSelectionChange: vi.fn(),
+      onCloseClick: config?.onCloseClick ?? vi.fn(),
+      setLanguage: config?.setLanguage ?? vi.fn(),
+      isSelected: config?.isSelected ?? true,
+      onSelectionChange: config?.onSelectionChange ?? vi.fn(),
+      onViewModeToggle: config?.onViewModeToggle,
+      viewMode: config?.viewMode,
     },
   }),
 }));
@@ -101,7 +111,13 @@ vi.mock('../../../../src/Plugins/code/components/AceEditor', () => ({
 
 // Mock CodeToolbar 组件
 vi.mock('../../../../src/Plugins/code/components/CodeToolbar', () => ({
-  CodeToolbar: ({ element, readonly, isSelected }: any) => (
+  CodeToolbar: ({
+    element,
+    readonly,
+    isSelected,
+    onViewModeToggle,
+    ...rest
+  }: any) => (
     <div data-testid="code-toolbar">
       <span>Code Toolbar</span>
       <span data-testid="toolbar-language">
@@ -113,6 +129,15 @@ vi.mock('../../../../src/Plugins/code/components/CodeToolbar', () => ({
       <span data-testid="toolbar-selected">
         {isSelected ? 'selected' : 'not-selected'}
       </span>
+      {onViewModeToggle && (
+        <button
+          type="button"
+          data-testid="view-mode-toggle"
+          onClick={() => onViewModeToggle()}
+        >
+          Toggle View
+        </button>
+      )}
     </div>
   ),
 }));
@@ -552,6 +577,119 @@ describe('CodeRenderer Component', () => {
       expect(screen.queryByTestId('html-preview')).not.toBeInTheDocument();
       // 应该显示代码编辑器
       expect(screen.getByTestId('code-container')).toBeInTheDocument();
+    });
+  });
+
+  describe('handleViewModeToggle 与 useEffect', () => {
+    it('当 disableHtmlPreview 且为 HTML 时点击切换仍保持 code 模式', () => {
+      mockEditorStore.editorProps.codeProps.disableHtmlPreview = true;
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'html',
+          value: '<div>Safe</div>',
+        },
+      };
+      render(<CodeRenderer {...props} />);
+      const toggle = screen.queryByTestId('view-mode-toggle');
+      if (toggle) {
+        fireEvent.click(toggle);
+      }
+      expect(screen.queryByTestId('html-preview')).not.toBeInTheDocument();
+    });
+
+    it('当 disableHtmlPreview 从 false 变为 true 时强制切回 code 模式', () => {
+      mockEditorStore.editorProps.codeProps.disableHtmlPreview = false;
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'html',
+          value: '<div>Safe</div>',
+        },
+      };
+      const { rerender } = render(<CodeRenderer {...props} />);
+      mockEditorStore.editorProps.codeProps.disableHtmlPreview = true;
+      rerender(<CodeRenderer {...props} />);
+      expect(screen.queryByTestId('html-preview')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('5 秒未闭合超时', () => {
+    it('未闭合代码块 5 秒后应调用 update 将 finished 设为 true', async () => {
+      vi.useFakeTimers();
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'javascript',
+          value: 'const x = 1',
+          otherProps: { finished: false },
+        },
+      };
+      render(<CodeRenderer {...props} />);
+      vi.advanceTimersByTime(5000);
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          otherProps: expect.objectContaining({ finished: true }),
+        }),
+      );
+      vi.useRealTimers();
+    });
+  });
+
+  describe('配置型 HTML Skeleton', () => {
+    it('未完成且内容较长的配置型 HTML 应显示 Skeleton', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          type: 'code' as const,
+          language: 'html',
+          isConfig: true,
+          otherProps: { finished: false },
+          value: 'x'.repeat(101),
+          children: [{ text: '' }] as [{ text: string }],
+        },
+      };
+      const { container } = render(<CodeRenderer {...props} />);
+      expect(container.querySelector('.ant-skeleton')).toBeInTheDocument();
+    });
+  });
+
+  describe('ThinkBlock 分支', () => {
+    it('只读且 language 为 think 时应渲染 ThinkBlock', () => {
+      mockEditorStore.readonly = true;
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'think',
+          value: '思考内容',
+        },
+      };
+      render(<CodeRenderer {...props} />);
+      expect(screen.getByTestId('think-block-mock')).toBeInTheDocument();
+      expect(screen.getByText('思考内容')).toBeInTheDocument();
+      mockEditorStore.readonly = false;
+    });
+  });
+
+  describe('hideToolBar', () => {
+    it('当 hideToolBar 为 true 时不渲染 CodeToolbar', () => {
+      mockEditorStore.editorProps.codeProps.hideToolBar = true;
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'javascript',
+          frontmatter: undefined,
+        },
+      };
+      render(<CodeRenderer {...props} />);
+      expect(screen.queryByTestId('code-toolbar')).not.toBeInTheDocument();
+      mockEditorStore.editorProps.codeProps.hideToolBar = false;
     });
   });
 });

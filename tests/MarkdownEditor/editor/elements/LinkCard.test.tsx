@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LinkCard } from '../../../../src/MarkdownEditor/editor/elements/LinkCard';
 
 // Mock dependencies
@@ -257,6 +257,79 @@ describe('LinkCard', () => {
       render(<LinkCard {...defaultProps} />);
       const linkCard = document.querySelector('[data-be="link-card"]');
       expect(linkCard).toBeInTheDocument();
+    });
+  });
+
+  describe('finished 为 false 与超时分支 (27-33, 43-44, 62)', () => {
+    const unfinishedElement = {
+      ...defaultProps.element,
+      finished: false as const,
+      url: 'https://loading.com',
+      title: 'Loading Title',
+      name: 'Loading Name',
+    };
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('finished 为 false 时 5 秒内显示 Skeleton (27-29, 62)', () => {
+      vi.useFakeTimers();
+      const props = {
+        ...defaultProps,
+        element: unfinishedElement,
+      };
+      render(<LinkCard {...props} />);
+      expect(document.querySelector('.ant-skeleton')).toBeInTheDocument();
+      expect(screen.queryByText('Loading Title')).not.toBeInTheDocument();
+    });
+
+    it('finished 为 false 时 5 秒后显示为文本 (32-33, 43-44)', () => {
+      vi.useFakeTimers();
+      const props = {
+        ...defaultProps,
+        element: unfinishedElement,
+      };
+      render(<LinkCard {...props} />);
+      act(() => {
+        vi.advanceTimersByTime(5001);
+      });
+      expect(screen.getByText('https://loading.com')).toBeInTheDocument();
+      expect(document.querySelector('.ant-skeleton')).not.toBeInTheDocument();
+    });
+
+    it('finished 为 true 时 setShowAsText(false) (35-37)', () => {
+      render(<LinkCard {...defaultProps} />);
+      expect(screen.getByText('Example Title')).toBeInTheDocument();
+    });
+  });
+
+  describe('事件与点击分支 (81, 106-107, 134)', () => {
+    it('容器 onMouseDown 应 stopPropagation (81)', () => {
+      render(<LinkCard {...defaultProps} />);
+      const linkCard = document.querySelector('[data-be="link-card"]');
+      const ev = new MouseEvent('mousedown', { bubbles: true });
+      const stopSpy = vi.spyOn(ev, 'stopPropagation');
+      linkCard?.dispatchEvent(ev);
+      expect(stopSpy).toHaveBeenCalled();
+    });
+
+    it('点击容器区域应调用 window.open (106-107)', () => {
+      render(<LinkCard {...defaultProps} />);
+      const container = document.querySelector(
+        '[class*="link-card-container"]',
+      );
+      expect(container).toBeInTheDocument();
+      fireEvent.click(container!);
+      expect(mockWindowOpen).toHaveBeenCalledWith('https://example.com');
+    });
+
+    it('点击标题链接应调用 window.open', () => {
+      render(<LinkCard {...defaultProps} />);
+      const link = screen.getByText('Example Title').closest('a');
+      expect(link).toBeInTheDocument();
+      fireEvent.click(link!);
+      expect(mockWindowOpen).toHaveBeenCalledWith('https://example.com');
     });
   });
 });

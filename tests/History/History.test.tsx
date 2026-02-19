@@ -27,6 +27,12 @@ vi.mock('../../src/History/components', () => ({
       placeholder="搜索历史记录"
     />
   ),
+  HistoryEmpty: () => (
+    <div>
+      <div>找不到相关结果</div>
+      <div>换个关键词试试吧</div>
+    </div>
+  ),
   generateHistoryItems: vi.fn(() => [
     {
       key: 'group1',
@@ -189,6 +195,89 @@ describe('History 组件', () => {
       // 测试回调函数是否被正确传递
       expect(onClick).toBeDefined();
       expect(onSelected).toBeDefined();
+    });
+
+    it('点击组件外部时 useClickAway 关闭 Popover', async () => {
+      render(
+        <TestWrapper>
+          <History {...defaultProps} />
+        </TestWrapper>,
+      );
+
+      const historyButton = screen.getByTestId('history-button');
+      fireEvent.click(historyButton);
+
+      await waitFor(
+        () => {
+          expect(document.querySelector('.ant-popover-open')).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
+
+      fireEvent.mouseDown(document.body);
+
+      await waitFor(
+        () => {
+          expect(document.querySelector('.ant-popover-open')).not.toBeInTheDocument();
+        },
+        { timeout: 500 },
+      );
+    });
+
+    it('onDeleteItem 执行后调用 loadHistory', async () => {
+      const request = vi.fn().mockResolvedValue(mockHistoryData);
+      const onDeleteItem = vi.fn().mockResolvedValue(undefined);
+      const { generateHistoryItems } = await import(
+        '../../src/History/components'
+      );
+
+      let deleteCallbackFired = false;
+      vi.mocked(generateHistoryItems).mockImplementation((config: any) => {
+        const items = [
+          {
+            key: 'group1',
+            label: '今日',
+            type: 'group',
+            children: [
+              {
+                key: 'session1',
+                label: '测试会话1',
+                onClick: () => {},
+              },
+            ],
+          },
+        ];
+        if (config.onDeleteItem && !deleteCallbackFired) {
+          deleteCallbackFired = true;
+          Promise.resolve().then(() => config.onDeleteItem('session1'));
+        }
+        return items;
+      });
+
+      render(
+        <TestWrapper>
+          <History
+            {...defaultProps}
+            request={request}
+            onDeleteItem={onDeleteItem}
+          />
+        </TestWrapper>,
+      );
+
+      await waitFor(
+        () => {
+          expect(request).toHaveBeenCalledTimes(1);
+        },
+        { timeout: 1000 },
+      );
+
+      await waitFor(
+        () => {
+          expect(onDeleteItem).toHaveBeenCalledWith('session1');
+          expect(request).toHaveBeenCalledTimes(2);
+        },
+        { timeout: 2000 },
+      );
     });
   });
 
@@ -369,6 +458,118 @@ describe('History 组件', () => {
       );
 
       unmount();
+    });
+
+    it('空列表且有搜索关键词时显示 HistoryEmpty', async () => {
+      const emptyRequest = vi.fn().mockResolvedValue([]);
+      const { generateHistoryItems } = await import(
+        '../../src/History/components'
+      );
+      vi.mocked(generateHistoryItems).mockReturnValue([]);
+
+      render(
+        <TestWrapper>
+          <History
+            {...defaultProps}
+            request={emptyRequest}
+            standalone
+            agent={{
+              enabled: true,
+              onSearch: vi.fn(),
+              onNewChat: vi.fn(),
+              onLoadMore: vi.fn(),
+              onFavorite: vi.fn(),
+              onSelectionChange: vi.fn(),
+            }}
+          />
+        </TestWrapper>,
+      );
+
+      await waitFor(
+        () => {
+          expect(emptyRequest).toHaveBeenCalled();
+        },
+        { timeout: 1000 },
+      );
+
+      const searchInput = screen.getByTestId('search-input');
+      fireEvent.change(searchInput, { target: { value: '关键词' } });
+
+      await waitFor(
+        () => {
+          expect(screen.getByText('找不到相关结果')).toBeInTheDocument();
+          expect(screen.getByText('换个关键词试试吧')).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
+
+      vi.mocked(generateHistoryItems).mockReturnValue([
+        {
+          key: 'group1',
+          label: '今日',
+          type: 'group',
+          children: [
+            { key: 'session1', label: '测试会话1', onClick: () => {} },
+            { key: 'session2', label: '测试会话2', onClick: () => {} },
+          ],
+        },
+      ]);
+    });
+
+    it('空列表且无搜索关键词时使用 emptyRender', async () => {
+      const emptyRequest = vi.fn().mockResolvedValue([]);
+      const { generateHistoryItems } = await import(
+        '../../src/History/components'
+      );
+      vi.mocked(generateHistoryItems).mockReturnValue([]);
+
+      const emptyRender = vi.fn(() => (
+        <div data-testid="custom-empty-render">自定义空状态</div>
+      ));
+
+      render(
+        <TestWrapper>
+          <History
+            {...defaultProps}
+            request={emptyRequest}
+            emptyRender={emptyRender}
+          />
+        </TestWrapper>,
+      );
+
+      await waitFor(
+        () => {
+          expect(emptyRequest).toHaveBeenCalled();
+        },
+        { timeout: 1000 },
+      );
+
+      fireEvent.click(screen.getByTestId('history-button'));
+
+      await waitFor(
+        () => {
+          expect(emptyRender).toHaveBeenCalled();
+        },
+        { timeout: 1000 },
+      );
+    });
+
+    it('下拉打开时 Popover 使用 getPopupContainer 渲染内容', async () => {
+      render(
+        <TestWrapper>
+          <History {...defaultProps} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByTestId('history-button'));
+
+      await waitFor(
+        () => {
+          const openPopover = document.querySelector('.ant-popover-open');
+          expect(openPopover).toBeInTheDocument();
+        },
+        { timeout: 1000 },
+      );
     });
 
     it('应该支持复杂的自定义空状态组件', async () => {

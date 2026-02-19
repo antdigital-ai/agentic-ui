@@ -131,6 +131,7 @@ const mockLoadingData: WhiteBoxProcessInterface = {
 describe('ThoughtChainList', () => {
   afterEach(() => {
     cleanup();
+    vi.unstubAllEnvs?.();
   });
 
   // 基础渲染测试
@@ -156,6 +157,18 @@ describe('ThoughtChainList', () => {
       expect(screen.getByText('查询用户表数据')).toBeInTheDocument();
       expect(screen.getByText('调用用户信息接口')).toBeInTheDocument();
       expect(screen.getByText('检索产品文档')).toBeInTheDocument();
+    });
+
+    it('should render list item motion with variants when NODE_ENV is not test', () => {
+      vi.stubEnv('NODE_ENV', 'development');
+      render(
+        <ThoughtChainList
+          thoughtChainList={[mockTableSqlData]}
+          bubble={{ isFinished: true }}
+          finishAutoCollapse={false}
+        />,
+      );
+      expect(screen.getByText('查询用户表数据')).toBeInTheDocument();
     });
   });
 
@@ -384,6 +397,42 @@ describe('ThoughtChainList', () => {
 
       // 应该显示完成状态，包含时间信息
       expect(screen.getByText(/任务完成.*共耗时.*s/)).toBeInTheDocument();
+    });
+
+    it('应显示 taskAborted 当 bubble.isAborted 且 time<=0', () => {
+      const bubble = {
+        isAborted: true,
+        createAt: 1000,
+        endTime: 1000,
+        isFinished: false,
+      };
+
+      render(
+        <ThoughtChainList
+          thoughtChainList={[mockTableSqlData]}
+          bubble={bubble}
+        />,
+      );
+
+      expect(screen.getByText(/任务已取消|任务已中止|已中止/)).toBeInTheDocument();
+    });
+
+    it('应显示 taskComplete 与耗时当 bubble.isFinished 且 time>0', () => {
+      const bubble = {
+        isFinished: true,
+        createAt: 1000,
+        endTime: 6000,
+        isAborted: false,
+      };
+
+      render(
+        <ThoughtChainList
+          thoughtChainList={[mockTableSqlData]}
+          bubble={bubble}
+        />,
+      );
+
+      expect(screen.getByText(/任务完成.*共耗时.*5\.00s/)).toBeInTheDocument();
     });
 
     it('should auto-collapse when finished if finishAutoCollapse is true', async () => {

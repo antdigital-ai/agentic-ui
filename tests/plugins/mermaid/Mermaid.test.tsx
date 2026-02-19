@@ -8,6 +8,10 @@ vi.mock('../../../src/Hooks/useIntersectionOnce', () => ({
   useIntersectionOnce: () => true,
 }));
 
+vi.mock('../../../src/Plugins/mermaid/env', () => ({
+  isBrowser: vi.fn(() => true),
+}));
+
 // Mock mermaid
 vi.mock('mermaid', () => ({
   default: {
@@ -48,6 +52,16 @@ describe('Mermaid Component', () => {
     render(<Mermaid element={{ ...defaultElement, ...overrides }} />);
 
   describe('基本渲染测试', () => {
+    it('非浏览器环境（isBrowser 为 false）时应 return null', async () => {
+      const { isBrowser } = await import('../../../src/Plugins/mermaid/env');
+      vi.mocked(isBrowser).mockReturnValueOnce(false);
+
+      const { container } = render(
+        <Mermaid element={{ ...defaultElement }} />,
+      );
+      expect(container.firstChild).toBeNull();
+    });
+
     it('应该正确渲染 Mermaid 组件', () => {
       renderMermaid();
 

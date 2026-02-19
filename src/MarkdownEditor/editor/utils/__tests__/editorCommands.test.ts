@@ -542,4 +542,135 @@ describe('createList', () => {
       }
     });
   });
+
+  describe('createList 防御分支覆盖补充', () => {
+    it('有 selection 但 getCurrentNodes 为空时直接返回', () => {
+      editor.selection = {
+        anchor: { offset: 0, path: [0, 0] },
+        focus: { offset: 0, path: [0, 0] },
+      } as any;
+      (Editor.nodes as Mock).mockReturnValueOnce([]);
+      createList(editor, 'unordered');
+      expect(Transforms.wrapNodes).not.toHaveBeenCalled();
+    });
+
+    it('blockNodes 过滤后为空时提前返回', () => {
+      editor.selection = {
+        anchor: { offset: 0, path: [0, 0] },
+        focus: { offset: 0, path: [0, 0] },
+      } as any;
+      const p = { type: 'paragraph', children: [{ text: 'x' }] };
+      (Editor.nodes as Mock)
+        .mockReturnValueOnce([[p, [0]]]) // getCurrentNodes
+        .mockReturnValueOnce([[p, [0]]]); // findBlockNodesInSelection
+      (Editor.parent as Mock).mockReturnValue([{ type: 'list-item' }, [0]]);
+      (getListType as Mock).mockReturnValue('bulleted-list');
+
+      createList(editor, 'unordered');
+      expect(Transforms.wrapNodes).not.toHaveBeenCalled();
+    });
+
+    it('wrap list-item 时路径无效会 continue（850）', () => {
+      editor.selection = {
+        anchor: { offset: 0, path: [0, 0] },
+        focus: { offset: 0, path: [0, 0] },
+      } as any;
+      const p = { type: 'paragraph', children: [{ text: 'x' }] };
+      (Editor.nodes as Mock)
+        .mockReturnValueOnce([[p, [0]]])
+        .mockReturnValueOnce([[p, [0]]]);
+      (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
+      (Node.get as Mock).mockReturnValue(p);
+      (Node.string as Mock).mockReturnValue('x');
+      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
+      (getListType as Mock).mockReturnValue('bulleted-list');
+      (Editor.hasPath as Mock).mockReturnValue(false);
+
+      createList(editor, 'unordered');
+      expect(Transforms.wrapNodes).not.toHaveBeenCalled();
+    });
+
+    it('首个 listItem path 无效时在 888 返回', () => {
+      editor.selection = {
+        anchor: { offset: 0, path: [0, 0] },
+        focus: { offset: 0, path: [0, 0] },
+      } as any;
+      const p = { type: 'paragraph', children: [{ text: 'x' }] };
+      const listItem = { type: 'list-item', children: [p] };
+      (Editor.nodes as Mock)
+        .mockReturnValueOnce([[p, [0]]])
+        .mockReturnValueOnce([[p, [0]]]);
+      (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
+      (Node.get as Mock).mockReturnValue(listItem);
+      (Node.string as Mock).mockReturnValue('x');
+      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
+      (getListType as Mock).mockReturnValue('bulleted-list');
+      (Editor.hasPath as Mock).mockImplementation((_, path) =>
+        JSON.stringify(path) !== '[0]',
+      );
+
+      createList(editor, 'unordered');
+      expect(Transforms.select).not.toHaveBeenCalled();
+    });
+
+    it('firstPath 为根路径时在 897 返回', () => {
+      editor.selection = {
+        anchor: { offset: 0, path: [0] },
+        focus: { offset: 0, path: [0] },
+      } as any;
+      const p = { type: 'paragraph', children: [{ text: 'x' }] };
+      const listItem = { type: 'list-item', children: [p] };
+      (Editor.nodes as Mock)
+        .mockReturnValueOnce([[p, []]])
+        .mockReturnValueOnce([[p, []]]);
+      (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
+      (Node.get as Mock).mockReturnValue(listItem);
+      (Node.string as Mock).mockReturnValue('x');
+      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
+      (getListType as Mock).mockReturnValue('bulleted-list');
+      (Editor.hasPath as Mock).mockReturnValue(true);
+
+      createList(editor, 'unordered');
+      expect(Transforms.wrapNodes).not.toHaveBeenCalledWith(
+        editor,
+        expect.objectContaining({ type: 'bulleted-list' }),
+        expect.anything(),
+      );
+    });
+
+    it('mergeIntoAdjacentList 目标不是列表时直接返回（572）', () => {
+      editor.selection = {
+        anchor: { offset: 0, path: [1, 0] },
+        focus: { offset: 0, path: [1, 0] },
+      } as any;
+      const p = { type: 'paragraph', children: [{ text: 'x' }] };
+      const listItem = { type: 'list-item', children: [p] };
+      const rootNode = { type: 'root', children: [{}, {}, {}] };
+      const listNode = { type: 'bulleted-list', children: [listItem] };
+
+      (Editor.nodes as Mock)
+        .mockReturnValueOnce([[p, [1]]])
+        .mockReturnValueOnce([[p, [1]]]);
+      (Editor.parent as Mock).mockReturnValue([{ type: 'root' }, []]);
+      (getListType as Mock).mockReturnValue('bulleted-list');
+      (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
+      (Path.hasPrevious as Mock).mockReturnValue(false);
+      (Path.parent as Mock).mockReturnValue([]);
+      (Path.next as Mock).mockReturnValue([2]);
+      (Node.string as Mock).mockReturnValue('x');
+      (Node.get as Mock)
+        .mockReturnValueOnce(p)
+        .mockReturnValueOnce(listItem)
+        .mockReturnValueOnce(rootNode)
+        .mockReturnValueOnce(listNode)
+        .mockReturnValueOnce({ type: 'paragraph', children: [] });
+      (Editor.hasPath as Mock).mockReturnValue(true);
+      (isListType as unknown as Mock)
+        .mockReturnValueOnce(true)
+        .mockReturnValueOnce(false);
+
+      createList(editor, 'unordered');
+      expect(Transforms.moveNodes).not.toHaveBeenCalled();
+    });
+  });
 });

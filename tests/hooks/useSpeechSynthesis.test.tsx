@@ -131,6 +131,23 @@ describe('useSpeechSynthesis Hook', () => {
     expect(result.current.rate).toBe(1.5);
   });
 
+  it('应在播放中改变倍速时重启播报', () => {
+    const { result } = renderHook(() =>
+      useSpeechSynthesis({ text: 'Hello', defaultRate: 1 }),
+    );
+
+    act(() => {
+      result.current.start();
+    });
+    expect(result.current.isPlaying).toBe(true);
+
+    act(() => {
+      result.current.setRate(1.5);
+    });
+    expect(result.current.rate).toBe(1.5);
+    expect(mockSpeak).toHaveBeenCalledTimes(2);
+  });
+
   it('应该在文本为空时不开始播放', () => {
     const { result } = renderHook(() =>
       useSpeechSynthesis({ text: '', defaultRate: 1 }),
@@ -163,6 +180,26 @@ describe('useSpeechSynthesis Hook', () => {
     }
 
     expect(result.current.isPlaying).toBe(false);
+  });
+
+  it('第二次 start 时应清除上一次 utterance 的 onend/onerror', () => {
+    const { result } = renderHook(() =>
+      useSpeechSynthesis({ text: 'Hello', defaultRate: 1 }),
+    );
+
+    act(() => {
+      result.current.start();
+    });
+    const firstUtterance = (SpeechSynthesisUtterance as any).mock.results[0]
+      .value;
+    expect(firstUtterance.onend).toBeDefined();
+    expect(firstUtterance.onerror).toBeDefined();
+
+    act(() => {
+      result.current.start();
+    });
+    expect(SpeechSynthesisUtterance).toHaveBeenCalledTimes(2);
+    expect(mockCancel).toHaveBeenCalledTimes(2);
   });
 
   it('应该处理播放错误事件', () => {
@@ -203,6 +240,21 @@ describe('useSpeechSynthesis Hook', () => {
 
     // 卸载后应该再次调用 cancel
     expect(mockCancel.mock.calls.length).toBeGreaterThan(callCountBeforeUnmount);
+  });
+
+  it('start 时 speak 抛错应进入 catch 并设置 isPlaying 为 false', () => {
+    mockSpeak.mockImplementationOnce(() => {
+      throw new Error('speak failed');
+    });
+    const { result } = renderHook(() =>
+      useSpeechSynthesis({ text: 'Hello', defaultRate: 1 }),
+    );
+
+    act(() => {
+      result.current.start();
+    });
+
+    expect(result.current.isPlaying).toBe(false);
   });
 
   it('应该在浏览器不支持时优雅降级', () => {

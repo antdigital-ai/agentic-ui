@@ -547,6 +547,13 @@ export const ChartRender: React.FC<{
     }, 800), // 从 300ms 增加到 800ms
   );
 
+  // 卸载时取消未执行的防抖，避免在测试或 SSR 环境下 teardown 后回调触发 setState
+  React.useEffect(() => {
+    return () => {
+      debouncedUpdateRenderKeyRef.current?.cancel?.();
+    };
+  }, []);
+
   const renderDescriptionsFallback = React.useMemo(() => {
     const columnCount = config?.columns?.length || 0;
     return chartData.length < 2 && columnCount > 8;
@@ -725,6 +732,7 @@ export const ChartRender: React.FC<{
       filterByChanged;
 
     if (hasChanged) {
+      const dataHashChanged = prevDataRef.current.dataHash !== dataHash;
       // 更新缓存
       prevDataRef.current = {
         dataHash,
@@ -735,7 +743,7 @@ export const ChartRender: React.FC<{
       };
 
       // 对于流式数据，使用防抖更新，避免频繁渲染
-      if (prevDataRef.current.dataHash !== dataHash) {
+      if (dataHashChanged) {
         debouncedUpdateRenderKeyRef.current();
       } else {
         // 配置变化时立即更新

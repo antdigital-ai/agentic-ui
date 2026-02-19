@@ -5,7 +5,7 @@
 import { Schema } from '@ant-design/agentic-ui/MarkdownEditor/editor/elements/Schema';
 import { CodeNode } from '@ant-design/agentic-ui/MarkdownEditor/el';
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -264,6 +264,40 @@ describe('Schema', () => {
       );
 
       expect(screen.getByTestId('custom-render')).toBeInTheDocument();
+    });
+
+    it('render 抛出异常时应回退默认渲染', () => {
+      mockEditorProps.codeProps = {
+        render: vi.fn(() => {
+          throw new Error('render error');
+        }),
+      };
+
+      renderWithProvider(
+        <Schema element={mockElement} attributes={mockAttributes}>
+          {null}
+        </Schema>,
+      );
+
+      expect(screen.getByTestId('schema-container')).toBeInTheDocument();
+    });
+  });
+
+  describe('schema-clickable 事件处理', () => {
+    it('点击、鼠标移动、按键时应执行对应 handler 不报错', () => {
+      renderWithProvider(
+        <Schema element={mockElement} attributes={mockAttributes}>
+          {null}
+        </Schema>,
+      );
+
+      const clickable = screen.getByTestId('schema-clickable');
+
+      expect(() => {
+        fireEvent.click(clickable);
+        fireEvent.mouseMove(clickable);
+        fireEvent.keyDown(clickable);
+      }).not.toThrow();
     });
   });
 });

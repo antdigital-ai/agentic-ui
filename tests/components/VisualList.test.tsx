@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { VisualList } from '../../src/Components/ImageList';
+import { VisualList as VisualListWithErrorHandling } from '../../src/Components/VisualList';
 
 describe('VisualList 组件', () => {
   const mockData = [
@@ -256,6 +257,20 @@ describe('VisualList 组件', () => {
     expect(link).toHaveStyle({
       display: 'flex',
       textDecoration: 'none',
+    });
+  });
+
+  it('图片 onError 时应显示默认图标', async () => {
+    const dataWithOneImg = [{ id: '1', src: '/valid.jpg', alt: '图' }];
+    const { container } = render(
+      <VisualListWithErrorHandling data={dataWithOneImg} />,
+    );
+    const img = container.querySelector('img');
+    expect(img).toBeInTheDocument();
+    fireEvent.error(img!);
+    await waitFor(() => {
+      const defaultIcon = container.querySelector('[data-type="image"]');
+      expect(defaultIcon).toBeTruthy();
     });
   });
 });

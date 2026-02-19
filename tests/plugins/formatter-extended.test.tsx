@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { MarkdownFormatter } from '../../src/Plugins/formatter';
 
 // 扩展现有的 formatter 测试，添加更多边界情况和功能测试
 
@@ -547,6 +548,20 @@ describe('Formatter Plugin Extended Tests', () => {
       expect(screen.getByTestId('long-text-result')).toHaveTextContent(
         '处理了 10000 个字符',
       );
+    });
+  });
+
+  describe('addPanguSpacing 保护逻辑', () => {
+    it('应保护代码块、HTML 注释、含 HTML 的 Markdown 链接', () => {
+      const codeBlock = '```a```';
+      const comment = '<!-- 注释 -->';
+      const linkHtml = '[文字<b>粗体</b>](https://a.com)';
+      const text = [codeBlock, comment, linkHtml, '中文English混排'].join('\n');
+      const result = MarkdownFormatter.addPanguSpacing(text);
+      expect(result).toContain(codeBlock);
+      expect(result).toContain(comment);
+      expect(result).toContain(linkHtml);
+      expect(result).toContain('中文 English 混排');
     });
   });
 });

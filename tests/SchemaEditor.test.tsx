@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nProvide } from '../src/I18n';
 import { SchemaEditor, SchemaEditorRef } from '../src/Schema/SchemaEditor';
 import { LowCodeSchema } from '../src/Schema/types';
+import { mdDataSchemaValidator } from '../src/Schema/validator';
 
 // Mock AceEditorWrapper to avoid DOM manipulation issues in tests
 vi.mock('../src/Schema/SchemaEditor/AceEditorWrapper', () => ({
@@ -40,6 +41,13 @@ vi.mock('../src/Schema/SchemaRenderer', () => ({
 // Mock copy-to-clipboard
 vi.mock('copy-to-clipboard', () => ({
   default: vi.fn().mockReturnValue(true),
+}));
+
+// Mock schema validator for 168, 170 覆盖
+vi.mock('../src/Schema/validator', () => ({
+  mdDataSchemaValidator: {
+    validate: vi.fn().mockReturnValue({ valid: true, errors: [] }),
+  },
 }));
 
 // Mock antd message
@@ -375,6 +383,66 @@ describe('SchemaEditor', () => {
     });
   });
 
+  describe('Schema 校验错误展示', () => {
+    it('校验失败且存在 errors 时展示错误信息拼接', async () => {
+      vi.mocked(mdDataSchemaValidator.validate).mockReturnValueOnce({
+        valid: false,
+        errors: [
+          { path: '', message: 'Error1' },
+          { path: '', message: 'Error2' },
+        ],
+      });
+
+      const ref = createRef<SchemaEditorRef>();
+      render(
+        <TestWrapper>
+          <SchemaEditor
+            ref={ref}
+            initialSchema={mockSchema}
+            initialValues={mockValues}
+            height={600}
+          />
+        </TestWrapper>,
+      );
+
+      ref.current?.setSchema(mockSchema);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/Error1.*Error2|Error2.*Error1/),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('校验失败且无 errors 时展示 validationFailed 文案', async () => {
+      vi.mocked(mdDataSchemaValidator.validate).mockReturnValueOnce({
+        valid: false,
+        errors: [],
+      });
+
+      const ref = createRef<SchemaEditorRef>();
+      render(
+        <TestWrapper>
+          <SchemaEditor
+            ref={ref}
+            initialSchema={mockSchema}
+            initialValues={mockValues}
+            height={600}
+          />
+        </TestWrapper>,
+      );
+
+      ref.current?.setSchema(mockSchema);
+
+      const errEl = await screen.findByText(
+        /验证失败|Validation failed/,
+        {},
+        { timeout: 3000 },
+      );
+      expect(errEl).toBeInTheDocument();
+    });
+  });
+
   describe('Ref 功能测试', () => {
     it('应该能够通过 ref 设置 Schema', async () => {
       const ref = createRef<SchemaEditorRef>();
@@ -585,6 +653,56 @@ describe('SchemaEditor', () => {
 
       // 检查是否显示成功消息
       expect(message.success).toHaveBeenCalled();
+    });
+
+    it('复制 HTML 失败时显示 message.error', async () => {
+      const copyModule = await import('copy-to-clipboard');
+      const copyFn = copyModule.default as ReturnType<typeof vi.fn>;
+      vi.mocked(copyFn).mockReturnValueOnce(false);
+
+      const ref = createRef<SchemaEditorRef>();
+      render(
+        <TestWrapper>
+          <SchemaEditor
+            ref={ref}
+            initialSchema={mockSchema}
+            initialValues={mockValues}
+            height={600}
+          />
+        </TestWrapper>,
+      );
+
+      ref.current?.copyHtml();
+
+      await waitFor(() => {
+        expect(message.error).toHaveBeenCalled();
+      });
+    });
+
+    it('复制抛出异常时显示 message.error', async () => {
+      const copyModule = await import('copy-to-clipboard');
+      const copyFn = copyModule.default as ReturnType<typeof vi.fn>;
+      vi.mocked(copyFn).mockImplementationOnce(() => {
+        throw new Error('copy throw');
+      });
+
+      const ref = createRef<SchemaEditorRef>();
+      render(
+        <TestWrapper>
+          <SchemaEditor
+            ref={ref}
+            initialSchema={mockSchema}
+            initialValues={mockValues}
+            height={600}
+          />
+        </TestWrapper>,
+      );
+
+      ref.current?.copyHtml();
+
+      await waitFor(() => {
+        expect(message.error).toHaveBeenCalled();
+      });
     });
 
     it('应该能够通过 ref 完整操作流程', async () => {
@@ -820,6 +938,7 @@ describe('SchemaEditor', () => {
       const handleCustomAction = vi.fn();
       const customButton = (
         <button
+          type="button"
           key="custom-action"
           data-testid="custom-action"
           onClick={handleCustomAction}
@@ -850,10 +969,20 @@ describe('SchemaEditor', () => {
       const handleAction2 = vi.fn();
 
       const actions = [
-        <button key="action-1" data-testid="action-1" onClick={handleAction1}>
+        <button
+          type="button"
+          key="action-1"
+          data-testid="action-1"
+          onClick={handleAction1}
+        >
           操作1
         </button>,
-        <button key="action-2" data-testid="action-2" onClick={handleAction2}>
+        <button
+          type="button"
+          key="action-2"
+          data-testid="action-2"
+          onClick={handleAction2}
+        >
           操作2
         </button>,
       ];
@@ -878,6 +1007,7 @@ describe('SchemaEditor', () => {
       const handleCustomAction = vi.fn();
       const customButton = (
         <button
+          type="button"
           key="custom-action"
           data-testid="custom-action"
           onClick={handleCustomAction}
@@ -925,6 +1055,7 @@ describe('SchemaEditor', () => {
       const handleCustomAction = vi.fn();
       const customButton = (
         <button
+          type="button"
           key="custom-action"
           data-testid="custom-action"
           onClick={handleCustomAction}

@@ -366,4 +366,145 @@ describe('BubbleExtra', () => {
       ).not.toBeInTheDocument();
     });
   });
+
+  describe('点赞取消与点踩分支覆盖', () => {
+    it('已点赞时点击应调用 onLikeCancel (137)', async () => {
+      const onLikeCancel = vi.fn();
+      const originData = {
+        ...defaultProps.bubble.originData!,
+        feedback: 'thumbsUp' as const,
+      };
+      const props = {
+        ...defaultProps,
+        onLikeCancel,
+        bubble: { ...defaultProps.bubble, originData },
+      };
+      render(<BubbleExtra {...props} />);
+      fireEvent.click(screen.getByTestId('like-button'));
+      await waitFor(() => {
+        expect(onLikeCancel).toHaveBeenCalledWith(originData);
+      });
+    });
+
+    it('已点赞时点击应调用 onCancelLike 兼容 (138)', async () => {
+      const onCancelLike = vi.fn();
+      const originData = {
+        ...defaultProps.bubble.originData!,
+        feedback: 'thumbsUp' as const,
+      };
+      const props = {
+        ...defaultProps,
+        onCancelLike,
+        bubble: { ...defaultProps.bubble, originData },
+      };
+      render(<BubbleExtra {...props} />);
+      fireEvent.click(screen.getByTestId('like-button'));
+      await waitFor(() => {
+        expect(onCancelLike).toHaveBeenCalledWith(originData);
+      });
+    });
+
+    it('已反馈时点击踩应直接 return (180)', async () => {
+      const onDislike = vi.fn();
+      const originData = {
+        ...defaultProps.bubble.originData!,
+        feedback: 'thumbsDown' as const,
+      };
+      const props = {
+        ...defaultProps,
+        onDislike,
+        bubble: { ...defaultProps.bubble, originData },
+      };
+      render(<BubbleExtra {...props} />);
+      fireEvent.click(screen.getByTestId('dislike-button'));
+      await waitFor(() => {
+        expect(onDislike).not.toHaveBeenCalled();
+      });
+    });
+
+    it('未反馈时点击踩应调用 onDisLike 兼容 (185-186)', async () => {
+      const onDisLike = vi.fn();
+      const props = {
+        ...defaultProps,
+        onDislike: undefined,
+        onDisLike,
+      };
+      render(<BubbleExtra {...props} />);
+      fireEvent.click(screen.getByTestId('dislike-button'));
+      await waitFor(() => {
+        expect(onDisLike).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('复制失败与 pure/aborted 分支', () => {
+    it('复制按钮点击抛错时静默处理 (259-260)', async () => {
+      const copy = (await import('copy-to-clipboard')).default;
+      vi.mocked(copy).mockImplementation(() => {
+        throw new Error('copy failed');
+      });
+      render(<BubbleExtra {...defaultProps} />);
+      const copyBtn = screen.getByTestId('chat-item-copy-button');
+      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      fireEvent.click(copyBtn);
+      await waitFor(() => {
+        expect(spy).toHaveBeenCalled();
+      });
+      spy.mockRestore();
+    });
+
+    it('typing 且 content 不为 ... 时显示 Loading 与生成中 (351, 356)', () => {
+      const originData = {
+        ...defaultProps.bubble.originData!,
+        isFinished: false,
+        isAborted: false,
+        content: 'generating',
+        extra: {},
+      };
+      const props = {
+        ...defaultProps,
+        bubble: { ...defaultProps.bubble, originData },
+      };
+      const { container } = render(<BubbleExtra {...props} />);
+      expect(container.textContent).toMatch(/generating|生成/);
+    });
+
+    it('isAborted 时右侧显示 copyDom (363)', () => {
+      const originData = {
+        ...defaultProps.bubble.originData!,
+        isAborted: true,
+        content: 'aborted content',
+      };
+      const props = {
+        ...defaultProps,
+        bubble: { ...defaultProps.bubble, originData },
+      };
+      render(<BubbleExtra {...props} />);
+      expect(screen.getByTestId('chat-item-copy-button')).toBeInTheDocument();
+    });
+
+    it('无 copyDom 且 isAborted 且无 reSend 时 return null (421)', () => {
+      const originData = {
+        ...defaultProps.bubble.originData!,
+        isAborted: true,
+        content: '回答已停止生成',
+        extra: {},
+      };
+      const props = {
+        ...defaultProps,
+        shouldShowCopy: false,
+        bubble: { ...defaultProps.bubble, originData },
+      };
+      render(<BubbleExtra {...props} />);
+      expect(screen.queryByTestId('like-button')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('chat-item-copy-button')).not.toBeInTheDocument();
+    });
+
+    it('pure 时返回数组 [reSend, like, disLike, copyDom, voiceDom] (424)', () => {
+      const props = { ...defaultProps, pure: true };
+      render(<BubbleExtra {...props} />);
+      expect(screen.getByTestId('like-button')).toBeInTheDocument();
+      expect(screen.getByTestId('dislike-button')).toBeInTheDocument();
+    });
+  });
 });

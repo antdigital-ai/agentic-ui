@@ -1,4 +1,6 @@
 import * as utils from '@ant-design/agentic-ui/MarkdownEditor/editor/utils';
+import { fireEvent, render } from '@testing-library/react';
+import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 describe('MarkdownEditor Utils', () => {
@@ -147,6 +149,18 @@ describe('MarkdownEditor Utils', () => {
       expect(mockAppendChild).toHaveBeenCalledWith(mockLink);
       expect(mockLink.click).toHaveBeenCalled();
       expect(mockRemoveChild).toHaveBeenCalledWith(mockLink);
+      expect(mockLink.addEventListener).toHaveBeenCalledWith(
+        'click',
+        expect.any(Function),
+      );
+
+      // 触发 click 监听器，断言 stopPropagation 被调用
+      const clickHandler = mockLink.addEventListener.mock.calls.find(
+        (c: [string, Function]) => c[0] === 'click',
+      )?.[1];
+      const mockEvent = { stopPropagation: vi.fn() };
+      clickHandler(mockEvent);
+      expect(mockEvent.stopPropagation).toHaveBeenCalled();
 
       // 清理模拟
       mockCreateElement.mockRestore();
@@ -409,6 +423,114 @@ describe('MarkdownEditor Utils', () => {
         writable: true,
       });
       console.log = originalLog;
+    });
+  });
+
+  describe('useTimeoutFn', () => {
+    it('应在延时后执行回调', () => {
+      vi.useFakeTimers();
+      const fn = vi.fn();
+      const TestComp = () => {
+        const [isReady, clear, set] = utils.useTimeoutFn(fn, 100);
+        return (
+          <div>
+            <span data-testid="ready">{String(isReady())}</span>
+            <button type="button" onClick={clear} data-testid="clear">
+              clear
+            </button>
+            <button type="button" onClick={set} data-testid="set">
+              set
+            </button>
+          </div>
+        );
+      };
+      render(<TestComp />);
+      expect(fn).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(100);
+      expect(fn).toHaveBeenCalledTimes(1);
+      vi.useRealTimers();
+    });
+  });
+
+  describe('useGetSetState', () => {
+    it('get/set 应更新状态', () => {
+      const TestComp = () => {
+        const [get, set] = utils.useGetSetState({ count: 0 });
+        return (
+          <div>
+            <span data-testid="count">{get().count}</span>
+            <button
+              type="button"
+              onClick={() => set({ count: get().count + 1 })}
+              data-testid="inc"
+            >
+              +
+            </button>
+          </div>
+        );
+      };
+      const { getByTestId } = render(<TestComp />);
+      expect(getByTestId('count')).toHaveTextContent('0');
+      fireEvent.click(getByTestId('inc'));
+      expect(getByTestId('count')).toHaveTextContent('1');
+    });
+
+    it('set 传入 null/undefined 时直接返回不更新状态', () => {
+      const TestComp = () => {
+        const [get, set] = utils.useGetSetState({ a: 1 });
+        return (
+          <div>
+            <span data-testid="val">{get().a}</span>
+            <button type="button" onClick={() => set(null as any)} data-testid="set-null">
+              set null
+            </button>
+            <button type="button" onClick={() => set(undefined as any)} data-testid="set-undefined">
+              set undefined
+            </button>
+          </div>
+        );
+      };
+      const { getByTestId } = render(<TestComp />);
+      expect(getByTestId('val')).toHaveTextContent('1');
+      fireEvent.click(getByTestId('set-null'));
+      expect(getByTestId('val')).toHaveTextContent('1');
+      fireEvent.click(getByTestId('set-undefined'));
+      expect(getByTestId('val')).toHaveTextContent('1');
+    });
+
+    it('set 传入非对象时在开发环境报错', () => {
+      const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const TestComp = () => {
+        const [, set] = utils.useGetSetState({ a: 1 });
+        return (
+          <button type="button" onClick={() => set('not-object' as any)}>
+            set
+          </button>
+        );
+      };
+      const { getByText } = render(<TestComp />);
+      fireEvent.click(getByText('set'));
+      if (process.env.NODE_ENV !== 'production') {
+        expect(err).toHaveBeenCalledWith(
+          'useGetSetState setter patch must be an object.',
+        );
+      }
+      err.mockRestore();
+    });
+
+    it('初始状态非对象时在开发环境报错', () => {
+      const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const TestComp = () => {
+        utils.useGetSetState(1 as any);
+        return <div>ok</div>;
+      };
+      render(<TestComp />);
+      if (process.env.NODE_ENV !== 'production') {
+        expect(err).toHaveBeenCalledWith(
+          'useGetSetState initial state must be an object.',
+        );
+      }
+      err.mockRestore();
     });
   });
 

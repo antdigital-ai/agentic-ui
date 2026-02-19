@@ -151,4 +151,25 @@ describe('DragHandle Component', () => {
     const dragHandle = document.querySelector('[data-drag-handle]');
     expect(dragHandle).toHaveAttribute('contenteditable', 'false');
   });
+
+  it('在 list-item 且无 previousSibling 或 previousSibling 有 data-check-item 时应使用 parent.parentElement', () => {
+    const mockStore = { draggedElement: null };
+    mockUseEditorStore.mockReturnValue({
+      store: mockStore,
+      editorProps: { drag: { enable: true } },
+      readonly: false,
+    });
+    const ListItemWrapper = () => (
+      <div data-be="list-item">
+        <div>
+          <DragHandle />
+        </div>
+      </div>
+    );
+    const { container } = render(<ListItemWrapper />);
+    const dragHandle = container.querySelector('[data-drag-handle]');
+    expect(dragHandle).toBeInTheDocument();
+    fireEvent.mouseDown(dragHandle!);
+    expect(mockStore.draggedElement).toBe(container.querySelector('[data-be="list-item"]'));
+  });
 });

@@ -18,13 +18,13 @@ export function isMarkdown(text: string): boolean {
     return true;
   }
 
-  // Check for Markdown links
-  if (/\[.+\]\(.+\)/.test(text)) {
+  // Check for Markdown images (before links: ![alt](url) also matches link pattern)
+  if (/!\[.+\]\(.+\)/.test(text)) {
     return true;
   }
 
-  // Check for Markdown images
-  if (/!\[.+\]\(.+\)/.test(text)) {
+  // Check for Markdown links
+  if (/\[.+\]\(.+\)/.test(text)) {
     return true;
   }
 

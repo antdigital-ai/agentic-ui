@@ -20,6 +20,30 @@ vi.mock('../src/icons/LoadingIcon', () => ({
   ),
 }));
 
+// Mock antd Image to expose preview close callback for coverage
+vi.mock('antd', async (importOriginal) => {
+  const mod = await importOriginal() as Record<string, unknown>;
+  return {
+    ...mod,
+    Image: function MockImage({ preview, src, alt, ...rest }: any) {
+      return (
+        <div data-testid="image-preview-wrapper">
+          <img src={src} alt={alt} {...rest} />
+          {preview?.onVisibleChange != null && (
+            <button
+              type="button"
+              data-testid="close-preview"
+              onClick={() => preview.onVisibleChange(false)}
+            >
+              Close preview
+            </button>
+          )}
+        </div>
+      );
+    },
+  };
+});
+
 import {
   AttachmentFile,
   AttachmentFileList,
@@ -359,5 +383,201 @@ describe('AttachmentFileList', () => {
     expect(listContainer).toBeInTheDocument();
     // Verify file item is rendered
     expect(screen.getByText('test')).toBeInTheDocument();
+  });
+
+  it('should call onPreview when preview is triggered and onPreview is provided', async () => {
+    const fileMap = new Map();
+    const file = createMockFile({ name: 'doc.pdf', status: 'done' });
+    fileMap.set('uuid1', file);
+
+    render(
+      <AttachmentFileList
+        fileMap={fileMap}
+        onDelete={mockOnDelete}
+        onPreview={mockOnPreview}
+        onDownload={mockOnDownload}
+      />,
+    );
+
+    const fileItem = screen.getByText('doc').closest('div');
+    await act(async () => {
+      fireEvent.click(fileItem!);
+    });
+
+    expect(mockOnPreview).toHaveBeenCalledTimes(1);
+    expect(mockOnPreview).toHaveBeenCalledWith(file);
+  });
+
+  it('should set image preview src when previewing image file without onPreview', async () => {
+    const fileMap = new Map();
+    const file = createMockFile({
+      name: 'photo.jpg',
+      type: 'image/jpeg',
+      status: 'done',
+      previewUrl: 'https://example.com/preview.jpg',
+    });
+    fileMap.set('uuid1', file);
+
+    const { container } = render(
+      <AttachmentFileList
+        fileMap={fileMap}
+        onDelete={mockOnDelete}
+        onDownload={mockOnDownload}
+      />,
+    );
+
+    const fileItem = screen.getByText('photo').closest('div');
+    await act(async () => {
+      fireEvent.click(fileItem!);
+    });
+
+    const imagePreview = screen.getByAltText('Preview');
+    expect(imagePreview).toHaveAttribute('src', 'https://example.com/preview.jpg');
+  });
+
+  it('should open file in new window when previewing non-image file without onPreview', async () => {
+    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const fileMap = new Map();
+    const file = createMockFile({
+      name: 'doc.pdf',
+      type: 'application/pdf',
+      status: 'done',
+      url: 'https://example.com/doc.pdf',
+      previewUrl: '', // 无 previewUrl 时使用 url
+    });
+    fileMap.set('uuid1', file);
+
+    render(
+      <AttachmentFileList
+        fileMap={fileMap}
+        onDelete={mockOnDelete}
+        onDownload={mockOnDownload}
+      />,
+    );
+
+    const fileItem = screen.getByText('doc').closest('div');
+    await act(async () => {
+      fireEvent.click(fileItem!);
+    });
+
+    expect(windowOpenSpy).toHaveBeenCalledWith('https://example.com/doc.pdf', '_blank');
+    windowOpenSpy.mockRestore();
+  });
+
+  it('should not call window.open when file has no url and no previewUrl', async () => {
+    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const fileMap = new Map();
+    const file = createMockFile({
+      name: 'doc.pdf',
+      type: 'application/pdf',
+      status: 'done',
+      url: '',
+      previewUrl: undefined,
+    });
+    fileMap.set('uuid1', file);
+
+    render(
+      <AttachmentFileList
+        fileMap={fileMap}
+        onDelete={mockOnDelete}
+        onDownload={mockOnDownload}
+      />,
+    );
+
+    const fileItem = screen.getByText('doc').closest('div');
+    await act(async () => {
+      fireEvent.click(fileItem!);
+    });
+
+    expect(windowOpenSpy).not.toHaveBeenCalled();
+    windowOpenSpy.mockRestore();
+  });
+
+  it('should call onDelete with file when delete button is clicked', async () => {
+    const fileMap = new Map();
+    const file = createMockFile({ name: 'test.txt', status: 'done' });
+    fileMap.set('uuid1', file);
+
+    const { container } = render(
+      <AttachmentFileList
+        fileMap={fileMap}
+        onDelete={mockOnDelete}
+        onPreview={mockOnPreview}
+        onDownload={mockOnDownload}
+      />,
+    );
+
+    const deleteBtn = container.querySelector(
+      '.ant-agentic-md-editor-attachment-list-item-close-icon',
+    );
+    await act(async () => {
+      fireEvent.click(deleteBtn!);
+    });
+
+    expect(mockOnDelete).toHaveBeenCalledTimes(1);
+    expect(mockOnDelete).toHaveBeenCalledWith(file);
+  });
+
+  it('should call onRetry with file when retry is triggered on error item', async () => {
+    const mockOnRetry = vi.fn();
+    const fileMap = new Map();
+    const file = createMockFile({
+      name: 'error.txt',
+      status: 'error',
+      uuid: 'error-uuid',
+    });
+    fileMap.set('error-uuid', file);
+
+    render(
+      <AttachmentFileList
+        fileMap={fileMap}
+        onDelete={mockOnDelete}
+        onPreview={mockOnPreview}
+        onDownload={mockOnDownload}
+        onRetry={mockOnRetry}
+      />,
+    );
+
+    const fileNameEl = screen.getByText('error');
+    await act(async () => {
+      fireEvent.click(fileNameEl);
+    });
+
+    expect(mockOnRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('should clear image preview when preview is closed', async () => {
+    const fileMap = new Map();
+    const file = createMockFile({
+      name: 'photo.jpg',
+      type: 'image/jpeg',
+      status: 'done',
+      previewUrl: 'https://example.com/preview.jpg',
+    });
+    fileMap.set('uuid1', file);
+
+    render(
+      <AttachmentFileList
+        fileMap={fileMap}
+        onDelete={mockOnDelete}
+        onDownload={mockOnDownload}
+      />,
+    );
+
+    const fileItem = screen.getByText('photo').closest('div');
+    await act(async () => {
+      fireEvent.click(fileItem!);
+    });
+
+    const imagePreview = screen.getByAltText('Preview');
+    expect(imagePreview).toHaveAttribute('src', 'https://example.com/preview.jpg');
+
+    const closeBtn = screen.getByTestId('close-preview');
+    await act(async () => {
+      fireEvent.click(closeBtn);
+    });
+
+    const imgAfter = screen.getByAltText('Preview');
+    expect(imgAfter.getAttribute('src')).toBeFalsy();
   });
 });

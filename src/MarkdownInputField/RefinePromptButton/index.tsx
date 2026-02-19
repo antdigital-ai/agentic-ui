@@ -4,6 +4,7 @@ import { ConfigProvider, Tooltip } from 'antd';
 import React, { useContext } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ActionIconBox } from '../../Components/ActionIconBox';
+import { isBrowserEnv } from './env';
 import { useStyle } from './style';
 type RefinePromptButtonProps = {
   isHover: boolean;
@@ -33,11 +34,7 @@ export const RefinePromptButton: React.FC<RefinePromptButtonProps> = (
     return <TextOptimize />;
   };
 
-  if (
-    typeof window === 'undefined' ||
-    typeof document === 'undefined' ||
-    !window.document
-  ) {
+  if (!isBrowserEnv()) {
     return null;
   }
 

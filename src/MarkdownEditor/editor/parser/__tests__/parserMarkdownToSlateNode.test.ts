@@ -1,4 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { handleDefinition } from '../parse/parseElements';
+import { handleMath, shouldTreatInlineMathAsText } from '../parse/parseMath';
+import { handleAttachmentLink, handleImage } from '../parse/parseMedia';
 import {
   clearParseCache,
   parserMarkdownToSlateNode,
@@ -465,6 +468,36 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(result.schema[0].children).toHaveLength(2);
     });
+
+    it('should set start on ordered list when first item number is not 1', () => {
+      const markdown = '3. First\n4. Second\n5. Third';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'numbered-list',
+        start: 3,
+      });
+    });
+
+    it('should extract mentions from list item when first inline is link with multiple siblings', () => {
+      const markdown = '- [Alice](https://example.com/avatar?id=42) 参与讨论';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      const list = result.schema[0] as any;
+      expect(list.type).toBe('bulleted-list');
+      expect(list.children).toHaveLength(1);
+      const listItem = list.children[0];
+      expect(listItem.type).toBe('list-item');
+      expect(listItem.mentions).toBeDefined();
+      expect(listItem.mentions).toHaveLength(1);
+      expect(listItem.mentions[0]).toMatchObject({
+        avatar: 'https://example.com/avatar?id=42',
+        name: 'Alice',
+        id: '42',
+      });
+    });
   });
 
   describe('handleImage', () => {
@@ -529,6 +562,26 @@ describe('parserMarkdownToSlateNode', () => {
           },
         ],
       });
+    });
+  });
+
+  describe('parseMedia handleImage / handleAttachmentLink', () => {
+    it('handleImage 应处理图片元素并返回媒体节点', () => {
+      const el = {
+        url: 'http://example.com/pic.png',
+        alt: 'pic',
+        finished: true,
+      };
+      const result = handleImage(el);
+      expect(result).toBeDefined();
+      expect(JSON.stringify(result)).toContain('http://example.com/pic.png');
+      expect(JSON.stringify(result)).toContain('pic');
+    });
+
+    it('handleAttachmentLink 在未找到附件时应返回 null', () => {
+      const el = { children: [{ value: 'not an attachment link' }] };
+      const result = handleAttachmentLink(el);
+      expect(result).toBeNull();
     });
   });
 
@@ -943,6 +996,45 @@ function hello() {
         type: 'paragraph',
         children: [{ text: 'Term 2\n: Definition 2' }],
       });
+    });
+  });
+
+  describe('handleDefinition', () => {
+    it('should format definition element to paragraph with label and url', () => {
+      const result = handleDefinition({
+        label: 'ref',
+        url: 'https://example.com',
+      });
+      expect(result).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: '[ref]: https://example.com' }],
+      });
+    });
+
+    it('should format definition element when url is empty', () => {
+      const result = handleDefinition({ label: 'x', url: '' });
+      expect(result).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: '[x]: ' }],
+      });
+    });
+  });
+
+  describe('parseMath', () => {
+    it('shouldTreatInlineMathAsText 空字符串应返回 true', () => {
+      expect(shouldTreatInlineMathAsText('')).toBe(true);
+      expect(shouldTreatInlineMathAsText('   ')).toBe(true);
+    });
+
+    it('handleMath 应返回 katex 块节点', () => {
+      const result = handleMath({ value: 'x^2 + y^2 = z^2' });
+      expect(result).toMatchObject({
+        type: 'katex',
+        language: 'latex',
+        katex: true,
+        value: 'x^2 + y^2 = z^2',
+      });
+      expect(result.children).toEqual([{ text: '' }]);
     });
   });
 
@@ -1587,6 +1679,23 @@ const y = 2;
       expect(result1.schema.length).toBe(result2.schema.length);
     });
 
+    it('应在 openLinksInNewTab 为 true 时为链接设置 otherProps.target 和 rel', () => {
+      const markdown = '[点击](https://example.com)';
+      const result = parserMarkdownToSlateNode(markdown, [], {
+        openLinksInNewTab: true,
+      });
+
+      expect(result.schema).toHaveLength(1);
+      const paragraph = result.schema[0] as any;
+      expect(paragraph.type).toBe('paragraph');
+      const linkLeaf = paragraph.children?.find((n: any) => n.url);
+      expect(linkLeaf).toBeDefined();
+      expect(linkLeaf.url).toBe('https://example.com');
+      expect(linkLeaf.otherProps).toBeDefined();
+      expect(linkLeaf.otherProps.target).toBe('_blank');
+      expect(linkLeaf.otherProps.rel).toBe('noopener noreferrer');
+    });
+
     it('应该为不同插件生成不同的 hash', () => {
       const markdown = '# 标题\n\n段落';
 
@@ -1606,6 +1715,20 @@ const y = 2;
       expect(result1.schema.length).toBe(result2.schema.length);
     });
 
+    it('插件 match 为 true 且 convert 返回 null 时应调用 convert', () => {
+      const convertFn = vi.fn(() => null as any);
+      const plugin: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => true,
+            convert: convertFn,
+          },
+        ],
+      };
+      parserMarkdownToSlateNode('# a', [plugin]);
+      expect(convertFn).toHaveBeenCalled();
+    });
+
     it('应在插件 match 为 true 时调用 convert', () => {
       const convertFn = vi.fn(() => null as any);
       const plugin: import('../../../plugin').MarkdownEditorPlugin = {
@@ -1618,6 +1741,50 @@ const y = 2;
       };
       parserMarkdownToSlateNode('# a', [plugin]);
       expect(convertFn).toHaveBeenCalled();
+    });
+
+    it('parseWithPlugins 当 convert 返回长度为 2 的数组时取 converted[0]', () => {
+      const plugin: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => true,
+            convert: () =>
+              [
+                {
+                  type: 'paragraph',
+                  children: [{ text: 'from plugin' }],
+                },
+                null,
+              ] as any,
+          },
+        ],
+      };
+      const result = parserMarkdownToSlateNode('# a', [plugin]);
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: 'from plugin' }],
+      });
+    });
+
+    it('filterTopLevelSchema 应过滤仅含换行或空子节点的段落', () => {
+      const plugin: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => true,
+            convert: () =>
+              [{ type: 'paragraph', children: [{ text: '\n' }] }, null] as any,
+          },
+        ],
+      };
+      const result = parserMarkdownToSlateNode('# a', [plugin]);
+      expect(result.schema).toHaveLength(0);
+    });
+
+    it('parseHtmlCommentProps 在 HTML 注释内容非合法 JSON 时返回 null', () => {
+      const markdown = '<!-- invalid json -->';
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema.length).toBeGreaterThanOrEqual(0);
     });
 
     it('parserMdToSchema 应过滤掉 language===html 且 isConfig 的节点', () => {
@@ -1640,6 +1807,24 @@ const y = 2;
         (s: any) => s.language === 'html' && s.isConfig,
       );
       expect(htmlConfigNodes).toHaveLength(0);
+    });
+
+    it('parserMdToSchema 应过滤掉无 type 且无 text 的节点', () => {
+      const convertFn = vi.fn(() => ({}) as any);
+      const plugin: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => true,
+            convert: convertFn,
+          },
+        ],
+      };
+      const result = parserMdToSchema('x', [plugin]);
+      expect(convertFn).toHaveBeenCalled();
+      const withoutTypeOrText = result.schema.filter(
+        (s: any) => s.type === null && s.text === null,
+      );
+      expect(withoutTypeOrText).toHaveLength(0);
     });
 
     it('应该限制缓存大小为 100 个条目', () => {

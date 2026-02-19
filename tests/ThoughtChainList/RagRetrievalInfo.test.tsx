@@ -74,7 +74,8 @@ describe('RagRetrievalInfo', () => {
     );
 
     const chunkBlock = screen.getByText('DocA');
-    fireEvent.click(chunkBlock);
+    const clickableDiv = chunkBlock.closest('div');
+    fireEvent.click(clickableDiv ?? chunkBlock);
 
     expect(onMetaClick).toHaveBeenCalledTimes(1);
     expect(onMetaClick).toHaveBeenCalledWith(
@@ -86,5 +87,88 @@ describe('RagRetrievalInfo', () => {
         answer: 'Answer A',
       }),
     );
+  });
+
+  it('点击多个检索结果块时每次应调用 onMetaClick 并传入对应 docMeta', () => {
+    const onMetaClick = vi.fn();
+
+    render(
+      <TestWrapper>
+        <RagRetrievalInfo
+          category="RagRetrieval"
+          onMetaClick={onMetaClick}
+          input={{ searchQueries: ['q1', 'q2'] }}
+          output={{
+            chunks: [
+              {
+                docMeta: {
+                  doc_name: '文档A',
+                  doc_id: 'id-a',
+                  type: 'doc',
+                  origin_text: 't1',
+                  answer: '答案A',
+                },
+                content: '',
+                originUrl: '',
+              },
+              {
+                docMeta: {
+                  doc_name: '文档B',
+                  doc_id: 'id-b',
+                  type: 'doc',
+                  origin_text: 't2',
+                  answer: '答案B',
+                },
+                content: '',
+                originUrl: '',
+              },
+            ],
+          }}
+        />
+      </TestWrapper>,
+    );
+
+    const docA = screen.getByText('文档A');
+    fireEvent.click(docA.closest('div') ?? docA);
+    expect(onMetaClick).toHaveBeenLastCalledWith(
+      expect.objectContaining({ doc_name: '文档A', doc_id: 'id-a' }),
+    );
+
+    const docB = screen.getByText('文档B');
+    fireEvent.click(docB.closest('div') ?? docB);
+    expect(onMetaClick).toHaveBeenLastCalledWith(
+      expect.objectContaining({ doc_name: '文档B', doc_id: 'id-b' }),
+    );
+    expect(onMetaClick).toHaveBeenCalledTimes(2);
+  });
+
+  it('onMetaClick 为 undefined 时点击检索块不报错', () => {
+    render(
+      <TestWrapper>
+        <RagRetrievalInfo
+          category="RagRetrieval"
+          onMetaClick={undefined as any}
+          input={{ searchQueries: ['q'] }}
+          output={{
+            chunks: [
+              {
+                docMeta: {
+                  doc_name: 'DocX',
+                  doc_id: 'id-x',
+                  type: 'doc',
+                  origin_text: 'text',
+                  answer: 'Answer X',
+                },
+                content: '',
+                originUrl: '',
+              },
+            ],
+          }}
+        />
+      </TestWrapper>,
+    );
+
+    const block = screen.getByText('DocX');
+    expect(() => fireEvent.click(block.closest('div') ?? block)).not.toThrow();
   });
 });
