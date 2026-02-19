@@ -1,10 +1,10 @@
-import { FileSearch } from '@sofa-design/icons';
-import { ConfigProvider, Image } from 'antd';
+import { FileSearch, Play } from '@sofa-design/icons';
+import { ConfigProvider, Image, Modal } from 'antd';
 import classNames from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useContext, useMemo, useState } from 'react';
 import { AttachmentFile } from '../AttachmentButton/types';
-import { isImageFile } from '../AttachmentButton/utils';
+import { isImageFile, isVideoFile } from '../AttachmentButton/utils';
 import { FileMapViewItem } from './FileMapViewItem';
 import { useStyle } from './style';
 
@@ -90,19 +90,43 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
     return fileList.filter((file) => isImageFile(file));
   }, [fileList]);
 
-  // 所有非图片文件列表
-  const allNoImageFiles = useMemo(() => {
-    return fileList.filter((file) => !isImageFile(file));
+  // 视频列表，与图片一样以缩略图形式展示
+  const videoList = useMemo(() => {
+    return fileList.filter((file) => isVideoFile(file));
   }, [fileList]);
 
-  // 根据 maxDisplayCount 限制显示的非图片文件列表
-  const noImageFileList = useMemo(() => {
-    // 如果已展开所有文件，或者未设置最大显示数量，则显示所有文件
+  // 所有非图片、非视频文件列表
+  const allNoMediaFiles = useMemo(() => {
+    return fileList.filter((file) => !isImageFile(file) && !isVideoFile(file));
+  }, [fileList]);
+
+  // 根据 maxDisplayCount 限制显示的非媒体文件列表
+  const noMediaFileList = useMemo(() => {
     if (showAllFiles || props.maxDisplayCount === undefined) {
-      return allNoImageFiles;
+      return allNoMediaFiles;
     }
-    return allNoImageFiles.slice(0, Math.max(0, props.maxDisplayCount));
-  }, [allNoImageFiles, props.maxDisplayCount, showAllFiles]);
+    return allNoMediaFiles.slice(0, Math.max(0, props.maxDisplayCount));
+  }, [allNoMediaFiles, props.maxDisplayCount, showAllFiles]);
+
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [previewingVideo, setPreviewingVideo] = useState<AttachmentFile | null>(
+    null,
+  );
+
+  const handleVideoClick = (file: AttachmentFile) => {
+    if (file.status === 'error') return;
+    if (props.onPreview) {
+      props.onPreview(file);
+    } else {
+      setPreviewingVideo(file);
+      setVideoModalOpen(true);
+    }
+  };
+
+  const handleVideoModalClose = () => {
+    setVideoModalOpen(false);
+    setPreviewingVideo(null);
+  };
 
   const handleViewAllClick = async () => {
     if (props.onViewAll) {
@@ -160,19 +184,99 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
         )}
       >
         <Image.PreviewGroup>
-          {imgList.map((file, index) => {
-            return (
-              <Image
-                rootClassName={classNames(`${prefix}-image`, hashId)}
-                width={124}
-                height={124}
-                src={file.previewUrl || file.url}
-                key={file.uuid || file.name || index}
-              />
-            );
-          })}
+          {imgList.map((file, index) => (
+            <Image
+              rootClassName={classNames(`${prefix}-image`, hashId)}
+              width={124}
+              height={124}
+              src={file.previewUrl || file.url}
+              key={file.uuid || file.name || index}
+            />
+          ))}
         </Image.PreviewGroup>
       </motion.div>
+      {videoList.length > 0 && (
+        <motion.div
+          variants={{
+            visible: { opacity: 1 },
+            hidden: { opacity: 0 },
+          }}
+          whileInView="visible"
+          initial="hidden"
+          animate="visible"
+          className={classNames(
+            `${prefix}-video-row`,
+            `${prefix}-video-row-${placement}`,
+            hashId,
+          )}
+          style={props.style}
+        >
+          {videoList.map((file, index) => {
+            const videoUrl = file.previewUrl || file.url || '';
+            const isSingleVideo = videoList.length === 1;
+            const thumbSize = isSingleVideo
+              ? { width: 330, height: 188 }
+              : { width: 124, height: 124 };
+            return (
+              <div
+                role="button"
+                tabIndex={0}
+                className={classNames(
+                  `${prefix}-image`,
+                  `${prefix}-video-thumb`,
+                  hashId,
+                )}
+                key={file.uuid || file.name || index}
+                onClick={() => handleVideoClick(file)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleVideoClick(file);
+                  }
+                }}
+                aria-label={`播放视频：${file.name}`}
+                style={thumbSize}
+              >
+                <video
+                  src={videoUrl}
+                  preload="metadata"
+                  muted
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
+                <div
+                  className={classNames(`${prefix}-video-play-overlay`, hashId)}
+                  aria-hidden
+                >
+                  <Play />
+                </div>
+              </div>
+            );
+          })}
+        </motion.div>
+      )}
+      <Modal
+        open={videoModalOpen}
+        onCancel={handleVideoModalClose}
+        footer={null}
+        width="auto"
+        centered
+        destroyOnClose
+        styles={{ body: { padding: 0 } }}
+      >
+        {previewingVideo && (
+          <video
+            src={previewingVideo.previewUrl || previewingVideo.url}
+            controls
+            autoPlay
+            style={{ maxWidth: '80vw', maxHeight: '80vh' }}
+          />
+        )}
+      </Modal>
       <motion.div
         variants={{
           visible: {
@@ -201,7 +305,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
         )}
         style={props.style}
       >
-        {noImageFileList.map((file, index) => {
+        {noMediaFileList.map((file, index) => {
           return (
             <FileMapViewItem
               style={{ width: props.style?.width }}
@@ -230,7 +334,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           );
         })}
         {props.maxDisplayCount !== undefined &&
-        allNoImageFiles.length > props.maxDisplayCount &&
+        allNoMediaFiles.length > props.maxDisplayCount &&
         !showAllFiles ? (
           <div
             style={{ width: props.style?.width }}

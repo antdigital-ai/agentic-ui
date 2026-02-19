@@ -475,6 +475,24 @@ const MLeafComponent = (
   if (leaf.html) {
     prefixClassName = classNames(mdEditorBaseClass + '-m-html');
   }
+  if (leaf.jinjaVariable) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-variable`,
+    );
+  }
+  if (leaf.jinjaTag) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-tag`,
+    );
+  }
+  if (leaf.jinjaComment) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-comment`,
+    );
+  }
   if (leaf.current) {
     style.background = '#f59e0b';
   }

@@ -2,6 +2,7 @@ import { Node } from 'mdast';
 import React from 'react';
 import { Editor, NodeEntry } from 'slate';
 import { ElementProps, Elements } from './el';
+import type { JinjaConfig } from './types';
 
 export type MarkdownEditorPlugin = {
   // ------------------ 自定义节点渲染 ------------------
@@ -27,6 +28,11 @@ export type MarkdownEditorPlugin = {
   hotkeys?: Record<string, (editor: Editor) => void>; // 自定义快捷键
 
   onPaste?: (text: string) => boolean; // 自定义粘贴处理
+
+  /** 启用 Jinja 能力（模板面板 + 语法高亮），与 props.jinja?.enable 二选一 */
+  jinja?: true;
+  /** 通过插件启用时的默认 Jinja 配置（当未传 props.jinja 时使用） */
+  jinjaConfig?: JinjaConfig;
 };
 
 // 使用 Context 传递插件配置

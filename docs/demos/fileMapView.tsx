@@ -1,4 +1,4 @@
-﻿import { AttachmentFile, FileMapView } from '@ant-design/agentic-ui';
+import { AttachmentFile, FileMapView } from '@ant-design/agentic-ui';
 import {
   CheckOutlined,
   CopyOutlined,
@@ -57,6 +57,14 @@ const mixedFileMap = new Map<string, AttachmentFile>([
       'photo.jpg',
       'image/jpeg',
       'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+    ),
+  ],
+  [
+    'video-1',
+    createMockFile(
+      'demo.mp4',
+      'video/mp4',
+      'https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/90LVRoQeGdkAAAAAAAAAAAAAK4eUAQBr',
     ),
   ],
   [

@@ -401,7 +401,7 @@ describe('ChartRender', () => {
   describe('表格渲染测试', () => {
     it('应该正确渲染表格', () => {
       const props = { ...defaultProps, chartType: 'table' as const };
-      render(
+      const { container } = render(
         <I18nContext.Provider value={mockI18n}>
           <ChartRender {...props} />
         </I18nContext.Provider>,
@@ -411,13 +411,17 @@ describe('ChartRender', () => {
       expect(screen.getByText('A')).toBeInTheDocument();
       expect(screen.getByText('B')).toBeInTheDocument();
       expect(screen.getByText('C')).toBeInTheDocument();
+
+      // 检查 BEM 类名
+      expect(container.querySelector('.ant-agentic-plugin-chart')).toBeInTheDocument();
+      expect(container.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
     });
   });
 
   describe('定义列表渲染测试', () => {
     it('应该正确渲染定义列表', () => {
       const props = { ...defaultProps, chartType: 'descriptions' as const };
-      render(
+      const { container } = render(
         <I18nContext.Provider value={mockI18n}>
           <ChartRender {...props} />
         </I18nContext.Provider>,
@@ -427,6 +431,10 @@ describe('ChartRender', () => {
       expect(screen.getByText('A')).toBeInTheDocument();
       expect(screen.getByText('B')).toBeInTheDocument();
       expect(screen.getByText('C')).toBeInTheDocument();
+
+      // 检查 BEM 类名
+      expect(container.querySelector('.ant-agentic-plugin-chart')).toBeInTheDocument();
+      expect(container.querySelector('.ant-agentic-plugin-chart__descriptions')).toBeInTheDocument();
     });
 
     it('应该在数据少于2条且列数大于8时渲染定义列表', () => {

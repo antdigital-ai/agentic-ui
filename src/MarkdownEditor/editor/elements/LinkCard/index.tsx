@@ -17,7 +17,8 @@ export function LinkCard({
   }>
 >) {
   const context = useContext(ConfigProvider.ConfigContext);
-  const baseCls = context?.getPrefixCls('agentic-md-editor-link-card');
+  const contentCls = context?.getPrefixCls('agentic-md-editor-content');
+  const blockCls = contentCls ? `${contentCls}-link-card` : '';
   const htmlRef = React.useRef<HTMLDivElement>(null);
   const [showAsText, setShowAsText] = useState(false);
 
@@ -70,7 +71,7 @@ export function LinkCard({
   return (
     <div {...attributes}>
       <div
-        className={classNames(baseCls)}
+        className={classNames(blockCls)}
         data-be="link-card"
         data-drag-el
         draggable={false}
@@ -106,15 +107,15 @@ export function LinkCard({
             if (typeof window === 'undefined') return;
             window.open(element?.url);
           }}
-          className={classNames(`${baseCls}-container`)}
+          className={classNames(`${blockCls}__container`)}
         >
           <div
-            className={classNames(`${baseCls}-container-content`)}
+            className={classNames(`${blockCls}__content`)}
             contentEditable={false}
           >
             {element.icon ? (
               <img
-                className={classNames(`${baseCls}-container-content-icon`)}
+                className={classNames(`${blockCls}__icon`)}
                 src={element.icon}
                 width={56}
               />
@@ -127,7 +128,7 @@ export function LinkCard({
             >
               <a
                 href={element?.url}
-                className={classNames(`${baseCls}-container-content-title`)}
+                className={classNames(`${blockCls}__title`)}
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
@@ -139,16 +140,12 @@ export function LinkCard({
                 {element.title || element.name || 'no title'}
               </a>
               <div
-                className={classNames(
-                  `${baseCls}-container-content-description`,
-                )}
+                className={classNames(`${blockCls}__description`)}
               >
                 {element.description ? element.description : element?.url}
               </div>
               <div
-                className={classNames(
-                  `${baseCls}-container-content-collaborators`,
-                )}
+                className={classNames(`${blockCls}__collaborators`)}
               >
                 {element.otherProps?.collaborators ? (
                   <div>
@@ -171,9 +168,7 @@ export function LinkCard({
                 )}
                 {element.otherProps?.updateTime ? (
                   <div
-                    className={classNames(
-                      `${baseCls}-container-content-updateTime`,
-                    )}
+                    className={classNames(`${blockCls}__update-time`)}
                     style={{
                       color: 'rgba(0,0,0,0.45)',
                       fontSize: 12,

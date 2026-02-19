@@ -69,9 +69,7 @@ export default () => {
       key: '4',
       title: '获取实时市场数据失败',
       content: [
-        <div key="1">
-          API 调用超时：第三方数据源 MarketAPI 响应超时（30s）
-        </div>,
+        <div key="1">API 调用超时：第三方数据源 MarketAPI 响应超时（30s）</div>,
       ],
       status: 'error' as TaskStatus,
     },

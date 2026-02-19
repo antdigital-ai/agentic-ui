@@ -23,8 +23,8 @@ export class BackspaceKey {
 
   private clearStyle(sel: Range) {
     const start = Range.start(sel);
-    const leaf = Node.leaf(this.editor, start.path);
-    if (leaf.text?.length === 1 && EditorUtils.isDirtLeaf(leaf)) {
+    const [leaf] = Editor.leaf(this.editor, start);
+    if (leaf?.text?.length === 1 && EditorUtils.isDirtLeaf(leaf)) {
       EditorUtils.clearMarks(this.editor);
     }
   }
@@ -82,7 +82,6 @@ export class BackspaceKey {
           Node.string(firstChild).trim() === '' &&
           listItem.children.length === 1; // 只有第一个段落，没有嵌套列表
 
-        console.log('isEmptyListItem', isEmptyListItem);
         // 如果 list-item 为空，优先执行删除逻辑
         if (isEmptyListItem) {
           // 使用新的拆分逻辑处理空的list-item

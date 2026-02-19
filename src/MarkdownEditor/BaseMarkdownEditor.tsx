@@ -22,6 +22,7 @@ import { withErrorReporting } from './editor/plugins/catchError';
 import { EditorStore, EditorStoreContext } from './editor/store';
 import { InsertAutocomplete } from './editor/tools/InsertAutocomplete';
 import { InsertLink } from './editor/tools/InsertLink';
+import { JinjaTemplatePanel } from './editor/tools/JinjaTemplatePanel';
 import { TocHeading } from './editor/tools/Leading';
 import { FloatBar } from './editor/tools/ToolBar/FloatBar';
 import ToolBar from './editor/tools/ToolBar/ToolBar';
@@ -319,6 +320,37 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
 
   const [domRect, setDomRect] = useState<DOMRect | null>(null);
 
+  const jinjaEnabled =
+    props.jinja?.enable === true ||
+    (Array.isArray(props.plugins) &&
+      props.plugins.some(
+        (p) => (p as MarkdownEditorPlugin & { jinja?: boolean }).jinja === true,
+      ));
+  const pluginWithJinja = Array.isArray(props.plugins)
+    ? (props.plugins.find(
+        (p) => (p as MarkdownEditorPlugin & { jinja?: boolean }).jinja === true,
+      ) as
+        | (MarkdownEditorPlugin & { jinja?: boolean; jinjaConfig?: any })
+        | undefined)
+    : undefined;
+  const effectiveJinja = props.jinja
+    ? props.jinja
+    : pluginWithJinja?.jinjaConfig
+      ? pluginWithJinja.jinjaConfig
+      : pluginWithJinja
+        ? { enable: true as const }
+        : undefined;
+  const jinjaTemplatePanelEnabled =
+    jinjaEnabled &&
+    effectiveJinja !== undefined &&
+    effectiveJinja !== null &&
+    effectiveJinja.templatePanel !== false &&
+    (typeof effectiveJinja.templatePanel !== 'object' ||
+      effectiveJinja.templatePanel?.enable !== false);
+
+  const [openJinjaTemplate, setOpenJinjaTemplate] = useState(false);
+  const [jinjaAnchorPath, setJinjaAnchorPath] = useState<number[] | null>(null);
+
   return wrapSSR(
     <I18nBoundary>
       <PluginContext.Provider value={props.plugins || []}>
@@ -338,9 +370,18 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
             setDomRect,
             typewriter: props.typewriter ?? false,
             readonly: props.readonly ?? false,
-            editorProps: props || {},
+            editorProps:
+              effectiveJinja !== undefined
+                ? { ...props, jinja: effectiveJinja }
+                : props || {},
             markdownEditorRef,
             markdownContainerRef,
+            openJinjaTemplate,
+            setOpenJinjaTemplate,
+            jinjaAnchorPath,
+            setJinjaAnchorPath,
+            jinjaEnabled,
+            jinjaTemplatePanelEnabled,
           }}
         >
           <div
@@ -462,6 +503,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 <InsertAutocomplete
                   {...(props?.insertAutocompleteProps || {})}
                 />
+                {jinjaTemplatePanelEnabled ? <JinjaTemplatePanel /> : null}
               </>
             )}
             {children}

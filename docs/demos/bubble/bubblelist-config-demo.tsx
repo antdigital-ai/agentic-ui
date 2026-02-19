@@ -35,11 +35,7 @@ const sampleMessages: MessageBubbleData[] = [
     'assistant',
     '你好！我可以帮你进行代码审查、性能优化建议和技术方案设计。',
   ),
-  createMockMessage(
-    '2',
-    'user',
-    '请帮我看一下这个 React 组件的渲染性能问题。',
-  ),
+  createMockMessage('2', 'user', '请帮我看一下这个 React 组件的渲染性能问题。'),
   createMockMessage(
     '3',
     'assistant',

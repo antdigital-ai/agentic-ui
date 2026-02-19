@@ -20,10 +20,7 @@ import { DocInfoListProps } from './types/DocInfo';
  */
 export interface BubbleImperativeHandle {
   /** 更新消息项数据 */
-  setMessageItem?: (
-    id: string,
-    data: Partial<MessageBubbleData>,
-  ) => void;
+  setMessageItem?: (id: string, data: Partial<MessageBubbleData>) => void;
 }
 
 /**

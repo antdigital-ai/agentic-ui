@@ -223,7 +223,9 @@ export const CommentList: React.FC<{
                             } catch (error) {}
                           }}
                         >
-                          <Tooltip title={locale?.['comment.delete'] || '删除评论'}>
+                          <Tooltip
+                            title={locale?.['comment.delete'] || '删除评论'}
+                          >
                             <span
                               className={classNames(
                                 `${baseCls}-item-header-action-item`,
@@ -252,7 +254,9 @@ export const CommentList: React.FC<{
                           </span>
                         </Tooltip>
                       ) : null}
-                      <Tooltip title={locale?.['comment.jumpTo'] || '跳转到评论位置'}>
+                      <Tooltip
+                        title={locale?.['comment.jumpTo'] || '跳转到评论位置'}
+                      >
                         <span
                           className={classNames(
                             `${baseCls}-item-header-action-item`,

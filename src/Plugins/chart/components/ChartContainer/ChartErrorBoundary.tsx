@@ -95,7 +95,10 @@ class ChartErrorBoundary extends React.Component<
         <Result
           status="error"
           title={locale?.['chart.renderFailed'] || '图表渲染失败'}
-          subTitle={locale?.['chart.renderFailedSubTitle'] || '图表组件遇到了一个错误，请稍后重试'}
+          subTitle={
+            locale?.['chart.renderFailedSubTitle'] ||
+            '图表组件遇到了一个错误，请稍后重试'
+          }
         />
       );
     }

@@ -68,6 +68,18 @@ export interface EditorStoreContextType {
   openInsertCompletion?: boolean;
   /** 设置打开插入自动完成状态 */
   setOpenInsertCompletion?: (open: boolean) => void;
+  /** 是否打开 Jinja 模板面板 */
+  openJinjaTemplate?: boolean;
+  /** 设置打开 Jinja 模板面板状态 */
+  setOpenJinjaTemplate?: (open: boolean) => void;
+  /** Jinja 弹层插入锚点 path（当前段落节点 path） */
+  jinjaAnchorPath?: number[] | null;
+  /** 设置 Jinja 弹层锚点 path */
+  setJinjaAnchorPath?: (path: number[] | null) => void;
+  /** 是否启用 Jinja（总开关，用于语法高亮等） */
+  jinjaEnabled?: boolean;
+  /** 是否启用 Jinja 模板面板（用于触发与弹层） */
+  jinjaTemplatePanelEnabled?: boolean;
   /** 编辑器属性配置 */
   editorProps: MarkdownEditorProps;
   /** Markdown编辑器引用 */
@@ -102,6 +114,12 @@ export const useEditorStore = () => {
       typewriter: false,
       editorProps: {} as MarkdownEditorProps,
       markdownEditorRef: {} as React.MutableRefObject<any>,
+      openJinjaTemplate: false,
+      setOpenJinjaTemplate: undefined,
+      jinjaAnchorPath: null,
+      setJinjaAnchorPath: undefined,
+      jinjaEnabled: false,
+      jinjaTemplatePanelEnabled: false,
     }
   );
 };

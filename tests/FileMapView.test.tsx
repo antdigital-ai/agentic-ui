@@ -347,6 +347,35 @@ describe('FileMapView', () => {
       expect(images.length).toBe(2);
     });
 
+    it('should display video files in separate row with thumbnail', () => {
+      const fileMap = new Map();
+      fileMap.set('video-1', createMockFile('demo.mp4', 'video/mp4'));
+
+      const { container } = render(<FileMapView fileMap={fileMap} />);
+
+      // Single video: 330x188
+      const videoThumb = container.querySelector('.ant-agentic-md-editor-file-view-list-video-thumb');
+      expect(videoThumb).toBeInTheDocument();
+      expect((videoThumb as HTMLElement).style.width).toBe('330px');
+      expect((videoThumb as HTMLElement).style.height).toBe('188px');
+
+      const video = container.querySelector('video');
+      expect(video).toBeInTheDocument();
+    });
+
+    it('should display multiple videos with 124x124 size', () => {
+      const fileMap = new Map();
+      fileMap.set('video-1', createMockFile('demo1.mp4', 'video/mp4'));
+      fileMap.set('video-2', createMockFile('demo2.webm', 'video/webm'));
+
+      const { container } = render(<FileMapView fileMap={fileMap} />);
+
+      const videoThumbs = container.querySelectorAll('.ant-agentic-md-editor-file-view-list-video-thumb');
+      expect(videoThumbs.length).toBe(2);
+      expect((videoThumbs[0] as HTMLElement).style.width).toBe('124px');
+      expect((videoThumbs[0] as HTMLElement).style.height).toBe('124px');
+    });
+
     it('should handle image preview', () => {
       const onPreview = vi.fn();
       const fileMap = new Map();

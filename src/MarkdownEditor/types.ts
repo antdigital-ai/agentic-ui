@@ -1,7 +1,7 @@
 import type { Ace } from 'ace-builds';
 import { AnchorProps, ImageProps } from 'antd';
 import React from 'react';
-import { BaseEditor, Selection } from 'slate';
+import { BaseEditor, Editor, Selection } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor, RenderElementProps } from 'slate-react';
 import { TagPopupProps } from './editor/elements/TagPopup';
@@ -43,6 +43,43 @@ export type CommentDataType = {
     avatar?: string;
   };
 };
+
+/** Jinja 模板项，与 agent-ui-pc JinjaTemplateData 一致 */
+export type JinjaTemplateItem = {
+  title: string;
+  description?: string;
+  template: string;
+};
+
+/** 模板列表：静态数组或异步加载（与 TagPopupProps.items 一致） */
+export type JinjaTemplatePanelItems =
+  | JinjaTemplateItem[]
+  | ((params?: { editor?: Editor }) => Promise<JinjaTemplateItem[]>);
+
+/** 模板面板配置（与 tag 配置做成一样，支持 items 异步） */
+export interface JinjaTemplatePanelConfig {
+  /** 是否开启 {} 触发与模板面板，默认 true */
+  enable?: boolean;
+  /** 触发符，默认 '{}' */
+  trigger?: string;
+  /**
+   * 模板列表：静态数组或异步加载
+   * 不传时使用内置 JINJA_TEMPLATE_DATA
+   */
+  items?: JinjaTemplatePanelItems;
+  /** 无数据时展示，同 TagPopupProps.notFoundContent */
+  notFoundContent?: React.ReactNode;
+}
+
+/** Jinja 配置：总开关、使用说明链接、模板面板 */
+export interface JinjaConfig {
+  /** 总开关：为 true 时启用 Jinja 语法高亮；同时若未关闭 templatePanel 则启用模板面板 */
+  enable: boolean;
+  /** 使用说明链接，供模板面板「使用说明」使用 */
+  docLink?: string;
+  /** 模板面板配置（与 tag 配置做成一样，支持 items 异步） */
+  templatePanel?: boolean | JinjaTemplatePanelConfig;
+}
 
 /**
  * 编辑器接口定义
@@ -360,6 +397,10 @@ export type MarkdownEditorProps = {
     enabled?: boolean;
     allowedTypes?: string[];
   };
+  /**
+   * Jinja 配置：语法高亮与模板面板（输入 `{}` 触发）
+   */
+  jinja?: JinjaConfig;
   /**
    * 插件配置
    */

@@ -3,7 +3,7 @@ import copy from 'copy-to-clipboard';
 import isHotkey from 'is-hotkey';
 import { useEffect, useMemo } from 'react';
 import { Subject } from 'rxjs';
-import { Editor, Element, Node, Path, Range, Transforms } from 'slate';
+import { Editor, Element, Path, Range, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { MarkdownEditorProps } from '../../BaseMarkdownEditor';
@@ -113,7 +113,8 @@ export class KeyboardTask {
   selectWord() {
     const sel = this.editor.selection;
     if (sel && Range.isCollapsed(sel)) {
-      const text = Node.leaf(this.editor, sel.anchor.path).text || '';
+      const [leaf] = Editor.leaf(this.editor, sel.anchor);
+      const text = leaf?.text || '';
       let start = sel.anchor.offset;
       let end = start;
       const next = text.slice(start);

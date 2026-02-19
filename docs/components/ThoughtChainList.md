@@ -86,26 +86,26 @@ export default App;
 
 ## 属性
 
-| 属性                     | 类型                               | 必需 | 描述                           | 废弃版本 |
-| ------------------------ | ---------------------------------- | ---- | ------------------------------ | -------- |
-| `thoughtChainList`       | `WhiteBoxProcessInterface[]`       | 是   | 思维链项目数组                 | - |
-| `isLoading`              | `boolean`                          | 否   | 表示组件是否处于加载状态       | - |
-| ~~`loading`~~            | `boolean`                          | 否   | 已废弃，请使用 `isLoading`     | 2.29.0 |
-| `bubble`                 | `object`                           | 否   | 聊天状态信息                   | - |
-| ~~`chatItem`~~           | `object`                           | 否   | 已废弃，请使用 `bubble`        | 2.30.0 |
-| `bubble.isFinished`      | `boolean`                          | 否   | 聊天/任务是否已完成            |
-| `bubble.endTime`         | `number`                           | 否   | 聊天结束的时间戳               |
-| `bubble.createAt`        | `number`                           | 否   | 聊天创建的时间戳               |
-| `bubble.isAborted`       | `boolean`                          | 否   | 聊天/任务是否被中止            |
-| `style`                  | `React.CSSProperties`              | 否   | 自定义 CSS 样式                | - |
-| `compact`                | `boolean`                          | 否   | 启用紧凑显示模式               | - |
-| `markdownRenderProps`    | `MarkdownEditorProps`              | 否   | Markdown 渲染属性              | - |
-| `finishAutoCollapse`     | `boolean`                          | 否   | 完成时自动折叠（默认为 true）  | - |
-| `locale`                 | `object`                           | 否   | 本地化字符串                   | - |
-| `titleRender`            | `(props, defaultDom) => ReactNode` | 否   | 自定义标题渲染                 | - |
-| `titleExtraRender`       | `(props, defaultDom) => ReactNode` | 否   | 自定义标题右侧额外内容渲染     | - |
-| `thoughtChainItemRender` | `object`                           | 否   | 自定义思维链项目的渲染         | - |
-| `onDocMetaClick`         | `(docMeta: DocMeta) => void`       | 否   | 文档元数据点击回调             | - |
+| 属性                     | 类型                               | 必需 | 描述                          | 废弃版本 |
+| ------------------------ | ---------------------------------- | ---- | ----------------------------- | -------- |
+| `thoughtChainList`       | `WhiteBoxProcessInterface[]`       | 是   | 思维链项目数组                | -        |
+| `isLoading`              | `boolean`                          | 否   | 表示组件是否处于加载状态      | -        |
+| ~~`loading`~~            | `boolean`                          | 否   | 已废弃，请使用 `isLoading`    | 2.29.0   |
+| `bubble`                 | `object`                           | 否   | 聊天状态信息                  | -        |
+| ~~`chatItem`~~           | `object`                           | 否   | 已废弃，请使用 `bubble`       | 2.30.0   |
+| `bubble.isFinished`      | `boolean`                          | 否   | 聊天/任务是否已完成           |
+| `bubble.endTime`         | `number`                           | 否   | 聊天结束的时间戳              |
+| `bubble.createAt`        | `number`                           | 否   | 聊天创建的时间戳              |
+| `bubble.isAborted`       | `boolean`                          | 否   | 聊天/任务是否被中止           |
+| `style`                  | `React.CSSProperties`              | 否   | 自定义 CSS 样式               | -        |
+| `compact`                | `boolean`                          | 否   | 启用紧凑显示模式              | -        |
+| `markdownRenderProps`    | `MarkdownEditorProps`              | 否   | Markdown 渲染属性             | -        |
+| `finishAutoCollapse`     | `boolean`                          | 否   | 完成时自动折叠（默认为 true） | -        |
+| `locale`                 | `object`                           | 否   | 本地化字符串                  | -        |
+| `titleRender`            | `(props, defaultDom) => ReactNode` | 否   | 自定义标题渲染                | -        |
+| `titleExtraRender`       | `(props, defaultDom) => ReactNode` | 否   | 自定义标题右侧额外内容渲染    | -        |
+| `thoughtChainItemRender` | `object`                           | 否   | 自定义思维链项目的渲染        | -        |
+| `onDocMetaClick`         | `(docMeta: DocMeta) => void`       | 否   | 文档元数据点击回调            | -        |
 
 ## 类型定义
 

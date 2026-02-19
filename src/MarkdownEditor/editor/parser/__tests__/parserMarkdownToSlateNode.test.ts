@@ -1,18 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleDefinition } from '../parse/parseElements';
-import {
-  handleImage,
-  handleAttachmentLink,
-} from '../parse/parseMedia';
-import {
-  handleMath,
-  shouldTreatInlineMathAsText,
-} from '../parse/parseMath';
-import { parserMdToSchema } from '../parserMdToSchema';
+import { handleMath, shouldTreatInlineMathAsText } from '../parse/parseMath';
+import { handleAttachmentLink, handleImage } from '../parse/parseMedia';
 import {
   clearParseCache,
   parserMarkdownToSlateNode,
 } from '../parserMarkdownToSlateNode';
+import { parserMdToSchema } from '../parserMdToSchema';
 
 import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
@@ -1779,10 +1773,7 @@ const y = 2;
           {
             match: () => true,
             convert: () =>
-              [
-                { type: 'paragraph', children: [{ text: '\n' }] },
-                null,
-              ] as any,
+              [{ type: 'paragraph', children: [{ text: '\n' }] }, null] as any,
           },
         ],
       };

@@ -360,7 +360,11 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
         ...style,
       }}
       onClick={handleClick}
-      title={rowIndex !== undefined ? (locale?.['table.clickToShowActions'] || '点击显示操作按钮') : undefined}
+      title={
+        rowIndex !== undefined
+          ? locale?.['table.clickToShowActions'] || '点击显示操作按钮'
+          : undefined
+      }
     >
       <div
         className={classNames(

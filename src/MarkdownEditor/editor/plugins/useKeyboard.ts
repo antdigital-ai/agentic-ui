@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey';
-import React, { useMemo } from 'react';
+import React, { useRef, useMemo } from 'react';
 import {
   BaseEditor,
   Editor,
@@ -73,12 +73,29 @@ export const useKeyboard = (
     openInsertCompletion,
     insertCompletionText$,
     setOpenInsertCompletion,
+    openJinjaTemplate,
+    setOpenJinjaTemplate,
+    setJinjaAnchorPath,
+    jinjaTemplatePanelEnabled,
+    editorProps,
   } = useEditorStore();
+  // 从 editorProps.jinja 读取（BaseMarkdownEditor 已写入 effectiveJinja），支持插件配置的 trigger
+  const effectiveJinja = editorProps?.jinja;
+  const jinjaTrigger =
+    (effectiveJinja?.templatePanel &&
+      typeof effectiveJinja.templatePanel === 'object' &&
+      effectiveJinja.templatePanel.trigger) ||
+    '{}';
+  const matchKeyRef = useRef<MatchKey | null>(null);
+  if (matchKeyRef.current === null) {
+    matchKeyRef.current = new MatchKey(
+      markdownEditorRef as React.MutableRefObject<Editor | null>,
+    );
+  }
   return useMemo(() => {
     const tab = new TabKey(markdownEditorRef.current);
     const backspace = new BackspaceKey(markdownEditorRef.current);
     const enter = new EnterKey(store, backspace);
-    const match = new MatchKey(markdownEditorRef.current);
     return (e: React.KeyboardEvent) => {
       // 只读模式下跳过所有键盘处理，提升性能
       if (props.readonly) return;
@@ -96,6 +113,10 @@ export const useKeyboard = (
       }
 
       if (openInsertCompletion && (isHotkey('up', e) || isHotkey('down', e))) {
+        e.preventDefault();
+        return;
+      }
+      if (openJinjaTemplate && (isHotkey('up', e) || isHotkey('down', e))) {
         e.preventDefault();
         return;
       }
@@ -137,8 +158,13 @@ export const useKeyboard = (
         e.preventDefault();
       }
 
-      if (props?.markdown?.matchInputToNode) {
-        if (match.run(e)) return;
+      // 仅当显式开启 matchInputToNode 时才执行输入转节点（如 "- " 转列表），默认关闭
+      // IME 输入法组合期间不触发，避免输入「-」后按空格选字时误转为列表
+      if (
+        props?.markdown?.matchInputToNode === true &&
+        !e.nativeEvent?.isComposing
+      ) {
+        if (matchKeyRef.current!.run(e)) return;
       }
 
       if (e.key.toLowerCase().startsWith('arrow')) {
@@ -230,6 +256,19 @@ export const useKeyboard = (
           const codeMatch = str.match(/^```([\w+\-#]+)$/i);
           if (codeMatch) {
           } else {
+            const strAfterKey = str + (e.key.length === 1 ? e.key : '');
+            // 仅在实际输入一个字符且刚好补全 trigger 时打开面板，避免 Backspace 等导致误打开
+            if (
+              jinjaTemplatePanelEnabled &&
+              e.key.length === 1 &&
+              strAfterKey === jinjaTrigger &&
+              setOpenJinjaTemplate &&
+              setJinjaAnchorPath
+            ) {
+              setJinjaAnchorPath(node[1]);
+              setTimeout(() => setOpenJinjaTemplate(true));
+              return;
+            }
             const insertMatch = str.match(/^\/([^\n]+)?$/i);
             if (
               insertMatch &&
@@ -248,5 +287,17 @@ export const useKeyboard = (
         }
       }
     };
-  }, [markdownEditorRef.current, props?.readonly]);
+  }, [
+    markdownEditorRef.current,
+    props?.readonly,
+    props?.markdown?.matchInputToNode,
+    openInsertCompletion,
+    insertCompletionText$,
+    setOpenInsertCompletion,
+    openJinjaTemplate,
+    setOpenJinjaTemplate,
+    setJinjaAnchorPath,
+    jinjaTemplatePanelEnabled,
+    jinjaTrigger,
+  ]);
 };

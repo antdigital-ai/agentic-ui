@@ -159,7 +159,7 @@ const genTableMinSize = (
  * - 支持错误边界
  * - 响应式布局
  */
-export const SlateMarkdownEditor = (props: MEditorProps) => {
+export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   // 所有hooks必须在组件顶部按固定顺序调用
   const {
     store,
@@ -167,6 +167,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
     markdownContainerRef,
     readonly,
     setDomRect,
+    jinjaEnabled,
   } = useEditorStore();
 
   // 懒加载元素索引计数器
@@ -202,7 +203,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
 
   const onKeyDown = useKeyboard(store, markdownEditorRef, props);
   const onChange = useOnchange(markdownEditorRef.current, props.onChange);
-  const high = useHighlight(store);
+  const high = useHighlight(store, jinjaEnabled);
 
   const childrenIsEmpty = useMemo(() => {
     if (!markdownEditorRef.current?.children) return false;
@@ -1195,4 +1196,4 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
       </Slate>
     </>,
   );
-};
+});

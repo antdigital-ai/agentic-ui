@@ -8,6 +8,12 @@ const LINK_REG =
   /(https?|ftp):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gi;
 const FOOTNOTE_REG = /\[\^[^\]]+\]/g;
 const TABLE_ROW_REG = /^\|([^|]+\|)+$/;
+/** 至少一个非 } 字符，避免匹配 {{}}、{{ 等不完整表达式 */
+const JINJA_VARIABLE_REG = /\{\{[^}]+\}\}/g;
+/** 至少一个非 % 字符，避免匹配 {%%} */
+const JINJA_TAG_REG = /\{%[^%]+%\}/g;
+/** 单行内注释，避免跨多行高亮造成大段误匹配（编辑器场景） */
+const JINJA_COMMENT_REG = /\{#[^\n]*?#\}/g;
 
 export const cacheTextNode = new WeakMap<
   object,
@@ -113,7 +119,33 @@ const processLinkMatches = (
   return ranges;
 };
 
-export function useHighlight(store?: EditorStore) {
+const processJinjaMatches = (
+  text: string,
+  path: Path,
+  childIndex: number,
+): any[] => {
+  const ranges: any[] = [];
+  const collect = (reg: RegExp, prop: string) => {
+    reg.lastIndex = 0;
+    let match: RegExpMatchArray | null;
+    while ((match = reg.exec(text)) !== null) {
+      const index = match.index;
+      if (typeof index === 'number') {
+        ranges.push(
+          createRange(path, childIndex, index, match[0].length, {
+            [prop]: true,
+          }),
+        );
+      }
+    }
+  };
+  collect(JINJA_VARIABLE_REG, 'jinjaVariable');
+  collect(JINJA_TAG_REG, 'jinjaTag');
+  collect(JINJA_COMMENT_REG, 'jinjaComment');
+  return ranges;
+};
+
+export function useHighlight(store?: EditorStore, jinjaEnabled?: boolean) {
   return ([node, path]: NodeEntry): Range[] => {
     // 快速路径：非元素节点或不在高亮节点列表中
     if (!Element.isElement(node) || !highlightNodes.has(node.type)) {
@@ -144,6 +176,10 @@ export function useHighlight(store?: EditorStore) {
           // 处理链接
           if (child.text && !child.url && !child.docId && !child.hash) {
             allTextRanges.push(...processLinkMatches(child.text, path, i));
+          }
+
+          if (jinjaEnabled && child.text && !EditorUtils.isDirtLeaf(child)) {
+            allTextRanges.push(...processJinjaMatches(child.text, path, i));
           }
         }
 
