@@ -1,5 +1,5 @@
 import { FormatPainterOutlined } from '@ant-design/icons';
-import classnames from 'clsx';
+import classNames from 'clsx';
 import React from 'react';
 import { ToolBarItem } from './ToolBarItem';
 
@@ -17,7 +17,7 @@ export const FormatButton = React.memo<FormatButtonProps>(
         title={i18n.locale?.format || '格式化'}
         icon={<FormatPainterOutlined />}
         onClick={onFormat}
-        className={classnames(`${baseClassName}-item`, hashId)}
+        className={classNames(`${baseClassName}-item`, hashId)}
         style={{ fontSize: '0.9em' }}
       />
     );

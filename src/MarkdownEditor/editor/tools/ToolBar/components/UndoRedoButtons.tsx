@@ -1,5 +1,5 @@
 import { RedoOutlined, UndoOutlined } from '@ant-design/icons';
-import classnames from 'clsx';
+import classNames from 'clsx';
 import React from 'react';
 import { ToolBarItem } from './ToolBarItem';
 
@@ -19,13 +19,13 @@ export const UndoRedoButtons = React.memo<UndoRedoButtonsProps>(
           title={i18n?.locale?.undo || '撤销'}
           icon={<UndoOutlined />}
           onClick={onUndo}
-          className={classnames(`${baseClassName}-item`, hashId)}
+          className={classNames(`${baseClassName}-item`, hashId)}
         />
         <ToolBarItem
           title={i18n?.locale?.redo || '重做'}
           icon={<RedoOutlined />}
           onClick={onRedo}
-          className={classnames(`${baseClassName}-item`, hashId)}
+          className={classNames(`${baseClassName}-item`, hashId)}
         />
       </>
     );

@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from 'chart.js';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
-import classNamesLib from 'clsx';
+import clsx from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -975,7 +975,7 @@ const BarChart: React.FC<BarChartProps> = ({
     downloadChart(chartRef.current, 'bar-chart');
   };
 
-  const rootClassName = classNamesLib(classNames?.root, className);
+  const rootClassName = clsx(classNames?.root, className);
   const rootStyle = {
     width: responsiveWidth,
     height: responsiveHeight,
@@ -983,19 +983,19 @@ const BarChart: React.FC<BarChartProps> = ({
     ...styles?.root,
   };
 
-  const toolbarClassName = classNamesLib(classNames?.toolbar);
+  const toolbarClassName = clsx(classNames?.toolbar);
   const toolbarStyle = styles?.toolbar;
 
-  const statisticContainerClassName = classNamesLib(
+  const statisticContainerClassName = clsx(
     classNames?.statisticContainer,
     `${baseClassName}-statistic-container`,
   );
   const statisticContainerStyle = styles?.statisticContainer;
 
-  const filterClassName = classNamesLib(classNames?.filter);
+  const filterClassName = clsx(classNames?.filter);
   const filterStyle = styles?.filter;
 
-  const wrapperClassName = classNamesLib(
+  const wrapperClassName = clsx(
     classNames?.wrapper,
     `${baseClassName}-wrapper`,
   );

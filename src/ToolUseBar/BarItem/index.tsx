@@ -1,4 +1,4 @@
-import classnames from 'clsx';
+import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
 import React, { memo, useMemo } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
@@ -62,7 +62,7 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
 
   // 使用 useMemo 优化样式类名
   const toolClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool ${hashId}`, {
+    return classNames(`${prefixCls}-tool ${hashId}`, {
       [`${prefixCls}-tool-success`]: tool.status === 'success',
       [`${prefixCls}-tool-loading`]: tool.status === 'loading',
       [`${prefixCls}-tool-loading-light`]: tool.status === 'loading' && light,
@@ -75,11 +75,11 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
   }, [prefixCls, hashId, tool.status, light, isActive, expanded]);
 
   const toolBarClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-bar`, hashId);
+    return classNames(`${prefixCls}-tool-bar`, hashId);
   }, [prefixCls, hashId]);
 
   const toolHeaderClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-header`, hashId);
+    return classNames(`${prefixCls}-tool-header`, hashId);
   }, [prefixCls, hashId]);
 
   const handleClick = useRefFunction((e: React.MouseEvent<HTMLDivElement>) => {
@@ -126,12 +126,12 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
     <div
       key={tool.id}
       data-testid="ToolUserItem"
-      className={classnames(toolClassName, {
+      className={classNames(toolClassName, {
         [`${prefixCls}-tool-collapsed`]: !showContent,
       })}
     >
       <div
-        className={classnames(toolBarClassName, {
+        className={classNames(toolBarClassName, {
           [`${prefixCls}-tool-bar-collapsed`]: !showContent,
         })}
         data-testid="tool-user-item-tool-bar"
@@ -150,7 +150,7 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
           light={light}
         />
         {tool.time || showContent ? (
-          <div className={classnames(`${prefixCls}-tool-time-expand`, hashId)}>
+          <div className={classNames(`${prefixCls}-tool-time-expand`, hashId)}>
             <ToolTime tool={tool} prefixCls={prefixCls} hashId={hashId} />
             <ToolExpand
               showContent={showContent}

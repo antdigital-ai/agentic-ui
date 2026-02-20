@@ -1,4 +1,4 @@
-import classnames from 'clsx';
+import classNames from 'clsx';
 import React from 'react';
 import { ToolBarItem } from './ToolBarItem';
 
@@ -65,7 +65,7 @@ export const FormattingTools = React.memo<FormattingToolsProps>(
               }
               icon={tool.icon}
               onClick={() => !isCodeNode && onToolClick(tool)}
-              className={classnames(`${baseClassName}-item`, hashId)}
+              className={classNames(`${baseClassName}-item`, hashId)}
               style={{
                 color: isActive ? '#1677ff' : undefined,
               }}

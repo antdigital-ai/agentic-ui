@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import cx from 'clsx';
+import classNames from 'clsx';
 import React, { useContext } from 'react';
 import { useStyle } from './style';
 
@@ -89,7 +89,7 @@ export const TextLoading: React.FC<TextLoadingProps> = ({
 
   return wrapSSR(
     <span
-      className={cx(prefixCls, hashId, className, {
+      className={classNames(prefixCls, hashId, className, {
         [`${prefixCls}-disabled`]: disabled,
         [`${prefixCls}-dark`]: theme === 'dark',
         [`${prefixCls}-light`]: theme === 'light',

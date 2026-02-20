@@ -1,7 +1,7 @@
 import { memo, MutableRefObject, useContext } from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
-import cx from 'clsx';
+import clsx from 'clsx';
 import React from 'react';
 import { WhiteBoxProcessInterface } from '../ThoughtChainList/types';
 import { BubbleAvatar } from './Avatar';
@@ -104,7 +104,7 @@ export const AIBubble: React.FC<
       bubbleNameClassName={classNames?.bubbleNameClassName}
       className={classNames?.bubbleListItemTitleClassName}
       style={styles?.bubbleListItemTitleStyle}
-      prefixClass={cx(`${prefixClass}-bubble-title`)}
+      prefixClass={clsx(`${prefixClass}-bubble-title`)}
       title={avatar?.title || avatar?.name}
       placement={placement}
       time={time}
@@ -165,7 +165,7 @@ export const AIBubble: React.FC<
               width: '100%',
               ...styles?.bubbleListItemExtraStyle,
             }}
-            className={cx(
+            className={clsx(
               `${prefixClass}-bubble-after`,
               `${prefixClass}-bubble-after-${placement}`,
               `${prefixClass}-bubble-after-ai`, // AI消息 after 特定样式
@@ -223,7 +223,7 @@ export const AIBubble: React.FC<
       }}
     >
       <Flex
-        className={cx(
+        className={clsx(
           hashId,
           className,
           `${prefixClass}-bubble`,
@@ -242,7 +242,7 @@ export const AIBubble: React.FC<
       >
         <div
           style={style}
-          className={cx(
+          className={clsx(
             `${prefixClass}-bubble-container`,
             `${prefixClass}-bubble-container-${placement}`,
             {
@@ -253,7 +253,7 @@ export const AIBubble: React.FC<
         >
           {preMessageSameRole ? null : (
             <div
-              className={cx(
+              className={clsx(
                 `${prefixClass}-bubble-avatar-title`,
                 `${prefixClass}-bubble-avatar-title-${placement}`,
                 `${prefixClass}-bubble-avatar-title-ai`, // AI消息头像标题特定样式
@@ -275,7 +275,7 @@ export const AIBubble: React.FC<
               flexDirection: 'column',
               alignItems: 'flex-start', // AI消息内容左对齐
             }}
-            className={cx(
+            className={clsx(
               `${prefixClass}-bubble-container`,
               `${prefixClass}-bubble-container-${placement}`,
               `${prefixClass}-bubble-container-ai`, // AI消息容器特定样式
@@ -290,7 +290,7 @@ export const AIBubble: React.FC<
             {contentBeforeDom ? (
               <div
                 style={styles?.bubbleListItemExtraStyle}
-                className={cx(
+                className={clsx(
                   `${prefixClass}-bubble-before`,
                   `${prefixClass}-bubble-before-${placement}`,
                   `${prefixClass}-bubble-before-ai`, // AI消息 before 特定样式
@@ -306,7 +306,7 @@ export const AIBubble: React.FC<
                 minWidth: standalone ? 'min(16px,100%)' : '0px',
                 ...styles?.bubbleListItemContentStyle,
               }}
-              className={cx(
+              className={clsx(
                 `${prefixClass}-bubble-content`,
                 `${prefixClass}-bubble-content-${placement}`,
                 `${prefixClass}-bubble-content-ai`, // AI消息内容特定样式
@@ -356,7 +356,7 @@ export const AIBubble: React.FC<
             title: titleDom,
             header: (
               <div
-                className={cx(
+                className={clsx(
                   `${prefixClass}-bubble-avatar-title`,
                   `${prefixClass}-bubble-avatar-title-${placement}`,
                   `${prefixClass}-bubble-avatar-title-ai`,

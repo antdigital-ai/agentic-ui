@@ -55,7 +55,13 @@ pnpm run prettier   # 格式化代码
 -   **Hooks**: camelCase, 以 `use` 开头 (如 `useEditor.ts`)
 -   **工具函数**: camelCase (如 `parseMarkdown.ts`)
 -   **样式文件**: `style.ts`
--   **类名**: BEM 命名法 (Block: `.history-item`, Element: `.history-item__title`, Modifier: `.history-item--selected`)
+-   **类名**: BEM 命名法
+    - Block: `.history-item`
+    - Element（子元素）: `.history-item__title` 或 `prefix-item`（与 prefixCls 拼接）
+    - Modifier（状态修饰）: `.history-item--selected` 或 `prefix-item--active`
+    - 避免过长复合名，如 `item-min-plus-icon` 应简化为 `item--more`
+-   **className 工具**: 统一使用 `import classNames from 'clsx'`。若组件存在 `classNames` 属性（如自定义类名配置），则使用 `import clsx from 'clsx'` 避免变量遮蔽
+-   **前缀变量**: 组件内获取的类名前缀统一命名为 `prefixCls`，与 Ant Design 保持一致
 
 ### 文件组织结构
 

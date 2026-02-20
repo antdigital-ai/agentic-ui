@@ -1,5 +1,5 @@
 import { Api, ChevronUp, X } from '@sofa-design/icons';
-import classnames from 'clsx';
+import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { memo, useMemo } from 'react';
 import { ToolCall } from '.';
@@ -17,14 +17,14 @@ const ToolImageComponent: React.FC<ToolImageProps> = ({
   hashId,
 }) => {
   const toolImageWrapperClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-image-wrapper`, hashId, {
+    return classNames(`${prefixCls}-tool-image-wrapper`, hashId, {
       [`${prefixCls}-tool-image-wrapper-rotating`]: tool.status === 'loading',
       [`${prefixCls}-tool-image-wrapper-loading`]: tool.status === 'loading',
     });
   }, [prefixCls, hashId, tool.status]);
 
   const toolImageClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-image`, hashId);
+    return classNames(`${prefixCls}-tool-image`, hashId);
   }, [prefixCls, hashId]);
 
   // 缓存动画配置，避免重复创建对象
@@ -90,7 +90,7 @@ const ToolHeaderRightComponent: React.FC<ToolHeaderRightProps> = ({
   light,
 }) => {
   const toolHeaderRightClassName = useMemo(() => {
-    return classnames(
+    return classNames(
       `${prefixCls}-tool-header-right`,
       {
         [`${prefixCls}-tool-header-right-light`]: light,
@@ -100,13 +100,13 @@ const ToolHeaderRightComponent: React.FC<ToolHeaderRightProps> = ({
   }, [prefixCls, hashId, light]);
 
   const toolNameClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-name`, hashId, {
+    return classNames(`${prefixCls}-tool-name`, hashId, {
       [`${prefixCls}-tool-name-loading`]: tool.status === 'loading',
     });
   }, [prefixCls, hashId, tool.status]);
 
   const toolTargetClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-target`, hashId, {
+    return classNames(`${prefixCls}-tool-target`, hashId, {
       [`${prefixCls}-tool-target-loading`]: tool.status === 'loading',
       [`${prefixCls}-tool-target-light`]: light,
     });
@@ -180,7 +180,7 @@ const ToolTimeComponent: React.FC<ToolTimeProps> = ({
   hashId,
 }) => {
   const toolTimeClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-time`, hashId);
+    return classNames(`${prefixCls}-tool-time`, hashId);
   }, [prefixCls, hashId]);
 
   // 缓存时间元素渲染
@@ -211,7 +211,7 @@ const ToolExpandComponent: React.FC<ToolExpandProps> = ({
   onExpandClick,
 }) => {
   const toolExpandClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-expand`, hashId);
+    return classNames(`${prefixCls}-tool-expand`, hashId);
   }, [prefixCls, hashId]);
 
   // 缓存样式对象，避免重复创建
@@ -261,26 +261,26 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
   expanded,
 }) => {
   const toolContainerClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-container`, hashId, {
+    return classNames(`${prefixCls}-tool-container`, hashId, {
       [`${prefixCls}-tool-container-light`]: light,
     });
   }, [prefixCls, hashId, light]);
 
   // 缓存错误样式类名
   const errorClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-content-error`, hashId);
+    return classNames(`${prefixCls}-tool-content-error`, hashId);
   }, [prefixCls, hashId]);
 
   const errorIconClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-content-error-icon`, hashId);
+    return classNames(`${prefixCls}-tool-content-error-icon`, hashId);
   }, [prefixCls, hashId]);
 
   const errorTextClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-content-error-text`, hashId);
+    return classNames(`${prefixCls}-tool-content-error-text`, hashId);
   }, [prefixCls, hashId]);
 
   const contentClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-content`, hashId);
+    return classNames(`${prefixCls}-tool-content`, hashId);
   }, [prefixCls, hashId]);
 
   const errorDom = useMemo(() => {
