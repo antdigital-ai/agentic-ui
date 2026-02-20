@@ -9,6 +9,55 @@ group:
 
 # Changelog
 
+## v2.29.31
+
+- MarkdownEditor
+  - 🐞 修复 `list-item` 下 `Node.leaf` 报错，改用 `Editor.leaf` 解析叶子节点。
+  - 🛠 优化 `matchInputToNode` 功能与键盘处理逻辑。
+  - 🛠 优化 `classname` 规范与使用。 [#315](https://github.com/ant-design/agentic-ui/pull/315) [@陈帅]
+
+✅ 增强 MarkdownEditor 和 Bubble 组件的测试覆盖率。 [#307](https://github.com/ant-design/agentic-ui/pull/307) [@222]
+
+## v2.29.30
+
+- MarkdownEditor
+  - 🛠 使用 `React.memo` 优化 `SlateMarkdownEditor` 渲染性能。
+  - 🛠 统一 `classname` 前缀为 `agentic-md-editor-*`。 [#311](https://github.com/ant-design/agentic-ui/pull/311) [@陈帅]
+
+- LinkCard
+  - 🛠 按 BEM 规范整理 `class` 命名。 [#312](https://github.com/ant-design/agentic-ui/pull/312) [@陈帅]
+
+- Chart
+  - 🛠 优化 ProForm 配置表单类名，使用 `agentic-chart-config-form` 前缀并添加 BEM 结构。 [#313](https://github.com/ant-design/agentic-ui/pull/313) [@陈帅]
+
+- ChartRender
+  - 🛠 优化表格与描述列表的 BEM 类名。 [#314](https://github.com/ant-design/agentic-ui/pull/314) [@陈帅]
+
+- AceEditor
+  - 🛠 移除 `effect` 中的未使用依赖。
+
+## v2.29.29
+
+- MarkdownEditor
+  - 🆕 新增 Jinja 模板能力，支持 `jinja` 配置、`{}` 触发模板面板、语法高亮、`createJinjaPlugin`。 [#309](https://github.com/ant-design/agentic-ui/pull/309) [#310](https://github.com/ant-design/agentic-ui/pull/310) [@陈帅]
+
+## v2.29.28
+
+- Workspace
+  - 🆕 支持视频文件预览播放。 [#308](https://github.com/ant-design/agentic-ui/pull/308) [@陈帅]
+
+- SchemaEditorBridgeManager
+  - 🆕 增加 `getContentById` 方法以支持内容获取。 [#306](https://github.com/ant-design/agentic-ui/pull/306) [@222]
+
+📚 演示数据与内容更新。 [#305](https://github.com/ant-design/agentic-ui/pull/305) [@陈帅]
+
+## v2.29.27
+
+- Bubble
+  - 🛠 重构 locale 处理逻辑，优化国际化支持。 ([e1927ec6](https://github.com/ant-design/agentic-ui/commit/e1927ec6))
+
+📚 补充 changelog v2.29.8-v2.29.26 版本更新记录。 [#303](https://github.com/ant-design/agentic-ui/pull/303) [@陈帅]
+
 ## v2.29.26
 
 - Bubble
