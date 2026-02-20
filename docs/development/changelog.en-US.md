@@ -9,6 +9,55 @@ group:
 
 # Changelog
 
+## v2.29.31
+
+- MarkdownEditor
+  - 🐞 Fix `Node.leaf` error under `list-item`, use `Editor.leaf` to parse leaf nodes.
+  - 🛠 Enhance `matchInputToNode` functionality and keyboard handling logic.
+  - 🛠 Optimize `classname` specification and usage. [#315](https://github.com/ant-design/agentic-ui/pull/315) [@陈帅]
+
+✅ Enhance test coverage for MarkdownEditor and Bubble components. [#307](https://github.com/ant-design/agentic-ui/pull/307) [@222]
+
+## v2.29.30
+
+- MarkdownEditor
+  - 🛠 Optimize `SlateMarkdownEditor` rendering performance with `React.memo`.
+  - 🛠 Unify `classname` prefix to `agentic-md-editor-*`. [#311](https://github.com/ant-design/agentic-ui/pull/311) [@陈帅]
+
+- LinkCard
+  - 🛠 Reorganize `class` naming per BEM specification. [#312](https://github.com/ant-design/agentic-ui/pull/312) [@陈帅]
+
+- Chart
+  - 🛠 Optimize ProForm config form class names with `agentic-chart-config-form` prefix and BEM structure. [#313](https://github.com/ant-design/agentic-ui/pull/313) [@陈帅]
+
+- ChartRender
+  - 🛠 Optimize BEM class names for table and description list. [#314](https://github.com/ant-design/agentic-ui/pull/314) [@陈帅]
+
+- AceEditor
+  - 🛠 Remove unused dependency from `effect` hook.
+
+## v2.29.29
+
+- MarkdownEditor
+  - 🆕 Add Jinja template support with `jinja` config, `{}` trigger for template panel, syntax highlighting, and `createJinjaPlugin`. [#309](https://github.com/ant-design/agentic-ui/pull/309) [#310](https://github.com/ant-design/agentic-ui/pull/310) [@陈帅]
+
+## v2.29.28
+
+- Workspace
+  - 🆕 Support video file preview and playback. [#308](https://github.com/ant-design/agentic-ui/pull/308) [@陈帅]
+
+- SchemaEditorBridgeManager
+  - 🆕 Add `getContentById` method for content retrieval. [#306](https://github.com/ant-design/agentic-ui/pull/306) [@222]
+
+📚 Update demo data and content. [#305](https://github.com/ant-design/agentic-ui/pull/305) [@陈帅]
+
+## v2.29.27
+
+- Bubble
+  - 🛠 Refactor locale handling for improved internationalization support. ([e1927ec6](https://github.com/ant-design/agentic-ui/commit/e1927ec6))
+
+📚 Supplement changelog entries for v2.29.8-v2.29.26. [#303](https://github.com/ant-design/agentic-ui/pull/303) [@陈帅]
+
 ## v2.29.26
 
 - Bubble
