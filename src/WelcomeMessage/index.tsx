@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classnames from 'clsx';
+import clsx from 'clsx';
 import React, { useContext } from 'react';
 import { TextAnimate, TextAnimateProps } from '../Components/TextAnimate';
 import {
@@ -113,7 +113,7 @@ export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
 
   return wrapSSR(
     <div
-      className={classnames(prefixCls, hashId, rootClassName)}
+      className={clsx(prefixCls, hashId, rootClassName)}
       style={restStyle}
     >
       {/* Title */}
@@ -121,7 +121,7 @@ export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
         <TypingAnimation
           as="div"
           {...titleAnimateProps}
-          className={classnames(`${prefixCls}-title`, classNames?.title)}
+          className={clsx(`${prefixCls}-title`, classNames?.title)}
         >
           {title}
         </TypingAnimation>
@@ -135,7 +135,7 @@ export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
           by="character"
           once
           {...descriptionAnimateProps}
-          className={classnames(
+          className={clsx(
             `${prefixCls}-description`,
             classNames?.description,
           )}

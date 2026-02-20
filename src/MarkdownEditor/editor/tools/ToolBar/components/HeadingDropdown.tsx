@@ -1,5 +1,5 @@
 import { Dropdown } from 'antd';
-import classnames from 'clsx';
+import classNames from 'clsx';
 import React from 'react';
 import { ToolBarItem } from './ToolBarItem';
 
@@ -60,7 +60,7 @@ export const HeadingDropdown = React.memo<HeadingDropdownProps>(
         <ToolBarItem
           title={i18n?.locale?.heading || '标题'}
           icon={null}
-          className={classnames(`${baseClassName}-item`, hashId)}
+          className={classNames(`${baseClassName}-item`, hashId)}
           style={{
             minWidth: 36,
             textAlign: 'center',

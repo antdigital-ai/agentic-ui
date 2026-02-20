@@ -11,7 +11,7 @@ import type {
 } from '../type';
 
 import { ConfigProvider } from 'antd';
-import cx from 'clsx';
+import clsx from 'clsx';
 import { nanoid } from 'nanoid';
 import React from 'react';
 import { LazyElement } from '../../MarkdownEditor/editor/components/LazyElement';
@@ -509,7 +509,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
   if (loading)
     return wrapSSR(
       <div
-        className={cx(prefixClass, `${prefixClass}-loading`, className, hashId)}
+        className={clsx(prefixClass, `${prefixClass}-loading`, className, hashId)}
         ref={bubbleListRef}
         style={{
           padding: 24,
@@ -521,7 +521,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
 
   return wrapSSR(
     <div
-      className={cx(`${prefixClass}`, className, hashId, {
+      className={clsx(`${prefixClass}`, className, hashId, {
         [`${prefixClass}-readonly`]: props.readonly,
         [`${prefixClass}-compact`]: compact,
       })}

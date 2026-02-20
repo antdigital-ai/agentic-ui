@@ -1,6 +1,6 @@
 import { Plus } from '@sofa-design/icons';
 import { Divider, Dropdown } from 'antd';
-import classnames from 'clsx';
+import classNames from 'clsx';
 import React, { useContext, useMemo } from 'react';
 import { I18nContext } from '../../../../I18n';
 import { useEditorStore } from '../../store';
@@ -158,7 +158,7 @@ export const BaseToolBar = React.memo<{
           title={option.label.join(' ')}
           icon={option.icon}
           onClick={() => handleInsert(option)}
-          className={classnames(`${baseClassName}-item`, hashId)}
+          className={classNames(`${baseClassName}-item`, hashId)}
         />
       )),
     [insertOptions, handleInsert, baseClassName, hashId],
@@ -393,9 +393,9 @@ export const BaseToolBar = React.memo<{
         <ToolBarItem
           title={i18n.locale?.moreActions || '更多操作'}
           icon={<Plus />}
-          className={classnames(
+          className={classNames(
             `${baseClassName}-item`,
-            `${baseClassName}-item-min-plus-icon`,
+            `${baseClassName}-item--more`,
             hashId,
           )}
           tabIndex={-1}
@@ -489,7 +489,7 @@ export const BaseToolBar = React.memo<{
           if (React.isValidElement(item)) {
             return item.type === 'span' ? (
               <div
-                className={classnames(`${baseClassName}-item`, hashId)}
+                className={classNames(`${baseClassName}-item`, hashId)}
                 key={`${key}-span`}
               >
                 {item}
@@ -501,7 +501,7 @@ export const BaseToolBar = React.memo<{
 
           return (
             <div
-              className={classnames(`${baseClassName}-item`, hashId)}
+              className={classNames(`${baseClassName}-item`, hashId)}
               key={`${key}-div`}
             >
               {item}

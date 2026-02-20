@@ -1,5 +1,5 @@
 import { LinkOutlined } from '@ant-design/icons';
-import classnames from 'clsx';
+import classNames from 'clsx';
 import React from 'react';
 import { ToolBarItem } from './ToolBarItem';
 
@@ -18,7 +18,7 @@ export const LinkButton = React.memo<LinkButtonProps>(
         title={i18n?.locale?.insertLink || '插入链接'}
         icon={<LinkOutlined />}
         onClick={onInsertLink}
-        className={classnames(`${baseClassName}-item`, hashId)}
+        className={classNames(`${baseClassName}-item`, hashId)}
         style={{
           color: isLinkActive ? '#1677ff' : undefined,
         }}

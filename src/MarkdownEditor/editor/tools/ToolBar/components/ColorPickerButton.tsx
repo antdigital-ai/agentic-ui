@@ -1,6 +1,6 @@
 import { HighlightOutlined } from '@ant-design/icons';
 import { ColorPicker } from 'antd';
-import classnames from 'clsx';
+import classNames from 'clsx';
 import React from 'react';
 import { ToolBarItem } from './ToolBarItem';
 
@@ -46,7 +46,7 @@ export const ColorPickerButton = React.memo<ColorPickerButtonProps>(
       <ToolBarItem
         title={i18n?.locale?.['font-color'] || '字体颜色'}
         icon={<HighlightOutlined />}
-        className={classnames(`${baseClassName}-item`, hashId)}
+        className={classNames(`${baseClassName}-item`, hashId)}
         style={{ position: 'relative' }}
       >
         <ColorPicker

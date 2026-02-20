@@ -1,5 +1,5 @@
 import { Flex } from 'antd';
-import cx from 'clsx';
+import classNames from 'clsx';
 import React from 'react';
 
 import {
@@ -109,7 +109,7 @@ export const BubbleTitle: React.FC<TitleProps> = ({
   return wrapSSR(
     <>
       <Flex
-        className={cx(hashId, prefixClass, className)}
+        className={classNames(hashId, prefixClass, className)}
         style={flexStyle}
         gap={TITLE_GAP}
         data-testid="bubble-title"
@@ -117,7 +117,7 @@ export const BubbleTitle: React.FC<TitleProps> = ({
         {title && <span className={bubbleNameClassName}>{title}</span>}
         {time && (
           <time
-            className={cx(`${prefixClass}-time`, hashId)}
+            className={classNames(`${prefixClass}-time`, hashId)}
             data-testid="bubble-time"
           >
             {formatTime(time)}

@@ -1,4 +1,4 @@
-import classnames from 'clsx';
+import classNames from 'clsx';
 import React from 'react';
 import { ToolBarItem } from './ToolBarItem';
 
@@ -35,7 +35,7 @@ export const ClearFormatButton = React.memo<ClearFormatButtonProps>(
         title={i18n?.locale?.clearFormatting || '清除格式'}
         icon={<ClearIcon />}
         onClick={onClear}
-        className={classnames(`${baseClassName}-item`, hashId)}
+        className={classNames(`${baseClassName}-item`, hashId)}
       />
     );
   },

@@ -1,7 +1,7 @@
 import { memo, MutableRefObject, useContext } from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
-import cx from 'clsx';
+import clsx from 'clsx';
 import React from 'react';
 import { Quote, QuoteProps } from '../Quote';
 import { BubbleConfigContext } from './BubbleConfigProvide';
@@ -98,7 +98,7 @@ export const UserBubble: React.FC<
       bubbleNameClassName={classNames?.bubbleNameClassName}
       className={classNames?.bubbleListItemTitleClassName}
       style={styles?.bubbleListItemTitleStyle}
-      prefixClass={cx(`${prefixClass}-bubble-title`)}
+      prefixClass={clsx(`${prefixClass}-bubble-title`)}
       title={''}
       placement={placement}
       time={time}
@@ -169,7 +169,7 @@ export const UserBubble: React.FC<
       }}
     >
       <Flex
-        className={cx(
+        className={clsx(
           hashId,
           className,
           `${prefixClass}-bubble`,
@@ -186,11 +186,11 @@ export const UserBubble: React.FC<
       >
         <div
           style={style}
-          className={cx(`${prefixClass}-bubble-container`, hashId)}
+          className={clsx(`${prefixClass}-bubble-container`, hashId)}
         >
           <div
             style={contentContainerStyle}
-            className={cx(
+            className={clsx(
               `${prefixClass}-bubble-container`,
               `${prefixClass}-bubble-container-${placement}`,
               `${prefixClass}-bubble-container-user`,
@@ -201,7 +201,7 @@ export const UserBubble: React.FC<
             data-testid="chat-message"
           >
             <div
-              className={cx(
+              className={clsx(
                 `${prefixClass}-bubble-avatar-title`,
                 `${prefixClass}-bubble-avatar-title-${placement}`,
                 `${prefixClass}-bubble-avatar-title-ai`,
@@ -219,7 +219,7 @@ export const UserBubble: React.FC<
             {contentBeforeDom && (
               <div
                 style={styles?.bubbleListItemExtraStyle}
-                className={cx(
+                className={clsx(
                   `${prefixClass}-bubble-before`,
                   `${prefixClass}-bubble-before-${placement}`,
                   `${prefixClass}-bubble-before-user`,
@@ -232,7 +232,7 @@ export const UserBubble: React.FC<
             )}
             <div
               style={contentStyle}
-              className={cx(
+              className={clsx(
                 `${prefixClass}-bubble-content`,
                 `${prefixClass}-bubble-content-${placement}`,
                 `${prefixClass}-bubble-content-user`,
@@ -248,7 +248,7 @@ export const UserBubble: React.FC<
             {hasFileMap && (
               <div
                 style={fileViewStyle}
-                className={cx(
+                className={clsx(
                   `${prefixClass}-bubble-after`,
                   `${prefixClass}-bubble-after-${placement}`,
                   `${prefixClass}-bubble-after-ai`,

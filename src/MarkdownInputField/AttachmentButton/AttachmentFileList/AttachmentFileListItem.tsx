@@ -29,10 +29,6 @@ const getFileExtension = (fileName: string) => {
   return fileName.split('.').slice(-1)[0];
 };
 
-const buildClassName = (...classes: (string | undefined)[]) => {
-  return classNames(...classes);
-};
-
 const FileIcon: React.FC<{
   file: AttachmentFile;
   prefixCls?: string;
@@ -41,25 +37,25 @@ const FileIcon: React.FC<{
   const status = file.status || 'done';
   const iconMap: Record<FileStatus, React.ReactNode> = {
     uploading: (
-      <div className={buildClassName(`${prefixCls}-uploading-icon`, hashId)}>
+      <div className={classNames(`${prefixCls}-uploading-icon`, hashId)}>
         <FileUploadingSpin />
       </div>
     ),
     error: (
-      <div className={buildClassName(`${prefixCls}-error-icon`, hashId)}>
+      <div className={classNames(`${prefixCls}-error-icon`, hashId)}>
         <FileFailed />
       </div>
     ),
     done: (
       <AttachmentFileIcon
         file={file}
-        className={buildClassName(`${prefixCls}-file-icon-img`, hashId)}
+        className={classNames(`${prefixCls}-file-icon-img`, hashId)}
       />
     ),
   };
 
   return (
-    <div className={buildClassName(`${prefixCls}-file-icon`, hashId)}>
+    <div className={classNames(`${prefixCls}-file-icon`, hashId)}>
       {iconMap[status]}
     </div>
   );
@@ -72,13 +68,13 @@ const FileSizeInfo: React.FC<{
   locale?: typeof import('../../../I18n').cnLabels;
 }> = ({ file, prefixCls, hashId, locale }) => {
   const status = file.status || 'done';
-  const baseClassName = buildClassName(`${prefixCls}-file-size`, hashId);
+  const baseClassName = classNames(`${prefixCls}-file-size`, hashId);
 
   const statusContentMap: Record<FileStatus, React.ReactNode> = {
     uploading: locale?.uploading || '上传中...',
     error: (
       <div
-        className={buildClassName(
+        className={classNames(
           baseClassName,
           `${prefixCls}-file-size-error`,
         )}
@@ -94,7 +90,7 @@ const FileSizeInfo: React.FC<{
       return sizeItems.map((item) => (
         <span
           key={item}
-          className={buildClassName(`${prefixCls}-file-size-item`, hashId)}
+          className={classNames(`${prefixCls}-file-size-item`, hashId)}
         >
           {item}
         </span>
@@ -122,7 +118,7 @@ const DeleteButton: React.FC<{
   return (
     <div
       onClick={onClick}
-      className={buildClassName(`${prefixCls}-close-icon`, hashId)}
+      className={classNames(`${prefixCls}-close-icon`, hashId)}
     >
       <X role="img" aria-label="X" />
     </div>
@@ -176,13 +172,13 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
         exit={ANIMATION_VARIANTS.exit}
       >
         <FileIcon file={file} prefixCls={prefixCls} hashId={hashId} />
-        <div className={buildClassName(`${prefixCls}-file-info`, hashId)}>
+        <div className={classNames(`${prefixCls}-file-info`, hashId)}>
           <div
             onClick={handleRetryClick}
-            className={buildClassName(`${prefixCls}-file-name`, hashId)}
+            className={classNames(`${prefixCls}-file-name`, hashId)}
           >
             <span
-              className={buildClassName(`${prefixCls}-file-name-text`, hashId)}
+              className={classNames(`${prefixCls}-file-name-text`, hashId)}
             >
               {getFileNameWithoutExtension(file.name)}
             </span>

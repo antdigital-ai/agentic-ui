@@ -1,7 +1,7 @@
 import { memo, MutableRefObject, useContext } from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
-import cx from 'clsx';
+import clsx from 'clsx';
 import React from 'react';
 import { BaseMarkdownEditor } from '../MarkdownEditor/BaseMarkdownEditor';
 import { runRender } from './AIBubble';
@@ -61,7 +61,7 @@ export const PureBubble: React.FC<
       bubbleNameClassName={classNames?.bubbleNameClassName}
       className={classNames?.bubbleListItemTitleClassName}
       style={styles?.bubbleListItemTitleStyle}
-      prefixClass={cx(`${prefixClass}-bubble-title`)}
+      prefixClass={clsx(`${prefixClass}-bubble-title`)}
       title={avatar?.title || avatar?.name}
       placement={placement}
       time={time}
@@ -170,7 +170,7 @@ export const PureBubble: React.FC<
       }}
     >
       <Flex
-        className={cx(
+        className={clsx(
           hashId,
           className,
           `${prefixClass}-bubble`,
@@ -189,7 +189,7 @@ export const PureBubble: React.FC<
       >
         <div
           style={style}
-          className={cx(
+          className={clsx(
             `${prefixClass}-bubble-container`,
             `${prefixClass}-bubble-container-${placement}`,
             {
@@ -199,7 +199,7 @@ export const PureBubble: React.FC<
           )}
         >
           <div
-            className={cx(
+            className={clsx(
               `${prefixClass}-bubble-avatar-title`,
               `${prefixClass}-bubble-avatar-title-${placement}`,
               `${prefixClass}-bubble-avatar-title-pure`,
@@ -221,7 +221,7 @@ export const PureBubble: React.FC<
               alignItems: isRightPlacement ? 'flex-end' : 'flex-start',
               ...styles?.bubbleListItemContentStyle,
             }}
-            className={cx(
+            className={clsx(
               `${prefixClass}-bubble-content-wrapper`,
               hashId,
               classNames?.bubbleContainerClassName,
@@ -231,7 +231,7 @@ export const PureBubble: React.FC<
             {contentBeforeDom ? (
               <div
                 style={styles?.bubbleListItemExtraStyle}
-                className={cx(
+                className={clsx(
                   `${prefixClass}-bubble-before`,
                   `${prefixClass}-bubble-before-${placement}`,
                   hashId,
@@ -242,7 +242,7 @@ export const PureBubble: React.FC<
               </div>
             ) : null}
             <div
-              className={cx(
+              className={clsx(
                 `${prefixClass}-bubble-content`,
                 `${prefixClass}-bubble-content-${placement}`,
                 `${prefixClass}-bubble-content-pure`,
@@ -285,7 +285,7 @@ export const PureBubble: React.FC<
             title: titleDom,
             header: (
               <div
-                className={cx(
+                className={clsx(
                   `${prefixClass}-bubble-avatar-title`,
                   `${prefixClass}-bubble-avatar-title-${placement}`,
                   `${prefixClass}-bubble-avatar-title-pure`,
