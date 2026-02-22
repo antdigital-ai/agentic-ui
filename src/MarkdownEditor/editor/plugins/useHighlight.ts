@@ -30,7 +30,7 @@ export const clearInlineKatex = (editor: Editor) => {
   inlineMath.forEach((c) => cacheTextNode.delete(c[0]));
 };
 
-const PARAGRAPH_TYPES = new Set(['paragraph', 'table-cell']);
+const PARAGRAPH_TYPES = new Set(['paragraph', 'table-cell', 'head']);
 const highlightNodes = new Set([
   'paragraph',
   'table-cell',
