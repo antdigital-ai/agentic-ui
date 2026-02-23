@@ -114,5 +114,37 @@ describe('useHighlight', () => {
       const grayRange = ranges.find((r: any) => r.color === '#a3a3a3');
       expect(grayRange).toBeDefined();
     });
+
+    it('head 类型中含脚注引用 [^xxx] 时应匹配 fnc 高亮范围', () => {
+      const high = useHighlight(store);
+      const node = {
+        type: 'head',
+        level: 1,
+        children: [{ text: 'Title [^doc]: ref' }],
+      } as any;
+      const path = [0];
+
+      const ranges = high([node, path]);
+
+      const fncRange = ranges.find((r: any) => r.fnc);
+      expect(fncRange).toBeDefined();
+      expect(fncRange.fnc).toBe(true);
+    });
+
+    it('head 类型中含 URL 文本时应匹配链接范围', () => {
+      const high = useHighlight(store);
+      const node = {
+        type: 'head',
+        level: 2,
+        children: [{ text: 'see https://example.com here' }],
+      } as any;
+      const path = [0];
+
+      const ranges = high([node, path]);
+
+      const linkRange = ranges.find((r: any) => r.link);
+      expect(linkRange).toBeDefined();
+      expect(linkRange.link).toContain('example.com');
+    });
   });
 });
