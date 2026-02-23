@@ -77,7 +77,7 @@ describe('withListsPlugin', () => {
         type: 'list-item',
         children: [
           { type: 'paragraph', children: [{ text: 'a' }] },
-          { type: 'paragraph', children: [{ text: 'b' }] },
+          { type: 'heading-one', children: [{ text: 'b' }] },
         ],
       },
     ] as any;

@@ -54,6 +54,8 @@ vi.mock('is-hotkey', () => ({
 
 // Mock 相关模块
 const mockSetOpenInsertCompletion = vi.fn();
+const mockSetOpenJinjaTemplate = vi.fn();
+const mockSetJinjaAnchorPath = vi.fn();
 const mockInsertCompletionText$ = { next: vi.fn() };
 const mockStoreState = {
   openInsertCompletion: false,
@@ -62,7 +64,7 @@ const mockStoreState = {
 };
 
 vi.mock('../../src/MarkdownEditor/editor/store', () => ({
-  useEditorStore: () => mockStoreState,
+  useEditorStore: vi.fn(() => mockStoreState),
 }));
 
 const mockNativeTableShouldHandle = vi.fn(() => false);

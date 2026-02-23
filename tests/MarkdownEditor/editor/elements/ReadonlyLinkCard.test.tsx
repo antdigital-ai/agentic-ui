@@ -110,8 +110,10 @@ describe('ReadonlyLinkCard', () => {
 
   it('点击卡片容器和标题链接都会触发 window.open', () => {
     renderCard({ ...baseElement, finished: true });
-    const container = document.querySelector('[class*="link-card-container"]')!;
-    fireEvent.click(container);
+    const linkCard = document.querySelector('[data-be="link-card"]');
+    const container = linkCard?.querySelector('[class*="__container"]');
+    expect(container).toBeInTheDocument();
+    fireEvent.click(container!);
 
     const link = screen.getByText('Title').closest('a')!;
     fireEvent.click(link);

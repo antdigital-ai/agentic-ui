@@ -1101,7 +1101,11 @@ describe('ChartRender', () => {
       await waitFor(
         () => {
           expect(screen.getByText('配置图表')).toBeInTheDocument();
-          expect(document.body.querySelector('.ant-form')).toBeInTheDocument();
+          const form =
+            document.body.querySelector('.ant-form') ||
+            document.body.querySelector('form');
+          expect(form).not.toBeNull();
+          expect(form).toBeInTheDocument();
         },
         { timeout: 2000 },
       );

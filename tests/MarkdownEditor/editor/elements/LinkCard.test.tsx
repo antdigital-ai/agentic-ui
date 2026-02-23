@@ -316,9 +316,8 @@ describe('LinkCard', () => {
 
     it('点击容器区域应调用 window.open (106-107)', () => {
       render(<LinkCard {...defaultProps} />);
-      const container = document.querySelector(
-        '[class*="link-card-container"]',
-      );
+      const linkCard = document.querySelector('[data-be="link-card"]');
+      const container = linkCard?.querySelector('[class*="__container"]');
       expect(container).toBeInTheDocument();
       fireEvent.click(container!);
       expect(mockWindowOpen).toHaveBeenCalledWith('https://example.com');
