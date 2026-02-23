@@ -23,7 +23,7 @@
             >
               <div
                 aria-describedby="test-id"
-                class="ant-agentic-md-editor-toolbar-item ant-agentic-md-editor-toolbar-item-min-plus-icon"
+                class="ant-agentic-md-editor-toolbar-item ant-agentic-md-editor-toolbar-item--more"
                 role="button"
                 tabindex="-1"
               >
