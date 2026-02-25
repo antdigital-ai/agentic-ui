@@ -276,6 +276,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-tool-content': {
         flex: 1,
+        minWidth: 0,
         fontSize: 'var(--font-size-sm)',
         fontWeight: 'normal',
         lineHeight: '160%',
