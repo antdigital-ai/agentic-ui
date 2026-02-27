@@ -710,7 +710,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         event.clipboardData,
         props,
       );
-      if (result === false) {
+      if (result) {
         return;
       }
     }
