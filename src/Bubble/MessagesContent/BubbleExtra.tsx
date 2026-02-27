@@ -10,7 +10,7 @@ import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
 import { motion } from 'framer-motion';
 
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
 import { useLocale } from '../../I18n';
@@ -249,22 +249,13 @@ export const BubbleExtra = ({
     locale,
   ]);
 
-  const lastCopyTimeRef = useRef<number>(0);
-  const COPY_DEBOUNCE_MS = 300;
-
   const copyDom = useMemo(
     () =>
       shouldShowCopy ? (
         <CopyButton
           data-testid="chat-item-copy-button"
           title={locale?.['chat.message.copy'] || '复制'}
-          onClick={(e) => {
-            e?.stopPropagation?.();
-            const now = Date.now();
-            if (now - lastCopyTimeRef.current < COPY_DEBOUNCE_MS) {
-              return;
-            }
-            lastCopyTimeRef.current = now;
+          onClick={() => {
             try {
               copy(bubble.originData?.content || '');
             } catch (error) {
