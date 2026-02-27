@@ -626,9 +626,11 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
    * @description paste event
    * @param {React.ClipboardEvent<HTMLDivElement>} e
    */
-  const onPaste = async (event: React.ClipboardEvent<HTMLDivElement>) => {
-    await handlePasteEvent(event);
-  };
+  const onPaste = useRefFunction(
+    async (event: React.ClipboardEvent<HTMLDivElement>) => {
+      await handlePasteEvent(event);
+    },
+  );
 
   /**
    * 实际的粘贴处理逻辑
@@ -636,6 +638,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   const handlePasteEvent = async (
     event: React.ClipboardEvent<HTMLDivElement>,
   ) => {
+    event.stopPropagation();
+    event.preventDefault();
     // 检查粘贴配置
     const pasteConfig = props.pasteConfig;
     if (pasteConfig?.enabled === false) {
@@ -705,18 +709,23 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
 
     // 2. 然后尝试处理 HTML
     if (types.includes('text/html') && allowedTypes.includes('text/html')) {
+      event.stopPropagation();
+      event.preventDefault();
       const result = await handleHtmlPaste(
         markdownEditorRef.current,
         event.clipboardData,
         props,
       );
-      if (result === false) {
+
+      if (result) {
         return;
       }
     }
 
     // 3. 处理文件
     if (types.includes('Files') && allowedTypes.includes('Files')) {
+      event.stopPropagation();
+      event.preventDefault();
       if (
         await handleFilesPaste(
           markdownEditorRef.current,
@@ -732,6 +741,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       types.includes('text/markdown') &&
       allowedTypes.includes('text/markdown')
     ) {
+      event.stopPropagation();
+      event.preventDefault();
       const text =
         event.clipboardData?.getData?.('text/markdown')?.trim() || '';
       if (text) {
@@ -745,6 +756,8 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     }
     // 4. 处理纯文本
     if (types.includes('text/plain') && allowedTypes.includes('text/plain')) {
+      event.stopPropagation();
+      event.preventDefault();
       const text = event.clipboardData?.getData?.('text/plain')?.trim() || '';
       if (!text) return;
 

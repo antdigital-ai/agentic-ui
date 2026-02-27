@@ -315,7 +315,7 @@ export function AceEditor({
       } catch (e) {}
     }
 
-    if (value !== codeRef.current) {
+    if (value !== codeRef.current || readonly) {
       if (element) editorRef.current?.setValue(value);
       editorRef.current?.clearSelection();
     }
