@@ -239,9 +239,13 @@ export function AceEditor({
   });
 
   // 初始化 Ace 编辑器（仅在库加载完成后）
+  // 注意： intentionally 不将 editorProps.codeProps 列入依赖，因其对象引用在父组件内容更新时会频繁变化，
+  // 导致编辑器被不必要地销毁重建。codeProps 的配置在初始化时已应用，主题等动态变更由独立 effect 处理。
   useEffect(() => {
     if (process.env.NODE_ENV === 'test') return;
     if (!aceLoaded || !aceModuleRef.current || !dom.current) return;
+
+    const codeProps = editorProps.codeProps || {};
 
     let value = element.value || '';
     if (element.language === 'json') {
@@ -266,13 +270,13 @@ export function AceEditor({
       showPrintMargin: false,
       showLineNumbers: true,
       showGutter: true,
-      ...(editorProps.codeProps || {}),
+      ...codeProps,
     } as Ace.EditorOptions);
 
     editorRef.current = codeEditor;
 
     // 设置主题
-    const theme = editorProps.codeProps?.theme || props.theme || 'github';
+    const theme = codeProps.theme || props.theme || 'github';
     codeEditor.setTheme(`ace/theme/${theme}`);
 
     // 设置语法高亮
@@ -300,8 +304,6 @@ export function AceEditor({
     aceLoaded,
     element.language,
     readonly,
-    editorProps.codeProps,
-    props.theme,
     setupEditorEvents,
   ]);
 
