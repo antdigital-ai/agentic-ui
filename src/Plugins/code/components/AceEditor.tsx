@@ -304,7 +304,6 @@ export function AceEditor({
     aceLoaded,
     element.language,
     readonly,
-    props.theme,
     setupEditorEvents,
   ]);
 
