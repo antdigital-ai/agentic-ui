@@ -15,9 +15,9 @@ const DonutChartStatisticExample: React.FC = () => {
         <DonutChart
           title="环形图统计指标"
           data={data}
-          width={400}
-          height={400}
-          dataTime="2024年数据"
+          width={260}
+          height={200}
+          dataTime="2025年数据"
           statistic={[
             { title: '总销量', value: 100, suffix: '万件' },
             { title: '同比增长', value: 15.8, suffix: '%' },

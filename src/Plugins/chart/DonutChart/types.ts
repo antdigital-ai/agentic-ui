@@ -21,6 +21,8 @@ export interface DonutChartConfig {
   borderColor?: string;
   /** 图表样式：'donut' 为环形图（默认），'pie' 为饼图 */
   chartStyle?: 'donut' | 'pie';
+  /** 是否展示数据标签与指示线：开启后扇区外显示数值/占比及连接线，tooltip 中也会展示原始数值，默认 false */
+  showDataLabels?: boolean;
 }
 
 export interface DonutChartProps extends ChartContainerProps {

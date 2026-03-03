@@ -1,5 +1,73 @@
 import { ArcElement, Plugin } from 'chart.js';
 
+/** 指示线默认长度（像素），需与 datalabels 的 offset 一致，使线头与文案衔接 */
+const DEFAULT_LEADER_LINE_PX = 4;
+
+/** 曲线控制点偏移系数，使指示线呈柔和弧线 */
+const CURVE_OFFSET = 12;
+
+/** 与 datalabels 的 display 阈值一致：占比不超过此不展示标签，也不画指示线 */
+const MIN_PCT_FOR_LABEL = 2;
+
+/**
+ * 数据标签指示线插件：仅在会展示数据标签的扇区上绘制线（与 datalabels display 逻辑一致，避免无线无文案）。
+ * 传入的 lineLength 应与 options.plugins.datalabels.offset 一致。
+ */
+export const createDataLabelsLeaderLinePlugin = (
+  lineLength: number = DEFAULT_LEADER_LINE_PX,
+): Plugin<'doughnut'> => ({
+  id: 'datalabelsLeaderLine',
+  afterDatasetDraw(chart, args) {
+    const { ctx } = chart;
+    const meta = chart.getDatasetMeta(args.index);
+    const dataset = chart.data.datasets?.[args.index];
+    const values = dataset?.data;
+    if (!meta?.data?.length || !values?.length) return;
+
+    const total = (values as number[]).reduce(
+      (s, v) => s + (Number.isFinite(Number(v)) ? Number(v) : 0),
+      0,
+    );
+    if (total <= 0) return;
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0, 25, 61, 0.16)';
+    ctx.lineWidth = 1;
+
+    meta.data.forEach((element, i) => {
+      const val = Number(values[i]);
+      if (!Number.isFinite(val) || (val / total) * 100 < MIN_PCT_FOR_LABEL)
+        return;
+
+      const arc = element as unknown as {
+        x: number;
+        y: number;
+        outerRadius: number;
+        startAngle: number;
+        endAngle: number;
+      };
+      const angle = (arc.startAngle + arc.endAngle) / 2;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      const x1 = arc.x + arc.outerRadius * cos;
+      const y1 = arc.y + arc.outerRadius * sin;
+      const x2 = arc.x + (arc.outerRadius + lineLength) * cos;
+      const y2 = arc.y + (arc.outerRadius + lineLength) * sin;
+      const midX = (x1 + x2) / 2;
+      const midY = (y1 + y2) / 2;
+      const ctrlX = midX + CURVE_OFFSET * -sin;
+      const ctrlY = midY + CURVE_OFFSET * cos;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.quadraticCurveTo(ctrlX, ctrlY, x2, y2);
+      ctx.stroke();
+    });
+
+    ctx.restore();
+  },
+});
+
 export const createCenterTextPlugin = (
   value: number,
   label: string,

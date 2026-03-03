@@ -6,6 +6,7 @@ import {
   Legend,
   Tooltip,
 } from 'chart.js';
+import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import classNames from 'clsx';
 import React, { useContext, useMemo, useRef, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
@@ -30,7 +31,11 @@ import {
   useResponsiveDimensions,
 } from './hooks';
 import LegendView from './Legend';
-import { createBackgroundArcPlugin, createCenterTextPlugin } from './plugins';
+import {
+  createBackgroundArcPlugin,
+  createCenterTextPlugin,
+  createDataLabelsLeaderLinePlugin,
+} from './plugins';
 import { useStyle } from './style';
 import type { DonutChartConfig, DonutChartProps } from './types';
 
@@ -112,7 +117,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
       return undefined;
     }
 
-    ChartJS.register(ArcElement, Tooltip, Legend);
+    ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
     donutChartComponentsRegistered = true;
     return undefined;
   }, []);
@@ -503,6 +508,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
               legend: {
                 display: false,
               },
+              /** 默认不展示扇区上的数值与占比，仅通过 configs[].showDataLabels === true 开启 */
+              datalabels: { display: false },
               tooltip: {
                 enabled: cfg.showTooltip !== false,
                 filter: (tooltipItem) =>
@@ -526,7 +533,10 @@ const DonutChart: React.FC<DonutChartProps> = ({
                       total > 0 && Number.isFinite(val)
                         ? ((val / total) * 100).toFixed(0)
                         : '0';
-                    return `${label}: ${Number.isFinite(val) ? val : raw} (${pct}%)`;
+                    if (cfg.showDataLabels) {
+                      return `${label}: ${Number.isFinite(val) ? val : raw} (${pct}%)`;
+                    }
+                    return `${label} (${pct}%)`;
                   },
                 },
               },
@@ -540,6 +550,57 @@ const DonutChart: React.FC<DonutChartProps> = ({
             },
             layout: {
               padding: isMobile ? 4 : 6,
+            },
+          };
+
+          const dataLabelOffset = isMobile ? 22 : 36;
+          const optionsWithDataLabels: ChartOptions<'doughnut'> = {
+            ...options,
+            ...(cfg.showDataLabels === true &&
+              !isSingleValueMode && {
+                layout: {
+                  ...options.layout,
+                  padding: isMobile ? 36 : 52,
+                },
+              }),
+            plugins: {
+              ...options.plugins,
+              ...(cfg.showDataLabels === true &&
+                !isSingleValueMode && {
+                  datalabels: {
+                    display: (context: Context) => {
+                      const value =
+                        context.dataset?.data?.[context.dataIndex];
+                      const numVal =
+                        typeof value === 'number' ? value : Number(value);
+                      if (!Number.isFinite(numVal) || total <= 0)
+                        return false;
+                      const pct = (numVal / total) * 100;
+                      if (pct < 2) return false;
+                      return true;
+                    },
+                    formatter: (value: number, context: Context) => {
+                      const pct =
+                        total > 0
+                          ? ((value / total) * 100).toFixed(2)
+                          : '0';
+                      const label =
+                        context.chart.data.labels?.[context.dataIndex];
+                      const labelStr =
+                        label !== undefined && label !== null
+                          ? String(label)
+                          : '';
+                      return labelStr ? `${labelStr}: ${pct}%` : `${value} (${pct}%)`;
+                    },
+                    color: isDarkTheme ? '#fff' : '#343A45',
+                    font: { size: isMobile ? 10 : 11, weight: 'normal' },
+                    anchor: 'end',
+                    align: 'end',
+                    offset: dataLabelOffset,
+                    clamp: false,
+                    clip: false,
+                  },
+                }),
             },
           };
 
@@ -614,13 +675,24 @@ const DonutChart: React.FC<DonutChartProps> = ({
                         chartRefs.current[idx] = instance as any;
                       }}
                       data={chartJsData}
-                      options={options}
+                      options={optionsWithDataLabels}
+                      plugins={
+                        cfg.showDataLabels === true && !isSingleValueMode
+                          ? [
+                              createDataLabelsLeaderLinePlugin(dataLabelOffset),
+                              ChartDataLabels,
+                            ]
+                          : []
+                      }
                     />
                   </ChartContainer>
                   {cfg.showLegend && (
                     <LegendView
                       chartData={chartData}
-                      backgroundColors={backgroundColors}
+                      backgroundColors={chartData.map(
+                        (_, i) =>
+                          backgroundColors[i % backgroundColors.length],
+                      )}
                       hiddenDataIndicesByChart={hiddenDataIndicesByChart}
                       chartIndex={idx}
                       onLegendItemClick={(dataIndex) =>
