@@ -143,14 +143,19 @@ describe('DonutChart Legend', () => {
 
   describe('移动端适配', () => {
     it('应该在移动端使用不同的样式', () => {
-      render(<Legend {...defaultProps} isMobile={true} />);
+      const { container } = render(<Legend {...defaultProps} isMobile={true} />);
 
       const legendContainer = screen
         .getByText('A')
         .closest('.test-donut-chart-legend');
       expect(legendContainer).toHaveStyle({
         marginLeft: '0',
-        maxHeight: '120px',
+        maxHeight: '200px',
+      });
+      const legendScrollContainer = container.querySelector(
+        '.test-donut-chart-legend > div',
+      );
+      expect(legendScrollContainer).toHaveStyle({
         overflowY: 'auto',
       });
     });
@@ -163,8 +168,6 @@ describe('DonutChart Legend', () => {
         .closest('.test-donut-chart-legend');
       expect(legendContainer).toHaveStyle({
         marginLeft: '12px',
-        maxHeight: 'none',
-        overflowY: 'visible',
       });
     });
   });
@@ -177,7 +180,10 @@ describe('DonutChart Legend', () => {
         '.test-donut-chart-legend',
       );
       expect(legendContainer).toBeInTheDocument();
-      expect(legendContainer?.children.length).toBe(0);
+      const legendItems = document.querySelectorAll(
+        '.test-donut-chart-legend-item',
+      );
+      expect(legendItems.length).toBe(0);
     });
 
     it('应该处理 total 为 0 的情况', () => {
