@@ -45,6 +45,27 @@ describe('parserMarkdownToSlateNode', () => {
       expect(numericTextNode).toBeUndefined();
     });
 
+    it('should keep $ inside Jinja {{ }} as plain text (system variable)', () => {
+      const markdown = 'Hello {{ $var }} world';
+      const { schema } = parserMarkdownToSlateNode(markdown);
+
+      expect(schema).toHaveLength(1);
+      const paragraph = schema[0] as any;
+      expect(paragraph.type).toBe('paragraph');
+
+      const inlineKatexNode = paragraph.children.find(
+        (child: any) => child?.type === 'inline-katex',
+      );
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('{{ ');
+      expect(textContent).toContain(' }}');
+      expect(textContent).toContain('var');
+    });
+
     it('should keep numeric content wrapped in dollars as plain text', () => {
       const markdown = 'Price is $100$ only.';
       const { schema } = parserMarkdownToSlateNode(markdown);

@@ -5,6 +5,7 @@
 import { Node, Text } from 'slate';
 import stringWidth from 'string-width';
 import { debugInfo } from '../../../Utils/debugUtils';
+import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
 import { ChartNode } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
 import { getMediaType } from '../utils/dom';
@@ -741,7 +742,7 @@ export const isMix = (t: Text) => {
  * - `<a href="{url}">` if `url` is defined.
  */
 const textHtml = (t: Text) => {
-  let str = t.text || '';
+  let str = (t.text || '').split(JINJA_DOLLAR_PLACEHOLDER).join('$');
   if (t.highColor) str = `<span style="color:${t.highColor}">${str}</span>`;
   if (t.code) str = `<code>${str}</code>`;
   if (t.italic) str = `<i>${str}</i>`;
@@ -771,7 +772,12 @@ const textHtml = (t: Text) => {
  */
 const textStyle = (t: Text) => {
   if (!t.text && !t.tag) return '';
-  let str = t?.text?.replace(/(?<!\\)\\/g, '\\').replace(/\n/g, '  \n') || '';
+  let str =
+    (t?.text || '')
+      .split(JINJA_DOLLAR_PLACEHOLDER)
+      .join('$')
+      ?.replace(/(?<!\\)\\/g, '\\')
+      .replace(/\n/g, '  \n') || '';
   let preStr = '',
     afterStr = '';
 
@@ -866,7 +872,7 @@ const composeText = (t: Text, parent: any[]) => {
   const index = siblings?.findIndex((n) => n === t);
   let str = textStyle(t)!;
   if (t?.url) {
-    str = `[${t.text}](${encodeURI(t?.url)})`;
+    str = `[${(t.text || '').split(JINJA_DOLLAR_PLACEHOLDER).join('$')}](${encodeURI(t?.url)})`;
   } else if (isMix(t) && index !== -1) {
     const next = siblings[index + 1];
     if (!str.endsWith(' ') && next && !Node.string(next).startsWith(' ')) {

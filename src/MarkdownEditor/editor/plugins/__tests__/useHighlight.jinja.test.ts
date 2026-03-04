@@ -67,6 +67,18 @@ describe('useHighlight - Jinja', () => {
     expect(commentRanges[0].focus.offset).toBe(20);
   });
 
+  it('returns ranges with jinjaVariable for {{ $var }} (system variable)', () => {
+    const node: Element = {
+      type: 'paragraph',
+      children: [{ text: 'hello {{ $name }} end' }],
+    };
+    const ranges = decorate([node, [0]]);
+    const variableRanges = ranges.filter((r: any) => r.jinjaVariable === true);
+    expect(variableRanges.length).toBeGreaterThanOrEqual(1);
+    expect(variableRanges[0].anchor.offset).toBe(6);
+    expect(variableRanges[0].focus.offset).toBe(17);
+  });
+
   it('returns empty array for non-paragraph node', () => {
     const node: Element = {
       type: 'code',

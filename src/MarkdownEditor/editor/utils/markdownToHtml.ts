@@ -9,9 +9,11 @@ import remarkRehype from 'remark-rehype';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
+import { JINJA_DOLLAR_PLACEHOLDER } from '../parser/constants';
 import {
   convertParagraphToImage,
   fixStrongWithSpecialChars,
+  protectJinjaDollarInText,
 } from '../parser/remarkParse';
 
 // 使用 any 类型避免 hast 类型依赖问题
@@ -199,6 +201,7 @@ export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
     [remarkGfm, { singleTilde: false }],
     fixStrongWithSpecialChars,
     convertParagraphToImage,
+    protectJinjaDollarInText,
     [remarkMath as unknown as Plugin, INLINE_MATH_WITH_SINGLE_DOLLAR],
     [remarkFrontmatter, FRONTMATTER_LANGUAGES],
     [remarkRehypePlugin, { allowDangerousHtml: true }],
@@ -310,8 +313,7 @@ export const markdownToHtml = async (
     const htmlContent = await createMarkdownProcessor(plugins, config).process(
       markdown,
     );
-
-    return String(htmlContent);
+    return String(htmlContent).split(JINJA_DOLLAR_PLACEHOLDER).join('$');
   } catch (error) {
     console.error('Error converting markdown to HTML:', error);
     return '';
@@ -355,7 +357,7 @@ export const markdownToHtmlSync = (
 ): string => {
   try {
     const file = createMarkdownProcessor(plugins, config).processSync(markdown);
-    return String(file);
+    return String(file).split(JINJA_DOLLAR_PLACEHOLDER).join('$');
   } catch (error) {
     console.error('Error converting markdown to HTML:', error);
     return '';
