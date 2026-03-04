@@ -85,6 +85,7 @@
     "is-hotkey": "^0.2.0",
     "json5": "^2.2.3",
     "katex": "^0.16.28",
+    "lodash": "^4.17.23",
     "lodash-es": "^4.17.23",
     "lottie-react": "^2.4.1",
     "mermaid": "^11.12.2",
