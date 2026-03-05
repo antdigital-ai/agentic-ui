@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { useLocale } from '../../../../I18n';
+import { useLocale } from '../../../I18n';
 import { DonutChartData } from './types';
 
 /** 图例每页显示条数，超过则显示分页 */

@@ -10,7 +10,7 @@ import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import classNames from 'clsx';
 import React, { useContext, useMemo, useRef, useState } from 'react';
 
-import { useLocale } from '../../../../I18n';
+import { useLocale } from '../../../I18n';
 import { Doughnut } from 'react-chartjs-2';
 import {
   ChartContainer,
