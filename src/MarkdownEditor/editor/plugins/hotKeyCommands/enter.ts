@@ -342,6 +342,24 @@ export class EnterKey {
       }
     }
     if (parent[0].type === 'list-item') {
+      // 列表为空（仅有一项且该项无内容）时，回车将列表转换为段落
+      const listItemPath = parent[1];
+      const [listNode, listPath] = Editor.parent(this.editor, listItemPath);
+      const isListWithSingleEmptyItem =
+        listNode.children.length === 1 &&
+        Node.string(node[0]) === '' &&
+        !Path.hasPrevious(listItemPath);
+
+      if (isListWithSingleEmptyItem) {
+        e.preventDefault();
+        Transforms.removeNodes(this.editor, { at: listPath });
+        Transforms.insertNodes(this.editor, EditorUtils.p, {
+          at: listPath,
+          select: true,
+        });
+        return true;
+      }
+
       if (isMod(e) || Path.hasPrevious(node[1])) {
         const text = Point.equals(end, sel.focus)
           ? [{ text: '' }]

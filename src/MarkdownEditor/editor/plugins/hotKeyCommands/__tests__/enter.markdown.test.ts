@@ -1,7 +1,7 @@
 import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorStore } from '../../../store';
 import { parserSlateNodeToMarkdown } from '../../../utils';
 import { withMarkdown } from '../../withMarkdown';
@@ -198,6 +198,44 @@ describe('EnterKey - Markdown 输出测试', () => {
       // 嵌套列表应该有缩进
       const nestedLine = lines[nestedIndex];
       expect(nestedLine.trimStart().length).toBeLessThan(nestedLine.length);
+    });
+
+    it('列表为空（仅一项且无内容）时按回车应转换为段落', () => {
+      editor.children = [
+        {
+          type: 'bulleted-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [
+                { type: 'paragraph', children: [{ text: '' }] },
+              ],
+            },
+          ],
+        },
+      ];
+
+      Transforms.select(editor, {
+        anchor: { path: [0, 0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 0, 0], offset: 0 },
+      });
+
+      const mockEvent = {
+        preventDefault: vi.fn(),
+        key: 'Enter',
+        shiftKey: false,
+        ctrlKey: false,
+        metaKey: false,
+      } as any;
+
+      enterKey.run(mockEvent);
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled();
+      expect(editor.children).toHaveLength(1);
+      expect(editor.children[0]).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: '' }],
+      });
     });
   });
 });
