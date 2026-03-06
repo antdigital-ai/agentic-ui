@@ -28,31 +28,42 @@ describe('useHighlight - Jinja', () => {
       (r: any) =>
         r.jinjaVariable === true ||
         r.jinjaTag === true ||
-        r.jinjaComment === true,
+        r.jinjaComment === true ||
+        r.jinjaDelimiter === true ||
+        r.jinjaVariableName === true ||
+        r.jinjaKeyword === true,
     );
     expect(jinjaRanges).toHaveLength(0);
   });
 
-  it('returns ranges with jinjaVariable for {{ }} in paragraph', () => {
+  it('returns ranges with jinjaVariableName/jinjaDelimiter for {{ }} in paragraph', () => {
     const node: Element = {
       type: 'paragraph',
       children: [{ text: 'hello {{ name }} end' }],
     };
     const ranges = decorate([node, [0]]);
-    const variableRanges = ranges.filter((r: any) => r.jinjaVariable === true);
+    const variableRanges = ranges.filter(
+      (r: any) => r.jinjaVariableName === true || r.jinjaVariable === true,
+    );
+    const delimiterRanges = ranges.filter((r: any) => r.jinjaDelimiter === true);
     expect(variableRanges.length).toBeGreaterThanOrEqual(1);
-    expect(variableRanges[0].anchor.offset).toBe(6);
-    expect(variableRanges[0].focus.offset).toBe(16);
+    expect(delimiterRanges.length).toBeGreaterThanOrEqual(2);
+    const nameRange = variableRanges.find((r: any) => r.jinjaVariableName);
+    expect(nameRange).toBeDefined();
+    expect(nameRange!.anchor.offset).toBe(9);
+    expect(nameRange!.focus.offset).toBe(13);
   });
 
-  it('returns ranges with jinjaTag for {% %} in paragraph', () => {
+  it('returns ranges with jinjaKeyword/jinjaDelimiter for {% %} in paragraph', () => {
     const node: Element = {
       type: 'paragraph',
       children: [{ text: '{% if x %}yes{% endif %}' }],
     };
     const ranges = decorate([node, [0]]);
-    const tagRanges = ranges.filter((r: any) => r.jinjaTag === true);
-    expect(tagRanges.length).toBeGreaterThanOrEqual(2);
+    const keywordRanges = ranges.filter((r: any) => r.jinjaKeyword === true);
+    const delimiterRanges = ranges.filter((r: any) => r.jinjaDelimiter === true);
+    expect(keywordRanges.length).toBeGreaterThanOrEqual(2);
+    expect(delimiterRanges.length).toBeGreaterThanOrEqual(4);
   });
 
   it('returns ranges with jinjaComment for {# #} in paragraph', () => {
@@ -67,16 +78,16 @@ describe('useHighlight - Jinja', () => {
     expect(commentRanges[0].focus.offset).toBe(20);
   });
 
-  it('returns ranges with jinjaVariable for {{ $var }} (system variable)', () => {
+  it('returns ranges with jinjaVariableName for {{ $var }} (system variable)', () => {
     const node: Element = {
       type: 'paragraph',
       children: [{ text: 'hello {{ $name }} end' }],
     };
     const ranges = decorate([node, [0]]);
-    const variableRanges = ranges.filter((r: any) => r.jinjaVariable === true);
+    const variableRanges = ranges.filter((r: any) => r.jinjaVariableName === true);
     expect(variableRanges.length).toBeGreaterThanOrEqual(1);
-    expect(variableRanges[0].anchor.offset).toBe(6);
-    expect(variableRanges[0].focus.offset).toBe(17);
+    expect(variableRanges[0].anchor.offset).toBe(9);
+    expect(variableRanges[0].focus.offset).toBe(14);
   });
 
   it('returns empty array for non-paragraph node', () => {
@@ -88,7 +99,7 @@ describe('useHighlight - Jinja', () => {
     expect(ranges).toEqual([]);
   });
 
-  it('returns jinjaTag ranges when paragraph contains inline code (e.g. {% if `x` %})', () => {
+  it('returns jinjaKeyword/jinjaDelimiter ranges when paragraph contains inline code (e.g. {% if `x` %})', () => {
     const node: Element = {
       type: 'paragraph',
       children: [
@@ -98,9 +109,10 @@ describe('useHighlight - Jinja', () => {
       ],
     } as any;
     const ranges = decorate([node, [0]]);
-    const tagRanges = ranges.filter((r: any) => r.jinjaTag === true);
-    expect(tagRanges.length).toBeGreaterThanOrEqual(1);
-    expect(tagRanges[0].anchor.path).toEqual([0, 0]);
-    expect(tagRanges[0].focus.path).toEqual([0, 2]);
+    const keywordRanges = ranges.filter((r: any) => r.jinjaKeyword === true);
+    const delimiterRanges = ranges.filter((r: any) => r.jinjaDelimiter === true);
+    expect(keywordRanges.length).toBeGreaterThanOrEqual(1);
+    expect(delimiterRanges.length).toBeGreaterThanOrEqual(2);
+    expect(keywordRanges.some((r: any) => r.jinjaKeyword === true)).toBe(true);
   });
 });

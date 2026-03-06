@@ -507,7 +507,7 @@
                   </span>
                 </span>
                 <span
-                  class="ant-agentic-md-editor-content-jinja-variable"
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
                   data-be="text"
                   data-slate-leaf="true"
                   draggable="false"
@@ -515,7 +515,76 @@
                   <span
                     data-slate-string="true"
                   >
-                    {{ user.name }}
+                    {{
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-variable-name"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    user
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    .
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-variable-name"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    name
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    }}
                   </span>
                 </span>
               </span>
@@ -541,7 +610,7 @@
                   </span>
                 </span>
                 <span
-                  class="ant-agentic-md-editor-content-jinja-tag"
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
                   data-be="text"
                   data-slate-leaf="true"
                   draggable="false"
@@ -549,7 +618,76 @@
                   <span
                     data-slate-string="true"
                   >
-                    {% if logged_in %}
+                    {%
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-keyword"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    if
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-variable-name"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    logged_in
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    %}
                   </span>
                 </span>
                 <span
@@ -564,7 +702,7 @@
                   </span>
                 </span>
                 <span
-                  class="ant-agentic-md-editor-content-jinja-tag"
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
                   data-be="text"
                   data-slate-leaf="true"
                   draggable="false"
@@ -572,7 +710,53 @@
                   <span
                     data-slate-string="true"
                   >
-                    {% endif %}
+                    {%
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-keyword"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    endif
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    %}
                   </span>
                 </span>
               </span>

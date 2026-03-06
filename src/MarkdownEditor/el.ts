@@ -284,6 +284,13 @@ export type CustomLeaf<T = Record<string, any>> = {
   jinjaVariable?: boolean;
   jinjaTag?: boolean;
   jinjaComment?: boolean;
+  jinjaKeyword?: boolean;
+  jinjaString?: boolean;
+  jinjaNumber?: boolean;
+  jinjaFilter?: boolean;
+  jinjaVariableName?: boolean;
+  jinjaPlaceholder?: boolean;
+  jinjaDelimiter?: boolean;
   selection?: BaseRange;
   id?: string;
   data?: Record<string, any>;

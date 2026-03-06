@@ -494,7 +494,7 @@
                   </span>
                 </span>
                 <span
-                  class="ant-agentic-md-editor-content-jinja-variable"
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
                   data-be="text"
                   data-slate-leaf="true"
                   draggable="false"
@@ -502,7 +502,76 @@
                   <span
                     data-slate-string="true"
                   >
-                    {{ user.name }}
+                    {{
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-variable-name"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    user
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    .
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-variable-name"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    name
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    }}
                   </span>
                 </span>
               </span>
@@ -528,7 +597,7 @@
                   </span>
                 </span>
                 <span
-                  class="ant-agentic-md-editor-content-jinja-tag"
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
                   data-be="text"
                   data-slate-leaf="true"
                   draggable="false"
@@ -536,7 +605,122 @@
                   <span
                     data-slate-string="true"
                   >
-                    {% if count &gt; 0 %}
+                    {%
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-keyword"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    if
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-variable-name"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    count
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    &gt;
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-number"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    0
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    %}
                   </span>
                 </span>
                 <span
@@ -551,7 +735,7 @@
                   </span>
                 </span>
                 <span
-                  class="ant-agentic-md-editor-content-jinja-variable"
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
                   data-be="text"
                   data-slate-leaf="true"
                   draggable="false"
@@ -559,7 +743,53 @@
                   <span
                     data-slate-string="true"
                   >
-                    {{ count }}
+                    {{
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-variable-name"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    count
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    }}
                   </span>
                 </span>
                 <span
@@ -574,7 +804,7 @@
                   </span>
                 </span>
                 <span
-                  class="ant-agentic-md-editor-content-jinja-tag"
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
                   data-be="text"
                   data-slate-leaf="true"
                   draggable="false"
@@ -582,7 +812,53 @@
                   <span
                     data-slate-string="true"
                   >
-                    {% endif %}
+                    {%
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-keyword"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    endif
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    %}
                   </span>
                 </span>
               </span>
@@ -608,7 +884,7 @@
                   </span>
                 </span>
                 <span
-                  class="ant-agentic-md-editor-content-jinja-tag"
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
                   data-be="text"
                   data-slate-leaf="true"
                   draggable="false"
@@ -616,7 +892,122 @@
                   <span
                     data-slate-string="true"
                   >
-                    {% for item in list %}
+                    {%
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-keyword"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    for
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-variable-name"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    item
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-keyword"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    in
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-variable-name"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    list
+                  </span>
+                </span>
+                <span
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                     
+                  </span>
+                </span>
+                <span
+                  class="ant-agentic-md-editor-content-jinja-delimiter"
+                  data-be="text"
+                  data-slate-leaf="true"
+                  draggable="false"
+                >
+                  <span
+                    data-slate-string="true"
+                  >
+                    %}
                   </span>
                 </span>
               </span>
@@ -644,7 +1035,7 @@
                       data-slate-node="text"
                     >
                       <span
-                        class="ant-agentic-md-editor-content-jinja-variable"
+                        class="ant-agentic-md-editor-content-jinja-delimiter"
                         data-be="text"
                         data-slate-leaf="true"
                         draggable="false"
@@ -652,7 +1043,76 @@
                         <span
                           data-slate-string="true"
                         >
-                          {{ item.title }}
+                          {{
+                        </span>
+                      </span>
+                      <span
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                           
+                        </span>
+                      </span>
+                      <span
+                        class="ant-agentic-md-editor-content-jinja-variable-name"
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                          item
+                        </span>
+                      </span>
+                      <span
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                          .
+                        </span>
+                      </span>
+                      <span
+                        class="ant-agentic-md-editor-content-jinja-variable-name"
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                          title
+                        </span>
+                      </span>
+                      <span
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                           
+                        </span>
+                      </span>
+                      <span
+                        class="ant-agentic-md-editor-content-jinja-delimiter"
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                          }}
                         </span>
                       </span>
                       <span
@@ -668,7 +1128,7 @@
                         </span>
                       </span>
                       <span
-                        class="ant-agentic-md-editor-content-jinja-tag"
+                        class="ant-agentic-md-editor-content-jinja-delimiter"
                         data-be="text"
                         data-slate-leaf="true"
                         draggable="false"
@@ -676,7 +1136,53 @@
                         <span
                           data-slate-string="true"
                         >
-                          {% endfor %}
+                          {%
+                        </span>
+                      </span>
+                      <span
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                           
+                        </span>
+                      </span>
+                      <span
+                        class="ant-agentic-md-editor-content-jinja-keyword"
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                          endfor
+                        </span>
+                      </span>
+                      <span
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                           
+                        </span>
+                      </span>
+                      <span
+                        class="ant-agentic-md-editor-content-jinja-delimiter"
+                        data-be="text"
+                        data-slate-leaf="true"
+                        draggable="false"
+                      >
+                        <span
+                          data-slate-string="true"
+                        >
+                          %}
                         </span>
                       </span>
                     </span>

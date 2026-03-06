@@ -157,6 +157,129 @@ const processLinkMatches = (
   return ranges;
 };
 
+/** Jinja 关键字集合 */
+const JINJA_KEYWORDS = new Set([
+  'set', 'if', 'elif', 'else', 'endif', 'for', 'endfor', 'in', 'and', 'or',
+  'not', 'with', 'without', 'true', 'false', 'is', 'none',
+]);
+
+/** 解析 {% %} 标签内部内容，返回子 token 的 [start, end, prop][] */
+const tokenizeJinjaTagContent = (
+  content: string,
+  baseOffset: number,
+): Array<{ start: number; end: number; prop: string }> => {
+  const tokens: Array<{ start: number; end: number; prop: string }> = [];
+  let pos = 0;
+
+  const addToken = (len: number, prop: string) => {
+    if (len > 0) {
+      tokens.push({ start: baseOffset + pos, end: baseOffset + pos + len, prop });
+      pos += len;
+    }
+  };
+
+  while (pos < content.length) {
+    const rest = content.slice(pos);
+
+    // 占位符 $(xxx:yyy)
+    const placeholderMatch = rest.match(/^\$\([^)]+\)/);
+    if (placeholderMatch) {
+      addToken(placeholderMatch[0].length, 'jinjaPlaceholder');
+      continue;
+    }
+
+    // 字符串 '...' 或 "..."
+    const singleStrMatch = rest.match(/^'([^'\\]|\\.)*'/);
+    const doubleStrMatch = rest.match(/^"([^"\\]|\\.)*"/);
+    const strMatch = singleStrMatch || doubleStrMatch;
+    if (strMatch) {
+      addToken(strMatch[0].length, 'jinjaString');
+      continue;
+    }
+
+    // 数字（含小数）
+    const numMatch = rest.match(/^\d+(\.\d+)?/);
+    if (numMatch) {
+      addToken(numMatch[0].length, 'jinjaNumber');
+      continue;
+    }
+
+    // 过滤器 | name
+    const filterMatch = rest.match(/^\|\s*[a-zA-Z_][a-zA-Z0-9_]*/);
+    if (filterMatch) {
+      addToken(filterMatch[0].length, 'jinjaFilter');
+      continue;
+    }
+
+    // 关键字（需与标识符区分）
+    const wordMatch = rest.match(/^[a-zA-Z_][a-zA-Z0-9_]*/);
+    if (wordMatch) {
+      const word = wordMatch[0];
+      addToken(word.length, JINJA_KEYWORDS.has(word) ? 'jinjaKeyword' : 'jinjaVariableName');
+      continue;
+    }
+
+    // 比较运算符（多字符优先）
+    if (rest.startsWith('==') || rest.startsWith('!=') || rest.startsWith('>=') || rest.startsWith('<=')) {
+      addToken(2, 'jinjaDelimiter');
+      continue;
+    }
+    if ('=<>'.includes(rest[0])) {
+      addToken(1, 'jinjaDelimiter');
+      continue;
+    }
+
+    // 其他符号或空格：作为 jinjaDelimiter（括括号等）或跳过
+    pos += 1;
+  }
+  return tokens;
+};
+
+/** 解析 {{ }} 变量块内部，返回子 token（变量名、过滤器、占位符） */
+const tokenizeJinjaVariableContent = (
+  content: string,
+  baseOffset: number,
+): Array<{ start: number; end: number; prop: string }> => {
+  const tokens: Array<{ start: number; end: number; prop: string }> = [];
+  let i = 0;
+
+  while (i < content.length) {
+    const rest = content.slice(i);
+    const ph = rest.match(/^\$\([^)]+\)/);
+    if (ph) {
+      tokens.push({
+        start: baseOffset + i,
+        end: baseOffset + i + ph[0].length,
+        prop: 'jinjaPlaceholder',
+      });
+      i += ph[0].length;
+      continue;
+    }
+    const flt = rest.match(/^\|\s*[a-zA-Z_][a-zA-Z0-9_]*/);
+    if (flt) {
+      tokens.push({
+        start: baseOffset + i,
+        end: baseOffset + i + flt[0].length,
+        prop: 'jinjaFilter',
+      });
+      i += flt[0].length;
+      continue;
+    }
+    const word = rest.match(/^[a-zA-Z_$][a-zA-Z0-9_]*/);
+    if (word) {
+      tokens.push({
+        start: baseOffset + i,
+        end: baseOffset + i + word[0].length,
+        prop: 'jinjaVariableName',
+      });
+      i += word[0].length;
+      continue;
+    }
+    i += 1;
+  }
+  return tokens;
+};
+
 /** 在整段文本上匹配 Jinja，支持被 inline code 分割的语法（如 {% if `x` %}） */
 const processJinjaMatchesOnFullText = (
   fullText: string,
@@ -164,27 +287,63 @@ const processJinjaMatchesOnFullText = (
   children: { text?: string }[],
 ): any[] => {
   const ranges: any[] = [];
-  const collect = (reg: RegExp, prop: string) => {
-    reg.lastIndex = 0;
-    let match: RegExpMatchArray | null;
-    while ((match = reg.exec(fullText)) !== null) {
-      const start = match.index;
-      const matched = match[0];
-      if (typeof start !== 'number' || !matched) continue;
-      const end = start + matched.length;
-      const range = createRangeSpanningChildren(
-        path,
-        children,
-        start,
-        end,
-        { [prop]: true },
-      );
-      if (range) ranges.push(range);
-    }
+
+  const addRange = (start: number, end: number, prop: string) => {
+    const range = createRangeSpanningChildren(path, children, start, end, { [prop]: true });
+    if (range) ranges.push(range);
   };
-  collect(JINJA_VARIABLE_REG, 'jinjaVariable');
-  collect(JINJA_TAG_REG, 'jinjaTag');
-  collect(JINJA_COMMENT_REG, 'jinjaComment');
+
+  // 注释：整块灰色
+  JINJA_COMMENT_REG.lastIndex = 0;
+  let match: RegExpMatchArray | null;
+  while ((match = JINJA_COMMENT_REG.exec(fullText)) !== null) {
+    const start = match.index;
+    const matched = match[0];
+    if (typeof start === 'number' && matched) {
+      addRange(start, start + matched.length, 'jinjaComment');
+    }
+  }
+
+  // 变量 {{ }}：细粒度高亮
+  JINJA_VARIABLE_REG.lastIndex = 0;
+  while ((match = JINJA_VARIABLE_REG.exec(fullText)) !== null) {
+    const start = match.index;
+    const matched = match[0];
+    if (typeof start !== 'number' || !matched) continue;
+    const openLen = 2; // {{
+    const closeLen = 2; // }}
+    const innerStart = start + openLen;
+    const innerEnd = start + matched.length - closeLen;
+    const innerContent = matched.slice(openLen, matched.length - closeLen);
+
+    addRange(start, innerStart, 'jinjaDelimiter');
+    const varTokens = tokenizeJinjaVariableContent(innerContent, innerStart);
+    if (varTokens.length > 0) {
+      varTokens.forEach((t) => addRange(t.start, t.end, t.prop));
+    } else if (innerContent.trim()) {
+      addRange(innerStart, innerEnd, 'jinjaVariableName');
+    }
+    addRange(innerEnd, start + matched.length, 'jinjaDelimiter');
+  }
+
+  // 标签 {% %}：细粒度高亮
+  JINJA_TAG_REG.lastIndex = 0;
+  while ((match = JINJA_TAG_REG.exec(fullText)) !== null) {
+    const start = match.index;
+    const matched = match[0];
+    if (typeof start !== 'number' || !matched) continue;
+    const openLen = 2; // {%
+    const closeLen = 2; // %}
+    const innerStart = start + openLen;
+    const innerEnd = start + matched.length - closeLen;
+    const innerContent = matched.slice(openLen, matched.length - closeLen);
+
+    addRange(start, innerStart, 'jinjaDelimiter');
+    const tagTokens = tokenizeJinjaTagContent(innerContent, innerStart);
+    tagTokens.forEach((t) => addRange(t.start, t.end, t.prop));
+    addRange(innerEnd, start + matched.length, 'jinjaDelimiter');
+  }
+
   return ranges;
 };
 

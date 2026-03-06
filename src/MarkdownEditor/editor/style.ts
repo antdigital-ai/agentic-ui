@@ -523,6 +523,30 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         color: 'var(--color-text-tertiary, rgba(0,0,0,0.25))',
         fontStyle: 'italic',
       },
+      '& &-jinja-keyword': {
+        color: 'var(--color-orange-8, #ee8017)',
+      },
+      '& &-jinja-string': {
+        color: 'var(--color-green-10, #10af74)',
+      },
+      '& &-jinja-number': {
+        color: 'var(--color-primary-10, #066ced)',
+      },
+      '& &-jinja-filter': {
+        color: 'var(--color-primary-8, #689ef0)',
+      },
+      '& &-jinja-variable-name': {
+        color: 'var(--color-primary-control-fill-primary, #1677ff)',
+      },
+      '& &-jinja-placeholder': {
+        color: 'var(--color-primary-control-fill-primary, #1677ff)',
+        backgroundColor: 'var(--color-primary-bg-tip, rgba(0,102,255,0.08))',
+        borderRadius: '2px',
+        padding: '0 2px',
+      },
+      '& &-jinja-delimiter': {
+        color: 'var(--color-text-tertiary, rgba(0,0,0,0.35))',
+      },
       '&:not(:last-child)': {
         marginBottom: '0.5em',
       },

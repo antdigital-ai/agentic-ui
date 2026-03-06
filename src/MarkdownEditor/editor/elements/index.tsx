@@ -508,6 +508,48 @@ const MLeafComponent = (
       `${mdEditorBaseClass}-jinja-comment`,
     );
   }
+  if (leaf.jinjaKeyword) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-keyword`,
+    );
+  }
+  if (leaf.jinjaString) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-string`,
+    );
+  }
+  if (leaf.jinjaNumber) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-number`,
+    );
+  }
+  if (leaf.jinjaFilter) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-filter`,
+    );
+  }
+  if (leaf.jinjaVariableName) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-variable-name`,
+    );
+  }
+  if (leaf.jinjaPlaceholder) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-placeholder`,
+    );
+  }
+  if (leaf.jinjaDelimiter) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-delimiter`,
+    );
+  }
   if (leaf.current) {
     style.background = '#f59e0b';
   }
