@@ -427,10 +427,13 @@ describe('SlateTable', () => {
     });
 
     it('非最后一列设置固定 width', () => {
-      const element = makeTableElement([['a', 'b']], { colWidths: [80, 90] });
+      // columnCount >= 3 时才会创建 data col（TABLE_COL_WIDTH_MIN_COLUMNS）
+      const element = makeTableElement([['a', 'b', 'c']], {
+        colWidths: [80, 90, 100],
+      });
       const { container } = renderSlateTable(element);
       const cols = container.querySelectorAll('col');
-      // cols[1] 是第一列（非最后列）
+      // cols[1] 是第一列数据列（非最后列）
       expect(cols[1].style.width).toBe('80px');
       expect(cols[1].style.minWidth).toBe('80px');
     });
@@ -462,11 +465,13 @@ describe('SlateTable', () => {
       containerDiv.appendChild(contentDiv);
       mocks.storeState.markdownContainerRef = { current: containerDiv };
 
-      // 768 - 32 - 12 = 724, 但容器是 400, 所以 400 - 32 - 12 = 356 < 768
-      const element = makeTableElement([['a', 'b']]);
+      // columnCount >= 3 时才会创建 data col（TABLE_COL_WIDTH_MIN_COLUMNS）
+      // 400 - 32 - 12 = 356 < 768 触发 mobile layout
+      const element = makeTableElement([['a', 'b', 'c']]);
       const { container } = renderSlateTable(element);
       const cols = container.querySelectorAll('col');
-      expect(cols.length).toBe(3);
+      // 行号列 + 3 数据列
+      expect(cols.length).toBe(4);
     });
   });
 });
