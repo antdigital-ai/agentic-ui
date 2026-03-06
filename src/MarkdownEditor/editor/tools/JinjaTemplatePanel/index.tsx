@@ -1,3 +1,4 @@
+import { CloseOutlined } from '@ant-design/icons';
 import { Info } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
@@ -9,33 +10,42 @@ import { ReactEditor } from 'slate-react';
 import { useLocale } from '../../../../I18n';
 import type { JinjaTemplateItem } from '../../../types';
 import { useEditorStore } from '../../store';
-import { getOffsetLeft } from '../../utils/dom';
 import { EditorUtils } from '../../utils/editorUtils';
 import { JINJA_PANEL_PREFIX_CLS, useJinjaTemplatePanelStyle } from './style';
 import { getJinjaTemplateData, JINJA_DOC_LINK } from './templates';
 
 const PANEL_MAX_HEIGHT = 320;
+const PANEL_MIN_WIDTH = 240;
 
 function getPosition(nodeEl: HTMLElement): {
   left: number;
   top?: number;
   bottom?: number;
+  position: 'fixed';
 } {
   const rect = nodeEl.getBoundingClientRect();
-  const left = getOffsetLeft(nodeEl, document.body) + 0;
-  const top = rect.bottom + window.scrollY;
+  const viewportWidth = document.documentElement.clientWidth;
   const viewportHeight = document.documentElement.clientHeight;
   const spaceBelow = viewportHeight - rect.bottom;
-  if (spaceBelow < PANEL_MAX_HEIGHT && rect.top > PANEL_MAX_HEIGHT) {
-    return { left, bottom: viewportHeight - rect.top };
+  const spaceAbove = rect.top;
+
+  let left = rect.left;
+  left = Math.max(0, Math.min(left, viewportWidth - PANEL_MIN_WIDTH));
+
+  if (spaceBelow < PANEL_MAX_HEIGHT && spaceAbove > PANEL_MAX_HEIGHT) {
+    return {
+      left,
+      bottom: Math.min(viewportHeight - rect.top, viewportHeight - PANEL_MAX_HEIGHT),
+      position: 'fixed',
+    };
   }
-  return { left, top };
+  const top = Math.min(rect.bottom, viewportHeight - PANEL_MAX_HEIGHT);
+  return { left, top, position: 'fixed' };
 }
 
 export const JinjaTemplatePanel: React.FC = () => {
   const {
     markdownEditorRef,
-    markdownContainerRef,
     openJinjaTemplate,
     setOpenJinjaTemplate,
     jinjaAnchorPath,
@@ -65,7 +75,8 @@ export const JinjaTemplatePanel: React.FC = () => {
     left: number;
     top?: number;
     bottom?: number;
-  }>({ left: 0 });
+    position: 'fixed';
+  }>({ left: 0, position: 'fixed' });
   const domRef = useRef<HTMLDivElement>(null);
 
   const context = React.useContext(ConfigProvider.ConfigContext);
@@ -130,7 +141,7 @@ export const JinjaTemplatePanel: React.FC = () => {
         }
       }
     } catch {
-      setPosition({ left: 0 });
+      setPosition({ left: 0, position: 'fixed' });
     }
   }, [openJinjaTemplate, jinjaAnchorPath, markdownEditorRef]);
 
@@ -201,11 +212,11 @@ export const JinjaTemplatePanel: React.FC = () => {
   );
 
   useEffect(() => {
-    const container = markdownContainerRef?.current;
-    if (!container) return;
-    container.addEventListener('keydown', keydown);
-    return () => container.removeEventListener('keydown', keydown);
-  }, [markdownContainerRef, keydown]);
+    if (!openJinjaTemplate) return;
+    const handleKeydown = (e: KeyboardEvent) => keydown(e);
+    document.addEventListener('keydown', handleKeydown);
+    return () => document.removeEventListener('keydown', handleKeydown);
+  }, [openJinjaTemplate, keydown]);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -220,7 +231,7 @@ export const JinjaTemplatePanel: React.FC = () => {
       aria-label="Jinja template list"
       className={classNames(prefixCls, hashId)}
       style={{
-        position: 'absolute',
+        position: position.position,
         zIndex: 9999,
         left: position.left,
         top: position.top,
@@ -233,18 +244,33 @@ export const JinjaTemplatePanel: React.FC = () => {
           <div className={`${prefixCls}-title`}>
             {locale['jinja.panel.title']}
           </div>
-          {docLink ? (
-            <div
-              className={`${prefixCls}-doc-link`}
+          <div className={`${prefixCls}-header-actions`}>
+            {docLink ? (
+              <div
+                className={`${prefixCls}-doc-link`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.open(docLink, '_blank');
+                }}
+              >
+                <Info />
+                {locale['jinja.panel.docLink']}
+              </div>
+            ) : null}
+            <button
+              type="button"
+              className={`${prefixCls}-close`}
               onClick={(e) => {
                 e.preventDefault();
-                window.open(docLink, '_blank');
+                e.stopPropagation();
+                close();
               }}
+              aria-label={locale['jinja.panel.close']}
+              title={locale['jinja.panel.close']}
             >
-              <Info />
-              {locale['jinja.panel.docLink']}
-            </div>
-          ) : null}
+              <CloseOutlined />
+            </button>
+          </div>
         </div>
 
         <div className={`${prefixCls}-list-box`}>

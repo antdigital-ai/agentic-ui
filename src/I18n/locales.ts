@@ -408,6 +408,7 @@ export const cnLabels = {
   // Jinja 模板面板相关
   'jinja.panel.title': 'Jinja 模板',
   'jinja.panel.docLink': '使用说明',
+  'jinja.panel.close': '关闭',
   'jinja.panel.noTemplates': '暂无模板',
   'jinja.template.variableInterpolation.title': '变量插值',
   'jinja.template.variableInterpolation.description': '{{ variable }}',
@@ -839,6 +840,7 @@ export const enLabels: typeof cnLabels = {
   // Jinja template panel related
   'jinja.panel.title': 'Jinja Templates',
   'jinja.panel.docLink': 'Documentation',
+  'jinja.panel.close': 'Close',
   'jinja.panel.noTemplates': 'No templates',
   'jinja.template.variableInterpolation.title': 'Variable interpolation',
   'jinja.template.variableInterpolation.description': '{{ variable }}',
