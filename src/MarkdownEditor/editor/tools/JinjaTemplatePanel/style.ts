@@ -34,6 +34,28 @@ const genJinjaPanelStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        flexShrink: 0,
+      },
+      '&-header-actions': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+      },
+      '&-close': {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+        margin: -4,
+        border: 'none',
+        background: 'transparent',
+        cursor: 'pointer',
+        color: 'var(--color-gray-text-light, var(--ant-color-text-secondary))',
+        borderRadius: token.borderRadiusSM,
+        '&:hover': {
+          color: 'var(--color-gray-text-default, var(--ant-color-text))',
+          backgroundColor: token.colorFillTertiary,
+        },
       },
       '&-title': {
         font: 'var(--font-text-body-emphasized-sm)',

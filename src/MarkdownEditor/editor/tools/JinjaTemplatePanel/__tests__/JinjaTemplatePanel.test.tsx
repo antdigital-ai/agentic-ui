@@ -18,10 +18,6 @@ vi.mock('react-dom', async () => {
   };
 });
 
-vi.mock('../../../utils/dom', () => ({
-  getOffsetLeft: vi.fn(() => 0),
-}));
-
 vi.mock('../../../utils/editorUtils', () => ({
   EditorUtils: { focus: vi.fn() },
 }));
@@ -85,6 +81,27 @@ describe('JinjaTemplatePanel', () => {
     expect(screen.getByText('变量插值')).toBeInTheDocument();
     expect(screen.getByText('条件语句')).toBeInTheDocument();
     expect(screen.getByText('循环遍历')).toBeInTheDocument();
+  });
+
+  it('close button calls setOpenJinjaTemplate and setJinjaAnchorPath when clicked', async () => {
+    const user = (await import('@testing-library/user-event')).default;
+    vi.mocked(useEditorStore).mockReturnValue({
+      ...defaultStore,
+      openJinjaTemplate: true,
+      jinjaAnchorPath: [0],
+    } as any);
+
+    render(
+      <I18nProvide>
+        <JinjaTemplatePanel />
+      </I18nProvide>,
+    );
+
+    const closeButton = screen.getByRole('button', { name: '关闭' });
+    await user.click(closeButton);
+
+    expect(defaultStore.setOpenJinjaTemplate).toHaveBeenCalledWith(false);
+    expect(defaultStore.setJinjaAnchorPath).toHaveBeenCalledWith(null);
   });
 
   it('renders notFoundContent when items are empty and config provides it', () => {
