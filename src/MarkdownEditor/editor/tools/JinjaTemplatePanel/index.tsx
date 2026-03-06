@@ -67,6 +67,7 @@ export const JinjaTemplatePanel: React.FC = () => {
     bottom?: number;
   }>({ left: 0 });
   const domRef = useRef<HTMLDivElement>(null);
+  const openTimeRef = useRef<number>(0);
 
   const context = React.useContext(ConfigProvider.ConfigContext);
   const prefixCls =
@@ -84,6 +85,10 @@ export const JinjaTemplatePanel: React.FC = () => {
     (e: Event) => {
       const target = e.target as HTMLElement;
       if (domRef.current && !domRef.current.contains(target)) {
+        // 忽略弹窗打开后短时间内的点击，避免「点击聚焦编辑器后快速输入 {}」
+        // 触发的陈旧 click 事件立即关闭弹窗
+        const elapsed = Date.now() - openTimeRef.current;
+        if (elapsed < 150) return;
         close();
       }
     },
@@ -137,6 +142,7 @@ export const JinjaTemplatePanel: React.FC = () => {
   useEffect(() => {
     if (!openJinjaTemplate) return;
     if (typeof window === 'undefined') return;
+    openTimeRef.current = Date.now();
     window.addEventListener('click', handleClickOutside);
     return () => window.removeEventListener('click', handleClickOutside);
   }, [openJinjaTemplate, handleClickOutside]);
