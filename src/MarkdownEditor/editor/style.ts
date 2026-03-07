@@ -13,6 +13,21 @@ import { TAG_STYLES } from './tagStyles';
 const COMMENT_HIGHLIGHT_COLOR =
   'var(--agentic-comment-highlight-color, rgba(21, 0, 255, 0.15))';
 
+/** Jinja 语法高亮 CSS 变量名，在 .ant-agentic-md-editor-content 上覆盖即可定制 */
+const JINJA_CSS_VAR = {
+  variable: '--agentic-md-editor-color-jinja-variable',
+  tag: '--agentic-md-editor-color-jinja-tag',
+  comment: '--agentic-md-editor-color-jinja-comment',
+  keyword: '--agentic-md-editor-color-jinja-keyword',
+  string: '--agentic-md-editor-color-jinja-string',
+  number: '--agentic-md-editor-color-jinja-number',
+  filter: '--agentic-md-editor-color-jinja-filter',
+  variableName: '--agentic-md-editor-color-jinja-variable-name',
+  placeholder: '--agentic-md-editor-color-jinja-placeholder',
+  placeholderBg: '--agentic-md-editor-color-jinja-placeholder-bg',
+  delimiter: '--agentic-md-editor-color-jinja-delimiter',
+} as const;
+
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     // 拖拽手柄样式
@@ -157,6 +172,21 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       whiteSpace: 'pre-wrap',
       wordWrap: 'break-word',
       fontSize: '15px',
+      // Jinja 语法高亮，仅通过 CSS 变量定制（在 .ant-agentic-md-editor-content 上覆盖）
+      [JINJA_CSS_VAR.variable]:
+        'var(--color-primary-control-fill-primary, #1677ff)',
+      [JINJA_CSS_VAR.tag]: 'var(--color-orange-6, #d46b08)',
+      [JINJA_CSS_VAR.comment]: 'var(--color-text-tertiary, rgba(0,0,0,0.25))',
+      [JINJA_CSS_VAR.keyword]: '#5c4033',
+      [JINJA_CSS_VAR.string]: 'var(--color-green-10, #10af74)',
+      [JINJA_CSS_VAR.number]: 'var(--color-primary-10, #066ced)',
+      [JINJA_CSS_VAR.filter]: 'var(--color-primary-8, #689ef0)',
+      [JINJA_CSS_VAR.variableName]: 'var(--color-green-10, #10af74)',
+      [JINJA_CSS_VAR.placeholder]:
+        'var(--color-primary-control-fill-primary, #1677ff)',
+      [JINJA_CSS_VAR.placeholderBg]:
+        'var(--color-primary-bg-tip, rgba(0,102,255,0.08))',
+      [JINJA_CSS_VAR.delimiter]: '#d4b84b',
       '::-webkit-scrollbar': { width: '8px', height: '8px' },
       '::-webkit-scrollbar-thumb': {
         backgroundColor: 'var(--color-gray-text-tertiary)',
@@ -514,38 +544,38 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         color: 'rgba(0,0,0,0.45)',
       },
       '& &-jinja-variable': {
-        color: 'var(--color-primary-control-fill-primary, #1677ff)',
+        color: `var(${JINJA_CSS_VAR.variable})`,
       },
       '& &-jinja-tag': {
-        color: 'var(--color-orange-6, #d46b08)',
+        color: `var(${JINJA_CSS_VAR.tag})`,
       },
       '& &-jinja-comment': {
-        color: 'var(--color-text-tertiary, rgba(0,0,0,0.25))',
+        color: `var(${JINJA_CSS_VAR.comment})`,
         fontStyle: 'italic',
       },
       '& &-jinja-keyword': {
-        color: 'var(--color-orange-8, #ee8017)',
+        color: `var(${JINJA_CSS_VAR.keyword})`,
       },
       '& &-jinja-string': {
-        color: 'var(--color-green-10, #10af74)',
+        color: `var(${JINJA_CSS_VAR.string})`,
       },
       '& &-jinja-number': {
-        color: 'var(--color-primary-10, #066ced)',
+        color: `var(${JINJA_CSS_VAR.number})`,
       },
       '& &-jinja-filter': {
-        color: 'var(--color-primary-8, #689ef0)',
+        color: `var(${JINJA_CSS_VAR.filter})`,
       },
       '& &-jinja-variable-name': {
-        color: 'var(--color-primary-control-fill-primary, #1677ff)',
+        color: `var(${JINJA_CSS_VAR.variableName})`,
       },
       '& &-jinja-placeholder': {
-        color: 'var(--color-primary-control-fill-primary, #1677ff)',
-        backgroundColor: 'var(--color-primary-bg-tip, rgba(0,102,255,0.08))',
+        color: `var(${JINJA_CSS_VAR.placeholder})`,
+        backgroundColor: `var(${JINJA_CSS_VAR.placeholderBg})`,
         borderRadius: '2px',
         padding: '0 2px',
       },
       '& &-jinja-delimiter': {
-        color: 'var(--color-text-tertiary, rgba(0,0,0,0.35))',
+        color: `var(${JINJA_CSS_VAR.delimiter})`,
       },
       '&:not(:last-child)': {
         marginBottom: '0.5em',
