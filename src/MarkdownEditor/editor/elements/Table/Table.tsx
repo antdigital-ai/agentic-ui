@@ -96,7 +96,9 @@ export const SlateTable = ({
     const isMobileLayout = containerWidth <= mobileBreakpointValue;
     const minColumnWidth = isMobileLayout ? MOBILE_TABLE_MIN_COLUMN_WIDTH : 60;
     const maxColumnWidth = isMobileLayout ? containerWidth : containerWidth / 4;
-    const rowsToSample = Math.min(5, tableRows.length);
+    // 至少采样 3 行用于列宽计算（若有 3 行以上），不足 3 行时自动使用全部可用行
+    const rowsToSample =
+      tableRows.length >= 3 ? Math.min(5, tableRows.length) : tableRows.length;
 
     // 一次性计算宽度
     const calculatedWidths = Array.from(
