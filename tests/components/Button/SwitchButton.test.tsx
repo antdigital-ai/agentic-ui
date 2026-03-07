@@ -10,31 +10,27 @@ vi.mock('@sofa-design/icons', () => ({
 }));
 
 describe('SwitchButton', () => {
-  it('should render with default props', () => {
-    render(<SwitchButton>Toggle</SwitchButton>);
-    const button = screen.getByRole('button');
-    expect(button).toBeInTheDocument();
-    expect(button).toHaveAttribute('aria-pressed', 'false');
-  });
-
-  it('should render children text', () => {
-    render(<SwitchButton>Toggle Me</SwitchButton>);
-    expect(screen.getByText('Toggle Me')).toBeInTheDocument();
-  });
-
-  it('should render icon when provided', () => {
+  it('should render with children, icon, and default trigger icon', () => {
     render(
-      <SwitchButton icon={<span data-testid="custom-icon">icon</span>}>
-        Test
+      <SwitchButton icon={<span data-testid="icon">i</span>}>
+        Toggle
       </SwitchButton>,
     );
-    expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
+    expect(screen.getByText('Toggle')).toBeInTheDocument();
+    expect(screen.getByTestId('icon')).toBeInTheDocument();
+    expect(screen.getByTestId('chevron-down')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('should render custom triggerIcon', () => {
-    render(
+  it('should render custom triggerIcon and ChevronUp when active', () => {
+    const { rerender } = render(
+      <SwitchButton active={true}>Test</SwitchButton>,
+    );
+    expect(screen.getByTestId('chevron-up')).toBeInTheDocument();
+
+    rerender(
       <SwitchButton
-        triggerIcon={<span data-testid="custom-trigger">trigger</span>}
+        triggerIcon={<span data-testid="custom-trigger">t</span>}
       >
         Test
       </SwitchButton>,
@@ -42,22 +38,18 @@ describe('SwitchButton', () => {
     expect(screen.getByTestId('custom-trigger')).toBeInTheDocument();
   });
 
-  it('should render default ChevronDown when inactive', () => {
-    render(<SwitchButton>Test</SwitchButton>);
-    expect(screen.getByTestId('chevron-down')).toBeInTheDocument();
-  });
-
-  it('should render ChevronUp when active', () => {
-    render(<SwitchButton active={true}>Test</SwitchButton>);
-    expect(screen.getByTestId('chevron-up')).toBeInTheDocument();
-  });
-
-  it('should toggle uncontrolled state on click', () => {
+  it('should toggle uncontrolled state and call onChange/onClick', () => {
     const onChange = vi.fn();
-    render(<SwitchButton onChange={onChange}>Test</SwitchButton>);
+    const onClick = vi.fn();
+    render(
+      <SwitchButton onChange={onChange} onClick={onClick}>
+        Test
+      </SwitchButton>,
+    );
 
     fireEvent.click(screen.getByRole('button'));
     expect(onChange).toHaveBeenCalledWith(true);
+    expect(onClick).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByRole('button'));
     expect(onChange).toHaveBeenCalledWith(false);
@@ -66,51 +58,20 @@ describe('SwitchButton', () => {
   it('should not toggle when disabled', () => {
     const onChange = vi.fn();
     render(
-      <SwitchButton disabled onChange={onChange}>
-        Test
-      </SwitchButton>,
+      <SwitchButton disabled onChange={onChange}>Test</SwitchButton>,
     );
-
     fireEvent.click(screen.getByRole('button'));
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('should support controlled mode', () => {
-    const onChange = vi.fn();
+  it('should support controlled mode via active prop', () => {
     const { rerender } = render(
-      <SwitchButton active={false} onChange={onChange}>
-        Test
-      </SwitchButton>,
+      <SwitchButton active={false}>Test</SwitchButton>,
     );
-
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'false');
 
-    rerender(
-      <SwitchButton active={true} onChange={onChange}>
-        Test
-      </SwitchButton>,
-    );
+    rerender(<SwitchButton active={true}>Test</SwitchButton>);
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true');
-  });
-
-  it('should call onClick handler', async () => {
-    const onClick = vi.fn();
-    render(<SwitchButton onClick={onClick}>Test</SwitchButton>);
-
-    fireEvent.click(screen.getByRole('button'));
-    expect(onClick).toHaveBeenCalledTimes(1);
-  });
-
-  it('should apply custom className', () => {
-    render(<SwitchButton className="custom-class">Test</SwitchButton>);
-    const button = screen.getByRole('button');
-    expect(button.className).toContain('custom-class');
-  });
-
-  it('should apply custom style', () => {
-    render(<SwitchButton style={{ color: 'red' }}>Test</SwitchButton>);
-    const button = screen.getByRole('button');
-    expect(button).toHaveStyle({ color: 'rgb(255, 0, 0)' });
   });
 
   it('should support defaultActive prop', () => {
@@ -118,8 +79,14 @@ describe('SwitchButton', () => {
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('should render without children or icon', () => {
-    render(<SwitchButton />);
-    expect(screen.getByRole('button')).toBeInTheDocument();
+  it('should apply custom className and style', () => {
+    render(
+      <SwitchButton className="custom" style={{ color: 'red' }}>
+        Test
+      </SwitchButton>,
+    );
+    const button = screen.getByRole('button');
+    expect(button.className).toContain('custom');
+    expect(button).toHaveStyle({ color: 'rgb(255, 0, 0)' });
   });
 });

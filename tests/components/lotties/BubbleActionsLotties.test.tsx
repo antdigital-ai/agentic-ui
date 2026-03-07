@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { CopyLottie } from '../../../src/Components/lotties/bubble-actions/Copy';
 import { DislikeLottie } from '../../../src/Components/lotties/bubble-actions/Dislike';
 import { LikeLottie } from '../../../src/Components/lotties/bubble-actions/Like';
@@ -52,45 +52,27 @@ const lottieComponents = [
 ];
 
 describe.each(lottieComponents)('$name', ({ Component }) => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('should render with default props', () => {
+  it('should render with animation data and aria-hidden', () => {
     render(<Component />);
     const el = screen.getByTestId('lottie-animation');
-    expect(el).toBeInTheDocument();
     expect(el).toHaveAttribute('data-animation', 'loaded');
     expect(el).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('should render with custom size', () => {
-    render(<Component size={48} />);
+  it('should apply size, className, style, active, loop, autoplay', () => {
+    render(
+      <Component
+        size={48}
+        className="test-cls"
+        style={{ opacity: 0.5 }}
+        active={true}
+        loop={true}
+        autoplay={true}
+      />,
+    );
     const el = screen.getByTestId('lottie-animation');
-    expect(el).toHaveStyle({ width: '48px', height: '48px' });
-  });
-
-  it('should render with active prop', () => {
-    render(<Component active={true} />);
-    const el = screen.getByTestId('lottie-animation');
-    expect(el).toBeInTheDocument();
-  });
-
-  it('should render with custom className', () => {
-    render(<Component className="test-class" />);
-    const el = screen.getByTestId('lottie-animation');
-    expect(el.className).toContain('test-class');
-  });
-
-  it('should render with custom style', () => {
-    render(<Component style={{ opacity: 0.5 }} />);
-    const el = screen.getByTestId('lottie-animation');
-    expect(el).toHaveStyle({ opacity: '0.5' });
-  });
-
-  it('should render with loop and autoplay', () => {
-    render(<Component loop={true} autoplay={true} />);
-    const el = screen.getByTestId('lottie-animation');
+    expect(el).toHaveStyle({ width: '48px', height: '48px', opacity: '0.5' });
+    expect(el.className).toContain('test-cls');
     expect(el).toHaveAttribute('data-loop', 'true');
     expect(el).toHaveAttribute('data-autoplay', 'true');
   });

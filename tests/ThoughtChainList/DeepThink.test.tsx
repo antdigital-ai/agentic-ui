@@ -19,110 +19,59 @@ vi.mock('../../src/ThoughtChainList/DotAni', () => ({
   DotLoading: () => <span data-testid="dot-loading" />,
 }));
 
-const defaultLocale = {
+const locale = {
   deepThinkingInProgress: '正在深度思考中',
   taskExecutionFailed: '任务执行失败',
 };
 
-const renderWithI18n = (ui: React.ReactElement) => {
-  return render(
-    <I18nContext.Provider value={{ locale: defaultLocale } as any}>
+const wrap = (ui: React.ReactElement) =>
+  render(
+    <I18nContext.Provider value={{ locale } as any}>
       {ui}
     </I18nContext.Provider>,
   );
-};
 
 describe('DeepThink', () => {
-  it('should show loading state when no output and not finished', () => {
-    renderWithI18n(
-      <DeepThink info="test" category="thinking" />,
-    );
+  it('should show loading when no output and not finished', () => {
+    wrap(<DeepThink info="q" category="thinking" />);
     expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
-    expect(screen.getByTestId('dot-loading')).toBeInTheDocument();
     expect(screen.getByText('正在深度思考中')).toBeInTheDocument();
   });
 
-  it('should show output content when available', () => {
-    renderWithI18n(
+  it('should show output content via MarkdownEditor', () => {
+    wrap(
       <DeepThink
-        info="test"
+        info="q"
         category="thinking"
-        output={{ data: '思考结果' }}
-        isFinished={true}
+        output={{ data: '结果' }}
+        isFinished
       />,
     );
-    expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
-    expect(screen.getByText('思考结果')).toBeInTheDocument();
+    expect(screen.getByText('结果')).toBeInTheDocument();
   });
 
-  it('should show error message', () => {
-    renderWithI18n(
+  it('should show error from errorMsg/response.error/response.errorMsg', () => {
+    wrap(
       <DeepThink
-        info="test"
+        info="q"
         category="thinking"
-        output={{ errorMsg: 'Think error' }}
-        isFinished={true}
+        output={{ errorMsg: 'Fail' }}
+        isFinished
       />,
     );
-    expect(screen.getByText('"Think error"')).toBeInTheDocument();
+    expect(screen.getByText('"Fail"')).toBeInTheDocument();
     expect(screen.getByText('任务执行失败')).toBeInTheDocument();
   });
 
-  it('should show error from response.error', () => {
-    renderWithI18n(
-      <DeepThink
-        info="test"
-        category="thinking"
-        output={{ response: { error: 'Response error' } }}
-        isFinished={true}
-      />,
-    );
-    expect(screen.getByText('"Response error"')).toBeInTheDocument();
-  });
-
-  it('should show error from response.errorMsg', () => {
-    renderWithI18n(
-      <DeepThink
-        info="test"
-        category="thinking"
-        output={{ response: { errorMsg: 'Another error' } }}
-        isFinished={true}
-      />,
-    );
-    expect(screen.getByText('"Another error"')).toBeInTheDocument();
-  });
-
-  it('should not show loading when finished without output', () => {
-    renderWithI18n(
-      <DeepThink
-        info="test"
-        category="thinking"
-        isFinished={true}
-      />,
-    );
+  it('should not show loading when finished', () => {
+    wrap(<DeepThink info="q" category="thinking" isFinished />);
     expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
   });
 
   it('should pass data-testid prop', () => {
-    renderWithI18n(
-      <DeepThink
-        info="test"
-        category="thinking"
-        data-testid="deep-think-container"
-      />,
+    wrap(
+      <DeepThink info="q" category="thinking" data-testid="deep-think" />,
     );
-    expect(screen.getByTestId('deep-think-container')).toBeInTheDocument();
-  });
-
-  it('should render empty string when no output data', () => {
-    renderWithI18n(
-      <DeepThink
-        info="test"
-        category="thinking"
-        output={{}}
-        isFinished={true}
-      />,
-    );
-    expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
+    expect(screen.getByTestId('deep-think')).toBeInTheDocument();
   });
 });

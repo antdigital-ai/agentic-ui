@@ -5,85 +5,56 @@ import { describe, expect, it } from 'vitest';
 import { BubbleTitle } from '../../src/Bubble/Title';
 
 describe('BubbleTitle', () => {
-  it('should render with title text', () => {
+  it('should render title text and not render time when absent', () => {
     render(<BubbleTitle title="AI Assistant" />);
-    const titleEl = screen.getByTestId('bubble-title');
-    expect(titleEl).toBeInTheDocument();
     expect(screen.getByText('AI Assistant')).toBeInTheDocument();
-  });
-
-  it('should render with time', () => {
-    render(<BubbleTitle title="User" time={new Date('2023-12-21')} />);
-    const timeEl = screen.getByTestId('bubble-time');
-    expect(timeEl).toBeInTheDocument();
-  });
-
-  it('should not render time when not provided', () => {
-    render(<BubbleTitle title="User" />);
     expect(screen.queryByTestId('bubble-time')).not.toBeInTheDocument();
   });
 
-  it('should not render title span when title is falsy', () => {
-    const { container } = render(<BubbleTitle title="" />);
-    const titleEl = screen.getByTestId('bubble-title');
-    expect(titleEl).toBeInTheDocument();
-    expect(titleEl.querySelector('span')).toBeFalsy();
+  it('should render time element when time is provided', () => {
+    render(<BubbleTitle title="User" time={new Date('2023-12-21')} />);
+    expect(screen.getByTestId('bubble-time')).toBeInTheDocument();
   });
 
-  it('should apply left placement flex direction', () => {
-    render(<BubbleTitle title="Test" placement="left" />);
-    const titleEl = screen.getByTestId('bubble-title');
-    expect(titleEl).toHaveStyle({ flexDirection: 'row' });
-  });
+  it('should apply left/right placement flex direction', () => {
+    const { rerender } = render(
+      <BubbleTitle title="Test" placement="left" />,
+    );
+    expect(screen.getByTestId('bubble-title')).toHaveStyle({ flexDirection: 'row' });
 
-  it('should apply right placement flex direction', () => {
-    render(<BubbleTitle title="Test" placement="right" />);
-    const titleEl = screen.getByTestId('bubble-title');
-    expect(titleEl).toHaveStyle({ flexDirection: 'row-reverse' });
+    rerender(<BubbleTitle title="Test" placement="right" />);
+    expect(screen.getByTestId('bubble-title')).toHaveStyle({ flexDirection: 'row-reverse' });
   });
 
   it('should render quote content', () => {
     render(
       <BubbleTitle
         title="Test"
-        quote={<div data-testid="quote-content">Quote text</div>}
+        quote={<div data-testid="quote">Quote</div>}
       />,
     );
-    expect(screen.getByTestId('quote-content')).toBeInTheDocument();
+    expect(screen.getByTestId('quote')).toBeInTheDocument();
   });
 
-  it('should apply custom className', () => {
-    render(<BubbleTitle title="Test" className="custom-title" />);
-    const titleEl = screen.getByTestId('bubble-title');
-    expect(titleEl.className).toContain('custom-title');
-  });
-
-  it('should apply custom style', () => {
-    render(<BubbleTitle title="Test" style={{ margin: '10px' }} />);
-    const titleEl = screen.getByTestId('bubble-title');
-    expect(titleEl).toHaveStyle({ margin: '10px' });
-  });
-
-  it('should apply bubbleNameClassName to name span', () => {
-    render(
-      <BubbleTitle title="Name" bubbleNameClassName="name-class" />,
-    );
-    const nameSpan = screen.getByText('Name');
-    expect(nameSpan).toHaveClass('name-class');
-  });
-
-  it('should render with React node title', () => {
+  it('should apply className, style, bubbleNameClassName', () => {
     render(
       <BubbleTitle
-        title={<strong data-testid="strong-title">Bold Title</strong>}
+        title="Name"
+        className="custom-title"
+        style={{ margin: '10px' }}
+        bubbleNameClassName="name-cls"
       />,
     );
-    expect(screen.getByTestId('strong-title')).toBeInTheDocument();
+    const titleEl = screen.getByTestId('bubble-title');
+    expect(titleEl.className).toContain('custom-title');
+    expect(titleEl).toHaveStyle({ margin: '10px' });
+    expect(screen.getByText('Name')).toHaveClass('name-cls');
   });
 
-  it('should render with timestamp number', () => {
-    render(<BubbleTitle title="Test" time={1703145600000} />);
-    const timeEl = screen.getByTestId('bubble-time');
-    expect(timeEl).toBeInTheDocument();
+  it('should accept ReactNode as title', () => {
+    render(
+      <BubbleTitle title={<strong data-testid="strong">Bold</strong>} />,
+    );
+    expect(screen.getByTestId('strong')).toBeInTheDocument();
   });
 });

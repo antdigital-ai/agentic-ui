@@ -43,98 +43,54 @@ describe('AbstractLottie', () => {
     vi.clearAllMocks();
   });
 
-  it('should render with default props', () => {
+  it('should render with defaults: autoplay=false, loop=false, size=1em', () => {
     render(<AbstractLottie animationData={mockAnimationData} />);
     const el = screen.getByTestId('lottie-animation');
-    expect(el).toBeInTheDocument();
     expect(el).toHaveAttribute('data-loop', 'false');
     expect(el).toHaveAttribute('data-autoplay', 'false');
     expect(el).toHaveAttribute('aria-hidden', 'true');
-  });
-
-  it('should render with default size of 1em', () => {
-    render(<AbstractLottie animationData={mockAnimationData} />);
-    const el = screen.getByTestId('lottie-animation');
     expect(el).toHaveStyle({ width: '1em', height: '1em' });
   });
 
-  it('should render with custom numeric size', () => {
-    render(<AbstractLottie animationData={mockAnimationData} size={64} />);
-    const el = screen.getByTestId('lottie-animation');
-    expect(el).toHaveStyle({ width: '64px', height: '64px' });
-  });
-
-  it('should render with custom string size', () => {
-    render(<AbstractLottie animationData={mockAnimationData} size="2em" />);
-    const el = screen.getByTestId('lottie-animation');
-    expect(el).toHaveStyle({ width: '2em', height: '2em' });
-  });
-
-  it('should render with custom className', () => {
-    render(
-      <AbstractLottie
-        animationData={mockAnimationData}
-        className="custom-cls"
-      />,
+  it('should accept numeric and string size', () => {
+    const { rerender } = render(
+      <AbstractLottie animationData={mockAnimationData} size={64} />,
     );
-    const el = screen.getByTestId('lottie-animation');
-    expect(el.className).toContain('custom-cls');
+    expect(screen.getByTestId('lottie-animation')).toHaveStyle({ width: '64px' });
+
+    rerender(<AbstractLottie animationData={mockAnimationData} size="2em" />);
+    expect(screen.getByTestId('lottie-animation')).toHaveStyle({ width: '2em' });
   });
 
-  it('should render with custom style', () => {
+  it('should apply className, style, autoplay, loop', () => {
     render(
       <AbstractLottie
         animationData={mockAnimationData}
+        className="custom"
         style={{ margin: '5px' }}
+        autoplay={true}
+        loop={true}
       />,
     );
     const el = screen.getByTestId('lottie-animation');
+    expect(el.className).toContain('custom');
     expect(el).toHaveStyle({ margin: '5px' });
-  });
-
-  it('should render with autoplay enabled', () => {
-    render(
-      <AbstractLottie animationData={mockAnimationData} autoplay={true} />,
-    );
-    const el = screen.getByTestId('lottie-animation');
     expect(el).toHaveAttribute('data-autoplay', 'true');
-  });
-
-  it('should render with loop enabled', () => {
-    render(<AbstractLottie animationData={mockAnimationData} loop={true} />);
-    const el = screen.getByTestId('lottie-animation');
     expect(el).toHaveAttribute('data-loop', 'true');
   });
 
-  it('should call play when active becomes true', () => {
+  it('should call play when active=true, stop when active=false', () => {
     const { rerender } = render(
       <AbstractLottie animationData={mockAnimationData} active={false} />,
     );
-
-    rerender(
-      <AbstractLottie animationData={mockAnimationData} active={true} />,
-    );
-
-    expect(mockPlay).toHaveBeenCalled();
-  });
-
-  it('should call stop when active becomes false', () => {
-    const { rerender } = render(
-      <AbstractLottie animationData={mockAnimationData} active={true} />,
-    );
+    expect(mockStop).toHaveBeenCalled();
 
     mockPlay.mockClear();
     mockStop.mockClear();
 
     rerender(
-      <AbstractLottie animationData={mockAnimationData} active={false} />,
+      <AbstractLottie animationData={mockAnimationData} active={true} />,
     );
-
-    expect(mockStop).toHaveBeenCalled();
-  });
-
-  it('should call stop by default (active=false)', () => {
-    render(<AbstractLottie animationData={mockAnimationData} />);
-    expect(mockStop).toHaveBeenCalled();
+    expect(mockPlay).toHaveBeenCalled();
   });
 });

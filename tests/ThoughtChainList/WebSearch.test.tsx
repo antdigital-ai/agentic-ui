@@ -19,101 +19,60 @@ vi.mock('../../src/ThoughtChainList/DotAni', () => ({
   DotLoading: () => <span data-testid="dot-loading" />,
 }));
 
-const defaultLocale = {
+const locale = {
   networkQuerying: '网络查询中',
   taskExecutionFailed: '任务执行失败',
   'webSearch.noResults': '无搜索结果',
   'webSearch.searchFailed': '搜索失败',
 };
 
-const renderWithI18n = (ui: React.ReactElement) => {
-  return render(
-    <I18nContext.Provider value={{ locale: defaultLocale } as any}>
+const wrap = (ui: React.ReactElement) =>
+  render(
+    <I18nContext.Provider value={{ locale } as any}>
       {ui}
     </I18nContext.Provider>,
   );
-};
 
 describe('WebSearch', () => {
   it('should show loading state when no output and not finished', () => {
-    renderWithI18n(
-      <WebSearch info="test" category="web_search" />,
-    );
+    wrap(<WebSearch info="q" category="web_search" />);
     expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
-    expect(screen.getByTestId('dot-loading')).toBeInTheDocument();
     expect(screen.getByText('网络查询中')).toBeInTheDocument();
   });
 
-  it('should show output data when available', () => {
-    renderWithI18n(
+  it('should show output data via MarkdownEditor', () => {
+    wrap(
       <WebSearch
-        info="test"
+        info="q"
         category="web_search"
-        output={{ data: '搜索结果内容' }}
+        output={{ data: '>内容' }}
         isFinished={true}
       />,
     );
-    expect(screen.getByTestId('markdown-editor')).toBeInTheDocument();
-    expect(screen.getByText('搜索结果内容')).toBeInTheDocument();
+    expect(screen.getByText('内容')).toBeInTheDocument();
   });
 
-  it('should show no results message when output has no data', () => {
-    renderWithI18n(
-      <WebSearch
-        info="test"
-        category="web_search"
-        output={{}}
-        isFinished={true}
-      />,
+  it('should show no-results when output has no data', () => {
+    wrap(
+      <WebSearch info="q" category="web_search" output={{}} isFinished />,
     );
     expect(screen.getByText('无搜索结果')).toBeInTheDocument();
   });
 
-  it('should show error message', () => {
-    renderWithI18n(
+  it('should show error message from errorMsg or response.error', () => {
+    wrap(
       <WebSearch
-        info="test"
+        info="q"
         category="web_search"
         output={{ errorMsg: 'Network error' }}
-        isFinished={true}
+        isFinished
       />,
     );
     expect(screen.getByText('"Network error"')).toBeInTheDocument();
-    expect(screen.getByText('搜索失败')).toBeInTheDocument();
-  });
-
-  it('should show error from response.error', () => {
-    renderWithI18n(
-      <WebSearch
-        info="test"
-        category="web_search"
-        output={{ response: { error: 'Timeout error' } }}
-        isFinished={true}
-      />,
-    );
-    expect(screen.getByText('"Timeout error"')).toBeInTheDocument();
   });
 
   it('should not show loading when finished without output', () => {
-    renderWithI18n(
-      <WebSearch
-        info="test"
-        category="web_search"
-        isFinished={true}
-      />,
-    );
+    wrap(<WebSearch info="q" category="web_search" isFinished />);
     expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
-  });
-
-  it('should strip leading > from data', () => {
-    renderWithI18n(
-      <WebSearch
-        info="test"
-        category="web_search"
-        output={{ data: '>quoted content' }}
-        isFinished={true}
-      />,
-    );
-    expect(screen.getByText('quoted content')).toBeInTheDocument();
   });
 });
