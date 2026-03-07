@@ -244,19 +244,31 @@ const renderButtonGroup = ({
     taskStatus === TASK_STATUS.STOPPED ||
     taskStatus === TASK_STATUS.CANCELLED
   ) {
-    if (onCreateNewTask) {
-      actionNode = (
-        <Button
-          type="primary"
-          onClick={onCreateNewTask}
-          icon={<PlusOutlined />}
-          color="default"
-          variant="solid"
-        >
-          {locale?.agentRunBar?.createNewTask}
-        </Button>
-      );
-    }
+    actionNode = (
+      <>
+        {onViewResult && (
+          <Button
+            onClick={onViewResult}
+            color="default"
+            variant="solid"
+            autoInsertSpace={false}
+          >
+            {locale?.agentRunBar?.submitTask}
+          </Button>
+        )}
+        {onCreateNewTask && (
+          <Button
+            type="primary"
+            onClick={onCreateNewTask}
+            icon={<PlusOutlined />}
+            color="default"
+            variant="solid"
+          >
+            {locale?.agentRunBar?.createNewTask}
+          </Button>
+        )}
+      </>
+    );
   }
   // 任务已完成状态
   else if (
@@ -300,6 +312,16 @@ const renderButtonGroup = ({
         {onReplay && (
           <Button onClick={onReplay} variant="solid" autoInsertSpace={false}>
             {locale?.agentRunBar?.replayTask}
+          </Button>
+        )}
+        {onViewResult && (
+          <Button
+            onClick={onViewResult}
+            color="default"
+            variant="solid"
+            autoInsertSpace={false}
+          >
+            {locale?.agentRunBar?.submitTask}
           </Button>
         )}
         {onCreateNewTask && (
