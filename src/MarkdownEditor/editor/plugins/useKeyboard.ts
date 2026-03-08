@@ -258,9 +258,11 @@ export const useKeyboard = (
           } else {
             const strAfterKey = str + (e.key.length === 1 ? e.key : '');
             // 在实际输入一个字符且补全 trigger 时打开面板，支持在文本后输入（如 "hello {}"）
+            // IME 组合期间不触发，避免输入法选字时误触发或失效
             if (
               jinjaTemplatePanelEnabled &&
               e.key.length === 1 &&
+              !e.nativeEvent?.isComposing &&
               strAfterKey.endsWith(jinjaTrigger) &&
               setOpenJinjaTemplate &&
               setJinjaAnchorPath
