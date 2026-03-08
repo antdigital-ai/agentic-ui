@@ -12,8 +12,15 @@ import { useStyle } from './style';
 
 const LOADING_SIZE = 16;
 
-const buildClassName = (...args: Parameters<typeof classNames>) =>
-  classNames(...args);
+const COLLAPSE_VARIANTS = {
+  expanded: { height: 'auto', opacity: 1 },
+  collapsed: { height: 0, opacity: 0 },
+};
+
+const COLLAPSE_TRANSITION = {
+  height: { duration: 0.26, ease: [0.4, 0, 0.2, 1] },
+  opacity: { duration: 0.2, ease: 'linear' },
+};
 
 const hasTaskContent = (content: React.ReactNode | React.ReactNode[]) => {
   if (Array.isArray(content)) {
@@ -69,7 +76,7 @@ const StatusIcon: React.FC<{
     success: <SuccessFill />,
     loading: <Loading size={LOADING_SIZE} />,
     pending: (
-      <div className={buildClassName(`${prefixCls}-status-idle`, hashId)}>
+      <div className={classNames(`${prefixCls}-status-idle`, hashId)}>
         <CircleDashed />
       </div>
     ),
@@ -78,7 +85,7 @@ const StatusIcon: React.FC<{
 
   return (
     <div
-      className={buildClassName(
+      className={classNames(
         `${prefixCls}-status`,
         `${prefixCls}-status-${status}`,
         hashId,
@@ -107,7 +114,6 @@ const TaskListItem: React.FC<TaskListItemProps> = memo(
     const isCollapsed = !expandedKeys.includes(item.key);
     const hasContent = hasTaskContent(item.content);
 
-    // 使用 useCallback 优化切换处理函数
     const handleToggle = useCallback(() => {
       onToggle(item.key);
     }, [item.key, onToggle]);
@@ -116,41 +122,14 @@ const TaskListItem: React.FC<TaskListItemProps> = memo(
       ? locale?.['taskList.expand'] || '展开'
       : locale?.['taskList.collapse'] || '收起';
 
-    const contentVariants = useMemo(
-      () => ({
-        expanded: {
-          height: 'auto',
-          opacity: 1,
-        },
-        collapsed: {
-          height: 0,
-          opacity: 0,
-        },
-      }),
-      [],
-    );
-
-    const contentTransition = useMemo(
-      () => ({
-        height: {
-          duration: 0.26,
-          ease: [0.4, 0, 0.2, 1],
-        },
-        opacity: {
-          duration: 0.2,
-          ease: 'linear',
-        },
-      }),
-      [],
-    );
     return (
       <div
         key={item.key}
-        className={buildClassName(`${prefixCls}-thoughtChainItem`, hashId)}
+        className={classNames(`${prefixCls}-thoughtChainItem`, hashId)}
         data-testid="task-list-thoughtChainItem"
       >
         <div
-          className={buildClassName(`${prefixCls}-left`, hashId)}
+          className={classNames(`${prefixCls}-left`, hashId)}
           onClick={handleToggle}
           data-testid="task-list-left"
         >
@@ -159,29 +138,26 @@ const TaskListItem: React.FC<TaskListItemProps> = memo(
             prefixCls={prefixCls}
             hashId={hashId}
           />
-          <div className={buildClassName(`${prefixCls}-content-left`, hashId)}>
+          <div className={classNames(`${prefixCls}-content-left`, hashId)}>
             {!isLast && (
               <div
-                className={buildClassName(`${prefixCls}-dash-line`, hashId)}
+                className={classNames(`${prefixCls}-dash-line`, hashId)}
                 data-testid="task-list-dash-line"
               />
             )}
           </div>
         </div>
-        <div className={buildClassName(`${prefixCls}-right`, hashId)}>
+        <div className={classNames(`${prefixCls}-right`, hashId)}>
           <div
-            className={buildClassName(`${prefixCls}-top`, hashId)}
+            className={classNames(`${prefixCls}-top`, hashId)}
             onClick={handleToggle}
           >
-            <div className={buildClassName(`${prefixCls}-title`, hashId)}>
+            <div className={classNames(`${prefixCls}-title`, hashId)}>
               {item.title}
             </div>
             {hasContent && (
               <div
-                className={buildClassName(
-                  `${prefixCls}-arrowContainer`,
-                  hashId,
-                )}
+                className={classNames(`${prefixCls}-arrowContainer`, hashId)}
                 onClick={handleToggle}
                 data-testid="task-list-arrowContainer"
               >
@@ -200,14 +176,14 @@ const TaskListItem: React.FC<TaskListItemProps> = memo(
             {!isCollapsed && (
               <motion.div
                 key="task-content"
-                variants={contentVariants}
+                variants={COLLAPSE_VARIANTS}
                 initial="collapsed"
                 animate="expanded"
                 exit="collapsed"
-                transition={contentTransition}
-                className={buildClassName(`${prefixCls}-body`, hashId)}
+                transition={COLLAPSE_TRANSITION}
+                className={classNames(`${prefixCls}-body`, hashId)}
               >
-                <div className={buildClassName(`${prefixCls}-content`, hashId)}>
+                <div className={classNames(`${prefixCls}-content`, hashId)}>
                   {item.content}
                 </div>
               </motion.div>
@@ -228,131 +204,12 @@ const getDefaultExpandedKeys = (
   return isControlled ? [] : items.map((item) => item.key);
 };
 
-const getTaskSummary = (items: TaskItem[]) => {
-  const completedCount = items.filter((item) => item.status === 'success').length;
-  const loadingItem = items.find((item) => item.status === 'loading');
-  const errorItem = items.find((item) => item.status === 'error');
-  const hasRunning = !!loadingItem;
-  const hasError = !!errorItem;
-  const allDone = completedCount === items.length && items.length > 0;
-
-  return { completedCount, loadingItem, errorItem, hasRunning, hasError, allDone };
-};
-
-interface SimpleTaskListBarProps {
-  items: TaskItem[];
-  prefixCls: string;
-  hashId: string;
-  expanded: boolean;
-  onToggle: () => void;
-}
-
-const SimpleTaskListBar: React.FC<SimpleTaskListBarProps> = memo(
-  ({ items, prefixCls, hashId, expanded, onToggle }) => {
-    const { locale } = useContext(I18nContext);
-    const { completedCount, loadingItem, hasRunning, hasError, allDone } =
-      useMemo(() => getTaskSummary(items), [items]);
-
-    const simpleCls = `${prefixCls}-simple`;
-
-    const summaryStatus: TaskStatus = allDone
-      ? 'success'
-      : hasError
-        ? 'error'
-        : hasRunning
-          ? 'loading'
-          : 'pending';
-
-    const summaryText = useMemo(() => {
-      if (allDone) {
-        return locale?.['taskList.taskComplete'] || '任务完成';
-      }
-      if (loadingItem?.title) {
-        const template =
-          locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
-        return template.replace('${taskName}', String(loadingItem.title));
-      }
-      if (hasError) {
-        return locale?.['taskList.taskAborted'] || '任务已取消';
-      }
-      return locale?.['taskList.taskList'] || '任务列表';
-    }, [allDone, loadingItem, hasError, locale]);
-
-    const progressText = `${completedCount}/${items.length}`;
-
-    const arrowTitle = expanded
-      ? locale?.['taskList.collapse'] || '收起'
-      : locale?.['taskList.expand'] || '展开';
-
-    return (
-      <div
-        className={buildClassName(simpleCls, hashId)}
-        onClick={onToggle}
-        role="button"
-        tabIndex={0}
-        aria-expanded={expanded}
-        aria-label={arrowTitle}
-        data-testid="task-list-simple-bar"
-      >
-        <div className={buildClassName(`${simpleCls}-status`, hashId)}>
-          <StatusIcon
-            status={summaryStatus}
-            prefixCls={prefixCls}
-            hashId={hashId}
-          />
-        </div>
-        <div className={buildClassName(`${simpleCls}-text`, hashId)}>
-          {summaryText}
-        </div>
-        <div className={buildClassName(`${simpleCls}-progress`, hashId)}>
-          {progressText}
-        </div>
-        <div className={buildClassName(`${simpleCls}-arrow`, hashId)}>
-          <ActionIconBox
-            title={arrowTitle}
-            iconStyle={getArrowRotation(!expanded)}
-            loading={false}
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle();
-            }}
-          >
-            <ChevronUp data-testid="task-list-simple-arrow" />
-          </ActionIconBox>
-        </div>
-      </div>
-    );
-  },
-);
-
-SimpleTaskListBar.displayName = 'SimpleTaskListBar';
-
 /**
  * TaskList 组件
  *
  * 显示任务列表，支持展开/折叠、状态管理等功能
  * 支持受控和非受控两种模式
  * 支持 variant="simple" 模式，将列表收起为紧凑的摘要条
- *
- * @example
- * ```tsx
- * // 非受控模式
- * <TaskList
- *   items={[
- *     { key: 'task1', title: '任务1', content: '内容', status: 'success' }
- *   ]}
- * />
- *
- * // 受控模式
- * <TaskList
- *   items={tasks}
- *   expandedKeys={expandedKeys}
- *   onExpandedKeysChange={setExpandedKeys}
- * />
- *
- * // Simple 模式
- * <TaskList items={tasks} variant="simple" />
- * ```
  */
 export const TaskList = memo(
   ({
@@ -365,6 +222,7 @@ export const TaskList = memo(
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('task-list');
     const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { locale } = useContext(I18nContext);
 
     const isControlled = expandedKeys !== undefined;
     const defaultKeys = getDefaultExpandedKeys(items, isControlled);
@@ -392,80 +250,118 @@ export const TaskList = memo(
       setSimpleExpanded((prev) => !prev);
     }, []);
 
-    if (variant === 'simple') {
-      const contentVariants = {
-        expanded: { height: 'auto', opacity: 1 },
-        collapsed: { height: 0, opacity: 0 },
-      };
+    const { summaryStatus, summaryText, progressText } = useMemo(() => {
+      const completedCount = items.filter((i) => i.status === 'success').length;
+      const loadingItem = items.find((i) => i.status === 'loading');
+      const hasError = items.some((i) => i.status === 'error');
+      const allDone = completedCount === items.length && items.length > 0;
 
-      const contentTransition = {
-        height: { duration: 0.26, ease: [0.4, 0, 0.2, 1] as const },
-        opacity: { duration: 0.2, ease: 'linear' as const },
-      };
+      let status: TaskStatus = 'pending';
+      let text = locale?.['taskList.taskList'] || '任务列表';
 
-      return wrapSSR(
-        <div
-          className={buildClassName(
-            `${prefixCls}-simple-wrapper`,
-            hashId,
-            className,
-          )}
-          data-testid="task-list-simple-wrapper"
-        >
-          <SimpleTaskListBar
-            items={items}
-            prefixCls={prefixCls}
-            hashId={hashId}
-            expanded={simpleExpanded}
-            onToggle={handleSimpleToggle}
-          />
-          <AnimatePresence initial={false}>
-            {simpleExpanded && (
-              <motion.div
-                key="simple-task-list-content"
-                variants={contentVariants}
-                initial="collapsed"
-                animate="expanded"
-                exit="collapsed"
-                transition={contentTransition}
-                className={buildClassName(
-                  `${prefixCls}-simple-content`,
-                  hashId,
-                )}
-              >
-                <div className={buildClassName(`${prefixCls}-simple-list`, hashId)}>
-                  {items.map((item, index) => (
-                    <TaskListItem
-                      key={item.key}
-                      item={item}
-                      isLast={index === items.length - 1}
-                      prefixCls={prefixCls}
-                      hashId={hashId}
-                      expandedKeys={internalExpandedKeys}
-                      onToggle={handleToggle}
-                    />
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>,
-      );
+      if (allDone) {
+        status = 'success';
+        text = locale?.['taskList.taskComplete'] || '任务完成';
+      } else if (loadingItem?.title) {
+        status = 'loading';
+        const tpl =
+          locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
+        text = tpl.replace('${taskName}', String(loadingItem.title));
+      } else if (hasError) {
+        status = 'error';
+        text = locale?.['taskList.taskAborted'] || '任务已取消';
+      }
+
+      return {
+        summaryStatus: status,
+        summaryText: text,
+        progressText: `${completedCount}/${items.length}`,
+      };
+    }, [items, locale]);
+
+    const renderItems = () =>
+      items.map((item, index) => (
+        <TaskListItem
+          key={item.key}
+          item={item}
+          isLast={index === items.length - 1}
+          prefixCls={prefixCls}
+          hashId={hashId}
+          expandedKeys={internalExpandedKeys}
+          onToggle={handleToggle}
+        />
+      ));
+
+    if (variant !== 'simple') {
+      return wrapSSR(<div className={className}>{renderItems()}</div>);
     }
 
+    const simpleCls = `${prefixCls}-simple`;
+    const simpleArrowTitle = simpleExpanded
+      ? locale?.['taskList.collapse'] || '收起'
+      : locale?.['taskList.expand'] || '展开';
+
     return wrapSSR(
-      <div className={className}>
-        {items.map((item, index) => (
-          <TaskListItem
-            key={item.key}
-            item={item}
-            isLast={index === items.length - 1}
-            prefixCls={prefixCls}
-            hashId={hashId}
-            expandedKeys={internalExpandedKeys}
-            onToggle={handleToggle}
-          />
-        ))}
+      <div
+        className={classNames(`${simpleCls}-wrapper`, hashId, className)}
+        data-testid="task-list-simple-wrapper"
+      >
+        {/* 摘要条 */}
+        <div
+          className={classNames(simpleCls, hashId)}
+          onClick={handleSimpleToggle}
+          role="button"
+          tabIndex={0}
+          aria-expanded={simpleExpanded}
+          aria-label={simpleArrowTitle}
+          data-testid="task-list-simple-bar"
+        >
+          <div className={classNames(`${simpleCls}-status`, hashId)}>
+            <StatusIcon
+              status={summaryStatus}
+              prefixCls={prefixCls}
+              hashId={hashId}
+            />
+          </div>
+          <div className={classNames(`${simpleCls}-text`, hashId)}>
+            {summaryText}
+          </div>
+          <div className={classNames(`${simpleCls}-progress`, hashId)}>
+            {progressText}
+          </div>
+          <div className={classNames(`${simpleCls}-arrow`, hashId)}>
+            <ActionIconBox
+              title={simpleArrowTitle}
+              iconStyle={getArrowRotation(!simpleExpanded)}
+              loading={false}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSimpleToggle();
+              }}
+            >
+              <ChevronUp data-testid="task-list-simple-arrow" />
+            </ActionIconBox>
+          </div>
+        </div>
+
+        {/* 展开的任务列表 */}
+        <AnimatePresence initial={false}>
+          {simpleExpanded && (
+            <motion.div
+              key="simple-task-list-content"
+              variants={COLLAPSE_VARIANTS}
+              initial="collapsed"
+              animate="expanded"
+              exit="collapsed"
+              transition={COLLAPSE_TRANSITION}
+              className={classNames(`${simpleCls}-content`, hashId)}
+            >
+              <div className={classNames(`${simpleCls}-list`, hashId)}>
+                {renderItems()}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>,
     );
   },
