@@ -29,6 +29,8 @@ group:
 | expandedKeys         | 受控模式：当前展开的任务项 key 数组 | `string[]`                         | -           | -      |
 | onExpandedKeysChange | 受控模式：展开状态变化时的回调函数  | `(expandedKeys: string[]) => void` | -           | -      |
 | variant              | 组件变体，`simple` 模式将任务列表收起为紧凑的单行摘要条 | `'default' \| 'simple'`  | `'default'` | 2.31.0 |
+| open                 | `simple` 模式下摘要条是否展开（受控） | `boolean`                | -           | 2.31.0 |
+| onOpenChange         | `simple` 模式下摘要条展开状态变化回调 | `(open: boolean) => void`| -           | 2.31.0 |
 
 ### TaskItem
 

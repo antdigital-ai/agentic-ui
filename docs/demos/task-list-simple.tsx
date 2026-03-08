@@ -1,10 +1,12 @@
 import { TaskList, ToolUseBar } from '@ant-design/agentic-ui';
+import { Button, Space } from 'antd';
 import React, { useState } from 'react';
 
 type TaskStatus = 'success' | 'pending';
 
 export default () => {
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
   const [items] = useState([
     {
       key: '1',
@@ -66,8 +68,17 @@ export default () => {
 
   return (
     <div style={{ padding: 24, maxWidth: 480 }}>
-      <h3>Simple 模式 - 紧凑摘要条</h3>
-      <TaskList items={items} variant="simple" />
+      <Space style={{ marginBottom: 16 }}>
+        <Button onClick={() => setOpen(!open)}>
+          {open ? '收起' : '展开'}
+        </Button>
+      </Space>
+      <TaskList
+        items={items}
+        variant="simple"
+        open={open}
+        onOpenChange={setOpen}
+      />
     </div>
   );
 };

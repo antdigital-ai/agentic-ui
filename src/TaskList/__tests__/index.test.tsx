@@ -828,5 +828,87 @@ describe('TaskList', () => {
       expect(bar).toBeInTheDocument();
       expect(screen.getByText('0/0')).toBeInTheDocument();
     });
+
+    describe('受控 open/onOpenChange', () => {
+      it('open=true 时应展开任务列表', () => {
+        render(
+          <TaskList items={simpleItems} variant="simple" open={true} />,
+        );
+
+        expect(screen.getByText('Completed Task')).toBeInTheDocument();
+        expect(screen.getByText('Running Task')).toBeInTheDocument();
+      });
+
+      it('open=false 时应收起任务列表', () => {
+        render(
+          <TaskList items={simpleItems} variant="simple" open={false} />,
+        );
+
+        expect(
+          screen.queryByText('Completed content'),
+        ).not.toBeInTheDocument();
+      });
+
+      it('点击时应调用 onOpenChange', () => {
+        const handleOpenChange = vi.fn();
+        render(
+          <TaskList
+            items={simpleItems}
+            variant="simple"
+            open={false}
+            onOpenChange={handleOpenChange}
+          />,
+        );
+
+        const bar = screen.getByTestId('task-list-simple-bar');
+        fireEvent.click(bar);
+
+        expect(handleOpenChange).toHaveBeenCalledWith(true);
+      });
+
+      it('受控模式下外部更新 open 应同步展开状态', async () => {
+        const handleOpenChange = vi.fn();
+        const { rerender } = render(
+          <TaskList
+            items={simpleItems}
+            variant="simple"
+            open={false}
+            onOpenChange={handleOpenChange}
+          />,
+        );
+
+        expect(
+          screen.queryByText('Completed Task'),
+        ).not.toBeInTheDocument();
+
+        rerender(
+          <TaskList
+            items={simpleItems}
+            variant="simple"
+            open={true}
+            onOpenChange={handleOpenChange}
+          />,
+        );
+
+        await waitFor(() => {
+          expect(screen.getByText('Completed Task')).toBeInTheDocument();
+        });
+      });
+
+      it('不传 open 时应为非受控模式', async () => {
+        render(<TaskList items={simpleItems} variant="simple" />);
+
+        expect(
+          screen.queryByText('Completed Task'),
+        ).not.toBeInTheDocument();
+
+        const bar = screen.getByTestId('task-list-simple-bar');
+        fireEvent.click(bar);
+
+        await waitFor(() => {
+          expect(screen.getByText('Completed Task')).toBeInTheDocument();
+        });
+      });
+    });
   });
 });

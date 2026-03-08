@@ -3,7 +3,7 @@ import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
-import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
+import React, { memo, useContext, useMemo } from 'react';
 import { ActionIconBox } from '../Components/ActionIconBox';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { I18nContext } from '../I18n';
@@ -31,6 +31,8 @@ export const TaskList = memo(
     expandedKeys,
     onExpandedKeysChange,
     variant = 'default',
+    open,
+    onOpenChange,
   }: TaskListProps) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('task-list');
@@ -56,11 +58,14 @@ export const TaskList = memo(
       setInternalExpandedKeys(newExpandedKeys);
     });
 
-    const [simpleExpanded, setSimpleExpanded] = useState(false);
+    const [simpleExpanded, setSimpleExpanded] = useMergedState(false, {
+      value: open,
+      onChange: (val) => onOpenChange?.(val),
+    });
 
-    const handleSimpleToggle = useCallback(() => {
-      setSimpleExpanded((prev) => !prev);
-    }, []);
+    const handleSimpleToggle = useRefFunction(() => {
+      setSimpleExpanded(!simpleExpanded);
+    });
 
     const { summaryStatus, summaryText, progressText } = useMemo(() => {
       const completedCount = items.filter(

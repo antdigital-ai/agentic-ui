@@ -22,6 +22,10 @@ export interface TaskListProps {
   onExpandedKeysChange?: (expandedKeys: string[]) => void;
   /** 组件变体，simple 模式将任务列表收起为紧凑的单行摘要 */
   variant?: TaskListVariant;
+  /** simple 模式下摘要条是否展开（受控） */
+  open?: boolean;
+  /** simple 模式下摘要条展开状态变化回调 */
+  onOpenChange?: (open: boolean) => void;
 }
 
 /**
