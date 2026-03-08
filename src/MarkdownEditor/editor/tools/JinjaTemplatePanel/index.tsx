@@ -17,6 +17,10 @@ import { getJinjaTemplateData, JINJA_DOC_LINK } from './templates';
 const PANEL_MAX_HEIGHT = 320;
 const PANEL_MIN_WIDTH = 240;
 
+/** 忽略弹窗打开后短时间内的 outside click，避免「点击聚焦编辑器 → 快速输入 {}」时，
+ * 同一次点击产生的陈旧 click 事件立即关闭弹窗。阈值是经验值，依赖系统负载和时钟精度。 */
+const STALE_CLICK_IGNORE_MS = 150;
+
 function getPosition(nodeEl: HTMLElement): {
   left: number;
   top?: number;
@@ -96,10 +100,8 @@ export const JinjaTemplatePanel: React.FC = () => {
     (e: Event) => {
       const target = e.target as HTMLElement;
       if (domRef.current && !domRef.current.contains(target)) {
-        // 忽略弹窗打开后短时间内的点击，避免「点击聚焦编辑器后快速输入 {}」
-        // 触发的陈旧 click 事件立即关闭弹窗
         const elapsed = Date.now() - openTimeRef.current;
-        if (elapsed < 150) return;
+        if (elapsed < STALE_CLICK_IGNORE_MS) return;
         close();
       }
     },
