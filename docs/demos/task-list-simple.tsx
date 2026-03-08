@@ -1,8 +1,7 @@
+import type { TaskStatus } from '@ant-design/agentic-ui';
 import { TaskList, ToolUseBar } from '@ant-design/agentic-ui';
 import { Button, Space } from 'antd';
 import React, { useState } from 'react';
-
-type TaskStatus = 'success' | 'pending';
 
 export default () => {
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
@@ -19,7 +18,7 @@ export default () => {
         <div key="5">汇总市场份额数据</div>,
         <div key="6">生成竞品分析摘要报告</div>,
       ],
-      status: 'success' as TaskStatus,
+      status: 'success' satisfies TaskStatus,
     },
     {
       key: '2',
@@ -47,7 +46,7 @@ export default () => {
           ]}
         />,
       ],
-      status: 'loading' as TaskStatus,
+      status: 'loading' satisfies TaskStatus,
     },
     {
       key: '3',
@@ -56,13 +55,13 @@ export default () => {
         <div key="1">整合数据分析结论</div>,
         <div key="2">插入可视化图表</div>,
       ],
-      status: 'pending' as TaskStatus,
+      status: 'pending' satisfies TaskStatus,
     },
     {
       key: '4',
       title: '审核并发布分析报告',
       content: [<div key="1">最终审核与发布</div>],
-      status: 'pending' as TaskStatus,
+      status: 'pending' satisfies TaskStatus,
     },
   ]);
 

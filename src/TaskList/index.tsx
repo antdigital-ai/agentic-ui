@@ -3,5 +3,6 @@ export type {
   TaskItem,
   TaskListProps,
   TaskListVariant,
+  TaskStatus,
   ThoughtChainProps,
 } from './types';

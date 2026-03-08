@@ -72,14 +72,12 @@ export const TaskListItem: React.FC<TaskListItemProps> = memo(
             {hasContent && (
               <div
                 className={classNames(`${prefixCls}-arrowContainer`, hashId)}
-                onClick={handleToggle}
                 data-testid="task-list-arrowContainer"
               >
                 <ActionIconBox
                   title={arrowTitle}
                   iconStyle={getArrowRotation(isCollapsed)}
                   loading={false}
-                  onClick={handleToggle}
                 >
                   <ChevronUp data-testid="task-list-arrow" />
                 </ActionIconBox>

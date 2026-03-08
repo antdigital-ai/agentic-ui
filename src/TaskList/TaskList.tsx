@@ -64,7 +64,7 @@ export const TaskList = memo(
     });
 
     const handleSimpleToggle = useRefFunction(() => {
-      setSimpleExpanded(!simpleExpanded);
+      setSimpleExpanded((prev: boolean) => !prev);
     });
 
     const { summaryStatus, summaryText, progressText } = useMemo(() => {
@@ -85,7 +85,12 @@ export const TaskList = memo(
         status = 'loading';
         const tpl =
           locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
-        text = tpl.replace('${taskName}', String(loadingItem.title));
+        const title = loadingItem.title;
+        const taskName =
+          typeof title === 'string' || typeof title === 'number'
+            ? String(title)
+            : '';
+        text = tpl.replace('${taskName}', taskName);
       } else if (hasError) {
         status = 'error';
         text = locale?.['taskList.taskAborted'] || '任务已取消';
