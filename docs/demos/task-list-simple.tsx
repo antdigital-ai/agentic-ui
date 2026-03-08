@@ -1,9 +1,11 @@
 import type { TaskStatus } from '@ant-design/agentic-ui';
 import { TaskList, ToolUseBar } from '@ant-design/agentic-ui';
+import { Button, Space } from 'antd';
 import React, { useState } from 'react';
 
 export default () => {
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
   const [items] = useState([
     {
       key: '1',
@@ -41,12 +43,6 @@ export default () => {
               toolTarget: '绘制市场份额饼图',
               time: '2',
             },
-            {
-              id: '3',
-              toolName: 'report_builder',
-              toolTarget: '编排分析报告布局',
-              time: '4',
-            },
           ]}
         />,
       ],
@@ -58,26 +54,30 @@ export default () => {
       content: [
         <div key="1">整合数据分析结论</div>,
         <div key="2">插入可视化图表</div>,
-        <div key="3" style={{ color: '#1890ff' }}>
-          编辑文件 竞品分析报告-v2.md
-        </div>,
       ],
       status: 'pending' satisfies TaskStatus,
     },
     {
       key: '4',
-      title: '获取实时市场数据失败',
-      content: [
-        <div key="1">API 调用超时：第三方数据源 MarketAPI 响应超时（30s）</div>,
-      ],
-      status: 'error' satisfies TaskStatus,
+      title: '审核并发布分析报告',
+      content: [<div key="1">最终审核与发布</div>],
+      status: 'pending' satisfies TaskStatus,
     },
   ]);
 
   return (
-    <div style={{ padding: 24 }}>
-      <h3>竞品分析任务流程示例</h3>
-      <TaskList items={items} />
+    <div style={{ padding: 24, maxWidth: 480 }}>
+      <Space style={{ marginBottom: 16 }}>
+        <Button onClick={() => setOpen(!open)}>
+          {open ? '收起' : '展开'}
+        </Button>
+      </Space>
+      <TaskList
+        items={items}
+        variant="simple"
+        open={open}
+        onOpenChange={setOpen}
+      />
     </div>
   );
 };
