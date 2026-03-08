@@ -269,7 +269,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-tool-container': {
         display: 'flex',
+        flexDirection: 'column',
         width: '100%',
+        maxHeight: 700,
+        overflow: 'hidden',
+        overflowY: 'auto',
+        position: 'relative',
         paddingInline: 4,
         paddingBottom: 4,
         '&-light': {
@@ -287,10 +292,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         lineHeight: '160%',
         letterSpacing: 'normal',
         color: '#767E8B',
-        overflow: 'hidden',
-        display: '-webkit-box',
-        WebkitLineClamp: 5,
-        WebkitBoxOrient: 'vertical',
       },
       '&-tool-content-error': {
         display: 'flex',
