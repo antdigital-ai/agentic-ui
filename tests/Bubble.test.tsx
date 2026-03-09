@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { Bubble } from '../src/Bubble';
+import { Bubble, UserBubble } from '../src/Bubble';
 import { BubbleConfigContext } from '../src/Bubble/BubbleConfigProvide';
 import { MessagesContext } from '../src/Bubble/MessagesContent/BubbleContext';
 import { BubbleProps } from '../src/Bubble/type';
@@ -172,6 +172,51 @@ describe('Bubble', () => {
       </BubbleConfigProvide>,
     );
     expect(screen.queryByText('Test message content')).not.toBeInTheDocument();
+  });
+
+  describe('UserBubble 条件渲染优化 - 避免不必要的 DOM 元素', () => {
+    it('titleRender 返回 null 时不渲染 avatar-title 包装器', () => {
+      const userProps = {
+        ...defaultProps,
+        originData: {
+          ...defaultProps.originData,
+          role: 'user' as const,
+          id: 'user-msg-conditional',
+        },
+        bubbleRenderConfig: {
+          titleRender: () => null,
+        },
+      };
+      const { container } = render(
+        <BubbleConfigProvide>
+          <UserBubble {...userProps} pure={false} />
+        </BubbleConfigProvide>,
+      );
+
+      expect(
+        container.querySelector('[data-testid="bubble-avatar-title"]'),
+      ).toBeNull();
+    });
+
+    it('titleDom 存在时渲染 avatar-title 包装器', () => {
+      const userProps = {
+        ...defaultProps,
+        originData: {
+          ...defaultProps.originData,
+          role: 'user' as const,
+          id: 'user-msg-with-title',
+        },
+      };
+      const { container } = render(
+        <BubbleConfigProvide>
+          <UserBubble {...userProps} pure={false} />
+        </BubbleConfigProvide>,
+      );
+
+      expect(
+        container.querySelector('[data-testid="bubble-avatar-title"]'),
+      ).toBeInTheDocument();
+    });
   });
 
   it('UserBubble 内 setMessage 应调用 bubbleRef.setMessageItem', async () => {

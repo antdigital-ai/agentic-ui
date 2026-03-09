@@ -200,22 +200,25 @@ export const UserBubble: React.FC<
             )}
             data-testid="chat-message"
           >
-            <div
-              className={clsx(
-                `${prefixClass}-bubble-avatar-title`,
-                `${prefixClass}-bubble-avatar-title-${placement}`,
-                `${prefixClass}-bubble-avatar-title-ai`,
-                classNames?.bubbleAvatarTitleClassName,
-                hashId,
-                {
-                  [`${prefixClass}-bubble-avatar-title-pure`]: props.pure,
-                  [`${prefixClass}-bubble-avatar-title-quote`]:
-                    quote?.quoteDescription,
-                },
-              )}
+            {titleDom ? (
+              <div
+                data-testid="bubble-avatar-title"
+                className={clsx(
+                  `${prefixClass}-bubble-avatar-title`,
+                  `${prefixClass}-bubble-avatar-title-${placement}`,
+                  `${prefixClass}-bubble-avatar-title-ai`,
+                  classNames?.bubbleAvatarTitleClassName,
+                  hashId,
+                  {
+                    [`${prefixClass}-bubble-avatar-title-pure`]: props.pure,
+                    [`${prefixClass}-bubble-avatar-title-quote`]:
+                      quote?.quoteDescription,
+                  },
+                )}
             >
               {titleDom}
             </div>
+            ) : null}
             {contentBeforeDom && (
               <div
                 style={styles?.bubbleListItemExtraStyle}

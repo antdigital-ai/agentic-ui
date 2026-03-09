@@ -209,6 +209,7 @@
               >
                 <div
                   class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+                  data-testid="bubble-avatar-title"
                 >
                   <span
                     class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"
@@ -348,6 +349,7 @@
                 >
                   <div
                     class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-right ant-agentic-bubble-avatar-title-ai"
+                    data-testid="bubble-avatar-title"
                   >
                     <div
                       class="ant-agentic-bubble-title ant-flex"
@@ -437,6 +439,7 @@
               >
                 <div
                   class="ant-agentic-bubble-avatar-title ant-agentic-bubble-avatar-title-left ant-agentic-bubble-avatar-title-ai ant-agentic-bubble-avatar-title-pure"
+                  data-testid="bubble-avatar-title"
                 >
                   <span
                     class="ant-avatar ant-avatar-circle ant-avatar-image ant-agentic-bubble-avatar"

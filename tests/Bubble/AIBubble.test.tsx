@@ -398,4 +398,63 @@ describe('AIBubble', () => {
     // 应该渲染 before content，因为 alwaysRender 为 true
     expect(screen.getByTestId('message-before')).toBeInTheDocument();
   });
+
+  describe('条件渲染优化 - 避免不必要的 DOM 元素', () => {
+    it('preMessageSameRole 为 true 时不渲染 avatar-title 包装器', () => {
+      render(
+        <BubbleConfigProvide>
+          <AIBubble
+            {...defaultProps}
+            preMessage={{
+              content: 'Previous AI message',
+              createAt: 1716537500000,
+              id: '122',
+              role: 'assistant' as RoleType,
+              updateAt: 1716537500000,
+            }}
+            originData={{
+              ...defaultProps.originData,
+              content: 'Current AI message',
+              role: 'assistant' as RoleType,
+            }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      expect(screen.queryByTestId('bubble-avatar-title')).not.toBeInTheDocument();
+    });
+
+    it('avatarRender 和 titleRender 均返回 null 时不渲染 avatar-title 包装器', () => {
+      render(
+        <BubbleConfigProvide>
+          <AIBubble
+            {...defaultProps}
+            preMessage={{
+              content: 'User message',
+              createAt: 1716537500000,
+              id: '122',
+              role: 'user' as RoleType,
+              updateAt: 1716537500000,
+            }}
+            bubbleRenderConfig={{
+              avatarRender: () => null,
+              titleRender: () => null,
+            }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      expect(screen.queryByTestId('bubble-avatar-title')).not.toBeInTheDocument();
+    });
+
+    it('avatarDom 或 titleDom 至少有一个存在时渲染 avatar-title 包装器', () => {
+      render(
+        <BubbleConfigProvide>
+          <AIBubble {...defaultProps} />
+        </BubbleConfigProvide>,
+      );
+
+      expect(screen.getByTestId('bubble-avatar-title')).toBeInTheDocument();
+    });
+  });
 });

@@ -251,8 +251,9 @@ export const AIBubble: React.FC<
             hashId,
           )}
         >
-          {preMessageSameRole ? null : (
+          {!preMessageSameRole && (avatarDom || titleDom) ? (
             <div
+              data-testid="bubble-avatar-title"
               className={clsx(
                 `${prefixClass}-bubble-avatar-title`,
                 `${prefixClass}-bubble-avatar-title-${placement}`,
@@ -267,7 +268,7 @@ export const AIBubble: React.FC<
               {avatarDom}
               {titleDom}
             </div>
-          )}
+          ) : null}
           <div
             style={{
               display: 'flex',
