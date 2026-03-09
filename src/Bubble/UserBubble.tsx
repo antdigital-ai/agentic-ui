@@ -230,21 +230,23 @@ export const UserBubble: React.FC<
                 {contentBeforeDom}
               </div>
             )}
-            <div
-              style={contentStyle}
-              className={clsx(
-                `${prefixClass}-bubble-content`,
-                `${prefixClass}-bubble-content-${placement}`,
-                `${prefixClass}-bubble-content-user`,
-                { [`${prefixClass}-bubble-content-pure`]: props.pure },
-                classNames?.bubbleListItemContentClassName,
-                hashId,
-              )}
-              onDoubleClick={props.onDoubleClick}
-              data-testid="message-content"
-            >
-              {childrenDom}
-            </div>
+            {childrenDom ? (
+              <div
+                style={contentStyle}
+                className={clsx(
+                  `${prefixClass}-bubble-content`,
+                  `${prefixClass}-bubble-content-${placement}`,
+                  `${prefixClass}-bubble-content-user`,
+                  { [`${prefixClass}-bubble-content-pure`]: props.pure },
+                  classNames?.bubbleListItemContentClassName,
+                  hashId,
+                )}
+                onDoubleClick={props.onDoubleClick}
+                data-testid="message-content"
+              >
+                {childrenDom}
+              </div>
+            ) : null}
             {hasFileMap && (
               <div
                 style={fileViewStyle}

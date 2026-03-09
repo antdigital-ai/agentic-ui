@@ -301,26 +301,28 @@ export const AIBubble: React.FC<
                 {contentBeforeDom}
               </div>
             ) : null}
-            <div
-              style={{
-                minWidth: standalone ? 'min(16px,100%)' : '0px',
-                ...styles?.bubbleListItemContentStyle,
-              }}
-              className={clsx(
-                `${prefixClass}-bubble-content`,
-                `${prefixClass}-bubble-content-${placement}`,
-                `${prefixClass}-bubble-content-ai`, // AI消息内容特定样式
-                {
-                  [`${prefixClass}-bubble-content-pure`]: props.pure,
-                },
-                classNames?.bubbleListItemContentClassName,
-                hashId,
-              )}
-              onDoubleClick={props.onDoubleClick}
-              data-testid="message-content"
-            >
-              {childrenDom}
-            </div>
+            {childrenDom ? (
+              <div
+                style={{
+                  minWidth: standalone ? 'min(16px,100%)' : '0px',
+                  ...styles?.bubbleListItemContentStyle,
+                }}
+                className={clsx(
+                  `${prefixClass}-bubble-content`,
+                  `${prefixClass}-bubble-content-${placement}`,
+                  `${prefixClass}-bubble-content-ai`, // AI消息内容特定样式
+                  {
+                    [`${prefixClass}-bubble-content-pure`]: props.pure,
+                  },
+                  classNames?.bubbleListItemContentClassName,
+                  hashId,
+                )}
+                onDoubleClick={props.onDoubleClick}
+                data-testid="message-content"
+              >
+                {childrenDom}
+              </div>
+            ) : null}
             {contentAfterDom}
           </div>
         </div>
