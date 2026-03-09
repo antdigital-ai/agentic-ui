@@ -242,10 +242,41 @@ export const useKeyboard = (
       });
       if (!node) return;
       if (node?.[0]?.type === 'paragraph') {
-        const [node] = Editor.nodes<any>(markdownEditorRef.current, {
+        const [paraNode] = Editor.nodes<any>(markdownEditorRef.current, {
           match: (n) => Element.isElement(n) && n.type === 'paragraph',
           mode: 'lowest',
         });
+        const node = paraNode;
+        if (node) {
+          const sel = markdownEditorRef.current.selection;
+          // Jinja 触发：基于光标位置检测，支持在任意位置输入 {}（含两个模板中间）
+          if (
+            jinjaTemplatePanelEnabled &&
+            e.key.length === 1 &&
+            !e.nativeEvent?.isComposing &&
+            sel &&
+            Range.isCollapsed(sel) &&
+            Path.isAncestor(node[1], sel.anchor.path) &&
+            setOpenJinjaTemplate &&
+            setJinjaAnchorPath
+          ) {
+            const strBeforeCursor = Editor.string(
+              markdownEditorRef.current,
+              Editor.range(
+                markdownEditorRef.current,
+                Editor.start(markdownEditorRef.current, node[1]),
+                sel.anchor,
+              ),
+            );
+            const strAfterKeyAtCursor =
+              strBeforeCursor + (e.key.length === 1 ? e.key : '');
+            if (strAfterKeyAtCursor.endsWith(jinjaTrigger)) {
+              setJinjaAnchorPath(node[1]);
+              setTimeout(() => setOpenJinjaTemplate(true));
+              return;
+            }
+          }
+        }
         if (
           node &&
           node[0].children.length === 1 &&
@@ -256,21 +287,6 @@ export const useKeyboard = (
           const codeMatch = str.match(/^```([\w+\-#]+)$/i);
           if (codeMatch) {
           } else {
-            const strAfterKey = str + (e.key.length === 1 ? e.key : '');
-            // 在实际输入一个字符且补全 trigger 时打开面板，支持在文本后输入（如 "hello {}"）
-            // IME 组合期间不触发，避免输入法选字时误触发或失效
-            if (
-              jinjaTemplatePanelEnabled &&
-              e.key.length === 1 &&
-              !e.nativeEvent?.isComposing &&
-              strAfterKey.endsWith(jinjaTrigger) &&
-              setOpenJinjaTemplate &&
-              setJinjaAnchorPath
-            ) {
-              setJinjaAnchorPath(node[1]);
-              setTimeout(() => setOpenJinjaTemplate(true));
-              return;
-            }
             const insertMatch = str.match(/^\/([^\n]+)?$/i);
             if (
               insertMatch &&
