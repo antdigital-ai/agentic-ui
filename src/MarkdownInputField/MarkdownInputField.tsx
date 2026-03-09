@@ -285,6 +285,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
       >
         <div
           ref={inputRef}
+          data-testid="markdown-input-field"
           className={classNames(baseCls, hashId, props.className, {
             [`${baseCls}-disabled`]: props.disabled,
             [`${baseCls}-skill-mode`]: props.skillMode?.open,
