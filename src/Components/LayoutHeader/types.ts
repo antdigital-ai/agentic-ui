@@ -4,8 +4,8 @@ import type { ReactNode } from 'react';
  * 布局头部配置接口
  */
 export interface LayoutHeaderConfig {
-  /** 标题文本 */
-  title?: string;
+  /** 标题，支持文本或自定义 React 节点 */
+  title?: ReactNode;
   /** 是否显示分享按钮 */
   showShare?: boolean;
   /** 左侧是否可折叠 */
