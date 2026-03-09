@@ -1,9 +1,12 @@
-import { Api, ChevronUp, X } from '@sofa-design/icons';
+import { Api, ChevronUp, ChevronsDownUp, ChevronsUpDown, X } from '@sofa-design/icons';
 import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ToolCall } from '.';
 import { useRefFunction } from '../../Hooks/useRefFunction';
+
+/** 内容超出此高度时自动收起 */
+const CONTENT_COLLAPSE_THRESHOLD = 200;
 
 interface ToolImageProps {
   tool: ToolCall;
@@ -287,11 +290,19 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
   expanded,
   disableAnimation = false,
 }) => {
+  const contentInnerRef = useRef<HTMLDivElement>(null);
+  const [isContentOverflowing, setIsContentOverflowing] = useState(false);
+  const [contentExpanded, setContentExpanded] = useState(false);
+
   const toolContainerClassName = useMemo(() => {
     return classNames(`${prefixCls}-tool-container`, hashId, {
       [`${prefixCls}-tool-container-light`]: light,
     });
   }, [prefixCls, hashId, light]);
+
+  const contentExpandClassName = useMemo(() => {
+    return classNames(`${prefixCls}-tool-content-expand`, hashId);
+  }, [prefixCls, hashId]);
 
   // 缓存错误样式类名
   const errorClassName = useMemo(() => {
@@ -333,6 +344,72 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
     ) : null;
   }, [tool.content, contentClassName]);
 
+  const checkOverflow = useCallback(() => {
+    const el = contentInnerRef.current;
+    if (!el) return;
+    const { scrollHeight } = el;
+    setIsContentOverflowing(scrollHeight > CONTENT_COLLAPSE_THRESHOLD);
+  }, []);
+
+  useEffect(() => {
+    if (!showContent || !expanded) return;
+    checkOverflow();
+    const el = contentInnerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(checkOverflow);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [showContent, expanded, tool.content, tool.errorMessage, checkOverflow]);
+
+  const handleContentExpandToggle = useRefFunction(() => {
+    setContentExpanded((prev) => !prev);
+  });
+
+  const showContentExpandButton =
+    showContent && expanded && isContentOverflowing;
+
+  const contentInnerStyle = useMemo((): React.CSSProperties | undefined => {
+    if (!showContentExpandButton) return undefined;
+    if (contentExpanded) return undefined;
+    return {
+      maxHeight: CONTENT_COLLAPSE_THRESHOLD,
+      overflow: 'hidden',
+    };
+  }, [showContentExpandButton, contentExpanded]);
+
+  const contentExpandButton = useMemo(() => {
+    if (!showContentExpandButton) return null;
+    const expandIcon = contentExpanded ? (
+      <ChevronsDownUp />
+    ) : (
+      <ChevronsUpDown />
+    );
+    const expandText = contentExpanded ? '收起' : '展开';
+    return (
+      <div
+        className={contentExpandClassName}
+        onClick={handleContentExpandToggle}
+        data-testid="tool-content-expand"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleContentExpandToggle();
+          }
+        }}
+      >
+        {expandIcon}
+        {expandText}
+      </div>
+    );
+  }, [
+    showContentExpandButton,
+    contentExpanded,
+    contentExpandClassName,
+    handleContentExpandToggle,
+  ]);
+
   const contentVariants = useMemo(
     () => ({
       expanded: {
@@ -369,6 +446,16 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
     [],
   );
 
+  const innerContent = (
+    <>
+      <div ref={contentInnerRef} style={contentInnerStyle}>
+        {contentDom}
+        {errorDom}
+      </div>
+      {contentExpandButton}
+    </>
+  );
+
   // 禁用动画时使用简单的显示/隐藏
   if (disableAnimation) {
     return showContent && expanded ? (
@@ -377,8 +464,7 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
         data-testid="tool-user-item-tool-container"
         style={{ overflow: 'hidden' }}
       >
-        {contentDom}
-        {errorDom}
+        {innerContent}
       </div>
     ) : null;
   }
@@ -397,8 +483,7 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
           transition={contentTransition}
           style={containerStyle}
         >
-          {contentDom}
-          {errorDom}
+          {innerContent}
         </motion.div>
       ) : null}
 
