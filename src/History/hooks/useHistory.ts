@@ -1,27 +1,49 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRefFunction } from '../../index';
 import { HistoryProps } from '../types';
 import { HistoryDataType } from '../types/HistoryData';
+
+/**
+ * 根据关键词从列表中过滤
+ */
+function filterListByKeyword(
+  list: HistoryDataType[],
+  keyword: string,
+): HistoryDataType[] {
+  if (!keyword.trim()) return list;
+  const lower = keyword.toLowerCase();
+  return list.filter((item) => {
+    const title =
+      typeof item.sessionTitle === 'string'
+        ? item.sessionTitle
+        : String(item.sessionTitle || '');
+    return title.toLowerCase().includes(lower);
+  });
+}
 
 /**
  * 历史记录状态管理 Hook
  */
 export const useHistory = (props: HistoryProps) => {
   const [open, setOpen] = useState(false);
-  const [chatList, setChatList] = useState<HistoryDataType[]>(() => []);
+  const chatListRef = useRef<HistoryDataType[]>([]);
+  const [listVersion, setListVersion] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [filteredList, setFilteredList] = useState<HistoryDataType[]>([]);
+
+  const filteredList = useMemo(
+    () => filterListByKeyword(chatListRef.current, searchKeyword),
+    [searchKeyword, listVersion],
+  );
 
   const loadHistory = useRefFunction(async () => {
     const msg = (await props
       ?.request?.({
         agentId: props.agentId,
       })
-      .then((msg) => {
-        return msg;
-      })) as HistoryDataType[];
-    setChatList(msg || []);
+      .then((m) => m)) as HistoryDataType[];
+    chatListRef.current = msg || [];
+    setListVersion((v) => v + 1);
   });
 
   // 暴露 reload 方法给 actionRef
@@ -45,32 +67,14 @@ export const useHistory = (props: HistoryProps) => {
     loadHistory();
   }, [props.sessionId, props.request, loadHistory]);
 
-  // 搜索过滤逻辑
-  useEffect(() => {
-    if (!searchKeyword.trim()) {
-      setFilteredList(chatList);
-    } else {
-      const filtered = chatList.filter((item) => {
-        const title =
-          typeof item.sessionTitle === 'string'
-            ? item.sessionTitle
-            : String(item.sessionTitle || '');
-        return title.toLowerCase().includes(searchKeyword.toLowerCase());
-      });
-      setFilteredList(filtered);
-    }
-  }, [searchKeyword]);
-
   // 处理收藏
   const handleFavorite = useRefFunction(
     async (sessionId: string, isFavorite: boolean) => {
       await props.agent?.onFavorite?.(sessionId, isFavorite);
-      // 更新本地状态
-      setChatList((prev) =>
-        prev.map((item) =>
-          item.sessionId === sessionId ? { ...item, isFavorite } : item,
-        ),
+      chatListRef.current = chatListRef.current.map((item) =>
+        item.sessionId === sessionId ? { ...item, isFavorite } : item,
       );
+      setListVersion((v) => v + 1);
     },
   );
 
@@ -106,7 +110,7 @@ export const useHistory = (props: HistoryProps) => {
   return {
     open,
     setOpen,
-    chatList,
+    chatList: chatListRef.current,
     searchKeyword,
     selectedIds,
     filteredList,
