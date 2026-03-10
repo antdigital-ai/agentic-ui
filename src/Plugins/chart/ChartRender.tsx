@@ -47,47 +47,47 @@ import {
 const getChartMap = (i18n: any) => ({
   pie: {
     title: i18n?.locale?.pieChart || '饼图',
-    changeData: ['donut'],
+    changeData: ['donut', 'table'],
   },
   donut: {
     title: i18n?.locale?.donutChart || '环形图',
-    changeData: ['pie'],
+    changeData: ['pie', 'table'],
   },
   bar: {
     title: i18n?.locale?.barChart || '条形图',
-    changeData: ['column', 'line', 'area'],
+    changeData: ['column', 'line', 'area', 'table'],
   },
   line: {
     title: i18n?.locale?.lineChart || '折线图',
-    changeData: ['column', 'bar', 'area'],
+    changeData: ['column', 'bar', 'area', 'table'],
   },
   column: {
     title: i18n?.locale?.columnChart || '柱状图',
-    changeData: ['bar', 'line', 'area'],
+    changeData: ['bar', 'line', 'area', 'table'],
   },
   area: {
     title: i18n?.locale?.areaChart || '面积图',
-    changeData: ['column', 'bar', 'line'],
+    changeData: ['column', 'bar', 'line', 'table'],
   },
   radar: {
     title: i18n?.locale?.radarChart || '雷达图',
-    changeData: [],
+    changeData: ['table'],
   },
   scatter: {
     title: i18n?.locale?.scatterChart || '散点图',
-    changeData: [],
+    changeData: ['table'],
   },
   funnel: {
     title: i18n?.locale?.funnelChart || '漏斗图',
-    changeData: [],
+    changeData: ['table'],
   },
   table: {
     title: i18n?.locale?.table || '表格',
-    changeData: ['column', 'line', 'area', 'pie', 'donut'],
+    changeData: ['column', 'line', 'area', 'pie', 'donut', 'bar', 'radar', 'scatter', 'funnel'],
   },
   descriptions: {
     title: i18n?.locale?.descriptions || '定义列表',
-    changeData: ['column', 'line', 'area', 'pie', 'donut'],
+    changeData: ['column', 'line', 'area', 'pie', 'donut', 'table'],
   },
 });
 
@@ -962,15 +962,36 @@ export const ChartRender: React.FC<{
             maxWidth: 'calc(100% - 32px)',
             maxHeight: 400,
             userSelect: 'none',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
-          <Table
-            size="small"
-            dataSource={chartData}
-            columns={config?.columns}
-            pagination={false}
-            rowKey={(record) => record.key}
-          />
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 12px',
+              borderBottom: '1px solid #eee',
+              flexShrink: 0,
+            }}
+          >
+            {title && (
+              <span style={{ fontSize: 14, fontWeight: 500 }}>{title}</span>
+            )}
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+              {toolBar}
+            </div>
+          </div>
+          <div style={{ flex: 1, overflow: 'auto' }}>
+            <Table
+              size="small"
+              dataSource={chartData}
+              columns={config?.columns}
+              pagination={false}
+              rowKey={(record) => record.key}
+            />
+          </div>
         </div>
       );
     }
@@ -984,8 +1005,25 @@ export const ChartRender: React.FC<{
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
+            margin: 12,
           }}
         >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 0',
+              flexShrink: 0,
+            }}
+          >
+            {title && (
+              <span style={{ fontSize: 14, fontWeight: 500 }}>{title}</span>
+            )}
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+              {toolBar}
+            </div>
+          </div>
           {chartData.map((row: Record<string, any>, rowIndex: number) => (
             <Descriptions
               bordered
