@@ -1992,6 +1992,15 @@ console.log('嵌套的代码');
                         <col
                           style="width: 12px; min-width: 12px; max-width: 12px;"
                         />
+                        <col
+                          style="width: 168px; min-width: 168px; max-width: 168px;"
+                        />
+                        <col
+                          style="width: 240px; min-width: 240px; max-width: 240px;"
+                        />
+                        <col
+                          style="min-width: 80px;"
+                        />
                       </colgroup>
                       <tbody>
                         <tr
