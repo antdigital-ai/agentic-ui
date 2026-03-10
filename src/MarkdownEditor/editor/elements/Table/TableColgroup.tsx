@@ -18,8 +18,8 @@ function isPercentWidth(value: ColWidthValue): value is string {
 /**
  * 表格 colgroup 渲染
  *
- * - 百分比列宽：各列固定 width/minWidth/maxWidth，实现平分
- * - px 列宽：最后一列使用 minWidth 实现弹性伸缩，其余列固定
+ * - **百分比列宽**：各列固定 width/minWidth/maxWidth，实现平分（1–4 列场景）
+ * - **px 列宽**：最后一列仅 minWidth 以实现弹性伸缩，其余列固定 120px（5+ 列场景）
  */
 export const TableColgroup: React.FC<TableColgroupProps> = ({
   colWidths,

@@ -60,12 +60,21 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
       [columnCount, otherProps],
     );
 
-    // 宽度充足时不设置 colgroup，由浏览器自然分布；仅在溢出或未测量时计算列宽
+    /**
+     * 列宽按需计算：
+     * - 显式传入 colWidths：始终使用
+     * - needsColWidths=true（溢出或未测量）：使用 computedColWidths，1–4 列 % 平分，5+ 列 120px
+     * - needsColWidths=false（宽度充足）：[]，不渲染 colgroup，由浏览器自然分布
+     */
     const colWidths = useMemo(() => {
       if (otherProps?.colWidths?.length) return otherProps.colWidths;
       return needsColWidths ? computedColWidths : [];
     }, [otherProps?.colWidths, needsColWidths, computedColWidths]);
 
+    /**
+     * 监听容器宽度，仅在表格溢出时设置 needsColWidths，减少不必要的列宽计算。
+     * unmeasured (clientWidth===0)：SSR/测试等未测量场景，保守启用列宽。
+     */
     useEffect(() => {
       const container = containerRef.current;
       const table = tableTargetRef.current;
