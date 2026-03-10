@@ -265,7 +265,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
         footer={null}
         width="auto"
         centered
-        destroyOnClose
+        destroyOnHidden
         styles={{ body: { padding: 0 } }}
       >
         {previewingVideo && (
