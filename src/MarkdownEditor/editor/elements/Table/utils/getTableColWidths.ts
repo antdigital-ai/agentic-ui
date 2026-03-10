@@ -25,8 +25,8 @@ export type ColWidthValue = number | string;
  * 3. **5 列及以上**：每列 TABLE_DEFAULT_COL_WIDTH (120px)
  *
  * ## 使用说明
- * - 由 ReadonlyTableComponent 在「宽度不足」时调用，宽容器下不调用
- * - 详见 Table/utils/README.md
+ * - 由 useReadonlyTableColWidths 在「宽度不足」时调用，宽容器下不调用
+ * - 详见 Table/utils/README.md、useReadonlyTableColWidths.ts
  *
  * @param input - 列数与 otherProps
  * @returns 列宽数组，支持 number (px) 或 string (如 '25%')
