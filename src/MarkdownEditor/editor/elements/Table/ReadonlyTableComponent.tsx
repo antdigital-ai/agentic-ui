@@ -11,7 +11,11 @@ import React, {
   useState,
 } from 'react';
 import { ActionIconBox } from '../../../../Components/ActionIconBox';
-import { TABLE_COL_WIDTH_MIN_COLUMNS } from '../../../../Constants/mobile';
+import {
+  TABLE_COL_WIDTH_MIN_COLUMNS,
+  TABLE_DEFAULT_COL_WIDTH,
+  TABLE_LAST_COL_MIN_WIDTH,
+} from '../../../../Constants/mobile';
 import { I18nContext } from '../../../../I18n';
 import { useEditorStore } from '../../store';
 import { TableNode } from '../../types/Table';
@@ -58,9 +62,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
         return otherProps.colWidths;
       }
 
-      // 使用固定宽度避免复杂计算
-      const defaultWidth = 80;
-      return Array(columnCount).fill(defaultWidth);
+      return Array(columnCount).fill(TABLE_DEFAULT_COL_WIDTH);
     }, [element?.otherProps, element?.children?.[0]?.children?.length]);
 
     // 缓存复制处理函数
@@ -123,13 +125,13 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
           {colWidths.length > 0 && (
             <colgroup>
               {colWidths.map((colWidth: number, index: number) => {
-                const isLastCol = index === colWidths.length - 1;
+                    const isLastCol = index === colWidths.length - 1;
                 return (
                   <col
                     key={index}
                     style={
                       isLastCol
-                        ? { minWidth: 60 }
+                        ? { minWidth: TABLE_LAST_COL_MIN_WIDTH }
                         : {
                             width: colWidth,
                             minWidth: colWidth,
