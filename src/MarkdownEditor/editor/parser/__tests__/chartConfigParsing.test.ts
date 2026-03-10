@@ -370,5 +370,46 @@ describe('Chart Configuration Parsing', () => {
       // 应该至少有一个表格或图表节点
       expect(tableNode).toBeDefined();
     });
+
+    it('当 x 或 y 不在表格列中时应降级为表格渲染', () => {
+      // 配置的 x="产品" y="销量" 与表格列 "类型" "占比" 不匹配
+      const markdown = `<!-- {"chartType": "bar", "x": "产品", "y": "销量"} -->
+| 类型 | 占比 |
+| --- | --- |
+| A | 30% |
+| B | 70% |`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+      const cardNode = result.schema.find((node: any) => node.type === 'card');
+      expect(cardNode).toBeDefined();
+
+      const findChartNode = (node: any): any => {
+        if (node.type === 'chart') return node;
+        if (node.children) {
+          for (const child of node.children) {
+            const found = findChartNode(child);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+
+      const findTableNode = (node: any): any => {
+        if (node.type === 'table') return node;
+        if (node.children) {
+          for (const child of node.children) {
+            const found = findTableNode(child);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+
+      const chartNode = findChartNode(cardNode);
+      const tableNode = findTableNode(cardNode);
+
+      expect(chartNode).toBeNull();
+      expect(tableNode).toBeDefined();
+    });
   });
 });

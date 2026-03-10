@@ -291,7 +291,29 @@ export const parseTableOrChart = (
 
   const chartType = getChartType();
   // 如果 chartType 为 "table"，将其视为不存在，按普通表格处理
-  const isChart = chartType && chartType !== 'table';
+  let isChart = chartType && chartType !== 'table';
+
+  // 图表的 x、y 必须在表格列中存在，否则降级为表格渲染
+  if (isChart && chartConfig) {
+    const columnKeys = new Set(columns.map((c) => c.dataIndex));
+    const configsToValidate = Array.isArray(chartConfig)
+      ? chartConfig
+      : [chartConfig];
+
+    const isChartConfigValid = (cfg: ChartTypeConfig): boolean => {
+      if (!cfg || cfg.chartType === 'table') return true;
+      if (cfg.x && !columnKeys.has(cfg.x)) return false;
+      if (cfg.y && !columnKeys.has(cfg.y)) return false;
+      return true;
+    };
+
+    const allConfigsValid = configsToValidate.every((c) =>
+      isChartConfigValid(c as ChartTypeConfig),
+    );
+    if (!allConfigsValid) {
+      isChart = false;
+    }
+  }
 
   // 计算合并单元格信息
   const mergeCells = (config as CodeNode['otherProps'])?.mergeCells || [];
