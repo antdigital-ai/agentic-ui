@@ -89,6 +89,11 @@ const MenuItem: React.FC<{
     }
   });
 
+  // 分组类型但子项为空时不展示
+  if (item.type === 'group' && (!item.children || !item.children.length)) {
+    return null;
+  }
+
   // 如果是分组且有子项，并且嵌套层级小于2
   if (item.type === 'group' && item.children && level < 2) {
     return (
