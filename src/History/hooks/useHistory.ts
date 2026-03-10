@@ -59,7 +59,7 @@ export const useHistory = (props: HistoryProps) => {
       });
       setFilteredList(filtered);
     }
-  }, [chatList, searchKeyword]);
+  }, [searchKeyword]);
 
   // 处理收藏
   const handleFavorite = useRefFunction(
