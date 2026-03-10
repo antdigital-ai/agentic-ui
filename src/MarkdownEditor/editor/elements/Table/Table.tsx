@@ -9,6 +9,7 @@ import {
   MOBILE_TABLE_MIN_COLUMN_WIDTH,
   TABLE_COL_WIDTH_MIN_COLUMNS,
 } from '../../../../Constants/mobile';
+import { TableColgroup, TABLE_ROW_INDEX_COL_WIDTH } from './TableColgroup';
 import { useEditorStore } from '../../store';
 import { ReadonlyTableComponent } from './ReadonlyTableComponent';
 import { TablePropsContext } from './TableContext';
@@ -59,20 +60,11 @@ export const SlateTable = ({
   // 总是调用 hooks，避免条件调用
   const [tableRef, scrollState] = useScrollShadow();
 
-  // 只在编辑模式下进行复杂的列宽计算
+  // 编辑模式下列宽计算（readonly 时走 ReadonlyTableComponent，跳过计算）
   const colWidths = useMemo(() => {
-    // readonly 模式下使用简化计算，少于 3 列不设置 col
-    if (readonly) {
-      const colCount = props.element?.children?.[0]?.children?.length || 0;
-      if (colCount === 0 || colCount < TABLE_COL_WIDTH_MIN_COLUMNS) return [];
-      const otherProps = props.element?.otherProps as any;
-      if (otherProps?.colWidths) {
-        return otherProps.colWidths;
-      }
-      return Array(colCount).fill(80); // 固定宽度
-    }
+    if (readonly) return [];
 
-    // 少于 3 列不设置 col，使用浏览器默认布局
+    // 少于 5 列不设置 col，列平分宽度
     if (columnCount < TABLE_COL_WIDTH_MIN_COLUMNS) return [];
 
     // 如果在 props 中存在，直接使用以避免计算
@@ -216,32 +208,10 @@ export const SlateTable = ({
           return false;
         }}
       >
-        <colgroup>
-          <col
-            style={{
-              width: 12,
-              minWidth: 12,
-              maxWidth: 12,
-            }}
-          />
-          {(colWidths || []).map((colWidth: number, index: number) => {
-            const isLastCol = index === (colWidths?.length ?? 0) - 1;
-            return (
-              <col
-                key={index}
-                style={
-                  isLastCol
-                    ? { minWidth: 60 }
-                    : {
-                        width: colWidth,
-                        minWidth: colWidth,
-                        maxWidth: colWidth,
-                      }
-                }
-              />
-            );
-          }) || null}
-        </colgroup>
+        <TableColgroup
+          colWidths={colWidths ?? []}
+          prefixColWidth={TABLE_ROW_INDEX_COL_WIDTH}
+        />
         <tbody>
           {readonly ? null : (
             <TableRowIndex

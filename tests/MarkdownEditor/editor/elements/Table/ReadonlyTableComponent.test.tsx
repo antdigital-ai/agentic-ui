@@ -156,7 +156,7 @@ describe('ReadonlyTableComponent', () => {
       </tr>
     );
 
-    it('>= 3 列时使用 otherProps 中的 colWidths', () => {
+    it('显式传入 otherProps.colWidths 时使用自定义列宽', () => {
       const elementWithColWidths = {
         ...elementWith3Columns,
         otherProps: {
@@ -169,10 +169,11 @@ describe('ReadonlyTableComponent', () => {
       expect(cols.length).toBe(3);
     });
 
-    it('少于 3 列时不设置 col', () => {
+    it('1–4 列时使用百分比实现列平分', () => {
       renderComponent();
       const cols = document.querySelectorAll('col');
-      expect(cols.length).toBe(0);
+      expect(cols.length).toBe(2);
+      expect((cols[0] as HTMLElement).style.width).toBe('50%');
     });
 
     it('应该处理空的 children', () => {
@@ -186,7 +187,7 @@ describe('ReadonlyTableComponent', () => {
       expect(cols.length).toBe(0);
     });
 
-    it('>= 3 列时为每一列应用正确的宽度样式', () => {
+    it('>= 5 列时为每一列应用默认宽度，或使用 otherProps.colWidths', () => {
       const elementWithColWidths = {
         ...elementWith3Columns,
         otherProps: {
@@ -617,17 +618,38 @@ describe('ReadonlyTableComponent', () => {
       expect(cols.length).toBe(10);
     });
 
-    it('应该为每列应用默认宽度 120', () => {
-      renderComponent();
+    it('5 列及以上时应用默认 120px，最后一列弹性', () => {
+      const elementWith5Cols = {
+        type: 'table',
+        children: [
+          {
+            type: 'table-row',
+            children: Array.from({ length: 5 }, (_, i) => ({
+              type: 'table-cell',
+              children: [
+                { type: 'paragraph', children: [{ text: `Col ${i + 1}` }] },
+              ],
+            })),
+          },
+        ],
+      };
+      const fiveColChildren = (
+        <tr>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <td key={i}>Col {i}</td>
+          ))}
+        </tr>
+      );
+      renderComponent(elementWith5Cols, { children: fiveColChildren });
       const cols = document.querySelectorAll('col');
+      expect(cols.length).toBe(5);
       cols.forEach((col, i) => {
         const htmlCol = col as HTMLElement;
         const isLastCol = i === cols.length - 1;
         if (isLastCol) {
-          // 最后一列仅设置 minWidth 以保持弹性
-          expect(htmlCol.style.minWidth).toBe('60px');
+          expect(htmlCol.style.minWidth).toBe('80px');
         } else {
-          expect(htmlCol.style.width).toBe('80px');
+          expect(htmlCol.style.width).toBe('120px');
         }
       });
     });

@@ -3,8 +3,8 @@ const MOBILE_PADDING_MAX = '12px';
 const MOBILE_PADDING_SCALE = '2vw';
 const MOBILE_TABLE_MIN_CELL_WIDTH = 96;
 
-/** 表格列宽计算的列数阈值，少于该列数不设置 col 元素，使用浏览器默认布局 */
-export const TABLE_COL_WIDTH_MIN_COLUMNS = 3;
+/** 表格列宽阈值：1–4 列使用百分比平分，5 列及以上使用固定 120px */
+export const TABLE_COL_WIDTH_MIN_COLUMNS = 5;
 
 /** 表格默认列宽，与 style.ts 中 --table-cell-min-width (120px) 保持一致 */
 export const TABLE_DEFAULT_COL_WIDTH = 120;
