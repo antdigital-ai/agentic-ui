@@ -292,6 +292,7 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
     shouldRenderAsThinkBlock,
     shouldRenderAsCodeEditor,
     props.element,
+    props.element?.value,
     props.attributes,
     props.children,
     state.showBorder,

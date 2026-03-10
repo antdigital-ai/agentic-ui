@@ -108,6 +108,20 @@ const areElementPropsEqual = (
     return false;
   }
 
+  // 只读模式下，代码块内容可能流式更新，必须比较 value 以确保动态更新
+  if (
+    nextProps.readonly &&
+    prevProps.readonly &&
+    (prevProps.element as any)?.type === 'code' &&
+    (nextProps.element as any)?.type === 'code'
+  ) {
+    const prevValue = (prevProps.element as any)?.value ?? '';
+    const nextValue = (nextProps.element as any)?.value ?? '';
+    if (prevValue !== nextValue) {
+      return false;
+    }
+  }
+
   // 比较 hash
   const prevHash = (prevProps.element as any)?.hash;
   const nextHash = (nextProps.element as any)?.hash;
