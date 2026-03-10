@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ActionItemContainer } from '../../../src/MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
@@ -244,8 +244,7 @@ describe('ActionItemContainer', () => {
       // 简化测试，移除有问题的指针事件测试
     });
 
-    // 抛错在 useEffect 中异步触发，无法用 expect().toThrow() 同步断言
-    it.skip('应该正确处理缺失 key 的子元素（开发环境）', () => {
+    it('应该正确处理缺失 key 的子元素（开发环境）', () => {
       const originalEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
 
@@ -254,7 +253,11 @@ describe('ActionItemContainer', () => {
       ) as KeyedElement;
 
       expect(() => {
-        render(<ActionItemContainer>{childWithoutKey}</ActionItemContainer>);
+        act(() => {
+          render(
+            <ActionItemContainer>{childWithoutKey}</ActionItemContainer>,
+          );
+        });
       }).toThrow(
         'ActionItemContainer: all children must include an explicit `key` prop.',
       );

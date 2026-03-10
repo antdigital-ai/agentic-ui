@@ -179,7 +179,7 @@ console.error = (...args: any[]) => {
   ) {
     return;
   }
-  originalError.call(console, args[0]);
+  originalError.apply(console, args);
 };
 
 // 重写 console.error 来过滤 act() 警告
@@ -194,7 +194,7 @@ console.warn = (...args: any[]) => {
   ) {
     return;
   }
-  originalWarn.call(console, args[0]);
+  originalWarn.apply(console, args);
 };
 
 Object.defineProperty(globalThis, 'cancelAnimationFrame', {
