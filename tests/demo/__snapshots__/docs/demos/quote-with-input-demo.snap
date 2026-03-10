@@ -16,6 +16,7 @@
       >
         <div
           class="ant-dropdown-trigger ant-agentic-md-input-field ant-agentic-md-input-field-skill-mode"
+          data-testid="markdown-input-field"
           style="height: min(114px,100%); border-radius: 16px; min-height: 0; max-height: min(114px,100%);"
           tabindex="1"
         >
