@@ -16,7 +16,7 @@ export interface ReadonlyTableColWidthsInput {
 }
 
 const SMART_SAMPLE_ROWS = 5;
-const SMART_CELL_PADDING = 20;
+const SMART_CELL_PADDING = 28; // 20 基础内边距 + 8 数字等字符宽度补偿
 const SMART_FONT = '14px sans-serif';
 const CHAR_WIDTH_PX = 12;
 const WORD_SPLIT = /[\s\u4e00-\u9fa5]/;
