@@ -125,7 +125,7 @@ export const BubbleMessageDisplay: React.FC<
     contentAfterDom,
   ]);
 
-  const memo = useMemo(() => {
+  const messageContent = useMemo(() => {
     if (
       content === LOADING_FLAT ||
       (!props.originData?.isFinished && !content)
@@ -445,5 +445,5 @@ export const BubbleMessageDisplay: React.FC<
     props.bubbleRenderConfig?.afterMessageRender,
   ]);
 
-  return memo;
+  return messageContent;
 };

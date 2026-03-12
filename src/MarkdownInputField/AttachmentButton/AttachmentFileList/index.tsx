@@ -113,11 +113,6 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
     if (!visible) setImgSrc(undefined);
   };
 
-  const handleDelete = (file: AttachmentFile) => () => onDelete(file);
-  const handlePreviewFile = (file: AttachmentFile) => () => handlePreview(file);
-  const handleDownload = (file: AttachmentFile) => () => onDownload?.(file);
-  const handleRetry = (file: AttachmentFile) => () => onRetry?.(file);
-
   return wrapSSR(
     <div
       className={classNames(`${prefix}-container`, hashId, {
@@ -140,10 +135,10 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
               className={classNames(hashId, `${prefix}-item`)}
               key={getFileKey(file, index)}
               file={file}
-              onDelete={handleDelete(file)}
-              onPreview={handlePreviewFile(file)}
-              onDownload={handleDownload(file)}
-              onRetry={handleRetry(file)}
+              onDelete={onDelete}
+              onPreview={onPreview ?? handlePreview}
+              onDownload={onDownload}
+              onRetry={onRetry}
             />
           ))}
         </AnimatePresence>
