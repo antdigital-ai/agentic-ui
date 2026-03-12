@@ -377,14 +377,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         flex: 1,
         minWidth: 0,
         position: 'relative',
-        '--agentic-ui-table-border-radius': '8px',
-        '--agentic-ui-table-border-color': '#E7E9E8',
-        '--agentic-ui-table-header-bg': '#f7f7f9',
-        '--agentic-ui-table-cell-bg': '#ffffff',
-        '--agentic-ui-table-odd-row-bg': 'rgba(35,35,38,.04)',
-        '--agentic-ui-table-hover-bg': 'rgba(0, 0, 0, 0.04)',
-        '--agentic-ui-table-cell-min-width': '120px',
-        '--agentic-ui-table-cell-padding': '16px 12px',
+        '--agentic-ui-table-border-radius':
+          'var(--table-border-radius, 8px)',
+        '--agentic-ui-table-border-color':
+          'var(--table-border-color, #E7E9E8)',
+        '--agentic-ui-table-header-bg': 'var(--table-header-bg, #f7f7f9)',
+        '--agentic-ui-table-cell-bg': 'var(--table-cell-bg, #ffffff)',
+        '--agentic-ui-table-odd-row-bg':
+          'var(--table-odd-row-bg, rgba(35,35,38,.04))',
+        '--agentic-ui-table-hover-bg':
+          'var(--table-hover-bg, rgba(0, 0, 0, 0.04))',
+        '--agentic-ui-table-cell-min-width':
+          'var(--table-cell-min-width, 120px)',
+        '--agentic-ui-table-cell-padding':
+          'var(--table-cell-padding, 16px 12px)',
         '&-container': {
           display: 'flex',
           gap: 1,
