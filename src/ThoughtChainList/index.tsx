@@ -233,6 +233,18 @@ const ThoughtChainContent = React.memo<
       });
     }, [thoughtChainList, bubble?.isFinished, collapse]);
 
+    const mergedMarkdownProps = useMemo(
+      () =>
+        merge(markdownRenderProps || {}, {
+          codeProps: {
+            showLineNumbers: false,
+            showGutter: false,
+            fontSize: 12,
+          },
+        }),
+      [markdownRenderProps],
+    );
+
     return (
       <motion.div
         className={classNames(
@@ -292,13 +304,7 @@ const ThoughtChainContent = React.memo<
               >
                 <ThoughtChainListItem
                   index={index}
-                  markdownRenderProps={merge(markdownRenderProps, {
-                    codeProps: {
-                      showLineNumbers: false,
-                      showGutter: false,
-                      fontSize: 12,
-                    },
-                  })}
+                  markdownRenderProps={mergedMarkdownProps}
                   bubble={bubble}
                   thoughtChainListItem={item}
                   hashId={hashId}
@@ -399,8 +405,8 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
 
     // memo 化的回调函数
     const handleCollapseToggle = React.useCallback(() => {
-      setCollapse(!collapse);
-    }, [collapse]);
+      setCollapse((prev) => !prev);
+    }, []);
 
     const handleDocMetaClose = React.useCallback(() => {
       setDocMeta(null);
@@ -427,14 +433,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
 
       if (!loading && bubble?.isFinished) {
         if (time > 0) {
-          if (bubble?.isFinished) {
-            return `${locale?.taskComplete}, ${locale?.totalTimeUsed} ${time.toFixed(2)}s`;
-          }
-          return (
-            <FlipText
-              word={`${locale?.taskComplete}, ${locale?.totalTimeUsed} ${time.toFixed(2)}s`}
-            />
-          );
+          return `${locale?.taskComplete}, ${locale?.totalTimeUsed} ${time.toFixed(2)}s`;
         }
         return <FlipText word={locale?.taskComplete} />;
       }

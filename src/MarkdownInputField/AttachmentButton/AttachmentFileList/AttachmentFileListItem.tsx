@@ -12,10 +12,10 @@ type FileStatus = 'uploading' | 'error' | 'done';
 
 interface FileListItemProps {
   file: AttachmentFile;
-  onDelete: () => void;
-  onPreview: () => void;
-  onDownload: () => void;
-  onRetry?: () => void;
+  onDelete: (file: AttachmentFile) => void;
+  onPreview?: (file: AttachmentFile) => void;
+  onDownload?: (file: AttachmentFile) => void;
+  onRetry?: (file: AttachmentFile) => void;
   className?: string;
   prefixCls?: string;
   hashId?: string;
@@ -147,17 +147,17 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
 
   const handleFileClick = () => {
     if (!isDoneStatus) return;
-    onPreview?.();
+    onPreview?.(file);
   };
 
   const handleRetryClick = () => {
     if (!isErrorStatus) return;
-    onRetry?.();
+    onRetry?.(file);
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onDelete?.();
+    onDelete(file);
   };
 
   return (
