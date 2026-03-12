@@ -763,6 +763,20 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
 
       const selection = markdownEditorRef.current.selection;
 
+      // plainTextOnly 时仅插入纯文本，不做 HTML/Markdown/链接解析
+      if (pasteConfig?.plainTextOnly) {
+        if (selection) {
+          Transforms.insertText(markdownEditorRef.current, text, {
+            at: selection,
+          });
+        } else {
+          Transforms.insertNodes(markdownEditorRef.current, [
+            { type: 'paragraph', children: [{ text }] },
+          ]);
+        }
+        return;
+      }
+
       // 如果是表格或者代码块，直接插入文本
       if (shouldInsertTextDirectly(markdownEditorRef.current, selection)) {
         Transforms.insertText(markdownEditorRef.current, text);

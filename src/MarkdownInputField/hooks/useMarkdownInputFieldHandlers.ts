@@ -107,13 +107,12 @@ export const useMarkdownInputFieldHandlers = ({
     }
   });
 
-  // 图片粘贴上传
+  // 图片粘贴上传（仅在 attachment.enable 时生效，默认关闭）
   const handlePaste = useRefFunction(
     async (e: React.ClipboardEvent<HTMLDivElement>) => {
-      // 优先使用 props.attachment，如果没有则使用 markdownProps?.attachment
       const attachmentConfig =
         props.attachment || props.markdownProps?.attachment;
-      // 如果没有配置 upload 或 uploadWithResponse，不支持粘贴图片
+      if (!attachmentConfig?.enable) return;
       if (!attachmentConfig?.upload && !attachmentConfig?.uploadWithResponse) {
         return;
       }

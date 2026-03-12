@@ -144,7 +144,9 @@ describe('useMarkdownInputFieldHandlers', () => {
     it('使用 markdownProps.attachment 当 props.attachment 为空', async () => {
       const params = createDefaultParams();
       params.props.attachment = undefined;
-      params.props.markdownProps = { attachment: { upload: vi.fn() } };
+      params.props.markdownProps = {
+        attachment: { enable: true, upload: vi.fn() },
+      };
       mockGetFileListFromDataTransferItems.mockResolvedValue([
         { type: 'image/png', name: 'a.png' },
       ]);
@@ -153,6 +155,18 @@ describe('useMarkdownInputFieldHandlers', () => {
       await result.current.handlePaste(e);
       expect(mockGetFileListFromDataTransferItems).toHaveBeenCalledWith(e);
       expect(mockUpLoadFileToServer).toHaveBeenCalled();
+    });
+
+    it('attachment.enable 为 false 或未设置时不进行粘贴上传', async () => {
+      const params = createDefaultParams();
+      params.props.attachment = { enable: false, upload: vi.fn() };
+      mockGetFileListFromDataTransferItems.mockResolvedValue([
+        { type: 'image/png', name: 'a.png' },
+      ]);
+      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      await result.current.handlePaste({ clipboardData: { items: [] } } as any);
+      expect(mockGetFileListFromDataTransferItems).not.toHaveBeenCalled();
+      expect(mockUpLoadFileToServer).not.toHaveBeenCalled();
     });
 
     it('无 upload 且无 uploadWithResponse 时直接 return', async () => {
@@ -166,7 +180,7 @@ describe('useMarkdownInputFieldHandlers', () => {
 
     it('粘贴内容中无图片时直接 return', async () => {
       const params = createDefaultParams();
-      params.props.attachment = { upload: vi.fn() };
+      params.props.attachment = { enable: true, upload: vi.fn() };
       mockGetFileListFromDataTransferItems.mockResolvedValue([
         { type: 'text/plain', name: 'a.txt' },
       ]);
@@ -177,7 +191,7 @@ describe('useMarkdownInputFieldHandlers', () => {
 
     it('粘贴含图片时调用 upLoadFileToServer', async () => {
       const params = createDefaultParams();
-      params.props.attachment = { upload: vi.fn() };
+      params.props.attachment = { enable: true, upload: vi.fn() };
       mockGetFileListFromDataTransferItems.mockResolvedValue([
         { type: 'image/png', name: 'p.png' },
       ]);
