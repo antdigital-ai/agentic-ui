@@ -1,4 +1,10 @@
 import { Editor, Node, Operation, Path, Transforms } from 'slate';
+import { Text } from 'slate';
+
+/**
+ * 连续空格跳出链接的阈值（输入第二个空格时跳出 data-url）
+ */
+const SPACES_TO_EXIT_LINK = 2;
 
 /**
  * 处理链接卡片和媒体相关节点的操作
@@ -11,11 +17,34 @@ import { Editor, Node, Operation, Path, Transforms } from 'slate';
  * 处理以下链接和媒体相关操作:
  * - 拆分链接卡片或媒体节点 (split_node)
  * - 删除链接卡片内的节点 (remove_node)
+ * - 链接内连续输入两个空格时跳出链接 (insert_text)
  */
 const handleLinkAndMediaOperation = (
   editor: Editor,
   operation: Operation,
 ): boolean => {
+  if (operation.type === 'insert_text' && /^\s+$/.test(operation.text as string)) {
+    const currentNode = Node.get(editor, operation.path) as Record<
+      string,
+      unknown
+    >;
+    if (Text.isText(currentNode) && currentNode?.url) {
+      const text = (currentNode.text as string) || '';
+      const offset = operation.offset ?? editor.selection?.anchor?.offset ?? 0;
+      const isAtEnd = offset >= text.length;
+      const textAfterInsert = text.slice(0, offset) + (operation.text as string);
+      const trailingSpaces = textAfterInsert.match(/\s*$/)?.[0]?.length ?? 0;
+
+      if (isAtEnd && trailingSpaces >= SPACES_TO_EXIT_LINK) {
+        Transforms.insertNodes(editor, [{ text: operation.text as string }], {
+          at: Path.next(operation.path),
+          select: true,
+        });
+        return true;
+      }
+    }
+  }
+
   if (
     operation.type === 'split_node' &&
     (operation.properties?.type === 'link-card' ||
