@@ -364,18 +364,18 @@ export type MarkdownEditorProps = {
   /**
    * 样式
    * @description 支持通过 CSS 变量自定义表格等渲染样式，可覆盖的变量包括：
-   * - `--table-border-radius` 表格圆角，默认 8px
-   * - `--table-border-color` 表格边框颜色，默认 #E7E9E8
-   * - `--table-header-bg` 表头背景色，默认 #f7f7f9
-   * - `--table-hover-bg` 行悬停背景色，默认 rgba(0,0,0,0.04)
-   * - `--table-cell-min-width` 单元格最小宽度，默认 120px
-   * - `--table-cell-padding` 单元格内边距，默认 16px 12px
-   * @example style={{ ['--table-border-color']: '#ddd', ['--table-header-bg']: '#f0f0f0' } as React.CSSProperties}
+   * - `--agentic-ui-table-border-radius` 表格圆角，默认 8px
+   * - `--agentic-ui-table-border-color` 表格边框颜色，默认 #E7E9E8
+   * - `--agentic-ui-table-header-bg` 表头背景色，默认 #f7f7f9
+   * - `--agentic-ui-table-hover-bg` 行悬停背景色，默认 rgba(0,0,0,0.04)
+   * - `--agentic-ui-table-cell-min-width` 单元格最小宽度，默认 120px
+   * - `--agentic-ui-table-cell-padding` 单元格内边距，默认 16px 12px
+   * @example style={{ ['--agentic-ui-table-border-color']: '#ddd', ['--agentic-ui-table-header-bg']: '#f0f0f0' } as React.CSSProperties}
    */
   style?: React.CSSProperties;
   /**
    * 内容样式
-   * @description 支持 `--content-padding` 等 CSS 变量
+   * @description 支持 `--agentic-ui-content-padding` 等 CSS 变量
    */
   contentStyle?: React.CSSProperties;
   /**

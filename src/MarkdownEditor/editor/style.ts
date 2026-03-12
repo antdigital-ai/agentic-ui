@@ -11,21 +11,21 @@ import './code.css';
 import { TAG_STYLES } from './tagStyles';
 
 const COMMENT_HIGHLIGHT_COLOR =
-  'var(--agentic-comment-highlight-color, rgba(21, 0, 255, 0.15))';
+  'var(--agentic-ui-comment-highlight-color, rgba(21, 0, 255, 0.15))';
 
 /** Jinja 语法高亮 CSS 变量名，在 .ant-agentic-md-editor-content 上覆盖即可定制 */
 const JINJA_CSS_VAR = {
-  variable: '--agentic-md-editor-color-jinja-variable',
-  tag: '--agentic-md-editor-color-jinja-tag',
-  comment: '--agentic-md-editor-color-jinja-comment',
-  keyword: '--agentic-md-editor-color-jinja-keyword',
-  string: '--agentic-md-editor-color-jinja-string',
-  number: '--agentic-md-editor-color-jinja-number',
-  filter: '--agentic-md-editor-color-jinja-filter',
-  variableName: '--agentic-md-editor-color-jinja-variable-name',
-  placeholder: '--agentic-md-editor-color-jinja-placeholder',
-  placeholderBg: '--agentic-md-editor-color-jinja-placeholder-bg',
-  delimiter: '--agentic-md-editor-color-jinja-delimiter',
+  variable: '--agentic-ui-md-editor-color-jinja-variable',
+  tag: '--agentic-ui-md-editor-color-jinja-tag',
+  comment: '--agentic-ui-md-editor-color-jinja-comment',
+  keyword: '--agentic-ui-md-editor-color-jinja-keyword',
+  string: '--agentic-ui-md-editor-color-jinja-string',
+  number: '--agentic-ui-md-editor-color-jinja-number',
+  filter: '--agentic-ui-md-editor-color-jinja-filter',
+  variableName: '--agentic-ui-md-editor-color-jinja-variable-name',
+  placeholder: '--agentic-ui-md-editor-color-jinja-placeholder',
+  placeholderBg: '--agentic-ui-md-editor-color-jinja-placeholder-bg',
+  delimiter: '--agentic-ui-md-editor-color-jinja-delimiter',
 } as const;
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {

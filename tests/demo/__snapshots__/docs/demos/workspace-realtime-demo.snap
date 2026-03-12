@@ -308,7 +308,7 @@
               >
                 <div
                   class="ant-agentic-md-editor-container"
-                  style="height: 100%; --content-padding: 0px; padding: 0px; overflow: visible;"
+                  style="height: 100%; --agentic-ui-content-padding: 0px; padding: 0px; overflow: visible;"
                   tabindex="-1"
                 >
                   <div

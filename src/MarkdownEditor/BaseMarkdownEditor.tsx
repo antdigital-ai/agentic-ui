@@ -429,7 +429,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 // 如果 contentStyle 中设置了 padding，设置 CSS 变量和内联样式
                 ...(contentStyle?.padding !== undefined
                   ? {
-                      '--content-padding': `${
+                      '--agentic-ui-content-padding': `${
                         typeof contentStyle.padding === 'number'
                           ? `${contentStyle.padding}px`
                           : contentStyle.padding
