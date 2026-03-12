@@ -420,6 +420,11 @@ export type MarkdownEditorProps = {
   pasteConfig?: {
     enabled?: boolean;
     allowedTypes?: string[];
+    /**
+     * 仅插入纯文本，不解析 HTML/Markdown/链接等
+     * @default false
+     */
+    plainTextOnly?: boolean;
   };
   /**
    * Jinja 配置：语法高亮与模板面板（输入 `{}` 触发）

@@ -67,6 +67,8 @@ export type { MarkdownInputFieldProps };
  * - 支持自动完成功能
  * - 支持自定义渲染配置
  */
+const DEFAULT_ATTACHMENT = { enable: false } as const;
+
 const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   tagInputProps,
   markdownProps,
@@ -76,6 +78,8 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   isShowTopOperatingArea = false,
   ...props
 }) => {
+  // 默认关闭文件上传，需显式传入 attachment.enable: true 开启
+  const attachment = { ...DEFAULT_ATTACHMENT, ...props.attachment };
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const baseCls = getPrefixCls('agentic-md-input-field');
   const { wrapSSR, hashId } = useStyle(baseCls, props.disableHoverAnimation);
@@ -95,7 +99,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   } = useMarkdownInputFieldState({
     value: props.value,
     onChange: props.onChange,
-    attachment: props.attachment,
+    attachment,
   });
 
   // 边框光束动画状态
@@ -138,7 +142,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     toolsRender: props.toolsRender,
     maxHeight: props.maxHeight,
     style: props.style,
-    attachment: props.attachment,
+    attachment,
     isEnlarged,
     rightPadding,
     topRightPadding,
@@ -168,7 +172,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     handleFileRemoval,
     handleFileRetry,
   } = useFileUploadManager({
-    attachment: props.attachment,
+    attachment,
     fileMap,
     onFileMapChange: setFileMap,
   });
@@ -195,7 +199,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
       onSend: props.onSend,
       allowEmptySubmit: props.allowEmptySubmit,
       markdownProps,
-      attachment: props.attachment,
+      attachment,
       triggerSendKey: props.triggerSendKey,
     },
     markdownEditorRef,
@@ -215,7 +219,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
 
   // 渲染辅助
   const attachmentList = useAttachmentList({
-    attachment: props.attachment,
+    attachment,
     fileMap,
     handleFileRemoval,
     handleFileRetry,
@@ -231,7 +235,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
 
   const sendActionsNode = useSendActionsNode({
     props: {
-      attachment: props.attachment,
+      attachment,
       voiceRecognizer: props.voiceRecognizer,
       value,
       disabled: props.disabled,
@@ -413,7 +417,11 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                 }}
                 titlePlaceholderContent={props.placeholder}
                 toc={false}
-                pasteConfig={props.pasteConfig}
+                pasteConfig={{
+                  allowedTypes: ['text/plain'],
+                  plainTextOnly: true,
+                  ...props.pasteConfig,
+                }}
                 {...markdownProps}
               >
                 {props?.quickActionRender ||
@@ -460,6 +468,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   value,
                   fileMap,
                   onFileMapChange: setFileMap,
+                  attachment,
                   ...props,
                   isHover,
                   isLoading,

@@ -135,6 +135,7 @@ export type MarkdownInputFieldProps = {
   /**
    * 附件配置
    * @description 配置附件功能，可以启用或禁用附件上传，并自定义附件按钮的属性
+   * @default { enable: false } 默认关闭文件上传
    * @example
    * ```tsx
    * <BubbleChat
@@ -150,7 +151,14 @@ export type MarkdownInputFieldProps = {
    * />
    * ```
    */
+  /**
+   * 附件配置，默认 enable 为 false，需显式开启文件上传
+   */
   attachment?: {
+    /**
+     * 是否启用文件上传（包含粘贴图片上传）
+     * @default false
+     */
     enable?: boolean;
   } & AttachmentButtonProps;
 
@@ -333,7 +341,7 @@ export type MarkdownInputFieldProps = {
     enabled?: boolean;
     /**
      * 允许的粘贴内容类型
-     * @default ['application/x-slate-md-fragment', 'text/html', 'Files', 'text/markdown', 'text/plain']
+     * MarkdownInputField 默认为 ['text/plain']，仅粘贴纯文本
      */
     allowedTypes?: Array<
       | 'application/x-slate-md-fragment'
@@ -342,6 +350,11 @@ export type MarkdownInputFieldProps = {
       | 'text/markdown'
       | 'text/plain'
     >;
+    /**
+     * 是否仅插入纯文本，不处理 HTML、链接、Markdown 解析等
+     * MarkdownInputField 默认为 true
+     */
+    plainTextOnly?: boolean;
   };
 
   /**
