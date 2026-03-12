@@ -389,6 +389,20 @@ export type MarkdownEditorProps = {
     };
     pure?: boolean;
     previewTitle?: string;
+    /**
+     * 表格 CSS 变量覆盖，支持通过配置自定义表格样式
+     * @example
+     * ```tsx
+     * tableConfig={{
+     *   cssVariables: {
+     *     '--agentic-ui-table-border-color': '#d9d9d9',
+     *     '--agentic-ui-table-header-bg': '#fafafa',
+     *     '--agentic-ui-table-cell-min-width': '150px',
+     *   },
+     * }}
+     * ```
+     */
+    cssVariables?: Record<`--${string}`, string>;
   };
   /**
    * 粘贴配置

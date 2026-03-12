@@ -48,7 +48,8 @@ export const SlateTable = ({
 }: {
   children: React.ReactNode;
 } & RenderElementProps) => {
-  const { readonly, markdownContainerRef } = useEditorStore();
+  const { readonly, markdownContainerRef, editorProps } = useEditorStore();
+  const tableCssVariables = editorProps?.tableConfig?.cssVariables;
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { tablePath } = useContext(TablePropsContext);
 
@@ -261,6 +262,7 @@ export const SlateTable = ({
       style={{
         ...boxShadowStyle,
         position: 'relative',
+        ...(tableCssVariables as React.CSSProperties),
       }}
       onDragStart={(e) => {
         // 阻止拖拽开始时的文字选择

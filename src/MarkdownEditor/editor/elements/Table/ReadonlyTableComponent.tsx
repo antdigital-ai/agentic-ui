@@ -39,6 +39,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
         fullScreen: 'modal',
         copy: 'md',
       },
+      cssVariables: tableCssVariables,
     } = editorProps?.tableConfig || {};
 
     const tableTargetRef = useRef<HTMLTableElement>(null);
@@ -157,7 +158,11 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
 
     return (
       <>
-        <div ref={containerRef} className={classNames(baseCls)}>
+        <div
+          ref={containerRef}
+          className={classNames(baseCls)}
+          style={tableCssVariables as React.CSSProperties}
+        >
           {tableDom}
         </div>
         {popoverContent}
@@ -189,6 +194,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
                   minWidth: 0,
                   overflow: 'auto',
                   width: 'calc(80vw - 64px)',
+                  ...(tableCssVariables as React.CSSProperties),
                 }}
                 ref={modelTargetRef}
                 onMouseDown={(e) => {

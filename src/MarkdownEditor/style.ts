@@ -377,12 +377,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         flex: 1,
         minWidth: 0,
         position: 'relative',
-        '--table-border-radius': '8px',
-        '--table-border-color': '#E7E9E8',
-        '--table-header-bg': '#f7f7f9',
-        '--table-odd-row-bg': 'rgba(35,35,38,.04)',
-        '--table-hover-bg': 'rgba(0, 0, 0, 0.04)',
-        '--table-cell-min-width': '120px',
+        '--agentic-ui-table-border-radius':
+          'var(--table-border-radius, 8px)',
+        '--agentic-ui-table-border-color':
+          'var(--table-border-color, #E7E9E8)',
+        '--agentic-ui-table-header-bg': 'var(--table-header-bg, #f7f7f9)',
+        '--agentic-ui-table-cell-bg': 'var(--table-cell-bg, #ffffff)',
+        '--agentic-ui-table-odd-row-bg':
+          'var(--table-odd-row-bg, rgba(35,35,38,.04))',
+        '--agentic-ui-table-hover-bg':
+          'var(--table-hover-bg, rgba(0, 0, 0, 0.04))',
+        '--agentic-ui-table-cell-min-width':
+          'var(--table-cell-min-width, 120px)',
+        '--agentic-ui-table-cell-padding':
+          'var(--table-cell-padding, 16px 12px)',
         '&-container': {
           display: 'flex',
           gap: 1,
@@ -431,8 +439,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
           position: 'relative',
           fontVariant: 'tabular-nums',
-          borderRadius: 'var(--table-border-radius)',
-          border: '1px solid var(--table-border-color)',
+          borderRadius: 'var(--agentic-ui-table-border-radius)',
+          border: '1px solid var(--agentic-ui-table-border-color)',
 
           [`&${token.componentCls}-content-table-readonly-pure`]: {
             border: 'none',
@@ -441,7 +449,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
               borderLeft: 'none',
             },
             'tr:not(.config-tr):last-child td:not(.config-td)': {
-              borderBottom: '1px solid var(--table-border-color)',
+              borderBottom: '1px solid var(--agentic-ui-table-border-color)',
             },
             'tr:not(.config-tr):first-child th:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:first-child:not(.config-td):not([colspan]):not([rowspan])':
               {
@@ -462,26 +470,26 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
 
           'th.config-th,td.config-td': {
-            borderBottom: '1px solid var(--table-border-color)',
-            borderLeft: '1px solid var(--table-border-color)',
+            borderBottom: '1px solid var(--agentic-ui-table-border-color)',
+            borderLeft: '1px solid var(--agentic-ui-table-border-color)',
           },
           'tr td.config-td:first-child': {
             borderLeft: 'none',
           },
 
           'th:not(.config-td)': {
-            backgroundColor: 'var(--table-header-bg)',
-            borderBottom: '1px solid var(--table-border-color)',
+            backgroundColor: 'var(--agentic-ui-table-header-bg)',
+            borderBottom: '1px solid var(--agentic-ui-table-border-color)',
             textWrap: 'nowrap',
             verticalAlign: 'top',
-            padding: 'var(--table-cell-padding, 16px 12px)',
+            padding: 'var(--agentic-ui-table-cell-padding, 16px 12px)',
             textAlign: 'left',
             lineHeight: '24px',
             fontSize: '1em',
             fontWeight: 600,
             borderTop: 'none',
-            minWidth: 'var(--table-cell-min-width)',
-            width: 'var(--table-cell-min-width)',
+            minWidth: 'var(--agentic-ui-table-cell-min-width)',
+            width: 'var(--agentic-ui-table-cell-min-width)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -490,13 +498,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
           'td:not(.config-td)': {
             verticalAlign: 'top',
-            padding: 'var(--table-cell-padding, 16px 12px)',
+            padding: 'var(--agentic-ui-table-cell-padding, 16px 12px)',
             textAlign: 'left',
             position: 'relative',
             lineHeight: '24px',
             fontSize: '1em',
-            minWidth: 'var(--table-cell-min-width)',
-            width: 'var(--table-cell-min-width)',
+            minWidth: 'var(--agentic-ui-table-cell-min-width)',
+            width: 'var(--agentic-ui-table-cell-min-width)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -514,8 +522,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
               borderTop: 'none',
             },
             'td:not(.config-td)': {
-              borderBottom: '1px solid var(--table-border-color)',
-              borderLeft: '1px solid var(--table-border-color)',
+              borderBottom: '1px solid var(--agentic-ui-table-border-color)',
+              borderLeft: '1px solid var(--agentic-ui-table-border-color)',
 
               '&:first-child': {
                 fontSize: '1em',
@@ -532,7 +540,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
           'tbody tr:not(.config-tr):hover': {
             background:
-              'linear-gradient(var(--table-hover-bg), var(--table-hover-bg)), linear-gradient(white, white)',
+              'linear-gradient(var(--agentic-ui-table-hover-bg), var(--agentic-ui-table-hover-bg)), linear-gradient(var(--agentic-ui-table-cell-bg), var(--agentic-ui-table-cell-bg))',
           },
           // 表格圆角处理
           'th:not(.config-td), td:not(.config-td)': {
@@ -541,51 +549,51 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
           'tr:not(.config-tr):first-child th:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:first-child:not(.config-td):not([colspan]):not([rowspan])':
             {
-              borderTopLeftRadius: 'var(--table-border-radius)',
+              borderTopLeftRadius: 'var(--agentic-ui-table-border-radius)',
             },
           'tr:not(.config-tr):first-child th:last-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:last-child:not(.config-td):not([colspan]):not([rowspan])':
             {
-              borderTopRightRadius: 'var(--table-border-radius)',
+              borderTopRightRadius: 'var(--agentic-ui-table-border-radius)',
             },
           'tr:not(.config-tr):last-child td:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):last-child th:first-child:not(.config-td):not([colspan]):not([rowspan])':
             {
-              borderBottomLeftRadius: 'var(--table-border-radius)',
+              borderBottomLeftRadius: 'var(--agentic-ui-table-border-radius)',
             },
           'tr:not(.config-tr):last-child td:last-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):last-child th:last-child:not(.config-td):not([colspan]):not([rowspan])':
             {
-              borderBottomRightRadius: 'var(--table-border-radius)',
+              borderBottomRightRadius: 'var(--agentic-ui-table-border-radius)',
             },
 
           // 处理合并单元格的圆角
           'tr:not(.config-tr):first-child th:not(.config-td)[colspan]:first-child, tr:not(.config-tr):first-child td:not(.config-td)[colspan]:first-child,tr:not(.config-tr):first-child th:not(.config-td)[rowspan]:first-child, tr:not(.config-tr):first-child td:not(.config-td)[rowspan]:first-child':
             {
-              borderTopLeftRadius: 'var(--table-border-radius)',
+              borderTopLeftRadius: 'var(--agentic-ui-table-border-radius)',
             },
 
           'tr:not(.config-tr):first-child th:not(.config-td)[colspan]:last-child, tr:not(.config-tr):first-child td:not(.config-td)[colspan]:last-child,tr:not(.config-tr):first-child th:not(.config-td)[rowspan]:last-child, tr:not(.config-tr):first-child td:not(.config-td)[rowspan]:last-child':
             {
-              borderTopRightRadius: 'var(--table-border-radius)',
+              borderTopRightRadius: 'var(--agentic-ui-table-border-radius)',
             },
 
           'tr:not(.config-tr):last-child td:not(.config-td)[colspan]:first-child, tr:not(.config-tr):last-child th:not(.config-td)[colspan]:first-child,tr:not(.config-tr):last-child td:not(.config-td)[rowspan]:first-child, tr:not(.config-tr):last-child th:not(.config-td)[rowspan]:first-child':
             {
-              borderBottomLeftRadius: 'var(--table-border-radius)',
+              borderBottomLeftRadius: 'var(--agentic-ui-table-border-radius)',
             },
 
           'tr:not(.config-tr):last-child td:not(.config-td)[colspan]:last-child, tr:not(.config-tr):last-child th:not(.config-td)[colspan]:last-child,tr:not(.config-tr):last-child td:not(.config-td)[rowspan]:last-child, tr:not(.config-tr):last-child th:not(.config-td)[rowspan]:last-child':
             {
-              borderBottomRightRadius: 'var(--table-border-radius)',
+              borderBottomRightRadius: 'var(--agentic-ui-table-border-radius)',
             },
 
           'tr:not(.config-tr):first-child:last-child th:not(.config-td)[colspan]:first-child:last-child, tr:not(.config-tr):first-child:last-child td:not(.config-td)[colspan]:first-child:last-child':
             {
-              borderRadius: 'var(--table-border-radius)',
+              borderRadius: 'var(--agentic-ui-table-border-radius)',
             },
 
           'th:not(.config-td)[rowspan]:first-child:last-child, td:not(.config-td)[rowspan]:first-child:last-child':
             {
-              borderTopLeftRadius: 'var(--table-border-radius)',
-              borderBottomLeftRadius: 'var(--table-border-radius)',
+              borderTopLeftRadius: 'var(--agentic-ui-table-border-radius)',
+              borderBottomLeftRadius: 'var(--agentic-ui-table-border-radius)',
             },
           [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
             'th:not(.config-td), td:not(.config-td)': {
@@ -667,7 +675,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 1000,
         justifyContent: 'center',
         fontSize: 12,
-        border: '1px solid var(--table-border-color)',
+        border: '1px solid var(--agentic-ui-table-border-color)',
         width: '20px',
         height: '20px',
         cursor: 'pointer',
@@ -731,7 +739,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         justifyContent: 'center',
         fontSize: 12,
-        border: '1px solid var(--table-border-color)',
+        border: '1px solid var(--agentic-ui-table-border-color)',
         width: '20px',
         height: '20px',
         cursor: 'pointer',
