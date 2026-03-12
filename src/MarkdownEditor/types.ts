@@ -402,7 +402,7 @@ export type MarkdownEditorProps = {
      * }}
      * ```
      */
-    cssVariables?: Record<string, string>;
+    cssVariables?: Record<`--${string}`, string>;
   };
   /**
    * 粘贴配置
