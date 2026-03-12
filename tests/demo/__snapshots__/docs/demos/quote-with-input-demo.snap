@@ -582,7 +582,7 @@ useEffect(() =&gt; {
               >
                 <div
                   class="ant-agentic-md-editor-container"
-                  style="height: 100%; --content-padding: var(--padding-3x); align-items: flex-start; padding-right: 64px;"
+                  style="height: 100%; --agentic-ui-content-padding: var(--padding-3x); align-items: flex-start; padding-right: 64px;"
                   tabindex="-1"
                 >
                   <div

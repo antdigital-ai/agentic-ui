@@ -37,7 +37,7 @@
             >
               <div
                 class="ant-agentic-md-editor-container"
-                style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none; --content-padding: 0px; padding: 0px;"
+                style="overflow: auto; display: flex; height: 100%; position: relative; gap: 24px; outline: none; --agentic-ui-content-padding: 0px; padding: 0px;"
                 tabindex="-1"
               >
                 <div
