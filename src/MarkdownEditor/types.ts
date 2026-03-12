@@ -395,9 +395,9 @@ export type MarkdownEditorProps = {
      * ```tsx
      * tableConfig={{
      *   cssVariables: {
-     *     '--table-border-color': '#d9d9d9',
-     *     '--table-header-bg': '#fafafa',
-     *     '--table-cell-min-width': '150px',
+     *     '--agentic-ui-table-border-color': '#d9d9d9',
+     *     '--agentic-ui-table-header-bg': '#fafafa',
+     *     '--agentic-ui-table-cell-min-width': '150px',
      *   },
      * }}
      * ```
