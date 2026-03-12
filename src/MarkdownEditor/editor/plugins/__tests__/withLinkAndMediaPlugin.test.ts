@@ -50,4 +50,42 @@ describe('withLinkAndMediaPlugin', () => {
     expect(insertNodesSpy).toHaveBeenCalled();
     insertNodesSpy.mockRestore();
   });
+
+  it('应在链接末尾连续输入两个空格时跳出 data-url，插入空格到链接外', () => {
+    const editor = withLinkAndMediaPlugin(createEditor());
+    editor.children = [
+      {
+        type: 'paragraph',
+        children: [
+          {
+            text: 'https://example.com ',
+            url: 'https://example.com',
+          },
+        ],
+      },
+    ];
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 20 },
+      focus: { path: [0, 0], offset: 20 },
+    };
+
+    const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+
+    editor.apply({
+      type: 'insert_text',
+      path: [0, 0],
+      offset: 20,
+      text: ' ',
+    });
+
+    expect(insertNodesSpy).toHaveBeenCalledWith(
+      editor,
+      [{ text: ' ' }],
+      expect.objectContaining({
+        at: [0, 1],
+        select: true,
+      }),
+    );
+    insertNodesSpy.mockRestore();
+  });
 });
