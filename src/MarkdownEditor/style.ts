@@ -380,9 +380,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '--table-border-radius': '8px',
         '--table-border-color': '#E7E9E8',
         '--table-header-bg': '#f7f7f9',
+        '--table-cell-bg': '#ffffff',
         '--table-odd-row-bg': 'rgba(35,35,38,.04)',
         '--table-hover-bg': 'rgba(0, 0, 0, 0.04)',
         '--table-cell-min-width': '120px',
+        '--table-cell-padding': '16px 12px',
         '&-container': {
           display: 'flex',
           gap: 1,
@@ -532,7 +534,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
           'tbody tr:not(.config-tr):hover': {
             background:
-              'linear-gradient(var(--table-hover-bg), var(--table-hover-bg)), linear-gradient(white, white)',
+              'linear-gradient(var(--table-hover-bg), var(--table-hover-bg)), linear-gradient(var(--table-cell-bg), var(--table-cell-bg))',
           },
           // 表格圆角处理
           'th:not(.config-td), td:not(.config-td)': {
