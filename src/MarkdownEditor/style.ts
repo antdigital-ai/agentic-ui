@@ -374,7 +374,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 表格样式使用 CSS 变量 + fallback，支持通过父级 style 或 ConfigProvider 覆盖：
       // --agentic-ui-table-border-radius, --agentic-ui-table-border-color,
       // --agentic-ui-table-header-bg, --agentic-ui-table-hover-bg,
-      // --agentic-ui-table-cell-min-width, --agentic-ui-table-cell-padding
+      // --agentic-ui-table-cell-bg, --agentic-ui-table-cell-min-width,
+      // --agentic-ui-table-cell-padding
       [`${token.componentCls}-content-table`]: {
         width: '100%',
         overflow: 'auto',
@@ -530,7 +531,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
           'tbody tr:not(.config-tr):hover': {
             background:
-              'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(white, white)',
+              'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))',
           },
           // 表格圆角处理
           'th:not(.config-td), td:not(.config-td)': {

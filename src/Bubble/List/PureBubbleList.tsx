@@ -104,7 +104,7 @@ export interface PureBubbleListProps {
   };
 }
 
-export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
+export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
   const {
     bubbleList,
     bubbleListRef,
@@ -138,7 +138,7 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
   const prefixClass = getPrefixCls('agentic-bubble-list');
   const { wrapSSR, hashId } = useStyle(prefixClass);
 
-  const deps = useMemo(() => [props.style], [JSON.stringify(props.style)]);
+  const deps = useMemo(() => [props.style], [props.style]);
 
   // 为 loading 项生成唯一的 key，使用 ref 缓存以确保稳定性
   const loadingKeysRef = useRef<Map<string, string>>(new Map());
@@ -152,8 +152,11 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
       const BubbleComponent =
         placement === 'right' ? PureUserBubble : PureAIBubble;
       const isLast = index === bubbleList.length - 1;
-      (item as any).isLatest = isLast;
-      (item as any).isLast = isLast;
+      const originDataWithFlags = {
+        ...item,
+        isLatest: isLast,
+        isLast,
+      };
 
       // 如果 id 是 LOADING_FLAT，使用 uuid 作为 key
       // 使用 index 和 createAt 的组合作为缓存 key，确保同一项在重新渲染时保持相同的 key
@@ -179,7 +182,7 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
           style={{
             ...styles?.bubbleListItemStyle,
           }}
-          originData={item}
+          originData={originDataWithFlags}
           placement={placement}
           time={item.updateAt || item.createAt}
           deps={deps}
@@ -295,6 +298,8 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
       {listDom}
     </div>,
   );
-};
+});
+
+PureBubbleList.displayName = 'PureBubbleList';
 
 export default PureBubbleList;

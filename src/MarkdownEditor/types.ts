@@ -368,6 +368,7 @@ export type MarkdownEditorProps = {
    * - `--agentic-ui-table-border-color` 表格边框颜色，默认 #E7E9E8
    * - `--agentic-ui-table-header-bg` 表头背景色，默认 #f7f7f9
    * - `--agentic-ui-table-hover-bg` 行悬停背景色，默认 rgba(0,0,0,0.04)
+   * - `--agentic-ui-table-cell-bg` 单元格背景色，默认 #ffffff
    * - `--agentic-ui-table-cell-min-width` 单元格最小宽度，默认 120px
    * - `--agentic-ui-table-cell-padding` 单元格内边距，默认 16px 12px
    * @example style={{ ['--agentic-ui-table-border-color']: '#ddd', ['--agentic-ui-table-header-bg']: '#f0f0f0' } as React.CSSProperties}
@@ -398,6 +399,20 @@ export type MarkdownEditorProps = {
     };
     pure?: boolean;
     previewTitle?: string;
+    /**
+     * 表格 CSS 变量覆盖，支持通过配置自定义表格样式
+     * @example
+     * ```tsx
+     * tableConfig={{
+     *   cssVariables: {
+     *     '--agentic-ui-table-border-color': '#d9d9d9',
+     *     '--agentic-ui-table-header-bg': '#fafafa',
+     *     '--agentic-ui-table-cell-min-width': '150px',
+     *   },
+     * }}
+     * ```
+     */
+    cssVariables?: Record<`--${string}`, string>;
   };
   /**
    * 粘贴配置
