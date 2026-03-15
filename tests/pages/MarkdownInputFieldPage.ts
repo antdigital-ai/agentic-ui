@@ -31,10 +31,13 @@ export class MarkdownInputFieldPage {
 
   /**
    * 导航到 demo 页面
+   * 使用 domcontentloaded 先完成 DOM，减少 load 阶段资源压力，降低 headless 下 Page crashed 概率。
    */
   async goto(demoPath: string = 'markdowninputfield-demo-1') {
-    await this.page.goto(`/~demos/${demoPath}`);
-    // 等待页面加载完成（DOMContentLoaded 和 networkidle）
+    await this.page.goto(`/~demos/${demoPath}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60_000,
+    });
     await this.page.waitForLoadState('networkidle');
     await this.waitForReady();
   }
