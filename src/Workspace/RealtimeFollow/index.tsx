@@ -283,7 +283,8 @@ const Overlay: React.FC<{
   );
 };
 
-const getContentForEditor = (
+/** 供测试覆盖使用：根据 type 将 content 转为编辑器所需字符串 */
+export const getContentForEditor = (
   type: RealtimeFollowMode,
   content: string | DiffContent | undefined,
 ): string => {

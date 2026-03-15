@@ -4,6 +4,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../src/I18n';
 import {
+  getContentForEditor,
   RealtimeFollow,
   RealtimeFollowList,
   shouldUpdateEditor,
@@ -1019,6 +1020,23 @@ describe('RealtimeFollow Component', () => {
     });
   });
 
+  describe('getContentForEditor 分支覆盖 (291-292)', () => {
+    it('type 为 html 且 content 为字符串时返回包装后的 html 代码块', () => {
+      expect(getContentForEditor('html', '<p>hi</p>')).toBe(
+        '```html\n<p>hi</p>\n```',
+      );
+    });
+    it('type 为 html 且 content 非字符串时使用空字符串 (291-292)', () => {
+      expect(
+        getContentForEditor('html', {
+          original: '<h1>old</h1>',
+          modified: '<h1>new</h1>',
+        }),
+      ).toBe('```html\n\n```');
+      expect(getContentForEditor('html', undefined)).toBe('```html\n\n```');
+    });
+  });
+
   describe('RealtimeFollow - Edge Cases', () => {
     it('应该处理无效类型 (373)', () => {
       const { container } = render(
@@ -1675,28 +1693,6 @@ describe('RealtimeFollow Component', () => {
         htmlPreviewResult.container.querySelector('iframe'),
       ).toBeInTheDocument();
       htmlPreviewResult.unmount();
-    });
-
-    it('应该处理 onViewModeChange 回调', () => {
-      const onViewModeChange = vi.fn();
-
-      render(
-        <TestWrapper>
-          <RealtimeFollow
-            data={{
-              type: 'html',
-              content: '<h1>测试</h1>',
-              onViewModeChange,
-              status: 'done',
-            }}
-            htmlViewMode="preview"
-          />
-        </TestWrapper>,
-      );
-
-      // 通过 HtmlPreview 组件触发回调
-      const iframe = document.querySelector('iframe');
-      expect(iframe).toBeInTheDocument();
     });
 
     it('应该处理 RealtimeHeader 中无 locale 的情况', () => {
