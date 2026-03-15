@@ -246,4 +246,34 @@ describe('useThrottleFn', () => {
 
     expect(mockAsyncFn).toHaveBeenCalledWith('test');
   });
+
+  it('should not create duplicate timeout when called multiple times within interval', () => {
+    const setTimeoutSpy = vi.spyOn(global, 'setTimeout');
+    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
+    const mockFn = vi.fn();
+    const { result } = renderHook(() => useThrottleFn(mockFn, 100));
+
+    act(() => {
+      result.current('first');
+    });
+    expect(mockFn).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      result.current('second');
+    });
+    act(() => {
+      result.current('third');
+    });
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    expect(mockFn).toHaveBeenCalledTimes(2);
+    expect(mockFn).toHaveBeenLastCalledWith('third');
+
+    setTimeoutSpy.mockRestore();
+    clearTimeoutSpy.mockRestore();
+  });
 });

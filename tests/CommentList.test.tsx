@@ -402,4 +402,79 @@ describe('CommentList Component', () => {
 
     expect(screen.getByText('This is a test comment')).toBeInTheDocument();
   });
+
+  it('pure 为 false 时渲染 300px 占位 div', () => {
+    const { container } = renderWithProvider(
+      <CommentList
+        commentList={[mockCommentData[0]]}
+        comment={mockComment}
+        pure={false}
+      />,
+    );
+    const placeholder = container.querySelector('div[style*="300px"]');
+    expect(placeholder).toBeInTheDocument();
+  });
+
+  it('pure 为 true 时不渲染占位 div', () => {
+    const { container } = renderWithProvider(
+      <CommentList
+        commentList={[mockCommentData[0]]}
+        comment={mockComment}
+        pure={true}
+      />,
+    );
+    const placeholder = container.querySelector('div[style*="width: 300px"]');
+    expect(placeholder).toBeNull();
+  });
+
+  it('点击跳转按钮时执行 scrollIntoView、scrollBy 并调用 comment.onClick', () => {
+    const scrollIntoViewMock = vi.fn();
+    const scrollByMock = vi.fn();
+    const mockEl = {
+      scrollIntoView: scrollIntoViewMock,
+    };
+    const getElementByIdSpy = vi
+      .spyOn(document, 'getElementById')
+      .mockReturnValue(mockEl as any);
+    const scrollBySpy = vi.spyOn(window, 'scrollBy').mockImplementation(scrollByMock);
+
+    renderWithProvider(
+      <CommentList
+        commentList={[mockCommentData[0]]}
+        comment={mockComment}
+        style={{ width: '300px' }}
+      />,
+    );
+
+    const jumpButton = screen.getByLabelText('export');
+    fireEvent.click(jumpButton);
+
+    expect(getElementByIdSpy).toHaveBeenCalledWith('comment-comment-1');
+    expect(scrollIntoViewMock).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+    expect(scrollBySpy).toHaveBeenCalledWith(0, -40);
+    expect(mockComment.onClick).toHaveBeenCalledWith(
+      'comment-1',
+      mockCommentData[0],
+    );
+
+    getElementByIdSpy.mockRestore();
+    scrollBySpy.mockRestore();
+  });
+
+  it('无 comment 时点击编辑或删除不报错', () => {
+    renderWithProvider(
+      <CommentList
+        commentList={[mockCommentData[0]]}
+        comment={undefined as any}
+        style={{ width: '300px' }}
+      />,
+    );
+    const editButton = screen.queryByLabelText('edit');
+    const deleteButton = screen.queryByLabelText('delete');
+    expect(editButton).not.toBeInTheDocument();
+    expect(deleteButton).not.toBeInTheDocument();
+  });
 });

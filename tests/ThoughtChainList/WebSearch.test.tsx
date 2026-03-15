@@ -6,8 +6,10 @@ import { I18nContext } from '../../src/I18n';
 import { WebSearch } from '../../src/ThoughtChainList/WebSearch';
 
 vi.mock('../../src/ThoughtChainList/MarkdownEditor', () => ({
-  MarkdownEditorUpdate: ({ initValue }: any) => (
-    <div data-testid="markdown-editor">{initValue}</div>
+  MarkdownEditorUpdate: ({ initValue, typewriter }: any) => (
+    <div data-testid="markdown-editor" data-typewriter={String(!!typewriter)}>
+      {initValue}
+    </div>
   ),
 }));
 
@@ -74,5 +76,34 @@ describe('WebSearch', () => {
   it('should not show loading when finished without output', () => {
     wrap(<WebSearch info="q" category="web_search" isFinished />);
     expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+  });
+
+  it('should show error UI when output.response.error is set', () => {
+    wrap(
+      <WebSearch
+        info="q"
+        category="web_search"
+        output={{ response: { error: 'API failed' } }}
+        isFinished
+      />,
+    );
+    expect(screen.getByText('"API failed"')).toBeInTheDocument();
+  });
+
+  it('should pass typewriter to MarkdownEditorUpdate when streaming and no error', () => {
+    wrap(
+      <WebSearch
+        info="q"
+        category="web_search"
+        output={{
+          data: '>streaming',
+          type: 'TOKEN',
+          response: {},
+        }}
+        isFinished={false}
+      />,
+    );
+    const editor = screen.getByTestId('markdown-editor');
+    expect(editor).toHaveAttribute('data-typewriter', 'true');
   });
 });

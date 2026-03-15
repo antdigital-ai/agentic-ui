@@ -38,6 +38,15 @@ export default defineConfig({
         '**/icons/**',
         'test/**',
       ],
+      // 启用 COVERAGE_ENFORCE=1 时强制覆盖率阈值；目标 90%，当前分支约 84%，后续可逐步提升
+      ...(process.env.COVERAGE_ENFORCE === '1' && {
+        thresholds: {
+          lines: 90,
+          functions: 90,
+          branches: 84,
+          statements: 90,
+        },
+      }),
     },
   },
 });

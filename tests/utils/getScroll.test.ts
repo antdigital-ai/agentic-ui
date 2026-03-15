@@ -68,6 +68,21 @@ describe('getScroll', () => {
       expect(getScroll(target as any)).toBe(42);
     });
 
+    it('falls back to target.documentElement.scrollTop when result is not number and no ownerDocument', () => {
+      const doc = document.implementation.createHTMLDocument('');
+      Object.defineProperty(doc.documentElement, 'scrollTop', {
+        value: 88,
+        writable: true,
+        configurable: true,
+      });
+      const target = {
+        scrollTop: undefined,
+        ownerDocument: undefined,
+        documentElement: doc.documentElement,
+      };
+      expect(getScroll(target as any)).toBe(88);
+    });
+
     it('returns 0 when target is null', () => {
       expect(getScroll(null)).toBe(0);
     });

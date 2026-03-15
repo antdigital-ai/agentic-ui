@@ -269,6 +269,63 @@ describe('ToolCall Component', () => {
       await user.click(retryButton);
       expect(onChangeItem).toHaveBeenCalled();
     });
+    it('同时传 onItemChange 与 onChangeItem 时点击重试应优先调用 onItemChange', async () => {
+      const onItemChange = vi.fn();
+      const onChangeItem = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <ToolCall
+          {...mockProps}
+          onItemChange={onItemChange}
+          onChangeItem={onChangeItem}
+        />,
+      );
+      const editButton = screen.getByTestId('action-修改');
+      await user.click(editButton);
+      const retryButton = screen.getByText(
+        (c) => c.replace(/\s/g, '') === '重试',
+      );
+      await user.click(retryButton);
+      expect(onItemChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          runId: 'test-run-id',
+          input: mockProps.input,
+          output: mockProps.output,
+        }),
+        expect.objectContaining({
+          feedbackContent: 'parsed content',
+          feedbackType: 'toolArg',
+          feedbackRunId: 'test-run-id',
+        }),
+      );
+      expect(onChangeItem).not.toHaveBeenCalled();
+    });
+
+    it('重试时 parserSlateNodeToMarkdown 返回空则 callback 收到 feedbackContent 为空字符串', async () => {
+      const parserMod = await import('../../MarkdownEditor');
+      const parserSpy = vi.mocked(parserMod.parserSlateNodeToMarkdown);
+      parserSpy.mockReturnValueOnce(undefined as any);
+
+      const onItemChange = vi.fn();
+      const user = userEvent.setup();
+      render(<ToolCall {...mockProps} onItemChange={onItemChange} />);
+
+      const editButton = screen.getByTestId('action-修改');
+      await user.click(editButton);
+      const retryButton = screen.getByText(
+        (c) => c.replace(/\s/g, '') === '重试',
+      );
+      await user.click(retryButton);
+
+      expect(onItemChange).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          feedbackContent: '',
+          feedbackType: 'toolArg',
+          feedbackRunId: 'test-run-id',
+        }),
+      );
+    });
     it('应该在编辑器模式下正确显示编辑器内容', async () => {
       const user = userEvent.setup();
       render(<ToolCall {...mockProps} onChangeItem={vi.fn()} />);

@@ -639,6 +639,14 @@ describe('SchemaForm', () => {
       });
     });
 
+    it('renders object without properties as disabled input', () => {
+      render(<SchemaForm schema={edgeCaseSchema} />);
+
+      expect(screen.getByText('空对象')).toBeInTheDocument();
+      const emptyObjectInput = screen.getByPlaceholderText('请输入 空对象');
+      expect(emptyObjectInput).toBeDisabled();
+    });
+
     it('preserves form state when schema changes', () => {
       const { rerender } = render(<SchemaForm schema={mockSchema} />);
 

@@ -277,6 +277,32 @@ describe('AIBubble', () => {
     });
   });
 
+  it('should not call setMessageItem when onDisLike rejects', async () => {
+    const setMessageItem = vi.fn();
+    const onDisLike = vi.fn().mockRejectedValue(new Error('DisLike failed'));
+
+    render(
+      <BubbleConfigProvide>
+        <AIBubble
+          {...defaultProps}
+          bubbleRef={{ current: { setMessageItem } } as any}
+          id="bubble-dislike-fail"
+          onDisLike={onDisLike}
+          originData={{
+            ...defaultProps.originData,
+            role: 'assistant' as RoleType,
+          }}
+        />
+      </BubbleConfigProvide>,
+    );
+
+    const dislikeButton = screen.getByTestId('dislike-button');
+    fireEvent.click(dislikeButton);
+
+    await waitFor(() => expect(onDisLike).toHaveBeenCalled());
+    expect(setMessageItem).not.toHaveBeenCalled();
+  });
+
   it('should handle onDislike error gracefully', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const onDislike = vi.fn().mockRejectedValue(new Error('Dislike failed'));
