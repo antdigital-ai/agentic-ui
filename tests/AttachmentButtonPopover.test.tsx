@@ -33,6 +33,8 @@ describe('AttachmentButtonPopover', () => {
       expect(imageFormat?.extensions).toContain('jpeg');
       expect(imageFormat?.extensions).toContain('png');
       expect(imageFormat?.extensions).toContain('gif');
+      expect(imageFormat?.extensions).toContain('webp');
+      expect(imageFormat?.extensions).toContain('svg');
     });
 
     it('should have correct file extensions for documents', () => {
@@ -61,6 +63,7 @@ describe('AttachmentButtonPopover', () => {
 
       expect(screen.getByText(/每个文件不超过/)).toBeInTheDocument();
       expect(screen.getByText(/jpg, jpeg, png, gif/)).toBeInTheDocument();
+      expect(screen.getByText(/webp, svg/)).toBeInTheDocument();
     });
 
     it('should use custom format message when locale.input.supportedFormatMessage is provided', () => {
@@ -102,7 +105,7 @@ describe('AttachmentButtonPopover', () => {
 
       expect(
         screen.getByText(
-          /Supports file upload, each file not exceeding 10 MB, formats such as jpg, jpeg, png, gif/,
+          /Supports file upload, each file not exceeding 10 MB, formats such as jpg, jpeg, png, gif, bmp, webp, svg/,
         ),
       ).toBeInTheDocument();
     });
