@@ -9,6 +9,11 @@ group:
 
 # Changelog
 
+## v2.29.54 (In Development)
+
+- MarkdownEditor
+  - 🆕 Add markdown-it-container style `:::` custom container syntax (info/warning/success/error/tip). [#360](https://github.com/ant-design/agentic-ui/pull/360)
+
 ## v2.29.31
 
 - MarkdownEditor

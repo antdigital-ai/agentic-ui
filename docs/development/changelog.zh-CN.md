@@ -9,6 +9,11 @@ group:
 
 # Changelog
 
+## v2.29.54（开发中）
+
+- MarkdownEditor
+  - 🆕 支持 markdown-it-container 风格的 `:::` 自定义容器语法（info/warning/success/error/tip 等）。[#360](https://github.com/ant-design/agentic-ui/pull/360)
+
 ## v2.29.31
 
 - MarkdownEditor
