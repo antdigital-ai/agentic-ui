@@ -93,6 +93,24 @@ describe('PureBubbleList', () => {
       const listRoot = container.querySelector('[data-chat-list="2"]');
       expect(listRoot).toBeInTheDocument();
     });
+
+    it('不应修改传入的 bubbleList 项（支持冻结对象）', () => {
+      const frozenBubble = Object.freeze(
+        createMockBubbleData('frozen', 'assistant', 'Frozen content'),
+      );
+
+      expect(() =>
+        render(
+          <BubbleConfigProvide>
+            <PureBubbleList bubbleList={[frozenBubble]} />
+          </BubbleConfigProvide>,
+        ),
+      ).not.toThrow();
+
+      expect(frozenBubble).not.toHaveProperty('isLatest');
+      expect(frozenBubble).not.toHaveProperty('isLast');
+      expect(screen.getByText('Frozen content')).toBeInTheDocument();
+    });
   });
 
   describe('LOADING_FLAT 与 key 稳定性', () => {

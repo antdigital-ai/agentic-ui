@@ -555,6 +555,7 @@ describe('AttachmentFileList', () => {
     });
 
     expect(mockOnRetry).toHaveBeenCalledTimes(1);
+    expect(mockOnRetry).toHaveBeenCalledWith(file);
   });
 
   it('should clear image preview when preview is closed', async () => {
