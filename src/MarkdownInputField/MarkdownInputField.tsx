@@ -157,13 +157,12 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
 
   // Refs 管理
   const { markdownEditorRef, quickActionsRef, actionsRef, isSendingRef } =
-    useMarkdownInputFieldRefs(
-      {
-        inputRef: props.inputRef,
-        value: props.value,
-      },
-      value,
-    );
+    useMarkdownInputFieldRefs({
+      inputRef: props.inputRef,
+      value: props.value,
+      onChange: props.onChange,
+      setValue,
+    });
 
   // 文件上传管理
   const {
