@@ -44,6 +44,33 @@ export const generateHtmlDocument = (
       margin-left: 0;
       color: #666;
     }
+    .markdown-container {
+      padding: 12px 16px;
+      margin: 1em 0;
+      border-radius: 6px;
+      border-left: 4px solid;
+      line-height: 1.6;
+    }
+    .markdown-container__title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .markdown-container.info {
+      border-left-color: #1677ff;
+      background-color: rgba(22, 119, 255, 0.08);
+    }
+    .markdown-container.warning {
+      border-left-color: #faad14;
+      background-color: rgba(250, 173, 20, 0.08);
+    }
+    .markdown-container.success {
+      border-left-color: #52c41a;
+      background-color: rgba(82, 196, 26, 0.08);
+    }
+    .markdown-container.error {
+      border-left-color: #ff4d4f;
+      background-color: rgba(255, 77, 79, 0.08);
+    }
     img {
       max-width: 100%;
     }

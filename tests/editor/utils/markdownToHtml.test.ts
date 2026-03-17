@@ -138,6 +138,58 @@ title: Test
       expect(result).toContain('<h1>Markdown content</h1>');
     });
 
+    it('应该支持 markdown-it-container 风格的 ::: 自定义容器', async () => {
+      // 注意：::: 容器需要空行分隔，否则会被解析为同一段落
+      const markdown = `:::info
+
+这是信息提示块。
+
+:::
+
+:::warning
+
+这是警告提示块。
+
+:::
+
+:::success
+
+这是成功提示块。
+
+:::
+
+:::error
+
+这是错误提示块。
+
+:::`;
+      const result = await markdownToHtml(markdown);
+      expect(result).toContain('markdown-container');
+      expect(result).toContain('info');
+      expect(result).toContain('warning');
+      expect(result).toContain('success');
+      expect(result).toContain('error');
+      expect(result).toContain('这是信息提示块');
+      expect(result).toContain('这是警告提示块');
+      expect(result).toContain('这是成功提示块');
+      expect(result).toContain('这是错误提示块');
+    });
+
+    it('应该支持带标题的 ::: 容器', async () => {
+      const markdown = `::: tip 提示
+
+这是一条带标题的提示块。
+
+:::`;
+      const result = await markdownToHtml(markdown);
+
+      expect(result).toContain('markdown-container');
+      expect(result).toContain('tip');
+      expect(result).toContain('markdown-container__title');
+      expect(result).toContain('提示');
+      expect(result).toContain('这是一条带标题的提示块');
+    });
+
     it('应该处理无效的Markdown并返回空字符串', async () => {
       // 使用一个会导致unified处理错误的输入
       const problematicMarkdown = '\u0000\u0001\u0002'; // 多个null字符

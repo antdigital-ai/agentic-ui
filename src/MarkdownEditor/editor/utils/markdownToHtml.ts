@@ -15,6 +15,7 @@ import {
   fixStrongWithSpecialChars,
   protectJinjaDollarInText,
 } from '../parser/remarkParse';
+import { remarkContainer } from '../parser/remarkContainer';
 
 // 使用 any 类型避免 hast 类型依赖问题
 type HastElement = {
@@ -195,6 +196,12 @@ function rehypeCodeBlock(): Plugin<[], HastRoot> {
   };
 }
 
+/** 内置容器插件配置：支持 ::: type 语法（兼容 markdown-it-container） */
+const REMARK_CONTAINER_OPTIONS = {
+  className: 'markdown-container',
+  titleElement: { className: ['markdown-container__title'] },
+};
+
 export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
   [
     remarkParse,
@@ -204,6 +211,7 @@ export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
     protectJinjaDollarInText,
     [remarkMath as unknown as Plugin, INLINE_MATH_WITH_SINGLE_DOLLAR],
     [remarkFrontmatter, FRONTMATTER_LANGUAGES],
+    [remarkContainer, REMARK_CONTAINER_OPTIONS],
     [remarkRehypePlugin, { allowDangerousHtml: true }],
   ] as const;
 
@@ -310,10 +318,14 @@ export const markdownToHtml = async (
   config?: MarkdownToHtmlConfig,
 ): Promise<string> => {
   try {
-    const htmlContent = await createMarkdownProcessor(plugins, config).process(
+    const file = await createMarkdownProcessor(plugins, config).process(
       markdown,
     );
-    return String(htmlContent).split(JINJA_DOLLAR_PLACEHOLDER).join('$');
+    const htmlContent =
+      file && typeof file === 'object' && 'value' in file
+        ? String((file as { value: unknown }).value ?? '')
+        : String(file);
+    return htmlContent.split(JINJA_DOLLAR_PLACEHOLDER).join('$');
   } catch (error) {
     console.error('Error converting markdown to HTML:', error);
     return '';
@@ -357,7 +369,11 @@ export const markdownToHtmlSync = (
 ): string => {
   try {
     const file = createMarkdownProcessor(plugins, config).processSync(markdown);
-    return String(file).split(JINJA_DOLLAR_PLACEHOLDER).join('$');
+    const htmlContent =
+      file && typeof file === 'object' && 'value' in file
+        ? String((file as { value: unknown }).value ?? '')
+        : String(file);
+    return htmlContent.split(JINJA_DOLLAR_PLACEHOLDER).join('$');
   } catch (error) {
     console.error('Error converting markdown to HTML:', error);
     return '';

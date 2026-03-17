@@ -435,6 +435,35 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           backgroundColor: 'var(--color-gray-control-fill-secondary)',
         },
       },
+      // markdown-it-container 风格的自定义容器（::: info / warning / success / error）
+      '.markdown-container': {
+        padding: '12px 16px',
+        margin: '1em 0',
+        borderRadius: '6px',
+        borderLeft: '4px solid',
+        fontSize: 'var(--font-size-base)',
+        lineHeight: '160%',
+        '&__title': {
+          fontWeight: 600,
+          marginBottom: '8px',
+        },
+        '&.info': {
+          borderLeftColor: 'var(--color-info, #1677ff)',
+          backgroundColor: 'var(--color-info-bg, rgba(22, 119, 255, 0.08))',
+        },
+        '&.warning': {
+          borderLeftColor: 'var(--color-warning, #faad14)',
+          backgroundColor: 'var(--color-warning-bg, rgba(250, 173, 20, 0.08))',
+        },
+        '&.success': {
+          borderLeftColor: 'var(--color-success, #52c41a)',
+          backgroundColor: 'var(--color-success-bg, rgba(82, 196, 26, 0.08))',
+        },
+        '&.error': {
+          borderLeftColor: 'var(--color-error, #ff4d4f)',
+          backgroundColor: 'var(--color-error-bg, rgba(255, 77, 79, 0.08))',
+        },
+      },
       '[data-be="media-container"], [data-be="image-container"]': {
         display: 'flex',
         minWidth: 0,

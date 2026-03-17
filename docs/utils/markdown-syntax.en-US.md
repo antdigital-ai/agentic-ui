@@ -144,23 +144,31 @@ Use three or more `-`, `*`, or `_`.
 
 ## Alerts
 
-Use `:::` syntax to create different types of alert blocks.
+Use `:::` syntax to create different types of alert blocks (markdown-it-container compatible). **Note**: Blank lines are required between `:::` and content.
 
 ```markdown
 :::info
+
 This is an info alert.
+
 :::
 
 :::warning
+
 This is a warning alert.
+
 :::
 
 :::success
+
 This is a success alert.
+
 :::
 
 :::error
+
 This is an error alert.
+
 :::
 ```
 

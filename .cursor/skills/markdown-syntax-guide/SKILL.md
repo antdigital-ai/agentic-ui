@@ -173,23 +173,31 @@ import { Card } from 'antd';
 
 ### 5. 提示块 (Alerts)
 
-使用 `:::` 语法：
+使用 `:::` 语法（兼容 markdown-it-container）。**注意**：`:::` 与内容之间需用空行分隔。
 
 ```markdown
 :::info
+
 这是信息提示块。
+
 :::
 
 :::warning
+
 这是警告提示块。
+
 :::
 
 :::success
+
 这是成功提示块。
+
 :::
 
 :::error
+
 这是错误提示块。
+
 :::
 ```
 
