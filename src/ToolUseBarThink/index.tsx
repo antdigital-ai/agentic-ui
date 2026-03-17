@@ -17,6 +17,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useLocale } from '../I18n';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { useStyle } from './style';
 
@@ -252,6 +253,7 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
   styles,
   onToggleFloatingExpand,
 }) => {
+  const locale = useLocale();
   const contentInnerRef = useRef<HTMLDivElement>(null);
   const [isContentOverflowing, setIsContentOverflowing] = useState(false);
   const [contentExpanded, setContentExpanded] = useState(false);
@@ -292,7 +294,7 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
     <ChevronsUpDown style={FLOATING_ICON_STYLE} />
   );
 
-  const floatingText = floatingExpandedState ? '收起' : '展开';
+  const floatingText = floatingExpandedState ? locale.collapse : locale.expand;
 
   const showFloatingExpand = status === 'loading' && !light;
 
@@ -339,7 +341,7 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
     ) : (
       <ChevronsUpDown />
     );
-    const text = contentExpanded ? '收起' : '展开';
+    const text = contentExpanded ? locale.collapse : locale.expand;
     return (
       <div
         className={contentExpandClassName}
@@ -363,6 +365,7 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
     contentExpanded,
     contentExpandClassName,
     handleContentExpandToggle,
+    locale,
   ]);
 
   // 缓存容器元素

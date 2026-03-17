@@ -218,6 +218,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         width: '100%',
         padding: 8,
         display: 'flex',
+        flexDirection: 'column',
         maxHeight: 700,
         overflow: 'hidden',
         overflowY: 'auto',
