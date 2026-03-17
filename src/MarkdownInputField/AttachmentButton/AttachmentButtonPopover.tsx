@@ -48,7 +48,7 @@ export const SupportedFileFormats = {
     icon: <FileImageOutlined />,
     type: '图片',
     maxSize: 10 * FILE_SIZE_UNITS.KB,
-    extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
+    extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'],
   },
   document: {
     icon: <FileTextFilled />,
