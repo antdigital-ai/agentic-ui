@@ -297,7 +297,8 @@ export const handleBlockquote = (
 /** 从 mdast 段落等节点提取纯文本（用于识别闭合标记 :::） */
 function getNodeText(node: any): string {
   if (!node) return '';
-  if (node.type === 'text' && node.value != null) return String(node.value);
+  if (node.type === 'text' && node.value !== null && node.value !== undefined)
+    return String(node.value);
   if (Array.isArray(node.children)) {
     return node.children.map((c: any) => getNodeText(c)).join('');
   }
@@ -318,7 +319,7 @@ export const handleContainerDirective = (
   const title =
     typeof attrs.title === 'string'
       ? attrs.title
-      : attrs.title != null
+      : attrs.title !== null && attrs.title !== undefined
         ? String(attrs.title)
         : undefined;
   const otherProps: Record<string, unknown> = {

@@ -1310,7 +1310,9 @@ const handleBlockquote = (
             .trim()
         : '';
     const open =
-      containerTitle != null && String(containerTitle).trim()
+      containerTitle !== null &&
+      containerTitle !== undefined &&
+      String(containerTitle).trim()
         ? `:::${containerType}{title="${String(containerTitle).trim()}"}`
         : `:::${containerType}`;
     return `${open}\n\n${innerContent || ''}\n\n:::`;
