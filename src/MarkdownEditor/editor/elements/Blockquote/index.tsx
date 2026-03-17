@@ -57,6 +57,7 @@ export function Blockquote(props: ElementProps<BlockQuoteNode>) {
         <div
           {...commonAttrs}
           data-be="blockquote"
+          data-testid="markdown-container"
           className={clsx(
             'markdown-container',
             containerType,
@@ -64,7 +65,12 @@ export function Blockquote(props: ElementProps<BlockQuoteNode>) {
           )}
         >
           {containerTitle ? (
-            <div className="markdown-container__title">{containerTitle}</div>
+            <div
+              className="markdown-container__title"
+              data-testid="markdown-container-title"
+            >
+              {containerTitle}
+            </div>
           ) : null}
           {props.children}
         </div>
@@ -72,7 +78,11 @@ export function Blockquote(props: ElementProps<BlockQuoteNode>) {
     }
 
     return (
-      <blockquote data-be={'blockquote'} {...commonAttrs}>
+      <blockquote
+        data-be="blockquote"
+        data-testid="blockquote"
+        {...commonAttrs}
+      >
         {props.children}
       </blockquote>
     );

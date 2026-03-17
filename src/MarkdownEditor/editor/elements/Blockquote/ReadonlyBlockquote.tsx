@@ -38,8 +38,9 @@ export const ReadonlyBlockquote: React.FC<ElementProps<BlockQuoteNode>> =
     const containerType = props.element?.otherProps?.markdownContainerType as
       | string
       | undefined;
-    const containerTitle = props.element?.otherProps
-      ?.markdownContainerTitle as string | undefined;
+    const containerTitle = props.element?.otherProps?.markdownContainerTitle as
+      | string
+      | undefined;
 
     if (containerType) {
       return (
@@ -49,7 +50,7 @@ export const ReadonlyBlockquote: React.FC<ElementProps<BlockQuoteNode>> =
           className={clsx(
             'markdown-container',
             containerType,
-            props.attributes?.className,
+            (props.attributes as React.HTMLAttributes<HTMLElement>)?.className,
           )}
         >
           {containerTitle ? (
