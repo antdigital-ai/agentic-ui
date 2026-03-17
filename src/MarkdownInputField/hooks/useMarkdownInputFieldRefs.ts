@@ -3,7 +3,7 @@ import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
 interface UseMarkdownInputFieldRefsParams
-  extends Pick<MarkdownInputFieldProps, 'inputRef' | 'value' | 'onChange'> {
+  extends Pick<MarkdownInputFieldProps, 'inputRef' | 'value'> {
   setValue: (value: string) => void;
 }
 
@@ -36,7 +36,6 @@ export const useMarkdownInputFieldRefs = (
     ) => {
       if (md !== undefined) {
         props.setValue(md);
-        props.onChange?.(md);
       }
       return editor?.store?.setMDContent(md, plugins, options);
     };
@@ -56,7 +55,7 @@ export const useMarkdownInputFieldRefs = (
         setMDContent: syncValueAndSetMDContent,
       },
     };
-  }, [props.setValue, props.onChange]);
+  }, [props.setValue]);
 
   return {
     markdownEditorRef,

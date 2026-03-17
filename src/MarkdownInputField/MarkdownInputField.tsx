@@ -160,7 +160,6 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     useMarkdownInputFieldRefs({
       inputRef: props.inputRef,
       value: props.value,
-      onChange: props.onChange,
       setValue,
     });
 
