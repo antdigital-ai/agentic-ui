@@ -486,17 +486,81 @@ interface UseMarkdownToReactOptions {
 }
 
 /**
+ * 将单个 markdown 片段转为 React 元素（内部函数）
+ */
+const renderMarkdownBlock = (
+  blockContent: string,
+  processor: Processor,
+  components: Record<string, any>,
+): React.ReactNode => {
+  if (!blockContent.trim()) return null;
+  try {
+    const mdast = processor.parse(blockContent);
+    const hast = processor.runSync(mdast);
+    return toJsxRuntime(hast as any, {
+      Fragment,
+      jsx: jsx as any,
+      jsxs: jsxs as any,
+      components: components as any,
+    });
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * 将 markdown 按块（双换行）拆分，尊重代码围栏边界。
+ * 返回的每个块是一个独立的 markdown 片段，可单独解析。
+ */
+const splitMarkdownBlocks = (content: string): string[] => {
+  const lines = content.split('\n');
+  const blocks: string[] = [];
+  let current: string[] = [];
+  let inFence = false;
+
+  for (const line of lines) {
+    const trimmed = line.trimStart();
+    if (trimmed.startsWith('```') || trimmed.startsWith('~~~')) {
+      inFence = !inFence;
+    }
+    if (!inFence && line === '' && current.length > 0) {
+      const prev = current[current.length - 1];
+      if (prev === '') {
+        blocks.push(current.join('\n'));
+        current = [];
+        continue;
+      }
+    }
+    current.push(line);
+  }
+  if (current.length > 0) {
+    blocks.push(current.join('\n'));
+  }
+  return blocks;
+};
+
+const BLOCK_CACHE_KEY = Symbol('blockCache');
+
+interface BlockCacheEntry {
+  source: string;
+  element: React.ReactNode;
+}
+
+/**
  * 将 markdown 字符串转换为 React 元素树的 hook。
  *
- * 使用 unified + remark + rehype 将 markdown 解析为 hast，
- * 再通过 hast-util-to-jsx-runtime 转为 React 元素。
- * 输出的元素带有与 MarkdownEditor 一致的 className 和 data-be 属性。
+ * 性能优化：分块缓存
+ * - markdown 按双换行拆分为独立块
+ * - 已完成的块（非最后一个）通过内容哈希缓存 React 输出
+ * - 每次更新只重新解析变化的块（通常仅最后一个）
+ * - 稳定块的 React 元素直接复用，跳过 parse → hast → jsx 全链路
  */
 export const useMarkdownToReact = (
   content: string,
   options?: UseMarkdownToReactOptions,
 ): React.ReactNode => {
   const processorRef = useRef<Processor | null>(null);
+  const blockCacheRef = useRef<Map<string, BlockCacheEntry>>(new Map());
 
   const processor = useMemo(() => {
     const p = createHastProcessor(options?.remarkPlugins, options?.htmlConfig);
@@ -506,6 +570,11 @@ export const useMarkdownToReact = (
 
   const prefixCls = options?.prefixCls || 'ant-agentic-md-editor';
 
+  const components = useMemo(() => {
+    const userComponents = options?.components || {};
+    return buildEditorAlignedComponents(prefixCls, userComponents);
+  }, [prefixCls, options?.components]);
+
   return useMemo(() => {
     if (!content) return null;
 
@@ -513,23 +582,44 @@ export const useMarkdownToReact = (
       const preprocessed = content
         .replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$');
 
-      const mdast = processor.parse(preprocessed);
-      const hast = processor.runSync(mdast);
+      const blocks = splitMarkdownBlocks(preprocessed);
+      if (blocks.length === 0) return null;
 
-      const userComponents = options?.components || {};
-      const components = buildEditorAlignedComponents(prefixCls, userComponents);
+      const cache = blockCacheRef.current;
+      const newCache = new Map<string, BlockCacheEntry>();
+      const elements: React.ReactNode[] = [];
 
-      return toJsxRuntime(hast as any, {
-        Fragment,
-        jsx: jsx as any,
-        jsxs: jsxs as any,
-        components: components as any,
-      });
+      for (let i = 0; i < blocks.length; i++) {
+        const block = blocks[i];
+        const isLast = i === blocks.length - 1;
+
+        // 非最后一个块：使用缓存
+        if (!isLast) {
+          const cached = cache.get(block);
+          if (cached && cached.source === block) {
+            newCache.set(block, cached);
+            elements.push(
+              jsx(Fragment, { children: cached.element, key: i }),
+            );
+            continue;
+          }
+        }
+
+        // 最后一个块或缓存未命中：重新解析
+        const element = renderMarkdownBlock(block, processor, components);
+        newCache.set(block, { source: block, element });
+        elements.push(
+          jsx(Fragment, { children: element, key: i }),
+        );
+      }
+
+      blockCacheRef.current = newCache;
+      return jsxs(Fragment, { children: elements });
     } catch (error) {
       console.error('Failed to render markdown:', error);
       return null;
     }
-  }, [content, processor, options?.components, prefixCls]);
+  }, [content, processor, components]);
 };
 
 /**
