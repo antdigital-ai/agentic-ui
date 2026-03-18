@@ -166,7 +166,7 @@ SSE token 到达
 
 在 `MarkdownPreview`（Bubble 渲染入口）层面做模式分发：
 
-```tsx
+```tsx | pure
 interface MarkdownPreviewProps {
   content: string;
   typing?: boolean;
@@ -184,7 +184,6 @@ const MarkdownPreview = (props: MarkdownPreviewProps) => {
         content={content}
         streaming={typing}
         plugins={props.plugins}
-        // 传递插件渲染配置
       />
     );
   }
@@ -194,7 +193,6 @@ const MarkdownPreview = (props: MarkdownPreviewProps) => {
     <MarkdownEditor
       initValue={content}
       readonly={false}
-      // ...
     />
   );
 };
@@ -224,7 +222,7 @@ const MarkdownPreview = (props: MarkdownPreviewProps) => {
 
 #### 完整实现
 
-```tsx
+```tsx | pure
 interface CharacterQueueOptions {
   /** 每帧输出的最大字符数，默认 3 */
   charsPerFrame?: number;
@@ -421,7 +419,7 @@ class CharacterQueue {
 
 MarkdownRenderer 是核心的渲染组件：
 
-```tsx
+```tsx | pure
 interface MarkdownRendererProps {
   /** 完整的 markdown 内容（持续增长） */
   content: string;
@@ -470,7 +468,7 @@ displayedContent (string)
 
 全量执行 `markdownToHtml` 在长文档时成本较高。采用**分块缓存**策略：
 
-```tsx
+```tsx | pure
 interface BlockCache {
   /** 源 markdown 文本 */
   source: string;
@@ -540,7 +538,7 @@ class IncrementalMarkdownRenderer {
 
 渲染后，通过 `useEffect` + `querySelectorAll` 找到标记节点，用 `createPortal` 挂载 React 组件：
 
-```tsx
+```tsx | pure
 const useSpecialBlockPortals = (
   containerRef: React.RefObject<HTMLDivElement>,
   plugins: MarkdownEditorPlugin[],
@@ -580,7 +578,7 @@ const useSpecialBlockPortals = (
 
 不使用 `dangerouslySetInnerHTML`，而是将 HTML AST（hast）直接转为 React 元素树，在转换过程中直接替换特殊节点：
 
-```tsx
+```tsx | pure
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
@@ -630,7 +628,7 @@ const markdownToReact = (
 
 #### 现有插件接口
 
-```typescript
+```typescript | pure
 type MarkdownEditorPlugin = {
   elements?: Record<string, React.ComponentType<ElementProps<any>>>;
   parseMarkdown?: { match; convert }[];
@@ -642,7 +640,7 @@ type MarkdownEditorPlugin = {
 
 #### 新增渲染器插件接口
 
-```typescript
+```typescript | pure
 interface RendererPlugin {
   /** 用于 HTML/React 渲染模式的组件映射 */
   rendererComponents?: Record<string, React.ComponentType<RendererBlockProps>>;
@@ -665,7 +663,7 @@ type MarkdownEditorPlugin = {
 
 #### 标准插件适配
 
-```typescript
+```typescript | pure
 // 更新 standardPlugins
 export const standardPlugins: MarkdownEditorPlugin[] = [
   {
@@ -694,7 +692,7 @@ export const standardPlugins: MarkdownEditorPlugin[] = [
 
 某些场景需要在流式完成后切换到编辑模式（如用户点击编辑按钮）。设计平滑的切换方案：
 
-```tsx
+```tsx | pure
 const EditableMessage = ({ content, isFinished }) => {
   const [editing, setEditing] = useState(false);
 
@@ -736,7 +734,7 @@ const EditableMessage = ({ content, isFinished }) => {
 - `MarkdownPreview` 根据 `renderMode?: 'slate' | 'html'` 选择渲染器
 - 默认仍使用 Slate（`renderMode='slate'`），新模式需要显式开启
 
-```tsx
+```tsx | pure
 // MarkdownPreview.tsx
 const MarkdownPreview = (props) => {
   const renderMode = props.markdownRenderConfig?.renderMode ?? 'slate';
@@ -746,7 +744,7 @@ const MarkdownPreview = (props) => {
   }
 
   // 现有逻辑不变
-  return <MarkdownEditor readonly initValue={content} ... />;
+  return <MarkdownEditor readonly initValue={content} />;
 };
 ```
 
@@ -955,7 +953,7 @@ const MarkdownPreview = (props) => {
 
 MarkdownRenderer 应该复用现有的 CSS 类名和 CSS-in-JS token 系统：
 
-```tsx
+```tsx | pure
 const MarkdownRenderer = (props) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-md-editor');
