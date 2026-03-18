@@ -11,6 +11,7 @@ import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import { useMemo, useRef } from 'react';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
+import { visit } from 'unist-util-visit';
 import {
   convertParagraphToImage,
   fixStrongWithSpecialChars,
@@ -33,6 +34,55 @@ const REMARK_DIRECTIVE_CONTAINER_OPTIONS = {
 };
 
 const remarkRehypePlugin = remarkRehype as unknown as Plugin;
+
+const FOOTNOTE_REF_PATTERN = /\[\^([^\]]+)\]/g;
+
+/**
+ * rehype 插件：将文本中残留的 [^N] 模式转为 fnc 标记元素。
+ *
+ * remark-gfm 只在有对应 footnoteDefinition 时才会转换 footnoteReference，
+ * 但 AI 对话场景中 [^1] 常用作内联引用（无底部定义）。
+ * 此插件在 hast 层面补充处理这些"裸引用"。
+ */
+const rehypeFootnoteRef = () => {
+  return (tree: any) => {
+    visit(tree, 'text', (node: any, index: number | undefined, parent: any) => {
+      if (!parent || index === undefined) return;
+      const value = node.value as string;
+      if (!FOOTNOTE_REF_PATTERN.test(value)) return;
+
+      FOOTNOTE_REF_PATTERN.lastIndex = 0;
+      const children: any[] = [];
+      let lastIndex = 0;
+      let match: RegExpExecArray | null;
+
+      while ((match = FOOTNOTE_REF_PATTERN.exec(value)) !== null) {
+        if (match.index > lastIndex) {
+          children.push({ type: 'text', value: value.slice(lastIndex, match.index) });
+        }
+        children.push({
+          type: 'element',
+          tagName: 'span',
+          properties: {
+            'data-fnc': 'fnc',
+            'data-fnc-name': match[1],
+          },
+          children: [{ type: 'text', value: match[1] }],
+        });
+        lastIndex = match.index + match[0].length;
+      }
+
+      if (lastIndex < value.length) {
+        children.push({ type: 'text', value: value.slice(lastIndex) });
+      }
+
+      if (children.length > 0) {
+        parent.children.splice(index, 1, ...children);
+        return index + children.length;
+      }
+    });
+  };
+};
 
 const createHastProcessor = (
   extraRemarkPlugins?: MarkdownRemarkPlugin[],
@@ -57,7 +107,8 @@ const createHastProcessor = (
       handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
     })
     .use(rehypeRaw)
-    .use(rehypeKatex);
+    .use(rehypeKatex)
+    .use(rehypeFootnoteRef);
 
   if (extraRemarkPlugins) {
     extraRemarkPlugins.forEach((entry) => {
@@ -285,7 +336,7 @@ const buildEditorAlignedComponents = (
       return jsx('hr' as any, { ...rest, 'data-be': 'hr' });
     },
 
-    // 脚注引用 sup > a：对齐 MarkdownEditor 的 data-fnc 样式
+    // 脚注引用 sup > a（remark-gfm 有定义时生成）
     sup: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('span' as any, {
@@ -298,6 +349,23 @@ const buildEditorAlignedComponents = (
         },
         children,
       });
+    },
+
+    // span：拦截 rehypeFootnoteRef 生成的 data-fnc span，应用 fnc 样式
+    span: (props: any) => {
+      const { node, children, ...rest } = props;
+      if (rest['data-fnc'] === 'fnc') {
+        return jsx('span' as any, {
+          ...rest,
+          className: `${contentCls}-fnc`,
+          style: {
+            fontSize: 12,
+            cursor: 'pointer',
+          },
+          children,
+        });
+      }
+      return jsx('span' as any, { ...rest, children });
     },
 
     // 脚注定义区：remark-gfm 生成 <section data-footnotes class="footnotes">

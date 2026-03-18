@@ -228,18 +228,27 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('Below');
   });
 
-  it('应渲染脚注引用', () => {
+  it('应渲染脚注引用（有定义）', () => {
     const { container } = render(
       <MarkdownRenderer content={'This has a footnote[^1].\n\n[^1]: Footnote content here.'} />,
     );
 
-    // 脚注引用应渲染为 data-fnc="fnc" 的元素
     const fncEl = container.querySelector('[data-fnc="fnc"]');
     expect(fncEl).toBeTruthy();
 
-    // 脚注定义区应存在
     const fndEl = container.querySelector('[data-be="footnoteDefinition"]');
     expect(fndEl).toBeTruthy();
+  });
+
+  it('应渲染裸脚注引用（无定义，AI 对话场景）', () => {
+    const { container } = render(
+      <MarkdownRenderer content={'公司营收达 776.73 亿美元。[^2] Cloud 收入同比增长 22%。[^3]'} />,
+    );
+
+    const fncElements = container.querySelectorAll('[data-fnc="fnc"]');
+    expect(fncElements.length).toBe(2);
+    expect(fncElements[0]?.textContent).toBe('2');
+    expect(fncElements[1]?.textContent).toBe('3');
   });
 
   it('应渲染图片', () => {
