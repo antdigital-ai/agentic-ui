@@ -202,8 +202,10 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer content={'```js\nconst x = 1;\n```'} />,
     );
 
-    // 代码块应该存在
-    expect(container.querySelector('pre') || container.querySelector('[class*="code-block"]')).toBeTruthy();
+    // 代码块应使用 CodeContainer（data-be="code"）
+    expect(container.querySelector('[data-be="code"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="code-toolbar"]')).toBeTruthy();
+    expect(container.textContent).toContain('const x = 1;');
   });
 
   it('应渲染有序列表', () => {
