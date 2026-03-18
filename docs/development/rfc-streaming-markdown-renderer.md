@@ -143,18 +143,19 @@ Slate 维护两棵平行的树：
 
 ```
 SSE token 到达
-  → CharacterQueue.push(newChars)        // O(1) 推入队列
-    → RAF tick
-      → CharacterQueue.flush(batchSize)  // O(b) 取出 b 个字符
-        → displayedContent += flushed    // O(1) 字符串拼接
-          → markdownToHtml(displayed)    // O(n) 增量或全量转 HTML
-            → React setState             // DOM 更新
+  → CharacterQueue.push(content)                // O(1) 更新 fullContent
+    → 混合调度器（可见: RAF / 不可见: setTimeout）
+      → tick: displayedLength += batchSize      // O(1) 指针前移
+        → onFlush(displayed)                    // 截取已显示部分
+          → markdownToHtml(displayed)           // O(n) 增量或全量转 HTML
+            → React setState                    // DOM 更新
 ```
 
 **与现有链路的关键差异**：
 
 - **消除 Slate 整体**：无 Slate 实例、无 Operation、无 History、无 Normalize
 - **字符队列解耦**：token 到达和渲染频率解耦，天然防抖
+- **后台不阻塞**：标签页不可见时降级为 setTimeout，队列持续消费不停滞
 - **更少的中间表示**：Markdown → HTML（两层），而非 Markdown → mdast → Slate Nodes → React VDOM（四层）
 
 ---
@@ -206,8 +207,22 @@ const MarkdownPreview = (props: MarkdownPreviewProps) => {
 字符队列是流式渲染的核心，负责：
 
 - 接收 SSE 推送的 token（任意速率）
-- 以固定帧率（60fps / RAF）输出字符
+- 标签页可见时以 RAF（60fps）驱动动画输出
+- **标签页不可见时降级为 setTimeout 驱动**，保证后台仍能消费队列
+- 标签页从后台切回前台时自动追赶已到达的内容
 - 支持可配置的输出速率和动画效果
+
+#### 为什么不能只用 RAF？
+
+`requestAnimationFrame` 在浏览器标签页不可见时会被浏览器暂停（Chrome/Firefox）或极大限流（Safari），导致：
+
+1. **字符队列停滞**：push 进来的 token 全部堆积，displayed 指针不前进
+2. **切回时内容缺失**：用户切回标签页，看到内容远远落后于实际流式进度
+3. **切回后瞬间雪崩**：如果 RAF 恢复后一次性消费积压的大量字符，会产生卡顿
+
+因此必须使用**混合调度策略**：可见 → RAF（流畅动画），不可见 → setTimeout（持续消费）。
+
+#### 完整实现
 
 ```tsx
 interface CharacterQueueOptions {
@@ -221,15 +236,26 @@ interface CharacterQueueOptions {
   flushStrategy?: 'character' | 'word' | 'token';
   /** 内容完成后立即 flush 全部剩余 */
   flushOnComplete?: boolean;
+  /** 后台 tick 间隔（ms），默认 100 */
+  backgroundInterval?: number;
+  /**
+   * 后台每次 tick 的字符数倍率，默认 10。
+   * 后台无需动画效果，可以加速消费。
+   */
+  backgroundBatchMultiplier?: number;
 }
 
+type TickMode = 'raf' | 'timeout';
+
 class CharacterQueue {
-  private buffer: string = '';
   private displayedLength: number = 0;
   private fullContent: string = '';
   private rafId: number | null = null;
+  private timerId: ReturnType<typeof setTimeout> | null = null;
+  private tickMode: TickMode = 'raf';
   private onFlush: (displayed: string) => void;
   private options: Required<CharacterQueueOptions>;
+  private disposed: boolean = false;
 
   constructor(
     onFlush: (displayed: string) => void,
@@ -242,73 +268,154 @@ class CharacterQueue {
       speed: options?.speed ?? 1.0,
       flushStrategy: options?.flushStrategy ?? 'character',
       flushOnComplete: options?.flushOnComplete ?? true,
+      backgroundInterval: options?.backgroundInterval ?? 100,
+      backgroundBatchMultiplier: options?.backgroundBatchMultiplier ?? 10,
     };
+
+    this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
-  /** SSE token 到达时调用 */
+  /** SSE token 到达时调用——接收完整的 content 字符串 */
   push(content: string): void {
     this.fullContent = content;
     if (!this.options.animate) {
-      // 非动画模式，直接显示全部
       this.displayedLength = content.length;
       this.onFlush(content);
       return;
     }
-    this.startTick();
+    this.ensureTicking();
   }
 
   /** 标记流式完成，flush 所有剩余内容 */
   complete(): void {
     if (this.options.flushOnComplete) {
-      this.cancelTick();
+      this.cancelAllTicks();
       this.displayedLength = this.fullContent.length;
       this.onFlush(this.fullContent);
     }
   }
 
-  private startTick(): void {
-    if (this.rafId !== null) return;
-    this.rafId = requestAnimationFrame(this.tick);
+  dispose(): void {
+    this.disposed = true;
+    this.cancelAllTicks();
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+  }
+
+  // ---- 调度核心 ----
+
+  /**
+   * 根据当前标签页可见性选择调度方式：
+   * - visible → RAF（流畅 60fps 动画）
+   * - hidden  → setTimeout（后台持续消费，无需动画）
+   */
+  private ensureTicking(): void {
+    if (this.disposed) return;
+    if (this.isTickActive()) return;
+
+    const isVisible = document.visibilityState === 'visible';
+    this.tickMode = isVisible ? 'raf' : 'timeout';
+
+    if (this.tickMode === 'raf') {
+      this.rafId = requestAnimationFrame(this.tick);
+    } else {
+      this.timerId = setTimeout(this.tick, this.options.backgroundInterval);
+    }
   }
 
   private tick = (): void => {
-    const remaining = this.fullContent.length - this.displayedLength;
-    if (remaining <= 0) {
-      this.rafId = null;
-      return;
-    }
+    this.rafId = null;
+    this.timerId = null;
 
-    const batchSize = Math.max(
+    if (this.disposed) return;
+
+    const remaining = this.fullContent.length - this.displayedLength;
+    if (remaining <= 0) return;
+
+    const isVisible = document.visibilityState === 'visible';
+    const baseBatch = Math.max(
       1,
       Math.ceil(this.options.charsPerFrame * this.options.speed),
     );
+
+    // 后台模式：加大 batch 倍率，快速追赶进度
+    const batchSize = isVisible
+      ? baseBatch
+      : baseBatch * this.options.backgroundBatchMultiplier;
+
     this.displayedLength = Math.min(
       this.displayedLength + batchSize,
       this.fullContent.length,
     );
     this.onFlush(this.fullContent.slice(0, this.displayedLength));
 
-    this.rafId = requestAnimationFrame(this.tick);
+    // 如果还有剩余，继续调度
+    if (this.displayedLength < this.fullContent.length) {
+      this.scheduleNext(isVisible);
+    }
   };
 
-  dispose(): void {
-    this.cancelTick();
+  private scheduleNext(isVisible: boolean): void {
+    if (isVisible) {
+      this.tickMode = 'raf';
+      this.rafId = requestAnimationFrame(this.tick);
+    } else {
+      this.tickMode = 'timeout';
+      this.timerId = setTimeout(this.tick, this.options.backgroundInterval);
+    }
   }
 
-  private cancelTick(): void {
+  /**
+   * visibilitychange 事件处理：
+   * 标签页切回前台时，从 setTimeout 模式切换为 RAF 模式，
+   * 保证动画恢复流畅。
+   */
+  private handleVisibilityChange(): void {
+    if (this.disposed) return;
+    if (this.displayedLength >= this.fullContent.length) return;
+
+    // 切换调度模式：取消当前 tick，用新模式重新开始
+    this.cancelAllTicks();
+    this.ensureTicking();
+  }
+
+  private isTickActive(): boolean {
+    return this.rafId !== null || this.timerId !== null;
+  }
+
+  private cancelAllTicks(): void {
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
+    }
+    if (this.timerId !== null) {
+      clearTimeout(this.timerId);
+      this.timerId = null;
     }
   }
 }
 ```
 
-**设计要点**：
+#### 调度策略可视化
 
-- `push(content)` 接收的是**完整的 content 字符串**（与当前 `originData.content` 行为一致），而非增量 diff。队列内部通过 `displayedLength` 指针实现增量输出。
-- `flushStrategy` 支持不同粒度的输出：按字符、按词（空格分隔）、按 token（SSE 原始 chunk）。
-- 流式完成时，`complete()` 可以立即 flush 所有剩余内容，避免"拖尾"。
+```
+标签页可见                    标签页隐藏                    标签页切回
+─────────────────────────┬─────────────────────────┬──────────────────
+ RAF tick (16ms)          │  setTimeout (100ms)     │  RAF tick (16ms)
+ batch = 3 chars/frame    │  batch = 30 chars/tick  │  batch = 3 chars/frame
+ ▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸  │  ▸▸▸▸▸▸▸               │  ▸▸▸▸▸▸▸▸▸▸▸▸▸▸
+                          │                         │
+ 动画逐字输出              │  静默追赶进度            │  动画继续（已追赶完毕）
+```
+
+#### 设计要点
+
+- **push(content)** 接收的是**完整的 content 字符串**（与当前 `originData.content` 行为一致），而非增量 diff。队列内部通过 `displayedLength` 指针实现增量输出。
+- **flushStrategy** 支持不同粒度的输出：按字符、按词（空格分隔）、按 token（SSE 原始 chunk）。
+- **流式完成时**，`complete()` 立即 flush 所有剩余内容，避免"拖尾"。
+- **后台消费**：标签页不可见时自动切换为 setTimeout 驱动，以 `backgroundBatchMultiplier` 倍率加速消费，确保用户切回时内容基本追赶到最新。
+- **切回恢复**：visibilitychange 事件触发后，取消 setTimeout，切换回 RAF，动画无缝衔接。
+- **dispose** 同时清理 RAF、setTimeout 和 visibilitychange 监听，防止内存泄漏。
 
 ### 3. MarkdownRenderer 组件 {#markdown-renderer-component}
 
@@ -731,7 +838,18 @@ const MarkdownPreview = (props) => {
 - **推荐方案 B**（hast-util-to-jsx-runtime），完全不使用 dangerouslySetInnerHTML
 - 如果使用方案 A，通过 `rehype-sanitize` 做 HTML 净化
 
-### 风险 5：流式 Markdown 不完整片段
+### 风险 5：标签页不可见时 RAF 停止
+
+**问题**：`requestAnimationFrame` 在浏览器标签页不可见时会被暂停（Chrome/Firefox）或极大限流（Safari ~1fps），导致字符队列完全停滞，已推入的 token 无法消费。
+
+**缓解**：
+- CharacterQueue 使用**混合调度策略**：可见时 RAF，不可见时 `setTimeout`
+- 后台 `setTimeout` 以 100ms 间隔 + 10x batch 倍率运行，快速消费堆积的 token
+- 监听 `visibilitychange` 事件，标签页切回时无缝切换为 RAF 模式恢复动画
+- `dispose()` 方法同时清理 RAF、setTimeout 和事件监听，防止泄漏
+- 详见 [字符队列系统](#character-queue-system) 的完整实现
+
+### 风险 6：流式 Markdown 不完整片段
 
 **问题**：流式过程中的 Markdown 可能是不完整的（如 `` ```js\nconst `` 代码块未闭合）。
 
@@ -808,7 +926,26 @@ const MarkdownPreview = (props) => {
 - 无法控制输出速率和动画效果
 - `content` 变化 → `markdownToHtml` → DOM 更新的链路在高频触发时会卡顿
 
-字符队列通过 RAF 限流，将渲染频率锁定在 60fps，同时提供平滑的逐字输出效果。
+字符队列通过混合调度（可见时 RAF、不可见时 setTimeout）限流，标签页前台时将渲染频率锁定在 60fps 提供平滑逐字输出，后台时通过 setTimeout 保证队列不停滞。
+
+### Q: 为什么不能只用 RAF 驱动字符队列？
+
+`requestAnimationFrame` 在浏览器标签页不可见时会被暂停或极大限流：
+
+- **Chrome/Firefox**：标签页隐藏后 RAF 完全停止回调
+- **Safari**：限流到约 1fps
+
+如果字符队列只依赖 RAF，在用户切走标签页期间，所有通过 `push()` 进来的 token 都无法被消费，切回时会出现内容大幅落后、瞬间雪崩等问题。因此必须在不可见时降级为 `setTimeout`。
+
+### Q: 为什么不能只用 setTimeout 驱动字符队列？
+
+`setTimeout` 的最小精度约 4ms（实际调度抖动更大），无法对齐浏览器的帧渲染周期。如果用 setTimeout(tick, 16) 模拟 60fps：
+
+- 与浏览器的 vsync 不对齐，容易出现丢帧和抖动
+- 两次 tick 之间的实际间隔可能是 4ms 或 30ms，导致动画不均匀
+- 无法利用浏览器的帧调度优化（如 compositing 批处理）
+
+因此最佳方案是 **前台 RAF + 后台 setTimeout** 的混合策略。
 
 ### Q: 增量 HTML 转换有必要吗？
 
