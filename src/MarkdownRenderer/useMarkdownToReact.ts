@@ -247,6 +247,7 @@ const buildEditorAlignedComponents = (
     },
 
     // 表格：复用 MarkdownEditor 的表格 CSS 结构
+    // 无 Slate 节点数据，使用 table-layout: auto 自动计算列宽
     table: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('div' as any, {
@@ -256,9 +257,40 @@ const buildEditorAlignedComponents = (
           children: jsx('table' as any, {
             ...rest,
             className: `${tableCls}-readonly-table`,
+            style: { tableLayout: 'auto', width: '100%' },
             children,
           }),
         }),
+      });
+    },
+
+    // thead / tbody：直接透传
+    thead: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('thead' as any, { ...rest, children });
+    },
+    tbody: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('tbody' as any, { ...rest, children });
+    },
+    tr: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('tr' as any, { ...rest, children });
+    },
+    th: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('th' as any, {
+        ...rest,
+        style: { whiteSpace: 'normal', width: 'auto' },
+        children,
+      });
+    },
+    td: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('td' as any, {
+        ...rest,
+        style: { whiteSpace: 'normal', width: 'auto' },
+        children,
       });
     },
 
