@@ -39,8 +39,13 @@ const stringifyObj = remark()
 
 const myRemark = {
   stringify: (obj: Root) => {
-    const mdStr = stringifyObj.stringify(obj);
-    return mdStr;
+    try {
+      const mdStr = stringifyObj.stringify(obj);
+      return mdStr;
+    } catch (error) {
+      console.error('myRemark.stringify error', obj);
+      return '';
+    }
   },
 };
 
