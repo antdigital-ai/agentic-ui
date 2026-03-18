@@ -3,7 +3,7 @@
  */
 
 import type { RootContent, Table } from 'mdast';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   getColumnAlignment,
   normalizeFieldName,
@@ -168,6 +168,59 @@ describe('parseTable', () => {
       expect(emptyCell.children).toHaveLength(1);
       expect(emptyCell.children[0].type).toBe('paragraph');
       expect(emptyCell.children[0].children).toEqual([{ text: '' }]);
+    });
+
+    it('myRemark.stringify 失败时应兜底返回空字符串并继续解析', () => {
+      const malformedTable: Table = {
+        type: 'table',
+        align: [null],
+        children: [
+          {
+            type: 'tableRow',
+            children: [
+              {
+                type: 'tableCell',
+                children: [{ type: 'unexpected-node' } as any],
+              } as any,
+            ],
+          } as any,
+          {
+            type: 'tableRow',
+            children: [
+              {
+                type: 'tableCell',
+                children: [{ type: 'text', value: '1' } as any],
+              } as any,
+            ],
+          } as any,
+        ],
+      } as any;
+
+      const pre: RootContent = {
+        type: 'paragraph',
+        children: [{ type: 'text', value: '' }],
+      };
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
+
+      const result = parseTableOrChart(
+        malformedTable,
+        pre,
+        [],
+        noopParseNodes as any,
+      );
+
+      expect(result).toBeDefined();
+      const inner = (result as any).children?.[1];
+      expect(inner.type).toBe('table');
+      expect(inner.otherProps?.dataSource).toHaveLength(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'myRemark.stringify error',
+        expect.any(Object),
+      );
+
+      consoleErrorSpy.mockRestore();
     });
   });
 });
