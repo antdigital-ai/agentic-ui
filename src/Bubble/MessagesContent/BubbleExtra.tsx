@@ -422,6 +422,7 @@ export const BubbleExtra = ({
   if (pure) {
     return [reSend, like, disLike, copyDom, voiceDom];
   }
+  const inPopover = context?.extraShowOnHover;
   return (
     <div
       className={prefixCls}
@@ -430,10 +431,14 @@ export const BubbleExtra = ({
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        paddingLeft: placement === 'right' ? 0 : 'var(--padding-5x)',
-        paddingRight: placement === 'right' ? 0 : 'var(--padding-5x)',
-        paddingTop: placement === 'right' ? 0 : 'var(--padding-1x)',
-        paddingBottom: placement === 'right' ? 0 : 'var(--padding-2x)',
+        ...(inPopover
+          ? { padding: 0 }
+          : {
+              paddingLeft: placement === 'right' ? 0 : 'var(--padding-5x)',
+              paddingRight: placement === 'right' ? 0 : 'var(--padding-5x)',
+              paddingTop: placement === 'right' ? 0 : 'var(--padding-1x)',
+              paddingBottom: placement === 'right' ? 0 : 'var(--padding-2x)',
+            }),
         color: 'var(--color-gray-text-secondary)',
         fontSize: context?.compact ? '11px' : '13px',
         gap: 4,
