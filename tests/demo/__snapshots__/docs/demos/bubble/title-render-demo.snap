@@ -653,7 +653,6 @@
                   data-testid="message-box-content"
                 >
                   <div
-                    aria-describedby="test-id"
                     style="display: flex; flex-direction: column; min-width: 0; max-width: 100%;"
                   >
                     <div
@@ -699,6 +698,39 @@
                             </span>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                    <div
+                      class="ant-chat-item-extra"
+                      style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0px 0px 0px 0px; color: var(--color-gray-text-secondary); font-size: 13px; gap: 4px;"
+                    >
+                      <div
+                        animate="visible"
+                        class="ant-chat-item-extra-action-box"
+                        initial="hidden"
+                        style="display: flex; gap: 8px; align-items: center;"
+                        variants="[object Object]"
+                        whileinview="visible"
+                      >
+                        <span
+                          aria-describedby="test-id"
+                          aria-label="复制"
+                          class="ant-agentic-md-editor-action-icon-box ant-agentic-md-editor-action-icon-box-light"
+                          data-testid="chat-item-copy-button"
+                          data-title="复制"
+                          role="button"
+                          tabindex="0"
+                        >
+                          <div
+                            aria-hidden="true"
+                            class="ant-bubble-actions-lottie"
+                            data-autoplay="false"
+                            data-loop="false"
+                            data-testid="lottie-animation"
+                            lottieref="[object Object]"
+                            style="width: 1em; height: 1em; display: flex; justify-content: center; align-items: center;"
+                          />
+                        </span>
                       </div>
                     </div>
                   </div>
