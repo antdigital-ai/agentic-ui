@@ -61,6 +61,13 @@ export interface MarkdownRendererProps {
     ) => React.ReactNode;
     onFootnoteDefinitionChange?: (data: any[]) => void;
   };
+  /** 链接配置 */
+  linkConfig?: {
+    /** 是否在新标签页打开链接，默认 true */
+    openInNewTab?: boolean;
+    /** 自定义链接点击处理，返回 false 可阻止默认跳转 */
+    onClick?: (url?: string) => boolean | void;
+  };
 }
 
 export interface MarkdownRendererRef {

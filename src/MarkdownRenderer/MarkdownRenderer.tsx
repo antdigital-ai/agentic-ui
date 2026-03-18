@@ -86,6 +86,7 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
       className,
       style,
       prefixCls: customPrefixCls,
+      linkConfig,
     } = props;
 
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
@@ -174,6 +175,7 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
       htmlConfig,
       components,
       prefixCls,
+      linkConfig,
     });
 
     return wrapSSR(

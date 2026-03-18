@@ -197,6 +197,7 @@ const ThinkBlockRendererComponent = (props: any) => {
 const buildEditorAlignedComponents = (
   prefixCls: string,
   userComponents: Record<string, React.ComponentType<RendererBlockProps>>,
+  linkConfig?: { openInNewTab?: boolean; onClick?: (url?: string) => boolean | void },
 ) => {
   const listCls = `${prefixCls}-list`;
   const tableCls = `${prefixCls}-content-table`;
@@ -344,14 +345,25 @@ const buildEditorAlignedComponents = (
     // ================================================================
 
     a: (props: any) => {
-      const { node, ...rest } = props;
+      const { node, href, onClick: origOnClick, ...rest } = props;
+      const openInNewTab = linkConfig?.openInNewTab !== false;
       return jsx('a' as any, {
         ...rest,
+        href,
         'data-be': 'text',
         'data-url': 'url',
         'data-testid': 'markdown-link',
-        target: '_blank',
-        rel: 'noopener noreferrer',
+        target: openInNewTab ? '_blank' : undefined,
+        rel: openInNewTab ? 'noopener noreferrer' : undefined,
+        onClick: (e: MouseEvent) => {
+          if (linkConfig?.onClick) {
+            const res = linkConfig.onClick(href);
+            if (res === false) {
+              e.preventDefault();
+              return;
+            }
+          }
+        },
       });
     },
 
@@ -481,7 +493,72 @@ const buildEditorAlignedComponents = (
       });
     },
 
-    // 水平线
+    // 视频：对齐 ReadonlyMedia 的 video 处理
+    video: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('div' as any, {
+        'data-be': 'media',
+        'data-testid': 'markdown-video',
+        style: {
+          position: 'relative',
+          width: '100%',
+          maxWidth: '100%',
+          margin: '0.5em 0',
+        },
+        children: jsx('video' as any, {
+          ...rest,
+          controls: true,
+          style: {
+            maxWidth: '100%',
+            borderRadius: 8,
+          },
+          children,
+        }),
+      });
+    },
+
+    // 音频：对齐 ReadonlyMedia 的 audio 处理
+    audio: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('div' as any, {
+        'data-be': 'media',
+        'data-testid': 'markdown-audio',
+        style: {
+          position: 'relative',
+          width: '100%',
+          margin: '0.5em 0',
+        },
+        children: jsx('audio' as any, {
+          ...rest,
+          controls: true,
+          style: { width: '100%' },
+          children,
+        }),
+      });
+    },
+
+    // iframe
+    iframe: (props: any) => {
+      const { node, ...rest } = props;
+      return jsx('div' as any, {
+        'data-testid': 'markdown-iframe',
+        style: {
+          position: 'relative',
+          width: '100%',
+          margin: '0.5em 0',
+        },
+        children: jsx('iframe' as any, {
+          ...rest,
+          style: {
+            width: '100%',
+            minHeight: 300,
+            border: '1px solid var(--color-gray-border-light, #e8e8e8)',
+            borderRadius: 8,
+          },
+        }),
+      });
+    },
+
     hr: (props: any) => {
       const { node, ...rest } = props;
       return jsx('hr' as any, { ...rest, 'data-be': 'hr', 'data-testid': 'markdown-hr' });
@@ -560,6 +637,11 @@ interface UseMarkdownToReactOptions {
   components?: Record<string, React.ComponentType<RendererBlockProps>>;
   /** MarkdownEditor 的 CSS 前缀，用于生成对齐的 className */
   prefixCls?: string;
+  /** 链接配置：onClick 拦截、openInNewTab 控制 */
+  linkConfig?: {
+    openInNewTab?: boolean;
+    onClick?: (url?: string) => boolean | void;
+  };
 }
 
 /**
@@ -649,8 +731,8 @@ export const useMarkdownToReact = (
 
   const components = useMemo(() => {
     const userComponents = options?.components || {};
-    return buildEditorAlignedComponents(prefixCls, userComponents);
-  }, [prefixCls, options?.components]);
+    return buildEditorAlignedComponents(prefixCls, userComponents, options?.linkConfig);
+  }, [prefixCls, options?.components, options?.linkConfig]);
 
   return useMemo(() => {
     if (!content) return null;
