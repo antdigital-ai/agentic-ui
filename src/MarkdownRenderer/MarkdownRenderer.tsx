@@ -16,6 +16,7 @@ import { CharacterQueue } from './CharacterQueue';
 import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
 import { ChartBlockRenderer } from './renderers/ChartRenderer';
+import { SchemaBlockRenderer } from './renderers/SchemaRenderer';
 import type {
   MarkdownRendererProps,
   MarkdownRendererRef,
@@ -23,7 +24,7 @@ import type {
 } from './types';
 import { useMarkdownToReact } from './useMarkdownToReact';
 
-const SPECIAL_LANGUAGES = new Set(['mermaid', 'chart', 'json-chart']);
+const SCHEMA_LANGUAGES = new Set(['schema', 'apaasify', 'apassify', 'agentar-card']);
 
 /**
  * 从插件列表中收集 rendererComponents
@@ -43,12 +44,15 @@ const collectRendererComponents = (
 };
 
 /**
- * 默认的代码块路由——根据语言分发到 Mermaid / Chart / 普通代码渲染器
+ * 默认的代码块路由——根据语言分发到对应渲染器
  */
 const DefaultCodeRouter: React.FC<
-  RendererBlockProps & { pluginComponents: Record<string, React.ComponentType<RendererBlockProps>> }
+  RendererBlockProps & {
+    pluginComponents: Record<string, React.ComponentType<RendererBlockProps>>;
+    apaasifyRender?: (value: any) => React.ReactNode;
+  }
 > = (props) => {
-  const { language, pluginComponents, ...rest } = props;
+  const { language, pluginComponents, apaasifyRender, ...rest } = props;
 
   if (language === 'mermaid') {
     const MermaidComp = pluginComponents.mermaid || MermaidBlockRenderer;
@@ -58,6 +62,11 @@ const DefaultCodeRouter: React.FC<
   if (language === 'chart' || language === 'json-chart') {
     const ChartComp = pluginComponents.chart || ChartBlockRenderer;
     return <ChartComp {...rest} language={language} />;
+  }
+
+  if (SCHEMA_LANGUAGES.has(language)) {
+    const SchemaComp = pluginComponents.schema || SchemaBlockRenderer;
+    return <SchemaComp {...rest} language={language} apaasifyRender={apaasifyRender} />;
   }
 
   const CodeComp = pluginComponents.code || CodeBlockRenderer;
@@ -87,6 +96,7 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
       style,
       prefixCls: customPrefixCls,
       linkConfig,
+      apaasify,
     } = props;
 
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
@@ -157,18 +167,26 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
     // 构建组件映射
     // code 渲染器通过 pre override 在 useMarkdownToReact 中路由，
     // 不直接映射到 <code> 标签（否则会影响行内代码 `code`）
+    const apaasifyRender = useMemo(() => {
+      if (apaasify?.enable && apaasify.render) return apaasify.render;
+      return undefined;
+    }, [apaasify]);
+
     const components = useMemo(() => {
       const codeRouter = (codeProps: RendererBlockProps) => (
-        <DefaultCodeRouter {...codeProps} pluginComponents={pluginComponents} />
+        <DefaultCodeRouter
+          {...codeProps}
+          pluginComponents={pluginComponents}
+          apaasifyRender={apaasifyRender}
+        />
       );
       codeRouter.displayName = 'CodeRouter';
 
       return {
-        // __codeBlock 是内部约定 key，在 useMarkdownToReact 的 pre override 中使用
         __codeBlock: codeRouter,
         ...pluginComponents,
       };
-    }, [pluginComponents]);
+    }, [pluginComponents, apaasifyRender]);
 
     const reactContent = useMarkdownToReact(displayedContent, {
       remarkPlugins,

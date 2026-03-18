@@ -296,4 +296,41 @@ describe('MarkdownRenderer', () => {
     expect(img?.getAttribute('src')).toBe('https://example.com/image.png');
     expect(img?.getAttribute('alt')).toBe('alt text');
   });
+
+  it('应将 schema 代码块渲染为 SchemaRenderer', () => {
+    const schemaJson = JSON.stringify({ type: 'object', properties: { name: { type: 'string' } } });
+    const { container } = render(
+      <MarkdownRenderer content={'```schema\n' + schemaJson + '\n```'} />,
+    );
+
+    const schemaEl = container.querySelector('[data-testid="schema-renderer"]');
+    expect(schemaEl).toBeTruthy();
+  });
+
+  it('应将 apaasify 代码块渲染为 SchemaRenderer', () => {
+    const schemaJson = JSON.stringify({ type: 'form', fields: [] });
+    const { container } = render(
+      <MarkdownRenderer content={'```apaasify\n' + schemaJson + '\n```'} />,
+    );
+
+    const schemaEl = container.querySelector('[data-testid="schema-renderer"]');
+    expect(schemaEl).toBeTruthy();
+  });
+
+  it('应支持 apaasify 自定义 render', () => {
+    const schemaJson = JSON.stringify({ type: 'form', fields: [] });
+    const { container } = render(
+      <MarkdownRenderer
+        content={'```apaasify\n' + schemaJson + '\n```'}
+        apaasify={{
+          enable: true,
+          render: (value: any) => <div data-testid="custom-apaasify">Custom: {value?.type}</div>,
+        }}
+      />,
+    );
+
+    const customEl = container.querySelector('[data-testid="custom-apaasify"]');
+    expect(customEl).toBeTruthy();
+    expect(customEl?.textContent).toContain('Custom: form');
+  });
 });

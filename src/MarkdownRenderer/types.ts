@@ -68,6 +68,12 @@ export interface MarkdownRendererProps {
     /** 自定义链接点击处理，返回 false 可阻止默认跳转 */
     onClick?: (url?: string) => boolean | void;
   };
+  /** Apaasify / Schema 自定义渲染 */
+  apaasify?: {
+    enable?: boolean;
+    /** 自定义渲染函数，接收解析后的 JSON value，返回 React 节点 */
+    render?: (value: any) => React.ReactNode;
+  };
 }
 
 export interface MarkdownRendererRef {
