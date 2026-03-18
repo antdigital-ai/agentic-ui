@@ -335,16 +335,93 @@ const buildEditorAlignedComponents = (
       });
     },
 
-    // 链接：新标签页打开
+    // ================================================================
+    // Leaf 级别（行内元素）：对齐 MLeaf 的渲染逻辑
+    // ================================================================
+
+    // 链接：data-url="url" + 新标签页打开（对齐 MLeaf 的 leaf.url 逻辑）
     a: (props: any) => {
       const { node, ...rest } = props;
       return jsx('a' as any, {
         ...rest,
+        'data-be': 'text',
+        'data-url': 'url',
         target: '_blank',
         rel: 'noopener noreferrer',
       });
     },
 
+    // 粗体：对齐 MLeaf 的 leaf.bold（fontWeight: bold）
+    strong: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('strong' as any, {
+        ...rest,
+        'data-testid': 'markdown-bold',
+        style: { fontWeight: 'bold' },
+        children,
+      });
+    },
+
+    // 斜体：对齐 MLeaf 的 leaf.italic
+    em: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('em' as any, {
+        ...rest,
+        style: { fontStyle: 'italic' },
+        children,
+      });
+    },
+
+    // 删除线：对齐 MLeaf 的 leaf.strikethrough → <s>
+    del: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('del' as any, { ...rest, children });
+    },
+
+    // 行内代码：对齐 MLeaf 的 inline-code className
+    code: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('code' as any, {
+        ...rest,
+        className: `${contentCls}-inline-code`,
+        children,
+      });
+    },
+
+    // 高亮 <mark>
+    mark: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('mark' as any, {
+        ...rest,
+        style: { background: '#f59e0b', padding: '0.1em 0.2em', borderRadius: 2 },
+        children,
+      });
+    },
+
+    // <kbd> 键盘标记
+    kbd: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('kbd' as any, {
+        ...rest,
+        style: {
+          padding: '0.1em 0.4em',
+          fontSize: '0.85em',
+          border: '1px solid var(--color-gray-border-light, #d9d9d9)',
+          borderRadius: 3,
+          boxShadow: '0 1px 0 var(--color-gray-border-light, #d9d9d9)',
+          fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+        },
+        children,
+      });
+    },
+
+    // <sub> 下标
+    sub: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('sub' as any, { ...rest, children });
+    },
+
+    // ================================================================
     // 代码块 pre > code → 路由到自定义渲染器
     pre: (props: any) => {
       const { node, children, ...rest } = props;

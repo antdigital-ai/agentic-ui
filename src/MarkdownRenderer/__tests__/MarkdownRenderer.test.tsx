@@ -39,13 +39,34 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('This is a paragraph.');
   });
 
-  it('应渲染粗体和斜体', () => {
+  it('应渲染粗体（带 data-testid）', () => {
     const { container } = render(
-      <MarkdownRenderer content="This is **bold** and *italic*." />,
+      <MarkdownRenderer content="This is **bold** text." />,
     );
 
-    expect(container.querySelector('strong')?.textContent).toBe('bold');
-    expect(container.querySelector('em')?.textContent).toBe('italic');
+    const bold = container.querySelector('[data-testid="markdown-bold"]');
+    expect(bold).toBeTruthy();
+    expect(bold?.textContent).toBe('bold');
+  });
+
+  it('应渲染斜体', () => {
+    const { container } = render(
+      <MarkdownRenderer content="This is *italic* text." />,
+    );
+
+    const em = container.querySelector('em');
+    expect(em).toBeTruthy();
+    expect(em?.textContent).toBe('italic');
+  });
+
+  it('应渲染删除线', () => {
+    const { container } = render(
+      <MarkdownRenderer content="This is ~~deleted~~ text." />,
+    );
+
+    const del = container.querySelector('del');
+    expect(del).toBeTruthy();
+    expect(del?.textContent).toBe('deleted');
   });
 
   it('应渲染无序列表', () => {
@@ -60,7 +81,7 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('Item 3');
   });
 
-  it('应渲染链接，且默认在新标签页打开', () => {
+  it('应渲染链接（data-url + 新标签页）', () => {
     const { container } = render(
       <MarkdownRenderer content="[Example](https://example.com)" />,
     );
@@ -70,6 +91,7 @@ describe('MarkdownRenderer', () => {
     expect(link?.getAttribute('href')).toBe('https://example.com');
     expect(link?.getAttribute('target')).toBe('_blank');
     expect(link?.getAttribute('rel')).toContain('noopener');
+    expect(link?.getAttribute('data-url')).toBe('url');
   });
 
   it('应渲染 GFM 表格', () => {
@@ -168,7 +190,7 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('Hello World');
   });
 
-  it('应渲染行内代码', () => {
+  it('应渲染行内代码（带 inline-code className）', () => {
     const { container } = render(
       <MarkdownRenderer content="Use `const x = 1` in your code." />,
     );
@@ -176,6 +198,7 @@ describe('MarkdownRenderer', () => {
     const codeEl = container.querySelector('code');
     expect(codeEl).toBeTruthy();
     expect(codeEl?.textContent).toBe('const x = 1');
+    expect(codeEl?.className).toContain('inline-code');
   });
 
   it('应渲染块引用', () => {
