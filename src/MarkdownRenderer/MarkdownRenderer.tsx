@@ -169,6 +169,7 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
       remarkPlugins,
       htmlConfig,
       components,
+      prefixCls,
     });
 
     return wrapSSR(

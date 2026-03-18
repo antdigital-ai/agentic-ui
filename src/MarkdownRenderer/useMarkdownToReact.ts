@@ -34,9 +34,6 @@ const REMARK_DIRECTIVE_CONTAINER_OPTIONS = {
 
 const remarkRehypePlugin = remarkRehype as unknown as Plugin;
 
-/**
- * 创建 unified 处理器，将 markdown 转为 hast
- */
 const createHastProcessor = (
   extraRemarkPlugins?: MarkdownRemarkPlugin[],
   config?: MarkdownToHtmlConfig,
@@ -87,9 +84,6 @@ const createHastProcessor = (
   return processor as Processor;
 };
 
-/**
- * 从 code 元素的 className 中提取语言
- */
 const extractLanguageFromClassName = (
   className: string | string[] | undefined,
 ): string | undefined => {
@@ -102,10 +96,176 @@ const extractLanguageFromClassName = (
   return undefined;
 };
 
+/**
+ * 构建与 MarkdownEditor Readonly 组件对齐的 hast→React 组件映射。
+ *
+ * MarkdownEditor 的 Slate 元素使用 data-be 属性和 prefixCls 类名，
+ * 这里为原生 HTML 标签添加相同的属性，使共用的 CSS 能正确命中。
+ */
+const buildEditorAlignedComponents = (
+  prefixCls: string,
+  userComponents: Record<string, React.ComponentType<RendererBlockProps>>,
+) => {
+  const listCls = `${prefixCls}-list`;
+  const tableCls = `${prefixCls}-content-table`;
+
+  return {
+    // 段落：data-be="paragraph"
+    p: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('div' as any, {
+        ...rest,
+        'data-be': 'paragraph',
+        children,
+      });
+    },
+
+    // 标题：h1-h6, data-be="head"
+    h1: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('h1' as any, { ...rest, 'data-be': 'head', children });
+    },
+    h2: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('h2' as any, { ...rest, 'data-be': 'head', children });
+    },
+    h3: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('h3' as any, { ...rest, 'data-be': 'head', children });
+    },
+    h4: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('h4' as any, { ...rest, 'data-be': 'head', children });
+    },
+    h5: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('h5' as any, { ...rest, 'data-be': 'head', children });
+    },
+    h6: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('h6' as any, { ...rest, 'data-be': 'head', children });
+    },
+
+    // 引用块：data-be="blockquote"
+    blockquote: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('blockquote' as any, {
+        ...rest,
+        'data-be': 'blockquote',
+        children,
+      });
+    },
+
+    // 列表（ul/ol）：包裹 div.list-container + ul/ol.list
+    ul: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('div' as any, {
+        className: `${listCls}-container`,
+        'data-be': 'list',
+        children: jsx('ul' as any, {
+          ...rest,
+          className: `${listCls} ul`,
+          children,
+        }),
+      });
+    },
+    ol: (props: any) => {
+      const { node, children, start, ...rest } = props;
+      return jsx('div' as any, {
+        className: `${listCls}-container`,
+        'data-be': 'list',
+        children: jsx('ol' as any, {
+          ...rest,
+          className: `${listCls} ol`,
+          start,
+          children,
+        }),
+      });
+    },
+
+    // 列表项：li.list-item, data-be="list-item"
+    li: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('li' as any, {
+        ...rest,
+        className: `${listCls}-item`,
+        'data-be': 'list-item',
+        children,
+      });
+    },
+
+    // 表格：复用 MarkdownEditor 的表格 CSS 结构
+    table: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('div' as any, {
+        className: tableCls,
+        children: jsx('div' as any, {
+          className: `${tableCls}-container`,
+          children: jsx('table' as any, {
+            ...rest,
+            className: `${tableCls}-readonly-table`,
+            children,
+          }),
+        }),
+      });
+    },
+
+    // 链接：新标签页打开
+    a: (props: any) => {
+      const { node, ...rest } = props;
+      return jsx('a' as any, {
+        ...rest,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      });
+    },
+
+    // 代码块 pre > code → 路由到自定义渲染器
+    pre: (props: any) => {
+      const { node, children, ...rest } = props;
+      const codeChild = Array.isArray(children) ? children[0] : children;
+      const codeProps = codeChild?.props || {};
+      const language = extractLanguageFromClassName(codeProps.className);
+
+      const CodeBlockComponent = userComponents.__codeBlock || userComponents.code;
+      if (CodeBlockComponent) {
+        return jsx(CodeBlockComponent as any, {
+          ...rest,
+          language,
+          children: codeProps.children,
+          node,
+        });
+      }
+
+      return jsxs('pre' as any, {
+        ...rest,
+        children: [children],
+      });
+    },
+
+    // 图片
+    img: (props: any) => {
+      const { node, ...rest } = props;
+      return jsx('img' as any, { ...rest, 'data-be': 'image' });
+    },
+
+    // 水平线
+    hr: (props: any) => {
+      const { node, ...rest } = props;
+      return jsx('hr' as any, { ...rest, 'data-be': 'hr' });
+    },
+
+    // 用户提供的组件覆盖在最上层
+    ...userComponents,
+  };
+};
+
 interface UseMarkdownToReactOptions {
   remarkPlugins?: MarkdownRemarkPlugin[];
   htmlConfig?: MarkdownToHtmlConfig;
   components?: Record<string, React.ComponentType<RendererBlockProps>>;
+  /** MarkdownEditor 的 CSS 前缀，用于生成对齐的 className */
+  prefixCls?: string;
 }
 
 /**
@@ -113,7 +273,7 @@ interface UseMarkdownToReactOptions {
  *
  * 使用 unified + remark + rehype 将 markdown 解析为 hast，
  * 再通过 hast-util-to-jsx-runtime 转为 React 元素。
- * 支持自定义组件映射，用于拦截特殊块（code, chart, mermaid 等）。
+ * 输出的元素带有与 MarkdownEditor 一致的 className 和 data-be 属性。
  */
 export const useMarkdownToReact = (
   content: string,
@@ -127,6 +287,8 @@ export const useMarkdownToReact = (
     return p;
   }, [options?.remarkPlugins, options?.htmlConfig]);
 
+  const prefixCls = options?.prefixCls || 'ant-agentic-md-editor';
+
   return useMemo(() => {
     if (!content) return null;
 
@@ -137,53 +299,20 @@ export const useMarkdownToReact = (
       const mdast = processor.parse(preprocessed);
       const hast = processor.runSync(mdast);
 
-      const components = options?.components || {};
+      const userComponents = options?.components || {};
+      const components = buildEditorAlignedComponents(prefixCls, userComponents);
 
-      const result = toJsxRuntime(hast as any, {
+      return toJsxRuntime(hast as any, {
         Fragment,
         jsx: jsx as any,
         jsxs: jsxs as any,
-        components: {
-          ...components,
-          a: (props: any) => {
-            const { node, ...rest } = props;
-            return jsx('a' as any, {
-              ...rest,
-              target: '_blank',
-              rel: 'noopener noreferrer',
-            });
-          },
-          pre: (props: any) => {
-            const { node, children, ...rest } = props;
-            const codeChild = Array.isArray(children) ? children[0] : children;
-            const codeProps = codeChild?.props || {};
-            const language = extractLanguageFromClassName(codeProps.className);
-
-            // __codeBlock 是内部约定的代码块渲染器 key
-            const CodeBlockComponent = components.__codeBlock || components.code;
-            if (CodeBlockComponent) {
-              return jsx(CodeBlockComponent as any, {
-                ...rest,
-                language,
-                children: codeProps.children,
-                node,
-              });
-            }
-
-            return jsxs('pre' as any, {
-              ...rest,
-              children: [children],
-            });
-          },
-        } as any,
+        components: components as any,
       });
-
-      return result;
     } catch (error) {
       console.error('Failed to render markdown:', error);
       return null;
     }
-  }, [content, processor, options?.components]);
+  }, [content, processor, options?.components, prefixCls]);
 };
 
 /**
@@ -205,21 +334,17 @@ export const markdownToReactSync = (
     const mdast = processor.parse(preprocessed);
     const hast = processor.runSync(mdast);
 
+    const userComps = components || {};
+    const allComponents = buildEditorAlignedComponents(
+      'ant-agentic-md-editor',
+      userComps,
+    );
+
     return toJsxRuntime(hast as any, {
       Fragment,
       jsx: jsx as any,
       jsxs: jsxs as any,
-      components: {
-        ...components,
-        a: (props: any) => {
-          const { node, ...rest } = props;
-          return jsx('a' as any, {
-            ...rest,
-            target: '_blank',
-            rel: 'noopener noreferrer',
-          });
-        },
-      } as any,
+      components: allComponents as any,
     });
   } catch (error) {
     console.error('Failed to render markdown:', error);
