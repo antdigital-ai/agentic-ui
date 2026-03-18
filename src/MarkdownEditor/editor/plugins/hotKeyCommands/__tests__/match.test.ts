@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
-import React from 'react';
 import { cleanup } from '@testing-library/react';
+import React from 'react';
 import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';

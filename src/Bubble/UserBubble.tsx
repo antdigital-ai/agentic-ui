@@ -216,9 +216,9 @@ export const UserBubble: React.FC<
                       quote?.quoteDescription,
                   },
                 )}
-            >
-              {titleDom}
-            </div>
+              >
+                {titleDom}
+              </div>
             ) : null}
             {contentBeforeDom && (
               <div

@@ -24,11 +24,10 @@
     ".dumi/typing.d.ts",
     "docs/demos/**/*",
     "docs/components/**/*",
-    "src/**/**/*",
+    "src/**/*",
     "src/MarkDown/demos/.tsx",
-    "tests/**/*",
     "docs/pure.tsx",
     "home/**/*"
   ],
-  "exclude": ["home/demo-components"]
+  "exclude": ["home/demo-components", "**/__tests__/**", "**/*.test.ts", "**/*.test.tsx", "tests/**"]
 }

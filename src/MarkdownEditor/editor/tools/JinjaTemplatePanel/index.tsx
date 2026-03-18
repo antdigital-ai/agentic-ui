@@ -3,7 +3,13 @@ import { Info } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import isHotkey from 'is-hotkey';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ReactDOM from 'react-dom';
 import { Editor, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
@@ -35,7 +41,10 @@ function getPosition(nodeEl: HTMLElement): {
   if (spaceBelow < PANEL_MAX_HEIGHT && spaceAbove > PANEL_MAX_HEIGHT) {
     return {
       left,
-      bottom: Math.min(viewportHeight - rect.top, viewportHeight - PANEL_MAX_HEIGHT),
+      bottom: Math.min(
+        viewportHeight - rect.top,
+        viewportHeight - PANEL_MAX_HEIGHT,
+      ),
       position: 'fixed',
     };
   }
@@ -64,10 +73,7 @@ export const JinjaTemplatePanel: React.FC = () => {
   const itemsConfig = templatePanelConfig?.items;
 
   const locale = useLocale();
-  const defaultItems = useMemo(
-    () => getJinjaTemplateData(locale),
-    [locale],
-  );
+  const defaultItems = useMemo(() => getJinjaTemplateData(locale), [locale]);
   const [items, setItems] = useState<JinjaTemplateItem[]>(defaultItems);
   const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);

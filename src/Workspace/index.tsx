@@ -143,10 +143,7 @@ const Workspace: FC<WorkspaceProps> & {
   const [resetKey, setResetKey] = useState(0);
 
   const displayTitle = title ?? (locale?.['workspace.title'] || 'Workspace');
-  const defaultConfig = useMemo(
-    () => DEFAULT_CONFIG(locale),
-    [locale],
-  );
+  const defaultConfig = useMemo(() => DEFAULT_CONFIG(locale), [locale]);
   const [internalActiveTab, setInternalActiveTab] = useState('');
   const availableTabs = useMemo((): TabItem[] => {
     const tabs: TabItem[] = [];

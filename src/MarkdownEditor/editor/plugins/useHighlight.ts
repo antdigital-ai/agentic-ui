@@ -89,7 +89,11 @@ const createRangeSpanningChildren = (
   }
 
   if (anchorPath && focusPath) {
-    return { anchor: { path: anchorPath, offset: anchorOffset }, focus: { path: focusPath, offset: focusOffset }, ...props };
+    return {
+      anchor: { path: anchorPath, offset: anchorOffset },
+      focus: { path: focusPath, offset: focusOffset },
+      ...props,
+    };
   }
   return null;
 };
@@ -159,8 +163,23 @@ const processLinkMatches = (
 
 /** Jinja 关键字集合 */
 const JINJA_KEYWORDS = new Set([
-  'set', 'if', 'elif', 'else', 'endif', 'for', 'endfor', 'in', 'and', 'or',
-  'not', 'with', 'without', 'true', 'false', 'is', 'none',
+  'set',
+  'if',
+  'elif',
+  'else',
+  'endif',
+  'for',
+  'endfor',
+  'in',
+  'and',
+  'or',
+  'not',
+  'with',
+  'without',
+  'true',
+  'false',
+  'is',
+  'none',
 ]);
 
 /** 解析 {% %} 标签内部内容，返回子 token 的 [start, end, prop][] */
@@ -173,7 +192,11 @@ const tokenizeJinjaTagContent = (
 
   const addToken = (len: number, prop: string) => {
     if (len > 0) {
-      tokens.push({ start: baseOffset + pos, end: baseOffset + pos + len, prop });
+      tokens.push({
+        start: baseOffset + pos,
+        end: baseOffset + pos + len,
+        prop,
+      });
       pos += len;
     }
   };
@@ -215,12 +238,20 @@ const tokenizeJinjaTagContent = (
     const wordMatch = rest.match(/^[a-zA-Z_][a-zA-Z0-9_]*/);
     if (wordMatch) {
       const word = wordMatch[0];
-      addToken(word.length, JINJA_KEYWORDS.has(word) ? 'jinjaKeyword' : 'jinjaVariableName');
+      addToken(
+        word.length,
+        JINJA_KEYWORDS.has(word) ? 'jinjaKeyword' : 'jinjaVariableName',
+      );
       continue;
     }
 
     // 比较运算符（多字符优先）
-    if (rest.startsWith('==') || rest.startsWith('!=') || rest.startsWith('>=') || rest.startsWith('<=')) {
+    if (
+      rest.startsWith('==') ||
+      rest.startsWith('!=') ||
+      rest.startsWith('>=') ||
+      rest.startsWith('<=')
+    ) {
       addToken(2, 'jinjaDelimiter');
       continue;
     }
@@ -289,7 +320,9 @@ const processJinjaMatchesOnFullText = (
   const ranges: any[] = [];
 
   const addRange = (start: number, end: number, prop: string) => {
-    const range = createRangeSpanningChildren(path, children, start, end, { [prop]: true });
+    const range = createRangeSpanningChildren(path, children, start, end, {
+      [prop]: true,
+    });
     if (range) ranges.push(range);
   };
 

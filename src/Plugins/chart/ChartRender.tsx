@@ -83,7 +83,17 @@ const getChartMap = (i18n: any) => ({
   },
   table: {
     title: i18n?.locale?.table || '表格',
-    changeData: ['column', 'line', 'area', 'pie', 'donut', 'bar', 'radar', 'scatter', 'funnel'],
+    changeData: [
+      'column',
+      'line',
+      'area',
+      'pie',
+      'donut',
+      'bar',
+      'radar',
+      'scatter',
+      'funnel',
+    ],
   },
   descriptions: {
     title: i18n?.locale?.descriptions || '定义列表',

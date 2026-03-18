@@ -207,9 +207,7 @@ describe('EnterKey - Markdown 输出测试', () => {
           children: [
             {
               type: 'list-item',
-              children: [
-                { type: 'paragraph', children: [{ text: '' }] },
-              ],
+              children: [{ type: 'paragraph', children: [{ text: '' }] }],
             },
           ],
         },

@@ -716,9 +716,7 @@ describe('TaskList', () => {
     it('应该显示当前正在运行的任务名称', () => {
       render(<TaskList items={simpleItems} variant="simple" />);
 
-      expect(
-        screen.getByText('正在进行Running Task任务'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('正在进行Running Task任务')).toBeInTheDocument();
     });
 
     it('点击摘要条应展开任务列表', async () => {
@@ -811,13 +809,17 @@ describe('TaskList', () => {
 
       expect(screen.getByText('Success Task')).toBeInTheDocument();
       expect(screen.getByText('Success content')).toBeInTheDocument();
-      expect(screen.queryByTestId('task-list-simple-bar')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('task-list-simple-bar'),
+      ).not.toBeInTheDocument();
     });
 
     it('不传 variant 时默认为 default 模式', () => {
       render(<TaskList items={mockItems} />);
 
-      expect(screen.queryByTestId('task-list-simple-bar')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('task-list-simple-bar'),
+      ).not.toBeInTheDocument();
       expect(screen.getByText('Success Task')).toBeInTheDocument();
     });
 
@@ -831,22 +833,16 @@ describe('TaskList', () => {
 
     describe('受控 open/onOpenChange', () => {
       it('open=true 时应展开任务列表', () => {
-        render(
-          <TaskList items={simpleItems} variant="simple" open={true} />,
-        );
+        render(<TaskList items={simpleItems} variant="simple" open={true} />);
 
         expect(screen.getByText('Completed Task')).toBeInTheDocument();
         expect(screen.getByText('Running Task')).toBeInTheDocument();
       });
 
       it('open=false 时应收起任务列表', () => {
-        render(
-          <TaskList items={simpleItems} variant="simple" open={false} />,
-        );
+        render(<TaskList items={simpleItems} variant="simple" open={false} />);
 
-        expect(
-          screen.queryByText('Completed content'),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText('Completed content')).not.toBeInTheDocument();
       });
 
       it('点击时应调用 onOpenChange', () => {
@@ -877,9 +873,7 @@ describe('TaskList', () => {
           />,
         );
 
-        expect(
-          screen.queryByText('Completed Task'),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText('Completed Task')).not.toBeInTheDocument();
 
         rerender(
           <TaskList
@@ -898,9 +892,7 @@ describe('TaskList', () => {
       it('不传 open 时应为非受控模式', async () => {
         render(<TaskList items={simpleItems} variant="simple" />);
 
-        expect(
-          screen.queryByText('Completed Task'),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText('Completed Task')).not.toBeInTheDocument();
 
         const bar = screen.getByTestId('task-list-simple-bar');
         fireEvent.click(bar);

@@ -31,7 +31,9 @@ export const remarkContainer: Plugin<[RemarkContainerOptions?]> = (
 ) => {
   const className = options.className ?? 'markdown-container';
   const containerTag = options.containerTag ?? 'div';
-  const titleElement = options.titleElement ?? { className: ['markdown-container__title'] };
+  const titleElement = options.titleElement ?? {
+    className: ['markdown-container__title'],
+  };
 
   const constructContainer = (children: any[], type: string) => ({
     type: 'container',

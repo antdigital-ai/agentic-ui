@@ -435,7 +435,6 @@ const upLoadFileBatch = async (fragmentList: any[], editorProps: any) => {
         await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY));
       }
     }
-
   } catch (error) {
     console.error('文件上传失败:', error);
   } finally {

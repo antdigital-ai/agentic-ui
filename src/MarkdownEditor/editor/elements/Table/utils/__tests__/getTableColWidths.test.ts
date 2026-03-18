@@ -44,30 +44,24 @@ describe('getReadonlyTableColWidths', () => {
   });
 
   it('任意列数无显式 colWidths 时返回百分比平分', () => {
-    expect(getReadonlyTableColWidths({ columnCount: 1, otherProps: {} })).toEqual([
-      '100.00%',
-    ]);
-    expect(getReadonlyTableColWidths({ columnCount: 2, otherProps: {} })).toEqual([
-      '50.00%',
-      '50.00%',
-    ]);
-    expect(getReadonlyTableColWidths({ columnCount: 3, otherProps: {} })).toEqual([
-      '33.33%',
-      '33.33%',
-      '33.33%',
-    ]);
-    expect(getReadonlyTableColWidths({ columnCount: 4, otherProps: {} })).toEqual([
-      '25.00%',
-      '25.00%',
-      '25.00%',
-      '25.00%',
-    ]);
-    expect(getReadonlyTableColWidths({ columnCount: 5, otherProps: {} })).toEqual(
-      Array(5).fill('20.00%'),
-    );
-    expect(getReadonlyTableColWidths({ columnCount: 6, otherProps: undefined })).toEqual(
-      Array(6).fill('16.67%'),
-    );
+    expect(
+      getReadonlyTableColWidths({ columnCount: 1, otherProps: {} }),
+    ).toEqual(['100.00%']);
+    expect(
+      getReadonlyTableColWidths({ columnCount: 2, otherProps: {} }),
+    ).toEqual(['50.00%', '50.00%']);
+    expect(
+      getReadonlyTableColWidths({ columnCount: 3, otherProps: {} }),
+    ).toEqual(['33.33%', '33.33%', '33.33%']);
+    expect(
+      getReadonlyTableColWidths({ columnCount: 4, otherProps: {} }),
+    ).toEqual(['25.00%', '25.00%', '25.00%', '25.00%']);
+    expect(
+      getReadonlyTableColWidths({ columnCount: 5, otherProps: {} }),
+    ).toEqual(Array(5).fill('20.00%'));
+    expect(
+      getReadonlyTableColWidths({ columnCount: 6, otherProps: undefined }),
+    ).toEqual(Array(6).fill('16.67%'));
   });
 
   it('传入 element 时按 string-width 计算内容宽度并归一化为百分比', () => {
@@ -78,8 +72,12 @@ describe('getReadonlyTableColWidths', () => {
       element,
     });
     expect(result).toHaveLength(2);
-    expect(result.every((r) => typeof r === 'string' && r.endsWith('%'))).toBe(true);
-    const [p0, p1] = result.map((r) => parseFloat((r as string).replace('%', '')));
+    expect(result.every((r) => typeof r === 'string' && r.endsWith('%'))).toBe(
+      true,
+    );
+    const [p0, p1] = result.map((r) =>
+      parseFloat((r as string).replace('%', '')),
+    );
     expect(p0 + p1).toBeCloseTo(100, 1);
     expect(p1).toBeGreaterThan(p0);
   });
@@ -120,12 +118,16 @@ describe('getReadonlyTableColWidths', () => {
       containerWidth: 600,
     });
     expect(result).toHaveLength(4);
-    expect(result.every((r) => typeof r === 'string' && r.endsWith('%'))).toBe(true);
+    expect(result.every((r) => typeof r === 'string' && r.endsWith('%'))).toBe(
+      true,
+    );
   });
 });
 
 /** 构造 6 列表格：id, name, info, tag, date, action，用于 SmartTableScouter 行为测试 */
-function tableWithSixColumns(rows: Array<[string, string, string, string, string, string]>): TableNode {
+function tableWithSixColumns(
+  rows: Array<[string, string, string, string, string, string]>,
+): TableNode {
   return {
     type: 'table',
     children: rows.map((cells) => ({
@@ -158,7 +160,9 @@ describe('SmartTableScouter', () => {
       containerWidth: 1000,
     });
     expect(result).toHaveLength(3);
-    expect(result.every((r) => typeof r === 'string' && (r as string).endsWith('%'))).toBe(true);
+    expect(
+      result.every((r) => typeof r === 'string' && (r as string).endsWith('%')),
+    ).toBe(true);
   });
 
   it('should give more space to "info" column than "id" column', () => {
@@ -167,14 +171,16 @@ describe('SmartTableScouter', () => {
       measureText: (text: string) => ({ width: text.length * 8 }),
     });
     const originalCreateElement = document.createElement.bind(document);
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      if (tagName === 'canvas') {
-        return {
-          getContext: () => createFakeCanvasContext(),
-        } as unknown as HTMLCanvasElement;
-      }
-      return originalCreateElement(tagName);
-    });
+    vi.spyOn(document, 'createElement').mockImplementation(
+      (tagName: string) => {
+        if (tagName === 'canvas') {
+          return {
+            getContext: () => createFakeCanvasContext(),
+          } as unknown as HTMLCanvasElement;
+        }
+        return originalCreateElement(tagName);
+      },
+    );
 
     const element = tableWithSixColumns(mockData);
     const result = getReadonlyTableColWidths({

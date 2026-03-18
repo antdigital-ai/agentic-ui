@@ -8,7 +8,9 @@ import { createEditor, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMarkdownInputFieldHandlers } from '../useMarkdownInputFieldHandlers';
 
-vi.mock('../../../../Hooks/useRefFunction', () => ({ useRefFunction: (fn: any) => fn }));
+vi.mock('../../../../Hooks/useRefFunction', () => ({
+  useRefFunction: (fn: any) => fn,
+}));
 
 const mockUpLoadFileToServer = vi.fn();
 vi.mock('../../AttachmentButton', () => ({
@@ -91,7 +93,9 @@ describe('useMarkdownInputFieldHandlers', () => {
       const params = createDefaultParams();
       params.props.disabled = true;
       params.props.onSend = vi.fn();
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       await result.current.sendMessage();
       expect(params.props.onSend).not.toHaveBeenCalled();
     });
@@ -100,7 +104,9 @@ describe('useMarkdownInputFieldHandlers', () => {
       const params = createDefaultParams();
       params.props.typing = true;
       params.props.onSend = vi.fn();
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       await result.current.sendMessage();
       expect(params.props.onSend).not.toHaveBeenCalled();
     });
@@ -109,7 +115,9 @@ describe('useMarkdownInputFieldHandlers', () => {
       const params = createDefaultParams();
       params.isLoading = true;
       params.props.onSend = vi.fn();
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       await result.current.sendMessage();
       expect(params.props.onSend).not.toHaveBeenCalled();
     });
@@ -118,9 +126,15 @@ describe('useMarkdownInputFieldHandlers', () => {
       const params = createDefaultParams();
       const err = new Error('send failed');
       params.props.onSend = vi.fn().mockRejectedValue(err);
-      params.markdownEditorRef.current!.store.getMDContent.mockReturnValue('hi');
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      params.markdownEditorRef.current!.store.getMDContent.mockReturnValue(
+        'hi',
+      );
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       await expect(result.current.sendMessage()).rejects.toThrow('send failed');
       expect(consoleSpy).toHaveBeenCalledWith('Send message failed:', err);
       consoleSpy.mockRestore();
@@ -130,11 +144,17 @@ describe('useMarkdownInputFieldHandlers', () => {
       const params = createDefaultParams();
       params.props.onSend = vi.fn().mockResolvedValue(undefined);
       params.props.onChange = vi.fn();
-      params.markdownEditorRef.current!.store.getMDContent.mockReturnValue('content');
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      params.markdownEditorRef.current!.store.getMDContent.mockReturnValue(
+        'content',
+      );
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       await result.current.sendMessage();
       expect(params.props.onSend).toHaveBeenCalledWith('content');
-      expect(params.markdownEditorRef.current!.store.clearContent).toHaveBeenCalled();
+      expect(
+        params.markdownEditorRef.current!.store.clearContent,
+      ).toHaveBeenCalled();
       expect(params.setValue).toHaveBeenCalledWith('');
       expect(params.setFileMap).toHaveBeenCalledWith(new Map());
     });
@@ -150,7 +170,9 @@ describe('useMarkdownInputFieldHandlers', () => {
       mockGetFileListFromDataTransferItems.mockResolvedValue([
         { type: 'image/png', name: 'a.png' },
       ]);
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       const e = { clipboardData: { items: [] } } as any;
       await result.current.handlePaste(e);
       expect(mockGetFileListFromDataTransferItems).toHaveBeenCalledWith(e);
@@ -163,7 +185,9 @@ describe('useMarkdownInputFieldHandlers', () => {
       mockGetFileListFromDataTransferItems.mockResolvedValue([
         { type: 'image/png', name: 'a.png' },
       ]);
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       await result.current.handlePaste({ clipboardData: { items: [] } } as any);
       expect(mockGetFileListFromDataTransferItems).not.toHaveBeenCalled();
       expect(mockUpLoadFileToServer).not.toHaveBeenCalled();
@@ -173,7 +197,9 @@ describe('useMarkdownInputFieldHandlers', () => {
       const params = createDefaultParams();
       params.props.attachment = {};
       params.props.markdownProps = undefined;
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       await result.current.handlePaste({ clipboardData: { items: [] } } as any);
       expect(mockUpLoadFileToServer).not.toHaveBeenCalled();
     });
@@ -184,7 +210,9 @@ describe('useMarkdownInputFieldHandlers', () => {
       mockGetFileListFromDataTransferItems.mockResolvedValue([
         { type: 'text/plain', name: 'a.txt' },
       ]);
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       await result.current.handlePaste({ clipboardData: { items: [] } } as any);
       expect(mockUpLoadFileToServer).not.toHaveBeenCalled();
     });
@@ -195,7 +223,9 @@ describe('useMarkdownInputFieldHandlers', () => {
       mockGetFileListFromDataTransferItems.mockResolvedValue([
         { type: 'image/png', name: 'p.png' },
       ]);
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       const e = { clipboardData: { items: [] } } as any;
       await result.current.handlePaste(e);
       expect(mockUpLoadFileToServer).toHaveBeenCalledWith(
@@ -213,7 +243,9 @@ describe('useMarkdownInputFieldHandlers', () => {
     it('inputComposition 为 true 时直接 return', () => {
       const params = createDefaultParams();
       (params.markdownEditorRef.current!.store as any).inputComposition = true;
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       const e = {
         key: 'Enter',
         ctrlKey: false,
@@ -229,7 +261,9 @@ describe('useMarkdownInputFieldHandlers', () => {
 
     it('isComposing 为 true 时直接 return', () => {
       const params = createDefaultParams();
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       const e = {
         key: 'Enter',
         ctrlKey: false,
@@ -246,7 +280,9 @@ describe('useMarkdownInputFieldHandlers', () => {
     it('Home 键应 preventDefault 并 Transforms.select 到文档开头', () => {
       const params = createDefaultParams();
       const selectSpy = vi.spyOn(Transforms, 'select');
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       const e = {
         key: 'Home',
         ctrlKey: false,
@@ -266,7 +302,9 @@ describe('useMarkdownInputFieldHandlers', () => {
     it('End 键应 preventDefault 并 Transforms.select 到文档末尾', () => {
       const params = createDefaultParams();
       const selectSpy = vi.spyOn(Transforms, 'select');
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       const e = {
         key: 'End',
         ctrlKey: false,
@@ -287,8 +325,12 @@ describe('useMarkdownInputFieldHandlers', () => {
       const params = createDefaultParams();
       params.props.triggerSendKey = 'Mod+Enter';
       params.props.onSend = vi.fn().mockResolvedValue(undefined);
-      params.markdownEditorRef.current!.store.getMDContent.mockReturnValue('content');
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      params.markdownEditorRef.current!.store.getMDContent.mockReturnValue(
+        'content',
+      );
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       const e = {
         key: 'Enter',
         ctrlKey: true,
@@ -310,8 +352,12 @@ describe('useMarkdownInputFieldHandlers', () => {
       mockIsMobileDevice.mockReturnValue(true);
       const params = createDefaultParams();
       params.props.onSend = vi.fn().mockResolvedValue(undefined);
-      params.markdownEditorRef.current!.store.getMDContent.mockReturnValue('text');
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      params.markdownEditorRef.current!.store.getMDContent.mockReturnValue(
+        'text',
+      );
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       const e = {
         key: 'Enter',
         ctrlKey: true,
@@ -331,7 +377,9 @@ describe('useMarkdownInputFieldHandlers', () => {
   describe('activeInput', () => {
     it('active 为 true 时设置 tabIndex 和 active 类', () => {
       const params = createDefaultParams();
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       result.current.activeInput(true);
       expect(params.inputRef.current?.tabIndex).toBe(1);
       expect(params.inputRef.current?.classList.contains('active')).toBe(true);
@@ -340,7 +388,9 @@ describe('useMarkdownInputFieldHandlers', () => {
     it('active 为 false 时移除 active 类', () => {
       const params = createDefaultParams();
       params.inputRef.current?.classList.add('active');
-      const { result } = renderHook(() => useMarkdownInputFieldHandlers(params));
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
       result.current.activeInput(false);
       expect(params.inputRef.current?.tabIndex).toBe(-1);
       expect(params.inputRef.current?.classList.contains('active')).toBe(false);

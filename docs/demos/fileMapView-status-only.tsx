@@ -30,8 +30,22 @@ const statusOnlyFileMap = new Map<string, AttachmentFile>([
   ['img-2', createStatusOnlyFile('screenshot.png', 'image/png', 512 * 1024)],
   ['vid-1', createStatusOnlyFile('demo.mp4', 'video/mp4', 15 * 1024 * 1024)],
   ['doc-1', createStatusOnlyFile('report.pdf', 'application/pdf', 1024 * 1024)],
-  ['doc-2', createStatusOnlyFile('sheet.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 256 * 1024)],
-  ['doc-3', createStatusOnlyFile('note.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 88 * 1024)],
+  [
+    'doc-2',
+    createStatusOnlyFile(
+      'sheet.xlsx',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      256 * 1024,
+    ),
+  ],
+  [
+    'doc-3',
+    createStatusOnlyFile(
+      'note.docx',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      88 * 1024,
+    ),
+  ],
 ]);
 
 export default () => (

@@ -225,8 +225,8 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
   // extraShowOnHover 开启时，左右两侧均通过 Popover 在 hover 时展示 extra
   const isLeft = props.placement === 'left';
   const popoverAlign = isLeft
-    ? { points: ['tl', 'bl'] as const, offset: [0, -12] as [number, number] }
-    : { points: ['tr', 'br'] as const, offset: [0, -12] as [number, number] };
+    ? { points: ['tl', 'bl'] as [string, string], offset: [0, -12] as [number, number] }
+    : { points: ['tr', 'br'] as [string, string], offset: [0, -12] as [number, number] };
   const popoverPlacement = isLeft ? 'bottomLeft' : 'bottomRight';
 
   return (

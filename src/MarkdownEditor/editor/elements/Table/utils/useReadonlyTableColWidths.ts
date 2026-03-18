@@ -40,7 +40,7 @@ export function useReadonlyTableColWidths({
     const check = () => {
       const cw = container.clientWidth;
       setContainerWidth(cw);
-      setNeedsColWidths(cw === 0 || (table.scrollWidth > cw));
+      setNeedsColWidths(cw === 0 || table.scrollWidth > cw);
     };
     const ro = new ResizeObserver(check);
     ro.observe(container);

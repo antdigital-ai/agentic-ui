@@ -10,15 +10,15 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
 import React, {
   memo,
-  useContext,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { useLocale } from '../I18n';
 import { useRefFunction } from '../Hooks/useRefFunction';
+import { useLocale } from '../I18n';
 import { useStyle } from './style';
 
 const getChevronStyle = (expanded: boolean): React.CSSProperties => ({
@@ -336,11 +336,7 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
 
   const contentExpandButton = useMemo(() => {
     if (!showContentExpand) return null;
-    const icon = contentExpanded ? (
-      <ChevronsDownUp />
-    ) : (
-      <ChevronsUpDown />
-    );
+    const icon = contentExpanded ? <ChevronsDownUp /> : <ChevronsUpDown />;
     const text = contentExpanded ? locale.collapse : locale.expand;
     return (
       <div

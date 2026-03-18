@@ -1,10 +1,10 @@
-import type { TaskStatus } from '@ant-design/agentic-ui';
+import type { TaskItem, TaskStatus } from '@ant-design/agentic-ui';
 import { TaskList, ToolUseBar } from '@ant-design/agentic-ui';
 import React, { useState } from 'react';
 
 export default () => {
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
-  const [items] = useState([
+  const [items] = useState<TaskItem[]>([
     {
       key: '1',
       title: '收集并分析竞品产品数据',

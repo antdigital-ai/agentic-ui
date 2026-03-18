@@ -84,94 +84,94 @@ const Legend: React.FC<LegendProps> = ({
         }}
       >
         {displayedItems.map((d, i) => {
-        const dataIndex = startIndex + i;
-        const isHidden = hiddenDataIndices.has(dataIndex);
-        return (
-          <div
-            key={dataIndex}
-            className={[`${baseClassName}-legend-item`, hashId]
-              .filter(Boolean)
-              .join(' ')}
-            style={{
-              cursor: 'pointer',
-              padding: isMobile ? '4px 0' : '6px 0',
-              fontSize: isMobile ? 11 : 12,
-              minHeight: isMobile ? '24px' : '28px',
-              textDecoration: isHidden ? 'line-through' : 'none',
-            }}
-            onClick={() => onLegendItemClick(dataIndex)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onLegendItemClick(dataIndex);
-              }
-            }}
-            tabIndex={0}
-            role="button"
-            aria-label={`${isHidden ? locale['chart.legend.show'] : locale['chart.legend.hide']} ${d.label}`}
-          >
-            <span
-              className={[`${baseClassName}-legend-color`, hashId]
+          const dataIndex = startIndex + i;
+          const isHidden = hiddenDataIndices.has(dataIndex);
+          return (
+            <div
+              key={dataIndex}
+              className={[`${baseClassName}-legend-item`, hashId]
                 .filter(Boolean)
                 .join(' ')}
               style={{
-                ['--donut-legend-color' as any]:
-                  backgroundColors[dataIndex] || '#ccc',
-                width: isMobile ? 10 : 12,
-                height: isMobile ? 10 : 12,
-                borderRadius: 4,
-                marginRight: isMobile ? 4 : 6,
+                cursor: 'pointer',
+                padding: isMobile ? '4px 0' : '6px 0',
+                fontSize: isMobile ? 11 : 12,
+                minHeight: isMobile ? '24px' : '28px',
+                textDecoration: isHidden ? 'line-through' : 'none',
               }}
-            />
-            <span
-              className={[`${baseClassName}-legend-label`, hashId]
-                .filter(Boolean)
-                .join(' ')}
-              style={{
-                fontSize: isMobile ? 11 : 13,
-                flex: isMobile ? '0 1 auto' : 1,
-                minWidth: isMobile ? '60px' : 'auto',
+              onClick={() => onLegendItemClick(dataIndex)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onLegendItemClick(dataIndex);
+                }
               }}
+              tabIndex={0}
+              role="button"
+              aria-label={`${isHidden ? locale['chart.legend.show'] : locale['chart.legend.hide']} ${d.label}`}
             >
-              {d.label}
-            </span>
-            <span
-              className={[`${baseClassName}-legend-value`, hashId]
-                .filter(Boolean)
-                .join(' ')}
-              style={{
-                fontSize: isMobile ? 11 : 13,
-                fontWeight: isMobile ? 400 : 500,
-                marginLeft: isMobile ? 8 : 15,
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
-              <span>{d.value}</span>
               <span
-                className={[`${baseClassName}-legend-percent`, hashId]
+                className={[`${baseClassName}-legend-color`, hashId]
                   .filter(Boolean)
                   .join(' ')}
                 style={{
-                  fontSize: isMobile ? 10 : 12,
-                  marginLeft: isMobile ? 6 : 8,
-                  marginTop: 0,
+                  ['--donut-legend-color' as any]:
+                    backgroundColors[dataIndex] || '#ccc',
+                  width: isMobile ? 10 : 12,
+                  height: isMobile ? 10 : 12,
+                  borderRadius: 4,
+                  marginRight: isMobile ? 4 : 6,
+                }}
+              />
+              <span
+                className={[`${baseClassName}-legend-label`, hashId]
+                  .filter(Boolean)
+                  .join(' ')}
+                style={{
+                  fontSize: isMobile ? 11 : 13,
+                  flex: isMobile ? '0 1 auto' : 1,
+                  minWidth: isMobile ? '60px' : 'auto',
                 }}
               >
-                {(() => {
-                  const v =
-                    typeof d.value === 'number' ? d.value : Number(d.value);
-                  return total > 0 && Number.isFinite(v)
-                    ? ((v / total) * 100).toFixed(0)
-                    : '0';
-                })()}
-                %
+                {d.label}
               </span>
-            </span>
-          </div>
-        );
-      })}
+              <span
+                className={[`${baseClassName}-legend-value`, hashId]
+                  .filter(Boolean)
+                  .join(' ')}
+                style={{
+                  fontSize: isMobile ? 11 : 13,
+                  fontWeight: isMobile ? 400 : 500,
+                  marginLeft: isMobile ? 8 : 15,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                <span>{d.value}</span>
+                <span
+                  className={[`${baseClassName}-legend-percent`, hashId]
+                    .filter(Boolean)
+                    .join(' ')}
+                  style={{
+                    fontSize: isMobile ? 10 : 12,
+                    marginLeft: isMobile ? 6 : 8,
+                    marginTop: 0,
+                  }}
+                >
+                  {(() => {
+                    const v =
+                      typeof d.value === 'number' ? d.value : Number(d.value);
+                    return total > 0 && Number.isFinite(v)
+                      ? ((v / total) * 100).toFixed(0)
+                      : '0';
+                  })()}
+                  %
+                </span>
+              </span>
+            </div>
+          );
+        })}
       </div>
       {totalPages > 1 && (
         <div

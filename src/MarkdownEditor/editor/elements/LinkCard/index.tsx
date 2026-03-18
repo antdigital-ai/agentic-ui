@@ -139,14 +139,10 @@ export function LinkCard({
               >
                 {element.title || element.name || 'no title'}
               </a>
-              <div
-                className={classNames(`${blockCls}__description`)}
-              >
+              <div className={classNames(`${blockCls}__description`)}>
                 {element.description ? element.description : element?.url}
               </div>
-              <div
-                className={classNames(`${blockCls}__collaborators`)}
-              >
+              <div className={classNames(`${blockCls}__collaborators`)}>
                 {element.otherProps?.collaborators ? (
                   <div>
                     <AvatarList

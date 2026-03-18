@@ -269,7 +269,12 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
   if (isLoading) {
     return wrapSSR(
       <div
-        className={clsx(prefixClass, `${prefixClass}-loading`, className, hashId)}
+        className={clsx(
+          prefixClass,
+          `${prefixClass}-loading`,
+          className,
+          hashId,
+        )}
         ref={bubbleListRef}
         style={{
           padding: 24,

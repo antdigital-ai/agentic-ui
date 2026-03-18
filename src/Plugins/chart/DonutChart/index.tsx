@@ -10,8 +10,8 @@ import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import classNames from 'clsx';
 import React, { useContext, useMemo, useRef, useState } from 'react';
 
-import { useLocale } from '../../../I18n';
 import { Doughnut } from 'react-chartjs-2';
+import { useLocale } from '../../../I18n';
 import {
   ChartContainer,
   ChartFilter,
@@ -19,8 +19,8 @@ import {
   ChartToolBar,
   downloadChart,
 } from '../components';
-import { isWindowDefined } from '../env';
 import { defaultColorList } from '../const';
+import { isWindowDefined } from '../env';
 import { resolveCssVariable } from '../utils';
 import {
   SINGLE_MODE_DESKTOP_CUTOUT,
@@ -572,28 +572,26 @@ const DonutChart: React.FC<DonutChartProps> = ({
                 !isSingleValueMode && {
                   datalabels: {
                     display: (context: Context) => {
-                      const value =
-                        context.dataset?.data?.[context.dataIndex];
+                      const value = context.dataset?.data?.[context.dataIndex];
                       const numVal =
                         typeof value === 'number' ? value : Number(value);
-                      if (!Number.isFinite(numVal) || total <= 0)
-                        return false;
+                      if (!Number.isFinite(numVal) || total <= 0) return false;
                       const pct = (numVal / total) * 100;
                       if (pct < 2) return false;
                       return true;
                     },
                     formatter: (value: number, context: Context) => {
                       const pct =
-                        total > 0
-                          ? ((value / total) * 100).toFixed(2)
-                          : '0';
+                        total > 0 ? ((value / total) * 100).toFixed(2) : '0';
                       const label =
                         context.chart.data.labels?.[context.dataIndex];
                       const labelStr =
                         label !== undefined && label !== null
                           ? String(label)
                           : '';
-                      return labelStr ? `${labelStr}: ${pct}%` : `${value} (${pct}%)`;
+                      return labelStr
+                        ? `${labelStr}: ${pct}%`
+                        : `${value} (${pct}%)`;
                     },
                     color: isDarkTheme ? '#fff' : '#343A45',
                     font: { size: isMobile ? 10 : 11, weight: 'normal' },
@@ -693,8 +691,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                     <LegendView
                       chartData={chartData}
                       backgroundColors={chartData.map(
-                        (_, i) =>
-                          backgroundColors[i % backgroundColors.length],
+                        (_, i) => backgroundColors[i % backgroundColors.length],
                       )}
                       hiddenDataIndicesByChart={hiddenDataIndicesByChart}
                       chartIndex={idx}

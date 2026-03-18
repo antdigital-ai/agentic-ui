@@ -11,7 +11,9 @@ describe('catchError / withErrorReporting', () => {
       other: 1,
     };
     const wrapped = withErrorReporting(editor as any);
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
     const consoleLog = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     wrapped.someMethod('a', 'b');

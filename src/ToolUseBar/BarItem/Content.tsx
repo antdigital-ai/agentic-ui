@@ -1,7 +1,20 @@
-import { Api, ChevronUp, ChevronsDownUp, ChevronsUpDown, X } from '@sofa-design/icons';
+import {
+  Api,
+  ChevronUp,
+  ChevronsDownUp,
+  ChevronsUpDown,
+  X,
+} from '@sofa-design/icons';
 import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ToolCall } from '.';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 
@@ -66,7 +79,12 @@ const ToolImageComponent: React.FC<ToolImageProps> = ({
     return tool.status === 'loading'
       ? loadingAnimationConfig
       : idleAnimationConfig;
-  }, [tool.status, loadingAnimationConfig, idleAnimationConfig, disableAnimation]);
+  }, [
+    tool.status,
+    loadingAnimationConfig,
+    idleAnimationConfig,
+    disableAnimation,
+  ]);
 
   // 缓存图标渲染
   const iconElement = useMemo(() => {

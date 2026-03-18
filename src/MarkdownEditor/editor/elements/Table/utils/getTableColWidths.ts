@@ -1,8 +1,8 @@
 import { Node } from 'slate';
 import stringWidth from 'string-width';
 import {
-  TABLE_DEFAULT_COL_WIDTH,
   TABLE_COL_WIDTH_MIN_COLUMNS,
+  TABLE_DEFAULT_COL_WIDTH,
 } from '../../../../../Constants/mobile';
 import type { TableNode } from '../../../types/Table';
 
@@ -38,14 +38,16 @@ function getSampledCellTexts(
   columnCount: number,
   maxRows: number,
 ): string[][] {
-  return getTableRows(element).slice(0, maxRows).map((row) =>
-    Array.from({ length: columnCount }, (_, i) => {
-      const cell = row.children?.[i];
-      return cell && typeof cell === 'object' && 'children' in cell
-        ? Node.string(cell as Parameters<typeof Node.string>[0])
-        : '';
-    }),
-  );
+  return getTableRows(element)
+    .slice(0, maxRows)
+    .map((row) =>
+      Array.from({ length: columnCount }, (_, i) => {
+        const cell = row.children?.[i];
+        return cell && typeof cell === 'object' && 'children' in cell
+          ? Node.string(cell as Parameters<typeof Node.string>[0])
+          : '';
+      }),
+    );
 }
 
 function createMeasureContext(): CanvasRenderingContext2D | null {
@@ -125,7 +127,9 @@ function getContentBasedColWidthsPx(
     for (const row of rows) {
       const cell = row.children?.[colIndex];
       if (cell && typeof cell === 'object' && 'children' in cell) {
-        const w = stringWidth(Node.string(cell as Parameters<typeof Node.string>[0])) * CHAR_WIDTH_PX;
+        const w =
+          stringWidth(Node.string(cell as Parameters<typeof Node.string>[0])) *
+          CHAR_WIDTH_PX;
         if (w > maxPx) maxPx = w;
       }
     }
@@ -135,7 +139,9 @@ function getContentBasedColWidthsPx(
 
 function pxToPercent(px: number[]): string[] {
   const total = px.reduce((a, b) => a + b, 0);
-  return total <= 0 ? px.map(() => '0%') : px.map((w) => `${((w / total) * 100).toFixed(2)}%`);
+  return total <= 0
+    ? px.map(() => '0%')
+    : px.map((w) => `${((w / total) * 100).toFixed(2)}%`);
 }
 
 /** 只读表格列宽：显式 colWidths > 智能算法(6+列) > 内容比例 > 平分 */

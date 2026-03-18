@@ -8,7 +8,11 @@ vi.mock('antd', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>;
   return {
     ...actual,
-    ColorPicker: ({ onChange }: { onChange?: (c: { toHexString: () => string }) => void }) => (
+    ColorPicker: ({
+      onChange,
+    }: {
+      onChange?: (c: { toHexString: () => string }) => void;
+    }) => (
       <button
         type="button"
         data-testid="mock-color-change"
@@ -34,10 +38,7 @@ describe('ColorPickerButton', () => {
   it('onColorChange 应在 ColorPicker 变更时被调用', () => {
     const onColorChange = vi.fn();
     render(
-      <ColorPickerButton
-        {...defaultProps}
-        onColorChange={onColorChange}
-      />,
+      <ColorPickerButton {...defaultProps} onColorChange={onColorChange} />,
     );
     const changeBtn = screen.getByTestId('mock-color-change');
     fireEvent.click(changeBtn);

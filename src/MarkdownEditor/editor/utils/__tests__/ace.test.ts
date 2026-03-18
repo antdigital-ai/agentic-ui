@@ -109,7 +109,9 @@ vi.mock('ace-builds/src-noconflict/theme-cloud9_night', () => ({}));
 vi.mock('ace-builds/src-noconflict/theme-cloud_editor', () => ({}));
 
 vi.mock('ace-builds/src-noconflict/ext-modelist', () => ({
-  default: { modes: [{ name: 'javascript' }, { name: 'python' }, { name: 'text' }] },
+  default: {
+    modes: [{ name: 'javascript' }, { name: 'python' }, { name: 'text' }],
+  },
 }));
 
 describe('ace utils', () => {

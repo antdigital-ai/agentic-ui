@@ -234,7 +234,11 @@ describe('parseTableOrChart 通过 parserMarkdownToSlateNode', () => {
       expect(row0[0].rowSpan).toBe(2);
       expect(row0[0].colSpan).toBe(2);
     }
-    if (row0[1] !== null && row0[1] !== undefined && row0[1].hidden !== undefined) {
+    if (
+      row0[1] !== null &&
+      row0[1] !== undefined &&
+      row0[1].hidden !== undefined
+    ) {
       expect(row0[1].hidden).toBe(true);
     }
   });

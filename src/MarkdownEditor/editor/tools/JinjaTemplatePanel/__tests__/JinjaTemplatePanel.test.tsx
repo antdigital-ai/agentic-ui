@@ -256,7 +256,9 @@ describe('JinjaTemplatePanel', () => {
       </I18nProvide>,
     );
 
-    expect(screen.getByRole('listbox', { name: 'Jinja template list' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('listbox', { name: 'Jinja template list' }),
+    ).toBeInTheDocument();
 
     document.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),

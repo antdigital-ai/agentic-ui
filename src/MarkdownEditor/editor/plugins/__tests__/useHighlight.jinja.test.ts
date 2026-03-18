@@ -45,7 +45,9 @@ describe('useHighlight - Jinja', () => {
     const variableRanges = ranges.filter(
       (r: any) => r.jinjaVariableName === true || r.jinjaVariable === true,
     );
-    const delimiterRanges = ranges.filter((r: any) => r.jinjaDelimiter === true);
+    const delimiterRanges = ranges.filter(
+      (r: any) => r.jinjaDelimiter === true,
+    );
     expect(variableRanges.length).toBeGreaterThanOrEqual(1);
     expect(delimiterRanges.length).toBeGreaterThanOrEqual(2);
     const nameRange = variableRanges.find((r: any) => r.jinjaVariableName);
@@ -61,7 +63,9 @@ describe('useHighlight - Jinja', () => {
     };
     const ranges = decorate([node, [0]]);
     const keywordRanges = ranges.filter((r: any) => r.jinjaKeyword === true);
-    const delimiterRanges = ranges.filter((r: any) => r.jinjaDelimiter === true);
+    const delimiterRanges = ranges.filter(
+      (r: any) => r.jinjaDelimiter === true,
+    );
     expect(keywordRanges.length).toBeGreaterThanOrEqual(2);
     expect(delimiterRanges.length).toBeGreaterThanOrEqual(4);
   });
@@ -84,7 +88,9 @@ describe('useHighlight - Jinja', () => {
       children: [{ text: 'hello {{ $name }} end' }],
     };
     const ranges = decorate([node, [0]]);
-    const variableRanges = ranges.filter((r: any) => r.jinjaVariableName === true);
+    const variableRanges = ranges.filter(
+      (r: any) => r.jinjaVariableName === true,
+    );
     expect(variableRanges.length).toBeGreaterThanOrEqual(1);
     expect(variableRanges[0].anchor.offset).toBe(9);
     expect(variableRanges[0].focus.offset).toBe(14);
@@ -110,7 +116,9 @@ describe('useHighlight - Jinja', () => {
     } as any;
     const ranges = decorate([node, [0]]);
     const keywordRanges = ranges.filter((r: any) => r.jinjaKeyword === true);
-    const delimiterRanges = ranges.filter((r: any) => r.jinjaDelimiter === true);
+    const delimiterRanges = ranges.filter(
+      (r: any) => r.jinjaDelimiter === true,
+    );
     expect(keywordRanges.length).toBeGreaterThanOrEqual(1);
     expect(delimiterRanges.length).toBeGreaterThanOrEqual(2);
     expect(keywordRanges.some((r: any) => r.jinjaKeyword === true)).toBe(true);

@@ -5,11 +5,7 @@ import { createEditor } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorStore } from '../../store';
 import { EditorUtils } from '../../utils/editorUtils';
-import {
-  cacheTextNode,
-  clearInlineKatex,
-  useHighlight,
-} from '../useHighlight';
+import { cacheTextNode, clearInlineKatex, useHighlight } from '../useHighlight';
 
 vi.mock('../../utils/editorUtils', () => ({
   EditorUtils: {

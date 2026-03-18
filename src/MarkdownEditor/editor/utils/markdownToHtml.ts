@@ -117,7 +117,11 @@ function leafDirectiveHandler(state: any, node: any) {
     type: 'element',
     tagName: 'span',
     properties: {
-      className: ['directive', 'leaf', `directive-${String(node.name || 'unknown')}`],
+      className: [
+        'directive',
+        'leaf',
+        `directive-${String(node.name || 'unknown')}`,
+      ],
     },
     children: state.all(node),
   };

@@ -1,10 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  areCommentLeafPropsEqual,
-  CommentLeaf,
-} from '../CommentLeaf';
+import { areCommentLeafPropsEqual, CommentLeaf } from '../CommentLeaf';
 
 vi.mock('../../../../Utils/debugUtils', () => ({
   debugInfo: vi.fn(),
@@ -16,7 +13,9 @@ vi.mock('../../store', () => ({
 }));
 
 vi.mock('../Comment', () => ({
-  CommentView: ({ children }: any) => <div data-testid="comment-view">{children}</div>,
+  CommentView: ({ children }: any) => (
+    <div data-testid="comment-view">{children}</div>
+  ),
 }));
 
 describe('areCommentLeafPropsEqual', () => {
@@ -37,9 +36,9 @@ describe('areCommentLeafPropsEqual', () => {
   });
 
   it('returns false when comment differs', () => {
-    expect(
-      areCommentLeafPropsEqual(base, { ...base, comment: { x: 1 } }),
-    ).toBe(false);
+    expect(areCommentLeafPropsEqual(base, { ...base, comment: { x: 1 } })).toBe(
+      false,
+    );
   });
 
   it('returns false when leaf differs by comment/id/selection/data', () => {
@@ -60,8 +59,18 @@ describe('areCommentLeafPropsEqual', () => {
   it('returns true when leaf is different reference but same keys', () => {
     const sameChild = <span>x</span>;
     const sameData = {};
-    const leafA = { comment: true as const, id: '1', selection: undefined, data: sameData };
-    const leafB = { comment: true as const, id: '1', selection: undefined, data: sameData };
+    const leafA = {
+      comment: true as const,
+      id: '1',
+      selection: undefined,
+      data: sameData,
+    };
+    const leafB = {
+      comment: true as const,
+      id: '1',
+      selection: undefined,
+      data: sameData,
+    };
     expect(
       areCommentLeafPropsEqual(
         { children: sameChild, leaf: leafA, comment: base.comment },
@@ -74,10 +83,7 @@ describe('areCommentLeafPropsEqual', () => {
 describe('CommentLeaf', () => {
   it('renders children when leaf.comment is false', () => {
     render(
-      <CommentLeaf
-        leaf={{ comment: false }}
-        comment={{}}
-      >
+      <CommentLeaf leaf={{ comment: false }} comment={{}}>
         <span data-testid="child">text</span>
       </CommentLeaf>,
     );
@@ -87,10 +93,7 @@ describe('CommentLeaf', () => {
 
   it('renders CommentView when leaf.comment is true', () => {
     render(
-      <CommentLeaf
-        leaf={{ comment: true, id: 'c1', data: {} }}
-        comment={{}}
-      >
+      <CommentLeaf leaf={{ comment: true, id: 'c1', data: {} }} comment={{}}>
         <span data-testid="child">text</span>
       </CommentLeaf>,
     );

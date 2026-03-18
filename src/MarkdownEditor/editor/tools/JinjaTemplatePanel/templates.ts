@@ -11,14 +11,16 @@ const JINJA_TEMPLATE_IDS = [
 ] as const;
 
 /** 内置 Jinja 模板基础数据（不含 i18n 文案） */
-export const JINJA_TEMPLATE_BASE: { id: (typeof JINJA_TEMPLATE_IDS)[number]; template: string }[] =
-  [
-    { id: 'variableInterpolation', template: '{{ }}' },
-    { id: 'condition', template: '{% if  %}\n  \n{% endif %}' },
-    { id: 'loop', template: '{% for  in  %}\n  \n{% endfor %}' },
-    { id: 'filter', template: '{{  | }}' },
-    { id: 'setVariable', template: '{% set  =  %}' },
-  ];
+export const JINJA_TEMPLATE_BASE: {
+  id: (typeof JINJA_TEMPLATE_IDS)[number];
+  template: string;
+}[] = [
+  { id: 'variableInterpolation', template: '{{ }}' },
+  { id: 'condition', template: '{% if  %}\n  \n{% endif %}' },
+  { id: 'loop', template: '{% for  in  %}\n  \n{% endfor %}' },
+  { id: 'filter', template: '{{  | }}' },
+  { id: 'setVariable', template: '{% set  =  %}' },
+];
 
 /**
  * 根据 locale 生成带国际化文案的 Jinja 模板列表

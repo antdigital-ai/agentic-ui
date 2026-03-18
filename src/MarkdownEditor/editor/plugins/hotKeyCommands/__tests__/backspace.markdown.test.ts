@@ -442,9 +442,9 @@ describe('BackspaceKey - Markdown 输出测试', () => {
     });
 
     it('表格首个单元格无前路径时退格应阻止并返回 true', () => {
-      const rawEditor = withHistory(
-        withReact(createEditor()),
-      ) as BaseEditor & ReactEditor & HistoryEditor;
+      const rawEditor = withHistory(withReact(createEditor())) as BaseEditor &
+        ReactEditor &
+        HistoryEditor;
       rawEditor.children = [
         {
           type: 'table',
@@ -724,8 +724,12 @@ describe('BackspaceKey - Markdown 输出测试', () => {
     });
 
     it('非 paragraph 且单字符脏叶时调用 clearMarks', () => {
-      const isDirtLeafSpy = vi.spyOn(EditorUtils, 'isDirtLeaf').mockReturnValueOnce(true);
-      const clearMarksSpy = vi.spyOn(EditorUtils, 'clearMarks').mockImplementation(() => {});
+      const isDirtLeafSpy = vi
+        .spyOn(EditorUtils, 'isDirtLeaf')
+        .mockReturnValueOnce(true);
+      const clearMarksSpy = vi
+        .spyOn(EditorUtils, 'clearMarks')
+        .mockImplementation(() => {});
       editor.children = [
         { type: 'code', children: [{ text: 'x', bold: true }] },
       ];

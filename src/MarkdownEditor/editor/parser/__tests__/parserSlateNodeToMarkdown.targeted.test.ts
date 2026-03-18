@@ -83,7 +83,11 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
   });
 
   it('覆盖 blockquote 尾部标记与 code/media 非末尾换行（671,679）', () => {
-    const nestedParent = [{ root: true }, { type: 'blockquote' }, { type: 'blockquote' }];
+    const nestedParent = [
+      { root: true },
+      { type: 'blockquote' },
+      { type: 'blockquote' },
+    ];
     const q = parserSlateNodeToMarkdown(
       [{ type: 'paragraph', children: [{ text: 'nested' }] }],
       '',
@@ -137,10 +141,17 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
         {
           type: 'table-row',
           children: [
-            { type: 'table-cell', align: 'mystery', children: [{ text: 'HEAD' }] },
+            {
+              type: 'table-cell',
+              align: 'mystery',
+              children: [{ text: 'HEAD' }],
+            },
           ],
         },
-        { type: 'table-row', children: [{ type: 'table-cell', children: [{ text: 'a' }] }] },
+        {
+          type: 'table-row',
+          children: [{ type: 'table-cell', children: [{ text: 'a' }] }],
+        },
       ],
     };
     const result = parserSlateNodeToMarkdown([node as any]);
@@ -196,11 +207,15 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
     const result = parserSlateNodeToMarkdown([
       { type: 'image', url: 'http://[::1', alt: 'bad' },
       { type: 'media', mediaType: 'video', url: 'https://x.com/v.mp4' },
-      { type: 'media', mediaType: 'iframe', url: 'https://x.com/if', height: 100 },
+      {
+        type: 'media',
+        mediaType: 'iframe',
+        url: 'https://x.com/if',
+        height: 100,
+      },
     ] as any);
     expect(warnSpy).toHaveBeenCalled();
     expect(result).toContain('<video src="https://x.com/v.mp4"/>');
     warnSpy.mockRestore();
   });
 });
-

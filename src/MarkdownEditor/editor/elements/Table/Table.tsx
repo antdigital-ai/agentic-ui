@@ -9,9 +9,9 @@ import {
   MOBILE_TABLE_MIN_COLUMN_WIDTH,
   TABLE_EDIT_COL_WIDTH_MIN_COLUMNS,
 } from '../../../../Constants/mobile';
-import { TableColgroup, TABLE_ROW_INDEX_COL_WIDTH } from './TableColgroup';
 import { useEditorStore } from '../../store';
 import { ReadonlyTableComponent } from './ReadonlyTableComponent';
+import { TABLE_ROW_INDEX_COL_WIDTH, TableColgroup } from './TableColgroup';
 import { TablePropsContext } from './TableContext';
 import { TableRowIndex } from './TableRowIndex';
 import useScrollShadow from './useScrollShadow';

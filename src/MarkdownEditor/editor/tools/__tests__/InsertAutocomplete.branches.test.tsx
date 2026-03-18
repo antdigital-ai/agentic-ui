@@ -203,19 +203,18 @@ vi.mock('../insertAutocompleteStyle', () => ({
 }));
 
 vi.mock('react-dom', async () => {
-  const actual =
-    await vi.importActual<typeof import('react-dom')>('react-dom');
+  const actual = await vi.importActual<typeof import('react-dom')>('react-dom');
   return {
     ...actual,
     createPortal: (children: React.ReactNode) => children,
   };
 });
 
-import { useEditorStore } from '../../store';
 import { Editor, Element, Node, Transforms } from 'slate';
 import { selChange$ } from '../../plugins/useOnchange';
-import { getRemoteMediaType } from '../../utils/media';
+import { useEditorStore } from '../../store';
 import { EditorUtils } from '../../utils/editorUtils';
+import { getRemoteMediaType } from '../../utils/media';
 import {
   InsertAutocomplete,
   InsertAutocompleteItem,
@@ -321,9 +320,9 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
     await renderAndShowInsertLink();
     const input = document.body.querySelector('input');
     expect(input).toBeTruthy();
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
   });
 
@@ -338,9 +337,9 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
       });
     });
     await act(async () => {});
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed')!;
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    )!;
     expect(embedBtn).toBeTruthy();
     fireEvent.click(embedBtn);
     await act(async () => {});
@@ -361,9 +360,9 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
       });
     });
     await act(async () => {});
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed')!;
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    )!;
     fireEvent.click(embedBtn);
     await act(async () => {});
 
@@ -382,9 +381,9 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
       });
     });
     await act(async () => {});
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed')!;
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    )!;
     fireEvent.click(embedBtn);
     await act(async () => {});
 
@@ -404,9 +403,9 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
       });
     });
     await act(async () => {});
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed')!;
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    )!;
     fireEvent.click(embedBtn);
     await act(async () => {});
 
@@ -426,9 +425,9 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
       });
     });
     await act(async () => {});
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed')!;
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    )!;
     fireEvent.click(embedBtn);
     await act(async () => {});
 
@@ -449,15 +448,13 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
       });
     });
     await act(async () => {});
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed')!;
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    )!;
     fireEvent.click(embedBtn);
     await act(async () => {});
 
-    expect(getRemoteMediaType).toHaveBeenCalledWith(
-      '//example.com/video.mp4',
-    );
+    expect(getRemoteMediaType).toHaveBeenCalledWith('//example.com/video.mp4');
   });
 
   it('insertMedia with invalid protocol does not call getRemoteMediaType', async () => {
@@ -536,18 +533,18 @@ describe('InsertAutocomplete branches - insertMedia via link input', () => {
     fireEvent.change(input, { target: { value: 'https://test.com' } });
     await act(async () => {});
 
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     expect(embedBtn!.hasAttribute('disabled')).toBe(false);
   });
 
   it('Embed button is disabled when insertUrl is empty', async () => {
     await renderAndShowInsertLink();
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     expect(embedBtn!.disabled).toBe(true);
   });
@@ -590,9 +587,9 @@ describe('InsertAutocomplete branches - insertAttachByLink', () => {
       fireEvent.click(tabEmbed);
       await act(async () => {});
     }
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     fireEvent.click(embedBtn!);
     await act(async () => {});
@@ -619,9 +616,9 @@ describe('InsertAutocomplete branches - insertAttachByLink', () => {
       fireEvent.click(tabEmbed);
       await act(async () => {});
     }
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     fireEvent.click(embedBtn!);
     await act(async () => {});
@@ -651,9 +648,9 @@ describe('InsertAutocomplete branches - insertAttachByLink', () => {
       fireEvent.click(tabEmbed);
       await act(async () => {});
     }
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     fireEvent.click(embedBtn!);
     await act(async () => {});
@@ -712,9 +709,9 @@ describe('InsertAutocomplete branches - insertAttachByLink', () => {
       fireEvent.click(tabEmbed);
       await act(async () => {});
     }
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     fireEvent.click(embedBtn!);
     await act(async () => {});
@@ -743,9 +740,9 @@ describe('InsertAutocomplete branches - insertAttachByLink', () => {
       fireEvent.click(tabEmbed);
       await act(async () => {});
     }
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     fireEvent.click(embedBtn!);
     await act(async () => {});
@@ -776,9 +773,9 @@ describe('InsertAutocomplete branches - insertAttachByLink', () => {
       fireEvent.click(tabEmbed);
       await act(async () => {});
     }
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     fireEvent.click(embedBtn!);
     await act(async () => {});
@@ -861,9 +858,9 @@ describe('InsertAutocomplete branches - insertAttachByLink', () => {
     expect(input).toBeTruthy();
     fireEvent.change(input, { target: { value: 'https://test.pdf' } });
     await act(async () => {});
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     expect(embedBtn!.hasAttribute('disabled')).toBe(false);
   });
@@ -1487,9 +1484,7 @@ describe('InsertAutocomplete branches - keydown direct invoke', () => {
       value: 10,
       configurable: true,
     });
-    const qsSpy = vi
-      .spyOn(document, 'querySelector')
-      .mockReturnValue(targetEl);
+    const qsSpy = vi.spyOn(document, 'querySelector').mockReturnValue(targetEl);
 
     const wrapper = document.body.querySelector(
       '[class*="insert-autocomplete"]',
@@ -1538,9 +1533,7 @@ describe('InsertAutocomplete branches - keydown direct invoke', () => {
       value: 300,
       configurable: true,
     });
-    const qsSpy = vi
-      .spyOn(document, 'querySelector')
-      .mockReturnValue(targetEl);
+    const qsSpy = vi.spyOn(document, 'querySelector').mockReturnValue(targetEl);
 
     const wrapper = document.body.querySelector(
       '[class*="insert-autocomplete"]',
@@ -1625,9 +1618,9 @@ describe('InsertAutocomplete branches - Editor.nodes match callbacks', () => {
       await act(async () => {});
     }
 
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     fireEvent.click(embedBtn!);
     await act(async () => {});
@@ -1658,9 +1651,9 @@ describe('InsertAutocomplete branches - Editor.nodes match callbacks', () => {
     });
     await act(async () => {});
 
-    const embedBtn = Array.from(
-      document.body.querySelectorAll('button'),
-    ).find((b) => b.textContent === 'Embed');
+    const embedBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === 'Embed',
+    );
     expect(embedBtn).toBeTruthy();
     fireEvent.click(embedBtn!);
     await act(async () => {});

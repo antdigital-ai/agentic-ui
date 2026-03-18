@@ -8,9 +8,7 @@ describe('withListsPlugin', () => {
     editor.children = [
       {
         type: 'bulleted-list',
-        children: [
-          { type: 'paragraph', children: [{ text: 'x' }] } as any,
-        ],
+        children: [{ type: 'paragraph', children: [{ text: 'x' }] } as any],
       },
     ];
 
@@ -55,9 +53,11 @@ describe('withListsPlugin', () => {
       },
     ] as any;
 
-    const isBlockSpy = vi.spyOn(Editor, 'isBlock').mockImplementation((_e, n) => {
-      return (n as any).type === 'link' ? false : true;
-    });
+    const isBlockSpy = vi
+      .spyOn(Editor, 'isBlock')
+      .mockImplementation((_e, n) => {
+        return (n as any).type === 'link' ? false : true;
+      });
     const wrapNodesSpy = vi.spyOn(Transforms, 'wrapNodes');
     editor.normalizeNode([editor.children[0], [0]]);
 
@@ -95,7 +95,12 @@ describe('withListsPlugin', () => {
       {
         type: 'list',
         order: true,
-        children: [{ type: 'list-item', children: [{ type: 'paragraph', children: [{ text: '' }] }] }],
+        children: [
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: '' }] }],
+          },
+        ],
       },
     ] as any;
 
@@ -118,7 +123,12 @@ describe('withListsPlugin', () => {
     editor.children = [
       {
         type: 'list',
-        children: [{ type: 'list-item', children: [{ type: 'paragraph', children: [{ text: '' }] }] }],
+        children: [
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: '' }] }],
+          },
+        ],
       },
     ] as any;
 

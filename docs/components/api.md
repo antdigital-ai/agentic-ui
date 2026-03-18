@@ -179,9 +179,9 @@ For it will surely sprout wings and fly off to the sky like an eagle
 
 ### Markdown 输入配置 (markdown)
 
-| 属性             | 类型      | 默认值 | 描述                   |
-| ---------------- | --------- | ------ | ---------------------- |
-| matchLeaf        | `boolean` | -      | 是否启用叶子节点匹配   |
+| 属性             | 类型      | 默认值  | 描述                                                                           |
+| ---------------- | --------- | ------- | ------------------------------------------------------------------------------ |
+| matchLeaf        | `boolean` | -       | 是否启用叶子节点匹配                                                           |
 | matchInputToNode | `boolean` | `false` | 是否启用输入到节点匹配（如输入 `- ` 转为列表），默认关闭，需显式传 `true` 开启 |
 
 ### 工具栏配置 (toolBar)

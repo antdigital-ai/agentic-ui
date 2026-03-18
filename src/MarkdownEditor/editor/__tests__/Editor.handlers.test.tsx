@@ -141,4 +141,3 @@ describe('SlateMarkdownEditor handler coverage', () => {
     expect(event.stopPropagation).toHaveBeenCalled();
   });
 });
-

@@ -41,8 +41,7 @@ export class MatchKey {
       ) {
         if (n.checkAllow && !n.checkAllow({ editor, node, sel })) continue;
         const [leafNode] = Editor.leaf(editor, sel.anchor);
-        const str =
-          Node.string(leafNode).slice(0, sel.anchor.offset) + e.key;
+        const str = Node.string(leafNode).slice(0, sel.anchor.offset) + e.key;
         const m = str.match(n.reg);
         if (m) {
           if (n.run(this.createParams(editor, node, m))) {

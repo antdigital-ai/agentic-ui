@@ -170,6 +170,8 @@ describe('DragHandle Component', () => {
     const dragHandle = container.querySelector('[data-drag-handle]');
     expect(dragHandle).toBeInTheDocument();
     fireEvent.mouseDown(dragHandle!);
-    expect(mockStore.draggedElement).toBe(container.querySelector('[data-be="list-item"]'));
+    expect(mockStore.draggedElement).toBe(
+      container.querySelector('[data-be="list-item"]'),
+    );
   });
 });

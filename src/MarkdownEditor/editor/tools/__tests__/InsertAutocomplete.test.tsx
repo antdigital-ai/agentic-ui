@@ -1,17 +1,23 @@
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
 import { Subject } from 'rxjs';
+import { Editor, Node, Transforms } from 'slate';
+import { ReactEditor } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { selChange$ } from '../../plugins/useOnchange';
+import { getRemoteMediaType } from '../../utils/media';
 import {
   getInsertOptions,
   InsertAutocomplete,
   InsertAutocompleteItem,
 } from '../InsertAutocomplete';
-import { getRemoteMediaType } from '../../utils/media';
-import { Editor, Node, Transforms } from 'slate';
-import { ReactEditor } from 'slate-react';
-import { selChange$ } from '../../plugins/useOnchange';
 
 const paragraphNode = { type: 'paragraph', children: [{ text: '' }] };
 const nodeTuple: [typeof paragraphNode, number[]] = [paragraphNode, [0]];
@@ -21,7 +27,10 @@ function* editorNodesGenerator() {
 }
 
 const mockEditor = {
-  selection: { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } },
+  selection: {
+    anchor: { path: [0, 0], offset: 0 },
+    focus: { path: [0, 0], offset: 0 },
+  },
   children: [paragraphNode],
 };
 
@@ -38,7 +47,10 @@ mockNodeEl.getBoundingClientRect = vi.fn().mockReturnValue({
   y: 100,
   toJSON: () => ({}),
 });
-Object.defineProperty(mockNodeEl, 'clientHeight', { value: 20, configurable: true });
+Object.defineProperty(mockNodeEl, 'clientHeight', {
+  value: 20,
+  configurable: true,
+});
 
 const keyTaskNext = vi.fn();
 const setOpenInsertCompletion = vi.fn();
@@ -86,7 +98,18 @@ vi.mock('slate', () => ({
 
 vi.mock('../../../I18n', () => ({
   I18nContext: React.createContext({
-    locale: { table: '表格', quote: '引用', code: '代码', head1: '主标题', head2: '段标题', head3: '小标题', 'b-list': '无序列表', 'n-list': '有序列表', 't-list': '任务列表', localeImage: '本地图片' },
+    locale: {
+      table: '表格',
+      quote: '引用',
+      code: '代码',
+      head1: '主标题',
+      head2: '段标题',
+      head3: '小标题',
+      'b-list': '无序列表',
+      'n-list': '有序列表',
+      't-list': '任务列表',
+      localeImage: '本地图片',
+    },
     t: (key: string) => key,
   }),
   LocalKeys: {},
@@ -140,7 +163,10 @@ vi.mock('../InsertAutocomplete', async (importOriginal) => {
   const mod = await importOriginal<typeof import('../InsertAutocomplete')>();
   return {
     ...mod,
-    getInsertOptions: (ctx: Parameters<typeof mod.getInsertOptions>[0], locale: Parameters<typeof mod.getInsertOptions>[1]) => {
+    getInsertOptions: (
+      ctx: Parameters<typeof mod.getInsertOptions>[0],
+      locale: Parameters<typeof mod.getInsertOptions>[1],
+    ) => {
       const options = mod.getInsertOptions(ctx, locale);
       const mediaIdx = options.findIndex((o: any) => o.key === 'media');
       if (mediaIdx >= 0) {
@@ -149,14 +175,26 @@ vi.mock('../InsertAutocomplete', async (importOriginal) => {
           ...media,
           children: [
             ...(media.children || []),
-            { key: 'embedMedia', task: 'image', label: ['Embed media', '嵌入媒体'], icon: React.createElement('span') },
+            {
+              key: 'embedMedia',
+              task: 'image',
+              label: ['Embed media', '嵌入媒体'],
+              icon: React.createElement('span'),
+            },
           ],
         };
       }
       options.push({
         label: ['Attachment', '附件'],
         key: 'attachGroup',
-        children: [{ key: 'attachLink', task: 'attachment', label: ['By link', '链接'], icon: React.createElement('span') }],
+        children: [
+          {
+            key: 'attachLink',
+            task: 'attachment',
+            label: ['By link', '链接'],
+            icon: React.createElement('span'),
+          },
+        ],
       } as any);
       return options;
     },
@@ -180,7 +218,18 @@ function getDefaultStore() {
 }
 
 describe('getInsertOptions', () => {
-  const locale = { table: '表格', quote: '引用', code: '代码', head1: '主标题', head2: '段标题', head3: '小标题', 'b-list': '无序列表', 'n-list': '有序列表', 't-list': '任务列表', localeImage: '本地图片' } as any;
+  const locale = {
+    table: '表格',
+    quote: '引用',
+    code: '代码',
+    head1: '主标题',
+    head2: '段标题',
+    head3: '小标题',
+    'b-list': '无序列表',
+    'n-list': '有序列表',
+    't-list': '任务列表',
+    localeImage: '本地图片',
+  } as any;
 
   it('returns element, media, list and attachGroup when isTop is false', () => {
     const options = getInsertOptions({ isTop: false }, locale);
@@ -198,37 +247,61 @@ describe('getInsertOptions', () => {
     const headOption = options.find((o) => o.key === 'head');
     expect(headOption).toBeDefined();
     expect(headOption?.children?.length).toBe(3);
-    expect(headOption?.children?.map((c) => c.key)).toEqual(['head1', 'head2', 'head3']);
+    expect(headOption?.children?.map((c) => c.key)).toEqual([
+      'head1',
+      'head2',
+      'head3',
+    ]);
   });
 
   it('uses locale labels for table, quote, code', () => {
     const options = getInsertOptions({ isTop: false }, locale);
     const element = options.find((o) => o.key === 'element');
-    expect(element?.children?.find((c) => c.key === 'table')?.label).toContain('表格');
-    expect(element?.children?.find((c) => c.key === 'quote')?.label).toContain('引用');
-    expect(element?.children?.find((c) => c.key === 'code')?.label).toContain('代码');
+    expect(element?.children?.find((c) => c.key === 'table')?.label).toContain(
+      '表格',
+    );
+    expect(element?.children?.find((c) => c.key === 'quote')?.label).toContain(
+      '引用',
+    );
+    expect(element?.children?.find((c) => c.key === 'code')?.label).toContain(
+      '代码',
+    );
   });
 
   it('uses fallback labels when locale key is missing', () => {
     const options = getInsertOptions({ isTop: false }, {} as any);
     expect(options.length).toBeGreaterThan(0);
     const element = options.find((o) => o.key === 'element');
-    expect(element?.children?.some((c) => c.label?.some((l) => l === '表格' || l === '引用' || l === '代码'))).toBe(true);
+    expect(
+      element?.children?.some((c) =>
+        c.label?.some((l) => l === '表格' || l === '引用' || l === '代码'),
+      ),
+    ).toBe(true);
   });
 
   it('returns head group with head2 and head3 args when isTop is true', () => {
     const options = getInsertOptions({ isTop: true }, locale);
     const headOption = options.find((o) => o.key === 'head');
-    expect(headOption?.children?.find((c) => c.key === 'head2')?.args).toEqual([2]);
-    expect(headOption?.children?.find((c) => c.key === 'head3')?.args).toEqual([3]);
+    expect(headOption?.children?.find((c) => c.key === 'head2')?.args).toEqual([
+      2,
+    ]);
+    expect(headOption?.children?.find((c) => c.key === 'head3')?.args).toEqual([
+      3,
+    ]);
   });
 
   it('returns list group with b-list, n-list, t-list and correct args', () => {
     const options = getInsertOptions({ isTop: false }, locale);
     const listOption = options.find((o) => o.key === 'list');
-    expect(listOption?.children?.find((c) => c.key === 'b-list')?.args).toEqual(['unordered']);
-    expect(listOption?.children?.find((c) => c.key === 'n-list')?.args).toEqual(['ordered']);
-    expect(listOption?.children?.find((c) => c.key === 't-list')?.args).toEqual(['task']);
+    expect(listOption?.children?.find((c) => c.key === 'b-list')?.args).toEqual(
+      ['unordered'],
+    );
+    expect(listOption?.children?.find((c) => c.key === 'n-list')?.args).toEqual(
+      ['ordered'],
+    );
+    expect(listOption?.children?.find((c) => c.key === 't-list')?.args).toEqual(
+      ['task'],
+    );
   });
 });
 
@@ -239,12 +312,27 @@ describe('InsertAutocomplete Component', () => {
   });
 
   const mockInsertOptions: InsertAutocompleteItem[] = [
-    { label: ['Heading', '标题'], key: 'heading', task: vi.fn(), icon: <div data-testid="heading-icon">H</div> },
-    { label: ['Paragraph', '段落'], key: 'paragraph', task: vi.fn(), icon: <div data-testid="paragraph-icon">P</div> },
+    {
+      label: ['Heading', '标题'],
+      key: 'heading',
+      task: vi.fn(),
+      icon: <div data-testid="heading-icon">H</div>,
+    },
+    {
+      label: ['Paragraph', '段落'],
+      key: 'paragraph',
+      task: vi.fn(),
+      icon: <div data-testid="paragraph-icon">P</div>,
+    },
   ];
 
   it('renders without crashing with insertOptions and runInsertTask', () => {
-    render(<InsertAutocomplete insertOptions={mockInsertOptions} runInsertTask={vi.fn()} />);
+    render(
+      <InsertAutocomplete
+        insertOptions={mockInsertOptions}
+        runInsertTask={vi.fn()}
+      />,
+    );
     expect(document.body).toBeInTheDocument();
   });
 
@@ -290,7 +378,8 @@ describe('InsertAutocomplete Component', () => {
     act(() => {
       insertCompletionText$.next('');
     });
-    const tableItem = screen.queryByText('表格') ?? screen.queryByText('Elements');
+    const tableItem =
+      screen.queryByText('表格') ?? screen.queryByText('Elements');
     const toClick = tableItem ?? document.body.querySelector('.ant-menu-item');
     if (toClick) {
       fireEvent.click(toClick);
@@ -302,7 +391,12 @@ describe('InsertAutocomplete Component', () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     const codeItem = screen.queryByText('代码') ?? screen.queryByText('Code');
-    const toClick = codeItem ?? Array.from(document.body.querySelectorAll('.ant-menu-item')).find((el) => el.textContent?.includes('代码') || el.textContent?.includes('Code'));
+    const toClick =
+      codeItem ??
+      Array.from(document.body.querySelectorAll('.ant-menu-item')).find(
+        (el) =>
+          el.textContent?.includes('代码') || el.textContent?.includes('Code'),
+      );
     if (toClick) {
       fireEvent.click(toClick);
       expect(Transforms.insertText).toHaveBeenCalled();
@@ -322,8 +416,15 @@ describe('InsertAutocomplete Component', () => {
     act(() => {
       insertCompletionText$.next('');
     });
-    const customItem = screen.queryByText('标题') ?? screen.queryByText('Heading');
-    const toClick = customItem ?? Array.from(document.body.querySelectorAll('.ant-menu-item')).find((el) => el.textContent?.includes('Heading') || el.textContent?.includes('标题'));
+    const customItem =
+      screen.queryByText('标题') ?? screen.queryByText('Heading');
+    const toClick =
+      customItem ??
+      Array.from(document.body.querySelectorAll('.ant-menu-item')).find(
+        (el) =>
+          el.textContent?.includes('Heading') ||
+          el.textContent?.includes('标题'),
+      );
     if (toClick) {
       fireEvent.click(toClick);
       expect(runInsertTask).toHaveBeenCalledWith(
@@ -347,11 +448,19 @@ describe('InsertAutocomplete Component', () => {
     render(<InsertAutocomplete optionsRender={optionsRender} />);
     act(() => insertCompletionText$.next(''));
     expect(optionsRender).toHaveBeenCalled();
-    const listItem = screen.queryByText('无序列表') ?? screen.queryByText('List');
-    const toClick = listItem ?? Array.from(document.body.querySelectorAll('.ant-menu-item')).find((el) => el.textContent?.includes('无序') || el.textContent?.includes('List'));
+    const listItem =
+      screen.queryByText('无序列表') ?? screen.queryByText('List');
+    const toClick =
+      listItem ??
+      Array.from(document.body.querySelectorAll('.ant-menu-item')).find(
+        (el) =>
+          el.textContent?.includes('无序') || el.textContent?.includes('List'),
+      );
     if (toClick) {
       fireEvent.click(toClick);
-      expect(keyTaskNext).toHaveBeenCalledWith(expect.objectContaining({ key: 'list' }));
+      expect(keyTaskNext).toHaveBeenCalledWith(
+        expect.objectContaining({ key: 'list' }),
+      );
     }
   });
 
@@ -362,7 +471,9 @@ describe('InsertAutocomplete Component', () => {
     });
     expect(document.body.querySelector('.ant-menu')).toBeInTheDocument();
     fireEvent.click(document.body);
-    const wrapper = document.body.querySelector('[class*="insert-autocomplete"]');
+    const wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    );
     expect(wrapper).toBeTruthy();
   });
 
@@ -420,9 +531,13 @@ describe('InsertAutocomplete Component', () => {
     useEditorStoreMock.mockImplementation(() => store as any);
     const { rerender } = render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    useEditorStoreMock.mockImplementation(() => ({ ...store, openInsertCompletion: false }) as any);
+    useEditorStoreMock.mockImplementation(
+      () => ({ ...store, openInsertCompletion: false }) as any,
+    );
     rerender(<InsertAutocomplete />);
-    useEditorStoreMock.mockImplementation(() => ({ ...store, openInsertCompletion: true }) as any);
+    useEditorStoreMock.mockImplementation(
+      () => ({ ...store, openInsertCompletion: true }) as any,
+    );
     rerender(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     expect(() => {
@@ -434,7 +549,11 @@ describe('InsertAutocomplete Component', () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     expect(() => {
-      fireEvent.keyDown(mockContainer, { key: 'Escape', code: 'Escape', keyCode: 27 });
+      fireEvent.keyDown(mockContainer, {
+        key: 'Escape',
+        code: 'Escape',
+        keyCode: 27,
+      });
     }).not.toThrow();
   });
 
@@ -442,7 +561,11 @@ describe('InsertAutocomplete Component', () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     expect(() => {
-      fireEvent.keyDown(mockContainer, { key: 'Backspace', code: 'Backspace', keyCode: 8 });
+      fireEvent.keyDown(mockContainer, {
+        key: 'Backspace',
+        code: 'Backspace',
+        keyCode: 8,
+      });
     }).not.toThrow();
   });
 
@@ -470,18 +593,32 @@ describe('InsertAutocomplete Component', () => {
   it('ArrowDown then ArrowUp with mock target triggers scroll branch', async () => {
     const mockScroll = vi.fn();
     const mockTarget = document.createElement('div');
-    Object.defineProperty(mockTarget, 'offsetTop', { value: 50, configurable: true });
-    const querySpy = vi.spyOn(document, 'querySelector').mockImplementation(((sel: string) => {
+    Object.defineProperty(mockTarget, 'offsetTop', {
+      value: 50,
+      configurable: true,
+    });
+    const querySpy = vi.spyOn(document, 'querySelector').mockImplementation(((
+      sel: string,
+    ) => {
       if (sel?.includes('data-action')) return mockTarget;
       return null;
     }) as any);
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     await act(async () => {});
-    const wrapper = document.body.querySelector('[class*="insert-autocomplete"]') as HTMLDivElement;
+    const wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    ) as HTMLDivElement;
     if (wrapper) {
-      Object.defineProperty(wrapper, 'scrollTop', { value: 200, writable: true, configurable: true });
-      Object.defineProperty(wrapper, 'clientHeight', { value: 100, configurable: true });
+      Object.defineProperty(wrapper, 'scrollTop', {
+        value: 200,
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(wrapper, 'clientHeight', {
+        value: 100,
+        configurable: true,
+      });
       wrapper.scroll = mockScroll;
     }
     fireEvent.keyDown(mockContainer, { key: 'ArrowDown', code: 'ArrowDown' });
@@ -497,23 +634,41 @@ describe('InsertAutocomplete Component', () => {
     useEditorStoreMock.mockImplementation(() => store as any);
     const mockScroll = vi.fn();
     const mockTarget = document.createElement('div');
-    Object.defineProperty(mockTarget, 'offsetTop', { value: 300, configurable: true });
-    const querySpy = vi.spyOn(document, 'querySelector').mockImplementation(((sel: string) => {
+    Object.defineProperty(mockTarget, 'offsetTop', {
+      value: 300,
+      configurable: true,
+    });
+    const querySpy = vi.spyOn(document, 'querySelector').mockImplementation(((
+      sel: string,
+    ) => {
       if (sel?.includes('data-action')) return mockTarget;
       return null;
     }) as any);
     const { rerender } = render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    useEditorStoreMock.mockImplementation(() => ({ ...store, openInsertCompletion: false }) as any);
+    useEditorStoreMock.mockImplementation(
+      () => ({ ...store, openInsertCompletion: false }) as any,
+    );
     rerender(<InsertAutocomplete />);
-    useEditorStoreMock.mockImplementation(() => ({ ...store, openInsertCompletion: true }) as any);
+    useEditorStoreMock.mockImplementation(
+      () => ({ ...store, openInsertCompletion: true }) as any,
+    );
     rerender(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     await act(async () => {});
-    const wrapper = document.body.querySelector('[class*="insert-autocomplete"]') as HTMLDivElement;
+    const wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    ) as HTMLDivElement;
     if (wrapper) {
-      Object.defineProperty(wrapper, 'scrollTop', { value: 0, writable: true, configurable: true });
-      Object.defineProperty(wrapper, 'clientHeight', { value: 100, configurable: true });
+      Object.defineProperty(wrapper, 'scrollTop', {
+        value: 0,
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(wrapper, 'clientHeight', {
+        value: 100,
+        configurable: true,
+      });
       wrapper.scroll = mockScroll;
     }
     expect(() => {
@@ -530,7 +685,9 @@ describe('InsertAutocomplete Component', () => {
     const { rerender } = render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     expect(addSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
-    useEditorStoreMock.mockImplementation(() => ({ ...storeWithOpen, openInsertCompletion: false }) as any);
+    useEditorStoreMock.mockImplementation(
+      () => ({ ...storeWithOpen, openInsertCompletion: false }) as any,
+    );
     rerender(<InsertAutocomplete />);
     expect(removeSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
     addSpy.mockRestore();
@@ -545,14 +702,24 @@ describe('InsertAutocomplete Component', () => {
       task: 'customTask',
       icon: <span />,
     };
-    render(<InsertAutocomplete insertOptions={[customOption]} runInsertTask={runInsertTaskProp} />);
+    render(
+      <InsertAutocomplete
+        insertOptions={[customOption]}
+        runInsertTask={runInsertTaskProp}
+      />,
+    );
     act(() => insertCompletionText$.next(''));
-    const item = await screen.findByText(/自定义|Custom/, {}, { timeout: 500 }).catch(() => null);
+    const item = await screen
+      .findByText(/自定义|Custom/, {}, { timeout: 500 })
+      .catch(() => null);
     if (item) {
       fireEvent.click(item);
       await act(async () => {});
       expect(Transforms.delete).toHaveBeenCalled();
-      expect(runInsertTaskProp).toHaveBeenCalledWith(customOption, expect.objectContaining({ isCustom: true }));
+      expect(runInsertTaskProp).toHaveBeenCalledWith(
+        customOption,
+        expect.objectContaining({ isCustom: true }),
+      );
     }
   });
 });
@@ -580,7 +747,9 @@ describe('InsertAutocomplete with insertLink', () => {
     act(() => {
       insertCompletionText$.next('');
     });
-    const quickItem = await screen.findByText(/图片|Image/, {}, { timeout: 500 }).catch(() => null);
+    const quickItem = await screen
+      .findByText(/图片|Image/, {}, { timeout: 500 })
+      .catch(() => null);
     if (quickItem) {
       fireEvent.click(quickItem);
       expect(runInsertTask).toHaveBeenCalledWith(
@@ -604,16 +773,24 @@ describe('InsertAutocomplete insertMedia', () => {
     act(() => {
       insertCompletionText$.next('');
     });
-    const embedMediaItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedMediaItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedMediaItem) {
       fireEvent.click(embedMediaItem);
       await act(async () => {});
     }
-    const input = document.body.querySelector('input[placeholder*="media"]') ?? document.body.querySelector('input');
+    const input =
+      document.body.querySelector('input[placeholder*="media"]') ??
+      document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'https://example.com/video.mp4' } });
+      fireEvent.change(input, {
+        target: { value: 'https://example.com/video.mp4' },
+      });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
@@ -625,14 +802,18 @@ describe('InsertAutocomplete insertMedia', () => {
   it('insertMedia with youtube replaceUrl', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const embedMediaItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedMediaItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedMediaItem) fireEvent.click(embedMediaItem);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
       fireEvent.change(input, { target: { value: 'https://youtu.be/abc123' } });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
@@ -644,18 +825,26 @@ describe('InsertAutocomplete insertMedia', () => {
   it('insertMedia with youtube replaceUrl and optional ?si= preserves query', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const embedMediaItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedMediaItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedMediaItem) fireEvent.click(embedMediaItem);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'https://youtu.be/abc123?si=xyz' } });
+      fireEvent.change(input, {
+        target: { value: 'https://youtu.be/abc123?si=xyz' },
+      });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
-        expect(getRemoteMediaType).toHaveBeenCalledWith(expect.stringMatching(/youtube\.com\/embed\/abc123\?si=xyz/));
+        expect(getRemoteMediaType).toHaveBeenCalledWith(
+          expect.stringMatching(/youtube\.com\/embed\/abc123\?si=xyz/),
+        );
       }
     }
   });
@@ -664,14 +853,18 @@ describe('InsertAutocomplete insertMedia', () => {
     vi.mocked(getRemoteMediaType).mockResolvedValue(null);
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const embedMediaItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedMediaItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedMediaItem) fireEvent.click(embedMediaItem);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
       fireEvent.change(input, { target: { value: 'https://example.com/x' } });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
@@ -683,18 +876,26 @@ describe('InsertAutocomplete insertMedia', () => {
   it('insertMedia with bilibili replaceUrl', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const embedMediaItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedMediaItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedMediaItem) fireEvent.click(embedMediaItem);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'https://www.bilibili.com/video/BV1xx411c7mD/' } });
+      fireEvent.change(input, {
+        target: { value: 'https://www.bilibili.com/video/BV1xx411c7mD/' },
+      });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
-        expect(getRemoteMediaType).toHaveBeenCalledWith(expect.stringContaining('player.bilibili.com'));
+        expect(getRemoteMediaType).toHaveBeenCalledWith(
+          expect.stringContaining('player.bilibili.com'),
+        );
       }
     }
   });
@@ -702,18 +903,26 @@ describe('InsertAutocomplete insertMedia', () => {
   it('insertMedia with src= replaceUrl', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const embedMediaItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedMediaItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedMediaItem) fireEvent.click(embedMediaItem);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'src="https://example.com/img.png"' } });
+      fireEvent.change(input, {
+        target: { value: 'src="https://example.com/img.png"' },
+      });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
-        expect(getRemoteMediaType).toHaveBeenCalledWith('https://example.com/img.png');
+        expect(getRemoteMediaType).toHaveBeenCalledWith(
+          'https://example.com/img.png',
+        );
       }
     }
   });
@@ -721,14 +930,18 @@ describe('InsertAutocomplete insertMedia', () => {
   it('insertMedia invalid protocol throws', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const embedMediaItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedMediaItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedMediaItem) fireEvent.click(embedMediaItem);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
       fireEvent.change(input, { target: { value: 'not-a-valid-url' } });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
@@ -739,18 +952,26 @@ describe('InsertAutocomplete insertMedia', () => {
   it('insertMedia with plain https URL (no replaceUrl match) succeeds', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const embedMediaItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedMediaItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedMediaItem) fireEvent.click(embedMediaItem);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'https://example.com/photo.jpg' } });
+      fireEvent.change(input, {
+        target: { value: 'https://example.com/photo.jpg' },
+      });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
-        expect(getRemoteMediaType).toHaveBeenCalledWith('https://example.com/photo.jpg');
+        expect(getRemoteMediaType).toHaveBeenCalledWith(
+          'https://example.com/photo.jpg',
+        );
         expect(Transforms.setNodes).toHaveBeenCalled();
       }
     }
@@ -760,14 +981,20 @@ describe('InsertAutocomplete insertMedia', () => {
     vi.mocked(getRemoteMediaType).mockResolvedValueOnce(null);
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const embedMediaItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedMediaItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedMediaItem) fireEvent.click(embedMediaItem);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'https://example.com/unknown' } });
+      fireEvent.change(input, {
+        target: { value: 'https://example.com/unknown' },
+      });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
@@ -790,14 +1017,21 @@ describe('InsertAutocomplete insertAttachment', () => {
   it('shows insertAttachment UI when clicking default attachLink option', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const linkItem = await screen.findByText(/链接|By link/, {}, { timeout: 800 }).catch(() => null);
+    const linkItem = await screen
+      .findByText(/链接|By link/, {}, { timeout: 800 })
+      .catch(() => null);
     if (linkItem) {
       fireEvent.click(linkItem);
-      await waitFor(() => {
-        const tabs = document.body.querySelector('.ant-tabs');
-        const chooseFile = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent?.includes('Choose a file'));
-        expect(tabs ?? chooseFile).toBeTruthy();
-      }, { timeout: 1000 });
+      await waitFor(
+        () => {
+          const tabs = document.body.querySelector('.ant-tabs');
+          const chooseFile = Array.from(
+            document.body.querySelectorAll('button'),
+          ).find((b) => b.textContent?.includes('Choose a file'));
+          expect(tabs ?? chooseFile).toBeTruthy();
+        },
+        { timeout: 1000 },
+      );
     } else {
       expect(document.body.querySelector('.ant-menu')).toBeTruthy();
     }
@@ -806,17 +1040,27 @@ describe('InsertAutocomplete insertAttachment', () => {
   it('insertAttachByLink with http URL calls fetch and setNodes', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const linkItem = await screen.findByText(/链接|By link/, {}, { timeout: 500 }).catch(() => null);
+    const linkItem = await screen
+      .findByText(/链接|By link/, {}, { timeout: 500 })
+      .catch(() => null);
     if (linkItem) fireEvent.click(linkItem);
     await act(async () => {});
-    const tabEmbed = Array.from(document.body.querySelectorAll('.ant-tabs-tab')).find((t) => t.textContent?.includes('Embed'));
+    const tabEmbed = Array.from(
+      document.body.querySelectorAll('.ant-tabs-tab'),
+    ).find((t) => t.textContent?.includes('Embed'));
     if (tabEmbed) fireEvent.click(tabEmbed);
     await act(async () => {});
-    const input = document.body.querySelector('input[placeholder*="attachment"]') ?? document.body.querySelector('input');
+    const input =
+      document.body.querySelector('input[placeholder*="attachment"]') ??
+      document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'https://example.com/file.pdf' } });
+      fireEvent.change(input, {
+        target: { value: 'https://example.com/file.pdf' },
+      });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
@@ -830,10 +1074,14 @@ describe('InsertAutocomplete insertAttachment', () => {
   it('insertAttachByLink via Local tab Choose a file button', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const linkItem = await screen.findByText(/链接|By link/, {}, { timeout: 500 }).catch(() => null);
+    const linkItem = await screen
+      .findByText(/链接|By link/, {}, { timeout: 500 })
+      .catch(() => null);
     if (linkItem) fireEvent.click(linkItem);
     await act(async () => {});
-    const chooseFileBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent?.includes('Choose a file'));
+    const chooseFileBtn = Array.from(
+      document.body.querySelectorAll('button'),
+    ).find((b) => b.textContent?.includes('Choose a file'));
     if (chooseFileBtn) {
       fireEvent.click(chooseFileBtn);
       await act(async () => {});
@@ -845,56 +1093,89 @@ describe('InsertAutocomplete insertAttachment', () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: false });
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const linkItem = await screen.findByText(/链接|By link/, {}, { timeout: 500 }).catch(() => null);
+    const linkItem = await screen
+      .findByText(/链接|By link/, {}, { timeout: 500 })
+      .catch(() => null);
     if (linkItem) fireEvent.click(linkItem);
     await act(async () => {});
-    const tabEmbed = Array.from(document.body.querySelectorAll('.ant-tabs-tab')).find((t) => t.textContent?.includes('Embed'));
+    const tabEmbed = Array.from(
+      document.body.querySelectorAll('.ant-tabs-tab'),
+    ).find((t) => t.textContent?.includes('Embed'));
     if (tabEmbed) fireEvent.click(tabEmbed);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
       fireEvent.change(input, { target: { value: 'https://example.com/err' } });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
       }
     }
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, headers: new Headers({ 'content-length': '0' }) });
+    global.fetch = vi
+      .fn()
+      .mockResolvedValue({
+        ok: true,
+        headers: new Headers({ 'content-length': '0' }),
+      });
   });
 
   it('insertAttachByLink with http URL extracts filename from path', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const linkItem = await screen.findByText(/链接|By link/, {}, { timeout: 500 }).catch(() => null);
+    const linkItem = await screen
+      .findByText(/链接|By link/, {}, { timeout: 500 })
+      .catch(() => null);
     if (linkItem) fireEvent.click(linkItem);
     await act(async () => {});
-    const tabEmbed = Array.from(document.body.querySelectorAll('.ant-tabs-tab')).find((t) => t.textContent?.includes('Embed'));
+    const tabEmbed = Array.from(
+      document.body.querySelectorAll('.ant-tabs-tab'),
+    ).find((t) => t.textContent?.includes('Embed'));
     if (tabEmbed) fireEvent.click(tabEmbed);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'https://example.com/my-file.pdf' } });
+      fireEvent.change(input, {
+        target: { value: 'https://example.com/my-file.pdf' },
+      });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
-        expect(Transforms.setNodes).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ name: 'my-file', url: 'https://example.com/my-file.pdf' }), expect.anything());
+        expect(Transforms.setNodes).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            name: 'my-file',
+            url: 'https://example.com/my-file.pdf',
+          }),
+          expect.anything(),
+        );
       }
     }
   });
 
   it('insertAttachByLink when next node is not empty paragraph does not delete', async () => {
-    vi.mocked(Editor.next).mockReturnValueOnce([{ type: 'paragraph', children: [{ text: 'x' }] }, [1]] as any);
+    vi.mocked(Editor.next).mockReturnValueOnce([
+      { type: 'paragraph', children: [{ text: 'x' }] },
+      [1],
+    ] as any);
     vi.mocked(Node.string).mockReturnValueOnce('x');
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const linkItem = await screen.findByText(/链接|By link/, {}, { timeout: 500 }).catch(() => null);
+    const linkItem = await screen
+      .findByText(/链接|By link/, {}, { timeout: 500 })
+      .catch(() => null);
     if (linkItem) fireEvent.click(linkItem);
     await act(async () => {});
-    const chooseFileBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent?.includes('Choose a file'));
+    const chooseFileBtn = Array.from(
+      document.body.querySelectorAll('button'),
+    ).find((b) => b.textContent?.includes('Choose a file'));
     if (chooseFileBtn) {
       fireEvent.click(chooseFileBtn);
       await act(async () => {});
@@ -910,17 +1191,25 @@ describe('InsertAutocomplete insertAttachment', () => {
     vi.mocked(Node.string).mockReturnValue('');
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const linkItem = await screen.findByText(/链接|By link/, {}, { timeout: 500 }).catch(() => null);
+    const linkItem = await screen
+      .findByText(/链接|By link/, {}, { timeout: 500 })
+      .catch(() => null);
     if (linkItem) fireEvent.click(linkItem);
     await act(async () => {});
-    const tabEmbed = Array.from(document.body.querySelectorAll('.ant-tabs-tab')).find((t) => t.textContent?.includes('Embed'));
+    const tabEmbed = Array.from(
+      document.body.querySelectorAll('.ant-tabs-tab'),
+    ).find((t) => t.textContent?.includes('Embed'));
     if (tabEmbed) fireEvent.click(tabEmbed);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'https://example.com/doc.pdf' } });
+      fireEvent.change(input, {
+        target: { value: 'https://example.com/doc.pdf' },
+      });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
@@ -932,17 +1221,23 @@ describe('InsertAutocomplete insertAttachment', () => {
   it('insertAttachByLink with non-http URL does not call fetch', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const linkItem = await screen.findByText(/链接|By link/, {}, { timeout: 500 }).catch(() => null);
+    const linkItem = await screen
+      .findByText(/链接|By link/, {}, { timeout: 500 })
+      .catch(() => null);
     if (linkItem) fireEvent.click(linkItem);
     await act(async () => {});
-    const tabEmbed = Array.from(document.body.querySelectorAll('.ant-tabs-tab')).find((t) => t.textContent?.includes('Embed'));
+    const tabEmbed = Array.from(
+      document.body.querySelectorAll('.ant-tabs-tab'),
+    ).find((t) => t.textContent?.includes('Embed'));
     if (tabEmbed) fireEvent.click(tabEmbed);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
       fireEvent.change(input, { target: { value: 'file:///local/path.pdf' } });
       await act(async () => {});
-      const embedBtn = Array.from(document.body.querySelectorAll('button')).find((b) => b.textContent === 'Embed');
+      const embedBtn = Array.from(
+        document.body.querySelectorAll('button'),
+      ).find((b) => b.textContent === 'Embed');
       if (embedBtn && !embedBtn.hasAttribute('disabled')) {
         fireEvent.click(embedBtn);
         await act(async () => {});
@@ -970,9 +1265,10 @@ describe('InsertAutocomplete insertAttachment', () => {
       insertCompletionText$.next('');
     });
     const menuItems = document.body.querySelectorAll('.ant-menu-item');
-    const toClick = Array.from(menuItems).find(
-      (el) => el.textContent === '附件' || el.textContent === 'Attachment',
-    ) ?? menuItems[0];
+    const toClick =
+      Array.from(menuItems).find(
+        (el) => el.textContent === '附件' || el.textContent === 'Attachment',
+      ) ?? menuItems[0];
     if (toClick) {
       fireEvent.click(toClick);
       expect(runInsertTask).toHaveBeenCalledWith(
@@ -1001,17 +1297,31 @@ describe('InsertAutocomplete calculatePosition and effect branches', () => {
       y: 100,
       toJSON: () => ({}),
     } as DOMRect);
-    Object.defineProperty(mockNodeEl, 'clientHeight', { value: 200, configurable: true });
-    Object.defineProperty(document.documentElement, 'clientHeight', { value: 300, configurable: true });
+    Object.defineProperty(mockNodeEl, 'clientHeight', {
+      value: 200,
+      configurable: true,
+    });
+    Object.defineProperty(document.documentElement, 'clientHeight', {
+      value: 300,
+      configurable: true,
+    });
     if (!('scrollTop' in document.body)) {
-      Object.defineProperty(document.body, 'scrollTop', { value: 0, configurable: true });
+      Object.defineProperty(document.body, 'scrollTop', {
+        value: 0,
+        configurable: true,
+      });
     }
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     await act(async () => {});
-    const wrapper = document.body.querySelector('[class*="insert-autocomplete"]') as HTMLElement;
+    const wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    ) as HTMLElement;
     expect(wrapper).toBeTruthy();
-    expect(wrapper?.style?.bottom === '0px' || String(wrapper?.style?.bottom) === '0').toBe(true);
+    expect(
+      wrapper?.style?.bottom === '0px' ||
+        String(wrapper?.style?.bottom) === '0',
+    ).toBe(true);
   });
 
   it('calculatePosition branch: spaceAbove large, spaceBelow small (show above)', async () => {
@@ -1026,12 +1336,20 @@ describe('InsertAutocomplete calculatePosition and effect branches', () => {
       y: 250,
       toJSON: () => ({}),
     } as DOMRect);
-    Object.defineProperty(mockNodeEl, 'clientHeight', { value: 20, configurable: true });
-    Object.defineProperty(document.documentElement, 'clientHeight', { value: 300, configurable: true });
+    Object.defineProperty(mockNodeEl, 'clientHeight', {
+      value: 20,
+      configurable: true,
+    });
+    Object.defineProperty(document.documentElement, 'clientHeight', {
+      value: 300,
+      configurable: true,
+    });
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     await act(async () => {});
-    const wrapper = document.body.querySelector('[class*="insert-autocomplete"]') as HTMLElement;
+    const wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    ) as HTMLElement;
     expect(wrapper).toBeTruthy();
   });
 
@@ -1067,12 +1385,20 @@ describe('InsertAutocomplete calculatePosition and effect branches', () => {
       y: 50,
       toJSON: () => ({}),
     } as DOMRect);
-    Object.defineProperty(mockNodeEl, 'clientHeight', { value: 20, configurable: true });
-    Object.defineProperty(document.documentElement, 'clientHeight', { value: 400, configurable: true });
+    Object.defineProperty(mockNodeEl, 'clientHeight', {
+      value: 20,
+      configurable: true,
+    });
+    Object.defineProperty(document.documentElement, 'clientHeight', {
+      value: 400,
+      configurable: true,
+    });
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     await act(async () => {});
-    const wrapper = document.body.querySelector('[class*="insert-autocomplete"]') as HTMLElement;
+    const wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    ) as HTMLElement;
     expect(wrapper).toBeTruthy();
     expect(wrapper?.style?.top).toBeDefined();
     expect(String(wrapper?.style?.bottom ?? '')).toBe('');
@@ -1090,12 +1416,20 @@ describe('InsertAutocomplete calculatePosition and effect branches', () => {
       y: 10,
       toJSON: () => ({}),
     } as DOMRect);
-    Object.defineProperty(mockNodeEl, 'clientHeight', { value: 20, configurable: true });
-    Object.defineProperty(document.documentElement, 'clientHeight', { value: 400, configurable: true });
+    Object.defineProperty(mockNodeEl, 'clientHeight', {
+      value: 20,
+      configurable: true,
+    });
+    Object.defineProperty(document.documentElement, 'clientHeight', {
+      value: 400,
+      configurable: true,
+    });
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
     await act(async () => {});
-    const wrapper = document.body.querySelector('[class*="insert-autocomplete"]') as HTMLElement;
+    const wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    ) as HTMLElement;
     expect(wrapper?.style?.left).toBeDefined();
   });
 });
@@ -1109,7 +1443,9 @@ describe('InsertAutocomplete input and keyboard', () => {
   it('insertLink Input onMouseDown stopPropagation', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const embedItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedItem) fireEvent.click(embedItem);
     await act(async () => {});
     const input = document.body.querySelector('input');
@@ -1124,12 +1460,16 @@ describe('InsertAutocomplete input and keyboard', () => {
   it('insertLink Input Enter key triggers insertMedia', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const embedItem = await screen.findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 }).catch(() => null);
+    const embedItem = await screen
+      .findByText(/嵌入媒体|Embed media/, {}, { timeout: 500 })
+      .catch(() => null);
     if (embedItem) fireEvent.click(embedItem);
     await act(async () => {});
     const input = document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'https://example.com/a.mp4' } });
+      fireEvent.change(input, {
+        target: { value: 'https://example.com/a.mp4' },
+      });
       await act(async () => {});
       fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
       await act(async () => {});
@@ -1140,7 +1480,9 @@ describe('InsertAutocomplete input and keyboard', () => {
   it('wrapper onMouseDown prevents default', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const wrapper = document.body.querySelector('[class*="insert-autocomplete"]');
+    const wrapper = document.body.querySelector(
+      '[class*="insert-autocomplete"]',
+    );
     if (wrapper) {
       const ev = new MouseEvent('mousedown', { bubbles: true });
       const preventSpy = vi.spyOn(ev, 'preventDefault');
@@ -1153,15 +1495,23 @@ describe('InsertAutocomplete input and keyboard', () => {
   it('insertAttachment Embed tab Enter triggers insertAttachByLink', async () => {
     render(<InsertAutocomplete />);
     act(() => insertCompletionText$.next(''));
-    const linkItem = await screen.findByText(/链接|By link/, {}, { timeout: 500 }).catch(() => null);
+    const linkItem = await screen
+      .findByText(/链接|By link/, {}, { timeout: 500 })
+      .catch(() => null);
     if (linkItem) fireEvent.click(linkItem);
     await act(async () => {});
-    const tabEmbed = Array.from(document.body.querySelectorAll('.ant-tabs-tab')).find((t) => t.textContent?.includes('Embed'));
+    const tabEmbed = Array.from(
+      document.body.querySelectorAll('.ant-tabs-tab'),
+    ).find((t) => t.textContent?.includes('Embed'));
     if (tabEmbed) fireEvent.click(tabEmbed);
     await act(async () => {});
-    const input = document.body.querySelector('input[placeholder*="attachment"]') ?? document.body.querySelector('input');
+    const input =
+      document.body.querySelector('input[placeholder*="attachment"]') ??
+      document.body.querySelector('input');
     if (input) {
-      fireEvent.change(input, { target: { value: 'https://example.com/f.pdf' } });
+      fireEvent.change(input, {
+        target: { value: 'https://example.com/f.pdf' },
+      });
       await act(async () => {});
       fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
       await act(async () => {});
@@ -1261,7 +1611,6 @@ describe('InsertAutocomplete callback branch coverage', () => {
     );
     window.matchMedia = originalMatchMedia;
   });
-
 });
 
 describe('InsertAutocomplete position fallback coverage', () => {

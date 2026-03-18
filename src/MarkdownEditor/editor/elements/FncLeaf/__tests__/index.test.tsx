@@ -3,8 +3,8 @@ import { fireEvent, render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { FncLeaf } from '../index';
 import { isMobileDevice } from '../../../../../MarkdownInputField/AttachmentButton/utils';
+import { FncLeaf } from '../index';
 
 vi.mock('../../../../../MarkdownInputField/AttachmentButton/utils', () => ({
   isMobileDevice: vi.fn(),

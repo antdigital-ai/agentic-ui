@@ -41,7 +41,9 @@ describe('loadChartRuntime', () => {
 
   it('import 失败时 catch 中重置 runtimeLoader 并抛出', async () => {
     vi.resetModules();
-    vi.spyOn(Promise, 'all').mockRejectedValueOnce(new Error('chart load fail'));
+    vi.spyOn(Promise, 'all').mockRejectedValueOnce(
+      new Error('chart load fail'),
+    );
     const { loadChartRuntime } = await import('./loadChartRuntime');
     await expect(loadChartRuntime()).rejects.toThrow('chart load fail');
     vi.restoreAllMocks();

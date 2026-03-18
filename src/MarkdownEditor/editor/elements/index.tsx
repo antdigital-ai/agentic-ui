@@ -7,6 +7,7 @@ import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 import { I18nContext } from '../../../I18n';
 import { debugInfo } from '../../../Utils/debugUtils';
 import { MarkdownEditorProps } from '../../types';
+import { JINJA_DOLLAR_PLACEHOLDER } from '../parser/constants';
 import { useEditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
 import { Blockquote } from './Blockquote';
@@ -46,18 +47,23 @@ import { Paragraph } from './Paragraph';
 import { ReadonlyParagraph } from './Paragraph/ReadonlyParagraph';
 import { Schema } from './Schema';
 import { ReadonlySchema } from './Schema/ReadonlySchema';
-import { JINJA_DOLLAR_PLACEHOLDER } from '../parser/constants';
 import { tableRenderElement } from './Table';
 import { ReadonlyTableComponent } from './Table/ReadonlyTableComponent';
 import { TagPopup } from './TagPopup';
 
 /** 递归将 Jinja 占位符还原为 $ 显示 */
-const restoreJinjaDollarInChildren = (children: React.ReactNode): React.ReactNode =>
+const restoreJinjaDollarInChildren = (
+  children: React.ReactNode,
+): React.ReactNode =>
   React.Children.map(children, (child) => {
     if (typeof child === 'string') {
       return child.split(JINJA_DOLLAR_PLACEHOLDER).join('$');
     }
-    if (React.isValidElement(child) && child.props.children !== undefined && child.props.children !== null) {
+    if (
+      React.isValidElement(child) &&
+      child.props.children !== undefined &&
+      child.props.children !== null
+    ) {
       return React.cloneElement(child as React.ReactElement<any>, {
         children: restoreJinjaDollarInChildren(child.props.children),
       });

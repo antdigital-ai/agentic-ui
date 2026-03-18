@@ -48,9 +48,14 @@ describe('parseBlockElements', () => {
       const parseNodes = vi.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars -- 签名需与 parseNodes 一致
         (nodes: any[], _top: boolean, _parent: any) => {
-          if (!nodes?.length) return [{ type: 'paragraph', children: [{ text: '' }] }];
+          if (!nodes?.length)
+            return [{ type: 'paragraph', children: [{ text: '' }] }];
           const first = nodes[0];
-          if (first.type === 'paragraph' && first.children?.length > 1 && first.children[0]?.type === 'link') {
+          if (
+            first.type === 'paragraph' &&
+            first.children?.length > 1 &&
+            first.children[0]?.type === 'link'
+          ) {
             const link = first.children[0];
             return [
               {
@@ -72,7 +77,11 @@ describe('parseBlockElements', () => {
           {
             type: 'paragraph',
             children: [
-              { type: 'link', url: 'https://example.com/avatar?id=99', text: 'Bob' },
+              {
+                type: 'link',
+                url: 'https://example.com/avatar?id=99',
+                text: 'Bob',
+              },
               { type: 'text', value: ' 回复' },
             ],
           },
@@ -108,7 +117,11 @@ describe('parseBlockElements', () => {
 
     it('should set otherProps.finished when link element has finished === false', () => {
       const leaf = { text: 'link' };
-      const linkElement = { type: 'link', url: 'https://x.com', finished: false };
+      const linkElement = {
+        type: 'link',
+        url: 'https://x.com',
+        finished: false,
+      };
 
       const result = applyInlineFormatting(leaf as any, linkElement);
 
@@ -127,7 +140,11 @@ describe('parseBlockElements', () => {
         },
       };
 
-      const result = applyInlineFormatting(leaf as any, linkElement, config as any);
+      const result = applyInlineFormatting(
+        leaf as any,
+        linkElement,
+        config as any,
+      );
 
       expect(result.url).toBe('https://fallback.com');
     });

@@ -605,8 +605,8 @@ describe('createList', () => {
       (Node.string as Mock).mockReturnValue('x');
       (Editor.withoutNormalizing as Mock).mockImplementation((_, fn) => fn());
       (getListType as Mock).mockReturnValue('bulleted-list');
-      (Editor.hasPath as Mock).mockImplementation((_, path) =>
-        JSON.stringify(path) !== '[0]',
+      (Editor.hasPath as Mock).mockImplementation(
+        (_, path) => JSON.stringify(path) !== '[0]',
       );
 
       createList(editor, 'unordered');

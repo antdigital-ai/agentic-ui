@@ -68,9 +68,7 @@ export const TaskList = memo(
     });
 
     const { summaryStatus, summaryText, progressText } = useMemo(() => {
-      const completedCount = items.filter(
-        (i) => i.status === 'success',
-      ).length;
+      const completedCount = items.filter((i) => i.status === 'success').length;
       const loadingItem = items.find((i) => i.status === 'loading');
       const hasError = items.some((i) => i.status === 'error');
       const allDone = completedCount === items.length && items.length > 0;

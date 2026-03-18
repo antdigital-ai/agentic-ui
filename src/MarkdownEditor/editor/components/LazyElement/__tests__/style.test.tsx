@@ -6,12 +6,9 @@ import { useStyle } from '../style';
 
 describe('LazyElement style', () => {
   it('useStyle 应返回 wrapSSR 与 hashId', () => {
-    const { result } = renderHook(
-      () => useStyle('ant-agentic-lazy-element'),
-      {
-        wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
-      },
-    );
+    const { result } = renderHook(() => useStyle('ant-agentic-lazy-element'), {
+      wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
+    });
 
     expect(result.current).toBeDefined();
     expect(result.current).toHaveProperty('wrapSSR');

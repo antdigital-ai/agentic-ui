@@ -5,10 +5,10 @@
 import { Node, Text } from 'slate';
 import stringWidth from 'string-width';
 import { debugInfo } from '../../../Utils/debugUtils';
-import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
 import { ChartNode } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
 import { getMediaType } from '../utils/dom';
+import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
 
 const inlineNode = new Set(['break']);
 

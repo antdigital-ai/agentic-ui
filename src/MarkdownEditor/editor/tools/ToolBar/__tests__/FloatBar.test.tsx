@@ -15,7 +15,10 @@ Object.defineProperty(mockMarkdownContainer, 'clientWidth', {
 });
 
 const mockEditor = {
-  selection: { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 5 } },
+  selection: {
+    anchor: { path: [0, 0], offset: 0 },
+    focus: { path: [0, 0], offset: 5 },
+  },
   children: [{ type: 'paragraph', children: [{ text: 'x' }] }],
 };
 const mockMarkdownEditorRef = { current: mockEditor };
@@ -29,11 +32,15 @@ vi.mock('../floatBarStyle', () => ({
 }));
 
 vi.mock('../BaseBar', () => ({
-  BaseToolBar: ({ prefix }: any) => <div data-testid="base-toolbar">{prefix}</div>,
+  BaseToolBar: ({ prefix }: any) => (
+    <div data-testid="base-toolbar">{prefix}</div>
+  ),
 }));
 
 vi.mock('../ReadonlyBaseBar', () => ({
-  ReadonlyBaseBar: ({ prefix }: any) => <div data-testid="readonly-base-bar">{prefix}</div>,
+  ReadonlyBaseBar: ({ prefix }: any) => (
+    <div data-testid="readonly-base-bar">{prefix}</div>
+  ),
 }));
 
 vi.mock('../../../utils/dom', () => ({
@@ -172,12 +179,16 @@ describe('FloatBar', () => {
 
   it('readonly 时应渲染 ReadonlyBaseBar', () => {
     render(<FloatBar readonly={true} />);
-    expect(document.body.querySelector('[data-testid="readonly-base-bar"]')).toBeInTheDocument();
+    expect(
+      document.body.querySelector('[data-testid="readonly-base-bar"]'),
+    ).toBeInTheDocument();
   });
 
   it('非 readonly 时应渲染 BaseToolBar', () => {
     render(<FloatBar readonly={false} />);
-    expect(document.body.querySelector('[data-testid="base-toolbar"]')).toBeInTheDocument();
+    expect(
+      document.body.querySelector('[data-testid="base-toolbar"]'),
+    ).toBeInTheDocument();
   });
 
   it('无 markdownContainerRef.current 时应 return null', () => {

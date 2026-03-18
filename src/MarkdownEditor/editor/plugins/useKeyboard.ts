@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey';
-import React, { useRef, useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import {
   BaseEditor,
   Editor,

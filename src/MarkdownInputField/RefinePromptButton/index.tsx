@@ -3,9 +3,9 @@ import { TextOptimize } from '@sofa-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
 import React, { useContext } from 'react';
 
-import { useLocale } from '../../I18n';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ActionIconBox } from '../../Components/ActionIconBox';
+import { useLocale } from '../../I18n';
 import { isBrowserEnv } from './env';
 import { useStyle } from './style';
 type RefinePromptButtonProps = {

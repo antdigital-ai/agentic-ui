@@ -2,7 +2,13 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React, { createRef } from 'react';
 import { Subject } from 'rxjs';
-import { BaseEditor, createEditor, Editor, Transforms, type Selection } from 'slate';
+import {
+  BaseEditor,
+  createEditor,
+  Editor,
+  Transforms,
+  type Selection,
+} from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -19,8 +25,8 @@ import { SlateMarkdownEditor } from '../Editor';
 import * as handlePasteModule from '../plugins/handlePaste';
 import { EditorStore, EditorStoreContext } from '../store';
 import type { KeyboardTask, Methods } from '../utils';
-import { EditorUtils } from '../utils/editorUtils';
 import * as editorUtilsModule from '../utils/editorUtils';
+import { EditorUtils } from '../utils/editorUtils';
 
 describe('SlateMarkdownEditor', () => {
   let mockInstance: MarkdownEditorInstance;
@@ -1198,7 +1204,10 @@ describe('SlateMarkdownEditor', () => {
 
       renderEditor({
         initSchemaValue: [
-          { type: 'paragraph', children: [{ text: 'copy me' }] } as ParagraphNode,
+          {
+            type: 'paragraph',
+            children: [{ text: 'copy me' }],
+          } as ParagraphNode,
         ],
       });
       const editable = document.querySelector(
@@ -1219,7 +1228,10 @@ describe('SlateMarkdownEditor', () => {
     it('onDragOver 应调用 preventDefault', () => {
       renderEditor({
         initSchemaValue: [
-          { type: 'paragraph', children: [{ text: 'drag over' }] } as ParagraphNode,
+          {
+            type: 'paragraph',
+            children: [{ text: 'drag over' }],
+          } as ParagraphNode,
         ],
       });
       const editable = document.querySelector(
@@ -1233,7 +1245,10 @@ describe('SlateMarkdownEditor', () => {
       const onFocus = vi.fn();
       renderEditor({
         initSchemaValue: [
-          { type: 'paragraph', children: [{ text: 'focus text' }] } as ParagraphNode,
+          {
+            type: 'paragraph',
+            children: [{ text: 'focus text' }],
+          } as ParagraphNode,
         ],
         onFocus,
       });

@@ -16,10 +16,9 @@ describe('parseMarkdownToNodesAndInsert', () => {
 
     parseMarkdownToNodesAndInsert(editor, '');
 
-    expect(insertSpy).toHaveBeenCalledWith(
-      editor,
-      [{ type: 'paragraph', children: [{ text: '' }] }],
-    );
+    expect(insertSpy).toHaveBeenCalledWith(editor, [
+      { type: 'paragraph', children: [{ text: '' }] },
+    ]);
     insertSpy.mockRestore();
   });
 
@@ -41,19 +40,24 @@ describe('parseMarkdownToNodesAndInsert', () => {
 
   it('有选区且有选中文本时应 removeNodes 再 insert', () => {
     const editor = createEditor();
-    editor.children = [
-      { type: 'paragraph', children: [{ text: 'hello' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: 'hello' }] }];
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 5 },
     };
-    const removeSpy = vi.spyOn(Transforms, 'removeNodes').mockImplementation(() => {});
-    const insertSpy = vi.spyOn(Transforms, 'insertNodes').mockImplementation(() => {});
+    const removeSpy = vi
+      .spyOn(Transforms, 'removeNodes')
+      .mockImplementation(() => {});
+    const insertSpy = vi
+      .spyOn(Transforms, 'insertNodes')
+      .mockImplementation(() => {});
 
     const result = parseMarkdownToNodesAndInsert(editor, 'new');
 
-    expect(removeSpy).toHaveBeenCalledWith(editor, expect.objectContaining({ at: expect.anything() }));
+    expect(removeSpy).toHaveBeenCalledWith(
+      editor,
+      expect.objectContaining({ at: expect.anything() }),
+    );
     expect(insertSpy).toHaveBeenCalledWith(
       editor,
       expect.any(Array),

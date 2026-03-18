@@ -2,8 +2,10 @@ import { useEffect, useImperativeHandle, useRef } from 'react';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
-interface UseMarkdownInputFieldRefsParams
-  extends Pick<MarkdownInputFieldProps, 'inputRef' | 'value'> {
+interface UseMarkdownInputFieldRefsParams extends Pick<
+  MarkdownInputFieldProps,
+  'inputRef' | 'value'
+> {
   setValue: (value: string) => void;
 }
 
@@ -26,36 +28,40 @@ export const useMarkdownInputFieldRefs = (
   }, [props.value]);
 
   // 通过 ref 暴露编辑器实例，包装 store.setMDContent 以同步 value 状态，确保发送按钮正确响应
-  useImperativeHandle(props.inputRef, () => {
-    const editor = markdownEditorRef.current;
+  useImperativeHandle(
+    props.inputRef,
+    (): MarkdownEditorInstance | undefined => {
+      const editor = markdownEditorRef.current;
 
-    const syncValueAndSetMDContent = (
-      md?: string,
-      plugins?: any,
-      options?: any,
-    ) => {
-      if (md !== undefined) {
-        props.setValue(md);
+      const syncValueAndSetMDContent = (
+        md?: string,
+        plugins?: any,
+        options?: any,
+      ) => {
+        if (md !== undefined) {
+          props.setValue(md);
+        }
+        return editor?.store?.setMDContent(md, plugins, options);
+      };
+
+      if (!editor) {
+        return {
+          store: {
+            setMDContent: syncValueAndSetMDContent,
+          },
+        } as unknown as MarkdownEditorInstance;
       }
-      return editor?.store?.setMDContent(md, plugins, options);
-    };
 
-    if (!editor) {
       return {
+        ...editor,
         store: {
+          ...editor.store,
           setMDContent: syncValueAndSetMDContent,
         },
       } as MarkdownEditorInstance;
-    }
-
-    return {
-      ...editor,
-      store: {
-        ...editor.store,
-        setMDContent: syncValueAndSetMDContent,
-      },
-    };
-  }, [props.setValue]);
+    },
+    [props.setValue],
+  );
 
   return {
     markdownEditorRef,

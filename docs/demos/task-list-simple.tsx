@@ -1,4 +1,4 @@
-import type { TaskStatus } from '@ant-design/agentic-ui';
+import type { TaskItem, TaskStatus } from '@ant-design/agentic-ui';
 import { TaskList, ToolUseBar } from '@ant-design/agentic-ui';
 import { Button, Space } from 'antd';
 import React, { useState } from 'react';
@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 export default () => {
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
-  const [items] = useState([
+  const [items] = useState<TaskItem[]>([
     {
       key: '1',
       title: '收集并分析竞品产品数据',
@@ -68,9 +68,7 @@ export default () => {
   return (
     <div style={{ padding: 24, maxWidth: 480 }}>
       <Space style={{ marginBottom: 16 }}>
-        <Button onClick={() => setOpen(!open)}>
-          {open ? '收起' : '展开'}
-        </Button>
+        <Button onClick={() => setOpen(!open)}>{open ? '收起' : '展开'}</Button>
       </Space>
       <TaskList
         items={items}

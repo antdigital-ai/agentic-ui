@@ -258,7 +258,7 @@ const FileItemComponent: FC<{
     }
 
     // 使用默认分享行为
-    handleDefaultShare(fileWithId, locale);
+    handleDefaultShare(fileWithId);
   };
 
   // 判断是否显示预览按钮：
@@ -922,7 +922,7 @@ export const FileComponent: FC<{
                       // 为保持回调参数签名一致，显式传入第二个参数为 undefined
                       onShare(file, undefined);
                     } else {
-                      handleDefaultShare(file, locale);
+                      handleDefaultShare(file);
                     }
                   },
                 })
@@ -1059,7 +1059,7 @@ export const FileComponent: FC<{
                 origin: 'preview',
               });
             } else {
-              handleDefaultShare(file, locale);
+              handleDefaultShare(file);
             }
           }}
           onLocate={onLocate}

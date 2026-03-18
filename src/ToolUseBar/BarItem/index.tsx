@@ -145,11 +145,11 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
           data-testid="tool-user-item-tool-header"
         >
           <ToolImage
-          tool={tool}
-          prefixCls={prefixCls}
-          hashId={hashId}
-          disableAnimation={disableAnimation}
-        />
+            tool={tool}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            disableAnimation={disableAnimation}
+          />
         </div>
         <ToolHeaderRight
           tool={tool}

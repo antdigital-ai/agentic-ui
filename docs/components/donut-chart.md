@@ -19,6 +19,7 @@ group:
 <code src="../demos/charts/donut/donut-toolbar-filter.tsx" background="var(--main-bg-color)" title="工具栏过滤器" iframe=540></code>
 <code src="../demos/charts/donut/donut-statistic.tsx" background="var(--main-bg-color)" title="统计指标" iframe=540></code>
 <code src="../demos/charts/donut/donut-large-data.tsx" background="var(--main-bg-color)" title="多值-大数据量" iframe=560></code>
+
 ## API
 
 ### DonutChartProps
@@ -54,17 +55,17 @@ group:
 
 ### DonutChartConfig
 
-| 字段            | 类型                                     | 默认值                      | 说明                       |
-| --------------- | ---------------------------------------- | --------------------------- | -------------------------- |
-| lastModified    | `string`                                 | -                           | 最近更新时间（展示用）     |
-| theme           | `'light' \| 'dark'`                      | `'light'`                   | 主题风格                   |
-| cutout          | `string \| number`                       | -                           | 中心空心占比（如 `'60%'`） |
-| chartStyle      | `'pie' \| 'donut'`                       | `'donut'`                   | 图表样式：饼图或环形图     |
-| showLegend      | `boolean`                                | `true`                      | 是否显示图例               |
-| showTooltip     | `boolean`                                | `true`                      | 是否显示 tooltip           |
-| legendPosition  | `'top' \| 'left' \| 'bottom' \| 'right'` | `'right'（移动端自动底部）` | 图例位置                   |
-| backgroundColor | `string[]`                               | 内置色板                    | 每项对应一个扇区颜色       |
-| borderColor     | `string`                                 | -                           | 边框颜色                   |
+| 字段            | 类型                                     | 默认值                      | 说明                                                                                    |
+| --------------- | ---------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------- |
+| lastModified    | `string`                                 | -                           | 最近更新时间（展示用）                                                                  |
+| theme           | `'light' \| 'dark'`                      | `'light'`                   | 主题风格                                                                                |
+| cutout          | `string \| number`                       | -                           | 中心空心占比（如 `'60%'`）                                                              |
+| chartStyle      | `'pie' \| 'donut'`                       | `'donut'`                   | 图表样式：饼图或环形图                                                                  |
+| showLegend      | `boolean`                                | `true`                      | 是否显示图例                                                                            |
+| showTooltip     | `boolean`                                | `true`                      | 是否显示 tooltip                                                                        |
+| legendPosition  | `'top' \| 'left' \| 'bottom' \| 'right'` | `'right'（移动端自动底部）` | 图例位置                                                                                |
+| backgroundColor | `string[]`                               | 内置色板                    | 每项对应一个扇区颜色                                                                    |
+| borderColor     | `string`                                 | -                           | 边框颜色                                                                                |
 | showDataLabels  | `boolean`                                | `false`                     | 是否展示数据标签与指示线：开启后扇区外显示数值/占比及连接线，tooltip 中也会展示原始数值 |
 
 ### ChartStatisticConfig

@@ -700,7 +700,9 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
               children: [
                 {
                   type: 'list-item',
-                  children: [{ type: 'paragraph', children: [{ text: 'Nested' }] }],
+                  children: [
+                    { type: 'paragraph', children: [{ text: 'Nested' }] },
+                  ],
                 },
               ],
             },
@@ -718,14 +720,20 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
       {
         type: 'bulleted-list',
         children: [
-          { type: 'list-item', children: [{ type: 'paragraph', children: [{ text: 'A' }] }] },
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: 'A' }] }],
+          },
         ],
       },
       { type: 'paragraph', children: [{ text: '   ' }] },
       {
         type: 'numbered-list',
         children: [
-          { type: 'list-item', children: [{ type: 'paragraph', children: [{ text: 'B' }] }] },
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: 'B' }] }],
+          },
         ],
       },
     ];
@@ -793,12 +801,20 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
       toMarkdown: [
         {
           match: (n: any) => n.type === 'custom-block',
-          convert: (n: any) => ({ type: 'paragraph', children: [{ text: n.value || '' }] }),
+          convert: (n: any) => ({
+            type: 'paragraph',
+            children: [{ text: n.value || '' }],
+          }),
         },
       ],
     };
     const node = { type: 'custom-block', value: 'From plugin' };
-    const result = parserSlateNodeToMarkdown([node], '', [{ root: true }], [plugin as any]);
+    const result = parserSlateNodeToMarkdown(
+      [node],
+      '',
+      [{ root: true }],
+      [plugin as any],
+    );
     expect(result).toBe('From plugin');
   });
 
@@ -1096,7 +1112,10 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
       type: 'bulleted-list',
       children: [
         null as any,
-        { type: 'list-item', children: [{ type: 'paragraph', children: [{ text: 'Item' }] }] },
+        {
+          type: 'list-item',
+          children: [{ type: 'paragraph', children: [{ text: 'Item' }] }],
+        },
       ],
     };
     const result = parserSlateNodeToMarkdown([node]);
@@ -1248,8 +1267,14 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
     const node = {
       type: 'table',
       children: [
-        { type: 'table-row', children: [{ type: 'table-cell', children: [{ text: 'A' }] }] },
-        { type: 'table-row', children: [{ type: 'table-cell', children: [{ text: 'B' }] }] },
+        {
+          type: 'table-row',
+          children: [{ type: 'table-cell', children: [{ text: 'A' }] }],
+        },
+        {
+          type: 'table-row',
+          children: [{ type: 'table-cell', children: [{ text: 'B' }] }],
+        },
       ],
     };
     const result = parserSlateNodeToMarkdown([node]);
@@ -1262,7 +1287,10 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
     const node = {
       type: 'table',
       children: [
-        { type: 'table-row', children: [{ type: 'table-cell', children: [{ text: 'H' }] }] },
+        {
+          type: 'table-row',
+          children: [{ type: 'table-cell', children: [{ text: 'H' }] }],
+        },
         { type: 'table-cell', children: [{ text: 'Cell' }] } as any,
       ],
     };
@@ -1437,7 +1465,10 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
 
   it('should handle card node not adding extra newlines (node.type === card branch)', () => {
     const nodes = [
-      { type: 'card', children: [{ type: 'paragraph', children: [{ text: 'C' }] }] },
+      {
+        type: 'card',
+        children: [{ type: 'paragraph', children: [{ text: 'C' }] }],
+      },
       { type: 'paragraph', children: [{ text: 'P' }] },
     ];
     const result = parserSlateNodeToMarkdown(nodes);
@@ -1450,7 +1481,10 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
       {
         type: 'bulleted-list',
         children: [
-          { type: 'list-item', children: [{ type: 'paragraph', children: [{ text: 'L' }] }] },
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: 'L' }] }],
+          },
         ],
       },
       { type: 'code', language: 'js', value: 'x=1' },

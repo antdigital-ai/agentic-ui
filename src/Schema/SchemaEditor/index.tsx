@@ -224,7 +224,8 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
     }, []);
 
     // 复制函数
-    const handleCopyContent = useCallback((content: string) => {
+    const handleCopyContent = useCallback(
+      (content: string) => {
         if (!content || !content.trim()) {
           return;
         }

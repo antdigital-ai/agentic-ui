@@ -300,12 +300,7 @@ export function AceEditor({
       clearTimeout(debounceTimer.current);
       codeEditor.destroy();
     };
-  }, [
-    aceLoaded,
-    element.language,
-    readonly,
-    setupEditorEvents,
-  ]);
+  }, [aceLoaded, element.language, readonly, setupEditorEvents]);
 
   // 监听外部值变化
   useEffect(() => {

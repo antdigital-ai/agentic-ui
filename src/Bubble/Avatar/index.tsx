@@ -66,7 +66,9 @@ export const BubbleAvatar: React.FC<BubbleAvatarProps> = ({
   const isBase64 = Boolean(avatar?.startsWith('data'));
 
   if (typeof avatar === 'string' && isEmoji(String(avatar))) {
-    return <div className={classNames(`${prefixCls}-emoji`, hashId)}>{avatar}</div>;
+    return (
+      <div className={classNames(`${prefixCls}-emoji`, hashId)}>{avatar}</div>
+    );
   }
 
   const text = String(isImage ? title : avatar);

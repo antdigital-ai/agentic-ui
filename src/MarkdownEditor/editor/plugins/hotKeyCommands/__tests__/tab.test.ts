@@ -977,9 +977,7 @@ describe('TabKey', () => {
           },
           {
             type: 'list-item',
-            children: [
-              { type: 'paragraph', children: [{ text: 'item2' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'item2' }] }],
           },
         ],
       };
@@ -987,12 +985,14 @@ describe('TabKey', () => {
       Transforms.select(editor, { path: [0, 1, 0, 0], offset: 5 });
       const mockEvent = { preventDefault: vi.fn(), shiftKey: false } as any;
       const originalNodeGet = Node.get.bind(Node);
-      const nodeGetSpy = vi.spyOn(Node, 'get').mockImplementation((editor, path) => {
-        if (Path.equals(path, [0, 0, 1])) {
-          return { type: 'paragraph', children: [] } as any;
-        }
-        return originalNodeGet(editor, path);
-      });
+      const nodeGetSpy = vi
+        .spyOn(Node, 'get')
+        .mockImplementation((editor, path) => {
+          if (Path.equals(path, [0, 0, 1])) {
+            return { type: 'paragraph', children: [] } as any;
+          }
+          return originalNodeGet(editor, path);
+        });
       const mockInsertText = vi.fn();
       editor.insertText = mockInsertText;
       tabKey.run(mockEvent);
@@ -1092,9 +1092,7 @@ describe('TabKey', () => {
         children: [
           {
             type: 'list-item',
-            children: [
-              { type: 'paragraph', children: [{ text: 'item1' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'item1' }] }],
           },
         ],
       };
@@ -1102,12 +1100,14 @@ describe('TabKey', () => {
       Transforms.select(editor, { path: [0, 0, 0, 0], offset: 0 });
       const mockEvent = { preventDefault: vi.fn(), shiftKey: false } as any;
       const originalNodeGet = Node.get.bind(Node);
-      const nodeGetSpy = vi.spyOn(Node, 'get').mockImplementation((editor, path) => {
-        if (Path.equals(path, [0, 0])) {
-          return { type: 'paragraph', children: [] } as any;
-        }
-        return originalNodeGet(editor, path);
-      });
+      const nodeGetSpy = vi
+        .spyOn(Node, 'get')
+        .mockImplementation((editor, path) => {
+          if (Path.equals(path, [0, 0])) {
+            return { type: 'paragraph', children: [] } as any;
+          }
+          return originalNodeGet(editor, path);
+        });
       const mockInsertText = vi.fn();
       editor.insertText = mockInsertText;
       tabKey.run(mockEvent);
@@ -1791,11 +1791,13 @@ describe('TabKey', () => {
       } as any;
       let liftCallCount = 0;
       const originalLift = Transforms.liftNodes.bind(Transforms);
-      const liftSpy = vi.spyOn(Transforms, 'liftNodes').mockImplementation((...args: any[]) => {
-        liftCallCount += 1;
-        if (liftCallCount === 2) throw new Error('other error');
-        return originalLift(...args);
-      });
+      const liftSpy = vi
+        .spyOn(Transforms, 'liftNodes')
+        .mockImplementation((...args: any[]) => {
+          liftCallCount += 1;
+          if (liftCallCount === 2) throw new Error('other error');
+          return originalLift(...args);
+        });
       expect(() => {
         try {
           tabKey.run(mockEvent);
@@ -1948,11 +1950,13 @@ describe('TabKey', () => {
       } as any;
       let liftCallCount = 0;
       const originalLift = Transforms.liftNodes.bind(Transforms);
-      const liftSpy = vi.spyOn(Transforms, 'liftNodes').mockImplementation((...args: any[]) => {
-        liftCallCount += 1;
-        if (liftCallCount === 2) throw new Error('other error');
-        return originalLift(...args);
-      });
+      const liftSpy = vi
+        .spyOn(Transforms, 'liftNodes')
+        .mockImplementation((...args: any[]) => {
+          liftCallCount += 1;
+          if (liftCallCount === 2) throw new Error('other error');
+          return originalLift(...args);
+        });
       expect(() => {
         try {
           tabKey.run(mockEvent);

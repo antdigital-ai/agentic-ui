@@ -195,7 +195,9 @@ describe('History Component', () => {
 
       await waitFor(
         () => {
-          expect(document.querySelector('.ant-popover-open')).toBeInTheDocument();
+          expect(
+            document.querySelector('.ant-popover-open'),
+          ).toBeInTheDocument();
         },
         { timeout: 2000 },
       );

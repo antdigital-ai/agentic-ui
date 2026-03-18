@@ -91,4 +91,3 @@ describe('SlateMarkdownEditor ErrorBoundary coverage', () => {
     expect(screen.queryByText('child')).not.toBeInTheDocument();
   });
 });
-

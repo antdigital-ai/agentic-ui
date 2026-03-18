@@ -57,7 +57,10 @@ describe('keyArrow', () => {
   });
 
   it('未匹配的热键应不阻止默认行为', () => {
-    editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
     const mockEvent = {
       key: 'Enter',
       preventDefault: vi.fn(),
@@ -69,7 +72,10 @@ describe('keyArrow', () => {
 
   it('ArrowDown 时应调用 EditorUtils.findNext', () => {
     Transforms.insertText(editor, 'x');
-    editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 0 },
+    };
     const findNextSpy = vi.mocked(EditorUtils.findNext);
     findNextSpy.mockClear();
     const mockEvent = {
