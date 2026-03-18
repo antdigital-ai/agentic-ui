@@ -21,6 +21,7 @@ import {
   handleThematicBreak,
 } from './parse/parseElements';
 import { addEmptyLinesIfNeeded } from './parse/parseEmptyLines';
+import { preprocessProtectTimeFromDirective } from './constants';
 import { handleFootnoteReference } from './parse/parseFootnote';
 import {
   handleHtml,
@@ -257,7 +258,8 @@ export class MarkdownToSlateParser {
   }
 
   private preprocessMarkdown(md: string): string {
-    const thinkProcessed = removeAnswerTags(preprocessThinkTags(md || ''));
+    const timeProtected = preprocessProtectTimeFromDirective(md || '');
+    const thinkProcessed = removeAnswerTags(preprocessThinkTags(timeProtected));
     const nonStandardProcessed = removeAnswerTags(
       preprocessNonStandardHtmlTags(thinkProcessed),
     );

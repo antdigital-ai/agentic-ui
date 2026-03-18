@@ -18,6 +18,7 @@ import { MarkdownEditorPlugin } from '../../../plugin';
 import { TableNode, TrNode as TableRowNode } from '../../types/Table';
 import { EditorUtils } from '../../utils';
 import type { ParserMarkdownToSlateNodeConfig } from '../parserMarkdownToSlateNode';
+import { REMARK_REHYPE_DIRECTIVE_HANDLERS } from '../../utils/markdownToHtml';
 
 // 表格相关常量
 export const MIN_TABLE_CELL_LENGTH = 5; // 表格单元格最小长度
@@ -31,7 +32,10 @@ const stringifyObj = remark()
   .use(remarkMath as any, {
     singleDollarTextMath: false,
   })
-  .use(remarkRehype as any, { allowDangerousHtml: true })
+  .use(remarkRehype as any, {
+    allowDangerousHtml: true,
+    handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
+  })
   .use(rehypeRaw)
   .use(rehypeKatex as any)
   .use(remarkGfm, { singleTilde: false }) // 禁用单波浪线删除线

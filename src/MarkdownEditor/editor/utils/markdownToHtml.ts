@@ -129,7 +129,11 @@ function leafDirectiveHandler(state: any, node: any) {
   return state.applyData(node, result);
 }
 
-const REMARK_REHYPE_DIRECTIVE_HANDLERS = {
+/**
+ * remark-rehype 的 directive 节点 handlers，用于避免 "Cannot handle unknown node textDirective" 等错误
+ * 可复用于 parseTable 等其他使用 remark-rehype 的场景
+ */
+export const REMARK_REHYPE_DIRECTIVE_HANDLERS = {
   textDirective: textDirectiveHandler,
   leafDirective: leafDirectiveHandler,
 };
