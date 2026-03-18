@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { message } from 'antd';
 import { CardNode } from '../../../el';
 import { ELEMENT_TAGS } from '../../plugins/insertParsedHtmlNodes';
 
@@ -167,9 +166,6 @@ export const makeDeserializer = (jsx: any) => {
         try {
           return deserializeElement(c as any, imageTags);
         } catch (error) {
-          message.error(
-            'Error deserializing list item:' + (c as HTMLElement).innerHTML,
-          );
           console.error(error);
         }
         return jsx('element', { type: 'paragraph' }, [

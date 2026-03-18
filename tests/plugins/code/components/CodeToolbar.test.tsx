@@ -150,7 +150,6 @@ describe('CodeToolbar', () => {
       fireEvent.click(copyButton);
 
       expect(mockCopy).toHaveBeenCalledWith('console.log("Hello World");');
-      expect(message.success).toHaveBeenCalledWith('复制成功');
     });
   });
 
@@ -601,13 +600,13 @@ describe('CodeToolbar', () => {
       expect(setTheme).toHaveBeenCalledWith('chaos');
     });
 
-    it('复制成功时显示 message.success', () => {
+    it('复制成功时调用 copy', () => {
       const mockCopy = copy as any;
       mockCopy.mockReturnValue(true);
       render(<CodeToolbar {...defaultProps} isSelected={true} />);
       const copyButton = screen.getByTitle('复制');
       fireEvent.click(copyButton);
-      expect(message.success).toHaveBeenCalled();
+      expect(mockCopy).toHaveBeenCalled();
     });
 
     it('复制失败时静默处理并输出 console.error', () => {

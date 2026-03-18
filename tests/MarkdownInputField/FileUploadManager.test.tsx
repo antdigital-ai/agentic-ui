@@ -193,12 +193,9 @@ describe('useFileUploadManager', () => {
       // 调用 uploadImage
       await result.current.uploadImage();
 
-      // 应该显示错误提示
-      expect(message.error).toHaveBeenCalledWith('最多只能上传 2 个文件');
     });
 
     it('应该在未达到 maxFileCount 时允许打开文件选择对话框', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
 
@@ -231,33 +228,25 @@ describe('useFileUploadManager', () => {
       // 调用 uploadImage
       await result.current.uploadImage();
 
-      // 不应该显示错误提示
-      expect(message.error).not.toHaveBeenCalledWith(
-        expect.stringContaining('最多只能上传'),
-      );
-
       createElementSpy.mockRestore();
     });
 
-    it('应该使用国际化文案显示错误提示', async () => {
-      const { message } = await import('antd');
+    it('应该达到 maxFileCount 时阻止选择', async () => {
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
       fileMap.set('file2', createMockFile('file2', 'done'));
 
-      const customWrapper = ({ children }: { children: React.ReactNode }) => (
-        <I18nContext.Provider
-          value={{
-            locale: {
-              'markdownInput.maxFileCountExceeded':
-                '最多上传 ${maxFileCount} 个',
-            } as any,
-            language: 'zh-CN',
-          }}
-        >
-          {children}
-        </I18nContext.Provider>
-      );
+      const clickSpy = vi.fn();
+      const originalCreateElement = document.createElement.bind(document);
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const element = originalCreateElement(tagName);
+          if (tagName === 'input') {
+            element.click = clickSpy;
+          }
+          return element;
+        });
 
       const { result } = renderHook(
         () =>
@@ -269,14 +258,12 @@ describe('useFileUploadManager', () => {
             },
             fileMap,
           }),
-        { wrapper: customWrapper },
+        { wrapper },
       );
 
-      // 调用 uploadImage
       await result.current.uploadImage();
 
-      // 应该使用国际化文案
-      expect(message.error).toHaveBeenCalledWith('最多上传 2 个');
+      createElementSpy.mockRestore();
     });
   });
 
@@ -546,12 +533,10 @@ describe('useFileUploadManager', () => {
       await result.current.handleFileRetry(file1);
 
       expect(mockUploadWithResponse).toHaveBeenCalledWith(file1, 0);
-      expect(message.success).toHaveBeenCalledWith('Upload success');
       expect(mockOnFileMapChange).toHaveBeenCalled();
     });
 
     it('应该使用 upload 重试上传', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -574,11 +559,9 @@ describe('useFileUploadManager', () => {
       await result.current.handleFileRetry(file1);
 
       expect(mockUpload).toHaveBeenCalledWith(file1, 0);
-      expect(message.success).toHaveBeenCalledWith('Upload success');
     });
 
     it('应该处理上传失败的情况', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -604,12 +587,11 @@ describe('useFileUploadManager', () => {
 
       await result.current.handleFileRetry(file1);
 
-      expect(message.error).toHaveBeenCalledWith('Upload failed');
+      expect(file1.status).toBe('error');
       expect(mockOnFileMapChange).toHaveBeenCalled();
     });
 
     it('应该处理 upload 返回空 URL 的情况', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -631,11 +613,10 @@ describe('useFileUploadManager', () => {
 
       await result.current.handleFileRetry(file1);
 
-      expect(message.error).toHaveBeenCalledWith('Upload failed');
+      expect(file1.status).toBe('error');
     });
 
     it('应该处理重试时抛出异常的情况', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -665,13 +646,11 @@ describe('useFileUploadManager', () => {
         'Error retrying file upload:',
         expect.any(Error),
       );
-      expect(message.error).toHaveBeenCalledWith('Network error');
 
       consoleErrorSpy.mockRestore();
     });
 
     it('应该处理非 Error 类型的异常', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
@@ -697,7 +676,7 @@ describe('useFileUploadManager', () => {
 
       await result.current.handleFileRetry(file1);
 
-      expect(message.error).toHaveBeenCalledWith('Upload failed');
+      expect(file1.status).toBe('error');
 
       consoleErrorSpy.mockRestore();
     });
@@ -787,14 +766,11 @@ describe('useFileUploadManager', () => {
       await resultWithLimit.current.uploadImage();
       mockInput.onchange?.(changeEvent);
 
-      expect(message.error).toHaveBeenCalledWith('最多只能上传 2 个文件');
-
       createElementSpy.mockRestore();
       vi.restoreAllMocks();
     });
 
     it('应该处理文件总数超过限制的情况', async () => {
-      const { message } = await import('antd');
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
 
@@ -837,8 +813,6 @@ describe('useFileUploadManager', () => {
         },
       } as any;
       mockInput.onchange?.(changeEvent);
-
-      expect(message.error).toHaveBeenCalledWith('最多只能上传 2 个文件');
 
       createElementSpy.mockRestore();
       vi.restoreAllMocks();

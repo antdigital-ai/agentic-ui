@@ -384,7 +384,8 @@ describe('docx module', () => {
   });
 
   describe('deserializeListItem', () => {
-    it('deserializeElement 抛错时应走 catch 并调用 message.error', () => {
+    it('deserializeElement 抛错时应走 catch 并输出 console.error', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const container = document.createElement('div');
       const p = document.createElement('p');
       p.setAttribute('class', 'MsoListParagraph');
@@ -400,9 +401,8 @@ describe('docx module', () => {
       container.appendChild(p);
 
       deserialize(p, {});
-      expect(message.error).toHaveBeenCalledWith(
-        expect.stringContaining('Error deserializing list item'),
-      );
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
     });
   });
 

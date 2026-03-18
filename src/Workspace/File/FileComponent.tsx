@@ -1,7 +1,6 @@
-import { ConfigProvider, Image, Input, Spin, Typography, message } from 'antd';
+import { ConfigProvider, Image, Input, Spin, Typography } from 'antd';
 
 import {
-  Check,
   ChevronDown as DownIcon,
   Download as DownloadIcon,
   Eye as EyeIcon,
@@ -82,34 +81,12 @@ const handleFileDownload = (file: FileNode) => {
 };
 
 // 通用的默认分享处理函数
-const handleDefaultShare = async (file: FileNode, locale?: any) => {
+const handleDefaultShare = async (file: FileNode) => {
   try {
     const shareUrl = file.url || file.previewUrl || window.location.href;
     await navigator.clipboard.writeText(shareUrl);
-    message.success({
-      icon: (
-        <Check
-          style={{
-            fontSize: 16,
-            marginRight: 8,
-            color: 'var(--color-green-control-fill-primary)',
-          }}
-        />
-      ),
-      content: (
-        <span
-          style={{
-            font: 'var(--font-text-body-emphasized-base)',
-            color: 'var(--color-gray-text-default)',
-          }}
-        >
-          {locale?.['workspace.file.linkCopied'] || '已复制链接'}
-        </span>
-      ),
-    });
   } catch (error) {
-    // 如果复制失败，显示错误提示
-    message.error(locale?.['workspace.file.copyFailed'] || '复制失败');
+    // 复制失败时静默处理
   }
 };
 

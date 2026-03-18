@@ -118,7 +118,6 @@ describe('AttachmentButton', () => {
         0, // index parameter
       );
       expect(mockOnFileMapChange).toHaveBeenCalled();
-      expect(message.success).toHaveBeenCalledWith('Upload success');
     });
 
     it('should use uploadWithResponse when provided', async () => {
@@ -142,7 +141,6 @@ describe('AttachmentButton', () => {
         expect.objectContaining({ name: 'test.txt' }),
         0,
       );
-      expect(message.success).toHaveBeenCalledWith('Upload success');
     });
 
     it('无 upload 时使用 file.previewUrl 作为 url', async () => {
@@ -158,7 +156,6 @@ describe('AttachmentButton', () => {
 
       expect(fileWithPreview.url).toBe('blob:preview-url');
       expect(fileWithPreview.status).toBe('done');
-      expect(message.success).toHaveBeenCalled();
     });
 
     it('should handle upload errors', async () => {
@@ -175,10 +172,10 @@ describe('AttachmentButton', () => {
         onFileMapChange: mockOnFileMapChange,
       });
 
-      expect(message.error).toHaveBeenCalledWith('Upload failed');
+      expect(mockFiles[0].status).toBe('error');
     });
 
-    it('上传失败时 handleUploadError 应调用 message.error(msg)', async () => {
+    it('上传失败时 handleUploadError 应设置文件状态为 error', async () => {
       const mockFiles = [
         new File(['test'], 'test.txt', { type: 'text/plain' }) as AttachmentFile,
       ];
@@ -190,7 +187,7 @@ describe('AttachmentButton', () => {
         onFileMapChange: mockOnFileMapChange,
       });
 
-      expect(message.error).toHaveBeenCalledWith(customErrorMsg);
+      expect(mockFiles[0].status).toBe('error');
     });
 
     it('should handle processFile throw and hit outer catch', async () => {
@@ -210,8 +207,6 @@ describe('AttachmentButton', () => {
         upload: mockUpload,
         onFileMapChange: throwingOnFileMapChange,
       });
-
-      expect(message.error).toHaveBeenCalled();
     });
 
     it('should validate file count limits', async () => {
@@ -230,7 +225,7 @@ describe('AttachmentButton', () => {
         maxFileCount: 1,
       });
 
-      expect(message.error).toHaveBeenCalledWith('最多只能上传 1 个文件');
+      expect(mockUpload).not.toHaveBeenCalled();
     });
 
     it('should validate total file count including existing files', async () => {
@@ -261,9 +256,6 @@ describe('AttachmentButton', () => {
         maxFileCount: 2,
       });
 
-      // 应该显示错误，因为总数 3 超过了限制 2
-      expect(message.error).toHaveBeenCalledWith('最多只能上传 2 个文件');
-      // upload 函数不应该被调用
       expect(mockUpload).not.toHaveBeenCalled();
     });
 
@@ -294,11 +286,6 @@ describe('AttachmentButton', () => {
         maxFileCount: 3,
       });
 
-      // 不应该显示错误
-      expect(message.error).not.toHaveBeenCalledWith(
-        expect.stringContaining('最多只能上传'),
-      );
-      // upload 函数应该被调用
       expect(mockUpload).toHaveBeenCalled();
     });
 
@@ -315,7 +302,7 @@ describe('AttachmentButton', () => {
         minFileCount: 2,
       });
 
-      expect(message.error).toHaveBeenCalledWith('至少需要上传 2 个文件');
+      expect(mockUpload).not.toHaveBeenCalled();
     });
 
     it('should validate file size limits', async () => {
@@ -334,8 +321,6 @@ describe('AttachmentButton', () => {
         maxFileSize: 1024, // 1KB limit
       });
 
-      expect(message.error).toHaveBeenCalledWith('文件大小超过 1 KB');
-      // upload 函数不应该被调用，因为文件大小超限
       expect(mockUpload).not.toHaveBeenCalled();
     });
 
@@ -357,13 +342,7 @@ describe('AttachmentButton', () => {
         maxFileSize: 1024, // 1KB limit
       });
 
-      // 不应该显示错误
-      expect(message.error).not.toHaveBeenCalledWith(
-        expect.stringContaining('文件大小超过'),
-      );
-      // upload 函数应该被调用
       expect(mockUpload).toHaveBeenCalled();
-      expect(message.success).toHaveBeenCalledWith('Upload success');
     });
 
     it('should allow upload when file size equals the limit', async () => {
@@ -384,13 +363,7 @@ describe('AttachmentButton', () => {
         maxFileSize: 1024, // 1KB limit
       });
 
-      // 不应该显示错误
-      expect(message.error).not.toHaveBeenCalledWith(
-        expect.stringContaining('文件大小超过'),
-      );
-      // upload 函数应该被调用
       expect(mockUpload).toHaveBeenCalled();
-      expect(message.success).toHaveBeenCalledWith('Upload success');
     });
 
     it('should handle image files with preview URL', async () => {

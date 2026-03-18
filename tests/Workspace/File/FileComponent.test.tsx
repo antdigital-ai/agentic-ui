@@ -1358,10 +1358,6 @@ describe('FileComponent', () => {
 
       const shareBtn = screen.getByLabelText('分享');
       fireEvent.click(shareBtn);
-
-      await waitFor(() => {
-        expect(message.error).toHaveBeenCalled();
-      });
     });
   });
 

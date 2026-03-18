@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import { Editor, Node, Path, Transforms } from 'slate';
 import { Elements, MarkdownEditorProps } from '../../BaseMarkdownEditor';
 import { isMarkdown } from '../utils';
@@ -96,7 +95,6 @@ export const handleFilesPaste = async (
   try {
     const fileList = clipboardData.files;
     if (fileList.length > 0 && editorProps.image?.upload) {
-      const hideLoading = message.loading('上传中...');
       try {
         const url = [];
         for await (const file of fileList) {
@@ -130,12 +128,9 @@ export const handleFilesPaste = async (
             },
           );
         });
-        message.success('上传成功');
-        hideLoading();
         return true;
       } catch (error) {
         console.log('error', error);
-        hideLoading();
         return false;
       }
     }

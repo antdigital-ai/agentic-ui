@@ -1,9 +1,8 @@
 import { Paperclip } from '@sofa-design/icons';
-import { ConfigProvider, message } from 'antd';
+import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { useContext } from 'react';
 import type { LocalKeys } from '../../I18n';
-import { compileTemplate } from '../../I18n';
 import AttachmentButtonPopover, {
   AttachmentButtonPopoverProps,
   SupportedFileFormats,
@@ -84,7 +83,6 @@ type UploadProps = {
 };
 
 const WAIT_TIME_MS = 16;
-const KB_SIZE = 1024;
 const DEFAULT_MESSAGES = {
   uploading: 'Uploading...',
   uploadSuccess: 'Upload success',
@@ -121,22 +119,10 @@ const validateFileCount = (
   const totalFileCount = newFileCount + existingFileCount;
 
   if (props.maxFileCount && totalFileCount > props.maxFileCount) {
-    const msg = props.locale?.['markdownInput.maxFileCountExceeded']
-      ? compileTemplate(props.locale['markdownInput.maxFileCountExceeded'], {
-          maxFileCount: String(props.maxFileCount),
-        })
-      : DEFAULT_MESSAGES.maxFileCountExceeded(props.maxFileCount);
-    message.error(msg);
     return false;
   }
 
   if (props.minFileCount && totalFileCount < props.minFileCount) {
-    const msg = props.locale?.['markdownInput.minFileCountRequired']
-      ? compileTemplate(props.locale['markdownInput.minFileCountRequired'], {
-          minFileCount: String(props.minFileCount),
-        })
-      : DEFAULT_MESSAGES.minFileCountRequired(props.minFileCount);
-    message.error(msg);
     return false;
   }
 
@@ -149,13 +135,6 @@ const validateFileSize = (
 ): boolean => {
   if (!props.maxFileSize || file.size <= props.maxFileSize) return true;
 
-  const maxSizeKB = props.maxFileSize / KB_SIZE;
-  const msg =
-    props.locale?.['markdownInput.fileSizeExceeded']?.replace(
-      '${maxSize}',
-      `${maxSizeKB}`,
-    ) || DEFAULT_MESSAGES.fileSizeExceeded(maxSizeKB);
-  message.error(msg);
   return false;
 };
 
@@ -202,13 +181,6 @@ const handleUploadSuccess = (
   file.status = 'done';
   file.url = url;
   updateFileMap(map, file, props.onFileMapChange);
-  message.success(
-    getLocaleMessage(
-      props.locale,
-      'uploadSuccess',
-      DEFAULT_MESSAGES.uploadSuccess,
-    ),
-  );
 };
 
 const handleUploadError = (
@@ -219,14 +191,6 @@ const handleUploadError = (
 ) => {
   file.status = 'error';
   updateFileMap(map, file, props.onFileMapChange);
-  const msg =
-    errorMsg ||
-    getLocaleMessage(
-      props.locale,
-      'uploadFailed',
-      DEFAULT_MESSAGES.uploadFailed,
-    );
-  message.error(msg);
 };
 
 const processFile = async (
@@ -288,9 +252,7 @@ export const upLoadFileToServer = async (
 ) => {
   const map = props.fileMap || new Map<string, AttachmentFile>();
   const existingFileCount = map.size;
-  const hideLoading = message.loading(
-    getLocaleMessage(props.locale, 'uploading', DEFAULT_MESSAGES.uploading),
-  );
+  const hideLoading = () => {};
 
   const fileList = Array.from(files) as AttachmentFile[];
   fileList.forEach(prepareFile);
@@ -313,13 +275,6 @@ export const upLoadFileToServer = async (
       file.status = 'error';
       updateFileMap(map, file, props.onFileMapChange);
     });
-    message.error(
-      getLocaleMessage(
-        props.locale,
-        'uploadFailed',
-        DEFAULT_MESSAGES.uploadFailed,
-      ),
-    );
   } finally {
     hideLoading();
   }

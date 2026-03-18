@@ -1,6 +1,5 @@
 import { CloseCircleOutlined } from '@ant-design/icons';
 import type { Ace } from 'ace-builds';
-import { message } from 'antd';
 import copy from 'copy-to-clipboard';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useGetSetState } from 'react-use';
@@ -167,7 +166,6 @@ export function MermaidElement(props: ElementProps<CodeNode>) {
                   try {
                     const code = props.element.value || '';
                     copy(code);
-                    message.success(i18n.locale?.copySuccess || '复制成功');
                   } catch (error) {}
                 }}
               >

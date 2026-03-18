@@ -164,7 +164,6 @@ describe('ReadonlyBaseBar', () => {
       fireEvent.click(copyButton);
 
       expect(mockCopy).toHaveBeenCalledWith('Test content');
-      expect(message.success).toHaveBeenCalledWith('复制成功');
     });
 
     it('应该处理复制失败的情况', () => {
@@ -177,9 +176,6 @@ describe('ReadonlyBaseBar', () => {
 
       const copyButton = screen.getByRole('button', { name: /copy/i });
       fireEvent.click(copyButton);
-
-      // 应该不会显示成功消息
-      expect(message.success).not.toHaveBeenCalled();
     });
 
     it('editor.selection 为空时从 dom 获取选区并复制', () => {
@@ -212,7 +208,6 @@ describe('ReadonlyBaseBar', () => {
         fireEvent.click(copyButton);
 
         expect(mockCopy).toHaveBeenCalledWith('Test content');
-        expect(message.success).toHaveBeenCalledWith('复制成功');
       } finally {
         if (prevImpl) vi.mocked(useEditorStore).mockImplementation(prevImpl);
       }
