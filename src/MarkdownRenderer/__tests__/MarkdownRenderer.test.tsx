@@ -228,6 +228,20 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('Below');
   });
 
+  it('应渲染脚注引用', () => {
+    const { container } = render(
+      <MarkdownRenderer content={'This has a footnote[^1].\n\n[^1]: Footnote content here.'} />,
+    );
+
+    // 脚注引用应渲染为 data-fnc="fnc" 的元素
+    const fncEl = container.querySelector('[data-fnc="fnc"]');
+    expect(fncEl).toBeTruthy();
+
+    // 脚注定义区应存在
+    const fndEl = container.querySelector('[data-be="footnoteDefinition"]');
+    expect(fndEl).toBeTruthy();
+  });
+
   it('应渲染图片', () => {
     const { container } = render(
       <MarkdownRenderer content="![alt text](https://example.com/image.png)" />,

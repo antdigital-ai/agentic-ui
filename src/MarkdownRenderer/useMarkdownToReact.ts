@@ -108,6 +108,7 @@ const buildEditorAlignedComponents = (
 ) => {
   const listCls = `${prefixCls}-list`;
   const tableCls = `${prefixCls}-content-table`;
+  const contentCls = prefixCls; // e.g. ant-agentic-md-editor-content
 
   return {
     // 段落：data-be="paragraph"
@@ -282,6 +283,43 @@ const buildEditorAlignedComponents = (
     hr: (props: any) => {
       const { node, ...rest } = props;
       return jsx('hr' as any, { ...rest, 'data-be': 'hr' });
+    },
+
+    // 脚注引用 sup > a：对齐 MarkdownEditor 的 data-fnc 样式
+    sup: (props: any) => {
+      const { node, children, ...rest } = props;
+      return jsx('span' as any, {
+        ...rest,
+        'data-fnc': 'fnc',
+        className: `${contentCls}-fnc`,
+        style: {
+          fontSize: 12,
+          cursor: 'pointer',
+        },
+        children,
+      });
+    },
+
+    // 脚注定义区：remark-gfm 生成 <section data-footnotes class="footnotes">
+    section: (props: any) => {
+      const { node, children, className, ...rest } = props;
+      const isFootnotes =
+        className === 'footnotes' ||
+        (typeof rest?.['data-footnotes'] !== 'undefined');
+      if (isFootnotes) {
+        return jsx('div' as any, {
+          ...rest,
+          'data-be': 'footnoteDefinition',
+          style: {
+            fontSize: 12,
+            borderTop: '1px solid var(--color-gray-border-light, #e8e8e8)',
+            marginTop: 16,
+            paddingTop: 8,
+          },
+          children,
+        });
+      }
+      return jsx('section' as any, { ...rest, className, children });
     },
 
     // 用户提供的组件覆盖在最上层
