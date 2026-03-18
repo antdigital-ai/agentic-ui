@@ -2,7 +2,6 @@ import { ConfigProvider } from 'antd';
 import clsx from 'clsx';
 import React, {
   forwardRef,
-  useCallback,
   useContext,
   useEffect,
   useImperativeHandle,
@@ -11,11 +10,11 @@ import React, {
   useState,
 } from 'react';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
+import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
 import { CharacterQueue } from './CharacterQueue';
 import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
 import { ChartBlockRenderer } from './renderers/ChartRenderer';
-import { useMarkdownRendererStyle } from './style';
 import type {
   MarkdownRendererProps,
   MarkdownRendererRef,
@@ -89,8 +88,9 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
     } = props;
 
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
-    const prefixCls = getPrefixCls('agentic-md-renderer', customPrefixCls);
-    const { wrapSSR, hashId } = useMarkdownRendererStyle(prefixCls);
+    // 复用 MarkdownEditor 的 CSS 前缀和样式，保持渲染一致性
+    const prefixCls = getPrefixCls('agentic-md-editor', customPrefixCls);
+    const { wrapSSR, hashId } = useEditorStyle(prefixCls);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const [displayedContent, setDisplayedContent] = useState(content || '');
@@ -174,10 +174,17 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
     return wrapSSR(
       <div
         ref={containerRef}
-        className={clsx(prefixCls, hashId, className)}
+        className={clsx(
+          prefixCls,
+          `${prefixCls}-readonly`,
+          hashId,
+          className,
+        )}
         style={style}
       >
-        {reactContent}
+        <div className={clsx(`${prefixCls}-container`, hashId)}>
+          {reactContent}
+        </div>
       </div>,
     );
   },

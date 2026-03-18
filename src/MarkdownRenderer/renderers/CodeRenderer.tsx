@@ -21,7 +21,7 @@ export const CodeBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   const { language, children, className, ...rest } = props;
   const [copied, setCopied] = useState(false);
   const { getPrefixCls } = React.useContext(ConfigProvider.ConfigContext);
-  const prefixCls = getPrefixCls('agentic-md-renderer');
+  const prefixCls = getPrefixCls('agentic-md-editor');
 
   const code = useMemo(() => extractTextContent(children), [children]);
 

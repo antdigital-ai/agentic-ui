@@ -24,7 +24,7 @@ export const MermaidBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   const [svg, setSvg] = useState<string>('');
   const [error, setError] = useState<string>('');
   const { getPrefixCls } = React.useContext(ConfigProvider.ConfigContext);
-  const prefixCls = getPrefixCls('agentic-md-renderer');
+  const prefixCls = getPrefixCls('agentic-md-editor');
 
   const code = extractTextContent(children);
 

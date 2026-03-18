@@ -19,7 +19,7 @@ const extractTextContent = (children: React.ReactNode): string => {
 export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   const { children, className } = props;
   const { getPrefixCls } = React.useContext(ConfigProvider.ConfigContext);
-  const prefixCls = getPrefixCls('agentic-md-renderer');
+  const prefixCls = getPrefixCls('agentic-md-editor');
 
   const code = extractTextContent(children);
 
