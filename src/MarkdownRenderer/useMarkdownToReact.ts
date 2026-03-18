@@ -203,58 +203,61 @@ const buildEditorAlignedComponents = (
   const contentCls = prefixCls; // e.g. ant-agentic-md-editor-content
 
   return {
-    // 段落：data-be="paragraph"
+    // ================================================================
+    // Block 级别元素
+    // ================================================================
+
     p: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('div' as any, {
         ...rest,
         'data-be': 'paragraph',
+        'data-testid': 'markdown-paragraph',
         children,
       });
     },
 
-    // 标题：h1-h6, data-be="head"
     h1: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('h1' as any, { ...rest, 'data-be': 'head', children });
+      return jsx('h1' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-1', children });
     },
     h2: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('h2' as any, { ...rest, 'data-be': 'head', children });
+      return jsx('h2' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-2', children });
     },
     h3: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('h3' as any, { ...rest, 'data-be': 'head', children });
+      return jsx('h3' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-3', children });
     },
     h4: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('h4' as any, { ...rest, 'data-be': 'head', children });
+      return jsx('h4' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-4', children });
     },
     h5: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('h5' as any, { ...rest, 'data-be': 'head', children });
+      return jsx('h5' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-5', children });
     },
     h6: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('h6' as any, { ...rest, 'data-be': 'head', children });
+      return jsx('h6' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-6', children });
     },
 
-    // 引用块：data-be="blockquote"
     blockquote: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('blockquote' as any, {
         ...rest,
         'data-be': 'blockquote',
+        'data-testid': 'markdown-blockquote',
         children,
       });
     },
 
-    // 列表（ul/ol）：包裹 div.list-container + ul/ol.list
     ul: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('div' as any, {
         className: `${listCls}-container`,
         'data-be': 'list',
+        'data-testid': 'markdown-unordered-list',
         children: jsx('ul' as any, {
           ...rest,
           className: `${listCls} ul`,
@@ -267,6 +270,7 @@ const buildEditorAlignedComponents = (
       return jsx('div' as any, {
         className: `${listCls}-container`,
         'data-be': 'list',
+        'data-testid': 'markdown-ordered-list',
         children: jsx('ol' as any, {
           ...rest,
           className: `${listCls} ol`,
@@ -276,23 +280,22 @@ const buildEditorAlignedComponents = (
       });
     },
 
-    // 列表项：li.list-item, data-be="list-item"
     li: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('li' as any, {
         ...rest,
         className: `${listCls}-item`,
         'data-be': 'list-item',
+        'data-testid': 'markdown-list-item',
         children,
       });
     },
 
-    // 表格：复用 MarkdownEditor 的表格 CSS 结构
-    // 无 Slate 节点数据，使用 table-layout: auto 自动计算列宽
     table: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('div' as any, {
         className: tableCls,
+        'data-testid': 'markdown-table',
         children: jsx('div' as any, {
           className: `${tableCls}-container`,
           children: jsx('table' as any, {
@@ -305,23 +308,23 @@ const buildEditorAlignedComponents = (
       });
     },
 
-    // thead / tbody：直接透传
     thead: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('thead' as any, { ...rest, children });
+      return jsx('thead' as any, { ...rest, 'data-testid': 'markdown-thead', children });
     },
     tbody: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('tbody' as any, { ...rest, children });
+      return jsx('tbody' as any, { ...rest, 'data-testid': 'markdown-tbody', children });
     },
     tr: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('tr' as any, { ...rest, children });
+      return jsx('tr' as any, { ...rest, 'data-testid': 'markdown-tr', children });
     },
     th: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('th' as any, {
         ...rest,
+        'data-testid': 'markdown-th',
         style: { whiteSpace: 'normal', width: 'auto' },
         children,
       });
@@ -330,28 +333,28 @@ const buildEditorAlignedComponents = (
       const { node, children, ...rest } = props;
       return jsx('td' as any, {
         ...rest,
+        'data-testid': 'markdown-td',
         style: { whiteSpace: 'normal', width: 'auto' },
         children,
       });
     },
 
     // ================================================================
-    // Leaf 级别（行内元素）：对齐 MLeaf 的渲染逻辑
+    // Leaf 级别（行内元素）
     // ================================================================
 
-    // 链接：data-url="url" + 新标签页打开（对齐 MLeaf 的 leaf.url 逻辑）
     a: (props: any) => {
       const { node, ...rest } = props;
       return jsx('a' as any, {
         ...rest,
         'data-be': 'text',
         'data-url': 'url',
+        'data-testid': 'markdown-link',
         target: '_blank',
         rel: 'noopener noreferrer',
       });
     },
 
-    // 粗体：对齐 MLeaf 的 leaf.bold（fontWeight: bold）
     strong: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('strong' as any, {
@@ -362,47 +365,46 @@ const buildEditorAlignedComponents = (
       });
     },
 
-    // 斜体：对齐 MLeaf 的 leaf.italic
     em: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('em' as any, {
         ...rest,
+        'data-testid': 'markdown-italic',
         style: { fontStyle: 'italic' },
         children,
       });
     },
 
-    // 删除线：对齐 MLeaf 的 leaf.strikethrough → <s>
     del: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('del' as any, { ...rest, children });
+      return jsx('del' as any, { ...rest, 'data-testid': 'markdown-strikethrough', children });
     },
 
-    // 行内代码：对齐 MLeaf 的 inline-code className
     code: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('code' as any, {
         ...rest,
+        'data-testid': 'markdown-inline-code',
         className: `${contentCls}-inline-code`,
         children,
       });
     },
 
-    // 高亮 <mark>
     mark: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('mark' as any, {
         ...rest,
+        'data-testid': 'markdown-mark',
         style: { background: '#f59e0b', padding: '0.1em 0.2em', borderRadius: 2 },
         children,
       });
     },
 
-    // <kbd> 键盘标记
     kbd: (props: any) => {
       const { node, children, ...rest } = props;
       return jsx('kbd' as any, {
         ...rest,
+        'data-testid': 'markdown-kbd',
         style: {
           padding: '0.1em 0.4em',
           fontSize: '0.85em',
@@ -415,10 +417,9 @@ const buildEditorAlignedComponents = (
       });
     },
 
-    // <sub> 下标
     sub: (props: any) => {
       const { node, children, ...rest } = props;
-      return jsx('sub' as any, { ...rest, children });
+      return jsx('sub' as any, { ...rest, 'data-testid': 'markdown-sub', children });
     },
 
     // ================================================================
@@ -445,11 +446,11 @@ const buildEditorAlignedComponents = (
       });
     },
 
-    // 图片：对齐 ReadonlyEditorImage 的 DOM 结构
     img: (props: any) => {
       const { node, ...rest } = props;
       return jsx('div' as any, {
         'data-be': 'image',
+        'data-testid': 'markdown-image',
         style: {
           position: 'relative',
           userSelect: 'none',
@@ -483,7 +484,7 @@ const buildEditorAlignedComponents = (
     // 水平线
     hr: (props: any) => {
       const { node, ...rest } = props;
-      return jsx('hr' as any, { ...rest, 'data-be': 'hr' });
+      return jsx('hr' as any, { ...rest, 'data-be': 'hr', 'data-testid': 'markdown-hr' });
     },
 
     // 脚注引用 sup > a（remark-gfm 有定义时生成）
@@ -492,6 +493,7 @@ const buildEditorAlignedComponents = (
       return jsx('span' as any, {
         ...rest,
         'data-fnc': 'fnc',
+        'data-testid': 'markdown-footnote-ref',
         className: `${contentCls}-fnc`,
         style: {
           fontSize: 12,
@@ -501,12 +503,12 @@ const buildEditorAlignedComponents = (
       });
     },
 
-    // span：拦截 rehypeFootnoteRef 生成的 data-fnc span，应用 fnc 样式
     span: (props: any) => {
       const { node, children, ...rest } = props;
       if (rest['data-fnc'] === 'fnc') {
         return jsx('span' as any, {
           ...rest,
+          'data-testid': 'markdown-footnote-ref',
           className: `${contentCls}-fnc`,
           style: {
             fontSize: 12,
@@ -518,7 +520,6 @@ const buildEditorAlignedComponents = (
       return jsx('span' as any, { ...rest, children });
     },
 
-    // 脚注定义区：remark-gfm 生成 <section data-footnotes class="footnotes">
     section: (props: any) => {
       const { node, children, className, ...rest } = props;
       const isFootnotes =
@@ -528,6 +529,7 @@ const buildEditorAlignedComponents = (
         return jsx('div' as any, {
           ...rest,
           'data-be': 'footnoteDefinition',
+          'data-testid': 'markdown-footnote-section',
           style: {
             fontSize: 12,
             borderTop: '1px solid var(--color-gray-border-light, #e8e8e8)',
@@ -540,10 +542,8 @@ const buildEditorAlignedComponents = (
       return jsx('section' as any, { ...rest, className, children });
     },
 
-    // <think> 标签：渲染为 ToolUseBarThink 组件
     think: ThinkBlockRendererComponent,
 
-    // <answer> 标签：直接透传子内容（answer 标签是包裹在 think 外层的）
     answer: (props: any) => {
       const { node, children } = props;
       return jsx(Fragment, { children });
