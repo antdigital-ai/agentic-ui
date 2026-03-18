@@ -19,10 +19,11 @@ export function preprocessProtectTimeFromDirective(markdown: string): string {
     /:\/\//g,
     URL_PROTOCOL_PLACEHOLDER,
   );
-  // 在冒号与紧跟的数字之间插入零宽空格，阻止 ":20"、":31" 等被 remark-directive 解析为 textDirective
+  // 使用反斜杠转义冒号，阻止 ":20"、":31" 等被 remark-directive 解析为 textDirective
+  // remark-directive 官方推荐：\:port 可防止 :port 被解析为指令
   const withTimeProtected = withProtocolProtected.replace(
     /:(\d)/g,
-    (_, d) => `:\u200B${d}`,
+    (_, d) => `\\:${d}`,
   );
   return withTimeProtected.replace(/\uE01B\uE01B/g, '://');
 }

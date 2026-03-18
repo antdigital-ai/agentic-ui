@@ -1942,8 +1942,7 @@ const y = 2;
       expect(result.schema.length).toBeGreaterThan(0);
     });
 
-    // TODO: 语雀文档含时间格式 02:20:31 时，remark-directive 可能仍误解析，待进一步调查
-    it.skip('应该正确解析语雀文档（含文档信息表、时间格式、有序列表）不触发 textDirective 错误', () => {
+    it('应该正确解析语雀文档（含文档信息表、时间格式、有序列表）不触发 textDirective 错误', () => {
       clearParseCache();
       const markdown = `| 字段 | 内容 |
 |------|------|
@@ -1972,7 +1971,7 @@ const y = 2;
       expect(textContent).toContain('check');
     });
 
-    it.skip('应该正确处理语雀文档（含文档信息表格、时间格式等，避免 textDirective 报错）', () => {
+    it('应该正确处理语雀文档（含文档信息表格、时间格式等，避免 textDirective 报错）', () => {
       const markdown = `# 跟业务侧的对接
 
 | 字段 | 内容 |
@@ -2000,7 +1999,7 @@ const y = 2;
       expect(result.schema.length).toBeGreaterThan(0);
     });
 
-    it.skip('应正确处理语雀文档格式（含文档信息表格、时间格式、编号列表）避免 textDirective 渲染错误', () => {
+    it('应正确处理语雀文档格式（含文档信息表格、时间格式、编号列表）避免 textDirective 渲染错误', () => {
       const markdown = `| 字段 | 内容 |
 |------|------|
 | 标题 | 跟业务侧的对接 |
