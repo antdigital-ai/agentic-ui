@@ -243,10 +243,39 @@ const buildEditorAlignedComponents = (
       });
     },
 
-    // 图片
+    // 图片：对齐 ReadonlyEditorImage 的 DOM 结构
     img: (props: any) => {
       const { node, ...rest } = props;
-      return jsx('img' as any, { ...rest, 'data-be': 'image' });
+      return jsx('div' as any, {
+        'data-be': 'image',
+        style: {
+          position: 'relative',
+          userSelect: 'none',
+          width: '100%',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+        },
+        children: jsx('div' as any, {
+          style: {
+            padding: 4,
+            userSelect: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+          },
+          'data-be': 'image-container',
+          children: jsx('img' as any, {
+            ...rest,
+            style: {
+              maxWidth: '100%',
+              height: 'auto',
+              borderRadius: 8,
+            },
+          }),
+        }),
+      });
     },
 
     // 水平线

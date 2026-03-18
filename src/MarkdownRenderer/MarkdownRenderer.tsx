@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
+import { useStyle as useContentStyle } from '../MarkdownEditor/editor/style';
 import { CharacterQueue } from './CharacterQueue';
 import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
@@ -91,6 +92,9 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
     // 复用 MarkdownEditor 的 CSS 前缀和样式，保持渲染一致性
     const prefixCls = getPrefixCls('agentic-md-editor', customPrefixCls);
     const { wrapSSR, hashId } = useEditorStyle(prefixCls);
+    // 同时注册 content 层的样式（段落间距、链接、blockquote 等）
+    const contentCls = `${prefixCls}-content`;
+    useContentStyle(contentCls, {});
 
     const containerRef = useRef<HTMLDivElement>(null);
     const [displayedContent, setDisplayedContent] = useState(content || '');
@@ -184,7 +188,9 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
         style={style}
       >
         <div className={clsx(`${prefixCls}-container`, hashId)}>
-          {reactContent}
+          <div className={clsx(contentCls, hashId)}>
+            {reactContent}
+          </div>
         </div>
       </div>,
     );
