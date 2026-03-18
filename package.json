@@ -82,6 +82,7 @@
     "dompurify": "^3.3.1",
     "flubber": "^0.4.2",
     "framer-motion": "^11.18.2",
+    "hast-util-to-jsx-runtime": "^2.3.6",
     "is-hotkey": "^0.2.0",
     "json5": "^2.2.3",
     "katex": "^0.16.28",

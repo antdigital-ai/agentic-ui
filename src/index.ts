@@ -47,6 +47,9 @@ export * from './History/types';
 export * from './History/types/HistoryData';
 export * from './History/types/HistoryList';
 
+// ─── Markdown 渲染器（流式/只读轻量渲染，无 Slate 依赖） ─────────────────────
+export * from './MarkdownRenderer';
+
 // ─── Markdown 编辑器 ─────────────────────────────────────────────────────────
 export * from './MarkdownEditor';
 export * from './MarkdownEditor/el';

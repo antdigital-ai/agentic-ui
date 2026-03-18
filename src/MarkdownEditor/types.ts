@@ -4,6 +4,7 @@ import React from 'react';
 import { BaseEditor, Editor, Selection } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor, RenderElementProps } from 'slate-react';
+import type { RenderMode } from '../MarkdownRenderer/types';
 import { TagPopupProps } from './editor/elements/TagPopup';
 import { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
@@ -698,4 +699,13 @@ export type MarkdownEditorProps = {
    * @description 配置附件上传功能
    */
   attachment?: Record<string, unknown>;
+
+  /**
+   * 渲染模式
+   * @description 仅在 readonly 模式下生效
+   * - 'slate': 使用 Slate 编辑器渲染（默认，向后兼容）
+   * - 'markdown': 使用轻量 MarkdownRenderer 渲染（无 Slate 实例，性能更优）
+   * @default 'slate'
+   */
+  renderMode?: RenderMode;
 };

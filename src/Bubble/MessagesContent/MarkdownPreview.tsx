@@ -8,6 +8,7 @@ import {
   parserMdToSchema,
 } from '../../';
 import { useLocale } from '../../I18n';
+import { MarkdownRenderer } from '../../MarkdownRenderer';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { MessageBubbleData } from '../type';
 import { MessagesContext } from './BubbleContext';
@@ -109,16 +110,40 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
   const extraShowOnHover = config?.extraShowOnHover;
   const { token } = theme.useToken();
 
+  const renderMode = props.markdownRenderConfig?.renderMode ?? 'slate';
+
   const isPaddingHidden = useMemo(() => {
     return !!extra;
   }, [extra, typing]);
 
   useEffect(() => {
+    if (renderMode !== 'slate') return;
     const schema = parserMdToSchema(content).schema;
     MarkdownEditorRef.current?.store.updateNodeList(schema);
-  }, [content]);
+  }, [content, renderMode]);
 
   const markdown = useMemo(() => {
+    // MarkdownRenderer 渲染路径——轻量，不创建 Slate 实例
+    if (renderMode === 'markdown') {
+      return (
+        <MarkdownRenderer
+          content={content}
+          streaming={typing}
+          isFinished={props.originData?.isFinished}
+          plugins={props.markdownRenderConfig?.plugins}
+          fncProps={fncProps}
+          style={{
+            maxWidth: standalone ? '100%' : undefined,
+            padding: isPaddingHidden ? 0 : undefined,
+            margin: isPaddingHidden ? 0 : undefined,
+            ...(props.markdownRenderConfig?.style || {}),
+          }}
+          codeProps={props.markdownRenderConfig?.codeProps}
+        />
+      );
+    }
+
+    // Slate 渲染路径——保持向后兼容
     const minWidth = content?.includes?.('chartType')
       ? standalone
         ? Math.max((htmlRef?.current?.clientWidth || 600) - 23, 500)
@@ -161,7 +186,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         readonly
       />
     );
-  }, [hidePadding, typing, props.originData?.isLast, isPaddingHidden, content]);
+  }, [hidePadding, typing, props.originData?.isLast, isPaddingHidden, content, renderMode]);
 
   const errorDom = (
     <div
