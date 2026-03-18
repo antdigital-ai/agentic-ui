@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react';
 import { ConfigProvider } from 'antd';
 import clsx from 'clsx';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ChartRender } from '../../Plugins/chart/ChartRender';
+import { Loading } from '../../Components/Loading';
 import type { RendererBlockProps } from '../types';
 
 const extractTextContent = (children: React.ReactNode): string => {
@@ -13,105 +15,164 @@ const extractTextContent = (children: React.ReactNode): string => {
   return '';
 };
 
+interface ChartData {
+  config?: any;
+  chartType?: string;
+  x?: string;
+  y?: string;
+  dataSource?: Record<string, any>[];
+  columns?: { title: string; dataIndex: string }[];
+  [key: string]: any;
+}
+
 /**
- * Chart.js 图表渲染器，按需加载 chart.js 和 react-chartjs-2。
+ * 解析图表 JSON 配置。
+ * 支持两种格式：
+ * 1. 完整格式：{ config: [...], dataSource: [...], columns: [...] }
+ * 2. 简单格式：{ chartType, x, y, data: [...] }
+ */
+const parseChartData = (code: string): ChartData | null => {
+  try {
+    const parsed = JSON.parse(code.trim());
+    if (!parsed || typeof parsed !== 'object') return null;
+
+    if (Array.isArray(parsed)) {
+      return { config: parsed };
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * 图表渲染器——复用 MarkdownEditor 的 ChartRender 组件。
+ *
+ * 在 MarkdownEditor 中，图表由 HTML 注释（配置）+ 表格（数据）组合而成，
+ * Slate 解析器将其合并为 chart 节点（otherProps.config / dataSource / columns）。
+ *
+ * 在 MarkdownRenderer 中，chart 代码块的内容是序列化后的 JSON，
+ * 包含 config、dataSource、columns 等字段。
  */
 export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   const { children, className } = props;
   const { getPrefixCls } = React.useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-md-editor');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [columnLength, setColumnLength] = useState(2);
 
   const code = extractTextContent(children);
+  const chartData = useMemo(() => parseChartData(code), [code]);
 
-  const chartConfig = useMemo(() => {
-    try {
-      return JSON.parse(code);
-    } catch {
-      return null;
-    }
-  }, [code]);
+  useEffect(() => {
+    const updateWidth = () => {
+      const width = containerRef.current?.clientWidth || 400;
+      const configs = chartData?.config
+        ? Array.isArray(chartData.config)
+          ? chartData.config
+          : [chartData.config]
+        : [chartData];
+      setColumnLength(Math.min(Math.floor(Math.max(width, 256) / 256), configs.length));
+    };
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, [chartData]);
 
-  if (!chartConfig) {
+  if (!chartData) {
     return (
       <div className={clsx(`${prefixCls}-chart-block`, `${prefixCls}-chart-block--error`, className)}>
-        <pre>{code}</pre>
+        <pre style={{ margin: 0, padding: 12, fontSize: 12 }}>{code}</pre>
       </div>
     );
   }
 
+  const configs: any[] = Array.isArray(chartData.config)
+    ? chartData.config
+    : chartData.config
+      ? [chartData.config]
+      : [chartData];
+
+  const dataSource = chartData.dataSource || chartData.data || [];
+  const columns = chartData.columns || [];
+
   return (
-    <div className={clsx(`${prefixCls}-chart-block`, className)}>
-      <ChartCanvas config={chartConfig} prefixCls={prefixCls} />
+    <div
+      ref={containerRef}
+      data-be="chart"
+      className={clsx(className)}
+      style={{
+        flex: 1,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: '100%',
+        margin: '1em 0',
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 8,
+          userSelect: 'none',
+        }}
+      >
+        {configs.map((cfg, index) => {
+          const { chartType, x, y, ...rest } = cfg;
+
+          if (!chartType) {
+            return (
+              <div key={index} style={{ padding: 12, color: '#999' }}>
+                <Loading />
+              </div>
+            );
+          }
+
+          const chartDataItems = dataSource.map((item: any) => ({
+            ...item,
+            column_list: Object.keys(item),
+          }));
+
+          const height = Math.min(400, containerRef.current?.clientWidth || 400);
+
+          return (
+            <div
+              key={index}
+              style={{
+                margin: 'auto',
+                minWidth: 0,
+                width: columnLength === 1 ? '100%' : `calc(${100 / columnLength}% - 8px)`,
+                maxWidth: '100%',
+                flex: 1,
+                userSelect: 'none',
+              }}
+            >
+              <ChartRender
+                chartType={chartType}
+                chartData={chartDataItems}
+                columnLength={columnLength}
+                onColumnLengthChange={setColumnLength}
+                title={rest?.title}
+                dataTime={rest?.dataTime}
+                groupBy={rest?.groupBy}
+                filterBy={rest?.filterBy}
+                colorLegend={rest?.colorLegend}
+                config={{
+                  height,
+                  x,
+                  y,
+                  columns,
+                  index,
+                  rest,
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
 
 ChartBlockRenderer.displayName = 'ChartBlockRenderer';
-
-/**
- * 独立的 Chart Canvas，按需动态加载 chart.js
- */
-const ChartCanvas: React.FC<{
-  config: any;
-  prefixCls: string;
-}> = ({ config, prefixCls }) => {
-  const [ChartComponent, setChartComponent] = React.useState<React.ComponentType<any> | null>(null);
-  const [error, setError] = React.useState<string>('');
-
-  React.useEffect(() => {
-    let cancelled = false;
-    const loadChart = async () => {
-      try {
-        const [chartModule, reactChartModule] = await Promise.all([
-          import('chart.js'),
-          import('react-chartjs-2'),
-        ]);
-
-        chartModule.Chart.register(
-          ...chartModule.registerables || [],
-        );
-
-        if (!cancelled) {
-          const chartType = config?.type || 'bar';
-          const typeMap: Record<string, React.ComponentType<any>> = {
-            bar: reactChartModule.Bar,
-            line: reactChartModule.Line,
-            pie: reactChartModule.Pie,
-            doughnut: reactChartModule.Doughnut,
-            radar: reactChartModule.Radar,
-            polarArea: reactChartModule.PolarArea,
-            scatter: reactChartModule.Scatter,
-            bubble: reactChartModule.Bubble,
-          };
-          setChartComponent(() => typeMap[chartType] || reactChartModule.Bar);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(String(err));
-        }
-      }
-    };
-
-    loadChart();
-    return () => { cancelled = true; };
-  }, []);
-
-  if (error) {
-    return <div className={`${prefixCls}-chart-block-error`}>{error}</div>;
-  }
-
-  if (!ChartComponent) {
-    return <div className={`${prefixCls}-chart-block-loading`}>Loading chart...</div>;
-  }
-
-  return (
-    <ChartComponent
-      data={config.data}
-      options={{
-        responsive: true,
-        maintainAspectRatio: true,
-        ...config.options,
-      }}
-    />
-  );
-};
