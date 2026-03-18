@@ -200,22 +200,30 @@
                     </span>
                   </span>
                 </span>
-                <span
-                  data-slate-node="text"
+                <div
+                  class=""
+                  data-be="paragraph"
+                  data-drag-el="true"
+                  data-slate-node="element"
                 >
                   <span
-                    data-be="text"
-                    data-slate-leaf="true"
-                    draggable="false"
+                    data-slate-node="text"
                   >
                     <span
-                      data-slate-length="0"
-                      data-slate-zero-width="z"
+                      data-be="text"
+                      data-slate-leaf="true"
+                      draggable="false"
                     >
-                      ﻿
+                      <span
+                        data-slate-length="0"
+                        data-slate-zero-width="n"
+                      >
+                        ﻿
+                        <br />
+                      </span>
                     </span>
                   </span>
-                </span>
+                </div>
                 <span
                   data-slate-node="text"
                 >

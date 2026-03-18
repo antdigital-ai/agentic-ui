@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../src/I18n';
@@ -589,10 +589,6 @@ describe('useFileUploadManager', () => {
       const file1 = createMockFile('file1', 'error');
       fileMap.set('file1', file1);
 
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-
       const mockUpload = vi.fn().mockRejectedValue(new Error('Network error'));
 
       const { result } = renderHook(
@@ -610,12 +606,9 @@ describe('useFileUploadManager', () => {
 
       await result.current.handleFileRetry(file1);
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Error retrying file upload:',
-        expect.any(Error),
-      );
-
-      consoleErrorSpy.mockRestore();
+      // 异常被捕获后，文件应保持 error 状态，并触发 onFileMapChange
+      expect(file1.status).toBe('error');
+      expect(mockOnFileMapChange).toHaveBeenCalled();
     });
 
     it('应该处理非 Error 类型的异常', async () => {
