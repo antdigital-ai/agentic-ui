@@ -149,7 +149,9 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
       }
     }, [content, streaming]);
 
-    // 构建组件映射：将 pre > code 路由到对应渲染器
+    // 构建组件映射
+    // code 渲染器通过 pre override 在 useMarkdownToReact 中路由，
+    // 不直接映射到 <code> 标签（否则会影响行内代码 `code`）
     const components = useMemo(() => {
       const codeRouter = (codeProps: RendererBlockProps) => (
         <DefaultCodeRouter {...codeProps} pluginComponents={pluginComponents} />
@@ -157,7 +159,8 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
       codeRouter.displayName = 'CodeRouter';
 
       return {
-        code: codeRouter,
+        // __codeBlock 是内部约定 key，在 useMarkdownToReact 的 pre override 中使用
+        __codeBlock: codeRouter,
         ...pluginComponents,
       };
     }, [pluginComponents]);

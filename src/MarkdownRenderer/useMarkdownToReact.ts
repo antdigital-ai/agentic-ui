@@ -159,9 +159,10 @@ export const useMarkdownToReact = (
             const codeProps = codeChild?.props || {};
             const language = extractLanguageFromClassName(codeProps.className);
 
-            if (components.code) {
-              const CodeComponent = components.code;
-              return jsx(CodeComponent as any, {
+            // __codeBlock 是内部约定的代码块渲染器 key
+            const CodeBlockComponent = components.__codeBlock || components.code;
+            if (CodeBlockComponent) {
+              return jsx(CodeBlockComponent as any, {
                 ...rest,
                 language,
                 children: codeProps.children,
