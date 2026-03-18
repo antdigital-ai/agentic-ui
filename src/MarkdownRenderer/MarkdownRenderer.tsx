@@ -92,9 +92,9 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
     // 复用 MarkdownEditor 的 CSS 前缀和样式，保持渲染一致性
     const prefixCls = getPrefixCls('agentic-md-editor', customPrefixCls);
     const { wrapSSR, hashId } = useEditorStyle(prefixCls);
-    // 同时注册 content 层的样式（段落间距、链接、blockquote 等）
+    // 注册 content 层的样式（段落间距、链接、blockquote 等）
     const contentCls = `${prefixCls}-content`;
-    useContentStyle(contentCls, {});
+    const { wrapSSR: wrapContentSSR } = useContentStyle(contentCls, {});
 
     const containerRef = useRef<HTMLDivElement>(null);
     const [displayedContent, setDisplayedContent] = useState(content || '');
@@ -177,22 +177,24 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
     });
 
     return wrapSSR(
-      <div
-        ref={containerRef}
-        className={clsx(
-          prefixCls,
-          `${prefixCls}-readonly`,
-          hashId,
-          className,
-        )}
-        style={style}
-      >
-        <div className={clsx(`${prefixCls}-container`, hashId)}>
-          <div className={clsx(contentCls, hashId)}>
-            {reactContent}
+      wrapContentSSR(
+        <div
+          ref={containerRef}
+          className={clsx(
+            prefixCls,
+            `${prefixCls}-readonly`,
+            hashId,
+            className,
+          )}
+          style={style}
+        >
+          <div className={clsx(`${prefixCls}-container`, hashId)}>
+            <div className={clsx(contentCls, hashId)}>
+              {reactContent}
+            </div>
           </div>
-        </div>
-      </div>,
+        </div>,
+      ),
     );
   },
 );
