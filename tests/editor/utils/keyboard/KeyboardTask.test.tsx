@@ -470,8 +470,6 @@ describe('KeyboardTask', () => {
         target: { files: mockFiles },
       };
       await mockInputElement.onchange(mockEvent);
-
-      expect(message.error).toHaveBeenCalledWith('图片上传功能未配置');
     });
 
     it('应该防止重复上传', async () => {

@@ -6,7 +6,7 @@
 
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { ChevronsUpDown, Copy, Moon } from '@sofa-design/icons';
-import { message, Segmented } from 'antd';
+import { Segmented } from 'antd';
 import copy from 'copy-to-clipboard';
 import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../../Components/ActionIconBox';
@@ -311,8 +311,6 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
             try {
               const code = element.value || '';
               copy(code);
-              // 显示成功提示
-              message.success(i18n.locale?.copySuccess || '复制成功');
             } catch (error) {
               // 复制失败时静默处理
               console.error('复制失败:', error);

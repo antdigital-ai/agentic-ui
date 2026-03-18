@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import { useContext } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
@@ -148,13 +147,6 @@ export const useFileUploadManager = ({
       attachment?.maxFileCount &&
       currentFileCount >= attachment.maxFileCount
     ) {
-      const errorMsg = locale?.['markdownInput.maxFileCountExceeded']
-        ? locale['markdownInput.maxFileCountExceeded'].replace(
-            '${maxFileCount}',
-            String(attachment.maxFileCount),
-          )
-        : `最多只能上传 ${attachment.maxFileCount} 个文件`;
-      message.error(errorMsg);
       return;
     }
 
@@ -182,26 +174,12 @@ export const useFileUploadManager = ({
         if (attachment?.maxFileCount) {
           // 如果一次选择的文件数量超过最大限制，完全拒绝
           if (selectedFiles.length > attachment.maxFileCount) {
-            const errorMsg = locale?.['markdownInput.maxFileCountExceeded']
-              ? locale['markdownInput.maxFileCountExceeded'].replace(
-                  '${maxFileCount}',
-                  String(attachment.maxFileCount),
-                )
-              : `最多只能上传 ${attachment.maxFileCount} 个文件`;
-            message.error(errorMsg);
             return;
           }
 
           // 如果选择的文件数量加上已有文件数量超过限制，完全拒绝
           const totalFileCount = selectedFiles.length + currentFileCount;
           if (totalFileCount > attachment.maxFileCount) {
-            const errorMsg = locale?.['markdownInput.maxFileCountExceeded']
-              ? locale['markdownInput.maxFileCountExceeded'].replace(
-                  '${maxFileCount}',
-                  String(attachment.maxFileCount),
-                )
-              : `最多只能上传 ${attachment.maxFileCount} 个文件`;
-            message.error(errorMsg);
             return;
           }
         }
@@ -256,14 +234,12 @@ export const useFileUploadManager = ({
 
       let url: string | undefined;
       let isSuccess = false;
-      let errorMsg: string | null = null;
 
       // 优先使用 uploadWithResponse，然后使用 upload
       if (attachment?.uploadWithResponse) {
         const uploadResult = await attachment.uploadWithResponse(file, 0);
         url = uploadResult.fileUrl;
         isSuccess = uploadResult.uploadStatus === 'SUCCESS';
-        errorMsg = uploadResult.errorMessage || null;
         // 将完整的响应数据存储到 file 对象中
         file.uploadResponse = uploadResult;
       } else if (attachment?.upload) {
@@ -276,25 +252,16 @@ export const useFileUploadManager = ({
         file.url = url;
         map.set(file.uuid || '', file);
         updateAttachmentFiles(map);
-        message.success(locale?.uploadSuccess || 'Upload success');
       } else {
         file.status = 'error';
         map.set(file.uuid || '', file);
         updateAttachmentFiles(map);
-        const failedMsg = errorMsg || locale?.uploadFailed || 'Upload failed';
-        message.error(failedMsg);
       }
-    } catch (error) {
-      console.error('Error retrying file upload:', error);
+    } catch {
       file.status = 'error';
       const map = new Map(fileMap);
       map.set(file.uuid || '', file);
       updateAttachmentFiles(map);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : locale?.uploadFailed || 'Upload failed';
-      message.error(errorMessage);
     }
   });
 

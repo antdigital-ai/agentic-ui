@@ -3,7 +3,7 @@ import {
   CopyFilled,
   HighlightFilled,
 } from '@ant-design/icons';
-import { Input, message, Modal } from 'antd';
+import { Input, Modal } from 'antd';
 import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
 import React, { useContext, useEffect, useMemo } from 'react';
@@ -244,7 +244,6 @@ export const ReadonlyBaseBar = (props: { prefix?: string }) => {
           }
           try {
             copy(title);
-            message.success(i18n.locale?.copySuccess || '复制成功');
           } catch (error) {}
         }}
       >

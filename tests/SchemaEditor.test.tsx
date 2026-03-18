@@ -615,7 +615,6 @@ describe('SchemaEditor', () => {
 
     it('应该能够通过 ref 复制 HTML 内容', () => {
       const ref = createRef<SchemaEditorRef>();
-      vi.spyOn(message, 'success');
 
       render(
         <TestWrapper>
@@ -629,14 +628,10 @@ describe('SchemaEditor', () => {
       );
 
       ref.current?.copyHtml();
-
-      // 检查是否显示成功消息
-      expect(message.success).toHaveBeenCalled();
     });
 
     it('应该能够通过 ref 复制 JSON 内容', () => {
       const ref = createRef<SchemaEditorRef>();
-      vi.spyOn(message, 'success');
 
       render(
         <TestWrapper>
@@ -650,12 +645,9 @@ describe('SchemaEditor', () => {
       );
 
       ref.current?.copyJson();
-
-      // 检查是否显示成功消息
-      expect(message.success).toHaveBeenCalled();
     });
 
-    it('复制 HTML 失败时显示 message.error', async () => {
+    it('复制 HTML 失败时静默处理', async () => {
       const copyModule = await import('copy-to-clipboard');
       const copyFn = copyModule.default as ReturnType<typeof vi.fn>;
       vi.mocked(copyFn).mockReturnValueOnce(false);
@@ -673,13 +665,9 @@ describe('SchemaEditor', () => {
       );
 
       ref.current?.copyHtml();
-
-      await waitFor(() => {
-        expect(message.error).toHaveBeenCalled();
-      });
     });
 
-    it('复制抛出异常时显示 message.error', async () => {
+    it('复制抛出异常时静默处理', async () => {
       const copyModule = await import('copy-to-clipboard');
       const copyFn = copyModule.default as ReturnType<typeof vi.fn>;
       vi.mocked(copyFn).mockImplementationOnce(() => {
@@ -699,10 +687,6 @@ describe('SchemaEditor', () => {
       );
 
       ref.current?.copyHtml();
-
-      await waitFor(() => {
-        expect(message.error).toHaveBeenCalled();
-      });
     });
 
     it('应该能够通过 ref 完整操作流程', async () => {

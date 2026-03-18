@@ -439,9 +439,6 @@ describe('insertParsedHtmlNodes', () => {
     // 媒体片段应该被过滤掉，只保留文本内容
     const textContent = Node.string(editor.children[0]);
     expect(textContent).toBe('Text after image');
-    // 不应该显示上传成功消息
-    expect(message.success).not.toHaveBeenCalled();
-    expect(message.error).not.toHaveBeenCalled();
   });
 
   // 测试用例：未配置 upload 时，粘贴包含多个媒体文件的 HTML 应该过滤掉所有媒体片段
@@ -477,9 +474,6 @@ describe('insertParsedHtmlNodes', () => {
     const textContent = Node.string(editor.children[0]);
     expect(textContent).toContain('Text between');
     expect(textContent).toContain('Text after');
-    // 不应该显示上传成功消息
-    expect(message.success).not.toHaveBeenCalled();
-    expect(message.error).not.toHaveBeenCalled();
   });
 
   // 测试用例：未配置 upload 时，粘贴包含嵌套媒体文件的 HTML 应该过滤掉所有媒体片段
@@ -504,8 +498,6 @@ describe('insertParsedHtmlNodes', () => {
     const textContent = Node.string(editor.children[0]);
     expect(textContent).toContain('Text between');
     expect(textContent).toContain('Text after');
-    expect(message.success).not.toHaveBeenCalled();
-    expect(message.error).not.toHaveBeenCalled();
   });
 
   // 测试用例：配置了 upload 时，正常上传流程不受影响
@@ -1082,14 +1074,13 @@ describe('insertParsedHtmlNodes', () => {
       expect(editor.children.length).toBeGreaterThanOrEqual(15);
     });
 
-    it('解析失败时应捕获错误并提示', async () => {
+    it('解析失败时应捕获错误并返回 false', async () => {
       vi.mocked(docxDeserializerModule.docxDeserializer).mockRejectedValueOnce(
         new Error('parse error'),
       );
       editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
       const result = await insertParsedHtmlNodes(editor, '<p>x</p>', {}, '');
       expect(result).toBe(false);
-      expect(message.error).toHaveBeenCalledWith('Content parsing failed, please try again');
     });
 
     it('标题节点且 fragment 为 paragraph 但无 text 节点时应返回 false', async () => {
@@ -1174,7 +1165,6 @@ describe('insertParsedHtmlNodes', () => {
         '',
       );
       expect(result).toBe(true);
-      expect(message.error).toHaveBeenCalledWith('Some files failed to upload');
     });
 
     it('upload 超过 BATCH_SIZE 时应命中批次延迟分支', async () => {

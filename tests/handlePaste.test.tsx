@@ -440,8 +440,6 @@ describe('handlePaste utilities', () => {
       );
 
       expect(result).toBe(true);
-      expect(message.loading).toHaveBeenCalledWith('上传中...');
-      expect(message.success).toHaveBeenCalledWith('上传成功');
     });
 
     it('should handle non-image file paste', async () => {
@@ -549,12 +547,7 @@ describe('handlePaste utilities', () => {
         {}, // 未配置 upload
       );
 
-      // 应该返回 false，表示没有处理文件
       expect(result).toBe(false);
-      // 不应该显示任何上传相关的消息
-      expect(message.loading).not.toHaveBeenCalled();
-      expect(message.success).not.toHaveBeenCalled();
-      expect(message.error).not.toHaveBeenCalled();
     });
 
     it('should not process files when image.upload is undefined', async () => {
@@ -573,12 +566,7 @@ describe('handlePaste utilities', () => {
         { image: {} }, // image 存在但 upload 未配置
       );
 
-      // 应该返回 false，表示没有处理文件
       expect(result).toBe(false);
-      // 不应该显示任何上传相关的消息
-      expect(message.loading).not.toHaveBeenCalled();
-      expect(message.success).not.toHaveBeenCalled();
-      expect(message.error).not.toHaveBeenCalled();
     });
 
     it('should not process files when image is undefined', async () => {
@@ -597,12 +585,7 @@ describe('handlePaste utilities', () => {
         {}, // image 未配置
       );
 
-      // 应该返回 false，表示没有处理文件
       expect(result).toBe(false);
-      // 不应该显示任何上传相关的消息
-      expect(message.loading).not.toHaveBeenCalled();
-      expect(message.success).not.toHaveBeenCalled();
-      expect(message.error).not.toHaveBeenCalled();
     });
   });
 

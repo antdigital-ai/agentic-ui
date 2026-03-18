@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import copy from 'copy-to-clipboard';
 import isHotkey from 'is-hotkey';
 import { useEffect, useMemo } from 'react';
@@ -214,10 +213,8 @@ export class KeyboardTask {
         return;
       }
       input.dataset.readonly = 'true';
-      const hideLoading = message.loading('上传中...');
       try {
         if (!this.props?.image?.upload) {
-          message.error('图片上传功能未配置');
           return;
         }
         const url =
@@ -229,12 +226,9 @@ export class KeyboardTask {
             insertMedia(u);
           }
         });
-        message.success('上传成功');
       } catch (error) {
         console.error('图片上传失败:', error);
-        message.error('图片上传失败');
       } finally {
-        hideLoading();
         input.value = '';
       }
     };
