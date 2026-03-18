@@ -190,6 +190,15 @@ title: Test
       expect(result).toContain('这是一条带标题的提示块');
     });
 
+    it('应该支持 remark-directive 行内 textDirective 语法（避免 unknown node 错误）', async () => {
+      const markdown = '文本中有 :icon[check] 这样的行内指令';
+      const result = await markdownToHtml(markdown);
+
+      expect(result).toContain('directive');
+      expect(result).toContain('directive-icon');
+      expect(result).toContain('check');
+    });
+
     it('应该处理无效的Markdown并返回空字符串', async () => {
       // 使用一个会导致unified处理错误的输入
       const problematicMarkdown = '\u0000\u0001\u0002'; // 多个null字符

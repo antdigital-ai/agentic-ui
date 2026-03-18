@@ -92,6 +92,45 @@ const FRONTMATTER_LANGUAGES: readonly string[] = ['yaml'];
 const remarkRehypePlugin = remarkRehype as unknown as Plugin;
 
 /**
+ * mdast-util-to-hast 自定义 handler：将 remark-directive 的 textDirective 转为 span 元素
+ * 避免 "Cannot handle unknown node textDirective" 错误
+ */
+function textDirectiveHandler(state: any, node: any) {
+  const result = {
+    type: 'element',
+    tagName: 'span',
+    properties: {
+      className: ['directive', `directive-${String(node.name || 'unknown')}`],
+    },
+    children: state.all(node),
+  };
+  state.patch(node, result);
+  return state.applyData(node, result);
+}
+
+/**
+ * mdast-util-to-hast 自定义 handler：将 remark-directive 的 leafDirective 转为 span 元素
+ * 避免 "Cannot handle unknown node leafDirective" 错误
+ */
+function leafDirectiveHandler(state: any, node: any) {
+  const result = {
+    type: 'element',
+    tagName: 'span',
+    properties: {
+      className: ['directive', 'leaf', `directive-${String(node.name || 'unknown')}`],
+    },
+    children: state.all(node),
+  };
+  state.patch(node, result);
+  return state.applyData(node, result);
+}
+
+const REMARK_REHYPE_DIRECTIVE_HANDLERS = {
+  textDirective: textDirectiveHandler,
+  leafDirective: leafDirectiveHandler,
+};
+
+/**
  * 配置链接渲染器，在新标签页打开链接
  */
 function rehypeLinkTarget(): Plugin<[], HastRoot> {
@@ -214,7 +253,13 @@ export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
     [remarkFrontmatter, FRONTMATTER_LANGUAGES],
     remarkDirective,
     [remarkDirectiveContainer, REMARK_DIRECTIVE_CONTAINER_OPTIONS],
-    [remarkRehypePlugin, { allowDangerousHtml: true }],
+    [
+      remarkRehypePlugin,
+      {
+        allowDangerousHtml: true,
+        handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
+      },
+    ],
   ] as const;
 
 const DEFAULT_REMARK_PLUGINS: MarkdownRemarkPlugin[] = [
