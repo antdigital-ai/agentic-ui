@@ -8,10 +8,11 @@ import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
-import { useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
+import { ToolUseBarThink } from '../ToolUseBarThink';
 import {
   convertParagraphToImage,
   fixStrongWithSpecialChars,
@@ -145,6 +146,46 @@ const extractLanguageFromClassName = (
     if (match) return match[1];
   }
   return undefined;
+};
+
+/**
+ * 提取 React children 的文本内容
+ */
+const extractChildrenText = (children: React.ReactNode): string => {
+  if (typeof children === 'string') return children;
+  if (typeof children === 'number') return String(children);
+  if (Array.isArray(children)) return children.map(extractChildrenText).join('');
+  if (React.isValidElement(children) && children.props?.children) {
+    return extractChildrenText(children.props.children);
+  }
+  return '';
+};
+
+/**
+ * <think> 标签渲染组件——使用 ToolUseBarThink 替代原生 DOM。
+ * 在 MarkdownEditor 中，<think> 被预处理为 ```think 代码块，
+ * 然后由 ThinkBlock 组件（依赖 Slate 上下文）渲染为 ToolUseBarThink。
+ * 在 MarkdownRenderer 中，<think> 通过 rehypeRaw 保留为 hast 元素，
+ * 这里直接渲染为 ToolUseBarThink，无需 Slate 上下文。
+ */
+const ThinkBlockRendererComponent = (props: any) => {
+  const { children } = props;
+  const content = extractChildrenText(children);
+  const isLoading = content.endsWith('...');
+
+  return React.createElement(ToolUseBarThink, {
+    testId: 'think-block-renderer',
+    styles: {
+      root: {
+        boxSizing: 'border-box',
+        maxWidth: '680px',
+        marginTop: 8,
+      },
+    },
+    toolName: isLoading ? '深度思考...' : '深度思考',
+    thinkContent: content,
+    status: isLoading ? 'loading' : 'success',
+  });
 };
 
 /**
@@ -420,6 +461,15 @@ const buildEditorAlignedComponents = (
         });
       }
       return jsx('section' as any, { ...rest, className, children });
+    },
+
+    // <think> 标签：渲染为 ToolUseBarThink 组件
+    think: ThinkBlockRendererComponent,
+
+    // <answer> 标签：直接透传子内容（answer 标签是包裹在 think 外层的）
+    answer: (props: any) => {
+      const { node, children } = props;
+      return jsx(Fragment, { children });
     },
 
     // 用户提供的组件覆盖在最上层

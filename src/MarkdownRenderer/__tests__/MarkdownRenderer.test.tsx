@@ -251,6 +251,16 @@ describe('MarkdownRenderer', () => {
     expect(fncElements[1]?.textContent).toBe('3');
   });
 
+  it('应将 <think> 标签渲染为 ToolUseBarThink 组件', () => {
+    const { container } = render(
+      <MarkdownRenderer content={'<think>\n这是一段思考内容\n</think>\n\n最终回答'} />,
+    );
+
+    const thinkBlock = container.querySelector('[data-testid="think-block-renderer"]');
+    expect(thinkBlock).toBeTruthy();
+    expect(container.textContent).toContain('最终回答');
+  });
+
   it('应渲染图片', () => {
     const { container } = render(
       <MarkdownRenderer content="![alt text](https://example.com/image.png)" />,
