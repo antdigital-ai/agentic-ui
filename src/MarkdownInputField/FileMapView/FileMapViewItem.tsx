@@ -78,13 +78,8 @@ export const FileMapViewItem: React.FC<{
       ? fileName.slice(lastDotIndex + 1)
       : '';
 
-  // 有 status 但无 url/previewUrl：文件内容未拿到，展示大小与格式占位块
-  if (
-    file.status !== undefined &&
-    file.status !== null &&
-    !file.url &&
-    !file.previewUrl
-  ) {
+  // 有 status 但无 url/previewUrl：文件内容未拿到，展示大小与格式占位块（loading 状态除外）
+  if (isFileMetaPlaceholderState(file)) {
     return <FileMetaPlaceholder file={file} />;
   }
   return (

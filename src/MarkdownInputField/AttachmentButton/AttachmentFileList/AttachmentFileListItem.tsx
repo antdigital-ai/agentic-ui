@@ -5,10 +5,14 @@ import { motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { I18nContext } from '../../../I18n';
 import { AttachmentFile } from '../types';
-import { isFileMetaPlaceholderState, kbToSize } from '../utils';
+import {
+  isAttachmentFileLoading,
+  isFileMetaPlaceholderState,
+  kbToSize,
+} from '../utils';
 import { AttachmentFileIcon, FileMetaPlaceholder } from './AttachmentFileIcon';
 
-type FileStatus = 'uploading' | 'error' | 'done';
+type FileStatus = 'uploading' | 'pending' | 'error' | 'done';
 
 interface FileListItemProps {
   file: AttachmentFile;
@@ -34,8 +38,10 @@ const FileIcon: React.FC<{
   prefixCls?: string;
   hashId?: string;
 }> = ({ file, prefixCls, hashId }) => {
-  const status = file.status || 'done';
-  const iconMap: Record<FileStatus, React.ReactNode> = {
+  const status = ((file.status || 'done') === 'pending'
+    ? 'uploading'
+    : file.status || 'done') as Exclude<FileStatus, 'pending'>;
+  const iconMap: Record<Exclude<FileStatus, 'pending'>, React.ReactNode> = {
     uploading: (
       <div className={classNames(`${prefixCls}-uploading-icon`, hashId)}>
         <FileUploadingSpin />
@@ -67,11 +73,12 @@ const FileSizeInfo: React.FC<{
   hashId?: string;
   locale?: typeof import('../../../I18n').cnLabels;
 }> = ({ file, prefixCls, hashId, locale }) => {
-  const status = file.status || 'done';
+  const status = (file.status || 'done') as FileStatus;
   const baseClassName = classNames(`${prefixCls}-file-size`, hashId);
 
   const statusContentMap: Record<FileStatus, React.ReactNode> = {
     uploading: locale?.uploading || '上传中...',
+    pending: locale?.uploading || '上传中...',
     error: (
       <div
         className={classNames(baseClassName, `${prefixCls}-file-size-error`)}
@@ -140,7 +147,7 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   const { locale } = useContext(I18nContext);
   const isErrorStatus = file.status === 'error';
   const isDoneStatus = file.status === 'done';
-  const canDelete = file.status !== 'uploading';
+  const canDelete = !isAttachmentFileLoading(file.status);
 
   const handleFileClick = () => {
     if (!isDoneStatus) return;
@@ -158,12 +165,7 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   };
 
   // 有 status 但无 url/previewUrl：文件内容未拿到，展示大小与格式占位块
-  if (
-    file.status !== undefined &&
-    file.status !== null &&
-    !file.url &&
-    !file.previewUrl
-  ) {
+  if (isFileMetaPlaceholderState(file)) {
     return <FileMetaPlaceholder file={file} className={className} />;
   }
 

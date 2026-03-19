@@ -14,7 +14,7 @@ export type UploadResponse = {
 
 export type AttachmentFile = File & {
   url?: string;
-  status?: 'error' | 'uploading' | 'done';
+  status?: 'error' | 'uploading' | 'pending' | 'done';
   uuid?: string;
   size?: number | null;
   previewUrl?: string;
