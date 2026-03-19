@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+import { Button, ConfigProvider } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -91,9 +91,26 @@ const ChartWithRetry: React.FC<{
     [chartType, rest?.title, x, y, chartDataItems.length, columns.length],
   );
 
+  const handleRetry = React.useCallback(() => {
+    setRetryKey((k) => k + 1);
+  }, []);
+
   const chartFallback = (
-    <div style={{ padding: 12, color: '#999', fontSize: 12 }}>
-      Chart: {rest?.title || chartType}
+    <div
+      style={{
+        padding: 12,
+        color: '#999',
+        fontSize: 12,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: 8,
+      }}
+    >
+      <span>Chart: {rest?.title || chartType}</span>
+      <Button type="link" size="small" onClick={handleRetry}>
+        重新渲染
+      </Button>
     </div>
   );
 

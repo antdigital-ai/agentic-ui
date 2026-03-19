@@ -395,6 +395,7 @@ export const cnLabels = {
   // 图表错误相关
   'chart.renderFailed': '图表渲染失败',
   'chart.renderFailedSubTitle': '图表组件遇到了一个错误，请稍后重试',
+  'chart.retry': '重新渲染',
   // DonutChart 图例相关
   'chart.legend.show': '显示',
   'chart.legend.hide': '隐藏',
@@ -827,6 +828,7 @@ export const enLabels: typeof cnLabels = {
   'chart.renderFailed': 'Chart Rendering Failed',
   'chart.renderFailedSubTitle':
     'The chart component encountered an error, please try again later',
+  'chart.retry': 'Retry',
   // DonutChart legend related
   'chart.legend.show': 'Show',
   'chart.legend.hide': 'Hide',
