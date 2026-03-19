@@ -43,18 +43,28 @@ const STREAM_INCOMPLETE_REGEX = {
   'inline-code': [/^`[^`\r\n]{0,300}$/],
 } as const;
 
+/**
+ * 判断表格是否仍不完整。
+ * 等待 header + separator + 至少一行数据（3 行）后提交。
+ */
 const isTableIncomplete = (markdown: string) => {
   if (markdown.includes('\n\n')) return false;
   const lines = markdown.split('\n');
-  if (lines.length <= 1) return true;
+  // 需要至少 3 行：header | separator | 第一行数据
+  if (lines.length < 3) return true;
   const [header, separator] = lines;
   if (!/^\|.*\|$/.test(header.trim())) return false;
   const columns = separator.trim().split('|').map((c) => c.trim()).filter(Boolean);
-  return columns.every((col, i) =>
+  const isSeparatorValid = columns.every((col, i) =>
     i === columns.length - 1
       ? col === ':' || /^:?-+:?$/.test(col)
       : /^:?-+:?$/.test(col),
   );
+  if (!isSeparatorValid) return false;
+  // separator 完整但还没有数据行
+  if (lines.length <= 2) return true;
+  // 有数据行了，不再缓存
+  return false;
 };
 
 const tokenRecognizerMap: Partial<Record<StreamCacheTokenType, Recognizer>> = {
@@ -88,7 +98,11 @@ const tokenRecognizerMap: Partial<Record<StreamCacheTokenType, Recognizer>> = {
       return listPrefix && rest.startsWith('`') ? listPrefix : null;
     },
   },
-  // Table 不缓存——流式场景下表格边输入边显示
+  [StreamCacheTokenType.Table]: {
+    tokenType: StreamCacheTokenType.Table,
+    isStartOfToken: (md) => md.startsWith('|'),
+    isStreamingValid: isTableIncomplete,
+  },
   [StreamCacheTokenType.InlineCode]: {
     tokenType: StreamCacheTokenType.InlineCode,
     isStartOfToken: (md) => md.startsWith('`'),
