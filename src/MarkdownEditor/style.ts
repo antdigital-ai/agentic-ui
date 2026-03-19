@@ -71,17 +71,23 @@ const genTableStyle = (
       },
 
       table: {
-        borderCollapse: 'collapse',
-        width: '100%',
+        borderCollapse: 'separate',
+        borderSpacing: 0,
+        width: 'max-content',
+        tableLayout: 'fixed',
         margin: '16px 0',
         maxWidth: '100%',
+        position: 'relative',
         fontVariant: 'tabular-nums',
         borderRadius: TABLE_RADIUS,
         border: TABLE_BORDER,
-        overflow: 'hidden',
 
+        // readonly：collapse + overflow: hidden 实现圆角，不影响编辑态 UI
         [`&${tableCls}-readonly-table`]: {
           width: '100%',
+          borderCollapse: 'collapse',
+          tableLayout: 'auto',
+          overflow: 'hidden',
         },
 
         th: {
