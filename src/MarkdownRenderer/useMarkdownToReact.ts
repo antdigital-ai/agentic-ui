@@ -507,7 +507,6 @@ const buildEditorAlignedComponents = (
           children: jsx('table' as any, {
             ...rest,
             className: `${tableCls}-readonly-table`,
-            style: { tableLayout: 'auto', width: '100%' },
             children,
           }),
         }),
@@ -540,21 +539,11 @@ const buildEditorAlignedComponents = (
     },
     th: (props: any) => {
       const { node: _node, children, ...rest } = props;
-      return jsx('th' as any, {
-        ...rest,
-        'data-testid': 'markdown-th',
-        style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children,
-      });
+      return jsx('th' as any, { ...rest, 'data-testid': 'markdown-th', children });
     },
     td: (props: any) => {
       const { node: _node, children, ...rest } = props;
-      return jsx('td' as any, {
-        ...rest,
-        'data-testid': 'markdown-td',
-        style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children,
-      });
+      return jsx('td' as any, { ...rest, 'data-testid': 'markdown-td', children });
     },
 
     // input[type=checkbox]：task list 的 checkbox（兜底，主逻辑在 li 中）
