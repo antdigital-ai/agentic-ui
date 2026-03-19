@@ -26,20 +26,15 @@ const extractText = (children: React.ReactNode): string => {
 };
 
 /**
- * 识别 children 中是否包含非文本节点（如 img/video 等）。
- * 这类节点无法通过纯文本差分可靠动画，需直接透传。
+ * 识别 children 中是否包含 React 元素节点。
+ * 富文本结构（链接、脚注、图片等）在纯文本差分下会丢失结构信息，直接透传更安全。
  */
-const hasNonTextNode = (children: React.ReactNode): boolean => {
+const hasElementNode = (children: React.ReactNode): boolean => {
   if (children === null || children === undefined || typeof children === 'boolean')
     return false;
   if (typeof children === 'string' || typeof children === 'number') return false;
-  if (Array.isArray(children)) return children.some(hasNonTextNode);
-  if (React.isValidElement(children)) {
-    const nestedChildren = children.props?.children;
-    if (nestedChildren === null || nestedChildren === undefined) return true;
-    return hasNonTextNode(nestedChildren);
-  }
-  return true;
+  if (Array.isArray(children)) return children.some(hasElementNode);
+  return React.isValidElement(children);
 };
 
 interface ChunkState {
@@ -64,10 +59,10 @@ const AnimationText = React.memo<AnimationTextProps>(
     const prevTextRef = useRef('');
 
     const text = extractText(children);
-    const hasRichNonTextContent = hasNonTextNode(children);
+    const hasElementContent = hasElementNode(children);
 
     useEffect(() => {
-      if (hasRichNonTextContent) {
+      if (hasElementContent) {
         prevTextRef.current = text;
         return;
       }
@@ -88,7 +83,7 @@ const AnimationText = React.memo<AnimationTextProps>(
         { key: newKey, text: newText, done: false },
       ]);
       prevTextRef.current = text;
-    }, [text, children, hasRichNonTextContent]);
+    }, [text, children, hasElementContent]);
 
     const handleAnimationEnd = (key: string) => {
       setChunks((prev) =>
@@ -115,7 +110,7 @@ const AnimationText = React.memo<AnimationTextProps>(
       [],
     );
 
-    if (hasRichNonTextContent) {
+    if (hasElementContent) {
       return <>{children}</>;
     }
 
