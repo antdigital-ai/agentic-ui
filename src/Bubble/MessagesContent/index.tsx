@@ -15,6 +15,8 @@ import { MarkdownPreview } from './MarkdownPreview';
 import { useMessagesContentStyle } from './style';
 
 export const LOADING_FLAT = '...';
+const THINKING_FALLBACK_TEXT = '思考中...';
+const THINKING_DOT_INDICES = [0, 1, 2] as const;
 
 /**
  * BubbleMessageDisplay 组件 - 聊天气泡消息显示组件
@@ -142,8 +144,33 @@ export const BubbleMessageDisplay: React.FC<
               hashId,
             )}
             data-testid="message-content"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
           >
-            {locale?.['chat.message.thinking'] || '思考中...'}
+            <span
+              className={`${baseChatCls}-messages-content-loading-text`}
+              data-testid="message-thinking-text"
+            >
+              {locale?.['chat.message.thinking'] || THINKING_FALLBACK_TEXT}
+            </span>
+            <span
+              className={classNames(
+                `${baseChatCls}-messages-content-loading-dots`,
+                props.classNames?.bubbleLoadingIconClassName,
+              )}
+              style={props.styles?.bubbleLoadingIconStyle}
+              data-testid="message-thinking-dots"
+              aria-hidden="true"
+            >
+              {THINKING_DOT_INDICES.map((dotIndex) => (
+                <span
+                  key={dotIndex}
+                  className={`${baseChatCls}-messages-content-loading-dot`}
+                  data-testid="message-thinking-dot"
+                />
+              ))}
+            </span>
           </div>,
         );
       }
