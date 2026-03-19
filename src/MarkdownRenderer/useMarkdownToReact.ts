@@ -493,7 +493,7 @@ const buildEditorAlignedComponents = (
         className: `${listCls}-item`,
         'data-be': 'list-item',
         'data-testid': 'markdown-list-item',
-        children,
+        children: wrapAnimation(children),
       });
     },
 
@@ -553,7 +553,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-td',
         style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children,
+        children: wrapAnimation(children),
       });
     },
 
