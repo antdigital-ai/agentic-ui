@@ -9,4 +9,4 @@
 
 - [x] 补回 `table-cell-index` 和 `table-cell-index-spacer` 的 action-buttons 样式
 - [x] 运行表格相关测试确认无回归
-- [ ] 提交、推送并同步更新 PR
+- [x] 提交、推送并同步更新 PR
