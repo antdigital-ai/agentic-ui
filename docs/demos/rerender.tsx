@@ -10,29 +10,54 @@ import { Button, Input, Radio, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { newEnergyFundContent } from './shared/newEnergyFundContent';
 
-const SPEED_CONFIG = {
-  fast: 1,
-  medium: 16,
-  slow: 160,
-} as const;
+type SpeedType = 'block' | 'fast' | 'medium' | 'slow';
 
-type SpeedType = keyof typeof SPEED_CONFIG;
+/**
+ * 将 markdown 按 block（\n\n）分割，保留分隔符
+ */
+const splitBlocks = (text: string): string[] => {
+  const blocks: string[] = [];
+  let current = '';
+  let inFence = false;
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trimStart().startsWith('```') || line.trimStart().startsWith('~~~')) {
+      inFence = !inFence;
+    }
+    current += (current ? '\n' : '') + line;
+    if (
+      !inFence &&
+      line === '' &&
+      i + 1 < lines.length &&
+      lines[i + 1] === ''
+    ) {
+      continue;
+    }
+    if (!inFence && line === '' && current.trim()) {
+      blocks.push(current);
+      current = '';
+    }
+  }
+  if (current) blocks.push(current);
+  return blocks;
+};
 
-// md 逐字符渲染 demo —— 使用 MarkdownRenderer（无 Slate 实例）
+// md 渲染 demo —— 使用 MarkdownRenderer（无 Slate 实例）
 export const RerenderMdDemo = () => {
   const { containerRef } = useAutoScroll();
   const [content, setContent] = useState('');
-  const [speed, setSpeed] = useState<SpeedType>('medium');
+  const [speed, setSpeed] = useState<SpeedType>('fast');
   const [isPaused, setIsPaused] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const pauseRef = useRef(false);
   const currentIndexRef = useRef(0);
-  const speedRef = useRef<number>(SPEED_CONFIG.medium);
+  const speedRef = useRef<SpeedType>('fast');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [restartKey, setRestartKey] = useState(0);
 
   useEffect(() => {
-    speedRef.current = SPEED_CONFIG[speed];
+    speedRef.current = speed;
   }, [speed]);
 
   useEffect(() => {
@@ -63,8 +88,9 @@ export const RerenderMdDemo = () => {
   };
 
   useEffect(() => {
+    const blocks = splitBlocks(newEnergyFundContent);
+    const chars = newEnergyFundContent.split('');
     let md = '';
-    const list = newEnergyFundContent.split('');
     currentIndexRef.current = 0;
     setIsFinished(false);
 
@@ -75,23 +101,42 @@ export const RerenderMdDemo = () => {
     }
 
     const processNext = () => {
-      if (currentIndexRef.current >= list.length) {
-        setIsFinished(true);
-        return;
+      const isBlock = speedRef.current === 'block';
+
+      if (isBlock) {
+        if (currentIndexRef.current >= blocks.length) {
+          setIsFinished(true);
+          return;
+        }
+        if (pauseRef.current) {
+          timeoutRef.current = setTimeout(processNext, 100);
+          return;
+        }
+        md = blocks.slice(0, currentIndexRef.current + 1).join('\n');
+        currentIndexRef.current += 1;
+        timeoutRef.current = setTimeout(() => {
+          setContent(md);
+          processNext();
+        }, 50);
+      } else {
+        if (currentIndexRef.current >= chars.length) {
+          setIsFinished(true);
+          return;
+        }
+        if (pauseRef.current) {
+          timeoutRef.current = setTimeout(processNext, 100);
+          return;
+        }
+        md += chars[currentIndexRef.current];
+        currentIndexRef.current += 1;
+        const delay =
+          speedRef.current === 'fast' ? 1 :
+          speedRef.current === 'medium' ? 16 : 160;
+        timeoutRef.current = setTimeout(() => {
+          setContent(md);
+          processNext();
+        }, delay);
       }
-
-      if (pauseRef.current) {
-        timeoutRef.current = setTimeout(processNext, 100);
-        return;
-      }
-
-      md += list[currentIndexRef.current];
-      currentIndexRef.current += 1;
-
-      timeoutRef.current = setTimeout(() => {
-        setContent(md);
-        processNext();
-      }, speedRef.current);
     };
 
     processNext();
@@ -139,6 +184,7 @@ export const RerenderMdDemo = () => {
             onChange={(e) => setSpeed(e.target.value)}
             buttonStyle="solid"
           >
+            <Radio.Button value="block">逐块</Radio.Button>
             <Radio.Button value="fast">快</Radio.Button>
             <Radio.Button value="medium">中</Radio.Button>
             <Radio.Button value="slow">慢</Radio.Button>
