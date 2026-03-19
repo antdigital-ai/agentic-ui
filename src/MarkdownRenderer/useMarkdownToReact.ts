@@ -944,13 +944,16 @@ export const useMarkdownToReact = (
       for (let i = 0; i < blocks.length; i++) {
         const block = blocks[i];
         const isLast = i === blocks.length - 1;
+        // 用 index + 内容前 64 字符作 key，保持稳定性：
+        // 相同位置 + 相同内容开头 → 相同 key → React 不 unmount
+        const stableKey = `b${i}-${block.slice(0, 64)}`;
 
         if (!isLast) {
           const cached = cache.get(block);
           if (cached && cached.source === block) {
             newCache.set(block, cached);
             elements.push(
-              jsx(Fragment, { children: cached.element, key: i }),
+              jsx(Fragment, { children: cached.element, key: stableKey }),
             );
             continue;
           }
@@ -961,7 +964,7 @@ export const useMarkdownToReact = (
           if (!shouldReparseLastBlock(lastBlockRef.current.source, block)) {
             newCache.set(block, { source: lastBlockRef.current.source, element: lastBlockRef.current.element });
             elements.push(
-              jsx(Fragment, { children: lastBlockRef.current.element, key: i }),
+              jsx(Fragment, { children: lastBlockRef.current.element, key: stableKey }),
             );
             continue;
           }
@@ -972,7 +975,7 @@ export const useMarkdownToReact = (
         newCache.set(block, entry);
         if (isLast) lastBlockRef.current = entry;
         elements.push(
-          jsx(Fragment, { children: element, key: i }),
+          jsx(Fragment, { children: element, key: stableKey }),
         );
       }
 
