@@ -350,6 +350,21 @@ describe('MarkdownRenderer', () => {
     expect(img?.getAttribute('alt')).toBe('alt text');
   });
 
+  it('流式模式下应保留图片节点', () => {
+    const { container } = render(
+      <MarkdownRenderer
+        content="![alt text](https://example.com/image.png)"
+        streaming={true}
+        queueOptions={{ animate: false }}
+      />,
+    );
+
+    const img = container.querySelector('img');
+    expect(img).toBeTruthy();
+    expect(img?.getAttribute('src')).toBe('https://example.com/image.png');
+    expect(img?.getAttribute('alt')).toBe('alt text');
+  });
+
   it('应将 schema 代码块渲染为 SchemaRenderer', () => {
     const schemaJson = JSON.stringify({
       type: 'object',
