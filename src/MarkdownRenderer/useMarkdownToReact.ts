@@ -12,6 +12,7 @@ import React, { useMemo, useRef } from 'react';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
+import { Image } from 'antd';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import {
   convertParagraphToImage,
@@ -574,7 +575,8 @@ const buildEditorAlignedComponents = (
     },
 
     img: (props: any) => {
-      const { node, ...rest } = props;
+      const { node, src, alt, width, height, ...rest } = props;
+      const imgWidth = width ? (Number(width) || width) : 400;
       return jsx('div' as any, {
         'data-be': 'image',
         'data-testid': 'markdown-image',
@@ -595,13 +597,20 @@ const buildEditorAlignedComponents = (
             maxWidth: '100%',
             boxSizing: 'border-box',
           },
+          'data-testid': 'image-container',
           'data-be': 'image-container',
-          children: jsx('img' as any, {
-            ...rest,
+          children: jsx(Image as any, {
+            src,
+            alt: alt || 'image',
+            width: imgWidth,
+            height,
+            preview: { getContainer: () => document.body },
+            referrerPolicy: 'no-referrer',
+            draggable: false,
             style: {
               maxWidth: '100%',
               height: 'auto',
-              borderRadius: 8,
+              display: 'block',
             },
           }),
         }),
