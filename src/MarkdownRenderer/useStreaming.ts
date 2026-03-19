@@ -240,7 +240,11 @@ export const useStreaming = (input: string, enabled: boolean): string => {
       setOutput('');
       return;
     }
-    enabled ? processStreaming(input) : setOutput(input);
+    if (enabled) {
+      processStreaming(input);
+    } else {
+      setOutput(input);
+    }
   }, [input, enabled, processStreaming]);
 
   return output;

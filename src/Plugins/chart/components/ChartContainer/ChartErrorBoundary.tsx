@@ -52,6 +52,9 @@ class ChartErrorBoundary extends React.Component<
   static contextType = I18nContext;
   declare context: React.ContextType<typeof I18nContext>;
 
+  /** 本轮错误是否已自动重试过，用于“自动重试一次” */
+  private _hasAutoRetried = false;
+
   constructor(props: ChartErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -62,6 +65,7 @@ class ChartErrorBoundary extends React.Component<
 
   /** 重试：清除错误状态并递增 key，使 children 销毁后重建 */
   handleRetry = (): void => {
+    this._hasAutoRetried = false;
     this.setState((prev) => ({
       hasError: false,
       retryKey: prev.retryKey + 1,
@@ -87,6 +91,15 @@ class ChartErrorBoundary extends React.Component<
     // 在开发环境下打印错误信息
     if (process.env.NODE_ENV === 'development') {
       console.error('ChartErrorBoundary caught an error:', error);
+    }
+
+    // 自动重试一次：清除错误并递增 key，使 children 销毁后重建
+    if (!this._hasAutoRetried) {
+      this._hasAutoRetried = true;
+      this.setState((prev) => ({
+        hasError: false,
+        retryKey: prev.retryKey + 1,
+      }));
     }
   }
 
