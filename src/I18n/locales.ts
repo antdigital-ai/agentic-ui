@@ -213,7 +213,7 @@ export const cnLabels = {
   'workspace.file.linkCopied': '已复制链接',
   'workspace.file.copyFailed': '复制失败',
   // MarkdownInputField 组件相关
-  'markdownInput.fileSizeExceeded': '文件大小超过 ${maxSize} KB',
+  'markdownInput.fileSizeExceeded': '超过 ${maxSize} KB',
   'markdownInput.maxFileCountExceeded': '最多只能上传 ${maxFileCount} 个文件',
   'markdownInput.minFileCountRequired': '至少需要上传 ${minFileCount} 个文件',
   // 文档信息相关
@@ -638,7 +638,7 @@ export const enLabels: typeof cnLabels = {
   'workspace.file.linkCopied': 'Link copied',
   'workspace.file.copyFailed': 'Copy failed',
   // MarkdownInputField component related
-  'markdownInput.fileSizeExceeded': 'File size exceeds ${maxSize} KB',
+  'markdownInput.fileSizeExceeded': 'Exceeds ${maxSize} KB',
   'markdownInput.maxFileCountExceeded': 'Maximum ${maxFileCount} files allowed',
   'markdownInput.minFileCountRequired':
     'At least ${minFileCount} files required',

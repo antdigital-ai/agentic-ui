@@ -42,27 +42,29 @@ MarkdownEditor 是一个功能强大的 Markdown 编辑器组件，基于 React 
 import React from 'react';
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 
+const initialMarkdown = `# 基础使用示例
+
+这是一段普通段落。支持 **加粗**、*斜体*、\`行内代码\` 等 Markdown 语法。
+
+## 列表与表格
+
+- 列表项一
+- 列表项二
+- 列表项三
+
+| 作品名称   | 在线地址       | 上线日期   |
+| :--------- | :------------- | :--------: |
+| 逍遥自在轩 | [niceshare.site](https://niceshare.site) | 2024-04-26 |
+| 玉桃文飨轩 | [share.lovejade.cn](https://share.lovejade.cn) | 2022-08-26 |
+| 晚晴幽草轩 | [jeffjade.com](https://www.jeffjade.com) | 2014-09-20 |
+`;
+
 export default () => {
   return (
     <MarkdownEditor
-      initValue={`# 高级配置示例 
-4 Do not wear yourself out to get rich;  
-Stop and show understanding.
-5 You will fix your eyes on wealth, and it is no more,  
-For it will surely sprout wings and fly off to the sky like an eagle
- \n * 数据表1 \n * 数据表二 8. 绘制表格
-
-| 作品名称        | 在线地址   |  上线日期  |
-| :--------  | :-----  | :----:  |
-| 逍遥自在轩 | [https://niceshare.site](https://niceshare.site/?ref=markdown.lovejade.cn) |2024-04-26|
-| 玉桃文飨轩 | [https://share.lovejade.cn](https://share.lovejade.cn/?ref=markdown.lovejade.cn) |2022-08-26|
-| 缘知随心庭 | [https://fine.niceshare.site](https://fine.niceshare.site/?ref=markdown.lovejade.cn) |2022-02-26|
-| 静轩之别苑 | [http://quickapp.lovejade.cn](http://quickapp.lovejade.cn/?ref=markdown.lovejade.cn) |2019-01-12|
-| 晚晴幽草轩 | [https://www.jeffjade.com](https://www.jeffjade.com/?ref=markdown.lovejade.cn) |2014-09-20|
-
----`}
+      initValue={initialMarkdown}
       height="400px"
-      onChange={(value, schema) => {
+      onChange={(value) => {
         console.log('内容变化:', value);
       }}
     />

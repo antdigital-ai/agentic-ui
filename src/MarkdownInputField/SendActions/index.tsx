@@ -43,6 +43,17 @@ export interface SendActionsProps {
   /** 文件上传是否完成 */
   fileUploadDone?: boolean;
 
+  /** 文件上传状态 */
+  fileUploadStatus?: 'uploading' | 'done' | 'error';
+
+  /** 文件上传状态统计 */
+  fileUploadSummary?: {
+    totalCount: number;
+    doneCount: number;
+    uploadingCount: number;
+    errorCount: number;
+  };
+
   /** 是否正在录音 */
   recording?: boolean;
 
@@ -105,6 +116,8 @@ export const SendActions: React.FC<SendActionsProps> = ({
   typing,
   isLoading,
   fileUploadDone = true,
+  fileUploadStatus = fileUploadDone ? 'done' : 'uploading',
+  fileUploadSummary,
   recording = false,
   collapseSendActions = false,
   allowEmptySubmit = false,
@@ -129,7 +142,6 @@ export const SendActions: React.FC<SendActionsProps> = ({
     '()',
   ].filter(Boolean).length;
   const { locale } = useContext(I18nContext);
-
   /**
    * 默认发送操作按钮
    */
@@ -226,7 +238,8 @@ export const SendActions: React.FC<SendActionsProps> = ({
           onStopRecording,
           onSend,
           onStop,
-          fileUploadStatus: fileUploadDone ? 'done' : 'uploading',
+          fileUploadStatus,
+          fileUploadSummary,
         },
         defaultActions,
       )

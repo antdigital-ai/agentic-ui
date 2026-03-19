@@ -78,18 +78,19 @@ export const FileMapViewItem: React.FC<{
       ? fileName.slice(lastDotIndex + 1)
       : '';
 
-  // 有 status 但无 url/previewUrl：文件内容未拿到，展示大小与格式占位块
-  if (
-    file.status !== undefined &&
-    file.status !== null &&
-    !file.url &&
-    !file.previewUrl
-  ) {
+  // 有 status 但无 url/previewUrl：文件内容未拿到，展示大小与格式占位块（loading 状态除外）
+  if (isFileMetaPlaceholderState(file)) {
     return <FileMetaPlaceholder file={file} />;
   }
   return (
     <Tooltip
-      title={<div>{locale?.clickToPreview}</div>}
+      title={
+        file.status === 'error' && file.errorMessage ? (
+          <div>{file.errorMessage}</div>
+        ) : (
+          <div>{locale?.clickToPreview}</div>
+        )
+      }
       placement="topLeft"
       arrow={false}
     >
@@ -151,14 +152,26 @@ export const FileMapViewItem: React.FC<{
               props.hashId,
             )}
           >
-            <span
-              className={classNames(
-                `${props.prefixCls}-file-name-extension`,
-                props.hashId,
-              )}
-            >
-              {displayExtension}
-            </span>
+            {file.status === 'error' && file.errorMessage ? (
+              <span
+                className={classNames(
+                  `${props.prefixCls}-file-error-msg`,
+                  props.hashId,
+                )}
+                style={{ color: 'var(--color-red-text-secondary)' }}
+              >
+                {file.errorMessage}
+              </span>
+            ) : (
+              <>
+                <span
+                  className={classNames(
+                    `${props.prefixCls}-file-name-extension`,
+                    props.hashId,
+                  )}
+                >
+                  {displayExtension}
+                </span>
             <span
               className={classNames(
                 `${props.prefixCls}-separator`,
@@ -188,6 +201,8 @@ export const FileMapViewItem: React.FC<{
                 ? dayjs(file?.lastModified).format('HH:mm')
                 : ''}
             </div>
+              </>
+            )}
           </div>
         </div>
 

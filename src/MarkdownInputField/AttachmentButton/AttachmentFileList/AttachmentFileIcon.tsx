@@ -200,8 +200,8 @@ export const AttachmentFileIcon: React.FC<{
 }> = (props) => {
   const { file, className } = props;
 
-  // 上传中状态
-  if (file.status === 'uploading') {
+  // 上传中状态（兼容 pending）
+  if (file.status === 'uploading' || file.status === 'pending') {
     return <FileUploadingSpin />;
   }
 

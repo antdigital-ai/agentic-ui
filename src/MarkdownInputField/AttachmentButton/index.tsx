@@ -89,7 +89,7 @@ const DEFAULT_MESSAGES = {
   uploadFailed: 'Upload failed',
   maxFileCountExceeded: (count: number) => `最多只能上传 ${count} 个文件`,
   minFileCountRequired: (count: number) => `至少需要上传 ${count} 个文件`,
-  fileSizeExceeded: (size: number) => `文件大小超过 ${size} KB`,
+  fileSizeExceeded: (size: number) => `超过 ${size} KB`,
 };
 
 const waitTime = (ms: number) =>
@@ -190,6 +190,7 @@ const handleUploadError = (
   props: UploadProps,
 ) => {
   file.status = 'error';
+  if (errorMsg !== null) file.errorMessage = errorMsg;
   updateFileMap(map, file, props.onFileMapChange);
 };
 
@@ -202,6 +203,16 @@ const processFile = async (
   await waitTime(WAIT_TIME_MS);
 
   if (!validateFileSize(file, props)) {
+    const maxSizeKb = Math.round((props.maxFileSize || 0) / 1024);
+    const raw = getLocaleMessage(
+      props.locale,
+      'markdownInput.fileSizeExceeded',
+      DEFAULT_MESSAGES.fileSizeExceeded(maxSizeKb),
+    );
+    file.errorMessage = raw.includes('${maxSize}')
+      ? raw.replace(/\$\{maxSize\}/g, String(maxSizeKb))
+      : raw;
+    file.errorCode = 'FILE_SIZE_EXCEEDED';
     file.status = 'error';
     updateFileMap(map, file, props.onFileMapChange);
     return;

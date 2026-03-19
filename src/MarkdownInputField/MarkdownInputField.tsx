@@ -166,6 +166,8 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   // 文件上传管理
   const {
     fileUploadDone,
+    fileUploadStatus,
+    fileUploadSummary,
     supportedFormat,
     uploadImage,
     updateAttachmentFiles,
@@ -250,6 +252,8 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     setFileMap,
     supportedFormat,
     fileUploadDone,
+    fileUploadStatus,
+    fileUploadSummary,
     recording,
     isLoading,
     collapseSendActions,
@@ -445,7 +449,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                     isHover={isHover}
                     isLoading={isLoading}
                     disabled={props.disabled}
-                    fileUploadStatus={fileUploadDone ? 'done' : 'uploading'}
+                    fileUploadStatus={fileUploadStatus}
                     refinePrompt={props.refinePrompt}
                     editorRef={markdownEditorRef}
                     onValueChange={(text) => {
@@ -486,7 +490,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   ...props,
                   isHover,
                   isLoading,
-                  fileUploadStatus: fileUploadDone ? 'done' : 'uploading',
+                  fileUploadStatus,
                 })}
               </div>
               {sendActionsNode}
