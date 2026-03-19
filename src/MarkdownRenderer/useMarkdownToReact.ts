@@ -890,6 +890,8 @@ interface UseMarkdownToReactOptions {
     openInNewTab?: boolean;
     onClick?: (url?: string) => boolean | void;
   };
+  /** 是否处于流式状态，用于最后一个块的打字动画 */
+  streaming?: boolean;
 }
 
 /**
@@ -1066,7 +1068,17 @@ export const useMarkdownToReact = (
         const entry = { source: block, element };
         newCache.set(block, entry);
         if (isLast) lastBlockRef.current = entry;
-        elements.push(jsx(Fragment, { children: element }, stableKey));
+        if (isLast && options?.streaming) {
+          elements.push(
+            jsx('div' as any, {
+              className: `${prefixCls}-streaming-block`,
+              key: stableKey,
+              children: element,
+            }),
+          );
+        } else {
+          elements.push(jsx(Fragment, { children: element }, stableKey));
+        }
       }
 
       blockCacheRef.current = newCache;
@@ -1075,7 +1087,7 @@ export const useMarkdownToReact = (
       console.error('Failed to render markdown:', error);
       return null;
     }
-  }, [content, processor, components]);
+  }, [content, processor, components, options?.streaming]);
 };
 
 /**

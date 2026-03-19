@@ -207,13 +207,14 @@ const InternalMarkdownRenderer = forwardRef<
     };
   }, [pluginComponents, apaasifyRender]);
 
-  const reactContent = useMarkdownToReact(displayedContent, {
-    remarkPlugins,
-    htmlConfig,
-    components,
-    prefixCls,
-    linkConfig,
-  });
+    const reactContent = useMarkdownToReact(displayedContent, {
+      remarkPlugins,
+      htmlConfig,
+      components,
+      prefixCls,
+      linkConfig,
+      streaming,
+    });
 
   return wrapVarSSR(
     wrapSSR(
