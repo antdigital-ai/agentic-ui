@@ -7,47 +7,11 @@ import {
   useEditorStyleRegister,
 } from '../Hooks/useStyle';
 
-// ── Table 样式提取 ──────────────────────────────────────────────────────────
+// ── Table ──────────────────────────────────────────────────────────────────
 const TABLE_BORDER = '1px solid var(--agentic-ui-table-border-color, #E7E9E8)';
 const TABLE_RADIUS = 'var(--agentic-ui-table-border-radius, 8px)';
-const TABLE_HOVER_BG =
-  'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0,0,0,0.04)), var(--agentic-ui-table-hover-bg, rgba(0,0,0,0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))';
-
-const NO_SPAN = ':not([colspan]):not([rowspan])';
-
-/** 生成四角圆角选择器 */
-const cornerRadius = (
-  rowPos: 'first-child' | 'last-child',
-  cellPos: 'first-child' | 'last-child',
-  radius: string,
-  property: string,
-) => {
-  const selector = [
-    `tr:${rowPos} th:${cellPos}${NO_SPAN}`,
-    `tr:${rowPos} td:${cellPos}${NO_SPAN}`,
-  ].join(', ');
-  return { [selector]: { [property]: radius } };
-};
-
-/** 合并单元格圆角（colspan/rowspan） */
-const spanCornerRadius = (
-  rowPos: string,
-  cellPos: string,
-  radius: string,
-  property: string,
-) => {
-  const selector = [
-    `tr:${rowPos} th[colspan]:${cellPos}`,
-    `tr:${rowPos} td[colspan]:${cellPos}`,
-    `tr:${rowPos} th[rowspan]:${cellPos}`,
-    `tr:${rowPos} td[rowspan]:${cellPos}`,
-  ].join(', ');
-  return { [selector]: { [property]: radius } };
-};
-
-/** th/td 共用的单元格基础样式 */
-const cellBase = {
-  verticalAlign: 'top',
+const TABLE_CELL = {
+  verticalAlign: 'top' as const,
   padding: 'var(--agentic-ui-table-cell-padding, 16px 12px)',
   textAlign: 'left' as const,
   lineHeight: '24px',
@@ -59,59 +23,6 @@ const cellBase = {
   textOverflow: 'ellipsis' as const,
   zIndex: 1,
   background: 'inherit',
-};
-
-const ACTION_BUTTON_BASE = {
-  padding: '2px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 12,
-  border: TABLE_BORDER,
-  width: '20px',
-  height: '20px',
-  cursor: 'pointer',
-  backgroundPosition: '50%',
-  backgroundRepeat: 'no-repeat',
-  transition:
-    'color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
-  borderRadius: '4px',
-  background: 'var(--color-gray-bg-card-white)',
-  boxShadow: 'var(--shadow-border-base)',
-  color: 'var(--color-gray-text-secondary)',
-  '&:hover': { backgroundColor: '#FFF', boxShadow: 'var(--shadow-control-lg)' },
-};
-
-const genIndexActionButtons = (
-  token: ChatTokenType,
-  prefix: string,
-): Record<string, CSSInterpolation> => {
-  const cls = `${token.componentCls}-${prefix}`;
-  const isSpacer = prefix.includes('spacer');
-  return {
-    [`${cls}-action-buttons`]: {
-      position: 'absolute',
-      ...(isSpacer
-        ? { top: '-28px', right: '50%', transform: 'translateX(50%)', zIndex: 10, display: 'flex' }
-        : { top: '4px', left: '-24px', zIndex: 1000, flexDirection: 'column', display: 'none' }),
-      alignItems: 'center',
-      gap: '2px',
-      opacity: 0,
-      transition: 'opacity 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
-    },
-    [`${cls}-action-buttons-visible`]: { opacity: 1, ...(isSpacer ? {} : { display: 'flex' }) },
-    [`${cls}-action-button`]: { ...ACTION_BUTTON_BASE, ...(isSpacer ? {} : { zIndex: 1000 }) },
-    [`${cls}-delete-icon`]: { '&:hover': { color: '#ff4d4f' } },
-    ...(isSpacer
-      ? {
-          [`${cls}-insert-column-before`]: { '&:hover': { color: '#52c41a' } },
-          [`${cls}-insert-column-after`]: { '&:hover': { color: '#52c41a' } },
-        }
-      : {
-          [`${cls}-insert-row-before`]: { '&:hover': { color: '#52c41a' } },
-          [`${cls}-insert-row-after`]: { '&:hover': { color: '#52c41a' } },
-        }),
-  };
 };
 
 const genTableStyle = (
@@ -129,10 +40,7 @@ const genTableStyle = (
       minWidth: 0,
       position: 'relative',
 
-      // 容器
       '&-container': {
-        display: 'flex',
-        gap: 1,
         maxWidth: '100%',
         minWidth: 0,
         outline: 'none',
@@ -145,8 +53,6 @@ const genTableStyle = (
         },
       },
       '&-editor-table': { marginTop: '1em' },
-
-      // 操作栏（全屏、复制）
       '&-readonly-table-actions': {
         opacity: 0,
         position: 'absolute',
@@ -164,75 +70,41 @@ const genTableStyle = (
         transition: 'all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)',
       },
 
-      // ── table 元素 ──
       table: {
-        borderCollapse: 'separate',
-        borderSpacing: 0,
-        width: 'max-content',
-        tableLayout: 'fixed',
+        borderCollapse: 'collapse',
+        width: '100%',
         margin: '16px 0',
         maxWidth: '100%',
-        position: 'relative',
         fontVariant: 'tabular-nums',
         borderRadius: TABLE_RADIUS,
         border: TABLE_BORDER,
+        overflow: 'hidden',
 
         [`&${tableCls}-readonly-table`]: {
           width: '100%',
-          minWidth: 'max-content',
         },
 
-        // 表头
         th: {
-          ...cellBase,
+          ...TABLE_CELL,
           backgroundColor: 'var(--agentic-ui-table-header-bg, #f7f7f9)',
           borderBottom: TABLE_BORDER,
-          borderTop: 'none',
           fontWeight: 600,
-          textWrap: 'nowrap',
         },
 
-        // 数据单元格
         td: {
-          ...cellBase,
-          position: 'relative',
+          ...TABLE_CELL,
+          borderBottom: TABLE_BORDER,
+          borderLeft: TABLE_BORDER,
           'div[data-be="paragraph"]': { margin: 0, textWrap: 'auto' },
         },
 
-        // 数据行
-        tr: {
-          background: 'inherit',
-          '&:first-child td': { borderTop: 'none' },
-          td: {
-            borderBottom: TABLE_BORDER,
-            borderLeft: TABLE_BORDER,
-            '&:first-child': { fontSize: '1em', lineHeight: '24px', fontWeight: 600 },
-          },
-          'td:first-child': { borderLeft: 'none' },
-          '&:last-child td': { borderBottom: 'none' },
+        'td:first-child': { borderLeft: 'none' },
+        'tr:last-child td': { borderBottom: 'none' },
+        'tr td:first-child': { fontWeight: 600 },
+
+        'tbody tr:hover': {
+          backgroundColor: 'var(--agentic-ui-table-hover-bg, rgba(0,0,0,0.04))',
         },
-
-        'tbody tr:hover': { background: TABLE_HOVER_BG },
-
-        // 默认无圆角
-        'th, td': { borderRadius: '0' },
-
-        // 四角圆角
-        ...cornerRadius('first-child', 'first-child', TABLE_RADIUS, 'borderTopLeftRadius'),
-        ...cornerRadius('first-child', 'last-child', TABLE_RADIUS, 'borderTopRightRadius'),
-        ...cornerRadius('last-child', 'first-child', TABLE_RADIUS, 'borderBottomLeftRadius'),
-        ...cornerRadius('last-child', 'last-child', TABLE_RADIUS, 'borderBottomRightRadius'),
-
-        // 合并单元格圆角
-        ...spanCornerRadius('first-child', 'first-child', TABLE_RADIUS, 'borderTopLeftRadius'),
-        ...spanCornerRadius('first-child', 'last-child', TABLE_RADIUS, 'borderTopRightRadius'),
-        ...spanCornerRadius('last-child', 'first-child', TABLE_RADIUS, 'borderBottomLeftRadius'),
-        ...spanCornerRadius('last-child', 'last-child', TABLE_RADIUS, 'borderBottomRightRadius'),
-
-        'tr:first-child:last-child th[colspan]:first-child:last-child, tr:first-child:last-child td[colspan]:first-child:last-child':
-          { borderRadius: TABLE_RADIUS },
-        'th[rowspan]:first-child:last-child, td[rowspan]:first-child:last-child':
-          { borderTopLeftRadius: TABLE_RADIUS, borderBottomLeftRadius: TABLE_RADIUS },
 
         [`@media (max-width: ${mobileBreakpoint})`]: {
           'th, td': { padding: mobilePadding },
@@ -240,7 +112,6 @@ const genTableStyle = (
       },
     },
 
-    // 编辑态单元格
     [`${token.componentCls}-table-td`]: {
       padding: '8px',
       verticalAlign: 'middle',
@@ -252,41 +123,25 @@ const genTableStyle = (
       '&[data-select="true"]:after': {
         content: '" "',
         position: 'absolute',
-        top: '0',
-        left: '0',
-        right: '0',
-        bottom: '0',
+        top: 0, left: 0, right: 0, bottom: 0,
         zIndex: 2,
         pointerEvents: 'none',
         backgroundColor: 'var(--color-primary-control-fill-secondary-hover)',
       },
       [`@media (max-width: ${mobileBreakpoint})`]: { padding: '2px' },
     },
-
-    // 行索引
     [`${token.componentCls}-table-row-index`]: { display: 'table-row' },
-
-    // 列索引（行头操作区）
     [`${token.componentCls}-table-cell-index`]: {
-      width: '12px',
-      maxWidth: 12,
-      padding: 0,
-      position: 'relative',
-      verticalAlign: 'middle',
-      contentEditable: false,
+      width: 12, maxWidth: 12, padding: 0,
+      position: 'relative', verticalAlign: 'middle',
       backgroundColor: 'var(--color-gray-control-fill-secondary)',
       '&:hover': { backgroundColor: 'var(--color-gray-control-fill-secondary-hover)' },
     },
-    ...genIndexActionButtons(token, 'table-cell-index'),
-
-    // 列索引 Spacer（列头操作区）
     [`${token.componentCls}-table-cell-index-spacer`]: {
-      contentEditable: false,
       cursor: 'pointer',
       backgroundColor: 'var(--color-gray-control-fill-secondary)',
       '&:hover': { backgroundColor: 'var(--color-gray-control-fill-secondary-hover)' },
     },
-    ...genIndexActionButtons(token, 'table-cell-index-spacer'),
   };
 };
 
