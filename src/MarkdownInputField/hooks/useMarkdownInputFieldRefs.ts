@@ -28,6 +28,7 @@ export const useMarkdownInputFieldRefs = (
   }, [props.value]);
 
   // 通过 ref 暴露编辑器实例，包装 store.setMDContent 以同步 value 状态，确保发送按钮正确响应
+  // 使用 Proxy 包装 store，仅覆盖 setMDContent，保留 getMDContent、clearContent、focus 等全部方法
   useImperativeHandle(
     props.inputRef,
     (): MarkdownEditorInstance | undefined => {
@@ -52,12 +53,18 @@ export const useMarkdownInputFieldRefs = (
         } as unknown as MarkdownEditorInstance;
       }
 
+      const storeProxy = new Proxy(editor.store, {
+        get(target, prop) {
+          if (prop === 'setMDContent') {
+            return syncValueAndSetMDContent;
+          }
+          return Reflect.get(target, prop);
+        },
+      });
+
       return {
         ...editor,
-        store: {
-          ...editor.store,
-          setMDContent: syncValueAndSetMDContent,
-        },
+        store: storeProxy,
       } as MarkdownEditorInstance;
     },
     [props.setValue],
