@@ -1038,7 +1038,7 @@ export const useMarkdownToReact = (
           if (cached && cached.source === block) {
             newCache.set(block, cached);
             elements.push(
-              jsx(Fragment, { children: cached.element, key: stableKey }),
+              jsx(Fragment, { children: cached.element }, stableKey),
             );
             continue;
           }
@@ -1052,10 +1052,11 @@ export const useMarkdownToReact = (
               element: lastBlockRef.current.element,
             });
             elements.push(
-              jsx(Fragment, {
-                children: lastBlockRef.current.element,
-                key: stableKey,
-              }),
+              jsx(
+                Fragment,
+                { children: lastBlockRef.current.element },
+                stableKey,
+              ),
             );
             continue;
           }
@@ -1065,7 +1066,7 @@ export const useMarkdownToReact = (
         const entry = { source: block, element };
         newCache.set(block, entry);
         if (isLast) lastBlockRef.current = entry;
-        elements.push(jsx(Fragment, { children: element, key: stableKey }));
+        elements.push(jsx(Fragment, { children: element }, stableKey));
       }
 
       blockCacheRef.current = newCache;

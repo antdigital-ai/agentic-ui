@@ -82,10 +82,9 @@ const genTableStyle = (
         borderRadius: TABLE_RADIUS,
         border: TABLE_BORDER,
 
-        // readonly：collapse + overflow: hidden 实现圆角，不影响编辑态 UI
+        // readonly：overflow: hidden，不影响编辑态 UI
         [`&${tableCls}-readonly-table`]: {
           width: '100%',
-          borderCollapse: 'collapse',
           tableLayout: 'auto',
           overflow: 'hidden',
           border: TABLE_BORDER,

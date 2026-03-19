@@ -112,9 +112,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-empty': {
         textAlign: 'center',
         color: '#6B7280',
-        backgroundColor: '#fff',
-        borderRadius: '12px',
-        border: '1px solid #e1e5e9',
         padding: '0.5rem',
         position: 'relative',
         zIndex: 1,
