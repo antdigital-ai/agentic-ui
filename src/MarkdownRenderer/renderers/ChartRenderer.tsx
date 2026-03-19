@@ -1,6 +1,7 @@
 import { ConfigProvider } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { ChartRender } from '../../Plugins/chart/ChartRender';
 import { Loading } from '../../Components/Loading';
 import type { RendererBlockProps } from '../types';
@@ -129,12 +130,28 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
             );
           }
 
-          const chartDataItems = dataSource.map((item: any) => ({
-            ...item,
-            column_list: Object.keys(item),
-          }));
+          const chartDataItems = dataSource
+            .map((item: any) => {
+              const { chartType: _ct, ...rowData } = item;
+              const row: Record<string, any> = { ...rowData, column_list: Object.keys(rowData) };
+              if (x && row[x] !== undefined) {
+                const num = Number(row[x]);
+                if (!isNaN(num)) row[x] = num;
+              }
+              if (y && row[y] !== undefined) {
+                const num = Number(row[y]);
+                if (!isNaN(num)) row[y] = num;
+              }
+              return row;
+            });
 
           const height = Math.min(400, containerRef.current?.clientWidth || 400);
+
+          const chartFallback = (
+            <div style={{ padding: 12, color: '#999', fontSize: 12 }}>
+              Chart: {rest?.title || chartType}
+            </div>
+          );
 
           return (
             <div
@@ -148,25 +165,27 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
                 userSelect: 'none',
               }}
             >
-              <ChartRender
-                chartType={chartType}
-                chartData={chartDataItems}
-                columnLength={columnLength}
-                onColumnLengthChange={setColumnLength}
-                title={rest?.title}
-                dataTime={rest?.dataTime}
-                groupBy={rest?.groupBy}
-                filterBy={rest?.filterBy}
-                colorLegend={rest?.colorLegend}
-                config={{
-                  height,
-                  x,
-                  y,
-                  columns,
-                  index,
-                  rest,
-                }}
-              />
+              <ErrorBoundary fallback={chartFallback}>
+                <ChartRender
+                  chartType={chartType}
+                  chartData={chartDataItems}
+                  columnLength={columnLength}
+                  onColumnLengthChange={setColumnLength}
+                  title={rest?.title}
+                  dataTime={rest?.dataTime}
+                  groupBy={rest?.groupBy}
+                  filterBy={rest?.filterBy}
+                  colorLegend={rest?.colorLegend}
+                  config={{
+                    height,
+                    x,
+                    y,
+                    columns,
+                    index,
+                    rest,
+                  }}
+                />
+              </ErrorBoundary>
             </div>
           );
         })}

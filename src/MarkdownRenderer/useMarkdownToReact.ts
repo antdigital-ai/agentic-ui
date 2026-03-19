@@ -55,14 +55,14 @@ const extractTableData = (tableNode: any): {
 
   const columns = headerRow.children.map((cell: any) => {
     const text = extractCellText(cell);
-    return { title: text, dataIndex: text };
+    return { title: text, dataIndex: text, key: text };
   });
 
   const dataSource: Record<string, any>[] = [];
   for (let i = 1; i < tableNode.children.length; i++) {
     const row = tableNode.children[i];
     if (!row?.children) continue;
-    const record: Record<string, any> = {};
+    const record: Record<string, any> = { key: `row-${i}` };
     row.children.forEach((cell: any, j: number) => {
       if (j < columns.length) {
         const val = extractCellText(cell);
