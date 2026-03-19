@@ -441,7 +441,7 @@ const buildEditorAlignedComponents = (
       return jsx('th' as any, {
         ...rest,
         'data-testid': 'markdown-th',
-        style: { whiteSpace: 'normal', width: 'auto' },
+        style: { whiteSpace: 'normal', maxWidth: '20%' },
         children,
       });
     },
@@ -450,7 +450,7 @@ const buildEditorAlignedComponents = (
       return jsx('td' as any, {
         ...rest,
         'data-testid': 'markdown-td',
-        style: { whiteSpace: 'normal', width: 'auto' },
+        style: { whiteSpace: 'normal', maxWidth: '20%' },
         children,
       });
     },
