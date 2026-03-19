@@ -196,6 +196,15 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
       linkConfig,
     });
 
+    const rootStyle: React.CSSProperties = {
+      // 提供间距 CSS 变量回退值，防止宿主未定义时间距异常
+      '--margin-2x': 'var(--margin-2x, 8px)',
+      '--margin-4x': 'var(--margin-4x, 16px)',
+      '--margin-8x': 'var(--margin-8x, 24px)',
+      '--padding-4x': 'var(--padding-4x, 16px)',
+      ...style,
+    } as React.CSSProperties;
+
     return wrapSSR(
       wrapContentSSR(
         <div
@@ -206,7 +215,7 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
             hashId,
             className,
           )}
-          style={style}
+          style={rootStyle}
         >
           <div className={clsx(`${prefixCls}-container`, hashId)}>
             <div className={clsx(contentCls, hashId)}>
