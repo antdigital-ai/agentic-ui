@@ -21,10 +21,11 @@ export const useRendererVarStyle = (prefixCls: string) => {
         '--padding-5x': '20px',
       },
 
-      // 流式文字淡入动画（仅 opacity，GPU composited，不卡顿）
-      '@keyframes markdownRendererFadeIn': {
-        from: { opacity: 0, filter: 'blur(1px)', transform: 'translateY(2px)' },
-        to: { opacity: 1, filter: 'blur(0px)', transform: 'translateY(0px)' },
+      // 流式文字淡入动画（opacity + translateY，GPU 硬件加速，清爽流派）
+      // 仅使用 opacity 和 transform，避免 blur 带来的重绘开销
+      '@keyframes markdownRendererSlideFadeIn': {
+        from: { opacity: 0, transform: 'translateY(4px)' },
+        to: { opacity: 1, transform: 'translateY(0)' },
       },
     };
   });
