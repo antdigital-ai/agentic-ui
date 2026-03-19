@@ -337,7 +337,7 @@ export const cnLabels = {
   'input.openGallery': '打开相册',
   'input.openFile': '打开文件',
   'input.supportedFormatMessage':
-    '支持上传文件，每个文件不超过 ${maxSize}，支持 ${extensions}等格式。',
+    '每个文件不超过 ${maxSize}，支持 ${extensions}等格式。',
   'input.sendButtonTooltip.send': '按 Enter 键发送',
   'input.sendButtonTooltip.newline': '按 Shift+Enter 键换行',
   'input.sendButtonTooltip.send.mod': '按 Cmd/Ctrl+Enter 键发送',

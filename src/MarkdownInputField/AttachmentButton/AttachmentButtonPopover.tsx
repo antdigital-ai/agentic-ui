@@ -82,7 +82,7 @@ export const SupportedFileFormats = {
 };
 
 const DEFAULT_FORMAT_MESSAGE =
-  '支持上传文件，每个文件不超过 ${maxSize}，支持 ${extensions}等格式。';
+  '每个文件不超过 ${maxSize}，支持 ${extensions}等格式。';
 
 const buildFormatMessage = (
   format: SupportedFormat,
