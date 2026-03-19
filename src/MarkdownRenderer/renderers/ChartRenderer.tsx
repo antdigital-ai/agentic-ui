@@ -46,6 +46,100 @@ const parseChartData = (code: string): ChartData | null => {
   }
 };
 
+/** 图表渲染失败时用相同 props 重试一次（销毁再重建） */
+const ChartWithRetry: React.FC<{
+  index: number;
+  columnLength: number;
+  setColumnLength: (n: number) => void;
+  chartType: string;
+  chartDataItems: Record<string, any>[];
+  rest: Record<string, any>;
+  height: number;
+  x?: string;
+  y?: string;
+  columns: { title: string; dataIndex: string }[];
+}> = (props) => {
+  const {
+    index,
+    columnLength,
+    setColumnLength,
+    chartType,
+    chartDataItems,
+    rest,
+    height,
+    x,
+    y,
+    columns,
+  } = props;
+  const [retryKey, setRetryKey] = useState(0);
+
+  const handleChartError = React.useCallback(
+    (error: Error, info: React.ErrorInfo) => {
+      console.error('[MarkdownRenderer ChartBlockRenderer] 渲染失败:', {
+        chartType,
+        title: rest?.title,
+        x,
+        y,
+        dataSourceLength: chartDataItems.length,
+        columnsLength: columns.length,
+        error: error.message,
+        stack: error.stack,
+        componentStack: info.componentStack,
+      });
+      setRetryKey((k) => (k === 0 ? 1 : k));
+    },
+    [chartType, rest?.title, x, y, chartDataItems.length, columns.length],
+  );
+
+  const chartFallback = (
+    <div style={{ padding: 12, color: '#999', fontSize: 12 }}>
+      Chart: {rest?.title || chartType}
+    </div>
+  );
+
+  return (
+    <div
+      style={{
+        margin: 'auto',
+        minWidth: 0,
+        width:
+          columnLength === 1
+            ? '100%'
+            : `calc(${100 / columnLength}% - 8px)`,
+        maxWidth: '100%',
+        flex: 1,
+        userSelect: 'none',
+      }}
+    >
+      <ErrorBoundary
+        key={retryKey}
+        fallback={chartFallback}
+        onError={handleChartError}
+      >
+        <ChartRender
+          chartType={chartType}
+          chartData={chartDataItems}
+          columnLength={columnLength}
+          onColumnLengthChange={setColumnLength}
+          title={rest?.title}
+          dataTime={rest?.dataTime}
+          groupBy={rest?.groupBy}
+          filterBy={rest?.filterBy}
+          colorLegend={rest?.colorLegend}
+          config={{
+            height,
+            x,
+            y,
+            columns,
+            index,
+            rest,
+          }}
+        />
+      </ErrorBoundary>
+    </div>
+  );
+};
+
 /**
  * 图表渲染器——复用 MarkdownEditor 的 ChartRender 组件。
  *
@@ -176,69 +270,20 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
               containerRef.current?.clientWidth || 400,
             );
 
-            const handleChartError = (error: Error, info: React.ErrorInfo) => {
-              console.error('[MarkdownRenderer ChartBlockRenderer] 渲染失败:', {
-                chartType,
-                title: rest?.title,
-                x,
-                y,
-                groupBy: rest?.groupBy,
-                colorLegend: rest?.colorLegend,
-                filterBy: rest?.filterBy,
-                dataSourceLength: chartDataItems.length,
-                columnsLength: columns.length,
-                error: error.message,
-                stack: error.stack,
-                componentStack: info.componentStack,
-              });
-            };
-
-            const chartFallback = (
-              <div style={{ padding: 12, color: '#999', fontSize: 12 }}>
-                Chart: {rest?.title || chartType}
-              </div>
-            );
-
             return (
-              <div
+              <ChartWithRetry
                 key={index}
-                style={{
-                  margin: 'auto',
-                  minWidth: 0,
-                  width:
-                    columnLength === 1
-                      ? '100%'
-                      : `calc(${100 / columnLength}% - 8px)`,
-                  maxWidth: '100%',
-                  flex: 1,
-                  userSelect: 'none',
-                }}
-              >
-                <ErrorBoundary
-                  fallback={chartFallback}
-                  onError={handleChartError}
-                >
-                  <ChartRender
-                    chartType={chartType}
-                    chartData={chartDataItems}
-                    columnLength={columnLength}
-                    onColumnLengthChange={setColumnLength}
-                    title={rest?.title}
-                    dataTime={rest?.dataTime}
-                    groupBy={rest?.groupBy}
-                    filterBy={rest?.filterBy}
-                    colorLegend={rest?.colorLegend}
-                    config={{
-                      height,
-                      x,
-                      y,
-                      columns,
-                      index,
-                      rest,
-                    }}
-                  />
-                </ErrorBoundary>
-              </div>
+                index={index}
+                columnLength={columnLength}
+                setColumnLength={setColumnLength}
+                chartType={chartType}
+                chartDataItems={chartDataItems}
+                rest={rest}
+                height={height}
+                x={x}
+                y={y}
+                columns={columns}
+              />
             );
           })}
         </div>
