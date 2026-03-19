@@ -224,7 +224,7 @@ const createHastProcessor = (
       handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
     })
     .use(rehypeRaw)
-    .use(rehypeKatex, { strict: false })
+    .use(rehypeKatex, { strict: 'ignore' } as any)
     .use(rehypeFootnoteRef);
 
   if (extraRemarkPlugins) {
@@ -886,12 +886,33 @@ interface BlockCacheEntry {
  * - 每次更新只重新解析变化的块（通常仅最后一个）
  * - 稳定块的 React 元素直接复用，跳过 parse → hast → jsx 全链路
  */
+/**
+ * 流式场景下，最后一个块每个字符都变化，但大部分变化只是尾部追加。
+ * 对最后一个块做节流：只在新增了换行、块级标记、或超过一定字符数时才重新解析。
+ */
+const LAST_BLOCK_THROTTLE_CHARS = 20;
+const BLOCK_BOUNDARY_TRIGGERS = /[\n`|#>*\-\[\]!$]/;
+
+const shouldReparseLastBlock = (
+  prevSource: string | undefined,
+  newSource: string,
+): boolean => {
+  if (!prevSource) return true;
+  if (newSource.length < prevSource.length) return true;
+  if (!newSource.startsWith(prevSource)) return true;
+  const added = newSource.slice(prevSource.length);
+  if (added.length >= LAST_BLOCK_THROTTLE_CHARS) return true;
+  if (BLOCK_BOUNDARY_TRIGGERS.test(added)) return true;
+  return false;
+};
+
 export const useMarkdownToReact = (
   content: string,
   options?: UseMarkdownToReactOptions,
 ): React.ReactNode => {
   const processorRef = useRef<Processor | null>(null);
   const blockCacheRef = useRef<Map<string, BlockCacheEntry>>(new Map());
+  const lastBlockRef = useRef<{ source: string; element: React.ReactNode } | null>(null);
 
   const processor = useMemo(() => {
     const p = createHastProcessor(options?.remarkPlugins, options?.htmlConfig);
@@ -924,7 +945,6 @@ export const useMarkdownToReact = (
         const block = blocks[i];
         const isLast = i === blocks.length - 1;
 
-        // 非最后一个块：使用缓存
         if (!isLast) {
           const cached = cache.get(block);
           if (cached && cached.source === block) {
@@ -936,9 +956,21 @@ export const useMarkdownToReact = (
           }
         }
 
-        // 最后一个块或缓存未命中：重新解析
+        // 最后一个块：节流——仅在有意义的变化时重新解析
+        if (isLast && lastBlockRef.current) {
+          if (!shouldReparseLastBlock(lastBlockRef.current.source, block)) {
+            newCache.set(block, { source: lastBlockRef.current.source, element: lastBlockRef.current.element });
+            elements.push(
+              jsx(Fragment, { children: lastBlockRef.current.element, key: i }),
+            );
+            continue;
+          }
+        }
+
         const element = renderMarkdownBlock(block, processor, components);
-        newCache.set(block, { source: block, element });
+        const entry = { source: block, element };
+        newCache.set(block, entry);
+        if (isLast) lastBlockRef.current = entry;
         elements.push(
           jsx(Fragment, { children: element, key: i }),
         );
