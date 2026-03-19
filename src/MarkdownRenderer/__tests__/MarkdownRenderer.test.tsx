@@ -303,6 +303,32 @@ describe('MarkdownRenderer', () => {
     expect(fncElements[0]?.textContent).toBe('1');
   });
 
+  it('流式追加 [^1] 时不应丢失脚注引用节点', () => {
+    const baseContent =
+      'Microsoft Corporation 是一家领先的技术公司，专注于云计算、生产力软件、业务应用程序和消费技术。';
+    const { container, rerender } = render(
+      <MarkdownRenderer
+        content={baseContent}
+        streaming={true}
+        queueOptions={{ animate: false }}
+      />,
+    );
+
+    expect(container.textContent).toContain('Microsoft Corporation');
+
+    rerender(
+      <MarkdownRenderer
+        content={`${baseContent}[^1]`}
+        streaming={true}
+        queueOptions={{ animate: false }}
+      />,
+    );
+
+    const fncElements = container.querySelectorAll('[data-fnc="fnc"]');
+    expect(fncElements.length).toBe(1);
+    expect(fncElements[0]?.textContent).toBe('1');
+  });
+
   it('应将 <think> 标签渲染为 ToolUseBarThink 组件', () => {
     const { container } = render(
       <MarkdownRenderer

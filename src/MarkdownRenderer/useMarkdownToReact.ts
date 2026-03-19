@@ -976,12 +976,14 @@ interface BlockCacheEntry {
  * 对最后一个块做节流：只在新增了换行、块级标记、或超过一定字符数时才重新解析。
  */
 const LAST_BLOCK_THROTTLE_CHARS = 20;
-const BLOCK_BOUNDARY_TRIGGERS = /[\n`|#>*\-[\]]!$]/;
+const BLOCK_BOUNDARY_TRIGGERS = /[\n`|#>*\-!$[\]]/;
 
 const shouldReparseLastBlock = (
   prevSource: string | undefined,
   newSource: string,
+  streaming?: boolean,
 ): boolean => {
+  if (!streaming) return true;
   if (!prevSource) return true;
   if (newSource.length < prevSource.length) return true;
   if (!newSource.startsWith(prevSource)) return true;
@@ -1056,7 +1058,13 @@ export const useMarkdownToReact = (
 
         // 最后一个块：节流——仅在有意义的变化时重新解析
         if (isLast && lastBlockRef.current) {
-          if (!shouldReparseLastBlock(lastBlockRef.current.source, block)) {
+          if (
+            !shouldReparseLastBlock(
+              lastBlockRef.current.source,
+              block,
+              options?.streaming,
+            )
+          ) {
             newCache.set(block, {
               source: lastBlockRef.current.source,
               element: lastBlockRef.current.element,
