@@ -21,6 +21,11 @@ export const useRendererVarStyle = (prefixCls: string) => {
         '--padding-5x': '20px',
       },
 
+      // 流式文字淡入动画（仅 opacity，GPU composited，不卡顿）
+      '@keyframes markdownRendererFadeIn': {
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+      },
     };
   });
 };

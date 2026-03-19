@@ -2,6 +2,7 @@ import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React, { useMemo, useRef } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
+import AnimationText from './AnimationText';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import remarkDirective from 'remark-directive';
@@ -327,6 +328,7 @@ const ThinkBlockRendererComponent = (props: any) => {
 const buildEditorAlignedComponents = (
   prefixCls: string,
   userComponents: Record<string, React.ComponentType<RendererBlockProps>>,
+  streaming?: boolean,
   linkConfig?: {
     openInNewTab?: boolean;
     onClick?: (url?: string) => boolean | void;
@@ -335,6 +337,11 @@ const buildEditorAlignedComponents = (
   const listCls = `${prefixCls}-list`;
   const tableCls = `${prefixCls}-content-table`;
   const contentCls = prefixCls; // e.g. ant-agentic-md-editor-content
+
+  const wrapAnimation = (children: any) =>
+    streaming
+      ? jsx(AnimationText as any, { children })
+      : children;
 
   return {
     // ================================================================
@@ -347,7 +354,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'paragraph',
         'data-testid': 'markdown-paragraph',
-        children,
+        children: wrapAnimation(children),
       });
     },
 
@@ -357,7 +364,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-1',
-        children,
+        children: wrapAnimation(children),
       });
     },
     h2: (props: any) => {
@@ -366,7 +373,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-2',
-        children,
+        children: wrapAnimation(children),
       });
     },
     h3: (props: any) => {
@@ -375,7 +382,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-3',
-        children,
+        children: wrapAnimation(children),
       });
     },
     h4: (props: any) => {
@@ -384,7 +391,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-4',
-        children,
+        children: wrapAnimation(children),
       });
     },
     h5: (props: any) => {
@@ -393,7 +400,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-5',
-        children,
+        children: wrapAnimation(children),
       });
     },
     h6: (props: any) => {
@@ -402,7 +409,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-6',
-        children,
+        children: wrapAnimation(children),
       });
     },
 
@@ -1008,9 +1015,10 @@ export const useMarkdownToReact = (
     return buildEditorAlignedComponents(
       prefixCls,
       userComponents,
+      options?.streaming,
       options?.linkConfig,
     );
-  }, [prefixCls, options?.components, options?.linkConfig]);
+  }, [prefixCls, options?.components, options?.streaming, options?.linkConfig]);
 
   return useMemo(() => {
     if (!content) return null;
@@ -1105,6 +1113,7 @@ export const markdownToReactSync = (
     const allComponents = buildEditorAlignedComponents(
       'ant-agentic-md-editor',
       userComps,
+      false,
     );
 
     return toJsxRuntime(hast as any, {

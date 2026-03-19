@@ -11,5 +11,7 @@ export type {
   RenderMode,
   RendererBlockProps,
 } from './types';
+export { default as AnimationText } from './AnimationText';
+export type { AnimationConfig, AnimationTextProps } from './AnimationText';
 export { markdownToReactSync, useMarkdownToReact } from './useMarkdownToReact';
 export { useStreaming } from './useStreaming';
