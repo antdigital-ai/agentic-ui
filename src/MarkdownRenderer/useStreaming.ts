@@ -43,6 +43,8 @@ const STREAM_INCOMPLETE_REGEX = {
   'inline-code': [/^`[^`\r\n]{0,300}$/],
 } as const;
 
+const STREAMING_LOADING_PLACEHOLDER = '...';
+
 /**
  * 判断表格是否仍不完整。
  * 等待 header + separator + 至少一行数据（3 行）后提交。
@@ -150,6 +152,12 @@ const getInitialCache = (): StreamCache => ({
   completeMarkdown: '',
 });
 
+const getStreamingOutput = (cache: StreamCache): string => {
+  if (cache.completeMarkdown) return cache.completeMarkdown;
+  if (cache.pending) return STREAMING_LOADING_PLACEHOLDER;
+  return '';
+};
+
 const isInCodeBlock = (text: string, isFinalChunk = false): boolean => {
   const lines = text.split('\n');
   let inFenced = false;
@@ -232,12 +240,13 @@ export const useStreaming = (input: string, enabled: boolean): string => {
       }
     }
 
-    setOutput(cache.completeMarkdown);
+    setOutput(getStreamingOutput(cache));
   }, []);
 
   useEffect(() => {
     if (typeof input !== 'string') {
       setOutput('');
+      cacheRef.current = getInitialCache();
       return;
     }
     if (enabled) {
