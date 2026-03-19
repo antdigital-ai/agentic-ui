@@ -59,6 +59,17 @@ describe('MarkdownRenderer', () => {
     expect(em?.textContent).toBe('italic');
   });
 
+  it('应渲染任务列表（task list）', () => {
+    const { container } = render(
+      <MarkdownRenderer content={'- [ ] 未完成\n- [x] 已完成'} />,
+    );
+
+    const taskItems = container.querySelectorAll('[data-testid="markdown-task-item"]');
+    expect(taskItems.length).toBeGreaterThanOrEqual(1);
+    expect(container.textContent).toContain('未完成');
+    expect(container.textContent).toContain('已完成');
+  });
+
   it('应渲染删除线', () => {
     const { container } = render(
       <MarkdownRenderer content="This is ~~deleted~~ text." />,

@@ -12,7 +12,7 @@ import React, { useMemo, useRef } from 'react';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
-import { Image } from 'antd';
+import { Checkbox, Image } from 'antd';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import {
   convertParagraphToImage,
@@ -398,7 +398,42 @@ const buildEditorAlignedComponents = (
     },
 
     li: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node, children, className, ...rest } = props;
+      const isTask =
+        className === 'task-list-item' ||
+        (Array.isArray(className) && className.includes('task-list-item'));
+
+      if (isTask) {
+        const childArray = Array.isArray(children) ? children : [children];
+        let checked = false;
+        const filteredChildren = childArray.filter((child: any) => {
+          if (
+            React.isValidElement(child) &&
+            (child as any).props?.type === 'checkbox'
+          ) {
+            checked = !!(child as any).props?.checked;
+            return false;
+          }
+          return true;
+        });
+
+        return jsxs('li' as any, {
+          ...rest,
+          className: `${listCls}-item ${listCls}-task`,
+          'data-be': 'list-item',
+          'data-testid': 'markdown-task-item',
+          children: [
+            jsx('span' as any, {
+              className: `${listCls}-check-item`,
+              contentEditable: false,
+              'data-check-item': true,
+              children: jsx(Checkbox as any, { checked, disabled: true }),
+            }),
+            ...filteredChildren,
+          ],
+        });
+      }
+
       return jsx('li' as any, {
         ...rest,
         className: `${listCls}-item`,
@@ -454,6 +489,19 @@ const buildEditorAlignedComponents = (
         style: { whiteSpace: 'normal', maxWidth: '20%' },
         children,
       });
+    },
+
+    // input[type=checkbox]：task list 的 checkbox（兜底，主逻辑在 li 中）
+    input: (props: any) => {
+      const { node, type, checked, disabled, ...rest } = props;
+      if (type === 'checkbox') {
+        return jsx(Checkbox as any, {
+          checked: !!checked,
+          disabled: true,
+          'data-testid': 'markdown-checkbox',
+        });
+      }
+      return jsx('input' as any, { ...rest, type, checked, disabled });
     },
 
     // ================================================================
