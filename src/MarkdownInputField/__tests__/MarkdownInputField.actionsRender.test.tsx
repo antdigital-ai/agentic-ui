@@ -3,7 +3,6 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { AttachmentFile } from '../AttachmentButton/types';
 import { MarkdownInputField } from '../MarkdownInputField';
-import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 
 describe('MarkdownInputField - actionsRender', () => {
   const createAttachmentFile = (
@@ -286,33 +285,4 @@ describe('MarkdownInputField - actionsRender', () => {
     );
   });
 
-  it('should render upload status hint beside input actions', () => {
-    const uploadingFile = createAttachmentFile({
-      uuid: 'uploading-1',
-      status: 'uploading',
-    });
-    const doneFile = createAttachmentFile({
-      uuid: 'done-1',
-      status: 'done',
-    });
-
-    render(
-      <MarkdownInputField
-        attachment={{
-          enable: true,
-          fileMap: new Map([
-            ['uploading-1', uploadingFile],
-            ['done-1', doneFile],
-          ]),
-        }}
-      />,
-    );
-
-    const uploadStatus = screen.getByTestId(
-      MARKDOWN_INPUT_FIELD_TEST_IDS.UPLOAD_STATUS,
-    );
-    expect(uploadStatus).toBeInTheDocument();
-    expect(uploadStatus.textContent).toContain('1/2');
-    expect(uploadStatus.textContent).toMatch(/上传中|Uploading/);
-  });
 });

@@ -21,8 +21,6 @@ export const MARKDOWN_INPUT_FIELD_TEST_IDS = {
   SEND_TOOLS: 'markdown-input-field-send-tools',
   /** 发送操作区（附件、语音、发送按钮等） */
   SEND_ACTIONS: 'markdown-input-field-send-actions',
-  /** 文件上传状态提示 */
-  UPLOAD_STATUS: 'markdown-input-field-upload-status',
   /** 更多操作按钮（折叠时的省略号） */
   MORE_ACTIONS: 'markdown-input-field-more-actions',
   /** 附件列表 */

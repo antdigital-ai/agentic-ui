@@ -233,31 +233,6 @@ const genStyle: GenerateStyle<
         font: 'var(--font-text-body-base)',
         color: 'var(--color-gray-text-default)',
       },
-      '&-upload-status': {
-        maxWidth: 180,
-        padding: '2px 8px',
-        borderRadius: 'var(--radius-base)',
-        font: 'var(--font-text-body-sm)',
-        letterSpacing: 'var(--letter-spacing-body-sm, normal)',
-        lineHeight: '20px',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        background: 'var(--color-gray-bg-page)',
-        color: 'var(--color-gray-text-secondary)',
-        '&-uploading': {
-          background: 'var(--color-blue-bg-tip)',
-          color: 'var(--color-blue-text-secondary)',
-        },
-        '&-error': {
-          background: 'var(--color-red-bg-tip)',
-          color: 'var(--color-red-text-secondary)',
-        },
-        '&-done': {
-          background: 'var(--color-green-bg-tip)',
-          color: 'var(--color-green-text-secondary)',
-        },
-      },
       '&-quick-actions': {
         position: 'absolute',
         userSelect: 'none',

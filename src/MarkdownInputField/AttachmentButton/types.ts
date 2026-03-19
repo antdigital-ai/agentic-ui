@@ -18,6 +18,8 @@ export type AttachmentFile = File & {
   uuid?: string;
   size?: number | null;
   previewUrl?: string;
+  /** 错误信息（如文件超限、上传失败等），在 status 为 error 时展示 */
+  errorMessage?: string | null;
   /** 上传响应数据（使用 uploadWithResponse 时会填充此字段） */
   uploadResponse?: UploadResponse;
 };

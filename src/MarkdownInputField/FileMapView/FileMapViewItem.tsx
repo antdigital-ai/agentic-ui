@@ -84,7 +84,13 @@ export const FileMapViewItem: React.FC<{
   }
   return (
     <Tooltip
-      title={<div>{locale?.clickToPreview}</div>}
+      title={
+        file.status === 'error' && file.errorMessage ? (
+          <div>{file.errorMessage}</div>
+        ) : (
+          <div>{locale?.clickToPreview}</div>
+        )
+      }
       placement="topLeft"
       arrow={false}
     >
@@ -146,14 +152,26 @@ export const FileMapViewItem: React.FC<{
               props.hashId,
             )}
           >
-            <span
-              className={classNames(
-                `${props.prefixCls}-file-name-extension`,
-                props.hashId,
-              )}
-            >
-              {displayExtension}
-            </span>
+            {file.status === 'error' && file.errorMessage ? (
+              <span
+                className={classNames(
+                  `${props.prefixCls}-file-error-msg`,
+                  props.hashId,
+                )}
+                style={{ color: 'var(--color-red-text-secondary)' }}
+              >
+                {file.errorMessage}
+              </span>
+            ) : (
+              <>
+                <span
+                  className={classNames(
+                    `${props.prefixCls}-file-name-extension`,
+                    props.hashId,
+                  )}
+                >
+                  {displayExtension}
+                </span>
             <span
               className={classNames(
                 `${props.prefixCls}-separator`,
@@ -183,6 +201,8 @@ export const FileMapViewItem: React.FC<{
                 ? dayjs(file?.lastModified).format('HH:mm')
                 : ''}
             </div>
+              </>
+            )}
           </div>
         </div>
 

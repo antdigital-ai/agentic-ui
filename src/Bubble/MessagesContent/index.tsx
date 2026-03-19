@@ -213,9 +213,27 @@ export const BubbleMessageDisplay: React.FC<
           )
         : defaultExtra;
 
+    if (React.isValidElement(content)) {
+      return wrapSSR(
+        <div
+          className={classNames(
+            'agent-item-default-content',
+            `${baseChatCls}-messages-content-message`,
+            hashId,
+          )}
+          data-testid="message-box-content"
+          onDoubleClick={props.onDoubleClick}
+        >
+          {beforeContent}
+          {content}
+          {afterContent}
+          {extra}
+        </div>,
+      );
+    }
+
     if (
       content === '...' ||
-      React.isValidElement(content) ||
       props.placement !== 'left' ||
       props?.originData?.extra?.tags?.includes?.('REJECT_TO_ANSWER') ||
       props.originData?.role === 'bot'

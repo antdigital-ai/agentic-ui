@@ -190,6 +190,7 @@ const handleUploadError = (
   props: UploadProps,
 ) => {
   file.status = 'error';
+  if (errorMsg !== null) file.errorMessage = errorMsg;
   updateFileMap(map, file, props.onFileMapChange);
 };
 
@@ -202,6 +203,15 @@ const processFile = async (
   await waitTime(WAIT_TIME_MS);
 
   if (!validateFileSize(file, props)) {
+    const maxSizeKb = Math.round((props.maxFileSize || 0) / 1024);
+    const raw = getLocaleMessage(
+      props.locale,
+      'markdownInput.fileSizeExceeded',
+      DEFAULT_MESSAGES.fileSizeExceeded(maxSizeKb),
+    );
+    file.errorMessage = raw.includes('${maxSize}')
+      ? raw.replace(/\$\{maxSize\}/g, String(maxSizeKb))
+      : raw;
     file.status = 'error';
     updateFileMap(map, file, props.onFileMapChange);
     return;

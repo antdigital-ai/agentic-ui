@@ -83,7 +83,9 @@ const FileSizeInfo: React.FC<{
       <div
         className={classNames(baseClassName, `${prefixCls}-file-size-error`)}
       >
-        {locale?.uploadFailed || '上传失败'}
+        {file.errorMessage ||
+          locale?.uploadFailed ||
+          '上传失败'}
       </div>
     ),
     done: (() => {

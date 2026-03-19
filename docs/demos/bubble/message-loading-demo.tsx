@@ -1,4 +1,8 @@
-import { Bubble, MessageBubbleData } from '@ant-design/agentic-ui';
+import {
+  AnswerAlert,
+  Bubble,
+  MessageBubbleData,
+} from '@ant-design/agentic-ui';
 import { Button, message, Space, Switch } from 'antd';
 import React, { useRef, useState } from 'react';
 
@@ -99,7 +103,16 @@ export default () => {
           originData={{
             ...mockMessage,
             typing: isLoading,
-            content: isLoading ? '正在思考中，请稍候...' : mockMessage.content,
+            content: isLoading ? (
+              <AnswerAlert
+                message="正在思考中，请稍候..."
+                type="gray"
+                showIcon
+                closable
+              />
+            ) : (
+              mockMessage.content
+            ),
             isFinished: !isLoading,
           }}
           onLike={handleLike}
