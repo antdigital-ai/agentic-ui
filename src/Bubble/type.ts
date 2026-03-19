@@ -380,6 +380,14 @@ export interface BubbleProps<
   markdownRenderConfig?: MarkdownEditorProps;
 
   /**
+   * 渲染模式快捷设置
+   * - 'slate': 使用 Slate 编辑器渲染（默认）
+   * - 'markdown': 使用轻量 MarkdownRenderer（无 Slate 实例，性能更优）
+   * 等效于 markdownRenderConfig={{ renderMode }}
+   */
+  renderMode?: 'slate' | 'markdown';
+
+  /**
    * 自定义配置
    */
   customConfig?: CustomConfig;

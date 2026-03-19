@@ -222,6 +222,13 @@ export type BubbleListProps = {
   onAvatarClick?: BubbleProps['onAvatarClick'];
   onDoubleClick?: BubbleProps['onDoubleClick'];
   markdownRenderConfig?: BubbleProps['markdownRenderConfig'];
+  /**
+   * 渲染模式快捷设置
+   * - 'slate': 使用 Slate 编辑器渲染（默认）
+   * - 'markdown': 使用轻量 MarkdownRenderer（无 Slate 实例，性能更优）
+   * 等效于 markdownRenderConfig={{ renderMode }}
+   */
+  renderMode?: 'slate' | 'markdown';
   docListProps?: BubbleProps['docListProps'];
 
   /**
@@ -367,7 +374,8 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
     isLoading,
     styles,
     classNames,
-    markdownRenderConfig,
+    markdownRenderConfig: markdownRenderConfigProp,
+    renderMode,
     userMeta,
     assistantMeta,
     bubbleList = [],
@@ -376,6 +384,15 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
     onWheel,
     onTouchMove,
   } = props;
+
+  // 合并 renderMode 快捷属性到 markdownRenderConfig
+  const markdownRenderConfig = useMemo(
+    () =>
+      renderMode
+        ? { ...markdownRenderConfigProp, renderMode }
+        : markdownRenderConfigProp,
+    [markdownRenderConfigProp, renderMode],
+  );
 
   // 兼容旧属性
   const loading = isLoading ?? legacyLoading;
