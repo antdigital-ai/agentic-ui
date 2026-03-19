@@ -160,12 +160,15 @@ export const UserBubble: React.FC<
     styles?.bubbleListItemContentStyle,
   );
 
+  // 用户气泡默认 hover 展示复制等操作，父级可透传覆盖
+  const effectiveExtraShowOnHover = extraShowOnHover ?? true;
+
   const itemDom = wrapSSR(
     <BubbleConfigContext.Provider
       value={{
         compact,
         standalone: !!standalone,
-        extraShowOnHover,
+        extraShowOnHover: effectiveExtraShowOnHover,
         bubble: props as any,
       }}
     >
