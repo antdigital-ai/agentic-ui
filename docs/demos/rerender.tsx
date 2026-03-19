@@ -22,7 +22,10 @@ const splitBlocks = (text: string): string[] => {
   const lines = text.split('\n');
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (line.trimStart().startsWith('```') || line.trimStart().startsWith('~~~')) {
+    if (
+      line.trimStart().startsWith('```') ||
+      line.trimStart().startsWith('~~~')
+    ) {
       inFence = !inFence;
     }
     current += (current ? '\n' : '') + line;
@@ -130,8 +133,11 @@ export const RerenderMdDemo = () => {
         md += chars[currentIndexRef.current];
         currentIndexRef.current += 1;
         const delay =
-          speedRef.current === 'fast' ? 1 :
-          speedRef.current === 'medium' ? 16 : 160;
+          speedRef.current === 'fast'
+            ? 1
+            : speedRef.current === 'medium'
+              ? 16
+              : 160;
         timeoutRef.current = setTimeout(() => {
           setContent(md);
           processNext();
@@ -239,8 +245,8 @@ export const RerenderMdDemo = () => {
         <h4>MarkdownRenderer 模式说明：</h4>
         <ul>
           <li>
-            <strong>MarkdownRenderer</strong>: 使用轻量 Markdown
-            渲染器，不创建 Slate 实例
+            <strong>MarkdownRenderer</strong>: 使用轻量 Markdown 渲染器，不创建
+            Slate 实例
           </li>
           <li>
             <strong>content</strong>: markdown 内容字符串（持续增长）
@@ -264,10 +270,12 @@ export const RerenderMdDemo = () => {
             <code>parserMarkdownToSlateNode</code>
           </li>
           <li>
-            无 Slate Editor 实例、无 Operation 队列、无 History 栈、无
-            Normalize
+            无 Slate Editor 实例、无 Operation 队列、无 History 栈、无 Normalize
           </li>
-          <li>Markdown → hast → React（两层），而非 Markdown → mdast → Slate → React（四层）</li>
+          <li>
+            Markdown → hast → React（两层），而非 Markdown → mdast → Slate →
+            React（四层）
+          </li>
         </ul>
       </div>
     </div>

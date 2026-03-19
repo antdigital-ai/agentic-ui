@@ -1,9 +1,9 @@
 import type React from 'react';
-import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
+import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 
 export interface CharacterQueueOptions {
   /** 每帧输出的最大字符数，默认 3 */

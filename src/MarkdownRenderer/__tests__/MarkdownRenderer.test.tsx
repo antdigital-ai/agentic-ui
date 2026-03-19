@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownRenderer } from '../index';
@@ -22,9 +22,7 @@ describe('MarkdownRenderer', () => {
   });
 
   it('应渲染基础 markdown 内容', async () => {
-    const { container } = render(
-      <MarkdownRenderer content="# Hello World" />,
-    );
+    const { container } = render(<MarkdownRenderer content="# Hello World" />);
 
     await vi.runAllTimersAsync();
     expect(container.querySelector('h1')).toBeTruthy();
@@ -64,7 +62,9 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer content={'- [ ] 未完成\n- [x] 已完成'} />,
     );
 
-    const taskItems = container.querySelectorAll('[data-testid="markdown-task-item"]');
+    const taskItems = container.querySelectorAll(
+      '[data-testid="markdown-task-item"]',
+    );
     expect(taskItems.length).toBeGreaterThanOrEqual(1);
     expect(container.textContent).toContain('未完成');
     expect(container.textContent).toContain('已完成');
@@ -111,9 +111,7 @@ describe('MarkdownRenderer', () => {
 | --- | --- |
 | Cell 1 | Cell 2 |
 `;
-    const { container } = render(
-      <MarkdownRenderer content={tableMarkdown} />,
-    );
+    const { container } = render(<MarkdownRenderer content={tableMarkdown} />);
 
     expect(container.querySelector('table')).toBeTruthy();
     expect(container.querySelector('th')?.textContent).toContain('Header 1');
@@ -121,9 +119,7 @@ describe('MarkdownRenderer', () => {
   });
 
   it('空内容不应崩溃', () => {
-    const { container } = render(
-      <MarkdownRenderer content="" />,
-    );
+    const { container } = render(<MarkdownRenderer content="" />);
 
     expect(container).toBeTruthy();
   });
@@ -149,9 +145,7 @@ describe('MarkdownRenderer', () => {
 
     expect(container.textContent).toContain('initial');
 
-    rerender(
-      <MarkdownRenderer content="updated" />,
-    );
+    rerender(<MarkdownRenderer content="updated" />);
 
     expect(container.textContent).toContain('updated');
   });
@@ -238,7 +232,9 @@ describe('MarkdownRenderer', () => {
 
     // 代码块应使用 CodeContainer（data-be="code"）
     expect(container.querySelector('[data-be="code"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="code-toolbar"]')).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="code-toolbar"]'),
+    ).toBeTruthy();
     expect(container.textContent).toContain('const x = 1;');
   });
 
@@ -266,7 +262,9 @@ describe('MarkdownRenderer', () => {
 
   it('应渲染脚注引用（有定义）', () => {
     const { container } = render(
-      <MarkdownRenderer content={'This has a footnote[^1].\n\n[^1]: Footnote content here.'} />,
+      <MarkdownRenderer
+        content={'This has a footnote[^1].\n\n[^1]: Footnote content here.'}
+      />,
     );
 
     const fncEl = container.querySelector('[data-fnc="fnc"]');
@@ -278,7 +276,9 @@ describe('MarkdownRenderer', () => {
 
   it('应渲染裸脚注引用（无定义，AI 对话场景）', () => {
     const { container } = render(
-      <MarkdownRenderer content={'公司营收达 776.73 亿美元。[^2] Cloud 收入同比增长 22%。[^3]'} />,
+      <MarkdownRenderer
+        content={'公司营收达 776.73 亿美元。[^2] Cloud 收入同比增长 22%。[^3]'}
+      />,
     );
 
     const fncElements = container.querySelectorAll('[data-fnc="fnc"]');
@@ -289,10 +289,14 @@ describe('MarkdownRenderer', () => {
 
   it('应将 <think> 标签渲染为 ToolUseBarThink 组件', () => {
     const { container } = render(
-      <MarkdownRenderer content={'<think>\n这是一段思考内容\n</think>\n\n最终回答'} />,
+      <MarkdownRenderer
+        content={'<think>\n这是一段思考内容\n</think>\n\n最终回答'}
+      />,
     );
 
-    const thinkBlock = container.querySelector('[data-testid="think-block-renderer"]');
+    const thinkBlock = container.querySelector(
+      '[data-testid="think-block-renderer"]',
+    );
     expect(thinkBlock).toBeTruthy();
     expect(container.textContent).toContain('最终回答');
   });
@@ -307,13 +311,13 @@ describe('MarkdownRenderer', () => {
       '| 2024-02 | 200 |',
     ].join('\n');
 
-    const { container } = render(
-      <MarkdownRenderer content={content} />,
-    );
+    const { container } = render(<MarkdownRenderer content={content} />);
 
     const chartEl = container.querySelector('[data-be="chart"]');
     expect(chartEl).toBeTruthy();
-    expect(container.querySelector('[data-testid="markdown-table"]')).toBeFalsy();
+    expect(
+      container.querySelector('[data-testid="markdown-table"]'),
+    ).toBeFalsy();
   });
 
   it('应支持单对象格式的图表注释', () => {
@@ -326,13 +330,13 @@ describe('MarkdownRenderer', () => {
       '| 设计 | 60 |',
     ].join('\n');
 
-    const { container } = render(
-      <MarkdownRenderer content={content} />,
-    );
+    const { container } = render(<MarkdownRenderer content={content} />);
 
     const chartEl = container.querySelector('[data-be="chart"]');
     expect(chartEl).toBeTruthy();
-    expect(container.querySelector('[data-testid="markdown-table"]')).toBeFalsy();
+    expect(
+      container.querySelector('[data-testid="markdown-table"]'),
+    ).toBeFalsy();
   });
 
   it('应渲染图片', () => {
@@ -347,7 +351,10 @@ describe('MarkdownRenderer', () => {
   });
 
   it('应将 schema 代码块渲染为 SchemaRenderer', () => {
-    const schemaJson = JSON.stringify({ type: 'object', properties: { name: { type: 'string' } } });
+    const schemaJson = JSON.stringify({
+      type: 'object',
+      properties: { name: { type: 'string' } },
+    });
     const { container } = render(
       <MarkdownRenderer content={'```schema\n' + schemaJson + '\n```'} />,
     );
@@ -373,7 +380,9 @@ describe('MarkdownRenderer', () => {
         content={'```apaasify\n' + schemaJson + '\n```'}
         apaasify={{
           enable: true,
-          render: (value: any) => <div data-testid="custom-apaasify">Custom: {value?.type}</div>,
+          render: (value: any) => (
+            <div data-testid="custom-apaasify">Custom: {value?.type}</div>
+          ),
         }}
       />,
     );

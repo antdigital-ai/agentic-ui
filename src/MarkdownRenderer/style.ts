@@ -10,7 +10,7 @@ export { useStyle } from '../MarkdownEditor/style';
 import { useEditorStyleRegister } from '../Hooks/useStyle';
 
 export const useRendererVarStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('MarkdownRendererVars', (token) => {
+  return useEditorStyleRegister('MarkdownRendererVars', (_token) => {
     return {
       // :where 选择器优先级为 0，不会覆盖宿主定义的变量
       [`:where(.${prefixCls})`]: {

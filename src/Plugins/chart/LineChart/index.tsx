@@ -1,7 +1,7 @@
 import { ConfigProvider } from 'antd';
 import { ChartData, Chart as ChartJS, ChartOptions } from 'chart.js';
 import classNames from 'clsx';
-import React, { useContext, useMemo, useRef } from 'react';
+import React, { useContext, useLayoutEffect, useMemo, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   ChartContainer,
@@ -121,7 +121,9 @@ const LineChart: React.FC<LineChartProps> = ({
   ...props
 }) => {
   // 注册 Chart.js 组件
-  registerLineChartComponents();
+  useLayoutEffect(() => {
+    registerLineChartComponents();
+  }, []);
 
   // 响应式尺寸
   const { responsiveWidth, responsiveHeight, isMobile } = useResponsiveSize(

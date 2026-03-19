@@ -1,4 +1,7 @@
+import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
+import React, { useMemo, useRef } from 'react';
+import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import remarkDirective from 'remark-directive';
@@ -7,25 +10,22 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
-import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
-import React, { useMemo, useRef } from 'react';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
-import { Checkbox, Image } from 'antd';
-import { ToolUseBarThink } from '../ToolUseBarThink';
+import { JINJA_DOLLAR_PLACEHOLDER } from '../MarkdownEditor/editor/parser/constants';
+import { remarkDirectiveContainer } from '../MarkdownEditor/editor/parser/remarkDirectiveContainer';
 import {
   convertParagraphToImage,
   fixStrongWithSpecialChars,
   protectJinjaDollarInText,
 } from '../MarkdownEditor/editor/parser/remarkParse';
-import { remarkDirectiveContainer } from '../MarkdownEditor/editor/parser/remarkDirectiveContainer';
 import {
   REMARK_REHYPE_DIRECTIVE_HANDLERS,
   type MarkdownRemarkPlugin,
   type MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
-import { JINJA_DOLLAR_PLACEHOLDER } from '../MarkdownEditor/editor/parser/constants';
+import { ToolUseBarThink } from '../ToolUseBarThink';
 import type { RendererBlockProps } from './types';
 
 const INLINE_MATH_WITH_SINGLE_DOLLAR = { singleDollarTextMath: true };
@@ -41,10 +41,24 @@ const FOOTNOTE_REF_PATTERN = /\[\^([^\]]+)\]/g;
 
 const CHART_COMMENT_PATTERN = /^<!--\s*(\[[\s\S]*\]|\{[\s\S]*\})\s*-->$/;
 
+const extractCellText = (cell: any): string => {
+  if (!cell?.children) return '';
+  return cell.children
+    .map((child: any) => {
+      if (child.type === 'text') return child.value || '';
+      if (child.children) return extractCellText(child);
+      return '';
+    })
+    .join('')
+    .trim();
+};
+
 /**
  * 从 mdast table 节点提取列名和数据
  */
-const extractTableData = (tableNode: any): {
+const extractTableData = (
+  tableNode: any,
+): {
   columns: { title: string; dataIndex: string }[];
   dataSource: Record<string, any>[];
 } | null => {
@@ -74,18 +88,6 @@ const extractTableData = (tableNode: any): {
   }
 
   return { columns, dataSource };
-};
-
-const extractCellText = (cell: any): string => {
-  if (!cell?.children) return '';
-  return cell.children
-    .map((child: any) => {
-      if (child.type === 'text') return child.value || '';
-      if (child.children) return extractCellText(child);
-      return '';
-    })
-    .join('')
-    .trim();
 };
 
 /**
@@ -126,7 +128,9 @@ const remarkChartFromComment = () => {
       }
 
       if (!Array.isArray(chartConfig)) chartConfig = [chartConfig];
-      const hasChartType = chartConfig.some((c: any) => c.chartType && c.chartType !== 'table');
+      const hasChartType = chartConfig.some(
+        (c: any) => c.chartType && c.chartType !== 'table',
+      );
       if (!hasChartType) continue;
 
       const tableData = extractTableData(next);
@@ -174,7 +178,10 @@ const rehypeFootnoteRef = () => {
 
       while ((match = FOOTNOTE_REF_PATTERN.exec(value)) !== null) {
         if (match.index > lastIndex) {
-          children.push({ type: 'text', value: value.slice(lastIndex, match.index) });
+          children.push({
+            type: 'text',
+            value: value.slice(lastIndex, match.index),
+          });
         }
         children.push({
           type: 'element',
@@ -230,7 +237,10 @@ const createHastProcessor = (
   if (extraRemarkPlugins) {
     extraRemarkPlugins.forEach((entry) => {
       if (Array.isArray(entry)) {
-        const [plugin, ...pluginOptions] = entry as unknown as [Plugin, ...unknown[]];
+        const [plugin, ...pluginOptions] = entry as unknown as [
+          Plugin,
+          ...unknown[],
+        ];
         processor.use(plugin, ...pluginOptions);
       } else {
         processor.use(entry as Plugin);
@@ -241,7 +251,10 @@ const createHastProcessor = (
   if (config?.markedConfig) {
     config.markedConfig.forEach((entry) => {
       if (Array.isArray(entry)) {
-        const [plugin, ...pluginOptions] = entry as unknown as [Plugin, ...unknown[]];
+        const [plugin, ...pluginOptions] = entry as unknown as [
+          Plugin,
+          ...unknown[],
+        ];
         processor.use(plugin, ...pluginOptions);
       } else {
         processor.use(entry as Plugin);
@@ -270,7 +283,8 @@ const extractLanguageFromClassName = (
 const extractChildrenText = (children: React.ReactNode): string => {
   if (typeof children === 'string') return children;
   if (typeof children === 'number') return String(children);
-  if (Array.isArray(children)) return children.map(extractChildrenText).join('');
+  if (Array.isArray(children))
+    return children.map(extractChildrenText).join('');
   if (React.isValidElement(children) && children.props?.children) {
     return extractChildrenText(children.props.children);
   }
@@ -313,7 +327,10 @@ const ThinkBlockRendererComponent = (props: any) => {
 const buildEditorAlignedComponents = (
   prefixCls: string,
   userComponents: Record<string, React.ComponentType<RendererBlockProps>>,
-  linkConfig?: { openInNewTab?: boolean; onClick?: (url?: string) => boolean | void },
+  linkConfig?: {
+    openInNewTab?: boolean;
+    onClick?: (url?: string) => boolean | void;
+  },
 ) => {
   const listCls = `${prefixCls}-list`;
   const tableCls = `${prefixCls}-content-table`;
@@ -325,7 +342,7 @@ const buildEditorAlignedComponents = (
     // ================================================================
 
     p: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('div' as any, {
         ...rest,
         'data-be': 'paragraph',
@@ -335,32 +352,62 @@ const buildEditorAlignedComponents = (
     },
 
     h1: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('h1' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-1', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('h1' as any, {
+        ...rest,
+        'data-be': 'head',
+        'data-testid': 'markdown-heading-1',
+        children,
+      });
     },
     h2: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('h2' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-2', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('h2' as any, {
+        ...rest,
+        'data-be': 'head',
+        'data-testid': 'markdown-heading-2',
+        children,
+      });
     },
     h3: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('h3' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-3', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('h3' as any, {
+        ...rest,
+        'data-be': 'head',
+        'data-testid': 'markdown-heading-3',
+        children,
+      });
     },
     h4: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('h4' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-4', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('h4' as any, {
+        ...rest,
+        'data-be': 'head',
+        'data-testid': 'markdown-heading-4',
+        children,
+      });
     },
     h5: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('h5' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-5', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('h5' as any, {
+        ...rest,
+        'data-be': 'head',
+        'data-testid': 'markdown-heading-5',
+        children,
+      });
     },
     h6: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('h6' as any, { ...rest, 'data-be': 'head', 'data-testid': 'markdown-heading-6', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('h6' as any, {
+        ...rest,
+        'data-be': 'head',
+        'data-testid': 'markdown-heading-6',
+        children,
+      });
     },
 
     blockquote: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('blockquote' as any, {
         ...rest,
         'data-be': 'blockquote',
@@ -370,7 +417,7 @@ const buildEditorAlignedComponents = (
     },
 
     ul: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('div' as any, {
         className: `${listCls}-container`,
         'data-be': 'list',
@@ -383,7 +430,7 @@ const buildEditorAlignedComponents = (
       });
     },
     ol: (props: any) => {
-      const { node, children, start, ...rest } = props;
+      const { node: _node, children, start, ...rest } = props;
       return jsx('div' as any, {
         className: `${listCls}-container`,
         'data-be': 'list',
@@ -398,7 +445,7 @@ const buildEditorAlignedComponents = (
     },
 
     li: (props: any) => {
-      const { node, children, className, ...rest } = props;
+      const { node: _node, children, className, ...rest } = props;
       const isTask =
         className === 'task-list-item' ||
         (Array.isArray(className) && className.includes('task-list-item'));
@@ -444,7 +491,7 @@ const buildEditorAlignedComponents = (
     },
 
     table: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('div' as any, {
         className: tableCls,
         'data-testid': 'markdown-table',
@@ -461,19 +508,31 @@ const buildEditorAlignedComponents = (
     },
 
     thead: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('thead' as any, { ...rest, 'data-testid': 'markdown-thead', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('thead' as any, {
+        ...rest,
+        'data-testid': 'markdown-thead',
+        children,
+      });
     },
     tbody: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('tbody' as any, { ...rest, 'data-testid': 'markdown-tbody', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('tbody' as any, {
+        ...rest,
+        'data-testid': 'markdown-tbody',
+        children,
+      });
     },
     tr: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('tr' as any, { ...rest, 'data-testid': 'markdown-tr', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('tr' as any, {
+        ...rest,
+        'data-testid': 'markdown-tr',
+        children,
+      });
     },
     th: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('th' as any, {
         ...rest,
         'data-testid': 'markdown-th',
@@ -482,7 +541,7 @@ const buildEditorAlignedComponents = (
       });
     },
     td: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('td' as any, {
         ...rest,
         'data-testid': 'markdown-td',
@@ -493,7 +552,7 @@ const buildEditorAlignedComponents = (
 
     // input[type=checkbox]：task list 的 checkbox（兜底，主逻辑在 li 中）
     input: (props: any) => {
-      const { node, type, checked, disabled, ...rest } = props;
+      const { node: _node, type, checked, disabled, ...rest } = props;
       if (type === 'checkbox') {
         return jsx(Checkbox as any, {
           checked: !!checked,
@@ -509,7 +568,7 @@ const buildEditorAlignedComponents = (
     // ================================================================
 
     a: (props: any) => {
-      const { node, href, onClick: origOnClick, ...rest } = props;
+      const { node: _node, href, onClick: _origOnClick, ...rest } = props;
       const openInNewTab = linkConfig?.openInNewTab !== false;
       return jsx('a' as any, {
         ...rest,
@@ -532,7 +591,7 @@ const buildEditorAlignedComponents = (
     },
 
     strong: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('strong' as any, {
         ...rest,
         'data-testid': 'markdown-bold',
@@ -542,7 +601,7 @@ const buildEditorAlignedComponents = (
     },
 
     em: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('em' as any, {
         ...rest,
         'data-testid': 'markdown-italic',
@@ -552,12 +611,16 @@ const buildEditorAlignedComponents = (
     },
 
     del: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('del' as any, { ...rest, 'data-testid': 'markdown-strikethrough', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('del' as any, {
+        ...rest,
+        'data-testid': 'markdown-strikethrough',
+        children,
+      });
     },
 
     code: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('code' as any, {
         ...rest,
         'data-testid': 'markdown-inline-code',
@@ -567,17 +630,21 @@ const buildEditorAlignedComponents = (
     },
 
     mark: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('mark' as any, {
         ...rest,
         'data-testid': 'markdown-mark',
-        style: { background: '#f59e0b', padding: '0.1em 0.2em', borderRadius: 2 },
+        style: {
+          background: '#f59e0b',
+          padding: '0.1em 0.2em',
+          borderRadius: 2,
+        },
         children,
       });
     },
 
     kbd: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('kbd' as any, {
         ...rest,
         'data-testid': 'markdown-kbd',
@@ -594,25 +661,30 @@ const buildEditorAlignedComponents = (
     },
 
     sub: (props: any) => {
-      const { node, children, ...rest } = props;
-      return jsx('sub' as any, { ...rest, 'data-testid': 'markdown-sub', children });
+      const { node: _node, children, ...rest } = props;
+      return jsx('sub' as any, {
+        ...rest,
+        'data-testid': 'markdown-sub',
+        children,
+      });
     },
 
     // ================================================================
     // 代码块 pre > code → 路由到自定义渲染器
     pre: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       const codeChild = Array.isArray(children) ? children[0] : children;
       const codeProps = codeChild?.props || {};
       const language = extractLanguageFromClassName(codeProps.className);
 
-      const CodeBlockComponent = userComponents.__codeBlock || userComponents.code;
+      const CodeBlockComponent =
+        userComponents.__codeBlock || userComponents.code;
       if (CodeBlockComponent) {
         return jsx(CodeBlockComponent as any, {
           ...rest,
           language,
           children: codeProps.children,
-          node,
+          node: _node,
         });
       }
 
@@ -623,8 +695,8 @@ const buildEditorAlignedComponents = (
     },
 
     img: (props: any) => {
-      const { node, src, alt, width, height, ...rest } = props;
-      const imgWidth = width ? (Number(width) || width) : 400;
+      const { node: _node, src, alt, width, height, ..._rest } = props;
+      const imgWidth = width ? Number(width) || width : 400;
       return jsx('div' as any, {
         'data-be': 'image',
         'data-testid': 'markdown-image',
@@ -667,7 +739,7 @@ const buildEditorAlignedComponents = (
 
     // 视频：对齐 ReadonlyMedia 的 video 处理
     video: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('div' as any, {
         'data-be': 'media',
         'data-testid': 'markdown-video',
@@ -691,7 +763,7 @@ const buildEditorAlignedComponents = (
 
     // 音频：对齐 ReadonlyMedia 的 audio 处理
     audio: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('div' as any, {
         'data-be': 'media',
         'data-testid': 'markdown-audio',
@@ -711,7 +783,7 @@ const buildEditorAlignedComponents = (
 
     // iframe
     iframe: (props: any) => {
-      const { node, ...rest } = props;
+      const { node: _node, ...rest } = props;
       return jsx('div' as any, {
         'data-testid': 'markdown-iframe',
         style: {
@@ -732,13 +804,17 @@ const buildEditorAlignedComponents = (
     },
 
     hr: (props: any) => {
-      const { node, ...rest } = props;
-      return jsx('hr' as any, { ...rest, 'data-be': 'hr', 'data-testid': 'markdown-hr' });
+      const { node: _node, ...rest } = props;
+      return jsx('hr' as any, {
+        ...rest,
+        'data-be': 'hr',
+        'data-testid': 'markdown-hr',
+      });
     },
 
     // 脚注引用 sup > a（remark-gfm 有定义时生成）
     sup: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       return jsx('span' as any, {
         ...rest,
         'data-fnc': 'fnc',
@@ -753,7 +829,7 @@ const buildEditorAlignedComponents = (
     },
 
     span: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node: _node, children, ...rest } = props;
       if (rest['data-fnc'] === 'fnc') {
         return jsx('span' as any, {
           ...rest,
@@ -770,10 +846,10 @@ const buildEditorAlignedComponents = (
     },
 
     section: (props: any) => {
-      const { node, children, className, ...rest } = props;
+      const { node: _node, children, className, ...rest } = props;
       const isFootnotes =
         className === 'footnotes' ||
-        (typeof rest?.['data-footnotes'] !== 'undefined');
+        typeof rest?.['data-footnotes'] !== 'undefined';
       if (isFootnotes) {
         return jsx('div' as any, {
           ...rest,
@@ -794,7 +870,7 @@ const buildEditorAlignedComponents = (
     think: ThinkBlockRendererComponent,
 
     answer: (props: any) => {
-      const { node, children } = props;
+      const { node: _node, children } = props;
       return jsx(Fragment, { children });
     },
 
@@ -870,7 +946,7 @@ const splitMarkdownBlocks = (content: string): string[] => {
   return blocks;
 };
 
-const BLOCK_CACHE_KEY = Symbol('blockCache');
+const _BLOCK_CACHE_KEY = Symbol('blockCache');
 
 interface BlockCacheEntry {
   source: string;
@@ -891,7 +967,7 @@ interface BlockCacheEntry {
  * 对最后一个块做节流：只在新增了换行、块级标记、或超过一定字符数时才重新解析。
  */
 const LAST_BLOCK_THROTTLE_CHARS = 20;
-const BLOCK_BOUNDARY_TRIGGERS = /[\n`|#>*\-\[\]!$]/;
+const BLOCK_BOUNDARY_TRIGGERS = /[\n`|#>*\-[\]]!$]/;
 
 const shouldReparseLastBlock = (
   prevSource: string | undefined,
@@ -912,7 +988,10 @@ export const useMarkdownToReact = (
 ): React.ReactNode => {
   const processorRef = useRef<Processor | null>(null);
   const blockCacheRef = useRef<Map<string, BlockCacheEntry>>(new Map());
-  const lastBlockRef = useRef<{ source: string; element: React.ReactNode } | null>(null);
+  const lastBlockRef = useRef<{
+    source: string;
+    element: React.ReactNode;
+  } | null>(null);
 
   const processor = useMemo(() => {
     const p = createHastProcessor(options?.remarkPlugins, options?.htmlConfig);
@@ -924,15 +1003,21 @@ export const useMarkdownToReact = (
 
   const components = useMemo(() => {
     const userComponents = options?.components || {};
-    return buildEditorAlignedComponents(prefixCls, userComponents, options?.linkConfig);
+    return buildEditorAlignedComponents(
+      prefixCls,
+      userComponents,
+      options?.linkConfig,
+    );
   }, [prefixCls, options?.components, options?.linkConfig]);
 
   return useMemo(() => {
     if (!content) return null;
 
     try {
-      const preprocessed = content
-        .replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$');
+      const preprocessed = content.replace(
+        new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'),
+        '$',
+      );
 
       const blocks = splitMarkdownBlocks(preprocessed);
       if (blocks.length === 0) return null;
@@ -962,9 +1047,15 @@ export const useMarkdownToReact = (
         // 最后一个块：节流——仅在有意义的变化时重新解析
         if (isLast && lastBlockRef.current) {
           if (!shouldReparseLastBlock(lastBlockRef.current.source, block)) {
-            newCache.set(block, { source: lastBlockRef.current.source, element: lastBlockRef.current.element });
+            newCache.set(block, {
+              source: lastBlockRef.current.source,
+              element: lastBlockRef.current.element,
+            });
             elements.push(
-              jsx(Fragment, { children: lastBlockRef.current.element, key: stableKey }),
+              jsx(Fragment, {
+                children: lastBlockRef.current.element,
+                key: stableKey,
+              }),
             );
             continue;
           }
@@ -974,9 +1065,7 @@ export const useMarkdownToReact = (
         const entry = { source: block, element };
         newCache.set(block, entry);
         if (isLast) lastBlockRef.current = entry;
-        elements.push(
-          jsx(Fragment, { children: element, key: stableKey }),
-        );
+        elements.push(jsx(Fragment, { children: element, key: stableKey }));
       }
 
       blockCacheRef.current = newCache;
@@ -1001,8 +1090,10 @@ export const markdownToReactSync = (
 
   try {
     const processor = createHastProcessor(remarkPlugins, htmlConfig);
-    const preprocessed = content
-      .replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$');
+    const preprocessed = content.replace(
+      new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'),
+      '$',
+    );
 
     const mdast = processor.parse(preprocessed);
     const hast = processor.runSync(mdast);

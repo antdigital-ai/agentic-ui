@@ -54,15 +54,15 @@ SSE token 到达
 
 ### 涉及文件
 
-| 文件 | 职责 |
-|------|------|
-| `src/Bubble/MessagesContent/MarkdownPreview.tsx` | 流式场景入口，content → schema → updateNodeList |
-| `src/MarkdownEditor/BaseMarkdownEditor.tsx` | 创建 Slate Editor 实例，挂载全部编辑态基础设施 |
-| `src/MarkdownEditor/editor/Editor.tsx` | Slate `<Editable>` 渲染，包含 paste/keyboard/composition 等编辑逻辑 |
-| `src/MarkdownEditor/editor/store.ts` | `updateNodeList` + `generateDiffOperations` 差分更新核心 |
-| `src/MarkdownEditor/editor/parser/parserMdToSchema.ts` | Markdown → Slate Node 解析 |
-| `src/MarkdownEditor/editor/elements/` | 各元素的 Readonly 组件（ReadonlyParagraph、ReadonlyCode 等） |
-| `src/Plugins/` | 标准插件（chart、code、katex、mermaid） |
+| 文件                                                   | 职责                                                                |
+| ------------------------------------------------------ | ------------------------------------------------------------------- |
+| `src/Bubble/MessagesContent/MarkdownPreview.tsx`       | 流式场景入口，content → schema → updateNodeList                     |
+| `src/MarkdownEditor/BaseMarkdownEditor.tsx`            | 创建 Slate Editor 实例，挂载全部编辑态基础设施                      |
+| `src/MarkdownEditor/editor/Editor.tsx`                 | Slate `<Editable>` 渲染，包含 paste/keyboard/composition 等编辑逻辑 |
+| `src/MarkdownEditor/editor/store.ts`                   | `updateNodeList` + `generateDiffOperations` 差分更新核心            |
+| `src/MarkdownEditor/editor/parser/parserMdToSchema.ts` | Markdown → Slate Node 解析                                          |
+| `src/MarkdownEditor/editor/elements/`                  | 各元素的 Readonly 组件（ReadonlyParagraph、ReadonlyCode 等）        |
+| `src/Plugins/`                                         | 标准插件（chart、code、katex、mermaid）                             |
 
 ### 只读渲染时仍加载的编辑态开销
 
@@ -83,13 +83,13 @@ SSE token 到达
 
 以一条包含代码块和表格的典型 AI 回复为例，每次 `content` 变化时：
 
-| 步骤 | 操作 | 时间复杂度 | 说明 |
-|------|------|-----------|------|
-| 1 | `parserMdToSchema(content)` | O(n) | 全量重新解析整个 content 字符串 |
-| 2 | `generateDiffOperations()` | O(n) | 递归比较新旧 Slate 节点树 |
-| 3 | `executeOperations()` | O(k) | 通过 Transforms 执行 k 个操作 |
-| 4 | Slate normalizing | O(k) | 每个 Transform 触发 normalize |
-| 5 | React reconciliation | O(m) | Slate 触发 m 个组件更新 |
+| 步骤 | 操作                        | 时间复杂度 | 说明                            |
+| ---- | --------------------------- | ---------- | ------------------------------- |
+| 1    | `parserMdToSchema(content)` | O(n)       | 全量重新解析整个 content 字符串 |
+| 2    | `generateDiffOperations()`  | O(n)       | 递归比较新旧 Slate 节点树       |
+| 3    | `executeOperations()`       | O(k)       | 通过 Transforms 执行 k 个操作   |
+| 4    | Slate normalizing           | O(k)       | 每个 Transform 触发 normalize   |
+| 5    | React reconciliation        | O(m)       | Slate 触发 m 个组件更新         |
 
 **关键问题**：步骤 1 和 2 在每个 token 到达时都是 **全量** 操作。当 content 达到数千字时，仅解析和比较就需要数毫秒。而 SSE 场景下 token 可能以 50-100ms 间隔到达，导致持续的 CPU 压力。
 
@@ -189,12 +189,7 @@ const MarkdownPreview = (props: MarkdownPreviewProps) => {
   }
 
   // 编辑场景：使用 Slate 编辑器（保持不变）
-  return (
-    <MarkdownEditor
-      initValue={content}
-      readonly={false}
-    />
-  );
+  return <MarkdownEditor initValue={content} readonly={false} />;
 };
 ```
 
@@ -297,7 +292,10 @@ class CharacterQueue {
   dispose(): void {
     this.disposed = true;
     this.cancelAllTicks();
-    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    document.removeEventListener(
+      'visibilitychange',
+      this.handleVisibilityChange,
+    );
   }
 
   // ---- 调度核心 ----
@@ -495,7 +493,10 @@ class IncrementalMarkdownRenderer {
       .map((b) => b.html)
       .join('');
 
-    const changedContent = this.getContentFromBlock(content, affectedBlockIndex);
+    const changedContent = this.getContentFromBlock(
+      content,
+      affectedBlockIndex,
+    );
     const changedHtml = markdownToHtmlSync(changedContent);
 
     // 更新缓存
@@ -532,8 +533,7 @@ class IncrementalMarkdownRenderer {
 </pre>
 
 <!-- 图表 -->
-<div data-block-type="chart" data-block-id="b2" data-chart-config="...">
-</div>
+<div data-block-type="chart" data-block-id="b2" data-chart-config="..."></div>
 ```
 
 渲染后，通过 `useEffect` + `querySelectorAll` 找到标记节点，用 `createPortal` 挂载 React 组件：
@@ -596,9 +596,7 @@ const markdownToReact = (
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
     .use(rehypeKatex)
-    .runSync(
-      unified().use(remarkParse).parse(markdown)
-    );
+    .runSync(unified().use(remarkParse).parse(markdown));
 
   return toJsxRuntime(hast, {
     Fragment,
@@ -617,6 +615,7 @@ const markdownToReact = (
 ```
 
 **推荐方案 B**，因为：
+
 - 无 `dangerouslySetInnerHTML`，无 XSS 风险
 - React 组件树有完整的生命周期，可以做 memo 优化
 - 插件系统可以直接注入自定义组件
@@ -766,37 +765,37 @@ const MarkdownPreview = (props) => {
 
 ### 性能对比
 
-| 指标 | Slate 渲染（现有） | HTML 渲染（新方案） | 提升 |
-|------|-------------------|-------------------|------|
-| 每 token 处理延迟 | 5-20ms (parse + diff + transforms) | < 1ms (queue push) | 10-20x |
-| 首屏渲染 | 慢（需创建 Slate 实例） | 快（纯 HTML/React） | 2-3x |
-| 内存占用 | 高（双树 + History + Store） | 低（单树 + HTML cache） | 50%+ |
-| 长文档流式 | 线性退化（全量 diff） | 亚线性（增量 HTML + 缓存） | 显著 |
-| CPU 占用（流式） | 持续高（每 token 全量计算） | 低（RAF 批量 + 队列） | 5-10x |
+| 指标              | Slate 渲染（现有）                 | HTML 渲染（新方案）        | 提升   |
+| ----------------- | ---------------------------------- | -------------------------- | ------ |
+| 每 token 处理延迟 | 5-20ms (parse + diff + transforms) | < 1ms (queue push)         | 10-20x |
+| 首屏渲染          | 慢（需创建 Slate 实例）            | 快（纯 HTML/React）        | 2-3x   |
+| 内存占用          | 高（双树 + History + Store）       | 低（单树 + HTML cache）    | 50%+   |
+| 长文档流式        | 线性退化（全量 diff）              | 亚线性（增量 HTML + 缓存） | 显著   |
+| CPU 占用（流式）  | 持续高（每 token 全量计算）        | 低（RAF 批量 + 队列）      | 5-10x  |
 
 ### 功能对比
 
-| 功能 | Slate 渲染 | HTML 渲染 | 说明 |
-|------|-----------|----------|------|
-| 基础 Markdown | ✅ | ✅ | GFM、表格、列表等 |
-| 代码高亮 | ✅ | ✅ | 通过 rendererComponents 适配 |
-| 图表 | ✅ | ✅ | 通过 rendererComponents 适配 |
-| Mermaid | ✅ | ✅ | 通过 rendererComponents 适配 |
-| KaTeX | ✅ | ✅ | rehype-katex 原生支持 |
-| 打字动画 | ❌ 无原生支持 | ✅ 字符队列天然支持 | 核心优势 |
-| 内联编辑 | ✅ | ❌ 需切换到 Slate | 只读场景不需要 |
-| 文本选择/复制 | ✅ | ✅ | 原生 HTML 选择 |
-| 自定义渲染 | ✅ eleItemRender | ✅ blockRenderers / components | 接口略有不同 |
-| Typewriter 滚动 | ✅ | ✅ | useAutoScroll 可复用 |
+| 功能            | Slate 渲染       | HTML 渲染                      | 说明                         |
+| --------------- | ---------------- | ------------------------------ | ---------------------------- |
+| 基础 Markdown   | ✅               | ✅                             | GFM、表格、列表等            |
+| 代码高亮        | ✅               | ✅                             | 通过 rendererComponents 适配 |
+| 图表            | ✅               | ✅                             | 通过 rendererComponents 适配 |
+| Mermaid         | ✅               | ✅                             | 通过 rendererComponents 适配 |
+| KaTeX           | ✅               | ✅                             | rehype-katex 原生支持        |
+| 打字动画        | ❌ 无原生支持    | ✅ 字符队列天然支持            | 核心优势                     |
+| 内联编辑        | ✅               | ❌ 需切换到 Slate              | 只读场景不需要               |
+| 文本选择/复制   | ✅               | ✅                             | 原生 HTML 选择               |
+| 自定义渲染      | ✅ eleItemRender | ✅ blockRenderers / components | 接口略有不同                 |
+| Typewriter 滚动 | ✅               | ✅                             | useAutoScroll 可复用         |
 
 ### 架构复杂度对比
 
-| 维度 | Slate 渲染 | HTML 渲染 |
-|------|-----------|----------|
-| 中间表示层数 | 4 (MD → mdast → Slate → VDOM) | 2 (MD → HTML/hast → VDOM) |
-| 依赖体积 | slate + slate-react + slate-history (~80KB) | unified 生态（已有） |
-| 只读组件数 | 15+ Readonly* 组件 | 0（或少量 renderer 组件） |
-| Store 复杂度 | EditorStore 2500+ 行 | 无需 Store |
+| 维度         | Slate 渲染                                  | HTML 渲染                 |
+| ------------ | ------------------------------------------- | ------------------------- |
+| 中间表示层数 | 4 (MD → mdast → Slate → VDOM)               | 2 (MD → HTML/hast → VDOM) |
+| 依赖体积     | slate + slate-react + slate-history (~80KB) | unified 生态（已有）      |
+| 只读组件数   | 15+ Readonly\* 组件                         | 0（或少量 renderer 组件） |
+| Store 复杂度 | EditorStore 2500+ 行                        | 无需 Store                |
 
 ---
 
@@ -807,6 +806,7 @@ const MarkdownPreview = (props) => {
 **问题**：Slate 渲染和 HTML 渲染的视觉输出可能不完全一致。
 
 **缓解**：
+
 - 复用现有的 CSS 类名体系（`prefixCls` + BEM）
 - 为 MarkdownRenderer 的 HTML 输出应用相同的 CSS-in-JS 样式
 - 建立视觉回归测试（Playwright screenshot comparison）
@@ -816,6 +816,7 @@ const MarkdownPreview = (props) => {
 **问题**：现有插件的 `elements` 组件接收的是 Slate `ElementProps`，无法直接用于 HTML 渲染。
 
 **缓解**：
+
 - 新增 `renderer.rendererComponents` 接口，与 `elements` 并行
 - 标准插件（code、chart、mermaid、katex）提供双模渲染组件
 - 第三方插件可以选择性地实现 `renderer` 字段
@@ -825,6 +826,7 @@ const MarkdownPreview = (props) => {
 **问题**：如果在流式进行中切换到编辑模式，需要无缝衔接。
 
 **缓解**：
+
 - 流式进行中禁止切换到编辑模式（UI 上 disable 编辑按钮）
 - 流式完成后，通过预缓存的 `parserMdToSchema` 结果快速初始化 Slate
 
@@ -833,6 +835,7 @@ const MarkdownPreview = (props) => {
 **问题**：`dangerouslySetInnerHTML` 有 XSS 风险。
 
 **缓解**：
+
 - **推荐方案 B**（hast-util-to-jsx-runtime），完全不使用 dangerouslySetInnerHTML
 - 如果使用方案 A，通过 `rehype-sanitize` 做 HTML 净化
 
@@ -841,6 +844,7 @@ const MarkdownPreview = (props) => {
 **问题**：`requestAnimationFrame` 在浏览器标签页不可见时会被暂停（Chrome/Firefox）或极大限流（Safari ~1fps），导致字符队列完全停滞，已推入的 token 无法消费。
 
 **缓解**：
+
 - CharacterQueue 使用**混合调度策略**：可见时 RAF，不可见时 `setTimeout`
 - 后台 `setTimeout` 以 100ms 间隔 + 10x batch 倍率运行，快速消费堆积的 token
 - 监听 `visibilitychange` 事件，标签页切回时无缝切换为 RAF 模式恢复动画
@@ -849,9 +853,10 @@ const MarkdownPreview = (props) => {
 
 ### 风险 6：流式 Markdown 不完整片段
 
-**问题**：流式过程中的 Markdown 可能是不完整的（如 `` ```js\nconst `` 代码块未闭合）。
+**问题**：流式过程中的 Markdown 可能是不完整的（如 ` ```js\nconst ` 代码块未闭合）。
 
 **缓解**：
+
 - 现有的 `parserMdToSchema` 已经处理了不完整片段的问题（因为当前就是每个 token 都重新解析）
 - unified pipeline 同样能处理不完整的 Markdown（未闭合的代码块会当作最后一个块元素）
 - 通过 `rehypeCodeBlock` 插件中已有的 `data-state="loading"` 标记来识别未完成的代码块
@@ -865,37 +870,37 @@ const MarkdownPreview = (props) => {
 
 涉及的新增/修改：
 
-| 类型 | 路径 | 说明 |
-|------|------|------|
-| 新增 | `src/MarkdownRenderer/CharacterQueue.ts` | 字符队列核心 |
-| 新增 | `src/MarkdownRenderer/MarkdownRenderer.tsx` | 主渲染组件 |
-| 新增 | `src/MarkdownRenderer/useMarkdownToReact.ts` | hast → React 转换 hook |
-| 新增 | `src/MarkdownRenderer/IncrementalRenderer.ts` | 增量渲染优化 |
-| 新增 | `src/MarkdownRenderer/index.tsx` | 导出入口 |
-| 新增 | `src/MarkdownRenderer/style.ts` | 样式文件 |
-| 新增 | `src/MarkdownRenderer/types.ts` | 类型定义 |
-| 新增 | `src/MarkdownRenderer/__tests__/` | 测试文件 |
+| 类型 | 路径                                          | 说明                   |
+| ---- | --------------------------------------------- | ---------------------- |
+| 新增 | `src/MarkdownRenderer/CharacterQueue.ts`      | 字符队列核心           |
+| 新增 | `src/MarkdownRenderer/MarkdownRenderer.tsx`   | 主渲染组件             |
+| 新增 | `src/MarkdownRenderer/useMarkdownToReact.ts`  | hast → React 转换 hook |
+| 新增 | `src/MarkdownRenderer/IncrementalRenderer.ts` | 增量渲染优化           |
+| 新增 | `src/MarkdownRenderer/index.tsx`              | 导出入口               |
+| 新增 | `src/MarkdownRenderer/style.ts`               | 样式文件               |
+| 新增 | `src/MarkdownRenderer/types.ts`               | 类型定义               |
+| 新增 | `src/MarkdownRenderer/__tests__/`             | 测试文件               |
 
 ### Phase 2：插件适配
 
-| 类型 | 路径 | 说明 |
-|------|------|------|
-| 修改 | `src/MarkdownEditor/plugin.ts` | 扩展 MarkdownEditorPlugin 类型 |
-| 新增 | `src/MarkdownRenderer/renderers/CodeRenderer.tsx` | 代码块渲染器 |
-| 新增 | `src/MarkdownRenderer/renderers/ChartRenderer.tsx` | 图表渲染器 |
-| 新增 | `src/MarkdownRenderer/renderers/MermaidRenderer.tsx` | Mermaid 渲染器 |
-| 新增 | `src/MarkdownRenderer/renderers/KatexRenderer.tsx` | KaTeX 渲染器 |
-| 修改 | `src/Plugins/defaultPlugins.tsx` | 添加 renderer 字段 |
+| 类型 | 路径                                                 | 说明                           |
+| ---- | ---------------------------------------------------- | ------------------------------ |
+| 修改 | `src/MarkdownEditor/plugin.ts`                       | 扩展 MarkdownEditorPlugin 类型 |
+| 新增 | `src/MarkdownRenderer/renderers/CodeRenderer.tsx`    | 代码块渲染器                   |
+| 新增 | `src/MarkdownRenderer/renderers/ChartRenderer.tsx`   | 图表渲染器                     |
+| 新增 | `src/MarkdownRenderer/renderers/MermaidRenderer.tsx` | Mermaid 渲染器                 |
+| 新增 | `src/MarkdownRenderer/renderers/KatexRenderer.tsx`   | KaTeX 渲染器                   |
+| 修改 | `src/Plugins/defaultPlugins.tsx`                     | 添加 renderer 字段             |
 
 ### Phase 3：集成
 
-| 类型 | 路径 | 说明 |
-|------|------|------|
-| 修改 | `src/Bubble/MessagesContent/MarkdownPreview.tsx` | 添加 renderMode 分发 |
-| 修改 | `src/Workspace/RealtimeFollow/index.tsx` | 适配新渲染器 |
-| 修改 | `src/ThoughtChainList/MarkdownEditor.tsx` | 适配新渲染器 |
-| 修改 | `src/MarkdownEditor/types.ts` | 添加 renderMode 类型 |
-| 修改 | `src/index.ts` | 导出 MarkdownRenderer |
+| 类型 | 路径                                             | 说明                  |
+| ---- | ------------------------------------------------ | --------------------- |
+| 修改 | `src/Bubble/MessagesContent/MarkdownPreview.tsx` | 添加 renderMode 分发  |
+| 修改 | `src/Workspace/RealtimeFollow/index.tsx`         | 适配新渲染器          |
+| 修改 | `src/ThoughtChainList/MarkdownEditor.tsx`        | 适配新渲染器          |
+| 修改 | `src/MarkdownEditor/types.ts`                    | 添加 renderMode 类型  |
+| 修改 | `src/index.ts`                                   | 导出 MarkdownRenderer |
 
 ### Phase 4：测试与优化
 
@@ -962,7 +967,7 @@ const MarkdownRenderer = (props) => {
   return wrapSSR(
     <div className={clsx(prefixCls, `${prefixCls}-readonly`, hashId)}>
       {/* HTML 内容 */}
-    </div>
+    </div>,
   );
 };
 ```

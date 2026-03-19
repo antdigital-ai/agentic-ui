@@ -186,7 +186,14 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         readonly
       />
     );
-  }, [hidePadding, typing, props.originData?.isLast, isPaddingHidden, content, renderMode]);
+  }, [
+    hidePadding,
+    typing,
+    props.originData?.isLast,
+    isPaddingHidden,
+    content,
+    renderMode,
+  ]);
 
   const errorDom = (
     <div

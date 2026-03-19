@@ -415,6 +415,7 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
     </>
   );
 
+  // 收起时不渲染 thinkContent，避免双份 DOM 和重复布局计算，减轻展开/收起卡顿
   return (
     <AnimatePresence initial={false} mode="sync">
       {expandedState ? (
@@ -430,30 +431,15 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
         >
           {innerContent}
         </motion.div>
-      ) : null}
-      {!expandedState ? (
+      ) : showFloatingExpand ? (
         <div
-          style={{
-            visibility: 'hidden',
-            height: 1,
-            overflow: 'hidden',
-            opacity: 0,
-          }}
+          className={floatingExpandClassName}
+          onClick={onToggleFloatingExpand}
+          data-testid="tool-use-bar-think-floating-expand"
+          style={styles?.floatingExpand}
         >
-          <div className={contentClassName} style={styles?.content}>
-            {thinkContent}
-          </div>
-          {showFloatingExpand ? (
-            <div
-              className={floatingExpandClassName}
-              onClick={onToggleFloatingExpand}
-              data-testid="tool-use-bar-think-floating-expand"
-              style={styles?.floatingExpand}
-            >
-              {floatingIcon}
-              {floatingText}
-            </div>
-          ) : null}
+          {floatingIcon}
+          {floatingText}
         </div>
       ) : null}
     </AnimatePresence>

@@ -9,15 +9,15 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useStyle as useContentStyle } from '../MarkdownEditor/editor/style';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
-import { useStyle as useContentStyle } from '../MarkdownEditor/editor/style';
-import { useRendererVarStyle } from './style';
 import { CharacterQueue } from './CharacterQueue';
+import { ChartBlockRenderer } from './renderers/ChartRenderer';
 import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
-import { ChartBlockRenderer } from './renderers/ChartRenderer';
 import { SchemaBlockRenderer } from './renderers/SchemaRenderer';
+import { useRendererVarStyle } from './style';
 import type {
   MarkdownRendererProps,
   MarkdownRendererRef,
@@ -25,7 +25,12 @@ import type {
 } from './types';
 import { useMarkdownToReact } from './useMarkdownToReact';
 
-const SCHEMA_LANGUAGES = new Set(['schema', 'apaasify', 'apassify', 'agentar-card']);
+const SCHEMA_LANGUAGES = new Set([
+  'schema',
+  'apaasify',
+  'apassify',
+  'agentar-card',
+]);
 
 /**
  * 从插件列表中收集 rendererComponents
@@ -33,7 +38,10 @@ const SCHEMA_LANGUAGES = new Set(['schema', 'apaasify', 'apassify', 'agentar-car
 const collectRendererComponents = (
   plugins?: MarkdownEditorPlugin[],
 ): Record<string, React.ComponentType<RendererBlockProps>> => {
-  const components: Record<string, React.ComponentType<RendererBlockProps>> = {};
+  const components: Record<
+    string,
+    React.ComponentType<RendererBlockProps>
+  > = {};
   if (!plugins) return components;
   for (const plugin of plugins) {
     const renderer = (plugin as any).renderer;
@@ -67,7 +75,13 @@ const DefaultCodeRouter: React.FC<
 
   if (SCHEMA_LANGUAGES.has(language)) {
     const SchemaComp = pluginComponents.schema || SchemaBlockRenderer;
-    return <SchemaComp {...rest} language={language} apaasifyRender={apaasifyRender} />;
+    return (
+      <SchemaComp
+        {...rest}
+        language={language}
+        apaasifyRender={apaasifyRender}
+      />
+    );
   }
 
   const CodeComp = pluginComponents.code || CodeBlockRenderer;
@@ -83,152 +97,153 @@ const DefaultCodeRouter: React.FC<
  * - Markdown → hast → React 元素树（hast-util-to-jsx-runtime）
  * - 特殊块（code / mermaid / chart / katex）通过组件映射拦截渲染
  */
-const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendererProps>(
-  (props, ref) => {
-    const {
-      content,
-      streaming = false,
-      isFinished,
-      queueOptions,
-      plugins,
-      remarkPlugins,
-      htmlConfig,
-      className,
-      style,
-      prefixCls: customPrefixCls,
-      linkConfig,
-      apaasify,
-    } = props;
+const InternalMarkdownRenderer = forwardRef<
+  MarkdownRendererRef,
+  MarkdownRendererProps
+>((props, ref) => {
+  const {
+    content,
+    streaming = false,
+    isFinished,
+    queueOptions,
+    plugins,
+    remarkPlugins,
+    htmlConfig,
+    className,
+    style,
+    prefixCls: customPrefixCls,
+    linkConfig,
+    apaasify,
+  } = props;
 
-    const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
-    // 复用 MarkdownEditor 的 CSS 前缀和样式，保持渲染一致性
-    const prefixCls = getPrefixCls('agentic-md-editor', customPrefixCls);
-    const { wrapSSR, hashId } = useEditorStyle(prefixCls);
-    // 注册 content 层的样式（段落间距、链接、blockquote 等）
-    const contentCls = `${prefixCls}-content`;
-    const { wrapSSR: wrapContentSSR } = useContentStyle(contentCls, {});
-    // 注册间距 CSS 变量回退值（:where 低优先级，不覆盖宿主定义）
-    const { wrapSSR: wrapVarSSR } = useRendererVarStyle(prefixCls);
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  // 复用 MarkdownEditor 的 CSS 前缀和样式，保持渲染一致性
+  const prefixCls = getPrefixCls('agentic-md-editor', customPrefixCls);
+  const { wrapSSR, hashId } = useEditorStyle(prefixCls);
+  // 注册 content 层的样式（段落间距、链接、blockquote 等）
+  const contentCls = `${prefixCls}-content`;
+  const { wrapSSR: wrapContentSSR } = useContentStyle(contentCls, {});
+  // 注册间距 CSS 变量回退值（:where 低优先级，不覆盖宿主定义）
+  const { wrapSSR: wrapVarSSR } = useRendererVarStyle(prefixCls);
 
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [displayedContent, setDisplayedContent] = useState(content || '');
-    const queueRef = useRef<CharacterQueue | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [displayedContent, setDisplayedContent] = useState(content || '');
+  const queueRef = useRef<CharacterQueue | null>(null);
 
-    useImperativeHandle(ref, () => ({
-      nativeElement: containerRef.current,
-      getDisplayedContent: () => displayedContent,
-    }));
+  useImperativeHandle(ref, () => ({
+    nativeElement: containerRef.current,
+    getDisplayedContent: () => displayedContent,
+  }));
 
-    // 收集插件的 rendererComponents
-    const pluginComponents = useMemo(
-      () => collectRendererComponents(plugins),
-      [plugins],
-    );
+  // 收集插件的 rendererComponents
+  const pluginComponents = useMemo(
+    () => collectRendererComponents(plugins),
+    [plugins],
+  );
 
-    // 字符队列管理
-    useEffect(() => {
-      if (!streaming) {
-        // 非流式：直接展示全部内容
-        setDisplayedContent(content || '');
-        return;
-      }
+  // 字符队列管理
+  useEffect(() => {
+    if (!streaming) {
+      // 非流式：直接展示全部内容
+      setDisplayedContent(content || '');
+      return;
+    }
 
-      if (!queueRef.current) {
-        queueRef.current = new CharacterQueue(
-          (displayed) => setDisplayedContent(displayed),
-          queueOptions,
-        );
-      }
-
-      queueRef.current.push(content || '');
-
-      return undefined;
-    }, [content, streaming, queueOptions]);
-
-    // 流式完成时 flush 所有剩余内容
-    useEffect(() => {
-      if (isFinished && queueRef.current) {
-        queueRef.current.complete();
-      }
-    }, [isFinished]);
-
-    // 清理
-    useEffect(() => {
-      return () => {
-        queueRef.current?.dispose();
-        queueRef.current = null;
-      };
-    }, []);
-
-    // 非流式内容变化时同步
-    useEffect(() => {
-      if (!streaming) {
-        setDisplayedContent(content || '');
-      }
-    }, [content, streaming]);
-
-    // 构建组件映射
-    // code 渲染器通过 pre override 在 useMarkdownToReact 中路由，
-    // 不直接映射到 <code> 标签（否则会影响行内代码 `code`）
-    const apaasifyRender = useMemo(() => {
-      if (apaasify?.enable && apaasify.render) return apaasify.render;
-      return undefined;
-    }, [apaasify]);
-
-    const components = useMemo(() => {
-      const codeRouter = (codeProps: RendererBlockProps) => (
-        <DefaultCodeRouter
-          {...codeProps}
-          pluginComponents={pluginComponents}
-          apaasifyRender={apaasifyRender}
-        />
+    if (!queueRef.current) {
+      queueRef.current = new CharacterQueue(
+        (displayed) => setDisplayedContent(displayed),
+        queueOptions,
       );
-      codeRouter.displayName = 'CodeRouter';
+    }
 
-      return {
-        __codeBlock: codeRouter,
-        ...pluginComponents,
-      };
-    }, [pluginComponents, apaasifyRender]);
+    queueRef.current.push(content || '');
 
-    const reactContent = useMarkdownToReact(displayedContent, {
-      remarkPlugins,
-      htmlConfig,
-      components,
-      prefixCls,
-      linkConfig,
-    });
+    return undefined;
+  }, [content, streaming, queueOptions]);
 
-    return wrapVarSSR(
-      wrapSSR(
-        wrapContentSSR(
+  // 流式完成时 flush 所有剩余内容
+  useEffect(() => {
+    if (isFinished && queueRef.current) {
+      queueRef.current.complete();
+    }
+  }, [isFinished]);
+
+  // 清理
+  useEffect(() => {
+    return () => {
+      queueRef.current?.dispose();
+      queueRef.current = null;
+    };
+  }, []);
+
+  // 非流式内容变化时同步
+  useEffect(() => {
+    if (!streaming) {
+      setDisplayedContent(content || '');
+    }
+  }, [content, streaming]);
+
+  // 构建组件映射
+  // code 渲染器通过 pre override 在 useMarkdownToReact 中路由，
+  // 不直接映射到 <code> 标签（否则会影响行内代码 `code`）
+  const apaasifyRender = useMemo(() => {
+    if (apaasify?.enable && apaasify.render) return apaasify.render;
+    return undefined;
+  }, [apaasify]);
+
+  const components = useMemo(() => {
+    const codeRouter = (codeProps: RendererBlockProps) => (
+      <DefaultCodeRouter
+        {...codeProps}
+        pluginComponents={pluginComponents}
+        apaasifyRender={apaasifyRender}
+      />
+    );
+    codeRouter.displayName = 'CodeRouter';
+
+    return {
+      __codeBlock: codeRouter,
+      ...pluginComponents,
+    };
+  }, [pluginComponents, apaasifyRender]);
+
+  const reactContent = useMarkdownToReact(displayedContent, {
+    remarkPlugins,
+    htmlConfig,
+    components,
+    prefixCls,
+    linkConfig,
+  });
+
+  return wrapVarSSR(
+    wrapSSR(
+      wrapContentSSR(
+        <div
+          ref={containerRef}
+          className={clsx(
+            prefixCls,
+            `${prefixCls}-readonly`,
+            hashId,
+            className,
+          )}
+          style={style}
+        >
           <div
-            ref={containerRef}
-            className={clsx(
-              prefixCls,
-              `${prefixCls}-readonly`,
-              hashId,
-              className,
-            )}
-            style={style}
+            className={clsx(`${prefixCls}-container`, hashId)}
+            style={{ display: 'block' }}
           >
             <div
-              className={clsx(`${prefixCls}-container`, hashId)}
-              style={{ display: 'block' }}
+              className={clsx(contentCls, hashId)}
+              style={{ whiteSpace: 'normal', wordWrap: 'normal' }}
             >
-              <div
-                className={clsx(contentCls, hashId)}
-                style={{ whiteSpace: 'normal', wordWrap: 'normal' }}
-              >
-                {reactContent}
-              </div>
+              {reactContent}
             </div>
-          </div>,
-        ),
+          </div>
+        </div>,
       ),
-    );
-  },
-);
+    ),
+  );
+});
 
 InternalMarkdownRenderer.displayName = 'MarkdownRenderer';
 

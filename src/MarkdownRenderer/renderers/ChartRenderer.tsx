@@ -2,8 +2,8 @@ import { ConfigProvider } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ChartRender } from '../../Plugins/chart/ChartRender';
 import { Loading } from '../../Components/Loading';
+import { ChartRender } from '../../Plugins/chart/ChartRender';
 import type { RendererBlockProps } from '../types';
 
 const extractTextContent = (children: React.ReactNode): string => {
@@ -84,7 +84,9 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
           ? chartData.config
           : [chartData.config]
         : [chartData];
-      setColumnLength(Math.min(Math.floor(Math.max(width, 256) / 256), configs.length));
+      setColumnLength(
+        Math.min(Math.floor(Math.max(width, 256) / 256), configs.length),
+      );
     };
     updateWidth();
     window.addEventListener('resize', updateWidth);
@@ -93,7 +95,13 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
 
   if (!chartData) {
     return (
-      <div className={clsx(`${prefixCls}-chart-block`, `${prefixCls}-chart-block--error`, className)}>
+      <div
+        className={clsx(
+          `${prefixCls}-chart-block`,
+          `${prefixCls}-chart-block--error`,
+          className,
+        )}
+      >
         <pre style={{ margin: 0, padding: 12, fontSize: 12 }}>{code}</pre>
       </div>
     );
@@ -123,31 +131,35 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
       }}
     >
       {!mounted ? (
-        <div style={{ padding: 12 }}><Loading /></div>
+        <div style={{ padding: 12 }}>
+          <Loading />
+        </div>
       ) : (
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 8,
-          userSelect: 'none',
-        }}
-      >
-        {configs.map((cfg, index) => {
-          const { chartType, x, y, ...rest } = cfg;
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+            userSelect: 'none',
+          }}
+        >
+          {configs.map((cfg, index) => {
+            const { chartType, x, y, ...rest } = cfg;
 
-          if (!chartType) {
-            return (
-              <div key={index} style={{ padding: 12, color: '#999' }}>
-                <Loading />
-              </div>
-            );
-          }
+            if (!chartType) {
+              return (
+                <div key={index} style={{ padding: 12, color: '#999' }}>
+                  <Loading />
+                </div>
+              );
+            }
 
-          const chartDataItems = dataSource
-            .map((item: any) => {
-              const { chartType: _ct, ...rowData } = item;
-              const row: Record<string, any> = { ...rowData, column_list: Object.keys(rowData) };
+            const chartDataItems = dataSource.map((item: any) => {
+              const { chartType: _chartType, ...rowData } = item;
+              const row: Record<string, any> = {
+                ...rowData,
+                column_list: Object.keys(rowData),
+              };
               if (x && row[x] !== undefined) {
                 const num = Number(row[x]);
                 if (!isNaN(num)) row[x] = num;
@@ -159,68 +171,77 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
               return row;
             });
 
-          const height = Math.min(400, containerRef.current?.clientWidth || 400);
+            const height = Math.min(
+              400,
+              containerRef.current?.clientWidth || 400,
+            );
 
-          const handleChartError = (error: Error, info: React.ErrorInfo) => {
-            console.error('[MarkdownRenderer ChartBlockRenderer] 渲染失败:', {
-              chartType,
-              title: rest?.title,
-              x,
-              y,
-              groupBy: rest?.groupBy,
-              colorLegend: rest?.colorLegend,
-              filterBy: rest?.filterBy,
-              dataSourceLength: chartDataItems.length,
-              columnsLength: columns.length,
-              error: error.message,
-              stack: error.stack,
-              componentStack: info.componentStack,
-            });
-          };
+            const handleChartError = (error: Error, info: React.ErrorInfo) => {
+              console.error('[MarkdownRenderer ChartBlockRenderer] 渲染失败:', {
+                chartType,
+                title: rest?.title,
+                x,
+                y,
+                groupBy: rest?.groupBy,
+                colorLegend: rest?.colorLegend,
+                filterBy: rest?.filterBy,
+                dataSourceLength: chartDataItems.length,
+                columnsLength: columns.length,
+                error: error.message,
+                stack: error.stack,
+                componentStack: info.componentStack,
+              });
+            };
 
-          const chartFallback = (
-            <div style={{ padding: 12, color: '#999', fontSize: 12 }}>
-              Chart: {rest?.title || chartType}
-            </div>
-          );
+            const chartFallback = (
+              <div style={{ padding: 12, color: '#999', fontSize: 12 }}>
+                Chart: {rest?.title || chartType}
+              </div>
+            );
 
-          return (
-            <div
-              key={index}
-              style={{
-                margin: 'auto',
-                minWidth: 0,
-                width: columnLength === 1 ? '100%' : `calc(${100 / columnLength}% - 8px)`,
-                maxWidth: '100%',
-                flex: 1,
-                userSelect: 'none',
-              }}
-            >
-              <ErrorBoundary fallback={chartFallback} onError={handleChartError}>
-                <ChartRender
-                  chartType={chartType}
-                  chartData={chartDataItems}
-                  columnLength={columnLength}
-                  onColumnLengthChange={setColumnLength}
-                  title={rest?.title}
-                  dataTime={rest?.dataTime}
-                  groupBy={rest?.groupBy}
-                  filterBy={rest?.filterBy}
-                  colorLegend={rest?.colorLegend}
-                  config={{
-                    height,
-                    x,
-                    y,
-                    columns,
-                    index,
-                    rest,
-                  }}
-                />
-              </ErrorBoundary>
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div
+                key={index}
+                style={{
+                  margin: 'auto',
+                  minWidth: 0,
+                  width:
+                    columnLength === 1
+                      ? '100%'
+                      : `calc(${100 / columnLength}% - 8px)`,
+                  maxWidth: '100%',
+                  flex: 1,
+                  userSelect: 'none',
+                }}
+              >
+                <ErrorBoundary
+                  fallback={chartFallback}
+                  onError={handleChartError}
+                >
+                  <ChartRender
+                    chartType={chartType}
+                    chartData={chartDataItems}
+                    columnLength={columnLength}
+                    onColumnLengthChange={setColumnLength}
+                    title={rest?.title}
+                    dataTime={rest?.dataTime}
+                    groupBy={rest?.groupBy}
+                    filterBy={rest?.filterBy}
+                    colorLegend={rest?.colorLegend}
+                    config={{
+                      height,
+                      x,
+                      y,
+                      columns,
+                      index,
+                      rest,
+                    }}
+                  />
+                </ErrorBoundary>
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );

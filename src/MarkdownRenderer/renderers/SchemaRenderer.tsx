@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { SchemaRenderer } from '../../Schema';
 import partialParse from '../../MarkdownEditor/editor/parser/json-parse';
+import { SchemaRenderer } from '../../Schema';
 import type { RendererBlockProps } from '../types';
 
 const extractTextContent = (children: React.ReactNode): string => {
@@ -123,10 +123,7 @@ export const SchemaBlockRenderer: React.FC<
   }
 
   return (
-    <div
-      data-testid="schema-renderer"
-      style={{ padding: '0.5em' }}
-    >
+    <div data-testid="schema-renderer" style={{ padding: '0.5em' }}>
       <SchemaRenderer
         schema={schemaValue}
         values={schemaValue?.initialValues || {}}

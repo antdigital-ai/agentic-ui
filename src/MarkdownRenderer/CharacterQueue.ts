@@ -108,8 +108,7 @@ export class CharacterQueue {
     if (this.disposed || this.isTickActive()) return;
 
     const isVisible =
-      typeof document !== 'undefined' &&
-      document.visibilityState === 'visible';
+      typeof document !== 'undefined' && document.visibilityState === 'visible';
     this.tickMode = isVisible ? 'raf' : 'timeout';
 
     if (this.tickMode === 'raf') {
@@ -129,8 +128,7 @@ export class CharacterQueue {
     if (remaining <= 0) return;
 
     const isVisible =
-      typeof document !== 'undefined' &&
-      document.visibilityState === 'visible';
+      typeof document !== 'undefined' && document.visibilityState === 'visible';
     const baseBatch = Math.max(
       1,
       Math.ceil(this.options.charsPerFrame * this.options.speed),

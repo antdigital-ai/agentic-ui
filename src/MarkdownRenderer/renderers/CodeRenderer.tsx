@@ -1,6 +1,4 @@
 import { ChevronsUpDown, Copy, Moon } from '@sofa-design/icons';
-import { ConfigProvider } from 'antd';
-import clsx from 'clsx';
 import copy from 'copy-to-clipboard';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
@@ -25,7 +23,7 @@ const extractTextContent = (children: React.ReactNode): string => {
  * 不依赖 Slate 上下文，提供与 CodeRenderer readonly 模式一致的视觉效果。
  */
 export const CodeBlockRenderer: React.FC<RendererBlockProps> = (props) => {
-  const { language, children, className } = props;
+  const { language, children } = props;
   const [theme, setTheme] = useState('github');
   const [isExpanded, setIsExpanded] = useState(true);
   const i18n = useContext(I18nContext);

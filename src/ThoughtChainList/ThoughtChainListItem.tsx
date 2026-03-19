@@ -1,4 +1,4 @@
-﻿import classNames from 'clsx';
+import classNames from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
@@ -403,9 +403,12 @@ export const ThoughtChainListItem: React.FC<
             transitionBehavior: 'allow-discrete',
           }}
         >
-          {props.contentRender
-            ? props.contentRender(thoughtChainListItem, content)
-            : content}
+          {/* 仅展开时挂载详情，避免多个深度思考/ Markdown 同时渲染导致卡顿 */}
+          {!collapse
+            ? props.contentRender
+              ? props.contentRender(thoughtChainListItem, content)
+              : content
+            : null}
         </div>
       </div>
     </ThoughtChainItemMotion>

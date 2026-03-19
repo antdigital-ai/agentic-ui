@@ -63,6 +63,10 @@ group:
 
 <code src="../demos/rerender-edit.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+### 编辑器与渲染器对比
+
+<code src="../demos/rerender-diff.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 ### 相同渲染
 
 <code src="../demos/same-render.tsx" background="var(--main-bg-color)" iframe=540></code>

@@ -94,9 +94,13 @@ const genTableStyle = (
         th: {
           ...TABLE_CELL,
           backgroundColor: 'var(--agentic-ui-table-header-bg, #f7f7f9)',
+          border: 'none',
           borderBottom: TABLE_BORDER,
+          borderLeft: 'none',
+          borderTop: 'none',
           fontWeight: 600,
         },
+        'th:not(:first-child)': { borderLeft: TABLE_BORDER },
 
         td: {
           ...TABLE_CELL,
@@ -112,7 +116,6 @@ const genTableStyle = (
         'tbody tr:hover': {
           backgroundColor: 'var(--agentic-ui-table-hover-bg, rgba(0,0,0,0.04))',
         },
-
         [`@media (max-width: ${mobileBreakpoint})`]: {
           'th, td': { padding: mobilePadding },
         },
@@ -130,7 +133,10 @@ const genTableStyle = (
       '&[data-select="true"]:after': {
         content: '" "',
         position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         zIndex: 2,
         pointerEvents: 'none',
         backgroundColor: 'var(--color-primary-control-fill-secondary-hover)',
@@ -139,15 +145,22 @@ const genTableStyle = (
     },
     [`${token.componentCls}-table-row-index`]: { display: 'table-row' },
     [`${token.componentCls}-table-cell-index`]: {
-      width: 12, maxWidth: 12, padding: 0,
-      position: 'relative', verticalAlign: 'middle',
+      width: 12,
+      maxWidth: 12,
+      padding: 0,
+      position: 'relative',
+      verticalAlign: 'middle',
       backgroundColor: 'var(--color-gray-control-fill-secondary)',
-      '&:hover': { backgroundColor: 'var(--color-gray-control-fill-secondary-hover)' },
+      '&:hover': {
+        backgroundColor: 'var(--color-gray-control-fill-secondary-hover)',
+      },
     },
     [`${token.componentCls}-table-cell-index-spacer`]: {
       cursor: 'pointer',
       backgroundColor: 'var(--color-gray-control-fill-secondary)',
-      '&:hover': { backgroundColor: 'var(--color-gray-control-fill-secondary-hover)' },
+      '&:hover': {
+        backgroundColor: 'var(--color-gray-control-fill-secondary-hover)',
+      },
     },
   };
 };
