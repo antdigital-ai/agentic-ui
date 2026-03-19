@@ -34,46 +34,49 @@ const extractText = (children: React.ReactNode): string => {
  *
  * 仅对纯文本增量有效；如果内容不是简单追加（删除/替换），直接替换所有 chunks。
  */
-const AnimationText = React.memo<AnimationTextProps>(({ children, animationConfig }) => {
-  const { fadeDuration = 200, easing = 'ease-in-out' } = animationConfig || {};
-  const [chunks, setChunks] = useState<React.ReactNode[]>([]);
-  const prevTextRef = useRef('');
+const AnimationText = React.memo<AnimationTextProps>(
+  ({ children, animationConfig }) => {
+    const { fadeDuration = 200, easing = 'ease-in-out' } =
+      animationConfig || {};
+    const [chunks, setChunks] = useState<React.ReactNode[]>([]);
+    const prevTextRef = useRef('');
 
-  const text = extractText(children);
+    const text = extractText(children);
 
-  useEffect(() => {
-    if (text === prevTextRef.current) return;
+    useEffect(() => {
+      if (text === prevTextRef.current) return;
 
-    if (!prevTextRef.current || !text.startsWith(prevTextRef.current)) {
-      setChunks([children]);
+      if (!prevTextRef.current || !text.startsWith(prevTextRef.current)) {
+        setChunks([children]);
+        prevTextRef.current = text;
+        return;
+      }
+
+      const prevLen = prevTextRef.current.length;
+      setChunks((prev) => [...prev, text.slice(prevLen)]);
       prevTextRef.current = text;
-      return;
-    }
+    }, [text, children]);
 
-    const prevLen = prevTextRef.current.length;
-    setChunks((prev) => [...prev, text.slice(prevLen)]);
-    prevTextRef.current = text;
-  }, [text, children]);
+    const animationStyle = useMemo(
+      () => ({
+        animation: `markdownRendererFadeIn ${fadeDuration}ms ${easing} forwards`,
+        willChange: 'opacity',
+        color: 'inherit',
+      }),
+      [fadeDuration, easing],
+    );
 
-  const animationStyle = useMemo(
-    () => ({
-      animation: `markdownRendererFadeIn ${fadeDuration}ms ${easing} forwards`,
-      willChange: 'opacity',
-      color: 'inherit',
-    }),
-    [fadeDuration, easing],
-  );
-
-  return (
-    <>
-      {chunks.map((chunk, index) => (
-        <span style={animationStyle} key={`anim-${index}`}>
-          {chunk}
-        </span>
-      ))}
-    </>
-  );
-});
+    return (
+      <>
+        {chunks.map((chunk, index) => (
+          <span style={animationStyle} key={`anim-${index}`}>
+            {chunk}
+          </span>
+        ))}
+      </>
+    );
+  },
+);
 
 AnimationText.displayName = 'AnimationText';
 
