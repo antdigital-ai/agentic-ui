@@ -224,7 +224,7 @@ const createHastProcessor = (
       handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
     })
     .use(rehypeRaw)
-    .use(rehypeKatex)
+    .use(rehypeKatex, { strict: false })
     .use(rehypeFootnoteRef);
 
   if (extraRemarkPlugins) {
