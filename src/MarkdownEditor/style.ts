@@ -88,6 +88,7 @@ const genTableStyle = (
           borderCollapse: 'collapse',
           tableLayout: 'auto',
           overflow: 'hidden',
+          border: TABLE_BORDER,
         },
 
         th: {
