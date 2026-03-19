@@ -216,7 +216,10 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
               className={clsx(`${prefixCls}-container`, hashId)}
               style={{ display: 'block' }}
             >
-              <div className={clsx(contentCls, hashId)}>
+              <div
+                className={clsx(contentCls, hashId)}
+                style={{ whiteSpace: 'normal', wordWrap: 'normal' }}
+              >
                 {reactContent}
               </div>
             </div>
