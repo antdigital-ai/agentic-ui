@@ -1068,17 +1068,7 @@ export const useMarkdownToReact = (
         const entry = { source: block, element };
         newCache.set(block, entry);
         if (isLast) lastBlockRef.current = entry;
-        if (isLast && options?.streaming) {
-          elements.push(
-            jsx('div' as any, {
-              className: `${prefixCls}-streaming-block`,
-              key: stableKey,
-              children: element,
-            }),
-          );
-        } else {
-          elements.push(jsx(Fragment, { children: element }, stableKey));
-        }
+        elements.push(jsx(Fragment, { children: element }, stableKey));
       }
 
       blockCacheRef.current = newCache;

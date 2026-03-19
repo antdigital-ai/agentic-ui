@@ -21,26 +21,6 @@ export const useRendererVarStyle = (prefixCls: string) => {
         '--padding-5x': '20px',
       },
 
-      // 流式打字动画：新文字从模糊到清晰
-      '@keyframes textFadeInBlur': {
-        '0%': {
-          opacity: 0,
-          filter: 'blur(4px)',
-          transform: 'translateY(2px)',
-        },
-        '100%': {
-          opacity: 1,
-          filter: 'blur(0px)',
-          transform: 'translateY(0)',
-        },
-      },
-
-      [`.${prefixCls}-streaming-block`]: {
-        '& > *:last-child': {
-          animation: 'textFadeInBlur 0.3s ease-out forwards',
-          willChange: 'opacity, filter, transform',
-        },
-      },
     };
   });
 };
