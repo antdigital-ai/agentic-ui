@@ -52,6 +52,7 @@ describe('AttachmentFileListItem', () => {
       />,
     );
     expect(screen.queryByTestId('file-item')).not.toBeInTheDocument();
-    expect(screen.getByText('TXT')).toBeInTheDocument();
+    expect(screen.getByText('-')).toBeInTheDocument();
+    expect(screen.getByText(/B$/)).toBeInTheDocument();
   });
 });
