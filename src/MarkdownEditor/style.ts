@@ -38,7 +38,7 @@ const genTableStyle = (
   return {
     [tableCls]: {
       width: '100%',
-      flex: 1,
+      maxWidth: '100%',
       minWidth: 0,
       position: 'relative',
 
