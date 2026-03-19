@@ -10,6 +10,9 @@ import {
 // ── Table ──────────────────────────────────────────────────────────────────
 const TABLE_BORDER = '1px solid var(--agentic-ui-table-border-color, #E7E9E8)';
 const TABLE_RADIUS = 'var(--agentic-ui-table-border-radius, 8px)';
+const TABLE_ACTION_BUTTON_SIZE = 20;
+const TABLE_ACTION_BUTTON_GAP = '2px';
+const TABLE_ACTION_BUTTON_ICON_SIZE = 12;
 const TABLE_CELL = {
   verticalAlign: 'top' as const,
   padding: 'var(--agentic-ui-table-cell-padding, 16px 12px)',
@@ -160,11 +163,119 @@ const genTableStyle = (
         backgroundColor: 'var(--color-gray-control-fill-secondary-hover)',
       },
     },
+    [`${token.componentCls}-table-cell-index-action-buttons`]: {
+      position: 'absolute',
+      top: 4,
+      left: -24,
+      zIndex: 1000,
+      alignItems: 'center',
+      flexDirection: 'column',
+      gap: TABLE_ACTION_BUTTON_GAP,
+      opacity: 0,
+      display: 'none',
+      transition: 'opacity 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+    },
+    [`${token.componentCls}-table-cell-index-action-buttons-visible`]: {
+      opacity: 1,
+      display: 'flex',
+    },
+    [`${token.componentCls}-table-cell-index-action-button`]: {
+      padding: 2,
+      display: 'flex',
+      alignItems: 'center',
+      zIndex: 1000,
+      justifyContent: 'center',
+      fontSize: TABLE_ACTION_BUTTON_ICON_SIZE,
+      border: TABLE_BORDER,
+      width: TABLE_ACTION_BUTTON_SIZE,
+      height: TABLE_ACTION_BUTTON_SIZE,
+      cursor: 'pointer',
+      backgroundPosition: '50%',
+      backgroundRepeat: 'no-repeat',
+      transition:
+        'color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+      borderRadius: '4px',
+      background: 'var(--color-gray-bg-card-white)',
+      boxShadow: 'var(--shadow-border-base)',
+      color: 'var(--color-gray-text-secondary)',
+      '&:hover': {
+        backgroundColor: '#FFF',
+        boxShadow: 'var(--shadow-control-lg)',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-delete-icon`]: {
+      '&:hover': {
+        color: '#ff4d4f',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-insert-row-before`]: {
+      '&:hover': {
+        color: '#52c41a',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-insert-row-after`]: {
+      '&:hover': {
+        color: '#52c41a',
+      },
+    },
     [`${token.componentCls}-table-cell-index-spacer`]: {
       cursor: 'pointer',
       backgroundColor: 'var(--color-gray-control-fill-secondary)',
       '&:hover': {
         backgroundColor: 'var(--color-gray-control-fill-secondary-hover)',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-spacer-action-buttons`]: {
+      position: 'absolute',
+      top: -28,
+      right: '50%',
+      transform: 'translateX(50%)',
+      zIndex: 10,
+      display: 'flex',
+      alignItems: 'center',
+      gap: TABLE_ACTION_BUTTON_GAP,
+      opacity: 0,
+      transition: 'opacity 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+    },
+    [`${token.componentCls}-table-cell-index-spacer-action-buttons-visible`]: {
+      opacity: 1,
+    },
+    [`${token.componentCls}-table-cell-index-spacer-action-button`]: {
+      padding: 2,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: TABLE_ACTION_BUTTON_ICON_SIZE,
+      border: TABLE_BORDER,
+      width: TABLE_ACTION_BUTTON_SIZE,
+      height: TABLE_ACTION_BUTTON_SIZE,
+      cursor: 'pointer',
+      backgroundPosition: '50%',
+      backgroundRepeat: 'no-repeat',
+      transition:
+        'color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+      borderRadius: '4px',
+      background: 'var(--color-gray-bg-card-white)',
+      boxShadow: 'var(--shadow-border-base)',
+      color: 'var(--color-gray-text-secondary)',
+      '&:hover': {
+        backgroundColor: '#FFF',
+        boxShadow: 'var(--shadow-control-lg)',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-spacer-delete-icon`]: {
+      '&:hover': {
+        color: '#ff4d4f',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-spacer-insert-column-before`]: {
+      '&:hover': {
+        color: '#52c41a',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-spacer-insert-column-after`]: {
+      '&:hover': {
+        color: '#52c41a',
       },
     },
   };
