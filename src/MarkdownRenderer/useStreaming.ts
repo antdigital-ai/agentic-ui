@@ -88,11 +88,7 @@ const tokenRecognizerMap: Partial<Record<StreamCacheTokenType, Recognizer>> = {
       return listPrefix && rest.startsWith('`') ? listPrefix : null;
     },
   },
-  [StreamCacheTokenType.Table]: {
-    tokenType: StreamCacheTokenType.Table,
-    isStartOfToken: (md) => md.startsWith('|'),
-    isStreamingValid: isTableIncomplete,
-  },
+  // Table 不缓存——流式场景下表格边输入边显示
   [StreamCacheTokenType.InlineCode]: {
     tokenType: StreamCacheTokenType.InlineCode,
     isStartOfToken: (md) => md.startsWith('`'),

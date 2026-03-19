@@ -58,7 +58,7 @@ const AnimationText = React.memo<AnimationTextProps>(({ children, animationConfi
   const animationStyle = useMemo(
     () => ({
       animation: `markdownRendererFadeIn ${fadeDuration}ms ${easing} forwards`,
-      willChange: 'opacity, filter, transform',
+      willChange: 'opacity',
       color: 'inherit',
     }),
     [fadeDuration, easing],
