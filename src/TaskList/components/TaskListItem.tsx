@@ -1,15 +1,9 @@
 import { ChevronUp } from '@sofa-design/icons';
 import classNames from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
 import React, { memo, useCallback, useContext } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
-import {
-  COLLAPSE_TRANSITION,
-  COLLAPSE_VARIANTS,
-  getArrowRotation,
-  hasTaskContent,
-} from '../constants';
+import { getArrowRotation, hasTaskContent } from '../constants';
 import type { TaskItem } from '../types';
 import { StatusIcon } from './StatusIcon';
 
@@ -84,23 +78,13 @@ export const TaskListItem: React.FC<TaskListItemProps> = memo(
               </div>
             )}
           </div>
-          <AnimatePresence initial={false}>
-            {!isCollapsed && (
-              <motion.div
-                key="task-content"
-                variants={COLLAPSE_VARIANTS}
-                initial="collapsed"
-                animate="expanded"
-                exit="collapsed"
-                transition={COLLAPSE_TRANSITION}
-                className={classNames(`${prefixCls}-body`, hashId)}
-              >
-                <div className={classNames(`${prefixCls}-content`, hashId)}>
-                  {item.content}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {!isCollapsed && (
+            <div className={classNames(`${prefixCls}-body`, hashId)}>
+              <div className={classNames(`${prefixCls}-content`, hashId)}>
+                {item.content}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );

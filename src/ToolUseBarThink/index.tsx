@@ -6,7 +6,7 @@ import {
 } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
 import React, {
   memo,
@@ -364,35 +364,6 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
     locale,
   ]);
 
-  // 缓存容器元素
-  const contentVariants = useMemo(
-    () => ({
-      expanded: {
-        height: 'auto',
-        opacity: 1,
-      },
-      collapsed: {
-        height: 0,
-        opacity: 0,
-      },
-    }),
-    [],
-  );
-
-  const contentTransition = useMemo(
-    () => ({
-      height: {
-        duration: 0.26,
-        ease: [0.4, 0, 0.2, 1],
-      },
-      opacity: {
-        duration: 0.2,
-        ease: 'linear',
-      },
-    }),
-    [],
-  );
-
   const innerContent = (
     <>
       <div ref={contentInnerRef} style={contentInnerStyle}>
@@ -415,35 +386,32 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
     </>
   );
 
-  // 收起时不渲染 thinkContent，避免双份 DOM 和重复布局计算，减轻展开/收起卡顿
-  return (
-    <AnimatePresence initial={false} mode="sync">
-      {expandedState ? (
-        <motion.div
-          variants={contentVariants}
-          initial="collapsed"
-          key="think-container"
-          animate="expanded"
-          exit="collapsed"
-          transition={contentTransition}
-          className={containerClassName}
-          data-testid="tool-use-bar-think-container"
-        >
-          {innerContent}
-        </motion.div>
-      ) : showFloatingExpand ? (
-        <div
-          className={floatingExpandClassName}
-          onClick={onToggleFloatingExpand}
-          data-testid="tool-use-bar-think-floating-expand"
-          style={styles?.floatingExpand}
-        >
-          {floatingIcon}
-          {floatingText}
-        </div>
-      ) : null}
-    </AnimatePresence>
-  );
+  // 收起时不渲染 thinkContent，无动画避免展开/收起卡顿
+  if (expandedState) {
+    return (
+      <div
+        className={containerClassName}
+        data-testid="tool-use-bar-think-container"
+        style={{ overflow: 'hidden' }}
+      >
+        {innerContent}
+      </div>
+    );
+  }
+  if (showFloatingExpand) {
+    return (
+      <div
+        className={floatingExpandClassName}
+        onClick={onToggleFloatingExpand}
+        data-testid="tool-use-bar-think-floating-expand"
+        style={styles?.floatingExpand}
+      >
+        {floatingIcon}
+        {floatingText}
+      </div>
+    );
+  }
+  return null;
 };
 
 /**

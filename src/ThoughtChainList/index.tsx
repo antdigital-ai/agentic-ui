@@ -260,24 +260,8 @@ const ThoughtChainContent = React.memo<
         <motion.div
           role="list"
           className={classNames(`${prefixCls}-content-list`, hashId)}
-          variants={{
-            hidden: {
-              opacity: 0,
-              transition: {
-                when: 'afterChildren',
-              },
-            },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.3,
-                when: 'beforeChildren',
-              },
-            },
-          }}
-          whileInView="visible"
-          initial="hidden"
-          animate="visible"
+          initial={false}
+          animate={{ opacity: 1 }}
         >
           {processedItems.map((item, index) => {
             const info = item.info?.split(/(\$\{\w+\})/);
@@ -484,7 +468,6 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
 
         <div className={classNames(`${prefixCls}`, hashId)} style={restStyle}>
           <motion.div
-            transition={{ duration: 0.3 }}
             className={classNames(`${prefixCls}-container`, hashId, {
               [`${prefixCls}-container-loading`]: !bubble?.isFinished,
             })}

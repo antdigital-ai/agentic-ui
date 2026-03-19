@@ -1,7 +1,6 @@
 import { ChevronUp } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
 import React, { memo, useContext, useMemo } from 'react';
 import { ActionIconBox } from '../Components/ActionIconBox';
@@ -9,11 +8,7 @@ import { useRefFunction } from '../Hooks/useRefFunction';
 import { I18nContext } from '../I18n';
 import { StatusIcon } from './components/StatusIcon';
 import { TaskListItem } from './components/TaskListItem';
-import {
-  COLLAPSE_TRANSITION,
-  COLLAPSE_VARIANTS,
-  getArrowRotation,
-} from './constants';
+import { getArrowRotation } from './constants';
 import { useStyle } from './style';
 import type { TaskItem, TaskListProps, TaskStatus } from './types';
 
@@ -164,23 +159,13 @@ export const TaskList = memo(
             </ActionIconBox>
           </div>
         </div>
-        <AnimatePresence initial={false}>
-          {simpleExpanded && (
-            <motion.div
-              key="simple-task-list-content"
-              variants={COLLAPSE_VARIANTS}
-              initial="collapsed"
-              animate="expanded"
-              exit="collapsed"
-              transition={COLLAPSE_TRANSITION}
-              className={classNames(`${simpleCls}-content`, hashId)}
-            >
-              <div className={classNames(`${simpleCls}-list`, hashId)}>
-                {renderItems()}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {simpleExpanded && (
+          <div className={classNames(`${simpleCls}-content`, hashId)}>
+            <div className={classNames(`${simpleCls}-list`, hashId)}>
+              {renderItems()}
+            </div>
+          </div>
+        )}
       </div>,
     );
   },
