@@ -9,10 +9,70 @@ group:
 
 # Changelog
 
-## v2.29.54 (In Development)
+## v2.29.59 (In Development)
+
+- MarkdownRenderer
+  - 🆕 Use Markdown Renderer instead of Slate for streaming scenarios. [#369](https://github.com/ant-design/agentic-ui/pull/369)
+- Bubble
+  - 🐞 Fix `extraShowOnHover` handling to default to `true` when not provided.
+- MarkdownInputField
+  - 🌐 Improve clarity of file upload related messages.
+- 📖 Remove `rfc-streaming-markdown-renderer.md` documentation. [#370](https://github.com/ant-design/agentic-ui/pull/370)
+- 🛠 Fix test and Chart error logging.
+
+## v2.29.58
+
+- Bubble
+  - 💄 Remove padding from `extra` in Popover mode. [#367](https://github.com/ant-design/agentic-ui/pull/367)
+- MarkdownPreview
+  - 🛠 Improve code formatting and error handling.
+- FileUploadManager
+  - 🛠 Improve error handling.
+- ✅ Add Markdown directive and parseTable regression test coverage. [#366](https://github.com/ant-design/agentic-ui/pull/366)
+
+## v2.29.57
+
+- MarkdownEditor
+  - 🐞 Fix `textDirective` rendering failure, support Yuque documents. [#365](https://github.com/ant-design/agentic-ui/pull/365)
+- 🛠 Add error handling to `myRemark.stringify` for improved robustness.
+- 🐞 Fix TypeScript type errors.
+- 🐞 Update card-selection-demo snapshot, fix paragraph element structure and attributes.
+
+## v2.29.56
+
+- MarkdownEditor
+  - 🐞 Add `textDirective`/`leafDirective` processors for remark-rehype, fix unknown node error. [#364](https://github.com/ant-design/agentic-ui/pull/364)
+- Bubble
+  - 🆕 Add `extraShowOnHover` prop, default off, when enabled `extra` only shows on hover.
+  - 💄 Change `extra` to show on hover instead of always visible. [#362](https://github.com/ant-design/agentic-ui/pull/362)
+- 🛠 Remove all message prompt calls. [#363](https://github.com/ant-design/agentic-ui/pull/363)
+- ✅ Add regression tests for PureBubbleList, AttachmentFileList, AttachmentButtonPopover. [#355](https://github.com/ant-design/agentic-ui/pull/355) [#356](https://github.com/ant-design/agentic-ui/pull/356) [#359](https://github.com/ant-design/agentic-ui/pull/359)
+
+## v2.29.55
+
+- MarkdownInputField
+  - 🆕 Send button supports sendable state. [#361](https://github.com/ant-design/agentic-ui/pull/361)
+- Blockquote
+  - 🆕 Add `data-testid` attributes for improved testing support.
+  - 🐞 Fix `className` compatibility by casting attributes to `React.HTMLAttributes`.
+
+## v2.29.54
 
 - MarkdownEditor
   - 🆕 Add markdown-it-container style `:::` custom container syntax (info/warning/success/error/tip). [#360](https://github.com/ant-design/agentic-ui/pull/360)
+- MarkdownInputField
+  - 🆕 Add `data-testid` attributes to demos for E2E testing support.
+
+## v2.29.53
+
+- MarkdownInputField
+  - 🆕 Add E2E test ID support and export `testIds` constant.
+  - 🆕 Image upload supports svg and webp formats. [#358](https://github.com/ant-design/agentic-ui/pull/358)
+- ChartStatistic
+  - 🆕 Support Semantic styles and `subtitle` display.
+- ToolUseBarThink
+  - 🌐 Add internationalization support, add `flex-direction: column` to container. [#357](https://github.com/ant-design/agentic-ui/pull/357)
+- ✅ Improve test coverage for RealtimeFollow, FileMapView, AttachmentFileIcon, BeforeToolContainer, Enlargement.
 
 ## v2.29.31
 

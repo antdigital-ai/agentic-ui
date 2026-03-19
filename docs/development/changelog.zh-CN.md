@@ -9,10 +9,70 @@ group:
 
 # Changelog
 
-## v2.29.54（开发中）
+## v2.29.59（开发中）
+
+- MarkdownRenderer
+  - 🆕 流式场景下使用 Markdown Renderer 替代 Slate 渲染。[#369](https://github.com/ant-design/agentic-ui/pull/369)
+- Bubble
+  - 🐞 修复 `extraShowOnHover` 未传入时默认值为 `true` 的处理逻辑。
+- MarkdownInputField
+  - 🌐 优化文件上传相关文案的清晰度。
+- 📖 移除 `rfc-streaming-markdown-renderer.md` 文档。[#370](https://github.com/ant-design/agentic-ui/pull/370)
+- 🛠 修复测试与 Chart 错误日志。
+
+## v2.29.58
+
+- Bubble
+  - 💄 `extra` 在 Popover 模式下移除 padding。[#367](https://github.com/ant-design/agentic-ui/pull/367)
+- MarkdownPreview
+  - 🛠 优化代码格式与错误处理。
+- FileUploadManager
+  - 🛠 优化错误处理逻辑。
+- ✅ 补充 Markdown directive 与 parseTable 回归测试覆盖率。[#366](https://github.com/ant-design/agentic-ui/pull/366)
+
+## v2.29.57
+
+- MarkdownEditor
+  - 🐞 修复 `textDirective` 渲染失败，支持语雀文档。[#365](https://github.com/ant-design/agentic-ui/pull/365)
+- 🛠 优化 `myRemark.stringify` 错误处理，提升健壮性。
+- 🐞 修复 TypeScript 类型错误。
+- 🐞 更新 card-selection-demo 快照，修复段落元素的结构和属性。
+
+## v2.29.56
+
+- MarkdownEditor
+  - 🐞 为 remark-rehype 添加 `textDirective`/`leafDirective` 处理器，修复 unknown node 错误。[#364](https://github.com/ant-design/agentic-ui/pull/364)
+- Bubble
+  - 🆕 新增 `extraShowOnHover` 配置，默认关闭，开启后 `extra` 仅在 hover 时展示。
+  - 💄 `extra` 改为 hover 时展示，不再常驻显示。[#362](https://github.com/ant-design/agentic-ui/pull/362)
+- 🛠 移除所有 message 提示调用。[#363](https://github.com/ant-design/agentic-ui/pull/363)
+- ✅ 补充 PureBubbleList、AttachmentFileList、AttachmentButtonPopover 回归测试。[#355](https://github.com/ant-design/agentic-ui/pull/355) [#356](https://github.com/ant-design/agentic-ui/pull/356) [#359](https://github.com/ant-design/agentic-ui/pull/359)
+
+## v2.29.55
+
+- MarkdownInputField
+  - 🆕 发送按钮支持可发送状态。[#361](https://github.com/ant-design/agentic-ui/pull/361)
+- Blockquote
+  - 🆕 添加 `data-testid` 属性以支持测试。
+  - 🐞 修复 `className` 兼容性问题，将 attributes 转为 `React.HTMLAttributes`。
+
+## v2.29.54
 
 - MarkdownEditor
   - 🆕 支持 markdown-it-container 风格的 `:::` 自定义容器语法（info/warning/success/error/tip 等）。[#360](https://github.com/ant-design/agentic-ui/pull/360)
+- MarkdownInputField
+  - 🆕 Demo 增加 `data-testid` 属性以支持 E2E 测试。
+
+## v2.29.53
+
+- MarkdownInputField
+  - 🆕 新增 E2E 测试 ID 支持并导出 `testIds` 常量。
+  - 🆕 文件上传的图片支持 svg 和 webp 格式。[#358](https://github.com/ant-design/agentic-ui/pull/358)
+- ChartStatistic
+  - 🆕 支持 Semantic 样式与 `subtitle` 展示。
+- ToolUseBarThink
+  - 🌐 增加国际化支持，容器添加 `flex-direction: column`。[#357](https://github.com/ant-design/agentic-ui/pull/357)
+- ✅ 补充 RealtimeFollow、FileMapView、AttachmentFileIcon、BeforeToolContainer、Enlargement 等测试覆盖率。
 
 ## v2.29.31
 
