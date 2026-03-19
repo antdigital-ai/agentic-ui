@@ -1,20 +1,46 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { useContext, useEffect, useMemo, useRef } from 'react';
-import { Node } from 'slate';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { RenderElementProps } from 'slate-react';
-import stringWidth from 'string-width';
 import {
   MOBILE_BREAKPOINT,
   MOBILE_TABLE_MIN_COLUMN_WIDTH,
   TABLE_EDIT_COL_WIDTH_MIN_COLUMNS,
 } from '../../../../Constants/mobile';
 import { useEditorStore } from '../../store';
+import type { TableNode } from '../../types/Table';
 import { ReadonlyTableComponent } from './ReadonlyTableComponent';
 import { TABLE_ROW_INDEX_COL_WIDTH, TableColgroup } from './TableColgroup';
 import { TablePropsContext } from './TableContext';
 import { TableRowIndex } from './TableRowIndex';
+import { getReadonlyTableColWidths } from './utils/getTableColWidths';
 import useScrollShadow from './useScrollShadow';
+
+const TABLE_HORIZONTAL_PADDING = 32;
+const TABLE_EDIT_DESKTOP_MIN_COLUMN_WIDTH = 60;
+const TABLE_MIN_CONTAINER_WIDTH = 200;
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
+const toPixelWidth = (
+  width: number | string | undefined,
+  containerWidth: number,
+  fallbackWidth: number,
+): number => {
+  if (typeof width === 'number') return width;
+  if (!width) return fallbackWidth;
+
+  if (width.endsWith('%')) {
+    const ratio = Number.parseFloat(width);
+    if (Number.isFinite(ratio)) {
+      return (containerWidth * ratio) / 100;
+    }
+  }
+
+  const parsed = Number.parseFloat(width);
+  return Number.isFinite(parsed) ? parsed : fallbackWidth;
+};
 
 /**
  * 表格组
@@ -57,85 +83,125 @@ export const SlateTable = ({
   const tableTargetRef = useRef<HTMLTableElement>(null);
   const columnCount = props.element?.children?.[0]?.children?.length || 0;
   const mobileBreakpointValue = parseInt(MOBILE_BREAKPOINT, 10) || 768;
+  const [contentWidth, setContentWidth] = useState(0);
 
   // 总是调用 hooks，避免条件调用
   const [tableRef, scrollState] = useScrollShadow();
 
-  // 编辑模式下列宽计算（readonly 时走 ReadonlyTableComponent，跳过计算）
+  const resolvedContentWidth = useMemo(() => {
+    if (contentWidth > 0) return contentWidth;
+    return (
+      markdownContainerRef?.current?.querySelector('.ant-agentic-md-editor-content')
+        ?.clientWidth || 400
+    );
+  }, [contentWidth, markdownContainerRef]);
+
+  const availableTableWidth = useMemo(
+    () =>
+      Math.max(
+        resolvedContentWidth - TABLE_HORIZONTAL_PADDING - TABLE_ROW_INDEX_COL_WIDTH,
+        TABLE_MIN_CONTAINER_WIDTH,
+      ),
+    [resolvedContentWidth],
+  );
+
+  useEffect(() => {
+    if (readonly || typeof window === 'undefined') return;
+
+    const contentElement = markdownContainerRef?.current?.querySelector(
+      '.ant-agentic-md-editor-content',
+    ) as HTMLDivElement | null;
+
+    if (!contentElement) {
+      setContentWidth(0);
+      return;
+    }
+
+    const updateWidth = () => {
+      setContentWidth(contentElement.clientWidth || 0);
+    };
+
+    if (typeof ResizeObserver === 'undefined') {
+      updateWidth();
+      return;
+    }
+
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(contentElement);
+    updateWidth();
+
+    return () => resizeObserver.disconnect();
+  }, [readonly, markdownContainerRef]);
+
+  // 编辑态列宽策略：
+  // 1. 优先显式 colWidths；
+  // 2. 统一复用只读态宽度算法做内容感知；
+  // 3. 结果归一化为 px，避免百分比在编辑态引发抖动。
   const colWidths = useMemo(() => {
     if (readonly) return [];
 
     // 少于 TABLE_EDIT_COL_WIDTH_MIN_COLUMNS 列不设置 data col，仅行号列（显式 colWidths 也忽略）
     if (columnCount < TABLE_EDIT_COL_WIDTH_MIN_COLUMNS) return [];
+    if (!props.element?.children?.length) return [];
 
-    // 显式传入 colWidths 时优先使用
-    if (props.element?.otherProps?.colWidths?.length) {
-      return props.element.otherProps.colWidths as number[];
+    const explicitColWidths = (
+      props.element?.otherProps as { colWidths?: Array<number | string> } | undefined
+    )?.colWidths;
+    if (explicitColWidths?.length) {
+      return explicitColWidths
+        .slice(0, columnCount)
+        .map((width) =>
+          Math.max(
+            1,
+            Math.round(
+              toPixelWidth(width, availableTableWidth, TABLE_EDIT_DESKTOP_MIN_COLUMN_WIDTH),
+            ),
+          ),
+        );
     }
 
-    if (typeof window === 'undefined' || !props.element?.children?.length)
-      return [];
-
-    const tableRows = props.element.children;
-    if (!tableRows?.[0]?.children?.length) return [];
-
-    // 只获取一次容器宽度
-    const containerWidth =
-      (markdownContainerRef?.current?.querySelector(
-        '.ant-agentic-md-editor-content',
-      )?.clientWidth || 400) -
-      32 -
-      12;
-    const isMobileLayout = containerWidth <= mobileBreakpointValue;
-    const minColumnWidth = isMobileLayout ? MOBILE_TABLE_MIN_COLUMN_WIDTH : 60;
-    const maxColumnWidth = isMobileLayout ? containerWidth : containerWidth / 4;
-    // 至少采样 3 行用于列宽计算（若有 3 行以上），不足 3 行时自动使用全部可用行
-    const rowsToSample =
-      tableRows.length >= 3 ? Math.min(5, tableRows.length) : tableRows.length;
-
-    // 一次性计算宽度
-    const calculatedWidths = Array.from(
-      { length: columnCount },
-      (_, colIndex) => {
-        const cellWidths = [];
-
-        for (let rowIndex = 0; rowIndex < rowsToSample; rowIndex++) {
-          const cell = tableRows[rowIndex]?.children?.[colIndex];
-          if (cell) {
-            const textWidth = stringWidth(Node.string(cell)) * 12;
-            cellWidths.push(textWidth);
-          }
-        }
-
-        return Math.min(
-          Math.max(minColumnWidth, ...cellWidths),
-          maxColumnWidth,
+    const isMobileLayout = availableTableWidth <= mobileBreakpointValue;
+    const minColumnWidth = isMobileLayout
+      ? MOBILE_TABLE_MIN_COLUMN_WIDTH
+      : TABLE_EDIT_DESKTOP_MIN_COLUMN_WIDTH;
+    const maxColumnWidth = isMobileLayout
+      ? availableTableWidth
+      : Math.max(
+          TABLE_EDIT_DESKTOP_MIN_COLUMN_WIDTH,
+          availableTableWidth / 4,
         );
-      },
+
+    const sourceColWidths = getReadonlyTableColWidths({
+      columnCount,
+      element: props.element as TableNode,
+      containerWidth: availableTableWidth,
+    });
+
+    const fallbackWidth = Math.max(
+      minColumnWidth,
+      Math.floor(availableTableWidth / Math.max(columnCount, 1)),
     );
 
-    // 如果表格少于5行且总宽度超过容器宽度，则均匀分配宽度
-    if (tableRows.length < 5 && columnCount > 0) {
-      const totalWidth = calculatedWidths.reduce(
-        (sum, width) => sum + width,
-        0,
-      );
-      if (totalWidth > containerWidth) {
-        const evenWidth = Math.max(
-          minColumnWidth,
-          Math.floor(containerWidth / columnCount),
-        );
-        return Array(columnCount).fill(evenWidth);
-      }
+    const normalizedWidths = Array.from({ length: columnCount }, (_, index) =>
+      clamp(
+        toPixelWidth(sourceColWidths[index], availableTableWidth, fallbackWidth),
+        minColumnWidth,
+        maxColumnWidth,
+      ),
+    );
+
+    const totalWidth = normalizedWidths.reduce((sum, width) => sum + width, 0);
+    if (totalWidth > availableTableWidth && columnCount > 0) {
+      return Array(columnCount).fill(fallbackWidth);
     }
 
-    return calculatedWidths;
+    return normalizedWidths;
   }, [
     readonly,
-    props.element?.otherProps?.colWidths,
-    props.element?.children?.length,
+    props.element,
     columnCount,
-    markdownContainerRef,
+    availableTableWidth,
+    mobileBreakpointValue,
   ]);
 
   // 只在编辑模式下添加resize事件监听
@@ -144,40 +210,26 @@ export const SlateTable = ({
 
     const resize = () => {
       if (process.env.NODE_ENV === 'test') return;
-      const maxWidth = colWidths
-        ? colWidths?.reduce((a: number, b: number) => a + b, 0) + 8
-        : 0;
-
-      const minWidth = markdownContainerRef?.current?.querySelector(
-        '.ant-agentic-md-editor-content',
-      )?.clientWidth;
-
       const dom = tableRef.current as HTMLDivElement;
-      if (dom) {
-        setTimeout(() => {
-          const containerWidthForBreakpoint =
-            (markdownContainerRef?.current?.querySelector(
-              '.ant-agentic-md-editor-content',
-            )?.clientWidth || 400) -
-            32 -
-            12;
-          const isMobileLayout =
-            containerWidthForBreakpoint <= mobileBreakpointValue;
-          const computedMinColumnWidth = isMobileLayout
-            ? MOBILE_TABLE_MIN_COLUMN_WIDTH
-            : 60;
-          const fallbackMinWidth = Number(
-            ((minWidth || 200) * 0.95).toFixed(0),
-          );
-          const requiredMinWidth = Math.max(
-            columnCount * computedMinColumnWidth,
-            maxWidth,
-            fallbackMinWidth,
-            200,
-          );
-          dom.style.minWidth = `${requiredMinWidth}px`;
-        }, 200);
-      }
+      if (!dom) return;
+
+      const isMobileLayout = availableTableWidth <= mobileBreakpointValue;
+      const minColumnWidth = isMobileLayout
+        ? MOBILE_TABLE_MIN_COLUMN_WIDTH
+        : TABLE_EDIT_DESKTOP_MIN_COLUMN_WIDTH;
+      const colWidthsTotal = colWidths.reduce((total, width) => total + width, 0);
+      const fallbackMinWidth = Number(
+        (Math.max(resolvedContentWidth, TABLE_MIN_CONTAINER_WIDTH) * 0.95).toFixed(
+          0,
+        ),
+      );
+      const requiredMinWidth = Math.max(
+        columnCount * minColumnWidth,
+        colWidthsTotal + TABLE_ROW_INDEX_COL_WIDTH,
+        fallbackMinWidth,
+        TABLE_MIN_CONTAINER_WIDTH,
+      );
+      dom.style.minWidth = `${requiredMinWidth}px`;
     };
     document.addEventListener('md-resize', resize);
     window.addEventListener('resize', resize);
@@ -186,7 +238,15 @@ export const SlateTable = ({
       document.removeEventListener('md-resize', resize);
       window.removeEventListener('resize', resize);
     };
-  }, [colWidths, readonly, markdownContainerRef, tableRef]);
+  }, [
+    colWidths,
+    readonly,
+    tableRef,
+    columnCount,
+    mobileBreakpointValue,
+    availableTableWidth,
+    resolvedContentWidth,
+  ]);
 
   useEffect(() => {
     if (readonly) return;

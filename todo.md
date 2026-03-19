@@ -10,3 +10,10 @@
 - [x] 补回 `table-cell-index` 和 `table-cell-index-spacer` 的 action-buttons 样式
 - [x] 运行表格相关测试确认无回归
 - [x] 提交、推送并同步更新 PR
+
+## TODO（切换 Table 宽度方案）
+
+- [x] 梳理现有编辑态 Table 宽度计算并设计替代方案
+- [x] 落地新的编辑态宽度计算实现（更稳定、少副作用）
+- [x] 运行 Table 相关测试验证无回归
+- [ ] 提交、推送并同步更新 PR
