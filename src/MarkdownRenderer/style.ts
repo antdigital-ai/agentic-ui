@@ -14,9 +14,9 @@ export const useRendererVarStyle = (prefixCls: string) => {
     return {
       // :where 选择器优先级为 0，不会覆盖宿主定义的变量
       [`:where(.${prefixCls})`]: {
-        '--margin-2x': '4px',
-        '--margin-4x': '8px',
-        '--margin-8x': '12px',
+        '--margin-2x': '8px',
+        '--margin-4x': '16px',
+        '--margin-8x': '20px',
         '--padding-2x': '8px',
         '--padding-4x': '16px',
         '--padding-5x': '20px',
