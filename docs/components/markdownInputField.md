@@ -1084,11 +1084,11 @@ export default () => {
 
 ### 最大文件限制与错误展示
 
-通过 `maxFileSize`（单文件最大字节数）和 `maxFileCount`（最大文件数量）可限制附件选择。当文件超过大小限制时，该文件会以**错误状态**出现在附件列表中，并展示「文件大小超过 xxx KB」等错误文案；超过数量限制时，多选会被拦截。
+通过 `maxFileSize`（单文件最大字节数）和 `maxFileCount`（最大文件数量）可限制附件选择。当文件超过大小限制时，该文件会以**错误状态**出现在附件列表中，并展示「超过 xxx KB」等错误文案；超过数量限制时，多选会被拦截。
 
 #### 文件超过最大值报错
 
-下方 Demo 中单文件限制为 **100KB**，选择超过该大小的文件时，该文件会以错误状态出现在附件列表并展示「文件大小超过 xxx KB」的报错提示。
+下方 Demo 中单文件限制为 **100KB**，选择超过该大小的文件时，该文件会以错误状态出现在附件列表并展示「超过 xxx KB」的报错提示。
 
 <code src="../demos/markdownInputField/max-file-size-error.tsx" background="var(--main-bg-color)" iframe=800></code>
 

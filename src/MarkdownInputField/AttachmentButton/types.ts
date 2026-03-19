@@ -20,6 +20,8 @@ export type AttachmentFile = File & {
   previewUrl?: string;
   /** 错误信息（如文件超限、上传失败等），在 status 为 error 时展示 */
   errorMessage?: string | null;
+  /** 错误类型，如 FILE_SIZE_EXCEEDED 表示因大小超限不可重试 */
+  errorCode?: string | null;
   /** 上传响应数据（使用 uploadWithResponse 时会填充此字段） */
   uploadResponse?: UploadResponse;
 };

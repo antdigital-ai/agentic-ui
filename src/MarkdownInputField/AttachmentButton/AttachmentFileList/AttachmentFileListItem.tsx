@@ -148,6 +148,8 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
 }) => {
   const { locale } = useContext(I18nContext);
   const isErrorStatus = file.status === 'error';
+  const isSizeExceededError = isErrorStatus && file.errorCode === 'FILE_SIZE_EXCEEDED';
+  const canRetry = isErrorStatus && !isSizeExceededError;
   const isDoneStatus = file.status === 'done';
   const canDelete = !isAttachmentFileLoading(file.status);
 
@@ -157,7 +159,7 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   };
 
   const handleRetryClick = () => {
-    if (!isErrorStatus) return;
+    if (!canRetry) return;
     onRetry?.(file);
   };
 
@@ -173,8 +175,8 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
 
   return (
     <Tooltip
-      title={locale?.clickToRetry || '点击重试'}
-      open={isErrorStatus ? undefined : false}
+      title={canRetry ? locale?.clickToRetry || '点击重试' : undefined}
+      open={canRetry ? undefined : false}
     >
       <motion.div
         variants={ANIMATION_VARIANTS}
