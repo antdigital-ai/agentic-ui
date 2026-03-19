@@ -23,8 +23,16 @@ export const useRendererVarStyle = (prefixCls: string) => {
 
       // 流式文字淡入动画（仅 opacity，GPU composited，不卡顿）
       '@keyframes markdownRendererFadeIn': {
-        from: { opacity: 0 },
-        to: { opacity: 1 },
+        '0%': {
+          opacity: 0,
+          filter: 'blur(4px)',
+          transform: 'translateY(2px)',
+        },
+        '100%': {
+          opacity: 1,
+          filter: 'blur(0px)',
+          transform: 'translateY(0)',
+        },
       },
     };
   });
