@@ -6,12 +6,16 @@ import {
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { useContext, useRef } from 'react';
-import { Editor, Transforms } from 'slate';
-import { ReactEditor, useSlate } from 'slate-react';
+import { useSlate } from 'slate-react';
 import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { useRefFunction } from '../../../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../../../I18n';
-import { NativeTableEditor } from '../../../../utils/native-table';
+import {
+  clearTableSelection,
+  insertTableRow,
+  removeTableRow,
+  selectTableRow,
+} from '../commands/tableCommands';
 import { TablePropsContext } from '../TableContext';
 
 /**
@@ -94,37 +98,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
     }
 
     try {
-      // 获取表格元素
-      const tableElement = Editor.node(editor, tablePath)[0] as any;
-      if (!tableElement || tableElement.type !== 'table') {
-        return;
-      }
-
-      // 获取表格的行数
-      const rowCount = tableElement.children?.length || 0;
-      if (rowCount === 0) {
-        return;
-      }
-
-      // 清除所有行的选中状态 - 通过 DOM 操作移除 data-select 属性
-      for (let rowIdx = 0; rowIdx < rowCount; rowIdx++) {
-        const rowElement = tableElement.children[rowIdx];
-        if (rowElement && rowElement.children) {
-          for (let colIdx = 0; colIdx < rowElement.children.length; colIdx++) {
-            const cellPath = [...tablePath, rowIdx, colIdx];
-            if (Editor.hasPath(editor, cellPath)) {
-              const [cellNode] = Editor.node(editor, cellPath);
-              if (cellNode && (cellNode as any).type === 'table-cell') {
-                // 通过 DOM 操作移除 data-select 属性
-                const domNode = ReactEditor.toDOMNode(editor, cellNode);
-                if (domNode) {
-                  domNode.removeAttribute('data-select');
-                }
-              }
-            }
-          }
-        }
-      }
+      clearTableSelection(editor, tablePath);
     } catch (error) {
       console.warn('Failed to clear table selection:', error);
     }
@@ -150,37 +124,8 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
     }
 
     try {
-      // 获取表格元素
-      const tableElement = Editor.node(editor, tablePath)[0] as any;
-      if (!tableElement || tableElement.type !== 'table') {
-        return;
-      }
-
-      // 获取表格的行数和列数
-      const rowCount = tableElement.children?.length || 0;
-      if (rowCount === 0) {
-        return;
-      }
-
       clearSelect(false);
-
-      // 选中指定行的所有单元格 - 通过 DOM 操作设置 data-select 属性
-      const rowElement = tableElement.children[rowIndex];
-      if (rowElement && rowElement.children) {
-        for (let colIdx = 0; colIdx < rowElement.children.length; colIdx++) {
-          const cellPath = [...tablePath, rowIndex, colIdx];
-          if (Editor.hasPath(editor, cellPath)) {
-            const [cellNode] = Editor.node(editor, cellPath);
-            if (cellNode && (cellNode as any).type === 'table-cell') {
-              // 通过 DOM 操作设置 data-select 属性
-              const domNode = ReactEditor.toDOMNode(editor, cellNode);
-              if (domNode) {
-                domNode.setAttribute('data-select', 'true');
-              }
-            }
-          }
-        }
-      }
+      selectTableRow(editor, tablePath, rowIndex);
     } catch (error) {
       console.warn('Failed to select table row:', error);
     }
@@ -197,37 +142,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
       if (!tablePath || rowIndex === undefined) {
         return;
       }
-
-      // 获取表格元素
-      const tableElement = Editor.node(editor, tablePath)[0] as any;
-      if (!tableElement || tableElement.type !== 'table') {
-        return;
-      }
-
-      const rowCount = tableElement.children.length;
-      const firstRow = tableElement.children[0] as any;
-      const colCount = firstRow.children.length;
-
-      // 检查是否只有一行一列
-      if (rowCount <= 1 && colCount <= 1) {
-        // 如果只有一行一列，删除整个表格
-        NativeTableEditor.removeTable(editor, tablePath);
-        return;
-      }
-
-      // 检查是否只有一行
-      if (rowCount <= 1) {
-        // 如果只有一行，删除整个表格
-        NativeTableEditor.removeTable(editor, tablePath);
-        return;
-      }
-
-      // 删除指定行
-      const rowPath = [...tablePath, rowIndex];
-      if (Editor.hasPath(editor, rowPath)) {
-        Transforms.removeNodes(editor, { at: rowPath });
-      }
-
+      removeTableRow(editor, tablePath, rowIndex);
       clearSelect();
     } catch (error) {
       console.warn('Failed to delete table row:', error);
@@ -245,34 +160,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
       if (!tablePath || rowIndex === undefined) {
         return;
       }
-
-      // 获取表格元素
-      const tableElement = Editor.node(editor, tablePath)[0] as any;
-      if (!tableElement || tableElement.type !== 'table') {
-        return;
-      }
-
-      const firstRow = tableElement.children[0] as any;
-      const colCount = firstRow.children.length;
-
-      // 创建新行
-      const newRow = {
-        type: 'table-row',
-        children: Array.from({ length: colCount }).map(() => ({
-          type: 'table-cell',
-          children: [
-            {
-              type: 'paragraph',
-              children: [{ text: '' }],
-            },
-          ],
-        })),
-      };
-
-      // 在当前行之前插入新行
-      const rowPath = [...tablePath, rowIndex];
-      Transforms.insertNodes(editor, newRow, { at: rowPath });
-
+      insertTableRow(editor, tablePath, rowIndex, 'before');
       clearSelect();
     } catch (error) {
       console.warn('Failed to insert row before:', error);
@@ -290,37 +178,7 @@ export const TableCellIndex: React.FC<TableCellIndexProps> = ({
       if (!tablePath || rowIndex === undefined) {
         return;
       }
-
-      // 获取表格元素
-      const tableElement = Editor.node(editor, tablePath)[0] as any;
-      if (!tableElement || tableElement.type !== 'table') {
-        return;
-      }
-
-      const firstRow = tableElement.children[0] as any;
-      const colCount = firstRow.children.length;
-
-      // 创建新行
-      const newRow = {
-        type: 'table-row',
-        children: Array.from({ length: colCount }).map(() => ({
-          type: 'table-cell',
-          children: [
-            {
-              type: 'paragraph',
-              children: [{ text: '' }],
-            },
-          ],
-        })),
-      };
-
-      // 在当前行之后插入新行
-      // 获取表格的行数来检查边界
-      const rowCount = tableElement.children.length;
-      const insertRowIndex = Math.min(rowIndex + 1, rowCount);
-      const rowPath = [...tablePath, insertRowIndex];
-      Transforms.insertNodes(editor, newRow, { at: rowPath });
-
+      insertTableRow(editor, tablePath, rowIndex, 'after');
       clearSelect();
     } catch (error) {
       console.warn('Failed to insert row after:', error);
