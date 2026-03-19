@@ -39,7 +39,7 @@ const remarkRehypePlugin = remarkRehype as unknown as Plugin;
 
 const FOOTNOTE_REF_PATTERN = /\[\^([^\]]+)\]/g;
 
-const CHART_COMMENT_PATTERN = /^<!--\s*(\[[\s\S]*\])\s*-->$/;
+const CHART_COMMENT_PATTERN = /^<!--\s*(\[[\s\S]*\]|\{[\s\S]*\})\s*-->$/;
 
 /**
  * 从 mdast table 节点提取列名和数据

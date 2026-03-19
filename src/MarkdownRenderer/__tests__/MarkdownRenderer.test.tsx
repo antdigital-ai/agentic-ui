@@ -302,7 +302,25 @@ describe('MarkdownRenderer', () => {
 
     const chartEl = container.querySelector('[data-be="chart"]');
     expect(chartEl).toBeTruthy();
-    // 不应渲染为普通表格
+    expect(container.querySelector('[data-testid="markdown-table"]')).toBeFalsy();
+  });
+
+  it('应支持单对象格式的图表注释', () => {
+    const content = [
+      '<!-- {"chartType":"radar","title":"评估","x":"指标","y":"得分"} -->',
+      '',
+      '| 指标 | 得分 |',
+      '| --- | --- |',
+      '| 技术 | 75 |',
+      '| 设计 | 60 |',
+    ].join('\n');
+
+    const { container } = render(
+      <MarkdownRenderer content={content} />,
+    );
+
+    const chartEl = container.querySelector('[data-be="chart"]');
+    expect(chartEl).toBeTruthy();
     expect(container.querySelector('[data-testid="markdown-table"]')).toBeFalsy();
   });
 
