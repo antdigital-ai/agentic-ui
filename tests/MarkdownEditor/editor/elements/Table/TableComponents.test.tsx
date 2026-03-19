@@ -330,7 +330,7 @@ describe('Table 组件测试', () => {
     it('应该处理 columnIndex 为 -1 的情况', () => {
       renderTableCellIndexSpacer({ columnIndex: -1 });
       const td = document.querySelector('td');
-      expect(td).toHaveAttribute('title', '点击选中整列，显示操作按钮');
+      expect(td).toHaveAttribute('title', '点击选中整个表格');
     });
 
     it('应该应用自定义样式', () => {

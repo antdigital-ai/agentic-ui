@@ -15,6 +15,7 @@ import {
   insertTableColumn,
   removeTableColumn,
   selectTableColumn,
+  selectWholeTable,
 } from '../commands/tableCommands';
 import { TablePropsContext } from '../TableContext';
 
@@ -84,7 +85,8 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
   const tableContext = useContext(TablePropsContext);
 
   const { deleteIconPosition, setDeleteIconPosition } = tableContext;
-  const targetColumnIndex = columnIndex === -1 ? 0 : columnIndex;
+  const isSelectWholeTable = columnIndex === -1;
+  const actionColumnIndex = isSelectWholeTable ? 0 : columnIndex;
 
   const clearSelect = useRefFunction((clearIcon = true) => {
     if (clearIcon) {
@@ -102,19 +104,24 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
     e.stopPropagation();
 
     // 如果提供了列索引，显示删除图标
-    if (targetColumnIndex !== undefined) {
+    if (columnIndex !== undefined) {
       setDeleteIconPosition?.({
-        columnIndex: targetColumnIndex,
+        columnIndex,
       });
     }
 
-    if (targetColumnIndex === undefined || !tablePath) {
+    if (columnIndex === undefined || !tablePath) {
       return;
     }
 
     try {
       clearSelect(false);
-      selectTableColumn(editor, tablePath, targetColumnIndex);
+      if (isSelectWholeTable) {
+        selectWholeTable(editor, tablePath);
+        return;
+      }
+
+      selectTableColumn(editor, tablePath, columnIndex);
     } catch (error) {
       console.warn('Failed to select table column:', error);
     }
@@ -128,10 +135,10 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
     e.stopPropagation();
 
     try {
-      if (!tablePath || targetColumnIndex === undefined) {
+      if (!tablePath || actionColumnIndex === undefined) {
         return;
       }
-      removeTableColumn(editor, tablePath, targetColumnIndex);
+      removeTableColumn(editor, tablePath, actionColumnIndex);
       clearSelect();
     } catch (error) {
       console.warn('Failed to delete table column:', error);
@@ -146,10 +153,10 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
     e.stopPropagation();
 
     try {
-      if (!tablePath || targetColumnIndex === undefined) {
+      if (!tablePath || actionColumnIndex === undefined) {
         return;
       }
-      insertTableColumn(editor, tablePath, targetColumnIndex, 'before');
+      insertTableColumn(editor, tablePath, actionColumnIndex, 'before');
       clearSelect();
     } catch (error) {
       console.warn('Failed to insert column before:', error);
@@ -164,10 +171,10 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
     e.stopPropagation();
 
     try {
-      if (!tablePath || targetColumnIndex === undefined) {
+      if (!tablePath || actionColumnIndex === undefined) {
         return;
       }
-      insertTableColumn(editor, tablePath, targetColumnIndex, 'after');
+      insertTableColumn(editor, tablePath, actionColumnIndex, 'after');
       clearSelect();
     } catch (error) {
       console.warn('Failed to insert column after:', error);
@@ -178,9 +185,8 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
 
   useClickAway(() => {
     if (
-      targetColumnIndex !== undefined &&
       deleteIconPosition &&
-      deleteIconPosition.columnIndex === targetColumnIndex
+      deleteIconPosition.columnIndex === columnIndex
     ) {
       clearSelect();
     }
@@ -188,9 +194,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
 
   // 检查是否应该显示删除图标
   const shouldShowDeleteIcon =
-    targetColumnIndex !== undefined &&
-    deleteIconPosition &&
-    deleteIconPosition.columnIndex === targetColumnIndex;
+    deleteIconPosition && deleteIconPosition.columnIndex === columnIndex;
 
   // 判断是否应该显示增加列的按钮（总是显示）
   const shouldShowInsertButtons = shouldShowDeleteIcon;
@@ -212,8 +216,10 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
       onClick={handleClick}
       title={
         columnIndex !== undefined
-          ? locale?.['table.clickToSelectColumn'] ||
-            '点击选中整列，显示操作按钮'
+          ? columnIndex === -1
+            ? locale?.['table.clickToSelectTable'] || '点击选中整个表格'
+            : locale?.['table.clickToSelectColumn'] ||
+              '点击选中整列，显示操作按钮'
           : undefined
       }
     >

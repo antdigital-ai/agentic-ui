@@ -181,10 +181,10 @@ describe('TableCellIndexSpacer 组件测试', () => {
     expect(td).toHaveAttribute('title', '点击选中整列，显示操作按钮');
   });
 
-  it('应该有正确的 title 属性 - 选中整列（columnIndex 为 -1）', () => {
+  it('应该有正确的 title 属性 - 选中整个表格', () => {
     renderTableCellIndexSpacer({ columnIndex: -1 });
     const td = document.querySelector('td');
-    expect(td).toHaveAttribute('title', '点击选中整列，显示操作按钮');
+    expect(td).toHaveAttribute('title', '点击选中整个表格');
   });
 
   it('应该在没有 columnIndex 时没有 title 属性', () => {
@@ -255,7 +255,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
     expect(td).toBeInTheDocument();
   });
 
-  it('应该处理 columnIndex 为 -1 的情况 - 选中单列', () => {
+  it('应该处理 columnIndex 为 -1 的情况 - 选中所有单元格', () => {
     renderTableCellIndexSpacer({ columnIndex: -1 });
     const td = document.querySelector('td');
     if (td) {
