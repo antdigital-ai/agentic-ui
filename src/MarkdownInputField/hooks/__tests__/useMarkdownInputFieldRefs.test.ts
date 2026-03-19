@@ -18,7 +18,7 @@ function createMockEditorInstance(): MarkdownEditorInstance {
   };
   return {
     store: store as any,
-    markdownEditorRef: { current: null },
+    markdownEditorRef: { current: null } as React.MutableRefObject<any>,
     markdownContainerRef: { current: null },
     exportHtml: vi.fn(),
   };
