@@ -1,3 +1,4 @@
+import type { CSSInterpolation } from '@ant-design/cssinjs';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
@@ -5,6 +6,215 @@ import {
   resetComponent,
   useEditorStyleRegister,
 } from '../Hooks/useStyle';
+
+// ── Table 样式提取 ──────────────────────────────────────────────────────────
+const TABLE_BORDER = '1px solid var(--agentic-ui-table-border-color, #E7E9E8)';
+const TABLE_RADIUS = 'var(--agentic-ui-table-border-radius, 8px)';
+const TABLE_HOVER_BG =
+  'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0,0,0,0.04)), var(--agentic-ui-table-hover-bg, rgba(0,0,0,0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))';
+
+const CELL = ':not(.config-td)';
+const ROW = ':not(.config-tr)';
+const NO_SPAN = ':not([colspan]):not([rowspan])';
+
+/** 生成四角圆角选择器 */
+const cornerRadius = (
+  rowPos: 'first-child' | 'last-child',
+  cellPos: 'first-child' | 'last-child',
+  radius: string,
+  property: string,
+  includeSpan = false,
+) => {
+  const spanSuffix = includeSpan ? '' : NO_SPAN;
+  const selector = [
+    `tr${ROW}:${rowPos} th:${cellPos}${CELL}${spanSuffix}`,
+    `tr${ROW}:${rowPos} td:${cellPos}${CELL}${spanSuffix}`,
+  ].join(', ');
+  return { [selector]: { [property]: radius } };
+};
+
+/** 合并单元格圆角（colspan/rowspan） */
+const spanCornerRadius = (
+  rowPos: string,
+  cellPos: string,
+  radius: string,
+  property: string,
+) => {
+  const selector = [
+    `tr${ROW}:${rowPos} th${CELL}[colspan]:${cellPos}`,
+    `tr${ROW}:${rowPos} td${CELL}[colspan]:${cellPos}`,
+    `tr${ROW}:${rowPos} th${CELL}[rowspan]:${cellPos}`,
+    `tr${ROW}:${rowPos} td${CELL}[rowspan]:${cellPos}`,
+  ].join(', ');
+  return { [selector]: { [property]: radius } };
+};
+
+/** th/td 共用的单元格基础样式 */
+const cellBase = {
+  verticalAlign: 'top',
+  padding: 'var(--agentic-ui-table-cell-padding, 16px 12px)',
+  textAlign: 'left' as const,
+  lineHeight: '24px',
+  fontSize: '1em',
+  minWidth: 'var(--agentic-ui-table-cell-min-width, 120px)',
+  width: 'var(--agentic-ui-table-cell-min-width, 120px)',
+  whiteSpace: 'nowrap' as const,
+  overflow: 'hidden' as const,
+  textOverflow: 'ellipsis' as const,
+  zIndex: 1,
+  background: 'inherit',
+};
+
+const genTableStyle = (
+  token: ChatTokenType,
+  mobileBreakpoint: string,
+  mobilePadding: string,
+): Record<string, CSSInterpolation> => {
+  const tableCls = `${token.componentCls}-content-table`;
+
+  return {
+    [tableCls]: {
+      width: '100%',
+      overflow: 'auto',
+      flex: 1,
+      minWidth: 0,
+      position: 'relative',
+
+      // 容器
+      '&-container': {
+        display: 'flex',
+        gap: 1,
+        maxWidth: '100%',
+        minWidth: 0,
+        outline: 'none',
+        position: 'relative',
+        marginBottom: 12,
+        [`&:hover ${tableCls}-readonly-table-actions`]: {
+          opacity: 1,
+          transform: 'translateX(50%)',
+          top: -24,
+        },
+      },
+      '&-editor-table': { marginTop: '1em' },
+
+      // 操作栏（全屏、复制）
+      '&-readonly-table-actions': {
+        opacity: 0,
+        position: 'absolute',
+        top: 20,
+        display: 'flex',
+        gap: 8,
+        right: '50%',
+        zIndex: 1000,
+        backgroundColor: 'var(--color-gray-bg-page-light)',
+        borderRadius: 'var(--radius-control-base)',
+        padding: '4px 8px',
+        boxShadow: 'var(--shadow-control-base)',
+        border: 'none',
+        transform: 'translateX(50%)',
+        transition: 'all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)',
+      },
+
+      // ── table 元素 ──
+      table: {
+        borderCollapse: 'separate',
+        borderSpacing: 0,
+        width: 'max-content',
+        tableLayout: 'fixed',
+        margin: '16px 0',
+        maxWidth: '100%',
+        position: 'relative',
+        fontVariant: 'tabular-nums',
+        borderRadius: TABLE_RADIUS,
+        border: TABLE_BORDER,
+
+        // 只读表格
+        [`&${tableCls}-readonly-table`]: {
+          width: '100%',
+          minWidth: 'max-content',
+        },
+
+        // 纯净模式（无外边框）
+        [`&${tableCls}-readonly-pure`]: {
+          border: 'none',
+          borderRadius: 'none',
+          [`tr${ROW} td${CELL}`]: { borderLeft: 'none' },
+          [`tr${ROW}:last-child td${CELL}`]: { borderBottom: TABLE_BORDER },
+          ...cornerRadius('first-child', 'first-child', 'unset', 'borderTopLeftRadius'),
+          ...cornerRadius('first-child', 'last-child', 'unset', 'borderTopRightRadius'),
+          ...cornerRadius('last-child', 'first-child', 'unset', 'borderBottomLeftRadius'),
+          ...cornerRadius('last-child', 'last-child', 'unset', 'borderBottomRightRadius'),
+        },
+
+        // 配置行/列边框
+        'th.config-th, td.config-td': { borderBottom: TABLE_BORDER, borderLeft: TABLE_BORDER },
+        'tr td.config-td:first-child': { borderLeft: 'none' },
+
+        // 表头
+        [`th${CELL}`]: {
+          ...cellBase,
+          backgroundColor: 'var(--agentic-ui-table-header-bg, #f7f7f9)',
+          borderBottom: TABLE_BORDER,
+          borderTop: 'none',
+          fontWeight: 600,
+          textWrap: 'nowrap',
+        },
+
+        // 数据单元格
+        [`td${CELL}`]: {
+          ...cellBase,
+          position: 'relative',
+          'div[data-be="paragraph"]': { margin: 0, textWrap: 'auto' },
+        },
+
+        // 数据行
+        [`tr${ROW}`]: {
+          background: 'inherit',
+          [`&:first-child td${CELL}`]: { borderTop: 'none' },
+          [`td${CELL}`]: {
+            borderBottom: TABLE_BORDER,
+            borderLeft: TABLE_BORDER,
+            '&:first-child': { fontSize: '1em', lineHeight: '24px', fontWeight: 600 },
+          },
+          [`td:first-child${CELL}`]: { borderLeft: 'none' },
+          [`&:last-child td${CELL}`]: { borderBottom: 'none' },
+        },
+
+        // hover
+        [`tbody tr${ROW}:hover`]: { background: TABLE_HOVER_BG },
+
+        // 所有单元格默认无圆角
+        [`th${CELL}, td${CELL}`]: { borderRadius: '0' },
+
+        // 四角圆角（普通单元格）
+        ...cornerRadius('first-child', 'first-child', TABLE_RADIUS, 'borderTopLeftRadius'),
+        ...cornerRadius('first-child', 'last-child', TABLE_RADIUS, 'borderTopRightRadius'),
+        ...cornerRadius('last-child', 'first-child', TABLE_RADIUS, 'borderBottomLeftRadius'),
+        ...cornerRadius('last-child', 'last-child', TABLE_RADIUS, 'borderBottomRightRadius'),
+
+        // 四角圆角（合并单元格 colspan/rowspan）
+        ...spanCornerRadius('first-child', 'first-child', TABLE_RADIUS, 'borderTopLeftRadius'),
+        ...spanCornerRadius('first-child', 'last-child', TABLE_RADIUS, 'borderTopRightRadius'),
+        ...spanCornerRadius('last-child', 'first-child', TABLE_RADIUS, 'borderBottomLeftRadius'),
+        ...spanCornerRadius('last-child', 'last-child', TABLE_RADIUS, 'borderBottomRightRadius'),
+
+        // 单行单列合并单元格
+        [`tr${ROW}:first-child:last-child th${CELL}[colspan]:first-child:last-child, tr${ROW}:first-child:last-child td${CELL}[colspan]:first-child:last-child`]:
+          { borderRadius: TABLE_RADIUS },
+        [`th${CELL}[rowspan]:first-child:last-child, td${CELL}[rowspan]:first-child:last-child`]:
+          { borderTopLeftRadius: TABLE_RADIUS, borderBottomLeftRadius: TABLE_RADIUS },
+
+        // 移动端
+        [`@media (max-width: ${mobileBreakpoint})`]: {
+          [`th${CELL}, td${CELL}`]: { padding: mobilePadding },
+        },
+      },
+
+      // Handsontable 兼容
+      'table.htCore': { boxSizing: 'content-box', '*': { boxSizing: 'content-box' } },
+    },
+  };
+};
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
@@ -371,247 +581,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       // --- Table ---
-      // 表格样式使用 CSS 变量 + fallback，支持通过父级 style 或 ConfigProvider 覆盖：
-      // --agentic-ui-table-border-radius, --agentic-ui-table-border-color,
+      // CSS 变量：--agentic-ui-table-border-radius, --agentic-ui-table-border-color,
       // --agentic-ui-table-header-bg, --agentic-ui-table-hover-bg,
-      // --agentic-ui-table-cell-bg, --agentic-ui-table-cell-min-width,
-      // --agentic-ui-table-cell-padding
-      [`${token.componentCls}-content-table`]: {
-        width: '100%',
-        overflow: 'auto',
-        flex: 1,
-        minWidth: 0,
-        position: 'relative',
-        '&-container': {
-          display: 'flex',
-          gap: 1,
-          maxWidth: '100%',
-          minWidth: 0,
-          outline: 'none',
-          position: 'relative',
-          marginBottom: 12,
-          [`&:hover ${token.componentCls}-content-table-readonly-table-actions`]:
-            {
-              opacity: 1,
-              transform: 'translateX(50%)',
-              top: -24,
-            },
-        },
-        '&-editor-table': {
-          marginTop: '1em',
-        },
-        '&-readonly-table-actions': {
-          opacity: 0,
-          position: 'absolute',
-          top: 20,
-          display: 'flex',
-          gap: 8,
-          right: '50%',
-          zIndex: 1000,
-          backgroundColor: 'var(--color-gray-bg-page-light)',
-          borderRadius: 'var(--radius-control-base)',
-          padding: '4px 8px',
-          boxShadow: 'var(--shadow-control-base)',
-          border: 'none',
-          transform: 'translateX(50%)',
-          transition: 'all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)',
-        },
-        table: {
-          borderCollapse: 'separate',
-          borderSpacing: 0,
-          width: 'max-content',
-          tableLayout: 'fixed',
-          margin: '16px 0',
-          maxWidth: '100%',
-
-          [`&${token.componentCls}-content-table-readonly-table`]: {
-            width: '100%',
-            minWidth: 'max-content',
-          },
-          position: 'relative',
-          fontVariant: 'tabular-nums',
-          borderRadius: 'var(--agentic-ui-table-border-radius, 8px)',
-          border: '1px solid var(--agentic-ui-table-border-color, #E7E9E8)',
-
-          [`&${token.componentCls}-content-table-readonly-pure`]: {
-            border: 'none',
-            borderRadius: 'none',
-            'tr:not(.config-tr) td:not(.config-td)': {
-              borderLeft: 'none',
-            },
-            'tr:not(.config-tr):last-child td:not(.config-td)': {
-              borderBottom:
-                '1px solid var(--agentic-ui-table-border-color, #E7E9E8)',
-            },
-            'tr:not(.config-tr):first-child th:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:first-child:not(.config-td):not([colspan]):not([rowspan])':
-              {
-                borderTopLeftRadius: 'unset',
-              },
-            'tr:not(.config-tr):first-child th:last-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:last-child:not(.config-td):not([colspan]):not([rowspan])':
-              {
-                borderTopRightRadius: 'unset',
-              },
-            'tr:not(.config-tr):last-child td:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):last-child th:first-child:not(.config-td):not([colspan]):not([rowspan])':
-              {
-                borderBottomLeftRadius: 'unset',
-              },
-            'tr:not(.config-tr):last-child td:last-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):last-child th:last-child:not(.config-td):not([colspan]):not([rowspan])':
-              {
-                borderBottomRightRadius: 'unset',
-              },
-          },
-
-          'th.config-th,td.config-td': {
-            borderBottom:
-              '1px solid var(--agentic-ui-table-border-color, #E7E9E8)',
-            borderLeft:
-              '1px solid var(--agentic-ui-table-border-color, #E7E9E8)',
-          },
-          'tr td.config-td:first-child': {
-            borderLeft: 'none',
-          },
-
-          'th:not(.config-td)': {
-            backgroundColor: 'var(--agentic-ui-table-header-bg, #f7f7f9)',
-            borderBottom:
-              '1px solid var(--agentic-ui-table-border-color, #E7E9E8)',
-            textWrap: 'nowrap',
-            verticalAlign: 'top',
-            padding: 'var(--agentic-ui-table-cell-padding, 16px 12px)',
-            textAlign: 'left',
-            lineHeight: '24px',
-            fontSize: '1em',
-            fontWeight: 600,
-            borderTop: 'none',
-            minWidth: 'var(--agentic-ui-table-cell-min-width, 120px)',
-            width: 'var(--agentic-ui-table-cell-min-width, 120px)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            zIndex: 1,
-            background: 'inherit',
-          },
-          'td:not(.config-td)': {
-            verticalAlign: 'top',
-            padding: 'var(--agentic-ui-table-cell-padding, 16px 12px)',
-            textAlign: 'left',
-            position: 'relative',
-            lineHeight: '24px',
-            fontSize: '1em',
-            minWidth: 'var(--agentic-ui-table-cell-min-width, 120px)',
-            width: 'var(--agentic-ui-table-cell-min-width, 120px)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            zIndex: 1,
-            background: 'inherit',
-            'div[data-be="paragraph"]': {
-              margin: 0,
-              textWrap: 'auto',
-            },
-          },
-          'tr:not(.config-tr)': {
-            background: 'inherit',
-
-            '&:first-child td:not(.config-td)': {
-              borderTop: 'none',
-            },
-            'td:not(.config-td)': {
-              borderBottom:
-                '1px solid var(--agentic-ui-table-border-color, #E7E9E8)',
-              borderLeft:
-                '1px solid var(--agentic-ui-table-border-color, #E7E9E8)',
-
-              '&:first-child': {
-                fontSize: '1em',
-                lineHeight: '24px',
-                fontWeight: 600,
-              },
-            },
-            'td:first-child:not(.config-td)': {
-              borderLeft: 'none',
-            },
-            '&:last-child td:not(.config-td)': {
-              borderBottom: 'none',
-            },
-          },
-          'tbody tr:not(.config-tr):hover': {
-            background:
-              'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))',
-          },
-          // 表格圆角处理
-          'th:not(.config-td), td:not(.config-td)': {
-            borderRadius: '0',
-          },
-
-          'tr:not(.config-tr):first-child th:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:first-child:not(.config-td):not([colspan]):not([rowspan])':
-            {
-              borderTopLeftRadius: 'var(--agentic-ui-table-border-radius, 8px)',
-            },
-          'tr:not(.config-tr):first-child th:last-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:last-child:not(.config-td):not([colspan]):not([rowspan])':
-            {
-              borderTopRightRadius:
-                'var(--agentic-ui-table-border-radius, 8px)',
-            },
-          'tr:not(.config-tr):last-child td:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):last-child th:first-child:not(.config-td):not([colspan]):not([rowspan])':
-            {
-              borderBottomLeftRadius:
-                'var(--agentic-ui-table-border-radius, 8px)',
-            },
-          'tr:not(.config-tr):last-child td:last-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):last-child th:last-child:not(.config-td):not([colspan]):not([rowspan])':
-            {
-              borderBottomRightRadius:
-                'var(--agentic-ui-table-border-radius, 8px)',
-            },
-
-          // 处理合并单元格的圆角
-          'tr:not(.config-tr):first-child th:not(.config-td)[colspan]:first-child, tr:not(.config-tr):first-child td:not(.config-td)[colspan]:first-child,tr:not(.config-tr):first-child th:not(.config-td)[rowspan]:first-child, tr:not(.config-tr):first-child td:not(.config-td)[rowspan]:first-child':
-            {
-              borderTopLeftRadius: 'var(--agentic-ui-table-border-radius, 8px)',
-            },
-
-          'tr:not(.config-tr):first-child th:not(.config-td)[colspan]:last-child, tr:not(.config-tr):first-child td:not(.config-td)[colspan]:last-child,tr:not(.config-tr):first-child th:not(.config-td)[rowspan]:last-child, tr:not(.config-tr):first-child td:not(.config-td)[rowspan]:last-child':
-            {
-              borderTopRightRadius:
-                'var(--agentic-ui-table-border-radius, 8px)',
-            },
-
-          'tr:not(.config-tr):last-child td:not(.config-td)[colspan]:first-child, tr:not(.config-tr):last-child th:not(.config-td)[colspan]:first-child,tr:not(.config-tr):last-child td:not(.config-td)[rowspan]:first-child, tr:not(.config-tr):last-child th:not(.config-td)[rowspan]:first-child':
-            {
-              borderBottomLeftRadius:
-                'var(--agentic-ui-table-border-radius, 8px)',
-            },
-
-          'tr:not(.config-tr):last-child td:not(.config-td)[colspan]:last-child, tr:not(.config-tr):last-child th:not(.config-td)[colspan]:last-child,tr:not(.config-tr):last-child td:not(.config-td)[rowspan]:last-child, tr:not(.config-tr):last-child th:not(.config-td)[rowspan]:last-child':
-            {
-              borderBottomRightRadius:
-                'var(--agentic-ui-table-border-radius, 8px)',
-            },
-
-          'tr:not(.config-tr):first-child:last-child th:not(.config-td)[colspan]:first-child:last-child, tr:not(.config-tr):first-child:last-child td:not(.config-td)[colspan]:first-child:last-child':
-            {
-              borderRadius: 'var(--agentic-ui-table-border-radius, 8px)',
-            },
-
-          'th:not(.config-td)[rowspan]:first-child:last-child, td:not(.config-td)[rowspan]:first-child:last-child':
-            {
-              borderTopLeftRadius: 'var(--agentic-ui-table-border-radius, 8px)',
-              borderBottomLeftRadius:
-                'var(--agentic-ui-table-border-radius, 8px)',
-            },
-          [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
-            'th:not(.config-td), td:not(.config-td)': {
-              padding: `${MOBILE_PADDING}`,
-            },
-          },
-        },
-        'table.htCore': {
-          boxSizing: 'content-box',
-          '*': {
-            boxSizing: 'content-box',
-          },
-        },
-      },
+      // --agentic-ui-table-cell-bg, --agentic-ui-table-cell-min-width, --agentic-ui-table-cell-padding
+      ...genTableStyle(token, MOBILE_BREAKPOINT, MOBILE_PADDING),
 
       // --- Table Td ---
       [`${token.componentCls}-table-td`]: {
