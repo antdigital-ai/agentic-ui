@@ -35,11 +35,20 @@ interface Recognizer {
 }
 
 const STREAM_INCOMPLETE_REGEX = {
-  image: [/^!\[[^\]\r\n]{0,1000}$/, /^!\[[^\r\n]{0,1000}\]\(*[^)\r\n]{0,1000}$/],
-  link: [/^\[(?!\^)[^\]\r\n]{0,1000}$/, /^\[(?!\^)[^\r\n]{0,1000}\]\(+[^)\r\n]{0,1000}$/],
+  image: [
+    /^!\[[^\]\r\n]{0,1000}$/,
+    /^!\[[^\r\n]{0,1000}\]\(*[^)\r\n]{0,1000}$/,
+  ],
+  link: [
+    /^\[(?!\^)[^\]\r\n]{0,1000}$/,
+    /^\[(?!\^)[^\r\n]{0,1000}\]\(+[^)\r\n]{0,1000}$/,
+  ],
   html: [/^<\/$/, /^<\/?[a-zA-Z][a-zA-Z0-9-]{0,100}[^>\r\n]{0,1000}$/],
   commonEmphasis: [/^(\*{1,3}|_{1,3})(?!\s)(?!.*\1$)[^\r\n]{0,1000}$/],
-  list: [/^[-+*]\s{0,3}$/, /^[-+*]\s{1,3}(\*{1,3}|_{1,3})(?!\s)(?!.*\1$)[^\r\n]{0,1000}$/],
+  list: [
+    /^[-+*]\s{0,3}$/,
+    /^[-+*]\s{1,3}(\*{1,3}|_{1,3})(?!\s)(?!.*\1$)[^\r\n]{0,1000}$/,
+  ],
   'inline-code': [/^`[^`\r\n]{0,300}$/],
 } as const;
 
@@ -56,7 +65,11 @@ const isTableIncomplete = (markdown: string) => {
   if (lines.length < 3) return true;
   const [header, separator] = lines;
   if (!/^\|.*\|$/.test(header.trim())) return false;
-  const columns = separator.trim().split('|').map((c) => c.trim()).filter(Boolean);
+  const columns = separator
+    .trim()
+    .split('|')
+    .map((c) => c.trim())
+    .filter(Boolean);
   const isSeparatorValid = columns.every((col, i) =>
     i === columns.length - 1
       ? col === ':' || /^:?-+:?$/.test(col)
@@ -73,27 +86,32 @@ const tokenRecognizerMap: Partial<Record<StreamCacheTokenType, Recognizer>> = {
   [StreamCacheTokenType.Link]: {
     tokenType: StreamCacheTokenType.Link,
     isStartOfToken: (md) => md.startsWith('['),
-    isStreamingValid: (md) => STREAM_INCOMPLETE_REGEX.link.some((re) => re.test(md)),
+    isStreamingValid: (md) =>
+      STREAM_INCOMPLETE_REGEX.link.some((re) => re.test(md)),
   },
   [StreamCacheTokenType.Image]: {
     tokenType: StreamCacheTokenType.Image,
     isStartOfToken: (md) => md.startsWith('!'),
-    isStreamingValid: (md) => STREAM_INCOMPLETE_REGEX.image.some((re) => re.test(md)),
+    isStreamingValid: (md) =>
+      STREAM_INCOMPLETE_REGEX.image.some((re) => re.test(md)),
   },
   [StreamCacheTokenType.Html]: {
     tokenType: StreamCacheTokenType.Html,
     isStartOfToken: (md) => md.startsWith('<'),
-    isStreamingValid: (md) => STREAM_INCOMPLETE_REGEX.html.some((re) => re.test(md)),
+    isStreamingValid: (md) =>
+      STREAM_INCOMPLETE_REGEX.html.some((re) => re.test(md)),
   },
   [StreamCacheTokenType.Emphasis]: {
     tokenType: StreamCacheTokenType.Emphasis,
     isStartOfToken: (md) => md.startsWith('*') || md.startsWith('_'),
-    isStreamingValid: (md) => STREAM_INCOMPLETE_REGEX.commonEmphasis.some((re) => re.test(md)),
+    isStreamingValid: (md) =>
+      STREAM_INCOMPLETE_REGEX.commonEmphasis.some((re) => re.test(md)),
   },
   [StreamCacheTokenType.List]: {
     tokenType: StreamCacheTokenType.List,
     isStartOfToken: (md) => /^[-+*]/.test(md),
-    isStreamingValid: (md) => STREAM_INCOMPLETE_REGEX.list.some((re) => re.test(md)),
+    isStreamingValid: (md) =>
+      STREAM_INCOMPLETE_REGEX.list.some((re) => re.test(md)),
     getCommitPrefix: (pending) => {
       const listPrefix = pending.match(/^([-+*]\s{0,3})/)?.[1];
       const rest = listPrefix ? pending.slice(listPrefix.length) : '';
@@ -108,7 +126,8 @@ const tokenRecognizerMap: Partial<Record<StreamCacheTokenType, Recognizer>> = {
   [StreamCacheTokenType.InlineCode]: {
     tokenType: StreamCacheTokenType.InlineCode,
     isStartOfToken: (md) => md.startsWith('`'),
-    isStreamingValid: (md) => STREAM_INCOMPLETE_REGEX['inline-code'].some((re) => re.test(md)),
+    isStreamingValid: (md) =>
+      STREAM_INCOMPLETE_REGEX['inline-code'].some((re) => re.test(md)),
   },
 };
 
@@ -120,11 +139,17 @@ const commitCache = (cache: StreamCache): void => {
   cache.token = StreamCacheTokenType.Text;
 };
 
-const recognize = (cache: StreamCache, tokenType: StreamCacheTokenType): void => {
+const recognize = (
+  cache: StreamCache,
+  tokenType: StreamCacheTokenType,
+): void => {
   const recognizer = tokenRecognizerMap[tokenType];
   if (!recognizer) return;
   const { token, pending } = cache;
-  if (token === StreamCacheTokenType.Text && recognizer.isStartOfToken(pending)) {
+  if (
+    token === StreamCacheTokenType.Text &&
+    recognizer.isStartOfToken(pending)
+  ) {
     cache.token = tokenType;
     return;
   }
@@ -177,7 +202,8 @@ const isInCodeBlock = (text: string, isFinalChunk = false): boolean => {
         fenceChar = char;
         fenceLen = len;
       } else {
-        const isValidEnd = char === fenceChar && len >= fenceLen && /^\s*$/.test(after);
+        const isValidEnd =
+          char === fenceChar && len >= fenceLen && /^\s*$/.test(after);
         if (isValidEnd && (isFinalChunk || i < lines.length - 1)) {
           inFenced = false;
           fenceChar = '';
@@ -210,7 +236,8 @@ export const useStreaming = (input: string, enabled: boolean): string => {
       return;
     }
 
-    const expectedPrefix = cacheRef.current.completeMarkdown + cacheRef.current.pending;
+    const expectedPrefix =
+      cacheRef.current.completeMarkdown + cacheRef.current.pending;
     if (!text.startsWith(expectedPrefix)) {
       cacheRef.current = getInitialCache();
     }
@@ -229,9 +256,13 @@ export const useStreaming = (input: string, enabled: boolean): string => {
       if (cache.token === StreamCacheTokenType.Text) {
         for (const handler of recognizeHandlers) handler.recognize(cache);
       } else {
-        const handler = recognizeHandlers.find((h) => h.tokenType === cache.token);
+        const handler = recognizeHandlers.find(
+          (h) => h.tokenType === cache.token,
+        );
         handler?.recognize(cache);
-        if ((cache.token as StreamCacheTokenType) === StreamCacheTokenType.Text) {
+        if (
+          (cache.token as StreamCacheTokenType) === StreamCacheTokenType.Text
+        ) {
           for (const h of recognizeHandlers) h.recognize(cache);
         }
       }

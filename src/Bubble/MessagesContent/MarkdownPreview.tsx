@@ -234,7 +234,8 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
   }
 
   // extraShowOnHover 开启时，无 extra 直接返回内容，避免 hover 出现空浮层
-  if (!extra) {
+  // 生成中（typing）时不使用 Popover，避免 hover 展示 extra
+  if (!extra || typing) {
     return (
       <div
         style={{

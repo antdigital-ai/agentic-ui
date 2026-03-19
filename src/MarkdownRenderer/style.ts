@@ -24,7 +24,7 @@ export const useRendererVarStyle = (prefixCls: string) => {
       // 流式文字淡入动画（opacity + translateY，GPU 硬件加速，清爽流派）
       // 仅使用 opacity 和 transform，避免 blur 带来的重绘开销
       '@keyframes markdownRendererSlideFadeIn': {
-        from: { opacity: 0, transform: 'translateY(4px)' },
+        from: { opacity: 0, transform: 'translateY(2px)' },
         to: { opacity: 1, transform: 'translateY(0)' },
       },
     };
