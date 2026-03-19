@@ -35,6 +35,17 @@ export interface FileUploadManagerReturn {
   /** 文件上传是否完成 */
   fileUploadDone: boolean;
 
+  /** 文件上传状态 */
+  fileUploadStatus: 'uploading' | 'done' | 'error';
+
+  /** 文件上传状态统计 */
+  fileUploadSummary: {
+    totalCount: number;
+    doneCount: number;
+    uploadingCount: number;
+    errorCount: number;
+  };
+
   /** 支持的文件格式 */
   supportedFormat: SupportedFileFormatsType;
 
@@ -63,12 +74,28 @@ export const useFileUploadManager = ({
 }: FileUploadManagerProps): FileUploadManagerReturn => {
   const { locale } = useContext(I18nContext);
 
-  // 判断是否所有文件上传完成
-  const fileUploadDone = fileMap?.size
-    ? Array.from(fileMap?.values() || []).every(
-        (file) => file.status === 'done',
-      )
-    : true;
+  const fileList = Array.from(fileMap?.values() || []);
+  const uploadingCount = fileList.filter(
+    (file) => file.status === 'uploading',
+  ).length;
+  const errorCount = fileList.filter((file) => file.status === 'error').length;
+  const totalCount = fileList.length;
+  const fileUploadSummary = {
+    totalCount,
+    uploadingCount,
+    errorCount,
+    // 兜底把未知状态也按完成态处理，避免统计缺口
+    doneCount: Math.max(0, totalCount - uploadingCount - errorCount),
+  };
+  const fileUploadStatus: 'uploading' | 'done' | 'error' =
+    fileUploadSummary.errorCount > 0
+      ? 'error'
+      : fileUploadSummary.uploadingCount > 0
+        ? 'uploading'
+        : 'done';
+  // 向后兼容：无文件时视为已完成
+  const fileUploadDone =
+    fileUploadSummary.totalCount > 0 ? fileUploadStatus === 'done' : true;
 
   // 默认支持的文件格式
   const supportedFormat =
@@ -269,6 +296,8 @@ export const useFileUploadManager = ({
   return {
     fileMap,
     fileUploadDone,
+    fileUploadStatus,
+    fileUploadSummary,
     supportedFormat,
     uploadImage,
     updateAttachmentFiles,

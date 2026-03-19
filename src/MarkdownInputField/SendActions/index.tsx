@@ -43,6 +43,17 @@ export interface SendActionsProps {
   /** 文件上传是否完成 */
   fileUploadDone?: boolean;
 
+  /** 文件上传状态 */
+  fileUploadStatus?: 'uploading' | 'done' | 'error';
+
+  /** 文件上传状态统计 */
+  fileUploadSummary?: {
+    totalCount: number;
+    doneCount: number;
+    uploadingCount: number;
+    errorCount: number;
+  };
+
   /** 是否正在录音 */
   recording?: boolean;
 
@@ -105,6 +116,8 @@ export const SendActions: React.FC<SendActionsProps> = ({
   typing,
   isLoading,
   fileUploadDone = true,
+  fileUploadStatus = fileUploadDone ? 'done' : 'uploading',
+  fileUploadSummary,
   recording = false,
   collapseSendActions = false,
   allowEmptySubmit = false,
@@ -129,6 +142,26 @@ export const SendActions: React.FC<SendActionsProps> = ({
     '()',
   ].filter(Boolean).length;
   const { locale } = useContext(I18nContext);
+  const showUploadStatus =
+    !!attachment?.enable && (fileUploadSummary?.totalCount ?? 0) > 0;
+
+  const uploadStatusText = useMemo(() => {
+    if (!showUploadStatus) return '';
+    const totalCount = fileUploadSummary?.totalCount ?? 0;
+    if (fileUploadStatus === 'uploading') {
+      return `${locale?.uploading || '上传中...'} ${
+        fileUploadSummary?.uploadingCount ?? 0
+      }/${totalCount}`;
+    }
+    if (fileUploadStatus === 'error') {
+      return `${locale?.uploadFailed || '上传失败'} ${
+        fileUploadSummary?.errorCount ?? 0
+      }/${totalCount}`;
+    }
+    return `${locale?.uploadSuccess || '上传成功'} ${
+      fileUploadSummary?.doneCount ?? totalCount
+    }/${totalCount}`;
+  }, [fileUploadStatus, fileUploadSummary, locale, showUploadStatus]);
 
   /**
    * 默认发送操作按钮
@@ -226,7 +259,8 @@ export const SendActions: React.FC<SendActionsProps> = ({
           onStopRecording,
           onSend,
           onStop,
-          fileUploadStatus: fileUploadDone ? 'done' : 'uploading',
+          fileUploadStatus,
+          fileUploadSummary,
         },
         defaultActions,
       )
@@ -257,6 +291,18 @@ export const SendActions: React.FC<SendActionsProps> = ({
         )}
         data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.SEND_ACTIONS}
       >
+        {showUploadStatus ? (
+          <div
+            className={classNames(
+              `${prefixCls}-upload-status`,
+              `${prefixCls}-upload-status-${fileUploadStatus}`,
+              hashId,
+            )}
+            data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.UPLOAD_STATUS}
+          >
+            {uploadStatusText}
+          </div>
+        ) : null}
         {collapseSendActions && actionsList.length > 2 ? (
           <>
             <Popover

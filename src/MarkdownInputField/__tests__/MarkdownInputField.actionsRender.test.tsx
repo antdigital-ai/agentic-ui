@@ -3,8 +3,28 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { AttachmentFile } from '../AttachmentButton/types';
 import { MarkdownInputField } from '../MarkdownInputField';
+import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 
 describe('MarkdownInputField - actionsRender', () => {
+  const createAttachmentFile = (
+    overrides: Partial<AttachmentFile>,
+  ): AttachmentFile => {
+    return {
+      name: 'test.txt',
+      type: 'text/plain',
+      size: 4,
+      lastModified: Date.now(),
+      webkitRelativePath: '',
+      arrayBuffer: async () => new ArrayBuffer(0),
+      slice: () => new Blob(),
+      stream: () => new ReadableStream(),
+      text: async () => 'test',
+      uuid: '1',
+      status: 'done',
+      ...overrides,
+    } as AttachmentFile;
+  };
+
   it('should render custom actions when actionsRender is provided', () => {
     const actionsRender = () => [
       <button type="button" key="custom-action-1" data-testid="custom-action-1">
@@ -235,5 +255,64 @@ describe('MarkdownInputField - actionsRender', () => {
     expect(container?.children[0]).toBe(firstButton);
     expect(container?.children[1]).toBe(sendButton);
     expect(container?.children[2]).toBe(lastButton);
+  });
+
+  it('should pass error status to actionsRender when any file upload fails', () => {
+    const actionsRender = vi.fn().mockReturnValue([
+      <button type="button" key="custom-action">
+        Action
+      </button>,
+    ]);
+    const errorFile = createAttachmentFile({
+      uuid: 'error-1',
+      status: 'error',
+    });
+
+    render(
+      <MarkdownInputField
+        actionsRender={actionsRender}
+        attachment={{
+          enable: true,
+          fileMap: new Map([['error-1', errorFile]]),
+        }}
+      />,
+    );
+
+    expect(actionsRender).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fileUploadStatus: 'error',
+      }),
+      expect.any(Array),
+    );
+  });
+
+  it('should render upload status hint beside input actions', () => {
+    const uploadingFile = createAttachmentFile({
+      uuid: 'uploading-1',
+      status: 'uploading',
+    });
+    const doneFile = createAttachmentFile({
+      uuid: 'done-1',
+      status: 'done',
+    });
+
+    render(
+      <MarkdownInputField
+        attachment={{
+          enable: true,
+          fileMap: new Map([
+            ['uploading-1', uploadingFile],
+            ['done-1', doneFile],
+          ]),
+        }}
+      />,
+    );
+
+    const uploadStatus = screen.getByTestId(
+      MARKDOWN_INPUT_FIELD_TEST_IDS.UPLOAD_STATUS,
+    );
+    expect(uploadStatus).toBeInTheDocument();
+    expect(uploadStatus.textContent).toContain('1/2');
+    expect(uploadStatus.textContent).toMatch(/上传中|Uploading/);
   });
 });
