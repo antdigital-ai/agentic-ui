@@ -13,8 +13,6 @@ const TABLE_RADIUS = 'var(--agentic-ui-table-border-radius, 8px)';
 const TABLE_HOVER_BG =
   'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0,0,0,0.04)), var(--agentic-ui-table-hover-bg, rgba(0,0,0,0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))';
 
-const CELL = ':not(.config-td)';
-const ROW = ':not(.config-tr)';
 const NO_SPAN = ':not([colspan]):not([rowspan])';
 
 /** 生成四角圆角选择器 */
@@ -23,12 +21,10 @@ const cornerRadius = (
   cellPos: 'first-child' | 'last-child',
   radius: string,
   property: string,
-  includeSpan = false,
 ) => {
-  const spanSuffix = includeSpan ? '' : NO_SPAN;
   const selector = [
-    `tr${ROW}:${rowPos} th:${cellPos}${CELL}${spanSuffix}`,
-    `tr${ROW}:${rowPos} td:${cellPos}${CELL}${spanSuffix}`,
+    `tr:${rowPos} th:${cellPos}${NO_SPAN}`,
+    `tr:${rowPos} td:${cellPos}${NO_SPAN}`,
   ].join(', ');
   return { [selector]: { [property]: radius } };
 };
@@ -41,10 +37,10 @@ const spanCornerRadius = (
   property: string,
 ) => {
   const selector = [
-    `tr${ROW}:${rowPos} th${CELL}[colspan]:${cellPos}`,
-    `tr${ROW}:${rowPos} td${CELL}[colspan]:${cellPos}`,
-    `tr${ROW}:${rowPos} th${CELL}[rowspan]:${cellPos}`,
-    `tr${ROW}:${rowPos} td${CELL}[rowspan]:${cellPos}`,
+    `tr:${rowPos} th[colspan]:${cellPos}`,
+    `tr:${rowPos} td[colspan]:${cellPos}`,
+    `tr:${rowPos} th[rowspan]:${cellPos}`,
+    `tr:${rowPos} td[rowspan]:${cellPos}`,
   ].join(', ');
   return { [selector]: { [property]: radius } };
 };
@@ -128,30 +124,13 @@ const genTableStyle = (
         borderRadius: TABLE_RADIUS,
         border: TABLE_BORDER,
 
-        // 只读表格
         [`&${tableCls}-readonly-table`]: {
           width: '100%',
           minWidth: 'max-content',
         },
 
-        // 纯净模式（无外边框）
-        [`&${tableCls}-readonly-pure`]: {
-          border: 'none',
-          borderRadius: 'none',
-          [`tr${ROW} td${CELL}`]: { borderLeft: 'none' },
-          [`tr${ROW}:last-child td${CELL}`]: { borderBottom: TABLE_BORDER },
-          ...cornerRadius('first-child', 'first-child', 'unset', 'borderTopLeftRadius'),
-          ...cornerRadius('first-child', 'last-child', 'unset', 'borderTopRightRadius'),
-          ...cornerRadius('last-child', 'first-child', 'unset', 'borderBottomLeftRadius'),
-          ...cornerRadius('last-child', 'last-child', 'unset', 'borderBottomRightRadius'),
-        },
-
-        // 配置行/列边框
-        'th.config-th, td.config-td': { borderBottom: TABLE_BORDER, borderLeft: TABLE_BORDER },
-        'tr td.config-td:first-child': { borderLeft: 'none' },
-
         // 表头
-        [`th${CELL}`]: {
+        th: {
           ...cellBase,
           backgroundColor: 'var(--agentic-ui-table-header-bg, #f7f7f9)',
           borderBottom: TABLE_BORDER,
@@ -161,57 +140,51 @@ const genTableStyle = (
         },
 
         // 数据单元格
-        [`td${CELL}`]: {
+        td: {
           ...cellBase,
           position: 'relative',
           'div[data-be="paragraph"]': { margin: 0, textWrap: 'auto' },
         },
 
         // 数据行
-        [`tr${ROW}`]: {
+        tr: {
           background: 'inherit',
-          [`&:first-child td${CELL}`]: { borderTop: 'none' },
-          [`td${CELL}`]: {
+          '&:first-child td': { borderTop: 'none' },
+          td: {
             borderBottom: TABLE_BORDER,
             borderLeft: TABLE_BORDER,
             '&:first-child': { fontSize: '1em', lineHeight: '24px', fontWeight: 600 },
           },
-          [`td:first-child${CELL}`]: { borderLeft: 'none' },
-          [`&:last-child td${CELL}`]: { borderBottom: 'none' },
+          'td:first-child': { borderLeft: 'none' },
+          '&:last-child td': { borderBottom: 'none' },
         },
 
-        // hover
-        [`tbody tr${ROW}:hover`]: { background: TABLE_HOVER_BG },
+        'tbody tr:hover': { background: TABLE_HOVER_BG },
 
-        // 所有单元格默认无圆角
-        [`th${CELL}, td${CELL}`]: { borderRadius: '0' },
+        // 默认无圆角
+        'th, td': { borderRadius: '0' },
 
-        // 四角圆角（普通单元格）
+        // 四角圆角
         ...cornerRadius('first-child', 'first-child', TABLE_RADIUS, 'borderTopLeftRadius'),
         ...cornerRadius('first-child', 'last-child', TABLE_RADIUS, 'borderTopRightRadius'),
         ...cornerRadius('last-child', 'first-child', TABLE_RADIUS, 'borderBottomLeftRadius'),
         ...cornerRadius('last-child', 'last-child', TABLE_RADIUS, 'borderBottomRightRadius'),
 
-        // 四角圆角（合并单元格 colspan/rowspan）
+        // 合并单元格圆角
         ...spanCornerRadius('first-child', 'first-child', TABLE_RADIUS, 'borderTopLeftRadius'),
         ...spanCornerRadius('first-child', 'last-child', TABLE_RADIUS, 'borderTopRightRadius'),
         ...spanCornerRadius('last-child', 'first-child', TABLE_RADIUS, 'borderBottomLeftRadius'),
         ...spanCornerRadius('last-child', 'last-child', TABLE_RADIUS, 'borderBottomRightRadius'),
 
-        // 单行单列合并单元格
-        [`tr${ROW}:first-child:last-child th${CELL}[colspan]:first-child:last-child, tr${ROW}:first-child:last-child td${CELL}[colspan]:first-child:last-child`]:
+        'tr:first-child:last-child th[colspan]:first-child:last-child, tr:first-child:last-child td[colspan]:first-child:last-child':
           { borderRadius: TABLE_RADIUS },
-        [`th${CELL}[rowspan]:first-child:last-child, td${CELL}[rowspan]:first-child:last-child`]:
+        'th[rowspan]:first-child:last-child, td[rowspan]:first-child:last-child':
           { borderTopLeftRadius: TABLE_RADIUS, borderBottomLeftRadius: TABLE_RADIUS },
 
-        // 移动端
         [`@media (max-width: ${mobileBreakpoint})`]: {
-          [`th${CELL}, td${CELL}`]: { padding: mobilePadding },
+          'th, td': { padding: mobilePadding },
         },
       },
-
-      // Handsontable 兼容
-      'table.htCore': { boxSizing: 'content-box', '*': { boxSizing: 'content-box' } },
     },
   };
 };
