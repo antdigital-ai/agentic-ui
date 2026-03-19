@@ -103,9 +103,7 @@ const ChartWithRetry: React.FC<{
         margin: 'auto',
         minWidth: 0,
         width:
-          columnLength === 1
-            ? '100%'
-            : `calc(${100 / columnLength}% - 8px)`,
+          columnLength === 1 ? '100%' : `calc(${100 / columnLength}% - 8px)`,
         maxWidth: '100%',
         flex: 1,
         userSelect: 'none',
@@ -117,7 +115,7 @@ const ChartWithRetry: React.FC<{
         onError={handleChartError}
       >
         <ChartRender
-          chartType={chartType}
+          chartType={chartType as 'pie'}
           chartData={chartDataItems}
           columnLength={columnLength}
           onColumnLengthChange={setColumnLength}
