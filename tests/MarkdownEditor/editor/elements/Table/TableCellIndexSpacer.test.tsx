@@ -193,10 +193,10 @@ describe('TableCellIndexSpacer 组件测试', () => {
     expect(td).toHaveAttribute('title', '点击选中整列，显示操作按钮');
   });
 
-  it('应该有正确的 title 属性 - 选中整个表格', () => {
+  it('应该有正确的 title 属性 - 选中整列（columnIndex 为 -1）', () => {
     renderTableCellIndexSpacer({ columnIndex: -1 });
     const td = document.querySelector('td');
-    expect(td).toHaveAttribute('title', '点击选中整个表格');
+    expect(td).toHaveAttribute('title', '点击选中整列，显示操作按钮');
   });
 
   it('应该在没有 columnIndex 时没有 title 属性', () => {
@@ -282,7 +282,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
     expect(td).toBeInTheDocument();
   });
 
-  it('应该处理 columnIndex 为 -1 的情况 - 选中所有单元格', () => {
+  it('应该处理 columnIndex 为 -1 的情况 - 选中单列', () => {
     renderTableCellIndexSpacer({ columnIndex: -1 });
     const td = document.querySelector('td');
     if (td) {
@@ -733,8 +733,8 @@ describe('TableCellIndexSpacer 组件测试', () => {
     });
   });
 
-  describe('handleClick 函数 - 选中所有单元格', () => {
-    it('应该处理 columnIndex 为 -1 时选中所有单元格', () => {
+  describe('handleClick 函数 - columnIndex 为 -1', () => {
+    it('应该处理 columnIndex 为 -1 时选中单列', () => {
       const mockSetAttribute = vi.fn();
       
       // 重置 mock
@@ -803,15 +803,14 @@ describe('TableCellIndexSpacer 组件测试', () => {
       );
 
       // 查找 TableCellIndexSpacer 渲染的 td 元素
-      // 组件渲染的 td 有 title="点击选中整个表格" (当 columnIndex === -1 时)
-      const spacerTd = document.querySelector('td[title="点击选中整个表格"]') || 
+      // 组件渲染的 td 在 columnIndex === -1 时也应显示整列选择文案
+      const spacerTd = document.querySelector('td[title="点击选中整列，显示操作按钮"]') || 
                        document.querySelector('td.config-td');
       if (spacerTd) {
         fireEvent.click(spacerTd);
       }
       
-      // handleClick 会遍历所有单元格并调用 setAttribute
-      // 由于有 4 个单元格，setAttribute 应该被调用 4 次
+      // handleClick 至少会命中目标列单元格并调用 setAttribute
       // 但需要确保 ReactEditor.toDOMNode 被正确调用
       // 注意：Editor.hasPath 和 Editor.node 是真实的 Slate API，它们应该能正常工作
       // 因为我们已经设置了正确的 editor.children 和 testEditorInstance
@@ -833,7 +832,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
       }
     });
 
-    it('应该处理选中所有单元格时 rowElement 为 null', () => {
+    it('应该处理选中单列时 rowElement 为 null', () => {
       const editor = createTestEditor();
       editor.children = [
         {
@@ -875,7 +874,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
       expect(td).toBeInTheDocument();
     });
 
-    it('应该处理选中所有单元格时 cellPath 不存在', () => {
+    it('应该处理选中单列时 cellPath 不存在', () => {
       renderTableCellIndexSpacer({ columnIndex: -1, tablePath: [0] });
       const td = document.querySelector('td');
       if (td) {
