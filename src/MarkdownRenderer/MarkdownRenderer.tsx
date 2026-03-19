@@ -212,8 +212,14 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
             )}
             style={style}
           >
-            <div className={clsx(`${prefixCls}-container`, hashId)}>
-              <div className={clsx(contentCls, hashId)}>
+            <div
+              className={clsx(`${prefixCls}-container`, hashId)}
+              style={{ display: 'block' }}
+            >
+              <div
+                className={clsx(contentCls, hashId)}
+                style={{ whiteSpace: 'pre-wrap' }}
+              >
                 {reactContent}
               </div>
             </div>
