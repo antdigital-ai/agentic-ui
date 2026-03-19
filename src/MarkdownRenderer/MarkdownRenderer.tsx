@@ -12,6 +12,7 @@ import React, {
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
 import { useStyle as useContentStyle } from '../MarkdownEditor/editor/style';
+import { useRendererVarStyle } from './style';
 import { CharacterQueue } from './CharacterQueue';
 import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
@@ -106,6 +107,8 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
     // 注册 content 层的样式（段落间距、链接、blockquote 等）
     const contentCls = `${prefixCls}-content`;
     const { wrapSSR: wrapContentSSR } = useContentStyle(contentCls, {});
+    // 注册间距 CSS 变量回退值（:where 低优先级，不覆盖宿主定义）
+    const { wrapSSR: wrapVarSSR } = useRendererVarStyle(prefixCls);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const [displayedContent, setDisplayedContent] = useState(content || '');
@@ -196,33 +199,26 @@ const InternalMarkdownRenderer = forwardRef<MarkdownRendererRef, MarkdownRendere
       linkConfig,
     });
 
-    const rootStyle: React.CSSProperties = {
-      // 提供间距 CSS 变量回退值，防止宿主未定义时间距异常
-      '--margin-2x': 'var(--margin-2x, 8px)',
-      '--margin-4x': 'var(--margin-4x, 16px)',
-      '--margin-8x': 'var(--margin-8x, 24px)',
-      '--padding-4x': 'var(--padding-4x, 16px)',
-      ...style,
-    } as React.CSSProperties;
-
-    return wrapSSR(
-      wrapContentSSR(
-        <div
-          ref={containerRef}
-          className={clsx(
-            prefixCls,
-            `${prefixCls}-readonly`,
-            hashId,
-            className,
-          )}
-          style={rootStyle}
-        >
-          <div className={clsx(`${prefixCls}-container`, hashId)}>
-            <div className={clsx(contentCls, hashId)}>
-              {reactContent}
+    return wrapVarSSR(
+      wrapSSR(
+        wrapContentSSR(
+          <div
+            ref={containerRef}
+            className={clsx(
+              prefixCls,
+              `${prefixCls}-readonly`,
+              hashId,
+              className,
+            )}
+            style={style}
+          >
+            <div className={clsx(`${prefixCls}-container`, hashId)}>
+              <div className={clsx(contentCls, hashId)}>
+                {reactContent}
+              </div>
             </div>
-          </div>
-        </div>,
+          </div>,
+        ),
       ),
     );
   },
