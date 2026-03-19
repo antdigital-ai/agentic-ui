@@ -101,18 +101,23 @@ const genTableStyle = (
         },
         'th:not(:first-child)': { borderLeft: TABLE_BORDER },
 
-        td: {
+        'td:not(.config-td)': {
           ...TABLE_CELL,
           borderBottom: TABLE_BORDER,
           borderLeft: TABLE_BORDER,
           'div[data-be="paragraph"]': { margin: 0, textWrap: 'auto' },
         },
 
-        'td:first-child': { borderLeft: 'none' },
-        'tr:last-child td': { borderBottom: 'none' },
-        'tr td:first-child': { fontWeight: 600 },
+        'th.config-th, td.config-td': {
+          borderBottom: TABLE_BORDER,
+          borderLeft: TABLE_BORDER,
+        },
+        'tr td.config-td:first-child': { borderLeft: 'none' },
+        'td:first-child:not(.config-td)': { borderLeft: 'none' },
+        'tr:last-child td:not(.config-td)': { borderBottom: 'none' },
+        'tr td:first-child:not(.config-td)': { fontWeight: 600 },
 
-        'tbody tr:hover': {
+        'tbody tr:not(.config-tr):hover': {
           background:
             'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))',
         },
