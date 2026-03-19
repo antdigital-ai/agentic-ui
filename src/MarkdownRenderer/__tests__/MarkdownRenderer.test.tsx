@@ -286,6 +286,26 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('最终回答');
   });
 
+  it('应将 HTML 注释 + 表格组合渲染为图表', () => {
+    const content = [
+      '<!-- [{"chartType":"line","title":"趋势","x":"month","y":"value"}] -->',
+      '',
+      '| month | value |',
+      '| --- | --- |',
+      '| 2024-01 | 100 |',
+      '| 2024-02 | 200 |',
+    ].join('\n');
+
+    const { container } = render(
+      <MarkdownRenderer content={content} />,
+    );
+
+    const chartEl = container.querySelector('[data-be="chart"]');
+    expect(chartEl).toBeTruthy();
+    // 不应渲染为普通表格
+    expect(container.querySelector('[data-testid="markdown-table"]')).toBeFalsy();
+  });
+
   it('应渲染图片', () => {
     const { container } = render(
       <MarkdownRenderer content="![alt text](https://example.com/image.png)" />,

@@ -38,6 +38,120 @@ const remarkRehypePlugin = remarkRehype as unknown as Plugin;
 
 const FOOTNOTE_REF_PATTERN = /\[\^([^\]]+)\]/g;
 
+const CHART_COMMENT_PATTERN = /^<!--\s*(\[[\s\S]*\])\s*-->$/;
+
+/**
+ * 从 mdast table 节点提取列名和数据
+ */
+const extractTableData = (tableNode: any): {
+  columns: { title: string; dataIndex: string }[];
+  dataSource: Record<string, any>[];
+} | null => {
+  if (!tableNode.children?.length) return null;
+
+  const headerRow = tableNode.children[0];
+  if (!headerRow?.children?.length) return null;
+
+  const columns = headerRow.children.map((cell: any) => {
+    const text = extractCellText(cell);
+    return { title: text, dataIndex: text };
+  });
+
+  const dataSource: Record<string, any>[] = [];
+  for (let i = 1; i < tableNode.children.length; i++) {
+    const row = tableNode.children[i];
+    if (!row?.children) continue;
+    const record: Record<string, any> = {};
+    row.children.forEach((cell: any, j: number) => {
+      if (j < columns.length) {
+        const val = extractCellText(cell);
+        const num = Number(val);
+        record[columns[j].dataIndex] = isNaN(num) || val === '' ? val : num;
+      }
+    });
+    dataSource.push(record);
+  }
+
+  return { columns, dataSource };
+};
+
+const extractCellText = (cell: any): string => {
+  if (!cell?.children) return '';
+  return cell.children
+    .map((child: any) => {
+      if (child.type === 'text') return child.value || '';
+      if (child.children) return extractCellText(child);
+      return '';
+    })
+    .join('')
+    .trim();
+};
+
+/**
+ * remark 插件：将 "HTML 注释（图表配置）+ 表格" 组合转为 chart 代码块。
+ *
+ * 在 MarkdownEditor 中，parseTableOrChart 负责此逻辑。
+ * 在 MarkdownRenderer 中，此插件在 mdast 层面完成等价转换。
+ *
+ * 匹配模式：
+ * ```
+ * <!-- [{"chartType":"line","x":"month","y":"value",...}] -->
+ * | month | value |
+ * |-------|-------|
+ * | 2024  | 100   |
+ * ```
+ */
+const remarkChartFromComment = () => {
+  return (tree: any) => {
+    const children = tree.children;
+    if (!children || !Array.isArray(children)) return;
+
+    const toRemove: number[] = [];
+
+    for (let i = 0; i < children.length - 1; i++) {
+      const node = children[i];
+      const next = children[i + 1];
+
+      if (node.type !== 'html' || next.type !== 'table') continue;
+
+      const match = node.value?.match(CHART_COMMENT_PATTERN);
+      if (!match) continue;
+
+      let chartConfig: any;
+      try {
+        chartConfig = JSON.parse(match[1]);
+      } catch {
+        continue;
+      }
+
+      if (!Array.isArray(chartConfig)) chartConfig = [chartConfig];
+      const hasChartType = chartConfig.some((c: any) => c.chartType && c.chartType !== 'table');
+      if (!hasChartType) continue;
+
+      const tableData = extractTableData(next);
+      if (!tableData) continue;
+
+      const chartJson = JSON.stringify({
+        config: chartConfig,
+        columns: tableData.columns,
+        dataSource: tableData.dataSource,
+      });
+
+      children[i] = {
+        type: 'code',
+        lang: 'chart',
+        value: chartJson,
+      };
+      toRemove.push(i + 1);
+      i++;
+    }
+
+    for (let j = toRemove.length - 1; j >= 0; j--) {
+      children.splice(toRemove[j], 1);
+    }
+  };
+};
+
 /**
  * rehype 插件：将文本中残留的 [^N] 模式转为 fnc 标记元素。
  *
@@ -103,6 +217,7 @@ const createHastProcessor = (
     .use(remarkFrontmatter, FRONTMATTER_LANGUAGES)
     .use(remarkDirective)
     .use(remarkDirectiveContainer, REMARK_DIRECTIVE_CONTAINER_OPTIONS)
+    .use(remarkChartFromComment)
     .use(remarkRehypePlugin, {
       allowDangerousHtml: true,
       handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
