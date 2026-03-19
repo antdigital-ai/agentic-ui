@@ -61,11 +61,22 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   const prefixCls = getPrefixCls('agentic-md-editor');
   const containerRef = useRef<HTMLDivElement>(null);
   const [columnLength, setColumnLength] = useState(2);
+  const [mounted, setMounted] = useState(false);
 
   const code = extractTextContent(children);
   const chartData = useMemo(() => parseChartData(code), [code]);
 
   useEffect(() => {
+    // 延迟一帧渲染图表，确保容器已挂载到 DOM 且有正确的宽度
+    // 解决 recharts ResponsiveContainer 在零宽容器中崩溃的问题
+    const raf = requestAnimationFrame(() => {
+      setMounted(true);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     const updateWidth = () => {
       const width = containerRef.current?.clientWidth || 400;
       const configs = chartData?.config
@@ -78,7 +89,7 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
     updateWidth();
     window.addEventListener('resize', updateWidth);
     return () => window.removeEventListener('resize', updateWidth);
-  }, [chartData]);
+  }, [chartData, mounted]);
 
   if (!chartData) {
     return (
@@ -111,6 +122,9 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
         overflow: 'hidden',
       }}
     >
+      {!mounted ? (
+        <div style={{ padding: 12 }}><Loading /></div>
+      ) : (
       <div
         style={{
           display: 'flex',
@@ -207,6 +221,7 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
           );
         })}
       </div>
+      )}
     </div>
   );
 };
