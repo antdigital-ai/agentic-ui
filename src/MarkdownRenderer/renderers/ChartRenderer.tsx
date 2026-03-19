@@ -147,6 +147,23 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
 
           const height = Math.min(400, containerRef.current?.clientWidth || 400);
 
+          const handleChartError = (error: Error, info: React.ErrorInfo) => {
+            console.error('[MarkdownRenderer ChartBlockRenderer] 渲染失败:', {
+              chartType,
+              title: rest?.title,
+              x,
+              y,
+              groupBy: rest?.groupBy,
+              colorLegend: rest?.colorLegend,
+              filterBy: rest?.filterBy,
+              dataSourceLength: chartDataItems.length,
+              columnsLength: columns.length,
+              error: error.message,
+              stack: error.stack,
+              componentStack: info.componentStack,
+            });
+          };
+
           const chartFallback = (
             <div style={{ padding: 12, color: '#999', fontSize: 12 }}>
               Chart: {rest?.title || chartType}
@@ -165,7 +182,7 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
                 userSelect: 'none',
               }}
             >
-              <ErrorBoundary fallback={chartFallback}>
+              <ErrorBoundary fallback={chartFallback} onError={handleChartError}>
                 <ChartRender
                   chartType={chartType}
                   chartData={chartDataItems}
