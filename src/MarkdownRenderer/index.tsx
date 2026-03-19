@@ -12,3 +12,4 @@ export type {
   RendererBlockProps,
 } from './types';
 export { markdownToReactSync, useMarkdownToReact } from './useMarkdownToReact';
+export { useStreaming } from './useStreaming';

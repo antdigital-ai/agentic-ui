@@ -18,6 +18,7 @@ import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
 import { SchemaBlockRenderer } from './renderers/SchemaRenderer';
 import { useRendererVarStyle } from './style';
+import { useStreaming } from './useStreaming';
 import type {
   MarkdownRendererProps,
   MarkdownRendererRef,
@@ -207,7 +208,10 @@ const InternalMarkdownRenderer = forwardRef<
     };
   }, [pluginComponents, apaasifyRender]);
 
-    const reactContent = useMarkdownToReact(displayedContent, {
+    // 流式缓存：将不完整的 Markdown token 暂缓，避免 parser 错误解析
+    const safeContent = useStreaming(displayedContent, streaming);
+
+    const reactContent = useMarkdownToReact(safeContent, {
       remarkPlugins,
       htmlConfig,
       components,
