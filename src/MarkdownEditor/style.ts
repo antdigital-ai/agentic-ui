@@ -114,7 +114,8 @@ const genTableStyle = (
         'tr td:first-child': { fontWeight: 600 },
 
         'tbody tr:hover': {
-          backgroundColor: 'var(--agentic-ui-table-hover-bg, rgba(0,0,0,0.04))',
+          background:
+            'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))',
         },
         [`@media (max-width: ${mobileBreakpoint})`]: {
           'th, td': { padding: mobilePadding },
