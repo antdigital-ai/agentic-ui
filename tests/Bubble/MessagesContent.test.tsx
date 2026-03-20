@@ -444,7 +444,10 @@ describe('BubbleMessageDisplay', () => {
 
       renderWithContext(props);
 
-      expect(screen.getByTestId('markdown-preview')).toBeInTheDocument();
+      expect(screen.getByTestId('message-box-content')).toBeInTheDocument();
+      expect(screen.getByTestId('react-content')).toHaveTextContent(
+        'React Content',
+      );
     });
 
     it('应该处理thoughtChain.alwaysRender为true的情况', () => {
