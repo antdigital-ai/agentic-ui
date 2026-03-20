@@ -70,6 +70,9 @@ export interface TextAnimateProps extends MotionProps {
   accessible?: boolean;
 }
 
+const TEXT_ANIMATE_BLUR_HIDDEN = 'blur(2px)';
+const TEXT_ANIMATE_BLUR_VISIBLE = 'blur(0px)';
+
 const staggerTimings: Record<AnimationType, number> = {
   text: 0.06,
   word: 0.05,
@@ -131,17 +134,17 @@ const defaultItemAnimationVariants: Record<
   blurIn: {
     container: defaultContainerVariants,
     item: {
-      hidden: { opacity: 0, filter: 'blur(10px)' },
+      hidden: { opacity: 0, filter: TEXT_ANIMATE_BLUR_HIDDEN },
       show: {
         opacity: 1,
-        filter: 'blur(0px)',
+        filter: TEXT_ANIMATE_BLUR_VISIBLE,
         transition: {
           duration: 0.3,
         },
       },
       exit: {
         opacity: 0,
-        filter: 'blur(10px)',
+        filter: TEXT_ANIMATE_BLUR_HIDDEN,
         transition: { duration: 0.3 },
       },
     },
@@ -149,10 +152,10 @@ const defaultItemAnimationVariants: Record<
   blurInUp: {
     container: defaultContainerVariants,
     item: {
-      hidden: { opacity: 0, filter: 'blur(10px)', y: 20 },
+      hidden: { opacity: 0, filter: TEXT_ANIMATE_BLUR_HIDDEN, y: 20 },
       show: {
         opacity: 1,
-        filter: 'blur(0px)',
+        filter: TEXT_ANIMATE_BLUR_VISIBLE,
         y: 0,
         transition: {
           y: { duration: 0.3 },
@@ -162,7 +165,7 @@ const defaultItemAnimationVariants: Record<
       },
       exit: {
         opacity: 0,
-        filter: 'blur(10px)',
+        filter: TEXT_ANIMATE_BLUR_HIDDEN,
         y: 20,
         transition: {
           y: { duration: 0.3 },
@@ -175,10 +178,10 @@ const defaultItemAnimationVariants: Record<
   blurInDown: {
     container: defaultContainerVariants,
     item: {
-      hidden: { opacity: 0, filter: 'blur(10px)', y: -20 },
+      hidden: { opacity: 0, filter: TEXT_ANIMATE_BLUR_HIDDEN, y: -20 },
       show: {
         opacity: 1,
-        filter: 'blur(0px)',
+        filter: TEXT_ANIMATE_BLUR_VISIBLE,
         y: 0,
         transition: {
           y: { duration: 0.3 },
