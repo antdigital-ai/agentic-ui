@@ -424,7 +424,8 @@ export const BubbleMessageDisplay: React.FC<
         extra={isExtraNull ? null : extra}
         htmlRef={props.bubbleListRef}
         content={
-          props.originData?.isFinished
+          props.originData?.isFinished &&
+          props?.originData?.extra?.answerStatus === 'EXCEPTION'
             ? (props.originData?.content as string) ||
               locale?.['chat.message.generateFailed'] ||
               '生成回答失败，请重试'
