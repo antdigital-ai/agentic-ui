@@ -361,17 +361,14 @@ def aggressive_allocation():
 }
 \`\`\`
 
-### 用户工具条（\`agentic-ui-usertoolbar\` → SuggestionList）
+### ToolUseBar（\`agentic-ui-toolusebar\`）
 
-\`\`\`agentic-ui-usertoolbar
+\`\`\`agentic-ui-toolusebar
 {
-  "items": [
-    { "text": "重新生成", "key": "regen" },
-    { "text": "简短回答", "key": "short" },
-    { "text": "详细说明", "key": "long" }
-  ],
-  "layout": "horizontal",
-  "type": "basic"
+  "tools": [
+    { "id": "t1", "toolName": "web_search", "toolTarget": "example.com/query", "status": "success", "time": "1.2s" },
+    { "id": "t2", "toolName": "read_file", "toolTarget": "/src/App.tsx", "status": "loading" }
+  ]
 }
 \`\`\`
 `;

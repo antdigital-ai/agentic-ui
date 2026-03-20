@@ -23,14 +23,14 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
       container.querySelector('[data-testid="agentic-ui-task-block"]'),
     ).toBeTruthy();
     expect(
-      screen.getByTestId('task-list-thoughtChainItem'),
+      screen.getByTestId('task-list-simple-wrapper'),
     ).toBeInTheDocument();
   });
 
   it('renderType=markdown 与 renderMode=markdown 等价', () => {
     const md = [
-      '```agentic-ui-usertoolbar',
-      '{ "items": [{ "text": "操作", "key": "a" }], "layout": "horizontal" }',
+      '```agentic-ui-toolusebar',
+      '{ "tools": [{ "id": "a", "toolName": "操作", "toolTarget": "目标", "status": "loading" }] }',
       '```',
     ].join('\n');
 
@@ -39,7 +39,8 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
     );
 
     expect(
-      container.querySelector('[data-testid="agentic-ui-usertoolbar-block"]'),
+      container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
     ).toBeTruthy();
+    expect(container.querySelector('[data-testid="ToolUse"]')).toBeTruthy();
   });
 });

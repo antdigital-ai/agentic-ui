@@ -14,7 +14,7 @@ import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
 import { CharacterQueue } from './CharacterQueue';
 import { AgenticUiTaskBlockRenderer } from './renderers/AgenticUiTaskBlockRenderer';
-import { AgenticUiUserToolbarBlockRenderer } from './renderers/AgenticUiUserToolbarBlockRenderer';
+import { AgenticUiToolUseBarBlockRenderer } from './renderers/AgenticUiToolUseBarBlockRenderer';
 import { ChartBlockRenderer } from './renderers/ChartRenderer';
 import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
@@ -82,10 +82,14 @@ const DefaultCodeRouter: React.FC<
     return <TaskComp {...rest} language={language} />;
   }
 
-  if (language === 'agentic-ui-usertoolbar') {
+  if (
+    language === 'agentic-ui-toolusebar' ||
+    language === 'agentic-ui-usertoolbar'
+  ) {
     const ToolbarComp =
+      pluginComponents['agentic-ui-toolusebar'] ||
       pluginComponents['agentic-ui-usertoolbar'] ||
-      AgenticUiUserToolbarBlockRenderer;
+      AgenticUiToolUseBarBlockRenderer;
     return <ToolbarComp {...rest} language={language} />;
   }
 

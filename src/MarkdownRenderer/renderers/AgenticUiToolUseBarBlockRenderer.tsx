@@ -1,8 +1,8 @@
 import json5 from 'json5';
 import React, { useMemo } from 'react';
-import { SuggestionList } from '../../Components/SuggestionList';
-import { normalizeUserToolbarPropsFromJson } from '../../MarkdownEditor/editor/elements/AgenticUiBlocks/agenticUiEmbedUtils';
+import { normalizeToolUseBarPropsFromJson } from '../../MarkdownEditor/editor/elements/AgenticUiBlocks/agenticUiEmbedUtils';
 import partialParse from '../../MarkdownEditor/editor/parser/json-parse';
+import { ToolUseBar } from '../../ToolUseBar';
 import type { RendererBlockProps } from '../types';
 
 const extractTextContent = (children: React.ReactNode): string => {
@@ -28,9 +28,9 @@ const parseJsonBody = (code: string): unknown => {
 };
 
 /**
- * ```agentic-ui-usertoolbar``` 代码块 → SuggestionList（用户侧快捷操作条）
+ * ```agentic-ui-toolusebar``` 代码块 → ToolUseBar
  */
-export const AgenticUiUserToolbarBlockRenderer: React.FC<RendererBlockProps> = (
+export const AgenticUiToolUseBarBlockRenderer: React.FC<RendererBlockProps> = (
   props,
 ) => {
   const code = useMemo(
@@ -38,15 +38,15 @@ export const AgenticUiUserToolbarBlockRenderer: React.FC<RendererBlockProps> = (
     [props.children],
   );
   const parsed = useMemo(() => parseJsonBody(code), [code]);
-  const toolbarProps = useMemo(
-    () => normalizeUserToolbarPropsFromJson(parsed),
+  const { tools, ...restBar } = useMemo(
+    () => normalizeToolUseBarPropsFromJson(parsed),
     [parsed],
   );
 
   if (parsed === null) {
     return (
       <pre
-        data-testid="agentic-ui-usertoolbar-fallback"
+        data-testid="agentic-ui-toolusebar-fallback"
         style={{
           background: 'rgb(242, 241, 241)',
           padding: '1em',
@@ -64,13 +64,13 @@ export const AgenticUiUserToolbarBlockRenderer: React.FC<RendererBlockProps> = (
 
   return (
     <div
-      data-testid="agentic-ui-usertoolbar-block"
+      data-testid="agentic-ui-toolusebar-block"
       style={{ margin: '0.75em 0' }}
     >
-      <SuggestionList {...toolbarProps} />
+      <ToolUseBar tools={tools} {...restBar} />
     </div>
   );
 };
 
-AgenticUiUserToolbarBlockRenderer.displayName =
-  'AgenticUiUserToolbarBlockRenderer';
+AgenticUiToolUseBarBlockRenderer.displayName =
+  'AgenticUiToolUseBarBlockRenderer';

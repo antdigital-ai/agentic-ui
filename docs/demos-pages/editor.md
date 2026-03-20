@@ -51,7 +51,7 @@ group:
 
 <code src="../demos/render.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-### Agentic UI 嵌入块（`agentic-ui-task` / `agentic-ui-usertoolbar`）
+### Agentic UI 嵌入块（`agentic-ui-task` / `agentic-ui-toolusebar`）
 
 <code src="../demos/agentic-ui-embed-render-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 

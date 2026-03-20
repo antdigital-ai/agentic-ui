@@ -27,7 +27,7 @@ export type LanguageHandler = (
  * 处理schema类型语言的辅助函数
  */
 const processAgenticUiJsonBlock =
-  (slateType: 'agentic-ui-task' | 'agentic-ui-usertoolbar'): LanguageHandler =>
+  (slateType: 'agentic-ui-task' | 'agentic-ui-toolusebar'): LanguageHandler =>
   (element: CodeElement, value: string): CodeElement => {
     let parsed: unknown = {};
     try {
@@ -43,6 +43,7 @@ const processAgenticUiJsonBlock =
     return {
       ...element,
       type: slateType,
+      language: slateType,
       value: parsed,
       children: [{ text: value }],
     };
@@ -88,7 +89,9 @@ const LANGUAGE_HANDLERS: Record<string, LanguageHandler> = {
   }),
   'agentar-card': processSchemaLanguage,
   'agentic-ui-task': processAgenticUiJsonBlock('agentic-ui-task'),
-  'agentic-ui-usertoolbar': processAgenticUiJsonBlock('agentic-ui-usertoolbar'),
+  'agentic-ui-toolusebar': processAgenticUiJsonBlock('agentic-ui-toolusebar'),
+  /** @deprecated 使用 `agentic-ui-toolusebar`，保留解析以兼容旧内容 */
+  'agentic-ui-usertoolbar': processAgenticUiJsonBlock('agentic-ui-toolusebar'),
 };
 
 /**
