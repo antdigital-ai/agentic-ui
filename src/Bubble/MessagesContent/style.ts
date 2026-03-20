@@ -5,6 +5,12 @@ const THINKING_DOT_SIZE = 4;
 const THINKING_DOT_GAP = 4;
 const THINKING_DOT_ANIMATION = 'agenticBubbleThinkingDotPulse';
 const THINKING_DOT_ANIMATION_DURATION = '1.2s';
+const THINKING_LOADING_PADDING = {
+  paddingLeft: 'var(--padding-5x)',
+  paddingRight: 'var(--padding-5x)',
+  paddingTop: 'var(--padding-1x)',
+  paddingBottom: 'var(--padding-2x)',
+};
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
@@ -14,7 +20,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       display: 'flex',
       alignItems: 'center',
       gap: 'var(--padding-2x)',
-      padding: 'var(--padding-3x)',
+      ...THINKING_LOADING_PADDING,
       color: 'rgb(102, 111, 141)',
       [`&-dots`]: {
         display: 'inline-flex',
@@ -40,10 +46,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         animationDelay: '0.4s',
       },
       '&-compact': {
-        padding: 'var(--padding-2x)',
+        ...THINKING_LOADING_PADDING,
       },
       '&-default': {
-        padding: 'var(--padding-3x)',
+        ...THINKING_LOADING_PADDING,
       },
     },
 
