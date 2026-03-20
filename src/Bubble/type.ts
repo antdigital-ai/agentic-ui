@@ -386,6 +386,10 @@ export interface BubbleProps<
    * 等效于 markdownRenderConfig={{ renderMode }}
    */
   renderMode?: 'slate' | 'markdown';
+  /**
+   * 与 `renderMode` 等价，兼容部分协议字段（如 `renderType=markdown`）
+   */
+  renderType?: 'slate' | 'markdown';
 
   /**
    * 自定义配置

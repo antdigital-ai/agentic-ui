@@ -708,4 +708,9 @@ export type MarkdownEditorProps = {
    * @default 'slate'
    */
   renderMode?: RenderMode;
+  /**
+   * 与 `renderMode` 等价，兼容部分协议或查询参数命名（如 `renderType=markdown`）
+   * @description 当同时传入时，`renderMode` 优先
+   */
+  renderType?: RenderMode;
 };

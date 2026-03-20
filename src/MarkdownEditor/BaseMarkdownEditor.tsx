@@ -13,6 +13,7 @@ import { createEditor, Editor, Selection } from 'slate';
 import { withHistory } from 'slate-history';
 import { withReact } from 'slate-react';
 import { I18nContext, I18nProvide } from '../I18n';
+import { MarkdownRenderer } from '../MarkdownRenderer';
 import { CommentList } from './editor/components/CommentList';
 import { SlateMarkdownEditor } from './editor/Editor';
 import { parserMdToSchema } from './editor/parser/parserMdToSchema';
@@ -140,8 +141,12 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
     editorStyle,
     height,
     children,
+    renderMode,
+    renderType,
     ...rest
   } = props;
+
+  const effectiveRenderMode = renderMode ?? renderType ?? 'slate';
   // 是否挂载
   const [editorMountStatus, setMountedStatus] = useState(false);
   const [isEditorFocused, setIsEditorFocused] = useState(false);
@@ -350,6 +355,52 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
 
   const [openJinjaTemplate, setOpenJinjaTemplate] = useState(false);
   const [jinjaAnchorPath, setJinjaAnchorPath] = useState<number[] | null>(null);
+
+  if (readonly && effectiveRenderMode === 'markdown') {
+    return wrapSSR(
+      <I18nBoundary>
+        <PluginContext.Provider value={props.plugins || []}>
+          <div
+            id={props.id ? String(props.id) || undefined : undefined}
+            className={classNames(
+              baseClassName,
+              'markdown-editor',
+              hashId,
+              props.className,
+              {
+                [`${baseClassName}-readonly`]: true,
+                [`${baseClassName}-report`]: props.reportMode,
+                [`${baseClassName}-slide`]: props.slideMode,
+              },
+            )}
+            style={{
+              width: width || '100%',
+              height: height || 'auto',
+              ...style,
+            }}
+            ref={markdownContainerRef}
+          >
+            <MarkdownRenderer
+              content={initValue || ''}
+              streaming={props.typewriter ?? false}
+              plugins={props.plugins}
+              remarkPlugins={props.markdownToHtmlOptions}
+              codeProps={props.codeProps}
+              apaasify={props.apaasify}
+              style={{
+                height: '100%',
+                ...contentStyle,
+              }}
+              prefixCls={baseClassName}
+              fncProps={props.fncProps}
+              linkConfig={props.linkConfig}
+            />
+            {children}
+          </div>
+        </PluginContext.Provider>
+      </I18nBoundary>,
+    );
+  }
 
   return wrapSSR(
     <I18nBoundary>

@@ -110,7 +110,10 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
   const extraShowOnHover = config?.extraShowOnHover;
   const { token } = theme.useToken();
 
-  const renderMode = props.markdownRenderConfig?.renderMode ?? 'slate';
+  const renderMode =
+    props.markdownRenderConfig?.renderMode ??
+    props.markdownRenderConfig?.renderType ??
+    'slate';
 
   const isPaddingHidden = useMemo(() => {
     return !!extra;
@@ -139,6 +142,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
             ...(props.markdownRenderConfig?.style || {}),
           }}
           codeProps={props.markdownRenderConfig?.codeProps}
+          apaasify={props.markdownRenderConfig?.apaasify}
         />
       );
     }
@@ -190,9 +194,13 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     hidePadding,
     typing,
     props.originData?.isLast,
+    props.originData?.isFinished,
     isPaddingHidden,
     content,
     renderMode,
+    props.markdownRenderConfig,
+    fncProps,
+    standalone,
   ]);
 
   const errorDom = (

@@ -229,6 +229,10 @@ export type BubbleListProps = {
    * 等效于 markdownRenderConfig={{ renderMode }}
    */
   renderMode?: 'slate' | 'markdown';
+  /**
+   * 与 `renderMode` 等价，兼容协议字段 `renderType=markdown`
+   */
+  renderType?: 'slate' | 'markdown';
   docListProps?: BubbleProps['docListProps'];
 
   /**
@@ -376,6 +380,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
     classNames,
     markdownRenderConfig: markdownRenderConfigProp,
     renderMode,
+    renderType,
     userMeta,
     assistantMeta,
     bubbleList = [],
@@ -385,14 +390,17 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
     onTouchMove,
   } = props;
 
-  // 合并 renderMode 快捷属性到 markdownRenderConfig
-  const markdownRenderConfig = useMemo(
-    () =>
-      renderMode
-        ? { ...markdownRenderConfigProp, renderMode }
-        : markdownRenderConfigProp,
-    [markdownRenderConfigProp, renderMode],
-  );
+  // 合并 renderMode / renderType 快捷属性到 markdownRenderConfig
+  const markdownRenderConfig = useMemo(() => {
+    const mode =
+      renderMode ??
+      renderType ??
+      markdownRenderConfigProp?.renderMode ??
+      markdownRenderConfigProp?.renderType;
+    return mode
+      ? { ...markdownRenderConfigProp, renderMode: mode }
+      : markdownRenderConfigProp;
+  }, [markdownRenderConfigProp, renderMode, renderType]);
 
   // 兼容旧属性
   const loading = isLoading ?? legacyLoading;
