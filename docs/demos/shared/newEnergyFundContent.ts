@@ -361,9 +361,9 @@ def aggressive_allocation():
 }
 \`\`\`
 
-### 用户工具条（\`agentic-ui-usertoolbar\` → SuggestionList）
+### ToolUseBar 场景快捷条（\`agentic-ui-toolusebar\` → SuggestionList）
 
-\`\`\`agentic-ui-usertoolbar
+\`\`\`agentic-ui-toolusebar
 {
   "items": [
     { "text": "重新生成", "key": "regen" },

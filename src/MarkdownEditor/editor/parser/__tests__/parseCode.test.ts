@@ -71,14 +71,25 @@ describe('parseCode agentic-ui embed blocks', () => {
     expect((result.value as any).items[0].key).toBe('a');
   });
 
-  it('should parse agentic-ui-usertoolbar to typed node with JSON value', () => {
+  it('should parse agentic-ui-toolusebar to typed node with JSON value', () => {
+    const raw = `{ "items": [{ "text": "继续", "key": "1" }] }`;
+    const result = handleCode(
+      { value: raw, lang: 'agentic-ui-toolusebar', meta: undefined },
+      undefined,
+    );
+    expect(result.type).toBe('agentic-ui-toolusebar');
+    expect(result.language).toBe('agentic-ui-toolusebar');
+    expect((result.value as any).items[0].text).toBe('继续');
+  });
+
+  it('should map legacy agentic-ui-usertoolbar lang to agentic-ui-toolusebar node', () => {
     const raw = `{ "items": [{ "text": "继续", "key": "1" }] }`;
     const result = handleCode(
       { value: raw, lang: 'agentic-ui-usertoolbar', meta: undefined },
       undefined,
     );
-    expect(result.type).toBe('agentic-ui-usertoolbar');
-    expect((result.value as any).items[0].text).toBe('继续');
+    expect(result.type).toBe('agentic-ui-toolusebar');
+    expect(result.language).toBe('agentic-ui-toolusebar');
   });
 });
 

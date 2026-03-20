@@ -253,10 +253,10 @@ import { Card } from 'antd';
 ```
 ````
 
-用户侧工具条（渲染为 `SuggestionList`）：
+用户侧工具条（渲染为 `SuggestionList`，与 ToolUseBar 场景命名对齐）：
 
 ````markdown
-```agentic-ui-usertoolbar
+```agentic-ui-toolusebar
 {
   "items": [{ "text": "继续", "key": "go" }],
   "layout": "horizontal"

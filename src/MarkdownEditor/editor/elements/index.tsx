@@ -15,9 +15,9 @@ import {
   ReadonlyAgenticUiTaskBlock,
 } from './AgenticUiBlocks/AgenticUiTaskBlock';
 import {
-  AgenticUiUserToolbarBlock,
-  ReadonlyAgenticUiUserToolbarBlock,
-} from './AgenticUiBlocks/AgenticUiUserToolbarBlock';
+  AgenticUiToolUseBarBlock,
+  ReadonlyAgenticUiToolUseBarBlock,
+} from './AgenticUiBlocks/AgenticUiToolUseBarBlock';
 import { Blockquote } from './Blockquote';
 import { ReadonlyBlockquote } from './Blockquote/ReadonlyBlockquote';
 import { Break } from './Break';
@@ -241,11 +241,12 @@ const MElementComponent = (
       ) : (
         <AgenticUiTaskBlock {...props} />
       );
+    case 'agentic-ui-toolusebar':
     case 'agentic-ui-usertoolbar':
       return props.readonly ? (
-        <ReadonlyAgenticUiUserToolbarBlock {...readonlyElementProps} />
+        <ReadonlyAgenticUiToolUseBarBlock {...readonlyElementProps} />
       ) : (
-        <AgenticUiUserToolbarBlock {...props} />
+        <AgenticUiToolUseBarBlock {...props} />
       );
     case 'image':
       return props.readonly ? (

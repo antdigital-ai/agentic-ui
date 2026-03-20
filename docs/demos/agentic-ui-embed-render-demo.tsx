@@ -6,7 +6,7 @@ import { newEnergyFundContent } from './shared/newEnergyFundContent';
 const AGENTIC_SECTION_HEADING = '## Agentic UI 嵌入块';
 
 /**
- * 演示 `agentic-ui-task` / `agentic-ui-usertoolbar` 在自定义元素渲染（eleItemRender）下的展示。
+ * 演示 `agentic-ui-task` / `agentic-ui-toolusebar` 在自定义元素渲染（eleItemRender）下的展示。
  * 内容与 `newEnergyFundContent` 文末「Agentic UI 嵌入块」一致（单源维护）。
  */
 export default () => {

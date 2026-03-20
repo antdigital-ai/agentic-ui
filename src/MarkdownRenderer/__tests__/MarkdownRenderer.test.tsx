@@ -472,7 +472,23 @@ describe('MarkdownRenderer', () => {
     ).toBeTruthy();
   });
 
-  it('应将 agentic-ui-usertoolbar 代码块渲染为 SuggestionList', () => {
+  it('应将 agentic-ui-toolusebar 代码块渲染为 SuggestionList', () => {
+    const json = JSON.stringify({
+      items: [{ text: '快捷操作', key: 'a' }],
+      layout: 'horizontal',
+    });
+    const { container } = render(
+      <MarkdownRenderer
+        content={'```agentic-ui-toolusebar\n' + json + '\n```'}
+      />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
+    ).toBeTruthy();
+  });
+
+  it('应将旧版 agentic-ui-usertoolbar 代码块渲染为 SuggestionList', () => {
     const json = JSON.stringify({
       items: [{ text: '快捷操作', key: 'a' }],
       layout: 'horizontal',
@@ -484,7 +500,7 @@ describe('MarkdownRenderer', () => {
     );
 
     expect(
-      container.querySelector('[data-testid="agentic-ui-usertoolbar-block"]'),
+      container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
     ).toBeTruthy();
   });
 });

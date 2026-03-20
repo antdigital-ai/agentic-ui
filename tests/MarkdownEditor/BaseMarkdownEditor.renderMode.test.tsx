@@ -29,7 +29,7 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
 
   it('renderType=markdown 与 renderMode=markdown 等价', () => {
     const md = [
-      '```agentic-ui-usertoolbar',
+      '```agentic-ui-toolusebar',
       '{ "items": [{ "text": "操作", "key": "a" }], "layout": "horizontal" }',
       '```',
     ].join('\n');
@@ -39,7 +39,7 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
     );
 
     expect(
-      container.querySelector('[data-testid="agentic-ui-usertoolbar-block"]'),
+      container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
     ).toBeTruthy();
   });
 });

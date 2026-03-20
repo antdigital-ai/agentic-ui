@@ -12,7 +12,7 @@ group:
 ## v2.29.59 (In Development)
 
 - MarkdownEditor / MarkdownRenderer
-  - 🆕 Support fenced `agentic-ui-task` and `agentic-ui-usertoolbar` code blocks, rendering TaskList and SuggestionList (user toolbar) respectively.
+  - 🆕 Support fenced `agentic-ui-task` and `agentic-ui-toolusebar` code blocks, rendering TaskList and SuggestionList (quick actions aligned with ToolUseBar); `agentic-ui-usertoolbar` remains readable but is deprecated.
   - 🆕 In readonly mode, `renderMode` / `renderType` `markdown` uses MarkdownRenderer (aligned with Bubble); `markdownRenderConfig` accepts `renderType` alias.
 - MarkdownRenderer
   - 🆕 Use Markdown Renderer instead of Slate for streaming scenarios. [#369](https://github.com/ant-design/agentic-ui/pull/369)

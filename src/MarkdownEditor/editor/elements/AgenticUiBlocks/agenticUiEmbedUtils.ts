@@ -33,8 +33,7 @@ export function normalizeTaskListPropsFromJson(parsed: unknown): TaskListProps {
     .filter((x): x is Record<string, unknown> => !!x && typeof x === 'object')
     .map((x) => {
       const status: TaskStatus = isTaskStatus(x.status) ? x.status : 'pending';
-      const key =
-        x.key !== undefined && x.key !== null ? String(x.key) : '';
+      const key = x.key !== undefined && x.key !== null ? String(x.key) : '';
       const title =
         x.title === undefined || x.title === null ? undefined : String(x.title);
       let content: TaskItem['content'] = '';
@@ -63,9 +62,9 @@ export function normalizeTaskListPropsFromJson(parsed: unknown): TaskListProps {
 }
 
 /**
- * 将 ```agentic-ui-usertoolbar JSON 规范化为 SuggestionListProps
+ * 将 ```agentic-ui-toolusebar JSON 规范化为 SuggestionListProps（与 ToolUseBar 场景对齐的快捷操作条）
  */
-export function normalizeUserToolbarPropsFromJson(
+export function normalizeToolUseBarPropsFromJson(
   parsed: unknown,
 ): SuggestionListProps {
   const root =
