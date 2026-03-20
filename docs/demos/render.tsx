@@ -1,7 +1,6 @@
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 import { Card } from 'antd';
 import React from 'react';
-import { agenticUiEmbedDemoMarkdown } from './shared/agenticUiEmbedDemoMarkdown';
 import { newEnergyFundContent } from './shared/newEnergyFundContent';
 
 export default () => {
@@ -10,7 +9,7 @@ export default () => {
       <MarkdownEditor
         width={'100vw'}
         height={'100vh'}
-        initValue={newEnergyFundContent + agenticUiEmbedDemoMarkdown}
+        initValue={newEnergyFundContent}
         eleItemRender={(props, defaultDom) => {
           if (
             props.element.type !== 'table-cell' &&

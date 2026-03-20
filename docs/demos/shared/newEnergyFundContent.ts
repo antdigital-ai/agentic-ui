@@ -346,4 +346,32 @@ def aggressive_allocation():
 - [ ] 更新投资组合配置比例
 - [x] 阅读最新行业研究报告
 - [x] 确认风险敞口在可接受范围内
+
+## Agentic UI 嵌入块
+
+### TaskList（\`agentic-ui-task\`）
+
+\`\`\`agentic-ui-task
+{
+  "items": [
+    { "key": "t1", "title": "分析需求", "content": "梳理用户场景与约束", "status": "success" },
+    { "key": "t2", "title": "实现方案", "content": "编写 Markdown 解析与渲染", "status": "loading" },
+    { "key": "t3", "title": "联调验收", "content": "等待 review", "status": "pending" }
+  ]
+}
+\`\`\`
+
+### 用户工具条（\`agentic-ui-usertoolbar\` → SuggestionList）
+
+\`\`\`agentic-ui-usertoolbar
+{
+  "items": [
+    { "text": "重新生成", "key": "regen" },
+    { "text": "简短回答", "key": "short" },
+    { "text": "详细说明", "key": "long" }
+  ],
+  "layout": "horizontal",
+  "type": "basic"
+}
+\`\`\`
 `;

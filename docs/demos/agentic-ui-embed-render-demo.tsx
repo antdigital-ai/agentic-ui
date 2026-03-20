@@ -1,19 +1,27 @@
 import { MarkdownEditor } from '@ant-design/agentic-ui';
 import { Card } from 'antd';
 import React from 'react';
-import { agenticUiEmbedDemoMarkdown } from './shared/agenticUiEmbedDemoMarkdown';
+import { newEnergyFundContent } from './shared/newEnergyFundContent';
+
+const AGENTIC_SECTION_HEADING = '## Agentic UI 嵌入块';
 
 /**
  * 演示 `agentic-ui-task` / `agentic-ui-usertoolbar` 在自定义元素渲染（eleItemRender）下的展示。
- * 与 render.tsx 使用相同的 Card 包裹逻辑，仅聚焦嵌入块内容。
+ * 内容与 `newEnergyFundContent` 文末「Agentic UI 嵌入块」一致（单源维护）。
  */
 export default () => {
+  const initValue = newEnergyFundContent.includes(AGENTIC_SECTION_HEADING)
+    ? newEnergyFundContent.slice(
+        newEnergyFundContent.indexOf(AGENTIC_SECTION_HEADING),
+      )
+    : '';
+
   return (
     <div>
       <MarkdownEditor
         width="100%"
         height="70vh"
-        initValue={agenticUiEmbedDemoMarkdown}
+        initValue={initValue}
         eleItemRender={(props, defaultDom) => {
           if (
             props.element.type !== 'table-cell' &&
