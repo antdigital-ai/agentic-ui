@@ -1,8 +1,4 @@
-import {
-  AnswerAlert,
-  Bubble,
-  MessageBubbleData,
-} from '@ant-design/agentic-ui';
+import { AnswerAlert, Bubble, MessageBubbleData } from '@ant-design/agentic-ui';
 import { Button, message, Space, Switch } from 'antd';
 import React, { useRef, useState } from 'react';
 
@@ -104,12 +100,21 @@ export default () => {
             ...mockMessage,
             typing: isLoading,
             content: isLoading ? (
-              <AnswerAlert
-                message="正在思考中，请稍候..."
-                type="gray"
-                showIcon
-                closable
-              />
+              <div
+                style={{
+                  paddingLeft: 'var(--padding-5x)',
+                  paddingRight: 'var(--padding-5x)',
+                  paddingTop: 'var(--padding-1x)',
+                  paddingBottom: 'var(--padding-2x)',
+                }}
+              >
+                <AnswerAlert
+                  message="正在思考中，请稍候..."
+                  type="gray"
+                  showIcon
+                  closable
+                />
+              </div>
             ) : (
               mockMessage.content
             ),
