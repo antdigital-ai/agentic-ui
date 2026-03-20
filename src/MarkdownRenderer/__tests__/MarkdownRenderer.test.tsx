@@ -420,6 +420,23 @@ describe('MarkdownRenderer', () => {
     expect(schemaEl).toBeTruthy();
   });
 
+  it('应将 agentar-card 代码块渲染为带 data-agentar-card 的容器', () => {
+    const cardJson = JSON.stringify({
+      type: 'form',
+      properties: { title: { type: 'string', default: 'x' } },
+    });
+    const { container } = render(
+      <MarkdownRenderer content={'```agentar-card\n' + cardJson + '\n```'} />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="agentar-card-container"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="code-toolbar"]'),
+    ).toBeFalsy();
+  });
+
   it('应将 apaasify 代码块渲染为 SchemaRenderer', () => {
     const schemaJson = JSON.stringify({ type: 'form', fields: [] });
     const { container } = render(

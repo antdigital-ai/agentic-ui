@@ -270,9 +270,13 @@ const extractLanguageFromClassName = (
   className: string | string[] | undefined,
 ): string | undefined => {
   if (!className) return undefined;
-  const classes = Array.isArray(className) ? className : [className];
+  const flat =
+    typeof className === 'string'
+      ? className
+      : className.map(String).join(' ');
+  const classes = flat.split(/\s+/).filter(Boolean);
   for (const cls of classes) {
-    const match = String(cls).match(/^language-(.+)$/);
+    const match = cls.match(/^language-(.+)$/);
     if (match) return match[1];
   }
   return undefined;
@@ -625,11 +629,14 @@ const buildEditorAlignedComponents = (
     },
 
     code: (props: any) => {
-      const { node: _node, children, ...rest } = props;
+      const { node: _node, children, className, ...rest } = props;
+      const fenceLang = extractLanguageFromClassName(className);
       return jsx('code' as any, {
         ...rest,
-        'data-testid': 'markdown-inline-code',
-        className: `${contentCls}-inline-code`,
+        'data-testid': fenceLang ? 'markdown-fenced-code' : 'markdown-inline-code',
+        className: fenceLang
+          ? className
+          : `${contentCls}-inline-code`,
         children,
       });
     },
@@ -677,10 +684,20 @@ const buildEditorAlignedComponents = (
     // ================================================================
     // 代码块 pre > code → 路由到自定义渲染器
     pre: (props: any) => {
-      const { node: _node, children, ...rest } = props;
+      const { node: hastPreNode, children, ...rest } = props;
       const codeChild = Array.isArray(children) ? children[0] : children;
       const codeProps = codeChild?.props || {};
-      const language = extractLanguageFromClassName(codeProps.className);
+      const codeHastClass =
+        hastPreNode?.children?.[0]?.type === 'element' &&
+        hastPreNode.children[0].tagName === 'code'
+          ? hastPreNode.children[0].properties?.className
+          : undefined;
+      let language = extractLanguageFromClassName(codeProps.className);
+      if (!language) {
+        language = extractLanguageFromClassName(
+          codeHastClass as string | string[] | undefined,
+        );
+      }
 
       const CodeBlockComponent =
         userComponents.__codeBlock || userComponents.code;
@@ -689,7 +706,7 @@ const buildEditorAlignedComponents = (
           ...rest,
           language,
           children: codeProps.children,
-          node: _node,
+          node: hastPreNode,
         });
       }
 
@@ -916,6 +933,7 @@ const renderMarkdownBlock = (
       jsx: jsx as any,
       jsxs: jsxs as any,
       components: components as any,
+      passNode: true,
     });
   } catch {
     return null;
@@ -1127,6 +1145,7 @@ export const markdownToReactSync = (
       jsx: jsx as any,
       jsxs: jsxs as any,
       components: allComponents as any,
+      passNode: true,
     });
   } catch (error) {
     console.error('Failed to render markdown:', error);
