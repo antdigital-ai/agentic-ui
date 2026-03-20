@@ -468,7 +468,7 @@ describe('MarkdownRenderer', () => {
       container.querySelector('[data-testid="agentic-ui-task-block"]'),
     ).toBeTruthy();
     expect(
-      container.querySelector('[data-testid="task-list-thoughtChainItem"]'),
+      container.querySelector('[data-testid="task-list-simple-wrapper"]'),
     ).toBeTruthy();
   });
 

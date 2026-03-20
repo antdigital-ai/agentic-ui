@@ -23,7 +23,7 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
       container.querySelector('[data-testid="agentic-ui-task-block"]'),
     ).toBeTruthy();
     expect(
-      screen.getByTestId('task-list-thoughtChainItem'),
+      screen.getByTestId('task-list-simple-wrapper'),
     ).toBeInTheDocument();
   });
 

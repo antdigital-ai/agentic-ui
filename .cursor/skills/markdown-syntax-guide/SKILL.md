@@ -247,11 +247,12 @@ import { Card } from 'antd';
 {
   "items": [
     { "key": "1", "title": "步骤", "content": "详情", "status": "loading" }
-  ],
-  "variant": "default"
+  ]
 }
 ```
 ````
+
+（默认 `variant` 为 `simple`；需完整任务链样式时在 JSON 根级增加 `"variant": "default"`。）
 
 工具使用栏（渲染为 `ToolUseBar`）：
 

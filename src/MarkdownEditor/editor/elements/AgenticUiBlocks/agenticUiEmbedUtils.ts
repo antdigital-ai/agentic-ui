@@ -45,10 +45,10 @@ export function normalizeTaskListPropsFromJson(parsed: unknown): TaskListProps {
     })
     .filter((item) => item.key.length > 0);
 
-  const variant =
-    root && (root as { variant?: string }).variant === 'simple'
-      ? 'simple'
-      : 'default';
+  const variantRaw = root ? (root as { variant?: string }).variant : undefined;
+  /** 嵌入块默认紧凑摘要条；需完整任务链样式时设 `variant: "default"` */
+  const variant: TaskListProps['variant'] =
+    variantRaw === 'default' ? 'default' : 'simple';
 
   const className =
     root && typeof (root as { className?: unknown }).className === 'string'
