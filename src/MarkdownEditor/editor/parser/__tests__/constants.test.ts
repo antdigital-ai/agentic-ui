@@ -25,6 +25,14 @@ describe('preprocessProtectTimeFromDirective', () => {
     expect(result).toContain('01\\:02\\:03');
   });
 
+  it('行内反引号内不应转义冒号', () => {
+    const markdown = '执行 `export PATH=/bin:20:/sbin` 后，时间 03:04:05';
+    const result = preprocessProtectTimeFromDirective(markdown);
+
+    expect(result).toContain('export PATH=/bin:20:/sbin');
+    expect(result).toContain('03\\:04\\:05');
+  });
+
   it('空字符串应原样返回', () => {
     expect(preprocessProtectTimeFromDirective('')).toBe('');
   });
