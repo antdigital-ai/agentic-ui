@@ -472,10 +472,16 @@ describe('MarkdownRenderer', () => {
     ).toBeTruthy();
   });
 
-  it('应将 agentic-ui-toolusebar 代码块渲染为 SuggestionList', () => {
+  it('应将 agentic-ui-toolusebar 代码块渲染为 ToolUseBar', () => {
     const json = JSON.stringify({
-      items: [{ text: '快捷操作', key: 'a' }],
-      layout: 'horizontal',
+      tools: [
+        {
+          id: 'a',
+          toolName: '快捷操作',
+          toolTarget: '示例目标',
+          status: 'success',
+        },
+      ],
     });
     const { container } = render(
       <MarkdownRenderer
@@ -486,12 +492,12 @@ describe('MarkdownRenderer', () => {
     expect(
       container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
     ).toBeTruthy();
+    expect(container.querySelector('[data-testid="ToolUse"]')).toBeTruthy();
   });
 
-  it('应将旧版 agentic-ui-usertoolbar 代码块渲染为 SuggestionList', () => {
+  it('应将旧版 agentic-ui-usertoolbar（items）代码块映射并渲染为 ToolUseBar', () => {
     const json = JSON.stringify({
       items: [{ text: '快捷操作', key: 'a' }],
-      layout: 'horizontal',
     });
     const { container } = render(
       <MarkdownRenderer
@@ -502,5 +508,6 @@ describe('MarkdownRenderer', () => {
     expect(
       container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
     ).toBeTruthy();
+    expect(container.querySelector('[data-testid="ToolUse"]')).toBeTruthy();
   });
 });

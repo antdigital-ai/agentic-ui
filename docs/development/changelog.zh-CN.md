@@ -12,7 +12,7 @@ group:
 ## v2.29.59（开发中）
 
 - MarkdownEditor / MarkdownRenderer
-  - 🆕 支持 `agentic-ui-task` 与 `agentic-ui-toolusebar` 围栏代码块，分别渲染为 TaskList 与 SuggestionList（与 ToolUseBar 场景对齐的快捷操作条）；`agentic-ui-usertoolbar` 仍可读入但已弃用。
+  - 🆕 支持 `agentic-ui-task` 与 `agentic-ui-toolusebar` 围栏代码块，分别渲染为 TaskList 与 ToolUseBar；`agentic-ui-usertoolbar` 仍可读入但已弃用。
   - 🆕 只读模式下 `renderMode` / `renderType` 为 `markdown` 时走 MarkdownRenderer，与气泡侧轻量渲染一致；`markdownRenderConfig` 支持 `renderType` 别名。
 - MarkdownRenderer
   - 🆕 流式场景下使用 Markdown Renderer 替代 Slate 渲染。[#369](https://github.com/ant-design/agentic-ui/pull/369)

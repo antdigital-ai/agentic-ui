@@ -1,8 +1,8 @@
 import json5 from 'json5';
 import React, { useMemo } from 'react';
-import { SuggestionList } from '../../Components/SuggestionList';
 import { normalizeToolUseBarPropsFromJson } from '../../MarkdownEditor/editor/elements/AgenticUiBlocks/agenticUiEmbedUtils';
 import partialParse from '../../MarkdownEditor/editor/parser/json-parse';
+import { ToolUseBar } from '../../ToolUseBar';
 import type { RendererBlockProps } from '../types';
 
 const extractTextContent = (children: React.ReactNode): string => {
@@ -28,7 +28,7 @@ const parseJsonBody = (code: string): unknown => {
 };
 
 /**
- * ```agentic-ui-toolusebar``` 代码块 → SuggestionList（与 ToolUseBar 场景对齐的快捷操作条）
+ * ```agentic-ui-toolusebar``` 代码块 → ToolUseBar
  */
 export const AgenticUiToolUseBarBlockRenderer: React.FC<RendererBlockProps> = (
   props,
@@ -38,7 +38,7 @@ export const AgenticUiToolUseBarBlockRenderer: React.FC<RendererBlockProps> = (
     [props.children],
   );
   const parsed = useMemo(() => parseJsonBody(code), [code]);
-  const toolbarProps = useMemo(
+  const { tools, ...restBar } = useMemo(
     () => normalizeToolUseBarPropsFromJson(parsed),
     [parsed],
   );
@@ -67,7 +67,7 @@ export const AgenticUiToolUseBarBlockRenderer: React.FC<RendererBlockProps> = (
       data-testid="agentic-ui-toolusebar-block"
       style={{ margin: '0.75em 0' }}
     >
-      <SuggestionList {...toolbarProps} />
+      <ToolUseBar tools={tools} {...restBar} />
     </div>
   );
 };

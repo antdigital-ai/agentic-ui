@@ -30,7 +30,7 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
   it('renderType=markdown 与 renderMode=markdown 等价', () => {
     const md = [
       '```agentic-ui-toolusebar',
-      '{ "items": [{ "text": "操作", "key": "a" }], "layout": "horizontal" }',
+      '{ "tools": [{ "id": "a", "toolName": "操作", "toolTarget": "目标", "status": "loading" }] }',
       '```',
     ].join('\n');
 
@@ -41,5 +41,6 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
     expect(
       container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
     ).toBeTruthy();
+    expect(container.querySelector('[data-testid="ToolUse"]')).toBeTruthy();
   });
 });

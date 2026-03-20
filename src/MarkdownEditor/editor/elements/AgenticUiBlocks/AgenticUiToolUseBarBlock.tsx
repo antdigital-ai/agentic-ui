@@ -1,6 +1,6 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
-import { SuggestionList } from '../../../../Components/SuggestionList';
+import { ToolUseBar } from '../../../../ToolUseBar';
 import { normalizeToolUseBarPropsFromJson } from './agenticUiEmbedUtils';
 
 export const AgenticUiToolUseBarBlock: React.FC<RenderElementProps> = ({
@@ -8,7 +8,9 @@ export const AgenticUiToolUseBarBlock: React.FC<RenderElementProps> = ({
   children,
   element,
 }) => {
-  const toolbarProps = normalizeToolUseBarPropsFromJson((element as any).value);
+  const { tools, ...restBar } = normalizeToolUseBarPropsFromJson(
+    (element as any).value,
+  );
 
   return (
     <div
@@ -17,7 +19,7 @@ export const AgenticUiToolUseBarBlock: React.FC<RenderElementProps> = ({
       data-testid="agentic-ui-toolusebar-block"
       style={{ margin: '0.75em 0' }}
     >
-      <SuggestionList {...toolbarProps} />
+      <ToolUseBar tools={tools} {...restBar} />
       <span
         data-testid="agentic-ui-toolusebar-hidden-children"
         style={{ display: 'none' }}

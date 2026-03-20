@@ -253,13 +253,14 @@ import { Card } from 'antd';
 ```
 ````
 
-用户侧工具条（渲染为 `SuggestionList`，与 ToolUseBar 场景命名对齐）：
+工具使用栏（渲染为 `ToolUseBar`）：
 
 ````markdown
 ```agentic-ui-toolusebar
 {
-  "items": [{ "text": "继续", "key": "go" }],
-  "layout": "horizontal"
+  "tools": [
+    { "id": "1", "toolName": "web_search", "toolTarget": "example.com", "status": "loading" }
+  ]
 }
 ```
 ````
