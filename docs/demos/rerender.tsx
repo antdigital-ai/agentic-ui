@@ -9,6 +9,9 @@ import {
 import { Button, Input, Radio, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { newEnergyFundContent } from './shared/newEnergyFundContent';
+import { RERENDER_CARD_APPENDIX } from './shared/rerenderCardAppendix';
+
+const rerenderDemoMarkdown = `${newEnergyFundContent}\n\n${RERENDER_CARD_APPENDIX.trim()}`;
 
 type SpeedType = 'block' | 'fast' | 'medium' | 'slow';
 
@@ -91,14 +94,14 @@ export const RerenderMdDemo = () => {
   };
 
   useEffect(() => {
-    const blocks = splitBlocks(newEnergyFundContent);
-    const chars = newEnergyFundContent.split('');
+    const blocks = splitBlocks(rerenderDemoMarkdown);
+    const chars = rerenderDemoMarkdown.split('');
     let md = '';
     currentIndexRef.current = 0;
     setIsFinished(false);
 
     if (process.env.NODE_ENV === 'test') {
-      setContent(newEnergyFundContent);
+      setContent(rerenderDemoMarkdown);
       setIsFinished(true);
       return;
     }
@@ -260,6 +263,10 @@ export const RerenderMdDemo = () => {
           <li>
             <strong>queueOptions</strong>: 字符队列配置，animate=false
             表示由外部控制逐字输出
+          </li>
+          <li>
+            文末追加 <strong>agentar-card</strong> 示例：流式结束后应渲染 Schema
+            卡片（与编辑器只读态 <code>agentar-card</code> 代码块一致）
           </li>
         </ul>
         <h4>与 Slate 模式对比：</h4>
