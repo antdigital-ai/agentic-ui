@@ -1097,6 +1097,7 @@ export const ChartRender: React.FC<{
     config?.y,
     config?.height,
     config?.index,
+    renderKey,
     toolBar,
     convertDonutData,
     convertFlatData,

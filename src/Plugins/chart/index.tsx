@@ -373,6 +373,7 @@ export const ChartElement = (props: RenderElementProps) => {
                 position: 'relative',
               }}
             >
+              {/* Slate 表格占位：必须在图表下方，避免 z-index 盖住 Canvas（否则部分浏览器只显示容器边框） */}
               <div
                 style={{
                   position: 'absolute',
@@ -380,7 +381,7 @@ export const ChartElement = (props: RenderElementProps) => {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  zIndex: 1,
+                  zIndex: 0,
                   width: '100%',
                   opacity: 0,
                   height: '100%',
@@ -392,6 +393,8 @@ export const ChartElement = (props: RenderElementProps) => {
               </div>
               <div
                 style={{
+                  position: 'relative',
+                  zIndex: 1,
                   display: 'flex',
                   flexWrap: 'wrap',
                   flexDirection: minWidth < 400 ? 'column' : 'row',
