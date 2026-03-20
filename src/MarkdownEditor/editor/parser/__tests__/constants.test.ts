@@ -16,6 +16,15 @@ describe('preprocessProtectTimeFromDirective', () => {
     expect(result).toContain('https://example.com/docs');
   });
 
+  it('围栏代码块内不应转义冒号（如 bash）', () => {
+    const markdown =
+      '说明见下\n\n```bash\nexport PATH=/usr/bin:20:/sbin\n```\n\n正文时间 01:02:03';
+    const result = preprocessProtectTimeFromDirective(markdown);
+
+    expect(result).toContain('export PATH=/usr/bin:20:/sbin');
+    expect(result).toContain('01\\:02\\:03');
+  });
+
   it('空字符串应原样返回', () => {
     expect(preprocessProtectTimeFromDirective('')).toBe('');
   });
