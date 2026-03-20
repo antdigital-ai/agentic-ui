@@ -16,9 +16,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       gap: 'var(--padding-2x)',
       padding: 'var(--padding-3x)',
       color: 'rgb(102, 111, 141)',
-      [`&-text`]: {
-        display: 'inline-block',
-      },
       [`&-dots`]: {
         display: 'inline-flex',
         alignItems: 'center',

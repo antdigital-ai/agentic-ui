@@ -273,7 +273,7 @@ export default () => (
 
 ### 思考中（DOM 轻量加载）演示
 
-演示 “思考中...” 分支的纯 DOM 渲染结构（文本 + dots），以及 `bubbleLoadingIconClassName` / `bubbleLoadingIconStyle` 的定制入口。
+演示 “思考中...” 分支的纯 DOM 渲染结构（dots 动效），以及 `bubbleLoadingIconClassName` / `bubbleLoadingIconStyle` 的定制入口。
 
 <code src="../demos/bubble/thinking-dom-demo.tsx">思考中 DOM 加载态</code>
 

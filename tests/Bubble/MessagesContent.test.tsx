@@ -363,9 +363,8 @@ describe('BubbleMessageDisplay', () => {
 
       const loadingContainer = screen.getByTestId('message-content');
       expect(loadingContainer).toHaveAttribute('role', 'status');
-      expect(screen.getByTestId('message-thinking-text')).toHaveTextContent(
-        '思考中...',
-      );
+      expect(loadingContainer).toHaveAttribute('aria-label', '思考中...');
+      expect(screen.queryByText('思考中...')).not.toBeInTheDocument();
       expect(screen.getByTestId('message-thinking-dots')).toBeInTheDocument();
       expect(screen.getAllByTestId('message-thinking-dot')).toHaveLength(3);
     });
