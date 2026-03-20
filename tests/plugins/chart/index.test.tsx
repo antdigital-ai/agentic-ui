@@ -450,6 +450,26 @@ describe('ChartElement', () => {
       expect(document.querySelector('[data-be="chart"]')).toBeInTheDocument();
     });
 
+    it('应将 Slate 占位层放在图表层下方，避免遮挡图表画布', () => {
+      renderChartElement();
+
+      const chartNode = screen.getByTestId('chart-render');
+      const chartLayer = chartNode.closest(
+        'div[style*="flex-wrap: wrap"]',
+      ) as HTMLDivElement | null;
+      expect(chartLayer).toBeInTheDocument();
+      expect(chartLayer).toHaveStyle('position: relative');
+      expect(chartLayer).toHaveStyle('z-index: 1');
+
+      const placeholderLayer = chartLayer?.previousElementSibling as
+        | HTMLDivElement
+        | null;
+      expect(placeholderLayer).toBeInTheDocument();
+      expect(placeholderLayer).toHaveStyle('position: absolute');
+      expect(placeholderLayer).toHaveStyle('z-index: 0');
+      expect(placeholderLayer).toHaveStyle('pointer-events: none');
+    });
+
     it('应响应 resize 更新宽度', () => {
       renderChartElement();
       expect(document.querySelector('[data-be="chart"]')).toBeInTheDocument();
