@@ -271,6 +271,12 @@ export default () => (
 
 <code src="../demos/bubble/message-loading-demo.tsx">消息加载状态</code>
 
+### 思考中（DOM 轻量加载）演示
+
+演示 “思考中...” 分支的纯 DOM 渲染结构（文本 + dots），以及 `bubbleLoadingIconClassName` / `bubbleLoadingIconStyle` 的定制入口。
+
+<code src="../demos/bubble/thinking-dom-demo.tsx">思考中 DOM 加载态</code>
+
 ### 文件加载状态演示
 
 演示 Bubble 组件的文件上传加载状态功能，包括文件处理时的加载效果和文件类型支持。
