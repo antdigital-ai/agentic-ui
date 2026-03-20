@@ -105,6 +105,7 @@ const genTableStyle = (
 
         'td:not(.config-td)': {
           ...TABLE_CELL,
+          position: 'relative',
           borderBottom: TABLE_BORDER,
           borderLeft: TABLE_BORDER,
           'div[data-be="paragraph"]': { margin: 0, textWrap: 'auto' },
