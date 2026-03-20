@@ -250,6 +250,8 @@ const parserNode = (
       break;
     case 'code':
     case 'apaasify':
+    case 'agentic-ui-task':
+    case 'agentic-ui-usertoolbar':
       str += handleCode(node, preString);
       break;
     case 'attach':

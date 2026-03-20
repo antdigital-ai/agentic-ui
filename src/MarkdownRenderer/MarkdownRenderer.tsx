@@ -13,18 +13,20 @@ import { useStyle as useContentStyle } from '../MarkdownEditor/editor/style';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
 import { CharacterQueue } from './CharacterQueue';
+import { AgenticUiTaskBlockRenderer } from './renderers/AgenticUiTaskBlockRenderer';
+import { AgenticUiUserToolbarBlockRenderer } from './renderers/AgenticUiUserToolbarBlockRenderer';
 import { ChartBlockRenderer } from './renderers/ChartRenderer';
 import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
 import { SchemaBlockRenderer } from './renderers/SchemaRenderer';
 import { useRendererVarStyle } from './style';
-import { useStreaming } from './useStreaming';
 import type {
   MarkdownRendererProps,
   MarkdownRendererRef,
   RendererBlockProps,
 } from './types';
 import { useMarkdownToReact } from './useMarkdownToReact';
+import { useStreaming } from './useStreaming';
 
 const SCHEMA_LANGUAGES = new Set([
   'schema',
@@ -72,6 +74,19 @@ const DefaultCodeRouter: React.FC<
   if (language === 'chart' || language === 'json-chart') {
     const ChartComp = pluginComponents.chart || ChartBlockRenderer;
     return <ChartComp {...rest} language={language} />;
+  }
+
+  if (language === 'agentic-ui-task') {
+    const TaskComp =
+      pluginComponents['agentic-ui-task'] || AgenticUiTaskBlockRenderer;
+    return <TaskComp {...rest} language={language} />;
+  }
+
+  if (language === 'agentic-ui-usertoolbar') {
+    const ToolbarComp =
+      pluginComponents['agentic-ui-usertoolbar'] ||
+      AgenticUiUserToolbarBlockRenderer;
+    return <ToolbarComp {...rest} language={language} />;
   }
 
   if (SCHEMA_LANGUAGES.has(language)) {
@@ -208,17 +223,17 @@ const InternalMarkdownRenderer = forwardRef<
     };
   }, [pluginComponents, apaasifyRender]);
 
-    // 流式缓存：将不完整的 Markdown token 暂缓，避免 parser 错误解析
-    const safeContent = useStreaming(displayedContent, streaming);
+  // 流式缓存：将不完整的 Markdown token 暂缓，避免 parser 错误解析
+  const safeContent = useStreaming(displayedContent, streaming);
 
-    const reactContent = useMarkdownToReact(safeContent, {
-      remarkPlugins,
-      htmlConfig,
-      components,
-      prefixCls,
-      linkConfig,
-      streaming,
-    });
+  const reactContent = useMarkdownToReact(safeContent, {
+    remarkPlugins,
+    htmlConfig,
+    components,
+    prefixCls,
+    linkConfig,
+    streaming,
+  });
 
   return wrapVarSSR(
     wrapSSR(

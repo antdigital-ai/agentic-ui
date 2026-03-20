@@ -448,4 +448,43 @@ describe('MarkdownRenderer', () => {
     expect(customEl).toBeTruthy();
     expect(customEl?.textContent).toContain('Custom: form');
   });
+
+  it('应将 agentic-ui-task 代码块渲染为 TaskList', () => {
+    const json = JSON.stringify({
+      items: [
+        {
+          key: '1',
+          title: '步骤一',
+          content: '说明',
+          status: 'loading',
+        },
+      ],
+    });
+    const { container } = render(
+      <MarkdownRenderer content={'```agentic-ui-task\n' + json + '\n```'} />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="agentic-ui-task-block"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="task-list-thoughtChainItem"]'),
+    ).toBeTruthy();
+  });
+
+  it('应将 agentic-ui-usertoolbar 代码块渲染为 SuggestionList', () => {
+    const json = JSON.stringify({
+      items: [{ text: '快捷操作', key: 'a' }],
+      layout: 'horizontal',
+    });
+    const { container } = render(
+      <MarkdownRenderer
+        content={'```agentic-ui-usertoolbar\n' + json + '\n```'}
+      />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="agentic-ui-usertoolbar-block"]'),
+    ).toBeTruthy();
+  });
 });

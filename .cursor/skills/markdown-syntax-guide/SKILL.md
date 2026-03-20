@@ -238,6 +238,32 @@ import { Card } from 'antd';
 ```
 ````
 
+**Agentic UI 嵌入块**（`@ant-design/agentic-ui` MarkdownEditor / MarkdownRenderer）
+
+任务列表（渲染为 `TaskList`）：
+
+````markdown
+```agentic-ui-task
+{
+  "items": [
+    { "key": "1", "title": "步骤", "content": "详情", "status": "loading" }
+  ],
+  "variant": "default"
+}
+```
+````
+
+用户侧工具条（渲染为 `SuggestionList`）：
+
+````markdown
+```agentic-ui-usertoolbar
+{
+  "items": [{ "text": "继续", "key": "go" }],
+  "layout": "horizontal"
+}
+```
+````
+
 **3D 模型**（若项目支持）
 
 ````markdown

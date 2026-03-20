@@ -56,6 +56,32 @@ describe('parseCode handleCode', () => {
   });
 });
 
+describe('parseCode agentic-ui embed blocks', () => {
+  it('should parse agentic-ui-task to typed node with JSON value', () => {
+    const raw = `{
+  "items": [{ "key": "a", "title": "T", "content": "c", "status": "loading" }]
+}`;
+    const result = handleCode(
+      { value: raw, lang: 'agentic-ui-task', meta: undefined },
+      undefined,
+    );
+    expect(result.type).toBe('agentic-ui-task');
+    expect(result.language).toBe('agentic-ui-task');
+    expect((result.value as any).items).toHaveLength(1);
+    expect((result.value as any).items[0].key).toBe('a');
+  });
+
+  it('should parse agentic-ui-usertoolbar to typed node with JSON value', () => {
+    const raw = `{ "items": [{ "text": "继续", "key": "1" }] }`;
+    const result = handleCode(
+      { value: raw, lang: 'agentic-ui-usertoolbar', meta: undefined },
+      undefined,
+    );
+    expect(result.type).toBe('agentic-ui-usertoolbar');
+    expect((result.value as any).items[0].text).toBe('继续');
+  });
+});
+
 describe('parseCode processSchemaLanguage double throw (37-41)', () => {
   it('should catch when both json5 and partialJsonParse throw', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});

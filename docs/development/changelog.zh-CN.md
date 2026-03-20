@@ -11,6 +11,8 @@ group:
 
 ## v2.29.59（开发中）
 
+- MarkdownEditor / MarkdownRenderer
+  - 🆕 支持 `agentic-ui-task` 与 `agentic-ui-usertoolbar` 围栏代码块，分别渲染为 TaskList 与 SuggestionList（用户工具条场景）。
 - MarkdownRenderer
   - 🆕 流式场景下使用 Markdown Renderer 替代 Slate 渲染。[#369](https://github.com/ant-design/agentic-ui/pull/369)
 - Bubble

@@ -11,6 +11,8 @@ group:
 
 ## v2.29.59 (In Development)
 
+- MarkdownEditor / MarkdownRenderer
+  - 🆕 Support fenced `agentic-ui-task` and `agentic-ui-usertoolbar` code blocks, rendering TaskList and SuggestionList (user toolbar) respectively.
 - MarkdownRenderer
   - 🆕 Use Markdown Renderer instead of Slate for streaming scenarios. [#369](https://github.com/ant-design/agentic-ui/pull/369)
 - Bubble

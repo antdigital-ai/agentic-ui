@@ -324,6 +324,8 @@ export const shouldInsertTextDirectly = (editor: Editor, selection: any) => {
     'code',
     'schema',
     'apaasify',
+    'agentic-ui-task',
+    'agentic-ui-usertoolbar',
   ].includes(rangeNode.type);
 };
 

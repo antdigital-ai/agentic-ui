@@ -10,6 +10,14 @@ import { MarkdownEditorProps } from '../../types';
 import { JINJA_DOLLAR_PLACEHOLDER } from '../parser/constants';
 import { useEditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
+import {
+  AgenticUiTaskBlock,
+  ReadonlyAgenticUiTaskBlock,
+} from './AgenticUiBlocks/AgenticUiTaskBlock';
+import {
+  AgenticUiUserToolbarBlock,
+  ReadonlyAgenticUiUserToolbarBlock,
+} from './AgenticUiBlocks/AgenticUiUserToolbarBlock';
 import { Blockquote } from './Blockquote';
 import { ReadonlyBlockquote } from './Blockquote/ReadonlyBlockquote';
 import { Break } from './Break';
@@ -226,6 +234,18 @@ const MElementComponent = (
         <ReadonlySchema {...readonlyElementProps} />
       ) : (
         <Schema {...props} />
+      );
+    case 'agentic-ui-task':
+      return props.readonly ? (
+        <ReadonlyAgenticUiTaskBlock {...readonlyElementProps} />
+      ) : (
+        <AgenticUiTaskBlock {...props} />
+      );
+    case 'agentic-ui-usertoolbar':
+      return props.readonly ? (
+        <ReadonlyAgenticUiUserToolbarBlock {...readonlyElementProps} />
+      ) : (
+        <AgenticUiUserToolbarBlock {...props} />
       );
     case 'image':
       return props.readonly ? (
