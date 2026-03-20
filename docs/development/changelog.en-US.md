@@ -9,19 +9,26 @@ group:
 
 # Changelog
 
-## v2.29.59 (In Development)
+## v2.30.1
 
-- MarkdownEditor / MarkdownRenderer
-  - 🆕 Support fenced `agentic-ui-task` and `agentic-ui-toolusebar` code blocks, rendering TaskList and ToolUseBar; `agentic-ui-usertoolbar` remains readable but is deprecated.
+- MarkdownEditor
+  - 🛠 Rebuild editable table implementation; improve column width handling, row/column commands, and cell selection. [#376](https://github.com/ant-design/agentic-ui/pull/376)
+  - 🆕 Support fenced `agentic-ui-task` and `agentic-ui-toolusebar` code blocks rendering TaskList and ToolUseBar; legacy `agentic-ui-usertoolbar` remains readable and normalizes to the new identifier. [#378](https://github.com/ant-design/agentic-ui/pull/378) [#380](https://github.com/ant-design/agentic-ui/pull/380)
   - 💄 Fenced `agentic-ui-task` defaults `variant` to `simple`; set root-level `variant` to `default` for the full task-chain layout.
-  - 🆕 In readonly mode, `renderMode` / `renderType` `markdown` uses MarkdownRenderer (aligned with Bubble); `markdownRenderConfig` accepts `renderType` alias.
+  - 🆕 In readonly mode, `renderMode` / `renderType` `markdown` uses MarkdownRenderer; `markdownRenderConfig` accepts `renderType` alias.
+  - 🐞 Fix Chart canvas not visible under the Slate placeholder overlay. [#381](https://github.com/ant-design/agentic-ui/pull/381)
 - MarkdownRenderer
   - 🆕 Use Markdown Renderer instead of Slate for streaming scenarios. [#369](https://github.com/ant-design/agentic-ui/pull/369)
+  - 💄 Add blur transition to streaming text fade-in animation.
 - Bubble
+  - 🛠 Optimize thinking state with lightweight DOM loading and dots-only animation. [#377](https://github.com/ant-design/agentic-ui/pull/377)
   - 🐞 Fix `extraShowOnHover` handling to default to `true` when not provided.
+- BubbleMessageDisplay
+  - 🐞 Fix empty, `undefined`, or `null` content rendering when `answerStatus` is `EXCEPTION`. [#376](https://github.com/ant-design/agentic-ui/pull/376)
 - MarkdownInputField
   - 🌐 Improve clarity of file upload related messages.
 - 📖 Remove `rfc-streaming-markdown-renderer.md` documentation. [#370](https://github.com/ant-design/agentic-ui/pull/370)
+- ✅ Add snapshots for agentic-ui embed and thinking DOM demos; update related demo snapshots.
 - 🛠 Fix test and Chart error logging.
 
 ## v2.29.58

@@ -9,19 +9,26 @@ group:
 
 # Changelog
 
-## v2.29.59（开发中）
+## v2.30.1
 
-- MarkdownEditor / MarkdownRenderer
-  - 🆕 支持 `agentic-ui-task` 与 `agentic-ui-toolusebar` 围栏代码块，分别渲染为 TaskList 与 ToolUseBar；`agentic-ui-usertoolbar` 仍可读入但已弃用。
-  - 💄 `agentic-ui-task` 嵌入块默认 `variant` 为 `simple`；需完整任务链样式时在 JSON 根级指定 `variant` 为 `default`。
-  - 🆕 只读模式下 `renderMode` / `renderType` 为 `markdown` 时走 MarkdownRenderer，与气泡侧轻量渲染一致；`markdownRenderConfig` 支持 `renderType` 别名。
+- MarkdownEditor
+  - 🛠 重构可编辑表格实现，优化列宽计算、行列命令与单元格选区。[#376](https://github.com/ant-design/agentic-ui/pull/376)
+  - 🆕 支持 `agentic-ui-task` 与 `agentic-ui-toolusebar` 围栏代码块，分别渲染为 TaskList 与 ToolUseBar；旧标识 `agentic-ui-usertoolbar` 仍可读入并规范为新标识。[#378](https://github.com/ant-design/agentic-ui/pull/378) [#380](https://github.com/ant-design/agentic-ui/pull/380)
+  - 💄 `agentic-ui-task` 嵌入块默认 `variant` 为 `simple`；需完整任务链样式时在 JSON 根级将 `variant` 设为 `default`。
+  - 🆕 只读模式下 `renderMode` / `renderType` 为 `markdown` 时走 MarkdownRenderer；`markdownRenderConfig` 支持 `renderType` 别名。
+  - 🐞 修复 Chart 在 Slate 占位层下画布不可见的问题。[#381](https://github.com/ant-design/agentic-ui/pull/381)
 - MarkdownRenderer
   - 🆕 流式场景下使用 Markdown Renderer 替代 Slate 渲染。[#369](https://github.com/ant-design/agentic-ui/pull/369)
+  - 💄 流式文字淡入动画增加 blur 过渡。
 - Bubble
+  - 🛠 思考中状态改为轻量 DOM 结构，仅保留 dots 动效。[#377](https://github.com/ant-design/agentic-ui/pull/377)
   - 🐞 修复 `extraShowOnHover` 未传入时默认值为 `true` 的处理逻辑。
+- BubbleMessageDisplay
+  - 🐞 修复 `EXCEPTION` 状态下空、`undefined` 或 `null` 内容的展示逻辑。[#376](https://github.com/ant-design/agentic-ui/pull/376)
 - MarkdownInputField
   - 🌐 优化文件上传相关文案的清晰度。
 - 📖 移除 `rfc-streaming-markdown-renderer.md` 文档。[#370](https://github.com/ant-design/agentic-ui/pull/370)
+- ✅ 补充 agentic-ui 嵌入与思考 DOM 演示快照，并更新相关演示快照。
 - 🛠 修复测试与 Chart 错误日志。
 
 ## v2.29.58
