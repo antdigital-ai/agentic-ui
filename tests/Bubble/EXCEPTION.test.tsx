@@ -22,31 +22,27 @@ describe('EXCEPTION', () => {
     });
 
     it('应该处理空内容', () => {
-      const { container } = render(<EXCEPTION content="" extra={null} />);
+      render(<EXCEPTION content="" extra={null} />);
 
-      // 检查组件是否渲染
-      const divElement = container.querySelector('div');
-      expect(divElement).toBeInTheDocument();
+      expect(
+        screen.getByText('生成回答失败，请重试'),
+      ).toBeInTheDocument();
     });
 
     it('应该处理undefined内容', () => {
-      const { container } = render(
-        <EXCEPTION content={undefined as any} extra={null} />,
-      );
+      render(<EXCEPTION content={undefined as any} extra={null} />);
 
-      // 检查组件是否渲染
-      const divElement = container.querySelector('div');
-      expect(divElement).toBeInTheDocument();
+      expect(
+        screen.getByText('生成回答失败，请重试'),
+      ).toBeInTheDocument();
     });
 
     it('应该处理null内容', () => {
-      const { container } = render(
-        <EXCEPTION content={null as any} extra={null} />,
-      );
+      render(<EXCEPTION content={null as any} extra={null} />);
 
-      // 检查组件是否渲染
-      const divElement = container.querySelector('div');
-      expect(divElement).toBeInTheDocument();
+      expect(
+        screen.getByText('生成回答失败，请重试'),
+      ).toBeInTheDocument();
     });
   });
 

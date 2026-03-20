@@ -1,5 +1,7 @@
-﻿import { theme } from 'antd';
+import { theme } from 'antd';
 import React from 'react';
+import { AnswerAlert } from '../../AnswerAlert';
+import { useLocale } from '../../I18n';
 import { MessageBubbleData } from '../type';
 
 /**
@@ -42,19 +44,33 @@ export const EXCEPTION = ({
   originData?: Record<string, any> & MessageBubbleData<Record<string, any>>;
 }) => {
   const { token } = theme.useToken();
+  const locale = useLocale();
+  const messageText = String(content ?? '').trim();
+
   return (
     <>
-      <div
-        style={{
-          color: token.colorError,
-          lineHeight: '24px',
-          padding: '4px var(--padding-3x)',
-          wordBreak: 'break-all',
-          textWrap: 'wrap',
-        }}
-      >
-        {content}
-      </div>
+      {messageText ? (
+        <div
+          style={{
+            color: token.colorError,
+            lineHeight: '24px',
+            padding: '4px var(--padding-3x)',
+            wordBreak: 'break-all',
+            textWrap: 'wrap',
+          }}
+        >
+          {content}
+        </div>
+      ) : (
+        <AnswerAlert
+          message={
+            locale?.['chat.message.generateFailed'] || '生成回答失败，请重试'
+          }
+          type="error"
+          showIcon
+          closable
+        />
+      )}
       {extra}
     </>
   );

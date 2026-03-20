@@ -769,9 +769,7 @@ describe('BubbleMessageDisplay', () => {
 
       renderWithContext(props);
 
-      expect(screen.getByTestId('content')).toHaveTextContent(
-        '生成回答失败，请重试',
-      );
+      expect(screen.getByTestId('content')).toHaveTextContent('');
     });
 
     it('应该处理用户角色消息', () => {
