@@ -26,7 +26,9 @@ const MaxFileSizeErrorDemo: React.FC = () => {
                 marginBottom: 8,
               }}
             >
-              单文件最大 <strong>100KB</strong>，最多 <strong>2</strong> 个文件。选择超过大小的文件时，会在附件列表中显示「超过 xxx KB」报错。
+              单文件最大 <strong>100KB</strong>，最多 <strong>2</strong>{' '}
+              个文件。选择超过大小的文件时，会在附件列表中显示「超过 xxx
+              KB」报错。
             </p>
             <MarkdownInputField
               value={value}

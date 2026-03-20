@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  isAttachmentFileLoading,
-  isFileMetaPlaceholderState,
-} from '../utils';
+import { isAttachmentFileLoading, isFileMetaPlaceholderState } from '../utils';
 
 describe('AttachmentButton utils', () => {
   it('should mark uploading and pending as loading status', () => {

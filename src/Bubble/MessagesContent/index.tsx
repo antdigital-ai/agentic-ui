@@ -147,7 +147,9 @@ export const BubbleMessageDisplay: React.FC<
             role="status"
             aria-live="polite"
             aria-atomic="true"
-            aria-label={locale?.['chat.message.thinking'] || THINKING_FALLBACK_TEXT}
+            aria-label={
+              locale?.['chat.message.thinking'] || THINKING_FALLBACK_TEXT
+            }
           >
             <span
               className={classNames(

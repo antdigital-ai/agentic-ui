@@ -40,7 +40,9 @@ export default () => {
             checkedChildren="思考中"
             unCheckedChildren="已完成"
           />
-          <Button onClick={() => setIsThinking((prev) => !prev)}>切换状态</Button>
+          <Button onClick={() => setIsThinking((prev) => !prev)}>
+            切换状态
+          </Button>
         </Space>
 
         <Bubble

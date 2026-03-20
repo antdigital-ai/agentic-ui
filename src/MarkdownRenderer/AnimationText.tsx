@@ -30,9 +30,14 @@ const extractText = (children: React.ReactNode): string => {
  * 富文本结构（链接、脚注、图片等）在纯文本差分下会丢失结构信息，直接透传更安全。
  */
 const hasElementNode = (children: React.ReactNode): boolean => {
-  if (children === null || children === undefined || typeof children === 'boolean')
+  if (
+    children === null ||
+    children === undefined ||
+    typeof children === 'boolean'
+  )
     return false;
-  if (typeof children === 'string' || typeof children === 'number') return false;
+  if (typeof children === 'string' || typeof children === 'number')
+    return false;
   if (Array.isArray(children)) return children.some(hasElementNode);
   return React.isValidElement(children);
 };

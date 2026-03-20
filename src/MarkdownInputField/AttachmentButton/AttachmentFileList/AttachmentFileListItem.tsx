@@ -38,9 +38,9 @@ const FileIcon: React.FC<{
   prefixCls?: string;
   hashId?: string;
 }> = ({ file, prefixCls, hashId }) => {
-  const status = ((file.status || 'done') === 'pending'
-    ? 'uploading'
-    : file.status || 'done') as Exclude<FileStatus, 'pending'>;
+  const status = (
+    (file.status || 'done') === 'pending' ? 'uploading' : file.status || 'done'
+  ) as Exclude<FileStatus, 'pending'>;
   const iconMap: Record<Exclude<FileStatus, 'pending'>, React.ReactNode> = {
     uploading: (
       <div className={classNames(`${prefixCls}-uploading-icon`, hashId)}>
@@ -83,9 +83,7 @@ const FileSizeInfo: React.FC<{
       <div
         className={classNames(baseClassName, `${prefixCls}-file-size-error`)}
       >
-        {file.errorMessage ||
-          locale?.uploadFailed ||
-          '上传失败'}
+        {file.errorMessage || locale?.uploadFailed || '上传失败'}
       </div>
     ),
     done: (() => {
@@ -148,7 +146,8 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
 }) => {
   const { locale } = useContext(I18nContext);
   const isErrorStatus = file.status === 'error';
-  const isSizeExceededError = isErrorStatus && file.errorCode === 'FILE_SIZE_EXCEEDED';
+  const isSizeExceededError =
+    isErrorStatus && file.errorCode === 'FILE_SIZE_EXCEEDED';
   const canRetry = isErrorStatus && !isSizeExceededError;
   const isDoneStatus = file.status === 'done';
   const canDelete = !isAttachmentFileLoading(file.status);

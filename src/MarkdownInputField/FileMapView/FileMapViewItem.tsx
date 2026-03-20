@@ -172,35 +172,35 @@ export const FileMapViewItem: React.FC<{
                 >
                   {displayExtension}
                 </span>
-            <span
-              className={classNames(
-                `${props.prefixCls}-separator`,
-                props.hashId,
-              )}
-            >
-              |
-            </span>
-            <div
-              className={classNames(
-                `${props.prefixCls}-file-size`,
-                props.hashId,
-              )}
-            >
-              {kbToSize(file.size / 1024)}
-            </div>
-            <span
-              className={classNames(
-                `${props.prefixCls}-separator`,
-                props.hashId,
-              )}
-            >
-              |
-            </span>
-            <div>
-              {file?.lastModified
-                ? dayjs(file?.lastModified).format('HH:mm')
-                : ''}
-            </div>
+                <span
+                  className={classNames(
+                    `${props.prefixCls}-separator`,
+                    props.hashId,
+                  )}
+                >
+                  |
+                </span>
+                <div
+                  className={classNames(
+                    `${props.prefixCls}-file-size`,
+                    props.hashId,
+                  )}
+                >
+                  {kbToSize(file.size / 1024)}
+                </div>
+                <span
+                  className={classNames(
+                    `${props.prefixCls}-separator`,
+                    props.hashId,
+                  )}
+                >
+                  |
+                </span>
+                <div>
+                  {file?.lastModified
+                    ? dayjs(file?.lastModified).format('HH:mm')
+                    : ''}
+                </div>
               </>
             )}
           </div>

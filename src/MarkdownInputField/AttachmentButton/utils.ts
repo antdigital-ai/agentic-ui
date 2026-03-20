@@ -114,9 +114,8 @@ export const isMediaFile = (file: File): boolean =>
 /**
  * 是否为「仅元信息占位」状态：有 status 但无 url/previewUrl，内容未拿到时整行以 FileMetaPlaceholder 风格展示
  */
-export const isAttachmentFileLoading = (
-  status?: string | null,
-): boolean => status === 'uploading' || status === 'pending';
+export const isAttachmentFileLoading = (status?: string | null): boolean =>
+  status === 'uploading' || status === 'pending';
 
 /**
  * 是否应该展示 FileMetaPlaceholder：

@@ -2,7 +2,6 @@ import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React, { useMemo, useRef } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
-import AnimationText from './AnimationText';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import remarkDirective from 'remark-directive';
@@ -27,6 +26,7 @@ import {
   type MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
 import { ToolUseBarThink } from '../ToolUseBarThink';
+import AnimationText from './AnimationText';
 import type { RendererBlockProps } from './types';
 
 const INLINE_MATH_WITH_SINGLE_DOLLAR = { singleDollarTextMath: true };
@@ -339,9 +339,7 @@ const buildEditorAlignedComponents = (
   const contentCls = prefixCls; // e.g. ant-agentic-md-editor-content
 
   const wrapAnimation = (children: any) =>
-    streaming
-      ? jsx(AnimationText as any, { children })
-      : children;
+    streaming ? jsx(AnimationText as any, { children }) : children;
 
   return {
     // ================================================================

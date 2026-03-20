@@ -284,5 +284,4 @@ describe('MarkdownInputField - actionsRender', () => {
       expect.any(Array),
     );
   });
-
 });
