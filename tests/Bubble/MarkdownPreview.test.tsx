@@ -159,5 +159,23 @@ describe('MarkdownPreview', () => {
         screen.queryByTestId('markdown-preview-popover-wrapper'),
       ).not.toBeInTheDocument();
     });
+
+    it('typing 为 true 时不使用 Popover 且不渲染 extra', () => {
+      render(
+        <HoverProvider>
+          <MarkdownPreview
+            {...defaultProps}
+            typing
+            placement="left"
+            extra={<span data-testid="extra-content">Extra</span>}
+          />
+        </HoverProvider>,
+      );
+
+      expect(
+        screen.queryByTestId('markdown-preview-popover-wrapper'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId('extra-content')).not.toBeInTheDocument();
+    });
   });
 });
