@@ -33,6 +33,12 @@ export default defineConfig({
       all: true,
       exclude: [
         'tests/**',
+        /** 不把源码树内的测试文件计入覆盖率，避免拉低分支等指标 */
+        '**/src/**/__tests__/**',
+        '**/src/**/*.test.ts',
+        '**/src/**/*.test.tsx',
+        '**/src/**/*.spec.ts',
+        '**/src/**/*.spec.tsx',
         '**/MarkdownEditor/editor/slate-react/**',
         '**/slate-table/**',
         '**/icons/**',
@@ -40,7 +46,7 @@ export default defineConfig({
         'test/**',
         '**/Hooks/useIntersectionOnce.ts',
       ],
-      // 启用 COVERAGE_ENFORCE=1 时强制覆盖率阈值；目标 90%，当前分支约 84%，后续可逐步提升
+      // 启用 COVERAGE_ENFORCE=1 时强制覆盖率阈值；src 内 *.test / __tests__ 已排除在覆盖率外
       ...(process.env.COVERAGE_ENFORCE === '1' && {
         thresholds: {
           lines: 90,

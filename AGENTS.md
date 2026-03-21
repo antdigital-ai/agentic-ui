@@ -423,20 +423,17 @@ import type { RefType } from './types';
 # 运行单元测试
 pnpm test
 
-# 运行测试并生成覆盖率
+# 运行测试并生成覆盖率（`src/**` 内 `__tests__`、`*.test.*` 不计入覆盖率）
 pnpm run test:coverage
+
+# 与 CI 一致：开启覆盖率阈值（见 vitest.config.ts）
+COVERAGE_ENFORCE=1 pnpm run test:coverage
 
 # 运行 E2E 测试
 pnpm run test:e2e
 
 # E2E 调试模式
 pnpm run test:e2e:debug
-```
-
-`tests/demo/demo.test.tsx` 默认只抽样部分文档 demo 以缩短耗时；本地需跑全量 demo 渲染时可执行：
-
-```bash
-AGENTIC_UI_DEMO_TEST_RATIO=1 pnpm exec vitest run tests/demo/demo.test.tsx
 ```
 
 #### 测试最佳实践
