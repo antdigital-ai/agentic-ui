@@ -99,6 +99,37 @@ describe('render-failure-regression', () => {
         );
       }).not.toThrow();
     });
+
+    it('应正确渲染图片卡片（![](url) 解析为 card+media）', () => {
+      expect(() => {
+        render(
+          <MarkdownEditor readonly initValue="![](test.jpg)" reportMode />,
+        );
+      }).not.toThrow();
+    });
+
+    it('应正确渲染表格卡片（表格被 wrapperCardNode 包装）', () => {
+      const tableMarkdown = `| 列1 | 列2 |
+| --- | --- |
+| a   | b   |`;
+      expect(() => {
+        render(
+          <MarkdownEditor readonly initValue={tableMarkdown} reportMode />,
+        );
+      }).not.toThrow();
+    });
+
+    it('应正确渲染视频卡片', () => {
+      expect(() => {
+        render(
+          <MarkdownEditor
+            readonly
+            initValue={'<video src="test.mp4" controls />'}
+            reportMode
+          />,
+        );
+      }).not.toThrow();
+    });
   });
 
   describe('Bubble - EXCEPTION 状态下空/null/undefined 内容不应导致渲染失败', () => {
