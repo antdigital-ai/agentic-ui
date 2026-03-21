@@ -9,6 +9,12 @@ const AGENTAR_CARD_SAMPLE = {
   author: 'Schema Team',
   createTime: '2024-03-30T10:00:00Z',
   updateTime: '2024-03-30T10:00:00Z',
+  /** 与 SchemaRenderer 的 values 对应，供 agentar-card 只读渲染 */
+  initialValues: {
+    title: 'Rerender 演示标题',
+    content: '这段文案来自 initialValues，可在 JSON 里修改以预览不同内容。',
+    bgColor: '#e6f4ff',
+  },
   component: {
     properties: {
       title: {
