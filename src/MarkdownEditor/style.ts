@@ -86,9 +86,9 @@ const genTableStyle = (
 
         // readonly：overflow: hidden，不影响编辑态 UI
         [`&${tableCls}-readonly-table`]: {
-          width: '100%',
           tableLayout: 'auto',
           overflow: 'hidden',
+          maxWidth: '100%',
           border: TABLE_BORDER,
         },
 
