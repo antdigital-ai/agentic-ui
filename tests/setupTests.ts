@@ -52,13 +52,15 @@ vi.mock('ace-builds/src-noconflict/ext-modelist', () => ({
 
 // Mock @galacean/effects 模块，避免在测试环境中访问 DOM 属性导致错误
 vi.mock('@galacean/effects', () => {
-  const mockPlayer = vi.fn().mockImplementation(() => ({
-    loadScene: vi.fn(),
-    dispose: vi.fn(),
-    resume: vi.fn(),
-    pause: vi.fn(),
-    resize: vi.fn(),
-  }));
+  const mockPlayer = vi.fn(function MockPlayer(this: unknown) {
+    return {
+      loadScene: vi.fn(),
+      dispose: vi.fn(),
+      resume: vi.fn(),
+      pause: vi.fn(),
+      resize: vi.fn(),
+    };
+  });
 
   return {
     Player: mockPlayer,
@@ -127,7 +129,7 @@ const idleCallbacks = new Map<number, () => void>();
 
 vi.stubGlobal(
   'requestIdleCallback',
-  vi.fn((cb: () => void, options?: { timeout?: number }) => {
+  vi.fn(function requestIdleCallbackStub(cb: () => void, options?: { timeout?: number }) {
     const id = ++idleCallbackIdCounter;
     idleCallbacks.set(id, cb);
     // 在测试环境中立即同步执行，避免异步操作阻塞测试
@@ -158,7 +160,7 @@ vi.stubGlobal(
 
 vi.stubGlobal(
   'cancelIdleCallback',
-  vi.fn((id: number) => {
+  vi.fn(function cancelIdleCallbackStub(id: number) {
     idleCallbacks.delete(id);
   }),
 );
@@ -204,21 +206,21 @@ Object.defineProperty(globalThis, 'cancelAnimationFrame', {
 
 // Mock requestAnimationFrame to prevent unhandled errors in tests
 Object.defineProperty(globalThis, 'requestAnimationFrame', {
-  value: vi.fn((callback) => {
+  value: vi.fn(function requestAnimationFrameStub(callback: FrameRequestCallback) {
     return setTimeout(callback, 16); // ~60fps
   }),
   writable: true,
 });
 
 Object.defineProperty(globalThis.window, 'requestAnimationFrame', {
-  value: vi.fn((callback) => {
+  value: vi.fn(function windowRequestAnimationFrameStub(callback: FrameRequestCallback) {
     return setTimeout(callback, 16); // ~60fps
   }),
   writable: true,
 });
 
 Object.defineProperty(globalThis.window, 'cancelAnimationFrame', {
-  value: vi.fn((id) => {
+  value: vi.fn(function cancelAnimationFrameStub(id: number) {
     clearTimeout(id);
   }),
   writable: true,
@@ -227,22 +229,26 @@ Object.defineProperty(globalThis.window, 'cancelAnimationFrame', {
 Object.defineProperty(globalThis, 'IntersectionObserver', {
   writable: true,
   configurable: true,
-  value: vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  })),
+  value: vi.fn(function MockIntersectionObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    };
+  }),
 });
 
 // Mock ResizeObserver
 Object.defineProperty(globalThis, 'ResizeObserver', {
   writable: true,
   configurable: true,
-  value: vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  })),
+  value: vi.fn(function MockResizeObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    };
+  }),
 });
 
 // ref: https://github.com/ant-design/ant-design/issues/18774

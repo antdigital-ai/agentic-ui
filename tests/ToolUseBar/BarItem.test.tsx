@@ -193,19 +193,21 @@ describe('ToolUseBarItem', () => {
 
   describe('Content 展开/收起按钮与键盘', () => {
     beforeEach(() => {
-      global.ResizeObserver = vi.fn().mockImplementation((callback: () => void) => ({
-        observe: vi.fn((el: HTMLElement) => {
-          if (el) {
-            Object.defineProperty(el, 'scrollHeight', {
-              value: 250,
-              configurable: true,
-            });
-            callback();
-          }
-        }),
-        disconnect: vi.fn(),
-        unobserve: vi.fn(),
-      }));
+      global.ResizeObserver = vi.fn(function MockResizeObserver(callback: () => void) {
+        return {
+          observe: vi.fn((el: HTMLElement) => {
+            if (el) {
+              Object.defineProperty(el, 'scrollHeight', {
+                value: 250,
+                configurable: true,
+              });
+              callback();
+            }
+          }),
+          disconnect: vi.fn(),
+          unobserve: vi.fn(),
+        };
+      });
     });
 
     afterEach(() => {

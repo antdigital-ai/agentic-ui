@@ -183,7 +183,9 @@ describe('Media targeted coverage', () => {
 
   it('覆盖 initial 的 image 探测回调（269/271）', () => {
     const created: any[] = [];
-    const origin = document.createElement.bind(document);
+    const origin = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
     vi.spyOn(document, 'createElement').mockImplementation(((tagName: string) => {
       const el = origin(tagName);
       if (String(tagName).toLowerCase() === 'img') created.push(el);
@@ -207,7 +209,9 @@ describe('Media targeted coverage', () => {
 
   it('覆盖 initial 的 video 探测回调（278/281）', () => {
     const created: any[] = [];
-    const origin = document.createElement.bind(document);
+    const origin = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
     vi.spyOn(document, 'createElement').mockImplementation(((tagName: string) => {
       const el = origin(tagName);
       if (String(tagName).toLowerCase() === 'video') created.push(el);
@@ -235,7 +239,9 @@ describe('Media targeted coverage', () => {
 
   it('覆盖 initial 的 audio 探测回调（285-292）', () => {
     const created: any[] = [];
-    const origin = document.createElement.bind(document);
+    const origin = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
     vi.spyOn(document, 'createElement').mockImplementation(((tagName: string) => {
       const el = origin(tagName);
       if (String(tagName).toLowerCase() === 'audio') created.push(el);

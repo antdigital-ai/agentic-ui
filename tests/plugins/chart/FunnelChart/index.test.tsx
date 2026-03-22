@@ -76,6 +76,7 @@ vi.mock('../../../../src/Plugins/chart/utils', () => ({
 describe('FunnelChart', () => {
   it(
     '应该渲染并触发样式与图表渲染逻辑',
+    { timeout: 15000 },
     async () => {
       const data = [
         { x: 'A', y: 100, ratio: '100%' },
@@ -93,6 +94,5 @@ describe('FunnelChart', () => {
       expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
       expect(screen.getByTestId('chart-title')).toHaveTextContent('测试漏斗');
     },
-    { timeout: 15000 },
   );
 });

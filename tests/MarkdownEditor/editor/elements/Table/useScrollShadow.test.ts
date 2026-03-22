@@ -12,20 +12,22 @@ describe('useScrollShadow Hook', () => {
     mockObserve = vi.fn();
     mockDisconnect = vi.fn();
 
-    global.ResizeObserver = vi.fn(() => ({
-      observe: mockObserve,
-      unobserve: vi.fn(),
-      disconnect: mockDisconnect,
-    })) as any;
+    global.ResizeObserver = vi.fn(function MockResizeObserver() {
+      return {
+        observe: mockObserve,
+        unobserve: vi.fn(),
+        disconnect: mockDisconnect,
+      };
+    }) as any;
 
     // Mock requestAnimationFrame
-    vi.spyOn(global, 'requestAnimationFrame').mockImplementation((cb: any) => {
+    vi.spyOn(global, 'requestAnimationFrame').mockImplementation(function rafStub(cb: any) {
       cb();
       return 0;
     });
 
     // Mock cancelAnimationFrame
-    vi.spyOn(global, 'cancelAnimationFrame').mockImplementation(() => {});
+    vi.spyOn(global, 'cancelAnimationFrame').mockImplementation(function cafStub() {});
   });
 
   afterEach(() => {

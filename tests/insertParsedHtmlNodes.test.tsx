@@ -11,9 +11,11 @@ import {
 import * as docxDeserializerModule from '../src/MarkdownEditor/editor/utils/docx/docxDeserializer';
 
 vi.mock('../src/MarkdownEditor/editor/plugins/hotKeyCommands/backspace', () => ({
-  BackspaceKey: vi.fn().mockImplementation(() => ({
-    range: vi.fn(),
-  })),
+  BackspaceKey: vi.fn(function MockBackspaceKey() {
+    return {
+      range: vi.fn(),
+    };
+  }),
 }));
 
 // Mock antd message

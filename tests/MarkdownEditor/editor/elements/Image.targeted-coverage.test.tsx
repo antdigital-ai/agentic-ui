@@ -164,7 +164,9 @@ describe('Image targeted coverage', () => {
 
   it('覆盖 EditorImage 的图片探测 onerror/onload 分支', () => {
     const createdImgs: HTMLImageElement[] = [];
-    const originalCreate = document.createElement.bind(document);
+    const originalCreate = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
     const createSpy = vi
       .spyOn(document, 'createElement')
       .mockImplementation(((tagName: string) => {

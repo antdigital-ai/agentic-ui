@@ -213,7 +213,7 @@ describe('useFileUploadManager', () => {
 
       // 模拟 DOM 操作
       const clickSpy = vi.fn();
-      const originalCreateElement = document.createElement.bind(document);
+      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
       const createElementSpy = vi
         .spyOn(document, 'createElement')
         .mockImplementation((tagName: string) => {
@@ -236,7 +236,7 @@ describe('useFileUploadManager', () => {
       fileMap.set('file2', createMockFile('file2', 'done'));
 
       const clickSpy = vi.fn();
-      const originalCreateElement = document.createElement.bind(document);
+      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
       const createElementSpy = vi
         .spyOn(document, 'createElement')
         .mockImplementation((tagName: string) => {
@@ -275,7 +275,7 @@ describe('useFileUploadManager', () => {
       const clickSpy = vi.fn();
       const appendChildSpy = vi.fn();
       const removeSpy = vi.fn();
-      const originalCreateElement = document.createElement.bind(document);
+      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
 
       let createdInput: HTMLInputElement | null = null;
 
@@ -318,7 +318,7 @@ describe('useFileUploadManager', () => {
       });
 
       const clickSpy = vi.fn();
-      const originalCreateElement = document.createElement.bind(document);
+      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
 
       let createdInput: HTMLInputElement | null = null;
 
@@ -357,7 +357,7 @@ describe('useFileUploadManager', () => {
       });
 
       const clickSpy = vi.fn();
-      const originalCreateElement = document.createElement.bind(document);
+      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
 
       let createdInput: HTMLInputElement | null = null;
 
@@ -941,7 +941,7 @@ describe('useFileUploadManager', () => {
   });
 
   describe('getAcceptValue 设备类型处理', () => {
-    const originalCreateElement = document.createElement.bind(document);
+    const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
 
     it.each([
       [

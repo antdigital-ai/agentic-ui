@@ -13,9 +13,11 @@ const { mockValidate, mockCompile } = vi.hoisted(() => {
 
 vi.mock('ajv', () => {
   return {
-    default: vi.fn().mockImplementation(() => ({
-      compile: mockCompile,
-    })),
+    default: vi.fn(function MockAjv() {
+      return {
+        compile: mockCompile,
+      };
+    }),
   };
 });
 

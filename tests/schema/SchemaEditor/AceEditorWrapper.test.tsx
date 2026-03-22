@@ -77,11 +77,13 @@ vi.mock('../../../src/MarkdownEditor/editor/utils/ace', () => ({
 }));
 
 // Mock ResizeObserver
-const mockResizeObserver = vi.fn(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+const mockResizeObserver = vi.fn(function MockResizeObserver() {
+  return {
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  };
+});
 
 Object.defineProperty(window, 'ResizeObserver', {
   writable: true,

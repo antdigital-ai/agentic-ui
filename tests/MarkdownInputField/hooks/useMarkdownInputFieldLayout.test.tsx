@@ -133,7 +133,7 @@ describe('useMarkdownInputFieldLayout', () => {
       originalNodeEnv = process.env.NODE_ENV;
 
       // 覆盖 ResizeObserver mock，捕获 callback
-      (globalThis as any).ResizeObserver = vi.fn((cb: any) => {
+      (globalThis as any).ResizeObserver = vi.fn(function MockResizeObserver(cb: any) {
         resizeCallback = cb;
         return {
           observe: observeSpy,

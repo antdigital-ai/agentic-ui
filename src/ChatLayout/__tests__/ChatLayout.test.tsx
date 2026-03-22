@@ -4,11 +4,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { ChatLayout, type ChatLayoutRef } from '../index';
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+global.ResizeObserver = vi.fn(function MockResizeObserver() {
+  return {
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  };
+});
 
 describe('ChatLayout', () => {
   it('renders with default props', () => {

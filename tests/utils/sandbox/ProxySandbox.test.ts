@@ -1992,7 +1992,9 @@ describe('边界情况测试', () => {
       const revokeSpy = vi.fn();
       const createSpy = vi.fn(() => 'blob:mock');
 
-      (globalThis as any).Worker = vi.fn(() => fakeWorker);
+      (globalThis as any).Worker = vi.fn(function MockWorker() {
+        return fakeWorker;
+      });
       (globalThis as any).URL = {
         ...OldURL,
         createObjectURL: createSpy,

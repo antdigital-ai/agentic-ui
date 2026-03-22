@@ -27,13 +27,17 @@ describe('useSpeechSynthesis Hook', () => {
       },
     });
 
-    // Mock SpeechSynthesisUtterance
-    global.SpeechSynthesisUtterance = vi.fn().mockImplementation((text) => ({
-      text,
-      rate: 1,
-      onend: null,
-      onerror: null,
-    })) as any;
+    // Mock SpeechSynthesisUtterance（Vitest 4：`new SpeechSynthesisUtterance()` 需 function mock）
+    global.SpeechSynthesisUtterance = vi.fn(function SpeechSynthesisUtteranceMock(
+      text: string,
+    ) {
+      return {
+        text,
+        rate: 1,
+        onend: null,
+        onerror: null,
+      };
+    }) as any;
   });
 
   it('应该正确检测浏览器支持', () => {

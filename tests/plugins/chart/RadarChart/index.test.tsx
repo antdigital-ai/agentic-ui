@@ -661,7 +661,9 @@ describe('RadarChart', () => {
 
   it('应该处理 generateLabels 中 ctx 为 null 的情况', () => {
     // Mock getContext 返回 null
-    const originalCreateElement = document.createElement.bind(document);
+    const originalCreateElement = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
     vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
       if (tagName === 'canvas') {
         const canvas = originalCreateElement('canvas') as HTMLCanvasElement;

@@ -106,7 +106,9 @@ describe('ReadonlyMedia', () => {
 
     it('initial 中 img onerror 时设置 loadSuccess false', async () => {
       vi.mocked(domUtils.getMediaType).mockReturnValue('image');
-      const orig = document.createElement.bind(document);
+      const orig = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
       document.createElement = ((tagName: string) => {
         const el = orig(tagName);
         if (tagName.toLowerCase() === 'img') {
@@ -124,7 +126,9 @@ describe('ReadonlyMedia', () => {
 
     it('initial 中 video onerror/onloadedmetadata', async () => {
       vi.mocked(domUtils.getMediaType).mockReturnValue('video');
-      const orig = document.createElement.bind(document);
+      const orig = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
       document.createElement = ((tagName: string) => {
         const el = orig(tagName);
         if (tagName.toLowerCase() === 'video') {
@@ -144,7 +148,9 @@ describe('ReadonlyMedia', () => {
 
     it('initial 中 video onerror 时设置 loadSuccess false', async () => {
       vi.mocked(domUtils.getMediaType).mockReturnValue('video');
-      const orig = document.createElement.bind(document);
+      const orig = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
       document.createElement = ((tagName: string) => {
         const el = orig(tagName);
         if (tagName.toLowerCase() === 'video') {
@@ -162,7 +168,9 @@ describe('ReadonlyMedia', () => {
 
     it('initial 中 img onload 时设置 loadSuccess true', async () => {
       vi.mocked(domUtils.getMediaType).mockReturnValue('image');
-      const orig = document.createElement.bind(document);
+      const orig = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
       document.createElement = ((tagName: string) => {
         const el = orig(tagName);
         if (tagName.toLowerCase() === 'img') {

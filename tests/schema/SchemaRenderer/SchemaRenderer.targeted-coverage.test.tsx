@@ -229,7 +229,9 @@ describe('SchemaRenderer targeted coverage', () => {
   });
 
   it('覆盖 executeScript 总 catch（155）', async () => {
-    const originalCreate = document.createElement.bind(document);
+    const originalCreate = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
     const createSpy = vi
       .spyOn(document, 'createElement')
       .mockImplementation((tagName: any) => {

@@ -148,7 +148,7 @@ describe('RadarChart 分支逻辑', () => {
   describe('generateLabels 文本截断逻辑', () => {
     it('短文本不截断，长文本截断加省略号', () => {
       // 直接 mock createElement 让 canvas.getContext 返回可用的 ctx
-      const origCreateElement = document.createElement.bind(document);
+      const origCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
       vi.spyOn(document, 'createElement').mockImplementation((tag: string, options?: any) => {
         if (tag === 'canvas') {
           return {
@@ -178,7 +178,7 @@ describe('RadarChart 分支逻辑', () => {
     });
 
     it('canvas context 为 null 时返回原始标签', () => {
-      const origCreateElement = document.createElement.bind(document);
+      const origCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
       vi.spyOn(document, 'createElement').mockImplementation((tag: string, options?: any) => {
         if (tag === 'canvas') {
           return { getContext: () => null } as any;

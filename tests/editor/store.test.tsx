@@ -103,11 +103,12 @@ describe('EditorStore', () => {
       expect(focusSpy).toHaveBeenCalledWith(editor);
     });
 
-    it('应该处理空文档情况', () => {
+    it('应该处理空文档情况', async () => {
       editor.children = [];
       const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
 
       store.focus();
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(insertNodesSpy).toHaveBeenCalledWith(
         editor,
@@ -116,11 +117,12 @@ describe('EditorStore', () => {
       );
     });
 
-    it('应该设置光标到文档末尾', () => {
+    it('应该设置光标到文档末尾', async () => {
       const endSpy = vi.spyOn(Editor, 'end');
       const selectSpy = vi.spyOn(Transforms, 'select');
 
       store.focus();
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(endSpy).toHaveBeenCalledWith(editor, []);
       expect(selectSpy).toHaveBeenCalled();
@@ -1136,7 +1138,7 @@ describe('EditorStore', () => {
         return 1 as any;
       });
 
-      vi.spyOn(ReactEditor, 'focus').mockImplementation(() => {
+      vi.spyOn(ReactEditor, 'focus').mockImplementation(function focusThrows() {
         throw new Error('Focus error');
       });
 
@@ -2202,6 +2204,7 @@ describe('EditorStore', () => {
         ] as any;
       });
       vi.spyOn(Path, 'next').mockReturnValue([1]);
+      vi.spyOn(Transforms, 'insertNodes');
 
       store.insertLink('https://link.com');
 

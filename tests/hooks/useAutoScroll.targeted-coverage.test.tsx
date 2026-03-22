@@ -3,11 +3,13 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import useAutoScroll from '../../src/Hooks/useAutoScroll';
 
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+global.ResizeObserver = vi.fn(function MockResizeObserver() {
+  return {
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  };
+});
 
 describe('useAutoScroll targeted coverage', () => {
   let mutationObserverDisconnect: ReturnType<typeof vi.fn>;
@@ -17,11 +19,13 @@ describe('useAutoScroll targeted coverage', () => {
     vi.useFakeTimers();
     mutationObserverDisconnect = vi.fn();
     mutationObserverObserve = vi.fn();
-    global.MutationObserver = vi.fn().mockImplementation((callback: MutationCallback) => ({
-      observe: mutationObserverObserve,
-      disconnect: mutationObserverDisconnect,
-      takeRecords: () => [],
-    }));
+    global.MutationObserver = vi.fn(function MockMutationObserver(callback: MutationCallback) {
+      return {
+        observe: mutationObserverObserve,
+        disconnect: mutationObserverDisconnect,
+        takeRecords: () => [],
+      };
+    });
   });
 
   afterEach(() => {
@@ -87,7 +91,7 @@ describe('useAutoScroll targeted coverage', () => {
 
   it('MutationObserver invokes checkScroll when addedNodes exist', () => {
     let observerCallback: MutationCallback = () => {};
-    global.MutationObserver = vi.fn().mockImplementation((callback: MutationCallback) => {
+    global.MutationObserver = vi.fn(function MockMutationObserver(callback: MutationCallback) {
       observerCallback = callback;
       return {
         observe: mutationObserverObserve,

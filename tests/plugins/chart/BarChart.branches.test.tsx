@@ -290,7 +290,9 @@ describe('BarChart 分支覆盖', () => {
 
   it('getContext 抛异常时 calculateLabelWidth 走 catch 分支', () => {
     // 通过 document.createElement 抛异常来确保进入 catch
-    const origCreate = document.createElement.bind(document);
+    const origCreate = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
     const createSpy = vi
       .spyOn(document, 'createElement')
       .mockImplementation((tag: string, ...args: any[]) => {
