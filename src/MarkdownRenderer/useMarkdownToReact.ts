@@ -25,6 +25,7 @@ import {
   type MarkdownRemarkPlugin,
   type MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
+import { parseChineseCurrencyToNumber } from '../Plugins/chart/utils';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import AnimationText from './AnimationText';
 import type { RendererBlockProps } from './types';
@@ -81,8 +82,17 @@ const extractTableData = (
     row.children.forEach((cell: any, j: number) => {
       if (j < columns.length) {
         const val = extractCellText(cell);
-        const num = Number(val);
-        record[columns[j].dataIndex] = isNaN(num) || val === '' ? val : num;
+        if (val === '') {
+          record[columns[j].dataIndex] = val;
+        } else {
+          const num = Number(val);
+          if (Number.isFinite(num)) {
+            record[columns[j].dataIndex] = num;
+          } else {
+            const cn = parseChineseCurrencyToNumber(val);
+            record[columns[j].dataIndex] = cn !== null ? cn : val;
+          }
+        }
       }
     });
     dataSource.push(record);
@@ -271,9 +281,7 @@ const extractLanguageFromClassName = (
 ): string | undefined => {
   if (!className) return undefined;
   const flat =
-    typeof className === 'string'
-      ? className
-      : className.map(String).join(' ');
+    typeof className === 'string' ? className : className.map(String).join(' ');
   const classes = flat.split(/\s+/).filter(Boolean);
   for (const cls of classes) {
     const match = cls.match(/^language-(.+)$/);
@@ -633,10 +641,10 @@ const buildEditorAlignedComponents = (
       const fenceLang = extractLanguageFromClassName(className);
       return jsx('code' as any, {
         ...rest,
-        'data-testid': fenceLang ? 'markdown-fenced-code' : 'markdown-inline-code',
-        className: fenceLang
-          ? className
-          : `${contentCls}-inline-code`,
+        'data-testid': fenceLang
+          ? 'markdown-fenced-code'
+          : 'markdown-inline-code',
+        className: fenceLang ? className : `${contentCls}-inline-code`,
         children,
       });
     },

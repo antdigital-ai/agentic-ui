@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Loading } from '../../Components/Loading';
 import { ChartRender } from '../../Plugins/chart/ChartRender';
+import { parseChineseCurrencyToNumber } from '../../Plugins/chart/utils';
 import type { RendererBlockProps } from '../types';
 
 const extractTextContent = (children: React.ReactNode): string => {
@@ -269,13 +270,21 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
                 ...rowData,
                 column_list: Object.keys(rowData),
               };
+              const coerceChartAxisCell = (raw: unknown) => {
+                if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+                const n = Number(raw);
+                if (Number.isFinite(n)) return n;
+                if (typeof raw === 'string') {
+                  const cn = parseChineseCurrencyToNumber(raw);
+                  if (cn !== null) return cn;
+                }
+                return raw;
+              };
               if (x && row[x] !== undefined) {
-                const num = Number(row[x]);
-                if (!isNaN(num)) row[x] = num;
+                row[x] = coerceChartAxisCell(row[x]);
               }
               if (y && row[y] !== undefined) {
-                const num = Number(row[y]);
-                if (!isNaN(num)) row[y] = num;
+                row[y] = coerceChartAxisCell(row[y]);
               }
               return row;
             });
