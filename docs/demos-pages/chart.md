@@ -78,6 +78,8 @@ group:
 
 <code src="../demos/charts/bar/bar-with-statistic.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+<code src="../demos/charts/bar/bar-chinese-currency.tsx" background="var(--main-bg-color)" title="中文金额（亿元/万元/元）" iframe=540></code>
+
 <code src="../demos/charts/bar/bar-max-thickness.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ## 漏斗图

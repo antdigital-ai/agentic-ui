@@ -31,6 +31,7 @@ import {
   findDataPointByXValue,
   hexToRgba,
   resolveCssVariable,
+  toNumber,
 } from '../utils';
 import { useStyle } from './style';
 
@@ -374,13 +375,15 @@ const BarChart: React.FC<BarChartProps> = ({
   // 是否是正负柱图（同一批次同时存在正值与负值）
   const hasPositive = useMemo(() => {
     return filteredData.some((item) => {
-      const v = typeof item.y === 'number' ? item.y : Number(item.y);
+      const v =
+        typeof item.y === 'number' ? item.y : toNumber(item.y, Number.NaN);
       return Number.isFinite(v) && v > 0;
     });
   }, [filteredData]);
   const hasNegative = useMemo(() => {
     return filteredData.some((item) => {
-      const v = typeof item.y === 'number' ? item.y : Number(item.y);
+      const v =
+        typeof item.y === 'number' ? item.y : toNumber(item.y, Number.NaN);
       return Number.isFinite(v) && v < 0;
     });
   }, [filteredData]);
@@ -412,7 +415,7 @@ const BarChart: React.FC<BarChartProps> = ({
       const typeData = xValues.map((x) => {
         const dataPoint = findDataPointByXValue(filteredData, x, type);
         const v = dataPoint?.y;
-        const n = typeof v === 'number' ? v : Number(v);
+        const n = typeof v === 'number' ? v : toNumber(v, Number.NaN);
         return Number.isFinite(n) ? n : null;
       });
 
@@ -659,7 +662,8 @@ const BarChart: React.FC<BarChartProps> = ({
 
     // 遍历所有数据点，计算标签文本的最大宽度
     filteredData.forEach((item) => {
-      const value = typeof item.y === 'number' ? item.y : Number(item.y);
+      const value =
+        typeof item.y === 'number' ? item.y : toNumber(item.y, Number.NaN);
       if (Number.isFinite(value)) {
         let labelText = '';
 
