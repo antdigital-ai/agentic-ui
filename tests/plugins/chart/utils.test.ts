@@ -319,6 +319,14 @@ describe('Chart Utils', () => {
       expect(parseChineseCurrencyToNumber('￥100元')).toBe(100);
     });
 
+    it('应该解析 IPO 募资表等「小数 + 空格 + 亿元」写法', () => {
+      const rAndD = parseChineseCurrencyToNumber('35.78 亿元');
+      const manufacturing = parseChineseCurrencyToNumber('6.24 亿元');
+      expect(rAndD).toBe(35.78e8);
+      expect(manufacturing).toBe(6.24e8);
+      expect((rAndD ?? 0) + (manufacturing ?? 0)).toBeCloseTo(42.02e8);
+    });
+
     it('无法识别时应返回 null', () => {
       expect(parseChineseCurrencyToNumber('8%')).toBe(null);
       expect(parseChineseCurrencyToNumber('abc')).toBe(null);
