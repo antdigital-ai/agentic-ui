@@ -161,7 +161,15 @@ const InternalMarkdownRenderer = forwardRef<
     [plugins],
   );
 
-  // 字符队列管理
+  // 字符队列管理：流式时仅对最后 50 字做动画，避免每段逐字输出
+  const resolvedQueueOptions = useMemo(
+    () =>
+      streaming
+        ? { animateTailChars: 50, ...queueOptions }
+        : queueOptions,
+    [streaming, queueOptions],
+  );
+
   useEffect(() => {
     if (!streaming) {
       // 非流式：直接展示全部内容
@@ -172,14 +180,14 @@ const InternalMarkdownRenderer = forwardRef<
     if (!queueRef.current) {
       queueRef.current = new CharacterQueue(
         (displayed) => setDisplayedContent(displayed),
-        queueOptions,
+        resolvedQueueOptions,
       );
     }
 
     queueRef.current.push(content || '');
 
     return undefined;
-  }, [content, streaming, queueOptions]);
+  }, [content, streaming, resolvedQueueOptions]);
 
   // 流式完成时 flush 所有剩余内容
   useEffect(() => {

@@ -177,4 +177,32 @@ describe('CharacterQueue', () => {
 
     queue.dispose();
   });
+
+  it('animateTailChars 为 50 时仅对末尾 50 字做动画', () => {
+    const onFlush = vi.fn();
+    const queue = new CharacterQueue(onFlush, {
+      animate: true,
+      charsPerFrame: 10,
+      animateTailChars: 50,
+    });
+
+    // 100 字内容：前 50 立即展示，后 50 逐字动画
+    const head = 'a'.repeat(50);
+    const tail = 'b'.repeat(50);
+    queue.push(head + tail);
+
+    // push 时立即 flush 前 50 字
+    expect(onFlush).toHaveBeenCalledWith(head);
+    expect(onFlush).toHaveBeenCalledTimes(1);
+
+    // 第一帧：50 + 10 = 60
+    vi.advanceTimersByTime(16);
+    expect(onFlush).toHaveBeenLastCalledWith(head + tail.slice(0, 10));
+
+    // 后续帧直至完成
+    vi.advanceTimersByTime(16 * 4);
+    expect(onFlush).toHaveBeenLastCalledWith(head + tail);
+
+    queue.dispose();
+  });
 });

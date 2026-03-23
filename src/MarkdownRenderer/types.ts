@@ -10,6 +10,12 @@ export interface CharacterQueueOptions {
   charsPerFrame?: number;
   /** 是否启用打字动画，默认 true（流式时） */
   animate?: boolean;
+  /**
+   * 仅对末尾 N 个字符做动画，前面内容立即展示。
+   * 设为 50 时，每次 push 只对最后 50 字逐字输出，避免整段逐字动画。
+   * 默认 undefined 表示整段动画（原有行为）。
+   */
+  animateTailChars?: number;
   /** 动画速度因子，1.0 为标准速度 */
   speed?: number;
   /** 内容完成后立即 flush 全部剩余 */

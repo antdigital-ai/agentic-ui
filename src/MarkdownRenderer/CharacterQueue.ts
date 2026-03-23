@@ -6,7 +6,6 @@ const DEFAULT_CHARS_PER_FRAME = 3;
 const DEFAULT_SPEED = 1.0;
 const DEFAULT_BACKGROUND_INTERVAL = 100;
 const DEFAULT_BACKGROUND_BATCH_MULTIPLIER = 10;
-
 interface ResolvedOptions {
   charsPerFrame: number;
   animate: boolean;
@@ -14,6 +13,8 @@ interface ResolvedOptions {
   flushOnComplete: boolean;
   backgroundInterval: number;
   backgroundBatchMultiplier: number;
+  /** 仅对末尾 N 字做动画，undefined 表示整段动画 */
+  animateTailChars: number | undefined;
 }
 
 /**
@@ -49,6 +50,7 @@ export class CharacterQueue {
       backgroundBatchMultiplier:
         options?.backgroundBatchMultiplier ??
         DEFAULT_BACKGROUND_BATCH_MULTIPLIER,
+      animateTailChars: options?.animateTailChars,
     };
 
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
@@ -67,6 +69,13 @@ export class CharacterQueue {
       this.displayedLength = content.length;
       this.onFlush(content);
       return;
+    }
+    // 仅对末尾 N 字做动画：立即展示前面内容
+    const tail = this.options.animateTailChars;
+    if (tail !== undefined && tail > 0 && content.length > tail) {
+      const staticLength = content.length - tail;
+      this.displayedLength = Math.max(this.displayedLength, staticLength);
+      this.onFlush(content.slice(0, this.displayedLength));
     }
     this.ensureTicking();
   }
