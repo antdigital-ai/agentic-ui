@@ -24,6 +24,7 @@ import {
 import { defaultColorList } from '../const';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
+import { useChartTheme } from '../hooks';
 import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
 
@@ -63,6 +64,8 @@ interface RadarChartProps extends ChartContainerProps {
   classNames?: ChartClassNames;
   /** 数据时间 */
   dataTime?: string;
+  /** 图表主题 */
+  theme?: 'dark' | 'light';
   /** 自定义主色（可选），支持 string 或 string[]；数组按序对应各数据序列 */
   color?: string | string[];
   /** 头部工具条额外按钮 */
@@ -89,6 +92,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
   toolbarExtra,
   renderFilterInToolbar = false,
   dataTime,
+  theme = 'light',
   color,
   statistic: statisticConfig,
   textMaxWidth = 80,
@@ -119,6 +123,9 @@ const RadarChart: React.FC<RadarChartProps> = ({
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('radar-chart');
   const { wrapSSR, hashId } = useStyle(prefixCls);
+
+  // 主题颜色 - 必须在所有条件返回之前调用
+  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
 
   // 处理 ChartStatistic 组件配置
   const statistics = useMemo(() => {
@@ -333,13 +340,6 @@ const RadarChart: React.FC<RadarChartProps> = ({
     };
   });
 
-  // 构建当前配置（用于主题等设置）
-  const currentConfig = {
-    theme: 'light' as const,
-    showLegend: true,
-    legendPosition: 'right' as const,
-  };
-
   // 筛选器的枚举，添加安全检查
   const filterEnum =
     categories.length > 0
@@ -386,16 +386,12 @@ const RadarChart: React.FC<RadarChartProps> = ({
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: currentConfig.showLegend !== false,
+        display: true,
         position: isMobile
           ? 'bottom'
-          : ((currentConfig.legendPosition || 'right') as
-              | 'top'
-              | 'left'
-              | 'bottom'
-              | 'right'),
+          : 'right',
         labels: {
-          color: currentConfig.theme === 'light' ? '#767E8B' : '#fff',
+          color: axisTextColor,
           font: {
             size: isMobile ? 10 : 12,
             weight: 'normal',
@@ -504,7 +500,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
             dataPoint?.dataset?.borderColor?.toString() || '#388BFF';
 
           // 创建 HTML 内容
-          const isDark = currentConfig.theme !== 'light';
+          const isDark = !isLight;
           const bgColor = isDark
             ? 'rgba(0, 0, 0, 0.8)'
             : 'rgba(255, 255, 255, 0.95)';
@@ -572,7 +568,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
                    letter-spacing: 0.04em;
                    font-variation-settings: 'opsz' auto;
                    font-feature-settings: 'kern' on;
-                   color: #343A45;
+                   color: ${isDark ? '#F9FAFB' : '#343A45'};
                    white-space: nowrap;
                  ">${value}</span>
                </div>
@@ -598,10 +594,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
         min: 0,
         ticks: {
           stepSize: isMobile ? 25 : 20, // 移动端减少刻度线以避免拥挤
-          color:
-            currentConfig.theme === 'light'
-              ? 'rgba(0, 25, 61, 0.3255)'
-              : '#fff',
+          color: axisTextColor,
           font: {
             size: isMobile ? 8 : 10,
           },
@@ -612,24 +605,15 @@ const RadarChart: React.FC<RadarChartProps> = ({
           },
         },
         grid: {
-          color:
-            currentConfig.theme === 'light'
-              ? 'rgba(0, 0, 0, 0.1)'
-              : 'rgba(255, 255, 255, 0.2)',
+          color: gridColor,
           lineWidth: 1,
         },
         angleLines: {
-          color:
-            currentConfig.theme === 'light'
-              ? 'rgba(0, 0, 0, 0.1)'
-              : 'rgba(255, 255, 255, 0.2)',
+          color: gridColor,
           lineWidth: 1,
         },
         pointLabels: {
-          color:
-            currentConfig.theme === 'light'
-              ? 'rgba(0, 25, 61, 0.3255)'
-              : '#fff',
+          color: axisTextColor,
           font: {
             size: isMobile ? 10 : 12,
             weight: 500,
@@ -663,7 +647,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
-        theme={currentConfig.theme}
+        theme={theme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -691,7 +675,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
                   selectedCustomSelection: selectedFilterLabel,
                   onSelectionChange: setSelectedFilterLabel,
                 })}
-                theme={currentConfig.theme}
+                theme={theme}
                 variant="compact"
               />
             ) : undefined
@@ -708,7 +692,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
               selectedCustomSelection: selectedFilterLabel,
               onSelectionChange: setSelectedFilterLabel,
             })}
-            theme={currentConfig.theme}
+            theme={theme}
           />
         )}
 
@@ -721,7 +705,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
               <ChartStatistic
                 key={index}
                 {...config}
-                theme={currentConfig.theme}
+                theme={theme}
               />
             ))}
           </div>

@@ -32,6 +32,7 @@ import {
   useMobile,
   useResponsiveDimensions,
 } from './hooks';
+import { useChartTheme } from '../hooks';
 import LegendView from './Legend';
 import {
   createBackgroundArcPlugin,
@@ -98,6 +99,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   title,
   showToolbar = true,
   onDownload,
+  theme = 'light',
   dataTime,
   filterList,
   selectedFilter,
@@ -126,6 +128,9 @@ const DonutChart: React.FC<DonutChartProps> = ({
 
   const { isMobile, windowWidth } = useMobile();
   const locale = useLocale();
+
+  // 使用 useChartTheme hook 获取主题相关颜色
+  const { isLight } = useChartTheme(theme);
 
   // 默认配置：当 configs 不传时，使用默认配置，showLegend 默认为 true
   const defaultConfigs: DonutChartConfig[] = [{ showLegend: true }];
@@ -282,8 +287,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
   const finalSelectedFilter = selectedFilter || internalSelectedCategory;
   const finalOnFilterChange = onFilterChange || handleInternalCategoryChange;
 
-  const chartFilterTheme: 'light' | 'dark' =
-    (finalConfigs[0]?.theme as 'light' | 'dark') || 'light';
+  // 使用组件级别的 theme prop，而不是从 configs 中获取
+  const chartFilterTheme: 'light' | 'dark' = theme;
 
   const dimensions = useResponsiveDimensions(
     isMobile,
@@ -497,7 +502,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
             );
           })();
 
-          const isDarkTheme = cfg.theme === 'dark';
+          const isDarkTheme = !isLight;
           const tooltipBackgroundColor = isDarkTheme ? '#1F2937' : '#FFFFFF';
           const tooltipBorderColor = isDarkTheme ? '#374151' : '#E5E7EB';
           const tooltipTitleColor = isDarkTheme ? '#F9FAFB' : '#111827';
@@ -593,7 +598,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                         ? `${labelStr}: ${pct}%`
                         : `${value} (${pct}%)`;
                     },
-                    color: isDarkTheme ? '#fff' : '#343A45',
+                    color: isDarkTheme ? '#F9FAFB' : '#343A45',
                     font: { size: isMobile ? 10 : 11, weight: 'normal' },
                     anchor: 'end',
                     align: 'end',

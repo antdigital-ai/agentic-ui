@@ -36,6 +36,8 @@ export interface DonutChartProps extends ChartContainerProps {
   title?: string;
   showToolbar?: boolean;
   onDownload?: () => void;
+  /** 图表主题 */
+  theme?: 'light' | 'dark';
   /** 数据时间 */
   dataTime?: string;
   /** 筛选项列表，不传时不显示筛选器 */

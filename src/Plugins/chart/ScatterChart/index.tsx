@@ -24,6 +24,7 @@ import { defaultColorList } from '../const';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
+import { useChartTheme } from '../hooks';
 import { useStyle } from './style';
 
 let scatterChartComponentsRegistered = false;
@@ -52,6 +53,8 @@ export interface ScatterChartProps extends ChartContainerProps {
   classNames?: ChartClassNames;
   /** 数据时间 */
   dataTime?: string;
+  /** 图表主题 */
+  theme?: 'dark' | 'light';
   /** 自定义主色（可选），支持 string 或 string[]；数组按序对应各数据序列 */
   color?: string | string[];
   /** 头部工具条额外按钮 */
@@ -105,6 +108,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   hiddenX = false,
   hiddenY = false,
   showGrid = true,
+  theme = 'light',
   color,
   statistic: statisticConfig,
   textMaxWidth = 80,
@@ -128,6 +132,9 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('scatter-chart');
   const { wrapSSR, hashId } = useStyle(prefixCls);
+
+  // 主题颜色 - 必须在所有条件返回之前调用
+  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
 
   // 处理 ChartStatistic 组件配置
   const statistics = useMemo(() => {
@@ -339,13 +346,6 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     };
   });
 
-  // 构建当前配置（应用默认值）
-  const currentConfig = {
-    theme: 'light' as const,
-    showLegend: true,
-    legendPosition: 'bottom' as const,
-  };
-
   // 筛选器的枚举，添加安全检查
   const filterEnum =
     categories.length > 0
@@ -386,17 +386,13 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: currentConfig.showLegend !== false,
+        display: true,
         position: isMobile
           ? 'bottom'
-          : ((currentConfig.legendPosition || 'bottom') as
-              | 'top'
-              | 'left'
-              | 'bottom'
-              | 'right'),
+          : 'bottom',
         align: 'start',
         labels: {
-          color: currentConfig.theme === 'light' ? '#767E8B' : '#fff',
+          color: axisTextColor,
           font: {
             size: isMobile ? 10 : 12,
             weight: 'normal',
@@ -517,7 +513,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
             dataPoint?.dataset?.borderColor?.toString() || '#917EF7';
 
           // 创建 HTML 内容
-          const isDark = currentConfig.theme !== 'light';
+          const isDark = !isLight;
           const bgColor = isDark
             ? 'rgba(0, 0, 0, 0.8)'
             : 'rgba(255, 255, 255, 0.95)';
@@ -585,7 +581,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
                   letter-spacing: 0.04em;
                   font-variation-settings: 'opsz' auto;
                   font-feature-settings: 'kern' on;
-                  color: #343A45;
+                  color: ${isDark ? '#F9FAFB' : '#343A45'};
                   white-space: nowrap;
                 ">${coordinates}</span>
               </div>
@@ -612,10 +608,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         title: {
           display: !!xAxisLabel,
           text: xAxisLabel || '',
-          color:
-            currentConfig.theme === 'light'
-              ? 'rgba(0, 25, 61, 0.3255)'
-              : '#fff',
+          color: axisTextColor,
           font: {
             size: isMobile ? 10 : 12,
             weight: 500,
@@ -625,10 +618,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         max: 12, // 使用默认值
         ticks: {
           stepSize: 1, // 使用默认值
-          color:
-            currentConfig.theme === 'light'
-              ? 'rgba(0, 25, 61, 0.3255)'
-              : '#fff',
+          color: axisTextColor,
           font: {
             size: isMobile ? 8 : 10,
           },
@@ -638,7 +628,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         },
         grid: {
           display: showGrid,
-          color: 'rgba(0, 16, 32, 0.0627)',
+          color: gridColor,
           lineWidth: 1,
         },
       },
@@ -649,10 +639,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         title: {
           display: !!yAxisLabel,
           text: yAxisLabel || '',
-          color:
-            currentConfig.theme === 'light'
-              ? 'rgba(0, 25, 61, 0.3255)'
-              : '#fff',
+          color: axisTextColor,
           font: {
             family: 'PingFang SC',
             size: isMobile ? 10 : 12,
@@ -664,10 +651,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         max: 100, // 使用默认值
         ticks: {
           stepSize: 10, // 使用默认值
-          color:
-            currentConfig.theme === 'light'
-              ? 'rgba(0, 25, 61, 0.3255)'
-              : '#fff',
+          color: axisTextColor,
           font: {
             family: 'PingFang SC',
             size: isMobile ? 8 : 12,
@@ -679,7 +663,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         },
         grid: {
           display: showGrid,
-          color: 'rgba(0, 16, 32, 0.0627)',
+          color: gridColor,
           lineWidth: 1,
         },
       },
@@ -709,7 +693,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
-        theme={currentConfig.theme}
+        theme={theme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -737,7 +721,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
                   selectedCustomSelection: selectedFilterLabel,
                   onSelectionChange: setSelectedFilterLabel,
                 })}
-                theme={currentConfig.theme}
+                theme={theme}
                 variant="compact"
               />
             ) : undefined
@@ -754,7 +738,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
               selectedCustomSelection: selectedFilterLabel,
               onSelectionChange: setSelectedFilterLabel,
             })}
-            theme={currentConfig.theme}
+            theme={theme}
           />
         )}
 
@@ -771,7 +755,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
               <ChartStatistic
                 key={index}
                 {...config}
-                theme={currentConfig.theme}
+                theme={theme}
               />
             ))}
           </div>

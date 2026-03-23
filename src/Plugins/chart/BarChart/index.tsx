@@ -33,6 +33,7 @@ import {
   resolveCssVariable,
   toNumber,
 } from '../utils';
+import { useChartTheme } from '../hooks';
 import { useStyle } from './style';
 
 /**
@@ -630,11 +631,8 @@ const BarChart: React.FC<BarChartProps> = ({
     }));
   }, [filterLabels]);
 
-  const isLight = theme === 'light';
-  const axisTextColor = isLight
-    ? 'rgba(0, 25, 61, 0.3255)'
-    : 'rgba(255, 255, 255, 0.8)';
-  const gridColor = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.2)';
+  // 使用 useChartTheme hook 获取主题相关颜色
+  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
 
   // 标签宽度计算函数
   const calculateLabelWidth = (text: string, fontSize: number = 11): number => {

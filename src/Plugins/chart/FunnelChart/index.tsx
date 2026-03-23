@@ -30,6 +30,7 @@ import {
   resolveCssVariable,
   toNumber,
 } from '../utils';
+import { useChartTheme } from '../hooks';
 import { useStyle } from './style';
 
 let funnelChartComponentsRegistered = false;
@@ -427,10 +428,8 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     return filterLabels?.map((l) => ({ key: l, label: l }));
   }, [filterLabels]);
 
-  const isLight = theme === 'light';
-  const axisTextColor = isLight
-    ? 'rgba(0, 25, 61, 0.3255)'
-    : 'rgba(255, 255, 255, 0.8)';
+  // 使用 useChartTheme hook 获取主题相关颜色
+  const { axisTextColor, isLight } = useChartTheme(theme);
 
   const options: ChartOptions<'bar'> = {
     responsive: true,
