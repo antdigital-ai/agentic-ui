@@ -23,12 +23,16 @@ describe('loadChartRuntime', () => {
 
     expect(runtime).toHaveProperty('AreaChart');
     expect(runtime).toHaveProperty('BarChart');
+    expect(runtime).toHaveProperty('BoxPlotChart');
     expect(runtime).toHaveProperty('DonutChart');
     expect(runtime).toHaveProperty('FunnelChart');
+    expect(runtime).toHaveProperty('HistogramChart');
     expect(runtime).toHaveProperty('LineChart');
     expect(runtime).toHaveProperty('RadarChart');
     expect(runtime).toHaveProperty('ScatterChart');
     expect(typeof runtime.AreaChart).toBe('function');
+    expect(typeof runtime.BoxPlotChart).toBe('function');
+    expect(typeof runtime.HistogramChart).toBe('function');
     expect(typeof runtime.LineChart).toBe('function');
   });
 
