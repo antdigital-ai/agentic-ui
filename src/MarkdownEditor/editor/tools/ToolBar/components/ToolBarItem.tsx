@@ -44,21 +44,22 @@ export const ToolBarItem = React.memo<ToolBarItemProps>(
       [onMouseDown],
     );
 
-    return (
-      <Tooltip title={title}>
-        <div
-          role={role}
-          className={className}
-          style={style}
-          onClick={handleClick}
-          onMouseDown={handleMouseDown}
-          onMouseEnter={onMouseEnter}
-          tabIndex={tabIndex}
-        >
-          {children || icon}
-        </div>
-      </Tooltip>
+    const content = (
+      <div
+        role={role}
+        className={className}
+        style={style}
+        onClick={handleClick}
+        onMouseDown={handleMouseDown}
+        onMouseEnter={onMouseEnter}
+        tabIndex={tabIndex}
+      >
+        {children || icon}
+      </div>
     );
+
+    // 仅在有 title 时使用 Tooltip，避免 rc-resize-observer 的 findDOMNode 弃用警告
+    return title ? <Tooltip title={title}>{content}</Tooltip> : content;
   },
 );
 

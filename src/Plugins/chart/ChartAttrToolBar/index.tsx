@@ -1,6 +1,7 @@
 import { DeleteOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
 import React, { useContext, useRef } from 'react';
+import clsx from 'clsx';
 import { NodeEntry, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { I18nContext } from '../../../I18n';
@@ -83,7 +84,7 @@ export const ChartAttrToolBar: React.FC<{
   const { wrapSSR, hashId } = useStyle(baseClassName);
   return wrapSSR(
     <div
-      className={[baseClassName, hashId].filter(Boolean).join(' ')}
+      className={clsx(baseClassName, hashId)}
       style={{
         width: 'auto',
       }}
@@ -111,9 +112,7 @@ export const ChartAttrToolBar: React.FC<{
           return (
             <div
               key={index}
-              className={[`${baseClassName}-item`, hashId]
-                .filter(Boolean)
-                .join(' ')}
+              className={clsx(`${baseClassName}-item`, hashId)}
               onClick={item.onClick}
               style={item.style}
             >
@@ -124,9 +123,7 @@ export const ChartAttrToolBar: React.FC<{
         return (
           <Tooltip mouseEnterDelay={0.3} key={index} title={item.title}>
             <div
-              className={[`${baseClassName}-item`, hashId]
-                .filter(Boolean)
-                .join(' ')}
+              className={clsx(`${baseClassName}-item`, hashId)}
               onClick={item.onClick}
             >
               {item.icon}
@@ -137,9 +134,7 @@ export const ChartAttrToolBar: React.FC<{
       {readonly ? null : (
         <Tooltip mouseEnterDelay={0.3} title={i18n?.locale?.delete || '删除'}>
           <div
-            className={[`${baseClassName}-item`, hashId]
-              .filter(Boolean)
-              .join(' ')}
+            className={clsx(`${baseClassName}-item`, hashId)}
           >
             <DeleteOutlined onClick={remove} />
           </div>

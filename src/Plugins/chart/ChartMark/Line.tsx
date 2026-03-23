@@ -8,7 +8,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import React, { useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Line as ChartLine } from 'react-chartjs-2';
 import { isWindowDefined } from '../env';
 import { stringFormatNumber } from '../utils';
@@ -17,7 +17,7 @@ import { ChartProps } from './useChart';
 
 let chartMarkLineRegistered = false;
 
-export const Line: React.FC<ChartProps> = (props) => {
+export const Line = forwardRef<ChartJS, ChartProps>((props, ref) => {
   React.useMemo(() => {
     if (chartMarkLineRegistered) {
       return undefined;
@@ -44,7 +44,7 @@ export const Line: React.FC<ChartProps> = (props) => {
   const htmlRef = useRef<HTMLDivElement>(null);
   const lineChartRef = useRef<any>(null);
 
-  useImperativeHandle(props.chartRef, () => chartRef.current, [
+  useImperativeHandle(ref, () => chartRef.current as ChartJS, [
     chartRef.current,
   ]);
 
@@ -183,4 +183,6 @@ export const Line: React.FC<ChartProps> = (props) => {
       <ChartLine ref={lineChartRef} data={chartData} options={options} />
     </Container>
   );
-};
+});
+
+Line.displayName = 'Line';

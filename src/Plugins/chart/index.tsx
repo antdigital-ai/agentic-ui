@@ -36,9 +36,11 @@ export { ChartRender } from './ChartRender';
 // 图表组件导出
 export { default as AreaChart } from './AreaChart';
 export { default as BarChart } from './BarChart';
+export { default as BoxPlotChart } from './BoxPlotChart';
 export { default as ChartStatistic } from './ChartStatistic';
 export { default as DonutChart } from './DonutChart';
 export { default as FunnelChart } from './FunnelChart';
+export { default as HistogramChart } from './HistogramChart';
 export { default as LineChart } from './LineChart';
 export { default as RadarChart } from './RadarChart';
 export { default as ScatterChart } from './ScatterChart';
@@ -55,6 +57,10 @@ export type {
   BarChartProps,
 } from './BarChart';
 export type {
+  BoxPlotChartDataItem,
+  BoxPlotChartProps,
+} from './BoxPlotChart';
+export type {
   ChartStatisticClassNames,
   ChartStatisticProps,
   ChartStatisticStyles,
@@ -65,6 +71,10 @@ export type {
   DonutChartProps,
 } from './DonutChart';
 export type { FunnelChartDataItem, FunnelChartProps } from './FunnelChart';
+export type {
+  HistogramChartDataItem,
+  HistogramChartProps,
+} from './HistogramChart';
 export type {
   LineChartConfigItem,
   LineChartDataItem,

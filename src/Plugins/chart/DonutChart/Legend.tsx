@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 
 import { useLocale } from '../../../I18n';
@@ -72,7 +73,7 @@ const DonutChartLegend: React.FC<DonutLegendProps> = ({
 
   return (
     <div
-      className={[`${baseClassName}-legend`, hashId].filter(Boolean).join(' ')}
+      className={clsx(`${baseClassName}-legend`, hashId)}
       style={{
         marginLeft: isMobile ? 0 : 12,
         ...(isMobile
@@ -99,9 +100,7 @@ const DonutChartLegend: React.FC<DonutLegendProps> = ({
           return (
             <div
               key={dataIndex}
-              className={[`${baseClassName}-legend-item`, hashId]
-                .filter(Boolean)
-                .join(' ')}
+              className={clsx(`${baseClassName}-legend-item`, hashId)}
               style={{
                 cursor: 'pointer',
                 padding: isMobile ? '4px 0' : '6px 0',
@@ -121,9 +120,7 @@ const DonutChartLegend: React.FC<DonutLegendProps> = ({
               aria-label={`${isHidden ? locale['chart.legend.show'] : locale['chart.legend.hide']} ${d.label}`}
             >
               <span
-                className={[`${baseClassName}-legend-color`, hashId]
-                  .filter(Boolean)
-                  .join(' ')}
+                className={clsx(`${baseClassName}-legend-color`, hashId)}
                 style={{
                   ['--donut-legend-color' as any]:
                     backgroundColors[dataIndex] || '#ccc',
@@ -134,9 +131,7 @@ const DonutChartLegend: React.FC<DonutLegendProps> = ({
                 }}
               />
               <span
-                className={[`${baseClassName}-legend-label`, hashId]
-                  .filter(Boolean)
-                  .join(' ')}
+                className={clsx(`${baseClassName}-legend-label`, hashId)}
                 style={{
                   color: legendMutedColor,
                   fontSize: isMobile ? 11 : 13,
@@ -147,9 +142,7 @@ const DonutChartLegend: React.FC<DonutLegendProps> = ({
                 {d.label}
               </span>
               <span
-                className={[`${baseClassName}-legend-value`, hashId]
-                  .filter(Boolean)
-                  .join(' ')}
+                className={clsx(`${baseClassName}-legend-value`, hashId)}
                 style={{
                   color: legendStrongColor,
                   fontSize: isMobile ? 11 : 13,
@@ -162,9 +155,7 @@ const DonutChartLegend: React.FC<DonutLegendProps> = ({
               >
                 <span>{d.value}</span>
                 <span
-                  className={[`${baseClassName}-legend-percent`, hashId]
-                    .filter(Boolean)
-                    .join(' ')}
+                  className={clsx(`${baseClassName}-legend-percent`, hashId)}
                   style={{
                     color: legendStrongColor,
                     fontSize: isMobile ? 10 : 12,
@@ -188,13 +179,17 @@ const DonutChartLegend: React.FC<DonutLegendProps> = ({
       </div>
       {totalPages > 1 && (
         <div
-          className={[`${baseClassName}-legend-pagination`, hashId]
-            .filter(Boolean)
-            .join(' ')}
-          style={{
-            ...(isMobile ? { flexShrink: 0 } : {}),
-            ...(isDark ? { borderTopColor: 'rgba(255,255,255,0.12)' } : {}),
-          }}
+          className={clsx(`${baseClassName}-legend-pagination`, hashId)}
+          style={
+            isMobile || isDark
+              ? {
+                  ...(isMobile ? { flexShrink: 0 } : {}),
+                  ...(isDark
+                    ? { borderTopColor: 'rgba(255,255,255,0.12)' }
+                    : {}),
+                }
+              : undefined
+          }
         >
           <button
             type="button"

@@ -1,5 +1,6 @@
-import { DownloadOutlined } from '@ant-design/icons';
+import { CopyOutlined, DownloadOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
+import clsx from 'clsx';
 import React, { useContext } from 'react';
 import { Loading } from '../../../../Components/Loading';
 import { I18nContext } from '../../../../I18n';
@@ -50,6 +51,8 @@ export interface ChartToolBarProps {
   theme?: 'light' | 'dark';
   /** 下载回调函数 */
   onDownload?: () => void;
+  /** 复制 Markdown 回调函数 */
+  onCopyMarkdown?: () => void;
   /** 额外内容 */
   extra?: React.ReactNode;
   /** 过滤器内容 */
@@ -92,6 +95,7 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
   styles,
   theme = 'light',
   onDownload,
+  onCopyMarkdown,
   extra,
   filter,
   loading = false,
@@ -107,19 +111,23 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
     }
   };
 
+  const handleCopyMarkdown = () => {
+    if (onCopyMarkdown) {
+      onCopyMarkdown();
+    }
+  };
+
   if (!title && !extra) {
     return null;
   }
 
-  const mergedClassName = [
+  const mergedClassName = clsx(
     prefixCls,
     `${prefixCls}-${theme}`,
     hashId,
     className,
     classNames,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  );
   const mergedStyle = {
     ...style,
     ...(Array.isArray(styles) ? Object.assign({}, ...styles) : styles || {}),
@@ -128,11 +136,7 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
   return wrapSSR(
     <div className={mergedClassName} style={mergedStyle}>
       {/* 左侧标题 */}
-      <div
-        className={[`${prefixCls}-header-title`, hashId]
-          .filter(Boolean)
-          .join(' ')}
-      >
+      <div className={clsx(`${prefixCls}-header-title`, hashId)}>
         {title}
         {loading && (
           <Loading
@@ -146,38 +150,35 @@ const ChartToolBar: React.FC<ChartToolBarProps> = ({
       </div>
 
       {/* 右侧时间+下载按钮 */}
-      <div
-        className={[`${prefixCls}-header-actions`, hashId]
-          .filter(Boolean)
-          .join(' ')}
-      >
+      <div className={clsx(`${prefixCls}-header-actions`, hashId)}>
         {dataTime ? (
           <>
-            <TimeIcon
-              className={[`${prefixCls}-time-icon`, hashId]
-                .filter(Boolean)
-                .join(' ')}
-            />
-            <span
-              className={[`${prefixCls}-data-time`, hashId]
-                .filter(Boolean)
-                .join(' ')}
-            >
+            <TimeIcon className={clsx(`${prefixCls}-time-icon`, hashId)} />
+            <span className={clsx(`${prefixCls}-data-time`, hashId)}>
               {i18n?.locale?.dataTime || '数据时间'}: {dataTime}
             </span>
           </>
         ) : null}
         {filter}
         {extra}
-        {handleDownload ? (
+        {onCopyMarkdown ? (
+          <Tooltip
+            mouseEnterDelay={0.3}
+            title={i18n?.locale?.copyMarkdown || '复制表格'}
+          >
+            <CopyOutlined
+              className={clsx(`${prefixCls}-copy-btn`, hashId)}
+              onClick={handleCopyMarkdown}
+            />
+          </Tooltip>
+        ) : null}
+        {onDownload ? (
           <Tooltip
             mouseEnterDelay={0.3}
             title={i18n?.locale?.download || '下载'}
           >
             <DownloadOutlined
-              className={[`${prefixCls}-download-btn`, hashId]
-                .filter(Boolean)
-                .join(' ')}
+              className={clsx(`${prefixCls}-download-btn`, hashId)}
               onClick={handleDownload}
             />
           </Tooltip>

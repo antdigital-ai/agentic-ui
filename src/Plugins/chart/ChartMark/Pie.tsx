@@ -1,5 +1,5 @@
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
-import React, { useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { defaultColorList } from '../const';
 import { isWindowDefined } from '../env';
@@ -8,7 +8,7 @@ import { ChartProps } from './useChart';
 
 let chartMarkPieRegistered = false;
 
-export const Pie: React.FC<ChartProps> = (props) => {
+export const Pie = forwardRef<ChartJS, ChartProps>((props, ref) => {
   React.useMemo(() => {
     if (chartMarkPieRegistered) {
       return undefined;
@@ -27,7 +27,7 @@ export const Pie: React.FC<ChartProps> = (props) => {
   const htmlRef = useRef<HTMLDivElement>(null);
   const pieChartRef = useRef<any>(null);
 
-  useImperativeHandle(props.chartRef, () => chartRef.current, [
+  useImperativeHandle(ref, () => chartRef.current as ChartJS, [
     chartRef.current,
   ]);
 
@@ -88,4 +88,6 @@ export const Pie: React.FC<ChartProps> = (props) => {
       <Doughnut ref={pieChartRef} data={chartData} options={options} />
     </Container>
   );
-};
+});
+
+Pie.displayName = 'Pie';

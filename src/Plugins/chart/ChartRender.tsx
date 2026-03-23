@@ -1,7 +1,15 @@
-import { DownOutlined, SettingOutlined } from '@ant-design/icons';
+import { CopyOutlined, DownOutlined, SettingOutlined } from '@ant-design/icons';
 import { ProForm, ProFormSelect } from '@ant-design/pro-components';
-import { ConfigProvider, Descriptions, Dropdown, Popover, Table } from 'antd';
+import {
+  ConfigProvider,
+  Descriptions,
+  Dropdown,
+  message,
+  Popover,
+  Table,
+} from 'antd';
 import { DescriptionsItemType } from 'antd/es/descriptions';
+import copy from 'copy-to-clipboard';
 import React, { lazy, Suspense, useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
@@ -55,19 +63,19 @@ const getChartMap = (i18n: any) => ({
   },
   bar: {
     title: i18n?.locale?.barChart || '条形图',
-    changeData: ['column', 'line', 'area', 'table'],
+    changeData: ['column', 'line', 'area', 'histogram', 'boxplot', 'table'],
   },
   line: {
     title: i18n?.locale?.lineChart || '折线图',
-    changeData: ['column', 'bar', 'area', 'table'],
+    changeData: ['column', 'bar', 'area', 'histogram', 'boxplot', 'table'],
   },
   column: {
     title: i18n?.locale?.columnChart || '柱状图',
-    changeData: ['bar', 'line', 'area', 'table'],
+    changeData: ['bar', 'line', 'area', 'histogram', 'boxplot', 'table'],
   },
   area: {
     title: i18n?.locale?.areaChart || '面积图',
-    changeData: ['column', 'bar', 'line', 'table'],
+    changeData: ['column', 'bar', 'line', 'histogram', 'boxplot', 'table'],
   },
   radar: {
     title: i18n?.locale?.radarChart || '雷达图',
@@ -75,11 +83,19 @@ const getChartMap = (i18n: any) => ({
   },
   scatter: {
     title: i18n?.locale?.scatterChart || '散点图',
-    changeData: ['table'],
+    changeData: ['histogram', 'boxplot', 'table'],
   },
   funnel: {
     title: i18n?.locale?.funnelChart || '漏斗图',
     changeData: ['table'],
+  },
+  boxplot: {
+    title: i18n?.locale?.boxplotChart || '箱线图',
+    changeData: ['histogram', 'column', 'bar', 'table'],
+  },
+  histogram: {
+    title: i18n?.locale?.histogramChart || '直方图',
+    changeData: ['boxplot', 'column', 'bar', 'table'],
   },
   table: {
     title: i18n?.locale?.table || '表格',
@@ -93,6 +109,8 @@ const getChartMap = (i18n: any) => ({
       'radar',
       'scatter',
       'funnel',
+      'boxplot',
+      'histogram',
     ],
   },
   descriptions: {
@@ -115,7 +133,9 @@ const ChartRuntimeRendererImpl: React.FC<{
     | 'area'
     | 'radar'
     | 'scatter'
-    | 'funnel';
+    | 'funnel'
+    | 'boxplot'
+    | 'histogram';
   runtime: ChartRuntime;
   convertDonutData: any[];
   convertFlatData: any[];
@@ -129,6 +149,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   colorLegend?: string;
   chartData: Record<string, any>[];
   getFieldValue: (row: any, field?: string) => string | undefined;
+  getFieldValueSafely: (row: any, field?: string) => any;
   loading?: boolean;
 }> = ({
   chartType,
@@ -144,6 +165,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   colorLegend,
   chartData,
   getFieldValue,
+  getFieldValueSafely,
   loading = false,
 }) => {
   const i18n = useContext(I18nContext);
@@ -152,6 +174,8 @@ const ChartRuntimeRendererImpl: React.FC<{
     FunnelChart,
     AreaChart,
     BarChart,
+    BoxPlotChart,
+    HistogramChart,
     LineChart,
     RadarChart,
     ScatterChart,
@@ -352,6 +376,98 @@ const ChartRuntimeRendererImpl: React.FC<{
     );
   }
 
+  if (chartType === 'boxplot') {
+    // 箱线图数据转换：将原始数据按标签分组
+    const boxplotData: {
+      label: string;
+      values: number[];
+      type?: string;
+      category?: string;
+    }[] = [];
+    const groupedByLabel: Record<
+      string,
+      { values: number[]; type?: string; category?: string }
+    > = {};
+
+    (chartData || []).forEach((row: any) => {
+      const label = getFieldValue(row, config?.x) || '默认';
+      const value = getFieldValueSafely(row, config?.y);
+      const type = getFieldValue(row, colorLegend);
+      const category = getFieldValue(row, groupBy);
+      // filterLabel 用于未来扩展，暂不使用
+
+      const key = `${label}_${type || 'default'}`;
+      if (!groupedByLabel[key]) {
+        groupedByLabel[key] = {
+          values: [],
+          type: type || undefined,
+          category: category || undefined,
+        };
+      }
+      const numValue =
+        typeof value === 'number' ? value : toNumber(value, Number.NaN);
+      if (Number.isFinite(numValue)) {
+        groupedByLabel[key].values.push(numValue);
+      }
+    });
+
+    Object.entries(groupedByLabel).forEach(([key, data]) => {
+      const label = key.split('_')[0];
+      if (data.values.length > 0) {
+        boxplotData.push({
+          label,
+          values: data.values,
+          ...(data.type ? { type: data.type } : {}),
+          ...(data.category ? { category: data.category } : {}),
+        });
+      }
+    });
+
+    return (
+      <BoxPlotChart
+        key={`${config?.index}-boxplot`}
+        data={boxplotData}
+        height={config?.height || 400}
+        title={title || ''}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+        loading={loading}
+      />
+    );
+  }
+
+  if (chartType === 'histogram') {
+    // 直方图数据转换：提取原始值
+    const histogramData = (chartData || []).map((row: any) => {
+      const value = getFieldValueSafely(row, config?.y);
+      const type = getFieldValue(row, colorLegend);
+      const category = getFieldValue(row, groupBy);
+      const filterLabel = getFieldValue(row, filterBy);
+      const numValue =
+        typeof value === 'number' ? value : toNumber(value, Number.NaN);
+
+      return {
+        value: Number.isFinite(numValue) ? numValue : 0,
+        ...(type ? { type } : {}),
+        ...(category ? { category } : {}),
+        ...(filterLabel ? { filterLabel } : {}),
+      };
+    });
+
+    return (
+      <HistogramChart
+        key={`${config?.index}-histogram`}
+        data={histogramData}
+        height={config?.height || 400}
+        title={title || ''}
+        stacked={config?.rest?.stacked ?? true}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+        loading={loading}
+      />
+    );
+  }
+
   return null;
 };
 
@@ -373,7 +489,9 @@ const ChartRuntimeRenderer = lazy(async () => {
         | 'area'
         | 'radar'
         | 'scatter'
-        | 'funnel';
+        | 'funnel'
+        | 'boxplot'
+        | 'histogram';
       convertDonutData: any[];
       convertFlatData: any[];
       config: any;
@@ -386,6 +504,7 @@ const ChartRuntimeRenderer = lazy(async () => {
       colorLegend?: string;
       chartData: Record<string, any>[];
       getFieldValue: (row: any, field?: string) => string | undefined;
+      getFieldValueSafely: (row: any, field?: string) => any;
       loading?: boolean;
     }) => <ChartRuntimeRendererImpl {...props} runtime={runtime} />,
   };
@@ -480,6 +599,8 @@ export const ChartRender: React.FC<{
     | 'radar'
     | 'scatter'
     | 'funnel'
+    | 'boxplot'
+    | 'histogram'
     | 'descriptions'
     | 'table';
   chartData: Record<string, any>[];
@@ -515,6 +636,8 @@ export const ChartRender: React.FC<{
     | 'descriptions'
     | 'table'
     | 'funnel'
+    | 'boxplot'
+    | 'histogram'
   >(() => props.chartType);
   const {
     chartData,
@@ -771,6 +894,54 @@ export const ChartRender: React.FC<{
     'ant-agentic-chart-config-form';
 
   /**
+   * 将表格数据转换为 Markdown 格式
+   */
+  const generateMarkdownTable = () => {
+    const columns = config?.columns || [];
+    const data = chartData || [];
+
+    if (columns.length === 0 || data.length === 0) {
+      return '';
+    }
+
+    // 表头
+    const headerRow = columns
+      .filter((col: any) => col?.title)
+      .map((col: any) => col.title)
+      .join(' | ');
+
+    // 分隔行
+    const separatorRow = columns
+      .filter((col: any) => col?.title)
+      .map(() => '---')
+      .join(' | ');
+
+    // 数据行
+    const dataRows = data.map((row: any) => {
+      return columns
+        .filter((col: any) => col?.title)
+        .map((col: any) => {
+          const value = row[col.dataIndex];
+          return value !== undefined && value !== null ? String(value) : '';
+        })
+        .join(' | ');
+    });
+
+    return [headerRow, separatorRow, ...dataRows].join('\n');
+  };
+
+  /**
+   * 复制表格 Markdown
+   */
+  const handleCopyMarkdown = () => {
+    const markdown = generateMarkdownTable();
+    if (markdown) {
+      copy(markdown);
+      message.success(i18n?.locale?.copySuccess || '复制成功');
+    }
+  };
+
+  /**
    * 图表配置
    */
   const toolBar = useMemo(() => {
@@ -938,6 +1109,15 @@ export const ChartRender: React.FC<{
           <SettingOutlined style={{ color: 'rgba(0, 25, 61, 0.3255)' }} />
         </ActionIconBox>
       </Popover>,
+      <ActionIconBox
+        key="copy-markdown"
+        title={i18n?.locale?.copyMarkdown || '复制表格'}
+      >
+        <CopyOutlined
+          style={{ color: 'rgba(0, 25, 61, 0.3255)' }}
+          onClick={handleCopyMarkdown}
+        />
+      </ActionIconBox>,
     ].filter((item) => !!item) as JSX.Element[];
   }, [
     chartType,
@@ -949,6 +1129,7 @@ export const ChartRender: React.FC<{
     config,
     props.config,
     chartConfigFormPrefixCls,
+    chartData,
   ]);
 
   const chartDom = useMemo(() => {
@@ -1083,6 +1264,7 @@ export const ChartRender: React.FC<{
             colorLegend={colorLegend}
             chartData={chartData}
             getFieldValue={getFieldValue}
+            getFieldValueSafely={getFieldValueSafely}
           />
         </Suspense>
       );
