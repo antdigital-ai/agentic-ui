@@ -209,8 +209,8 @@ const LineChart: React.FC<LineChartProps> = ({
         borderColor: resolvedColor,
         backgroundColor: hexToRgba(resolvedColor, 0.2),
         pointBackgroundColor: resolvedColor,
-        pointBorderColor: '#fff',
-        pointBorderWidth: 1,
+        pointBorderColor: isLight ? '#fff' : resolvedColor,
+        pointBorderWidth: isLight ? 1 : 0,
         borderWidth: 3,
         tension: 0,
         fill: false,
@@ -218,7 +218,7 @@ const LineChart: React.FC<LineChartProps> = ({
     });
 
     return { labels, datasets };
-  }, [filteredData, types, xValues, color]);
+  }, [filteredData, types, xValues, color, isLight]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,

@@ -1,6 +1,7 @@
 ---
 title: ScatterChart 散点图
 atomId: ScatterChart
+order: 7
 group:
   title: 图文输出
   order: 4
@@ -15,32 +16,45 @@ group:
 <code src="../demos/charts/scatter.tsx" background="var(--main-bg-color)" iframe=540></code>
 <code src="../demos/charts/scatter-toolbar-filter.tsx" background="var(--main-bg-color)" title="工具栏过滤器" iframe=540></code>
 <code src="../demos/charts/scatter-statistic.tsx" background="var(--main-bg-color)" title="统计指标" iframe=540></code>
+<code src="../demos/charts/scatter-dark.tsx" background="#141414" title="暗黑主题" iframe=520></code>
 
 ## API
 
 ### ScatterChartProps
 
-| 属性                  | 类型                     | 默认值     | 说明                                                                     |
-| --------------------- | ------------------------ | ---------- | ------------------------------------------------------------------------ |
-| data                  | `ScatterChartDataItem[]` | -          | 扁平化数据数组                                                           |
-| title                 | `string`                 | -          | 图表标题                                                                 |
-| width                 | `number \| string`       | `800`      | 宽度（px），移动端自适应为 100%                                          |
-| height                | `number \| string`       | `600`      | 高度（px），移动端最大约 80% 屏宽（上限 400）                            |
-| className             | `string`                 | -          | 自定义类名                                                               |
-| toolbarExtra          | `React.ReactNode`        | -          | 头部工具条额外按钮                                                       |
-| renderFilterInToolbar | `boolean`                | `false`    | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧） |
-| dataTime              | `string`                 | -          | 数据时间                                                                 |
-| xUnit                 | `string`                 | `'月'`     | X轴单位                                                                  |
-| yUnit                 | `string`                 | -          | Y轴单位                                                                  |
-| xAxisLabel            | `string`                 | -          | X轴标签                                                                  |
-| yAxisLabel            | `string`                 | -          | Y轴标签                                                                  |
-| xPosition             | `'top' \| 'bottom'`      | `'bottom'` | X轴位置                                                                  |
-| yPosition             | `'left' \| 'right'`      | `'left'`   | Y轴位置                                                                  |
-| hiddenX               | `boolean`                | `false`    | 是否隐藏 X 轴                                                            |
-| hiddenY               | `boolean`                | `false`    | 是否隐藏 Y 轴                                                            |
-| showGrid              | `boolean`                | `true`     | 是否显示网格线                                                           |
-| color                 | `string \| string[]`     | -          | 自定义主色；数组按序对应各数据序列                                       |
-| statistic             | `StatisticConfigType`    | -          | 统计数据组件配置                                                         |
+| 属性                  | 类型                                             | 默认值     | 说明                                                                                |
+| --------------------- | ------------------------------------------------ | ---------- | ----------------------------------------------------------------------------------- |
+| data                  | `ScatterChartDataItem[]`                         | -          | 扁平化数据数组                                                                      |
+| title                 | `string`                                         | -          | 图表标题                                                                            |
+| width                 | `number \| string`                               | `800`      | 宽度（px），移动端自适应为 100%                                                     |
+| height                | `number \| string`                               | `600`      | 高度（px），移动端最大约 80% 屏宽（上限 400）                                       |
+| className             | `string`                                         | -          | 自定义类名                                                                          |
+| toolbarExtra          | `React.ReactNode`                                | -          | 头部工具条额外按钮                                                                  |
+| renderFilterInToolbar | `boolean`                                        | `false`    | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧）            |
+| dataTime              | `string`                                         | -          | 数据时间                                                                            |
+| theme                 | `'dark' \| 'light'`                              | `'light'`  | 图表与容器主题；`dark` 时容器内嵌 Ant Design 暗色算法；图例为实心色块并与折线图一致 |
+| xUnit                 | `string`                                         | `'月'`     | X 轴单位                                                                            |
+| yUnit                 | `string`                                         | -          | Y 轴单位                                                                            |
+| xAxisLabel            | `string`                                         | -          | X 轴标签                                                                            |
+| yAxisLabel            | `string`                                         | -          | Y 轴标签                                                                            |
+| xPosition             | `'top' \| 'bottom'`                              | `'bottom'` | X 轴位置                                                                            |
+| yPosition             | `'left' \| 'right'`                              | `'left'`   | Y 轴位置                                                                            |
+| hiddenX               | `boolean`                                        | `false`    | 是否隐藏 X 轴                                                                       |
+| hiddenY               | `boolean`                                        | `false`    | 是否隐藏 Y 轴                                                                       |
+| showGrid              | `boolean`                                        | `true`     | 是否显示网格线                                                                      |
+| color                 | `string \| string[]`                             | -          | 自定义主色；数组按序对应各数据序列                                                  |
+| textMaxWidth          | `number`                                         | `80`       | 图例文字最大宽度（px），超出截断并加省略号                                          |
+| statistic             | `ChartStatisticConfig \| ChartStatisticConfig[]` | -          | 指标卡配置，单个对象或数组                                                          |
+
+### ChartContainerProps（继承）
+
+| 属性       | 类型                        | 默认值  | 说明                                                                            |
+| ---------- | --------------------------- | ------- | ------------------------------------------------------------------------------- |
+| classNames | `ChartClassNames`           | -       | 分层类名：`root`、`toolbar`、`statisticContainer`、`filter`、`wrapper`、`chart` |
+| loading    | `boolean`                   | `false` | 加载态                                                                          |
+| style      | `React.CSSProperties`       | -       | 根容器内联样式                                                                  |
+| styles     | `ChartStyles`               | -       | 与各层 DOM 对应的内联样式                                                       |
+| variant    | `'outline' \| 'borderless'` | -       | 容器描边变体                                                                    |
 
 ### ScatterChartDataItem
 

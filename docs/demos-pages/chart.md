@@ -105,3 +105,16 @@ group:
 ## Mermaid 图表
 
 <code src="../demos/charts/mermaid.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## 暗黑主题
+
+各图表设置 `theme="dark"` 后，内部 Ant Design 控件由 `ChartContainer` 自动套用暗色算法；文档 iframe 使用 `background="#141414"` 作为页面底色。
+
+<code src="../demos/charts/area-dark.tsx" background="#141414" title="面积图" iframe=480></code>
+<code src="../demos/charts/line-dark.tsx" background="#141414" title="折线图" iframe=480></code>
+<code src="../demos/charts/bar/bar-dark.tsx" background="#141414" title="柱状图" iframe=480></code>
+<code src="../demos/charts/radar-dark.tsx" background="#141414" title="雷达图" iframe=480></code>
+<code src="../demos/charts/scatter-dark.tsx" background="#141414" title="散点图" iframe=480></code>
+<code src="../demos/charts/funnel-dark.tsx" background="#141414" title="漏斗图" iframe=440></code>
+<code src="../demos/charts/donut-dark.tsx" background="#141414" title="环形图" iframe=480></code>
+<code src="../demos/charts/chart-statistic-dark.tsx" background="#141414" title="指标卡" iframe=320></code>

@@ -1,6 +1,7 @@
 ---
 title: DonutChart 环形图
 atomId: DonutChart
+order: 3
 group:
   title: 图文输出
   order: 4
@@ -19,6 +20,7 @@ group:
 <code src="../demos/charts/donut/donut-toolbar-filter.tsx" background="var(--main-bg-color)" title="工具栏过滤器" iframe=540></code>
 <code src="../demos/charts/donut/donut-statistic.tsx" background="var(--main-bg-color)" title="统计指标" iframe=540></code>
 <code src="../demos/charts/donut/donut-large-data.tsx" background="var(--main-bg-color)" title="多值-大数据量" iframe=560></code>
+<code src="../demos/charts/donut-dark.tsx" background="#141414" title="暗黑主题" iframe=520></code>
 
 ## API
 
@@ -31,6 +33,7 @@ group:
 | width                 | `number`                                         | `200`                    | 宽度（px），移动端自适应                                                 |
 | height                | `number`                                         | `200`                    | 高度（px），移动端自适应，移动端有最大尺寸限制                           |
 | className             | `string`                                         | -                        | 自定义类名                                                               |
+| theme                 | `'light' \| 'dark'`                              | `'light'`                | 根容器主题，与 `configs[].theme` 配合；`dark` 时容器内嵌 Ant Design 暗色算法，工具栏/筛选与画布一致 |
 | title                 | `string`                                         | -                        | 标题（同时用于工具栏）                                                   |
 | showToolbar           | `boolean`                                        | `true`                   | 是否显示下载/全屏等工具按钮                                              |
 | onDownload            | `() => void`                                     | -                        | 点击下载回调（未传时使用内置下载）                                       |
@@ -43,6 +46,16 @@ group:
 | toolbarExtra          | `React.ReactNode`                                | -                        | 头部工具条额外按钮                                                       |
 | renderFilterInToolbar | `boolean`                                        | `false`                  | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧） |
 | statistic             | `ChartStatisticConfig \| ChartStatisticConfig[]` | -                        | ChartStatistic组件配置：object表示单个配置，array表示多个配置            |
+
+### ChartContainerProps（继承）
+
+| 属性       | 类型                        | 默认值  | 说明                                                                 |
+| ---------- | --------------------------- | ------- | -------------------------------------------------------------------- |
+| classNames | `ChartClassNames`           | -       | 分层类名：`root`、`toolbar`、`statisticContainer`、`filter`、`wrapper`、`chart` |
+| loading    | `boolean`                   | `false` | 加载态                                                               |
+| style      | `React.CSSProperties`       | -       | 根容器内联样式                                                       |
+| styles     | `ChartStyles`               | -       | 与各层 DOM 对应的内联样式                                             |
+| variant    | `'outline' \| 'borderless'` | -       | 容器描边变体                                                         |
 
 ### DonutChartData
 
@@ -58,7 +71,7 @@ group:
 | 字段            | 类型                                     | 默认值                      | 说明                                                                                    |
 | --------------- | ---------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------- |
 | lastModified    | `string`                                 | -                           | 最近更新时间（展示用）                                                                  |
-| theme           | `'light' \| 'dark'`                      | `'light'`                   | 主题风格                                                                                |
+| theme           | `'light' \| 'dark'`                      | `'light'`                   | 单视图主题，与根级 `theme` 配合控制画布与图例配色                                                |
 | cutout          | `string \| number`                       | -                           | 中心空心占比（如 `'60%'`）                                                              |
 | chartStyle      | `'pie' \| 'donut'`                       | `'donut'`                   | 图表样式：饼图或环形图                                                                  |
 | showLegend      | `boolean`                                | `true`                      | 是否显示图例                                                                            |

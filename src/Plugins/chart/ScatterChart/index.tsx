@@ -4,6 +4,7 @@ import {
   Chart as ChartJS,
   ChartOptions,
   Legend,
+  type LegendItem,
   LinearScale,
   LineElement,
   PointElement,
@@ -21,10 +22,10 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
+import { useChartTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
-import { useChartTheme } from '../hooks';
 import { useStyle } from './style';
 
 let scatterChartComponentsRegistered = false;
@@ -247,7 +248,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
-        theme={'light'}
+        theme={theme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -260,6 +261,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
       >
         <ChartToolBar
           title={title || '散点图'}
+          theme={theme}
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}
@@ -387,9 +389,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     plugins: {
       legend: {
         display: true,
-        position: isMobile
-          ? 'bottom'
-          : 'bottom',
+        position: isMobile ? 'bottom' : 'bottom',
         align: 'start',
         labels: {
           color: axisTextColor,
@@ -404,21 +404,38 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
             const original =
               ChartJS.defaults.plugins.legend.labels.generateLabels(chart);
 
+            // 与折线图图例一致：实心色块 + 浅色 1px 白边；散点数据点仍为半透明，仅图例拉齐
+            const withLineLikeSwatch = (label: LegendItem): LegendItem => {
+              const idx = label.datasetIndex ?? 0;
+              const ds = chart.data?.datasets?.[idx];
+              const seriesColor =
+                typeof ds?.borderColor === 'string' && ds.borderColor
+                  ? ds.borderColor
+                  : defaultColorList[0] || '#1677ff';
+              return {
+                ...label,
+                fillStyle: seriesColor,
+                strokeStyle: isLight ? '#fff' : seriesColor,
+                lineWidth: isLight ? 1 : 0,
+              };
+            };
+
             // 创建一个临时 canvas 来测量文字宽度
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            if (!ctx) return original;
+            if (!ctx) return original.map(withLineLikeSwatch);
 
             // 设置字体样式与图例相同
             const fontSize = isMobile ? 10 : 12;
             ctx.font = `${fontSize}px 'PingFang SC', sans-serif`;
 
             return original.map((label) => {
-              const originalText = label.text;
+              const labelAligned = withLineLikeSwatch(label);
+              const originalText = labelAligned.text;
               const textWidth = ctx.measureText(originalText).width;
 
               if (textWidth <= textMaxWidth) {
-                return label;
+                return labelAligned;
               }
 
               // 文字超过最大宽度，需要截断
@@ -439,7 +456,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
               }
 
               return {
-                ...label,
+                ...labelAligned,
                 text: truncatedText + ellipsis,
               };
             });
@@ -706,6 +723,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
       >
         <ChartToolBar
           title={title || '散点图'}
+          theme={theme}
           onDownload={handleDownload}
           extra={toolbarExtra}
           dataTime={dataTime}
@@ -752,11 +770,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
             style={props.styles?.statisticContainer}
           >
             {statistics.map((config, index) => (
-              <ChartStatistic
-                key={index}
-                {...config}
-                theme={theme}
-              />
+              <ChartStatistic key={index} {...config} theme={theme} />
             ))}
           </div>
         )}
@@ -780,7 +794,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
-        theme={'light'}
+        theme={theme}
         isMobile={isMobile}
         className={classNames(hashId, className)}
         variant={props.variant}
@@ -793,6 +807,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
       >
         <ChartToolBar
           title={title || '散点图'}
+          theme={theme}
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}

@@ -1,6 +1,7 @@
 ---
 title: Footnote 脚注
 atomId: Footnote
+order: 11
 group:
   title: 图文输出
   order: 4

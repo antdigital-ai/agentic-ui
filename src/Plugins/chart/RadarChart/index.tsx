@@ -22,9 +22,9 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
+import { useChartTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
-import { useChartTheme } from '../hooks';
 import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
 
@@ -250,7 +250,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
-        theme={'light'}
+        theme={theme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -263,6 +263,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
       >
         <ChartToolBar
           title={title || '雷达图'}
+          theme={theme}
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}
@@ -332,8 +333,9 @@ const RadarChart: React.FC<RadarChartProps> = ({
       backgroundColor: hexToRgba(resolvedColor, 0.125),
       borderWidth: isMobile ? 1.5 : 2,
       pointBackgroundColor: resolvedColor,
-      pointBorderColor: '#fff',
-      pointBorderWidth: isMobile ? 1 : 2,
+      // 与折线图一致：浅色 1px 白边；暗色去掉白边，避免图例色块出现亮框
+      pointBorderColor: isLight ? '#fff' : resolvedColor,
+      pointBorderWidth: isLight ? 1 : 0,
       pointRadius: isMobile ? 3 : 4,
       pointHoverRadius: isMobile ? 5 : 6,
       fill: true,
@@ -371,8 +373,10 @@ const RadarChart: React.FC<RadarChartProps> = ({
               backgroundColor: `${defaultColorList[0] || '#1677ff'}20`,
               borderWidth: isMobile ? 1.5 : 2,
               pointBackgroundColor: defaultColorList[0] || '#1677ff',
-              pointBorderColor: '#fff',
-              pointBorderWidth: isMobile ? 1 : 2,
+              pointBorderColor: isLight
+                ? '#fff'
+                : defaultColorList[0] || '#1677ff',
+              pointBorderWidth: isLight ? 1 : 0,
               pointRadius: isMobile ? 3 : 4,
               pointHoverRadius: isMobile ? 5 : 6,
               fill: true,
@@ -387,9 +391,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
     plugins: {
       legend: {
         display: true,
-        position: isMobile
-          ? 'bottom'
-          : 'right',
+        position: isMobile ? 'bottom' : 'right',
         labels: {
           color: axisTextColor,
           font: {
@@ -660,6 +662,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
       >
         <ChartToolBar
           title={title || '雷达图'}
+          theme={theme}
           onDownload={handleDownload}
           extra={toolbarExtra}
           dataTime={dataTime}
@@ -702,11 +705,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
             className={classNames(`${prefixCls}-statistic-container`, hashId)}
           >
             {statistics.map((config, index) => (
-              <ChartStatistic
-                key={index}
-                {...config}
-                theme={theme}
-              />
+              <ChartStatistic key={index} {...config} theme={theme} />
             ))}
           </div>
         )}
@@ -721,7 +720,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
-        theme={'light'}
+        theme={theme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -734,6 +733,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
       >
         <ChartToolBar
           title={title || '雷达图'}
+          theme={theme}
           onDownload={() => {}}
           extra={toolbarExtra}
           dataTime={dataTime}

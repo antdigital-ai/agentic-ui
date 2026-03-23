@@ -15,6 +15,7 @@ const MIN_PCT_FOR_LABEL = 2;
  */
 export const createDataLabelsLeaderLinePlugin = (
   lineLength: number = DEFAULT_LEADER_LINE_PX,
+  darkMode: boolean = false,
 ): Plugin<'doughnut'> => ({
   id: 'datalabelsLeaderLine',
   afterDatasetDraw(chart, args) {
@@ -31,7 +32,9 @@ export const createDataLabelsLeaderLinePlugin = (
     if (total <= 0) return;
 
     ctx.save();
-    ctx.strokeStyle = 'rgba(0, 25, 61, 0.16)';
+    ctx.strokeStyle = darkMode
+      ? 'rgba(255, 255, 255, 0.22)'
+      : 'rgba(0, 25, 61, 0.16)';
     ctx.lineWidth = 1;
 
     meta.data.forEach((element, i) => {
@@ -72,6 +75,7 @@ export const createCenterTextPlugin = (
   value: number,
   label: string,
   isMobile: boolean = false,
+  darkMode: boolean = false,
 ): Plugin<'doughnut'> => ({
   id: 'centerText',
   beforeDraw: (chart) => {
@@ -86,14 +90,14 @@ export const createCenterTextPlugin = (
 
     // value 优先使用 Rubik
     ctx.font = `${isMobile ? '400' : '500'} ${percentFontSize}px 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif`;
-    ctx.fillStyle = '#343A45';
+    ctx.fillStyle = darkMode ? 'rgba(255, 255, 255, 0.92)' : '#343A45';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(`${value}%`, centerX, centerY - labelFontSize * 0.8);
 
     // label 优先使用 PingFang SC
     ctx.font = `300 ${labelFontSize}px 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif`;
-    ctx.fillStyle = '#767E8B';
+    ctx.fillStyle = darkMode ? 'rgba(255, 255, 255, 0.55)' : '#767E8B';
     ctx.fillText(label, centerX, centerY + labelFontSize * 0.6);
 
     ctx.restore();

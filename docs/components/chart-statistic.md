@@ -1,6 +1,7 @@
 ---
 title: ChartStatistic 指标卡
 atomId: ChartStatistic
+order: 8
 group:
   title: 图文输出
   order: 4
@@ -8,7 +9,7 @@ group:
 
 # ChartStatistic 指标卡
 
-用于显示单个关键指标数据的卡片组件，支持自定义格式化、主题切换、尺寸调整和弹性布局等功能。
+用于显示单个关键指标数据的卡片组件，支持自定义格式化、主题切换、尺寸调整和弹性布局等功能。常与面积图、折线图、柱状图等图表的 `statistic` 属性搭配使用。
 
 ## 何时使用
 
@@ -20,6 +21,7 @@ group:
 ## 代码演示
 
 <code src="../demos/charts/chartStatic.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/charts/chart-statistic-dark.tsx" background="#141414" iframe=320></code>
 
 ## API
 

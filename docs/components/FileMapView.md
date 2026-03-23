@@ -3,6 +3,7 @@ nav:
   title: 组件
   order: 1
 atomId: FileMapView
+order: 10
 group:
   title: 图文输出
   order: 4

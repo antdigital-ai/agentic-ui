@@ -37,16 +37,15 @@ const ChartStatisticDemo: React.FC = () => {
         </div>
       </div>
 
-      {/* 不同尺寸和主题 */}
+      {/* 不同尺寸 */}
       <div style={{ marginBottom: '32px' }}>
-        <h3>不同尺寸和主题</h3>
+        <h3>不同尺寸</h3>
         <div
           style={{
             display: 'flex',
             gap: '24px',
             alignItems: 'flex-start',
             flexWrap: 'wrap',
-            marginBottom: '16px',
           }}
         >
           <ChartStatistic
@@ -66,31 +65,6 @@ const ChartStatisticDemo: React.FC = () => {
             value={9999}
             suffix="次"
             size="large"
-          />
-        </div>
-
-        <div
-          style={{
-            background: '#1f1f1f',
-            padding: '16px',
-            borderRadius: '8px',
-            display: 'flex',
-            gap: '24px',
-            flexWrap: 'wrap',
-          }}
-        >
-          <ChartStatistic
-            title="暗色主题"
-            value={3456}
-            suffix="次"
-            theme="dark"
-          />
-          <ChartStatistic
-            title="带提示信息"
-            value={789}
-            suffix="台"
-            theme="dark"
-            tooltip="这是提示信息"
           />
         </div>
       </div>

@@ -335,8 +335,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
           return gradient;
         },
         pointBackgroundColor: resolvedColor,
-        pointBorderColor: '#fff',
-        pointBorderWidth: 1,
+        pointBorderColor: isLight ? '#fff' : resolvedColor,
+        pointBorderWidth: isLight ? 1 : 0,
         borderWidth: 3,
         tension: 0,
         fill: true,
@@ -344,7 +344,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
     });
 
     return { labels, datasets };
-  }, [filteredData, types, xValues, color]);
+  }, [filteredData, types, xValues, color, isLight]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,

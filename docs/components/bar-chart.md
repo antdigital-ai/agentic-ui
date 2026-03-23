@@ -1,6 +1,7 @@
 ---
 title: BarChart 柱状图
 atomId: BarChart
+order: 2
 group:
   title: 图文输出
   order: 4
@@ -21,37 +22,49 @@ group:
 <code src="../demos/charts/bar/bar-max-thickness.tsx" background="var(--main-bg-color)" title="柱子最大宽度控制" iframe=540></code>
 <code src="../demos/charts/bar/bar-with-statistic.tsx" background="var(--main-bg-color)" title="指标统计" iframe=540></code>
 <code src="../demos/charts/bar/bar-chinese-currency.tsx" background="var(--main-bg-color)" title="中文金额（亿元/万元/元）" iframe=540></code>
+<code src="../demos/charts/bar/bar-dark.tsx" background="#141414" title="暗黑主题" iframe=520></code>
 
 ## API
 
 ### BarChartProps
 
-| 属性                  | 类型                                             | 默认值     | 说明                                                                     |
-| --------------------- | ------------------------------------------------ | ---------- | ------------------------------------------------------------------------ |
-| title                 | `string`                                         | -          | 图表标题                                                                 |
-| data                  | `BarChartDataItem[]`                             | -          | 扁平化数据数组                                                           |
-| width                 | `number \| string`                               | `600`      | 图表宽度（px），移动端自适应为 100%                                      |
-| height                | `number \| string`                               | `400`      | 图表高度（px），移动端最大约 80% 屏宽（上限 400）                        |
-| className             | `string`                                         | -          | 自定义类名                                                               |
-| dataTime              | `string`                                         | -          | 数据时间                                                                 |
-| theme                 | `'dark' \| 'light'`                              | `'light'`  | 主题风格                                                                 |
-| color                 | `string \| string[]`                             | -          | 自定义主色；正负图取数组前两位为正/负色，一位则单色                      |
-| showLegend            | `boolean`                                        | `true`     | 是否显示图例                                                             |
-| legendPosition        | `'top' \| 'left' \| 'bottom' \| 'right'`         | `'bottom'` | 图例位置                                                                 |
-| legendAlign           | `'start' \| 'center' \| 'end'`                   | `'start'`  | 图例水平对齐方式                                                         |
-| showGrid              | `boolean`                                        | `true`     | 是否显示网格线                                                           |
-| xPosition             | `'top' \| 'bottom'`                              | `'bottom'` | X 轴位置                                                                 |
-| yPosition             | `'left' \| 'right'`                              | `'left'`   | Y 轴位置                                                                 |
-| hiddenX               | `boolean`                                        | `false`    | 是否隐藏 X 轴                                                            |
-| hiddenY               | `boolean`                                        | `false`    | 是否隐藏 Y 轴                                                            |
-| stacked               | `boolean`                                        | `false`    | 是否堆叠显示多个数据集                                                   |
-| indexAxis             | `'x' \| 'y'`                                     | `'x'`      | 轴向：`'x'` 垂直柱状图，`'y'` 水平条形图                                 |
-| maxBarThickness       | `number`                                         | -          | 柱子最大宽度                                                             |
-| toolbarExtra          | `React.ReactNode`                                | -          | 头部工具条额外按钮                                                       |
-| renderFilterInToolbar | `boolean`                                        | `false`    | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧） |
-| statistic             | `ChartStatisticConfig \| ChartStatisticConfig[]` | -          | ChartStatistic组件配置：object表示单个配置，array表示多个配置            |
-| showDataLabels        | `boolean`                                        | `false`    | 是否显示数据标签（在柱子顶部或右侧显示数值）                             |
-| dataLabelFormatter    | `(params: DataLabelFormatterParams) => string`   | -          | 数据标签格式化函数，可自定义显示格式（如添加单位、格式化数字）           |
+| 属性                  | 类型                                             | 默认值     | 说明                                                                                                               |
+| --------------------- | ------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------ |
+| title                 | `string`                                         | -          | 图表标题                                                                                                           |
+| data                  | `BarChartDataItem[]`                             | -          | 扁平化数据数组                                                                                                     |
+| width                 | `number \| string`                               | `600`      | 图表宽度（px），移动端自适应为 100%                                                                                |
+| height                | `number \| string`                               | `400`      | 图表高度（px），移动端最大约 80% 屏宽（上限 400）                                                                  |
+| className             | `string`                                         | -          | 自定义类名                                                                                                         |
+| dataTime              | `string`                                         | -          | 数据时间                                                                                                           |
+| theme                 | `'dark' \| 'light'`                              | `'light'`  | 图表与容器主题；`dark` 时容器内嵌 Ant Design 暗色算法，工具栏/筛选与画布一致；暗色下图例色块无白边，与浅色视觉区分 |
+| color                 | `string \| string[]`                             | -          | 自定义主色；正负图取数组前两位为正/负色，一位则单色                                                                |
+| showLegend            | `boolean`                                        | `true`     | 是否显示图例                                                                                                       |
+| legendPosition        | `'top' \| 'left' \| 'bottom' \| 'right'`         | `'bottom'` | 图例位置                                                                                                           |
+| legendAlign           | `'start' \| 'center' \| 'end'`                   | `'start'`  | 图例水平对齐方式                                                                                                   |
+| showGrid              | `boolean`                                        | `true`     | 是否显示网格线                                                                                                     |
+| xPosition             | `'top' \| 'bottom'`                              | `'bottom'` | X 轴位置                                                                                                           |
+| yPosition             | `'left' \| 'right'`                              | `'left'`   | Y 轴位置                                                                                                           |
+| hiddenX               | `boolean`                                        | `false`    | 是否隐藏 X 轴                                                                                                      |
+| hiddenY               | `boolean`                                        | `false`    | 是否隐藏 Y 轴                                                                                                      |
+| stacked               | `boolean`                                        | `false`    | 是否堆叠显示多个数据集                                                                                             |
+| indexAxis             | `'x' \| 'y'`                                     | `'x'`      | 轴向：`'x'` 垂直柱状图，`'y'` 水平条形图                                                                           |
+| maxBarThickness       | `number`                                         | -          | 柱子最大宽度                                                                                                       |
+| toolbarExtra          | `React.ReactNode`                                | -          | 头部工具条额外按钮                                                                                                 |
+| renderFilterInToolbar | `boolean`                                        | `false`    | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧）                                           |
+| chartOptions          | `Partial<ChartOptions<'bar'>>`                   | -          | 与默认 Chart.js 选项深度合并，用于细调坐标轴、动画等                                                               |
+| statistic             | `ChartStatisticConfig \| ChartStatisticConfig[]` | -          | ChartStatistic组件配置：object表示单个配置，array表示多个配置                                                      |
+| showDataLabels        | `boolean`                                        | `false`    | 是否显示数据标签（在柱子顶部或右侧显示数值）                                                                       |
+| dataLabelFormatter    | `(params: DataLabelFormatterParams) => string`   | -          | 数据标签格式化函数，可自定义显示格式（如添加单位、格式化数字）                                                     |
+
+### ChartContainerProps（继承）
+
+| 属性       | 类型                        | 默认值  | 说明                                                                            |
+| ---------- | --------------------------- | ------- | ------------------------------------------------------------------------------- |
+| classNames | `ChartClassNames`           | -       | 分层类名：`root`、`toolbar`、`statisticContainer`、`filter`、`wrapper`、`chart` |
+| loading    | `boolean`                   | `false` | 加载态                                                                          |
+| style      | `React.CSSProperties`       | -       | 根容器内联样式                                                                  |
+| styles     | `ChartStyles`               | -       | 与各层 DOM 对应的内联样式                                                       |
+| variant    | `'outline' \| 'borderless'` | -       | 容器描边变体                                                                    |
 
 ### BarChartDataItem
 
@@ -98,6 +111,7 @@ group:
 
 ## 说明
 
+- `chartOptions` 类型中的 `ChartOptions` 来自 `chart.js`，用于在默认配置之上做增量合并。
 - `stacked` 为 `true` 时，将按 `type` 将数据叠加显示。
 - `indexAxis='y'` 时为横向条形图。
 - `hiddenX` 和 `hiddenY` 可以控制坐标轴的显示/隐藏，适用于只展示图表本身而不需要坐标轴的场景。

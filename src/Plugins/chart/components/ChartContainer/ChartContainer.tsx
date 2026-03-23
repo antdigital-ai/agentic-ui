@@ -1,6 +1,11 @@
+import { ConfigProvider, theme as antdTheme } from 'antd';
 import classNames from 'clsx';
 import React from 'react';
 import type { ChartClassNames, ChartStyles } from '../../types/classNames';
+import {
+  ChartDarkAntdProvidedContext,
+  useChartDarkAntdProvided,
+} from './ChartDarkAntdContext';
 import ChartErrorBoundary from './ChartErrorBoundary';
 import { useStyle } from './style';
 
@@ -105,6 +110,7 @@ export interface ChartContainerRef {
  * - 统一的样式管理
  * - 内置错误边界保护，防止图表错误影响整个应用
  * - 错误边界默认启用，可通过配置禁用或自定义
+ * - `theme="dark"` 时在本容器内嵌套 Ant Design 暗色算法，工具栏/筛选等 antd 控件与画布暗色一致（嵌套容器不重复包裹）
  */
 const ChartContainer: React.FC<
   ChartContainerProps & {
@@ -127,6 +133,8 @@ const ChartContainer: React.FC<
   ...restProps
 }) => {
   const { wrapSSR, hashId } = useStyle(baseClassName);
+  const ancestorDarkAntdProvided = useChartDarkAntdProvided();
+  const wrapDarkAntd = theme === 'dark' && !ancestorDarkAntdProvided;
 
   // 构建动态类名
   const combinedClassName = classNames(
@@ -147,11 +155,21 @@ const ChartContainer: React.FC<
     ...stylesProp?.root,
   };
 
-  const containerContent = (
+  let containerContent: React.ReactNode = (
     <div className={combinedClassName} style={combinedStyle} {...restProps}>
       {children}
     </div>
   );
+
+  if (wrapDarkAntd) {
+    containerContent = (
+      <ChartDarkAntdProvidedContext.Provider value={true}>
+        <ConfigProvider theme={{ algorithm: antdTheme.darkAlgorithm }}>
+          {containerContent}
+        </ConfigProvider>
+      </ChartDarkAntdProvidedContext.Provider>
+    );
+  }
 
   // 如果启用了错误边界，则包装内容
   if (errorBoundary?.enabled !== false) {

@@ -23,10 +23,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         backgroundColor: '#fff',
       },
 
-      // 深色主题无边框
+      // 深色主题：略浅于纯黑页面底，与雷达等图表的「卡片」层次一致
       '&&-dark-theme': {
-        border: 'none',
-        backgroundColor: '#1a1a1a',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        backgroundColor: '#1f1f1f',
       },
 
       // 移动端适配

@@ -1,6 +1,7 @@
 ---
 title: FunnelChart 漏斗图
 atomId: FunnelChart
+order: 4
 group:
   title: 图文输出
   order: 4
@@ -22,6 +23,10 @@ group:
 
 <code src="../demos/charts/funnelWithMinWidthBottom.tsx" background="var(--main-bg-color)" iframe=800></code>
 
+### 暗黑主题
+
+<code src="../demos/charts/funnel-dark.tsx" background="#141414" title="暗黑主题" iframe=480></code>
+
 ## API
 
 ### FunnelChartProps
@@ -35,7 +40,7 @@ group:
 | height                | `number \| string`                       | `400`      | 图表高度（px），移动端最大约 80% 屏宽（上限 400）                                                                     |
 | className             | `string`                                 | -          | 自定义类名                                                                                                            |
 | dataTime              | `string`                                 | -          | 数据时间                                                                                                              |
-| theme                 | `'dark' \| 'light'`                      | `'light'`  | 主题风格                                                                                                              |
+| theme                 | `'dark' \| 'light'`                      | `'light'`  | 图表与容器主题；`dark` 时容器内嵌 Ant Design 暗色算法，工具栏/筛选与画布一致；暗色下图例色块无白边，与浅色视觉区分    |
 | showLegend            | `boolean`                                | `true`     | 是否显示图例                                                                                                          |
 | legendPosition        | `'top' \| 'left' \| 'bottom' \| 'right'` | `'bottom'` | 图例位置                                                                                                              |
 | legendAlign           | `'start' \| 'center' \| 'end'`           | `'start'`  | 图例水平对齐方式                                                                                                      |
@@ -45,6 +50,16 @@ group:
 | typeNames             | `{ rate?: string; name: string }`        | -          | 类型名称配置，用于图例和数据集标签                                                                                    |
 | statistic             | `StatisticConfigType`                    | -          | 统计数据组件配置                                                                                                      |
 | renderFilterInToolbar | `boolean`                                | `false`    | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧）                                              |
+
+### ChartContainerProps（继承）
+
+| 属性       | 类型                        | 默认值  | 说明                                                                            |
+| ---------- | --------------------------- | ------- | ------------------------------------------------------------------------------- |
+| classNames | `ChartClassNames`           | -       | 分层类名：`root`、`toolbar`、`statisticContainer`、`filter`、`wrapper`、`chart` |
+| loading    | `boolean`                   | `false` | 加载态                                                                          |
+| style      | `React.CSSProperties`       | -       | 根容器内联样式                                                                  |
+| styles     | `ChartStyles`               | -       | 与各层 DOM 对应的内联样式                                                       |
+| variant    | `'outline' \| 'borderless'` | -       | 容器描边变体                                                                    |
 
 ### FunnelChartDataItem
 

@@ -1,6 +1,7 @@
 ---
 title: FileAttachment 文件附件
 atomId: FileAttachment
+order: 9
 group:
   title: 图文输出
   order: 4

@@ -6,7 +6,7 @@ import { DonutChartData } from './types';
 /** 图例每页显示条数，超过则显示分页 */
 const LEGEND_PAGE_SIZE = 12;
 
-interface LegendProps {
+export interface DonutLegendProps {
   chartData: DonutChartData[];
   backgroundColors: string[];
   /** 按图索引维护的隐藏集合 */
@@ -18,9 +18,11 @@ interface LegendProps {
   baseClassName: string;
   hashId: string;
   isMobile: boolean;
+  /** 与 ChartContainer / 图表 theme 一致，用于图例文字与分页按钮 */
+  theme?: 'light' | 'dark';
 }
 
-const Legend: React.FC<LegendProps> = ({
+const DonutChartLegend: React.FC<DonutLegendProps> = ({
   chartData,
   backgroundColors,
   hiddenDataIndicesByChart,
@@ -30,8 +32,16 @@ const Legend: React.FC<LegendProps> = ({
   baseClassName,
   hashId,
   isMobile,
+  theme = 'light',
 }) => {
   const locale = useLocale();
+  const isDark = theme === 'dark';
+  const legendMutedColor = isDark ? 'rgba(255, 255, 255, 0.55)' : '#767E8B';
+  const legendStrongColor = isDark ? 'rgba(255, 255, 255, 0.88)' : '#343A45';
+  const paginationBorder = isDark
+    ? '1px solid rgba(255, 255, 255, 0.2)'
+    : '1px solid rgba(0,0,0,0.15)';
+  const paginationBg = isDark ? 'rgba(255, 255, 255, 0.08)' : '#fff';
   const hiddenDataIndices = React.useMemo(() => {
     return hiddenDataIndicesByChart[chartIndex] || new Set<number>();
   }, [hiddenDataIndicesByChart, chartIndex]);
@@ -128,6 +138,7 @@ const Legend: React.FC<LegendProps> = ({
                   .filter(Boolean)
                   .join(' ')}
                 style={{
+                  color: legendMutedColor,
                   fontSize: isMobile ? 11 : 13,
                   flex: isMobile ? '0 1 auto' : 1,
                   minWidth: isMobile ? '60px' : 'auto',
@@ -140,6 +151,7 @@ const Legend: React.FC<LegendProps> = ({
                   .filter(Boolean)
                   .join(' ')}
                 style={{
+                  color: legendStrongColor,
                   fontSize: isMobile ? 11 : 13,
                   fontWeight: isMobile ? 400 : 500,
                   marginLeft: isMobile ? 8 : 15,
@@ -154,6 +166,7 @@ const Legend: React.FC<LegendProps> = ({
                     .filter(Boolean)
                     .join(' ')}
                   style={{
+                    color: legendStrongColor,
                     fontSize: isMobile ? 10 : 12,
                     marginLeft: isMobile ? 6 : 8,
                     marginTop: 0,
@@ -178,7 +191,10 @@ const Legend: React.FC<LegendProps> = ({
           className={[`${baseClassName}-legend-pagination`, hashId]
             .filter(Boolean)
             .join(' ')}
-          style={isMobile ? { flexShrink: 0 } : undefined}
+          style={{
+            ...(isMobile ? { flexShrink: 0 } : {}),
+            ...(isDark ? { borderTopColor: 'rgba(255,255,255,0.12)' } : {}),
+          }}
         >
           <button
             type="button"
@@ -190,14 +206,15 @@ const Legend: React.FC<LegendProps> = ({
               fontSize: 12,
               cursor: currentPage <= 0 ? 'not-allowed' : 'pointer',
               opacity: currentPage <= 0 ? 0.5 : 1,
-              border: '1px solid rgba(0,0,0,0.15)',
+              border: paginationBorder,
               borderRadius: 4,
-              background: '#fff',
+              background: paginationBg,
+              color: legendStrongColor,
             }}
           >
             &lt;
           </button>
-          <span style={{ fontSize: 12, color: '#767E8B' }}>
+          <span style={{ fontSize: 12, color: legendMutedColor }}>
             {currentPage + 1}/{totalPages}
           </span>
           <button
@@ -210,9 +227,10 @@ const Legend: React.FC<LegendProps> = ({
               fontSize: 12,
               cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer',
               opacity: currentPage >= totalPages - 1 ? 0.5 : 1,
-              border: '1px solid rgba(0,0,0,0.15)',
+              border: paginationBorder,
               borderRadius: 4,
-              background: '#fff',
+              background: paginationBg,
+              color: legendStrongColor,
             }}
           >
             &gt;
@@ -223,4 +241,4 @@ const Legend: React.FC<LegendProps> = ({
   );
 };
 
-export default Legend;
+export default DonutChartLegend;
