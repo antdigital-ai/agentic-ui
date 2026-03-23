@@ -1,7 +1,7 @@
 ---
 title: ChartStatistic 指标卡
 atomId: ChartStatistic
-order: 8
+order: 10
 group:
   title: 图文输出
   order: 4

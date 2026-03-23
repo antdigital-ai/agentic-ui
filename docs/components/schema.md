@@ -3,7 +3,7 @@ nav:
   title: 组件
   order: 1
 atomId: Schema
-order: 13
+order: 15
 group:
   title: 图文输出
   order: 4

@@ -1,7 +1,7 @@
 ---
 title: Mermaid 图
 atomId: Mermaid
-order: 12
+order: 14
 group:
   title: 图文输出
   order: 4

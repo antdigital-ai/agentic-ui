@@ -3,7 +3,7 @@ nav:
   title: 组件
   order: 1
 atomId: SchemaEditor
-order: 14
+order: 16
 group:
   title: 图文输出
   order: 4

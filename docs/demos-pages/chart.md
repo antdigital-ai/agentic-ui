@@ -118,3 +118,5 @@ group:
 <code src="../demos/charts/funnel-dark.tsx" background="#141414" title="漏斗图" iframe=440></code>
 <code src="../demos/charts/donut-dark.tsx" background="#141414" title="环形图" iframe=480></code>
 <code src="../demos/charts/chart-statistic-dark.tsx" background="#141414" title="指标卡" iframe=320></code>
+<code src="../demos/charts/boxplot/boxplot-dark.tsx" background="#141414" title="箱线图" iframe=520></code>
+<code src="../demos/charts/histogram/histogram-dark.tsx" background="#141414" title="直方图" iframe=520></code>
