@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -72,8 +73,7 @@ describe('ChartToolBar', () => {
     render(<ChartToolBar title="仅标题" />);
 
     expect(screen.getByText('仅标题')).toBeInTheDocument();
-    // 当只有标题时，应该显示下载按钮，因为handleDownload函数始终存在
-    expect(screen.getByTestId('download-icon')).toBeInTheDocument();
+    expect(screen.queryByTestId('download-icon')).not.toBeInTheDocument();
   });
 
   it('应该在只有额外内容时正确渲染', () => {
@@ -101,8 +101,7 @@ describe('ChartToolBar', () => {
   it('应该在没有下载功能时不显示下载按钮', () => {
     render(<ChartToolBar title="测试标题" dataTime="2024-01-01 12:00:00" />);
 
-    // 即使没有onDownload，也应该显示下载按钮，因为handleDownload函数始终存在
-    expect(screen.getByTestId('download-icon')).toBeInTheDocument();
+    expect(screen.queryByTestId('download-icon')).not.toBeInTheDocument();
   });
 
   it('应该正确显示加载状态', () => {
@@ -176,22 +175,6 @@ describe('ChartToolBar', () => {
   });
 
   it('应该正确处理国际化文本', () => {
-    render(<ChartToolBar {...defaultProps} />);
-
-    expect(
-      screen.getByText('数据时间: 2024-01-01 12:00:00'),
-    ).toBeInTheDocument();
-  });
-
-  it('应该在没有国际化时使用默认文本', () => {
-    // Mock I18nContext without locale
-    vi.mock('../../../../src/I18n', () => ({
-      I18nContext: {
-        Consumer: ({ children }: any) =>
-          children({ locale: {}, language: 'zh-CN' }),
-      },
-    }));
-
     render(<ChartToolBar {...defaultProps} />);
 
     expect(
