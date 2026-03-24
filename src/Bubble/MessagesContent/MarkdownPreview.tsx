@@ -134,6 +134,10 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           streaming={typing}
           isFinished={props.originData?.isFinished}
           plugins={props.markdownRenderConfig?.plugins}
+          queueOptions={props.markdownRenderConfig?.queueOptions}
+          streamingParagraphAnimation={
+            props.markdownRenderConfig?.streamingParagraphAnimation
+          }
           fncProps={fncProps}
           style={{
             maxWidth: standalone ? '100%' : undefined,

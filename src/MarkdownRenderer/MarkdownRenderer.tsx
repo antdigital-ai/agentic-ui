@@ -133,6 +133,7 @@ const InternalMarkdownRenderer = forwardRef<
     style,
     prefixCls: customPrefixCls,
     linkConfig,
+    streamingParagraphAnimation,
     apaasify,
   } = props;
 
@@ -149,6 +150,8 @@ const InternalMarkdownRenderer = forwardRef<
   const containerRef = useRef<HTMLDivElement>(null);
   const [displayedContent, setDisplayedContent] = useState(content || '');
   const queueRef = useRef<CharacterQueue | null>(null);
+  /** 与 CharacterQueue 构造参数同步，避免 queueOptions 变更后仍用旧队列行为 */
+  const queueOptsSigRef = useRef('');
 
   useImperativeHandle(ref, () => ({
     nativeElement: containerRef.current,
@@ -161,32 +164,35 @@ const InternalMarkdownRenderer = forwardRef<
     [plugins],
   );
 
-  // 字符队列管理：流式时仅对最后 50 字做动画，避免每段逐字输出
+  // 字符队列：默认关闭逐字动画，避免 RAF 每帧全量重解析 Markdown 导致整页闪动。
+  // 需要打字机效果时显式传入 queueOptions={{ animate: true, animateTailChars?: number }}。
   const resolvedQueueOptions = useMemo(
     () =>
       streaming
-        ? { animateTailChars: 50, ...queueOptions }
+        ? { animate: false, animateTailChars: undefined, ...queueOptions }
         : queueOptions,
     [streaming, queueOptions],
   );
 
   useEffect(() => {
     if (!streaming) {
-      // 非流式：直接展示全部内容
       setDisplayedContent(content || '');
+      queueRef.current?.dispose();
+      queueRef.current = null;
+      queueOptsSigRef.current = '';
       return;
     }
 
-    if (!queueRef.current) {
+    const sig = JSON.stringify(resolvedQueueOptions ?? {});
+    if (!queueRef.current || sig !== queueOptsSigRef.current) {
+      queueRef.current?.dispose();
       queueRef.current = new CharacterQueue(
         (displayed) => setDisplayedContent(displayed),
         resolvedQueueOptions,
       );
+      queueOptsSigRef.current = sig;
     }
-
     queueRef.current.push(content || '');
-
-    return undefined;
   }, [content, streaming, resolvedQueueOptions]);
 
   // 流式完成时 flush 所有剩余内容
@@ -245,6 +251,7 @@ const InternalMarkdownRenderer = forwardRef<
     prefixCls,
     linkConfig,
     streaming,
+    streamingParagraphAnimation,
   });
 
   return wrapVarSSR(
@@ -265,7 +272,11 @@ const InternalMarkdownRenderer = forwardRef<
             style={{ display: 'block' }}
           >
             <div
-              className={clsx(contentCls, hashId)}
+              className={clsx(
+                contentCls,
+                `${contentCls}-markdown-readonly`,
+                hashId,
+              )}
               style={{ whiteSpace: 'normal', wordWrap: 'normal' }}
             >
               {reactContent}

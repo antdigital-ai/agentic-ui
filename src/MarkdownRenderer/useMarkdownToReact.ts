@@ -1,6 +1,6 @@
 import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
-import React, { useMemo, useRef } from 'react';
+import React, { useContext, useMemo, useRef } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
@@ -28,6 +28,7 @@ import {
 import { parseChineseCurrencyToNumber } from '../Plugins/chart/utils';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import AnimationText from './AnimationText';
+import { StreamingAnimationContext } from './StreamingAnimationContext';
 import type { RendererBlockProps } from './types';
 
 const INLINE_MATH_WITH_SINGLE_DOLLAR = { singleDollarTextMath: true };
@@ -345,13 +346,23 @@ const buildEditorAlignedComponents = (
     openInNewTab?: boolean;
     onClick?: (url?: string) => boolean | void;
   },
+  streamingParagraphAnimation?: boolean,
 ) => {
   const listCls = `${prefixCls}-list`;
   const tableCls = `${prefixCls}-content-table`;
   const contentCls = prefixCls; // e.g. ant-agentic-md-editor-content
 
-  const wrapAnimation = (children: any) =>
-    streaming ? jsx(AnimationText as any, { children }) : children;
+  /** 仅当 streaming、末块动画上下文允许且显式开启段落动画时包 AnimationText */
+  const StreamAnimWrap = ({ children }: { children: any }) => {
+    const ctx = useContext(StreamingAnimationContext);
+    const animateBlock = ctx?.animateBlock ?? true;
+    const allow = !!streaming && animateBlock && !!streamingParagraphAnimation;
+    if (!allow) return children;
+    return jsx(AnimationText as any, { children });
+  };
+  StreamAnimWrap.displayName = 'StreamAnimWrap';
+
+  const wrapAnimation = (children: any) => jsx(StreamAnimWrap, { children });
 
   return {
     // ================================================================
@@ -374,7 +385,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-1',
-        children: wrapAnimation(children),
+        children,
       });
     },
     h2: (props: any) => {
@@ -383,7 +394,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-2',
-        children: wrapAnimation(children),
+        children,
       });
     },
     h3: (props: any) => {
@@ -392,7 +403,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-3',
-        children: wrapAnimation(children),
+        children,
       });
     },
     h4: (props: any) => {
@@ -401,7 +412,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-4',
-        children: wrapAnimation(children),
+        children,
       });
     },
     h5: (props: any) => {
@@ -410,7 +421,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-5',
-        children: wrapAnimation(children),
+        children,
       });
     },
     h6: (props: any) => {
@@ -419,7 +430,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-6',
-        children: wrapAnimation(children),
+        children,
       });
     },
 
@@ -503,7 +514,7 @@ const buildEditorAlignedComponents = (
         className: `${listCls}-item`,
         'data-be': 'list-item',
         'data-testid': 'markdown-list-item',
-        children: wrapAnimation(children),
+        children,
       });
     },
 
@@ -563,7 +574,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-td',
         style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children: wrapAnimation(children),
+        children,
       });
     },
 
@@ -922,7 +933,29 @@ interface UseMarkdownToReactOptions {
   };
   /** 是否处于流式状态，用于最后一个块的打字动画 */
   streaming?: boolean;
+  /**
+   * 流式时是否对「生长中的末段」启用段落淡入（AnimationText）。
+   * 默认 false：重解析时频繁触发动画易导致整页闪动；需要时再显式传入 true。
+   */
+  streamingParagraphAnimation?: boolean;
 }
+
+/**
+ * 在 hast 上标记「最后一个 p」，用于流式时仅该段落播放入场（单块长文时避免全页 p 一起闪）
+ */
+const markLastParagraphStreamingTail = (hast: any) => {
+  const paragraphs: any[] = [];
+  visit(hast, 'element', (node: any) => {
+    if (node.tagName === 'p') {
+      paragraphs.push(node);
+    }
+  });
+  const last = paragraphs[paragraphs.length - 1];
+  if (last) {
+    last.properties = last.properties || {};
+    last.properties.dataStreamingTail = true;
+  }
+};
 
 /**
  * 将单个 markdown 片段转为 React 元素（内部函数）
@@ -931,11 +964,15 @@ const renderMarkdownBlock = (
   blockContent: string,
   processor: Processor,
   components: Record<string, any>,
+  blockOpts?: { markStreamingTailParagraph?: boolean },
 ): React.ReactNode => {
   if (!blockContent.trim()) return null;
   try {
     const mdast = processor.parse(blockContent);
     const hast = processor.runSync(mdast);
+    if (blockOpts?.markStreamingTailParagraph) {
+      markLastParagraphStreamingTail(hast);
+    }
     return toJsxRuntime(hast as any, {
       Fragment,
       jsx: jsx as any,
@@ -966,7 +1003,9 @@ const splitMarkdownBlocks = (content: string): string[] => {
     if (!inFence && line === '' && current.length > 0) {
       const prev = current[current.length - 1];
       if (prev === '') {
-        blocks.push(current.join('\n'));
+        // 触发分割的是「第二个连续空行」，不应并入上一块末尾，否则与单块解析结果字符串不一致、缓存失效
+        const withoutTrailingBlank = current.slice(0, -1);
+        blocks.push(withoutTrailingBlank.join('\n'));
         current = [];
         continue;
       }
@@ -1045,8 +1084,15 @@ export const useMarkdownToReact = (
       userComponents,
       options?.streaming,
       options?.linkConfig,
+      options?.streamingParagraphAnimation,
     );
-  }, [prefixCls, options?.components, options?.streaming, options?.linkConfig]);
+  }, [
+    prefixCls,
+    options?.components,
+    options?.streaming,
+    options?.linkConfig,
+    options?.streamingParagraphAnimation,
+  ]);
 
   return useMemo(() => {
     if (!content) {
@@ -1078,6 +1124,17 @@ export const useMarkdownToReact = (
       const newCache = new Map<string, BlockCacheEntry>();
       const elements: React.ReactNode[] = [];
 
+      const wrapBlockScope = (
+        node: React.ReactNode,
+        key: string,
+        animateBlock: boolean,
+      ) =>
+        jsx(StreamingAnimationContext.Provider, {
+          key,
+          value: { animateBlock },
+          children: node,
+        });
+
       const KEY_PREFIX_LEN = 64;
       for (let i = 0; i < blocks.length; i++) {
         const block = blocks[i];
@@ -1103,9 +1160,7 @@ export const useMarkdownToReact = (
           const cached = cache.get(block);
           if (cached && cached.source === block) {
             newCache.set(block, cached);
-            elements.push(
-              jsx(Fragment, { children: cached.element }, stableKey),
-            );
+            elements.push(wrapBlockScope(cached.element, stableKey, false));
             continue;
           }
         }
@@ -1124,21 +1179,25 @@ export const useMarkdownToReact = (
               element: lastBlockRef.current.element,
             });
             elements.push(
-              jsx(
-                Fragment,
-                { children: lastBlockRef.current.element },
+              wrapBlockScope(
+                lastBlockRef.current.element,
                 stableKey,
+                !!options?.streaming,
               ),
             );
             continue;
           }
         }
 
-        const element = renderMarkdownBlock(block, processor, components);
+        const element = renderMarkdownBlock(block, processor, components, {
+          markStreamingTailParagraph: isLast && !!options?.streaming,
+        });
         const entry = { source: block, element };
         newCache.set(block, entry);
         if (isLast) lastBlockRef.current = entry;
-        elements.push(jsx(Fragment, { children: element }, stableKey));
+        elements.push(
+          wrapBlockScope(element, stableKey, isLast && !!options?.streaming),
+        );
       }
 
       blockCacheRef.current = newCache;
@@ -1175,6 +1234,8 @@ export const markdownToReactSync = (
     const allComponents = buildEditorAlignedComponents(
       'ant-agentic-md-editor',
       userComps,
+      false,
+      undefined,
       false,
     );
 

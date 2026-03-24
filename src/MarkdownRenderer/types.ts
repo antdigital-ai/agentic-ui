@@ -8,7 +8,10 @@ import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 export interface CharacterQueueOptions {
   /** 每帧输出的最大字符数，默认 3 */
   charsPerFrame?: number;
-  /** 是否启用打字动画，默认 true（流式时） */
+  /**
+   * 是否启用 CharacterQueue 逐字输出（RAF 驱动）。
+   * MarkdownRenderer 流式默认合并为 `false`，避免每帧全量重解析导致整页闪动；需打字机时再设为 `true`。
+   */
   animate?: boolean;
   /**
    * 仅对末尾 N 个字符做动画，前面内容立即展示。
@@ -74,6 +77,11 @@ export interface MarkdownRendererProps {
     /** 自定义链接点击处理，返回 false 可阻止默认跳转 */
     onClick?: (url?: string) => boolean | void;
   };
+  /**
+   * 流式时是否为生长中的末段启用淡入（AnimationText）。
+   * 默认 false，避免重解析时整页闪动；需要段落入场效果时再设为 true。
+   */
+  streamingParagraphAnimation?: boolean;
   /** Apaasify / Schema 自定义渲染 */
   apaasify?: {
     enable?: boolean;

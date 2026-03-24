@@ -4,7 +4,10 @@ import React from 'react';
 import { BaseEditor, Editor, Selection } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor, RenderElementProps } from 'slate-react';
-import type { RenderMode } from '../MarkdownRenderer/types';
+import type {
+  CharacterQueueOptions,
+  RenderMode,
+} from '../MarkdownRenderer/types';
 import { TagPopupProps } from './editor/elements/TagPopup';
 import { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
@@ -516,6 +519,18 @@ export type MarkdownEditorProps = {
     /** 自定义链接渲染函数 */
     onClick?: (url?: string) => boolean | void;
   };
+
+  /**
+   * MarkdownRenderer 字符队列（仅 `renderMode: 'markdown'` 只读预览时生效）
+   * @description 默认关闭逐字 RAF；需要打字机时再设 `{ animate: true, animateTailChars: 50 }` 等
+   */
+  queueOptions?: CharacterQueueOptions;
+
+  /**
+   * 流式 Markdown 末段淡入（仅 `renderMode: 'markdown'` 时传给 MarkdownRenderer）
+   * @description 默认 false；设为 true 时末段使用 AnimationText 入场，可能在高频更新时产生闪动
+   */
+  streamingParagraphAnimation?: boolean;
 
   /**
    * 依赖数组

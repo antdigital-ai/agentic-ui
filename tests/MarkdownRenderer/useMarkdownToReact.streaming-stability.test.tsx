@@ -83,7 +83,8 @@ describe('useMarkdownToReact streaming stability', () => {
     const counters: Counters = { mounts: 0, unmounts: 0 };
     const CodeBlockProbe = createCodeBlockProbe(counters);
 
-    const chartBlock = '```chart\n{"config":[{"chartType":"line"}],"dataSource":[]}';
+    const chartBlock =
+      '```chart\n{"config":[{"chartType":"line"}],"dataSource":[]}\n```';
 
     const { rerender, unmount } = render(
       <HookHarness
@@ -97,9 +98,10 @@ describe('useMarkdownToReact streaming stability', () => {
     expect(counters.mounts).toBe(1);
     expect(counters.unmounts).toBe(0);
 
+    // 分块逻辑：围栏外需连续两个空行（\n\n\n）才切块，与 splitMarkdownBlocks 一致
     rerender(
       <HookHarness
-        content={`${chartBlock}\n\n后续段落`}
+        content={`${chartBlock}\n\n\n后续段落`}
         streaming
         codeBlockComponent={CodeBlockProbe}
       />,
