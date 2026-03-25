@@ -977,7 +977,7 @@ exports[`should convert markdown to schema in ![attachme chunk 1`] = `
         "type": "card-before",
       },
       {
-        "alt": "attachment.pdf",
+        "alt": "attachment:测试附件.pdf",
         "children": [
           {
             "text": "",
@@ -1015,7 +1015,7 @@ exports[`should convert markdown to schema in ![video:视频 chunk 1`] = `
         "type": "card-before",
       },
       {
-        "alt": "video",
+        "alt": "video:视频名",
         "children": [
           {
             "text": "",
@@ -5725,9 +5725,9 @@ exports[`should convert schema to markdown in ![](https: chunk 1`] = `
 ![](https://mdn.alipayobjects.com/huamei_gcee1x/afts/img/A*9F0qRYV8EjUAAAAAAAAAAAAADml6AQ/original)"
 `;
 
-exports[`should convert schema to markdown in ![attachme chunk 1`] = `"![attachment.pdf](https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/A*NudQQry0ERwAAAAAAAAAAAAADtN3AQ)"`;
+exports[`should convert schema to markdown in ![attachme chunk 1`] = `"![attachment:测试附件.pdf](https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/A*NudQQry0ERwAAAAAAAAAAAAADtN3AQ)"`;
 
-exports[`should convert schema to markdown in ![video:视频 chunk 1`] = `"![video](https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/A*NudQQry0ERwAAAAAAAAAAAAADtN3AQ)"`;
+exports[`should convert schema to markdown in ![video:视频 chunk 1`] = `"![video:视频名](https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/A*NudQQry0ERwAAAAAAAAAAAAADtN3AQ)"`;
 
 exports[`should convert schema to markdown in # 现代代码编辑器技 chunk 1`] = `"# 现代代码编辑器技术解析与实现示例"`;
 
