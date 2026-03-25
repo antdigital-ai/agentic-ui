@@ -409,10 +409,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       'li > p': { marginTop: '1em' },
       'li + li': { marginTop: '0.25em' },
       blockquote: {
-        display: 'flex',
+        display: 'block',
+        boxSizing: 'border-box',
         padding: '8px 12px',
-        gap: '10px',
-        flexGrow: 1,
         zIndex: 1,
         fontSize: 'var(--font-size-base)',
         fontWeight: 'normal',
@@ -421,6 +420,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         position: 'relative',
         color: 'var(--color-gray-text-secondary)',
         margin: '0 !important',
+        // 原 flex + gap 在子节点之间的间距（::before 为 absolute，不参与 flex）
+        '& > * + *': {
+          marginTop: '10px',
+        },
         '&:before': {
           content: "''",
           left: '0',
@@ -429,8 +432,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           height: 'calc(100% - 22px)',
           borderRadius: '4px',
           width: '3px',
-          display: 'flex',
-          alignSelf: 'stretch',
+          display: 'block',
           zIndex: 0,
           backgroundColor: 'var(--color-gray-control-fill-secondary)',
         },
