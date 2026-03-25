@@ -10,7 +10,10 @@ import remarkRehype from 'remark-rehype';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
-import { JINJA_DOLLAR_PLACEHOLDER } from '../parser/constants';
+import {
+  JINJA_DOLLAR_PLACEHOLDER,
+  preprocessProtectTimeFromDirective,
+} from '../parser/constants';
 import { remarkDirectiveContainer } from '../parser/remarkDirectiveContainer';
 import {
   convertParagraphToImage,
@@ -373,8 +376,9 @@ export const markdownToHtml = async (
   config?: MarkdownToHtmlConfig,
 ): Promise<string> => {
   try {
+    const safeMarkdown = preprocessProtectTimeFromDirective(markdown);
     const file = await createMarkdownProcessor(plugins, config).process(
-      markdown,
+      safeMarkdown,
     );
     const htmlContent =
       file && typeof file === 'object' && 'value' in file
@@ -423,7 +427,10 @@ export const markdownToHtmlSync = (
   config?: MarkdownToHtmlConfig,
 ): string => {
   try {
-    const file = createMarkdownProcessor(plugins, config).processSync(markdown);
+    const safeMarkdown = preprocessProtectTimeFromDirective(markdown);
+    const file = createMarkdownProcessor(plugins, config).processSync(
+      safeMarkdown,
+    );
     const htmlContent =
       file && typeof file === 'object' && 'value' in file
         ? String((file as { value: unknown }).value ?? '')

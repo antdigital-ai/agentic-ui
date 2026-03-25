@@ -47,6 +47,14 @@ describe('MarkdownRenderer', () => {
     expect(bold?.textContent).toBe('bold');
   });
 
+  it('应完整渲染 HH:mm 时间（避免 :mm 被 remark-directive 误解析）', () => {
+    const { container } = render(
+      <MarkdownRenderer content="时间：**每天上午 10:15**" />,
+    );
+
+    expect(container.textContent).toContain('10:15');
+  });
+
   it('应渲染斜体', () => {
     const { container } = render(
       <MarkdownRenderer content="This is *italic* text." />,
@@ -432,9 +440,7 @@ describe('MarkdownRenderer', () => {
     expect(
       container.querySelector('[data-testid="agentar-card-container"]'),
     ).toBeTruthy();
-    expect(
-      container.querySelector('[data-testid="code-toolbar"]'),
-    ).toBeFalsy();
+    expect(container.querySelector('[data-testid="code-toolbar"]')).toBeFalsy();
   });
 
   it('应将 apaasify 代码块渲染为 SchemaRenderer', () => {

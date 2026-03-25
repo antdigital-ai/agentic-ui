@@ -13,6 +13,7 @@ import remarkRehype from 'remark-rehype';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
+import { preprocessProtectTimeFromDirective } from '../MarkdownEditor/editor/parser/constants';
 import { remarkDirectiveContainer } from '../MarkdownEditor/editor/parser/remarkDirectiveContainer';
 import {
   convertParagraphToImage,
@@ -947,7 +948,9 @@ const renderMarkdownBlock = (
 ): React.ReactNode => {
   if (!blockContent.trim()) return null;
   try {
-    const mdast = processor.parse(blockContent);
+    const mdast = processor.parse(
+      preprocessProtectTimeFromDirective(blockContent),
+    );
     const hast = processor.runSync(mdast);
     if (blockOpts?.markStreamingTailParagraph) {
       markLastParagraphStreamingTail(hast);
@@ -1023,8 +1026,8 @@ export interface UseMarkdownToReactOptions {
 }
 
 export {
-  createHastProcessor,
   buildEditorAlignedComponents,
+  createHastProcessor,
   markLastParagraphStreamingTail,
   renderMarkdownBlock,
   splitMarkdownBlocks,

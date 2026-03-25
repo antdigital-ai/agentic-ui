@@ -57,6 +57,13 @@ describe('Markdown to HTML Utils', () => {
       expect(result).toContain('<strong>test</strong>');
     });
 
+    it('应保留 HH:mm 时间文本（避免 :mm 被 remark-directive 误解析）', async () => {
+      const markdown = '提醒时间 **10:15**';
+      const result = await markdownToHtml(markdown);
+
+      expect(result).toContain('10:15');
+    });
+
     it('允许通过插件数组新增插件', async () => {
       const plugins = createDefaultRemarkPlugins();
       plugins.splice(1, 0, remarkReplaceFooWithBar);
