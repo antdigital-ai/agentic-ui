@@ -31,7 +31,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         flexWrap: 'wrap',
         alignItems: 'flex-start',
         gap: 4,
+        padding: 0,
         maxWidth: 'calc(285px * 3 + 4px * 2)', // 3列：每列285px，间距4px
+        '& > :only-child': {
+          marginTop: 8,
+        },
       },
       '&::-webkit-scrollbar': {
         width: 6,
