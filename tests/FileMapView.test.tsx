@@ -35,7 +35,7 @@ describe('FileMapView', () => {
       const { container } = render(<FileMapView />);
       expect(
         container.querySelector('.ant-agentic-md-editor-file-view-list'),
-      ).toBeInTheDocument();
+      ).not.toBeInTheDocument();
     });
 
     it('should render with files', () => {
@@ -52,15 +52,19 @@ describe('FileMapView', () => {
     });
 
     it('should apply custom className', () => {
+      const fileMap = new Map();
+      fileMap.set('file-1', createMockFile('test.pdf', 'application/pdf'));
       const { container } = render(
-        <FileMapView className="custom-file-view" />,
+        <FileMapView className="custom-file-view" fileMap={fileMap} />,
       );
       expect(container.querySelector('.custom-file-view')).toBeInTheDocument();
     });
 
     it('should apply custom style', () => {
+      const fileMap = new Map();
+      fileMap.set('file-1', createMockFile('test.pdf', 'application/pdf'));
       const customStyle = { backgroundColor: 'red' };
-      const { container } = render(<FileMapView style={customStyle} />);
+      const { container } = render(<FileMapView style={customStyle} fileMap={fileMap} />);
       const element = container.querySelector(
         '.ant-agentic-md-editor-file-view-list',
       ) as HTMLElement;
@@ -368,14 +372,18 @@ describe('FileMapView', () => {
 
   describe('Placement', () => {
     it('should render with left placement by default', () => {
-      const { container } = render(<FileMapView />);
+      const fileMap = new Map();
+      fileMap.set('file-1', createMockFile('test.pdf', 'application/pdf'));
+      const { container } = render(<FileMapView fileMap={fileMap} />);
       expect(
         container.querySelector('.ant-agentic-md-editor-file-view-list'),
       ).toBeInTheDocument();
     });
 
     it('should render with right placement', () => {
-      const { container } = render(<FileMapView placement="right" />);
+      const fileMap = new Map();
+      fileMap.set('file-1', createMockFile('test.pdf', 'application/pdf'));
+      const { container } = render(<FileMapView placement="right" fileMap={fileMap} />);
       expect(
         container.querySelector('.ant-agentic-md-editor-file-view-list'),
       ).toBeInTheDocument();
@@ -616,21 +624,21 @@ describe('FileMapView', () => {
       const { container } = render(<FileMapView fileMap={fileMap} />);
       expect(
         container.querySelector('.ant-agentic-md-editor-file-view-list'),
-      ).toBeInTheDocument();
+      ).not.toBeInTheDocument();
     });
 
     it('should handle null fileMap', () => {
       const { container } = render(<FileMapView fileMap={null} />);
       expect(
         container.querySelector('.ant-agentic-md-editor-file-view-list'),
-      ).toBeInTheDocument();
+      ).not.toBeInTheDocument();
     });
 
     it('should handle undefined fileMap', () => {
       const { container } = render(<FileMapView />);
       expect(
         container.querySelector('.ant-agentic-md-editor-file-view-list'),
-      ).toBeInTheDocument();
+      ).not.toBeInTheDocument();
     });
 
     it('should handle single file', () => {
