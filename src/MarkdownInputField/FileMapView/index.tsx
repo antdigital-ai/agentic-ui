@@ -153,64 +153,66 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
         width: 'max-content',
       }}
     >
-      <motion.div
-        variants={{
-          visible: {
-            opacity: 1,
-            transition: {
-              when: 'beforeChildren',
-              staggerChildren: 0.1,
+      {imgList.length > 0 && (
+        <motion.div
+          variants={{
+            visible: {
+              opacity: 1,
+              transition: {
+                when: 'beforeChildren',
+                staggerChildren: 0.1,
+              },
             },
-          },
-          hidden: {
-            opacity: 0,
-            transition: {
-              when: 'afterChildren',
+            hidden: {
+              opacity: 0,
+              transition: {
+                when: 'afterChildren',
+              },
             },
-          },
-        }}
-        whileInView="visible"
-        initial="hidden"
-        animate={'visible'}
-        style={props.style}
-        className={classNames(
-          prefix,
-          hashId,
-          props.className,
-          `${prefix}-${placement}`,
-          {
-            [`${prefix}-image-list-view`]: imgList.length > 1,
-            [`${prefix}-image-list-view-${placement}`]: imgList.length > 1,
-          },
-        )}
-      >
-        <Image.PreviewGroup>
-          {imgList.map((file, index) => {
-            if (
-              file.status !== undefined &&
-              file.status !== null &&
-              !file.url &&
-              !file.previewUrl
-            ) {
+          }}
+          whileInView="visible"
+          initial="hidden"
+          animate={'visible'}
+          style={props.style}
+          className={classNames(
+            prefix,
+            hashId,
+            props.className,
+            `${prefix}-${placement}`,
+            {
+              [`${prefix}-image-list-view`]: imgList.length > 1,
+              [`${prefix}-image-list-view-${placement}`]: imgList.length > 1,
+            },
+          )}
+        >
+          <Image.PreviewGroup>
+            {imgList.map((file, index) => {
+              if (
+                file.status !== undefined &&
+                file.status !== null &&
+                !file.url &&
+                !file.previewUrl
+              ) {
+                return (
+                  <FileMetaPlaceholder
+                    file={file}
+                    key={file.uuid || file.name || index}
+                  />
+                );
+              }
               return (
-                <FileMetaPlaceholder
-                  file={file}
+                <Image
+                  rootClassName={classNames(`${prefix}-image`, hashId)}
+                  width={124}
+                  height={124}
+                  src={file.previewUrl || file.url}
                   key={file.uuid || file.name || index}
                 />
               );
-            }
-            return (
-              <Image
-                rootClassName={classNames(`${prefix}-image`, hashId)}
-                width={124}
-                height={124}
-                src={file.previewUrl || file.url}
-                key={file.uuid || file.name || index}
-              />
-            );
-          })}
-        </Image.PreviewGroup>
-      </motion.div>
+            })}
+          </Image.PreviewGroup>
+        </motion.div>
+      )}
       {videoList.length > 0 && (
         <motion.div
           variants={{
@@ -306,79 +308,81 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           />
         )}
       </Modal>
-      <motion.div
-        variants={{
-          visible: {
-            opacity: 1,
-            transition: {
-              when: 'beforeChildren',
-              staggerChildren: 0.1,
+      {allNoMediaFiles.length > 0 && (
+        <motion.div
+          variants={{
+            visible: {
+              opacity: 1,
+              transition: {
+                when: 'beforeChildren',
+                staggerChildren: 0.1,
+              },
             },
-          },
-          hidden: {
-            opacity: 0,
-            transition: {
-              when: 'afterChildren',
+            hidden: {
+              opacity: 0,
+              transition: {
+                when: 'afterChildren',
+              },
             },
-          },
-        }}
-        whileInView="visible"
-        initial="hidden"
-        animate={'visible'}
-        className={classNames(
-          prefix,
-          hashId,
-          props.className,
-          `${prefix}-${placement}`,
-          `${prefix}-vertical`,
-        )}
-        style={props.style}
-      >
-        {noMediaFileList.map((file, index) => {
-          return (
-            <FileMapViewItem
+          }}
+          whileInView="visible"
+          initial="hidden"
+          animate={'visible'}
+          className={classNames(
+            prefix,
+            hashId,
+            props.className,
+            `${prefix}-${placement}`,
+            `${prefix}-vertical`,
+          )}
+          style={props.style}
+        >
+          {noMediaFileList.map((file, index) => {
+            return (
+              <FileMapViewItem
+                style={{ width: props.style?.width }}
+                onPreview={
+                  props.onPreview
+                    ? () => {
+                        props.onPreview?.(file);
+                      }
+                    : undefined
+                }
+                onDownload={
+                  props.onDownload
+                    ? () => {
+                        props.onDownload?.(file);
+                      }
+                    : undefined
+                }
+                renderMoreAction={props.renderMoreAction}
+                customSlot={props.customSlot}
+                key={file?.uuid || file?.name || index}
+                prefixCls={`${prefix}-item`}
+                hashId={hashId}
+                className={classNames(hashId, `${prefix}-item`)}
+                file={file}
+              />
+            );
+          })}
+          {props.maxDisplayCount !== undefined &&
+          allNoMediaFiles.length > props.maxDisplayCount &&
+          !showAllFiles ? (
+            <div
               style={{ width: props.style?.width }}
-              onPreview={
-                props.onPreview
-                  ? () => {
-                      props.onPreview?.(file);
-                    }
-                  : undefined
-              }
-              onDownload={
-                props.onDownload
-                  ? () => {
-                      props.onDownload?.(file);
-                    }
-                  : undefined
-              }
-              renderMoreAction={props.renderMoreAction}
-              customSlot={props.customSlot}
-              key={file?.uuid || file?.name || index}
-              prefixCls={`${prefix}-item`}
-              hashId={hashId}
-              className={classNames(hashId, `${prefix}-item`)}
-              file={file}
-            />
-          );
-        })}
-        {props.maxDisplayCount !== undefined &&
-        allNoMediaFiles.length > props.maxDisplayCount &&
-        !showAllFiles ? (
-          <div
-            style={{ width: props.style?.width }}
-            className={classNames(hashId, `${prefix}-more-file-container`)}
-            onClick={handleViewAllClick}
-          >
-            <FileSearch color="var(--color-gray-text-secondary)" />
-            <div className={classNames(hashId, `${prefix}-more-file-name`)}>
-              <span style={{ whiteSpace: 'nowrap' }}>
-                查看此任务中的所有文件
-              </span>
+              className={classNames(hashId, `${prefix}-more-file-container`)}
+              onClick={handleViewAllClick}
+            >
+              <FileSearch color="var(--color-gray-text-secondary)" />
+              <div className={classNames(hashId, `${prefix}-more-file-name`)}>
+                <span style={{ whiteSpace: 'nowrap' }}>
+                  查看此任务中的所有文件
+                </span>
+              </div>
             </div>
-          </div>
-        ) : null}
-      </motion.div>
+          ) : null}
+        </motion.div>
+      )}
     </div>,
   );
 };

@@ -78,6 +78,92 @@ export const FileMapViewItem: React.FC<{
       ? fileName.slice(lastDotIndex + 1)
       : '';
 
+  const fileSize = file.size ? kbToSize(file.size / 1024) : '';
+  const lastModifiedTime = file?.lastModified
+    ? dayjs(file.lastModified).format('HH:mm')
+    : '';
+
+  const renderExtensionContainer = () => {
+    if (file.status === 'error' && file.errorMessage) {
+      return (
+        <div
+          className={classNames(
+            `${props.prefixCls}-file-name-extension-container`,
+            props.hashId,
+          )}
+        >
+          <span
+            className={classNames(
+              `${props.prefixCls}-file-error-msg`,
+              props.hashId,
+            )}
+            style={{ color: 'var(--color-red-text-secondary)' }}
+          >
+            {file.errorMessage}
+          </span>
+        </div>
+      );
+    }
+
+    const items: React.ReactNode[] = [];
+    if (displayExtension) {
+      items.push(
+        <span
+          key="ext"
+          className={classNames(
+            `${props.prefixCls}-file-name-extension`,
+            props.hashId,
+          )}
+        >
+          {displayExtension}
+        </span>,
+      );
+    }
+    if (fileSize) {
+      items.push(
+        <div
+          key="size"
+          className={classNames(
+            `${props.prefixCls}-file-size`,
+            props.hashId,
+          )}
+        >
+          {fileSize}
+        </div>,
+      );
+    }
+    if (lastModifiedTime) {
+      items.push(<div key="time">{lastModifiedTime}</div>);
+    }
+
+    if (items.length === 0) return null;
+
+    return (
+      <div
+        className={classNames(
+          `${props.prefixCls}-file-name-extension-container`,
+          props.hashId,
+        )}
+      >
+        {items.map((item, index) => (
+          <React.Fragment key={index}>
+            {index > 0 && (
+              <span
+                className={classNames(
+                  `${props.prefixCls}-separator`,
+                  props.hashId,
+                )}
+              >
+                |
+              </span>
+            )}
+            {item}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
+
   // 有 status 但无 url/previewUrl：文件内容未拿到，展示大小与格式占位块（loading 状态除外）
   if (isFileMetaPlaceholderState(file)) {
     return <FileMetaPlaceholder file={file} />;
@@ -146,64 +232,7 @@ export const FileMapViewItem: React.FC<{
               {displayName}
             </span>
           </div>
-          <div
-            className={classNames(
-              `${props.prefixCls}-file-name-extension-container`,
-              props.hashId,
-            )}
-          >
-            {file.status === 'error' && file.errorMessage ? (
-              <span
-                className={classNames(
-                  `${props.prefixCls}-file-error-msg`,
-                  props.hashId,
-                )}
-                style={{ color: 'var(--color-red-text-secondary)' }}
-              >
-                {file.errorMessage}
-              </span>
-            ) : (
-              <>
-                <span
-                  className={classNames(
-                    `${props.prefixCls}-file-name-extension`,
-                    props.hashId,
-                  )}
-                >
-                  {displayExtension}
-                </span>
-                <span
-                  className={classNames(
-                    `${props.prefixCls}-separator`,
-                    props.hashId,
-                  )}
-                >
-                  |
-                </span>
-                <div
-                  className={classNames(
-                    `${props.prefixCls}-file-size`,
-                    props.hashId,
-                  )}
-                >
-                  {kbToSize(file.size / 1024)}
-                </div>
-                <span
-                  className={classNames(
-                    `${props.prefixCls}-separator`,
-                    props.hashId,
-                  )}
-                >
-                  |
-                </span>
-                <div>
-                  {file?.lastModified
-                    ? dayjs(file?.lastModified).format('HH:mm')
-                    : ''}
-                </div>
-              </>
-            )}
-          </div>
+          {renderExtensionContainer()}
         </div>
 
         {hovered ? (
