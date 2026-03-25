@@ -1,7 +1,6 @@
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
-import remarkDirective from 'remark-directive';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -10,11 +9,9 @@ import remarkRehype from 'remark-rehype';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
-import {
-  JINJA_DOLLAR_PLACEHOLDER,
-  preprocessProtectTimeFromDirective,
-} from '../parser/constants';
+import { JINJA_DOLLAR_PLACEHOLDER } from '../parser/constants';
 import { remarkDirectiveContainer } from '../parser/remarkDirectiveContainer';
+import remarkDirectiveContainersOnly from '../parser/remarkDirectiveContainersOnly';
 import {
   convertParagraphToImage,
   fixStrongWithSpecialChars,
@@ -262,7 +259,7 @@ export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
     protectJinjaDollarInText,
     [remarkMath as unknown as Plugin, INLINE_MATH_WITH_SINGLE_DOLLAR],
     [remarkFrontmatter, FRONTMATTER_LANGUAGES],
-    remarkDirective,
+    remarkDirectiveContainersOnly as unknown as Plugin,
     [remarkDirectiveContainer, REMARK_DIRECTIVE_CONTAINER_OPTIONS],
     [
       remarkRehypePlugin,
@@ -376,9 +373,8 @@ export const markdownToHtml = async (
   config?: MarkdownToHtmlConfig,
 ): Promise<string> => {
   try {
-    const safeMarkdown = preprocessProtectTimeFromDirective(markdown);
     const file = await createMarkdownProcessor(plugins, config).process(
-      safeMarkdown,
+      markdown,
     );
     const htmlContent =
       file && typeof file === 'object' && 'value' in file
@@ -427,10 +423,7 @@ export const markdownToHtmlSync = (
   config?: MarkdownToHtmlConfig,
 ): string => {
   try {
-    const safeMarkdown = preprocessProtectTimeFromDirective(markdown);
-    const file = createMarkdownProcessor(plugins, config).processSync(
-      safeMarkdown,
-    );
+    const file = createMarkdownProcessor(plugins, config).processSync(markdown);
     const htmlContent =
       file && typeof file === 'object' && 'value' in file
         ? String((file as { value: unknown }).value ?? '')

@@ -3,7 +3,6 @@ import { Element } from 'slate';
 
 import { ChartTypeConfig, Elements } from '../../el';
 import { MarkdownEditorPlugin } from '../../plugin';
-import { preprocessProtectTimeFromDirective } from './constants';
 import { applyContextPropsAndConfig } from './parse/applyContextPropsAndConfig';
 import {
   handleBlockquote,
@@ -258,8 +257,7 @@ export class MarkdownToSlateParser {
   }
 
   private preprocessMarkdown(md: string): string {
-    const timeProtected = preprocessProtectTimeFromDirective(md || '');
-    const thinkProcessed = removeAnswerTags(preprocessThinkTags(timeProtected));
+    const thinkProcessed = removeAnswerTags(preprocessThinkTags(md || ''));
     const nonStandardProcessed = removeAnswerTags(
       preprocessNonStandardHtmlTags(thinkProcessed),
     );

@@ -1962,7 +1962,7 @@ const y = 2;
       expect(result.schema.length).toBeGreaterThan(0);
     });
 
-    it('应该正确解析包含 remark-directive textDirective 语法（:name[content]）的内容', () => {
+    it('行内 :name[content] 应作为普通文本解析（仅 ::: 为指令）', () => {
       const markdown = '文本中有 :icon[check] 这样的行内指令';
       expect(() => parserMarkdownToSlateNode(markdown)).not.toThrow();
       const result = parserMarkdownToSlateNode(markdown);
@@ -1992,7 +1992,7 @@ const y = 2;
       expect(result.schema.length).toBeGreaterThan(0);
     });
 
-    it('应该正确处理 remark-directive 行内 textDirective 语法', () => {
+    it('行内 :icon[check] 应稳定解析为普通段落', () => {
       const markdown = '文本中有 :icon[check] 这样的行内指令';
       expect(() => parserMarkdownToSlateNode(markdown)).not.toThrow();
       const result = parserMarkdownToSlateNode(markdown);
@@ -2018,7 +2018,7 @@ const y = 2;
       expect(result.schema.length).toBeGreaterThan(0);
     });
 
-    it('应正确处理 remark-directive 行内 textDirective 语法（:name[content]）', () => {
+    it('行内 :icon[check] 应保留在段落文本中', () => {
       const markdown = '文本中有 :icon[check] 这样的行内指令，需要正确解析';
       const result = parserMarkdownToSlateNode(markdown);
 
@@ -2027,7 +2027,7 @@ const y = 2;
       const textContent = paragraph.children
         ?.map((c: any) => c?.text ?? '')
         .join('');
-      expect(textContent).toContain('check');
+      expect(textContent).toContain(':icon[check]');
     });
 
     it('应该正确处理包含表格的切分', () => {

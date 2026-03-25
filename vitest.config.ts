@@ -5,7 +5,15 @@ export default defineConfig({
   esbuild: {
     //jsxInject: "import React from 'react'",
   },
-  resolve: {},
+  resolve: {
+    alias: {
+      // micromark-extension-directive 未在 package exports 中暴露子路径；供仅容器指令插件使用
+      'micromark-extension-directive/lib/directive-container.js': path.resolve(
+        __dirname,
+        'node_modules/micromark-extension-directive/lib/directive-container.js',
+      ),
+    },
+  },
   server: {
     host: '127.0.0.1',
   },

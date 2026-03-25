@@ -1,4 +1,3 @@
-import remarkDirective from 'remark-directive';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import remarkHtml from 'remark-html';
@@ -7,6 +6,7 @@ import remarkParse from 'remark-parse';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
+import remarkDirectiveContainersOnly from './remarkDirectiveContainersOnly';
 
 /**
  * 提取段落节点的文本内容
@@ -404,7 +404,7 @@ export function protectJinjaDollarInText() {
 // 注意：这个解析器只用于解析，不包含 HTML 渲染相关的插件
 const markdownParser = unified()
   .use(remarkParse) // 解析 Markdown
-  .use(remarkDirective) // 解析 ::: 容器指令（info / warning / success / error / tip{title="..."}）
+  .use(remarkDirectiveContainersOnly) // 仅解析 ::: 容器（不解析行内 :foo）
   .use(remarkHtml)
   .use(remarkFrontmatter, ['yaml']) // 处理前置元数据
   .use(remarkGfm, { singleTilde: false }) // GFM 插件，禁用单波浪线删除线

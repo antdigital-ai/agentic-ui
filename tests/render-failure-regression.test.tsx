@@ -2,7 +2,7 @@
  * 渲染失败回归测试 - 针对上个大版本引入的变更导致的渲染问题
  *
  * 覆盖场景（参考 changelog v2.29.56 - v2.30.1）:
- * - textDirective/leafDirective 渲染失败（remark-directive unknown node）
+ * - 仅 ::: 容器为指令；行内 :foo 为普通文本
  * - 语雀文档格式（表格+时间格式如 02:20:31 被误解析为 directive）
  * - Bubble EXCEPTION 状态下空、null、undefined 内容
  * - MarkdownRenderer 流式渲染
@@ -22,7 +22,7 @@ import {
 
 describe('render-failure-regression', () => {
   describe('MarkdownEditor - textDirective/语雀/容器不应导致渲染失败', () => {
-    it('应正确渲染包含 remark-directive textDirective 语法(:icon[check])的内容', () => {
+    it('应正确渲染包含 :icon[check] 普通文本（不作为指令）', () => {
       expect(() => {
         render(
           <MarkdownEditor
@@ -211,7 +211,7 @@ describe('render-failure-regression', () => {
       }).not.toThrow();
     });
 
-    it('应正确渲染含 textDirective 的 Markdown', () => {
+    it('应正确渲染含 :icon[check] 普通文本的 Markdown', () => {
       expect(() => {
         render(
           <MarkdownRenderer content="文本中有 :icon[check] 这样的行内指令" />,
@@ -255,13 +255,13 @@ describe('render-failure-regression', () => {
     });
   });
 
-  describe('markdownToHtml - textDirective/语雀内容转换不应抛错', () => {
-    it('textDirective 语法转 HTML 时应稳定输出不抛错', () => {
+  describe('markdownToHtml - 行内文本/语雀内容转换不应抛错', () => {
+    it('行内 :icon[check] 转 HTML 时应保留原文', () => {
       expect(() => {
         const html = markdownToHtmlSync(
           '文本中有 :icon[check] 这样的行内指令',
         );
-        expect(html).toContain('directive');
+        expect(html).toContain(':icon[check]');
       }).not.toThrow();
     });
 

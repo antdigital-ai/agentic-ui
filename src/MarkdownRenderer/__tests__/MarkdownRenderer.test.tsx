@@ -47,7 +47,7 @@ describe('MarkdownRenderer', () => {
     expect(bold?.textContent).toBe('bold');
   });
 
-  it('应完整渲染 HH:mm 时间（避免 :mm 被 remark-directive 误解析）', () => {
+  it('应完整渲染 HH:mm 时间（仅 ::: 为指令，行内时间保持原文）', () => {
     const { container } = render(
       <MarkdownRenderer content="时间：**每天上午 10:15**" />,
     );

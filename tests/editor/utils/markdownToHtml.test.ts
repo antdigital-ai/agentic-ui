@@ -57,7 +57,7 @@ describe('Markdown to HTML Utils', () => {
       expect(result).toContain('<strong>test</strong>');
     });
 
-    it('应保留 HH:mm 时间文本（避免 :mm 被 remark-directive 误解析）', async () => {
+    it('应保留 HH:mm 时间文本（仅 ::: 容器为指令）', async () => {
       const markdown = '提醒时间 **10:15**';
       const result = await markdownToHtml(markdown);
 
@@ -197,13 +197,12 @@ title: Test
       expect(result).toContain('这是一条带标题的提示块');
     });
 
-    it('应该支持 remark-directive 行内 textDirective 语法（避免 unknown node 错误）', async () => {
-      const markdown = '文本中有 :icon[check] 这样的行内指令';
+    it('行内 :name[label] 不作为指令解析（仅 ::: 容器为指令）', async () => {
+      const markdown = '文本中有 :icon[check] 这样的内容';
       const result = await markdownToHtml(markdown);
 
-      expect(result).toContain('directive');
-      expect(result).toContain('directive-icon');
-      expect(result).toContain('check');
+      expect(result).not.toContain('directive-icon');
+      expect(result).toContain(':icon[check]');
     });
 
     it('应该处理无效的Markdown并返回空字符串', async () => {

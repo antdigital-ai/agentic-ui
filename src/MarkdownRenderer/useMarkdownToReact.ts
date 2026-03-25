@@ -2,10 +2,7 @@ import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 
-import {
-  JINJA_DOLLAR_PLACEHOLDER,
-  preprocessProtectTimeFromDirective,
-} from '../MarkdownEditor/editor/parser/constants';
+import { JINJA_DOLLAR_PLACEHOLDER } from '../MarkdownEditor/editor/parser/constants';
 import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,
@@ -39,9 +36,7 @@ export const markdownToReactSync = (
       '$',
     );
 
-    const mdast = processor.parse(
-      preprocessProtectTimeFromDirective(preprocessed),
-    );
+    const mdast = processor.parse(preprocessed);
     const hast = processor.runSync(mdast);
 
     const userComps = components || {};
