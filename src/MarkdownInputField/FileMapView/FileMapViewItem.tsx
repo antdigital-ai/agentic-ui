@@ -87,6 +87,7 @@ export const FileMapViewItem: React.FC<{
     if (file.status === 'error' && file.errorMessage) {
       return (
         <div
+          data-testid="file-item-extension-container"
           className={classNames(
             `${props.prefixCls}-file-name-extension-container`,
             props.hashId,
@@ -97,6 +98,7 @@ export const FileMapViewItem: React.FC<{
               `${props.prefixCls}-file-error-msg`,
               props.hashId,
             )}
+            data-testid="file-item-error-msg"
             style={{ color: 'var(--color-red-text-secondary)' }}
           >
             {file.errorMessage}
@@ -110,6 +112,7 @@ export const FileMapViewItem: React.FC<{
       items.push(
         <span
           key="ext"
+          data-testid="file-item-extension"
           className={classNames(
             `${props.prefixCls}-file-name-extension`,
             props.hashId,
@@ -123,6 +126,7 @@ export const FileMapViewItem: React.FC<{
       items.push(
         <div
           key="size"
+          data-testid="file-item-size"
           className={classNames(
             `${props.prefixCls}-file-size`,
             props.hashId,
@@ -133,13 +137,18 @@ export const FileMapViewItem: React.FC<{
       );
     }
     if (lastModifiedTime) {
-      items.push(<div key="time">{lastModifiedTime}</div>);
+      items.push(
+        <div key="time" data-testid="file-item-time">
+          {lastModifiedTime}
+        </div>,
+      );
     }
 
     if (items.length === 0) return null;
 
     return (
       <div
+        data-testid="file-item-extension-container"
         className={classNames(
           `${props.prefixCls}-file-name-extension-container`,
           props.hashId,
@@ -206,6 +215,7 @@ export const FileMapViewItem: React.FC<{
         data-testid="file-item"
       >
         <div
+          data-testid="file-item-icon"
           className={classNames(`${props.prefixCls}-file-icon`, props.hashId)}
         >
           <AttachmentFileIcon
@@ -217,12 +227,14 @@ export const FileMapViewItem: React.FC<{
           />
         </div>
         <div
+          data-testid="file-item-info"
           className={classNames(`${props.prefixCls}-file-info`, props.hashId)}
         >
           <div
             className={classNames(`${props.prefixCls}-file-name`, props.hashId)}
           >
             <span
+              data-testid="file-item-name"
               className={classNames(
                 `${props.prefixCls}-file-name-text`,
                 props.hashId,
@@ -237,6 +249,7 @@ export const FileMapViewItem: React.FC<{
 
         {hovered ? (
           <div
+            data-testid="file-item-action-bar"
             className={classNames(
               `${props.prefixCls}-action-bar`,
               props.hashId,

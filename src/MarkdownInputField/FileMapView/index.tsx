@@ -143,6 +143,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
 
   return wrapSSR(
     <div
+      data-testid="file-view-list"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -174,6 +175,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           initial="hidden"
           animate={'visible'}
           style={props.style}
+          data-testid="file-view-image-list"
           className={classNames(
             prefix,
             hashId,
@@ -222,6 +224,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           whileInView="visible"
           initial="hidden"
           animate="visible"
+          data-testid="file-view-video-list"
           className={classNames(
             `${prefix}-video-row`,
             `${prefix}-video-row-${placement}`,
@@ -266,6 +269,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
                   }
                 }}
                 aria-label={`播放视频：${file.name}`}
+                data-testid="file-view-video-thumb"
                 style={thumbSize}
               >
                 <video
@@ -328,6 +332,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           whileInView="visible"
           initial="hidden"
           animate={'visible'}
+          data-testid="file-view-file-list"
           className={classNames(
             prefix,
             hashId,
@@ -369,6 +374,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           allNoMediaFiles.length > props.maxDisplayCount &&
           !showAllFiles ? (
             <div
+              data-testid="file-view-view-all"
               style={{ width: props.style?.width }}
               className={classNames(hashId, `${prefix}-more-file-container`)}
               onClick={handleViewAllClick}
