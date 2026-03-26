@@ -37,7 +37,7 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
   const style = useMemo(
     () =>
       ({
-        visibility: isRendered ? 'visible' : 'hidden',
+        opacity: isRendered ? 1 : 0,
         pointerEvents: isRendered ? 'auto' : 'none',
         width: '100%',
         height: isRendered ? '100%' : '0',

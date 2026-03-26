@@ -24,21 +24,22 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       flexDirection: 'column',
       // 增加隔离：防止内容溢出影响其他元素
       position: 'relative',
-      isolation: 'isolate', // CSS isolation 属性，创建新的堆叠上下文
-      contain: 'layout style paint', // CSS containment，限制布局和样式的影响范围
-      overflow: 'hidden', // 防止内容溢出
+      isolation: 'isolate',
+      contain: 'layout style paint',
+      overflow: 'hidden',
+      transition: 'height 0.3s ease, min-height 0.3s ease',
 
       // 渲染容器样式
       '& [data-mermaid-container="true"]': {
         width: '100%',
         display: 'flex',
         justifyContent: 'center',
-        // 增加隔离样式
         position: 'relative',
         isolation: 'isolate',
         contain: 'layout style paint',
         overflow: 'hidden',
-        // 防止 SVG 样式影响外部
+        transition:
+          'opacity 0.3s ease, height 0.3s ease, min-height 0.3s ease, max-height 0.3s ease',
       },
 
       // SVG 包装器样式（用于动态创建的 wrapper）
@@ -79,8 +80,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '200px',
+        animation: 'agenticMermaidFadeIn 0.3s ease',
 
-        // Skeleton 样式优化
         '& .ant-skeleton': {
           width: '100%',
           maxWidth: '800px',
@@ -99,16 +100,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         color: 'rgba(239, 68, 68, 0.8)',
         padding: '0.5rem',
         flex: 1,
-        // 错误信息也增加隔离
         position: 'relative',
         zIndex: 1,
         wordBreak: 'break-word',
         maxWidth: '100%',
         height: '100%',
         width: '100%',
+        animation: 'agenticMermaidFadeIn 0.3s ease',
       },
 
-      // 空状态样式
+      // 空状态样式（流式输入中的原始代码展示）
       '&-empty': {
         textAlign: 'center',
         color: '#6B7280',
@@ -118,11 +119,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         flex: 1,
         height: '100%',
         width: '100%',
+        animation: 'agenticMermaidFadeIn 0.3s ease',
       },
 
-      // Fallback 组件样式
+      // Fallback 组件样式（Suspense 加载中）
       '&-fallback': {
-        marginBottom: '0.75em',
         padding: '0.75rem 0',
         display: 'flex',
         justifyContent: 'center',
@@ -130,8 +131,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         color: '#6B7280',
         width: '100%',
         minHeight: '200px',
+        animation: 'agenticMermaidFadeIn 0.3s ease',
 
-        // Skeleton 样式优化
         '& .ant-skeleton': {
           width: '100%',
           maxWidth: '800px',
@@ -142,6 +143,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           minHeight: '200px',
           borderRadius: '12px',
         },
+      },
+
+      '@keyframes agenticMermaidFadeIn': {
+        from: { opacity: 0 },
+        to: { opacity: 1 },
       },
 
       // SVG 渲染优化样式

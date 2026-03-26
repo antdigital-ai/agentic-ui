@@ -49,9 +49,9 @@ const MermaidUnfinished = (props: { element: CodeNode }) => {
 /**
  * Mermaid 组件 - Mermaid图表渲染组件
  *
- * 该组件使用Mermaid库渲染图表，支持流程图、时序图、甘特图等。
  * 仅在代码块闭合（otherProps.finished !== false）时才渲染图表，
- * 否则展示原始代码，避免流式输入时反复触发渲染错误。
+ * 否则展示原始代码。各状态通过 CSS animation（fadeIn）实现平滑过渡，
+ * 渲染容器内部通过 opacity/height transition 避免视觉抖动。
  *
  * @component
  * @param {Object} props - 组件属性
