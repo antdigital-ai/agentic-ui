@@ -120,6 +120,9 @@ const genTableStyle = (
         'tr:last-child td:not(.config-td)': { borderBottom: 'none' },
         'tr td:first-child:not(.config-td)': { fontWeight: 600 },
 
+        'tbody tr:not(.config-tr)': {
+          animation: 'agenticTableRowFadeIn 0.3s ease both',
+        },
         'tbody tr:not(.config-tr):hover': {
           background:
             'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))',
@@ -277,6 +280,11 @@ const genTableStyle = (
       '&:hover': {
         color: '#52c41a',
       },
+    },
+
+    '@keyframes agenticTableRowFadeIn': {
+      from: { opacity: 0, transform: 'translateY(4px)' },
+      to: { opacity: 1, transform: 'translateY(0)' },
     },
   };
 };

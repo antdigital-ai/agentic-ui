@@ -564,7 +564,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-th',
         style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children,
+        children: wrapAnimation(children),
       });
     },
     td: (props: any) => {
@@ -573,7 +573,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-td',
         style: { whiteSpace: 'normal', maxWidth: '20%' },
-        children,
+        children: wrapAnimation(children),
       });
     },
 
