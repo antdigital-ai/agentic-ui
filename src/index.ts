@@ -8,6 +8,8 @@
  *   4. 按功能分区，便于维护
  */
 
+import './root.css';
+
 // ─── Slate 类型 re-export（唯一的第三方类型例外） ───────────────────────────
 export type { RenderElementProps } from 'slate-react';
 
