@@ -54,31 +54,47 @@ const STREAM_INCOMPLETE_REGEX = {
 
 const STREAMING_LOADING_PLACEHOLDER = '...';
 
+const parsePipeRowCells = (line: string): string[] | null => {
+  const trimmedLine = line.trim();
+  if (!trimmedLine.startsWith('|') || !trimmedLine.endsWith('|')) {
+    return null;
+  }
+  const cells = trimmedLine.split('|').slice(1, -1).map((cell) => cell.trim());
+  if (!cells.length) return null;
+  return cells;
+};
+
+const isTableSeparatorCell = (cell: string): boolean => {
+  return /^:?-{3,}:?$/.test(cell);
+};
+
 /**
  * 判断表格是否仍不完整。
- * 等待 header + separator + 至少一行数据（3 行）后提交。
+ * 等待 header + separator + 第一行数据完整闭合后提交。
  */
 const isTableIncomplete = (markdown: string) => {
   if (markdown.includes('\n\n')) return false;
-  const lines = markdown.split('\n');
+  const lines = markdown.replace(/\r\n/g, '\n').split('\n');
   // 需要至少 3 行：header | separator | 第一行数据
   if (lines.length < 3) return true;
-  const [header, separator] = lines;
-  if (!/^\|.*\|$/.test(header.trim())) return false;
-  const columns = separator
-    .trim()
-    .split('|')
-    .map((c) => c.trim())
-    .filter(Boolean);
-  const isSeparatorValid = columns.every((col, i) =>
-    i === columns.length - 1
-      ? col === ':' || /^:?-+:?$/.test(col)
-      : /^:?-+:?$/.test(col),
-  );
+  const [header, separator, firstDataRow] = lines;
+
+  const headerCells = parsePipeRowCells(header);
+  if (!headerCells) return false;
+
+  const separatorCells = parsePipeRowCells(separator);
+  if (!separatorCells || separatorCells.length !== headerCells.length) {
+    return false;
+  }
+  const isSeparatorValid = separatorCells.every(isTableSeparatorCell);
   if (!isSeparatorValid) return false;
-  // separator 完整但还没有数据行
-  if (lines.length <= 2) return true;
-  // 有数据行了，不再缓存
+
+  // 第三行不是表格行，视为当前表格 token 已完成（例如 header-only 表格后接普通文本）
+  if (!firstDataRow?.trim().startsWith('|')) return false;
+
+  // 第一行数据必须是闭合的管道行（以 | 结尾），否则继续缓存
+  if (!firstDataRow.trim().endsWith('|')) return true;
+
   return false;
 };
 

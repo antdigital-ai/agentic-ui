@@ -67,4 +67,48 @@ describe('useStreaming', () => {
       expect(result.current).toBe('prefix ');
     });
   });
+
+  it('表格流式输入时，首行未闭合前不应提前提交 header', async () => {
+    const tablePrefix = '| Name |\n| --- |\n| Al';
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: tablePrefix,
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('表格首行闭合后应一次性提交 header 与首行', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| Name |\n| --- |\n| Al',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+
+    rerender({
+      input: '| Name |\n| --- |\n| Alice |',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toBe('| Name |\n| --- |\n| Alice |');
+    });
+  });
 });
