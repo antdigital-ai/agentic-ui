@@ -247,9 +247,18 @@ export const useStreaming = (input: string, enabled: boolean): string => {
     if (!chunk) return;
 
     cache.processedLength += chunk.length;
+    let wasInCodeBlock = isInCodeBlock(cache.completeMarkdown + cache.pending);
     for (const char of chunk) {
       cache.pending += char;
-      if (isInCodeBlock(cache.completeMarkdown + cache.pending)) {
+      const inCodeBlock = isInCodeBlock(
+        cache.completeMarkdown + cache.pending,
+      );
+      if (inCodeBlock) {
+        wasInCodeBlock = true;
+        continue;
+      }
+      if (wasInCodeBlock) {
+        wasInCodeBlock = false;
         commitCache(cache);
         continue;
       }
