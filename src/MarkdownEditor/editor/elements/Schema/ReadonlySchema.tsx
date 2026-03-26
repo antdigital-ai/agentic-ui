@@ -46,33 +46,36 @@ export const ReadonlySchema: React.FC<RenderElementProps> = React.memo(
     const defaultDom = useMemo(() => {
       if (apaasify?.enable && apaasify.render) {
         const renderedContent = apaasify.render(props, bubble?.originData);
-        return (
-          <div
-            {...node.attributes}
-            data-testid="schema-container"
-            contentEditable={false}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              userSelect: 'text',
-              WebkitUserSelect: 'text',
-            }}
-          >
-            {renderedContent}
+        // 与 MarkdownRenderer 对齐：undefined 代表“回退默认渲染”，null 代表“显式不渲染内容”。
+        if (renderedContent !== undefined) {
+          return (
             <div
-              data-testid="schema-hidden-json"
+              {...node.attributes}
+              data-testid="schema-container"
+              contentEditable={false}
               style={{
-                height: 1,
-                opacity: 0,
-                userSelect: 'none',
-                pointerEvents: 'none',
-                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                userSelect: 'text',
+                WebkitUserSelect: 'text',
               }}
             >
-              {JSON.stringify(props.element.value, null, 2)}
+              {renderedContent}
+              <div
+                data-testid="schema-hidden-json"
+                style={{
+                  height: 1,
+                  opacity: 0,
+                  userSelect: 'none',
+                  pointerEvents: 'none',
+                  overflow: 'hidden',
+                }}
+              >
+                {JSON.stringify(props.element.value, null, 2)}
+              </div>
             </div>
-          </div>
-        );
+          );
+        }
       }
 
       if (node.language === 'agentar-card') {
