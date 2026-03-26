@@ -1,8 +1,11 @@
-import React, { lazy, Suspense } from 'react';
+import { ConfigProvider } from 'antd';
+import classNames from 'clsx';
+import React, { lazy, Suspense, useContext } from 'react';
 import { CodeNode } from '../../MarkdownEditor/el';
 import { isBrowser } from './env';
 import { MermaidFallback } from './MermaidFallback';
 import { MermaidRendererImpl } from './MermaidRendererImpl';
+import { useStyle } from './style';
 import { loadMermaid } from './utils';
 
 /**
@@ -15,44 +18,53 @@ const MermaidRenderer = lazy(async () => {
 });
 
 /**
+ * 代码块未闭合时的占位组件，展示原始 Mermaid 代码
+ */
+const MermaidUnfinished = (props: { element: CodeNode }) => {
+  const context = useContext(ConfigProvider.ConfigContext);
+  const baseCls =
+    context?.getPrefixCls('agentic-plugin-mermaid') || 'plugin-mermaid';
+  const { wrapSSR, hashId } = useStyle(baseCls);
+
+  return wrapSSR(
+    <div
+      className={classNames(baseCls, hashId)}
+      contentEditable={false}
+    >
+      <div className={classNames(`${baseCls}-empty`, hashId)}>
+        <pre
+          style={{
+            margin: 0,
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+          }}
+        >
+          {props.element.value || ''}
+        </pre>
+      </div>
+    </div>,
+  );
+};
+
+/**
  * Mermaid 组件 - Mermaid图表渲染组件
  *
  * 该组件使用Mermaid库渲染图表，支持流程图、时序图、甘特图等。
- * 使用 React.lazy 和 Suspense 实现代码分割和延迟加载，优化性能。
+ * 仅在代码块闭合（otherProps.finished !== false）时才渲染图表，
+ * 否则展示原始代码，避免流式输入时反复触发渲染错误。
  *
  * @component
- * @description Mermaid图表渲染组件，支持各种Mermaid图表类型
  * @param {Object} props - 组件属性
  * @param {CodeNode} props.element - 代码节点，包含Mermaid图表代码
- * @param {string} [props.element.value] - Mermaid图表代码字符串
- *
- * @example
- * ```tsx
- * <Mermaid
- *   element={{
- *     type: 'code',
- *     value: 'graph TD\nA[开始] --> B[处理] --> C[结束]'
- *   }}
- * />
- * ```
- *
- * @returns {React.ReactElement} 渲染的Mermaid图表组件
- *
- * @remarks
- * - 基于Mermaid库实现图表渲染
- * - 支持多种图表类型（流程图、时序图、甘特图等）
- * - 使用 React.lazy 和 Suspense 实现代码分割
- * - 提供延迟渲染优化性能
- * - 包含错误处理机制
- * - 支持空状态显示
- * - 提供美观的样式设计
- * - 禁用文本选择
- * - 居中显示图表
- * - 自动生成唯一ID
  */
 export const Mermaid = (props: { element: CodeNode }) => {
   if (!isBrowser()) {
     return null;
+  }
+
+  const isUnfinished = props.element.otherProps?.finished === false;
+  if (isUnfinished) {
+    return <MermaidUnfinished element={props.element} />;
   }
 
   return (

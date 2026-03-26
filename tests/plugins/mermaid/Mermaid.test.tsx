@@ -152,4 +152,49 @@ describe('Mermaid Component', () => {
     );
     await waitFor(() => expect(mermaid.default.render).toHaveBeenCalled());
   });
+
+  it('otherProps.finished === false 时不应渲染图表，展示原始代码', async () => {
+    const mermaid = await import('mermaid');
+    const { container } = render(
+      <Mermaid
+        element={{
+          ...defaultElement,
+          otherProps: { finished: false },
+        }}
+      />,
+    );
+    expect(mermaid.default.render).not.toHaveBeenCalled();
+    const pre = container.querySelector('pre');
+    expect(pre).toBeInTheDocument();
+    expect(pre?.textContent).toBe(defaultElement.value);
+  });
+
+  it('otherProps.finished 不为 false 时正常渲染图表', async () => {
+    const mermaid = await import('mermaid');
+    renderMermaid();
+    await waitFor(() => expect(mermaid.default.render).toHaveBeenCalled());
+  });
+
+  it('otherProps.finished 从 false 变为 undefined 后应开始渲染', async () => {
+    const mermaid = await import('mermaid');
+    const { rerender } = render(
+      <Mermaid
+        element={{
+          ...defaultElement,
+          otherProps: { finished: false },
+        }}
+      />,
+    );
+    expect(mermaid.default.render).not.toHaveBeenCalled();
+
+    rerender(
+      <Mermaid
+        element={{
+          ...defaultElement,
+          otherProps: {},
+        }}
+      />,
+    );
+    await waitFor(() => expect(mermaid.default.render).toHaveBeenCalled());
+  });
 });

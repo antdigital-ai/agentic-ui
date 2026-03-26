@@ -246,6 +246,44 @@ describe('isCodeBlockLikelyComplete', () => {
       const code = 'sequenceDiagram\n  Alice->>Bob: Hello';
       expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
     });
+
+    it('完整的 xychart-beta 应该返回 true', () => {
+      const code = `xychart-beta
+    title "Sales Revenue"
+    x-axis "Jan" "Feb" "Mar" "Apr"
+    y-axis "Revenue" 4000 to 11000`;
+      expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
+    });
+
+    it('完整的 mindmap 应该返回 true', () => {
+      const code = 'mindmap\n  root\n    Origins\n    Research';
+      expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
+    });
+
+    it('完整的 timeline 应该返回 true', () => {
+      const code = 'timeline\n  title History\n  2020 : Event A\n  2021 : Event B';
+      expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
+    });
+
+    it('完整的 quadrantChart 应该返回 true', () => {
+      const code = 'quadrantChart\n  title Features\n  x-axis Low to High\n  y-axis Low to High';
+      expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
+    });
+
+    it('完整的 requirementDiagram 应该返回 true', () => {
+      const code = 'requirementDiagram\n  requirement test_req';
+      expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
+    });
+
+    it('完整的 C4Context 应该返回 true', () => {
+      const code = 'C4Context\n  title System Context\n  Enterprise_Boundary e1, "Boundary"';
+      expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
+    });
+
+    it('完整的 block-beta 应该返回 true', () => {
+      const code = 'block-beta\n  columns 3\n  a b c';
+      expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
+    });
   });
 
   describe('括号匹配检查', () => {

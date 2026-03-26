@@ -138,7 +138,22 @@ function isMermaidCodeComplete(code: string): boolean {
     code.includes('erDiagram') ||
     code.includes('journey') ||
     code.includes('gitgraph') ||
-    code.includes('flowchart');
+    code.includes('flowchart') ||
+    code.includes('xychart-beta') ||
+    code.includes('mindmap') ||
+    code.includes('timeline') ||
+    code.includes('quadrantChart') ||
+    code.includes('sankey-beta') ||
+    code.includes('block-beta') ||
+    code.includes('packet-beta') ||
+    code.includes('kanban') ||
+    code.includes('architecture-beta') ||
+    code.includes('requirementDiagram') ||
+    code.includes('zenuml') ||
+    code.includes('C4Context') ||
+    code.includes('C4Container') ||
+    code.includes('C4Component') ||
+    code.includes('C4Deployment');
 
   if (!hasChartType) return false;
 
