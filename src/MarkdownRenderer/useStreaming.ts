@@ -89,11 +89,26 @@ const isTableIncomplete = (markdown: string) => {
   const isSeparatorValid = separatorCells.every(isTableSeparatorCell);
   if (!isSeparatorValid) return false;
 
+  const firstDataRowTrimmed = firstDataRow?.trim() || '';
+  // 第三行仍为空，说明首行数据尚未到达，继续缓存避免提前渲染 table header
+  if (!firstDataRowTrimmed) return true;
   // 第三行不是表格行，视为当前表格 token 已完成（例如 header-only 表格后接普通文本）
-  if (!firstDataRow?.trim().startsWith('|')) return false;
+  if (!firstDataRowTrimmed.startsWith('|')) return false;
+
+  const minPipeDelimiterCount = headerCells.length + 1;
+  const currentPipeDelimiterCount =
+    firstDataRowTrimmed.match(/\|/g)?.length || 0;
+
+  // 管道分隔符数量不足，说明第一行数据还未输入完整
+  if (currentPipeDelimiterCount < minPipeDelimiterCount) return true;
 
   // 第一行数据必须是闭合的管道行（以 | 结尾），否则继续缓存
-  if (!firstDataRow.trim().endsWith('|')) return true;
+  if (!firstDataRowTrimmed.endsWith('|')) return true;
+
+  const firstDataRowCells = parsePipeRowCells(firstDataRow);
+  if (!firstDataRowCells || firstDataRowCells.length !== headerCells.length) {
+    return true;
+  }
 
   return false;
 };
