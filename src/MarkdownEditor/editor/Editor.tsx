@@ -823,7 +823,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   /**
    * 处理输入法开始事件
    */
-  const onCompositionStart = (e: React.CompositionEvent) => {
+  const onCompositionStart = () => {
     if (markdownContainerRef.current) {
       markdownContainerRef.current.setAttribute('data-composition', '');
     }
@@ -846,11 +846,23 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       }
     }
 
+    // 注意：不在此处调用 e.preventDefault()。
+    // 移动端（Android GBoard / iOS 软键盘）所有输入都经过组合事件，
+    // 调用 preventDefault 会阻断浏览器将字符写入 contenteditable，
+    // 导致 Slate 模型永远为空，占位符无法消失。
+  };
+
+  /**
+   * 部分 Android WebView（如微信）可能跳过 compositionstart 直接触发
+   * compositionupdate，此处兜底确保 data-composition 始终被设置。
+   */
+  const onCompositionUpdate = () => {
     if (
-      markdownEditorRef.current.selection &&
-      Range.isCollapsed(markdownEditorRef.current.selection)
+      markdownContainerRef.current &&
+      !markdownContainerRef.current.hasAttribute('data-composition')
     ) {
-      e.preventDefault();
+      markdownContainerRef.current.setAttribute('data-composition', '');
+      store.inputComposition = true;
     }
   };
 
@@ -859,9 +871,6 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
    */
   const onCompositionEnd = () => {
     store.inputComposition = false;
-    if (markdownContainerRef.current) {
-      markdownContainerRef.current.removeAttribute('data-composition');
-    }
 
     const focusPath = markdownEditorRef.current.selection?.focus.path || [];
     if (focusPath.length > 0) {
@@ -879,6 +888,15 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         }
       }
     }
+
+    // 延迟到下一帧移除 data-composition，确保 Slate 完成模型更新、
+    // React 完成重渲染（isEmpty 变为 false、empty class 移除）后
+    // 再解除占位符隐藏，避免竞态导致占位符短暂闪现。
+    requestAnimationFrame(() => {
+      if (markdownContainerRef.current) {
+        markdownContainerRef.current.removeAttribute('data-composition');
+      }
+    });
   };
 
   const elementRenderElement = useRefFunction(
@@ -1173,6 +1191,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
           autoCorrect="off"
           autoCapitalize="none"
           onCompositionStart={onCompositionStart}
+          onCompositionUpdate={onCompositionUpdate}
           onCompositionEnd={onCompositionEnd}
           className={classNames(
             props.className,
