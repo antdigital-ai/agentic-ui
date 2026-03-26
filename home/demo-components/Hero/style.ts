@@ -152,64 +152,6 @@ export const StartButtonArrow = styled.div`
   }
 `;
 
-export const EvaluationButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  height: 48px;
-  padding: 8px 12px 8px 16px;
-  border-radius: 200px;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  transition: opacity 0.2s;
-  background-image:
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.2) 100%
-    ),
-    linear-gradient(
-      153.152deg,
-      rgb(0, 0, 0) 11.902%,
-      rgb(48, 102, 253) 60.356%,
-      rgb(86, 102, 238) 87.4%
-    );
-  box-shadow: inset 0px 0px 1px 0px rgba(80, 92, 113, 0.36);
-
-  &:hover {
-    opacity: 0.9;
-  }
-`;
-
-export const EvaluationButtonIcon = styled.div`
-  position: relative;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-`;
-
-export const EvaluationButtonText = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 1px 8px 2px;
-  font-family: 'PingFang SC', sans-serif;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 26px;
-  color: white;
-  white-space: pre;
-`;
-
-export const EvaluationButtonArrow = styled.div`
-  position: relative;
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  transition: transform 0.3s;
-`;
-
 export const LeftBackgroundImage = styled.img`
   position: absolute;
   top: 0;
