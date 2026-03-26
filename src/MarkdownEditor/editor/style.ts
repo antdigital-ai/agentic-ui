@@ -210,6 +210,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             lineHeight: '21px',
             wordBreak: 'break-word',
             whiteSpace: 'wrap',
+            // 防止占位符伪元素响应触摸/点击事件，避免在移动端
+            // 竞态窗口内占位符遮挡用户对实际文字的交互。
+            pointerEvents: 'none',
+            userSelect: 'none',
           },
         },
         '> div.empty:first-child [data-slate-node="text"]': {

@@ -1544,7 +1544,10 @@ describe('Editor branches - onCompositionStart/End', () => {
     editableProps.onCompositionStart(event);
 
     expect(mockStoreConfig.store.inputComposition).toBe(true);
-    expect(event.preventDefault).toHaveBeenCalled();
+    // preventDefault は移动端互換性のため呼び出さない：
+    // 移动端键盘通过 IME 组合事件输入，调用 preventDefault 会阻断
+    // 字符写入 contenteditable，导致占位符无法消失。
+    expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('compositionStart with tag-popup-input sets data-composition on tag input', () => {

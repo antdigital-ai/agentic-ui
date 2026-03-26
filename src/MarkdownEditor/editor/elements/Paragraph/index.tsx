@@ -1,5 +1,5 @@
 import classNames from 'clsx';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Node } from 'slate';
 import { I18nContext } from '../../../../I18n';
 import { debugInfo } from '../../../../Utils/debugUtils';
@@ -24,6 +24,21 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
   const { locale } = useContext(I18nContext);
   const [selected] = useSelStatus(props.element);
 
+  // 将 store.inputComposition（可变对象属性）同步到 React state，
+  // 使 useMemo 能在组合输入状态变化时重新评估 isEmpty，
+  // 避免竞态导致占位符在组合结束后短暂闪现。
+  const [isComposing, setIsComposing] = useState(false);
+  useEffect(() => {
+    const container = markdownContainerRef.current;
+    if (!container) return;
+
+    const observer = new MutationObserver(() => {
+      setIsComposing(container.hasAttribute('data-composition'));
+    });
+    observer.observe(container, { attributes: true, attributeFilter: ['data-composition'] });
+    return () => observer.disconnect();
+  }, [markdownContainerRef]);
+
   return React.useMemo(() => {
     const str = Node.string(props.element).trim();
     debugInfo('Paragraph - useMemo 渲染', {
@@ -37,11 +52,11 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     const hasOnlyTextNodes = props.element?.children?.every?.(
       (child: any) => !child.type && !child.code && !child.tag,
     );
-    // 当 trim 后的字符串为空时，应该显示 placeholder
-    // 需要满足：只有一个段落节点，且所有子节点都是纯文本节点
-    // 注意：当只输入空格时，trim() 后为空，!str 为 true，应该正确显示 placeholder
+    // 组合输入进行中时，Slate 模型尚未更新（字符还在 IME 候选区），
+    // 此时强制视为非空以隐藏占位符，避免用户输入时占位符仍然可见。
     const isEmpty =
       !str &&
+      !isComposing &&
       markdownEditorRef.current?.children.length === 1 &&
       hasOnlyTextNodes
         ? true
@@ -81,6 +96,7 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     align,
     readonly,
     selected,
+    isComposing,
     markdownEditorRef.current?.children.length,
     editorProps.titlePlaceholderContent,
   ]);
