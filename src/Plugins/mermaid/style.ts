@@ -109,16 +109,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         animation: 'agenticMermaidFadeIn 0.3s ease',
       },
 
-      // 空状态样式（流式输入中的原始代码展示）
+      // 源码预览样式（加载中 / 流式输入中）
       '&-empty': {
-        textAlign: 'center',
+        textAlign: 'left',
         color: '#6B7280',
-        padding: '0.5rem',
+        padding: '0.75rem 1.5rem',
         position: 'relative',
         zIndex: 1,
         flex: 1,
         height: '100%',
         width: '100%',
+        fontFamily:
+          "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
+        fontSize: '0.875em',
+        lineHeight: 1.7,
         animation: 'agenticMermaidFadeIn 0.3s ease',
       },
 

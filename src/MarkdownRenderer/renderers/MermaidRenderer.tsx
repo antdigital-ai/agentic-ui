@@ -1,6 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { lazy, Suspense, useMemo } from 'react';
+import { isBrowser } from '../../Plugins/mermaid/env';
+import { MermaidCodePreview } from '../../Plugins/mermaid/MermaidFallback';
 import { MermaidRendererImpl } from '../../Plugins/mermaid/MermaidRendererImpl';
+import { loadMermaid } from '../../Plugins/mermaid/utils';
 import type { RendererBlockProps } from '../types';
+
+const LazyMermaidRenderer = lazy(async () => {
+  await loadMermaid();
+  return { default: MermaidRendererImpl };
+});
 
 const extractTextContent = (children: React.ReactNode): string => {
   if (typeof children === 'string') return children;
@@ -13,8 +21,8 @@ const extractTextContent = (children: React.ReactNode): string => {
 };
 
 /**
- * Mermaid 图表渲染器——复用 MarkdownEditor 的 MermaidRendererImpl。
- * 将代码块文本包装为 CodeNode 格式后直接传递给已有的 Mermaid 渲染组件。
+ * Mermaid 图表渲染器
+ * 加载 mermaid 库期间展示源码预览，加载完成后渲染图表。
  */
 export const MermaidBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   const { children } = props;
@@ -31,10 +39,13 @@ export const MermaidBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   );
 
   if (!code.trim()) return null;
+  if (!isBrowser()) return null;
 
   return (
     <div data-be="mermaid" style={{ margin: '1em 0' }}>
-      <MermaidRendererImpl element={fakeElement as any} />
+      <Suspense fallback={<MermaidCodePreview code={code} />}>
+        <LazyMermaidRenderer element={fakeElement as any} />
+      </Suspense>
     </div>
   );
 };

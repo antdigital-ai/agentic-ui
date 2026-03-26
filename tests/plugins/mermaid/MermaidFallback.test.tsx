@@ -3,7 +3,10 @@ import { render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { MermaidFallback } from '../../../src/Plugins/mermaid/MermaidFallback';
+import {
+  MermaidCodePreview,
+  MermaidFallback,
+} from '../../../src/Plugins/mermaid/MermaidFallback';
 
 vi.mock('../../../src/Plugins/mermaid/style', () => ({
   useStyle: vi.fn(() => ({
@@ -13,30 +16,47 @@ vi.mock('../../../src/Plugins/mermaid/style', () => ({
 }));
 
 describe('MermaidFallback', () => {
-  it('应在 getPrefixCls 返回空时使用默认 baseCls (line 12 fallback)', () => {
+  it('MermaidFallback 兼容旧调用（无 code）', () => {
+    const { container } = render(<MermaidFallback />);
+    expect(container.querySelector('pre')).toBeInTheDocument();
+  });
+});
+
+describe('MermaidCodePreview', () => {
+  it('应展示传入的源码文本', () => {
+    const code = 'graph TD\n  A --> B';
+    const { container } = render(<MermaidCodePreview code={code} />);
+    const pre = container.querySelector('pre');
+    expect(pre).toBeInTheDocument();
+    expect(pre?.textContent).toBe(code);
+  });
+
+  it('应在 getPrefixCls 返回空时使用默认 baseCls', () => {
     const emptyPrefixClsContext = {
       getPrefixCls: () => '',
       getIconPrefixCls: () => 'anticon',
     };
     const { container } = render(
-      <ConfigProvider.ConfigContext.Provider value={emptyPrefixClsContext as any}>
-        <MermaidFallback />
+      <ConfigProvider.ConfigContext.Provider
+        value={emptyPrefixClsContext as any}
+      >
+        <MermaidCodePreview code="pie title Test" />
       </ConfigProvider.ConfigContext.Provider>,
     );
     expect(
-      container.querySelector('.agentic-plugin-mermaid-fallback'),
+      container.querySelector('.agentic-plugin-mermaid-empty'),
     ).toBeInTheDocument();
   });
 
   it('应在 ConfigProvider 下使用 prefixCls', () => {
     const { container } = render(
       <ConfigProvider prefixCls="ant">
-        <MermaidFallback />
+        <MermaidCodePreview code="graph LR\nX-->Y" />
       </ConfigProvider>,
     );
-    const fallbackEl =
-      container.querySelector('.ant-agentic-plugin-mermaid-fallback') ||
-      container.querySelector('[class*="mermaid-fallback"]');
-    expect(fallbackEl).toBeTruthy();
+    const el =
+      container.querySelector('.ant-agentic-plugin-mermaid-empty') ||
+      container.querySelector('[class*="mermaid-empty"]');
+    expect(el).toBeTruthy();
   });
 });
