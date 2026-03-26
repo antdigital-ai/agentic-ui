@@ -49,7 +49,7 @@ const STREAM_INCOMPLETE_REGEX = {
     /^[-+*]\s{0,3}$/,
     /^[-+*]\s{1,3}(\*{1,3}|_{1,3})(?!\s)(?!.*\1$)[^\r\n]{0,1000}$/,
   ],
-  'inline-code': [/^`[^`\r\n]{0,300}$/],
+  'inline-code': [/^`[^`\r\n]{0,300}$/, /^`{2,}$/],
 } as const;
 
 const STREAMING_LOADING_PLACEHOLDER = '...';
