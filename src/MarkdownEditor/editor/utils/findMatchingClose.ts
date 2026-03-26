@@ -123,58 +123,25 @@ function checkUnclosedBrackets(code: string): boolean {
   return false;
 }
 
-/**
- * 检查 Mermaid 代码是否完整
- */
+const MERMAID_DIAGRAM_KEYWORDS = [
+  'graph', 'flowchart', 'sequenceDiagram', 'gantt', 'pie',
+  'classDiagram', 'stateDiagram', 'erDiagram', 'journey', 'gitgraph',
+  'xychart-beta', 'mindmap', 'timeline', 'quadrantChart',
+  'sankey-beta', 'block-beta', 'packet-beta', 'kanban',
+  'architecture-beta', 'requirementDiagram', 'zenuml',
+  'C4Context', 'C4Container', 'C4Component', 'C4Deployment',
+] as const;
+
+const MERMAID_INCOMPLETE_TAIL = [
+  /graph\s*$/i,
+  /-->?\s*$/,
+];
+
 function isMermaidCodeComplete(code: string): boolean {
-  // 检查是否包含基本的 Mermaid 图表类型关键字
-  const hasChartType =
-    code.includes('graph') ||
-    code.includes('sequenceDiagram') ||
-    code.includes('gantt') ||
-    code.includes('pie') ||
-    code.includes('classDiagram') ||
-    code.includes('stateDiagram') ||
-    code.includes('erDiagram') ||
-    code.includes('journey') ||
-    code.includes('gitgraph') ||
-    code.includes('flowchart') ||
-    code.includes('xychart-beta') ||
-    code.includes('mindmap') ||
-    code.includes('timeline') ||
-    code.includes('quadrantChart') ||
-    code.includes('sankey-beta') ||
-    code.includes('block-beta') ||
-    code.includes('packet-beta') ||
-    code.includes('kanban') ||
-    code.includes('architecture-beta') ||
-    code.includes('requirementDiagram') ||
-    code.includes('zenuml') ||
-    code.includes('C4Context') ||
-    code.includes('C4Container') ||
-    code.includes('C4Component') ||
-    code.includes('C4Deployment');
-
-  if (!hasChartType) return false;
-
-  // 检查基本结构完整性
+  if (!MERMAID_DIAGRAM_KEYWORDS.some((kw) => code.includes(kw))) return false;
   if (code.length < 10) return false;
-
-  // 检查括号匹配
-  const hasUnclosedBrackets = checkUnclosedBrackets(code);
-  if (hasUnclosedBrackets) return false;
-
-  // 检查是否以常见的不完整模式结尾
-  const incompletePatterns = [
-    /graph\s*$/i, // 只有 graph 关键字
-    /-->?\s*$/, // 箭头后面没有内容
-  ];
-
-  const endsWithIncomplete = incompletePatterns.some((pattern) =>
-    pattern.test(code),
-  );
-
-  return !endsWithIncomplete;
+  if (checkUnclosedBrackets(code)) return false;
+  return !MERMAID_INCOMPLETE_TAIL.some((re) => re.test(code));
 }
 
 /**

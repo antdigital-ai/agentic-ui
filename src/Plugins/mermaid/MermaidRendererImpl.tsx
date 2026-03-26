@@ -6,10 +6,12 @@ import { CodeNode } from '../../MarkdownEditor/el';
 import { useStyle } from './style';
 import { useMermaidRender } from './useMermaidRender';
 
-/**
- * Mermaid 渲染器组件实现
- * 负责实际的图表渲染逻辑
- */
+const PRE_STYLE: React.CSSProperties = {
+  margin: 0,
+  whiteSpace: 'pre-wrap',
+  wordBreak: 'break-word',
+};
+
 export const MermaidRendererImpl = (props: { element: CodeNode }) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls =
@@ -34,7 +36,7 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     () => renderedCode && !isError,
     [renderedCode, isError],
   );
-  const style = useMemo(
+  const containerStyle = useMemo(
     () =>
       ({
         opacity: isRendered ? 1 : 0,
@@ -48,52 +50,31 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     [isRendered],
   );
 
-  const renderCode = props.element.value || '';
+  const code = props.element.value || '';
 
-  const dom = (
+  return wrapSSR(
     <div
       ref={containerRef}
       className={classNames(baseCls, hashId)}
       contentEditable={false}
     >
-      {/* 渲染容器：增加多层隔离 */}
       <div
         contentEditable={false}
         ref={divRef}
         className={classNames(hashId)}
-        style={style}
+        style={containerStyle}
         data-mermaid-container="true"
-      ></div>
-      {/* 错误状态显示：展示原始代码 */}
+      />
       {error && (
         <div className={classNames(`${baseCls}-error`, hashId)}>
-          <pre
-            style={{
-              margin: 0,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          >
-            {renderCode}
-          </pre>
+          <pre style={PRE_STYLE}>{code}</pre>
         </div>
       )}
-      {/* 空状态显示 */}
       {!renderedCode && !error && (
         <div className={classNames(`${baseCls}-empty`, hashId)}>
-          <pre
-            style={{
-              margin: 0,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          >
-            {renderCode}
-          </pre>
+          <pre style={PRE_STYLE}>{code}</pre>
         </div>
       )}
-    </div>
+    </div>,
   );
-
-  return wrapSSR(dom);
 };

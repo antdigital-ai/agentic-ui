@@ -3,10 +3,7 @@ import { render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  MermaidCodePreview,
-  MermaidFallback,
-} from '../../../src/Plugins/mermaid/MermaidFallback';
+import { MermaidCodePreview } from '../../../src/Plugins/mermaid/MermaidFallback';
 
 vi.mock('../../../src/Plugins/mermaid/style', () => ({
   useStyle: vi.fn(() => ({
@@ -15,13 +12,6 @@ vi.mock('../../../src/Plugins/mermaid/style', () => ({
   })),
 }));
 
-describe('MermaidFallback', () => {
-  it('MermaidFallback 兼容旧调用（无 code）', () => {
-    const { container } = render(<MermaidFallback />);
-    expect(container.querySelector('pre')).toBeInTheDocument();
-  });
-});
-
 describe('MermaidCodePreview', () => {
   it('应展示传入的源码文本', () => {
     const code = 'graph TD\n  A --> B';
@@ -29,6 +19,13 @@ describe('MermaidCodePreview', () => {
     const pre = container.querySelector('pre');
     expect(pre).toBeInTheDocument();
     expect(pre?.textContent).toBe(code);
+  });
+
+  it('空字符串时渲染空 pre', () => {
+    const { container } = render(<MermaidCodePreview code="" />);
+    const pre = container.querySelector('pre');
+    expect(pre).toBeInTheDocument();
+    expect(pre?.textContent).toBe('');
   });
 
   it('应在 getPrefixCls 返回空时使用默认 baseCls', () => {

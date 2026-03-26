@@ -32,8 +32,3 @@ export const MermaidCodePreview = (props: { code: string }) => {
     </div>,
   );
 };
-
-/**
- * @deprecated 使用 MermaidCodePreview 替代
- */
-export const MermaidFallback = () => <MermaidCodePreview code="" />;
