@@ -484,6 +484,51 @@ describe('FileMapView', () => {
   });
 
   describe('FileMapViewItem 分支覆盖', () => {
+    it('size 大于 0 时应展示文件大小', () => {
+      const fileMap = new Map();
+      fileMap.set('file-1', {
+        ...createMockFile('size.pdf', 'application/pdf'),
+        size: 1024,
+      });
+
+      const { container } = render(<FileMapView fileMap={fileMap} />);
+      const sizeNode = container.querySelector('[data-testid="file-item-size"]');
+
+      expect(sizeNode).toBeInTheDocument();
+      expect(sizeNode).toHaveTextContent('1 KB');
+    });
+
+    it('size 为 0 时不应展示文件大小', () => {
+      const fileMap = new Map();
+      fileMap.set('file-1', {
+        ...createMockFile('zero.pdf', 'application/pdf'),
+        size: 0,
+      });
+
+      const { container } = render(<FileMapView fileMap={fileMap} />);
+
+      expect(
+        container.querySelector('[data-testid="file-item-size"]'),
+      ).not.toBeInTheDocument();
+      expect(container.querySelector('[data-testid="file-item-extension"]')).toHaveTextContent(
+        'pdf',
+      );
+    });
+
+    it('缺失 size 时不应展示文件大小', () => {
+      const fileMap = new Map();
+      fileMap.set('file-1', createMockFile('nosize.pdf', 'application/pdf'));
+
+      const { container } = render(<FileMapView fileMap={fileMap} />);
+
+      expect(
+        container.querySelector('[data-testid="file-item-size"]'),
+      ).not.toBeInTheDocument();
+      expect(container.querySelector('[data-testid="file-item-extension"]')).toHaveTextContent(
+        'pdf',
+      );
+    });
+
     it('无扩展名文件名应正确显示 displayName (65)', () => {
       const fileMap = new Map();
       fileMap.set('file-1', {
