@@ -126,6 +126,31 @@ describe('MarkdownRenderer', () => {
     expect(container.querySelector('td')?.textContent).toContain('Cell 1');
   });
 
+  it('流式表格应在 header 与首行完整后再渲染', () => {
+    const tablePrefix = '| Header |\n| --- |\n| Cel';
+    const { container, rerender } = render(
+      <MarkdownRenderer
+        content={tablePrefix}
+        streaming={true}
+        queueOptions={{ animate: false }}
+      />,
+    );
+
+    expect(container.querySelector('table')).toBeFalsy();
+
+    rerender(
+      <MarkdownRenderer
+        content={'| Header |\n| --- |\n| Cell |'}
+        streaming={true}
+        queueOptions={{ animate: false }}
+      />,
+    );
+
+    expect(container.querySelector('table')).toBeTruthy();
+    expect(container.querySelector('th')?.textContent).toContain('Header');
+    expect(container.querySelector('td')?.textContent).toContain('Cell');
+  });
+
   it('空内容不应崩溃', () => {
     const { container } = render(<MarkdownRenderer content="" />);
 
