@@ -397,64 +397,74 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                     {file.name}
                   </Typography.Text>
                 </div>
-                <div
-                  className={classNames(
-                    `${filePrefixCls}-item-details`,
-                    hashId,
-                  )}
-                >
-                  <Typography.Text type="secondary" ellipsis>
-                    <span
-                      className={classNames(
-                        `${filePrefixCls}-item-type`,
-                        hashId,
+                {(fileTypeProcessor.inferFileType(file).displayType ||
+                  file.size ||
+                  file.lastModified) && (
+                  <div
+                    className={classNames(
+                      `${filePrefixCls}-item-details`,
+                      hashId,
+                    )}
+                  >
+                    <Typography.Text type="secondary" ellipsis>
+                      {fileTypeProcessor.inferFileType(file).displayType && (
+                        <span
+                          className={classNames(
+                            `${filePrefixCls}-item-type`,
+                            hashId,
+                          )}
+                        >
+                          {fileTypeProcessor.inferFileType(file).displayType}
+                        </span>
                       )}
-                    >
-                      {fileTypeProcessor.inferFileType(file).displayType ||
-                        fileTypeProcessor.inferFileType(file).fileType}
-                    </span>
-                    {file.size && (
-                      <>
-                        <span
-                          className={classNames(
-                            `${filePrefixCls}-item-separator`,
-                            hashId,
+                      {file.size && (
+                        <>
+                          {fileTypeProcessor.inferFileType(file).displayType && (
+                            <span
+                              className={classNames(
+                                `${filePrefixCls}-item-separator`,
+                                hashId,
+                              )}
+                            >
+                              |
+                            </span>
                           )}
-                        >
-                          |
-                        </span>
-                        <span
-                          className={classNames(
-                            `${filePrefixCls}-item-size`,
-                            hashId,
+                          <span
+                            className={classNames(
+                              `${filePrefixCls}-item-size`,
+                              hashId,
+                            )}
+                          >
+                            {formatFileSize(file.size as number)}
+                          </span>
+                        </>
+                      )}
+                      {file.lastModified && (
+                        <>
+                          {(fileTypeProcessor.inferFileType(file).displayType ||
+                            file.size) && (
+                            <span
+                              className={classNames(
+                                `${filePrefixCls}-item-separator`,
+                                hashId,
+                              )}
+                            >
+                              |
+                            </span>
                           )}
-                        >
-                          {formatFileSize(file.size as number)}
-                        </span>
-                      </>
-                    )}
-                    {file.lastModified && (
-                      <>
-                        <span
-                          className={classNames(
-                            `${filePrefixCls}-item-separator`,
-                            hashId,
-                          )}
-                        >
-                          |
-                        </span>
-                        <span
-                          className={classNames(
-                            `${filePrefixCls}-item-time`,
-                            hashId,
-                          )}
-                        >
-                          {formatLastModified(file.lastModified as any)}
-                        </span>
-                      </>
-                    )}
-                  </Typography.Text>
-                </div>
+                          <span
+                            className={classNames(
+                              `${filePrefixCls}-item-time`,
+                              hashId,
+                            )}
+                          >
+                            {formatLastModified(file.lastModified as any)}
+                          </span>
+                        </>
+                      )}
+                    </Typography.Text>
+                  </div>
+                )}
               </div>
             </div>
             {canDownload && onDownload && (

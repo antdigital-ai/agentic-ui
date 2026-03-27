@@ -172,6 +172,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
           })}
           onClick={async (e) => {
             e.preventDefault();
+            e.stopPropagation();
             if (!props.onClick) return;
             if (loading) return;
             setLoading(true);
@@ -186,6 +187,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
           onKeyDown={async (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
+              e.stopPropagation();
               if (!props.onClick) return;
               if (loading) return;
               setLoading(true);
@@ -228,6 +230,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
         })}
         onClick={async (e) => {
           e.preventDefault();
+          e.stopPropagation();
           if (!props.onClick) return;
           if (loading) return;
           setLoading(true);
@@ -242,6 +245,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
         onKeyDown={async (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
+            e.stopPropagation();
             if (!props.onClick) return;
             if (loading) return;
             setLoading(true);

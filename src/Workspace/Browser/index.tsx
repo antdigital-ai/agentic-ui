@@ -78,6 +78,7 @@ export interface BrowserItemProps {
   itemStyle?: React.CSSProperties;
   className?: string;
   onLocate?: (item: BrowserItem) => void;
+  onOpen?: (item: BrowserItem) => void;
 }
 
 export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
@@ -85,11 +86,17 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
   itemStyle = SUGGESTION_ITEM_STYLE,
   className,
   onLocate,
+  onOpen,
 }) => {
   const { prefixCls, wrapSSR, hashId } = useBrowserContext();
   const { locale } = useContext(I18nContext);
 
-  const handleSiteClick = () => {
+  const handleOpen = (e: React.MouseEvent) => {
+    if (onOpen) {
+      e.preventDefault();
+      onOpen(item);
+      return;
+    }
     window.open(item.url, '_blank', 'noopener,noreferrer');
   };
 
@@ -130,6 +137,7 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
               target="_blank"
               rel="noreferrer"
               style={{ color: 'inherit' }}
+              onClick={handleOpen}
             >
               <div
                 className={classNames(`${prefixCls}-result-item-title`, hashId)}
@@ -141,7 +149,7 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
         </div>
         <div
           className={classNames(`${prefixCls}-result-item-site`, hashId)}
-          onClick={handleSiteClick}
+          onClick={handleOpen}
         >
           {renderSiteAvatar(item.site, item.icon)}
           <Tooltip title={item.site} mouseEnterDelay={1}>
@@ -206,6 +214,7 @@ export interface BrowserListProps {
   loading?: boolean;
   loadingText?: string;
   onLocate?: (item: BrowserItem) => void;
+  onOpen?: (item: BrowserItem) => void;
 }
 
 export const BrowserList: React.FC<BrowserListProps> = ({
@@ -219,6 +228,7 @@ export const BrowserList: React.FC<BrowserListProps> = ({
   loading = false,
   loadingText,
   onLocate,
+  onOpen,
 }) => {
   const { prefixCls, wrapSSR, hashId } = useBrowserContext();
   const { locale } = useContext(I18nContext);
@@ -279,6 +289,7 @@ export const BrowserList: React.FC<BrowserListProps> = ({
             className={classNames(`${prefixCls}-result-item`, hashId)}
             itemStyle={SUGGESTION_ITEM_STYLE}
             onLocate={onLocate}
+            onOpen={onOpen}
           />
         )}
         footer={null}
@@ -304,6 +315,10 @@ export type BrowserProps = {
   emptyText?: string;
   loadingText?: string;
   onLocate?: (item: BrowserItem) => void;
+  /**
+   * 点击链接时的回调，提供后将拦截默认的新标签页打开行为
+   */
+  onOpen?: (item: BrowserItem) => void;
 };
 
 const Browser: React.FC<BrowserProps> = ({
@@ -314,13 +329,20 @@ const Browser: React.FC<BrowserProps> = ({
   emptyText,
   loadingText,
   onLocate,
+  onOpen,
 }) => {
+  const isSingleSuggestion = suggestions.length === 1;
+
   const [currentView, setCurrentView] = useState<'suggestions' | 'results'>(
-    'suggestions',
+    isSingleSuggestion ? 'results' : 'suggestions',
   );
   const [activeSuggestion, setActiveSuggestion] =
-    useState<BrowserSuggestion | null>(null);
-  const [activeLabel, setActiveLabel] = useState<string>('');
+    useState<BrowserSuggestion | null>(
+      isSingleSuggestion ? suggestions[0] : null,
+    );
+  const [activeLabel, setActiveLabel] = useState<string>(
+    isSingleSuggestion ? suggestions[0].label : '',
+  );
   const { locale } = useContext(I18nContext);
 
   const { prefixCls, wrapSSR, hashId } = useBrowserContext();
@@ -406,12 +428,13 @@ const Browser: React.FC<BrowserProps> = ({
         <BrowserList
           items={results}
           activeLabel={activeLabel}
-          onBack={() => setCurrentView('suggestions')}
+          onBack={isSingleSuggestion ? undefined : () => setCurrentView('suggestions')}
           countFormatter={countFormatter}
           emptyText={emptyText}
           loading={loading}
           loadingText={loadingText}
           onLocate={onLocate}
+          onOpen={onOpen}
         />
       )}
     </div>,

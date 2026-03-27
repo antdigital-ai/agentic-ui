@@ -148,11 +148,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           display: 'flex',
           alignItems: 'center',
 
-          '.ant-segmented': {
+          [`${token.antCls}-segmented`]: {
             borderRadius: 'var(--radius-control-base)',
           },
 
-          '.ant-segmented-item-selected ': {
+          [`${token.antCls}-segmented-item-selected `]: {
             borderRadius: 'var(--radius-control-base)',
           },
         },
@@ -241,14 +241,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             background: 'transparent',
           },
 
-          '.ant-empty-description': {
+          [`${token.antCls}-empty-description`]: {
             color: '#d9d9d9',
           },
         },
       },
 
       [`&--markdown`]: {
-        '.ant-agentic-md-editor-content div[data-be="paragraph"]:last-child': {
+        [`${token.antCls}-agentic-md-editor-content div[data-be="paragraph"]:last-child`]: {
           paddingBottom: '16px',
           color: 'var(--color-gray-text-light)',
           font: 'var(--font-text-code-base)',
@@ -262,7 +262,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         height: 'calc(100% - 72px)',
         overflow: 'auto',
         margin: '0 -12px',
-        '.ant-workspace-html-preview-content': {
+        [`${token.antCls}-workspace-html-preview-content`]: {
           '.ace-container': {
             border: 'unset',
             borderRadius: 'unset',
