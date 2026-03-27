@@ -152,7 +152,7 @@ const genStyle: GenerateStyle<
         maxHeight: 400,
         height: '100%',
         overflowY: 'visible',
-        scrollbarColor: 'var(--color-gray-text-tertiary) transparent',
+        scrollbarColor: 'var(--color-gray-text-tertiary, #505c716b) transparent',
         scrollbarWidth: 'thin',
         '&&-disabled': {
           backgroundColor: 'rgba(0,0,0,0.04)',

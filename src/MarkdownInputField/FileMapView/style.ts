@@ -237,7 +237,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             background: 'var(--color-gray-bg-card-white)',
             boxSizing: 'border-box',
             boxShadow: 'var(--shadow-control-base)',
-            borderRadius: 'var(--radius-base)',
+            borderRadius: 'var(--radius-base, 4px)',
             border: 'none',
             overflow: 'hidden',
             img: {

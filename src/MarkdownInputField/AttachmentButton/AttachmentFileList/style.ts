@@ -37,8 +37,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           height: 'var(--padding-1x)',
         },
         '&::-webkit-scrollbar-thumb': {
-          background: 'var(--color-gray-border-default)',
-          borderRadius: 'var(--radius-base)',
+          background: 'var(--color-gray-border-default, var(--color-gray-border-light))',
+          borderRadius: 'var(--radius-base, var(--radius-control-xs, 4px))',
         },
         '&::-webkit-scrollbar-track': {
           background: 'transparent',
@@ -97,7 +97,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             background: 'var(--color-gray-bg-card-white)',
             boxSizing: 'border-box',
             boxShadow: 'var(--shadow-control-base)',
-            borderRadius: 'var(--radius-base)',
+            borderRadius: 'var(--radius-base, var(--radius-control-xs, 4px))',
             border: 'none',
             overflow: 'hidden',
             img: {

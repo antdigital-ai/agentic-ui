@@ -17,7 +17,7 @@ const VideoThumbnail: React.FC<{
       ...style,
       position: 'relative',
       overflow: 'hidden',
-      borderRadius: 'var(--radius-base)',
+      borderRadius: 'var(--radius-base, 4px)',
       flexShrink: 0,
     }}
   >

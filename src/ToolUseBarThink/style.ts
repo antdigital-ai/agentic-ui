@@ -150,7 +150,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '&-light': {
           color: 'var(--color-gray-text-secondary)',
           '&:hover': {
-            color: 'var(--color-gray-text)',
+            color: 'var(--color-gray-text, var(--color-gray-text-default))',
           },
         },
       },

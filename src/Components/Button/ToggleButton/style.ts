@@ -16,7 +16,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
       alignItems: 'center',
       padding: '5px 12px',
       cursor: 'pointer',
-      fontFamily: 'var(--font-family-base)',
+      fontFamily:
+        'var(--font-family-base, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif)',
       fontSize: 'var(--font-size-base, 14px)',
       fontWeight: 'var(--font-weight-medium, 500)',
       lineHeight: 'var(--line-height-base, 1.5)',

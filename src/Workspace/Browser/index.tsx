@@ -177,7 +177,11 @@ export const BrowserHeader: React.FC<BrowserHeaderProps> = ({
         <Button
           type="text"
           icon={
-            <ArrowLeft style={{ color: 'var(--color-gray-text-quaternary)' }} />
+            <ArrowLeft
+              style={{
+                color: 'var(--color-gray-text-quaternary, var(--color-gray-text-light, #767e8b))',
+              }}
+            />
           }
           onClick={onBack}
         />

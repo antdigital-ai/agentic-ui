@@ -287,13 +287,21 @@ export const JinjaTemplatePanel: React.FC = () => {
 
         <div className={`${prefixCls}-list-box`}>
           {loading ? (
-            <div style={{ padding: 12, color: 'var(--color-text-secondary)' }}>
+            <div
+              style={{
+                padding: 12,
+                color: 'var(--color-text-secondary, var(--color-gray-text-secondary, rgba(0,0,0,0.45)))',
+              }}
+            >
               {locale.loading}
             </div>
           ) : items.length === 0 ? (
             (notFoundContent ?? (
               <div
-                style={{ padding: 12, color: 'var(--color-text-secondary)' }}
+                style={{
+                  padding: 12,
+                  color: 'var(--color-text-secondary, var(--color-gray-text-secondary, rgba(0,0,0,0.45)))',
+                }}
               >
                 {locale['jinja.panel.noTemplates']}
               </div>

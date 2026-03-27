@@ -470,7 +470,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 不可预览说明文案
       [`&-unsupported-text`]: {
         font: 'var(--font-text-body-sm)',
-        color: 'var(--color-text-secondary)',
+        color: 'var(--color-text-secondary, var(--color-gray-text-secondary))',
       },
     },
 

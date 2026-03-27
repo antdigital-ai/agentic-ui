@@ -6,6 +6,13 @@ import {
   useEditorStyleRegister,
 } from '../Hooks/useStyle';
 
+const RADIUS_XL =
+  'var(--radius-xl, var(--radius-card-lg, 16px))';
+const COLOR_GRAY_BG_ACTIVE =
+  'var(--color-gray-bg-active, var(--color-gray-control-fill-active, rgba(20, 22, 28, 0.12)))';
+const COLOR_GRAY_BORDER_DEFAULT =
+  'var(--color-gray-border-default, var(--color-gray-border-light, rgba(20, 22, 28, 0.12)))';
+
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
@@ -14,10 +21,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       height: '100%',
       width: '100%',
       position: 'relative',
-      borderTopLeftRadius: 'var(--radius-xl)',
-      borderTopRightRadius: 'var(--radius-xl)',
-      borderBottomLeftRadius: 'var(--radius-xl)',
-      borderBottomRightRadius: 'var(--radius-xl)',
+      borderTopLeftRadius: RADIUS_XL,
+      borderTopRightRadius: RADIUS_XL,
+      borderBottomLeftRadius: RADIUS_XL,
+      borderBottomRightRadius: RADIUS_XL,
       backgroundColor: 'var(--color-gray-bg-page-light)',
 
       '&-header': {
@@ -29,8 +36,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         minHeight: '48px',
         flexShrink: 0,
         zIndex: 10,
-        borderTopLeftRadius: 'var(--radius-xl)',
-        borderTopRightRadius: 'var(--radius-xl)',
+        borderTopLeftRadius: RADIUS_XL,
+        borderTopRightRadius: RADIUS_XL,
 
         '&-left': {
           display: 'flex',
@@ -65,7 +72,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             },
 
             '&:active': {
-              backgroundColor: 'var(--color-gray-bg-active)',
+              backgroundColor: COLOR_GRAY_BG_ACTIVE,
             },
           },
         },
@@ -94,7 +101,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             },
 
             '&:active': {
-              backgroundColor: 'var(--color-gray-bg-active)',
+              backgroundColor: COLOR_GRAY_BG_ACTIVE,
             },
           },
 
@@ -118,7 +125,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             },
 
             '&:active': {
-              backgroundColor: 'var(--color-gray-bg-active)',
+              backgroundColor: COLOR_GRAY_BG_ACTIVE,
             },
           },
         },
@@ -128,7 +135,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         position: 'relative',
         zIndex: 1,
         width: '100%',
-        paddingBottom: 'var(--radius-xl)',
+        paddingBottom: RADIUS_XL,
         flex: 1,
         overflow: 'hidden',
         display: 'flex',
@@ -154,7 +161,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             borderRadius: '3px',
 
             '&:hover': {
-              backgroundColor: 'var(--color-gray-border-default)',
+              backgroundColor: COLOR_GRAY_BORDER_DEFAULT,
             },
           },
           '> div': {
@@ -176,8 +183,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         position: 'absolute',
         bottom: 0,
         zIndex: 100,
-        borderBottomLeftRadius: 'var(--radius-xl)',
-        borderBottomRightRadius: 'var(--radius-xl)',
+        borderBottomLeftRadius: RADIUS_XL,
+        borderBottomRightRadius: RADIUS_XL,
       },
       '&-footer-background': {
         position: 'absolute',

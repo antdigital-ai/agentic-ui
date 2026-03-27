@@ -38,7 +38,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        gap: 'var(--gap-2x)',
+        gap: 'var(--gap-2x, var(--margin-2x))',
         [`${token.componentCls}-close`]: {
           cursor: 'pointer',
           transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',

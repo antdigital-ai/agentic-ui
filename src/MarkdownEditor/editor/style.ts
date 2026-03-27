@@ -189,7 +189,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       [JINJA_CSS_VAR.delimiter]: '#d4b84b',
       '::-webkit-scrollbar': { width: '8px', height: '8px' },
       '::-webkit-scrollbar-thumb': {
-        backgroundColor: 'var(--color-gray-text-tertiary)',
+        backgroundColor: 'var(--color-gray-text-tertiary, var(--color-gray-text-light))',
         borderRadius: '20px',
       },
       '&-edit': {
@@ -394,7 +394,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           fontSize: '0.9rem',
           lineHeight: 'var(--line-height-base)',
           letterSpacing: 'var(--letter-spacing-base)',
-          fontFamily: 'var(--font-family-base)',
+          fontFamily: 'var(--font-family-base, var(--font-family-text))',
         },
 
         'ul, ol': {

@@ -235,10 +235,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           transform: 'translateX(0)',
         },
         '95%': {
-          transform: 'translateX(var(--scroll-width))',
+          transform: 'translateX(var(--scroll-width, 0px))',
         },
         '100%': {
-          transform: 'translateX(var(--scroll-width))',
+          transform: 'translateX(var(--scroll-width, 0px))',
         },
       },
 
