@@ -4,6 +4,7 @@ import React, {
   forwardRef,
   memo,
   useContext,
+  useEffect,
   useImperativeHandle,
   useRef,
 } from 'react';
@@ -112,6 +113,13 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
       scrollContainer: containerRef.current,
       scrollToBottom,
     }));
+
+    // footer 实际高度变化时（spacer 随之调整），保持列表贴底
+    useEffect(() => {
+      if (actualFooterHeight > 0) {
+        scrollToBottom();
+      }
+    }, [actualFooterHeight]);
 
     const rootClassName = clsx(prefixCls, className, classNames?.root, hashId);
     const contentClassName = clsx(
