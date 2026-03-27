@@ -728,4 +728,17 @@ export type MarkdownEditorProps = {
    * @description 当同时传入时，`renderMode` 优先
    */
   renderType?: RenderMode;
+  /**
+   * 自定义元素渲染函数（仅 `renderMode: 'markdown'` 时生效）
+   * @description 拦截并自定义 MarkdownRenderer 中任意块级/行内元素的渲染结果。
+   * 与 Slate 模式的 `eleItemRender` 对应，允许替换段落、标题、列表、图片等元素。
+   * 返回 `undefined` 时回退到默认渲染。
+   * @param props - 元素属性（tagName、node、children 等）
+   * @param defaultDom - 默认渲染结果
+   * @returns 自定义渲染节点，或 undefined 时回退到 defaultDom
+   */
+  eleRender?: (
+    props: import('../MarkdownRenderer/types').MarkdownRendererEleProps,
+    defaultDom: React.ReactNode,
+  ) => React.ReactNode;
 };

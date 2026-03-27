@@ -5,6 +5,20 @@ import type {
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 
+/**
+ * markdown 渲染模式下传给 eleRender 的元素属性，
+ * 包含 HTML 标签名、hast 节点及所有原生 HTML 属性。
+ */
+export interface MarkdownRendererEleProps {
+  /** HTML tag name, e.g. 'p', 'h1', 'blockquote', 'pre' */
+  tagName: string;
+  /** The original hast node */
+  node?: any;
+  /** Rendered children */
+  children?: React.ReactNode;
+  [key: string]: any;
+}
+
 export interface CharacterQueueOptions {
   /** 每帧输出的最大字符数，默认 3 */
   charsPerFrame?: number;
@@ -88,6 +102,17 @@ export interface MarkdownRendererProps {
     /** 自定义渲染函数，接收解析后的 JSON value，返回 React 节点 */
     render?: (value: any) => React.ReactNode;
   };
+  /**
+   * 自定义元素渲染函数（markdown 渲染模式）
+   * 与 Slate 模式的 eleItemRender 对应，允许拦截并替换任意块级/行内元素的渲染结果。
+   * @param props - 元素属性（tagName、node、children 等）
+   * @param defaultDom - 默认渲染结果
+   * @returns 自定义渲染节点，或 undefined 时回退到 defaultDom
+   */
+  eleRender?: (
+    props: MarkdownRendererEleProps,
+    defaultDom: React.ReactNode,
+  ) => React.ReactNode;
 }
 
 export interface MarkdownRendererRef {
