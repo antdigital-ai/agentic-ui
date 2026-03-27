@@ -315,12 +315,18 @@ const Browser: React.FC<BrowserProps> = ({
   loadingText,
   onLocate,
 }) => {
+  const isSingleSuggestion = suggestions.length === 1;
+
   const [currentView, setCurrentView] = useState<'suggestions' | 'results'>(
-    'suggestions',
+    isSingleSuggestion ? 'results' : 'suggestions',
   );
   const [activeSuggestion, setActiveSuggestion] =
-    useState<BrowserSuggestion | null>(null);
-  const [activeLabel, setActiveLabel] = useState<string>('');
+    useState<BrowserSuggestion | null>(
+      isSingleSuggestion ? suggestions[0] : null,
+    );
+  const [activeLabel, setActiveLabel] = useState<string>(
+    isSingleSuggestion ? suggestions[0].label : '',
+  );
   const { locale } = useContext(I18nContext);
 
   const { prefixCls, wrapSSR, hashId } = useBrowserContext();
@@ -406,7 +412,7 @@ const Browser: React.FC<BrowserProps> = ({
         <BrowserList
           items={results}
           activeLabel={activeLabel}
-          onBack={() => setCurrentView('suggestions')}
+          onBack={isSingleSuggestion ? undefined : () => setCurrentView('suggestions')}
           countFormatter={countFormatter}
           emptyText={emptyText}
           loading={loading}
