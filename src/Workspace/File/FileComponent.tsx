@@ -371,6 +371,10 @@ const FileItemComponent: FC<{
                 </Typography.Text>
               )}
             </div>
+            {(fileWithId.renderDetails ||
+            fileTypeInfo.displayType ||
+            fileWithId.size ||
+            fileWithId.lastModified) && (
             <div
               className={classNames(`${finalPrefixCls}-item-details`, hashId)}
             >
@@ -378,24 +382,28 @@ const FileItemComponent: FC<{
                 fileWithId.renderDetails(renderContext)
               ) : (
                 <Typography.Text type="secondary" ellipsis>
-                  <span
-                    className={classNames(
-                      `${finalPrefixCls}-item-type`,
-                      hashId,
-                    )}
-                  >
-                    {fileTypeInfo.displayType || fileTypeInfo.fileType}
-                  </span>
+                  {fileTypeInfo.displayType && (
+                    <span
+                      className={classNames(
+                        `${finalPrefixCls}-item-type`,
+                        hashId,
+                      )}
+                    >
+                      {fileTypeInfo.displayType}
+                    </span>
+                  )}
                   {fileWithId.size && (
                     <>
-                      <span
-                        className={classNames(
-                          `${finalPrefixCls}-item-separator`,
-                          hashId,
-                        )}
-                      >
-                        |
-                      </span>
+                      {fileTypeInfo.displayType && (
+                        <span
+                          className={classNames(
+                            `${finalPrefixCls}-item-separator`,
+                            hashId,
+                          )}
+                        >
+                          |
+                        </span>
+                      )}
                       <span
                         className={classNames(
                           `${finalPrefixCls}-item-size`,
@@ -408,14 +416,16 @@ const FileItemComponent: FC<{
                   )}
                   {fileWithId.lastModified && (
                     <>
-                      <span
-                        className={classNames(
-                          `${finalPrefixCls}-item-separator`,
-                          hashId,
-                        )}
-                      >
-                        |
-                      </span>
+                      {(fileTypeInfo.displayType || fileWithId.size) && (
+                        <span
+                          className={classNames(
+                            `${finalPrefixCls}-item-separator`,
+                            hashId,
+                          )}
+                        >
+                          |
+                        </span>
+                      )}
                       <span
                         className={classNames(
                           `${finalPrefixCls}-item-time`,
@@ -429,6 +439,7 @@ const FileItemComponent: FC<{
                 </Typography.Text>
               )}
             </div>
+          )}
           </div>
           <div
             className={classNames(`${finalPrefixCls}-item-actions`, hashId)}
