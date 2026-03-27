@@ -28,7 +28,7 @@ import { parseChineseCurrencyToNumber } from '../Plugins/chart/utils';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import AnimationText from './AnimationText';
 import { StreamingAnimationContext } from './StreamingAnimationContext';
-import type { RendererBlockProps } from './types';
+import type { MarkdownRendererEleProps, RendererBlockProps } from './types';
 
 const INLINE_MATH_WITH_SINGLE_DOLLAR = { singleDollarTextMath: true };
 const FRONTMATTER_LANGUAGES: readonly string[] = ['yaml'];
@@ -346,6 +346,10 @@ const buildEditorAlignedComponents = (
     onClick?: (url?: string) => boolean | void;
   },
   streamingParagraphAnimation?: boolean,
+  eleRender?: (
+    props: MarkdownRendererEleProps,
+    defaultDom: React.ReactNode,
+  ) => React.ReactNode,
 ) => {
   const listCls = `${prefixCls}-list`;
   const tableCls = `${prefixCls}-content-table`;
@@ -363,89 +367,117 @@ const buildEditorAlignedComponents = (
 
   const wrapAnimation = (children: any) => jsx(StreamAnimWrap, { children });
 
+  /**
+   * 应用 eleRender 拦截：若用户返回非 undefined 值则使用，否则使用 defaultDom。
+   * 不对 table-cell/table-row 等子结构元素（th/td/tr/thead/tbody）进行拦截，
+   * 与 Slate 模式保持一致。
+   */
+  const applyEleRender = (
+    tagName: string,
+    props: any,
+    defaultDom: React.ReactNode,
+    skip = false,
+  ): React.ReactNode => {
+    if (!eleRender || skip) return defaultDom;
+    const result = eleRender({ tagName, ...props }, defaultDom);
+    return result !== undefined ? result : defaultDom;
+  };
+
   return {
     // ================================================================
     // Block 级别元素
     // ================================================================
 
     p: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('div' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('div' as any, {
         ...rest,
         'data-be': 'paragraph',
         'data-testid': 'markdown-paragraph',
         children: wrapAnimation(children),
       });
+      return applyEleRender('p', { node, children, ...rest }, defaultDom);
     },
 
     h1: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('h1' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('h1' as any, {
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-1',
         children,
       });
+      return applyEleRender('h1', { node, children, ...rest }, defaultDom);
     },
     h2: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('h2' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('h2' as any, {
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-2',
         children,
       });
+      return applyEleRender('h2', { node, children, ...rest }, defaultDom);
     },
     h3: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('h3' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('h3' as any, {
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-3',
         children,
       });
+      return applyEleRender('h3', { node, children, ...rest }, defaultDom);
     },
     h4: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('h4' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('h4' as any, {
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-4',
         children,
       });
+      return applyEleRender('h4', { node, children, ...rest }, defaultDom);
     },
     h5: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('h5' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('h5' as any, {
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-5',
         children,
       });
+      return applyEleRender('h5', { node, children, ...rest }, defaultDom);
     },
     h6: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('h6' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('h6' as any, {
         ...rest,
         'data-be': 'head',
         'data-testid': 'markdown-heading-6',
         children,
       });
+      return applyEleRender('h6', { node, children, ...rest }, defaultDom);
     },
 
     blockquote: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('blockquote' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('blockquote' as any, {
         ...rest,
         'data-be': 'blockquote',
         'data-testid': 'markdown-blockquote',
         children,
       });
+      return applyEleRender(
+        'blockquote',
+        { node, children, ...rest },
+        defaultDom,
+      );
     },
 
     ul: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('div' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('div' as any, {
         className: `${listCls}-container`,
         'data-be': 'list',
         'data-testid': 'markdown-unordered-list',
@@ -455,10 +487,11 @@ const buildEditorAlignedComponents = (
           children,
         }),
       });
+      return applyEleRender('ul', { node, children, ...rest }, defaultDom);
     },
     ol: (props: any) => {
-      const { node: _node, children, start, ...rest } = props;
-      return jsx('div' as any, {
+      const { node, children, start, ...rest } = props;
+      const defaultDom = jsx('div' as any, {
         className: `${listCls}-container`,
         'data-be': 'list',
         'data-testid': 'markdown-ordered-list',
@@ -469,14 +502,20 @@ const buildEditorAlignedComponents = (
           children,
         }),
       });
+      return applyEleRender(
+        'ol',
+        { node, children, start, ...rest },
+        defaultDom,
+      );
     },
 
     li: (props: any) => {
-      const { node: _node, children, className, ...rest } = props;
+      const { node, children, className, ...rest } = props;
       const isTask =
         className === 'task-list-item' ||
         (Array.isArray(className) && className.includes('task-list-item'));
 
+      let defaultDom: React.ReactNode;
       if (isTask) {
         const childArray = Array.isArray(children) ? children : [children];
         let checked = false;
@@ -491,7 +530,7 @@ const buildEditorAlignedComponents = (
           return true;
         });
 
-        return jsxs('li' as any, {
+        defaultDom = jsxs('li' as any, {
           ...rest,
           className: `${listCls}-item ${listCls}-task`,
           'data-be': 'list-item',
@@ -506,20 +545,26 @@ const buildEditorAlignedComponents = (
             ...filteredChildren,
           ],
         });
+      } else {
+        defaultDom = jsx('li' as any, {
+          ...rest,
+          className: `${listCls}-item`,
+          'data-be': 'list-item',
+          'data-testid': 'markdown-list-item',
+          children,
+        });
       }
 
-      return jsx('li' as any, {
-        ...rest,
-        className: `${listCls}-item`,
-        'data-be': 'list-item',
-        'data-testid': 'markdown-list-item',
-        children,
-      });
+      return applyEleRender(
+        'li',
+        { node, children, className, ...rest },
+        defaultDom,
+      );
     },
 
     table: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('div' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('div' as any, {
         className: tableCls,
         'data-testid': 'markdown-table',
         children: jsx('div' as any, {
@@ -532,6 +577,7 @@ const buildEditorAlignedComponents = (
           }),
         }),
       });
+      return applyEleRender('table', { node, children, ...rest }, defaultDom);
     },
 
     thead: (props: any) => {
@@ -595,9 +641,9 @@ const buildEditorAlignedComponents = (
     // ================================================================
 
     a: (props: any) => {
-      const { node: _node, href, onClick: _origOnClick, ...rest } = props;
+      const { node, href, onClick: _origOnClick, ...rest } = props;
       const openInNewTab = linkConfig?.openInNewTab !== false;
-      return jsx('a' as any, {
+      const defaultDom = jsx('a' as any, {
         ...rest,
         href,
         'data-be': 'text',
@@ -615,35 +661,39 @@ const buildEditorAlignedComponents = (
           }
         },
       });
+      return applyEleRender('a', { node, href, ...rest }, defaultDom);
     },
 
     strong: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('strong' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('strong' as any, {
         ...rest,
         'data-testid': 'markdown-bold',
         style: { fontWeight: 'bold' },
         children,
       });
+      return applyEleRender('strong', { node, children, ...rest }, defaultDom);
     },
 
     em: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('em' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('em' as any, {
         ...rest,
         'data-testid': 'markdown-italic',
         style: { fontStyle: 'italic' },
         children,
       });
+      return applyEleRender('em', { node, children, ...rest }, defaultDom);
     },
 
     del: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('del' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('del' as any, {
         ...rest,
         'data-testid': 'markdown-strikethrough',
         children,
       });
+      return applyEleRender('del', { node, children, ...rest }, defaultDom);
     },
 
     code: (props: any) => {
@@ -660,8 +710,8 @@ const buildEditorAlignedComponents = (
     },
 
     mark: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('mark' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('mark' as any, {
         ...rest,
         'data-testid': 'markdown-mark',
         style: {
@@ -671,11 +721,12 @@ const buildEditorAlignedComponents = (
         },
         children,
       });
+      return applyEleRender('mark', { node, children, ...rest }, defaultDom);
     },
 
     kbd: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('kbd' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('kbd' as any, {
         ...rest,
         'data-testid': 'markdown-kbd',
         style: {
@@ -688,15 +739,17 @@ const buildEditorAlignedComponents = (
         },
         children,
       });
+      return applyEleRender('kbd', { node, children, ...rest }, defaultDom);
     },
 
     sub: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('sub' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('sub' as any, {
         ...rest,
         'data-testid': 'markdown-sub',
         children,
       });
+      return applyEleRender('sub', { node, children, ...rest }, defaultDom);
     },
 
     // ================================================================
@@ -728,16 +781,21 @@ const buildEditorAlignedComponents = (
         });
       }
 
-      return jsxs('pre' as any, {
+      const defaultDom = jsxs('pre' as any, {
         ...rest,
         children: [children],
       });
+      return applyEleRender(
+        'pre',
+        { node: hastPreNode, children, ...rest },
+        defaultDom,
+      );
     },
 
     img: (props: any) => {
-      const { node: _node, src, alt, width, height, ..._rest } = props;
+      const { node, src, alt, width, height, ...rest } = props;
       const imgWidth = width ? Number(width) || width : 400;
-      return jsx('div' as any, {
+      const defaultDom = jsx('div' as any, {
         'data-be': 'image',
         'data-testid': 'markdown-image',
         style: {
@@ -775,12 +833,17 @@ const buildEditorAlignedComponents = (
           }),
         }),
       });
+      return applyEleRender(
+        'img',
+        { node, src, alt, width, height, ...rest },
+        defaultDom,
+      );
     },
 
     // 视频：对齐 ReadonlyMedia 的 video 处理
     video: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('div' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('div' as any, {
         'data-be': 'media',
         'data-testid': 'markdown-video',
         style: {
@@ -799,12 +862,13 @@ const buildEditorAlignedComponents = (
           children,
         }),
       });
+      return applyEleRender('video', { node, children, ...rest }, defaultDom);
     },
 
     // 音频：对齐 ReadonlyMedia 的 audio 处理
     audio: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('div' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('div' as any, {
         'data-be': 'media',
         'data-testid': 'markdown-audio',
         style: {
@@ -819,12 +883,13 @@ const buildEditorAlignedComponents = (
           children,
         }),
       });
+      return applyEleRender('audio', { node, children, ...rest }, defaultDom);
     },
 
     // iframe
     iframe: (props: any) => {
-      const { node: _node, ...rest } = props;
-      return jsx('div' as any, {
+      const { node, ...rest } = props;
+      const defaultDom = jsx('div' as any, {
         'data-testid': 'markdown-iframe',
         style: {
           position: 'relative',
@@ -841,21 +906,23 @@ const buildEditorAlignedComponents = (
           },
         }),
       });
+      return applyEleRender('iframe', { node, ...rest }, defaultDom);
     },
 
     hr: (props: any) => {
-      const { node: _node, ...rest } = props;
-      return jsx('hr' as any, {
+      const { node, ...rest } = props;
+      const defaultDom = jsx('hr' as any, {
         ...rest,
         'data-be': 'hr',
         'data-testid': 'markdown-hr',
       });
+      return applyEleRender('hr', { node, ...rest }, defaultDom);
     },
 
     // 脚注引用 sup > a（remark-gfm 有定义时生成）
     sup: (props: any) => {
-      const { node: _node, children, ...rest } = props;
-      return jsx('span' as any, {
+      const { node, children, ...rest } = props;
+      const defaultDom = jsx('span' as any, {
         ...rest,
         'data-fnc': 'fnc',
         'data-testid': 'markdown-footnote-ref',
@@ -866,6 +933,7 @@ const buildEditorAlignedComponents = (
         },
         children,
       });
+      return applyEleRender('sup', { node, children, ...rest }, defaultDom);
     },
 
     span: (props: any) => {
@@ -1020,6 +1088,15 @@ export interface UseMarkdownToReactOptions {
    * 与 `content`（常为 useStreaming 输出的可解析串）分离，避免占位符与正文切换时误判为非前缀修订。
    */
   contentRevisionSource?: string;
+  /**
+   * 自定义元素渲染拦截函数（markdown 渲染模式）。
+   * 允许在默认渲染结果基础上包装、替换任意元素。
+   * 返回 undefined 时回退到默认渲染。
+   */
+  eleRender?: (
+    props: MarkdownRendererEleProps,
+    defaultDom: React.ReactNode,
+  ) => React.ReactNode;
 }
 
 export {
@@ -1029,3 +1106,4 @@ export {
   renderMarkdownBlock,
   splitMarkdownBlocks,
 };
+export type { MarkdownRendererEleProps };

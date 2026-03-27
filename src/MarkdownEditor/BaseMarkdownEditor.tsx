@@ -394,6 +394,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
               prefixCls={baseClassName}
               fncProps={props.fncProps}
               linkConfig={props.linkConfig}
+              eleRender={props.eleRender}
             />
             {children}
           </div>

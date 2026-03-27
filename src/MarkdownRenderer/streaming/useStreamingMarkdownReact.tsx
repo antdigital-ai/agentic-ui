@@ -42,6 +42,7 @@ export const useStreamingMarkdownReact = (
         options?.streaming,
         options?.linkConfig,
         options?.streamingParagraphAnimation,
+        options?.eleRender,
       ),
     [
       prefixCls,
@@ -49,6 +50,7 @@ export const useStreamingMarkdownReact = (
       options?.streaming,
       options?.linkConfig,
       options?.streamingParagraphAnimation,
+      options?.eleRender,
     ],
   );
 

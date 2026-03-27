@@ -135,6 +135,7 @@ const InternalMarkdownRenderer = forwardRef<
     linkConfig,
     streamingParagraphAnimation,
     apaasify,
+    eleRender,
   } = props;
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
@@ -253,6 +254,7 @@ const InternalMarkdownRenderer = forwardRef<
     streaming,
     streamingParagraphAnimation,
     contentRevisionSource: streaming ? displayedContent : undefined,
+    eleRender,
   });
 
   return wrapVarSSR(
