@@ -51,11 +51,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       // 分割线样式
       [`${token.componentCls}-segmented`]: {
-        '.ant-segmented-group': {
+        [`${token.antCls}-segmented-group`]: {
           height: '32px',
         },
 
-        '&.ant-segmented:not(.chaos-segmented) .ant-segmented-item .ant-segmented-item-label':
+        [`&${token.antCls}-segmented:not(.chaos-segmented) ${token.antCls}-segmented-item ${token.antCls}-segmented-item-label`]:
           {
             height: '100%',
             display: 'flex',
@@ -63,8 +63,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             justifyContent: 'center',
           },
 
-        '.ant-segmented-item': {
-          '&:has(.ant-segmented-item-label:empty)': {
+        [`${token.antCls}-segmented-item`]: {
+          [`&:has(${token.antCls}-segmented-item-label:empty)`]: {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -77,7 +77,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             pointerEvents: 'none',
             backgroundColor: 'transparent !important',
 
-            '.ant-segmented-item-label': {
+            [`${token.antCls}-segmented-item-label`]: {
               padding: '0',
               height: '100%',
               width: '1px',
@@ -90,8 +90,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
         },
 
-        '.ant-segmented-item-disabled': {
-          '&:has(.ant-segmented-item-label:empty)': {
+        [`${token.antCls}-segmented-item-disabled`]: {
+          [`&:has(${token.antCls}-segmented-item-label:empty)`]: {
             opacity: '1 !important',
           },
         },
