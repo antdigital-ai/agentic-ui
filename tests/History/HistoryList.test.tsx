@@ -350,6 +350,36 @@ describe('HistoryList - generateHistoryItems', () => {
     expect(items).toHaveLength(3);
   });
 
+  it('filteredList 为 undefined 时应按空数组处理', () => {
+    const items = generateHistoryItems({
+      ...defaultConfig,
+      filteredList: undefined as unknown as HistoryDataType[],
+    });
+    expect(items).toHaveLength(0);
+  });
+
+  it('customDateFormatter 存在但分组首项 gmtCreate 为 falsy 时不调用 customDateFormatter', () => {
+    const customDateFormatter = vi.fn(() => '不应调用');
+    const listNoCreate = [
+      {
+        sessionId: 's1',
+        id: '1',
+        sessionTitle: '无时间',
+        gmtCreate: 0,
+      },
+    ] as HistoryDataType[];
+
+    const items = generateHistoryItems({
+      ...defaultConfig,
+      filteredList: listNoCreate,
+      customDateFormatter,
+    });
+
+    expect(customDateFormatter).not.toHaveBeenCalled();
+    expect(items).toHaveLength(1);
+    expect(items[0].label).not.toBe('不应调用');
+  });
+
   it('item 无 sessionId 时 onClick 应直接 return', () => {
     const onClick = vi.fn();
     const listWithNoSessionId = [

@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HistorySearch } from '../../../src/History/components/SearchComponent';
 import { I18nContext } from '../../../src/I18n';
 
@@ -91,6 +91,27 @@ describe('HistorySearch', () => {
 
     fireEvent.mouseDown(document.body);
     expect(screen.queryByPlaceholderText('搜索话题')).not.toBeInTheDocument();
+  });
+
+  it('展开且有输入内容时点击外部不收起', async () => {
+    const onSearch = vi.fn().mockResolvedValue(undefined);
+    render(
+      <TestWrapper>
+        <HistorySearch onSearch={onSearch} />
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByTestId('action-icon-box'));
+    const input = screen.getByPlaceholderText('搜索话题');
+    fireEvent.change(input, { target: { value: 'x' } });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 360));
+    });
+
+    fireEvent.mouseDown(document.body);
+
+    expect(screen.getByPlaceholderText('搜索话题')).toBeInTheDocument();
   });
 
   it('应该显示 task 类型的 placeholder', () => {

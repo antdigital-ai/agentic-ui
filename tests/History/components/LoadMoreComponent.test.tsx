@@ -305,4 +305,30 @@ describe('HistoryLoadMore', () => {
 
     expect(container.querySelector('.anticon-ellipsis')).toBeInTheDocument();
   });
+
+  it('task 类型加载中应显示 LoadingOutlined', async () => {
+    const onLoadMore = vi.fn(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 100);
+        }),
+    );
+    const { container } = render(
+      <TestWrapper>
+        <HistoryLoadMore onLoadMore={onLoadMore} type="task" />
+      </TestWrapper>,
+    );
+
+    const button = screen.getByRole('button');
+    fireEvent.click(button);
+
+    await waitFor(
+      () => {
+        expect(button.querySelector('.anticon-loading')).toBeInTheDocument();
+      },
+      { timeout: 1000 },
+    );
+
+    expect(container.querySelector('.anticon-ellipsis')).not.toBeInTheDocument();
+  });
 });
