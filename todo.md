@@ -8,6 +8,6 @@
 
 ## 对话 loading dom 间距修复
 
-- [ ] 定位对话 loading DOM 的样式入口
-- [ ] 为 loading DOM 增加顶部间距，避免仅工具场景粘连
-- [ ] 运行最小化校验并提交变更
+- [x] 定位对话 loading DOM 的样式入口
+- [x] 为 loading DOM 增加顶部间距，避免仅工具场景粘连
+- [x] 运行最小化校验并提交变更
