@@ -90,64 +90,67 @@ export const generateHistoryItems = ({
   const MIN_GROUP_SIZE = 3;
 
   // 按照时间顺序对分组进行排序：今日 > 昨日 > 一周内 > 其他
-  // 过滤掉项目数量少于最小阈值的分组
-  const sortedGroupKeys = Object.keys(groupList)
-    .filter((key) => groupList[key].length >= MIN_GROUP_SIZE)
-    .sort(
-      (keyA, keyB) => (groupMaxTimes[keyB] || 0) - (groupMaxTimes[keyA] || 0),
-    );
+  const sortedGroupKeys = Object.keys(groupList).sort(
+    (keyA, keyB) => (groupMaxTimes[keyB] || 0) - (groupMaxTimes[keyA] || 0),
+  );
 
-  const items = sortedGroupKeys.map((key) => {
+  const buildItemNodes = (list: HistoryDataType[]) =>
+    list
+      .sort((a, b) => {
+        if (sessionSort === false) return 0;
+        if (sessionSort) {
+          const result = sessionSort(a, b);
+          return typeof result === 'boolean' ? 0 : result;
+        }
+        return dayjs(b.gmtCreate).valueOf() - dayjs(a.gmtCreate).valueOf();
+      })
+      .map((item) => ({
+        key: item.sessionId || `item-${item.id}`,
+        type: 'item' as const,
+        onClick: () => {
+          if (!item.sessionId) return;
+          onClick(item.sessionId, item);
+        },
+        label: (
+          <HistoryItem
+            item={item}
+            selectedIds={selectedIds}
+            onSelectionChange={onSelectionChange}
+            onClick={onClick}
+            onDeleteItem={onDeleteItem}
+            agent={agent}
+            onFavorite={onFavorite}
+            extra={extra}
+            type={type}
+            runningId={runningId}
+            customOperationExtra={customOperationExtra}
+            itemDateFormatter={itemDateFormatter}
+          />
+        ),
+      }));
+
+  const items = sortedGroupKeys.flatMap((key) => {
     const list = groupList[key];
-    const firstItem = list?.at(0);
+
+    // 少于最小数量时，直接平铺为普通条目，不展示分组标题
+    if (list.length < MIN_GROUP_SIZE) {
+      return buildItemNodes(list);
+    }
+
+    const firstItem = list.at(0);
     const label =
       customDateFormatter && firstItem?.gmtCreate
         ? customDateFormatter(firstItem.gmtCreate)
         : formatTime(firstItem?.gmtCreate as number);
-    return {
-      key: `group-${key}`,
-      type: 'group' as const,
-      label: groupLabelRender ? groupLabelRender(key, list, label) : label,
-      children: list
-        ?.sort((a: HistoryDataType, b: HistoryDataType) => {
-          if (sessionSort === false) {
-            return 0;
-          }
-          if (sessionSort) {
-            const result = sessionSort(a, b);
-            return typeof result === 'boolean' ? 0 : result;
-          }
-          return dayjs(b.gmtCreate).valueOf() - dayjs(a.gmtCreate).valueOf();
-        })
-        ?.map((item: HistoryDataType) => {
-          return {
-            key: item.sessionId || `item-${item.id}`,
-            type: 'item' as const,
-            onClick: () => {
-              if (!item.sessionId) {
-                return;
-              }
-              onClick(item.sessionId, item);
-            },
-            label: (
-              <HistoryItem
-                item={item}
-                selectedIds={selectedIds}
-                onSelectionChange={onSelectionChange}
-                onClick={onClick}
-                onDeleteItem={onDeleteItem}
-                agent={agent}
-                onFavorite={onFavorite}
-                extra={extra}
-                type={type}
-                runningId={runningId}
-                customOperationExtra={customOperationExtra}
-                itemDateFormatter={itemDateFormatter}
-              />
-            ),
-          };
-        }),
-    };
+
+    return [
+      {
+        key: `group-${key}`,
+        type: 'group' as const,
+        label: groupLabelRender ? groupLabelRender(key, list, label) : label,
+        children: buildItemNodes(list),
+      },
+    ];
   });
 
   return items;

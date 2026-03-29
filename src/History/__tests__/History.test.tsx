@@ -13,7 +13,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext, cnLabels } from '../../I18n';
 import { History, HistoryDataType } from '../index';
 
-// 模拟默认请求函数（每个分组至少 3 条，满足分组显示最小数量要求）
+// 模拟默认请求函数
 const mockRequest = vi.fn().mockResolvedValue([
   {
     id: '1',
@@ -26,18 +26,18 @@ const mockRequest = vi.fn().mockResolvedValue([
   {
     id: '2',
     sessionId: 'session-2',
-    sessionTitle: '今日对话2',
+    sessionTitle: '昨日对话1',
     agentId: 'agent-1',
-    gmtCreate: dayjs().subtract(1, 'hour').valueOf(),
-    gmtLastConverse: dayjs().subtract(1, 'hour').valueOf(),
+    gmtCreate: dayjs().subtract(1, 'day').valueOf(),
+    gmtLastConverse: dayjs().subtract(1, 'day').valueOf(),
   },
   {
     id: '3',
     sessionId: 'session-3',
-    sessionTitle: '今日对话3',
+    sessionTitle: '一周前对话1',
     agentId: 'agent-1',
-    gmtCreate: dayjs().subtract(2, 'hour').valueOf(),
-    gmtLastConverse: dayjs().subtract(2, 'hour').valueOf(),
+    gmtCreate: dayjs().subtract(8, 'day').valueOf(),
+    gmtLastConverse: dayjs().subtract(8, 'day').valueOf(),
   },
 ]);
 
@@ -294,6 +294,33 @@ describe('History Component', () => {
   });
 
   describe('Custom Formatting and Sorting', () => {
+    const threeItemsInSameDayRequest = vi.fn().mockResolvedValue([
+      {
+        id: '1',
+        sessionId: 'session-1',
+        sessionTitle: '今日对话1',
+        agentId: 'agent-1',
+        gmtCreate: dayjs().valueOf(),
+        gmtLastConverse: dayjs().valueOf(),
+      },
+      {
+        id: '2',
+        sessionId: 'session-2',
+        sessionTitle: '今日对话2',
+        agentId: 'agent-1',
+        gmtCreate: dayjs().subtract(1, 'hour').valueOf(),
+        gmtLastConverse: dayjs().subtract(1, 'hour').valueOf(),
+      },
+      {
+        id: '3',
+        sessionId: 'session-3',
+        sessionTitle: '今日对话3',
+        agentId: 'agent-1',
+        gmtCreate: dayjs().subtract(2, 'hour').valueOf(),
+        gmtLastConverse: dayjs().subtract(2, 'hour').valueOf(),
+      },
+    ]);
+
     it('should use customDateFormatter when provided', async () => {
       const customDateFormatter = vi.fn().mockReturnValue('自定义日期');
 
@@ -301,6 +328,7 @@ describe('History Component', () => {
         <TestWrapper>
           <History
             {...defaultProps}
+            request={threeItemsInSameDayRequest}
             customDateFormatter={customDateFormatter}
             standalone
           />
