@@ -15,6 +15,7 @@ import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
 import { CharacterQueue } from './CharacterQueue';
 import { AgenticUiTaskBlockRenderer } from './renderers/AgenticUiTaskBlockRenderer';
 import { AgenticUiToolUseBarBlockRenderer } from './renderers/AgenticUiToolUseBarBlockRenderer';
+import { AgenticUiFileMapBlockRenderer } from './renderers/AgenticUiFileMapBlockRenderer';
 import { ChartBlockRenderer } from './renderers/ChartRenderer';
 import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
@@ -91,6 +92,12 @@ const DefaultCodeRouter: React.FC<
       pluginComponents['agentic-ui-usertoolbar'] ||
       AgenticUiToolUseBarBlockRenderer;
     return <ToolbarComp {...rest} language={language} />;
+  }
+
+  if (language === 'agentic-ui-filemap') {
+    const FileMapComp =
+      pluginComponents['agentic-ui-filemap'] || AgenticUiFileMapBlockRenderer;
+    return <FileMapComp {...rest} language={language} />;
   }
 
   if (SCHEMA_LANGUAGES.has(language)) {

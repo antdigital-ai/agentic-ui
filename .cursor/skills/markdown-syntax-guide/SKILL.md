@@ -266,6 +266,31 @@ import { Card } from 'antd';
 ```
 ````
 
+文件列表（渲染为 `FileMapView`）：
+
+````markdown
+```agentic-ui-filemap
+{
+  "fileList": [
+    { "uuid": "1", "name": "README.md", "size": 2048, "type": "text/markdown", "url": "https://example.com/README.md" },
+    { "uuid": "2", "name": "package.json", "size": 512, "type": "application/json", "url": "https://example.com/package.json" }
+  ]
+}
+```
+````
+
+支持字段：
+- `fileList`（或别名 `files`）：文件对象数组
+  - `name`：文件名（必填）
+  - `uuid` / `id`：唯一标识（可选，缺省时自动生成）
+  - `size`：文件大小（字节数，可选）
+  - `type`：MIME 类型（可选，用于显示文件图标）
+  - `url`：文件链接（可选）
+  - `previewUrl`：预览链接（可选）
+  - `status`：`"done"` / `"uploading"` / `"pending"` / `"error"`（可选）
+  - `errorMessage`：错误说明（`status === "error"` 时显示，可选）
+- `className`：自定义根元素类名（可选）
+
 **3D 模型**（若项目支持）
 
 ````markdown

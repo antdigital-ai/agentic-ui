@@ -91,6 +91,28 @@ describe('parseCode agentic-ui embed blocks', () => {
     expect(result.type).toBe('agentic-ui-toolusebar');
     expect(result.language).toBe('agentic-ui-toolusebar');
   });
+
+  it('should parse agentic-ui-filemap to typed node with JSON value', () => {
+    const raw = JSON.stringify({
+      fileList: [
+        {
+          name: 'README.md',
+          size: 2048,
+          type: 'text/markdown',
+          url: 'https://example.com/README.md',
+          uuid: 'file-1',
+        },
+      ],
+    });
+    const result = handleCode(
+      { value: raw, lang: 'agentic-ui-filemap', meta: undefined },
+      undefined,
+    );
+    expect(result.type).toBe('agentic-ui-filemap');
+    expect(result.language).toBe('agentic-ui-filemap');
+    expect((result.value as any).fileList).toHaveLength(1);
+    expect((result.value as any).fileList[0].name).toBe('README.md');
+  });
 });
 
 describe('parseCode processSchemaLanguage double throw (37-41)', () => {

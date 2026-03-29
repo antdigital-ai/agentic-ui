@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import type { AttachmentFile } from '../../../../MarkdownInputField/AttachmentButton/types';
 import type {
   TaskItem,
   TaskListProps,
@@ -160,4 +161,89 @@ export function normalizeToolUseBarPropsFromJson(
       : undefined;
 
   return { tools, className, light, disableAnimation };
+}
+
+export interface NormalizedFileMapEmbedProps {
+  fileList: AttachmentFile[];
+  className?: string;
+  style?: CSSProperties;
+}
+
+const fileItemFromRecord = (
+  x: Record<string, unknown>,
+  index: number,
+): AttachmentFile => {
+  const name =
+    x.name !== undefined && x.name !== null ? String(x.name) : `file-${index}`;
+  const url =
+    x.url !== undefined && x.url !== null ? String(x.url) : undefined;
+  const previewUrl =
+    x.previewUrl !== undefined && x.previewUrl !== null
+      ? String(x.previewUrl)
+      : undefined;
+  const type =
+    x.type !== undefined && x.type !== null ? String(x.type) : 'application/octet-stream';
+  const size =
+    typeof x.size === 'number' ? x.size : undefined;
+  const uuid =
+    x.uuid !== undefined && x.uuid !== null
+      ? String(x.uuid)
+      : x.id !== undefined && x.id !== null
+        ? String(x.id)
+        : `file-${index}`;
+
+  const rawStatus = x.status;
+  const status =
+    rawStatus === 'error' ||
+    rawStatus === 'uploading' ||
+    rawStatus === 'pending' ||
+    rawStatus === 'done'
+      ? rawStatus
+      : undefined;
+
+  const errorMessage =
+    typeof x.errorMessage === 'string' ? x.errorMessage : undefined;
+
+  return {
+    name,
+    type,
+    url,
+    previewUrl,
+    uuid,
+    size,
+    status,
+    errorMessage,
+  } as AttachmentFile;
+};
+
+/**
+ * 将 ```agentic-ui-filemap JSON 规范化为 FileMapView 所需 props
+ */
+export function normalizeFileMapPropsFromJson(
+  parsed: unknown,
+): NormalizedFileMapEmbedProps {
+  const root =
+    parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? parsed
+      : null;
+
+  let rawItems: unknown[] = [];
+  if (root && Array.isArray((root as { fileList?: unknown }).fileList)) {
+    rawItems = (root as { fileList: unknown[] }).fileList;
+  } else if (root && Array.isArray((root as { files?: unknown }).files)) {
+    rawItems = (root as { files: unknown[] }).files;
+  } else if (Array.isArray(parsed)) {
+    rawItems = parsed;
+  }
+
+  const fileList: AttachmentFile[] = rawItems
+    .filter((x): x is Record<string, unknown> => !!x && typeof x === 'object')
+    .map((x, i) => fileItemFromRecord(x, i));
+
+  const className =
+    root && typeof (root as { className?: unknown }).className === 'string'
+      ? (root as { className: string }).className
+      : undefined;
+
+  return { fileList, className };
 }

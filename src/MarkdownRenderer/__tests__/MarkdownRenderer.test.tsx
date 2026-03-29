@@ -558,4 +558,71 @@ describe('MarkdownRenderer', () => {
     ).toBeTruthy();
     expect(container.querySelector('[data-testid="ToolUse"]')).toBeTruthy();
   });
+
+  it('应将 agentic-ui-filemap 代码块渲染为 FileMapView', () => {
+    const json = JSON.stringify({
+      fileList: [
+        {
+          name: 'README.md',
+          size: 2048,
+          type: 'text/markdown',
+          url: 'https://example.com/README.md',
+          uuid: 'file-1',
+        },
+        {
+          name: 'package.json',
+          size: 1024,
+          type: 'application/json',
+          url: 'https://example.com/package.json',
+          uuid: 'file-2',
+        },
+      ],
+    });
+    const { container } = render(
+      <MarkdownRenderer content={'```agentic-ui-filemap\n' + json + '\n```'} />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="agentic-ui-filemap-block"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="file-view-list"]'),
+    ).toBeTruthy();
+  });
+
+  it('agentic-ui-filemap 解析失败时渲染 fallback', () => {
+    const { container } = render(
+      <MarkdownRenderer
+        content={'```agentic-ui-filemap\ninvalid json {{{\n```'}
+      />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="agentic-ui-filemap-fallback"]'),
+    ).toBeTruthy();
+  });
+
+  it('agentic-ui-filemap 支持 files 字段作为别名', () => {
+    const json = JSON.stringify({
+      files: [
+        {
+          name: 'doc.pdf',
+          size: 512,
+          type: 'application/pdf',
+          url: 'https://example.com/doc.pdf',
+          uuid: 'file-3',
+        },
+      ],
+    });
+    const { container } = render(
+      <MarkdownRenderer content={'```agentic-ui-filemap\n' + json + '\n```'} />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="agentic-ui-filemap-block"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="file-view-file-list"]'),
+    ).toBeTruthy();
+  });
 });
