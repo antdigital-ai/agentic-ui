@@ -3306,3 +3306,418 @@ a .ant-dropdown-trigger:hover {
   --otk-typography-title-margin-top: 1.2em;
   --otk-typography-title-margin-bottom: 0.5em;
 }
+[data-prefers-color="dark"] {
+  /* ============================================================ */
+  /* 暗色模式调色板覆盖                                            */
+  /* ============================================================ */
+
+  /* gray 调色板 */
+  --color-gray-1: #071821;
+  --color-gray-2: #152833;
+  --color-gray-3: #243a45;
+  --color-gray-4: #344c59;
+  --color-gray-5: #455e6d;
+  --color-gray-6: #567281;
+  --color-gray-7: #72829b;
+  --color-gray-8: #7c899e;
+  --color-gray-9: #8690a1;
+  --color-gray-10: #8f98a4;
+  --color-gray-11: #999fa7;
+
+  /* gray alpha 调色板（基于暗色文字色 rgba(199,221,255,x)）*/
+  --color-gray-a1: rgba(199,221,255,0.04);
+  --color-gray-a2: rgba(199,221,255,0.08);
+  --color-gray-a3: rgba(199,221,255,0.12);
+  --color-gray-a4: rgba(199,221,255,0.16);
+  --color-gray-a5: rgba(199,221,255,0.20);
+  --color-gray-a6: rgba(199,221,255,0.24);
+  --color-gray-a7: rgba(199,221,255,0.35);
+  --color-gray-a8: rgba(199,221,255,0.50);
+  --color-gray-a9: rgba(199,221,255,0.80);
+  --color-gray-a10: rgba(199,221,255,0.90);
+  --color-gray-a11: rgba(199,221,255,0.65);
+  --color-gray-a12: rgba(199,221,255,0.85);
+
+  /* gray 特殊变量 */
+  --color-gray-contrast: #1e2638;
+  --color-gray-bg-card-white: #141c2e;
+  --color-gray-bg-transparent: transparent;
+
+  /* primary 调色板 */
+  --color-primary-1: #00154c;
+  --color-primary-2: #002864;
+  --color-primary-3: #003c7d;
+  --color-primary-4: #005097;
+  --color-primary-5: #0064b1;
+  --color-primary-6: #0079cc;
+  --color-primary-7: #1d7afc;
+  --color-primary-8: #3f85f0;
+  --color-primary-9: #588fe4;
+  --color-primary-10: #6f98d7;
+  --color-primary-11: #85a0c9;
+
+  /* primary alpha 调色板 */
+  --color-primary-a1: rgba(88,143,228,0.04);
+  --color-primary-a2: rgba(88,143,228,0.08);
+  --color-primary-a3: rgba(88,143,228,0.12);
+  --color-primary-a4: rgba(88,143,228,0.16);
+  --color-primary-a5: rgba(88,143,228,0.2);
+  --color-primary-a6: rgba(88,143,228,0.24);
+  --color-primary-a7: rgba(88,143,228,0.35);
+  --color-primary-a8: rgba(88,143,228,0.5);
+  --color-primary-a9: rgba(88,143,228,0.8);
+  --color-primary-a10: rgba(88,143,228,0.9);
+  --color-primary-a11: rgba(88,143,228,0.65);
+  --color-primary-a12: rgba(88,143,228,0.85);
+
+  /* blue 调色板 */
+  --color-blue-1: #00154c;
+  --color-blue-2: #002864;
+  --color-blue-3: #003c7d;
+  --color-blue-4: #005097;
+  --color-blue-5: #0064b1;
+  --color-blue-6: #0079cc;
+  --color-blue-7: #1d7afc;
+  --color-blue-8: #3f85f0;
+  --color-blue-9: #588fe4;
+  --color-blue-10: #6f98d7;
+  --color-blue-11: #85a0c9;
+
+  /* blue alpha 调色板 */
+  --color-blue-a1: rgba(88,143,228,0.04);
+  --color-blue-a2: rgba(88,143,228,0.08);
+  --color-blue-a3: rgba(88,143,228,0.12);
+  --color-blue-a4: rgba(88,143,228,0.16);
+  --color-blue-a5: rgba(88,143,228,0.2);
+  --color-blue-a6: rgba(88,143,228,0.24);
+  --color-blue-a7: rgba(88,143,228,0.35);
+  --color-blue-a8: rgba(88,143,228,0.5);
+  --color-blue-a9: rgba(88,143,228,0.8);
+  --color-blue-a10: rgba(88,143,228,0.9);
+  --color-blue-a11: rgba(88,143,228,0.65);
+  --color-blue-a12: rgba(88,143,228,0.85);
+
+  /* red 调色板 */
+  --color-red-1: #400000;
+  --color-red-2: #5b0000;
+  --color-red-3: #77000c;
+  --color-red-4: #95181f;
+  --color-red-5: #b32f31;
+  --color-red-6: #d14544;
+  --color-red-7: #f15b50;
+  --color-red-8: #e66b60;
+  --color-red-9: #db796e;
+  --color-red-10: #cf867d;
+  --color-red-11: #c1918a;
+
+  /* red alpha 调色板 */
+  --color-red-a1: rgba(219,121,110,0.04);
+  --color-red-a2: rgba(219,121,110,0.08);
+  --color-red-a3: rgba(219,121,110,0.12);
+  --color-red-a4: rgba(219,121,110,0.16);
+  --color-red-a5: rgba(219,121,110,0.2);
+  --color-red-a6: rgba(219,121,110,0.24);
+  --color-red-a7: rgba(219,121,110,0.35);
+  --color-red-a8: rgba(219,121,110,0.5);
+  --color-red-a9: rgba(219,121,110,0.8);
+  --color-red-a10: rgba(219,121,110,0.9);
+  --color-red-a11: rgba(219,121,110,0.65);
+  --color-red-a12: rgba(219,121,110,0.85);
+
+  /* green 调色板 */
+  --color-green-1: #002000;
+  --color-green-2: #003600;
+  --color-green-3: #014e0b;
+  --color-green-4: #1d6721;
+  --color-green-5: #348136;
+  --color-green-6: #4a9b4b;
+  --color-green-7: #2abb7f;
+  --color-green-8: #4eb785;
+  --color-green-9: #64b28a;
+  --color-green-10: #76ad8f;
+  --color-green-11: #85a894;
+
+  /* green alpha 调色板 */
+  --color-green-a1: rgba(100,178,138,0.04);
+  --color-green-a2: rgba(100,178,138,0.08);
+  --color-green-a3: rgba(100,178,138,0.12);
+  --color-green-a4: rgba(100,178,138,0.16);
+  --color-green-a5: rgba(100,178,138,0.2);
+  --color-green-a6: rgba(100,178,138,0.24);
+  --color-green-a7: rgba(100,178,138,0.35);
+  --color-green-a8: rgba(100,178,138,0.5);
+  --color-green-a9: rgba(100,178,138,0.8);
+  --color-green-a10: rgba(100,178,138,0.9);
+  --color-green-a11: rgba(100,178,138,0.65);
+  --color-green-a12: rgba(100,178,138,0.85);
+
+  /* orange 调色板 */
+  --color-orange-1: #3a0000;
+  --color-orange-2: #570600;
+  --color-orange-3: #762100;
+  --color-orange-4: #953a00;
+  --color-orange-5: #b65200;
+  --color-orange-6: #d86b1d;
+  --color-orange-7: #f78826;
+  --color-orange-8: #e88d47;
+  --color-orange-9: #d9915d;
+  --color-orange-10: #c9946f;
+  --color-orange-11: #b9967f;
+
+  /* orange alpha 调色板 */
+  --color-orange-a1: rgba(217,145,93,0.04);
+  --color-orange-a2: rgba(217,145,93,0.08);
+  --color-orange-a3: rgba(217,145,93,0.12);
+  --color-orange-a4: rgba(217,145,93,0.16);
+  --color-orange-a5: rgba(217,145,93,0.2);
+  --color-orange-a6: rgba(217,145,93,0.24);
+  --color-orange-a7: rgba(217,145,93,0.35);
+  --color-orange-a8: rgba(217,145,93,0.5);
+  --color-orange-a9: rgba(217,145,93,0.8);
+  --color-orange-a10: rgba(217,145,93,0.9);
+  --color-orange-a11: rgba(217,145,93,0.65);
+  --color-orange-a12: rgba(217,145,93,0.85);
+
+  /* yellow 调色板 */
+  --color-yellow-1: #340000;
+  --color-yellow-2: #521900;
+  --color-yellow-3: #713300;
+  --color-yellow-4: #924d00;
+  --color-yellow-5: #b46800;
+  --color-yellow-6: #d78400;
+  --color-yellow-7: #f3a700;
+  --color-yellow-8: #e3a43e;
+  --color-yellow-9: #d2a258;
+  --color-yellow-10: #c29e6b;
+  --color-yellow-11: #b29b7a;
+
+  /* yellow alpha 调色板 */
+  --color-yellow-a1: rgba(210,162,88,0.04);
+  --color-yellow-a2: rgba(210,162,88,0.08);
+  --color-yellow-a3: rgba(210,162,88,0.12);
+  --color-yellow-a4: rgba(210,162,88,0.16);
+  --color-yellow-a5: rgba(210,162,88,0.2);
+  --color-yellow-a6: rgba(210,162,88,0.24);
+  --color-yellow-a7: rgba(210,162,88,0.35);
+  --color-yellow-a8: rgba(210,162,88,0.5);
+  --color-yellow-a9: rgba(210,162,88,0.8);
+  --color-yellow-a10: rgba(210,162,88,0.9);
+  --color-yellow-a11: rgba(210,162,88,0.65);
+  --color-yellow-a12: rgba(210,162,88,0.85);
+
+  /* sub0 调色板 */
+  --color-sub0-1: #001746;
+  --color-sub0-2: #002c60;
+  --color-sub0-3: #00417a;
+  --color-sub0-4: #005795;
+  --color-sub0-5: #006eb2;
+  --color-sub0-6: #0085ce;
+  --color-sub0-7: #388bff;
+  --color-sub0-8: #4f92f1;
+  --color-sub0-9: #6397e3;
+  --color-sub0-10: #769cd4;
+  --color-sub0-11: #87a0c5;
+
+  /* sub0 alpha 调色板 */
+  --color-sub0-a1: rgba(99,151,227,0.04);
+  --color-sub0-a2: rgba(99,151,227,0.08);
+  --color-sub0-a3: rgba(99,151,227,0.12);
+  --color-sub0-a4: rgba(99,151,227,0.16);
+  --color-sub0-a5: rgba(99,151,227,0.2);
+  --color-sub0-a6: rgba(99,151,227,0.24);
+  --color-sub0-a7: rgba(99,151,227,0.35);
+  --color-sub0-a8: rgba(99,151,227,0.5);
+  --color-sub0-a9: rgba(99,151,227,0.8);
+  --color-sub0-a10: rgba(99,151,227,0.9);
+  --color-sub0-a11: rgba(99,151,227,0.65);
+  --color-sub0-a12: rgba(99,151,227,0.85);
+
+  /* sub1 调色板 */
+  --color-sub1-1: #000a4b;
+  --color-sub1-2: #002166;
+  --color-sub1-3: #003683;
+  --color-sub1-4: #144ca0;
+  --color-sub1-5: #2762be;
+  --color-sub1-6: #3a7add;
+  --color-sub1-7: #917ef7;
+  --color-sub1-8: #9386ea;
+  --color-sub1-9: #968ddc;
+  --color-sub1-10: #9994ce;
+  --color-sub1-11: #9c99c0;
+
+  /* sub1 alpha 调色板 */
+  --color-sub1-a1: rgba(150,141,220,0.04);
+  --color-sub1-a2: rgba(150,141,220,0.08);
+  --color-sub1-a3: rgba(150,141,220,0.12);
+  --color-sub1-a4: rgba(150,141,220,0.16);
+  --color-sub1-a5: rgba(150,141,220,0.2);
+  --color-sub1-a6: rgba(150,141,220,0.24);
+  --color-sub1-a7: rgba(150,141,220,0.35);
+  --color-sub1-a8: rgba(150,141,220,0.5);
+  --color-sub1-a9: rgba(150,141,220,0.8);
+  --color-sub1-a10: rgba(150,141,220,0.9);
+  --color-sub1-a11: rgba(150,141,220,0.65);
+  --color-sub1-a12: rgba(150,141,220,0.85);
+
+  /* sub2 调色板 */
+  --color-sub2-1: #002123;
+  --color-sub2-2: #003c3e;
+  --color-sub2-3: #005a5b;
+  --color-sub2-4: #00797a;
+  --color-sub2-5: #00999a;
+  --color-sub2-6: #00bbbb;
+  --color-sub2-7: #2ad8fc;
+  --color-sub2-8: #50cce9;
+  --color-sub2-9: #66bfd6;
+  --color-sub2-10: #75b2c3;
+  --color-sub2-11: #80a6b0;
+
+  /* sub2 alpha 调色板 */
+  --color-sub2-a1: rgba(102,191,214,0.04);
+  --color-sub2-a2: rgba(102,191,214,0.08);
+  --color-sub2-a3: rgba(102,191,214,0.12);
+  --color-sub2-a4: rgba(102,191,214,0.16);
+  --color-sub2-a5: rgba(102,191,214,0.2);
+  --color-sub2-a6: rgba(102,191,214,0.24);
+  --color-sub2-a7: rgba(102,191,214,0.35);
+  --color-sub2-a8: rgba(102,191,214,0.5);
+  --color-sub2-a9: rgba(102,191,214,0.8);
+  --color-sub2-a10: rgba(102,191,214,0.9);
+  --color-sub2-a11: rgba(102,191,214,0.65);
+  --color-sub2-a12: rgba(102,191,214,0.85);
+
+  /* sub3 调色板 */
+  --color-sub3-1: #00192a;
+  --color-sub3-2: #032b3e;
+  --color-sub3-3: #153d53;
+  --color-sub3-4: #275169;
+  --color-sub3-5: #386680;
+  --color-sub3-6: #4a7b97;
+  --color-sub3-7: #718ab6;
+  --color-sub3-8: #7a8fb4;
+  --color-sub3-9: #8495b2;
+  --color-sub3-10: #8d9ab0;
+  --color-sub3-11: #969fad;
+
+  /* sub3 alpha 调色板 */
+  --color-sub3-a1: rgba(132,149,178,0.04);
+  --color-sub3-a2: rgba(132,149,178,0.08);
+  --color-sub3-a3: rgba(132,149,178,0.12);
+  --color-sub3-a4: rgba(132,149,178,0.16);
+  --color-sub3-a5: rgba(132,149,178,0.2);
+  --color-sub3-a6: rgba(132,149,178,0.24);
+  --color-sub3-a7: rgba(132,149,178,0.35);
+  --color-sub3-a8: rgba(132,149,178,0.5);
+  --color-sub3-a9: rgba(132,149,178,0.8);
+  --color-sub3-a10: rgba(132,149,178,0.9);
+  --color-sub3-a11: rgba(132,149,178,0.65);
+  --color-sub3-a12: rgba(132,149,178,0.85);
+
+  /* sub4 调色板 */
+  --color-sub4-1: #111b00;
+  --color-sub4-2: #273500;
+  --color-sub4-3: #405200;
+  --color-sub4-4: #5a7000;
+  --color-sub4-5: #769000;
+  --color-sub4-6: #93b000;
+  --color-sub4-7: #84dc18;
+  --color-sub4-8: #87cf45;
+  --color-sub4-9: #8ac25c;
+  --color-sub4-10: #8cb56d;
+  --color-sub4-11: #8da87b;
+
+  /* sub4 alpha 调色板 */
+  --color-sub4-a1: rgba(138,194,92,0.04);
+  --color-sub4-a2: rgba(138,194,92,0.08);
+  --color-sub4-a3: rgba(138,194,92,0.12);
+  --color-sub4-a4: rgba(138,194,92,0.16);
+  --color-sub4-a5: rgba(138,194,92,0.2);
+  --color-sub4-a6: rgba(138,194,92,0.24);
+  --color-sub4-a7: rgba(138,194,92,0.35);
+  --color-sub4-a8: rgba(138,194,92,0.5);
+  --color-sub4-a9: rgba(138,194,92,0.8);
+  --color-sub4-a10: rgba(138,194,92,0.9);
+  --color-sub4-a11: rgba(138,194,92,0.65);
+  --color-sub4-a12: rgba(138,194,92,0.85);
+
+  /* sub5 调色板 */
+  --color-sub5-1: #26003c;
+  --color-sub5-2: #3d0d57;
+  --color-sub5-3: #552473;
+  --color-sub5-4: #6f3b91;
+  --color-sub5-5: #8a52af;
+  --color-sub5-6: #a569cf;
+  --color-sub5-7: #e873bb;
+  --color-sub5-8: #dd7cb6;
+  --color-sub5-9: #d184b1;
+  --color-sub5-10: #c48bac;
+  --color-sub5-11: #b792a6;
+
+  /* sub5 alpha 调色板 */
+  --color-sub5-a1: rgba(209,132,177,0.04);
+  --color-sub5-a2: rgba(209,132,177,0.08);
+  --color-sub5-a3: rgba(209,132,177,0.12);
+  --color-sub5-a4: rgba(209,132,177,0.16);
+  --color-sub5-a5: rgba(209,132,177,0.2);
+  --color-sub5-a6: rgba(209,132,177,0.24);
+  --color-sub5-a7: rgba(209,132,177,0.35);
+  --color-sub5-a8: rgba(209,132,177,0.5);
+  --color-sub5-a9: rgba(209,132,177,0.8);
+  --color-sub5-a10: rgba(209,132,177,0.9);
+  --color-sub5-a11: rgba(209,132,177,0.65);
+  --color-sub5-a12: rgba(209,132,177,0.85);
+
+  /* sub6 调色板 */
+  --color-sub6-1: #340000;
+  --color-sub6-2: #531800;
+  --color-sub6-3: #733100;
+  --color-sub6-4: #944c00;
+  --color-sub6-5: #b66700;
+  --color-sub6-6: #da831e;
+  --color-sub6-7: #f8a530;
+  --color-sub6-8: #e7a34d;
+  --color-sub6-9: #d6a060;
+  --color-sub6-10: #c49d70;
+  --color-sub6-11: #b3997d;
+
+  /* sub6 alpha 调色板 */
+  --color-sub6-a1: rgba(214,160,96,0.04);
+  --color-sub6-a2: rgba(214,160,96,0.08);
+  --color-sub6-a3: rgba(214,160,96,0.12);
+  --color-sub6-a4: rgba(214,160,96,0.16);
+  --color-sub6-a5: rgba(214,160,96,0.2);
+  --color-sub6-a6: rgba(214,160,96,0.24);
+  --color-sub6-a7: rgba(214,160,96,0.35);
+  --color-sub6-a8: rgba(214,160,96,0.5);
+  --color-sub6-a9: rgba(214,160,96,0.8);
+  --color-sub6-a10: rgba(214,160,96,0.9);
+  --color-sub6-a11: rgba(214,160,96,0.65);
+  --color-sub6-a12: rgba(214,160,96,0.85);
+
+  /* sub7 调色板 */
+  --color-sub7-1: #001f00;
+  --color-sub7-2: #0b3800;
+  --color-sub7-3: #225200;
+  --color-sub7-4: #396e00;
+  --color-sub7-5: #508b00;
+  --color-sub7-6: #69a900;
+  --color-sub7-7: #49d05b;
+  --color-sub7-8: #5fc768;
+  --color-sub7-9: #6fbd74;
+  --color-sub7-10: #7bb37e;
+  --color-sub7-11: #86a987;
+
+  /* sub7 alpha 调色板 */
+  --color-sub7-a1: rgba(111,189,116,0.04);
+  --color-sub7-a2: rgba(111,189,116,0.08);
+  --color-sub7-a3: rgba(111,189,116,0.12);
+  --color-sub7-a4: rgba(111,189,116,0.16);
+  --color-sub7-a5: rgba(111,189,116,0.2);
+  --color-sub7-a6: rgba(111,189,116,0.24);
+  --color-sub7-a7: rgba(111,189,116,0.35);
+  --color-sub7-a8: rgba(111,189,116,0.5);
+  --color-sub7-a9: rgba(111,189,116,0.8);
+  --color-sub7-a10: rgba(111,189,116,0.9);
+  --color-sub7-a11: rgba(111,189,116,0.65);
+  --color-sub7-a12: rgba(111,189,116,0.85);
+}

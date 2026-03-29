@@ -1,5 +1,6 @@
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme as antdTheme } from 'antd';
 import zhCN from 'antd/es/locale/zh_CN';
+import { usePrefersColor } from 'dumi';
 import React, { useEffect } from 'react';
 
 // quicklink for prefetching in-viewport links when network is good
@@ -7,8 +8,10 @@ import React, { useEffect } from 'react';
 import { listen } from 'quicklink';
 import './reset-ant.css';
 
-// 包装组件，用于在应用级别使用 useAppData
 const AppWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [color] = usePrefersColor();
+  const isDark = color === 'dark';
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -18,16 +21,19 @@ const AppWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   }, []);
 
-  return <>{children}</>;
-};
-
-export function rootContainer(container: any) {
   return React.createElement(
     ConfigProvider,
     {
       locale: zhCN,
       prefixCls: 'otk',
+      theme: {
+        algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+      },
     },
-    React.createElement(AppWrapper, null, container),
+    children,
   );
+};
+
+export function rootContainer(container: any) {
+  return React.createElement(AppWrapper, null, container);
 }
