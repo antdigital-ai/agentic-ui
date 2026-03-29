@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import React from 'react';
+import { MenuItemType } from '../menu';
 import { HistoryDataType } from '../types/HistoryData';
 import { HistoryListConfig } from '../types/HistoryList';
 import { formatTime, groupByCategory } from '../utils';
@@ -69,7 +70,7 @@ export const generateHistoryItems = ({
   runningId,
   customOperationExtra,
   itemDateFormatter,
-}: HistoryListConfig) => {
+}: HistoryListConfig): MenuItemType[] => {
   const groupList = groupByCategory(
     filteredList || [],
     (item: HistoryDataType) => {
@@ -129,7 +130,7 @@ export const generateHistoryItems = ({
         ),
       }));
 
-  const items = sortedGroupKeys.flatMap((key) => {
+  const items: MenuItemType[] = sortedGroupKeys.flatMap((key): MenuItemType[] => {
     const list = groupList[key];
 
     // 少于最小数量时，直接平铺为普通条目，不展示分组标题

@@ -253,6 +253,7 @@ const parserNode = (
     case 'agentic-ui-task':
     case 'agentic-ui-toolusebar':
     case 'agentic-ui-usertoolbar':
+    case 'agentic-ui-filemap':
       str += handleCode(node, preString);
       break;
     case 'attach':

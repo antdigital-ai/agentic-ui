@@ -18,6 +18,10 @@ import {
   AgenticUiToolUseBarBlock,
   ReadonlyAgenticUiToolUseBarBlock,
 } from './AgenticUiBlocks/AgenticUiToolUseBarBlock';
+import {
+  AgenticUiFileMapBlock,
+  ReadonlyAgenticUiFileMapBlock,
+} from './AgenticUiBlocks/AgenticUiFileMapBlock';
 import { Blockquote } from './Blockquote';
 import { ReadonlyBlockquote } from './Blockquote/ReadonlyBlockquote';
 import { Break } from './Break';
@@ -247,6 +251,12 @@ const MElementComponent = (
         <ReadonlyAgenticUiToolUseBarBlock {...readonlyElementProps} />
       ) : (
         <AgenticUiToolUseBarBlock {...props} />
+      );
+    case 'agentic-ui-filemap':
+      return props.readonly ? (
+        <ReadonlyAgenticUiFileMapBlock {...readonlyElementProps} />
+      ) : (
+        <AgenticUiFileMapBlock {...props} />
       );
     case 'image':
       return props.readonly ? (
