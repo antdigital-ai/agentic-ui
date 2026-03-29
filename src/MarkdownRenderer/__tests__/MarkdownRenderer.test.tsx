@@ -625,4 +625,72 @@ describe('MarkdownRenderer', () => {
       container.querySelector('[data-testid="file-view-file-list"]'),
     ).toBeTruthy();
   });
+
+  it('agentic-ui-filemap 空列表时渲染外层容器但无文件项', () => {
+    const json = JSON.stringify({ fileList: [] });
+    const { container } = render(
+      <MarkdownRenderer content={'```agentic-ui-filemap\n' + json + '\n```'} />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="agentic-ui-filemap-block"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="file-view-file-list"]'),
+    ).toBeFalsy();
+  });
+
+  it('agentic-ui-filemap 图片类型文件渲染为图片列表', () => {
+    const json = JSON.stringify({
+      fileList: [
+        {
+          name: 'photo.png',
+          uuid: 'img-1',
+          type: 'image/png',
+          url: 'https://example.com/photo.png',
+        },
+      ],
+    });
+    const { container } = render(
+      <MarkdownRenderer content={'```agentic-ui-filemap\n' + json + '\n```'} />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="agentic-ui-filemap-block"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="file-view-image-list"]'),
+    ).toBeTruthy();
+  });
+
+  it('agentic-ui-filemap 与普通 markdown 混排时各自独立渲染', () => {
+    const json = JSON.stringify({
+      fileList: [{ name: 'mix.txt', uuid: 'm1' }],
+    });
+    const content =
+      '## 标题\n\n```agentic-ui-filemap\n' + json + '\n```\n\n结尾段落';
+    const { container } = render(<MarkdownRenderer content={content} />);
+
+    expect(container.querySelector('h2')).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="agentic-ui-filemap-block"]'),
+    ).toBeTruthy();
+    expect(container.textContent).toContain('结尾段落');
+  });
+
+  it('agentic-ui-filemap 直接传入数组格式', () => {
+    const json = JSON.stringify([
+      { name: 'array-file.txt', uuid: 'af-1', type: 'text/plain' },
+    ]);
+    const { container } = render(
+      <MarkdownRenderer content={'```agentic-ui-filemap\n' + json + '\n```'} />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="agentic-ui-filemap-block"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="file-view-file-list"]'),
+    ).toBeTruthy();
+  });
 });
