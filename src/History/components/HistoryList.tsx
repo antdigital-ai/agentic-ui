@@ -87,10 +87,15 @@ export const generateHistoryItems = ({
     ]),
   );
 
+  const MIN_GROUP_SIZE = 3;
+
   // 按照时间顺序对分组进行排序：今日 > 昨日 > 一周内 > 其他
-  const sortedGroupKeys = Object.keys(groupList).sort(
-    (keyA, keyB) => (groupMaxTimes[keyB] || 0) - (groupMaxTimes[keyA] || 0),
-  );
+  // 过滤掉项目数量少于最小阈值的分组
+  const sortedGroupKeys = Object.keys(groupList)
+    .filter((key) => groupList[key].length >= MIN_GROUP_SIZE)
+    .sort(
+      (keyA, keyB) => (groupMaxTimes[keyB] || 0) - (groupMaxTimes[keyA] || 0),
+    );
 
   const items = sortedGroupKeys.map((key) => {
     const list = groupList[key];
