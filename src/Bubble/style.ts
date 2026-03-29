@@ -158,6 +158,9 @@ const genStyle = (
         background: 'var(--color-primary-control-fill-secondary-active)',
         color: 'var(--color-gray-text-default)',
         boxShadow: 'none',
+        [`& ${token.antCls}-agentic-md-editor-content-inline-code`]: {
+          background: 'var(--color-primary-a7)',
+        },
         '&&-pure': {
           background: 'var(--color-primary-control-fill-primary)',
         },
@@ -179,6 +182,9 @@ const genStyle = (
           color: 'var(--color-gray-text-default)',
           borderRadius: '12px 12px 2px 12px',
           maxWidth: '668px',
+          [`& ${token.antCls}-agentic-md-editor-content-inline-code`]: {
+            background: 'var(--color-primary-control-fill-secondary-active)',
+          },
           '&&-pure': {
             background: 'var(--color-primary-control-fill-primary)',
           },
