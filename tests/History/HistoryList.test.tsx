@@ -46,7 +46,9 @@ vi.mock('../../src/History/utils', () => ({
 }));
 
 describe('HistoryList - generateHistoryItems', () => {
+  // 每组至少 3 条数据，满足 MIN_GROUP_SIZE = 3 的分组阈值，从而触发分组节点生成
   const mockHistoryData: HistoryDataType[] = [
+    // 今日 3 条
     {
       sessionId: 'session1',
       id: '1',
@@ -57,19 +59,51 @@ describe('HistoryList - generateHistoryItems', () => {
       sessionId: 'session2',
       id: '2',
       sessionTitle: '今天的对话2',
-      gmtCreate: dayjs().valueOf(),
+      gmtCreate: dayjs().subtract(1, 'hour').valueOf(),
     },
+    {
+      sessionId: 'session2b',
+      id: '2b',
+      sessionTitle: '今天的对话3',
+      gmtCreate: dayjs().subtract(2, 'hour').valueOf(),
+    },
+    // 昨日 3 条
     {
       sessionId: 'session3',
       id: '3',
-      sessionTitle: '昨天的对话',
+      sessionTitle: '昨天的对话1',
       gmtCreate: dayjs().subtract(1, 'day').valueOf(),
     },
     {
+      sessionId: 'session3b',
+      id: '3b',
+      sessionTitle: '昨天的对话2',
+      gmtCreate: dayjs().subtract(1, 'day').subtract(1, 'hour').valueOf(),
+    },
+    {
+      sessionId: 'session3c',
+      id: '3c',
+      sessionTitle: '昨天的对话3',
+      gmtCreate: dayjs().subtract(1, 'day').subtract(2, 'hour').valueOf(),
+    },
+    // 前天 3 条
+    {
       sessionId: 'session4',
       id: '4',
-      sessionTitle: '前天的对话',
+      sessionTitle: '前天的对话1',
       gmtCreate: dayjs().subtract(2, 'day').valueOf(),
+    },
+    {
+      sessionId: 'session4b',
+      id: '4b',
+      sessionTitle: '前天的对话2',
+      gmtCreate: dayjs().subtract(2, 'day').subtract(1, 'hour').valueOf(),
+    },
+    {
+      sessionId: 'session4c',
+      id: '4c',
+      sessionTitle: '前天的对话3',
+      gmtCreate: dayjs().subtract(2, 'day').subtract(2, 'hour').valueOf(),
     },
   ];
 
@@ -90,18 +124,18 @@ describe('HistoryList - generateHistoryItems', () => {
       type: 'group',
       label: '今日',
     });
-    expect(items[0].children).toHaveLength(2); // 今日有2个对话
+    expect(items[0].children).toHaveLength(3); // 今日有3个对话
 
     expect(items[1]).toMatchObject({
       type: 'group',
       label: '昨日',
     });
-    expect(items[1].children).toHaveLength(1); // 昨日有1个对话
+    expect(items[1].children).toHaveLength(3); // 昨日有3个对话
 
     expect(items[2]).toMatchObject({
       type: 'group',
     });
-    expect(items[2].children).toHaveLength(1); // 前天有1个对话
+    expect(items[2].children).toHaveLength(3); // 前天有3个对话
   });
 
   it('should use custom groupLabelRender to render group labels', () => {
@@ -131,6 +165,7 @@ describe('HistoryList - generateHistoryItems', () => {
       expect.arrayContaining([
         expect.objectContaining({ sessionId: 'session1' }),
         expect.objectContaining({ sessionId: 'session2' }),
+        expect.objectContaining({ sessionId: 'session2b' }),
       ]), // list
       '今日', // defaultLabel
     );
@@ -141,6 +176,8 @@ describe('HistoryList - generateHistoryItems', () => {
       '昨日', // key
       expect.arrayContaining([
         expect.objectContaining({ sessionId: 'session3' }),
+        expect.objectContaining({ sessionId: 'session3b' }),
+        expect.objectContaining({ sessionId: 'session3c' }),
       ]), // list
       '昨日', // defaultLabel
     );
@@ -154,7 +191,7 @@ describe('HistoryList - generateHistoryItems', () => {
       '自定义 今日',
     );
     expect(container.querySelector('.group-count')).toHaveTextContent(
-      '(2 条记录)',
+      '(3 条记录)',
     );
   });
 
@@ -177,7 +214,7 @@ describe('HistoryList - generateHistoryItems', () => {
     });
 
     // 验证自定义分组函数被调用
-    expect(mockGroupBy).toHaveBeenCalledTimes(4); // 4个历史记录
+    expect(mockGroupBy).toHaveBeenCalledTimes(9); // 9个历史记录
 
     // 验证 groupLabelRender 被调用
     expect(mockGroupLabelRender).toHaveBeenCalled();
@@ -260,21 +297,24 @@ describe('HistoryList - generateHistoryItems', () => {
       groupLabelRender: mockGroupLabelRender,
     });
 
-    // 验证今日分组（2个项目）
+    // 验证今日分组（3个项目）
     expect(mockGroupLabelRender).toHaveBeenCalledWith(
       '今日',
       expect.arrayContaining([
         expect.objectContaining({ sessionId: 'session1' }),
         expect.objectContaining({ sessionId: 'session2' }),
+        expect.objectContaining({ sessionId: 'session2b' }),
       ]),
       '今日',
     );
 
-    // 验证昨日分组（1个项目）
+    // 验证昨日分组（3个项目）
     expect(mockGroupLabelRender).toHaveBeenCalledWith(
       '昨日',
       expect.arrayContaining([
         expect.objectContaining({ sessionId: 'session3' }),
+        expect.objectContaining({ sessionId: 'session3b' }),
+        expect.objectContaining({ sessionId: 'session3c' }),
       ]),
       '昨日',
     );
@@ -304,7 +344,7 @@ describe('HistoryList - generateHistoryItems', () => {
     expect(container.querySelector('.custom-group-header')).toBeInTheDocument();
     expect(container.querySelector('.group-icon')).toHaveTextContent('📋');
     expect(container.querySelector('.group-label')).toHaveTextContent('今日');
-    expect(container.querySelector('.group-badge')).toHaveTextContent('2');
+    expect(container.querySelector('.group-badge')).toHaveTextContent('3');
   });
 
   it('should handle groupLabelRender with null or undefined returns', () => {
@@ -326,7 +366,7 @@ describe('HistoryList - generateHistoryItems', () => {
       sessionSort: false,
     });
     expect(items).toHaveLength(3);
-    expect(items[0].children!.length).toBe(2);
+    expect(items[0].children!.length).toBe(3);
   });
 
   it('sessionSort 为函数且返回 number 时应作为排序结果', () => {
