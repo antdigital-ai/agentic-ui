@@ -9,6 +9,11 @@ group:
 
 # Changelog
 
+## v2.30.12
+
+- MarkdownEditor / Plugins / CodeBlock
+  - 🆕 代码块工具栏新增「本地预览」按钮：`html` 与 `markdown` 语言的代码块可点击按钮在新标签页打开本地预览。HTML 代码直接以 Blob URL 渲染（允许执行 JavaScript），Markdown 代码先转换为 HTML 再打开。
+
 ## v2.30.1
 
 - MarkdownEditor

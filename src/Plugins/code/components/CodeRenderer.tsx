@@ -4,7 +4,7 @@
  */
 
 import { ConfigProvider, Skeleton, theme as antdTheme } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MarkdownEditor } from '../../../MarkdownEditor';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
 import { CodeNode, ElementProps } from '../../../MarkdownEditor/el';
@@ -13,6 +13,10 @@ import {
   useRenderConditions,
   useToolbarConfig,
 } from '../hooks';
+import {
+  openHtmlLocalPreview,
+  openMarkdownLocalPreview,
+} from '../utils/localPreview';
 import {
   AceEditor,
   AceEditorContainer,
@@ -150,6 +154,16 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
     setViewMode((prev) => (prev === 'preview' ? 'code' : 'preview'));
   };
 
+  // 本地预览处理函数
+  const handleLocalPreview = useCallback(() => {
+    const value = props.element?.value || '';
+    if (language === 'markdown') {
+      openMarkdownLocalPreview(value);
+    } else if (language === 'html') {
+      openHtmlLocalPreview(value);
+    }
+  }, [language, props.element?.value]);
+
   // 使用工具栏配置Hook
   const { toolbarProps } = useToolbarConfig({
     element: props.element,
@@ -159,6 +173,7 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
     onSelectionChange: setIsSelected,
     onViewModeToggle: handleViewModeToggle,
     viewMode,
+    onLocalPreview: handleLocalPreview,
   });
 
   // 检查代码块是否未闭合
@@ -308,5 +323,6 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
     viewMode,
     handleViewModeToggle,
     disableHtmlPreview,
+    handleLocalPreview,
   ]);
 }

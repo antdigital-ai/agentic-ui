@@ -16,6 +16,7 @@ interface UseToolbarConfigProps {
   onSelectionChange?: (selected: boolean) => void;
   onViewModeToggle?: () => void;
   viewMode?: 'preview' | 'code';
+  onLocalPreview?: () => void;
 }
 
 export function useToolbarConfig({
@@ -27,6 +28,7 @@ export function useToolbarConfig({
   onSelectionChange,
   onViewModeToggle,
   viewMode,
+  onLocalPreview,
 }: UseToolbarConfigProps) {
   // 组装语言选择器属性
   const languageSelectorProps: LanguageSelectorProps = useCallback(
@@ -49,6 +51,7 @@ export function useToolbarConfig({
       onSelectionChange,
       onViewModeToggle,
       viewMode,
+      onLocalPreview,
     }),
     [
       element,
@@ -59,6 +62,7 @@ export function useToolbarConfig({
       onSelectionChange,
       onViewModeToggle,
       viewMode,
+      onLocalPreview,
     ],
   )();
 

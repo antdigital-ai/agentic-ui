@@ -635,5 +635,75 @@ describe('CodeToolbar', () => {
       fireEvent.click(expandButton);
       expect(onExpandToggle).toHaveBeenCalled();
     });
+
+    describe('本地预览按钮测试', () => {
+      it('HTML 语言且提供 onLocalPreview 时显示本地预览按钮', () => {
+        const onLocalPreview = vi.fn();
+        const htmlElement = { ...defaultElement, language: 'html' };
+        render(
+          <CodeToolbar
+            {...defaultProps}
+            element={htmlElement}
+            isSelected={true}
+            onLocalPreview={onLocalPreview}
+          />,
+        );
+        expect(screen.getByTitle('本地预览')).toBeInTheDocument();
+      });
+
+      it('Markdown 语言且提供 onLocalPreview 时显示本地预览按钮', () => {
+        const onLocalPreview = vi.fn();
+        const mdElement = { ...defaultElement, language: 'markdown' };
+        render(
+          <CodeToolbar
+            {...defaultProps}
+            element={mdElement}
+            isSelected={true}
+            onLocalPreview={onLocalPreview}
+          />,
+        );
+        expect(screen.getByTitle('本地预览')).toBeInTheDocument();
+      });
+
+      it('JavaScript 语言不显示本地预览按钮（即使提供了回调）', () => {
+        const onLocalPreview = vi.fn();
+        render(
+          <CodeToolbar
+            {...defaultProps}
+            isSelected={true}
+            onLocalPreview={onLocalPreview}
+          />,
+        );
+        expect(screen.queryByTitle('本地预览')).not.toBeInTheDocument();
+      });
+
+      it('未提供 onLocalPreview 时 HTML 语言不显示本地预览按钮', () => {
+        const htmlElement = { ...defaultElement, language: 'html' };
+        render(
+          <CodeToolbar
+            {...defaultProps}
+            element={htmlElement}
+            isSelected={true}
+          />,
+        );
+        expect(screen.queryByTitle('本地预览')).not.toBeInTheDocument();
+      });
+
+      it('点击本地预览按钮时调用 onLocalPreview', () => {
+        const onLocalPreview = vi.fn();
+        const htmlElement = { ...defaultElement, language: 'html' };
+        render(
+          <CodeToolbar
+            {...defaultProps}
+            element={htmlElement}
+            isSelected={true}
+            onLocalPreview={onLocalPreview}
+          />,
+        );
+        const previewButton = screen.getByTitle('本地预览');
+        fireEvent.click(previewButton);
+        expect(onLocalPreview).toHaveBeenCalledTimes(1);
+      });
+    });
   });
 });

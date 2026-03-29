@@ -9,6 +9,11 @@ group:
 
 # Changelog
 
+## v2.30.12
+
+- MarkdownEditor / Plugins / CodeBlock
+  - 🆕 Added "Local Preview" button to the code block toolbar: `html` and `markdown` code blocks now have a button to open a local preview in a new tab. HTML code is rendered directly via a Blob URL (JavaScript is allowed to run); Markdown code is converted to HTML first.
+
 ## v2.30.1
 
 - MarkdownEditor

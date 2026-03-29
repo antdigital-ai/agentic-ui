@@ -5,7 +5,7 @@
  */
 
 import { CloseCircleOutlined } from '@ant-design/icons';
-import { ChevronsUpDown, Copy, Moon } from '@sofa-design/icons';
+import { ArrowUpRight, ChevronsUpDown, Copy, Moon } from '@sofa-design/icons';
 import { Segmented } from 'antd';
 import copy from 'copy-to-clipboard';
 import React, { useContext, useMemo } from 'react';
@@ -86,6 +86,8 @@ export interface CodeToolbarProps {
   viewMode?: 'preview' | 'code';
   /** 展开/收起回调 */
   onExpandToggle?: () => void;
+  /** 本地预览回调（在新标签页打开 HTML/Markdown 预览） */
+  onLocalPreview?: () => void;
 }
 
 /**
@@ -135,6 +137,7 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
     onExpandToggle,
     setTheme,
     viewMode = 'code',
+    onLocalPreview,
   } = props;
 
   // 检测 HTML 代码中是否包含 JavaScript
@@ -328,6 +331,21 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
         >
           <ChevronsUpDown />
         </ActionIconBox>
+
+        {/* 本地预览按钮（HTML 和 Markdown 语言时显示） */}
+        {(element?.language === 'html' || element?.language === 'markdown') &&
+          onLocalPreview && (
+            <ActionIconBox
+              title={i18n?.locale?.localPreview || '本地预览'}
+              theme={theme === 'chaos' ? 'dark' : 'light'}
+              onClick={(e) => {
+                e.stopPropagation();
+                onLocalPreview();
+              }}
+            >
+              <ArrowUpRight />
+            </ActionIconBox>
+          )}
       </div>
     </div>
   );
