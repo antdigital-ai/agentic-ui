@@ -5,3 +5,7 @@
  */
 
 export { langOptions } from './langOptions';
+export {
+  openHtmlLocalPreview,
+  openMarkdownLocalPreview,
+} from './localPreview';
