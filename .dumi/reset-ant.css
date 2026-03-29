@@ -3323,6 +3323,7 @@ a .ant-dropdown-trigger:hover {
   --color-gray-9: #8690a1;
   --color-gray-10: #8f98a4;
   --color-gray-11: #999fa7;
+  --color-gray-12: #acb2ba;
 
   /* gray alpha 调色板（基于暗色文字色 rgba(199,221,255,x)）*/
   --color-gray-a1: rgba(199,221,255,0.04);
@@ -3355,6 +3356,8 @@ a .ant-dropdown-trigger:hover {
   --color-primary-9: #588fe4;
   --color-primary-10: #6f98d7;
   --color-primary-11: #85a0c9;
+  --color-primary-12: #97b3dd;
+  --color-primary-12-rgb: 151, 179, 221;
 
   /* primary alpha 调色板 */
   --color-primary-a1: rgba(88,143,228,0.04);
@@ -3382,6 +3385,7 @@ a .ant-dropdown-trigger:hover {
   --color-blue-9: #588fe4;
   --color-blue-10: #6f98d7;
   --color-blue-11: #85a0c9;
+  --color-blue-12: #97b3dd;
 
   /* blue alpha 调色板 */
   --color-blue-a1: rgba(88,143,228,0.04);
@@ -3409,6 +3413,7 @@ a .ant-dropdown-trigger:hover {
   --color-red-9: #db796e;
   --color-red-10: #cf867d;
   --color-red-11: #c1918a;
+  --color-red-12: #d5a39c;
 
   /* red alpha 调色板 */
   --color-red-a1: rgba(219,121,110,0.04);
@@ -3436,6 +3441,7 @@ a .ant-dropdown-trigger:hover {
   --color-green-9: #64b28a;
   --color-green-10: #76ad8f;
   --color-green-11: #85a894;
+  --color-green-12: #97bba6;
 
   /* green alpha 调色板 */
   --color-green-a1: rgba(100,178,138,0.04);
@@ -3463,6 +3469,7 @@ a .ant-dropdown-trigger:hover {
   --color-orange-9: #d9915d;
   --color-orange-10: #c9946f;
   --color-orange-11: #b9967f;
+  --color-orange-12: #cca991;
 
   /* orange alpha 调色板 */
   --color-orange-a1: rgba(217,145,93,0.04);
@@ -3490,6 +3497,7 @@ a .ant-dropdown-trigger:hover {
   --color-yellow-9: #d2a258;
   --color-yellow-10: #c29e6b;
   --color-yellow-11: #b29b7a;
+  --color-yellow-12: #c5ae8c;
 
   /* yellow alpha 调色板 */
   --color-yellow-a1: rgba(210,162,88,0.04);
@@ -3517,6 +3525,7 @@ a .ant-dropdown-trigger:hover {
   --color-sub0-9: #6397e3;
   --color-sub0-10: #769cd4;
   --color-sub0-11: #87a0c5;
+  --color-sub0-12: #99b3d9;
 
   /* sub0 alpha 调色板 */
   --color-sub0-a1: rgba(99,151,227,0.04);
@@ -3544,6 +3553,7 @@ a .ant-dropdown-trigger:hover {
   --color-sub1-9: #968ddc;
   --color-sub1-10: #9994ce;
   --color-sub1-11: #9c99c0;
+  --color-sub1-12: #afacd3;
 
   /* sub1 alpha 调色板 */
   --color-sub1-a1: rgba(150,141,220,0.04);
@@ -3571,6 +3581,7 @@ a .ant-dropdown-trigger:hover {
   --color-sub2-9: #66bfd6;
   --color-sub2-10: #75b2c3;
   --color-sub2-11: #80a6b0;
+  --color-sub2-12: #92b9c3;
 
   /* sub2 alpha 调色板 */
   --color-sub2-a1: rgba(102,191,214,0.04);
@@ -3598,6 +3609,7 @@ a .ant-dropdown-trigger:hover {
   --color-sub3-9: #8495b2;
   --color-sub3-10: #8d9ab0;
   --color-sub3-11: #969fad;
+  --color-sub3-12: #a8b2c0;
 
   /* sub3 alpha 调色板 */
   --color-sub3-a1: rgba(132,149,178,0.04);
@@ -3625,6 +3637,7 @@ a .ant-dropdown-trigger:hover {
   --color-sub4-9: #8ac25c;
   --color-sub4-10: #8cb56d;
   --color-sub4-11: #8da87b;
+  --color-sub4-12: #9fbb8d;
 
   /* sub4 alpha 调色板 */
   --color-sub4-a1: rgba(138,194,92,0.04);
@@ -3652,6 +3665,7 @@ a .ant-dropdown-trigger:hover {
   --color-sub5-9: #d184b1;
   --color-sub5-10: #c48bac;
   --color-sub5-11: #b792a6;
+  --color-sub5-12: #caa4b9;
 
   /* sub5 alpha 调色板 */
   --color-sub5-a1: rgba(209,132,177,0.04);
@@ -3679,6 +3693,7 @@ a .ant-dropdown-trigger:hover {
   --color-sub6-9: #d6a060;
   --color-sub6-10: #c49d70;
   --color-sub6-11: #b3997d;
+  --color-sub6-12: #c6ac8f;
 
   /* sub6 alpha 调色板 */
   --color-sub6-a1: rgba(214,160,96,0.04);
@@ -3706,6 +3721,7 @@ a .ant-dropdown-trigger:hover {
   --color-sub7-9: #6fbd74;
   --color-sub7-10: #7bb37e;
   --color-sub7-11: #86a987;
+  --color-sub7-12: #98bc99;
 
   /* sub7 alpha 调色板 */
   --color-sub7-a1: rgba(111,189,116,0.04);
