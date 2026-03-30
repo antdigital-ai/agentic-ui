@@ -4,11 +4,28 @@ import type {
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
+import type { AttachmentFile } from '../MarkdownInputField/AttachmentButton/types';
+import type { FileMapViewProps } from '../MarkdownInputField/FileMapView';
 
 /**
- * markdown 渲染模式下传给 eleRender 的元素属性，
- * 包含 HTML 标签名、hast 节点及所有原生 HTML 属性。
+ * FileMapView 相关配置，透传给 agentic-ui-filemap 代码块渲染器，
+ * 方便在 markdownRenderConfig 中统一配置图片回显行为。
  */
+export interface FileMapConfig {
+  /**
+   * 预览文件回调，透传给 FileMapView.onPreview。
+   * 对图片：点击缩略图时触发，传入则阻止 antd Image 内置灯箱；
+   * 对视频：传入则阻止内置弹窗；对普通文件：传入则阻止默认 window.open。
+   */
+  onPreview?: (file: AttachmentFile) => void;
+  /**
+   * 自定义每个媒体条目（图片/视频）的渲染，透传给 FileMapView.itemRender，
+   * 常用于回显场景。
+   */
+  itemRender?: FileMapViewProps['itemRender'];
+}
+
+
 export interface MarkdownRendererEleProps {
   /** HTML tag name, e.g. 'p', 'h1', 'blockquote', 'pre' */
   tagName: string;
@@ -102,6 +119,11 @@ export interface MarkdownRendererProps {
     /** 自定义渲染函数，接收解析后的 JSON value，返回 React 节点 */
     render?: (value: any) => React.ReactNode;
   };
+  /**
+   * FileMapView 配置，透传给 agentic-ui-filemap 代码块渲染器。
+   * 可在 markdownRenderConfig 中统一配置图片 onPreview 和 itemRender。
+   */
+  fileMapConfig?: FileMapConfig;
   /**
    * 自定义元素渲染函数（markdown 渲染模式）
    * 与 Slate 模式的 eleItemRender 对应，允许拦截并替换任意块级/行内元素的渲染结果。

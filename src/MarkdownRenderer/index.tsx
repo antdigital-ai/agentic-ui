@@ -11,6 +11,7 @@ export { MermaidBlockRenderer } from './renderers/MermaidRenderer';
 export { SchemaBlockRenderer } from './renderers/SchemaRenderer';
 export type {
   CharacterQueueOptions,
+  FileMapConfig,
   MarkdownRendererEleProps,
   MarkdownRendererProps,
   MarkdownRendererRef,

@@ -22,6 +22,7 @@ import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
 import { SchemaBlockRenderer } from './renderers/SchemaRenderer';
 import { useRendererVarStyle } from './style';
 import type {
+  FileMapConfig,
   MarkdownRendererProps,
   MarkdownRendererRef,
   RendererBlockProps,
@@ -63,9 +64,11 @@ const DefaultCodeRouter: React.FC<
   RendererBlockProps & {
     pluginComponents: Record<string, React.ComponentType<RendererBlockProps>>;
     apaasifyRender?: (value: any) => React.ReactNode;
+    fileMapConfig?: FileMapConfig;
   }
 > = (props) => {
-  const { language, pluginComponents, apaasifyRender, ...rest } = props;
+  const { language, pluginComponents, apaasifyRender, fileMapConfig, ...rest } =
+    props;
 
   if (language === 'mermaid') {
     const MermaidComp = pluginComponents.mermaid || MermaidBlockRenderer;
@@ -97,7 +100,9 @@ const DefaultCodeRouter: React.FC<
   if (language === 'agentic-ui-filemap') {
     const FileMapComp =
       pluginComponents['agentic-ui-filemap'] || AgenticUiFileMapBlockRenderer;
-    return <FileMapComp {...rest} language={language} />;
+    return (
+      <FileMapComp {...rest} language={language} fileMapConfig={fileMapConfig} />
+    );
   }
 
   if (SCHEMA_LANGUAGES.has(language)) {
@@ -143,6 +148,7 @@ const InternalMarkdownRenderer = forwardRef<
     streamingParagraphAnimation,
     apaasify,
     eleRender,
+    fileMapConfig,
   } = props;
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
@@ -239,6 +245,7 @@ const InternalMarkdownRenderer = forwardRef<
         {...codeProps}
         pluginComponents={pluginComponents}
         apaasifyRender={apaasifyRender}
+        fileMapConfig={fileMapConfig}
       />
     );
     codeRouter.displayName = 'CodeRouter';
@@ -247,7 +254,7 @@ const InternalMarkdownRenderer = forwardRef<
       __codeBlock: codeRouter,
       ...pluginComponents,
     };
-  }, [pluginComponents, apaasifyRender]);
+  }, [pluginComponents, apaasifyRender, fileMapConfig]);
 
   // 流式缓存：将不完整的 Markdown token 暂缓，避免 parser 错误解析
   const safeContent = useStreaming(displayedContent, streaming);

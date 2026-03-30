@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { normalizeFileMapPropsFromJson } from '../../MarkdownEditor/editor/elements/AgenticUiBlocks/agenticUiEmbedUtils';
 import partialParse from '../../MarkdownEditor/editor/parser/json-parse';
 import { FileMapView } from '../../MarkdownInputField/FileMapView';
-import type { RendererBlockProps } from '../types';
+import type { FileMapConfig, RendererBlockProps } from '../types';
 
 const extractTextContent = (children: React.ReactNode): string => {
   if (typeof children === 'string') return children;
@@ -30,12 +30,13 @@ const parseJsonBody = (code: string): unknown => {
 /**
  * ```agentic-ui-filemap``` 代码块 → FileMapView
  */
-export const AgenticUiFileMapBlockRenderer: React.FC<RendererBlockProps> = (
-  props,
-) => {
+export const AgenticUiFileMapBlockRenderer: React.FC<
+  RendererBlockProps & { fileMapConfig?: FileMapConfig }
+> = (props) => {
+  const { fileMapConfig, ...rest } = props;
   const code = useMemo(
-    () => extractTextContent(props.children),
-    [props.children],
+    () => extractTextContent(rest.children),
+    [rest.children],
   );
   const parsed = useMemo(() => parseJsonBody(code), [code]);
   const { fileList, className } = useMemo(
@@ -68,7 +69,12 @@ export const AgenticUiFileMapBlockRenderer: React.FC<RendererBlockProps> = (
 
   return (
     <div data-testid="agentic-ui-filemap-block" style={{ margin: '0.75em 0' }}>
-      <FileMapView fileMap={fileMap} className={className} />
+      <FileMapView
+        fileMap={fileMap}
+        className={className}
+        onPreview={fileMapConfig?.onPreview}
+        itemRender={fileMapConfig?.itemRender}
+      />
     </div>
   );
 };
