@@ -174,6 +174,11 @@ export const useFileUploadManager = ({
       attachment?.maxFileCount &&
       currentFileCount >= attachment.maxFileCount
     ) {
+      attachment.onExceedMaxCount?.({
+        maxCount: attachment.maxFileCount,
+        currentCount: currentFileCount,
+        selectedCount: 0,
+      });
       return;
     }
 
@@ -201,12 +206,22 @@ export const useFileUploadManager = ({
         if (attachment?.maxFileCount) {
           // 如果一次选择的文件数量超过最大限制，完全拒绝
           if (selectedFiles.length > attachment.maxFileCount) {
+            attachment.onExceedMaxCount?.({
+              maxCount: attachment.maxFileCount,
+              currentCount: currentFileCount,
+              selectedCount: selectedFiles.length,
+            });
             return;
           }
 
           // 如果选择的文件数量加上已有文件数量超过限制，完全拒绝
           const totalFileCount = selectedFiles.length + currentFileCount;
           if (totalFileCount > attachment.maxFileCount) {
+            attachment.onExceedMaxCount?.({
+              maxCount: attachment.maxFileCount,
+              currentCount: currentFileCount,
+              selectedCount: selectedFiles.length,
+            });
             return;
           }
         }
@@ -218,6 +233,7 @@ export const useFileUploadManager = ({
             updateAttachmentFiles(newFileMap);
           },
           locale,
+          onExceedMaxCount: attachment?.onExceedMaxCount,
         });
       } catch (error) {
         console.error('Error uploading files:', error);
