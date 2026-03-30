@@ -2,7 +2,7 @@ import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 
-import { JINJA_DOLLAR_PLACEHOLDER } from '../MarkdownEditor/editor/parser/constants';
+import { JINJA_DOLLAR_PLACEHOLDER, preprocessNormalizeLeafToContainerDirective } from '../MarkdownEditor/editor/parser/constants';
 import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,
@@ -31,9 +31,8 @@ export const markdownToReactSync = (
 
   try {
     const processor = createHastProcessor(remarkPlugins, htmlConfig);
-    const preprocessed = content.replace(
-      new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'),
-      '$',
+    const preprocessed = preprocessNormalizeLeafToContainerDirective(
+      content.replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$'),
     );
 
     const mdast = processor.parse(preprocessed);

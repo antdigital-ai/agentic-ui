@@ -14,12 +14,13 @@ describe('markdownToHtml', () => {
     expect(html).not.toMatch(/directive-\d+/);
   });
 
-  it('markdownToHtmlSync 对块级 ::badge 在未启用全文 directive 时保持原文', () => {
+  it('markdownToHtmlSync 对块级 ::badge 规范化为 :::badge 容器指令', () => {
     const markdown = '::badge[ready]';
     const html = markdownToHtmlSync(markdown);
 
     expect(html).toContain('ready');
-    expect(html).toContain('::badge');
+    expect(html).toContain('markdown-container');
+    expect(html).toContain('badge');
   });
 
   it('openLinksInNewTab 开启时应为链接追加 target 与 rel', () => {

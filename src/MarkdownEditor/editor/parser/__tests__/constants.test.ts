@@ -1,5 +1,59 @@
 import { describe, expect, it } from 'vitest';
-import { preprocessProtectTimeFromDirective } from '../constants';
+import {
+  preprocessNormalizeLeafToContainerDirective,
+  preprocessProtectTimeFromDirective,
+} from '../constants';
+
+describe('preprocessNormalizeLeafToContainerDirective', () => {
+  it('将行首 ::warning 规范化为 :::warning', () => {
+    const md = '::warning\nSome content\n:::';
+    const result = preprocessNormalizeLeafToContainerDirective(md);
+    expect(result).toBe(':::warning\nSome content\n:::');
+  });
+
+  it('支持所有常见指令名称', () => {
+    const types = ['info', 'warning', 'error', 'success', 'tip', 'note'];
+    for (const type of types) {
+      const result = preprocessNormalizeLeafToContainerDirective(`::${type}\ncontent\n:::`);
+      expect(result.startsWith(`:::${type}`)).toBe(true);
+    }
+  });
+
+  it('不修改已是三冒号的容器指令', () => {
+    const md = ':::warning\nSome content\n:::';
+    const result = preprocessNormalizeLeafToContainerDirective(md);
+    expect(result).toBe(md);
+  });
+
+  it('不修改四冒号或更多冒号', () => {
+    const md = '::::warning\nSome content\n:::';
+    const result = preprocessNormalizeLeafToContainerDirective(md);
+    expect(result).toBe(md);
+  });
+
+  it('不修改行内的双冒号（不在行首）', () => {
+    const md = 'text ::warning text';
+    const result = preprocessNormalizeLeafToContainerDirective(md);
+    expect(result).toBe(md);
+  });
+
+  it('不修改时间格式 02:20:31', () => {
+    const md = '时间 02:20:31';
+    const result = preprocessNormalizeLeafToContainerDirective(md);
+    expect(result).toBe(md);
+  });
+
+  it('围栏代码块内不规范化', () => {
+    const md = '```bash\n::warning inside fence\n```\n::warning outside fence\n:::';
+    const result = preprocessNormalizeLeafToContainerDirective(md);
+    expect(result).toContain('::warning inside fence');
+    expect(result).toContain(':::warning outside fence');
+  });
+
+  it('空字符串原样返回', () => {
+    expect(preprocessNormalizeLeafToContainerDirective('')).toBe('');
+  });
+});
 
 describe('preprocessProtectTimeFromDirective', () => {
   it('应将时间中的冒号转义，避免被 directive 误解析', () => {

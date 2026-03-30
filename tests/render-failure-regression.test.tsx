@@ -74,6 +74,24 @@ describe('render-failure-regression', () => {
       }).not.toThrow();
     });
 
+    it('应正确渲染 :: 双冒号容器语法（::warning 等同于 :::warning）', () => {
+      const twoColonMarkdown = `::warning
+No API key found for provider "anthropic". Auth store: /home/node/.openclaw/agents/main/agent/auth-profiles.json
+Logs: openclaw logs --follow
+
+:::`;
+
+      expect(() => {
+        render(
+          <MarkdownEditor
+            readonly
+            initValue={twoColonMarkdown}
+            reportMode
+          />,
+        );
+      }).not.toThrow();
+    });
+
     it('应正确渲染混合表格与列表内容', () => {
       const mixedMarkdown = `# 标题
 
@@ -226,6 +244,20 @@ describe('render-failure-regression', () => {
             content={`:::info
 
 提示内容
+
+:::`}
+          />,
+        );
+      }).not.toThrow();
+    });
+
+    it('应正确渲染 :: 双冒号容器（::warning 语法）', () => {
+      expect(() => {
+        render(
+          <MarkdownRenderer
+            content={`::warning
+No API key found.
+Logs: openclaw logs --follow
 
 :::`}
           />,
