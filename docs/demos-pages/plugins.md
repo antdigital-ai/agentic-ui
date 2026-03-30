@@ -37,6 +37,10 @@ group:
 
 <code src="../demos/html-to-markdown-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-## HTML Markdown 预览
+## HTML Markdown 预览（内联切换）
 
 <code src="../demos/html-markdown-preview-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## HTML / Markdown 本地预览（新标签页）
+
+<code src="../demos/code-local-preview-demo.tsx" background="var(--main-bg-color)" iframe=640></code>

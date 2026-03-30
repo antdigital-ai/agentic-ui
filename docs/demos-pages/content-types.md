@@ -53,6 +53,12 @@ group:
 
 <code src="../demos/dance-effect.tsx"  background="var(--main-bg-color)" iframe=540 ></code>
 
+### HTML / Markdown 本地预览
+
+展示在只读模式下，HTML 和 Markdown 代码块支持内联预览切换与在新标签页中打开本地预览。
+
+<code src="../demos/code-local-preview-demo.tsx" background="var(--main-bg-color)" iframe=640></code>
+
 ## 特殊功能
 
 ### 引用展示
