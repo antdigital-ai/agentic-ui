@@ -171,11 +171,22 @@ describe('useFileUploadManager', () => {
   });
 
   describe('maxFileCount 点击拦截', () => {
-    it('应该在已达到 maxFileCount 时阻止打开文件选择对话框', async () => {
-      const { message } = await import('antd');
+    it('应该在已达到 maxFileCount 时仍允许打开文件选择对话框（超限文件将以 error 展示）', async () => {
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
       fileMap.set('file2', createMockFile('file2', 'done'));
+
+      const clickSpy = vi.fn();
+      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const element = originalCreateElement(tagName);
+          if (tagName === 'input') {
+            element.click = clickSpy;
+          }
+          return element;
+        });
 
       const { result } = renderHook(
         () =>
@@ -190,8 +201,13 @@ describe('useFileUploadManager', () => {
         { wrapper },
       );
 
-      // 调用 uploadImage
+      // 调用 uploadImage —— 现在即使达到上限也会弹出文件选择对话框
       await result.current.uploadImage();
+
+      // 应该仍然调用了 input.click()
+      expect(clickSpy).toHaveBeenCalled();
+
+      createElementSpy.mockRestore();
     });
 
     it('应该在未达到 maxFileCount 时允许打开文件选择对话框', async () => {
@@ -230,23 +246,25 @@ describe('useFileUploadManager', () => {
       createElementSpy.mockRestore();
     });
 
-    it('应该达到 maxFileCount 时阻止选择', async () => {
+    it('应该达到 maxFileCount 时阻止选择并触发 onExceedMaxCount 回调', async () => {
+      const { upLoadFileToServer } =
+        await import('../../src/MarkdownInputField/AttachmentButton');
+
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
       fileMap.set('file2', createMockFile('file2', 'done'));
 
-      const clickSpy = vi.fn();
-      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
+      const onExceedMaxCount = vi.fn();
+
+      const mockInput = document.createElement('input');
+      mockInput.type = 'file';
       const createElementSpy = vi
         .spyOn(document, 'createElement')
-        .mockImplementation((tagName: string) => {
-          const element = originalCreateElement(tagName);
-          if (tagName === 'input') {
-            element.click = clickSpy;
-          }
-          return element;
-        });
+        .mockReturnValue(mockInput);
+      vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
+      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(vi.fn());
 
+      const onFileMapChange = vi.fn();
       const { result } = renderHook(
         () =>
           useFileUploadManager({
@@ -254,15 +272,32 @@ describe('useFileUploadManager', () => {
             attachment: {
               ...defaultProps.attachment,
               maxFileCount: 2,
+              onExceedMaxCount,
             },
             fileMap,
+            onFileMapChange,
           }),
         { wrapper },
       );
 
       await result.current.uploadImage();
 
+      // 模拟用户选择了 2 个新文件（已有 2 个，再选 2 个 = 4 > 2，超限）
+      const mockFile1 = new File(['a'], 'a.txt', { type: 'text/plain' });
+      const mockFile2 = new File(['b'], 'b.txt', { type: 'text/plain' });
+      const changeEvent = {
+        target: { files: [mockFile1, mockFile2] },
+      } as any;
+      await mockInput.onchange?.(changeEvent);
+
+      // upLoadFileToServer 应被调用，且 onExceedMaxCount 被透传
+      expect(upLoadFileToServer).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ onExceedMaxCount }),
+      );
+
       createElementSpy.mockRestore();
+      vi.restoreAllMocks();
     });
   });
 
@@ -683,21 +718,16 @@ describe('useFileUploadManager', () => {
       vi.restoreAllMocks();
     });
 
-    it('应该处理文件数量超过限制的情况', async () => {
-      const { message } = await import('antd');
-      const { result } = renderHook(() => useFileUploadManager(defaultProps), {
-        wrapper,
-      });
+    it('应该处理文件数量超过限制的情况（onExceedMaxCount 被透传给 upLoadFileToServer）', async () => {
+      const { upLoadFileToServer } =
+        await import('../../src/MarkdownInputField/AttachmentButton');
 
-      const mockFile1 = new File(['test1'], 'test1.png', {
-        type: 'image/png',
-      });
-      const mockFile2 = new File(['test2'], 'test2.png', {
-        type: 'image/png',
-      });
-      const mockFile3 = new File(['test3'], 'test3.png', {
-        type: 'image/png',
-      });
+      const onExceedMaxCount = vi.fn();
+      const onFileMapChange = vi.fn();
+
+      const mockFile1 = new File(['test1'], 'test1.png', { type: 'image/png' });
+      const mockFile2 = new File(['test2'], 'test2.png', { type: 'image/png' });
+      const mockFile3 = new File(['test3'], 'test3.png', { type: 'image/png' });
 
       const mockInput = document.createElement('input');
       mockInput.type = 'file';
@@ -705,18 +735,7 @@ describe('useFileUploadManager', () => {
         .spyOn(document, 'createElement')
         .mockReturnValue(mockInput);
       vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
-      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(
-        vi.fn(),
-      );
-
-      await result.current.uploadImage();
-
-      // 模拟选择超过限制的文件
-      const changeEvent = {
-        target: {
-          files: [mockFile1, mockFile2, mockFile3],
-        },
-      } as any;
+      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(vi.fn());
 
       const { result: resultWithLimit } = renderHook(
         () =>
@@ -725,28 +744,43 @@ describe('useFileUploadManager', () => {
             attachment: {
               ...defaultProps.attachment,
               maxFileCount: 2,
+              onExceedMaxCount,
             },
+            onFileMapChange,
           }),
         { wrapper },
       );
 
       await resultWithLimit.current.uploadImage();
-      mockInput.onchange?.(changeEvent);
+
+      // 模拟选择超过限制的文件（3个 > maxFileCount 2）
+      const changeEvent = {
+        target: { files: [mockFile1, mockFile2, mockFile3] },
+      } as any;
+      await mockInput.onchange?.(changeEvent);
+
+      // upLoadFileToServer 应被调用，且 onExceedMaxCount 被透传
+      expect(upLoadFileToServer).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ onExceedMaxCount }),
+      );
 
       createElementSpy.mockRestore();
       vi.restoreAllMocks();
     });
 
-    it('应该处理文件总数超过限制的情况', async () => {
+    it('应该处理文件总数超过限制的情况（onExceedMaxCount 被透传给 upLoadFileToServer）', async () => {
+      const { upLoadFileToServer } =
+        await import('../../src/MarkdownInputField/AttachmentButton');
+
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
 
-      const mockFile1 = new File(['test1'], 'test1.png', {
-        type: 'image/png',
-      });
-      const mockFile2 = new File(['test2'], 'test2.png', {
-        type: 'image/png',
-      });
+      const onExceedMaxCount = vi.fn();
+      const onFileMapChange = vi.fn();
+
+      const mockFile1 = new File(['test1'], 'test1.png', { type: 'image/png' });
+      const mockFile2 = new File(['test2'], 'test2.png', { type: 'image/png' });
 
       const mockInput = document.createElement('input');
       mockInput.type = 'file';
@@ -754,9 +788,7 @@ describe('useFileUploadManager', () => {
         .spyOn(document, 'createElement')
         .mockReturnValue(mockInput);
       vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
-      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(
-        vi.fn(),
-      );
+      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(vi.fn());
 
       const { result } = renderHook(
         () =>
@@ -765,8 +797,10 @@ describe('useFileUploadManager', () => {
             attachment: {
               ...defaultProps.attachment,
               maxFileCount: 2,
+              onExceedMaxCount,
             },
             fileMap,
+            onFileMapChange,
           }),
         { wrapper },
       );
@@ -775,11 +809,15 @@ describe('useFileUploadManager', () => {
 
       // 模拟选择文件（已有1个，再选2个，总共3个超过限制2个）
       const changeEvent = {
-        target: {
-          files: [mockFile1, mockFile2],
-        },
+        target: { files: [mockFile1, mockFile2] },
       } as any;
-      mockInput.onchange?.(changeEvent);
+      await mockInput.onchange?.(changeEvent);
+
+      // upLoadFileToServer 应被调用，且 onExceedMaxCount 被透传
+      expect(upLoadFileToServer).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ onExceedMaxCount }),
+      );
 
       createElementSpy.mockRestore();
       vi.restoreAllMocks();

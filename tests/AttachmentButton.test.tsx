@@ -209,7 +209,7 @@ describe('AttachmentButton', () => {
       });
     });
 
-    it('should validate file count limits', async () => {
+    it('should validate file count limits and show error in map', async () => {
       const mockFiles = [
         new File(['test1'], 'test1.txt', {
           type: 'text/plain',
@@ -219,16 +219,49 @@ describe('AttachmentButton', () => {
         }) as AttachmentFile,
       ];
 
+      const onExceedMaxCount = vi.fn();
+
       await upLoadFileToServer(mockFiles, {
         upload: mockUpload,
         onFileMapChange: mockOnFileMapChange,
         maxFileCount: 1,
+        onExceedMaxCount,
       });
 
+      // upload 不应该被调用
+      expect(mockUpload).not.toHaveBeenCalled();
+      // onExceedMaxCount 应被调用，携带正确参数
+      expect(onExceedMaxCount).toHaveBeenCalledWith({
+        maxCount: 1,
+        currentCount: 0,
+        selectedCount: 2,
+      });
+      // 文件应以 error 状态进入 fileMap
+      expect(mockOnFileMapChange).toHaveBeenCalled();
+      const lastMap = mockOnFileMapChange.mock.calls[mockOnFileMapChange.mock.calls.length - 1][0] as Map<string, AttachmentFile>;
+      const files = Array.from(lastMap.values());
+      expect(files.every((f) => f.status === 'error')).toBe(true);
+      expect(files.every((f) => f.errorCode === 'FILE_COUNT_EXCEEDED')).toBe(true);
+    });
+
+    it('should call onExceedMaxCount without callback (backward compatible)', async () => {
+      const mockFiles = [
+        new File(['test1'], 'test1.txt', { type: 'text/plain' }) as AttachmentFile,
+        new File(['test2'], 'test2.txt', { type: 'text/plain' }) as AttachmentFile,
+      ];
+
+      // 不传 onExceedMaxCount，不应抛错，文件仍以 error 入 map
+      await expect(
+        upLoadFileToServer(mockFiles, {
+          upload: mockUpload,
+          onFileMapChange: mockOnFileMapChange,
+          maxFileCount: 1,
+        }),
+      ).resolves.toBeUndefined();
       expect(mockUpload).not.toHaveBeenCalled();
     });
 
-    it('should validate total file count including existing files', async () => {
+    it('should validate total file count including existing files and show error in map', async () => {
       // 创建已存在的文件
       const existingFile = new File(
         ['existing'],
@@ -249,14 +282,28 @@ describe('AttachmentButton', () => {
         }) as AttachmentFile,
       ];
 
+      const onExceedMaxCount = vi.fn();
+
       await upLoadFileToServer(mockFiles, {
         upload: mockUpload,
         onFileMapChange: mockOnFileMapChange,
         fileMap: existingFileMap,
         maxFileCount: 2,
+        onExceedMaxCount,
       });
 
       expect(mockUpload).not.toHaveBeenCalled();
+      expect(onExceedMaxCount).toHaveBeenCalledWith({
+        maxCount: 2,
+        currentCount: 1,
+        selectedCount: 2,
+      });
+      // 新文件应以 error 状态进入 fileMap
+      expect(mockOnFileMapChange).toHaveBeenCalled();
+      const lastMap = mockOnFileMapChange.mock.calls[mockOnFileMapChange.mock.calls.length - 1][0] as Map<string, AttachmentFile>;
+      const newFiles = Array.from(lastMap.values()).filter((f) => f.name !== 'existing.txt');
+      expect(newFiles.every((f) => f.status === 'error')).toBe(true);
+      expect(newFiles.every((f) => f.errorCode === 'FILE_COUNT_EXCEEDED')).toBe(true);
     });
 
     it('should allow upload when total file count is within limit', async () => {
