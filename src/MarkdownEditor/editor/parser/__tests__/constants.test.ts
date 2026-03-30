@@ -11,6 +11,17 @@ describe('preprocessNormalizeLeafToContainerDirective', () => {
     expect(result).toBe(':::warning\nSome content\n:::');
   });
 
+  it('将行首 :: 单独一行规范化为 :::', () => {
+    const md = '::warning\nSome content\n::';
+    const result = preprocessNormalizeLeafToContainerDirective(md);
+    expect(result).toBe(':::warning\nSome content\n:::');
+  });
+
+  it(':: 行首后有空白也视为关闭符', () => {
+    const result = preprocessNormalizeLeafToContainerDirective('::warning\ncontent\n::  ');
+    expect(result).toBe(':::warning\ncontent\n:::');
+  });
+
   it('支持所有常见指令名称', () => {
     const types = ['info', 'warning', 'error', 'success', 'tip', 'note'];
     for (const type of types) {
@@ -33,6 +44,12 @@ describe('preprocessNormalizeLeafToContainerDirective', () => {
 
   it('不修改行内的双冒号（不在行首）', () => {
     const md = 'text ::warning text';
+    const result = preprocessNormalizeLeafToContainerDirective(md);
+    expect(result).toBe(md);
+  });
+
+  it('不修改行内的 :: 关闭符（不在行首）', () => {
+    const md = 'text :: text';
     const result = preprocessNormalizeLeafToContainerDirective(md);
     expect(result).toBe(md);
   });

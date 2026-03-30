@@ -187,7 +187,7 @@ function hello() {
 ::warning
 ::warning 双冒号写法也被支持，等同于 :::warning。
 
-:::
+::
 ```
 
 ## 图表 (Charts)

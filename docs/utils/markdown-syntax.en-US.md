@@ -187,7 +187,7 @@ This is a tip block with a title.
 ::warning
 The double-colon ::warning syntax is also supported, equivalent to :::warning.
 
-:::
+::
 ```
 
 ## Charts

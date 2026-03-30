@@ -37,9 +37,9 @@ const tipBlocksMarkdown = `:::info
 :::
 
 ::warning
-::warning 双冒号写法也被支持，等同于 :::warning。适合工具自动生成的告警内容。
+::warning 双冒号写法也被支持，等同于 :::warning。开头 ::warning，结尾 :: 均可。
 
-:::`;
+::`;
 
 const TipBlocksDemo: React.FC = () => {
   return (

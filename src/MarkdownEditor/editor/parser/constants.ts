@@ -74,10 +74,12 @@ function protectLineOutsideInlineCode(markdownLine: string): string {
 }
 
 /**
- * 将行首的 `::name` (leaf directive，两个冒号) 规范化为 `:::name` (container directive，三个冒号)，
- * 使 ::warning / ::info 等双冒号写法能被 remarkDirectiveContainersOnly 正确解析为容器指令。
+ * 将行首的双冒号写法规范化为三冒号，使其能被 remarkDirectiveContainersOnly 正确解析。
  *
- * 匹配规则：行首仅有恰好两个冒号（不多于也不少于），后跟合法的指令名称标识符。
+ * 处理两种模式：
+ * - `::name` → `:::name`（开启行，后跟合法标识符字母）
+ * - `::` 单独一行 → `:::`（关闭行，行首恰好两个冒号且后无非空字符）
+ *
  * 代码围栏内的行不处理。
  */
 export function preprocessNormalizeLeafToContainerDirective(
@@ -95,6 +97,8 @@ export function preprocessNormalizeLeafToContainerDirective(
     }
     if (!inFence && /^:{2}(?!:)[a-zA-Z]/.test(line)) {
       out.push(':' + line);
+    } else if (!inFence && /^:{2}\s*$/.test(line)) {
+      out.push(':::');
     } else {
       out.push(line);
     }
