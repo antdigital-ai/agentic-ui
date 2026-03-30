@@ -663,6 +663,60 @@ describe('MarkdownRenderer', () => {
     ).toBeTruthy();
   });
 
+  it('agentic-ui-filemap 媒体占位符应与缩略图尺寸一致', () => {
+    const json = JSON.stringify({
+      fileList: [
+        {
+          name: 'image-placeholder.png',
+          uuid: 'img-ph',
+          type: 'image/png',
+          status: 'done',
+        },
+        {
+          name: 'video-single-placeholder.mp4',
+          uuid: 'video-ph-single',
+          type: 'video/mp4',
+          status: 'done',
+        },
+      ],
+    });
+
+    const { container } = render(
+      <MarkdownRenderer content={'```agentic-ui-filemap\n' + json + '\n```'} />,
+    );
+
+    const placeholders = container.querySelectorAll(
+      '[data-testid="file-meta-placeholder"]',
+    );
+    expect(placeholders.length).toBe(2);
+    expect(placeholders[0]).toHaveStyle({ width: '124px', height: '124px' });
+    expect(placeholders[1]).toHaveStyle({ width: '330px', height: '188px' });
+  });
+
+  it('agentic-ui-filemap 文件列表占位符应与文件项高度一致', () => {
+    const json = JSON.stringify({
+      fileList: [
+        {
+          name: 'doc-placeholder.pdf',
+          uuid: 'doc-ph',
+          type: 'application/pdf',
+          status: 'error',
+          errorMessage: '上传失败',
+        },
+      ],
+    });
+
+    const { container } = render(
+      <MarkdownRenderer content={'```agentic-ui-filemap\n' + json + '\n```'} />,
+    );
+
+    const placeholder = container.querySelector(
+      '[data-testid="file-meta-placeholder"]',
+    );
+    expect(placeholder).toBeTruthy();
+    expect(placeholder).toHaveStyle({ height: '56px' });
+  });
+
   it('agentic-ui-filemap 与普通 markdown 混排时各自独立渲染', () => {
     const json = JSON.stringify({
       fileList: [{ name: 'mix.txt', uuid: 'm1' }],

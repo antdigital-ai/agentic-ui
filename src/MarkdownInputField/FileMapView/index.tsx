@@ -5,9 +5,22 @@ import { motion } from 'framer-motion';
 import React, { useContext, useMemo, useState } from 'react';
 import { FileMetaPlaceholder } from '../AttachmentButton/AttachmentFileList/AttachmentFileIcon';
 import { AttachmentFile } from '../AttachmentButton/types';
-import { isImageFile, isVideoFile } from '../AttachmentButton/utils';
+import {
+  isFileMetaPlaceholderState,
+  isImageFile,
+  isVideoFile,
+} from '../AttachmentButton/utils';
 import { FileMapViewItem } from './FileMapViewItem';
 import { useStyle } from './style';
+
+const IMAGE_THUMBNAIL_SIZE = 124;
+const SINGLE_VIDEO_THUMBNAIL_SIZE = { width: 330, height: 188 } as const;
+
+const getMediaPlaceholderStyle = (size: { width: number; height: number }) => ({
+  width: size.width,
+  height: size.height,
+  minWidth: size.width,
+});
 
 export type FileMapViewProps = {
   /** 是否显示"查看更多"按钮 */
@@ -156,6 +169,11 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
     }
   };
 
+  const imagePlaceholderStyle = getMediaPlaceholderStyle({
+    width: IMAGE_THUMBNAIL_SIZE,
+    height: IMAGE_THUMBNAIL_SIZE,
+  });
+
   return wrapSSR(
     <div
       data-testid="file-view-list"
@@ -206,14 +224,14 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
             {imgList.map((file, index) => {
               const key = file.uuid || file.name || index;
 
-              if (
-                file.status !== undefined &&
-                file.status !== null &&
-                !file.url &&
-                !file.previewUrl
-              ) {
+              if (isFileMetaPlaceholderState(file)) {
                 const placeholderDom = (
-                  <FileMetaPlaceholder file={file} key={key} />
+                  <FileMetaPlaceholder
+                    file={file}
+                    key={key}
+                    className={classNames(`${prefix}-image`, hashId)}
+                    style={imagePlaceholderStyle}
+                  />
                 );
                 return props.itemRender
                   ? props.itemRender(file, placeholderDom)
@@ -274,18 +292,22 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
             const videoUrl = file.previewUrl || file.url || '';
             const isSingleVideo = videoList.length === 1;
             const thumbSize = isSingleVideo
-              ? { width: 330, height: 188 }
-              : { width: 124, height: 124 };
+              ? SINGLE_VIDEO_THUMBNAIL_SIZE
+              : { width: IMAGE_THUMBNAIL_SIZE, height: IMAGE_THUMBNAIL_SIZE };
             const key = file.uuid || file.name || index;
 
-            if (
-              file.status !== undefined &&
-              file.status !== null &&
-              !file.url &&
-              !file.previewUrl
-            ) {
+            if (isFileMetaPlaceholderState(file)) {
               const placeholderDom = (
-                <FileMetaPlaceholder file={file} key={key} />
+                <FileMetaPlaceholder
+                  file={file}
+                  key={key}
+                  className={classNames(
+                    `${prefix}-image`,
+                    `${prefix}-video-thumb`,
+                    hashId,
+                  )}
+                  style={getMediaPlaceholderStyle(thumbSize)}
+                />
               );
               return props.itemRender
                 ? props.itemRender(file, placeholderDom)
