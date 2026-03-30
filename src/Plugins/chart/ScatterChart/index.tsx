@@ -88,6 +88,14 @@ export interface ScatterChartProps extends ChartContainerProps {
   loading?: boolean;
   /** 自定义样式对象（支持对象格式，为每层DOM设置样式） */
   styles?: ChartStyles;
+  /** X 轴最小值，不传则从数据自动计算 */
+  xMin?: number;
+  /** X 轴最大值，不传则从数据自动计算 */
+  xMax?: number;
+  /** Y 轴最小值，不传则从数据自动计算 */
+  yMin?: number;
+  /** Y 轴最大值，不传则从数据自动计算 */
+  yMax?: number;
 }
 
 const ScatterChart: React.FC<ScatterChartProps> = ({
@@ -114,6 +122,10 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   statistic: statisticConfig,
   textMaxWidth = 80,
   loading = false,
+  xMin: xMinProp,
+  xMax: xMaxProp,
+  yMin: yMinProp,
+  yMax: yMaxProp,
   ...props
 }) => {
   useMemo(() => {
@@ -283,6 +295,64 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
       </ChartContainer>,
     );
   }
+
+  // 从数据中自动计算坐标轴范围，加 10% 边距，方便查看边界点
+  const computeAxisBounds = (
+    values: number[],
+    overrideMin: number | undefined,
+    overrideMax: number | undefined,
+    fallbackMin: number,
+    fallbackMax: number,
+  ) => {
+    if (overrideMin !== undefined && overrideMax !== undefined) {
+      return { min: overrideMin, max: overrideMax };
+    }
+    if (values.length === 0) {
+      return { min: fallbackMin, max: fallbackMax };
+    }
+    const dataMin = Math.min(...values);
+    const dataMax = Math.max(...values);
+    const range = dataMax - dataMin || 1;
+    const padding = range * 0.1;
+    return {
+      min: overrideMin !== undefined ? overrideMin : Math.floor(dataMin - padding),
+      max: overrideMax !== undefined ? overrideMax : Math.ceil(dataMax + padding),
+    };
+  };
+
+  const allXValues = filteredData
+    .map((item) => {
+      const v = typeof item.x === 'number' ? item.x : Number(item.x);
+      return Number.isFinite(v) ? v : null;
+    })
+    .filter((v): v is number => v !== null);
+
+  const allYValues = filteredData
+    .map((item) => {
+      const v = typeof item.y === 'number' ? item.y : Number(item.y);
+      return Number.isFinite(v) ? v : null;
+    })
+    .filter((v): v is number => v !== null);
+
+  const xBounds = computeAxisBounds(allXValues, xMinProp, xMaxProp, 1, 12);
+  const yBounds = computeAxisBounds(allYValues, yMinProp, yMaxProp, 0, 100);
+
+  const computeStepSize = (min: number, max: number, targetTicks = 10) => {
+    const range = max - min;
+    if (range <= 0) return 1;
+    const rawStep = range / targetTicks;
+    const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const normalized = rawStep / magnitude;
+    let step: number;
+    if (normalized <= 1) step = magnitude;
+    else if (normalized <= 2) step = 2 * magnitude;
+    else if (normalized <= 5) step = 5 * magnitude;
+    else step = 10 * magnitude;
+    return step;
+  };
+
+  const xStepSize = computeStepSize(xBounds.min, xBounds.max);
+  const yStepSize = computeStepSize(yBounds.min, yBounds.max);
 
   // 构建数据集，添加更强的安全检查
   const datasets = datasetTypes.map((type, index) => {
@@ -631,10 +701,10 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
             weight: 500,
           },
         },
-        min: 1, // 使用默认值
-        max: 12, // 使用默认值
+        min: xBounds.min,
+        max: xBounds.max,
         ticks: {
-          stepSize: 1, // 使用默认值
+          stepSize: xStepSize,
           color: axisTextColor,
           font: {
             size: isMobile ? 8 : 10,
@@ -664,10 +734,10 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
           },
           align: 'center',
         },
-        min: 0, // 使用默认值
-        max: 100, // 使用默认值
+        min: yBounds.min,
+        max: yBounds.max,
         ticks: {
-          stepSize: 10, // 使用默认值
+          stepSize: yStepSize,
           color: axisTextColor,
           font: {
             family: 'PingFang SC',

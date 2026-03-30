@@ -45,6 +45,10 @@ group:
 | color                 | `string \| string[]`                             | -          | 自定义主色；数组按序对应各数据序列                                                  |
 | textMaxWidth          | `number`                                         | `80`       | 图例文字最大宽度（px），超出截断并加省略号                                          |
 | statistic             | `ChartStatisticConfig \| ChartStatisticConfig[]` | -          | 指标卡配置，单个对象或数组                                                          |
+| xMin                  | `number`                                         | -          | X 轴最小值；不传时从数据自动推算（含 10% 边距）                                     |
+| xMax                  | `number`                                         | -          | X 轴最大值；不传时从数据自动推算（含 10% 边距）                                     |
+| yMin                  | `number`                                         | -          | Y 轴最小值；不传时从数据自动推算（含 10% 边距）                                     |
+| yMax                  | `number`                                         | -          | Y 轴最大值；不传时从数据自动推算（含 10% 边距）                                     |
 
 ### ChartContainerProps（继承）
 
@@ -89,3 +93,5 @@ group:
 
 - 移动端会减小点的半径与 hover 半径以提升观感。
 - `hiddenX` 和 `hiddenY` 可以控制坐标轴的显示/隐藏，适用于只展示图表本身而不需要坐标轴的场景。
+- 坐标轴范围默认根据实际数据自动推算，并附加约 10% 的边距以确保边界点可见。可通过 `xMin`/`xMax`/`yMin`/`yMax` 固定范围，如需 Y 轴固定 0–100 可传 `yMin={0} yMax={100}`。
+- 刻度步长（`stepSize`）同样依据范围自动计算，大范围数据（如 x: 1–4892, y: 1000–25000）会自动选用合适的步长，无需手动配置。
