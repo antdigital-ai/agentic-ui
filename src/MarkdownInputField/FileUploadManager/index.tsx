@@ -168,15 +168,6 @@ export const useFileUploadManager = ({
       return;
     }
 
-    // 检查是否已达到最大文件数量限制
-    const currentFileCount = fileMap?.size || 0;
-    if (
-      attachment?.maxFileCount &&
-      currentFileCount >= attachment.maxFileCount
-    ) {
-      return;
-    }
-
     const accept = getAcceptValue(forGallery || false);
     const input = document.createElement('input');
     input.id = 'uploadImage' + '_' + Math.random();
@@ -196,21 +187,8 @@ export const useFileUploadManager = ({
           return;
         }
 
-        // 检查选择的文件数量是否超过限制
-        const currentFileCount = fileMap?.size || 0;
-        if (attachment?.maxFileCount) {
-          // 如果一次选择的文件数量超过最大限制，完全拒绝
-          if (selectedFiles.length > attachment.maxFileCount) {
-            return;
-          }
-
-          // 如果选择的文件数量加上已有文件数量超过限制，完全拒绝
-          const totalFileCount = selectedFiles.length + currentFileCount;
-          if (totalFileCount > attachment.maxFileCount) {
-            return;
-          }
-        }
-
+        // 检查选择的文件数量是否超过限制——超限时交由 upLoadFileToServer 统一处理
+        // （upLoadFileToServer 内 validateFileCount 失败时会把文件以 error 状态入 map 并触发 onExceedMaxCount）
         await upLoadFileToServer(selectedFiles, {
           ...attachment,
           fileMap,
@@ -218,6 +196,7 @@ export const useFileUploadManager = ({
             updateAttachmentFiles(newFileMap);
           },
           locale,
+          onExceedMaxCount: attachment?.onExceedMaxCount,
         });
       } catch (error) {
         console.error('Error uploading files:', error);

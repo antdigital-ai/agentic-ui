@@ -55,6 +55,12 @@ export type AttachmentButtonProps = {
   minFileCount?: number;
   /** 是否允许一次选择多个文件（默认：true） */
   allowMultiple?: boolean;
+  /** 文件数量超出 maxFileCount 限制时的回调 */
+  onExceedMaxCount?: (info: {
+    maxCount: number;
+    currentCount: number;
+    selectedCount: number;
+  }) => void;
 };
 
 /**
@@ -80,6 +86,12 @@ type UploadProps = {
   minFileCount?: number;
   /** 国际化文案 */
   locale?: any;
+  /** 文件数量超出 maxFileCount 限制时的回调 */
+  onExceedMaxCount?: (info: {
+    maxCount: number;
+    currentCount: number;
+    selectedCount: number;
+  }) => void;
 };
 
 const WAIT_TIME_MS = 16;
@@ -271,6 +283,23 @@ export const upLoadFileToServer = async (
   // 在添加到 fileMap 之前先验证文件数量
   if (!validateFileCount(fileList.length, existingFileCount, props)) {
     hideLoading();
+    const maxCount = props.maxFileCount!;
+    const errorMessage = getLocaleMessage(
+      props.locale,
+      'markdownInput.maxFileCountExceeded',
+      DEFAULT_MESSAGES.maxFileCountExceeded(maxCount),
+    );
+    fileList.forEach((file) => {
+      file.status = 'error';
+      file.errorCode = 'FILE_COUNT_EXCEEDED';
+      file.errorMessage = errorMessage;
+      updateFileMap(map, file, props.onFileMapChange);
+    });
+    props.onExceedMaxCount?.({
+      maxCount,
+      currentCount: existingFileCount,
+      selectedCount: fileList.length,
+    });
     return;
   }
 

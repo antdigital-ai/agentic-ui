@@ -311,6 +311,7 @@ export default () => {
 | `maxFileSize`        | `number`                                                           | 单个文件最大大小（字节）                            |
 | `maxFileCount`       | `number`                                                           | 最大文件数量                                        |
 | `allowMultiple`      | `boolean`                                                          | 是否允许一次选择多个文件（默认：true）              |
+| `onExceedMaxCount`   | `(info: { maxCount: number; currentCount: number; selectedCount: number }) => void` | 文件数量超出 maxFileCount 限制时的回调 |
 
 #### SkillModeConfig
 
@@ -1091,6 +1092,12 @@ export default () => {
 下方 Demo 中单文件限制为 **100KB**，选择超过该大小的文件时，该文件会以错误状态出现在附件列表并展示「超过 xxx KB」的报错提示。
 
 <code src="../demos/markdownInputField/max-file-size-error.tsx" background="var(--main-bg-color)" iframe=800></code>
+
+#### 文件数量超限回调
+
+通过 `onExceedMaxCount` 回调，可以在文件数量超过 `maxFileCount` 限制时收到通知，由消费者决定如何展示提示信息，而不是静默失败。
+
+<code src="../demos/markdownInputField/max-file-count-exceed.tsx" background="var(--main-bg-color)" iframe=800></code>
 
 ### uploadWithResponse - 获取完整上传响应
 
