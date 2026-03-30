@@ -146,9 +146,11 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
 }) => {
   const { locale } = useContext(I18nContext);
   const isErrorStatus = file.status === 'error';
-  const isSizeExceededError =
-    isErrorStatus && file.errorCode === 'FILE_SIZE_EXCEEDED';
-  const canRetry = isErrorStatus && !isSizeExceededError;
+  const isNonRetryableError =
+    isErrorStatus &&
+    (file.errorCode === 'FILE_SIZE_EXCEEDED' ||
+      file.errorCode === 'FILE_COUNT_EXCEEDED');
+  const canRetry = isErrorStatus && !isNonRetryableError;
   const isDoneStatus = file.status === 'done';
   const canDelete = !isAttachmentFileLoading(file.status);
 

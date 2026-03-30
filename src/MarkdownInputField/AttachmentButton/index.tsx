@@ -283,8 +283,20 @@ export const upLoadFileToServer = async (
   // 在添加到 fileMap 之前先验证文件数量
   if (!validateFileCount(fileList.length, existingFileCount, props)) {
     hideLoading();
+    const maxCount = props.maxFileCount!;
+    const errorMessage = getLocaleMessage(
+      props.locale,
+      'markdownInput.maxFileCountExceeded',
+      DEFAULT_MESSAGES.maxFileCountExceeded(maxCount),
+    );
+    fileList.forEach((file) => {
+      file.status = 'error';
+      file.errorCode = 'FILE_COUNT_EXCEEDED';
+      file.errorMessage = errorMessage;
+      updateFileMap(map, file, props.onFileMapChange);
+    });
     props.onExceedMaxCount?.({
-      maxCount: props.maxFileCount!,
+      maxCount,
       currentCount: existingFileCount,
       selectedCount: fileList.length,
     });
