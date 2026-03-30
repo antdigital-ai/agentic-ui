@@ -129,6 +129,7 @@ export { useLanguage } from './Hooks/useLanguage';
 export * from './Hooks/useRefFunction';
 export * from './Hooks/useStyle';
 export * from './Hooks/useThrottleFn';
+export * from './Hooks/useWebSocket';
 
 // ─── 国际化 ──────────────────────────────────────────────────────────────────
 export * from './I18n';
