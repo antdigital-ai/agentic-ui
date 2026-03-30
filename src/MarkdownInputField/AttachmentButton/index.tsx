@@ -123,24 +123,6 @@ const getLocaleMessage = (locale: any, key: string, defaultMsg: string) => {
   return locale?.[key] || defaultMsg;
 };
 
-const validateFileCount = (
-  newFileCount: number,
-  existingFileCount: number,
-  props: UploadProps,
-): boolean => {
-  const totalFileCount = newFileCount + existingFileCount;
-
-  if (props.maxFileCount && totalFileCount > props.maxFileCount) {
-    return false;
-  }
-
-  if (props.minFileCount && totalFileCount < props.minFileCount) {
-    return false;
-  }
-
-  return true;
-};
-
 const validateFileSize = (
   file: AttachmentFile,
   props: UploadProps,
@@ -280,26 +262,35 @@ export const upLoadFileToServer = async (
   const fileList = Array.from(files) as AttachmentFile[];
   fileList.forEach(prepareFile);
 
-  // 在添加到 fileMap 之前先验证文件数量
-  if (!validateFileCount(fileList.length, existingFileCount, props)) {
+  const totalCount = fileList.length + existingFileCount;
+  const isMaxExceeded =
+    typeof props.maxFileCount === 'number' && totalCount > props.maxFileCount;
+  const isMinNotMet =
+    typeof props.minFileCount === 'number' && totalCount < props.minFileCount;
+
+  if (isMaxExceeded || isMinNotMet) {
     hideLoading();
-    const maxCount = props.maxFileCount!;
-    const errorMessage = getLocaleMessage(
-      props.locale,
-      'markdownInput.maxFileCountExceeded',
-      DEFAULT_MESSAGES.maxFileCountExceeded(maxCount),
-    );
-    fileList.forEach((file) => {
-      file.status = 'error';
-      file.errorCode = 'FILE_COUNT_EXCEEDED';
-      file.errorMessage = errorMessage;
-      updateFileMap(map, file, props.onFileMapChange);
-    });
-    props.onExceedMaxCount?.({
-      maxCount,
-      currentCount: existingFileCount,
-      selectedCount: fileList.length,
-    });
+    if (isMaxExceeded) {
+      const maxCount = props.maxFileCount!;
+      const rawMessage = getLocaleMessage(
+        props.locale,
+        'markdownInput.maxFileCountExceeded',
+        DEFAULT_MESSAGES.maxFileCountExceeded(maxCount),
+      );
+      const errorMessage = rawMessage.replace(/\$\{maxFileCount\}/g, String(maxCount));
+      fileList.forEach((file) => {
+        file.status = 'error';
+        file.errorCode = 'FILE_COUNT_EXCEEDED';
+        file.errorMessage = errorMessage;
+        if (file.uuid) map.set(file.uuid, file);
+      });
+      props.onFileMapChange?.(map);
+      props.onExceedMaxCount?.({
+        maxCount,
+        currentCount: existingFileCount,
+        selectedCount: fileList.length,
+      });
+    }
     return;
   }
 

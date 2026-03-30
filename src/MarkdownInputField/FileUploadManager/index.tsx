@@ -196,7 +196,6 @@ export const useFileUploadManager = ({
             updateAttachmentFiles(newFileMap);
           },
           locale,
-          onExceedMaxCount: attachment?.onExceedMaxCount,
         });
       } catch (error) {
         console.error('Error uploading files:', error);
