@@ -32,6 +32,7 @@ interface ChartData {
  * 支持两种格式：
  * 1. 完整格式：{ config: [...], dataSource: [...], columns: [...] }
  * 2. 简单格式：{ chartType, x, y, data: [...] }
+ * 3. algTypes 格式：{ type: "histogram", value: { data: [...], dataMetaMap: {...} } }
  */
 const parseChartData = (code: string): ChartData | null => {
   try {
@@ -41,6 +42,20 @@ const parseChartData = (code: string): ChartData | null => {
     if (Array.isArray(parsed)) {
       return { config: parsed };
     }
+
+    // Handle { type: "histogram", value: { data: [...], dataMetaMap: {...} } } format
+    if (
+      typeof parsed.type === 'string' &&
+      parsed.value &&
+      Array.isArray(parsed.value.data)
+    ) {
+      return {
+        chartType: parsed.type,
+        data: parsed.value.data,
+        dataMetaMap: parsed.value.dataMetaMap,
+      };
+    }
+
     return parsed;
   } catch {
     return null;

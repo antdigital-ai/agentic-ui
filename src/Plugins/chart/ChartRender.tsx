@@ -438,7 +438,32 @@ const ChartRuntimeRendererImpl: React.FC<{
 
   if (chartType === 'histogram') {
     // 直方图数据转换：提取原始值
+    // 同时支持预分箱格式：groupKey.DIM_LEFT / groupKey.DIM_RIGHT + MEASURE_PROB[0].actualValue
     const histogramData = (chartData || []).map((row: any) => {
+      const dimLeft = row?.groupKey?.DIM_LEFT;
+      const dimRight = row?.groupKey?.DIM_RIGHT;
+      const measureProb = Array.isArray(row?.MEASURE_PROB)
+        ? row.MEASURE_PROB[0]?.actualValue
+        : undefined;
+
+      if (
+        typeof dimLeft === 'number' &&
+        typeof dimRight === 'number' &&
+        typeof measureProb === 'number'
+      ) {
+        const type = getFieldValue(row, colorLegend);
+        const category = getFieldValue(row, groupBy);
+        const filterLabel = getFieldValue(row, filterBy);
+        return {
+          value: measureProb,
+          left: dimLeft,
+          right: dimRight,
+          ...(type ? { type } : {}),
+          ...(category ? { category } : {}),
+          ...(filterLabel ? { filterLabel } : {}),
+        };
+      }
+
       const value = getFieldValueSafely(row, config?.y);
       const type = getFieldValue(row, colorLegend);
       const category = getFieldValue(row, groupBy);
