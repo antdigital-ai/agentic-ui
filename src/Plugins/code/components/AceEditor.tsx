@@ -93,6 +93,8 @@ export function AceEditor({
   const debounceTimer = useRef(0);
   const editorRef = useRef<Ace.Editor>();
   const dom = useRef<HTMLDivElement>(null);
+  // 记录 Ace 会话当前使用的语言，用于语言变更时动态切换而不是销毁重建
+  const aceLanguageRef = useRef<string | null | undefined>(element.language);
 
   // Ace Editor 异步加载状态
   const [aceLoaded, setAceLoaded] = useState(false);
@@ -241,6 +243,8 @@ export function AceEditor({
   // 初始化 Ace 编辑器（仅在库加载完成后）
   // 注意： intentionally 不将 editorProps.codeProps 列入依赖，因其对象引用在父组件内容更新时会频繁变化，
   // 导致编辑器被不必要地销毁重建。codeProps 的配置在初始化时已应用，主题等动态变更由独立 effect 处理。
+  // element.language 同样不列为依赖，语言切换由独立的 effect 处理，避免流式渲染中 language
+  // 逐字符变化时触发编辑器销毁重建。
   useEffect(() => {
     if (process.env.NODE_ENV === 'test') return;
     if (!aceLoaded || !aceModuleRef.current || !dom.current) return;
@@ -274,6 +278,7 @@ export function AceEditor({
     } as Ace.EditorOptions);
 
     editorRef.current = codeEditor;
+    aceLanguageRef.current = element.language;
 
     // 设置主题
     const theme = codeProps.theme || props.theme || 'github';
@@ -300,7 +305,29 @@ export function AceEditor({
       clearTimeout(debounceTimer.current);
       codeEditor.destroy();
     };
-  }, [aceLoaded, element.language, readonly, setupEditorEvents]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aceLoaded, readonly, setupEditorEvents]);
+
+  // 语言切换时动态更新 Ace 会话模式，无需销毁重建编辑器
+  useEffect(() => {
+    if (!editorRef.current || !aceLoaded) return;
+    if (aceLanguageRef.current === element.language) return;
+
+    aceLanguageRef.current = element.language;
+
+    (async () => {
+      let lang = (element.language || '') as string;
+      if (modeMap.has(lang)) {
+        lang = modeMap.get(lang)!;
+      }
+      const aceLangs = await getAceLangs();
+      if (aceLangs.has(lang)) {
+        editorRef.current?.session.setMode(`ace/mode/${lang}`);
+      } else {
+        editorRef.current?.session.setMode(`ace/mode/text`);
+      }
+    })();
+  }, [element.language, aceLoaded]);
 
   // 监听外部值变化
   useEffect(() => {
@@ -312,7 +339,10 @@ export function AceEditor({
       } catch (e) {}
     }
 
-    if (value !== codeRef.current || readonly) {
+    // 只有当外部值与编辑器内部值不同时才更新，避免在 readonly 流式渲染时每次都
+    // 触发 setValue（setValue 会重置光标和滚动位置，导致代码块抖动）
+    if (value !== codeRef.current) {
+      codeRef.current = value;
       if (element) editorRef.current?.setValue(value);
       editorRef.current?.clearSelection();
     }

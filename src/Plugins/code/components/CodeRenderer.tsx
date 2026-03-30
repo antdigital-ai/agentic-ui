@@ -311,7 +311,6 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
     props.children,
     state.showBorder,
     state.hide,
-    state.htmlStr,
     isSelected,
     editorProps.codeProps?.hideToolBar,
     editorProps.codeProps?.disableHtmlPreview,
