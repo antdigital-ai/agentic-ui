@@ -147,6 +147,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           }}
           codeProps={props.markdownRenderConfig?.codeProps}
           apaasify={props.markdownRenderConfig?.apaasify}
+          fileMapConfig={props.markdownRenderConfig?.fileMapConfig}
         />
       );
     }

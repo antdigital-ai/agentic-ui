@@ -741,4 +741,10 @@ export type MarkdownEditorProps = {
     props: import('../MarkdownRenderer/types').MarkdownRendererEleProps,
     defaultDom: React.ReactNode,
   ) => React.ReactNode;
+  /**
+   * FileMapView 配置（仅 `renderMode: 'markdown'` 时生效）
+   * @description 透传给 agentic-ui-filemap 代码块渲染器，
+   * 统一配置图片/视频条目的 onPreview 拦截和 itemRender 自定义回显。
+   */
+  fileMapConfig?: import('../MarkdownRenderer/types').FileMapConfig;
 };
