@@ -40,8 +40,8 @@ export const AgenticUiFileMapBlockRenderer: React.FC<
   );
   const parsed = useMemo(() => parseJsonBody(code), [code]);
   const { fileList, className } = useMemo(
-    () => normalizeFileMapPropsFromJson(parsed),
-    [parsed],
+    () => normalizeFileMapPropsFromJson(parsed, fileMapConfig?.normalizeFile),
+    [parsed, fileMapConfig?.normalizeFile],
   );
   const fileMap = useMemo(
     () => new Map(fileList.map((f) => [f.uuid || f.name, f])),

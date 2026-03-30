@@ -23,6 +23,32 @@ export interface FileMapConfig {
    * 常用于回显场景。
    */
   itemRender?: FileMapViewProps['itemRender'];
+  /**
+   * 自定义文件数据规范化函数，用于将 agentic-ui-filemap 代码块中的原始 JSON 条目
+   * 转换为 AttachmentFile 对象。
+   *
+   * 适用于服务端返回的字段名与 AttachmentFile 不一致（如 fileUrl → url、
+   * fileId → uuid）或需要在数据层补充额外字段的场景。
+   *
+   * @param raw - 代码块 JSON 中的原始文件对象（未经处理）
+   * @param defaultFile - 由内置逻辑生成的默认 AttachmentFile，可在此基础上做局部覆盖
+   * @returns 转换后的 AttachmentFile；返回 null 时该条目将被过滤掉
+   *
+   * @example
+   * ```tsx
+   * fileMapConfig={{
+   *   normalizeFile: (raw, defaultFile) => ({
+   *     ...defaultFile,
+   *     url: raw.fileUrl as string,
+   *     uuid: raw.fileId as string,
+   *   }),
+   * }}
+   * ```
+   */
+  normalizeFile?: (
+    raw: Record<string, unknown>,
+    defaultFile: AttachmentFile,
+  ) => AttachmentFile | null;
 }
 
 
