@@ -14,7 +14,12 @@ export type FileMapViewProps = {
   showMoreButton?: boolean;
   /** 文件映射表 */
   fileMap?: Map<string, AttachmentFile>;
-  /** 预览文件回调 */
+  /**
+   * 预览文件回调。
+   * - 对于非图片/视频文件：点击预览按钮时触发，传入时阻止默认的 window.open 行为。
+   * - 对于图片文件：点击缩略图时触发，传入时阻止 antd Image 内置灯箱预览。
+   * - 对于视频文件：点击缩略图时触发，传入时阻止内置弹窗播放。
+   */
   onPreview?: (file: AttachmentFile) => void;
   /** 下载文件回调 */
   onDownload?: (file: AttachmentFile) => void;
@@ -31,6 +36,16 @@ export type FileMapViewProps = {
   /** 最多展示的非图片文件数量，传入则开启溢出控制并在超出时显示"查看所有文件"按钮，不传则展示所有文件且不显示按钮 */
   maxDisplayCount?: number;
   placement?: 'left' | 'right';
+  /**
+   * 自定义每个媒体（图片/视频）条目的渲染。
+   * 接收文件对象和默认渲染节点，返回自定义节点即可替换默认展示，常用于回显场景。
+   * @param file - 当前文件
+   * @param defaultDom - 默认渲染的 React 节点
+   */
+  itemRender?: (
+    file: AttachmentFile,
+    defaultDom: React.ReactNode,
+  ) => React.ReactNode;
 };
 
 /**
@@ -189,28 +204,51 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
         >
           <Image.PreviewGroup>
             {imgList.map((file, index) => {
+              const key = file.uuid || file.name || index;
+
               if (
                 file.status !== undefined &&
                 file.status !== null &&
                 !file.url &&
                 !file.previewUrl
               ) {
-                return (
-                  <FileMetaPlaceholder
-                    file={file}
-                    key={file.uuid || file.name || index}
-                  />
+                const placeholderDom = (
+                  <FileMetaPlaceholder file={file} key={key} />
                 );
+                return props.itemRender
+                  ? props.itemRender(file, placeholderDom)
+                  : placeholderDom;
               }
-              return (
+
+              const defaultImageDom = (
                 <Image
                   rootClassName={classNames(`${prefix}-image`, hashId)}
                   width={124}
                   height={124}
                   src={file.previewUrl || file.url}
-                  key={file.uuid || file.name || index}
+                  key={key}
+                  preview={
+                    props.onPreview
+                      ? {
+                          visible: false,
+                          onVisibleChange: () => props.onPreview?.(file),
+                          mask: (
+                            <div
+                              className={classNames(
+                                `${prefix}-image-mask`,
+                                hashId,
+                              )}
+                            />
+                          ),
+                        }
+                      : undefined
+                  }
                 />
               );
+
+              return props.itemRender
+                ? props.itemRender(file, defaultImageDom)
+                : defaultImageDom;
             })}
           </Image.PreviewGroup>
         </motion.div>
@@ -238,20 +276,23 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
             const thumbSize = isSingleVideo
               ? { width: 330, height: 188 }
               : { width: 124, height: 124 };
+            const key = file.uuid || file.name || index;
+
             if (
               file.status !== undefined &&
               file.status !== null &&
               !file.url &&
               !file.previewUrl
             ) {
-              return (
-                <FileMetaPlaceholder
-                  file={file}
-                  key={file.uuid || file.name || index}
-                />
+              const placeholderDom = (
+                <FileMetaPlaceholder file={file} key={key} />
               );
+              return props.itemRender
+                ? props.itemRender(file, placeholderDom)
+                : placeholderDom;
             }
-            return (
+
+            const defaultVideoDom = (
               <div
                 role="button"
                 tabIndex={0}
@@ -260,7 +301,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
                   `${prefix}-video-thumb`,
                   hashId,
                 )}
-                key={file.uuid || file.name || index}
+                key={key}
                 onClick={() => handleVideoClick(file)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
@@ -291,6 +332,10 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
                 </div>
               </div>
             );
+
+            return props.itemRender
+              ? props.itemRender(file, defaultVideoDom)
+              : defaultVideoDom;
           })}
         </motion.div>
       )}

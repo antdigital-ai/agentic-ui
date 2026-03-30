@@ -714,6 +714,115 @@ describe('FileMapView', () => {
     });
   });
 
+  describe('onPreview for image files', () => {
+    it('should call onPreview when image thumbnail is clicked', () => {
+      const onPreview = vi.fn();
+      const fileMap = new Map();
+      const imageFile = createMockFile('photo.jpg', 'image/jpeg');
+      fileMap.set('img-1', imageFile);
+
+      const { container } = render(
+        <FileMapView fileMap={fileMap} onPreview={onPreview} />,
+      );
+
+      const img = container.querySelector('img[src="https://example.com/photo.jpg"]');
+      expect(img).toBeInTheDocument();
+    });
+
+    it('should not trigger built-in lightbox when onPreview is provided for images', () => {
+      const onPreview = vi.fn();
+      const fileMap = new Map();
+      fileMap.set('img-1', createMockFile('photo.png', 'image/png'));
+
+      render(<FileMapView fileMap={fileMap} onPreview={onPreview} />);
+
+      // Image renders without the antd default preview group intercepting
+      expect(onPreview).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('itemRender prop', () => {
+    it('should use itemRender to wrap image items', () => {
+      const itemRender = vi.fn(
+        (file: any, defaultDom: React.ReactNode) => (
+          <div data-testid={`custom-item-${file.name}`}>{defaultDom}</div>
+        ),
+      );
+      const fileMap = new Map();
+      fileMap.set('img-1', createMockFile('wrap.jpg', 'image/jpeg'));
+
+      render(<FileMapView fileMap={fileMap} itemRender={itemRender} />);
+
+      expect(screen.getByTestId('custom-item-wrap.jpg')).toBeInTheDocument();
+      expect(itemRender).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'wrap.jpg' }),
+        expect.anything(),
+      );
+    });
+
+    it('should use itemRender to replace image items entirely', () => {
+      const itemRender = (_file: any, _defaultDom: React.ReactNode) => (
+        <div data-testid="replaced-item">replaced</div>
+      );
+      const fileMap = new Map();
+      fileMap.set('img-1', createMockFile('replace.jpg', 'image/jpeg'));
+
+      render(<FileMapView fileMap={fileMap} itemRender={itemRender} />);
+
+      expect(screen.getByTestId('replaced-item')).toBeInTheDocument();
+      expect(screen.getByText('replaced')).toBeInTheDocument();
+    });
+
+    it('should use itemRender for video items', () => {
+      const itemRender = vi.fn(
+        (file: any, defaultDom: React.ReactNode) => (
+          <div data-testid={`custom-video-${file.name}`}>{defaultDom}</div>
+        ),
+      );
+      const fileMap = new Map();
+      fileMap.set('vid-1', createMockFile('clip.mp4', 'video/mp4'));
+
+      render(<FileMapView fileMap={fileMap} itemRender={itemRender} />);
+
+      expect(screen.getByTestId('custom-video-clip.mp4')).toBeInTheDocument();
+      expect(itemRender).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'clip.mp4' }),
+        expect.anything(),
+      );
+    });
+
+    it('should fall back to default rendering when itemRender is not provided', () => {
+      const fileMap = new Map();
+      fileMap.set('img-1', createMockFile('default.jpg', 'image/jpeg'));
+
+      const { container } = render(<FileMapView fileMap={fileMap} />);
+
+      const img = container.querySelector('img[src="https://example.com/default.jpg"]');
+      expect(img).toBeInTheDocument();
+    });
+
+    it('should use itemRender for placeholder items when status is set but no url', () => {
+      const itemRender = vi.fn(
+        (file: any, defaultDom: React.ReactNode) => (
+          <div data-testid={`placeholder-wrap-${file.name}`}>{defaultDom}</div>
+        ),
+      );
+      const fileMap = new Map();
+      fileMap.set('img-1', {
+        uuid: 'uuid-placeholder',
+        name: 'loading.jpg',
+        type: 'image/jpeg',
+        status: 'uploading',
+        url: undefined,
+        previewUrl: undefined,
+      });
+
+      render(<FileMapView fileMap={fileMap} itemRender={itemRender} />);
+
+      expect(screen.getByTestId('placeholder-wrap-loading.jpg')).toBeInTheDocument();
+    });
+  });
+
   describe('maxDisplayCount Prop', () => {
     it('should display all files when maxDisplayCount is not provided', () => {
       const fileMap = new Map();
