@@ -157,6 +157,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           gap: 4,
           '&-error': {
             color: 'var(--color-red-a10)',
+            maxWidth: '100%',
+            overflow: 'auto',
           },
           '&-item:not(:last-child)': {
             lineHeight: '9px',
