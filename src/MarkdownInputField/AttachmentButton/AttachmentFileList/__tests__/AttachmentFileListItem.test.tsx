@@ -55,4 +55,18 @@ describe('AttachmentFileListItem', () => {
     expect(screen.getByText('-')).toBeInTheDocument();
     expect(screen.getByText(/B$/)).toBeInTheDocument();
   });
+
+  it('should not stretch FileMetaPlaceholder to full width', () => {
+    const file = createAttachmentFile('error');
+    render(
+      <AttachmentFileListItem
+        file={file}
+        prefixCls="test-attachment-item"
+        onDelete={vi.fn()}
+      />,
+    );
+
+    const placeholder = screen.getByTestId('file-meta-placeholder');
+    expect(placeholder).toHaveStyle({ flex: '0 0 auto' });
+  });
 });
