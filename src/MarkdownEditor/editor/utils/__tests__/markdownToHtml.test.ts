@@ -23,6 +23,52 @@ describe('markdownToHtml', () => {
     expect(html).toContain('badge');
   });
 
+  it('::warning … ::: 关闭符生成 warning 容器', () => {
+    const html = markdownToHtmlSync('::warning\n内容\n:::');
+
+    expect(html).toContain('markdown-container');
+    expect(html).toContain('warning');
+    expect(html).toContain('内容');
+  });
+
+  it('::warning … :: 关闭符与 ::: 关闭符输出等价', () => {
+    const htmlTriple = markdownToHtmlSync('::warning\ncontent\n:::');
+    const htmlDouble = markdownToHtmlSync('::warning\ncontent\n::');
+
+    expect(htmlDouble).toBe(htmlTriple);
+  });
+
+  it('::info 生成 info 类容器', () => {
+    const html = markdownToHtmlSync('::info\n提示\n::');
+
+    expect(html).toContain('markdown-container');
+    expect(html).toContain('info');
+    expect(html).toContain('提示');
+  });
+
+  it('行内 ::warning 不触发容器（非行首）', () => {
+    const html = markdownToHtmlSync('文本 ::warning 行内双冒号');
+
+    expect(html).not.toContain('markdown-container');
+    expect(html).toContain('::warning');
+  });
+
+  it('原始 issue 场景：含路径与日志行的 ::warning 块正确生成容器', () => {
+    const md = [
+      '::warning',
+      'No API key found for provider "anthropic". Auth store: /home/node/.openclaw/agents/main/agent/auth-profiles.json',
+      'Logs: openclaw logs --follow',
+      '',
+      '::',
+    ].join('\n');
+    const html = markdownToHtmlSync(md);
+
+    expect(html).toContain('markdown-container');
+    expect(html).toContain('warning');
+    expect(html).toContain('No API key found');
+    expect(html).toContain('openclaw');
+  });
+
   it('openLinksInNewTab 开启时应为链接追加 target 与 rel', () => {
     const html = markdownToHtmlSync('[官网](https://example.com)', undefined, {
       openLinksInNewTab: true,

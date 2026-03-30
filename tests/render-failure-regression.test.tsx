@@ -92,6 +92,38 @@ Logs: openclaw logs --follow
       }).not.toThrow();
     });
 
+    it('应正确渲染 :: 双冒号关闭符（::warning … ::）', () => {
+      const twoColonClose = `::warning
+内容行一
+内容行二
+
+::`;
+
+      expect(() => {
+        render(
+          <MarkdownEditor readonly initValue={twoColonClose} reportMode />,
+        );
+      }).not.toThrow();
+    });
+
+    it('应正确渲染 :: 与 ::: 混合的多个容器块', () => {
+      const mixedContainers = `::info
+这是信息块
+::
+
+:::warning
+
+这是警告块
+
+:::`;
+
+      expect(() => {
+        render(
+          <MarkdownEditor readonly initValue={mixedContainers} reportMode />,
+        );
+      }).not.toThrow();
+    });
+
     it('应正确渲染混合表格与列表内容', () => {
       const mixedMarkdown = `# 标题
 
@@ -262,6 +294,33 @@ Logs: openclaw logs --follow
 :::`}
           />,
         );
+      }).not.toThrow();
+    });
+
+    it('应正确渲染 :: 双冒号关闭符（::warning … ::）', () => {
+      expect(() => {
+        render(
+          <MarkdownRenderer
+            content={`::warning
+告警内容
+
+::`}
+          />,
+        );
+      }).not.toThrow();
+    });
+
+    it('原始 issue 场景：含文件路径的 ::warning 块正确渲染', () => {
+      const content = [
+        '::warning',
+        'No API key found for provider "anthropic". Auth store: /home/node/.openclaw/agents/main/agent/auth-profiles.json (agentDir: /home/node/.openclaw/.openclaw/agents/main/agent).',
+        'Logs: openclaw logs --follow',
+        '',
+        '::',
+      ].join('\n');
+
+      expect(() => {
+        render(<MarkdownRenderer content={content} />);
       }).not.toThrow();
     });
 
