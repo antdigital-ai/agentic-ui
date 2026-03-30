@@ -144,9 +144,14 @@ function hello() {
 
 ## 提示块 (Tip blocks)
 
-使用 `remark-directive` 的容器语法 `:::` 创建不同类型的提示块，渲染为带样式的 `div.markdown-container`（兼容 markdown-it-container 风格）。**注意**：`:::` 与内容之间需用空行分隔。带标题时使用属性语法 `{title="标题"}`。
+使用容器语法创建不同类型的提示块，渲染为带样式的 `div.markdown-container`（兼容 markdown-it-container 风格）。支持两种等价写法：
 
-<code src="../demos/tip-blocks-demo.tsx" background="var(--main-bg-color)" iframe=420></code>
+- **三冒号**：`:::type` … `:::` — 标准容器指令，支持属性语法 `{title="标题"}`。
+- **双冒号**：`::type` … `:::` — 简写形式，行首两个冒号开启，`:::` 收尾，适合工具自动生成的内容。
+
+**注意**：`:::` / `::` 开头行与内容之间可以有空行。
+
+<code src="../demos/tip-blocks-demo.tsx" background="var(--main-bg-color)" iframe=480></code>
 
 ```markdown
 :::info
@@ -176,6 +181,11 @@ function hello() {
 :::tip{title="提示"}
 
 这是一条带标题的提示块。
+
+:::
+
+::warning
+::warning 双冒号写法也被支持，等同于 :::warning。
 
 :::
 ```

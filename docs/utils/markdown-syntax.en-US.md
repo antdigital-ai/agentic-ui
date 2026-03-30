@@ -144,9 +144,14 @@ Use three or more `-`, `*`, or `_`.
 
 ## Tip blocks
 
-Use `remark-directive` container syntax `:::` to create different types of tip blocks; they render as styled `div.markdown-container` (markdown-it-container style). **Note**: Blank lines are required between `:::` and content. Use attribute `{title="Title"}` for a block with a title.
+Use container syntax to create different types of tip blocks; they render as styled `div.markdown-container` (markdown-it-container style). Two equivalent syntaxes are supported:
 
-<code src="../demos/tip-blocks-demo.tsx" background="var(--main-bg-color)" iframe=420></code>
+- **Triple-colon**: `:::type` … `:::` — standard container directive, supports `{title="Title"}` attribute.
+- **Double-colon**: `::type` … `:::` — shorthand form, opens with two colons at line start and closes with `:::`, useful for tool-generated content.
+
+**Note**: Blank lines between the opening line and content are allowed.
+
+<code src="../demos/tip-blocks-demo.tsx" background="var(--main-bg-color)" iframe=480></code>
 
 ```markdown
 :::info
@@ -176,6 +181,11 @@ This is an error alert.
 :::tip{title="Tip"}
 
 This is a tip block with a title.
+
+:::
+
+::warning
+The double-colon ::warning syntax is also supported, equivalent to :::warning.
 
 :::
 ```
