@@ -296,10 +296,10 @@ export function AceEditor({
       }
     }, 16);
 
-    if (readonly) return;
-
-    // 配置编辑器事件
-    setupEditorEvents(codeEditor);
+    if (!readonly) {
+      // 配置编辑器事件
+      setupEditorEvents(codeEditor);
+    }
 
     return () => {
       clearTimeout(debounceTimer.current);
@@ -339,12 +339,26 @@ export function AceEditor({
       } catch (e) {}
     }
 
-    // 只有当外部值与编辑器内部值不同时才更新，避免在 readonly 流式渲染时每次都
-    // 触发 setValue（setValue 会重置光标和滚动位置，导致代码块抖动）
-    if (value !== codeRef.current) {
-      codeRef.current = value;
-      if (element) editorRef.current?.setValue(value);
-      editorRef.current?.clearSelection();
+    if (value === codeRef.current) return;
+
+    const editor = editorRef.current;
+    const prev = codeRef.current;
+    codeRef.current = value;
+
+    if (!editor) return;
+
+    // 流式渲染时内容只会在末尾追加。通过检测 value.startsWith(prev) 来判断是否为纯追加，
+    // 若是则调用 session.insert 在末尾插入增量内容，避免 setValue 清空重写导致的闪动。
+    const isAppend = value.startsWith(prev);
+    if (isAppend) {
+      const delta = value.slice(prev.length);
+      const doc = editor.session.getDocument();
+      const lastRow = doc.getLength() - 1;
+      const lastCol = doc.getLine(lastRow).length;
+      editor.session.insert({ row: lastRow, column: lastCol }, delta);
+    } else {
+      editor.setValue(value);
+      editor.clearSelection();
     }
   }, [element.value]);
 
