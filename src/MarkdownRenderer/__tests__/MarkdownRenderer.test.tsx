@@ -717,6 +717,19 @@ describe('MarkdownRenderer', () => {
     expect(placeholder).toHaveStyle({ height: '56px' });
   });
 
+  it('agentic-ui-filemap 应展示结果文件标题用于区分上传附件', () => {
+    const json = JSON.stringify({
+      fileList: [{ name: 'result.txt', uuid: 'result-1', type: 'text/plain' }],
+    });
+    const { container } = render(
+      <MarkdownRenderer content={'```agentic-ui-filemap\n' + json + '\n```'} />,
+    );
+
+    const title = container.querySelector('[data-testid="file-view-title"]');
+    expect(title).toBeTruthy();
+    expect(title?.textContent).toMatch(/结果文件|Result files/);
+  });
+
   it('agentic-ui-filemap 与普通 markdown 混排时各自独立渲染', () => {
     const json = JSON.stringify({
       fileList: [{ name: 'mix.txt', uuid: 'm1' }],

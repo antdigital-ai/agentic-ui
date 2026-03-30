@@ -4,6 +4,7 @@ import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { ActionIconBox } from '../../../Components/ActionIconBox';
+import { I18nContext } from '../../../I18n';
 import { AttachmentFile } from '../types';
 import { isImageFile } from '../utils';
 import { AttachmentFileListItem } from './AttachmentFileListItem';
@@ -86,6 +87,7 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
   dataTestId,
 }) => {
   const context = useContext(ConfigProvider.ConfigContext);
+  const { locale } = useContext(I18nContext);
   const prefix = context?.getPrefixCls('agentic-md-editor-attachment-list');
   const { wrapSSR, hashId } = useStyle(prefix);
   const [imgSrc, setImgSrc] = React.useState<string | undefined>(undefined);
@@ -131,6 +133,14 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
         style={containerStyle}
         className={classNames(prefix, hashId)}
       >
+        {hasFiles ? (
+          <div
+            className={classNames(`${prefix}-title`, hashId)}
+            data-testid="attachment-list-title"
+          >
+            {locale?.['input.attachmentListTitle'] || '上传附件'}
+          </div>
+        ) : null}
         <AnimatePresence initial={false}>
           {fileList.map((file, index) => (
             <AttachmentFileListItem
