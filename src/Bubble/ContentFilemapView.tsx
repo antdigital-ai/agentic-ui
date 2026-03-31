@@ -94,7 +94,7 @@ export const ContentFilemapView: React.FC<{
 }> = ({ blocks, fileViewConfig, fileViewEvents, placement, style }) => {
   if (blocks.length === 0) return null;
   return (
-    <div style={style}>
+    <div style={style} data-testid="content-filemap-view">
       {blocks.map((block, i) => (
         <FilemapItem
           key={i}

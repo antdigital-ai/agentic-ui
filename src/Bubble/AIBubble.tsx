@@ -148,7 +148,7 @@ export const AIBubble: React.FC<
     [rawContent],
   );
 
-  const contentForDisplay = strippedContent || rawContent;
+  const contentForDisplay = filemapBlocks.length > 0 ? strippedContent : rawContent;
 
   const messageContent = (
     <BubbleMessageDisplay
