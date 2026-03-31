@@ -270,11 +270,11 @@ export const UserBubble: React.FC<
         </div>
         {hasFileMap && (
           <div
-            style={fileViewStyle}
+            style={{ ...fileViewStyle, alignSelf: 'flex-end' }}
             className={clsx(
               `${prefixClass}-bubble-after`,
               `${prefixClass}-bubble-after-${placement}`,
-              `${prefixClass}-bubble-after-ai`,
+              `${prefixClass}-bubble-after-user`,
               hashId,
             )}
             data-testid="message-after"
@@ -292,6 +292,7 @@ export const UserBubble: React.FC<
             fileViewConfig={props.fileViewConfig}
             fileViewEvents={props.fileViewEvents}
             placement={placement}
+            style={{ alignSelf: 'flex-end' }}
           />
         )}
       </Flex>

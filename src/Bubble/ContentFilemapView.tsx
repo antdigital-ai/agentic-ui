@@ -90,10 +90,11 @@ export const ContentFilemapView: React.FC<{
   fileViewConfig?: BubbleProps['fileViewConfig'];
   fileViewEvents?: BubbleProps['fileViewEvents'];
   placement?: 'left' | 'right';
-}> = ({ blocks, fileViewConfig, fileViewEvents, placement }) => {
+  style?: React.CSSProperties;
+}> = ({ blocks, fileViewConfig, fileViewEvents, placement, style }) => {
   if (blocks.length === 0) return null;
   return (
-    <>
+    <div style={style}>
       {blocks.map((block, i) => (
         <FilemapItem
           key={i}
@@ -103,6 +104,6 @@ export const ContentFilemapView: React.FC<{
           placement={placement}
         />
       ))}
-    </>
+    </div>
   );
 };
