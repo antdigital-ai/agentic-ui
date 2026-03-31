@@ -1,4 +1,4 @@
-import { memo, MutableRefObject, useContext, useRef } from 'react';
+import { memo, MutableRefObject, useContext, useMemo, useRef } from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
 import clsx from 'clsx';
@@ -8,11 +8,13 @@ import { WhiteBoxProcessInterface } from '../ThoughtChainList/types';
 import { BubbleAvatar } from './Avatar';
 import { BubbleBeforeNode } from './BubbleBeforeNode';
 import { BubbleConfigContext } from './BubbleConfigProvide';
+import { ContentFilemapView } from './ContentFilemapView';
 import { BubbleFileView } from './FileView';
 import { BubbleMessageDisplay } from './MessagesContent';
 import { MessagesContext } from './MessagesContent/BubbleContext';
 import { LOADING_FLAT } from './MessagesContent';
 import { BubbleExtra } from './MessagesContent/BubbleExtra';
+import { extractFilemapBlocks } from './extractFilemapBlocks';
 import { useStyle } from './style';
 import { BubbleTitle } from './Title';
 import type { BubbleMetaData, BubbleProps } from './type';
@@ -137,6 +139,17 @@ export const AIBubble: React.FC<
   const messageDisplayKey =
     messageDisplayKeyRef.current ?? id ?? nanoid();
 
+  const rawContent = props?.originData?.content as string | undefined;
+  const { blocks: filemapBlocks, stripped: strippedContent } = useMemo(
+    () =>
+      extractFilemapBlocks(
+        typeof rawContent === 'string' ? rawContent : '',
+      ),
+    [rawContent],
+  );
+
+  const contentForDisplay = strippedContent || rawContent;
+
   const messageContent = (
     <BubbleMessageDisplay
       markdownRenderConfig={props.markdownRenderConfig}
@@ -144,7 +157,7 @@ export const AIBubble: React.FC<
       bubbleListRef={props.bubbleListRef}
       bubbleListItemExtraStyle={styles?.bubbleListItemExtraStyle}
       bubbleRef={props.bubbleRef}
-      content={props?.originData?.content}
+      content={contentForDisplay}
       key={messageDisplayKey}
       data-id={props?.originData?.id}
       avatar={props?.originData?.meta as BubbleMetaData}
@@ -341,6 +354,14 @@ export const AIBubble: React.FC<
             {contentAfterDom}
           </div>
         </div>
+        {filemapBlocks.length > 0 && (
+          <ContentFilemapView
+            blocks={filemapBlocks}
+            fileViewConfig={props.fileViewConfig}
+            fileViewEvents={props.fileViewEvents}
+            placement={placement}
+          />
+        )}
       </Flex>
     </BubbleConfigContext.Provider>,
   );
