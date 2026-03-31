@@ -8,7 +8,6 @@ import { WhiteBoxProcessInterface } from '../ThoughtChainList/types';
 import { BubbleAvatar } from './Avatar';
 import { BubbleBeforeNode } from './BubbleBeforeNode';
 import { BubbleConfigContext } from './BubbleConfigProvide';
-import { BubbleFileView } from './FileView';
 import { BubbleMessageDisplay } from './MessagesContent';
 import { MessagesContext } from './MessagesContent/BubbleContext';
 import { LOADING_FLAT } from './MessagesContent';
@@ -167,32 +166,6 @@ export const AIBubble: React.FC<
       renderFileMoreAction={props.renderFileMoreAction}
       shouldShowVoice={props.shouldShowVoice}
       bubbleRenderConfig={props.bubbleRenderConfig}
-      contentAfterDom={
-        (props?.originData?.fileMap?.size || 0) > 0 ? (
-          <div
-            style={{
-              minWidth: standalone ? 'min(296px,100%)' : '0px',
-              paddingLeft: 12,
-              maxWidth: '100%',
-              width: '100%',
-              ...styles?.bubbleListItemExtraStyle,
-            }}
-            className={clsx(
-              `${prefixClass}-bubble-after`,
-              `${prefixClass}-bubble-after-${placement}`,
-              `${prefixClass}-bubble-after-ai`, // AI消息 after 特定样式
-              hashId,
-            )}
-            data-testid="message-after"
-          >
-            <BubbleFileView
-              placement={placement}
-              bubbleListRef={props.bubbleListRef}
-              bubble={props as any}
-            />
-          </div>
-        ) : null
-      }
     />
   );
 
