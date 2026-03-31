@@ -427,8 +427,12 @@ const DonutChart: React.FC<DonutChartProps> = ({
 
           const hiddenSetForChart =
             hiddenDataIndicesByChart[idx] || new Set<number>();
-          const visibleData = chartData.filter(
-            (_, index) => !hiddenSetForChart.has(index),
+          const visibleDataWithIndex = chartData
+            .map((d, index) => ({ d, originalIndex: index }))
+            .filter(({ originalIndex }) => !hiddenSetForChart.has(originalIndex));
+          const visibleData = visibleDataWithIndex.map(({ d }) => d);
+          const visibleOriginalIndices = visibleDataWithIndex.map(
+            ({ originalIndex }) => originalIndex,
           );
           const toNum = (v: any) => (typeof v === 'number' ? v : Number(v));
           const rawLabels = visibleData.map((d) => d.label);
@@ -443,9 +447,12 @@ const DonutChart: React.FC<DonutChartProps> = ({
           );
           const backgroundColors = cfg.backgroundColor || defaultColorList;
 
-          // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
-          const resolvedBackgroundColors = backgroundColors.map((color) =>
-            resolveCssVariable(color),
+          // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值），按原始索引取色保证与图例颜色一致
+          const resolvedVisibleBackgroundColors = visibleOriginalIndices.map(
+            (originalIndex) =>
+              resolveCssVariable(
+                backgroundColors[originalIndex % backgroundColors.length],
+              ),
           );
 
           const mainColor =
@@ -503,11 +510,11 @@ const DonutChart: React.FC<DonutChartProps> = ({
                 data: safeValues,
                 backgroundColor: isSingleValueMode
                   ? [resolvedMainColor, 'transparent']
-                  : resolvedBackgroundColors.slice(0, values.length),
+                  : resolvedVisibleBackgroundColors.slice(0, values.length),
                 borderColor: chartBorderColor,
                 hoverBackgroundColor: isSingleValueMode
                   ? [resolvedMainColor, 'transparent']
-                  : resolvedBackgroundColors.slice(0, values.length),
+                  : resolvedVisibleBackgroundColors.slice(0, values.length),
                 hoverBorderColor: chartHoverBorderColor,
                 borderWidth: cfg.chartStyle === 'pie' ? 0 : isMobile ? 1 : 1,
                 spacing: isSingleValueMode
