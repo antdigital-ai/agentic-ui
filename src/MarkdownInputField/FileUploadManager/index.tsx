@@ -231,9 +231,9 @@ export const useFileUploadManager = ({
    * 处理文件重试
    */
   const handleFileRetry = useRefFunction(async (file: AttachmentFile) => {
+    const map = new Map(fileMap);
     try {
       file.status = 'uploading';
-      const map = new Map(fileMap);
       map.set(file.uuid || '', file);
       updateAttachmentFiles(map);
 
@@ -261,12 +261,18 @@ export const useFileUploadManager = ({
         file.status = 'error';
         map.set(file.uuid || '', file);
         updateAttachmentFiles(map);
+        attachment?.onUploadError?.({ file, error: null });
       }
     } catch (error) {
-      file.status = 'error';
-      const map = new Map(fileMap);
-      map.set(file.uuid || '', file);
-      updateAttachmentFiles(map);
+      if (attachment?.removeFileOnUploadError) {
+        map.delete(file.uuid || '');
+        updateAttachmentFiles(map);
+      } else {
+        file.status = 'error';
+        map.set(file.uuid || '', file);
+        updateAttachmentFiles(map);
+      }
+      attachment?.onUploadError?.({ file, error });
       console.error('Error retrying file upload:', error);
     }
   });

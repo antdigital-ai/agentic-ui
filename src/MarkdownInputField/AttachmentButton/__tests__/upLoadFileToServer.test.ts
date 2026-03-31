@@ -78,3 +78,102 @@ describe('upLoadFileToServer - onExceedMaxSize', () => {
     expect(onExceedMaxSize).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('upLoadFileToServer - onUploadError', () => {
+  it('should call onUploadError when upload throws', async () => {
+    const onUploadError = vi.fn();
+    const uploadError = new Error('network error');
+    const upload = vi.fn().mockRejectedValue(uploadError);
+    const file = createFile('fail.txt', 100);
+
+    await upLoadFileToServer([file], { upload, onUploadError });
+
+    expect(onUploadError).toHaveBeenCalledTimes(1);
+    expect(onUploadError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: uploadError,
+        file: expect.objectContaining({ name: 'fail.txt' }),
+      }),
+    );
+  });
+
+  it('should call onUploadError when upload returns falsy URL', async () => {
+    const onUploadError = vi.fn();
+    const upload = vi.fn().mockResolvedValue('');
+    const file = createFile('empty-url.txt', 100);
+
+    await upLoadFileToServer([file], { upload, onUploadError });
+
+    expect(onUploadError).toHaveBeenCalledTimes(1);
+  });
+
+  it('should keep file in map with error status by default on upload failure', async () => {
+    const upload = vi.fn().mockRejectedValue(new Error('fail'));
+    const file = createFile('fail.txt', 100);
+    const fileMap = new Map<string, AttachmentFile>();
+    const onFileMapChange = vi.fn((map?: Map<string, AttachmentFile>) => {
+      if (map) map.forEach((f, k) => fileMap.set(k, f));
+    });
+
+    await upLoadFileToServer([file], { upload, fileMap, onFileMapChange });
+
+    const stored = Array.from(fileMap.values()).find(
+      (f) => f.name === 'fail.txt',
+    );
+    expect(stored?.status).toBe('error');
+  });
+});
+
+describe('upLoadFileToServer - removeFileOnUploadError', () => {
+  it('should remove file from map when removeFileOnUploadError is true and upload throws', async () => {
+    const upload = vi.fn().mockRejectedValue(new Error('fail'));
+    const file = createFile('remove-me.txt', 100);
+    const fileMap = new Map<string, AttachmentFile>();
+    const latestMap = { current: fileMap };
+    const onFileMapChange = vi.fn((map?: Map<string, AttachmentFile>) => {
+      latestMap.current = new Map(map);
+    });
+
+    await upLoadFileToServer([file], {
+      upload,
+      fileMap,
+      onFileMapChange,
+      removeFileOnUploadError: true,
+    });
+
+    expect(latestMap.current.size).toBe(0);
+  });
+
+  it('should remove file from map when removeFileOnUploadError is true and upload returns falsy URL', async () => {
+    const upload = vi.fn().mockResolvedValue('');
+    const file = createFile('remove-me.txt', 100);
+    const fileMap = new Map<string, AttachmentFile>();
+    const latestMap = { current: fileMap };
+    const onFileMapChange = vi.fn((map?: Map<string, AttachmentFile>) => {
+      latestMap.current = new Map(map);
+    });
+
+    await upLoadFileToServer([file], {
+      upload,
+      fileMap,
+      onFileMapChange,
+      removeFileOnUploadError: true,
+    });
+
+    expect(latestMap.current.size).toBe(0);
+  });
+
+  it('should still call onUploadError even when removeFileOnUploadError is true', async () => {
+    const onUploadError = vi.fn();
+    const upload = vi.fn().mockRejectedValue(new Error('fail'));
+    const file = createFile('fail.txt', 100);
+
+    await upLoadFileToServer([file], {
+      upload,
+      onUploadError,
+      removeFileOnUploadError: true,
+    });
+
+    expect(onUploadError).toHaveBeenCalledTimes(1);
+  });
+});

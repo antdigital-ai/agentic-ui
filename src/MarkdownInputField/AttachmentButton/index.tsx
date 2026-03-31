@@ -63,6 +63,13 @@ export type AttachmentButtonProps = {
   }) => void;
   /** 文件超出 maxFileSize 大小限制时的回调 */
   onExceedMaxSize?: (info: { file: AttachmentFile; maxSize: number }) => void;
+  /** 文件上传失败时的回调 */
+  onUploadError?: (info: { file: AttachmentFile; error: unknown }) => void;
+  /**
+   * 上传失败时自动将文件从列表中移除（退回），不显示错误状态
+   * @default false
+   */
+  removeFileOnUploadError?: boolean;
 };
 
 /**
@@ -96,6 +103,13 @@ type UploadProps = {
   }) => void;
   /** 文件超出 maxFileSize 大小限制时的回调 */
   onExceedMaxSize?: (info: { file: AttachmentFile; maxSize: number }) => void;
+  /** 文件上传失败时的回调 */
+  onUploadError?: (info: { file: AttachmentFile; error: unknown }) => void;
+  /**
+   * 上传失败时自动将文件从列表中移除（退回），不显示错误状态
+   * @default false
+   */
+  removeFileOnUploadError?: boolean;
 };
 
 const WAIT_TIME_MS = 16;
@@ -186,10 +200,17 @@ const handleUploadError = (
   errorMsg: string | null,
   map: Map<string, AttachmentFile>,
   props: UploadProps,
+  rawError?: unknown,
 ) => {
-  file.status = 'error';
-  if (errorMsg !== null) file.errorMessage = errorMsg;
-  updateFileMap(map, file, props.onFileMapChange);
+  if (props.removeFileOnUploadError) {
+    if (file.uuid) map.delete(file.uuid);
+    props.onFileMapChange?.(map);
+  } else {
+    file.status = 'error';
+    if (errorMsg !== null) file.errorMessage = errorMsg;
+    updateFileMap(map, file, props.onFileMapChange);
+  }
+  props.onUploadError?.({ file, error: rawError ?? errorMsg });
 };
 
 const processFile = async (
@@ -238,7 +259,7 @@ const processFile = async (
             'uploadFailed',
             DEFAULT_MESSAGES.uploadFailed,
           );
-    handleUploadError(file, errorMessage, map, props);
+    handleUploadError(file, errorMessage, map, props, error);
   }
 };
 
