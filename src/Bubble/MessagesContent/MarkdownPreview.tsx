@@ -8,10 +8,12 @@ import {
   parserMdToSchema,
 } from '../../';
 import { useLocale } from '../../I18n';
+import { FileMapView } from '../../MarkdownInputField/FileMapView';
 import { MarkdownRenderer } from '../../MarkdownRenderer';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { MessageBubbleData } from '../type';
 import { MessagesContext } from './BubbleContext';
+import { extractFileMapFromContent, removeFileMapBlocks } from './extractFileMap';
 
 /**
  * MarkdownPreview 组件用于渲染 Markdown 内容的预览。
@@ -125,10 +127,28 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     MarkdownEditorRef.current?.store.updateNodeList(schema);
   }, [content, renderMode]);
 
+  // 从正文中提取 agentic-ui-filemap 代码块，提取到则在正文外渲染并压制正文里的代码块
+  const extractedFileMap = useMemo(
+    () => extractFileMapFromContent(content),
+    [content],
+  );
+
+  const fileMapNode = useMemo(() => {
+    if (!extractedFileMap) return null;
+    const fileMapConfig = props.markdownRenderConfig?.fileMapConfig;
+    return (
+      <FileMapView
+        fileMap={extractedFileMap}
+        placement={props.placement}
+        onPreview={fileMapConfig?.onPreview}
+        itemRender={fileMapConfig?.itemRender}
+      />
+    );
+  }, [extractedFileMap, props.placement, props.markdownRenderConfig?.fileMapConfig]);
+
   const markdown = useMemo(() => {
-    // 当外侧已通过 BubbleFileView 渲染文件列表时，压制 markdown 里的代码块重复渲染
-    const hasExternalFileMap = (props.originData?.fileMap?.size || 0) > 0;
-    const resolvedFileMapConfig = hasExternalFileMap
+    // 提取到代码块时注入 hide:true，压制正文里的重复渲染
+    const resolvedFileMapConfig = extractedFileMap
       ? { ...props.markdownRenderConfig?.fileMapConfig, hide: true as const }
       : props.markdownRenderConfig?.fileMapConfig;
 
@@ -159,6 +179,9 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     }
 
     // Slate 渲染路径——保持向后兼容
+    const slateContent = extractedFileMap
+      ? removeFileMapBlocks(content)
+      : content;
     const minWidth = content?.includes?.('chartType')
       ? standalone
         ? Math.max((htmlRef?.current?.clientWidth || 600) - 23, 500)
@@ -169,7 +192,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         {...(props.markdownRenderConfig || {})}
         fncProps={fncProps}
         editorRef={MarkdownEditorRef}
-        initValue={content}
+        initValue={slateContent}
         toc={false}
         width="100%"
         height="auto"
@@ -212,6 +235,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     props.markdownRenderConfig,
     fncProps,
     standalone,
+    extractedFileMap,
   ]);
 
   const errorDom = (
@@ -245,6 +269,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           {beforeContent}
           {markdown}
           {docListNode}
+          {fileMapNode}
           {afterContent}
         </ErrorBoundary>
         {extra}
@@ -268,6 +293,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           {beforeContent}
           {markdown}
           {docListNode}
+          {fileMapNode}
           {afterContent}
         </ErrorBoundary>
       </div>
@@ -321,6 +347,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           {beforeContent}
           {markdown}
           {docListNode}
+          {fileMapNode}
           {afterContent}
         </ErrorBoundary>
       </div>
