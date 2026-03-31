@@ -12,16 +12,27 @@ import { useStyle } from './style';
 import type { BubbleMetaData, BubbleProps } from './type';
 
 import { runRender } from './AIBubble';
+import { BubbleFileView } from './FileView';
 import { BubbleTitle } from './Title';
 
 const USER_PLACEMENT = 'right' as const;
 const BUBBLE_GAP = 12;
+const FILE_VIEW_PADDING_LEFT = 12;
 
 const getContentContainerStyle = (): React.CSSProperties => ({
   display: 'flex',
   gap: 4,
   flexDirection: 'column',
   alignItems: 'flex-end',
+});
+
+const getFileViewStyle = (
+  standalone: boolean | undefined,
+  customStyle?: React.CSSProperties,
+): React.CSSProperties => ({
+  minWidth: standalone ? 'min(296px,100%)' : '0px',
+  paddingLeft: FILE_VIEW_PADDING_LEFT,
+  ...customStyle,
 });
 
 const getContentStyle = (
@@ -75,6 +86,7 @@ export const UserBubble: React.FC<
 
   const time = originData?.createAt || props.time;
   const placement = USER_PLACEMENT;
+  const hasFileMap = (originData?.fileMap?.size || 0) > 0;
 
   const quoteElement = quote?.quoteDescription ? <Quote {...quote} /> : null;
 
@@ -139,6 +151,10 @@ export const UserBubble: React.FC<
   );
 
   const contentContainerStyle = getContentContainerStyle();
+  const fileViewStyle = getFileViewStyle(
+    standalone,
+    styles?.bubbleListItemExtraStyle,
+  );
   const contentStyle = getContentStyle(
     standalone,
     styles?.bubbleListItemContentStyle,
@@ -238,6 +254,24 @@ export const UserBubble: React.FC<
                 {childrenDom}
               </div>
             ) : null}
+            {hasFileMap && (
+              <div
+                style={fileViewStyle}
+                className={clsx(
+                  `${prefixClass}-bubble-after`,
+                  `${prefixClass}-bubble-after-${placement}`,
+                  `${prefixClass}-bubble-after-ai`,
+                  hashId,
+                )}
+                data-testid="message-after"
+              >
+                <BubbleFileView
+                  bubbleListRef={props.bubbleListRef}
+                  bubble={props as any}
+                  placement={placement}
+                />
+              </div>
+            )}
             {contentAfterDom}
           </div>
         </div>
