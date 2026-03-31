@@ -126,6 +126,12 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
   }, [content, renderMode]);
 
   const markdown = useMemo(() => {
+    // 当外侧已通过 BubbleFileView 渲染文件列表时，压制 markdown 里的代码块重复渲染
+    const hasExternalFileMap = (props.originData?.fileMap?.size || 0) > 0;
+    const resolvedFileMapConfig = hasExternalFileMap
+      ? { ...props.markdownRenderConfig?.fileMapConfig, hide: true as const }
+      : props.markdownRenderConfig?.fileMapConfig;
+
     // MarkdownRenderer 渲染路径——轻量，不创建 Slate 实例
     if (renderMode === 'markdown') {
       return (
@@ -147,7 +153,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           }}
           codeProps={props.markdownRenderConfig?.codeProps}
           apaasify={props.markdownRenderConfig?.apaasify}
-          fileMapConfig={props.markdownRenderConfig?.fileMapConfig}
+          fileMapConfig={resolvedFileMapConfig}
         />
       );
     }

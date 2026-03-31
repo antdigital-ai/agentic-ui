@@ -67,6 +67,8 @@ export const AgenticUiFileMapBlockRenderer: React.FC<
     );
   }
 
+  if (fileMapConfig?.hide) return null;
+
   return (
     <div data-testid="agentic-ui-filemap-block" style={{ margin: '0.75em 0' }}>
       <FileMapView

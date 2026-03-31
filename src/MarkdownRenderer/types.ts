@@ -23,6 +23,12 @@ export interface FileMapConfig {
    * 常用于回显场景。
    */
   itemRender?: FileMapViewProps['itemRender'];
+  /**
+   * 是否隐藏 agentic-ui-filemap 代码块的渲染。
+   * 当消息外侧已通过 originData.fileMap + BubbleFileView 渲染文件列表时，
+   * Bubble 内部会自动将此值设为 true 以避免重复显示。
+   */
+  hide?: boolean;
 }
 
 
