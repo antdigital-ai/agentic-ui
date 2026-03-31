@@ -92,8 +92,9 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
   const { locale } = useContext(I18nContext);
 
   const handleOpen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (onOpen) {
-      e.preventDefault();
       onOpen(item);
       return;
     }
@@ -101,6 +102,7 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
   };
 
   const handleLocate = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     onLocate?.(item);
   };
