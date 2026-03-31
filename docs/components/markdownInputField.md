@@ -70,7 +70,7 @@ export default () => {
         attachment={{
           enable: true,
           accept: '.pdf,.doc,.docx,image/*',
-          maxSize: 10 * 1024 * 1024, // 10MB
+          maxFileSize: 10 * 1024 * 1024, // 10MB（字节）
           upload: async (file, index) => {
             if (index == 3) {
               throw new Error('上传失败');
@@ -485,7 +485,7 @@ export default () => {
         attachment={{
           enable: true,
           accept: '.pdf,.doc,.docx,image/*',
-          maxSize: 10 * 1024 * 1024, // 10MB
+          maxFileSize: 10 * 1024 * 1024, // 10MB（字节）
           upload: async (file, index) => {
             if (index == 3) {
               throw new Error('上传失败');
@@ -1041,7 +1041,7 @@ export default () => {
         attachment={{
           enable: true,
           accept: '.pdf,.doc,.docx,image/*',
-          maxSize: 10 * 1024 * 1024, // 10MB
+          maxFileSize: 10 * 1024 * 1024, // 10MB（字节）
           upload: async (file) => {
             // 模拟上传文件
             await new Promise((resolve) => setTimeout(resolve, 10000));
@@ -1066,7 +1066,7 @@ export default () => {
                 <code>accept</code> - 接受的文件类型
               </li>
               <li>
-                <code>maxSize</code> - 文件最大大小限制
+                <code>maxFileSize</code> - 文件最大大小限制（字节）
               </li>
               <li>
                 <code>upload</code> - 文件上传回调函数

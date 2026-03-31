@@ -142,7 +142,7 @@ export type MarkdownInputFieldProps = {
    *   attachment={{
    *     enable: true,
    *     accept: '.pdf,.doc,.docx',
-   *     maxSize: 10 * 1024 * 1024, // 10MB
+   *     maxFileSize: 10 * 1024 * 1024, // 10MB（字节）
    *     onUpload: async (file) => {
    *       const url = await uploadFile(file);
    *       return { url };
