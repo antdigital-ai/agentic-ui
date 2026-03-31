@@ -207,6 +207,24 @@ export const useKeyboard = (
 
       if (e.key === 'Tab') tab.run(e);
 
+      // Enter 键处理：代码块内统一插入换行，不触发发送也不分割块
+      if (e.key === 'Enter') {
+        const selection = markdownEditorRef.current.selection;
+        if (selection && Range.isCollapsed(selection)) {
+          const [codeNode] = Editor.nodes(markdownEditorRef.current, {
+            at: selection.focus.path,
+            match: (n) => Element.isElement(n) && n.type === 'code',
+            mode: 'lowest',
+          });
+          if (codeNode) {
+            e.stopPropagation();
+            e.preventDefault();
+            markdownEditorRef.current.insertText('\n');
+            return;
+          }
+        }
+      }
+
       // Enter 发送，Shift+Enter 换行
       if (e.key === 'Enter' && e.shiftKey && !(e.ctrlKey || e.metaKey)) {
         e.stopPropagation();
