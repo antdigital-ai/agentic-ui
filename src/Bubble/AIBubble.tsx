@@ -167,34 +167,34 @@ export const AIBubble: React.FC<
       renderFileMoreAction={props.renderFileMoreAction}
       shouldShowVoice={props.shouldShowVoice}
       bubbleRenderConfig={props.bubbleRenderConfig}
-      contentAfterDom={
-        (props?.originData?.fileMap?.size || 0) > 0 ? (
-          <div
-            style={{
-              minWidth: standalone ? 'min(296px,100%)' : '0px',
-              paddingLeft: 12,
-              maxWidth: '100%',
-              width: '100%',
-              ...styles?.bubbleListItemExtraStyle,
-            }}
-            className={clsx(
-              `${prefixClass}-bubble-after`,
-              `${prefixClass}-bubble-after-${placement}`,
-              `${prefixClass}-bubble-after-ai`, // AI消息 after 特定样式
-              hashId,
-            )}
-            data-testid="message-after"
-          >
-            <BubbleFileView
-              placement={placement}
-              bubbleListRef={props.bubbleListRef}
-              bubble={props as any}
-            />
-          </div>
-        ) : null
-      }
     />
   );
+
+  const hasFileMap = (props?.originData?.fileMap?.size || 0) > 0;
+
+  const fileViewDom = hasFileMap ? (
+    <div
+      style={{
+        minWidth: standalone ? 'min(296px,100%)' : '0px',
+        paddingLeft: 12,
+        maxWidth: '100%',
+        ...styles?.bubbleListItemExtraStyle,
+      }}
+      className={clsx(
+        `${prefixClass}-bubble-after`,
+        `${prefixClass}-bubble-after-${placement}`,
+        `${prefixClass}-bubble-after-ai`,
+        hashId,
+      )}
+      data-testid="message-after"
+    >
+      <BubbleFileView
+        placement={placement}
+        bubbleListRef={props.bubbleListRef}
+        bubble={props as any}
+      />
+    </div>
+  ) : null;
 
   const childrenDom = runRender(
     bubbleRenderConfig?.contentRender,
@@ -337,6 +337,7 @@ export const AIBubble: React.FC<
                 {childrenDom}
               </div>
             ) : null}
+            {fileViewDom}
             {contentAfterDom}
           </div>
         </div>

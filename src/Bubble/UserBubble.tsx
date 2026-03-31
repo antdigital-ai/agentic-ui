@@ -254,27 +254,27 @@ export const UserBubble: React.FC<
                 {childrenDom}
               </div>
             ) : null}
-            {hasFileMap && (
-              <div
-                style={fileViewStyle}
-                className={clsx(
-                  `${prefixClass}-bubble-after`,
-                  `${prefixClass}-bubble-after-${placement}`,
-                  `${prefixClass}-bubble-after-ai`,
-                  hashId,
-                )}
-                data-testid="message-after"
-              >
-                <BubbleFileView
-                  bubbleListRef={props.bubbleListRef}
-                  bubble={props as any}
-                  placement={placement}
-                />
-              </div>
-            )}
             {contentAfterDom}
           </div>
         </div>
+        {hasFileMap && (
+          <div
+            style={fileViewStyle}
+            className={clsx(
+              `${prefixClass}-bubble-after`,
+              `${prefixClass}-bubble-after-${placement}`,
+              `${prefixClass}-bubble-after-ai`,
+              hashId,
+            )}
+            data-testid="message-after"
+          >
+            <BubbleFileView
+              bubbleListRef={props.bubbleListRef}
+              bubble={props as any}
+              placement={placement}
+            />
+          </div>
+        )}
       </Flex>
     </BubbleConfigContext.Provider>,
   );
