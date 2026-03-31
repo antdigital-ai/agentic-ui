@@ -61,6 +61,8 @@ export type AttachmentButtonProps = {
     currentCount: number;
     selectedCount: number;
   }) => void;
+  /** 文件超出 maxFileSize 大小限制时的回调 */
+  onExceedMaxSize?: (info: { file: AttachmentFile; maxSize: number }) => void;
 };
 
 /**
@@ -92,6 +94,8 @@ type UploadProps = {
     currentCount: number;
     selectedCount: number;
   }) => void;
+  /** 文件超出 maxFileSize 大小限制时的回调 */
+  onExceedMaxSize?: (info: { file: AttachmentFile; maxSize: number }) => void;
 };
 
 const WAIT_TIME_MS = 16;
@@ -209,6 +213,7 @@ const processFile = async (
     file.errorCode = 'FILE_SIZE_EXCEEDED';
     file.status = 'error';
     updateFileMap(map, file, props.onFileMapChange);
+    props.onExceedMaxSize?.({ file, maxSize: props.maxFileSize || 0 });
     return;
   }
 
