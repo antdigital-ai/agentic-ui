@@ -235,6 +235,27 @@ export default () => (
         <SuggestionList items={items} onItemClick={() => alert('ask')} />
       </div>
     </Card>
+
+    <Card title="媒体消息">
+      <Bubble
+        style={{
+          flex: 1,
+        }}
+        pure
+        {...props}
+        originData={{
+          id: '1',
+          content: `有几个人\n\`\`\`agentic-ui-filemap
+{"fileList":[{"uuid":"1775017476829.1006osIAgFo5HCAIAvDTQfpqADAgEaf9wsk05FyA9L~tplv-dy-aweme-images_q75.webp","name":"osIAgFo5HCAIAvDTQfpqADAgEaf9wsk05FyA9L~tplv-dy-aweme-images_q75.webp","size":140528,"type":"image/webp","uploadResponse":{"fileId":"/home/admin/workspace/workspace-user-upload/2088352469891296/workspace-a0bstafm01237182drdmorxy1zxemoeoimr/osIAgFo5HCAIAvDTQfpqADAgEaf9wsk05FyA9L~tplv-dy-aweme-images_q75.webp","fileName":"osIAgFo5HCAIAvDTQfpqADAgEaf9wsk05FyA9L~tplv-dy-aweme-images_q75.webp","fileType":"image/webp","fileUrl":"","uploadStatus":"SUCCESS"}},{"uuid":"1775017477422.0542ocf9IAy5yk0xFA9gIpCSQcvfgAFLAoAHs5DDAE~tplv-dy-aweme-images_q75.webp","name":"ocf9IAy5yk0xFA9gIpCSQcvfgAFLAoAHs5DDAE~tplv-dy-aweme-images_q75.webp","size":93720,"type":"image/webp","uploadResponse":{"fileId":"/home/admin/workspace/workspace-user-upload/2088352469891296/workspace-a0bstafm01237182drdmorxy1zxemoeoimr/ocf9IAy5yk0xFA9gIpCSQcvfgAFLAoAHs5DDAE~tplv-dy-aweme-images_q75.webp","fileName":"ocf9IAy5yk0xFA9gIpCSQcvfgAFLAoAHs5DDAE~tplv-dy-aweme-images_q75.webp","fileType":"image/webp","fileUrl":"","uploadStatus":"SUCCESS"}},{"uuid":"1775017477211.3506oIBEAASliiALmqAgIesBDE3nxJNAu20WYAwfCw~tplv-dy-aweme-images_q75.webp","name":"oIBEAASliiALmqAgIesBDE3nxJNAu20WYAwfCw~tplv-dy-aweme-images_q75.webp","size":124462,"type":"image/webp","uploadResponse":{"fileId":"/home/admin/workspace/workspace-user-upload/2088352469891296/workspace-a0bstafm01237182drdmorxy1zxemoeoimr/oIBEAASliiALmqAgIesBDE3nxJNAu20WYAwfCw~tplv-dy-aweme-images_q75.webp","fileName":"oIBEAASliiALmqAgIesBDE3nxJNAu20WYAwfCw~tplv-dy-aweme-images_q75.webp","fileType":"image/webp","fileUrl":"","uploadStatus":"SUCCESS"}},{"uuid":"1775017477404.2668o8tuEDmLEBAwNwAmAxi2Ae0ABAngJCzqI3fVWi~tplv-dy-aweme-images_q75.webp","name":"o8tuEDmLEBAwNwAmAxi2Ae0ABAngJCzqI3fVWi~tplv-dy-aweme-images_q75.webp","size":108864,"type":"image/webp","uploadResponse":{"fileId":"/home/admin/workspace/workspace-user-upload/2088352469891296/workspace-a0bstafm01237182drdmorxy1zxemoeoimr/o8tuEDmLEBAwNwAmAxi2Ae0ABAngJCzqI3fVWi~tplv-dy-aweme-images_q75.webp","fileName":"o8tuEDmLEBAwNwAmAxi2Ae0ABAngJCzqI3fVWi~tplv-dy-aweme-images_q75.webp","fileType":"image/webp","fileUrl":"","uploadStatus":"SUCCESS"}}]}
+\`\``,
+          createAt: Date.now(),
+          updateAt: Date.now(),
+          meta: { avatar: '...', title: 'AI 助手' },
+        }}
+        avatar={{ avatar: '...', title: 'AI 助手' }}
+        placement="left"
+      />
+    </Card>
   </div>
 );
 ```
