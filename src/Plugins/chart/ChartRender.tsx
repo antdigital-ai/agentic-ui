@@ -182,12 +182,14 @@ const ChartRuntimeRendererImpl: React.FC<{
   } = runtime;
 
   if (chartType === 'pie') {
+    const pieSize = config?.height || 400;
     return (
       <DonutChart
         key={`${config?.index}-pie`}
         data={convertDonutData}
         configs={[{ chartStyle: 'pie', showLegend: true }]}
-        height={config?.height || 400}
+        width={pieSize}
+        height={pieSize}
         title={title}
         showToolbar={true}
         dataTime={dataTime}

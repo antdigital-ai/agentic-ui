@@ -516,7 +516,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                   ? [resolvedMainColor, 'transparent']
                   : resolvedVisibleBackgroundColors.slice(0, values.length),
                 hoverBorderColor: chartHoverBorderColor,
-                borderWidth: cfg.chartStyle === 'pie' ? 0 : isMobile ? 1 : 1,
+                borderWidth: cfg.chartStyle === 'pie' ? 2 : isMobile ? 1 : 1,
                 spacing: isSingleValueMode
                   ? 0
                   : cfg.chartStyle === 'pie'
