@@ -20,6 +20,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor';
@@ -622,10 +623,10 @@ const FileGroupComponent: FC<{
   const remainingCount = totalCount - visibleCount;
   const hasMore = remainingCount > 0;
 
-  const handleShowMore = (e: React.MouseEvent) => {
+  const handleShowMore = useRefFunction((e: React.MouseEvent) => {
     e.stopPropagation();
     setVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
-  };
+  });
 
   const contentVariants = useMemo(
     () => ({
@@ -819,7 +820,7 @@ export const FileComponent: FC<{
   const { wrapSSR, hashId } = useFileStyle(prefixCls);
 
   // 确保节点有稳定的唯一 ID（使用缓存）
-  const ensureNodeWithStableId = <T extends FileNode | GroupNode>(
+  const ensureNodeWithStableId = useRefFunction(<T extends FileNode | GroupNode>(
     node: T,
   ): T => {
     if (node.id) return { ...node };
@@ -836,17 +837,17 @@ export const FileComponent: FC<{
       ...node,
       id: cachedId,
     };
-  };
+  });
 
   // 返回列表（供预览页调用）
-  const handleBackToList = () => {
+  const handleBackToList = useRefFunction(() => {
     // 使进行中的预览请求失效
     previewRequestIdRef.current++;
     setPreviewFile(null);
     setCustomPreviewContent(null);
     setCustomPreviewHeader(null);
     setHeaderFileOverride(null);
-  };
+  });
 
   // 监听 resetKey 变化，重置预览状态
   useEffect(() => {
@@ -891,7 +892,7 @@ export const FileComponent: FC<{
   }, [nodes]);
 
   // 处理分组折叠/展开
-  const handleToggleGroup = (
+  const handleToggleGroup = useRefFunction((
     groupId: string,
     type: FileType,
     collapsed: boolean,
@@ -907,10 +908,10 @@ export const FileComponent: FC<{
     } else if (onToggleGroup) {
       onToggleGroup(type, collapsed);
     }
-  };
+  });
 
   // 包装后的返回逻辑，允许外部拦截
-  const handleBack = async () => {
+  const handleBack = useRefFunction(async () => {
     if (previewFile) {
       try {
         const result = await (onBack?.(previewFile) as any);
@@ -920,10 +921,10 @@ export const FileComponent: FC<{
       }
     }
     handleBackToList();
-  };
+  });
 
   // 预览页面的下载（供预览页调用）
-  const handleDownloadInPreview = (file: FileNode) => {
+  const handleDownloadInPreview = useRefFunction((file: FileNode) => {
     // 优先使用用户传入的下载方法
     if (onDownload) {
       onDownload(file);
@@ -931,10 +932,10 @@ export const FileComponent: FC<{
     }
 
     handleFileDownload(file);
-  };
+  });
 
   // 预览文件处理
-  const handlePreview = async (file: FileNode) => {
+  const handlePreview = useRefFunction(async (file: FileNode) => {
     // 如果用户提供了预览方法，尝试使用用户的方法
     if (onPreview) {
       const currentCallId = ++previewRequestIdRef.current;
@@ -1015,7 +1016,7 @@ export const FileComponent: FC<{
     }
     setCustomPreviewContent(null);
     setPreviewFile(file);
-  };
+  });
 
   // 通过 actionRef 暴露可编程接口
   React.useEffect(() => {
@@ -1040,7 +1041,7 @@ export const FileComponent: FC<{
   const hasKeyword = Boolean((keyword ?? '').trim());
 
   // 渲染搜索框组件 - 确保在所有情况下都保持一致
-  const renderSearchInput = () => {
+  const renderSearchInput = useRefFunction(() => {
     if (!showSearch) return null;
     return (
       <SearchInput
@@ -1052,10 +1053,10 @@ export const FileComponent: FC<{
         locale={locale}
       />
     );
-  };
+  });
 
   // 渲染空状态内容
-  const renderEmptyContent = () => {
+  const renderEmptyContent = useRefFunction(() => {
     if (hasKeyword) {
       return (
         <Typography.Text type="secondary">
@@ -1076,58 +1077,10 @@ export const FileComponent: FC<{
         <Empty description={locale?.['workspace.empty'] || 'No data'} />
       )
     );
-  };
-
-  // 图片预览组件
-  const ImagePreviewComponent = (
-    <Image
-      className={classNames(`${prefixCls}-hidden-image`, hashId)}
-      src={imagePreview.src}
-      preview={{
-        visible: imagePreview.visible,
-        onVisibleChange: (visible) => {
-          setImagePreview((prev) => ({ ...prev, visible }));
-        },
-      }}
-    />
-  );
-
-  // 如果正在预览文件，显示预览组件
-  if (previewFile) {
-    return (
-      <>
-        <PreviewComponent
-          file={previewFile}
-          onBack={handleBack}
-          onDownload={handleDownloadInPreview}
-          onShare={(file, options) => {
-            if (onShare) {
-              onShare(file, {
-                anchorEl: options?.anchorEl,
-                origin: 'preview',
-              });
-            } else {
-              handleDefaultShare(file);
-            }
-          }}
-          onLocate={onLocate}
-          customContent={customPreviewContent || undefined}
-          customHeader={customPreviewHeader || undefined}
-          customActions={
-            typeof customActions === 'function'
-              ? customActions(previewFile)
-              : customActions
-          }
-          headerFileOverride={headerFileOverride || undefined}
-          markdownEditorProps={markdownEditorProps}
-        />
-        {ImagePreviewComponent}
-      </>
-    );
-  }
+  });
 
   // 渲染文件内容
-  const renderFileContent = () => {
+  const renderFileContent = useRefFunction(() => {
     if ((!nodes || nodes.length === 0) && !loading) {
       return (
         <div className={classNames(`${prefixCls}-empty`, hashId)}>
@@ -1227,7 +1180,55 @@ export const FileComponent: FC<{
         </div>
       </>
     );
-  };
+  });
+
+  // 图片预览组件
+  const ImagePreviewComponent = (
+    <Image
+      className={classNames(`${prefixCls}-hidden-image`, hashId)}
+      src={imagePreview.src}
+      preview={{
+        visible: imagePreview.visible,
+        onVisibleChange: (visible) => {
+          setImagePreview((prev) => ({ ...prev, visible }));
+        },
+      }}
+    />
+  );
+
+  // 如果正在预览文件，显示预览组件
+  if (previewFile) {
+    return (
+      <>
+        <PreviewComponent
+          file={previewFile}
+          onBack={handleBack}
+          onDownload={handleDownloadInPreview}
+          onShare={(file, options) => {
+            if (onShare) {
+              onShare(file, {
+                anchorEl: options?.anchorEl,
+                origin: 'preview',
+              });
+            } else {
+              handleDefaultShare(file);
+            }
+          }}
+          onLocate={onLocate}
+          customContent={customPreviewContent || undefined}
+          customHeader={customPreviewHeader || undefined}
+          customActions={
+            typeof customActions === 'function'
+              ? customActions(previewFile)
+              : customActions
+          }
+          headerFileOverride={headerFileOverride || undefined}
+          markdownEditorProps={markdownEditorProps}
+        />
+        {ImagePreviewComponent}
+      </>
+    );
+  }
 
   // 统一的渲染逻辑 - 确保搜索框位置稳定
   return wrapSSR(
