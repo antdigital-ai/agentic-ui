@@ -225,7 +225,7 @@ describe('CodeToolbar', () => {
       expect(screen.getByText('Html Renderer')).toBeInTheDocument();
     });
 
-    it('应该为没有语言的代码显示 plain text', () => {
+    it('应该为没有语言的代码不显示语言标签', () => {
       const elementWithoutLanguage = { ...defaultElement, language: undefined };
       render(
         <CodeToolbar
@@ -236,7 +236,24 @@ describe('CodeToolbar', () => {
         />,
       );
 
-      expect(screen.getByText('plain text')).toBeInTheDocument();
+      expect(screen.queryByText('plain text')).not.toBeInTheDocument();
+    });
+
+    it('应该为 plain text 语言的代码不显示语言标签', () => {
+      const plainTextElement = {
+        ...defaultElement,
+        language: 'plain text' as any,
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={plainTextElement}
+          readonly={true}
+          isSelected={true}
+        />,
+      );
+
+      expect(screen.queryByText('plain text')).not.toBeInTheDocument();
     });
   });
 
