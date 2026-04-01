@@ -9,6 +9,8 @@ group:
 
 # Changelog
 
+> 🎉 **Milestone** · The first official website fully developed end-to-end by a designer (Hager) went live on 2026-04-01! Outstanding results — may this project sail smoothly, soar ever higher, and flourish for years to come! 🚀
+
 ## v2.30.12
 
 - MarkdownEditor / Plugins / CodeBlock
