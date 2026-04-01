@@ -61,6 +61,9 @@ const INPUT_FIELD_PADDING = {
   SMALL: `${GLOW_BORDER_OFFSET}px`,
 } as const;
 
+// MarkdownInputField 中 code block 的默认高度，避免初始占位过高
+const DEFAULT_INPUT_CODE_BLOCK_HEIGHT = 120;
+
 // 定义旋转动画
 const stopIconRotate = new Keyframes('stopIconRotate', {
   '0%': {
@@ -152,6 +155,7 @@ const genStyle: GenerateStyle<
         maxHeight: 400,
         height: '100%',
         overflowY: 'visible',
+        cursor: 'text',
         scrollbarColor: 'var(--color-gray-text-tertiary, #505c716b) transparent',
         scrollbarWidth: 'thin',
         '&&-disabled': {
@@ -162,6 +166,11 @@ const genStyle: GenerateStyle<
           margin: '0 !important',
           padding: '0 !important',
         },
+      },
+      // 仅覆盖 MarkdownInputField 内的代码块默认高度
+      '& [data-language][data-is-unclosed]': {
+        height: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
+        minHeight: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
       },
       '&-editor-content': {
         display: 'flex',

@@ -1,4 +1,4 @@
-import { memo, MutableRefObject, useContext, useRef } from 'react';
+import { memo, MutableRefObject, useContext, useMemo, useRef } from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
 import clsx from 'clsx';
@@ -8,11 +8,13 @@ import { WhiteBoxProcessInterface } from '../ThoughtChainList/types';
 import { BubbleAvatar } from './Avatar';
 import { BubbleBeforeNode } from './BubbleBeforeNode';
 import { BubbleConfigContext } from './BubbleConfigProvide';
+import { ContentFilemapView } from './ContentFilemapView';
 import { BubbleFileView } from './FileView';
 import { BubbleMessageDisplay } from './MessagesContent';
 import { MessagesContext } from './MessagesContent/BubbleContext';
 import { LOADING_FLAT } from './MessagesContent';
 import { BubbleExtra } from './MessagesContent/BubbleExtra';
+import { extractFilemapBlocks } from './extractFilemapBlocks';
 import { useStyle } from './style';
 import { BubbleTitle } from './Title';
 import type { BubbleMetaData, BubbleProps } from './type';
@@ -137,6 +139,17 @@ export const AIBubble: React.FC<
   const messageDisplayKey =
     messageDisplayKeyRef.current ?? id ?? nanoid();
 
+  const rawContent = props?.originData?.content as string | undefined;
+  const { blocks: filemapBlocks, stripped: strippedContent } = useMemo(
+    () =>
+      extractFilemapBlocks(
+        typeof rawContent === 'string' ? rawContent : '',
+      ),
+    [rawContent],
+  );
+
+  const contentForDisplay = filemapBlocks.length > 0 ? strippedContent : rawContent;
+
   const messageContent = (
     <BubbleMessageDisplay
       markdownRenderConfig={props.markdownRenderConfig}
@@ -144,7 +157,7 @@ export const AIBubble: React.FC<
       bubbleListRef={props.bubbleListRef}
       bubbleListItemExtraStyle={styles?.bubbleListItemExtraStyle}
       bubbleRef={props.bubbleRef}
-      content={props?.originData?.content}
+      content={contentForDisplay}
       key={messageDisplayKey}
       data-id={props?.originData?.id}
       avatar={props?.originData?.meta as BubbleMetaData}
@@ -167,34 +180,34 @@ export const AIBubble: React.FC<
       renderFileMoreAction={props.renderFileMoreAction}
       shouldShowVoice={props.shouldShowVoice}
       bubbleRenderConfig={props.bubbleRenderConfig}
-      contentAfterDom={
-        (props?.originData?.fileMap?.size || 0) > 0 ? (
-          <div
-            style={{
-              minWidth: standalone ? 'min(296px,100%)' : '0px',
-              paddingLeft: 12,
-              maxWidth: '100%',
-              width: '100%',
-              ...styles?.bubbleListItemExtraStyle,
-            }}
-            className={clsx(
-              `${prefixClass}-bubble-after`,
-              `${prefixClass}-bubble-after-${placement}`,
-              `${prefixClass}-bubble-after-ai`, // AI消息 after 特定样式
-              hashId,
-            )}
-            data-testid="message-after"
-          >
-            <BubbleFileView
-              placement={placement}
-              bubbleListRef={props.bubbleListRef}
-              bubble={props as any}
-            />
-          </div>
-        ) : null
-      }
     />
   );
+
+  const hasFileMap = (props?.originData?.fileMap?.size || 0) > 0;
+
+  const fileViewDom = hasFileMap ? (
+    <div
+      style={{
+        minWidth: standalone ? 'min(296px,100%)' : '0px',
+        paddingLeft: 12,
+        maxWidth: '100%',
+        ...styles?.bubbleListItemExtraStyle,
+      }}
+      className={clsx(
+        `${prefixClass}-bubble-after`,
+        `${prefixClass}-bubble-after-${placement}`,
+        `${prefixClass}-bubble-after-ai`,
+        hashId,
+      )}
+      data-testid="message-after"
+    >
+      <BubbleFileView
+        placement={placement}
+        bubbleListRef={props.bubbleListRef}
+        bubble={props as any}
+      />
+    </div>
+  ) : null;
 
   const childrenDom = runRender(
     bubbleRenderConfig?.contentRender,
@@ -337,9 +350,18 @@ export const AIBubble: React.FC<
                 {childrenDom}
               </div>
             ) : null}
+            {fileViewDom}
             {contentAfterDom}
           </div>
         </div>
+        {filemapBlocks.length > 0 && (
+          <ContentFilemapView
+            blocks={filemapBlocks}
+            fileViewConfig={props.fileViewConfig}
+            fileViewEvents={props.fileViewEvents}
+            placement={placement}
+          />
+        )}
       </Flex>
     </BubbleConfigContext.Provider>,
   );

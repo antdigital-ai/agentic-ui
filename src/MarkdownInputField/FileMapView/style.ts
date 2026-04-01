@@ -177,6 +177,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         font: 'var(--font-size-h6)',
         color: 'var(--color-gray-text-secondary)',
       },
+      '&-title': {
+        width: '100%',
+        color: 'var(--color-gray-text-light)',
+        font: 'var(--font-text-body-sm)',
+        lineHeight: '20px',
+        marginBottom: 2,
+      },
       '&-item': {
         width: '285px',
         height: '56px',

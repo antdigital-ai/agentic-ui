@@ -176,7 +176,19 @@ export const FileMapViewItem: React.FC<{
 
   // 有 status 但无 url/previewUrl：文件内容未拿到，展示大小与格式占位块（loading 状态除外）
   if (isFileMetaPlaceholderState(file)) {
-    return <FileMetaPlaceholder file={file} />;
+    return (
+      <FileMetaPlaceholder
+        file={file}
+        className={classNames(
+          props.className,
+          props.prefixCls ? `${props.prefixCls}-meta-placeholder` : undefined,
+        )}
+        style={{
+          height: 56,
+          ...props.style,
+        }}
+      />
+    );
   }
   return (
     <Tooltip

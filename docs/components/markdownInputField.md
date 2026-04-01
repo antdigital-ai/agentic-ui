@@ -300,18 +300,18 @@ export default () => {
 
 附件按钮配置属性。
 
-| 属性名               | 类型                                                               | 说明                                                |
-| -------------------- | ------------------------------------------------------------------ | --------------------------------------------------- |
-| `upload`             | `(file: AttachmentFile, index: number) => Promise<string>`         | 文件上传处理函数，返回文件 URL                      |
-| `uploadWithResponse` | `(file: AttachmentFile, index: number) => Promise<UploadResponse>` | 文件上传处理函数（返回完整响应），优先级高于 upload |
-| `fileMap`            | `Map<string, AttachmentFile>`                                      | 文件映射表，用于存储已上传的文件                    |
-| `onFileMapChange`    | `(files?: Map<string, AttachmentFile>) => void`                    | 文件映射表变更时的回调                              |
-| `supportedFormat`    | `SupportedFileFormats`                                             | 支持的文件格式配置                                  |
-| `disabled`           | `boolean`                                                          | 是否禁用按钮                                        |
-| `maxFileSize`        | `number`                                                           | 单个文件最大大小（字节）                            |
-| `maxFileCount`       | `number`                                                           | 最大文件数量                                        |
-| `allowMultiple`      | `boolean`                                                          | 是否允许一次选择多个文件（默认：true）              |
-| `onExceedMaxCount`   | `(info: { maxCount: number; currentCount: number; selectedCount: number }) => void` | 文件数量超出 maxFileCount 限制时的回调 |
+| 属性名               | 类型                                                                                | 说明                                                |
+| -------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `upload`             | `(file: AttachmentFile, index: number) => Promise<string>`                          | 文件上传处理函数，返回文件 URL                      |
+| `uploadWithResponse` | `(file: AttachmentFile, index: number) => Promise<UploadResponse>`                  | 文件上传处理函数（返回完整响应），优先级高于 upload |
+| `fileMap`            | `Map<string, AttachmentFile>`                                                       | 文件映射表，用于存储已上传的文件                    |
+| `onFileMapChange`    | `(files?: Map<string, AttachmentFile>) => void`                                     | 文件映射表变更时的回调                              |
+| `supportedFormat`    | `SupportedFileFormats`                                                              | 支持的文件格式配置                                  |
+| `disabled`           | `boolean`                                                                           | 是否禁用按钮                                        |
+| `maxFileSize`        | `number`                                                                            | 单个文件最大大小（字节）                            |
+| `maxFileCount`       | `number`                                                                            | 最大文件数量                                        |
+| `allowMultiple`      | `boolean`                                                                           | 是否允许一次选择多个文件（默认：true）              |
+| `onExceedMaxCount`   | `(info: { maxCount: number; currentCount: number; selectedCount: number }) => void` | 文件数量超出 maxFileCount 限制时的回调              |
 
 #### SkillModeConfig
 
@@ -848,7 +848,7 @@ export default () => {
 - `iShowBackTo` - 是否显示到顶到底
 - `operationBtnRender` - 自定义操作按钮渲染函数，用于在便捷操作区中添加自定义按钮
 
-```tsx
+````tsx
 import { Space, message } from 'antd';
 import { AimOutlined, GlobalOutlined, EditOutlined } from '@ant-design/icons';
 import { Sparkles, ChevronDown } from '@sofa-design/icons';
@@ -881,7 +881,7 @@ const createRecognizer: CreateRecognizer = async ({ onPartial, onError }) => {
 };
 export default () => {
   const [value, setValue] = React.useState(
-    '输入多行文本效果，输入多行文本效果，输入多行文本效果，输入多行文本效果，输入多行文本效果，输入多行文本效果，输入多行文本效果，输入多行文本效果，输入多行文本效果，输入多行文本',
+    '帮我创建一个定时任务。请根据我的描述: `${placeholder:任务名称}` 、 `${placeholder:执行频率}` ，内容如下： \n ```markdown  \n任务内容\n``` \n 帮我生成合适的定时任务配置。',
   );
 
   const markdownRef = React.useRef<MarkdownEditorInstance>(null);
@@ -1003,7 +1003,7 @@ export default () => {
     </div>
   );
 };
-```
+````
 
 ### 启用附件功能
 

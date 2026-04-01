@@ -36,6 +36,11 @@ const mockEditor = vi.hoisted(() => ({
   },
   session: {
     setMode: vi.fn(),
+    insert: vi.fn(),
+    getDocument: vi.fn(() => ({
+      getLength: vi.fn(() => 1),
+      getLine: vi.fn(() => 'abc'),
+    })),
   },
   commands: {
     addCommand: vi.fn(),
@@ -499,6 +504,74 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
 
     expect(mockEditor.setValue).toHaveBeenCalledWith('updated from outside');
     expect(mockEditor.clearSelection).toHaveBeenCalled();
+  });
+
+  it('流式追加时使用 session.insert 而不是 setValue', async () => {
+    function Wrapper({ value }: { value: string }) {
+      const result = AceEditor({
+        ...defaultProps,
+        element: { ...defaultProps.element, value },
+      });
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { rerender } = render(<Wrapper value="abc" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.setValue.mockClear();
+    mockEditor.session.insert.mockClear();
+
+    rerender(<Wrapper value="abcdef" />);
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mockEditor.session.insert).toHaveBeenCalledWith(
+      { row: 0, column: 3 },
+      'def',
+    );
+    expect(mockEditor.setValue).not.toHaveBeenCalled();
+  });
+
+  it('readonly 模式卸载时正确销毁 Ace 编辑器', async () => {
+    const prevReadonly = mockEditorStore.readonly;
+    mockEditorStore.readonly = true;
+
+    function Wrapper() {
+      const result = AceEditor(defaultProps);
+      return (
+        <div ref={result.dom}>
+          <textarea aria-label="ace" />
+        </div>
+      );
+    }
+
+    const { unmount } = render(<Wrapper />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(25);
+      await Promise.resolve();
+    });
+
+    mockEditor.destroy.mockClear();
+    unmount();
+    expect(mockEditor.destroy).toHaveBeenCalled();
+
+    mockEditorStore.readonly = prevReadonly;
   });
 
   it('setLanguage 与当前语言相同时提前返回', async () => {

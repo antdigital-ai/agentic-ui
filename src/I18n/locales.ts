@@ -333,6 +333,8 @@ export const cnLabels = {
   'suggestion.followUp': '追问',
   // MarkdownInputField related
   'input.fileUpload': '文件上传',
+  'input.attachmentListTitle': '上传附件',
+  'chat.fileMapTitle': '结果文件',
   'input.voiceInput': '语音输入',
   'input.voiceInputting': '语音输入中，点击可停止。',
   'input.placeholder': '请输入',
@@ -768,7 +770,9 @@ export const enLabels: typeof cnLabels = {
   'suggestion.select': 'Select suggestion',
   'suggestion.followUp': 'Follow-up',
   // MarkdownInputField related
-  'input.fileUpload': 'File upload',
+  'input.fileUpload': 'Upload attachments',
+  'input.attachmentListTitle': 'Uploaded attachments',
+  'chat.fileMapTitle': 'Result files',
   'input.voiceInput': 'Voice input',
   'input.voiceInputting': 'Voice input in progress, click to stop.',
   'input.placeholder': 'Please input',
