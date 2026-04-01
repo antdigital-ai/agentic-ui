@@ -196,7 +196,6 @@ export class FileTypeProcessor {
       FileCategory.Video,
       FileCategory.Audio,
       FileCategory.PDF,
-      FileCategory.Archive,
     ].includes(typeInference.category);
   }
 
@@ -223,8 +222,6 @@ export class FileTypeProcessor {
         return 'inline';
       case FileCategory.PDF:
         return 'inline';
-      case FileCategory.Archive:
-        return 'modal';
       default:
         return 'external';
     }

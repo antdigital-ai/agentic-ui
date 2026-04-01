@@ -58,7 +58,6 @@ export interface TaskProps extends BaseChildProps {
   onItemClick?: (item: TaskItem) => void;
 }
 
-// ... (rest of the file content unchanged)
 // 文件类型分类
 export enum FileCategory {
   Text = 'text',
@@ -112,19 +111,32 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
   },
   video: {
     category: FileCategory.Video,
-    extensions: ['mp4', 'webm', 'ogg'],
-    mimeTypes: ['video/mp4', 'video/webm', 'video/ogg'],
+    extensions: ['mp4', 'webm', 'ogv', 'mov', 'avi', 'mkv', 'flv', '3gp', 'm4v'],
+    mimeTypes: [
+      'video/mp4',
+      'video/webm',
+      'video/ogg',
+      'video/quicktime',
+      'video/x-msvideo',
+      'video/x-matroska',
+      'video/x-flv',
+      'video/3gpp',
+      'video/x-m4v',
+    ],
     nameKey: 'fileType.video',
   },
   audio: {
     category: FileCategory.Audio,
-    extensions: ['mp3', 'wav', 'ogg', 'aac', 'm4a'],
+    extensions: ['mp3', 'wav', 'ogg', 'aac', 'm4a', 'flac', 'wma', 'opus'],
     mimeTypes: [
       'audio/mpeg',
       'audio/wav',
       'audio/ogg',
       'audio/aac',
       'audio/mp4',
+      'audio/flac',
+      'audio/x-ms-wma',
+      'audio/opus',
     ],
     nameKey: 'fileType.audio',
   },

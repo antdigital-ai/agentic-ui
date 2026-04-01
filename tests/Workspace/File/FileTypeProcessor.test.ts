@@ -171,7 +171,7 @@ describe('FileTypeProcessor', () => {
     });
 
     it('应该处理各种视频类型', () => {
-      const extensions = ['mp4', 'webm', 'ogg'];
+      const extensions = ['mp4', 'webm', 'ogv'];
 
       extensions.forEach((ext) => {
         const file = { id: `f-${ext}`, name: `video.${ext}` };
@@ -432,7 +432,7 @@ describe('FileTypeProcessor', () => {
       expect(result.previewMode).toBe('none');
     });
 
-    it('有内容的压缩文件应返回 modal 预览模式', () => {
+    it('有内容的压缩文件不可预览', () => {
       const file = {
         id: 'f1',
         name: 'archive.zip',
@@ -440,8 +440,8 @@ describe('FileTypeProcessor', () => {
       };
       const result = processor.processFile(file);
       expect(result.typeInference.category).toBe(FileCategory.Archive);
-      expect(result.canPreview).toBe(true);
-      expect(result.previewMode).toBe('modal');
+      expect(result.canPreview).toBe(false);
+      expect(result.previewMode).toBe('none');
     });
 
     it('有内容的视频文件应返回 inline 预览模式 (223)', () => {
