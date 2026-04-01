@@ -180,6 +180,7 @@ const genStyle: GenerateStyle<
         minHeight: 0,
         borderRadius: 'inherit',
         overflow: 'hidden',
+        position: 'relative',
         [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
           padding: `${MOBILE_PADDING} !important`,
         },
@@ -196,6 +197,25 @@ const genStyle: GenerateStyle<
       },
       '&-loading': {
         cursor: 'not-allowed',
+      },
+      '&-typing-hint': {
+        position: 'absolute',
+        left: 'var(--padding-3x)',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        pointerEvents: 'none',
+        zIndex: 10,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        color: 'rgba(0,0,0,0.35)',
+        fontSize: 13,
+        userSelect: 'none',
+      },
+      '&-typing-hint-dots': {
+        display: 'inline-flex',
+        gap: 3,
+        alignItems: 'center',
       },
       '&-send-tools': {
         boxSizing: 'border-box',

@@ -2,6 +2,8 @@ import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useState } from 'react';
 import { BaseMarkdownEditor } from '../MarkdownEditor';
+import { TextLoading } from '../Components/lotties/TextLoading';
+import { useLocale } from '../I18n';
 import { BorderBeamAnimation } from './BorderBeamAnimation';
 import { useFileUploadManager } from './FileUploadManager';
 import { useMarkdownInputFieldActions } from './hooks/useMarkdownInputFieldActions';
@@ -85,6 +87,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const baseCls = getPrefixCls('agentic-md-input-field');
   const { wrapSSR, hashId } = useStyle(baseCls, props.disableHoverAnimation);
+  const locale = useLocale();
 
   // 状态管理
   const {
@@ -366,6 +369,19 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
               data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.EDITOR_CONTENT}
             >
               {attachmentList}
+
+              {(props.typing || isLoading) && !value && (
+                <div
+                  className={classNames(`${baseCls}-typing-hint`, hashId)}
+                  aria-live="polite"
+                  aria-label={locale['input.typing.hint']}
+                >
+                  <TextLoading
+                    text={locale['input.typing.hint']}
+                    fontSize={13}
+                  />
+                </div>
+              )}
 
               <BaseMarkdownEditor
                 editorRef={markdownEditorRef}
