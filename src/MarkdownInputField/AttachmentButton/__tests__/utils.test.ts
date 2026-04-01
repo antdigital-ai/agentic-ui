@@ -26,14 +26,14 @@ describe('AttachmentButton utils', () => {
     ).toBe(false);
   });
 
-  it('should not treat error files as FileMetaPlaceholder', () => {
+  it('should treat error files without urls as FileMetaPlaceholder (FileMapView uses this)', () => {
     expect(
       isFileMetaPlaceholderState({
         status: 'error',
         url: undefined,
         previewUrl: undefined,
       } as File),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it('should treat done files without urls as FileMetaPlaceholder', () => {

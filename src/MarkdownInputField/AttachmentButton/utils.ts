@@ -121,7 +121,6 @@ export const isAttachmentFileLoading = (status?: string | null): boolean =>
  * 是否应该展示 FileMetaPlaceholder：
  * - 有状态
  * - 非 loading（uploading/pending）
- * - 非错误状态（error 应展示失败 UI，不走占位符）
  * - 且没有可预览 URL
  */
 export const isFileMetaPlaceholderState = (
@@ -130,7 +129,6 @@ export const isFileMetaPlaceholderState = (
   file.status !== undefined &&
   file.status !== null &&
   !isAttachmentFileLoading(file.status) &&
-  file.status !== 'error' &&
   !file.url &&
   !(file as { previewUrl?: string }).previewUrl;
 

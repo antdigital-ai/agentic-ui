@@ -170,7 +170,8 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   };
 
   // 有 status 但无 url/previewUrl：文件内容未拿到，展示大小与格式占位块
-  if (isFileMetaPlaceholderState(file)) {
+  // 注意：error 状态不走占位符，直接在下面的 file-item 中展示失败 UI
+  if (!isErrorStatus && isFileMetaPlaceholderState(file)) {
     return <FileMetaPlaceholder file={file} className={className} />;
   }
 
