@@ -26,10 +26,20 @@ describe('AttachmentButton utils', () => {
     ).toBe(false);
   });
 
-  it('should treat non-loading files without urls as FileMetaPlaceholder', () => {
+  it('should not treat error files as FileMetaPlaceholder', () => {
     expect(
       isFileMetaPlaceholderState({
         status: 'error',
+        url: undefined,
+        previewUrl: undefined,
+      } as File),
+    ).toBe(false);
+  });
+
+  it('should treat done files without urls as FileMetaPlaceholder', () => {
+    expect(
+      isFileMetaPlaceholderState({
+        status: 'done',
         url: undefined,
         previewUrl: undefined,
       } as File),
