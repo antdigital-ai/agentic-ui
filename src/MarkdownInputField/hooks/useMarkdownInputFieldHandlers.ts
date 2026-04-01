@@ -1,7 +1,9 @@
 import React from 'react';
 import { Editor, Transforms } from 'slate';
+import { ReactEditor } from 'slate-react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
+import { EditorUtils } from '../../MarkdownEditor/editor/utils/editorUtils';
 import { upLoadFileToServer } from '../AttachmentButton';
 import type { AttachmentFile } from '../AttachmentButton/types';
 import { isMobileDevice } from '../AttachmentButton/utils';
@@ -206,6 +208,33 @@ export const useMarkdownInputFieldHandlers = ({
     },
   );
 
+  const handleContainerClick = useRefFunction(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (props.disabled) return;
+
+      const editor = markdownEditorRef?.current?.markdownEditorRef?.current;
+      if (!editor) return;
+
+      try {
+        if (ReactEditor.isFocused(editor)) return;
+      } catch {
+        // ignore
+      }
+
+      const target = e.target as HTMLElement;
+      const isInteractive =
+        target.closest('button') ||
+        target.closest('a') ||
+        target.closest('input') ||
+        target.closest('[contenteditable="true"]');
+      if (isInteractive) return;
+
+      EditorUtils.focus(editor);
+      const end = Editor.end(editor, []);
+      Transforms.select(editor, end);
+    },
+  );
+
   const activeInput = useRefFunction((active: boolean) => {
     if (inputRef.current) {
       if (active) {
@@ -223,6 +252,7 @@ export const useMarkdownInputFieldHandlers = ({
     sendMessage,
     handlePaste,
     handleKeyDown,
+    handleContainerClick,
     activeInput,
   };
 };

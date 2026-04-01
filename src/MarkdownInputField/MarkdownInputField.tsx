@@ -192,6 +192,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     sendMessage,
     handlePaste,
     handleKeyDown,
+    handleContainerClick,
     activeInput,
   } = useMarkdownInputFieldHandlers({
     props: {
@@ -329,6 +330,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
           tabIndex={1}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
+          onClick={handleContainerClick}
           onKeyDown={handleKeyDown}
         >
           <BorderBeamAnimation
