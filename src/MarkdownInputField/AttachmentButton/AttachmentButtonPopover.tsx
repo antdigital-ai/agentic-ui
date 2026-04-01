@@ -11,11 +11,10 @@ import React, { useContext, useMemo, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { LocalKeys } from '../../I18n';
 import { compileTemplate, I18nContext } from '../../I18n';
-import { isMobileDevice, isVivoOrOppoDevice, kbToSize } from './utils';
+import { isMobileDevice, isVivoOrOppoDevice } from './utils';
 
 export type SupportedFormat = {
   type: string;
-  maxSize: number;
   extensions: string[];
   icon: React.ReactNode;
   content?: React.ReactNode;
@@ -26,16 +25,9 @@ export type AttachmentButtonPopoverProps = {
   supportedFormat?: SupportedFormat;
   /** 上传图片的处理函数 */
   uploadImage?: (forGallery?: boolean) => Promise<void>;
-  /** 国际化文案，可覆盖 I18n 上下文中的配置。支持 `input.openGallery`、`input.openFile`、`input.supportedFormatMessage`（模板变量：${maxSize}、${extensions}）等 */
+  /** 国际化文案，可覆盖 I18n 上下文中的配置。支持 `input.openGallery`、`input.openFile`、`input.supportedFormatMessage`（模板变量：${extensions}）等 */
   locale?: Partial<LocalKeys>;
 };
-
-const FILE_SIZE_UNITS = {
-  KB: 1024,
-  MB: 1024 * 1024,
-};
-
-const DEFAULT_MAX_SIZE = 5000;
 
 const CONTENT_STYLE: React.CSSProperties = {
   fontSize: 16,
@@ -47,13 +39,11 @@ export const SupportedFileFormats = {
   image: {
     icon: <FileImageOutlined />,
     type: '图片',
-    maxSize: 10 * FILE_SIZE_UNITS.KB,
     extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'],
   },
   document: {
     icon: <FileTextFilled />,
     type: '文档',
-    maxSize: 10 * FILE_SIZE_UNITS.KB,
     extensions: [
       'pdf',
       'markdown',
@@ -70,29 +60,25 @@ export const SupportedFileFormats = {
   audio: {
     icon: <AudioOutlined />,
     type: '音频',
-    maxSize: 50 * FILE_SIZE_UNITS.KB,
     extensions: ['mp3', 'wav'],
   },
   video: {
     icon: <VideoCameraOutlined />,
     type: '视频',
-    maxSize: 100 * FILE_SIZE_UNITS.KB,
     extensions: ['mp4', 'avi', 'mov'],
   },
 };
 
-const DEFAULT_FORMAT_MESSAGE =
-  '每个文件不超过 ${maxSize}，支持 ${extensions}等格式。';
+const DEFAULT_FORMAT_MESSAGE = '支持 ${extensions}等格式。';
 
 const buildFormatMessage = (
   format: SupportedFormat,
   locale?: Partial<LocalKeys>,
 ) => {
-  const maxSize = kbToSize(format.maxSize || DEFAULT_MAX_SIZE);
   const extensions = format.extensions?.join(', ') || '';
   const template =
     locale?.['input.supportedFormatMessage'] ?? DEFAULT_FORMAT_MESSAGE;
-  return compileTemplate(template, { maxSize, extensions });
+  return compileTemplate(template, { extensions });
 };
 
 const FormatContent: React.FC<{

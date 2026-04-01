@@ -1188,7 +1188,6 @@ uploadWithResponse?: (
 | 参数       | 说明                 | 类型              | 默认值 | 版本 |
 | ---------- | -------------------- | ----------------- | ------ | ---- |
 | type       | 文件类型名称         | `string`          | -      | -    |
-| maxSize    | 最大文件大小（KB）   | `number`          | -      | -    |
 | extensions | 支持的文件扩展名数组 | `string[]`        | -      | -    |
 | icon       | 文件类型图标         | `React.ReactNode` | -      | -    |
 

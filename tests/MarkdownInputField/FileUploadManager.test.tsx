@@ -151,7 +151,6 @@ describe('useFileUploadManager', () => {
     it('应该使用正确的文件格式配置', () => {
       const customFormat = {
         extensions: ['.pdf', '.doc'],
-        maxSize: 10 * 1024 * 1024,
       };
 
       const { result } = renderHook(

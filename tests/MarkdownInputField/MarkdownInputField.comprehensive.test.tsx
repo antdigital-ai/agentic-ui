@@ -226,7 +226,7 @@ describe('MarkdownInputField Comprehensive Tests', () => {
             {
               enable: true,
               accept: '.pdf,.doc',
-              maxSize: 1024 * 1024,
+              maxFileSize: 1024 * 1024,
             } as any
           }
         />,
@@ -259,7 +259,7 @@ describe('MarkdownInputField Comprehensive Tests', () => {
               enable: true,
               upload: onUpload,
               accept: '.pdf,.doc',
-              maxSize: 1024 * 1024,
+              maxFileSize: 1024 * 1024,
             } as any
           }
         />,

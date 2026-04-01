@@ -507,7 +507,6 @@ describe('AttachmentButton', () => {
       const customFormats = {
         icon: <span>Custom Icon</span>,
         type: 'Custom Type',
-        maxSize: 5 * 1024,
         extensions: ['custom'],
       };
 
@@ -587,7 +586,6 @@ describe('AttachmentButton', () => {
       const customFormat = {
         icon: <span>Test Icon</span>,
         type: 'Test Type',
-        maxSize: 1024,
         extensions: ['test'],
       };
 
@@ -728,7 +726,6 @@ describe('AttachmentButton', () => {
       const customFormat = {
         icon: <span>Image Icon</span>,
         type: 'Image',
-        maxSize: 5120,
         extensions: ['jpg', 'png'],
       };
 
@@ -767,7 +764,6 @@ describe('AttachmentButton', () => {
 
       const customFormat = {
         type: 'Document',
-        maxSize: 10240,
         extensions: ['pdf', 'doc'],
         icon: <span>Doc Icon</span>,
       };
