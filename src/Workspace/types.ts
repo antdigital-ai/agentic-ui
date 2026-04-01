@@ -78,7 +78,8 @@ export interface FileTypeDefinition {
   category: FileCategory;
   extensions: string[];
   mimeTypes: string[];
-  name: string;
+  /** Locale key for the file type display name (e.g. 'fileType.plainText') */
+  nameKey: string;
 }
 
 // 文件类型注册表
@@ -87,13 +88,13 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
     category: FileCategory.Text,
     extensions: ['txt'],
     mimeTypes: ['text/plain'],
-    name: '文本文件',
+    nameKey: 'fileType.plainText',
   },
   markdown: {
     category: FileCategory.Text,
     extensions: ['md', 'markdown'],
     mimeTypes: ['text/markdown'],
-    name: 'Markdown',
+    nameKey: 'markdown',
   },
   image: {
     category: FileCategory.Image,
@@ -106,13 +107,13 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
       'image/webp',
       'image/svg+xml',
     ],
-    name: '图片',
+    nameKey: 'fileType.image',
   },
   video: {
     category: FileCategory.Video,
     extensions: ['mp4', 'webm', 'ogg'],
     mimeTypes: ['video/mp4', 'video/webm', 'video/ogg'],
-    name: '视频',
+    nameKey: 'fileType.video',
   },
   audio: {
     category: FileCategory.Audio,
@@ -124,13 +125,13 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
       'audio/aac',
       'audio/mp4',
     ],
-    name: '音频',
+    nameKey: 'fileType.audio',
   },
   pdf: {
     category: FileCategory.PDF,
     extensions: ['pdf'],
     mimeTypes: ['application/pdf'],
-    name: 'PDF文档',
+    nameKey: 'fileType.pdf',
   },
   word: {
     category: FileCategory.Word,
@@ -139,7 +140,7 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     ],
-    name: 'Word文档',
+    nameKey: 'fileType.word',
   },
   excel: {
     category: FileCategory.Excel,
@@ -148,13 +149,13 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
       'application/vnd.ms-excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ],
-    name: 'Excel表格',
+    nameKey: 'fileType.excel',
   },
   csv: {
     category: FileCategory.Excel,
     extensions: ['csv'],
     mimeTypes: ['text/csv', 'application/csv', 'application/vnd.ms-excel'],
-    name: 'CSV文件',
+    nameKey: 'fileType.csv',
   },
   archive: {
     category: FileCategory.Archive,
@@ -167,116 +168,116 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
       'application/gzip',
       'application/x-bzip2',
     ],
-    name: '压缩文件',
+    nameKey: 'fileType.archive',
   },
   // 代码文件类型
   javascript: {
     category: FileCategory.Code,
     extensions: ['js', 'mjs', 'cjs'],
     mimeTypes: ['text/javascript', 'application/javascript'],
-    name: 'JavaScript',
+    nameKey: 'javascript',
   },
   typescript: {
     category: FileCategory.Code,
     extensions: ['ts'],
     mimeTypes: ['text/typescript', 'application/typescript'],
-    name: 'TypeScript',
+    nameKey: 'typescript',
   },
   react: {
     category: FileCategory.Code,
     extensions: ['jsx', 'tsx'],
     mimeTypes: ['text/jsx', 'text/tsx'],
-    name: 'React',
+    nameKey: 'react',
   },
   python: {
     category: FileCategory.Code,
     extensions: ['py', 'pyw', 'pyi'],
     mimeTypes: ['text/x-python', 'application/x-python-code'],
-    name: 'Python',
+    nameKey: 'python',
   },
   java: {
     category: FileCategory.Code,
     extensions: ['java'],
     mimeTypes: ['text/x-java-source'],
-    name: 'Java',
+    nameKey: 'java',
   },
   cpp: {
     category: FileCategory.Code,
     extensions: ['cpp', 'cc', 'cxx', 'c++', 'hpp', 'hxx', 'h++'],
     mimeTypes: ['text/x-c++src', 'text/x-c++hdr'],
-    name: 'C++',
+    nameKey: 'c++',
   },
   c: {
     category: FileCategory.Code,
     extensions: ['c', 'h'],
     mimeTypes: ['text/x-csrc', 'text/x-chdr'],
-    name: 'C',
+    nameKey: 'c',
   },
   csharp: {
     category: FileCategory.Code,
     extensions: ['cs'],
     mimeTypes: ['text/x-csharp'],
-    name: 'C#',
+    nameKey: 'c#',
   },
   go: {
     category: FileCategory.Code,
     extensions: ['go'],
     mimeTypes: ['text/x-go'],
-    name: 'Go',
+    nameKey: 'go',
   },
   rust: {
     category: FileCategory.Code,
     extensions: ['rs'],
     mimeTypes: ['text/x-rust'],
-    name: 'Rust',
+    nameKey: 'rust',
   },
   php: {
     category: FileCategory.Code,
     extensions: ['php', 'php3', 'php4', 'php5', 'phtml'],
     mimeTypes: ['text/x-php', 'application/x-httpd-php'],
-    name: 'PHP',
+    nameKey: 'php',
   },
   ruby: {
     category: FileCategory.Code,
     extensions: ['rb', 'rbw'],
     mimeTypes: ['text/x-ruby'],
-    name: 'Ruby',
+    nameKey: 'ruby',
   },
   shell: {
     category: FileCategory.Code,
     extensions: ['sh', 'bash', 'zsh', 'fish'],
     mimeTypes: ['text/x-shellscript', 'application/x-sh'],
-    name: 'Shell脚本',
+    nameKey: 'fileType.shell',
   },
   powershell: {
     category: FileCategory.Code,
     extensions: ['ps1', 'psm1', 'psd1'],
     mimeTypes: ['text/x-powershell'],
-    name: 'PowerShell',
+    nameKey: 'powershell',
   },
   sql: {
     category: FileCategory.Code,
     extensions: ['sql'],
     mimeTypes: ['text/x-sql', 'application/sql'],
-    name: 'SQL',
+    nameKey: 'sql',
   },
   lua: {
     category: FileCategory.Code,
     extensions: ['lua'],
     mimeTypes: ['text/x-lua'],
-    name: 'Lua',
+    nameKey: 'lua',
   },
   perl: {
     category: FileCategory.Code,
     extensions: ['pl', 'pm', 'perl'],
     mimeTypes: ['text/x-perl'],
-    name: 'Perl',
+    nameKey: 'perl',
   },
   scala: {
     category: FileCategory.Code,
     extensions: ['scala', 'sc'],
     mimeTypes: ['text/x-scala'],
-    name: 'Scala',
+    nameKey: 'scala',
   },
   config: {
     category: FileCategory.Code,
@@ -298,7 +299,7 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
       'text/plain',
       'application/x-wine-extension-ini',
     ],
-    name: '配置文件',
+    nameKey: 'fileType.config',
   },
 } as const;
 
@@ -517,4 +518,17 @@ export const getMimeType = (fileType: FileType): string => {
 
 export const getFileCategory = (fileType: FileType): FileCategory => {
   return FILE_TYPES?.[fileType]?.category;
+};
+
+/**
+ * Get the localized display name for a file type.
+ * Falls back to the nameKey itself when no locale is provided.
+ */
+export const getFileTypeName = (
+  fileType: FileType,
+  locale?: Record<string, string>,
+): string => {
+  const definition = FILE_TYPES[fileType];
+  if (!definition) return fileType;
+  return locale?.[definition.nameKey] ?? definition.nameKey;
 };

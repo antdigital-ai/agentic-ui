@@ -273,7 +273,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
         .then(setReadyContent)
         .catch((err) => {
           const errorMessage =
-            err instanceof Error ? err.message : '加载文本内容失败';
+            err instanceof Error ? err.message : (locale?.['common.loadTextFailed'] || '加载文本内容失败');
           setContentState({ status: 'error', error: errorMessage });
           console.error('加载文本内容失败:', err);
         });
@@ -475,7 +475,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                     hashId,
                   )}
                 >
-                  此文件无法预览，请下载查看。
+                  {locale?.['workspace.file.unsupportedPreview'] || '此文件无法预览，请下载查看。'}
                 </div>
                 <Button
                   color="default"
@@ -484,7 +484,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                   onClick={handleDownload}
                   aria-label={locale?.['workspace.file.download'] || '下载'}
                 >
-                  下载
+                  {locale?.['workspace.file.downloadButton'] || '下载'}
                 </Button>
               </>
             )}
@@ -584,7 +584,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
             preload="metadata"
           >
             <track kind="captions" />
-            您的浏览器不支持视频播放
+            {locale?.['workspace.file.videoNotSupported'] || '您的浏览器不支持视频播放'}
           </video>
         ),
         audio: (
@@ -595,7 +595,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
             controlsList="nodownload"
             preload="metadata"
           >
-            您的浏览器不支持音频播放
+            {locale?.['workspace.file.audioNotSupported'] || '您的浏览器不支持音频播放'}
           </audio>
         ),
         pdf: (
@@ -636,7 +636,7 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
             <p>
               {locale?.['workspace.file.unknownFileType'] || '未知的文件类型'}
             </p>
-            <p>文件类型：{typeInference.fileType}</p>
+            <p>{locale?.['workspace.file.fileType'] || '文件类型：'}{typeInference.fileType}</p>
           </PlaceholderContent>
         );
     }
