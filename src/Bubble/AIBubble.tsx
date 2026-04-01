@@ -359,6 +359,7 @@ export const AIBubble: React.FC<
             blocks={filemapBlocks}
             fileViewConfig={props.fileViewConfig}
             fileViewEvents={props.fileViewEvents}
+            fileMapConfig={props.markdownRenderConfig?.fileMapConfig}
             placement={placement}
           />
         )}
