@@ -394,6 +394,50 @@ describe('MarkdownInputField - voiceInput', () => {
   });
 });
 
+describe('MarkdownInputField - click to focus', () => {
+  it('should have onClick handler on the container', () => {
+    render(<MarkdownInputField />);
+    const container = screen.getByTestId('markdown-input-field');
+    expect(container).toBeInTheDocument();
+    expect(container.getAttribute('tabindex')).toBe('1');
+  });
+
+  it('should not focus editor when disabled', () => {
+    render(<MarkdownInputField disabled />);
+    const container = screen.getByTestId('markdown-input-field');
+    fireEvent.click(container);
+    expect(container).toHaveClass('ant-agentic-md-input-field-disabled');
+  });
+
+  it('should allow clicking on the editor area', () => {
+    render(<MarkdownInputField />);
+    const editorContent = screen.getByTestId(
+      'markdown-input-field-editor-content',
+    );
+    expect(editorContent).toBeInTheDocument();
+    fireEvent.click(editorContent);
+  });
+
+  it('should not interfere with button clicks inside container', () => {
+    const onToolClick = vi.fn();
+    const toolsRender = () => [
+      <button
+        key="tool"
+        data-testid="inner-tool-btn"
+        onClick={onToolClick}
+        type="button"
+      >
+        Tool
+      </button>,
+    ];
+
+    render(<MarkdownInputField toolsRender={toolsRender} />);
+    const toolButton = screen.getByTestId('inner-tool-btn');
+    fireEvent.click(toolButton);
+    expect(onToolClick).toHaveBeenCalled();
+  });
+});
+
 describe('MarkdownInputField - allowEmptySubmit', () => {
   it('should not call onSend when empty by default', () => {
     const onSend = vi.fn();
