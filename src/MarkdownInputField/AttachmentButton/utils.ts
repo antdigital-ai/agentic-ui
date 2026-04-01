@@ -1,3 +1,5 @@
+import type { AttachmentFile } from './types';
+
 /**
  * 将KB转换为可读的文件大小格式
  * 支持从字节（B）到TB的所有单位，最小单位为B
@@ -114,8 +116,9 @@ export const isMediaFile = (file: File): boolean =>
 /**
  * 是否为「仅元信息占位」状态：有 status 但无 url/previewUrl，内容未拿到时整行以 FileMetaPlaceholder 风格展示
  */
-export const isAttachmentFileLoading = (status?: string | null): boolean =>
-  status === 'uploading' || status === 'pending';
+export const isAttachmentFileLoading = (
+  status?: AttachmentFile['status'] | null,
+): boolean => status === 'uploading' || status === 'pending';
 
 /**
  * 是否应该展示 FileMetaPlaceholder：
@@ -123,14 +126,12 @@ export const isAttachmentFileLoading = (status?: string | null): boolean =>
  * - 非 loading（uploading/pending）
  * - 且没有可预览 URL
  */
-export const isFileMetaPlaceholderState = (
-  file: File & { status?: string; url?: string; previewUrl?: string },
-): boolean =>
+export const isFileMetaPlaceholderState = (file: AttachmentFile): boolean =>
   file.status !== undefined &&
   file.status !== null &&
   !isAttachmentFileLoading(file.status) &&
   !file.url &&
-  !(file as { previewUrl?: string }).previewUrl;
+  !file.previewUrl;
 
 /**
  * 设备品牌匹配列表
