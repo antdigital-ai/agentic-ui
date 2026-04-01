@@ -283,6 +283,10 @@ export const upLoadFileToServer = async (
 ) => {
   const map = props.fileMap || new Map<string, AttachmentFile>();
   const existingFileCount = map.size;
+  // Always notify with a new Map reference so React state setters always trigger re-renders,
+  // regardless of whether the caller wraps the callback or passes a raw setState directly.
+  const notifyChange = (m: Map<string, AttachmentFile>) =>
+    props.onFileMapChange?.(new Map(m));
   const hideLoading = () => {};
 
   const fileList = Array.from(files) as AttachmentFile[];
@@ -293,6 +297,10 @@ export const upLoadFileToServer = async (
     typeof props.maxFileCount === 'number' && totalCount > props.maxFileCount;
   const isMinNotMet =
     typeof props.minFileCount === 'number' && totalCount < props.minFileCount;
+
+  // Wrap all internal change notifications to use notifyChange so every update
+  // produces a new Map reference that React's state setter will always accept.
+  const propsWithNotify: UploadProps = { ...props, onFileMapChange: notifyChange };
 
   if (isMaxExceeded || isMinNotMet) {
     hideLoading();
@@ -310,7 +318,7 @@ export const upLoadFileToServer = async (
         file.errorMessage = errorMessage;
         if (file.uuid) map.set(file.uuid, file);
       });
-      props.onFileMapChange?.(map);
+      notifyChange(map);
       props.onExceedMaxCount?.({
         maxCount,
         currentCount: existingFileCount,
@@ -321,16 +329,16 @@ export const upLoadFileToServer = async (
   }
 
   // 验证通过后再添加到 fileMap
-  fileList.forEach((file) => updateFileMap(map, file, props.onFileMapChange));
+  fileList.forEach((file) => updateFileMap(map, file, notifyChange));
 
   try {
     for (let i = 0; i < fileList.length; i++) {
-      await processFile(fileList[i], i, map, props);
+      await processFile(fileList[i], i, map, propsWithNotify);
     }
   } catch (error) {
     fileList.forEach((file) => {
       file.status = 'error';
-      updateFileMap(map, file, props.onFileMapChange);
+      updateFileMap(map, file, notifyChange);
     });
   } finally {
     hideLoading();
