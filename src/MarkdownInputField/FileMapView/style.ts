@@ -27,7 +27,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-vertical': {
         display: 'flex',
-        flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'flex-start',
         gap: 4,
