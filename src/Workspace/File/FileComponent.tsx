@@ -22,7 +22,7 @@ import React, {
 } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { ActionIconBox } from '../../Components/ActionIconBox';
-import { I18nContext } from '../../I18n';
+import { I18nContext, compileTemplate } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor';
 import type { FileNode, FileProps, FileType, GroupNode } from '../types';
 import { formatFileSize, formatLastModified } from '../utils';
@@ -618,6 +618,11 @@ const FileGroupComponent: FC<{
 }) => {
   const [visibleCount, setVisibleCount] = useState(GROUP_INITIAL_PAGE_SIZE);
 
+  // 分组数据变化时重置分页，避免切换数据源后一次性展示过多节点
+  useEffect(() => {
+    setVisibleCount(GROUP_INITIAL_PAGE_SIZE);
+  }, [group.id, group.children.length]);
+
   const totalCount = group.children.length;
   const visibleFiles = group.children.slice(0, visibleCount);
   const remainingCount = totalCount - visibleCount;
@@ -626,6 +631,14 @@ const FileGroupComponent: FC<{
   const handleShowMore = useRefFunction((e: React.MouseEvent) => {
     e.stopPropagation();
     setVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
+  });
+
+  const handleShowMoreKeyDown = useRefFunction((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      setVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
+    }
   });
 
   const contentVariants = useMemo(
@@ -656,8 +669,11 @@ const FileGroupComponent: FC<{
     [],
   );
 
-  const showMoreLabel = remainingCount > 0
-    ? (locale?.['workspace.file.showMore'] || '查看更多（还有 ${count} 个）').replace('${count}', String(remainingCount))
+  const showMoreLabel = hasMore
+    ? compileTemplate(
+        locale?.['workspace.file.showMore'] || '查看更多（还有 ${count} 个）',
+        { count: String(remainingCount) },
+      )
     : (locale?.['workspace.file.showMoreFiles'] || '查看更多文件');
 
   return (
@@ -702,9 +718,7 @@ const FileGroupComponent: FC<{
                 tabIndex={0}
                 className={classNames(`${prefixCls}-show-more`, hashId)}
                 onClick={handleShowMore}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') handleShowMore(e as any);
-                }}
+                onKeyDown={handleShowMoreKeyDown}
                 aria-label={showMoreLabel}
               >
                 {showMoreLabel}
@@ -803,6 +817,12 @@ export const FileComponent: FC<{
   >({});
   // 扁平文件列表（非分组模式）分页状态
   const [flatVisibleCount, setFlatVisibleCount] = useState(GROUP_INITIAL_PAGE_SIZE);
+
+  // nodes 或 keyword 变化时重置扁平列表分页，避免切换数据源后一次性渲染过多节点
+  useEffect(() => {
+    setFlatVisibleCount(GROUP_INITIAL_PAGE_SIZE);
+  }, [nodes, keyword]);
+
   // 追踪预览请求的序号，避免异步竞态
   const previewRequestIdRef = useRef(0);
   // 缓存节点 ID，避免每次渲染重新生成（使用 WeakMap 自动清理不再使用的节点）
@@ -1079,6 +1099,17 @@ export const FileComponent: FC<{
     );
   });
 
+  const handleFlatShowMore = useRefFunction(() => {
+    setFlatVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
+  });
+
+  const handleFlatShowMoreKeyDown = useRefFunction((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleFlatShowMore();
+    }
+  });
+
   // 渲染文件内容
   const renderFileContent = useRefFunction(() => {
     if ((!nodes || nodes.length === 0) && !loading) {
@@ -1157,9 +1188,10 @@ export const FileComponent: FC<{
 
     if (!flatHasMore) return items;
 
-    const flatShowMoreLabel = flatRemaining > 0
-      ? (locale?.['workspace.file.showMore'] || '查看更多（还有 ${count} 个）').replace('${count}', String(flatRemaining))
-      : (locale?.['workspace.file.showMoreFiles'] || '查看更多文件');
+    const flatShowMoreLabel = compileTemplate(
+      locale?.['workspace.file.showMore'] || '查看更多（还有 ${count} 个）',
+      { count: String(flatRemaining) },
+    );
 
     return (
       <>
@@ -1168,12 +1200,8 @@ export const FileComponent: FC<{
           role="button"
           tabIndex={0}
           className={classNames(`${prefixCls}-show-more`, hashId)}
-          onClick={() => setFlatVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              setFlatVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
-            }
-          }}
+          onClick={handleFlatShowMore}
+          onKeyDown={handleFlatShowMoreKeyDown}
           aria-label={flatShowMoreLabel}
         >
           {flatShowMoreLabel}
