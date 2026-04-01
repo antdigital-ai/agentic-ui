@@ -9,10 +9,131 @@ group:
 
 # Changelog
 
+## v2.30.15
+
+- MarkdownInputField
+  - 🆕 Add `onUploadError` callback and `removeFileOnUploadError` option for custom upload failure handling. [#434](https://github.com/ant-design/agentic-ui/pull/434)
+  - 🆕 Support file size interception and attachment upload error handling. [#437](https://github.com/ant-design/agentic-ui/pull/437)
+  - 🆕 Clicking anywhere in the input area automatically focuses the editor. [#435](https://github.com/ant-design/agentic-ui/pull/435)
+  - 🐞 Unify attachment file size configuration, remove `SupportedFormat.maxSize` field. [#429](https://github.com/ant-design/agentic-ui/pull/429)
+- 🐞 Fix `data-is-unclosed` attribute and CSS selector logic. [#438](https://github.com/ant-design/agentic-ui/pull/438)
+
+## v2.30.14
+
+- Bubble
+  - 🆕 Extract markdown filemap images to render outside the bubble. [#430](https://github.com/ant-design/agentic-ui/pull/430)
+- MarkdownInputField
+  - 🐞 Fix code blocks being uneditable inside MarkdownInputField. [#425](https://github.com/ant-design/agentic-ui/pull/425)
+  - 💄 Set default code block height to 120px. [#428](https://github.com/ant-design/agentic-ui/pull/428)
+  - 🐞 Prevent attachment placeholder from stretching full width. [#427](https://github.com/ant-design/agentic-ui/pull/427)
+- Workspace / Browser
+  - 🐞 Fix page navigation triggered on location and link clicks. [#431](https://github.com/ant-design/agentic-ui/pull/431)
+- DonutChart
+  - 🐞 Fix inconsistent legend and sector colors in pie/donut charts. [#432](https://github.com/ant-design/agentic-ui/pull/432)
+- Plugins / CodeBlock
+  - 💄 Update code block font size from 0.8em to 1em for improved readability.
+- Parser
+  - 🆕 Support `::warning` double-colon container directive syntax. [#426](https://github.com/ant-design/agentic-ui/pull/426)
+
+## v2.30.13
+
+- FileMapView
+  - 🆕 Support `onPreview` interception and `itemRender` custom rendering for images/videos, passed through `markdownRenderConfig.fileMapConfig`. [#423](https://github.com/ant-design/agentic-ui/pull/423)
+- FileMapConfig
+  - 🆕 Add `normalizeFile` callback for custom file data format conversion. [#424](https://github.com/ant-design/agentic-ui/pull/424)
+- MarkdownInputField
+  - 🆕 Add `onExceedMaxCount` callback, display files in error state when count exceeds limit. [#419](https://github.com/ant-design/agentic-ui/pull/419)
+- MarkdownRenderer
+  - 🐞 Fix code block flickering (unmount/remount) during streaming rendering. [#422](https://github.com/ant-design/agentic-ui/pull/422)
+- Chart / Histogram
+  - 🐞 Fix scientific notation parsing and support pre-binned data. [#421](https://github.com/ant-design/agentic-ui/pull/421)
+- Chart / ScatterChart
+  - 🐞 Auto-calculate axis range from data; support manual `xMin`/`xMax`/`yMin`/`yMax`. [#420](https://github.com/ant-design/agentic-ui/pull/420)
+- 🐞 Fix E2E full failure (`usePrefersColor` crash) and `toBeInTheDocument` TypeScript error. [#417](https://github.com/ant-design/agentic-ui/pull/417)
+
 ## v2.30.12
 
 - MarkdownEditor / Plugins / CodeBlock
   - 🆕 Added "Local Preview" button to the code block toolbar: `html` and `markdown` code blocks now have a button to open a local preview in a new tab. HTML code is rendered directly via a Blob URL (JavaScript is allowed to run); Markdown code is converted to HTML first.
+- MarkdownEditor
+  - 🆕 Add `agentic-ui-filemap` fenced code block, rendered as a file list. [#416](https://github.com/ant-design/agentic-ui/pull/416)
+- History
+  - 🆕 Do not display group title when group has fewer than 3 items; display items as a flat list instead. [#411](https://github.com/ant-design/agentic-ui/pull/411)
+- Bubble
+  - 🐞 Fix dark theme and user bubble style visibility issues. [#413](https://github.com/ant-design/agentic-ui/pull/413)
+- 🐞 Fix message list not reaching the bottom by a small margin (`useAutoScroll`). [#409](https://github.com/ant-design/agentic-ui/pull/409)
+- 🐞 Add top margin for chat loading state. [#410](https://github.com/ant-design/agentic-ui/pull/410)
+
+## v2.30.11
+
+- MarkdownRenderer
+  - 🆕 Support `eleRender` for custom element rendering (markdown render mode). [#405](https://github.com/ant-design/agentic-ui/pull/405)
+- MarkdownInputField
+  - 🐞 Fix placeholder not disappearing on mobile input. [#401](https://github.com/ant-design/agentic-ui/pull/401)
+- Workspace
+  - 🐞 Hide empty file detail panels; Browser links support `onOpen` callback. [#406](https://github.com/ant-design/agentic-ui/pull/406)
+  - 🛠 Replace hard-coded `ant-` class prefix with `token.antCls` in styles. [#404](https://github.com/ant-design/agentic-ui/pull/404)
+- 🐞 Provide default CSS variable values and auto-load root styles. [#403](https://github.com/ant-design/agentic-ui/pull/403)
+- 🐞 Delay streaming table rendering until first row is complete. [#400](https://github.com/ant-design/agentic-ui/pull/400)
+
+## v2.30.10
+
+- Mermaid
+  - 🐞 Only render Mermaid diagram when code block is closed. [#399](https://github.com/ant-design/agentic-ui/pull/399)
+- 💄 Adjust default table column width from 120px to 40px.
+
+## v2.30.9
+
+- MarkdownEditor
+  - 🛠 Simplify directive handling and remove unused subpath type.
+
+## v2.30.8
+
+- FileMapView
+  - 🐞 Hide file size when `size` is absent or 0. [#393](https://github.com/ant-design/agentic-ui/pull/393) [#394](https://github.com/ant-design/agentic-ui/pull/394)
+- MarkdownEditor
+  - 🐞 Use block layout for `blockquote` instead of flex. [#396](https://github.com/ant-design/agentic-ui/pull/396)
+- Parser
+  - 🆕 Only `:::` block container directives are supported; inline `:foo` forms are ignored. [#395](https://github.com/ant-design/agentic-ui/pull/395)
+
+## v2.30.7
+
+- 📖 Add Bubble streaming Markdown demo page.
+
+## v2.30.6
+
+- MarkdownRenderer
+  - 🆕 Enhance streaming rendering with tail fade-in animation and character queue configuration.
+
+## v2.30.5
+
+- MarkdownRenderer
+  - 🐞 Improve key stability and animation logic for streaming messages.
+
+## v2.30.4
+
+- MarkdownRenderer
+  - 🆕 Animate only the trailing 50 characters during streaming; add `animateTailChars` config.
+
+## v2.30.3
+
+- Chart
+  - 🆕 Add BoxPlot and Histogram chart components.
+  - 🆕 Atomic charts support dark theme. [#390](https://github.com/ant-design/agentic-ui/pull/390)
+  - 🆕 Export chart components with `forwardRef` to support ref forwarding.
+  - 🆕 Add copy Markdown table feature.
+- MarkdownRenderer
+  - 🆕 Improve block content stability in streaming scenarios, avoid repeated unmount and remount.
+
+## v2.30.2
+
+- Chart
+  - 🆕 Parse Chinese currency strings (亿元/万元/元) for charts. [#388](https://github.com/ant-design/agentic-ui/pull/388)
+- MarkdownEditor
+  - 🐞 Skip time-colon escape inside fenced code blocks. [#383](https://github.com/ant-design/agentic-ui/pull/383)
+  - 💄 Only render Tooltip in `ToolBarItem` when `title` is present, mitigating `findDOMNode` deprecation warning.
+- SchemaEditor
+  - 🐞 Restore empty content copy hint and success/failure feedback.
 
 ## v2.30.1
 
@@ -34,6 +155,12 @@ group:
   - 🌐 Improve clarity of file upload related messages.
 - 📖 Remove `rfc-streaming-markdown-renderer.md` documentation. [#370](https://github.com/ant-design/agentic-ui/pull/370)
 - ✅ Add snapshots for agentic-ui embed and thinking DOM demos; update related demo snapshots.
+- 🛠 Fix test and Chart error logging.
+
+## v2.29.60
+
+- MarkdownRenderer
+  - 🆕 Use Markdown Renderer instead of Slate for streaming scenarios (pre-release; formally shipped in v2.30.1). [#369](https://github.com/ant-design/agentic-ui/pull/369)
 - 🛠 Fix test and Chart error logging.
 
 ## v2.29.58

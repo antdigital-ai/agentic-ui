@@ -9,10 +9,131 @@ group:
 
 # Changelog
 
+## v2.30.15
+
+- MarkdownInputField
+  - 🆕 新增 `onUploadError` 回调及 `removeFileOnUploadError` 配置，支持自定义上传失败处理逻辑。[#434](https://github.com/ant-design/agentic-ui/pull/434)
+  - 🆕 支持文件大小拦截与上传错误处理。[#437](https://github.com/ant-design/agentic-ui/pull/437)
+  - 🆕 点击编辑框任意区域自动聚焦编辑器。[#435](https://github.com/ant-design/agentic-ui/pull/435)
+  - 🐞 统一 attachment 文件大小配置，删除 `SupportedFormat.maxSize` 字段。[#429](https://github.com/ant-design/agentic-ui/pull/429)
+- 🐞 修复 `data-is-unclosed` 属性与 CSS 选择器逻辑。[#438](https://github.com/ant-design/agentic-ui/pull/438)
+
+## v2.30.14
+
+- Bubble
+  - 🆕 将 markdown filemap 图片提取到气泡框外渲染。[#430](https://github.com/ant-design/agentic-ui/pull/430)
+- MarkdownInputField
+  - 🐞 修复代码块在 MarkdownInputField 中无法编辑的问题。[#425](https://github.com/ant-design/agentic-ui/pull/425)
+  - 💄 代码块默认高度设为 120px。[#428](https://github.com/ant-design/agentic-ui/pull/428)
+  - 🐞 修复 attachment 占位符拉伸全宽的问题。[#427](https://github.com/ant-design/agentic-ui/pull/427)
+- Workspace / Browser
+  - 🐞 修复定位和链接点击时触发页面跳转的问题。[#431](https://github.com/ant-design/agentic-ui/pull/431)
+- DonutChart
+  - 🐞 修复饼图/环形图图例颜色与扇区颜色不一致的问题。[#432](https://github.com/ant-design/agentic-ui/pull/432)
+- Plugins / CodeBlock
+  - 💄 代码块字号从 0.8em 调整为 1em，提升可读性。
+- Parser
+  - 🆕 支持 `::warning` 双冒号容器指令语法。[#426](https://github.com/ant-design/agentic-ui/pull/426)
+
+## v2.30.13
+
+- FileMapView
+  - 🆕 图片/视频支持 `onPreview` 拦截与 `itemRender` 自定义渲染，通过 `markdownRenderConfig.fileMapConfig` 透传。[#423](https://github.com/ant-design/agentic-ui/pull/423)
+- FileMapConfig
+  - 🆕 新增 `normalizeFile` 回调，支持自定义文件数据格式转换。[#424](https://github.com/ant-design/agentic-ui/pull/424)
+- MarkdownInputField
+  - 🆕 新增 `onExceedMaxCount` 回调，文件数量超限时以 error 状态展示。[#419](https://github.com/ant-design/agentic-ui/pull/419)
+- MarkdownRenderer
+  - 🐞 修复流式渲染时代码块抖动（销毁重建）问题。[#422](https://github.com/ant-design/agentic-ui/pull/422)
+- Chart / Histogram
+  - 🐞 修复科学记数法解析及支持预分箱数据。[#421](https://github.com/ant-design/agentic-ui/pull/421)
+- Chart / ScatterChart
+  - 🐞 坐标轴范围改为从数据自动计算，支持手动传入 `xMin`/`xMax`/`yMin`/`yMax`。[#420](https://github.com/ant-design/agentic-ui/pull/420)
+- 🐞 修复 E2E 全量失败（`usePrefersColor` 崩溃）及 `toBeInTheDocument` TS 类型报错。[#417](https://github.com/ant-design/agentic-ui/pull/417)
+
 ## v2.30.12
 
 - MarkdownEditor / Plugins / CodeBlock
   - 🆕 代码块工具栏新增「本地预览」按钮：`html` 与 `markdown` 语言的代码块可点击按钮在新标签页打开本地预览。HTML 代码直接以 Blob URL 渲染（允许执行 JavaScript），Markdown 代码先转换为 HTML 再打开。
+- MarkdownEditor
+  - 🆕 新增 `agentic-ui-filemap` 围栏代码块，渲染为文件列表。[#416](https://github.com/ant-design/agentic-ui/pull/416)
+- History
+  - 🆕 分组项目少于 3 个时不展示分组标题，仍平铺显示条目。[#411](https://github.com/ant-design/agentic-ui/pull/411)
+- Bubble
+  - 🐞 修复文档站暗色主题和用户气泡样式可见性问题。[#413](https://github.com/ant-design/agentic-ui/pull/413)
+- 🐞 修复消息列表差一点点无法贴底的问题（`useAutoScroll`）。[#409](https://github.com/ant-design/agentic-ui/pull/409)
+- 🐞 聊天加载状态增加顶部外边距。[#410](https://github.com/ant-design/agentic-ui/pull/410)
+
+## v2.30.11
+
+- MarkdownRenderer
+  - 🆕 支持 `eleRender` 自定义元素渲染（markdown 渲染模式）。[#405](https://github.com/ant-design/agentic-ui/pull/405)
+- MarkdownInputField
+  - 🐞 修复移动端输入时占位符不消失的兼容性问题。[#401](https://github.com/ant-design/agentic-ui/pull/401)
+- Workspace
+  - 🐞 文件项空详情隐藏，Browser 链接支持 `onOpen` 回调。[#406](https://github.com/ant-design/agentic-ui/pull/406)
+  - 🛠 使用 `token.antCls` 替换样式文件中写死的 `ant-` 类名前缀。[#404](https://github.com/ant-design/agentic-ui/pull/404)
+- 🐞 提供 CSS 变量默认值，自动加载根样式。[#403](https://github.com/ant-design/agentic-ui/pull/403)
+- 🐞 修复表格流式渲染，等待首行完整后再开始渲染。[#400](https://github.com/ant-design/agentic-ui/pull/400)
+
+## v2.30.10
+
+- Mermaid
+  - 🐞 仅在代码块闭合时渲染 Mermaid 图表。[#399](https://github.com/ant-design/agentic-ui/pull/399)
+- 💄 调整表格默认列宽从 120px 至 40px。
+
+## v2.30.9
+
+- MarkdownEditor
+  - 🛠 简化 directive 处理逻辑，移除未使用的 subpath 类型。
+
+## v2.30.8
+
+- FileMapView
+  - 🐞 无 `size` 或为 0 时不展示文件大小。[#393](https://github.com/ant-design/agentic-ui/pull/393) [#394](https://github.com/ant-design/agentic-ui/pull/394)
+- MarkdownEditor
+  - 🐞 `blockquote` 改用块级布局替代 flex。[#396](https://github.com/ant-design/agentic-ui/pull/396)
+- Parser
+  - 🆕 仅支持 `:::` 容器指令语法，忽略行内 `:foo` 形式。[#395](https://github.com/ant-design/agentic-ui/pull/395)
+
+## v2.30.7
+
+- 📖 新增 Bubble 流式 Markdown 演示页面。
+
+## v2.30.6
+
+- MarkdownRenderer
+  - 🆕 增强流式渲染功能，支持末段淡入动画与字符队列配置。
+
+## v2.30.5
+
+- MarkdownRenderer
+  - 🐞 优化流式消息的 key 稳定性与动画逻辑。
+
+## v2.30.4
+
+- MarkdownRenderer
+  - 🆕 流式渲染仅对末尾 50 字做动画，新增 `animateTailChars` 配置。
+
+## v2.30.3
+
+- Chart
+  - 🆕 新增箱线图（BoxPlot）和直方图（Histogram）组件。
+  - 🆕 原子图表支持暗黑主题。[#390](https://github.com/ant-design/agentic-ui/pull/390)
+  - 🆕 图表组件改为 `forwardRef` 导出，支持引用传递。
+  - 🆕 Markdown 表格支持一键复制功能。
+- MarkdownRenderer
+  - 🆕 优化流式场景下的块内容稳定性，避免重复卸载和挂载。
+
+## v2.30.2
+
+- Chart
+  - 🆕 支持解析亿元/万元/元等中文货币字符串。[#388](https://github.com/ant-design/agentic-ui/pull/388)
+- MarkdownEditor
+  - 🐞 修复时间冒号在围栏代码块内被转义的问题。[#383](https://github.com/ant-design/agentic-ui/pull/383)
+  - 💄 `ToolBarItem` 仅在存在 `title` 时渲染 Tooltip，缓解 `findDOMNode` 弃用警告。
+- SchemaEditor
+  - 🐞 恢复复制空内容提示与成功/失败反馈。
 
 ## v2.30.1
 
@@ -34,6 +155,12 @@ group:
   - 🌐 优化文件上传相关文案的清晰度。
 - 📖 移除 `rfc-streaming-markdown-renderer.md` 文档。[#370](https://github.com/ant-design/agentic-ui/pull/370)
 - ✅ 补充 agentic-ui 嵌入与思考 DOM 演示快照，并更新相关演示快照。
+- 🛠 修复测试与 Chart 错误日志。
+
+## v2.29.60
+
+- MarkdownRenderer
+  - 🆕 流式场景下使用 Markdown Renderer 替代 Slate 渲染（预发布，正式发布于 v2.30.1）。[#369](https://github.com/ant-design/agentic-ui/pull/369)
 - 🛠 修复测试与 Chart 错误日志。
 
 ## v2.29.58
