@@ -2508,4 +2508,133 @@ describe('FileComponent', () => {
       expect(screen.getByTestId('custom-edit')).toBeInTheDocument();
     });
   });
+
+  describe('分页（查看更多）', () => {
+    const makeFiles = (count: number): FileNode[] =>
+      Array.from({ length: count }, (_, i) => ({
+        id: `f${i}`,
+        name: `file-${i}.txt`,
+      }));
+
+    it('分组超过50个文件时只显示50个并出现查看更多按钮', () => {
+      const nodes = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText' as const,
+          children: makeFiles(60),
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      // 前50个文件应可见
+      expect(screen.getByText('file-0.txt')).toBeInTheDocument();
+      expect(screen.getByText('file-49.txt')).toBeInTheDocument();
+      // 第51个不可见
+      expect(screen.queryByText('file-50.txt')).not.toBeInTheDocument();
+      // 查看更多按钮应存在
+      expect(screen.getByText(/查看更多/)).toBeInTheDocument();
+    });
+
+    it('点击查看更多后显示更多文件', () => {
+      const nodes = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText' as const,
+          children: makeFiles(60),
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByText(/查看更多/));
+
+      // 所有60个文件现在都应可见
+      expect(screen.getByText('file-50.txt')).toBeInTheDocument();
+      expect(screen.getByText('file-59.txt')).toBeInTheDocument();
+      // 无更多按钮
+      expect(screen.queryByText(/查看更多/)).not.toBeInTheDocument();
+    });
+
+    it('不足50个时不显示查看更多', () => {
+      const nodes = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText' as const,
+          children: makeFiles(10),
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      expect(screen.queryByText(/查看更多/)).not.toBeInTheDocument();
+    });
+
+    it('扁平列表超过50个时只显示50个并出现查看更多按钮', () => {
+      const nodes = makeFiles(55);
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByText('file-0.txt')).toBeInTheDocument();
+      expect(screen.getByText('file-49.txt')).toBeInTheDocument();
+      expect(screen.queryByText('file-50.txt')).not.toBeInTheDocument();
+      expect(screen.getByText(/查看更多/)).toBeInTheDocument();
+    });
+
+    it('扁平列表点击查看更多后显示剩余文件', () => {
+      const nodes = makeFiles(55);
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByText(/查看更多/));
+
+      expect(screen.getByText('file-54.txt')).toBeInTheDocument();
+      expect(screen.queryByText(/查看更多/)).not.toBeInTheDocument();
+    });
+
+    it('查看更多按钮显示剩余数量', () => {
+      const nodes = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText' as const,
+          children: makeFiles(70),
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      // 70 - 50 = 20 remaining — the button text contains "20"
+      const showMoreBtn = screen.getByRole('button', { name: /查看更多/ });
+      expect(showMoreBtn).toBeInTheDocument();
+      expect(showMoreBtn.textContent).toMatch(/20/);
+    });
+  });
 });

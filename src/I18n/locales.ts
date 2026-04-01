@@ -282,6 +282,8 @@ export const cnLabels = {
   'workspace.download': '下载',
   // 新增：默认空态文案
   'workspace.empty': '暂无数据',
+  'workspace.file.showMore': '查看更多（还有 ${count} 个）',
+  'workspace.file.showMoreFiles': '查看更多文件',
   // 新增：Workspace 标题与搜索相关
   'workspace.title': '工作空间',
   'workspace.searchPlaceholder': '搜索文件名',
@@ -717,6 +719,8 @@ export const enLabels: typeof cnLabels = {
   'workspace.download': 'Download',
   // New: default empty text
   'workspace.empty': 'No data',
+  'workspace.file.showMore': 'Show more (${count} remaining)',
+  'workspace.file.showMoreFiles': 'Show more files',
   // New: Workspace title & search
   'workspace.title': 'Workspace',
   'workspace.searchPlaceholder': 'Search file name',

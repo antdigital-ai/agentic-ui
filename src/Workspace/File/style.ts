@@ -523,6 +523,30 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     [`${token.componentCls}-hidden-image`]: {
       display: 'none',
     },
+
+    // 查看更多按钮
+    [`${token.componentCls}-show-more`]: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '6px 0',
+      cursor: 'pointer',
+      color: 'var(--color-gray-text-secondary)',
+      font: 'var(--font-text-body-sm)',
+      letterSpacing: 'var(--letter-spacing-body-sm, normal)',
+      transition: 'color 0.2s ease',
+      userSelect: 'none',
+
+      '&:hover': {
+        color: 'var(--color-primary-control-fill-primary-active)',
+      },
+
+      svg: {
+        marginLeft: '4px',
+        width: '12px',
+        height: '12px',
+      },
+    },
   };
 };
 
