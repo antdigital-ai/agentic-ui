@@ -123,7 +123,9 @@ export const UserBubble: React.FC<
       bubbleListRef={props.bubbleListRef}
       bubbleListItemExtraStyle={styles?.bubbleListItemExtraStyle}
       bubbleRef={props.bubbleRef}
-      content={filemapBlocks.length > 0 ? strippedContent : originData?.content}
+      content={
+        filemapBlocks.length > 0 ? strippedContent : originData?.content
+      }
       key={originData?.id}
       data-id={originData?.id}
       avatar={originData?.meta as BubbleMetaData}
@@ -291,6 +293,7 @@ export const UserBubble: React.FC<
             blocks={filemapBlocks}
             fileViewConfig={props.fileViewConfig}
             fileViewEvents={props.fileViewEvents}
+            fileMapConfig={props.markdownRenderConfig?.fileMapConfig}
             placement={placement}
             style={{ alignSelf: 'flex-end' }}
           />

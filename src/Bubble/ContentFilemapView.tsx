@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { normalizeFileMapPropsFromJson } from '../MarkdownEditor/editor/elements/AgenticUiBlocks/agenticUiEmbedUtils';
 import partialParse from '../MarkdownEditor/editor/parser/json-parse';
 import { FileMapView } from '../MarkdownInputField/FileMapView';
+import type { FileMapConfig } from '../MarkdownRenderer/types';
 import type { FilemapBlock } from './extractFilemapBlocks';
 import type { BubbleProps } from './type';
 
@@ -22,13 +23,14 @@ const FilemapItem: React.FC<{
   body: string;
   fileViewConfig?: BubbleProps['fileViewConfig'];
   fileViewEvents?: BubbleProps['fileViewEvents'];
+  fileMapConfig?: FileMapConfig;
   placement?: 'left' | 'right';
-}> = ({ body, fileViewConfig, fileViewEvents, placement }) => {
+}> = ({ body, fileViewConfig, fileViewEvents, fileMapConfig, placement }) => {
   const parsed = useMemo(() => parseBody(body), [body]);
 
   const { fileList, className } = useMemo(
-    () => normalizeFileMapPropsFromJson(parsed),
-    [parsed],
+    () => normalizeFileMapPropsFromJson(parsed, fileMapConfig?.normalizeFile),
+    [parsed, fileMapConfig?.normalizeFile],
   );
 
   const fileMap = useMemo(
@@ -70,9 +72,11 @@ const FilemapItem: React.FC<{
       className={className ?? fileViewConfig?.className}
       style={fileViewConfig?.style}
       placement={placement}
-      onPreview={events?.onPreview}
+      onPreview={
+        events?.onPreview ?? fileMapConfig?.onPreview ?? defaultHandlers.onPreview
+      }
       onDownload={events?.onDownload}
-      itemRender={fileViewConfig?.itemRender}
+      itemRender={fileViewConfig?.itemRender ?? fileMapConfig?.itemRender}
       maxDisplayCount={fileViewConfig?.maxDisplayCount}
       showMoreButton={fileViewConfig?.showMoreButton}
       customSlot={fileViewConfig?.customSlot}
@@ -89,9 +93,10 @@ export const ContentFilemapView: React.FC<{
   blocks: FilemapBlock[];
   fileViewConfig?: BubbleProps['fileViewConfig'];
   fileViewEvents?: BubbleProps['fileViewEvents'];
+  fileMapConfig?: FileMapConfig;
   placement?: 'left' | 'right';
   style?: React.CSSProperties;
-}> = ({ blocks, fileViewConfig, fileViewEvents, placement, style }) => {
+}> = ({ blocks, fileViewConfig, fileViewEvents, fileMapConfig, placement, style }) => {
   if (blocks.length === 0) return null;
   return (
     <div style={style} data-testid="content-filemap-view">
@@ -101,6 +106,7 @@ export const ContentFilemapView: React.FC<{
           body={block.body}
           fileViewConfig={fileViewConfig}
           fileViewEvents={fileViewEvents}
+          fileMapConfig={fileMapConfig}
           placement={placement}
         />
       ))}

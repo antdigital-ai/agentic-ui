@@ -148,7 +148,12 @@ export const AIBubble: React.FC<
     [rawContent],
   );
 
-  const contentForDisplay = filemapBlocks.length > 0 ? strippedContent : rawContent;
+  const contentForDisplay =
+    filemapBlocks.length > 0
+      ? strippedContent
+      : typeof rawContent === 'string'
+        ? rawContent
+        : strippedContent;
 
   const messageContent = (
     <BubbleMessageDisplay
@@ -359,6 +364,7 @@ export const AIBubble: React.FC<
             blocks={filemapBlocks}
             fileViewConfig={props.fileViewConfig}
             fileViewEvents={props.fileViewEvents}
+            fileMapConfig={props.markdownRenderConfig?.fileMapConfig}
             placement={placement}
           />
         )}
