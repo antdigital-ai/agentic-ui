@@ -449,6 +449,7 @@ export const cnLabels = {
   'fileType.archive': '压缩文件',
   'fileType.shell': 'Shell 脚本',
   'fileType.config': '配置文件',
+  'fileType.powerpoint': 'PowerPoint 演示文稿',
   // PreviewComponent messages
   'workspace.file.unsupportedPreview': '此文件无法预览，请下载查看。',
   'workspace.file.downloadButton': '下载',
@@ -916,6 +917,7 @@ export const enLabels: typeof cnLabels = {
   'fileType.archive': 'Archive',
   'fileType.shell': 'Shell script',
   'fileType.config': 'Configuration file',
+  'fileType.powerpoint': 'PowerPoint presentation',
   // PreviewComponent messages
   'workspace.file.unsupportedPreview': 'This file cannot be previewed, please download to view.',
   'workspace.file.downloadButton': 'Download',

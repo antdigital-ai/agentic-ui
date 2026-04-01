@@ -69,6 +69,7 @@ export enum FileCategory {
   PDF = 'pdf',
   Word = 'word',
   Excel = 'excel',
+  Presentation = 'presentation',
   Archive = 'archive',
   Other = 'other',
 }
@@ -156,6 +157,15 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
     extensions: ['csv'],
     mimeTypes: ['text/csv', 'application/csv', 'application/vnd.ms-excel'],
     nameKey: 'fileType.csv',
+  },
+  powerpoint: {
+    category: FileCategory.Presentation,
+    extensions: ['ppt', 'pptx'],
+    mimeTypes: [
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    ],
+    nameKey: 'fileType.powerpoint',
   },
   archive: {
     category: FileCategory.Archive,
