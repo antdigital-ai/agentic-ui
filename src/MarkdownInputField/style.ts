@@ -168,7 +168,7 @@ const genStyle: GenerateStyle<
         },
       },
       // 仅覆盖 MarkdownInputField 内的代码块默认高度
-      '& [data-language][data-is-unclosed]': {
+      '& [data-language][data-is-unclosed="true"]': {
         height: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
         minHeight: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
       },
