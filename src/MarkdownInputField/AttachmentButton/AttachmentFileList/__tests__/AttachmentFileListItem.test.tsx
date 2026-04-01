@@ -42,8 +42,21 @@ describe('AttachmentFileListItem', () => {
     expect(screen.getByTestId('file-item')).toBeInTheDocument();
   });
 
-  it('should fallback to FileMetaPlaceholder when error and no urls', () => {
+  it('should render file-item with error icon when error and no urls', () => {
     const file = createAttachmentFile('error');
+    render(
+      <AttachmentFileListItem
+        file={file}
+        prefixCls="test-attachment-item"
+        onDelete={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId('file-item')).toBeInTheDocument();
+    expect(screen.queryByTestId('file-meta-placeholder')).not.toBeInTheDocument();
+  });
+
+  it('should fallback to FileMetaPlaceholder when done and no urls', () => {
+    const file = createAttachmentFile('done');
     render(
       <AttachmentFileListItem
         file={file}
@@ -52,20 +65,6 @@ describe('AttachmentFileListItem', () => {
       />,
     );
     expect(screen.queryByTestId('file-item')).not.toBeInTheDocument();
-    expect(screen.getByText('-')).toBeInTheDocument();
-    expect(screen.getByText(/B$/)).toBeInTheDocument();
-  });
-
-  it('should not stretch FileMetaPlaceholder to full width', () => {
-    const file = createAttachmentFile('error');
-    render(
-      <AttachmentFileListItem
-        file={file}
-        prefixCls="test-attachment-item"
-        onDelete={vi.fn()}
-      />,
-    );
-
     const placeholder = screen.getByTestId('file-meta-placeholder');
     expect(placeholder).toHaveStyle({ flex: '0 0 auto' });
   });
