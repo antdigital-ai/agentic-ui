@@ -228,17 +228,14 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
                 </div>
               )}
             <div>
-              {element.language ? (
+              {element.language && element.language !== 'plain text' && (
                 <span>
-                  {/* 根据代码类型显示不同标签 */}
                   {element.katex
                     ? 'Formula'
                     : element.language === 'html' && element.render
                       ? 'Html Renderer'
                       : element.language}
                 </span>
-              ) : (
-                <span>{'plain text'}</span>
               )}
             </div>
           </div>
