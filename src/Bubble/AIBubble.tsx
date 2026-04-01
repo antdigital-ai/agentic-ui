@@ -148,7 +148,12 @@ export const AIBubble: React.FC<
     [rawContent],
   );
 
-  const contentForDisplay = strippedContent;
+  const contentForDisplay =
+    filemapBlocks.length > 0
+      ? strippedContent
+      : typeof rawContent === 'string'
+        ? rawContent
+        : strippedContent;
 
   const messageContent = (
     <BubbleMessageDisplay

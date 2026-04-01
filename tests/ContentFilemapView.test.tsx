@@ -252,9 +252,9 @@ describe('ContentFilemapView', () => {
     ).toBeNull();
   });
 
-  // ─── extractFilemapBlocks 集成：始终使用 strippedContent ──────────────────
+  // ─── extractFilemapBlocks 集成：有块时使用 strippedContent，无块时保留原内容 ──
 
-  it('提取后 strippedContent 始终不含 agentic-ui-filemap 围栏（无论块数量）', () => {
+  it('有 filemap 块时 strippedContent 不含围栏，保留其余文本', () => {
     const content = `Hello\n\n\`\`\`agentic-ui-filemap\n${IMG_BODY}\n\`\`\`\n\nWorld`;
     const { blocks, stripped } = extractFilemapBlocks(content);
 
@@ -264,11 +264,12 @@ describe('ContentFilemapView', () => {
     expect(stripped).toContain('World');
   });
 
-  it('没有 filemap 块时 strippedContent 等同于原内容（trim）', () => {
+  it('没有 filemap 块时 strippedContent 等同于原内容（trim），但 AIBubble/UserBubble 此时使用 rawContent 避免修改原文', () => {
     const content = 'Just some text.';
     const { blocks, stripped } = extractFilemapBlocks(content);
 
     expect(blocks).toHaveLength(0);
+    // 无块时直接用 rawContent，不走 stripped（避免 trim 影响前后空白）
     expect(stripped).toBe(content.trim());
   });
 

@@ -41,10 +41,6 @@ const FilemapItem: React.FC<{
   const defaultHandlers = useMemo(
     () => ({
       onPreview: (file: any) => {
-        if (fileMapConfig?.onPreview) {
-          fileMapConfig.onPreview(file);
-          return;
-        }
         const url = file?.previewUrl || file?.url;
         if (url && typeof window !== 'undefined') window.open(url, '_blank');
       },
@@ -60,7 +56,7 @@ const FilemapItem: React.FC<{
       },
       onViewAll: () => {},
     }),
-    [fileMapConfig?.onPreview],
+    [],
   );
 
   let events: ReturnType<NonNullable<BubbleProps['fileViewEvents']>> = {};
@@ -76,7 +72,9 @@ const FilemapItem: React.FC<{
       className={className ?? fileViewConfig?.className}
       style={fileViewConfig?.style}
       placement={placement}
-      onPreview={events?.onPreview ?? defaultHandlers.onPreview}
+      onPreview={
+        events?.onPreview ?? fileMapConfig?.onPreview ?? defaultHandlers.onPreview
+      }
       onDownload={events?.onDownload}
       itemRender={fileViewConfig?.itemRender ?? fileMapConfig?.itemRender}
       maxDisplayCount={fileViewConfig?.maxDisplayCount}
