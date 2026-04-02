@@ -76,7 +76,7 @@ describe('TaskList Component', () => {
       key: 'task4',
       title: '任务4',
       content: '任务4内容',
-      status: 'error' as const,
+      status: 'pending' as const,
     },
   ];
 
@@ -112,7 +112,27 @@ describe('TaskList Component', () => {
 
     expect(screen.getByTestId('task-list-status-success')).toBeInTheDocument();
     expect(screen.getByTestId('task-list-status-loading')).toBeInTheDocument();
-    expect(screen.getByTestId('task-list-status-pending')).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('task-list-status-pending'),
+    ).toHaveLength(2);
+  });
+
+  it('应该显示错误状态的任务', () => {
+    const errorItems = [
+      {
+        key: 'task1',
+        title: '任务1',
+        content: '任务1内容',
+        status: 'error' as const,
+      },
+    ];
+
+    render(
+      <TestWrapper>
+        <TaskList items={errorItems} />
+      </TestWrapper>,
+    );
+
     expect(screen.getByTestId('task-list-status-error')).toBeInTheDocument();
   });
 
