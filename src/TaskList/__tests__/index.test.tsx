@@ -476,6 +476,51 @@ describe('TaskList', () => {
     });
   });
 
+  describe('取消状态测试', () => {
+    const cancelledItems = [
+      {
+        key: '1',
+        title: 'Task 1',
+        content: 'Content 1',
+        status: 'success' as const,
+      },
+      {
+        key: '2',
+        title: 'Task 2',
+        content: 'Content 2',
+        status: 'success' as const,
+      },
+      {
+        key: '3',
+        title: 'Cancelled Task',
+        content: 'Cancelled content',
+        status: 'error' as const,
+      },
+    ];
+
+    it('default 变体：有 error 任务时只渲染最后一条', () => {
+      render(<TaskList items={cancelledItems} />);
+
+      const taskItems = document.querySelectorAll(
+        '[data-testid="task-list-thoughtChainItem"]',
+      );
+      expect(taskItems).toHaveLength(1);
+      expect(screen.getByText('Cancelled Task')).toBeInTheDocument();
+      expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Task 2')).not.toBeInTheDocument();
+    });
+
+    it('default 变体：无 error 任务时渲染全部条目', () => {
+      const normalItems = cancelledItems.slice(0, 2);
+      render(<TaskList items={normalItems} />);
+
+      const taskItems = document.querySelectorAll(
+        '[data-testid="task-list-thoughtChainItem"]',
+      );
+      expect(taskItems).toHaveLength(2);
+    });
+  });
+
   describe('样式测试', () => {
     it('应该应用正确的CSS类名', () => {
       render(<TaskList items={mockItems} />);
@@ -789,6 +834,28 @@ describe('TaskList', () => {
       render(<TaskList items={errorItems} variant="simple" />);
 
       expect(screen.getByText('任务已取消')).toBeInTheDocument();
+    });
+
+    it('展开后取消状态只显示最后一条任务', async () => {
+      const errorItems = [
+        {
+          key: '1',
+          title: 'Task 1',
+          content: 'Content 1',
+          status: 'success' as const,
+        },
+        {
+          key: '2',
+          title: 'Error Task',
+          content: 'Error content',
+          status: 'error' as const,
+        },
+      ];
+
+      render(<TaskList items={errorItems} variant="simple" open={true} />);
+
+      expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
+      expect(screen.getByText('Error Task')).toBeInTheDocument();
     });
 
     it('应该支持自定义 className', () => {
