@@ -30,7 +30,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         minHeight: '20px',
         backdropFilter: 'blur(8px)',
         width: 'max-content',
-        transition: 'border-radius 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'border-radius 0.16s cubic-bezier(0.4, 0, 0.2, 1)',
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'column',
@@ -279,7 +279,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         opacity: 0,
         pointerEvents: 'none',
         transition:
-          'max-height 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.16s linear',
+          'max-height 0.16s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.12s linear',
         position: 'relative',
         paddingInline: 4,
         paddingBottom: 0,

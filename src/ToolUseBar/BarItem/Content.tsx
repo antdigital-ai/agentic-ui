@@ -21,7 +21,7 @@ import { useRefFunction } from '../../Hooks/useRefFunction';
 /** 内容超出此高度时自动收起 */
 const CONTENT_COLLAPSE_THRESHOLD = 200;
 /** 工具详情收起动画时长（毫秒） */
-const TOOL_CONTENT_COLLAPSE_DURATION_MS = 220;
+const TOOL_CONTENT_COLLAPSE_DURATION_MS = 160;
 
 interface ToolImageProps {
   tool: ToolCall;

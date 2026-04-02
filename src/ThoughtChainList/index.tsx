@@ -29,7 +29,7 @@ import {
   WhiteBoxProcessInterface,
 } from './types';
 
-const COLLAPSE_ANIMATION_DURATION_MS = 220;
+const COLLAPSE_ANIMATION_DURATION_MS = 160;
 
 // Initialize dayjs plugins
 try {

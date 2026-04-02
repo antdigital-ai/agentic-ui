@@ -14,7 +14,7 @@ import {
 } from './types';
 import { WebSearch } from './WebSearch';
 
-const DETAIL_COLLAPSE_DURATION_MS = 220;
+const DETAIL_COLLAPSE_DURATION_MS = 160;
 
 /**
  * ThoughtChainItemDetail 组件 - 思维链项详情组件
@@ -418,7 +418,7 @@ export const ThoughtChainListItem: React.FC<
               gridTemplateRows: collapse ? '0fr' : '1fr',
               opacity: collapse ? 0 : 1,
               transition:
-                'grid-template-rows 0.22s ease, opacity 0.16s ease',
+                'grid-template-rows 0.16s ease, opacity 0.12s ease',
               pointerEvents: collapse ? 'none' : 'auto',
             }}
             aria-hidden={collapse}
