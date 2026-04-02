@@ -1,4 +1,5 @@
 import classNames from 'clsx';
+import { motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
 import React, { memo, useMemo } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
@@ -111,6 +112,16 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
     },
   );
 
+  const toolItemTransition = useMemo(
+    () => ({
+      layout: {
+        duration: 0.22,
+        ease: [0.4, 0, 0.2, 1] as [number, number, number, number],
+      },
+    }),
+    [],
+  );
+
   if (tool.type === 'summary') {
     return (
       <ToolContent
@@ -126,12 +137,15 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
   }
 
   return (
-    <div
+    <motion.div
       key={tool.id}
       data-testid="ToolUserItem"
       className={classNames(toolClassName, {
         [`${prefixCls}-tool-collapsed`]: !showContent,
       })}
+      layout={!disableAnimation}
+      initial={false}
+      transition={disableAnimation ? undefined : toolItemTransition}
     >
       <div
         className={classNames(toolBarClassName, {
@@ -181,7 +195,7 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
         expanded={expanded}
         disableAnimation={disableAnimation}
       />
-    </div>
+    </motion.div>
   );
 };
 
