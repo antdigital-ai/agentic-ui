@@ -124,7 +124,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         borderRadius: '0px 0px 12px 12px',
         maxHeight: '566px',
         padding: '12px 12px',
-        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        opacity: 1,
+        transition:
+          'max-height 0.22s cubic-bezier(0.4, 0, 0.2, 1), padding 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.16s linear',
         overflow: 'auto',
         '&&-compact': {
           padding: 8,
@@ -133,6 +135,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           maxHeight: '0px',
           padding: '0',
           opacity: 0,
+          overflow: 'hidden',
         },
         '&-list': {
           display: 'flex',

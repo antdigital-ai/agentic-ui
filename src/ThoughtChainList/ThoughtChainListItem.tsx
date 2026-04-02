@@ -1,5 +1,5 @@
 import classNames from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { DeepThink } from './DeepThink';
@@ -13,6 +13,8 @@ import {
   WhiteBoxProcessInterface,
 } from './types';
 import { WebSearch } from './WebSearch';
+
+const DETAIL_COLLAPSE_DURATION_MS = 220;
 
 /**
  * ThoughtChainItemDetail 组件 - 思维链项详情组件
@@ -308,20 +310,9 @@ export const ThoughtChainListItem: React.FC<
     markdownRenderProps?: MarkdownEditorProps;
   } & ThoughtChainListProps['thoughtChainItemRender']
 > = React.memo((props) => {
-  const COLLAPSE_MOTION_TRANSITION = useMemo(
-    () => ({
-      height: {
-        duration: 0.22,
-        ease: [0.4, 0, 0.2, 1] as [number, number, number, number],
-      },
-      opacity: {
-        duration: 0.16,
-        ease: 'linear' as const,
-      },
-    }),
-    [],
-  );
   const [collapse, setCollapse] = React.useState<boolean>(false);
+  const [shouldRenderDetail, setShouldRenderDetail] =
+    React.useState<boolean>(true);
   const { thoughtChainListItem, prefixCls, hashId, setDocMeta } = props;
 
   const markdownRenderProps = useMemo(() => {
@@ -348,6 +339,21 @@ export const ThoughtChainListItem: React.FC<
   const handleCollapseChange = React.useCallback((change: boolean) => {
     setCollapse(change);
   }, []);
+
+  React.useEffect(() => {
+    if (!collapse) {
+      setShouldRenderDetail(true);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setShouldRenderDetail(false);
+    }, DETAIL_COLLAPSE_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [collapse]);
 
   const titleDom = (
     <TitleInfo
@@ -405,18 +411,24 @@ export const ThoughtChainListItem: React.FC<
         {props.titleRender
           ? props.titleRender(thoughtChainListItem!, titleDom)
           : titleDom}
-        <AnimatePresence initial={false}>
-          {!collapse ? (
-            <motion.div
-              key="thought-chain-item-content"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={COLLAPSE_MOTION_TRANSITION}
+        {shouldRenderDetail ? (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateRows: collapse ? '0fr' : '1fr',
+              opacity: collapse ? 0 : 1,
+              transition:
+                'grid-template-rows 0.22s ease, opacity 0.16s ease',
+              pointerEvents: collapse ? 'none' : 'auto',
+            }}
+            aria-hidden={collapse}
+          >
+            <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
+                minHeight: 0,
                 gap: 8,
               }}
             >
@@ -424,9 +436,9 @@ export const ThoughtChainListItem: React.FC<
               {props.contentRender
                 ? props.contentRender(thoughtChainListItem, content)
                 : content}
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+            </div>
+          </div>
+        ) : null}
       </div>
     </ThoughtChainItemMotion>
   );

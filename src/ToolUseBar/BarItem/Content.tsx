@@ -6,7 +6,7 @@ import {
   X,
 } from '@sofa-design/icons';
 import classNames from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import React, {
   memo,
   useCallback,
@@ -20,6 +20,8 @@ import { useRefFunction } from '../../Hooks/useRefFunction';
 
 /** 内容超出此高度时自动收起 */
 const CONTENT_COLLAPSE_THRESHOLD = 200;
+/** 工具详情收起动画时长（毫秒） */
+const TOOL_CONTENT_COLLAPSE_DURATION_MS = 220;
 
 interface ToolImageProps {
   tool: ToolCall;
@@ -311,6 +313,7 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
   const contentInnerRef = useRef<HTMLDivElement>(null);
   const [isContentOverflowing, setIsContentOverflowing] = useState(false);
   const [contentExpanded, setContentExpanded] = useState(false);
+  const [shouldRenderContent, setShouldRenderContent] = useState(expanded);
 
   const toolContainerClassName = useMemo(() => {
     return classNames(`${prefixCls}-tool-container`, hashId, {
@@ -379,6 +382,26 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
     return () => observer.disconnect();
   }, [showContent, expanded, tool.content, tool.errorMessage, checkOverflow]);
 
+  useEffect(() => {
+    if (!showContent) {
+      setShouldRenderContent(false);
+      return;
+    }
+
+    if (expanded) {
+      setShouldRenderContent(true);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setShouldRenderContent(false);
+    }, TOOL_CONTENT_COLLAPSE_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [expanded, showContent]);
+
   const handleContentExpandToggle = useRefFunction(() => {
     setContentExpanded((prev) => !prev);
   });
@@ -428,42 +451,6 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
     handleContentExpandToggle,
   ]);
 
-  const contentVariants = useMemo(
-    () => ({
-      expanded: {
-        height: 'auto',
-        opacity: 1,
-      },
-      collapsed: {
-        height: 0,
-        opacity: 0,
-      },
-    }),
-    [],
-  );
-
-  const contentTransition = useMemo(
-    () => ({
-      height: {
-        duration: 0.26,
-        ease: [0.4, 0, 0.2, 1],
-      },
-      opacity: {
-        duration: 0.2,
-        ease: 'linear',
-      },
-    }),
-    [],
-  );
-
-  const containerStyle = useMemo(
-    () => ({
-      overflow: 'hidden',
-      willChange: 'height, opacity',
-    }),
-    [],
-  );
-
   const innerContent = (
     <>
       <div ref={contentInnerRef} style={contentInnerStyle}>
@@ -478,7 +465,9 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
   if (disableAnimation) {
     return showContent && expanded ? (
       <div
-        className={toolContainerClassName}
+        className={classNames(toolContainerClassName, {
+          [`${prefixCls}-tool-container-expanded`]: true,
+        })}
         data-testid="tool-user-item-tool-container"
         style={{ overflow: 'hidden' }}
       >
@@ -488,21 +477,17 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
   }
 
   return (
-    <AnimatePresence initial={false} mode="sync">
-      {expanded ? (
-        <motion.div
-          key="tool-content"
-          className={toolContainerClassName}
+    <>
+      {showContent && shouldRenderContent ? (
+        <div
+          className={classNames(toolContainerClassName, {
+            [`${prefixCls}-tool-container-expanded`]: expanded,
+          })}
           data-testid="tool-user-item-tool-container"
-          variants={contentVariants}
-          initial="collapsed"
-          animate="expanded"
-          exit="collapsed"
-          transition={contentTransition}
-          style={containerStyle}
+          aria-hidden={!expanded}
         >
           {innerContent}
-        </motion.div>
+        </div>
       ) : null}
 
       {!showContent ? (
@@ -520,7 +505,7 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
           {errorDom}
         </div>
       ) : null}
-    </AnimatePresence>
+    </>
   );
 };
 

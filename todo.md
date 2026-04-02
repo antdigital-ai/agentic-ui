@@ -6,3 +6,4 @@
 - [x] 提交并推送改动
 - [x] 运行必要校验并根据结果修正（已尝试 `pnpm -s tsc --noEmit`，当前环境缺少 `tsc` 可执行文件）
 - [x] 为 ToolUseBar 展开收起补充轻量布局动画
+- [x] 将展开收起动画从 motion.div 改为纯 CSS 过渡
