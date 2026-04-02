@@ -1,5 +1,5 @@
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { DeepThink } from './DeepThink';
@@ -308,6 +308,19 @@ export const ThoughtChainListItem: React.FC<
     markdownRenderProps?: MarkdownEditorProps;
   } & ThoughtChainListProps['thoughtChainItemRender']
 > = React.memo((props) => {
+  const COLLAPSE_MOTION_TRANSITION = useMemo(
+    () => ({
+      height: {
+        duration: 0.22,
+        ease: [0.4, 0, 0.2, 1] as [number, number, number, number],
+      },
+      opacity: {
+        duration: 0.16,
+        ease: 'linear' as const,
+      },
+    }),
+    [],
+  );
   const [collapse, setCollapse] = React.useState<boolean>(false);
   const { thoughtChainListItem, prefixCls, hashId, setDocMeta } = props;
 
@@ -392,22 +405,28 @@ export const ThoughtChainListItem: React.FC<
         {props.titleRender
           ? props.titleRender(thoughtChainListItem!, titleDom)
           : titleDom}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: !collapse ? 'auto' : '0px',
-            overflow: 'hidden',
-            gap: 8,
-          }}
-        >
-          {/* 仅展开时挂载详情，避免多个深度思考/ Markdown 同时渲染导致卡顿 */}
-          {!collapse
-            ? props.contentRender
-              ? props.contentRender(thoughtChainListItem, content)
-              : content
-            : null}
-        </div>
+        <AnimatePresence initial={false}>
+          {!collapse ? (
+            <motion.div
+              key="thought-chain-item-content"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={COLLAPSE_MOTION_TRANSITION}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                gap: 8,
+              }}
+            >
+              {/* 仅展开时挂载详情，避免多个深度思考/ Markdown 同时渲染导致卡顿 */}
+              {props.contentRender
+                ? props.contentRender(thoughtChainListItem, content)
+                : content}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
     </ThoughtChainItemMotion>
   );
