@@ -22,6 +22,20 @@ import { TabKey } from './hotKeyCommands/tab';
 import { NativeTableKeyboard } from '../../utils/native-table';
 import { useEditorStore } from '../store';
 
+// Block types where plain Enter must be handled by EnterKey (not Slate's default insertBreak
+// and not the outer MarkdownInputField send handler). These are blocks where entering would
+// incorrectly split the node into two nodes with Slate's default behavior.
+const SPECIAL_ENTER_BLOCK_TYPES = new Set([
+  'list-item',
+  'code',
+  'table-cell',
+  'head',
+  'blockquote',
+  'card-before',
+  'card-after',
+  'break',
+]);
+
 /**
  * 键盘事件处理 Hook - 管理 Markdown 编辑器的所有键盘交互
  *
@@ -214,25 +228,25 @@ export const useKeyboard = (
         enter.run(e);
         return;
       }
-      // Enter 键（无 Shift）处理：如果在列表项中，让 EnterKey 处理；否则由 MarkdownInputField 处理发送
+      // Enter 键（无 Shift）处理：如果在特殊块类型中（列表项、代码块等），让 EnterKey 处理；否则由 MarkdownInputField 处理发送
       if (e.key === 'Enter' && !(e.ctrlKey || e.metaKey) && !e.shiftKey) {
-        // 检查当前是否在列表项中
         const selection = markdownEditorRef.current.selection;
         if (selection && Range.isCollapsed(selection)) {
           const [node] = Editor.nodes(markdownEditorRef.current, {
             at: selection.focus.path,
-            match: (n) => Element.isElement(n) && n.type === 'list-item',
+            match: (n) =>
+              Element.isElement(n) && SPECIAL_ENTER_BLOCK_TYPES.has(n.type),
             mode: 'lowest',
           });
           if (node) {
-            // 在列表项中，让 EnterKey 处理
+            // 在特殊块中，让 EnterKey 处理（如代码块插入换行、列表项创建新列表等）
             e.stopPropagation();
             e.preventDefault();
             enter.run(e);
             return;
           }
         }
-        // 不在列表项中，让 MarkdownInputField 处理发送
+        // 不在特殊块中，让 MarkdownInputField 处理发送
         return;
       }
 
