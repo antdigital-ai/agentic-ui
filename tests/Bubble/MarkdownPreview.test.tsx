@@ -37,13 +37,31 @@ vi.mock('react-error-boundary', () => ({
 }));
 
 vi.mock('../../src', () => ({
-  MarkdownEditor: () => <div data-testid="markdown-editor">Editor</div>,
+  MarkdownEditor: ({ typewriter }: { typewriter?: boolean }) => (
+    <div data-testid="markdown-editor">
+      Editor
+      <span data-testid="markdown-editor-typewriter">
+        {String(Boolean(typewriter))}
+      </span>
+    </div>
+  ),
   parserMdToSchema: () => ({ schema: {} }),
 }));
 
 vi.mock('../../src/MarkdownRenderer', () => ({
-  MarkdownRenderer: ({ content }: { content?: string }) => (
-    <div data-testid="markdown-renderer-markdown-mode">{content}</div>
+  MarkdownRenderer: ({
+    content,
+    streaming,
+  }: {
+    content?: string;
+    streaming?: boolean;
+  }) => (
+    <div data-testid="markdown-renderer-markdown-mode">
+      <span data-testid="markdown-renderer-content">{content}</span>
+      <span data-testid="markdown-renderer-streaming">
+        {String(Boolean(streaming))}
+      </span>
+    </div>
   ),
 }));
 
@@ -198,6 +216,67 @@ describe('MarkdownPreview', () => {
         screen.getByTestId('markdown-renderer-markdown-mode'),
       ).toHaveTextContent('# Hello');
       expect(screen.queryByTestId('markdown-editor')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('动画仅在最后一条消息启用', () => {
+    it('markdown 渲染模式下，非最后一条消息不启用 streaming 动画', () => {
+      render(
+        <MarkdownPreview
+          {...defaultProps}
+          typing
+          markdownRenderConfig={{ renderMode: 'markdown' }}
+          originData={{
+            role: 'assistant',
+            content: 'hello',
+            isFinished: false,
+            isLast: false,
+          }}
+        />,
+      );
+
+      expect(screen.getByTestId('markdown-renderer-streaming')).toHaveTextContent(
+        'false',
+      );
+    });
+
+    it('markdown 渲染模式下，最后一条消息启用 streaming 动画', () => {
+      render(
+        <MarkdownPreview
+          {...defaultProps}
+          typing
+          markdownRenderConfig={{ renderMode: 'markdown' }}
+          originData={{
+            role: 'assistant',
+            content: 'hello',
+            isFinished: false,
+            isLast: true,
+          }}
+        />,
+      );
+
+      expect(screen.getByTestId('markdown-renderer-streaming')).toHaveTextContent(
+        'true',
+      );
+    });
+
+    it('slate 渲染模式下，非最后一条消息不启用 typewriter', () => {
+      render(
+        <MarkdownPreview
+          {...defaultProps}
+          typing
+          originData={{
+            role: 'assistant',
+            content: 'hello',
+            isFinished: false,
+            isLast: false,
+          }}
+        />,
+      );
+
+      expect(screen.getByTestId('markdown-editor-typewriter')).toHaveTextContent(
+        'false',
+      );
     });
   });
 });

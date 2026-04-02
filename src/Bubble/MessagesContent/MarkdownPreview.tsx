@@ -114,6 +114,8 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     props.markdownRenderConfig?.renderMode ??
     props.markdownRenderConfig?.renderType ??
     'slate';
+  const shouldAnimateMarkdown =
+    Boolean(typing) && (props.originData?.isLast ?? true);
 
   const isPaddingHidden = useMemo(() => {
     return !!extra;
@@ -131,7 +133,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
       return (
         <MarkdownRenderer
           content={content}
-          streaming={typing}
+          streaming={shouldAnimateMarkdown}
           isFinished={props.originData?.isFinished}
           plugins={props.markdownRenderConfig?.plugins}
           queueOptions={props.markdownRenderConfig?.queueOptions}
@@ -184,7 +186,10 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           fontSize: 14,
           ...(props.markdownRenderConfig?.editorStyle || {}),
         }}
-        typewriter={props.markdownRenderConfig?.typewriter ?? typing}
+        typewriter={
+          (props.markdownRenderConfig?.typewriter ?? shouldAnimateMarkdown) &&
+          (props.originData?.isLast ?? true)
+        }
         style={{
           minWidth: minWidth ? `min(${minWidth}px,100%)` : undefined,
           maxWidth: standalone ? '100%' : undefined,
