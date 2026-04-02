@@ -205,8 +205,7 @@ const genStyle: GenerateStyle<
       '&-typing-hint': {
         position: 'absolute',
         left: 'var(--padding-3x)',
-        top: '50%',
-        transform: 'translateY(-50%)',
+        top: 20,
         pointerEvents: 'none',
         zIndex: 10,
         display: 'flex',
