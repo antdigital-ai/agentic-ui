@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme } from 'antd';
 import classNames from 'clsx';
 import React, { useContext, useMemo, useRef } from 'react';
 import { useIntersectionOnce } from '../../Hooks/useIntersectionOnce';
@@ -14,6 +14,7 @@ const PRE_STYLE: React.CSSProperties = {
 
 export const MermaidRendererImpl = (props: { element: CodeNode }) => {
   const context = useContext(ConfigProvider.ConfigContext);
+  const { token } = theme.useToken();
   const baseCls =
     context?.getPrefixCls('agentic-plugin-mermaid') || 'plugin-mermaid';
   const { wrapSSR, hashId } = useStyle(baseCls);
@@ -29,6 +30,15 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     divRef,
     id,
     isVisible,
+    {
+      colorBgContainer: token.colorBgContainer,
+      colorBgElevated: token.colorBgElevated,
+      colorText: token.colorText,
+      colorTextSecondary: token.colorTextSecondary,
+      colorBorder: token.colorBorder,
+      colorPrimary: token.colorPrimary,
+      fontFamily: token.fontFamily,
+    },
   );
 
   const isError = useMemo(() => !!error && !!error.trim(), [error]);

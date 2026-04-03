@@ -13,8 +13,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       padding: '0.75rem 0',
       borderRadius: '1em',
       maxWidth: '800px',
-      border: '1px solid #e8e8e8',
-      backgroundColor: '#fff',
+      border: `1px solid ${token.colorBorder}`,
+      backgroundColor: token.colorBgContainer,
       minWidth: '240px',
       minHeight: '200px',
       display: 'flex',
@@ -60,7 +60,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       '&-error': {
         textAlign: 'center',
-        color: 'rgba(239, 68, 68, 0.8)',
+        color: token.colorError,
         padding: '0.5rem',
         flex: 1,
         position: 'relative',
@@ -74,7 +74,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       '&-empty': {
         textAlign: 'left',
-        color: '#6B7280',
+        color: token.colorTextSecondary,
         padding: '0.75rem 1.5rem',
         position: 'relative',
         zIndex: 1,
@@ -96,27 +96,28 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '& svg': {
         '& .node': {
           '& rect, & circle, & ellipse, & polygon': {
-            stroke: '#333',
+            stroke: token.colorBorder,
             strokeWidth: '1px',
-            fill: '#fff',
+            fill: token.colorBgContainer,
           },
         },
         '& text': {
           dominantBaseline: 'middle',
           textAnchor: 'middle',
+          fill: `${token.colorText} !important`,
         },
         '& .nodeLabel': {
           fontWeight: 500,
-          fill: '#333 !important',
+          fill: `${token.colorText} !important`,
         },
         '& .edgeLabel': {
-          fill: '#666 !important',
+          fill: `${token.colorTextSecondary} !important`,
         },
         '& .flowchart-label': {
-          fill: '#333 !important',
+          fill: `${token.colorText} !important`,
         },
         '& .label': {
-          fill: '#333 !important',
+          fill: `${token.colorText} !important`,
         },
       },
     },
