@@ -453,9 +453,7 @@ export class EditorStore {
       const nodeList = parserMdToSchema(md, plugins).schema;
       this.setContent(nodeList);
       this._editor.current.children = nodeList;
-      if (!ReactEditor.isFocused(this._editor.current)) {
-        ReactEditor.deselect(this._editor.current);
-      }
+      this._safeDeselect();
       onProgress?.(1);
     } catch (error) {
       console.error('Failed to set MD content:', error);
@@ -476,9 +474,7 @@ export class EditorStore {
       if (allNodes.length > 0) {
         this.setContent(allNodes);
         this._editor.current.children = allNodes;
-        if (!ReactEditor.isFocused(this._editor.current)) {
-          ReactEditor.deselect(this._editor.current);
-        }
+        this._safeDeselect();
       }
       onProgress?.(1);
     } catch (error) {
@@ -511,6 +507,26 @@ export class EditorStore {
     if (this._currentAbortController) {
       this._currentAbortController.abort();
       this._currentAbortController = null;
+    }
+  }
+
+  /**
+   * 安全地取消编辑器选区。
+   *
+   * ReactEditor.deselect() 内部调用 window.getSelection().removeAllRanges()，
+   * 当编辑器处于聚焦状态时，浏览器要求必须存在活跃选区才能操作，
+   * 否则抛出 InvalidStateError("Failed to execute 'collapseToEnd' on 'Selection'")。
+   *
+   * 双重防御策略：
+   * 1. isFocused 检查 —— 大多数情况下直接跳过（性能优先）
+   * 2. try-catch —— 覆盖 isFocused 与 deselect 之间的竞态窗口
+   */
+  private _safeDeselect(): void {
+    if (ReactEditor.isFocused(this._editor.current)) return;
+    try {
+      ReactEditor.deselect(this._editor.current);
+    } catch {
+      // InvalidStateError：编辑器在 isFocused 检查与 deselect 调用之间获得了焦点，忽略即可
     }
   }
 
@@ -613,9 +629,7 @@ export class EditorStore {
             rafId = requestAnimationFrame(parseAndInsertNextBatch);
           } else {
             // 所有内容处理完成
-            if (!ReactEditor.isFocused(this._editor.current)) {
-              ReactEditor.deselect(this._editor.current);
-            }
+            this._safeDeselect();
             rafId = null;
             this._currentAbortController = null;
             resolve();
