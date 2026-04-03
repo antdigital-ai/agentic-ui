@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react';
+import { ReactEditor } from 'slate-react';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
@@ -39,10 +45,28 @@ export const useMarkdownInputFieldRefs = (
   // 同步外部 value 到编辑器 — 只在 value 来自外部（非编辑器自身输入）时写回
   useEffect(() => {
     if (!markdownEditorRef.current) return;
-    // Skip the round-trip: if the editor itself produced this value, it already
-    // has the correct document and calling setMDContent would overwrite the live
-    // selection state while the user is typing.
+
+    // Primary guard: this value was just produced by the editor itself —
+    // the Slate document is already correct, no write-back needed.
     if (props.value === lastEditorValueRef.current) return;
+
+    // Secondary guard: the editor is focused, meaning the user is actively
+    // typing.  A stale props.value (delayed by debounce + React batching) could
+    // arrive *after* the editor has moved on to a newer character.  Calling
+    // setMDContent in that window replaces the live document and triggers
+    // ReactEditor.deselect() on a focused editor → InvalidStateError → white
+    // screen.  Skip the write; _safeDeselect in store.ts also defends here as
+    // a last resort, but not calling setMDContent at all is the clean fix.
+    const slateEditor =
+      markdownEditorRef.current?.markdownEditorRef?.current;
+    if (slateEditor) {
+      try {
+        if (ReactEditor.isFocused(slateEditor)) return;
+      } catch {
+        // ReactEditor.isFocused can throw if the editor is being torn down
+      }
+    }
+
     markdownEditorRef.current?.store?.setMDContent(props.value ?? '');
   }, [props.value]);
 

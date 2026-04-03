@@ -421,6 +421,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   if (props.maxLength !== undefined) {
                     if (value.length > props.maxLength) {
                       const truncatedValue = value.slice(0, props.maxLength);
+                      onEditorChange(truncatedValue);
                       setValue(truncatedValue);
                       props.onChange?.(truncatedValue);
                       props.onMaxLengthExceeded?.(value);
