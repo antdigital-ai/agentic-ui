@@ -477,20 +477,24 @@ const MLeafComponent = (
               setTimeout(() => {
                 if (!markdownEditorRef.current) return;
                 if (!path?.length) return;
-                const nextPath = Path.next(path);
-                if (!Editor.hasPath(markdownEditorRef.current, nextPath)) {
-                  Transforms.insertNodes(
-                    markdownEditorRef.current,
-                    [{ text: ' ' }],
-                    {
-                      select: true,
-                    },
-                  );
-                } else {
-                  Transforms.select(markdownEditorRef.current, {
-                    anchor: Editor.end(markdownEditorRef.current, path),
-                    focus: Editor.end(markdownEditorRef.current, path),
-                  });
+                try {
+                  const nextPath = Path.next(path);
+                  if (!Editor.hasPath(markdownEditorRef.current, nextPath)) {
+                    Transforms.insertNodes(
+                      markdownEditorRef.current,
+                      [{ text: ' ' }],
+                      {
+                        select: true,
+                      },
+                    );
+                  } else {
+                    Transforms.select(markdownEditorRef.current, {
+                      anchor: Editor.end(markdownEditorRef.current, path),
+                      focus: Editor.end(markdownEditorRef.current, path),
+                    });
+                  }
+                } catch {
+                  // path may have become stale after the timeout; ignore
                 }
               }, 0);
             }}

@@ -212,8 +212,14 @@ export class EditorStore {
   focus() {
     const editor = this._editor.current;
     try {
-      // 1. 确保编辑器获得焦点
-      setTimeout(() => ReactEditor.focus(editor), 0);
+      // 1. 确保编辑器获得焦点（异步，需要单独 try-catch 防止白屏）
+      setTimeout(() => {
+        try {
+          ReactEditor.focus(editor);
+        } catch (e) {
+          console.error('ReactEditor.focus 失败:', e);
+        }
+      }, 0);
       // 2. 处理空文档情况
       if (editor.children.length === 0) {
         const defaultNode = { type: 'paragraph', children: [{ text: '' }] };

@@ -639,14 +639,18 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
           isTop: EditorUtils.isTop(markdownEditorRef.current, node[1]),
         };
         if (node?.[0]?.type === 'paragraph') {
-          const el = ReactEditor.toDOMNode(markdownEditorRef.current, node[0]);
-          if (el) {
-            const position = calculatePosition(el, document.body);
-            if (position) {
-              setState(position);
-            } else {
-              setState({ top: 0, left: 0, bottom: undefined });
+          try {
+            const el = ReactEditor.toDOMNode(markdownEditorRef.current, node[0]);
+            if (el) {
+              const position = calculatePosition(el, document.body);
+              if (position) {
+                setState(position);
+              } else {
+                setState({ top: 0, left: 0, bottom: undefined });
+              }
             }
+          } catch {
+            // node may not be mounted yet; position update skipped
           }
         }
         setupEventListeners();

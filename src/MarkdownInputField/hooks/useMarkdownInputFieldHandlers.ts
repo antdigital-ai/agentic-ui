@@ -231,8 +231,12 @@ export const useMarkdownInputFieldHandlers = ({
       if (isInteractive) return;
 
       EditorUtils.focus(editor);
-      const end = Editor.end(editor, []);
-      Transforms.select(editor, end);
+      try {
+        const end = Editor.end(editor, []);
+        Transforms.select(editor, end);
+      } catch {
+        // editor may have no valid content points yet; focus is still applied
+      }
     },
   );
 
