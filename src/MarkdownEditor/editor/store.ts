@@ -453,7 +453,9 @@ export class EditorStore {
       const nodeList = parserMdToSchema(md, plugins).schema;
       this.setContent(nodeList);
       this._editor.current.children = nodeList;
-      ReactEditor.deselect(this._editor.current);
+      if (!ReactEditor.isFocused(this._editor.current)) {
+        ReactEditor.deselect(this._editor.current);
+      }
       onProgress?.(1);
     } catch (error) {
       console.error('Failed to set MD content:', error);
@@ -474,7 +476,9 @@ export class EditorStore {
       if (allNodes.length > 0) {
         this.setContent(allNodes);
         this._editor.current.children = allNodes;
-        ReactEditor.deselect(this._editor.current);
+        if (!ReactEditor.isFocused(this._editor.current)) {
+          ReactEditor.deselect(this._editor.current);
+        }
       }
       onProgress?.(1);
     } catch (error) {
@@ -609,7 +613,9 @@ export class EditorStore {
             rafId = requestAnimationFrame(parseAndInsertNextBatch);
           } else {
             // 所有内容处理完成
-            ReactEditor.deselect(this._editor.current);
+            if (!ReactEditor.isFocused(this._editor.current)) {
+              ReactEditor.deselect(this._editor.current);
+            }
             rafId = null;
             this._currentAbortController = null;
             resolve();

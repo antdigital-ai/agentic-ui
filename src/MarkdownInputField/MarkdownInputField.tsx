@@ -159,7 +159,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   });
 
   // Refs 管理
-  const { markdownEditorRef, quickActionsRef, actionsRef, isSendingRef } =
+  const { markdownEditorRef, quickActionsRef, actionsRef, isSendingRef, onEditorChange } =
     useMarkdownInputFieldRefs({
       inputRef: props.inputRef,
       value: props.value,
@@ -431,6 +431,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                       return;
                     }
                   }
+                  // Record the value the editor just produced so the external
+                  // props.value sync effect skips the redundant setMDContent call
+                  // that would disrupt the live Slate selection while typing.
+                  onEditorChange(value);
                   setValue(value);
                   props.onChange?.(value);
                 }}

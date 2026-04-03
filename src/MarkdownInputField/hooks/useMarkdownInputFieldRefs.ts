@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useRef } from 'react';
+import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
@@ -21,9 +21,28 @@ export const useMarkdownInputFieldRefs = (
   const actionsRef = useRef<HTMLDivElement>(null);
   const isSendingRef = useRef(false);
 
-  // 同步外部 value 到编辑器
+  /**
+   * Tracks the last value emitted by the editor's own onChange callback.
+   * When props.value matches this ref we know the update originated from the
+   * editor itself and there is no need to call setMDContent — doing so would
+   * replace the live Slate document while the user is actively typing, causing
+   * ReactEditor.deselect() to throw "Failed to execute 'collapseToEnd' on
+   * 'Selection': There is no selection", which crashes the component tree.
+   */
+  const lastEditorValueRef = useRef<string | undefined>(undefined);
+
+  /** Called by MarkdownInputField's onChange handler to record what the editor just emitted. */
+  const onEditorChange = useCallback((value: string) => {
+    lastEditorValueRef.current = value;
+  }, []);
+
+  // 同步外部 value 到编辑器 — 只在 value 来自外部（非编辑器自身输入）时写回
   useEffect(() => {
     if (!markdownEditorRef.current) return;
+    // Skip the round-trip: if the editor itself produced this value, it already
+    // has the correct document and calling setMDContent would overwrite the live
+    // selection state while the user is typing.
+    if (props.value === lastEditorValueRef.current) return;
     markdownEditorRef.current?.store?.setMDContent(props.value ?? '');
   }, [props.value]);
 
@@ -75,5 +94,6 @@ export const useMarkdownInputFieldRefs = (
     quickActionsRef,
     actionsRef,
     isSendingRef,
+    onEditorChange,
   };
 };
