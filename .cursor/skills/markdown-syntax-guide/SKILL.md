@@ -1,6 +1,6 @@
 ---
 name: markdown-syntax-guide
-description: 指导用户使用 Markdown Editor / Markdown 渲染器的扩展语法。在用户询问如何写表格、视频、图表、卡片、提示块、Mermaid、apaasify 等语法时使用。Triggers on keywords like 表格, 视频, 图表, 卡片, 提示块, 语法, 怎么写, how to write table chart video card.
+description: 指导用户使用 Markdown Editor / Markdown 渲染器的扩展语法。图表场景默认优先使用 HTML 注释（chartType）+ 表格语法；Mermaid 仅用于流程/时序等结构图。Triggers on keywords like 表格, 视频, 图表, 卡片, 提示块, 语法, 怎么写, how to write table chart video card.
 ---
 
 # Markdown 语法指导 Skill
@@ -13,7 +13,7 @@ description: 指导用户使用 Markdown Editor / Markdown 渲染器的扩展语
 |------------|----------|
 | `表格`, `table` | 基础表格 + 高级表格 + 图表化表格 |
 | `视频`, `video` | HTML video 标签 + 图片式视频语法 |
-| `图表`, `chart`, `柱状图`, `饼图`, `折线图` | chartType 配置 + Mermaid |
+| `图表`, `chart`, `柱状图`, `饼图`, `折线图` | **优先** chartType 注释 + 表格（默认）；Mermaid（仅流程/时序图） |
 | `卡片`, `card`, `link-card` | 链接卡片语法 |
 | `提示块`, `alert`, `info`, `warning` | ::: 语法 |
 | `Mermaid`, `流程图`, `时序图` | Mermaid 代码块 |
@@ -98,21 +98,7 @@ description: 指导用户使用 Markdown Editor / Markdown 渲染器的扩展语
 
 ### 3. 图表 (Charts)
 
-**Mermaid 图表**
-
-````markdown
-```mermaid
-graph TD
-    A[开始] --> B{判断}
-    B -- 是 --> C[执行]
-    B -- 否 --> D[结束]
-    C --> D
-```
-````
-
-支持流程图、时序图、甘特图等 Mermaid 语法。
-
-**基于表格的数据图表**
+**默认优先：基于表格的数据图表（推荐）**
 
 在表格上方添加 HTML 注释配置 `chartType` 和坐标轴字段：
 
@@ -136,6 +122,20 @@ graph TD
 ```
 
 详细配置见 `docs/utils/chart-config.md`。
+
+**Mermaid 图表（仅流程/时序等结构图场景）**
+
+````markdown
+```mermaid
+graph TD
+    A[开始] --> B{判断}
+    B -- 是 --> C[执行]
+    B -- 否 --> D[结束]
+    C --> D
+```
+````
+
+支持流程图、时序图、甘特图等 Mermaid 语法。
 
 ---
 
@@ -320,7 +320,8 @@ title: 功能说明
 2. **说明必须紧邻**：表格的 `chartType` 注释必须紧贴表格上方；链接卡片的注释必须与链接在同一段落。
 3. **字段名与表格列一致**：`x`、`y` 等字段必须对应表格中的列名。
 4. **JSON 格式严格**：HTML 注释内的 JSON 不能有尾逗号、不能有注释，否则解析失败。
-5. **区分渲染环境**：MDX、apaasify 等依赖具体项目配置，需说明「若项目支持」。
+5. **图表回复优先级**：默认先给 `chartType` 注释 + 表格示例；仅在用户明确要流程图/时序图/状态机图时再给 Mermaid。
+6. **区分渲染环境**：MDX、apaasify 等依赖具体项目配置，需说明「若项目支持」。
 
 ## 参考文档
 
