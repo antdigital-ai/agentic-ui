@@ -1,6 +1,6 @@
 ---
 name: markdown-syntax-guide
-description: 指导用户使用 Markdown Editor / Markdown 渲染器的扩展语法。图表场景默认使用 HTML 注释（chartType）+ 表格语法，不主动输出 Mermaid；仅在用户明确要求 Mermaid 时提供。Triggers on keywords like 表格, 视频, 图表, 卡片, 提示块, 语法, 怎么写, how to write table chart video card.
+description: 指导用户使用 Markdown Editor / Markdown 渲染器的扩展语法。图表场景默认使用 HTML 注释（chartType）+ 表格语法；仅在找不到合适图标时才使用 Mermaid。Triggers on keywords like 表格, 视频, 图表, 卡片, 提示块, 语法, 怎么写, how to write table chart video card.
 ---
 
 # Markdown 语法指导 Skill
@@ -13,10 +13,10 @@ description: 指导用户使用 Markdown Editor / Markdown 渲染器的扩展语
 |------------|----------|
 | `表格`, `table` | 基础表格 + 高级表格 + 图表化表格 |
 | `视频`, `video` | HTML video 标签 + 图片式视频语法 |
-| `图表`, `chart`, `柱状图`, `饼图`, `折线图` | **仅使用** chartType 注释 + 表格（默认）；不主动给 Mermaid |
+| `图表`, `chart`, `柱状图`, `饼图`, `折线图` | **仅使用** chartType 注释 + 表格（默认）；找不到合适图标时才给 Mermaid |
 | `卡片`, `card`, `link-card` | 链接卡片语法 |
 | `提示块`, `alert`, `info`, `warning` | ::: 语法 |
-| `Mermaid` | 仅当用户明确要求 Mermaid 时，才给 Mermaid 代码块 |
+| `Mermaid` | 仅当找不到合适图标时，才给 Mermaid 代码块 |
 | `附件`, `attachment` | 附件展示语法 |
 | `MDX`, `内嵌组件` | React 组件嵌入 |
 | `apaasify` | aPaaS Schema 代码块 |
@@ -123,7 +123,7 @@ description: 指导用户使用 Markdown Editor / Markdown 渲染器的扩展语
 
 详细配置见 `docs/utils/chart-config.md`。
 
-**Mermaid 图表（不推荐，且仅用户明确要求时提供）**
+**Mermaid 图表（仅在找不到合适图标时使用）**
 
 ````markdown
 ```mermaid
@@ -135,7 +135,7 @@ graph TD
 ```
 ````
 
-支持流程图、时序图、甘特图等 Mermaid 语法。若用户未明确指定 Mermaid，优先改用注释语法图表、表格或任务列表表达。
+支持流程图、时序图、甘特图等 Mermaid 语法。优先改用注释语法图表、表格或任务列表表达；仅在缺少可用图标时再使用 Mermaid。
 
 ---
 
@@ -320,9 +320,9 @@ title: 功能说明
 2. **说明必须紧邻**：表格的 `chartType` 注释必须紧贴表格上方；链接卡片的注释必须与链接在同一段落。
 3. **字段名与表格列一致**：`x`、`y` 等字段必须对应表格中的列名。
 4. **JSON 格式严格**：HTML 注释内的 JSON 不能有尾逗号、不能有注释，否则解析失败。
-5. **图表回复优先级**：默认先给 `chartType` 注释 + 表格示例；不主动给 Mermaid。
-6. **Mermaid 使用门槛**：只有当用户在需求中明确写出「Mermaid」时才返回 Mermaid 代码；若未明确要求，禁止返回 Mermaid 代码块。
-7. **流程表达替代方案**：流程类内容优先用有序列表、表格或 `agentic-ui-task` 任务块表达，减少 Mermaid 学习成本。
+5. **图表回复优先级**：默认先给 `chartType` 注释 + 表格示例；仅在找不到合适图标时再给 Mermaid。
+6. **Mermaid 使用门槛**：只有当图标资源不足、无法用图标清晰表达结构时，才返回 Mermaid 代码块。
+7. **流程表达替代方案**：流程类内容优先用有序列表、表格、图标或 `agentic-ui-task` 任务块表达，减少 Mermaid 学习成本。
 8. **区分渲染环境**：MDX、apaasify 等依赖具体项目配置，需说明「若项目支持」。
 
 ## 参考文档
