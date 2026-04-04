@@ -107,6 +107,18 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
     onLocate?.(item);
   };
 
+  const handleOpenFromSite = (
+    e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onOpen) {
+      onOpen(item);
+      return;
+    }
+    window.open(item.url, '_blank', 'noopener,noreferrer');
+  };
+
   return wrapSSR(
     <List.Item
       className={className}
@@ -149,7 +161,18 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
             </a>
           </Tooltip>
         </div>
-        <div className={classNames(`${prefixCls}-result-item-site`, hashId)}>
+        <div
+          className={classNames(`${prefixCls}-result-item-site`, hashId)}
+          role="link"
+          tabIndex={0}
+          aria-label={item.site}
+          onClick={handleOpenFromSite}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              handleOpenFromSite(event);
+            }
+          }}
+        >
           {renderSiteAvatar(item.site, item.icon)}
           <Tooltip title={item.site} mouseEnterDelay={1}>
             <div
