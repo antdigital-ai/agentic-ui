@@ -1,6 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { MermaidApi } from './types';
-import { cleanupTempElement, loadMermaid, renderSvgToContainer } from './utils';
+import {
+  applyMermaidTheme,
+  cleanupTempElement,
+  createMermaidThemeConfig,
+  loadMermaid,
+  renderSvgToContainer,
+} from './utils';
+import type { MermaidThemeToken } from './utils';
 
 /**
  * Mermaid 渲染 Hook
@@ -10,15 +17,32 @@ export const useMermaidRender = (
   divRef: React.RefObject<HTMLDivElement>,
   id: string,
   isVisible: boolean,
+  themeToken?: MermaidThemeToken,
 ) => {
   const timer = useRef<number | null>(null);
   const mermaidRef = useRef<MermaidApi | null>(null);
-  const renderedCodeRef = useRef<string>('');
+  const renderedSignatureRef = useRef<string>('');
+  const latestRenderSignatureRef = useRef<string>('');
+  const appliedThemeCacheKeyRef = useRef<string>('');
   const [error, setError] = useState<string>('');
   const [renderedCode, setRenderedCode] = useState<string>('');
+  const themeConfig = useMemo(
+    () => createMermaidThemeConfig(themeToken),
+    [
+      themeToken?.colorBgContainer,
+      themeToken?.colorBgElevated,
+      themeToken?.colorBorder,
+      themeToken?.colorPrimary,
+      themeToken?.colorText,
+      themeToken?.colorTextSecondary,
+      themeToken?.fontFamily,
+    ],
+  );
+  const renderSignature = `${themeConfig.cacheKey}::${code}`;
+  latestRenderSignatureRef.current = renderSignature;
 
   useEffect(() => {
-    if (!isVisible || renderedCodeRef.current === code) {
+    if (!isVisible || renderedSignatureRef.current === renderSignature) {
       return;
     }
 
@@ -27,7 +51,7 @@ export const useMermaidRender = (
     }
 
     if (!code) {
-      renderedCodeRef.current = '';
+      renderedSignatureRef.current = '';
       setRenderedCode('');
       setError('');
       if (divRef.current) {
@@ -36,9 +60,9 @@ export const useMermaidRender = (
       return;
     }
 
-    const currentCode = code;
+    const currentSignature = renderSignature;
     timer.current = window.setTimeout(async () => {
-      if (code !== currentCode) {
+      if (latestRenderSignatureRef.current !== currentSignature) {
         timer.current = null;
         return;
       }
@@ -46,10 +70,14 @@ export const useMermaidRender = (
       try {
         const api = mermaidRef.current ?? (await loadMermaid());
         mermaidRef.current = api;
+        if (appliedThemeCacheKeyRef.current !== themeConfig.cacheKey) {
+          applyMermaidTheme(api, themeConfig);
+          appliedThemeCacheKeyRef.current = themeConfig.cacheKey;
+        }
 
         const trimmedCode = code.trim();
         if (!trimmedCode) {
-          renderedCodeRef.current = '';
+          renderedSignatureRef.current = '';
           setRenderedCode('');
           setError('');
           if (divRef.current) {
@@ -64,17 +92,22 @@ export const useMermaidRender = (
           trimmedCode.endsWith('```') ? trimmedCode : trimmedCode,
         );
 
+        if (latestRenderSignatureRef.current !== currentSignature) {
+          timer.current = null;
+          return;
+        }
+
         if (divRef.current) {
           renderSvgToContainer(svg, divRef.current);
         }
 
-        renderedCodeRef.current = code;
+        renderedSignatureRef.current = currentSignature;
         setRenderedCode(code);
         setError('');
       } catch (err) {
-        if (code === currentCode) {
+        if (latestRenderSignatureRef.current === currentSignature) {
           setError(String(err));
-          renderedCodeRef.current = code;
+          renderedSignatureRef.current = currentSignature;
           setRenderedCode(code);
           if (divRef.current) {
             divRef.current.innerHTML = '';
@@ -92,7 +125,7 @@ export const useMermaidRender = (
         timer.current = null;
       }
     };
-  }, [code, id, isVisible]);
+  }, [code, id, isVisible, renderSignature, themeConfig, divRef]);
 
   return { error, renderedCode };
 };
