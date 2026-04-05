@@ -11,7 +11,8 @@ export default function ClassNamesExtendedDemo() {
     {
       id: '1',
       role: 'user' as const,
-      content: '你好，这是一条用户消息',
+      content:
+        '给 `BubbleList` 加了 `classNames.content` 之后，里面的引用块和代码块会跟着变吗？',
       createAt: Date.now(),
       updateAt: Date.now(),
       meta: {
@@ -23,7 +24,8 @@ export default function ClassNamesExtendedDemo() {
     {
       id: '2',
       role: 'bot' as const,
-      content: '你好！这是一条机器人回复，演示各种自定义样式配置。',
+      content:
+        '会。样式作用在内容容器上时，内部 Markdown（引用、行内代码、`pre` 等）都在同一作用域下，可按需再用更细的选择器区分。',
       createAt: Date.now(),
       updateAt: Date.now(),
       meta: {
@@ -35,7 +37,8 @@ export default function ClassNamesExtendedDemo() {
     {
       id: '3',
       role: 'bot' as const,
-      content: '这条消息展示了加载状态和自定义样式',
+      content:
+        '本条模拟 **未完成**（`isFinished: false`），用于观察加载态、骨架与自定义类名同时存在时的表现。',
       createAt: Date.now(),
       updateAt: Date.now(),
       isFinished: false,

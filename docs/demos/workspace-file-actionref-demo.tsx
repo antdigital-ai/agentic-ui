@@ -17,7 +17,8 @@ const WorkspaceFileActionRefDemo: React.FC = () => {
             type: 'markdown',
             size: '2.5KB',
             lastModified: '2024-01-15 10:00:00',
-            content: '# 项目说明\n\n这是一个示例项目...',
+            content:
+              '# @ant-design/agentic-ui\n\n本 Demo 演示 Workspace 文件树与 `FileActionRef`（展开、定位等）。',
           },
           {
             name: 'CHANGELOG.md',
@@ -25,7 +26,8 @@ const WorkspaceFileActionRefDemo: React.FC = () => {
             size: '1.8KB',
             loading: true, // 模拟文件加载中
             lastModified: '2024-01-14 15:30:00',
-            content: '加载中的占位正文（示例）。',
+            content:
+              '正在拉取远端变更… 预览区可先展示骨架或上次缓存内容，加载完成后替换为全文。',
           },
         ],
       },

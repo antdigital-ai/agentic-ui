@@ -28,7 +28,7 @@ const createMockMessage = (
   } as BubbleMetaData,
 });
 
-// 示例消息
+// 初始会话（用于展示 loading、只读与列表高度等配置）
 const sampleMessages: MessageBubbleData[] = [
   createMockMessage(
     '1',

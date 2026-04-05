@@ -10,13 +10,15 @@ import { BubbleDemoCard } from './bubble/BubbleDemoCard';
 const initAssistant: MessageBubbleData = {
   id: 'a-1',
   role: 'assistant',
-  content: `# 欢迎使用 Ant Design MD Editor！
-我是 Ant Design 聊天助手，可以帮你：
-- **回答问题** - 解答技术相关疑问
-- **代码示例** - 提供组件使用示例  
-- **设计建议** - 给出设计方案建议
-- **文档说明** - 解释 API 和功能
-你想了解什么呢？`,
+  content: `# 在对话里使用 Markdown
+
+我是示例助手，可配合下方 **SuggestionList** 演示快捷追问。你可以：
+
+- **问 API** — \`Bubble\` / \`MarkdownEditor\` 等 props 与典型用法
+- **贴代码** — 组件集成、主题与 \`markdownRenderConfig\`
+- **要步骤** — 从安装到页面里接入 \`ChatLayout\` + \`BubbleList\`
+
+直接点选推荐问题，或在输入框里继续输入。`,
   extra: {},
   createAt: Date.now() - 10000,
   updateAt: Date.now() - 10000,
@@ -32,19 +34,19 @@ const initAssistant: MessageBubbleData = {
 
 const items = [
   {
-    key: 'qwe',
-    icon: '💸',
-    text: '关税对消费类基金的影响',
+    key: 'footnote-markdown',
+    icon: '🔗',
+    text: '脚注与引用在 Bubble / Markdown 里怎么配？',
   },
   {
-    key: 'asd',
-    icon: '📝',
-    text: '恒生科技指数基金相关新闻',
+    key: 'streaming-bubble',
+    icon: '⚡',
+    text: '流式 Markdown 和 BubbleList 如何一起用？',
   },
   {
-    key: 'zxc',
-    icon: '📊',
-    text: '数据分析与可视化',
+    key: 'chat-layout-setup',
+    icon: '🧩',
+    text: 'ChatLayout + BubbleList 最小接入步骤',
   },
 ];
 

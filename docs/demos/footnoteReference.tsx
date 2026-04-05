@@ -33,10 +33,11 @@ export default () => {
       path: [2, 0],
       time: 1735924079099,
       id: 1735924079099,
-      content: '你好',
+      content:
+        '标题写「新能源基金」，后文却以科技公司财报为主，建议统一主题或补充过渡说明。',
       anchorOffset: 283,
       focusOffset: 292,
-      refContent: '日带领Umi 在香港联',
+      refContent: '# 新能源基金现状及投资',
       commentType: 'comment',
     },
     {
@@ -49,12 +50,13 @@ export default () => {
       anchorOffset: 283,
       focusOffset: 292,
       user: {
-        name: '张志东',
+        name: '审阅人A',
       },
       time: 1629340800000,
-      content: '深圳大学是中国最好的大学之一,拥有很多优秀的学生。',
+      content:
+        '开篇外链为 example.com 占位，若面向真实读者需替换为可核验来源。',
       refContent:
-        '张志东在Umi 担任 CTO，并在 2014 年 9 月离职，转任Umi 公司终身荣誉顾问及Umi 学院荣誉院长等职位 。',
+        '[受产业链价格战影响，部分产品出现降价，产能过剩问题凸显](https://example.com/report)',
       commentType: 'comment',
     },
     {
@@ -67,13 +69,13 @@ export default () => {
       anchorOffset: 283,
       focusOffset: 292,
       user: {
-        name: '张志东',
+        name: '审阅人B',
       },
       time: 1629340800000,
       content:
-        '张志东, 马化腾的同学，被称为 QQ 之父。他的计算机技术非常出色，曾是深圳大学最拔尖的学生之一。',
+        '议题演进表列数较多，窄屏阅读压力大，是否考虑固定首列或附摘要？',
       refContent:
-        '张志东在Umi 担任 CTO，并在 2014 年 9 月离职，转任Umi 公司终身荣誉顾问及Umi 学院荣誉院长等职位 。',
+        '| 议题 | 2023 Q4 | 2024 Q2 | 2024 Q3 | 2024 Q4 | 2024 Q1 |',
       commentType: 'comment',
     },
   ]);
@@ -94,13 +96,13 @@ export default () => {
           loadMentions: async () => {
             return [
               {
-                name: '张志东',
+                name: '审阅人A',
                 id: '1',
                 avatar:
                   'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
               },
               {
-                name: '马化腾',
+                name: '审阅人B',
                 id: '2',
                 avatar:
                   'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
@@ -117,7 +119,7 @@ export default () => {
               {
                 ...data,
                 user: {
-                  name: '张志东',
+                  name: '审阅人A',
                   avatar:
                     'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
                 },
