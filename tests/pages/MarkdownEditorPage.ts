@@ -1,5 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+
 /**
  * MarkdownEditor Page Object Model
  * 封装 MarkdownEditor 组件的所有交互操作
@@ -17,7 +19,9 @@ export class MarkdownEditorPage {
   /**
    * 导航到 demo 页面
    */
-  async goto(demoPath: string = 'markdowneditor-demo-1') {
+  async goto(
+    demoPath: string = PLAYWRIGHT_FIXTURE_DEMOS.markdownEditor,
+  ) {
     await this.page.goto(`/~demos/${demoPath}`);
     // 等待页面加载完成
     await this.page.waitForLoadState('networkidle');

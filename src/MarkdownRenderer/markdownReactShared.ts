@@ -24,9 +24,14 @@ import {
   type MarkdownRemarkPlugin,
   type MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
+import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { parseChineseCurrencyToNumber } from '../Plugins/chart/utils';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import AnimationText from './AnimationText';
+import {
+  FncRefForMarkdown,
+  extractFootnoteRefFromSupChildren,
+} from './FncRefForMarkdown';
 import { StreamingAnimationContext } from './StreamingAnimationContext';
 import type { MarkdownRendererEleProps, RendererBlockProps } from './types';
 
@@ -345,6 +350,7 @@ const buildEditorAlignedComponents = (
     openInNewTab?: boolean;
     onClick?: (url?: string) => boolean | void;
   },
+  fncProps?: MarkdownEditorProps['fncProps'],
   streamingParagraphAnimation?: boolean,
   eleRender?: (
     props: MarkdownRendererEleProps,
@@ -919,9 +925,19 @@ const buildEditorAlignedComponents = (
       return applyEleRender('hr', { node, ...rest }, defaultDom);
     },
 
-    // 脚注引用 sup > a（remark-gfm 有定义时生成）
+    // 脚注引用 sup > a（remark-gfm 有定义时生成）— 与 Slate FncLeaf 对齐
     sup: (props: any) => {
       const { node, children, ...rest } = props;
+      const meta = extractFootnoteRefFromSupChildren(children);
+      if (meta) {
+        return jsx(FncRefForMarkdown as any, {
+          fncProps,
+          linkConfig,
+          identifier: meta.identifier,
+          url: meta.url,
+          children,
+        });
+      }
       const defaultDom = jsx('span' as any, {
         ...rest,
         'data-fnc': 'fnc',
@@ -939,14 +955,15 @@ const buildEditorAlignedComponents = (
     span: (props: any) => {
       const { node: _node, children, ...rest } = props;
       if (rest['data-fnc'] === 'fnc') {
-        return jsx('span' as any, {
-          ...rest,
-          'data-testid': 'markdown-footnote-ref',
-          className: `${contentCls}-fnc`,
-          style: {
-            fontSize: 12,
-            cursor: 'pointer',
-          },
+        const raw = rest['data-fnc-name'];
+        const identifier =
+          raw !== undefined && raw !== null && String(raw).length > 0
+            ? String(raw)
+            : extractChildrenText(children) || '?';
+        return jsx(FncRefForMarkdown as any, {
+          fncProps,
+          linkConfig,
+          identifier,
           children,
         });
       }
@@ -1076,6 +1093,8 @@ export interface UseMarkdownToReactOptions {
     openInNewTab?: boolean;
     onClick?: (url?: string) => boolean | void;
   };
+  /** 脚注：与只读 Slate 路径 FncLeaf / fncProps 对齐 */
+  fncProps?: MarkdownEditorProps['fncProps'];
   /** 是否处于流式状态，用于最后一个块的打字动画 */
   streaming?: boolean;
   /**

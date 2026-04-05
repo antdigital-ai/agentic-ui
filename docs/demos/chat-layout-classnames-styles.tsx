@@ -15,7 +15,7 @@ const MessageList = ({ count }: { count: number }) => (
           fontSize: 14,
         }}
       >
-        消息 {i + 1}
+        会话片段 {i + 1}（占位文案，便于观察 content 区背景与滚动）
       </div>
     ))}
   </div>

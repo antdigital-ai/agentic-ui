@@ -11,7 +11,17 @@ const WorkspaceFileShareDemo: React.FC = () => {
         name: '项目需求.md',
         size: '28KB',
         lastModified: '2025-08-01 13:20:00',
-        content: '# 需求文档\n\n这里是需求正文...',
+        content: `# 需求：Workspace 文件分享
+
+## 目标
+
+在仅预览场景下提供**只读分享链接**，并记录打开次数（Demo 为静态数据）。
+
+## 验收要点
+
+- \`canShare: true\` 的节点才出现分享入口
+- 链接过期或撤回后，打开提示失效而非白屏
+`,
         type: 'markdown',
         canShare: true,
       },

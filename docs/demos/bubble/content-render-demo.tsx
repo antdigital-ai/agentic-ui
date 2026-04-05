@@ -16,9 +16,9 @@ export default () => {
     {
       id: '1',
       role: 'assistant',
-      content: `# contentRender 演示
+      content: `# 自定义气泡内容（contentRender）
 
-可定制样式、元数据、加载态与标签。下方按钮切换渲染模式。`,
+下面同一条助手消息，可用按钮切换：**默认** / **元数据条** / **加载态** / **增强信息区**，观察 \`contentRender\` 如何包一层自定义布局而不改 \`originData.content\` 的正文 Markdown。`,
       createAt: Date.now() - 120000,
       updateAt: Date.now() - 120000,
       isFinished: true,

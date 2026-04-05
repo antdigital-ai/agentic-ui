@@ -328,7 +328,7 @@ const ok = () => true;
                 count: 123,
               }}
               nodes={nodes}
-              loading={loading}
+              isLoading={loading}
               onDownload={handleDownload}
               onGroupDownload={handleGroupDownload}
               onToggleGroup={handleToggleGroup}
@@ -366,7 +366,7 @@ const ok = () => true;
                   loading: true,
                 },
               ]}
-              loading={loading}
+              isLoading={loading}
               onDownload={handleDownload}
               onGroupDownload={handleGroupDownload}
               onToggleGroup={handleToggleGroup}

@@ -8,63 +8,15 @@ import { CodeElement } from '@ant-design/agentic-ui/Plugins/code';
 import { MermaidElement } from '@ant-design/agentic-ui/Plugins/mermaid';
 import { Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
+import {
+  energyFundDemoCommentList,
+  energyFundDemoMentionUsers,
+} from './shared/energyFundDemoComments';
 import { newEnergyFundContent } from './shared/newEnergyFundContent';
 
 export default () => {
   const editorRef = React.useRef<MarkdownEditorInstance>();
-  const [list, setList] = useState([
-    {
-      selection: {
-        anchor: { path: [2, 0], offset: 283 },
-        focus: { path: [2, 0], offset: 292 },
-      },
-      path: [2, 0],
-      time: 1735924079099,
-      id: 1735924079099,
-      content: '你好',
-      anchorOffset: 283,
-      focusOffset: 292,
-      refContent: '日带领Umi 在香港联',
-      commentType: 'comment',
-    },
-    {
-      id: 1,
-      selection: {
-        anchor: { path: [2, 0], offset: 283 },
-        focus: { path: [2, 0], offset: 292 },
-      },
-      path: [2, 0],
-      anchorOffset: 283,
-      focusOffset: 292,
-      user: {
-        name: '张志东',
-      },
-      time: 1629340800000,
-      content: '深圳大学是中国最好的大学之一,拥有很多优秀的学生。',
-      refContent:
-        '张志东在Umi 担任 CTO，并在 2014 年 9 月离职，转任Umi 公司终身荣誉顾问及Umi 学院荣誉院长等职位 。',
-      commentType: 'comment',
-    },
-    {
-      id: 2,
-      selection: {
-        anchor: { path: [2, 0], offset: 283 },
-        focus: { path: [2, 0], offset: 292 },
-      },
-      path: [2, 0],
-      anchorOffset: 283,
-      focusOffset: 292,
-      user: {
-        name: '张志东',
-      },
-      time: 1629340800000,
-      content:
-        '张志东, 马化腾的同学，被称为 QQ 之父。他的计算机技术非常出色，曾是深圳大学最拔尖的学生之一。',
-      refContent:
-        '张志东在Umi 担任 CTO，并在 2014 年 9 月离职，转任Umi 公司终身荣誉顾问及Umi 学院荣誉院长等职位 。',
-      commentType: 'comment',
-    },
-  ]);
+  const [list, setList] = useState(energyFundDemoCommentList);
   useEffect(() => {
     if (typeof window === 'undefined') return;
     // @ts-ignore
@@ -119,22 +71,7 @@ export default () => {
           comment={{
             enable: true,
             commentList: list,
-            loadMentions: async () => {
-              return [
-                {
-                  name: '张志东',
-                  id: '1',
-                  avatar:
-                    'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-                },
-                {
-                  name: '马化腾',
-                  id: '2',
-                  avatar:
-                    'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-                },
-              ];
-            },
+            loadMentions: async () => energyFundDemoMentionUsers(),
             onDelete: async (id) => {
               setList(list.filter((i) => i.id !== id));
             },
@@ -145,7 +82,7 @@ export default () => {
                 {
                   ...data,
                   user: {
-                    name: '张志东',
+                    name: '审阅人A',
                     avatar:
                       'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
                   },

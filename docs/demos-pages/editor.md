@@ -15,13 +15,13 @@ group:
 
 <code src="../demos/readonly.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-<code src="../demos/markdown-editor-readonly-compare.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdown-editor-readonly-compare.tsx" id="editor-readonly-compare-basic" background="var(--main-bg-color)" iframe=540></code>
 
 <code src="../demos/comment-highlight-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 <code src="../demos/empty.tsx" background="var(--main-bg-color)" iframe=540 ></code>
 
-<code src="../demos/setmd-content-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/setmd-content-demo.tsx" id="editor-setmd-under-features" background="var(--main-bg-color)" iframe=540></code>
 
 ## 编辑器模式
 
@@ -43,7 +43,7 @@ group:
 
 ### 只读模式对比
 
-<code src="../demos/markdown-editor-readonly-compare.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdown-editor-readonly-compare.tsx" id="editor-readonly-compare-mode" background="var(--main-bg-color)" iframe=540></code>
 
 ## 自定义渲染
 
@@ -87,4 +87,4 @@ group:
 
 ## 内容设置
 
-<code src="../demos/setmd-content-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/setmd-content-demo.tsx" id="editor-setmd-content-settings" background="var(--main-bg-color)" iframe=540></code>

@@ -2,7 +2,7 @@ import { expect, test } from '../tests/fixtures/page-fixture';
 
 test.describe('MarkdownEditor 基础功能', () => {
   test.beforeEach(async ({ markdownEditorPage }) => {
-    await markdownEditorPage.goto('markdowneditor-demo-1');
+    await markdownEditorPage.goto();
   });
 
   test('应该能够加载编辑器', async ({ markdownEditorPage }) => {
@@ -105,7 +105,7 @@ test.describe('MarkdownEditor 基础功能', () => {
 
 test.describe('MarkdownEditor 高级功能', () => {
   test.beforeEach(async ({ markdownEditorPage }) => {
-    await markdownEditorPage.goto('markdowneditor-demo-1');
+    await markdownEditorPage.goto();
   });
 
   test('应该支持标签输入功能', async ({ markdownEditorPage, page }) => {

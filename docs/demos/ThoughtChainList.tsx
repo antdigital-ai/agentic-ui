@@ -13,7 +13,7 @@ export default function Home() {
       }}
     >
       <ThoughtChainList
-        loading={false}
+        isLoading={false}
         thoughtChainList={[
           {
             category: 'TableSql',
@@ -65,7 +65,7 @@ export default function Home() {
       />
 
       <ThoughtChainList
-        loading={true}
+        isLoading={true}
         bubble={{
           isFinished: false,
           createAt: Date.now() - 5000,
@@ -102,7 +102,7 @@ export default function Home() {
 
       <h3>正在运行中的思维链（收起状态）</h3>
       <ThoughtChainList
-        loading={true}
+        isLoading={true}
         bubble={{
           isFinished: false,
           createAt: Date.now() - 10000,

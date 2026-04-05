@@ -55,8 +55,8 @@ const BasicDemo = () => {
       role: messages.length % 2 === 0 ? 'assistant' : 'user',
       content:
         messages.length % 2 === 0
-          ? '这是一条新的 AI 回复，ChatLayout 会自动滚动到这里。'
-          : '这是一条新的用户消息。',
+          ? '（助手）新消息插入列表末尾；若未手动上滚，`ChatLayout` 内容区会尽量跟随滚到底部。'
+          : '（用户）再追加一条，用于观察多轮对话下头部、列表与底部的联动。',
       createAt: Date.now(),
       updateAt: Date.now(),
       isFinished: true,

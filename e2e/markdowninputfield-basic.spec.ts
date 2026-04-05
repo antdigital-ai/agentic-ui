@@ -1,3 +1,4 @@
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
 import { expect, test } from '../tests/fixtures/page-fixture';
 
 test.describe('MarkdownInputField 基础功能', () => {
@@ -77,7 +78,9 @@ test.describe('MarkdownInputField 基础功能', () => {
   });
 
   test('应该能够部分选中并复制', async ({ markdownInputFieldPage, page }) => {
-    await markdownInputFieldPage.goto('markdowninputfield-demo-8');
+    await markdownInputFieldPage.goto(
+      PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldPasteConfig,
+    );
     await markdownInputFieldPage.typeText('Copy Test Text');
     await markdownInputFieldPage.focus();
 

@@ -109,10 +109,6 @@ group:
 
 <code src="../demos/bubble/file-view.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-<code src="../demos/bubble/file-loading-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
-
-<code src="../demos/bubble/message-loading-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
-
 <code src="../demos/bubble/voice.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 <code src="../demos/bubble/footnote-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
