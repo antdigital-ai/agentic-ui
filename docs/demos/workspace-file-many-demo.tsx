@@ -2,7 +2,8 @@ import { Workspace } from '@ant-design/agentic-ui';
 import type { FileNode, GroupNode } from '@ant-design/agentic-ui/Workspace/types';
 import React, { useMemo } from 'react';
 
-const MANY_FILE_COUNT = 1000;
+/** 足以观察长列表性能，体量适中 */
+const MANY_FILE_COUNT = 120;
 
 function buildManyFileNodes(): (FileNode | GroupNode)[] {
   const children: FileNode[] = [];

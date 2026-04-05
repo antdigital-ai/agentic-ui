@@ -47,12 +47,6 @@ const WorkspaceFileDemo: React.FC = () => {
           content: '# 项目需求文档',
           canLocate: true,
         },
-        {
-          name: '技术规范.docx',
-          // type: 'word',
-          size: '3.1MB',
-          lastModified: '2025-08-01 14:45:00',
-        },
       ],
     },
     {
@@ -77,13 +71,6 @@ const WorkspaceFileDemo: React.FC = () => {
           lastModified: '2025-08-01 10:20:00',
           url: '/downloads/data-statistics.xlsx',
         },
-        {
-          name: '财务报表.xlsx',
-          // type: 'excel',
-          size: '2.8MB',
-          lastModified: '2025-08-01 16:30:00',
-          content: '12345财务报表内容678',
-        },
       ],
     },
     {
@@ -96,12 +83,6 @@ const WorkspaceFileDemo: React.FC = () => {
           size: '3.2MB',
           lastModified: '2025-08-01 11:20:00',
           url: '/downloads/product-manual.pdf',
-        },
-        {
-          name: '研究报告.pdf',
-          type: 'pdf',
-          size: '4.5MB',
-          lastModified: '2025-08-01 13:45:00',
         },
       ],
     },
@@ -116,13 +97,6 @@ const WorkspaceFileDemo: React.FC = () => {
           lastModified: '2025-08-01 10:30:00',
           url: '/downloads/product-intro.mp3',
         },
-        {
-          name: '会议记录.wav',
-          type: 'audio',
-          size: '12.5MB',
-          lastModified: '2025-08-01 09:15:00',
-          url: '/downloads/meeting-record.wav',
-        },
       ],
     },
     {
@@ -135,19 +109,6 @@ const WorkspaceFileDemo: React.FC = () => {
           size: '856KB',
           lastModified: '2025-08-01 08:45:00',
           content: '下载/downloads/user-data.csv',
-        },
-        {
-          name: '销售记录.csv',
-          // type: 'plainText',
-          size: '1.1MB',
-          lastModified: '2025-08-01 11:25:00',
-        },
-        {
-          name: '产品目录.csv',
-          // type: 'plainText',
-          size: '432KB',
-          lastModified: '2025-08-01 15:10:00',
-          content: '产品目录',
         },
       ],
     },
@@ -167,30 +128,14 @@ const WorkspaceFileDemo: React.FC = () => {
           // type: 'markdown',
           size: '28KB',
           canDownload: false,
-          content: `# API文档
+          content: `# API 文档（示例）
 
-## 代码示例
-\`\`\`typescript
-const example = () => {
-  console.log("Hello World");
-}
-\`\`\`
+| 字段 | 类型 |
+|------|------|
+| name | string |
 
-## 表格示例
-| 名称 | 类型 | 说明 |
-|------|------|------|
-| name | string | 文件名 |
-| type | string | 文件类型 |
-
-## 数学公式
-$E = mc^2$
-
-## 流程图
-\`\`\`mermaid
-graph TD
-    A[开始] --> B{是否继续?}
-    B -- Yes --> C[继续]
-    B -- No --> D[结束]
+\`\`\`ts
+const ok = () => true;
 \`\`\`
 `,
           lastModified: '2025-08-01 13:20:00',
@@ -221,20 +166,6 @@ graph TD
           lastModified: '10:30',
           url: '/downloads/demo.mp4',
         },
-        {
-          name: '教程.webm',
-          type: 'video',
-          size: '12.1MB',
-          lastModified: '15:20',
-          url: '/downloads/tutorial.webm',
-        },
-        {
-          name: '示例视频.mp4',
-          type: 'video',
-          size: '8.2MB',
-          lastModified: '16:45',
-          url: 'https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/90LVRoQeGdkAAAAAAAAAAAAAK4eUAQBr',
-        },
       ],
     },
     {
@@ -247,20 +178,6 @@ graph TD
           size: '25.5MB',
           lastModified: '16:30',
           url: '/downloads/source-code.zip',
-        },
-        {
-          name: '资源文件.rar',
-          type: 'archive',
-          size: '18.2MB',
-          lastModified: '17:45',
-          url: '/downloads/resources.rar',
-        },
-        {
-          name: '文档备份.7z',
-          type: 'zip',
-          size: '8.7MB',
-          lastModified: '18:20',
-          url: '/downloads/docs-backup.7z',
         },
       ],
     },

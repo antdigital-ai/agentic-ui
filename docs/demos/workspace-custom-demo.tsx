@@ -14,12 +14,9 @@ import {
 // 自定义图表组件
 const CustomChart: React.FC = () => {
   const data = [
-    { name: '1月', value: 400 },
-    { name: '2月', value: 300 },
-    { name: '3月', value: 600 },
-    { name: '4月', value: 800 },
-    { name: '5月', value: 500 },
-    { name: '6月', value: 900 },
+    { name: 'Q1', value: 400 },
+    { name: 'Q2', value: 600 },
+    { name: 'Q3', value: 800 },
   ];
 
   return (
@@ -70,22 +67,15 @@ const CustomTable: React.FC = () => {
       key: '1',
       name: '张三',
       age: 32,
-      address: '北京市朝阳区',
+      address: '北京',
       status: 'active',
     },
     {
       key: '2',
       name: '李四',
       age: 42,
-      address: '上海市浦东新区',
+      address: '上海',
       status: 'inactive',
-    },
-    {
-      key: '3',
-      name: '王五',
-      age: 28,
-      address: '广州市天河区',
-      status: 'active',
     },
   ]);
 

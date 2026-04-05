@@ -76,12 +76,6 @@ const WEB_AVATAR_SRC_LIST: string[] = [
   'https://avatars.githubusercontent.com/u/49217418?s=40&v=4',
   'https://avatars.githubusercontent.com/u/27722486?s=40&v=4',
   'https://avatars.githubusercontent.com/u/5378891?s=40&v=4',
-  'https://avatars.githubusercontent.com/u/3580607?s=40&v=4',
-  'https://avatars.githubusercontent.com/u/13595509?s=40&v=4',
-  'https://avatars.githubusercontent.com/u/49827327?s=40&v=4',
-  'https://avatars.githubusercontent.com/u/465125?s=40&v=4',
-  'https://avatars.githubusercontent.com/u/29775873?s=40&v=4',
-  'https://avatars.githubusercontent.com/u/8358236?s=40&v=4',
 ];
 
 const WorkspaceFileLocateDemo: React.FC = () => {
@@ -181,7 +175,6 @@ const WorkspaceFileLocateDemo: React.FC = () => {
         text: '产品说明书也在这里，便于查阅细节。',
         fileId: 'file-3',
       },
-      { id: 'm6', role: 'user', text: '收到。' },
     ],
     [],
   );
@@ -227,8 +220,8 @@ const WorkspaceFileLocateDemo: React.FC = () => {
 
   const browserSuggestions = useMemo(
     () => [
-      { id: 's1', label: '搜索产品说明书与关键参数', count: 5 },
-      { id: 's2', label: '搜索会议纪要相关的背景资料', count: 5 },
+      { id: 's1', label: '搜索产品说明书与参数', count: 2 },
+      { id: 's2', label: '搜索会议纪要资料', count: 2 },
     ],
     [],
   );
@@ -238,74 +231,32 @@ const WorkspaceFileLocateDemo: React.FC = () => {
       s1: [
         {
           id: 'w-1',
-          title: '产品说明书（PDF）下载与预览',
+          title: '产品说明书（示例）',
           site: 'docs.example.com',
           url: 'https://docs.example.com/product-manual',
           canLocate: true,
         },
         {
           id: 'w-2',
-          title: '关键参数速查表（2026）',
+          title: '关键参数速查（示例）',
           site: 'kb.example.com',
           url: 'https://kb.example.com/params',
-          canLocate: true,
-        },
-        {
-          id: 'w-3',
-          title: '兼容性与约束说明',
-          site: 'support.example.com',
-          url: 'https://support.example.com/compat',
-          canLocate: true,
-        },
-        {
-          id: 'w-7',
-          title: 'PDF 阅读与标注最佳实践',
-          site: 'guide.example.com',
-          url: 'https://guide.example.com/pdf-reading',
-          canLocate: true,
-        },
-        {
-          id: 'w-8',
-          title: '产品参数 FAQ（常见问题）',
-          site: 'faq.example.com',
-          url: 'https://faq.example.com/params',
           canLocate: true,
         },
       ],
       s2: [
         {
           id: 'w-4',
-          title: '会议纪要模板与最佳实践',
+          title: '会议纪要模板（示例）',
           site: 'wiki.example.com',
           url: 'https://wiki.example.com/meeting-notes',
           canLocate: true,
         },
         {
           id: 'w-5',
-          title: '需求评审 Checklist',
+          title: '需求评审 Checklist（示例）',
           site: 'process.example.com',
           url: 'https://process.example.com/review-checklist',
-          canLocate: true,
-        },
-        {
-          id: 'w-6',
-          title: '风险登记与跟踪方法',
-          site: 'pm.example.com',
-          url: 'https://pm.example.com/risk',
-          canLocate: true,
-        },
-        {
-          id: 'w-9',
-          title: '会议纪要：行动项如何写得可执行',
-          site: 'writing.example.com',
-          url: 'https://writing.example.com/action-items',
-          canLocate: true,
-        },
-        {
-          id: 'w-10',
-          title: '评审会议主持与节奏控制',
-          site: 'facilitation.example.com',
-          url: 'https://facilitation.example.com/review',
           canLocate: true,
         },
       ],

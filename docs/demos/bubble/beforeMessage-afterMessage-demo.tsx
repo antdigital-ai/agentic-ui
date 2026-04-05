@@ -1,25 +1,12 @@
 import { Bubble, MessageBubbleData } from '@ant-design/agentic-ui';
 import React from 'react';
 import { BubbleDemoCard } from './BubbleDemoCard';
+import { bubbleDemoMarkdownSample } from './sharedDemoContent';
 
 const BeforeMessageAfterMessageDemo: React.FC = () => {
   const mockMessageData: MessageBubbleData = {
     id: 'demo-message-1',
-    content: `# 这是一个演示消息
-
-这是一个支持 **Markdown** 的消息内容。
-
-## 功能特性
-
-- 支持标题、列表、代码块等 Markdown 语法
-- 支持自定义 beforeMessageRender 和 afterMessageRender 渲染
-- 可以显示消息的元数据信息
-
-\`\`\`javascript
-console.log('Hello, World!');
-\`\`\`
-
-> 这是一个引用块，展示 Markdown 的引用功能。`,
+    content: bubbleDemoMarkdownSample,
     role: 'assistant',
     createAt: 1703123456789, // 2023-12-21 10:30:56
     updateAt: 1703123456789,

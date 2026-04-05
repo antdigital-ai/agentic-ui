@@ -424,9 +424,9 @@ export default () => (
 
 ### BubbleList 懒加载
 
-演示 BubbleList 组件的懒加载功能，包含 200 条消息，展示如何通过懒加载提升长列表的渲染性能。只有进入视口的气泡才会被渲染，减少初始 DOM 节点数量。
+演示 BubbleList 组件的懒加载功能（示例约 48 条消息），展示如何通过懒加载提升长列表的渲染性能。只有进入视口的气泡才会被渲染，减少初始 DOM 节点数量。
 
-<code src="../demos/bubble/bubblelist-lazy-demo.tsx">BubbleList 懒加载 - 200条消息</code>
+<code src="../demos/bubble/bubblelist-lazy-demo.tsx">BubbleList 懒加载</code>
 
 ## 📖 API 参考
 

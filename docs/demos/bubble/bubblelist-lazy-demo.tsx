@@ -1,6 +1,6 @@
 /**
  * title: BubbleList 懒加载示例
- * description: 展示 BubbleList 的懒加载功能，适用于长列表场景，包含 200 个消息项
+ * description: 展示 BubbleList 懒加载，约 48 条消息即可观察滚动加载
  */
 import {
   BubbleList,
@@ -10,6 +10,8 @@ import {
 import { Space, Statistic, Switch } from 'antd';
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { BubbleDemoCard } from './BubbleDemoCard';
+
+const LAZY_DEMO_MESSAGE_COUNT = 48;
 
 // 创建模拟消息
 const createMockMessage = (
@@ -21,8 +23,8 @@ const createMockMessage = (
   id,
   role,
   content,
-  createAt: Date.now() - (200 - index) * 1000,
-  updateAt: Date.now() - (200 - index) * 1000,
+  createAt: Date.now() - (LAZY_DEMO_MESSAGE_COUNT - index) * 1000,
+  updateAt: Date.now() - (LAZY_DEMO_MESSAGE_COUNT - index) * 1000,
   isFinished: true,
   meta: {
     avatar:
@@ -33,23 +35,16 @@ const createMockMessage = (
   } as BubbleMetaData,
 });
 
-// 生成 200 条消息
 const generateMessages = (): MessageBubbleData[] => {
   const messages: MessageBubbleData[] = [];
   const contents = [
-    '你好，请帮我看一下这个接口的响应时间为什么突然变慢了？',
-    '根据日志分析，接口延迟主要来自数据库查询层，建议添加索引优化。',
-    '我已经在 user_id 字段上加了索引，还需要做什么？',
-    '建议同时检查 N+1 查询问题，可以使用 DataLoader 进行批量查询优化。',
-    '能具体说一下 DataLoader 的使用方式吗？',
-    'DataLoader 通过批处理和缓存机制，将多个单独的数据请求合并为一次批量请求。',
-    '另外，Redis 缓存层也建议加上，热点数据的缓存命中率能达到 95% 以上。',
-    '好的，那缓存过期策略应该怎么设计比较合理？',
-    '推荐使用 TTL + 主动失效的双重策略，TTL 设为 5 分钟，数据变更时主动清除。',
-    '明白了，我先按这个方案试一下，有问题再来请教。',
+    '接口变慢可能出在哪？',
+    '先看 DB 与 N+1，再加索引或批量查询。',
+    '索引已加，还要做什么？',
+    '可试 DataLoader / 缓存与 TTL。',
   ];
 
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < LAZY_DEMO_MESSAGE_COUNT; i++) {
     const role = i % 2 === 0 ? 'assistant' : 'user';
     const contentIndex = i % contents.length;
     const content = `[消息 ${i + 1}] ${contents[contentIndex]}`;
@@ -65,7 +60,6 @@ export default () => {
   const [lazyEnabled, setLazyEnabled] = useState(true);
   const [renderTime, setRenderTime] = useState<number | null>(null);
 
-  // 生成 200 条消息
   const bubbleList = useMemo(() => generateMessages(), []);
 
   // 元数据配置

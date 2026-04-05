@@ -1,4 +1,7 @@
-﻿import { ThoughtChainList } from '@ant-design/agentic-ui';
+/**
+ * 与 ThoughtChainList.tsx 展示场景重叠，用于本地调试；文档站见 ThoughtChainList.tsx。
+ */
+import { ThoughtChainList } from '@ant-design/agentic-ui';
 import React from 'react';
 
 export default function Home() {

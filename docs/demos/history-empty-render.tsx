@@ -28,15 +28,8 @@ const HistoryEmptyRenderDemo = () => {
   };
 
   const items = [
-    { key: '1', text: '📊 帮我分析最近的行业市场数据' },
-    {
-      key: '2',
-      text: '📝 生成一份项目周报总结',
-    },
-    {
-      key: '3',
-      text: '🔍 对比几款主流 AI 编程助手',
-    },
+    { key: '1', text: '分析示例数据' },
+    { key: '2', text: '写一段周报摘要' },
   ];
 
   // 自定义空状态渲染

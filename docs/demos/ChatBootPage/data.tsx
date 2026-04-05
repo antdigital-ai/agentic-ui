@@ -37,60 +37,23 @@ export const createMockFile = (
   slice: () => new Blob(),
 });
 
-// 用于在回答内容中内联展示的文件列表（不挂载到 originData.fileMap）
 export const mockInlineFileMap = new Map<string, AttachmentFile>([
   [
-    'bubble-design-spec.pdf',
+    'demo-spec.pdf',
     createMockFile(
-      'bubble-design-spec.pdf',
+      'demo-spec.pdf',
       'application/pdf',
       2048576,
-      'https://example.com/bubble-design-spec.pdf',
+      'https://example.com/demo-spec.pdf',
     ),
   ],
   [
-    'component-preview.png',
+    'preview.png',
     createMockFile(
-      'component-preview.png',
+      'preview.png',
       'image/png',
       1048576,
       'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-    ),
-  ],
-  [
-    'api-reference.json',
-    createMockFile(
-      'api-reference.json',
-      'application/json',
-      512000,
-      'https://example.com/api-reference.json',
-    ),
-  ],
-  [
-    '投资分析报告.docx',
-    createMockFile(
-      '投资分析报告.docx',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      8847360,
-      'https://example.com/investment-report.docx',
-    ),
-  ],
-  [
-    '市场数据汇总.xlsx',
-    createMockFile(
-      '市场数据汇总.xlsx',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      6647360,
-      'https://example.com/market-data.xlsx',
-    ),
-  ],
-  [
-    '季度路演材料.pptx',
-    createMockFile(
-      '季度路演材料.pptx',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      7747360,
-      'https://example.com/quarterly-roadshow.pptx',
     ),
   ],
 ]);
@@ -115,30 +78,14 @@ export const createMockMessage = (
   fileMap: fileMap || new Map(),
 });
 
-// 初始消息内容模板
 export const INITIAL_MESSAGES = {
-  assistant: `### 我是 Ant Design 聊天助手
-可以帮你：
+  assistant: `### Ant Design 聊天助手
+可协助解答问题、提供示例与文档说明。`,
 
-- **回答问题** - 解答技术相关疑问
-- **代码示例** - 提供组件使用示例  
-- **设计建议** - 给出设计方案建议
-- **文档说明** - 解释 API 和功能
+  user: `请说明 Bubble 列表与附件展示的典型用法。`,
 
-你想了解什么呢？`,
-
-  user: `请帮我分析一下当前 A 股市场中新能源板块的投资机会，重点关注光伏和锂电池两个细分赛道。我想了解：1) 目前的估值水平是否合理；2) 未来 6-12 个月的行业催化剂有哪些；3) 推荐的配置策略和标的筛选逻辑。`,
-
-  bubbleDoc: `## Bubble 组件功能文档
-
-Bubble 组件是一个功能丰富的聊天气泡组件，支持：
-
-- 多种消息类型（文本、文件、图片等）
-- 自定义渲染配置
-- 左右布局切换
-- 文件附件展示
-
-以下是相关的设计文档和示例图片：`,
+  bubbleDoc: `## Bubble 附件示例
+下方为内联文件展示：`,
 };
 
 // 重试任务配置

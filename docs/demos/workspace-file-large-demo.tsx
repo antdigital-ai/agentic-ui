@@ -29,10 +29,13 @@ const FILE_TYPES: Array<{
 ];
 
 const MODULE_NAMES = [
-  'auth', 'user', 'order', 'product', 'payment', 'notification',
-  'search', 'report', 'dashboard', 'admin', 'api', 'core',
-  'utils', 'config', 'deploy', 'monitor', 'cache', 'queue',
-  'scheduler', 'logger',
+  'auth',
+  'user',
+  'order',
+  'api',
+  'core',
+  'utils',
+  'config',
 ];
 
 /** 生成 n 个文件节点 */
@@ -57,16 +60,40 @@ const generateFiles = (count: number, prefix = ''): FileNode[] =>
     };
   });
 
-/** 分组模式：4 个分组，每组 250 个文件 */
+const FILES_PER_GROUP = 30;
+
+/** 分组模式：4 组 × 30 个文件（共 120） */
 const GROUP_NODES: GroupNode[] = [
-  { id: 'g1', name: '后端服务', type: 'python', children: generateFiles(250, 'backend') },
-  { id: 'g2', name: '前端应用', type: 'react', children: generateFiles(250, 'frontend') },
-  { id: 'g3', name: '基础设施', type: 'shell', children: generateFiles(250, 'infra') },
-  { id: 'g4', name: '文档 & 配置', type: 'markdown', children: generateFiles(250, 'docs') },
+  {
+    id: 'g1',
+    name: '后端服务',
+    type: 'python',
+    children: generateFiles(FILES_PER_GROUP, 'backend'),
+  },
+  {
+    id: 'g2',
+    name: '前端应用',
+    type: 'react',
+    children: generateFiles(FILES_PER_GROUP, 'frontend'),
+  },
+  {
+    id: 'g3',
+    name: '基础设施',
+    type: 'shell',
+    children: generateFiles(FILES_PER_GROUP, 'infra'),
+  },
+  {
+    id: 'g4',
+    name: '文档 & 配置',
+    type: 'markdown',
+    children: generateFiles(FILES_PER_GROUP, 'docs'),
+  },
 ];
 
-/** 扁平模式：1000 个文件，不分组 */
-const FLAT_NODES: FileNode[] = generateFiles(1000, 'flat');
+const TOTAL_FILE_COUNT = FILES_PER_GROUP * GROUP_NODES.length;
+
+/** 扁平模式：与分组总数量一致 */
+const FLAT_NODES: FileNode[] = generateFiles(TOTAL_FILE_COUNT, 'flat');
 
 type Mode = 'grouped' | 'flat';
 
@@ -89,7 +116,8 @@ const WorkspaceFileLargeDemo: React.FC = () => {
         }}
       >
         <span style={{ color: '#666', fontSize: 13 }}>
-          共 <strong>1000</strong> 个文件 · 每组/列表首次展示 50 条，点击「查看更多」每次追加 100 条
+          共 <strong>{TOTAL_FILE_COUNT}</strong> 个文件 · 每组/列表首次展示 50
+          条，点击「查看更多」每次追加 100 条
         </span>
         <Segmented
           value={mode}
@@ -104,7 +132,7 @@ const WorkspaceFileLargeDemo: React.FC = () => {
       <div style={{ height: 560 }}>
         <Workspace title="大数据量文件演示">
           <Workspace.File
-            tab={{ count: 1000 }}
+            tab={{ count: TOTAL_FILE_COUNT }}
             nodes={nodes}
             onDownload={(file) => console.log('下载:', file.name)}
             onGroupDownload={(files, type) =>

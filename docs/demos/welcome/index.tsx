@@ -41,7 +41,7 @@ export default () => {
                   </div>
                 </>
               }
-              description="从简单提示开始，瞬间创建精美卡片设计，随时切换到高级编辑模式，精确调整每一个细节。"
+              description="用一句话说明你能做什么，引导用户开始提问。"
             />
             <MarkdownInputField />
           </div>
@@ -84,7 +84,7 @@ export default () => {
                   为你设计什么卡片？
                 </>
               }
-              description="从简单提示开始，瞬间创建精美卡片设计，随时切换到高级编辑模式，精确调整每一个细节。"
+              description="用一句话说明你能做什么，引导用户开始提问。"
             />
             <MarkdownInputField />
           </div>

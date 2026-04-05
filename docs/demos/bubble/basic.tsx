@@ -1,4 +1,8 @@
-import { Bubble, MessageBubbleData } from '@ant-design/agentic-ui';
+import {
+  AttachmentFile,
+  Bubble,
+  MessageBubbleData,
+} from '@ant-design/agentic-ui';
 import {
   CheckOutlined,
   CopyOutlined,
@@ -10,112 +14,175 @@ import {
 import { message, Popover } from 'antd';
 import React, { useRef, useState } from 'react';
 import { BubbleDemoCard } from './BubbleDemoCard';
-import {
-  ASSISTANT_META,
-  createAssistantMessage,
-  createMockFile,
-  createUserMessage,
-  PURE_TABLE_CONFIG,
-} from './shared';
 
-const mockInlineFileMap = new Map([
-  ['bubble-design-spec.pdf', createMockFile('bubble-design-spec.pdf', 'application/pdf', 2048576, 'https://example.com/bubble-design-spec.pdf')],
-  ['component-preview.png', createMockFile('component-preview.png', 'image/png', 1048576, 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png')],
-  ['component-api-reference.json', createMockFile('component-api-reference.json', 'application/json', 512000, 'https://example.com/component-api-reference.json')],
-  ['组件使用说明.docx', createMockFile('组件使用说明.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 8847360, 'https://example.com/component-guide.docx')],
-  ['接口测试报告.xlsx', createMockFile('接口测试报告.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 6647360, 'https://example.com/api-test-report.xlsx')],
-  ['技术方案演示.pptx', createMockFile('技术方案演示.pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 7747360, 'https://example.com/tech-proposal.pptx')],
+// 创建模拟文件的辅助函数
+const createMockFile = (
+  name: string,
+  type: string,
+  size: number,
+  url: string,
+): AttachmentFile => ({
+  name,
+  type,
+  size,
+  url,
+  lastModified: Date.now(),
+  webkitRelativePath: '',
+  arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+  bytes: () => Promise.resolve(new Uint8Array(0)),
+  text: () => Promise.resolve(''),
+  stream: () => new ReadableStream(),
+  slice: () => new Blob(),
+});
+
+const defaultMockMessage: MessageBubbleData = {
+  id: '1',
+  role: 'assistant',
+  content: `Ant Design 聊天助手：可回答问题、提供示例与文档说明。`,
+  createAt: Date.now() - 60000, // 1分钟前
+  updateAt: Date.now() - 60000,
+  isFinished: true,
+  extra: {
+    duration: 1200, // 生成耗时
+    model: 'gpt-4',
+    tokens: 150,
+  },
+  meta: {
+    avatar:
+      'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original',
+    title: 'Ant Design Assistant',
+    description: 'AI 助手',
+  },
+};
+
+const mockUserMessage: MessageBubbleData = {
+  id: '2',
+  role: 'user',
+  content:
+    '你好，想了解 Bubble 的基本用法。[Bubble](https://ant.design/components/bubble-cn)',
+  createAt: Date.now() - 30000, // 30秒前
+  updateAt: Date.now() - 30000,
+  isFinished: true,
+  meta: {
+    avatar:
+      'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+    title: '开发者',
+    description: '前端工程师',
+  },
+};
+
+const mockInlineFileMap = new Map<string, AttachmentFile>([
+  [
+    'demo-spec.pdf',
+    createMockFile(
+      'demo-spec.pdf',
+      'application/pdf',
+      2048576,
+      'https://example.com/demo-spec.pdf',
+    ),
+  ],
+  [
+    'preview.png',
+    createMockFile(
+      'preview.png',
+      'image/png',
+      1048576,
+      'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+    ),
+  ],
 ]);
 
-const defaultMockMessage = createAssistantMessage(
-  '1',
-  `我是 Ant Design 聊天助手，可以帮你：
-
-- **回答问题** - 解答技术相关疑问
-- **代码示例** - 提供组件使用示例  
-- **设计建议** - 给出设计方案建议
-- **文档说明** - 解释 API 和功能
-
-你想了解什么呢？`,
-  {
-    createAt: Date.now() - 60000,
-    updateAt: Date.now() - 60000,
-    extra: { duration: 1200, model: 'gpt-4', tokens: 150 },
-    meta: { ...ASSISTANT_META, title: 'Ant Design Assistant' },
+const mockFileMessage: MessageBubbleData = {
+  id: '3',
+  role: 'assistant',
+  content: `## 附件示例
+以下为内联文件列表：`,
+  createAt: Date.now() - 10000, // 10秒前
+  updateAt: Date.now() - 10000,
+  isFinished: true,
+  extra: {
+    duration: 800,
+    model: 'gpt-4',
+    tokens: 88,
   },
-);
-
-const mockUserMessage = createUserMessage(
-  '2',
-  '你好！我想了解 Bubble 组件的基本用法和特性。[https://ant.design/components/bubble-cn](https://ant.design/components/bubble-cn)',
-  {
-    createAt: Date.now() - 30000,
-    updateAt: Date.now() - 30000,
-    meta: { avatar: undefined, title: '开发者', description: '前端工程师' },
+  meta: {
+    avatar:
+      'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original',
+    title: 'Ant Design Assistant',
+    description: 'AI 助手',
   },
-);
-
-const mockFileMessage = createAssistantMessage(
-  '3',
-  `## Bubble 组件功能文档
-
-Bubble 组件是一个功能丰富的聊天气泡组件，支持：
-
-- 多种消息类型（文本、文件、图片等）
-- 自定义渲染配置
-- 左右布局切换
-- 文件附件展示
-
-以下是相关的设计文档和示例图片：`,
-  {
-    createAt: Date.now() - 10000,
-    updateAt: Date.now() - 10000,
-    extra: { duration: 800, model: 'gpt-4', tokens: 88 },
-    meta: { ...ASSISTANT_META, title: 'Ant Design Assistant' },
-    fileMap: mockInlineFileMap,
-  },
-);
-
-const FILE_ACTIONS: { key: string; label: string; icon: React.ReactNode; hasCheck?: boolean }[] = [
-  { key: 'copy', label: '复制', icon: <CopyOutlined />, hasCheck: true },
-  { key: 'download', label: '下载', icon: <DownloadOutlined /> },
-  { key: 'edit', label: '编辑', icon: <EditOutlined /> },
-  { key: 'share', label: '分享', icon: <ShareAltOutlined /> },
-];
+  fileMap: mockInlineFileMap,
+};
 
 export default () => {
   const bubbleRef = useRef<any>();
-  const [mockMessage, setMockMessage] = useState<MessageBubbleData>(() => defaultMockMessage);
+  const [mockMessage, setMockMessage] = useState<MessageBubbleData>(
+    () => defaultMockMessage,
+  );
 
+  // 处理点赞/点踩事件
   const handleLike = async (bubble: MessageBubbleData) => {
     message.success(`已点赞消息: ${bubble.id}`);
-    setMockMessage({ ...mockMessage, feedback: 'thumbsUp' });
+    console.log('点赞消息:', bubble);
+    setMockMessage({
+      ...mockMessage,
+      feedback: 'thumbsUp',
+    });
   };
 
   const handleCancelLike = async (bubble: MessageBubbleData) => {
     message.success(`已取消点赞消息: ${bubble.id}`);
-    setMockMessage({ ...mockMessage, feedback: undefined });
+    console.log('取消点赞消息:', bubble);
+    setMockMessage({
+      ...mockMessage,
+      feedback: undefined,
+    });
+    console.log('取消点赞消息:', bubble);
   };
 
   const handleDisLike = async (bubble: MessageBubbleData) => {
     message.info(`已点踩消息: ${bubble.id}`);
-    setMockMessage({ ...mockMessage, feedback: 'thumbsDown' });
+    console.log('点踩消息:', bubble);
+    setMockMessage({
+      ...mockMessage,
+      feedback: 'thumbsDown',
+    });
   };
 
+  // 处理回复事件
   const handleReply = (content: string) => {
     message.info(`回复内容: ${content}`);
+    console.log('回复内容:', content);
   };
 
+  // 处理头像点击事件
   const handleAvatarClick = () => {
-    message.success('点击了头像');
+    message.success('👤 点击了头像！可以查看用户资料或切换用户');
+    console.log('头像被点击了');
   };
 
   return (
-    <BubbleDemoCard title="Bubble 基础用法演示">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 24 }}>
+    <BubbleDemoCard
+      title="🎯 Bubble 基础用法演示"
+      description="💡 点击消息下方的操作按钮可以体验交互功能"
+    >
+      {/* 消息列表 */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+          padding: 24,
+        }}
+      >
+        {/* Assistant message */}
         <Bubble
           avatar={mockMessage.meta!}
-          markdownRenderConfig={PURE_TABLE_CONFIG}
+          markdownRenderConfig={{
+            tableConfig: {
+              pure: true,
+            },
+          }}
           placement="left"
           bubbleRef={bubbleRef}
           pure
@@ -127,8 +194,13 @@ export default () => {
           onAvatarClick={handleAvatarClick}
         />
 
+        {/* User message */}
         <Bubble
-          markdownRenderConfig={PURE_TABLE_CONFIG}
+          markdownRenderConfig={{
+            tableConfig: {
+              pure: true,
+            },
+          }}
           avatar={mockUserMessage.meta!}
           placement="right"
           bubbleRef={bubbleRef}
@@ -138,8 +210,13 @@ export default () => {
           onAvatarClick={handleAvatarClick}
         />
 
+        {/* Message with files */}
         <Bubble
-          markdownRenderConfig={PURE_TABLE_CONFIG}
+          markdownRenderConfig={{
+            tableConfig: {
+              pure: true,
+            },
+          }}
           avatar={mockFileMessage.meta!}
           placement="left"
           bubbleRef={bubbleRef}
@@ -147,47 +224,158 @@ export default () => {
           originData={mockFileMessage}
           fileViewConfig={{
             maxDisplayCount: 2,
+            // className: 'custom-file-view',
+            // customSlot: <>123</>,
             renderFileMoreAction: () => (file: any) => (
               <Popover
                 placement="bottomRight"
                 arrow={false}
                 trigger={['hover']}
                 content={
-                  <div style={{ width: 180, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {FILE_ACTIONS.map((item) => (
+                  <div
+                    style={{
+                      width: 180,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 4,
+                    }}
+                  >
+                    {[
+                      {
+                        key: 'copy',
+                        label: '复制',
+                        icon: <CopyOutlined />,
+                        onClick: () => console.log('复制', file),
+                      },
+                      {
+                        key: 'download',
+                        label: '下载',
+                        icon: <DownloadOutlined />,
+                        onClick: () => console.log('下载', file),
+                      },
+                      {
+                        key: 'edit',
+                        label: '编辑',
+                        icon: <EditOutlined />,
+                        onClick: () => console.log('编辑', file),
+                      },
+                      {
+                        key: 'share',
+                        label: '分享',
+                        icon: <ShareAltOutlined />,
+                        onClick: () => console.log('分享', file),
+                      },
+                    ].map((item) => (
                       <div
                         key={item.key}
-                        onClick={(e) => { e.stopPropagation(); console.log(item.label, file); }}
-                        style={{ height: 36, display: 'flex', alignItems: 'center', padding: '0 12px', borderRadius: 8, cursor: 'pointer' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          item.onClick();
+                        }}
+                        style={{
+                          height: 36,
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '0 12px',
+                          borderRadius: 8,
+                          cursor: 'pointer',
+                        }}
                       >
                         <span style={{ width: 20 }}>{item.icon}</span>
                         <span style={{ flex: 1 }}>{item.label}</span>
-                        {item.hasCheck && <CheckOutlined style={{ color: '#2f54eb' }} />}
+                        {item.key === 'copy' ? (
+                          <CheckOutlined style={{ color: '#2f54eb' }} />
+                        ) : null}
                       </div>
                     ))}
                     <div
-                      onClick={(e) => { e.stopPropagation(); console.log('删除', file); }}
-                      style={{ height: 36, display: 'flex', alignItems: 'center', padding: '0 12px', borderRadius: 8, cursor: 'pointer', color: '#ff4d4f' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('删除', file);
+                      }}
+                      style={{
+                        height: 36,
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0 12px',
+                        borderRadius: 8,
+                        cursor: 'pointer',
+                        color: '#ff4d4f',
+                      }}
                     >
-                      <span style={{ width: 20 }}><DeleteOutlined /></span>
+                      <span style={{ width: 20 }}>
+                        <DeleteOutlined />
+                      </span>
                       <span style={{ flex: 1 }}>删除</span>
                     </div>
                   </div>
                 }
               >
-                <div style={{ width: 18, height: 18 }} />
+                <div
+                  style={{
+                    width: 18,
+                    height: 18,
+                  }}
+                />
               </Popover>
             ),
           }}
           fileViewEvents={({ onPreview, onDownload }) => ({
-            onPreview: (file) => { onPreview(file); message.success('预览文件:'); },
-            onDownload: (file) => { onDownload(file); message.success('下载文件:'); },
+            onPreview: (file) => {
+              onPreview(file);
+              console.log('预览文件:', file);
+              message.success('预览文件:');
+            },
+            onDownload: (file) => {
+              onDownload(file);
+              console.log('下载文件:', file);
+              message.success('下载文件:');
+            },
+            // onViewAll: (files) => {
+            //   onViewAll(files);
+            //   console.log('查看所有文件:', files);
+            //   message.success('查看所有文件:');
+            // },
           })}
           onLike={handleLike}
           onDisLike={handleDisLike}
           onReply={handleReply}
           onAvatarClick={handleAvatarClick}
         />
+      </div>
+
+      {/* 功能说明 */}
+      <div
+        style={{
+          marginTop: 16,
+          padding: 16,
+          backgroundColor: '#e6f7ff',
+          borderRadius: 8,
+          fontSize: 14,
+          lineHeight: 1.6,
+        }}
+      >
+        <h4 style={{ margin: '0 0 12px 0' }}>🚀 基础功能演示</h4>
+        <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <li>
+            <strong>消息布局：</strong>支持左右两种布局，适配不同角色
+          </li>
+          <li>
+            <strong>丰富内容：</strong>支持 Markdown 格式、文件附件展示
+          </li>
+          <li>
+            <strong>交互操作：</strong>点赞、点踩、回复等操作反馈
+          </li>
+          <li>
+            <strong>头像点击：</strong>点击头像可以查看用户资料或切换用户
+          </li>
+          <li>
+            <strong>文件支持：</strong>自动识别并展示不同类型的文件
+          </li>
+          <li>
+            <strong>元数据：</strong>头像、标题、描述等信息展示
+          </li>
+        </ul>
       </div>
     </BubbleDemoCard>
   );
