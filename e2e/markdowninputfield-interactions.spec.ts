@@ -1,10 +1,12 @@
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
 import { expect, test } from '../tests/fixtures/page-fixture';
 
 test.describe('MarkdownInputField 交互功能', () => {
   test.describe('发送消息', () => {
     test.beforeEach(async ({ markdownInputFieldPage }) => {
-      // 使用基础 Demo
-      await markdownInputFieldPage.goto('markdowninputfield-demo-1');
+      await markdownInputFieldPage.goto(
+        PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldOnFocus,
+      );
     });
 
     test('按 Enter 键应该发送消息并清空输入框', async ({ markdownInputFieldPage }) => {
@@ -65,8 +67,9 @@ test.describe('MarkdownInputField 交互功能', () => {
 
   test.describe('放大/缩小功能', () => {
     test.beforeEach(async ({ markdownInputFieldPage }) => {
-      // 使用支持放大的 Demo (根据分析是 demo-6)
-      await markdownInputFieldPage.goto('markdowninputfield-demo-6');
+      await markdownInputFieldPage.goto(
+        PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldEnlarge,
+      );
     });
 
     test('点击放大按钮应该切换放大状态', async ({ markdownInputFieldPage }) => {

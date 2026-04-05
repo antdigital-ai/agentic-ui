@@ -1,8 +1,11 @@
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
 import { expect, test } from '../tests/fixtures/page-fixture';
 
 test.describe('MarkdownInputField 高级功能', () => {
   test('应该支持多行输入', async ({ markdownInputFieldPage }) => {
-    await markdownInputFieldPage.goto('markdowninputfield-demo-8');
+    await markdownInputFieldPage.goto(
+      PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldPasteConfig,
+    );
     const multiLineText = 'Line 1\nLine 2\nLine 3\nLine 4';
     await markdownInputFieldPage.typeText(multiLineText);
     const text = await markdownInputFieldPage.getText();

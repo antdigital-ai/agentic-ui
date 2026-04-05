@@ -1,3 +1,4 @@
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
 import { expect, test } from '../tests/fixtures/page-fixture';
 
 /**
@@ -9,7 +10,9 @@ test.describe('TagPopup 连续选择功能', () => {
     markdownInputFieldPage,
     page,
   }) => {
-    await markdownInputFieldPage.goto('markdowninputfield-demo-0');
+    await markdownInputFieldPage.goto(
+      PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldTags,
+    );
 
     // 等待 tag popup 输入区域出现
     const popupInputs = page.locator(
@@ -97,7 +100,9 @@ test.describe('TagPopup 连续选择功能', () => {
     markdownInputFieldPage,
     page,
   }) => {
-    await markdownInputFieldPage.goto('markdowninputfield-demo-0');
+    await markdownInputFieldPage.goto(
+      PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldTags,
+    );
 
     // 等待 tag popup 输入区域出现
     const popupInputs = page.locator(
@@ -156,7 +161,9 @@ test.describe('TagPopup 连续选择功能', () => {
     markdownInputFieldPage,
     page,
   }) => {
-    await markdownInputFieldPage.goto('markdowninputfield-demo-0');
+    await markdownInputFieldPage.goto(
+      PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldTags,
+    );
 
     // 等待 tag popup 输入区域出现
     const popupInput = page

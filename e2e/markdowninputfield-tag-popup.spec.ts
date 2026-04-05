@@ -1,3 +1,4 @@
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
 import { expect, test } from '../tests/fixtures/page-fixture';
 
 test.describe('MarkdownInputField Tag Popup', () => {
@@ -5,7 +6,9 @@ test.describe('MarkdownInputField Tag Popup', () => {
     markdownInputFieldPage,
     page,
   }) => {
-    await markdownInputFieldPage.goto('markdowninputfield-demo-0');
+    await markdownInputFieldPage.goto(
+      PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldTags,
+    );
 
     // 等待 tag popup 输入区域出现（这是实际可点击的元素）
     // 选择有下拉箭头的 tag popup（有可选项的那个），使用 .first() 确保唯一匹配
