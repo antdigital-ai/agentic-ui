@@ -87,6 +87,7 @@ export const FncRefForMarkdown: React.FC<FncRefForMarkdownProps> = ({
     <FncLeaf
       attributes={{ 'data-slate-leaf': true }}
       leaf={leaf}
+      text={leaf}
       fncProps={fncProps}
       linkConfig={linkConfig}
     >

@@ -29,7 +29,7 @@ const TagRender: React.FC<{
   placeholder: string;
   readonly?: boolean;
   style?: React.CSSProperties;
-}> = ({ onSelect, defaultDom, readonly }) => {
+}> = ({ onSelect, defaultDom, readonly, style, placeholder }) => {
   const [items] = useState([
     { key: '1', label: '选项1' },
     { key: '2', label: '选项2' },
@@ -48,7 +48,10 @@ const TagRender: React.FC<{
       }}
       trigger={['click']}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: 4, ...style }}
+        title={placeholder || undefined}
+      >
         {defaultDom}
         <ChevronDown style={{ color: '#999', fontSize: 12 }} />
       </div>
@@ -168,7 +171,17 @@ export default () => {
               setTimeout(() => resolve(URL.createObjectURL(file)), 1000);
             });
           },
-          onDelete: async (file) => URL.revokeObjectURL(file.previewUrl!),
+          onDelete: async (file) => {
+            const fileUrl = typeof file.url === 'string' ? file.url : undefined;
+            const previewUrl =
+              typeof file.previewUrl === 'string' ? file.previewUrl : undefined;
+            if (fileUrl?.startsWith('blob:')) {
+              URL.revokeObjectURL(fileUrl);
+            }
+            if (previewUrl?.startsWith('blob:') && previewUrl !== fileUrl) {
+              URL.revokeObjectURL(previewUrl);
+            }
+          },
         }}
         value={TEMPLATE_VALUE}
         tagInputProps={{ enable: true, items: TAG_ITEMS }}
