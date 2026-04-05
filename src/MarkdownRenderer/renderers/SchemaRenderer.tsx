@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import partialParse from '../../MarkdownEditor/editor/parser/json-parse';
+import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
 import { SchemaRenderer } from '../../Schema';
+import { debugInfo } from '../../Utils/debugUtils';
 import type { RendererBlockProps } from '../types';
 
 const extractTextContent = (children: React.ReactNode): string => {
@@ -41,15 +43,43 @@ const parseSchemaValue = (code: string): any => {
 export const SchemaBlockRenderer: React.FC<
   RendererBlockProps & {
     apaasifyRender?: (value: any) => React.ReactNode;
+    editorCodeProps?: MarkdownEditorProps['codeProps'];
   }
 > = (props) => {
-  const { children, language, apaasifyRender } = props;
+  const { children, language, apaasifyRender, editorCodeProps } = props;
   const code = extractTextContent(children);
 
   const schemaValue = useMemo(() => parseSchemaValue(code), [code]);
 
+  const applyCodeRender = (
+    defaultDom: React.ReactNode,
+    valueForElement: any,
+  ): React.ReactNode => {
+    const customRender = editorCodeProps?.render;
+    if (!customRender) return defaultDom;
+    const slateLike = {
+      attributes: {},
+      children: null,
+      element: {
+        type: language === 'agentar-card' ? 'card' : 'schema',
+        value: valueForElement,
+        language,
+      },
+    } as any;
+    try {
+      const rendered = customRender(slateLike, defaultDom, editorCodeProps);
+      if (rendered === undefined) return defaultDom;
+      return rendered;
+    } catch (error) {
+      debugInfo('SchemaBlockRenderer - codeProps.render 异常，回退默认', {
+        error: (error as Error)?.message || String(error),
+      });
+      return defaultDom;
+    }
+  };
+
   if (!schemaValue) {
-    return (
+    const fallbackDom = (
       <pre
         data-testid="schema-fallback"
         style={{
@@ -70,12 +100,13 @@ export const SchemaBlockRenderer: React.FC<
         <code>{code}</code>
       </pre>
     );
+    return applyCodeRender(fallbackDom, code);
   }
 
   if (apaasifyRender) {
     const rendered = apaasifyRender(schemaValue);
     if (rendered !== undefined) {
-      return (
+      const apaasifyDom = (
         <div
           data-testid="schema-container"
           contentEditable={false}
@@ -101,11 +132,12 @@ export const SchemaBlockRenderer: React.FC<
           </div>
         </div>
       );
+      return applyCodeRender(apaasifyDom, schemaValue);
     }
   }
 
   if (language === 'agentar-card') {
-    return (
+    const cardDom = (
       <div
         data-testid="agentar-card-container"
         style={{ padding: '0.5em' }}
@@ -120,9 +152,10 @@ export const SchemaBlockRenderer: React.FC<
         />
       </div>
     );
+    return applyCodeRender(cardDom, schemaValue);
   }
 
-  return (
+  const schemaDom = (
     <div data-testid="schema-renderer" style={{ padding: '0.5em' }}>
       <SchemaRenderer
         schema={schemaValue}
@@ -133,6 +166,7 @@ export const SchemaBlockRenderer: React.FC<
       />
     </div>
   );
+  return applyCodeRender(schemaDom, schemaValue);
 };
 
 SchemaBlockRenderer.displayName = 'SchemaBlockRenderer';

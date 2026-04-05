@@ -141,6 +141,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
             props.markdownRenderConfig?.streamingParagraphAnimation
           }
           fncProps={fncProps}
+          linkConfig={props.markdownRenderConfig?.linkConfig}
           style={{
             maxWidth: standalone ? '100%' : undefined,
             padding: isPaddingHidden ? 0 : undefined,

@@ -44,6 +44,7 @@ export const markdownToReactSync = (
       userComps,
       false,
       undefined,
+      undefined,
       false,
     );
 

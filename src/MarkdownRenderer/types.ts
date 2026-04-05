@@ -4,6 +4,7 @@ import type {
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
+import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import type { AttachmentFile } from '../MarkdownInputField/AttachmentButton/types';
 import type { FileMapViewProps } from '../MarkdownInputField/FileMapView';
 
@@ -117,16 +118,10 @@ export interface MarkdownRendererProps {
   style?: React.CSSProperties;
   /** 类名前缀 */
   prefixCls?: string;
-  /** 代码块配置（传递给 CodeRenderer） */
-  codeProps?: Record<string, any>;
-  /** 脚注配置 */
-  fncProps?: {
-    render?: (
-      props: Record<string, any> & { children: React.ReactNode },
-      defaultDom: React.ReactNode,
-    ) => React.ReactNode;
-    onFootnoteDefinitionChange?: (data: any[]) => void;
-  };
+  /** 代码块配置，与 MarkdownEditor `codeProps` 对齐（含 `render` 覆盖） */
+  codeProps?: MarkdownEditorProps['codeProps'];
+  /** 脚注配置，与 MarkdownEditor `fncProps` 对齐 */
+  fncProps?: MarkdownEditorProps['fncProps'];
   /** 链接配置 */
   linkConfig?: {
     /** 是否在新标签页打开链接，默认 true */
