@@ -48,7 +48,7 @@ export default () => {
   const bubbleRef = useRef<any>();
 
   // 配置状态
-  const [loading, setLoading] = useState(false);
+  const [listLoading, setListLoading] = useState(false);
   const [readonly, setReadonly] = useState(false);
   const [listHeight, setListHeight] = useState(400);
 
@@ -85,8 +85,8 @@ export default () => {
               加载状态:
             </label>
             <Switch
-              checked={loading}
-              onChange={setLoading}
+              checked={listLoading}
+              onChange={setListLoading}
               checkedChildren="加载中"
               unCheckedChildren="正常"
             />
@@ -138,7 +138,7 @@ export default () => {
           bubbleList={sampleMessages}
           bubbleListRef={bubbleListRef}
           bubbleRef={bubbleRef}
-          loading={loading}
+          isLoading={listLoading}
           readonly={readonly}
           assistantMeta={assistantMeta}
           userMeta={userMeta}
@@ -158,7 +158,8 @@ export default () => {
         <strong>📖 配置说明：</strong>
         <ul style={{ margin: '8px 0 0 0', paddingLeft: 20 }}>
           <li>
-            <strong>loading:</strong> 控制是否显示加载状态
+            <strong>isLoading:</strong> 是否显示列表加载状态（勿使用已废弃的{' '}
+            <code>loading</code>）
           </li>
           <li>
             <strong>readonly:</strong> 控制是否启用只读模式

@@ -316,27 +316,15 @@ export default () => (
 
 ### 基础功能展示
 
-展示气泡组件的基础功能，包括消息布局、加载状态、文件附件和交互操作。
+展示气泡组件的基础功能，包括消息布局、文件附件和交互操作（列表/流式加载请用 `isLoading` 等当前 API，勿使用已废弃的 `loading`）。
 
 <code src="../demos/bubble/basic.tsx">基础用法 - 消息布局与交互</code>
-
-### 消息加载状态演示
-
-演示 Bubble 组件的消息加载状态功能，包括消息生成时的加载效果和交互控制。
-
-<code src="../demos/bubble/message-loading-demo.tsx">消息加载状态</code>
 
 ### 思考中（DOM 轻量加载）演示
 
 演示 “思考中...” 分支的纯 DOM 渲染结构（dots 动效），以及 `bubbleLoadingIconClassName` / `bubbleLoadingIconStyle` 的定制入口。
 
 <code src="../demos/bubble/thinking-dom-demo.tsx">思考中 DOM 加载态</code>
-
-### 文件加载状态演示
-
-演示 Bubble 组件的文件上传加载状态功能，包括文件处理时的加载效果和文件类型支持。
-
-<code src="../demos/bubble/file-loading-demo.tsx">文件上传加载状态</code>
 
 ### 标题自定义渲染
 

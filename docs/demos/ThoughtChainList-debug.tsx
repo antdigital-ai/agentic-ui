@@ -16,7 +16,7 @@ export default function Home() {
       }}
     >
       <ThoughtChainList
-        loading={false}
+        isLoading={false}
         thoughtChainList={[
           {
             category: 'TableSql',
@@ -130,7 +130,8 @@ export default function Home() {
         <h4>Props 说明</h4>
         <ul>
           <li>
-            <code>loading</code> - 加载状态，设置为 false 表示已加载完成
+            <code>isLoading</code> - 加载状态，设置为 false 表示已加载完成（勿使用已废弃的{' '}
+            <code>loading</code>）
           </li>
           <li>
             <code>thoughtChainList</code> -
