@@ -58,7 +58,7 @@ group:
 
 ### AgenticLayoutProps
 
-| 参数 | 说明 | 类型 | 默认值 | 版本 |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
 | --- | --- | --- | --- | --- |
 | center | 中间内容区域（必填） | `ReactNode` | - | - |
 | left | 左侧边栏内容 | `ReactNode` | - | - |
@@ -72,7 +72,7 @@ group:
 
 ### header 配置（LayoutHeaderConfig）
 
-| 参数 | 说明 | 类型 | 默认值 | 版本 |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
 | --- | --- | --- | --- | --- |
 | title | 标题，支持文本或自定义 ReactNode | `ReactNode` | - | - |
 | showShare | 是否显示分享按钮 | `boolean` | `false` | - |

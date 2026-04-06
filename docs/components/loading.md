@@ -20,7 +20,7 @@ group:
 
 Loading 组件是主要的加载组件，支持多种使用模式。
 
-| 参数 | 说明 | 类型 | 默认值 | 版本 |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
 | --- | --- | --- | --- | --- |
 | `size` | 动画尺寸（宽度和高度），支持数字（px）或字符串（如 `'1em'`, `'2rem'`）。未设置时，嵌套模式默认为 `32px`，非嵌套模式默认为 `'1em'` | `number \| string` | - | - |
 | `tip` | 加载提示文本，支持 ReactNode。设置为 `false` 或 `null` 时不显示提示 | `React.ReactNode \| false \| null` | - | - |
@@ -48,7 +48,7 @@ Loading 组件库提供了三种不同风格的加载动画组件：
 - `CreativeSparkLoading` 基于 Lottie 动画实现
 - `CreativeRecommendationLoading` 基于 Effect 动画实现
 
-| 参数 | 说明 | 类型 | 默认值 | 版本 |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
 | --- | --- | --- | --- | --- |
 | `autoplay` | 是否自动播放动画 | `boolean` | `true` | - |
 | `loop` | 是否循环播放动画 | `boolean` | `true` | - |

@@ -29,7 +29,7 @@ export default () => (
 
 ### LayoutHeaderProps (LayoutHeaderConfig)
 
-| 参数 | 说明 | 类型 | 默认值 | 版本 |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
 | --- | --- | --- | --- | --- |
 | title | 标题文本 | `string` | - | - |
 | showShare | 是否显示分享按钮 | `boolean` | `true` | - |
