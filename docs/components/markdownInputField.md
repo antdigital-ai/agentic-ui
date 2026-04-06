@@ -253,46 +253,46 @@ export default () => {
 
 ## API
 
-| 属性名                   | 类型                                                                 | 默认值    | 描述                                        |
-| ------------------------ | -------------------------------------------------------------------- | --------- | ------------------------------------------- |
-| `value`                  | `string`                                                             | -         | 当前的 markdown 文本值                      |
-| `onChange`               | `(value: string) => void`                                            | -         | 当输入值改变时触发的回调函数                |
-| `placeholder`            | `string`                                                             | -         | 输入字段的占位文本                          |
-| `style`                  | `React.CSSProperties`                                                | -         | 应用于输入字段的内联样式                    |
-| `className`              | `string`                                                             | -         | 应用于输入字段的 CSS 类名                   |
-| `disabled`               | `boolean`                                                            | -         | 是否禁用输入字段                            |
-| `typing`                 | `boolean`                                                            | -         | AI 回复中等场景下为 true，输入区只读并显示提示 |
-| `allowEmptySubmit`       | `boolean`                                                            | `false`   | 是否允许在内容为空时也触发发送              |
-| `triggerSendKey`         | `'Enter' \| 'Mod+Enter'`                                             | `'Enter'` | 触发发送操作的键盘快捷键                    |
-| `onSend`                 | `(value: string) => Promise<void>`                                   | -         | 当内容发送时触发的异步回调函数              |
-| `onStop`                 | `() => void`                                                         | -         | 正在输入中时点击发送按钮的回调函数          |
-| `onFocus`                | `(value: string, schema: Elements[], e: FocusEvent) => void`         | -         | 当输入字段获得焦点时触发的回调函数          |
-| `onBlur`                 | `(value: string, schema: Elements[], e: MouseEvent) => void`         | -         | 当输入字段失去焦点时触发的回调函数          |
-| `tagInputProps`          | `MarkdownEditorProps['tagInputProps']`                               | -         | 标签输入的相关属性                          |
-| `borderRadius`           | `number`                                                             | `12`      | 边框圆角大小                                |
-| `attachment`             | `{ enable?: boolean } & AttachmentButtonProps`                       | -         | 附件配置                                    |
-| `voiceRecognizer`        | `CreateRecognizer`                                                   | -         | 语音输入配置                                |
-| `actionsRender`          | `(props, defaultActions) => React.ReactNode[]`                       | -         | 自定义渲染操作按钮的函数                    |
-| `toolsRender`            | `(props) => React.ReactNode[]`                                       | -         | 自定义渲染操作按钮前内容的函数              |
-| `beforeToolsRender`      | `(props) => React.ReactNode`                                         | -         | 自定义渲染输入框上方的工具栏区域            |
-| `quickActionRender`      | `(props) => React.ReactNode[]`                                       | -         | 自定义右上操作按钮渲染函数                  |
-| `leafRender`             | `(props, defaultDom) => React.ReactElement`                          | -         | 自定义叶子节点渲染函数                      |
-| `inputRef`               | `React.MutableRefObject<MarkdownEditorInstance>`                     | -         | 输入框引用                                  |
-| `skillMode`              | `SkillModeConfig`                                                    | -         | 技能模式配置                                |
-| `onSkillModeOpenChange`  | `(open: boolean) => void`                                            | -         | 技能模式状态变化回调                        |
-| `pasteConfig`            | `{ enabled?: boolean; allowedTypes?: string[] }`                     | -         | 粘贴配置                                    |
-| `refinePrompt`           | `{ enable: boolean; onRefine: (input: string) => Promise<string>; }` | -         | 提示词优化配置                              |
-| `enlargeable`            | `{ enable?: boolean; height?: number; }`                             | -         | 放大功能配置                                |
-| `isShowTopOperatingArea` | `boolean`                                                            | `false`   | 是否显示顶部操作区域                        |
-| `targetRef`              | `React.RefObject<HTMLDivElement>`                                    | -         | 顶部操作区域回到顶部/底部功能的目标元素引用 |
-| `operationBtnRender`     | `() => React.ReactNode`                                              | -         | 顶部操作区域自定义操作按钮渲染函数          |
-| `isShowBackTo`           | `boolean`                                                            | `true`    | 是否在顶部操作区域显示回到顶部/底部按钮     |
-| `maxHeight`              | `number \| string`                                                   | -         | 输入框的最大高度                            |
-| `maxLength`              | `number`                                                             | -         | 输入文本的最大字符数限制                    |
-| `onMaxLengthExceeded`    | `(value: string) => void`                                            | -         | 当输入达到最大长度限制时的回调函数          |
-| `sendButtonProps`        | `SendButtonCustomizationProps`                                       | -         | 发送按钮配置                                |
-| `disableHoverAnimation`  | `boolean`                                                            | `false`   | 是否禁用 hover 动画                         |
-| `bgColorList`            | `string[]`                                                           | -         | 背景颜色列表                                |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| `value` | 当前的 markdown 文本值 | `string` | - | - |
+| `onChange` | 当输入值改变时触发的回调函数 | `(value: string) => void` | - | - |
+| `placeholder` | 输入字段的占位文本 | `string` | - | - |
+| `style` | 应用于输入字段的内联样式 | `React.CSSProperties` | - | - |
+| `className` | 应用于输入字段的 CSS 类名 | `string` | - | - |
+| `disabled` | 是否禁用输入字段 | `boolean` | - | - |
+| `typing` | AI 回复中等场景下为 true，输入区只读并显示提示 | `boolean` | - | - |
+| `allowEmptySubmit` | 是否允许在内容为空时也触发发送 | `boolean` | `false` | - |
+| `triggerSendKey` | 触发发送操作的键盘快捷键 | `'Enter' \| 'Mod+Enter'` | `'Enter'` | - |
+| `onSend` | 当内容发送时触发的异步回调函数 | `(value: string) => Promise<void>` | - | - |
+| `onStop` | 正在输入中时点击发送按钮的回调函数 | `() => void` | - | - |
+| `onFocus` | 当输入字段获得焦点时触发的回调函数 | `(value: string, schema: Elements[], e: FocusEvent) => void` | - | - |
+| `onBlur` | 当输入字段失去焦点时触发的回调函数 | `(value: string, schema: Elements[], e: MouseEvent) => void` | - | - |
+| `tagInputProps` | 标签输入的相关属性 | `MarkdownEditorProps['tagInputProps']` | - | - |
+| `borderRadius` | 边框圆角大小 | `number` | `12` | - |
+| `attachment` | 附件配置 | `{ enable?: boolean } & AttachmentButtonProps` | - | - |
+| `voiceRecognizer` | 语音输入配置 | `CreateRecognizer` | - | - |
+| `actionsRender` | 自定义渲染操作按钮的函数 | `(props, defaultActions) => React.ReactNode[]` | - | - |
+| `toolsRender` | 自定义渲染操作按钮前内容的函数 | `(props) => React.ReactNode[]` | - | - |
+| `beforeToolsRender` | 自定义渲染输入框上方的工具栏区域 | `(props) => React.ReactNode` | - | - |
+| `quickActionRender` | 自定义右上操作按钮渲染函数 | `(props) => React.ReactNode[]` | - | - |
+| `leafRender` | 自定义叶子节点渲染函数 | `(props, defaultDom) => React.ReactElement` | - | - |
+| `inputRef` | 输入框引用 | `React.MutableRefObject<MarkdownEditorInstance>` | - | - |
+| `skillMode` | 技能模式配置 | `SkillModeConfig` | - | - |
+| `onSkillModeOpenChange` | 技能模式状态变化回调 | `(open: boolean) => void` | - | - |
+| `pasteConfig` | 粘贴配置 | `{ enabled?: boolean; allowedTypes?: string[] }` | - | - |
+| `refinePrompt` | 提示词优化配置 | `{ enable: boolean; onRefine: (input: string) => Promise<string>; }` | - | - |
+| `enlargeable` | 放大功能配置 | `{ enable?: boolean; height?: number; }` | - | - |
+| `isShowTopOperatingArea` | 是否显示顶部操作区域 | `boolean` | `false` | - |
+| `targetRef` | 顶部操作区域回到顶部/底部功能的目标元素引用 | `React.RefObject<HTMLDivElement>` | - | - |
+| `operationBtnRender` | 顶部操作区域自定义操作按钮渲染函数 | `() => React.ReactNode` | - | - |
+| `isShowBackTo` | 是否在顶部操作区域显示回到顶部/底部按钮 | `boolean` | `true` | - |
+| `maxHeight` | 输入框的最大高度 | `number \| string` | - | - |
+| `maxLength` | 输入文本的最大字符数限制 | `number` | - | - |
+| `onMaxLengthExceeded` | 当输入达到最大长度限制时的回调函数 | `(value: string) => void` | - | - |
+| `sendButtonProps` | 发送按钮配置 | `SendButtonCustomizationProps` | - | - |
+| `disableHoverAnimation` | 是否禁用 hover 动画 | `boolean` | `false` | - |
+| `bgColorList` | 背景颜色列表 | `string[]` | - | - |
 
 ### 类型定义
 
@@ -300,52 +300,52 @@ export default () => {
 
 附件按钮配置属性。
 
-| 属性名               | 类型                                                                                | 说明                                                |
-| -------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------- |
-| `upload`             | `(file: AttachmentFile, index: number) => Promise<string>`                          | 文件上传处理函数，返回文件 URL                      |
-| `uploadWithResponse` | `(file: AttachmentFile, index: number) => Promise<UploadResponse>`                  | 文件上传处理函数（返回完整响应），优先级高于 upload |
-| `fileMap`            | `Map<string, AttachmentFile>`                                                       | 文件映射表，用于存储已上传的文件                    |
-| `onFileMapChange`    | `(files?: Map<string, AttachmentFile>) => void`                                     | 文件映射表变更时的回调                              |
-| `supportedFormat`    | `SupportedFileFormats`                                                              | 支持的文件格式配置                                  |
-| `disabled`           | `boolean`                                                                           | 是否禁用按钮                                        |
-| `maxFileSize`        | `number`                                                                            | 单个文件最大大小（字节）                            |
-| `maxFileCount`       | `number`                                                                            | 最大文件数量                                        |
-| `allowMultiple`      | `boolean`                                                                           | 是否允许一次选择多个文件（默认：true）              |
-| `onExceedMaxCount`   | `(info: { maxCount: number; currentCount: number; selectedCount: number }) => void` | 文件数量超出 maxFileCount 限制时的回调              |
+| 属性               | 说明                                                | 类型                                                                                | 默认值 | 版本 |
+| ------------------ | --------------------------------------------------- | ----------------------------------------------------------------------------------- | ------ | ---- |
+| `upload`             | 文件上传处理函数，返回文件 URL                      | `(file: AttachmentFile, index: number) => Promise<string>`                          | -      | -    |
+| `uploadWithResponse` | 文件上传处理函数（返回完整响应），优先级高于 upload | `(file: AttachmentFile, index: number) => Promise<UploadResponse>`                  | -      | -    |
+| `fileMap`            | 文件映射表，用于存储已上传的文件                    | `Map<string, AttachmentFile>`                                                       | -      | -    |
+| `onFileMapChange`    | 文件映射表变更时的回调                              | `(files?: Map<string, AttachmentFile>) => void`                                     | -      | -    |
+| `supportedFormat`    | 支持的文件格式配置                                  | `SupportedFileFormats`                                                              | -      | -    |
+| `disabled`           | 是否禁用按钮                                        | `boolean`                                                                           | -      | -    |
+| `maxFileSize`        | 单个文件最大大小（字节）                            | `number`                                                                            | -      | -    |
+| `maxFileCount`       | 最大文件数量                                        | `number`                                                                            | -      | -    |
+| `allowMultiple`      | 是否允许一次选择多个文件（默认：true）              | `boolean`                                                                           | -      | -    |
+| `onExceedMaxCount`   | 文件数量超出 maxFileCount 限制时的回调              | `(info: { maxCount: number; currentCount: number; selectedCount: number }) => void` | -      | -    |
 
 #### SkillModeConfig
 
 技能模式配置接口。
 
-| 属性名         | 类型                                   | 默认值  | 说明                                              |
-| -------------- | -------------------------------------- | ------- | ------------------------------------------------- |
-| `enable`       | `boolean`                              | `true`  | 是否启用技能模式组件，当为 false 时组件完全不渲染 |
-| `open`         | `boolean`                              | `false` | 是否打开技能模式                                  |
-| `title`        | `React.ReactNode`                      | -       | 技能模式标题                                      |
-| `rightContent` | `React.ReactNode \| React.ReactNode[]` | -       | 右侧自定义内容，支持单个节点或数组                |
-| `closable`     | `boolean`                              | `true`  | 是否显示默认关闭按钮                              |
-| `style`        | `React.CSSProperties`                  | -       | 技能模式容器样式                                  |
-| `className`    | `string`                               | -       | 技能模式容器类名                                  |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| `enable` | 是否启用技能模式组件，当为 false 时组件完全不渲染 | `boolean` | `true` | - |
+| `open` | 是否打开技能模式 | `boolean` | `false` | - |
+| `title` | 技能模式标题 | `React.ReactNode` | - | - |
+| `rightContent` | 右侧自定义内容，支持单个节点或数组 | `React.ReactNode \| React.ReactNode[]` | - | - |
+| `closable` | 是否显示默认关闭按钮 | `boolean` | `true` | - |
+| `style` | 技能模式容器样式 | `React.CSSProperties` | - | - |
+| `className` | 技能模式容器类名 | `string` | - | - |
 
 #### SendButtonCustomizationProps
 
 发送按钮自定义配置。
 
-| 属性名    | 类型               | 说明                     |
-| --------- | ------------------ | ------------------------ |
-| `compact` | `boolean`          | 是否使用紧凑模式显示按钮 |
-| `colors`  | `SendButtonColors` | 自定义按钮颜色配置       |
+| 属性    | 说明                     | 类型               | 默认值 | 版本 |
+| ------- | ------------------------ | ------------------ | ------ | ---- |
+| `compact` | 是否使用紧凑模式显示按钮 | `boolean`          | -      | -    |
+| `colors`  | 自定义按钮颜色配置       | `SendButtonColors` | -      | -    |
 
 #### SendButtonColors
 
 发送按钮颜色配置。
 
-| 属性名            | 类型     | 说明                   |
-| ----------------- | -------- | ---------------------- |
-| `icon`            | `string` | 默认状态下的图标颜色   |
-| `iconHover`       | `string` | Hover 状态下的图标颜色 |
-| `background`      | `string` | 默认状态下的背景颜色   |
-| `backgroundHover` | `string` | Hover 状态下的背景颜色 |
+| 属性            | 说明                   | 类型     | 默认值 | 版本 |
+| --------------- | ---------------------- | -------- | ------ | ---- |
+| `icon`            | 默认状态下的图标颜色   | `string` | -      | -    |
+| `iconHover`       | Hover 状态下的图标颜色 | `string` | -      | -    |
+| `background`      | 默认状态下的背景颜色   | `string` | -      | -    |
+| `backgroundHover` | Hover 状态下的背景颜色 | `string` | -      | -    |
 
 ## 示例
 
@@ -791,10 +791,10 @@ export default () => {
 
 #### 相关属性
 
-| 属性               | 类型                           | 默认值  | 说明                                               |
-| ------------------ | ------------------------------ | ------- | -------------------------------------------------- |
-| `enlargeable`      | `boolean`                      | `false` | 是否启用放大功能                                   |
-| `enlargeTargetRef` | `React.RefObject<HTMLElement>` | -       | 放大时的目标容器引用，必须是一个具有定位属性的元素 |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| `enlargeable` | 是否启用放大功能 | `boolean` | `false` | - |
+| `enlargeTargetRef` | 放大时的目标容器引用，必须是一个具有定位属性的元素 | `React.RefObject<HTMLElement>` | - | - |
 
 #### 使用注意事项
 
