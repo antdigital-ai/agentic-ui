@@ -63,14 +63,14 @@ group:
 
 ### FunnelChartDataItem
 
-| 字段        | 类型               | 必填 | 说明                                                                             |
-| ----------- | ------------------ | ---- | -------------------------------------------------------------------------------- |
-| category    | `string`           | 否   | 分类（用于外层筛选）                                                             |
-| type        | `string`           | 否   | 数据序列名称（默认单序列）                                                       |
-| x           | `number \| string` | 是   | 阶段名（将作为 labels）                                                          |
-| y           | `number \| string` | 是   | 数值                                                                             |
-| filterLabel | `string`           | 否   | 二级筛选标签（可选）                                                             |
-| ratio       | `number \| string` | 否   | 与下一层的转化率（0-100 或 '80%'），最后一层可为 0；用于绘制两层之间的梯形与文本 |
+| 字段 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| category | 分类（用于外层筛选） | `string` | - | - |
+| type | 数据序列名称（默认单序列） | `string` | - | - |
+| x | 阶段名（将作为 labels）（必填） | `number \| string` | - | - |
+| y | 数值（必填） | `number \| string` | - | - |
+| filterLabel | 二级筛选标签（可选） | `string` | - | - |
+| ratio | 与下一层的转化率（0-100 或 '80%'），最后一层可为 0；用于绘制两层之间的梯形与文本 | `number \| string` | - | - |
 
 ### ChartStatisticConfig
 

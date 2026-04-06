@@ -51,12 +51,12 @@ group:
 
 ### HistogramChartDataItem
 
-| 字段        | 类型     | 必填 | 说明                     |
-| ----------- | -------- | ---- | ------------------------ |
-| value       | `number` | 是   | 原始数据值               |
-| type        | `string` | 否   | 数据系列（用于分组显示） |
-| category    | `string` | 否   | 分类（用于筛选）         |
-| filterLabel | `string` | 否   | 二级筛选标签（可选）     |
+| 字段 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| value | 原始数据值（必填） | `number` | - | - |
+| type | 数据系列（用于分组显示） | `string` | - | - |
+| category | 分类（用于筛选） | `string` | - | - |
+| filterLabel | 二级筛选标签（可选） | `string` | - | - |
 
 ## 说明
 

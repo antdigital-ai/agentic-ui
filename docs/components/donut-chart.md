@@ -59,12 +59,12 @@ group:
 
 ### DonutChartData
 
-| 字段        | 类型     | 必填 | 说明                           |
-| ----------- | -------- | ---- | ------------------------------ |
-| category    | `string` | 否   | 分类（用于可选自动分类与筛选） |
-| label       | `string` | 是   | 标签（将用于图例与中心文字）   |
-| value       | `number` | 是   | 数值（可自动计算百分比）       |
-| filterLabel | `string` | 否   | 二级筛选标签（可选）           |
+| 字段 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| category | 分类（用于可选自动分类与筛选） | `string` | - | - |
+| label | 标签（将用于图例与中心文字）（必填） | `string` | - | - |
+| value | 数值（可自动计算百分比）（必填） | `number` | - | - |
+| filterLabel | 二级筛选标签（可选） | `string` | - | - |
 
 ### DonutChartConfig
 

@@ -49,13 +49,13 @@ group:
 
 ### RadarChartDataItem
 
-| 字段        | 类型               | 必填 | 说明                             |
-| ----------- | ------------------ | ---- | -------------------------------- |
-| category    | `string`           | 否   | 分类（用于外层筛选）             |
-| label       | `string`           | 是   | 指标名称（将作为雷达图各轴标签） |
-| type        | `string`           | 否   | 数据序列名称（映射为 dataset）   |
-| score       | `number \| string` | 是   | 指标分值                         |
-| filterLabel | `string`           | 否   | 二级筛选标签（可选）             |
+| 字段 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| category | 分类（用于外层筛选） | `string` | - | - |
+| label | 指标名称（将作为雷达图各轴标签）（必填） | `string` | - | - |
+| type | 数据序列名称（映射为 dataset） | `string` | - | - |
+| score | 指标分值（必填） | `number \| string` | - | - |
+| filterLabel | 二级筛选标签（可选） | `string` | - | - |
 
 ### ChartStatisticConfig
 

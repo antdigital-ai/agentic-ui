@@ -68,27 +68,27 @@ group:
 
 ### BarChartDataItem
 
-| 字段        | 类型     | 必填 | 说明                           |
-| ----------- | -------- | ---- | ------------------------------ |
-| category    | `string` | 是   | 分类（用于外层筛选）           |
-| type        | `string` | 是   | 数据序列名称（映射为 dataset） |
-| x           | `number` | 是   | 横轴值（将作为 labels）        |
-| y           | `number` | 是   | 纵轴值                         |
-| xtitle      | `string` | 否   | X 轴标题（从数据中提取）       |
-| ytitle      | `string` | 否   | Y 轴标题（从数据中提取）       |
-| filterLabel | `string` | 否   | 二级筛选标签（可选）           |
+| 字段 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| category | 分类（用于外层筛选）（必填） | `string` | - | - |
+| type | 数据序列名称（映射为 dataset）（必填） | `string` | - | - |
+| x | 横轴值（将作为 labels）（必填） | `number` | - | - |
+| y | 纵轴值（必填） | `number` | - | - |
+| xtitle | X 轴标题（从数据中提取） | `string` | - | - |
+| ytitle | Y 轴标题（从数据中提取） | `string` | - | - |
+| filterLabel | 二级筛选标签（可选） | `string` | - | - |
 
 ### DataLabelFormatterParams
 
 `dataLabelFormatter` 函数接收的参数对象：
 
-| 字段         | 类型               | 说明                                         |
-| ------------ | ------------------ | -------------------------------------------- |
-| value        | `number`           | 数据值（堆叠图中为累计总和）                 |
-| label        | `string \| number` | 对应坐标轴的标签（如 X 轴标签："Q1"、"1"等） |
-| datasetLabel | `string`           | 数据集名称（如 "手机"、"电脑"等）            |
-| dataIndex    | `number`           | 数据点在数组中的索引                         |
-| datasetIndex | `number`           | 数据集在数组中的索引                         |
+| 字段 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| value | 数据值（堆叠图中为累计总和） | `number` | - | - |
+| label | 对应坐标轴的标签（如 X 轴标签："Q1"、"1"等） | `string \| number` | - | - |
+| datasetLabel | 数据集名称（如 "手机"、"电脑"等） | `string` | - | - |
+| dataIndex | 数据点在数组中的索引 | `number` | - | - |
+| datasetIndex | 数据集在数组中的索引 | `number` | - | - |
 
 ### ChartStatisticConfig
 

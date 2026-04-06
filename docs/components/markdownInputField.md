@@ -1122,16 +1122,16 @@ uploadWithResponse?: (
 
 #### UploadResponse 类型
 
-| 参数         | 说明             | 类型                            | 必填 |
-| ------------ | ---------------- | ------------------------------- | ---- |
-| fileId       | 文件ID           | `string`                        | 是   |
-| fileName     | 文件名           | `string`                        | 是   |
-| fileType     | 文件类型         | `string`                        | 是   |
-| fileUrl      | 文件URL          | `string`                        | 是   |
-| uploadStatus | 上传状态         | `'SUCCESS' \| 'FAIL' \| string` | 是   |
-| contentId    | 内容ID           | `string \| null`                | 否   |
-| errorMessage | 错误消息         | `string \| null`                | 否   |
-| fileSize     | 文件大小（字节） | `number \| null`                | 否   |
+| 参数 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| fileId | 文件ID（必填） | `string` | - | - |
+| fileName | 文件名（必填） | `string` | - | - |
+| fileType | 文件类型（必填） | `string` | - | - |
+| fileUrl | 文件URL（必填） | `string` | - | - |
+| uploadStatus | 上传状态（必填） | `'SUCCESS' \| 'FAIL' \| string` | - | - |
+| contentId | 内容ID | `string \| null` | - | - |
+| errorMessage | 错误消息 | `string \| null` | - | - |
+| fileSize | 文件大小（字节） | `number \| null` | - | - |
 
 #### 特性
 

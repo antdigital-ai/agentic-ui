@@ -56,15 +56,15 @@ group:
 
 ### AreaChartDataItem
 
-| 字段        | 类型     | 必填 | 说明                                 |
-| ----------- | -------- | ---- | ------------------------------------ |
-| category    | `string` | 是   | 分类（用于外层筛选）                 |
-| type        | `string` | 是   | 数据序列名称（会映射为一个 dataset） |
-| x           | `number` | 是   | 横轴值（将自动排序并作为 labels）    |
-| y           | `number` | 是   | 纵轴值                               |
-| xtitle      | `string` | 否   | X 轴标题（从数据中提取）             |
-| ytitle      | `string` | 否   | Y 轴标题（从数据中提取）             |
-| filterLabel | `string` | 否   | 二级筛选标签（可选）                 |
+| 字段 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| category | 分类（用于外层筛选）（必填） | `string` | - | - |
+| type | 数据序列名称（会映射为一个 dataset）（必填） | `string` | - | - |
+| x | 横轴值（将自动排序并作为 labels）（必填） | `number` | - | - |
+| y | 纵轴值（必填） | `number` | - | - |
+| xtitle | X 轴标题（从数据中提取） | `string` | - | - |
+| ytitle | Y 轴标题（从数据中提取） | `string` | - | - |
+| filterLabel | 二级筛选标签（可选） | `string` | - | - |
 
 ### ChartStatisticConfig
 
