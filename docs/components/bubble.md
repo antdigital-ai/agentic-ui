@@ -422,8 +422,8 @@ export default () => (
 
 #### 核心属性
 
-| 属性       | 说明                   | 类型                | 默认值   | 废弃版本 |
-| ---------- | ---------------------- | ------------------- | -------- | -------- |
+| 属性       | 说明                   | 类型                | 默认值   | 版本 |
+| ---------- | ---------------------- | ------------------- | -------- | ---- |
 | originData | 消息的原始数据         | `MessageBubbleData` | -        | -        |
 | avatar     | 头像元数据配置         | `BubbleMetaData`    | -        | -        |
 | placement  | 消息布局位置           | `'left' \| 'right'` | `'left'` | -        |
@@ -433,23 +433,23 @@ export default () => (
 
 #### 样式配置
 
-| 属性      | 说明             | 类型                  | 默认值 |
-| --------- | ---------------- | --------------------- | ------ |
-| className | 自定义 CSS 类名  | `string`              | -      |
-| style     | 自定义内联样式   | `React.CSSProperties` | -      |
-| styles    | 详细样式配置对象 | `BubbleStylesConfig`  | -      |
+| 属性      | 说明             | 类型                  | 默认值 | 版本 |
+| --------- | ---------------- | --------------------- | ------ | ---- |
+| className | 自定义 CSS 类名  | `string`              | -      | -    |
+| style     | 自定义内联样式   | `React.CSSProperties` | -      | -    |
+| styles    | 详细样式配置对象 | `BubbleStylesConfig`  | -      | -    |
 
 #### 渲染配置
 
-| 属性                 | 说明              | 类型                  | 默认值 |
-| -------------------- | ----------------- | --------------------- | ------ |
-| bubbleRenderConfig   | 自定义渲染配置    | `BubbleRenderConfig`  | -      |
-| markdownRenderConfig | Markdown 渲染配置 | `MarkdownEditorProps` | -      |
+| 属性                 | 说明              | 类型                  | 默认值 | 版本 |
+| -------------------- | ----------------- | --------------------- | ------ | ---- |
+| bubbleRenderConfig   | 自定义渲染配置    | `BubbleRenderConfig`  | -      | -    |
+| markdownRenderConfig | Markdown 渲染配置 | `MarkdownEditorProps` | -      | -    |
 
 #### 交互回调
 
-| 属性             | 说明                                | 类型                                  | 默认值 | 废弃版本 |
-| ---------------- | ----------------------------------- | ------------------------------------- | ------ | -------- |
+| 属性             | 说明                                | 类型                                  | 默认值 | 版本 |
+| ---------------- | ----------------------------------- | ------------------------------------- | ------ | ---- |
 | onLike           | 点赞回调函数                        | `(bubble: MessageBubbleData) => void` | -      | -        |
 | onDislike        | 点踩回调函数（符合命名规范）        | `(bubble: MessageBubbleData) => void` | -      | -        |
 | ~~onDisLike~~    | 已废弃，请使用 `onDislike`          | `(bubble: MessageBubbleData) => void` | -      | 2.29.0   |
@@ -464,8 +464,8 @@ export default () => (
 
 #### 核心属性
 
-| 属性          | 说明                       | 类型                  | 默认值  | 废弃版本 |
-| ------------- | -------------------------- | --------------------- | ------- | -------- |
+| 属性          | 说明                       | 类型                  | 默认值  | 版本 |
+| ------------- | -------------------------- | --------------------- | ------- | ---- |
 | bubbleList    | 消息列表数据               | `MessageBubbleData[]` | `[]`    | -        |
 | assistantMeta | AI 助手元数据              | `BubbleMetaData`      | -       | -        |
 | userMeta      | 用户元数据                 | `BubbleMetaData`      | -       | -        |
@@ -475,13 +475,13 @@ export default () => (
 
 #### 引用和样式
 
-| 属性          | 说明            | 类型                                       | 默认值 |
-| ------------- | --------------- | ------------------------------------------ | ------ |
-| bubbleListRef | 列表容器引用    | `MutableRefObject<HTMLDivElement>`         | -      |
-| bubbleRef     | 气泡组件引用    | `MutableRefObject<BubbleImperativeHandle>` | -      |
-| className     | 自定义 CSS 类名 | `string`                                   | -      |
-| style         | 自定义内联样式  | `React.CSSProperties`                      | -      |
-| styles        | 详细样式配置    | `BubbleListStylesConfig`                   | -      |
+| 属性          | 说明            | 类型                                       | 默认值 | 版本 |
+| ------------- | --------------- | ------------------------------------------ | ------ | ---- |
+| bubbleListRef | 列表容器引用    | `MutableRefObject<HTMLDivElement>`         | -      | -    |
+| bubbleRef     | 气泡组件引用    | `MutableRefObject<BubbleImperativeHandle>` | -      | -    |
+| className     | 自定义 CSS 类名 | `string`                                   | -      | -    |
+| style         | 自定义内联样式  | `React.CSSProperties`                      | -      | -    |
+| styles        | 详细样式配置    | `BubbleListStylesConfig`                   | -      | -    |
 
 ### 核心数据类型
 
@@ -574,8 +574,8 @@ interface BubbleSlotStyles {
 
 #### AI 气泡属性
 
-| 属性              | 说明                           | 类型          | 默认值 | 废弃版本 |
-| ----------------- | ------------------------------ | ------------- | ------ | -------- |
+| 属性              | 说明                           | 类型          | 默认值 | 版本 |
+| ----------------- | ------------------------------ | ------------- | ------ | ---- |
 | aiBubbleProps     | AI 气泡的属性配置              | `BubbleProps` | -      | -        |
 | ~~aIBubbleProps~~ | 已废弃，请使用 `aiBubbleProps` | `BubbleProps` | -      | 2.30.0   |
 

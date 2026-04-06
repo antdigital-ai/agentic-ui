@@ -60,8 +60,8 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 
 ### History
 
-| 参数                | 说明                                 | 类型                                                                               | 默认值  | 废弃版本 |
-| ------------------- | ------------------------------------ | ---------------------------------------------------------------------------------- | ------- | -------- |
+| 参数                | 说明                                 | 类型                                                                               | 默认值  | 版本 |
+| ------------------- | ------------------------------------ | ---------------------------------------------------------------------------------- | ------- | ---- |
 | agentId             | 代理ID，用于获取历史记录             | `string`                                                                           | -       | -        |
 | sessionId           | 会话ID，变更时会触发数据重新获取     | `string`                                                                           | -       | -        |
 | request             | 请求函数，用于获取历史数据           | `(params: { agentId: string }) => Promise<HistoryDataType[]>`                      | -       | -        |
@@ -83,30 +83,30 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 
 ### HistoryDataType
 
-| 参数            | 说明         | 类型               | 默认值  |
-| --------------- | ------------ | ------------------ | ------- |
-| id              | 会话记录ID   | `number \| string` | -       |
-| tenantId        | 租户ID       | `string`           | -       |
-| sessionTitle    | 会话标题     | `React.ReactNode`  | -       |
-| agentId         | AI代理ID     | `string`           | -       |
-| sessionId       | 会话唯一标识 | `string`           | -       |
-| gmtCreate       | 记录创建时间 | `number \| string` | -       |
-| gmtLastConverse | 最近对话时间 | `number \| string` | -       |
-| isFavorite      | 是否收藏     | `boolean`          | `false` |
-| isSelected      | 是否选中     | `boolean`          | `false` |
+| 参数            | 说明         | 类型               | 默认值  | 版本 |
+| --------------- | ------------ | ------------------ | ------- | ---- |
+| id              | 会话记录ID   | `number \| string` | -       | -    |
+| tenantId        | 租户ID       | `string`           | -       | -    |
+| sessionTitle    | 会话标题     | `React.ReactNode`  | -       | -    |
+| agentId         | AI代理ID     | `string`           | -       | -    |
+| sessionId       | 会话唯一标识 | `string`           | -       | -    |
+| gmtCreate       | 记录创建时间 | `number \| string` | -       | -    |
+| gmtLastConverse | 最近对话时间 | `number \| string` | -       | -    |
+| isFavorite      | 是否收藏     | `boolean`          | `false` | -    |
+| isSelected      | 是否选中     | `boolean`          | `false` | -    |
 
 ### HistoryChatType
 
-| 参数            | 说明         | 类型                                                                                                        | 默认值 |
-| --------------- | ------------ | ----------------------------------------------------------------------------------------------------------- | ------ |
-| feedback        | 问答对状态   | `'median' \| 'thumbsUp' \| 'thumbsDown'`                                                                    | -      |
-| tenantId        | 租户ID       | `string`                                                                                                    | -      |
-| agentId         | AI代理ID     | `string`                                                                                                    | -      |
-| questionContent | 提问内容     | `{ role?: string; content?: string; contentType?: string }`                                                 | -      |
-| answerContent   | 回答内容     | `{ role?: string; content?: string; contentType?: string; white_box_process?: WhiteBoxProcessInterface[] }` | -      |
-| sessionId       | 会话唯一标识 | `string`                                                                                                    | -      |
-| clientId        | 客户ID       | `string`                                                                                                    | -      |
-| gmtCreate       | 记录创建时间 | `string \| number`                                                                                          | -      |
+| 参数            | 说明         | 类型                                                                                                        | 默认值 | 版本 |
+| --------------- | ------------ | ----------------------------------------------------------------------------------------------------------- | ------ | ---- |
+| feedback        | 问答对状态   | `'median' \| 'thumbsUp' \| 'thumbsDown'`                                                                    | -      | -    |
+| tenantId        | 租户ID       | `string`                                                                                                    | -      | -    |
+| agentId         | AI代理ID     | `string`                                                                                                    | -      | -    |
+| questionContent | 提问内容     | `{ role?: string; content?: string; contentType?: string }`                                                 | -      | -    |
+| answerContent   | 回答内容     | `{ role?: string; content?: string; contentType?: string; white_box_process?: WhiteBoxProcessInterface[] }` | -      | -    |
+| sessionId       | 会话唯一标识 | `string`                                                                                                    | -      | -    |
+| clientId        | 客户ID       | `string`                                                                                                    | -      | -    |
+| gmtCreate       | 记录创建时间 | `string \| number`                                                                                          | -      | -    |
 
 ## 功能特性
 
