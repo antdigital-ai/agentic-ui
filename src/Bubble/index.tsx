@@ -17,3 +17,6 @@ export { UserBubble } from './UserBubble';
 
 /** Schema Editor 相关导出 */
 export * from './schema-editor';
+
+/** OpenAI Chat messages → MessageBubbleData */
+export * from './OpenAIMessageBubble';

@@ -9,6 +9,13 @@ group:
 
 # Changelog
 
+## v2.30.22
+
+- Bubble
+  - 🆕 Add `useOpenAIMessageBubbleData` hook and `mapOpenAIMessagesToMessageBubbleData` to convert OpenAI Chat Completions-style `messages` into `MessageBubbleData[]` for `BubbleList` and SSE streaming.
+  - 🆕 Add `useOpenClawMessageBubbleData`, `mapOpenClawMessagesToMessageBubbleData`, and `normalizeOpenClawMessagesToOpenAI` for OpenClaw session/transcript-style messages (`timestamp`, `toolResult`, etc.).
+  - 🆕 Add `useOllamaMessageBubbleData`, `mapOllamaMessagesToMessageBubbleData`, and `normalizeOllamaMessagesToOpenAI` for Ollama `/api/chat` `messages` (`images`, `tool_calls`, `thinking`, etc.).
+
 ## v2.30.15
 
 - MarkdownInputField
