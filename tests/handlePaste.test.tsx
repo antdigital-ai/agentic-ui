@@ -784,7 +784,7 @@ describe('handlePaste utilities', () => {
     });
   });
 
-  describe('Complex HTML Paste Snapshots', () => {
+  describe('Complex HTML paste (mocked insertParsedHtmlNodes)', () => {
     it('should correctly render nested lists and tables', async () => {
       const complexHtml = `
         <div>
@@ -821,10 +821,7 @@ describe('handlePaste utilities', () => {
         return '';
       });
 
-      // Mock the parsed result for lists and tables
-      (insertParsedHtmlNodes as any).mockImplementation(
-        async (editor: Editor) => {
-          editor.children = [
+      const expectedChildren = [
             {
               type: 'heading-one',
               children: [{ text: 'Complex Document' }],
@@ -920,6 +917,11 @@ describe('handlePaste utilities', () => {
               ],
             },
           ];
+
+      // Mock the parsed result for lists and tables
+      (insertParsedHtmlNodes as any).mockImplementation(
+        async (editor: Editor) => {
+          editor.children = expectedChildren;
           return true;
         },
       );
@@ -930,9 +932,7 @@ describe('handlePaste utilities', () => {
         {},
       );
 
-      expect(editor.children).toMatchSnapshot(
-        'complex-html-with-lists-and-tables',
-      );
+      expect(editor.children).toEqual(expectedChildren);
     });
 
     it('should correctly render code blocks and special characters', async () => {
@@ -954,10 +954,7 @@ describe('handlePaste utilities', () => {
         return '';
       });
 
-      // Mock the parsed result for code blocks
-      (insertParsedHtmlNodes as any).mockImplementation(
-        async (editor: Editor) => {
-          editor.children = [
+      const expectedChildren = [
             {
               type: 'code',
               language: 'javascript',
@@ -976,6 +973,11 @@ describe('handlePaste utilities', () => {
               children: [{ text: 'Emoji: 👋 🎉 🚀' }],
             },
           ];
+
+      // Mock the parsed result for code blocks
+      (insertParsedHtmlNodes as any).mockImplementation(
+        async (editor: Editor) => {
+          editor.children = expectedChildren;
           return true;
         },
       );
@@ -986,7 +988,7 @@ describe('handlePaste utilities', () => {
         {},
       );
 
-      expect(editor.children).toMatchSnapshot('code-blocks-and-special-chars');
+      expect(editor.children).toEqual(expectedChildren);
     });
 
     it('should correctly render mixed content types', async () => {
@@ -1016,10 +1018,7 @@ describe('handlePaste utilities', () => {
         return '';
       });
 
-      // Mock the parsed result for mixed content
-      (insertParsedHtmlNodes as any).mockImplementation(
-        async (editor: Editor) => {
-          editor.children = [
+      const expectedChildren = [
             {
               type: 'heading-two',
               children: [{ text: 'Mixed Content' }],
@@ -1081,6 +1080,11 @@ describe('handlePaste utilities', () => {
               ],
             },
           ];
+
+      // Mock the parsed result for mixed content
+      (insertParsedHtmlNodes as any).mockImplementation(
+        async (editor: Editor) => {
+          editor.children = expectedChildren;
           return true;
         },
       );
@@ -1091,7 +1095,7 @@ describe('handlePaste utilities', () => {
         {},
       );
 
-      expect(editor.children).toMatchSnapshot('mixed-content-types');
+      expect(editor.children).toEqual(expectedChildren);
     });
 
     it('should correctly render mathematical and scientific content', async () => {
@@ -1119,10 +1123,7 @@ describe('handlePaste utilities', () => {
         return '';
       });
 
-      // Mock the parsed result for mathematical content
-      (insertParsedHtmlNodes as any).mockImplementation(
-        async (editor: Editor) => {
-          editor.children = [
+      const expectedChildren = [
             {
               type: 'heading-three',
               children: [{ text: 'Mathematical Content' }],
@@ -1177,6 +1178,11 @@ describe('handlePaste utilities', () => {
               children: [{ text: 'Greek symbols: α β γ δ' }],
             },
           ];
+
+      // Mock the parsed result for mathematical content
+      (insertParsedHtmlNodes as any).mockImplementation(
+        async (editor: Editor) => {
+          editor.children = expectedChildren;
           return true;
         },
       );
@@ -1187,7 +1193,7 @@ describe('handlePaste utilities', () => {
         {},
       );
 
-      expect(editor.children).toMatchSnapshot('math-and-scientific-content');
+      expect(editor.children).toEqual(expectedChildren);
     });
 
     it('should correctly render form elements and interactive content', async () => {
@@ -1215,10 +1221,7 @@ describe('handlePaste utilities', () => {
         return '';
       });
 
-      // Mock the parsed result for form elements
-      (insertParsedHtmlNodes as any).mockImplementation(
-        async (editor: Editor) => {
-          editor.children = [
+      const expectedChildren = [
             {
               type: 'form',
               children: [
@@ -1274,6 +1277,11 @@ describe('handlePaste utilities', () => {
               ],
             },
           ];
+
+      // Mock the parsed result for form elements
+      (insertParsedHtmlNodes as any).mockImplementation(
+        async (editor: Editor) => {
+          editor.children = expectedChildren;
           return true;
         },
       );
@@ -1284,7 +1292,7 @@ describe('handlePaste utilities', () => {
         {},
       );
 
-      expect(editor.children).toMatchSnapshot('form-and-interactive-elements');
+      expect(editor.children).toEqual(expectedChildren);
     });
 
     it('should correctly render combined complex content', async () => {
@@ -1341,10 +1349,7 @@ describe('handlePaste utilities', () => {
         return '';
       });
 
-      // Mock the parsed result for combined content
-      (insertParsedHtmlNodes as any).mockImplementation(
-        async (editor: Editor) => {
-          editor.children = [
+      const expectedChildren = [
             {
               type: 'heading-one',
               children: [{ text: 'Combined Complex Content' }],
@@ -1506,6 +1511,11 @@ describe('handlePaste utilities', () => {
               ],
             },
           ];
+
+      // Mock the parsed result for combined content
+      (insertParsedHtmlNodes as any).mockImplementation(
+        async (editor: Editor) => {
+          editor.children = expectedChildren;
           return true;
         },
       );
@@ -1516,7 +1526,7 @@ describe('handlePaste utilities', () => {
         {},
       );
 
-      expect(editor.children).toMatchSnapshot('combined-complex-content');
+      expect(editor.children).toEqual(expectedChildren);
     });
   });
 });
