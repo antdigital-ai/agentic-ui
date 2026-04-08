@@ -9,6 +9,13 @@ group:
 
 # Changelog
 
+## v2.30.22
+
+- Bubble
+  - 🆕 新增 `useOpenAIMessageBubbleData` Hook 与 `mapOpenAIMessagesToMessageBubbleData`，支持将 OpenAI Chat Completions 风格的 `messages` 转为 `MessageBubbleData[]`，便于接入 `BubbleList` 与 SSE 流式内容。
+  - 🆕 新增 `useOpenClawMessageBubbleData`、`mapOpenClawMessagesToMessageBubbleData` 与 `normalizeOpenClawMessagesToOpenAI`，支持 OpenClaw 会话 / transcript 风格（`timestamp`、`toolResult` 等）。
+  - 🆕 新增 `useOllamaMessageBubbleData`、`mapOllamaMessagesToMessageBubbleData` 与 `normalizeOllamaMessagesToOpenAI`，支持 Ollama `/api/chat` 的 `messages`（`images`、`tool_calls`、`thinking` 等）。
+
 ## v2.30.15
 
 - MarkdownInputField
