@@ -310,6 +310,7 @@ export default () => {
 | `disabled`           | `boolean`                                                          | 是否禁用按钮                                        |
 | `maxFileSize`        | `number`                                                           | 单个文件最大大小（字节）                            |
 | `maxFileCount`       | `number`                                                           | 最大文件数量                                        |
+| `onPreview`          | `(file: AttachmentFile) => Promise<void>`                          | 自定义文件预览处理函数，不传时图片默认弹窗预览、其他文件新窗口打开 |
 | `allowMultiple`      | `boolean`                                                          | 是否允许一次选择多个文件（默认：true）              |
 
 #### SkillModeConfig
