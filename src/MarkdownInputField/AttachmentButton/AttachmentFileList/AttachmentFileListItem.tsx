@@ -155,13 +155,12 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   const canDelete = !isAttachmentFileLoading(file.status);
 
   const handleFileClick = () => {
+    if (canRetry) {
+      onRetry?.(file);
+      return;
+    }
     if (!isDoneStatus) return;
     onPreview?.(file);
-  };
-
-  const handleRetryClick = () => {
-    if (!canRetry) return;
-    onRetry?.(file);
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -192,7 +191,6 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
         <FileIcon file={file} prefixCls={prefixCls} hashId={hashId} />
         <div className={classNames(`${prefixCls}-file-info`, hashId)}>
           <div
-            onClick={handleRetryClick}
             className={classNames(`${prefixCls}-file-name`, hashId)}
           >
             <span className={classNames(`${prefixCls}-file-name-text`, hashId)}>
