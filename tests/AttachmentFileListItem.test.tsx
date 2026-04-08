@@ -34,6 +34,7 @@ describe('AttachmentFileListItem', () => {
   const mockOnDelete = vi.fn();
   const mockOnPreview = vi.fn();
   const mockOnDownload = vi.fn();
+  const mockOnRetry = vi.fn();
 
   const createMockFile = (
     overrides: Partial<AttachmentFile> = {},
@@ -170,6 +171,77 @@ describe('AttachmentFileListItem', () => {
     const fileItem = screen.getByText('error-file').closest('div');
     fireEvent.click(fileItem!);
 
+    expect(mockOnPreview).not.toHaveBeenCalled();
+  });
+
+  it('should call onRetry when clicked and status is retryable error', () => {
+    const file = createMockFile({
+      name: 'retry-file.txt',
+      status: 'error',
+    });
+
+    render(
+      <AttachmentFileListItem
+        file={file}
+        onDelete={mockOnDelete}
+        onPreview={mockOnPreview}
+        onDownload={mockOnDownload}
+        onRetry={mockOnRetry}
+      />,
+    );
+
+    const fileItem = screen.getByTestId('file-item');
+    fireEvent.click(fileItem);
+
+    expect(mockOnRetry).toHaveBeenCalledWith(file);
+    expect(mockOnPreview).not.toHaveBeenCalled();
+  });
+
+  it('should not call onRetry when error is FILE_SIZE_EXCEEDED', () => {
+    const file = createMockFile({
+      name: 'too-large.txt',
+      status: 'error',
+      errorCode: 'FILE_SIZE_EXCEEDED',
+    } as Partial<AttachmentFile>);
+
+    render(
+      <AttachmentFileListItem
+        file={file}
+        onDelete={mockOnDelete}
+        onPreview={mockOnPreview}
+        onDownload={mockOnDownload}
+        onRetry={mockOnRetry}
+      />,
+    );
+
+    const fileItem = screen.getByTestId('file-item');
+    fireEvent.click(fileItem);
+
+    expect(mockOnRetry).not.toHaveBeenCalled();
+    expect(mockOnPreview).not.toHaveBeenCalled();
+  });
+
+  it('should not call onRetry when error is FILE_COUNT_EXCEEDED', () => {
+    const file = createMockFile({
+      name: 'extra-file.txt',
+      status: 'error',
+      errorCode: 'FILE_COUNT_EXCEEDED',
+    } as Partial<AttachmentFile>);
+
+    render(
+      <AttachmentFileListItem
+        file={file}
+        onDelete={mockOnDelete}
+        onPreview={mockOnPreview}
+        onDownload={mockOnDownload}
+        onRetry={mockOnRetry}
+      />,
+    );
+
+    const fileItem = screen.getByTestId('file-item');
+    fireEvent.click(fileItem);
+
+    expect(mockOnRetry).not.toHaveBeenCalled();
     expect(mockOnPreview).not.toHaveBeenCalled();
   });
 
