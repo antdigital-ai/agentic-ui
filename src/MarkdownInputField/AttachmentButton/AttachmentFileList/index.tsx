@@ -13,7 +13,7 @@ import { useStyle } from './style';
 export type AttachmentFileListProps = {
   fileMap?: Map<string, AttachmentFile>;
   onDelete: (file: AttachmentFile) => void;
-  onPreview?: (file: AttachmentFile) => void;
+  onPreview?: (file: AttachmentFile) => void | Promise<void>;
   onDownload?: (file: AttachmentFile) => void;
   onRetry?: (file: AttachmentFile) => void;
   onClearFileMap?: () => void;

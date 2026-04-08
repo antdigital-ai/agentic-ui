@@ -416,6 +416,24 @@ export default () => (
 
 <code src="../demos/bubble/bubblelist-lazy-demo.tsx">BubbleList 懒加载</code>
 
+### OpenAI messages 适配 BubbleList
+
+将 OpenAI Chat Completions 风格的 `messages` 转为 `MessageBubbleData[]`，配合 `useOpenAIMessageBubbleData` 接入 `BubbleList`；默认按索引生成稳定 `id`，适合 SSE 流式更新同一条 assistant 内容。
+
+<code src="../demos/bubble/openai-messages-bubblelist.tsx">OpenAI messages - useOpenAIMessageBubbleData</code>
+
+### OpenClaw 风格 messages 适配 BubbleList
+
+OpenClaw 会话 / transcript 常见字段：`timestamp`（毫秒）、工具结果角色 `toolResult`（内部归一为 OpenAI 的 `tool` 再映射）。使用 `useOpenClawMessageBubbleData` 或 `mapOpenClawMessagesToMessageBubbleData`；可选 `normalizeOpenClawMessagesToOpenAI` 仅做结构转换。
+
+<code src="../demos/bubble/openclaw-messages-bubblelist.tsx">OpenClaw messages - useOpenClawMessageBubbleData</code>
+
+### Ollama /api/chat messages 适配 BubbleList
+
+与 [Ollama Chat API](https://docs.ollama.com/api/chat) 的 `messages` 一致：`role` 为 `system` | `user` | `assistant` | `tool`，可选 `images`（base64）、`tool_calls`、`thinking` 等。使用 `useOllamaMessageBubbleData` 或 `mapOllamaMessagesToMessageBubbleData`；默认消息 id 为 `` msg.id ?? `ollama-msg-${index}` ``。
+
+<code src="../demos/bubble/ollama-messages-bubblelist.tsx">Ollama messages - useOllamaMessageBubbleData</code>
+
 ## 📖 API 参考
 
 ### Bubble 单个气泡组件
@@ -482,6 +500,44 @@ export default () => (
 | className     | 自定义 CSS 类名 | `string`                                   | -      | -    |
 | style         | 自定义内联样式  | `React.CSSProperties`                      | -      | -    |
 | styles        | 详细样式配置    | `BubbleListStylesConfig`                   | -      | -    |
+
+### useOpenAIMessageBubbleData
+
+将 OpenAI Chat Completions 风格的 `messages` 转为 `MessageBubbleData[]`，与 `BubbleList` 搭配使用。流式（SSE）场景下请保持消息在数组中的下标稳定，默认 `id` 为 `` msg.id ?? `openai-msg-${index}` ``，避免用 content 参与 id 生成导致列表 key 抖动。
+
+| 属性        | 说明                     | 类型                       | 默认值 |
+| ----------- | ------------------------ | -------------------------- | ------ |
+| messages    | OpenAI 风格消息列表      | `OpenAIChatMessage[]`      | -      |
+| mapOptions  | 映射选项（时间戳、id 等） | `OpenAIMessagesMapOptions` | -      |
+| mapMessage  | 单条消息映射覆盖         | `OpenAIMessagesMapMessage` | -      |
+
+返回值：`MessageBubbleData[]`。
+
+另导出纯函数 `mapOpenAIMessagesToMessageBubbleData`，语义与 Hook 一致，便于非 React 或自行 `useMemo` 的场景。
+
+### useOpenClawMessageBubbleData
+
+将 OpenClaw 会话 / transcript 风格的 `messages`（含可选 `timestamp`、`toolResult`）转为 `MessageBubbleData[]`。默认将 `timestamp` 写入 `createAt` / `updateAt`（`useOpenClawTimestamps`），并在 `extra.openclaw.raw` 保留原始消息（`preserveOpenClawRawInExtra`）。其余选项与 `OpenAIMessagesMapOptions` 相同。
+
+| 属性        | 说明                     | 类型                         | 默认值 |
+| ----------- | ------------------------ | ---------------------------- | ------ |
+| messages    | OpenClaw 风格消息列表    | `OpenClawChatMessage[]`      | -      |
+| mapOptions  | 映射选项                 | `OpenClawMessagesMapOptions` | -      |
+| mapMessage  | 单条消息映射覆盖         | `OpenAIMessagesMapMessage`   | -      |
+
+另导出 `mapOpenClawMessagesToMessageBubbleData`、`normalizeOpenClawMessageToOpenAI`、`normalizeOpenClawMessagesToOpenAI`。
+
+### useOllamaMessageBubbleData
+
+将 Ollama `/api/chat` 请求体中的 `messages` 转为 `MessageBubbleData[]`。内部先归一为 OpenAI 兼容结构再映射；默认将 `thinking`、图片数量占位拼入正文（可关），并在 `extra.ollama.raw` 保留原始消息（可关）。
+
+| 属性        | 说明                     | 类型                       | 默认值 |
+| ----------- | ------------------------ | -------------------------- | ------ |
+| messages    | Ollama `ChatMessage` 列表 | `OllamaChatMessage[]`      | -      |
+| mapOptions  | 映射选项                 | `OllamaMessagesMapOptions` | -      |
+| mapMessage  | 单条消息映射覆盖         | `OpenAIMessagesMapMessage`   | -      |
+
+另导出 `mapOllamaMessagesToMessageBubbleData`、`normalizeOllamaMessageToOpenAI`、`normalizeOllamaMessagesToOpenAI`。
 
 ### 核心数据类型
 
