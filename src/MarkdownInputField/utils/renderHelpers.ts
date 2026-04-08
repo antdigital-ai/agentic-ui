@@ -32,7 +32,7 @@ export const useAttachmentList = ({
       onRetry: handleFileRetry,
       onPreview: attachment?.onPreview
         ? (file: AttachmentFile) => {
-            void attachment.onPreview?.(file).catch(() => {});
+            void Promise.resolve(attachment.onPreview?.(file)).catch(() => {});
           }
         : undefined,
       onClearFileMap: () => {

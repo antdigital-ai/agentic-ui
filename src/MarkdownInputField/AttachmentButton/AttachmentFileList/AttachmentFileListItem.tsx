@@ -17,7 +17,7 @@ type FileStatus = 'uploading' | 'pending' | 'error' | 'done';
 interface FileListItemProps {
   file: AttachmentFile;
   onDelete: (file: AttachmentFile) => void;
-  onPreview?: (file: AttachmentFile) => void;
+  onPreview?: (file: AttachmentFile) => void | Promise<void>;
   onDownload?: (file: AttachmentFile) => void;
   onRetry?: (file: AttachmentFile) => void;
   className?: string;

@@ -312,7 +312,7 @@ export default () => {
 | `maxFileCount`       | 最大文件数量                                                       | `number`                                                                            | -      | -    |
 | `allowMultiple`      | 是否允许一次选择多个文件（默认：true）                             | `boolean`                                                                           | -      | -    |
 | `onExceedMaxCount`   | 文件数量超出 maxFileCount 限制时的回调                             | `(info: { maxCount: number; currentCount: number; selectedCount: number }) => void` | -      | -    |
-| `onPreview`          | 自定义文件预览处理函数，不传时图片默认弹窗预览、其他文件新窗口打开 | `(file: AttachmentFile) => Promise<void>`                                           | -      | -    |
+| `onPreview`          | 自定义文件预览处理函数，不传时图片默认弹窗预览、其他文件新窗口打开 | `(file: AttachmentFile) => void \| Promise<void>`                                   | -      | -    |
 
 #### SkillModeConfig
 
