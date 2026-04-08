@@ -314,4 +314,22 @@ describe('TypingAnimation 分支覆盖', () => {
     });
     expect(container.textContent).toContain('Hi');
   });
+
+  it('words 含空字符串时 currentWord 为 falsy 走 || 分支', () => {
+    const { container } = render(
+      <TypingAnimation
+        words={['']}
+        startOnView={false}
+        delay={0}
+        duration={20}
+        loop={false}
+        showCursor={false}
+      />,
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(20);
+    });
+    expect(container.textContent).toBe('');
+  });
 });

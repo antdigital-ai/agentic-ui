@@ -5,67 +5,34 @@ import React, { useState } from 'react';
 const StandaloneHistoryDemo = () => {
   const [currentSessionId, setCurrentSessionId] = useState('session-2');
 
-  // 模拟请求函数
   const mockRequest = async ({ agentId }: { agentId: string }) => {
+    const now = Date.now();
     return [
       {
         id: '1',
         sessionId: 'session-1',
-        sessionTitle: '帮我用 Python 写一个 Web 爬虫',
-        agentId: agentId,
-        gmtCreate: Date.now() - 1800000, // 30分钟前
-        gmtLastConverse: Date.now() - 1800000,
+        sessionTitle: 'Python 爬虫入门',
+        agentId,
+        gmtCreate: now - 1800000,
+        gmtLastConverse: now - 1800000,
         isFavorite: true,
       },
       {
         id: '2',
         sessionId: 'session-2',
-        sessionTitle: '解释 React useEffect 的清理机制',
-        agentId: agentId,
-        gmtCreate: Date.now() - 7200000, // 2小时前
-        gmtLastConverse: Date.now() - 7200000,
+        sessionTitle: 'useEffect 清理函数',
+        agentId,
+        gmtCreate: now - 7200000,
+        gmtLastConverse: now - 7200000,
         isFavorite: false,
       },
       {
         id: '3',
         sessionId: 'session-3',
-        sessionTitle:
-          '设计一个高并发的消息推送系统架构，需要支持百万级用户同时在线',
-        agentId: agentId,
-        gmtCreate: Date.now() - 86400000, // 1天前
-        gmtLastConverse: Date.now() - 86400000,
-      },
-      {
-        id: '4',
-        sessionId: 'session-4',
-        sessionTitle: 'TypeScript 泛型在实际项目中的应用',
-        agentId: agentId,
-        gmtCreate: Date.now() - 86400000,
-        gmtLastConverse: Date.now() - 86400000,
-      },
-      {
-        id: '5',
-        sessionId: 'session-5',
-        sessionTitle: '帮我优化这段 SQL 查询的执行效率',
-        agentId: agentId,
-        gmtCreate: Date.now() - 172800000, // 2天前
-        gmtLastConverse: Date.now() - 172800000,
-      },
-      {
-        id: '6',
-        sessionId: 'session-6',
-        sessionTitle: '生成一份 Q3 季度销售数据分析报告',
-        agentId: agentId,
-        gmtCreate: Date.now() - 259200000, // 3天前
-        gmtLastConverse: Date.now() - 259200000,
-      },
-      {
-        id: '7',
-        sessionId: 'session-7',
-        sessionTitle: '如何用 Docker Compose 部署微服务',
-        agentId: agentId,
-        gmtCreate: Date.now() - 345600000, // 4天前
-        gmtLastConverse: Date.now() - 345600000,
+        sessionTitle: '高并发推送架构',
+        agentId,
+        gmtCreate: now - 86400000,
+        gmtLastConverse: now - 86400000,
       },
     ] as HistoryDataType[];
   };

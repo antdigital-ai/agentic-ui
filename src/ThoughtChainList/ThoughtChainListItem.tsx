@@ -14,6 +14,8 @@ import {
 } from './types';
 import { WebSearch } from './WebSearch';
 
+const DETAIL_COLLAPSE_DURATION_MS = 160;
+
 /**
  * ThoughtChainItemDetail 组件 - 思维链项详情组件
  *
@@ -309,6 +311,8 @@ export const ThoughtChainListItem: React.FC<
   } & ThoughtChainListProps['thoughtChainItemRender']
 > = React.memo((props) => {
   const [collapse, setCollapse] = React.useState<boolean>(false);
+  const [shouldRenderDetail, setShouldRenderDetail] =
+    React.useState<boolean>(true);
   const { thoughtChainListItem, prefixCls, hashId, setDocMeta } = props;
 
   const markdownRenderProps = useMemo(() => {
@@ -335,6 +339,21 @@ export const ThoughtChainListItem: React.FC<
   const handleCollapseChange = React.useCallback((change: boolean) => {
     setCollapse(change);
   }, []);
+
+  React.useEffect(() => {
+    if (!collapse) {
+      setShouldRenderDetail(true);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setShouldRenderDetail(false);
+    }, DETAIL_COLLAPSE_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [collapse]);
 
   const titleDom = (
     <TitleInfo
@@ -392,22 +411,34 @@ export const ThoughtChainListItem: React.FC<
         {props.titleRender
           ? props.titleRender(thoughtChainListItem!, titleDom)
           : titleDom}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: !collapse ? 'auto' : '0px',
-            overflow: 'hidden',
-            gap: 8,
-          }}
-        >
-          {/* 仅展开时挂载详情，避免多个深度思考/ Markdown 同时渲染导致卡顿 */}
-          {!collapse
-            ? props.contentRender
-              ? props.contentRender(thoughtChainListItem, content)
-              : content
-            : null}
-        </div>
+        {shouldRenderDetail ? (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateRows: collapse ? '0fr' : '1fr',
+              opacity: collapse ? 0 : 1,
+              transition:
+                'grid-template-rows 0.16s ease, opacity 0.12s ease',
+              pointerEvents: collapse ? 'none' : 'auto',
+            }}
+            aria-hidden={collapse}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                minHeight: 0,
+                gap: 8,
+              }}
+            >
+              {/* 仅展开时挂载详情，避免多个深度思考/ Markdown 同时渲染导致卡顿 */}
+              {props.contentRender
+                ? props.contentRender(thoughtChainListItem, content)
+                : content}
+            </div>
+          </div>
+        ) : null}
       </div>
     </ThoughtChainItemMotion>
   );

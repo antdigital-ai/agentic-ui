@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { VisualList } from '../../src/Components/ImageList';
-import { VisualList as VisualListWithErrorHandling } from '../../src/Components/VisualList';
+import { VisualList as VisualListFull } from '../../src/Components/VisualList';
 
 describe('VisualList 组件', () => {
   const mockData = [
@@ -262,9 +262,7 @@ describe('VisualList 组件', () => {
 
   it('图片 onError 时应显示默认图标', async () => {
     const dataWithOneImg = [{ id: '1', src: '/valid.jpg', alt: '图' }];
-    const { container } = render(
-      <VisualListWithErrorHandling data={dataWithOneImg} />,
-    );
+    const { container } = render(<VisualListFull data={dataWithOneImg} />);
     const img = container.querySelector('img');
     expect(img).toBeInTheDocument();
     fireEvent.error(img!);
@@ -272,6 +270,73 @@ describe('VisualList 组件', () => {
       const defaultIcon = container.querySelector('[data-type="image"]');
       expect(defaultIcon).toBeTruthy();
     });
+  });
+});
+
+describe('VisualList（Components/VisualList）', () => {
+  const mockData = [
+    { id: '1', src: '/img1.jpg', alt: '图片1', title: '标题1' },
+    { id: '2', src: '/img2.jpg', alt: '图片2', title: '标题2' },
+  ];
+
+  it('无 filter 时 displayList 使用原始 data', () => {
+    const { container } = render(<VisualListFull data={mockData} />);
+    expect(container.querySelectorAll('img')).toHaveLength(2);
+  });
+
+  it('有 filter 时走 data.filter 分支', () => {
+    const { container } = render(
+      <VisualListFull data={mockData} filter={(item) => item.id === '1'} />,
+    );
+    expect(container.querySelectorAll('img')).toHaveLength(1);
+  });
+
+  it('使用 renderItem 时不走 defaultRenderItem', () => {
+    render(
+      <VisualListFull
+        data={mockData}
+        renderItem={(item, i) => (
+          <li key={item.id || i} data-testid={`full-${i}`}>
+            {item.title}
+          </li>
+        )}
+      />,
+    );
+    expect(screen.getByTestId('full-0')).toHaveTextContent('标题1');
+  });
+
+  it('isLoading 优先于 legacy loading', () => {
+    render(
+      <VisualListFull
+        data={mockData}
+        loading={false}
+        isLoading
+      />,
+    );
+    expect(screen.getByText('加载中...')).toBeInTheDocument();
+  });
+
+  it('加载态支持自定义 loadingRender', () => {
+    render(
+      <VisualListFull
+        data={mockData}
+        isLoading
+        loadingRender={() => <span>Full loading</span>}
+      />,
+    );
+    expect(screen.getByText('Full loading')).toBeInTheDocument();
+  });
+
+  it('数据为空时渲染空状态', () => {
+    render(<VisualListFull data={[]} />);
+    expect(screen.getByText('暂无数据')).toBeInTheDocument();
+  });
+
+  it('可展示 description 描述', () => {
+    const { container } = render(
+      <VisualListFull data={mockData} description="描述文案" />,
+    );
+    expect(container.textContent).toContain('描述文案');
   });
 });
 

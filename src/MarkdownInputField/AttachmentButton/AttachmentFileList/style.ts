@@ -60,6 +60,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           transform: 'scale(1.05)',
         },
       },
+      '&-title': {
+        width: '100%',
+        flexBasis: '100%',
+        color: 'var(--color-gray-text-light)',
+        font: 'var(--font-text-body-sm)',
+        lineHeight: '20px',
+        marginBottom: 'var(--margin-0-5x)',
+      },
       '&-item': {
         width: '168px',
         height: '48px',
@@ -157,6 +165,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           gap: 4,
           '&-error': {
             color: 'var(--color-red-a10)',
+            maxWidth: '100%',
+            overflow: 'auto',
           },
           '&-item:not(:last-child)': {
             lineHeight: '9px',

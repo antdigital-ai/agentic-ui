@@ -327,6 +327,7 @@ export const shouldInsertTextDirectly = (editor: Editor, selection: any) => {
     'agentic-ui-task',
     'agentic-ui-toolusebar',
     'agentic-ui-usertoolbar',
+    'agentic-ui-filemap',
   ].includes(rangeNode.type);
 };
 

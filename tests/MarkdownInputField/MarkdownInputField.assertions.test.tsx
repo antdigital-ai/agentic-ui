@@ -275,7 +275,7 @@ describe('MarkdownInputField 断言测试', () => {
       const attachmentProps = {
         enable: true,
         accept: '.txt,.md',
-        maxSize: 1024 * 1024,
+        maxFileSize: 1024 * 1024,
         upload: vi.fn(),
       };
 

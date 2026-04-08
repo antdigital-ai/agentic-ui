@@ -243,7 +243,11 @@ describe('Browser Component', () => {
 
   it('在结果视图中点击返回按钮应回到搜索建议视图', async () => {
     const user = userEvent.setup();
-    const suggestions = createSuggestions();
+    // 多建议时才显示返回按钮
+    const suggestions: BrowserSuggestion[] = [
+      { id: 's1', label: '搜索建议1', count: 2 },
+      { id: 's2', label: '搜索建议2', count: 1 },
+    ];
 
     const request = vi.fn().mockReturnValue({
       items: [
@@ -271,6 +275,40 @@ describe('Browser Component', () => {
     await user.click(backButton);
 
     expect(screen.getByText('搜索建议1')).toBeInTheDocument();
+    expect(screen.getByText('搜索建议2')).toBeInTheDocument();
+  });
+
+  it('单个搜索建议时应直接展示结果视图且无返回按钮', () => {
+    const suggestions = createSuggestions();
+
+    const request = vi.fn().mockReturnValue({
+      items: [
+        {
+          id: '1',
+          title: '结果标题1',
+          site: 'example.com',
+          url: 'https://example.com',
+        },
+      ] satisfies BrowserItem[],
+      loading: false,
+    });
+
+    renderBrowserWithProvider(
+      <Browser
+        suggestions={suggestions}
+        request={request}
+        suggestionIcon={null}
+      />,
+    );
+
+    // 直接展示结果视图，无需点击建议
+    expect(screen.getByTestId('browser-list')).toBeInTheDocument();
+    expect(screen.getByText('结果标题1')).toBeInTheDocument();
+    // 单建议无返回按钮
+    expect(screen.queryByRole('button')).toBeNull();
+    // request 在初始化时已调用
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledWith(suggestions[0]);
   });
 
   it('结果列表中点击定位按钮应触发 onLocate', async () => {

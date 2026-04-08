@@ -200,6 +200,38 @@ describe('EnterKey - Markdown 输出测试', () => {
       expect(nestedLine.trimStart().length).toBeLessThan(nestedLine.length);
     });
 
+    it('在代码块中按回车应插入换行符，不新建代码块', () => {
+      editor.children = [
+        {
+          type: 'code',
+          language: 'javascript',
+          children: [{ text: 'const x = 1;' }],
+        } as any,
+      ];
+
+      Transforms.select(editor, {
+        anchor: { path: [0, 0], offset: 12 },
+        focus: { path: [0, 0], offset: 12 },
+      });
+
+      const mockEvent = {
+        preventDefault: vi.fn(),
+        key: 'Enter',
+        shiftKey: false,
+        ctrlKey: false,
+        metaKey: false,
+      } as any;
+
+      enterKey.run(mockEvent);
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled();
+      // 仍然只有一个代码块节点
+      expect(editor.children).toHaveLength(1);
+      expect(editor.children[0]).toMatchObject({ type: 'code' });
+      // 代码块中插入了换行
+      expect((editor.children[0] as any).children[0].text).toContain('\n');
+    });
+
     it('列表为空（仅一项且无内容）时按回车应转换为段落', () => {
       editor.children = [
         {

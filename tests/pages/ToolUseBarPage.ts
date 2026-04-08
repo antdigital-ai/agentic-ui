@@ -1,5 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+
 /**
  * ToolUseBar Page Object Model
  * 封装 ToolUseBar 组件的所有交互操作
@@ -17,7 +19,9 @@ export class ToolUseBarPage {
   /**
    * 导航到 demo 页面
    */
-  async goto(demoPath: string = 'toolusebar-demo-tool-use-bar-basic') {
+  async goto(
+    demoPath: string = PLAYWRIGHT_FIXTURE_DEMOS.toolUseBarBasic,
+  ) {
     await this.page.goto(`/~demos/${demoPath}`);
     console.log('goto', demoPath);
     await this.waitForReady();

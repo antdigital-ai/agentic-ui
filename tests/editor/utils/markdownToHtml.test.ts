@@ -182,6 +182,17 @@ title: Test
       expect(result).toContain('这是错误提示块');
     });
 
+    it('应该支持 :: 双冒号容器语法（::warning 规范化为 :::warning）', async () => {
+      const markdown = `::warning
+No API key found.
+Logs: openclaw logs --follow
+
+:::`;
+      const result = await markdownToHtml(markdown);
+      expect(result).toContain('markdown-container');
+      expect(result).toContain('warning');
+    });
+
     it('应该支持带标题的 ::: 容器（remark-directive 语法 title 属性）', async () => {
       const markdown = `:::tip{title="提示"}
 

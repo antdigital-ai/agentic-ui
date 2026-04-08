@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { Bubble, UserBubble } from '../src/Bubble';
+import { AIBubble, Bubble, UserBubble } from '../src/Bubble';
 import { BubbleConfigContext } from '../src/Bubble/BubbleConfigProvide';
 import { MessagesContext } from '../src/Bubble/MessagesContent/BubbleContext';
 import { BubbleProps } from '../src/Bubble/type';
@@ -918,6 +918,233 @@ describe('Bubble', () => {
 
       /** 组件应该正常渲染（显示加载状态） */
       expect(screen.getByTestId('chat-message')).toBeInTheDocument();
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// agentic-ui-filemap 提取与气泡外渲染集成测试
+// ─────────────────────────────────────────────────────────────────────────────
+
+const IMG_FILEMAP_JSON = JSON.stringify({
+  fileList: [
+    {
+      name: 'photo.png',
+      type: 'image/png',
+      uuid: 'uuid-img-1',
+      url: 'http://example.com/photo.png',
+    },
+  ],
+});
+
+const buildFilemapContent = (json: string, prefix = '', suffix = '') =>
+  [prefix, `\`\`\`agentic-ui-filemap\n${json}\n\`\`\``, suffix]
+    .filter(Boolean)
+    .join('\n\n');
+
+describe('agentic-ui-filemap 提取与渲染', () => {
+  describe('AIBubble', () => {
+    const aiBaseProps = {
+      id: 'ai-filemap-msg',
+      placement: 'left' as const,
+      avatar: { name: 'AI', title: 'AI助手' },
+    };
+
+    it('仅含 filemap 块时，气泡外渲染文件列表，消息区无原始代码块', () => {
+      const content = buildFilemapContent(IMG_FILEMAP_JSON);
+      const { container } = render(
+        <BubbleConfigContext.Provider value={{ standalone: false }}>
+          <AIBubble
+            {...aiBaseProps}
+            originData={{
+              content,
+              id: 'ai-filemap-msg',
+              role: 'assistant',
+              createAt: 0,
+              updateAt: 0,
+              isFinished: true,
+            }}
+          />
+        </BubbleConfigContext.Provider>,
+      );
+      expect(
+        container.querySelector('[data-testid="file-view-list"]'),
+      ).toBeInTheDocument();
+      expect(container.querySelector('code')).toBeNull();
+    });
+
+    it('filemap 块前有文字时，文字仍渲染，同时文件列表在气泡外', () => {
+      const content = buildFilemapContent(IMG_FILEMAP_JSON, '请查看以下附件：');
+      const { container } = render(
+        <BubbleConfigContext.Provider value={{ standalone: false }}>
+          <AIBubble
+            {...aiBaseProps}
+            originData={{
+              content,
+              id: 'ai-filemap-with-text',
+              role: 'assistant',
+              createAt: 0,
+              updateAt: 0,
+              isFinished: true,
+            }}
+          />
+        </BubbleConfigContext.Provider>,
+      );
+      expect(screen.getByText('请查看以下附件：')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="file-view-list"]'),
+      ).toBeInTheDocument();
+    });
+
+    it('无 filemap 块时不渲染 file-view-list', () => {
+      const { container } = render(
+        <BubbleConfigContext.Provider value={{ standalone: false }}>
+          <AIBubble
+            {...aiBaseProps}
+            originData={{
+              content: '普通文本消息',
+              id: 'ai-no-filemap',
+              role: 'assistant',
+              createAt: 0,
+              updateAt: 0,
+              isFinished: true,
+            }}
+          />
+        </BubbleConfigContext.Provider>,
+      );
+      expect(
+        container.querySelector('[data-testid="file-view-list"]'),
+      ).toBeNull();
+    });
+
+    it('filemap 块不在 bubble-content 容器内', () => {
+      const content = buildFilemapContent(IMG_FILEMAP_JSON);
+      const { container } = render(
+        <BubbleConfigContext.Provider value={{ standalone: false }}>
+          <AIBubble
+            {...aiBaseProps}
+            originData={{
+              content,
+              id: 'ai-filemap-outside',
+              role: 'assistant',
+              createAt: 0,
+              updateAt: 0,
+              isFinished: true,
+            }}
+          />
+        </BubbleConfigContext.Provider>,
+      );
+      const fileViewList = container.querySelector(
+        '[data-testid="file-view-list"]',
+      );
+      const contentFilemapView = container.querySelector(
+        '[data-testid="content-filemap-view"]',
+      );
+      // ContentFilemapView 应存在于 DOM 中
+      expect(contentFilemapView).toBeInTheDocument();
+      expect(fileViewList).toBeInTheDocument();
+      // chat-message 是 bubble 内容列（bubble-container-ai）的容器，
+      // ContentFilemapView 应是其兄弟节点，而不是后代
+      const chatMessage = container.querySelector('[data-testid="chat-message"]');
+      expect(chatMessage?.contains(contentFilemapView)).toBe(false);
+    });
+  });
+
+  describe('UserBubble', () => {
+    const userBaseProps = {
+      id: 'user-filemap-msg',
+      placement: 'right' as const,
+    };
+
+    it('仅含 filemap 块时，用户气泡外渲染文件列表', () => {
+      const content = buildFilemapContent(IMG_FILEMAP_JSON);
+      const { container } = render(
+        <BubbleConfigContext.Provider value={{ standalone: false }}>
+          <UserBubble
+            {...userBaseProps}
+            originData={{
+              content,
+              id: 'user-filemap-msg',
+              role: 'user',
+              createAt: 0,
+              updateAt: 0,
+            }}
+          />
+        </BubbleConfigContext.Provider>,
+      );
+      expect(
+        container.querySelector('[data-testid="file-view-list"]'),
+      ).toBeInTheDocument();
+    });
+
+    it('filemap 块不在 bubble-content 容器内', () => {
+      const content = buildFilemapContent(IMG_FILEMAP_JSON);
+      const { container } = render(
+        <BubbleConfigContext.Provider value={{ standalone: false }}>
+          <UserBubble
+            {...userBaseProps}
+            originData={{
+              content,
+              id: 'user-filemap-outside',
+              role: 'user',
+              createAt: 0,
+              updateAt: 0,
+            }}
+          />
+        </BubbleConfigContext.Provider>,
+      );
+      const contentFilemapView = container.querySelector(
+        '[data-testid="content-filemap-view"]',
+      );
+      expect(contentFilemapView).toBeInTheDocument();
+      const chatMessage = container.querySelector('[data-testid="chat-message"]');
+      expect(chatMessage?.contains(contentFilemapView)).toBe(false);
+    });
+
+    it('filemap 块与文字共存时，文字渲染在消息框内，附件在外', () => {
+      const content = buildFilemapContent(IMG_FILEMAP_JSON, '发个图给你看：');
+      const { container } = render(
+        <BubbleConfigContext.Provider value={{ standalone: false }}>
+          <UserBubble
+            {...userBaseProps}
+            originData={{
+              content,
+              id: 'user-filemap-mixed',
+              role: 'user',
+              createAt: 0,
+              updateAt: 0,
+            }}
+          />
+        </BubbleConfigContext.Provider>,
+      );
+      expect(screen.getByText('发个图给你看：')).toBeInTheDocument();
+      const fileViewList = container.querySelector(
+        '[data-testid="file-view-list"]',
+      );
+      expect(fileViewList).toBeInTheDocument();
+    });
+
+    it('filemap 容器携带 alignSelf flex-end 确保右对齐', () => {
+      const content = buildFilemapContent(IMG_FILEMAP_JSON);
+      const { container } = render(
+        <BubbleConfigContext.Provider value={{ standalone: false }}>
+          <UserBubble
+            {...userBaseProps}
+            originData={{
+              content,
+              id: 'user-filemap-align',
+              role: 'user',
+              createAt: 0,
+              updateAt: 0,
+            }}
+          />
+        </BubbleConfigContext.Provider>,
+      );
+      const wrapper = container.querySelector(
+        '[data-testid="content-filemap-view"]',
+      ) as HTMLElement | null;
+      expect(wrapper).toBeInTheDocument();
+      expect(wrapper?.style.alignSelf).toBe('flex-end');
     });
   });
 });

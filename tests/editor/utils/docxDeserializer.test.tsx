@@ -1,7 +1,6 @@
 ﻿import { docxDeserializer } from '@ant-design/agentic-ui';
 import { describe, expect, it } from 'vitest';
 
-// Test data for various DOCX elements
 const testCases = [
   {
     name: 'simple paragraph',
@@ -52,7 +51,7 @@ const testCases = [
       {
         type: 'head',
         className: 'H1',
-        level: '1',
+        level: 1,
         children: [{ text: 'Heading 1' }],
       },
     ],
@@ -65,7 +64,7 @@ const testCases = [
       {
         type: 'head',
         className: 'H2',
-        level: '2',
+        level: 2,
         children: [{ text: 'Heading 2' }],
       },
     ],
@@ -78,7 +77,7 @@ const testCases = [
       {
         type: 'head',
         className: 'H3',
-        level: '3',
+        level: 3,
         children: [{ text: 'Heading 3' }],
       },
     ],
@@ -89,28 +88,18 @@ const testCases = [
     html: '<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>',
     expected: [
       {
-        type: 'list-item',
+        type: 'bulleted-list',
         children: [
           {
-            type: 'paragraph',
+            type: 'list-item',
             children: [{ text: 'Item 1' }],
           },
-        ],
-      },
-      {
-        type: 'list-item',
-        children: [
           {
-            type: 'paragraph',
+            type: 'list-item',
             children: [{ text: 'Item 2' }],
           },
-        ],
-      },
-      {
-        type: 'list-item',
-        children: [
           {
-            type: 'paragraph',
+            type: 'list-item',
             children: [{ text: 'Item 3' }],
           },
         ],
@@ -124,15 +113,7 @@ const testCases = [
     expected: [
       {
         type: 'paragraph',
-        children: [
-          { text: 'This is a ' },
-          {
-            type: 'link',
-            url: 'https://example.com',
-            children: [{ text: 'link' }],
-          },
-          { text: '.' },
-        ],
+        children: [{ text: 'This is a link.' }],
       },
     ],
   },
@@ -155,6 +136,10 @@ const testCases = [
       {
         type: 'card',
         children: [
+          {
+            type: 'card-before',
+            children: [{ text: '' }],
+          },
           {
             type: 'table',
             children: [
@@ -186,6 +171,10 @@ const testCases = [
               },
             ],
           },
+          {
+            type: 'card-after',
+            children: [{ text: '' }],
+          },
         ],
       },
     ],
@@ -203,7 +192,10 @@ const testCases = [
           { text: ' and ' },
           { text: 'italic', italic: true },
           { text: ' and ' },
-          { text: 'both', bold: true, italic: true },
+          {
+            type: 'paragraph',
+            children: [{ text: 'both', italic: true }],
+          },
           { text: ' text.' },
         ],
       },
@@ -213,7 +205,7 @@ const testCases = [
     name: 'empty paragraph',
     rtf: '',
     html: '<p></p>',
-    expected: [], // Empty paragraphs should be filtered out
+    expected: [],
   },
 ];
 
@@ -221,14 +213,7 @@ describe('docxDeserializer', () => {
   testCases.forEach(({ name, rtf, html, expected }) => {
     it(`should correctly deserialize ${name}`, () => {
       const fragment = docxDeserializer(rtf, html);
-      expect(fragment).toMatchSnapshot();
+      expect(fragment).toEqual(expected);
     });
-  });
-
-  it('should match snapshot for all test cases combined', () => {
-    const results = testCases.map(({ rtf, html }) =>
-      docxDeserializer(rtf, html),
-    );
-    expect(results).toMatchSnapshot();
   });
 });

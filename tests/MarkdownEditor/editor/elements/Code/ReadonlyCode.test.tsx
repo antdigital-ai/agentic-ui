@@ -78,4 +78,21 @@ describe('ReadonlyCode', () => {
     const div = container.firstChild as HTMLElement;
     expect(div.getAttribute('data-is-unclosed')).toBe('true');
   });
+
+  it('finished 为 true 时不应设置 data-is-unclosed', () => {
+    const element = {
+      type: 'code',
+      language: 'javascript',
+      value: 'const a = 1;',
+      otherProps: { finished: true },
+      children: [{ text: '' }],
+    };
+    const { container } = render(
+      <ReadonlyCode attributes={mockAttributes} element={element}>
+        <span />
+      </ReadonlyCode>,
+    );
+    const div = container.firstChild as HTMLElement;
+    expect(div.hasAttribute('data-is-unclosed')).toBe(false);
+  });
 });

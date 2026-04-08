@@ -5,14 +5,12 @@ import React from 'react';
 const mockMessage: MessageBubbleData = {
   id: '1',
   role: 'assistant',
-  content: `我是 Ant Design 聊天助手，可以帮你：
+  content: `本 Demo 展示 **AnswerAlert** 与 **Bubble** 组合：上方为助手气泡正文，下方为结果提示条。
 
-- **回答问题** - 解答技术相关疑问
-- **代码示例** - 提供组件使用示例
-- **设计建议** - 给出设计方案建议
-- **文档说明** - 解释 API 和功能
+- **状态**：成功 / 警告 / 错误 等如何与对话内容并存
+- **交互**：关闭、跳转等由业务自行绑定
 
-你想了解什么呢？`,
+以下为气泡内 Markdown 占位，可替换为你的真实回复。`,
   createAt: Date.now() - 60000, // 1分钟前
   updateAt: Date.now() - 60000,
   isFinished: true,
@@ -24,7 +22,7 @@ const mockMessage: MessageBubbleData = {
   meta: {
     avatar:
       'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original',
-    title: 'Ant Design Assistant',
+    title: '示例助手',
     description: 'AI 助手',
   },
 };

@@ -33,6 +33,7 @@ import {
   parseTableOrChart,
   preprocessMarkdownTableNewlines,
 } from './parse/parseTable';
+import { preprocessNormalizeLeafToContainerDirective } from './constants';
 import mdastParser from './remarkParse';
 
 // 全局解析缓存
@@ -261,7 +262,8 @@ export class MarkdownToSlateParser {
     const nonStandardProcessed = removeAnswerTags(
       preprocessNonStandardHtmlTags(thinkProcessed),
     );
-    return preprocessMarkdownTableNewlines(nonStandardProcessed);
+    const tableProcessed = preprocessMarkdownTableNewlines(nonStandardProcessed);
+    return preprocessNormalizeLeafToContainerDirective(tableProcessed);
   }
 
   private buildMarkdownRoot(md: string): RootContent[] {

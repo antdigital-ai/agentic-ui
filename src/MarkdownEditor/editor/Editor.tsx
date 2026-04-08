@@ -487,16 +487,20 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
           !hasEditableTarget(markdownEditorRef.current, event.target)
         ) {
           const domSelection = window.getSelection();
-          markdownEditorRef.current.selection = getSelectionFromDomSelection(
-            markdownEditorRef.current,
-            domSelection!,
-          );
+          if (domSelection) {
+            markdownEditorRef.current.selection = getSelectionFromDomSelection(
+              markdownEditorRef.current,
+              domSelection,
+            );
+          }
         } else if (operationType === 'cut') {
           const domSelection = window.getSelection();
-          markdownEditorRef.current.selection = getSelectionFromDomSelection(
-            markdownEditorRef.current,
-            domSelection!,
-          );
+          if (domSelection) {
+            markdownEditorRef.current.selection = getSelectionFromDomSelection(
+              markdownEditorRef.current,
+              domSelection,
+            );
+          }
         }
 
         // 如果无法获取选区，则直接返回
@@ -836,12 +840,16 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         markdownEditorRef.current.selection?.focus.path || [],
       );
       if (node) {
-        const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
-        if (dom) {
-          const tagInput = dom.querySelector('[data-tag-popup-input]');
-          if (tagInput) {
-            tagInput.setAttribute('data-composition', '');
+        try {
+          const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
+          if (dom) {
+            const tagInput = dom.querySelector('[data-tag-popup-input]');
+            if (tagInput) {
+              tagInput.setAttribute('data-composition', '');
+            }
           }
+        } catch {
+          // node may not be mounted yet; ignore
         }
       }
     }
@@ -879,12 +887,16 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         markdownEditorRef.current.selection?.focus.path || [],
       );
       if (node) {
-        const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
-        if (dom) {
-          const tagInput = dom.querySelector('[data-tag-popup-input]');
-          if (tagInput) {
-            tagInput.removeAttribute('data-composition');
+        try {
+          const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
+          if (dom) {
+            const tagInput = dom.querySelector('[data-tag-popup-input]');
+            if (tagInput) {
+              tagInput.removeAttribute('data-composition');
+            }
           }
+        } catch {
+          // node may have been unmounted during composition; ignore
         }
       }
     }

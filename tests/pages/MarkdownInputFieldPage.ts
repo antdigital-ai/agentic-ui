@@ -1,5 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+
 /**
  * MarkdownInputField Page Object Model
  * 封装 MarkdownInputField 组件的所有交互操作
@@ -33,7 +35,9 @@ export class MarkdownInputFieldPage {
    * 导航到 demo 页面
    * 使用 domcontentloaded 先完成 DOM，减少 load 阶段资源压力，降低 headless 下 Page crashed 概率。
    */
-  async goto(demoPath: string = 'markdowninputfield-demo-1') {
+  async goto(
+    demoPath: string = PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldOnFocus,
+  ) {
     await this.page.goto(`/~demos/${demoPath}`, {
       waitUntil: 'domcontentloaded',
       timeout: 60_000,

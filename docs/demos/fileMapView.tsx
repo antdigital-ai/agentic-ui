@@ -19,7 +19,7 @@ const createMockFile = (
 ): AttachmentFile => ({
   name,
   type,
-  size: Math.floor(Math.random() * 10000000) + 1024,
+  size: 512000,
   url,
   previewUrl: previewUrl || url,
   status: 'done',
@@ -33,30 +33,13 @@ const createMockFile = (
   slice: () => new Blob(),
 });
 
-// 基础文件列表（混合类型）
 const mixedFileMap = new Map<string, AttachmentFile>([
   [
     'image-1',
     createMockFile(
-      'design-mockup.jpg',
-      'image/jpeg',
-      'https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*IsRPRJJps0cAAAAAAAAAAAAADkN6AQ/original',
-    ),
-  ],
-  [
-    'image-2',
-    createMockFile(
       'screenshot.png',
       'image/png',
       'https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*jThjRaPDP3kAAAAAAAAAAAAAekN6AQ/original',
-    ),
-  ],
-  [
-    'image-3',
-    createMockFile(
-      'photo.jpg',
-      'image/jpeg',
-      'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
     ),
   ],
   [
@@ -70,25 +53,9 @@ const mixedFileMap = new Map<string, AttachmentFile>([
   [
     'doc-1',
     createMockFile(
-      'project-proposal.pdf',
+      'readme.pdf',
       'application/pdf',
-      'https://example.com/proposal.pdf',
-    ),
-  ],
-  [
-    'doc-2',
-    createMockFile(
-      'requirements-document.docx',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'https://example.com/requirements.docx',
-    ),
-  ],
-  [
-    'doc-3',
-    createMockFile(
-      'presentation-slides.pptx',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      'https://example.com/slides.pptx',
+      'https://example.com/readme.pdf',
     ),
   ],
   [
@@ -99,17 +66,8 @@ const mixedFileMap = new Map<string, AttachmentFile>([
       'https://example.com/config.json',
     ),
   ],
-  [
-    'data-2',
-    createMockFile(
-      'settings.yaml',
-      'application/x-yaml',
-      'https://example.com/settings.yaml',
-    ),
-  ],
 ]);
 
-// 纯图片文件列表
 const imageOnlyMap = new Map<string, AttachmentFile>([
   [
     'img-1',
@@ -122,35 +80,18 @@ const imageOnlyMap = new Map<string, AttachmentFile>([
   [
     'img-2',
     createMockFile(
-      'photo-2.jpg',
-      'image/jpeg',
-      'https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*jThjRaPDP3kAAAAAAAAAAAAAekN6AQ/original',
-    ),
-  ],
-  [
-    'img-3',
-    createMockFile(
-      'photo-3.png',
+      'photo-2.png',
       'image/png',
       'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
     ),
   ],
-  [
-    'img-4',
-    createMockFile(
-      'photo-4.jpg',
-      'image/jpeg',
-      'https://mdn.alipayobjects.com/huamei_ptjqan/afts/img/A*IsRPRJJps0cAAAAAAAAAAAAADkN6AQ/original',
-    ),
-  ],
 ]);
 
-// 多文档文件列表（用于测试 maxDisplayCount）
 const manyDocsMap = new Map<string, AttachmentFile>([
   [
     'doc-1',
     createMockFile(
-      'annual-report-2023.pdf',
+      'report.pdf',
       'application/pdf',
       'https://example.com/report.pdf',
     ),
@@ -158,41 +99,25 @@ const manyDocsMap = new Map<string, AttachmentFile>([
   [
     'doc-2',
     createMockFile(
-      'financial-statement.xlsx',
+      'data.xlsx',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'https://example.com/statement.xlsx',
+      'https://example.com/data.xlsx',
     ),
   ],
   [
     'doc-3',
     createMockFile(
-      'meeting-minutes.docx',
+      'notes.docx',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'https://example.com/minutes.docx',
+      'https://example.com/notes.docx',
     ),
   ],
   [
     'doc-4',
     createMockFile(
-      'project-timeline.pptx',
+      'slides.pptx',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      'https://example.com/timeline.pptx',
-    ),
-  ],
-  [
-    'doc-5',
-    createMockFile(
-      'technical-specification.pdf',
-      'application/pdf',
-      'https://example.com/spec.pdf',
-    ),
-  ],
-  [
-    'doc-6',
-    createMockFile(
-      'user-manual.pdf',
-      'application/pdf',
-      'https://example.com/manual.pdf',
+      'https://example.com/slides.pptx',
     ),
   ],
 ]);

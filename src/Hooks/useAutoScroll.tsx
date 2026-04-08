@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useThrottleFn } from './useThrottleFn';
 
-const SCROLL_TOLERANCE = 20; // 滚动到底部的容差阈值
+const SCROLL_TOLERANCE = 20;
 
 /**
  * useAutoScroll Hook - 自动滚动 Hook
@@ -62,8 +62,16 @@ export const useAutoScroll = <T extends HTMLDivElement>(
 ) => {
   const containerRef = useRef<T | null>(null);
   const lastScrollHeight = useRef(0);
-  const isLocked = useRef(false); // 用户滚动锁定状态
+  /**
+   * 记录自动滚动是否处于激活状态（即用户没有主动向上滚动）。
+   * 在 smooth scroll 动画过程中 scrollTop 尚未到达目标值，如果此时有新内容
+   * 进来，isNearBottom 可能因 scrollTop 还在动画中途而误判为 false，导致
+   * 漏掉最后一次滚动。用此标志可以安全地跨帧维持"应该跟底"的意图。
+   */
+  const isAutoScrollEngaged = useRef(true);
   const observer = useRef<MutationObserver | null>(null);
+
+  const tolerance = props?.SCROLL_TOLERANCE ?? SCROLL_TOLERANCE;
 
   // 主滚动逻辑
   const _checkScroll = async (force = false, behavior?: 'smooth' | 'auto') => {
@@ -78,47 +86,68 @@ export const useAutoScroll = <T extends HTMLDivElement>(
     const currentScrollHeight = container.scrollHeight;
     const prevScrollHeight = lastScrollHeight.current;
 
-    // 计算用户是否在底部区域
+    // 使用当前 scrollHeight 判断是否靠近底部，避免 smooth 动画中 scrollTop
+    // 尚未到达目标时的误判。
     const isNearBottom =
       container.scrollTop + container.clientHeight >=
-      prevScrollHeight - (props?.SCROLL_TOLERANCE || SCROLL_TOLERANCE);
+      currentScrollHeight - tolerance;
 
-    // 触发滚动的情况：
-    // 1. 强制滚动（手动触发）
-    // 2. 内容高度增加且用户原本在底部
     const shouldScroll =
       force ||
       (currentScrollHeight > prevScrollHeight &&
-        (isNearBottom || isLocked.current));
+        (isNearBottom || isAutoScrollEngaged.current));
 
     if (shouldScroll && container.scrollTo) {
-      // 如果传入了 behavior，使用传入的值；否则使用配置的 scrollBehavior；最后默认为 'smooth'
       const scrollBehavior =
         behavior !== undefined ? behavior : props.scrollBehavior || 'smooth';
-      container.scrollTo?.({
+      container.scrollTo({
         top: currentScrollHeight,
         behavior: scrollBehavior,
       });
-      isLocked.current = false; // 滚动后解除锁定
+      isAutoScrollEngaged.current = true;
+    } else if (!isNearBottom) {
+      // 用户已经向上滚动远离底部，关闭自动跟随
+      isAutoScrollEngaged.current = false;
     }
 
     lastScrollHeight.current = currentScrollHeight;
   };
+
   const checkScroll = useThrottleFn(_checkScroll, props.timeout || 160);
+
+  // 监听用户手动滚动，判断其是否离开了底部
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const atBottom =
+        container.scrollTop + container.clientHeight >=
+        container.scrollHeight - tolerance;
+      if (atBottom) {
+        isAutoScrollEngaged.current = true;
+      } else {
+        isAutoScrollEngaged.current = false;
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [...(props.deps || [])]);
+
   // DOM 变化监听（MutationObserver）
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     observer.current = new MutationObserver((mutations) => {
-      // 过滤出添加节点的变化
       const hasAddedNodes = mutations.some((m) => m.addedNodes.length > 0);
       if (hasAddedNodes) checkScroll?.();
     });
 
     observer.current.observe(container, {
-      childList: true, // 监听子元素变化
-      subtree: true, // 监听所有后代
+      childList: true,
+      subtree: true,
       attributes: false,
       characterData: false,
     });

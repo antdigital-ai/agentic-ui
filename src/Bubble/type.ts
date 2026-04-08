@@ -2,6 +2,7 @@ import { TooltipProps } from 'antd';
 import { ReactNode } from 'react';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { AttachmentFile } from '../MarkdownInputField/AttachmentButton/types';
+import type { FileMapViewProps } from '../MarkdownInputField/FileMapView';
 import {
   BaseStyleProps,
   BubbleMetaData,
@@ -509,6 +510,8 @@ export interface BubbleProps<
     className?: string;
     /** 自定义根容器样式 */
     style?: React.CSSProperties;
+    /** 自定义每个媒体（图片/视频）条目的渲染，透传 FileMapView */
+    itemRender?: FileMapViewProps['itemRender'];
     /** 最大展示条目数（默认 3） */
     maxDisplayCount?: number;
     /** 是否显示"查看更多"按钮 */

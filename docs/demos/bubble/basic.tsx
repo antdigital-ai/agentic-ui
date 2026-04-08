@@ -35,18 +35,10 @@ const createMockFile = (
   slice: () => new Blob(),
 });
 
-// Mock data for the demo
 const defaultMockMessage: MessageBubbleData = {
   id: '1',
   role: 'assistant',
-  content: `我是 Ant Design 聊天助手，可以帮你：
-
-- **回答问题** - 解答技术相关疑问
-- **代码示例** - 提供组件使用示例  
-- **设计建议** - 给出设计方案建议
-- **文档说明** - 解释 API 和功能
-
-你想了解什么呢？`,
+  content: `Ant Design 聊天助手：可回答问题、提供示例与文档说明。`,
   createAt: Date.now() - 60000, // 1分钟前
   updateAt: Date.now() - 60000,
   isFinished: true,
@@ -67,7 +59,7 @@ const mockUserMessage: MessageBubbleData = {
   id: '2',
   role: 'user',
   content:
-    '你好！我想了解 Bubble 组件的基本用法和特性。[https://ant.design/components/bubble-cn](https://ant.design/components/bubble-cn)',
+    '你好，想了解 Bubble 的基本用法。[Bubble](https://ant.design/components/bubble-cn)',
   createAt: Date.now() - 30000, // 30秒前
   updateAt: Date.now() - 30000,
   isFinished: true,
@@ -79,60 +71,23 @@ const mockUserMessage: MessageBubbleData = {
   },
 };
 
-// 用于在回答内容中内联展示的文件列表（不挂载到 originData.fileMap）
 const mockInlineFileMap = new Map<string, AttachmentFile>([
   [
-    'bubble-design-spec.pdf',
+    'demo-spec.pdf',
     createMockFile(
-      'bubble-design-spec.pdf',
+      'demo-spec.pdf',
       'application/pdf',
       2048576,
-      'https://example.com/bubble-design-spec.pdf',
+      'https://example.com/demo-spec.pdf',
     ),
   ],
   [
-    'component-preview.png',
+    'preview.png',
     createMockFile(
-      'component-preview.png',
+      'preview.png',
       'image/png',
       1048576,
       'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-    ),
-  ],
-  [
-    'component-api-reference.json',
-    createMockFile(
-      'component-api-reference.json',
-      'application/json',
-      512000,
-      'https://example.com/component-api-reference.json',
-    ),
-  ],
-  [
-    '组件使用说明.docx',
-    createMockFile(
-      '组件使用说明.docx',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      8847360,
-      'https://example.com/component-guide.docx',
-    ),
-  ],
-  [
-    '接口测试报告.xlsx',
-    createMockFile(
-      '接口测试报告.xlsx',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      6647360,
-      'https://example.com/api-test-report.xlsx',
-    ),
-  ],
-  [
-    '技术方案演示.pptx',
-    createMockFile(
-      '技术方案演示.pptx',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      7747360,
-      'https://example.com/tech-proposal.pptx',
     ),
   ],
 ]);
@@ -140,16 +95,8 @@ const mockInlineFileMap = new Map<string, AttachmentFile>([
 const mockFileMessage: MessageBubbleData = {
   id: '3',
   role: 'assistant',
-  content: `## Bubble 组件功能文档
-
-Bubble 组件是一个功能丰富的聊天气泡组件，支持：
-
-- 多种消息类型（文本、文件、图片等）
-- 自定义渲染配置
-- 左右布局切换
-- 文件附件展示
-
-以下是相关的设计文档和示例图片：`,
+  content: `## 附件示例
+以下为内联文件列表：`,
   createAt: Date.now() - 10000, // 10秒前
   updateAt: Date.now() - 10000,
   isFinished: true,

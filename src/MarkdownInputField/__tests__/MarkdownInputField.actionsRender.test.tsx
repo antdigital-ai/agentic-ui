@@ -256,6 +256,27 @@ describe('MarkdownInputField - actionsRender', () => {
     expect(container?.children[2]).toBe(lastButton);
   });
 
+  it('should render attachment list title when files exist', () => {
+    const doneFile = createAttachmentFile({
+      uuid: 'file-attachment-title',
+      status: 'done',
+      url: 'https://example.com/attachment-title.txt',
+    });
+
+    render(
+      <MarkdownInputField
+        attachment={{
+          enable: true,
+          fileMap: new Map([['file-attachment-title', doneFile]]),
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId('attachment-list-title')).toHaveTextContent(
+      /上传附件|Uploaded attachments/,
+    );
+  });
+
   it('should pass error status to actionsRender when any file upload fails', () => {
     const actionsRender = vi.fn().mockReturnValue([
       <button type="button" key="custom-action">

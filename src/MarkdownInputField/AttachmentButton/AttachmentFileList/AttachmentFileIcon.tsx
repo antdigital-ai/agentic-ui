@@ -128,6 +128,7 @@ export const FileMetaPlaceholder: React.FC<{
   return (
     <Tooltip title={file.name}>
       <div
+        data-testid="file-meta-placeholder"
         className={className}
         style={{
           height: 48,
@@ -140,7 +141,8 @@ export const FileMetaPlaceholder: React.FC<{
           color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
           lineHeight: 1.2,
           overflow: 'hidden',
-          flex: 1,
+          // 占位块不应在 flex 容器中自动拉伸为整行宽度
+          flex: '0 0 auto',
           minWidth: 80,
           padding: 'var(--padding-1x) var(--padding-2x)',
           flexDirection: 'column',

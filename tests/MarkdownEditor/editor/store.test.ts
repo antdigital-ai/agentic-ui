@@ -71,6 +71,7 @@ vi.mock('slate-react', () => ({
     focus: vi.fn(),
     findPath: vi.fn(),
     deselect: vi.fn(),
+    isFocused: vi.fn(() => false),
   },
 }));
 

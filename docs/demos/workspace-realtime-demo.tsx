@@ -115,10 +115,6 @@ const WorkspaceRealtimeDemo: React.FC = () => {
       'added 156 packages in 2.3s',
       '$ npm run build',
       'webpack compiled successfully',
-      '# 可用性质量指数（UQ-index）计算模型',
-      'from flash_mla import get _mla_metadata, flash_mla_with_kvcache',
-      'tile_scheduler_metadata, num_splits = get_mla_metadata (cache_seqlens, s_q * h_q // h_kv, h_kv)',
-      'for i in range(num_layers):',
     ];
 
     let shellIndex = 0;
@@ -134,25 +130,13 @@ const WorkspaceRealtimeDemo: React.FC = () => {
     }, 1000);
 
     // Markdown 内容模拟
-    const markdownText = `# 实时文档编辑
+    const markdownText = `# 实时文档
 
-## 功能特性
+- 预览与打字机效果
 
-- **实时预览**: 支持 Markdown 实时预览
-- **语法高亮**: 代码块语法高亮
-- **数学公式**: 支持 LaTeX 数学公式
-
-## 代码示例
-
-\`\`\`javascript
-function hello() {
-  console.log("Hello, World!");
-}
+\`\`\`js
+console.log('ok');
 \`\`\`
-
-## 数学公式
-
-$E = mc^2$
 `;
 
     let mdIndex = 0;

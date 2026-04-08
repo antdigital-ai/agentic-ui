@@ -1,7 +1,8 @@
-/**
+﻿/**
  * title: 基础箱线图
  * description: 展示数据分布的统计图表，自动计算最小值、Q1、中位数、Q3、最大值
  */
+import React from 'react';
 import { BoxPlotChart } from '@ant-design/agentic-ui';
 
 export default () => {

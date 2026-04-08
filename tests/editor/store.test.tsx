@@ -38,6 +38,7 @@ vi.mock('slate-react', () => ({
     toSlateNode: vi.fn(() => ({ type: 'paragraph', children: [{ text: '' }] })),
     focus: vi.fn(),
     deselect: vi.fn(),
+    isFocused: vi.fn(() => false),
   },
   withReact: (editor: any) => editor,
 }));
@@ -195,26 +196,28 @@ describe('EditorStore', () => {
       editor.selection = selection;
 
       // 模拟 Editor.nodes 返回有效的节点
-      vi.spyOn(Editor, 'nodes').mockReturnValue([
+      const editorNodesSpy = vi.spyOn(Editor, 'nodes').mockReturnValue([
         [{ type: 'paragraph', children: [{ text: '' }] }, [0]],
       ] as any);
 
       // 模拟 Path.next 返回有效路径
-      vi.spyOn(Path, 'next').mockReturnValue([1]);
+      const pathNextSpy = vi.spyOn(Path, 'next').mockReturnValue([1]);
 
       // 模拟 Transforms.insertNodes 实际执行插入
-      vi.spyOn(Transforms, 'insertNodes').mockImplementation((editor) => {
-        if (
-          editor.children &&
-          editor.children[0] &&
-          editor.children[0].children
-        ) {
-          editor.children[0].children[0] = {
-            text: 'document.pdf',
-            url: 'file:///path/to/document.pdf',
-          };
-        }
-      });
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes').mockImplementation(
+        (editor) => {
+          if (
+            editor.children &&
+            editor.children[0] &&
+            editor.children[0].children
+          ) {
+            editor.children[0].children[0] = {
+              text: 'document.pdf',
+              url: 'file:///path/to/document.pdf',
+            };
+          }
+        },
+      );
 
       store.insertLink('file:///path/to/document.pdf');
 
@@ -222,6 +225,10 @@ describe('EditorStore', () => {
         text: 'document.pdf',
         url: 'file:///path/to/document.pdf',
       });
+
+      editorNodesSpy.mockRestore();
+      pathNextSpy.mockRestore();
+      insertNodesSpy.mockRestore();
     });
 
     it('应该在选区不存在时返回', () => {
@@ -1145,7 +1152,7 @@ describe('EditorStore', () => {
       store.focus();
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        '移动光标失败:',
+        'ReactEditor.focus 失败:',
         expect.any(Error),
       );
 
@@ -2197,14 +2204,16 @@ describe('EditorStore', () => {
         focus: { path: [0, 0], offset: 0 },
       };
 
-      vi.spyOn(Editor, 'nodes').mockImplementation(function* () {
-        yield [
-          { type: 'code', language: 'js', children: [{ text: '' }] },
-          [0],
-        ] as any;
-      });
-      vi.spyOn(Path, 'next').mockReturnValue([1]);
-      vi.spyOn(Transforms, 'insertNodes');
+      const editorNodesSpy = vi.spyOn(Editor, 'nodes').mockImplementation(
+        function* () {
+          yield [
+            { type: 'code', language: 'js', children: [{ text: '' }] },
+            [0],
+          ] as any;
+        },
+      );
+      const pathNextSpy = vi.spyOn(Path, 'next').mockReturnValue([1]);
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
 
       store.insertLink('https://link.com');
 
@@ -2216,6 +2225,10 @@ describe('EditorStore', () => {
         },
         expect.objectContaining({ at: [1], select: true }),
       );
+
+      editorNodesSpy.mockRestore();
+      pathNextSpy.mockRestore();
+      insertNodesSpy.mockRestore();
     });
   });
 

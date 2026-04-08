@@ -11,20 +11,24 @@ import React, {
 } from 'react';
 import { useStyle as useContentStyle } from '../MarkdownEditor/editor/style';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
+import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
 import { CharacterQueue } from './CharacterQueue';
 import { AgenticUiTaskBlockRenderer } from './renderers/AgenticUiTaskBlockRenderer';
 import { AgenticUiToolUseBarBlockRenderer } from './renderers/AgenticUiToolUseBarBlockRenderer';
+import { AgenticUiFileMapBlockRenderer } from './renderers/AgenticUiFileMapBlockRenderer';
 import { ChartBlockRenderer } from './renderers/ChartRenderer';
 import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
 import { SchemaBlockRenderer } from './renderers/SchemaRenderer';
 import { useRendererVarStyle } from './style';
 import type {
+  FileMapConfig,
   MarkdownRendererProps,
   MarkdownRendererRef,
   RendererBlockProps,
 } from './types';
+import { extractFootnoteDefinitionsFromMarkdown } from './extractFootnoteDefinitions';
 import { useMarkdownToReact } from './useMarkdownToReact';
 import { useStreaming } from './useStreaming';
 
@@ -62,9 +66,18 @@ const DefaultCodeRouter: React.FC<
   RendererBlockProps & {
     pluginComponents: Record<string, React.ComponentType<RendererBlockProps>>;
     apaasifyRender?: (value: any) => React.ReactNode;
+    fileMapConfig?: FileMapConfig;
+    editorCodeProps?: MarkdownEditorProps['codeProps'];
   }
 > = (props) => {
-  const { language, pluginComponents, apaasifyRender, ...rest } = props;
+  const {
+    language,
+    pluginComponents,
+    apaasifyRender,
+    fileMapConfig,
+    editorCodeProps,
+    ...rest
+  } = props;
 
   if (language === 'mermaid') {
     const MermaidComp = pluginComponents.mermaid || MermaidBlockRenderer;
@@ -93,6 +106,14 @@ const DefaultCodeRouter: React.FC<
     return <ToolbarComp {...rest} language={language} />;
   }
 
+  if (language === 'agentic-ui-filemap') {
+    const FileMapComp =
+      pluginComponents['agentic-ui-filemap'] || AgenticUiFileMapBlockRenderer;
+    return (
+      <FileMapComp {...rest} language={language} fileMapConfig={fileMapConfig} />
+    );
+  }
+
   if (SCHEMA_LANGUAGES.has(language)) {
     const SchemaComp = pluginComponents.schema || SchemaBlockRenderer;
     return (
@@ -100,12 +121,15 @@ const DefaultCodeRouter: React.FC<
         {...rest}
         language={language}
         apaasifyRender={apaasifyRender}
+        editorCodeProps={editorCodeProps}
       />
     );
   }
 
   const CodeComp = pluginComponents.code || CodeBlockRenderer;
-  return <CodeComp {...rest} language={language} />;
+  return (
+    <CodeComp {...rest} language={language} editorCodeProps={editorCodeProps} />
+  );
 };
 
 /**
@@ -136,6 +160,9 @@ const InternalMarkdownRenderer = forwardRef<
     streamingParagraphAnimation,
     apaasify,
     eleRender,
+    fileMapConfig,
+    fncProps,
+    codeProps: editorCodeProps,
   } = props;
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
@@ -218,6 +245,12 @@ const InternalMarkdownRenderer = forwardRef<
     }
   }, [content, streaming]);
 
+  useEffect(() => {
+    const notify = fncProps?.onFootnoteDefinitionChange;
+    if (!notify) return;
+    notify(extractFootnoteDefinitionsFromMarkdown(displayedContent || ''));
+  }, [displayedContent, fncProps?.onFootnoteDefinitionChange]);
+
   // 构建组件映射
   // code 渲染器通过 pre override 在 useMarkdownToReact 中路由，
   // 不直接映射到 <code> 标签（否则会影响行内代码 `code`）
@@ -227,11 +260,13 @@ const InternalMarkdownRenderer = forwardRef<
   }, [apaasify]);
 
   const components = useMemo(() => {
-    const codeRouter = (codeProps: RendererBlockProps) => (
+    const codeRouter = (blockProps: RendererBlockProps) => (
       <DefaultCodeRouter
-        {...codeProps}
+        {...blockProps}
         pluginComponents={pluginComponents}
         apaasifyRender={apaasifyRender}
+        fileMapConfig={fileMapConfig}
+        editorCodeProps={editorCodeProps}
       />
     );
     codeRouter.displayName = 'CodeRouter';
@@ -240,7 +275,7 @@ const InternalMarkdownRenderer = forwardRef<
       __codeBlock: codeRouter,
       ...pluginComponents,
     };
-  }, [pluginComponents, apaasifyRender]);
+  }, [pluginComponents, apaasifyRender, fileMapConfig, editorCodeProps]);
 
   // 流式缓存：将不完整的 Markdown token 暂缓，避免 parser 错误解析
   const safeContent = useStreaming(displayedContent, streaming);
@@ -251,6 +286,7 @@ const InternalMarkdownRenderer = forwardRef<
     components,
     prefixCls,
     linkConfig,
+    fncProps,
     streaming,
     streamingParagraphAnimation,
     contentRevisionSource: streaming ? displayedContent : undefined,

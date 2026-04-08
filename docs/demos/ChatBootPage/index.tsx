@@ -20,51 +20,26 @@ import './style.css';
 const StandaloneHistoryDemo = () => {
   const [currentSessionId, setCurrentSessionId] = useState('session-2');
 
-  // 模拟请求函数
   const mockRequest = async ({ agentId }: { agentId: string }) => {
-    // 模拟 API 请求
+    const t = Date.now();
     return [
       {
         id: '1',
         sessionId: 'session-1',
-        sessionTitle: '新能源汽车板块近期走势分析',
-        agentId: agentId,
-        gmtCreate: 1703123456789,
-        gmtLastConverse: 1703123456789,
+        sessionTitle: '会话 A（已收藏）',
+        agentId,
+        gmtCreate: t - 3600000,
+        gmtLastConverse: t - 3600000,
         isFavorite: true,
       },
       {
         id: '2',
         sessionId: 'session-2',
-        sessionTitle: '半导体ETF定投策略咨询',
-        agentId: agentId,
-        gmtCreate: 1703037056789,
-        gmtLastConverse: 1703037056789,
+        sessionTitle: '会话 B',
+        agentId,
+        gmtCreate: t - 86400000,
+        gmtLastConverse: t - 86400000,
         isFavorite: false,
-      },
-      {
-        id: '3',
-        sessionId: 'session-3',
-        sessionTitle: '对比分析沪深300和中证500指数基金的长期收益与风险表现',
-        agentId: agentId,
-        gmtCreate: 1702950656789,
-        gmtLastConverse: 1702950656789,
-      },
-      {
-        id: '4',
-        sessionId: 'session-4',
-        sessionTitle: '可转债投资入门指南',
-        agentId: agentId,
-        gmtCreate: 1702950656789,
-        gmtLastConverse: 1702950656789,
-      },
-      {
-        id: '5',
-        sessionId: 'session-5',
-        sessionTitle: '港股通标的筛选与估值分析',
-        agentId: agentId,
-        gmtCreate: 1702950656789,
-        gmtLastConverse: 1702950656789,
       },
     ] as HistoryDataType[];
   };

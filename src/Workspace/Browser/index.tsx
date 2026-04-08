@@ -92,8 +92,9 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
   const { locale } = useContext(I18nContext);
 
   const handleOpen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (onOpen) {
-      e.preventDefault();
       onOpen(item);
       return;
     }
@@ -101,8 +102,21 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
   };
 
   const handleLocate = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     onLocate?.(item);
+  };
+
+  const handleOpenFromSite = (
+    e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onOpen) {
+      onOpen(item);
+      return;
+    }
+    window.open(item.url, '_blank', 'noopener,noreferrer');
   };
 
   return wrapSSR(
@@ -149,7 +163,15 @@ export const BrowserItemComponent: React.FC<BrowserItemProps> = ({
         </div>
         <div
           className={classNames(`${prefixCls}-result-item-site`, hashId)}
-          onClick={handleOpen}
+          role="link"
+          tabIndex={0}
+          aria-label={item.site}
+          onClick={handleOpenFromSite}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              handleOpenFromSite(event);
+            }
+          }}
         >
           {renderSiteAvatar(item.site, item.icon)}
           <Tooltip title={item.site} mouseEnterDelay={1}>
@@ -187,7 +209,8 @@ export const BrowserHeader: React.FC<BrowserHeaderProps> = ({
           icon={
             <ArrowLeft
               style={{
-                color: 'var(--color-gray-text-quaternary, var(--color-gray-text-light, #767e8b))',
+                color:
+                  'var(--color-gray-text-quaternary, var(--color-gray-text-light, #767e8b))',
               }}
             />
           }
@@ -428,7 +451,9 @@ const Browser: React.FC<BrowserProps> = ({
         <BrowserList
           items={results}
           activeLabel={activeLabel}
-          onBack={isSingleSuggestion ? undefined : () => setCurrentView('suggestions')}
+          onBack={
+            isSingleSuggestion ? undefined : () => setCurrentView('suggestions')
+          }
           countFormatter={countFormatter}
           emptyText={emptyText}
           loading={loading}

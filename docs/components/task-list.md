@@ -22,24 +22,24 @@ group:
 
 > **类型名变更**：Props 类型已从 `ThoughtChainProps` 重命名为 `TaskListProps`。旧类型名仍可使用但已标记 deprecated。
 
-| 参数                 | 说明                                                    | 类型                               | 默认值      | 版本   |
-| -------------------- | ------------------------------------------------------- | ---------------------------------- | ----------- | ------ |
-| items                | 任务列表数据                                            | `TaskItem[]`                       | `[]`        | -      |
-| className            | 自定义类名                                              | `string`                           | -           | -      |
-| expandedKeys         | 受控模式：当前展开的任务项 key 数组                     | `string[]`                         | -           | -      |
-| onExpandedKeysChange | 受控模式：展开状态变化时的回调函数                      | `(expandedKeys: string[]) => void` | -           | -      |
-| variant              | 组件变体，`simple` 模式将任务列表收起为紧凑的单行摘要条 | `'default' \| 'simple'`            | `'default'` | 2.31.0 |
-| open                 | `simple` 模式下摘要条是否展开（受控）                   | `boolean`                          | -           | 2.31.0 |
-| onOpenChange         | `simple` 模式下摘要条展开状态变化回调                   | `(open: boolean) => void`          | -           | 2.31.0 |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| items | 任务列表数据 | `TaskItem[]` | `[]` | - |
+| className | 自定义类名 | `string` | - | - |
+| expandedKeys | 受控模式：当前展开的任务项 key 数组 | `string[]` | - | - |
+| onExpandedKeysChange | 受控模式：展开状态变化时的回调函数 | `(expandedKeys: string[]) => void` | - | - |
+| variant | 组件变体，`simple` 模式将任务列表收起为紧凑的单行摘要条 | `'default' \| 'simple'` | `'default'` | 2.31.0 |
+| open | `simple` 模式下摘要条是否展开（受控） | `boolean` | - | 2.31.0 |
+| onOpenChange | `simple` 模式下摘要条展开状态变化回调 | `(open: boolean) => void` | - | 2.31.0 |
 
 ### TaskItem
 
-| 参数    | 说明         | 类型                                             | 默认值 |
-| ------- | ------------ | ------------------------------------------------ | ------ |
-| key     | 任务唯一标识 | `string`                                         | -      |
-| title   | 任务标题     | `React.ReactNode`                                | -      |
-| content | 任务内容     | `React.ReactNode \| React.ReactNode[]`           | -      |
-| status  | 任务状态     | `'success' \| 'loading' \| 'pending' \| 'error'` | -      |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| key | 任务唯一标识 | `string` | - | - |
+| title | 任务标题 | `React.ReactNode` | - | - |
+| content | 任务内容 | `React.ReactNode \| React.ReactNode[]` | - | - |
+| status | 任务状态 | `'success' \| 'loading' \| 'pending' \| 'error'` | - | - |
 
 ### 受控模式示例
 

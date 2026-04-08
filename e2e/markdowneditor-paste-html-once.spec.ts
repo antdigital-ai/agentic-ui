@@ -7,7 +7,7 @@ test.describe('MarkdownEditor 粘贴 HTML 只插入一次', () => {
   const PASTED_UNIQUE_TEXT = 'E2E paste once unique';
 
   test.beforeEach(async ({ markdownEditorPage }) => {
-    await markdownEditorPage.goto('markdowneditor-demo-1');
+    await markdownEditorPage.goto();
   });
 
   test('粘贴 HTML 时 handlePasteEvent 应只插入一次文本', async ({

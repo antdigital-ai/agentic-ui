@@ -484,9 +484,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         marginBottom: 8,
       },
 
-      [`${token.antCls}-input-outlined:hover, ${token.antCls}-input-outlined:focus-within`]: {
-        borderColor: 'var(--color-primary-control-fill-primary-active)',
-      },
+      [`${token.antCls}-input-outlined:hover, ${token.antCls}-input-outlined:focus-within`]:
+        {
+          borderColor: 'var(--color-primary-control-fill-primary-active)',
+        },
 
       [`${token.antCls}-input-affix-wrapper >input${token.antCls}-input`]: {
         color: 'var(--color-gray-text-default)',
@@ -522,6 +523,30 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     // 隐藏的图片预览组件
     [`${token.componentCls}-hidden-image`]: {
       display: 'none',
+    },
+
+    // 查看更多按钮
+    [`${token.componentCls}-show-more`]: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '6px 0',
+      cursor: 'pointer',
+      color: 'var(--color-gray-text-secondary)',
+      font: 'var(--font-text-body-sm)',
+      letterSpacing: 'var(--letter-spacing-body-sm, normal)',
+      transition: 'color 0.2s ease',
+      userSelect: 'none',
+
+      '&:hover': {
+        color: 'var(--color-primary-control-fill-primary-active)',
+      },
+
+      svg: {
+        marginLeft: '4px',
+        width: '12px',
+        height: '12px',
+      },
     },
   };
 };

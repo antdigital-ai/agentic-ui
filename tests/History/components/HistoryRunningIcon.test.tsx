@@ -1,4 +1,4 @@
-﻿import { act, render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 import {
@@ -126,6 +126,23 @@ describe('HistoryRunningIcon', () => {
     });
     const style = container!.querySelector('style');
     expect(style).not.toBeInTheDocument();
+  });
+
+  it('NODE_ENV 非 test 时注入旋转动画 style', async () => {
+    const prev = process.env.NODE_ENV;
+    try {
+      process.env.NODE_ENV = 'development';
+
+      let container: HTMLElement;
+      await act(async () => {
+        const result = render(<HistoryRunningIcon animated />);
+        container = result.container;
+      });
+
+      expect(container!.querySelector('style')).toBeInTheDocument();
+    } finally {
+      process.env.NODE_ENV = prev;
+    }
   });
 });
 

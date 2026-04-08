@@ -4,11 +4,55 @@ import type {
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
+import type { MarkdownEditorProps } from '../MarkdownEditor/types';
+import type { AttachmentFile } from '../MarkdownInputField/AttachmentButton/types';
+import type { FileMapViewProps } from '../MarkdownInputField/FileMapView';
 
 /**
- * markdown 渲染模式下传给 eleRender 的元素属性，
- * 包含 HTML 标签名、hast 节点及所有原生 HTML 属性。
+ * FileMapView 相关配置，透传给 agentic-ui-filemap 代码块渲染器，
+ * 方便在 markdownRenderConfig 中统一配置图片回显行为。
  */
+export interface FileMapConfig {
+  /**
+   * 预览文件回调，透传给 FileMapView.onPreview。
+   * 对图片：点击缩略图时触发，传入则阻止 antd Image 内置灯箱；
+   * 对视频：传入则阻止内置弹窗；对普通文件：传入则阻止默认 window.open。
+   */
+  onPreview?: (file: AttachmentFile) => void;
+  /**
+   * 自定义每个媒体条目（图片/视频）的渲染，透传给 FileMapView.itemRender，
+   * 常用于回显场景。
+   */
+  itemRender?: FileMapViewProps['itemRender'];
+  /**
+   * 自定义文件数据规范化函数，用于将 agentic-ui-filemap 代码块中的原始 JSON 条目
+   * 转换为 AttachmentFile 对象。
+   *
+   * 适用于服务端返回的字段名与 AttachmentFile 不一致（如 fileUrl → url、
+   * fileId → uuid）或需要在数据层补充额外字段的场景。
+   *
+   * @param raw - 代码块 JSON 中的原始文件对象（未经处理）
+   * @param defaultFile - 由内置逻辑生成的默认 AttachmentFile，可在此基础上做局部覆盖
+   * @returns 转换后的 AttachmentFile；返回 null 时该条目将被过滤掉
+   *
+   * @example
+   * ```tsx
+   * fileMapConfig={{
+   *   normalizeFile: (raw, defaultFile) => ({
+   *     ...defaultFile,
+   *     url: raw.fileUrl as string,
+   *     uuid: raw.fileId as string,
+   *   }),
+   * }}
+   * ```
+   */
+  normalizeFile?: (
+    raw: Record<string, unknown>,
+    defaultFile: AttachmentFile,
+  ) => AttachmentFile | null;
+}
+
+
 export interface MarkdownRendererEleProps {
   /** HTML tag name, e.g. 'p', 'h1', 'blockquote', 'pre' */
   tagName: string;
@@ -74,16 +118,10 @@ export interface MarkdownRendererProps {
   style?: React.CSSProperties;
   /** 类名前缀 */
   prefixCls?: string;
-  /** 代码块配置（传递给 CodeRenderer） */
-  codeProps?: Record<string, any>;
-  /** 脚注配置 */
-  fncProps?: {
-    render?: (
-      props: Record<string, any> & { children: React.ReactNode },
-      defaultDom: React.ReactNode,
-    ) => React.ReactNode;
-    onFootnoteDefinitionChange?: (data: any[]) => void;
-  };
+  /** 代码块配置，与 MarkdownEditor `codeProps` 对齐（含 `render` 覆盖） */
+  codeProps?: MarkdownEditorProps['codeProps'];
+  /** 脚注配置，与 MarkdownEditor `fncProps` 对齐 */
+  fncProps?: MarkdownEditorProps['fncProps'];
   /** 链接配置 */
   linkConfig?: {
     /** 是否在新标签页打开链接，默认 true */
@@ -102,6 +140,11 @@ export interface MarkdownRendererProps {
     /** 自定义渲染函数，接收解析后的 JSON value，返回 React 节点 */
     render?: (value: any) => React.ReactNode;
   };
+  /**
+   * FileMapView 配置，透传给 agentic-ui-filemap 代码块渲染器。
+   * 可在 markdownRenderConfig 中统一配置图片 onPreview 和 itemRender。
+   */
+  fileMapConfig?: FileMapConfig;
   /**
    * 自定义元素渲染函数（markdown 渲染模式）
    * 与 Slate 模式的 eleItemRender 对应，允许拦截并替换任意块级/行内元素的渲染结果。

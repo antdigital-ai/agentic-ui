@@ -1,3 +1,4 @@
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
 import { expect, test } from '../tests/fixtures/page-fixture';
 
 /**
@@ -6,7 +7,7 @@ import { expect, test } from '../tests/fixtures/page-fixture';
  */
 test.describe('KeyboardTask 快捷键功能', () => {
   test.beforeEach(async ({ markdownEditorPage }) => {
-    await markdownEditorPage.goto('markdowneditor-demo-1');
+    await markdownEditorPage.goto();
     await markdownEditorPage.focus();
   });
 
@@ -591,8 +592,9 @@ test.describe('KeyboardTask 快捷键功能', () => {
       markdownInputFieldPage,
       page,
     }) => {
-      // 使用 markdowninputfield-demo-0
-      await markdownInputFieldPage.goto('markdowninputfield-demo-0');
+      await markdownInputFieldPage.goto(
+        PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldTags,
+      );
       
       // 先清空编辑器内容，确保测试环境干净
       // 直接执行 Ctrl+A 和 Delete，不使用 clear() 方法

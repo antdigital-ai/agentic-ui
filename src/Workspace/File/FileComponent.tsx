@@ -20,8 +20,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { ActionIconBox } from '../../Components/ActionIconBox';
-import { I18nContext } from '../../I18n';
+import { I18nContext, compileTemplate } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor';
 import type { FileNode, FileProps, FileType, GroupNode } from '../types';
 import { formatFileSize, formatLastModified } from '../utils';
@@ -29,6 +30,11 @@ import { fileTypeProcessor, isImageFile } from './FileTypeProcessor';
 import { PreviewComponent } from './PreviewComponent';
 import { useFileStyle } from './style';
 import { generateUniqueId, getFileTypeIcon, getGroupIcon } from './utils';
+
+/** Initial number of files shown per group before "show more" */
+const GROUP_INITIAL_PAGE_SIZE = 50;
+/** Number of additional files revealed per "show more" click */
+const GROUP_PAGE_SIZE_INCREMENT = 100;
 
 // 通用的键盘事件处理函数
 const handleKeyboardEvent = (
@@ -177,11 +183,12 @@ const FileItemComponent: FC<{
     ctx?: { anchorEl?: HTMLElement; origin: 'list' | 'preview' },
   ) => void;
   onLocate?: (file: FileNode) => void;
-  prefixCls?: string;
-  hashId?: string;
+  prefixCls: string;
+  hashId: string;
+  locale?: any;
   /** 是否在元素上绑定 id（默认 false） */
   bindDomId?: boolean;
-}> = ({
+}> = React.memo(({
   file,
   onClick,
   onDownload,
@@ -190,11 +197,9 @@ const FileItemComponent: FC<{
   onLocate,
   prefixCls,
   hashId,
+  locale,
   bindDomId = false,
 }) => {
-  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
-  const { locale } = useContext(I18nContext);
-  const finalPrefixCls = prefixCls || getPrefixCls('workspace-file');
   // 确保文件有唯一ID
   const fileWithId = ensureNodeWithId(file);
   const fileTypeInfo = fileTypeProcessor.inferFileType(fileWithId);
@@ -290,7 +295,7 @@ const FileItemComponent: FC<{
 
   // 内置操作按钮
   const actionBtnClass = classNames(
-    `${finalPrefixCls}-item-action-btn`,
+    `${prefixCls}-item-action-btn`,
     hashId,
   );
 
@@ -344,8 +349,8 @@ const FileItemComponent: FC<{
   // 自定义渲染上下文
   const renderContext = {
     file: fileWithId,
-    prefixCls: finalPrefixCls,
-    hashId: hashId || '',
+    prefixCls,
+    hashId,
     disabled: isDisabled,
     actions: builtinActions,
   };
@@ -354,15 +359,15 @@ const FileItemComponent: FC<{
     <AccessibleButton
       icon={
         <>
-          <div className={classNames(`${finalPrefixCls}-item-icon`, hashId)}>
+          <div className={classNames(`${prefixCls}-item-icon`, hashId)}>
             {getFileTypeIcon(
               fileTypeInfo.fileType,
               fileWithId.icon,
               fileWithId.name,
             )}
           </div>
-          <div className={classNames(`${finalPrefixCls}-item-info`, hashId)}>
-            <div className={classNames(`${finalPrefixCls}-item-name`, hashId)}>
+          <div className={classNames(`${prefixCls}-item-info`, hashId)}>
+            <div className={classNames(`${prefixCls}-item-name`, hashId)}>
               {fileWithId.renderName ? (
                 fileWithId.renderName(renderContext)
               ) : (
@@ -376,7 +381,7 @@ const FileItemComponent: FC<{
             fileWithId.size ||
             fileWithId.lastModified) && (
             <div
-              className={classNames(`${finalPrefixCls}-item-details`, hashId)}
+              className={classNames(`${prefixCls}-item-details`, hashId)}
             >
               {fileWithId.renderDetails ? (
                 fileWithId.renderDetails(renderContext)
@@ -385,7 +390,7 @@ const FileItemComponent: FC<{
                   {fileTypeInfo.displayType && (
                     <span
                       className={classNames(
-                        `${finalPrefixCls}-item-type`,
+                        `${prefixCls}-item-type`,
                         hashId,
                       )}
                     >
@@ -397,7 +402,7 @@ const FileItemComponent: FC<{
                       {fileTypeInfo.displayType && (
                         <span
                           className={classNames(
-                            `${finalPrefixCls}-item-separator`,
+                            `${prefixCls}-item-separator`,
                             hashId,
                           )}
                         >
@@ -406,7 +411,7 @@ const FileItemComponent: FC<{
                       )}
                       <span
                         className={classNames(
-                          `${finalPrefixCls}-item-size`,
+                          `${prefixCls}-item-size`,
                           hashId,
                         )}
                       >
@@ -419,7 +424,7 @@ const FileItemComponent: FC<{
                       {(fileTypeInfo.displayType || fileWithId.size) && (
                         <span
                           className={classNames(
-                            `${finalPrefixCls}-item-separator`,
+                            `${prefixCls}-item-separator`,
                             hashId,
                           )}
                         >
@@ -428,7 +433,7 @@ const FileItemComponent: FC<{
                       )}
                       <span
                         className={classNames(
-                          `${finalPrefixCls}-item-time`,
+                          `${prefixCls}-item-time`,
                           hashId,
                         )}
                       >
@@ -442,7 +447,7 @@ const FileItemComponent: FC<{
           )}
           </div>
           <div
-            className={classNames(`${finalPrefixCls}-item-actions`, hashId)}
+            className={classNames(`${prefixCls}-item-actions`, hashId)}
             onClick={(e) => e.stopPropagation()}
           >
             {fileWithId.renderActions ? (
@@ -460,27 +465,25 @@ const FileItemComponent: FC<{
       }
       onClick={handleClick}
       className={classNames(
-        `${finalPrefixCls}-item`,
-        { [`${finalPrefixCls}-item-disabled`]: isDisabled },
+        `${prefixCls}-item`,
+        { [`${prefixCls}-item-disabled`]: isDisabled },
         hashId,
       )}
       ariaLabel={`${locale?.['workspace.file'] || '文件'}：${fileWithId.name}`}
       id={bindDomId ? fileWithId.id : undefined}
     />
   );
-};
+});
 
 // 分组标题栏组件
 const GroupHeader: FC<{
   group: GroupNode;
   onToggle?: (groupId: string, type: FileType, collapsed: boolean) => void;
   onGroupDownload?: (files: FileNode[], groupType: FileType) => void;
-  prefixCls?: string;
-  hashId?: string;
-}> = ({ group, onToggle, onGroupDownload, prefixCls, hashId }) => {
-  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
-  const { locale } = useContext(I18nContext);
-  const finalPrefixCls = prefixCls || getPrefixCls('workspace-file');
+  prefixCls: string;
+  hashId: string;
+  locale?: any;
+}> = React.memo(({ group, onToggle, onGroupDownload, prefixCls, hashId, locale }) => {
   const groupTypeInfo = fileTypeProcessor.inferFileType(group);
   const groupType = group.type || groupTypeInfo.fileType;
 
@@ -521,19 +524,19 @@ const GroupHeader: FC<{
         <>
           <div
             className={classNames(
-              `${finalPrefixCls}-group-header-left`,
+              `${prefixCls}-group-header-left`,
               hashId,
             )}
           >
             <CollapseIcon
               className={classNames(
-                `${finalPrefixCls}-group-toggle-icon`,
+                `${prefixCls}-group-toggle-icon`,
                 hashId,
               )}
             />
             <div
               className={classNames(
-                `${finalPrefixCls}-group-type-icon`,
+                `${prefixCls}-group-type-icon`,
                 hashId,
               )}
             >
@@ -541,7 +544,7 @@ const GroupHeader: FC<{
             </div>
             <span
               className={classNames(
-                `${finalPrefixCls}-group-type-name`,
+                `${prefixCls}-group-type-name`,
                 hashId,
               )}
             >
@@ -550,12 +553,12 @@ const GroupHeader: FC<{
           </div>
           <div
             className={classNames(
-              `${finalPrefixCls}-group-header-right`,
+              `${prefixCls}-group-header-right`,
               hashId,
             )}
           >
             <span
-              className={classNames(`${finalPrefixCls}-group-count`, hashId)}
+              className={classNames(`${prefixCls}-group-count`, hashId)}
             >
               {group.children.length}
             </span>
@@ -565,7 +568,7 @@ const GroupHeader: FC<{
                 onClick={handleDownload}
                 tooltipProps={{ mouseEnterDelay: 0.3 }}
                 className={classNames(
-                  `${finalPrefixCls}-group-action-btn`,
+                  `${prefixCls}-group-action-btn`,
                   hashId,
                 )}
               >
@@ -576,11 +579,11 @@ const GroupHeader: FC<{
         </>
       }
       onClick={handleToggle}
-      className={classNames(`${finalPrefixCls}-group-header`, hashId)}
+      className={classNames(`${prefixCls}-group-header`, hashId)}
       ariaLabel={`${group.collapsed ? locale?.['workspace.expand'] || '展开' : locale?.['workspace.collapse'] || '收起'}${group.name}${locale?.['workspace.group'] || '分组'}`}
     />
   );
-};
+});
 
 // 文件分组组件
 const FileGroupComponent: FC<{
@@ -595,10 +598,11 @@ const FileGroupComponent: FC<{
     ctx?: { anchorEl?: HTMLElement; origin: 'list' | 'preview' },
   ) => void;
   onLocate?: (file: FileNode) => void;
-  prefixCls?: string;
-  hashId?: string;
+  prefixCls: string;
+  hashId: string;
+  locale?: any;
   bindDomId?: boolean;
-}> = ({
+}> = React.memo(({
   group,
   onToggle,
   onGroupDownload,
@@ -609,10 +613,34 @@ const FileGroupComponent: FC<{
   onLocate,
   prefixCls,
   hashId,
+  locale,
   bindDomId,
 }) => {
-  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
-  const finalPrefixCls = prefixCls || getPrefixCls('workspace-file');
+  const [visibleCount, setVisibleCount] = useState(GROUP_INITIAL_PAGE_SIZE);
+
+  // 分组数据变化时重置分页，避免切换数据源后一次性展示过多节点
+  useEffect(() => {
+    setVisibleCount(GROUP_INITIAL_PAGE_SIZE);
+  }, [group.id, group.children.length]);
+
+  const totalCount = group.children.length;
+  const visibleFiles = group.children.slice(0, visibleCount);
+  const remainingCount = totalCount - visibleCount;
+  const hasMore = remainingCount > 0;
+
+  const handleShowMore = useRefFunction((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
+  });
+
+  const handleShowMoreKeyDown = useRefFunction((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      setVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
+    }
+  });
+
   const contentVariants = useMemo(
     () => ({
       expanded: {
@@ -640,14 +668,23 @@ const FileGroupComponent: FC<{
     }),
     [],
   );
+
+  const showMoreLabel = hasMore
+    ? compileTemplate(
+        locale?.['workspace.file.showMore'] || '查看更多（还有 ${count} 个）',
+        { count: String(remainingCount) },
+      )
+    : (locale?.['workspace.file.showMoreFiles'] || '查看更多文件');
+
   return (
-    <div className={classNames(`${finalPrefixCls}-container--group`, hashId)}>
+    <div className={classNames(`${prefixCls}-container--group`, hashId)}>
       <GroupHeader
         group={group}
         onToggle={onToggle}
         onGroupDownload={onGroupDownload}
-        prefixCls={finalPrefixCls}
+        prefixCls={prefixCls}
         hashId={hashId}
+        locale={locale}
       />
       <AnimatePresence initial={false}>
         {!group.collapsed && (
@@ -658,9 +695,9 @@ const FileGroupComponent: FC<{
             animate="expanded"
             exit="collapsed"
             transition={contentTransition}
-            className={classNames(`${finalPrefixCls}-group-content`, hashId)}
+            className={classNames(`${prefixCls}-group-content`, hashId)}
           >
-            {group.children.map((file) => (
+            {visibleFiles.map((file) => (
               <FileItemComponent
                 key={file.id}
                 file={file}
@@ -669,17 +706,30 @@ const FileGroupComponent: FC<{
                 onPreview={onPreview}
                 onShare={onShare}
                 onLocate={onLocate}
-                prefixCls={finalPrefixCls}
+                prefixCls={prefixCls}
                 hashId={hashId}
+                locale={locale}
                 bindDomId={!!bindDomId}
               />
             ))}
+            {hasMore && (
+              <div
+                role="button"
+                tabIndex={0}
+                className={classNames(`${prefixCls}-show-more`, hashId)}
+                onClick={handleShowMore}
+                onKeyDown={handleShowMoreKeyDown}
+                aria-label={showMoreLabel}
+              >
+                {showMoreLabel}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
-};
+});
 
 export const FileComponent: FC<{
   nodes: FileProps['nodes'];
@@ -765,6 +815,14 @@ export const FileComponent: FC<{
   const [collapsedGroups, setCollapsedGroups] = useState<
     Record<string, boolean>
   >({});
+  // 扁平文件列表（非分组模式）分页状态
+  const [flatVisibleCount, setFlatVisibleCount] = useState(GROUP_INITIAL_PAGE_SIZE);
+
+  // nodes 或 keyword 变化时重置扁平列表分页，避免切换数据源后一次性渲染过多节点
+  useEffect(() => {
+    setFlatVisibleCount(GROUP_INITIAL_PAGE_SIZE);
+  }, [nodes, keyword]);
+
   // 追踪预览请求的序号，避免异步竞态
   const previewRequestIdRef = useRef(0);
   // 缓存节点 ID，避免每次渲染重新生成（使用 WeakMap 自动清理不再使用的节点）
@@ -782,7 +840,7 @@ export const FileComponent: FC<{
   const { wrapSSR, hashId } = useFileStyle(prefixCls);
 
   // 确保节点有稳定的唯一 ID（使用缓存）
-  const ensureNodeWithStableId = <T extends FileNode | GroupNode>(
+  const ensureNodeWithStableId = useRefFunction(<T extends FileNode | GroupNode>(
     node: T,
   ): T => {
     if (node.id) return { ...node };
@@ -799,17 +857,17 @@ export const FileComponent: FC<{
       ...node,
       id: cachedId,
     };
-  };
+  });
 
   // 返回列表（供预览页调用）
-  const handleBackToList = () => {
+  const handleBackToList = useRefFunction(() => {
     // 使进行中的预览请求失效
     previewRequestIdRef.current++;
     setPreviewFile(null);
     setCustomPreviewContent(null);
     setCustomPreviewHeader(null);
     setHeaderFileOverride(null);
-  };
+  });
 
   // 监听 resetKey 变化，重置预览状态
   useEffect(() => {
@@ -854,7 +912,7 @@ export const FileComponent: FC<{
   }, [nodes]);
 
   // 处理分组折叠/展开
-  const handleToggleGroup = (
+  const handleToggleGroup = useRefFunction((
     groupId: string,
     type: FileType,
     collapsed: boolean,
@@ -870,10 +928,10 @@ export const FileComponent: FC<{
     } else if (onToggleGroup) {
       onToggleGroup(type, collapsed);
     }
-  };
+  });
 
   // 包装后的返回逻辑，允许外部拦截
-  const handleBack = async () => {
+  const handleBack = useRefFunction(async () => {
     if (previewFile) {
       try {
         const result = await (onBack?.(previewFile) as any);
@@ -883,10 +941,10 @@ export const FileComponent: FC<{
       }
     }
     handleBackToList();
-  };
+  });
 
   // 预览页面的下载（供预览页调用）
-  const handleDownloadInPreview = (file: FileNode) => {
+  const handleDownloadInPreview = useRefFunction((file: FileNode) => {
     // 优先使用用户传入的下载方法
     if (onDownload) {
       onDownload(file);
@@ -894,10 +952,10 @@ export const FileComponent: FC<{
     }
 
     handleFileDownload(file);
-  };
+  });
 
   // 预览文件处理
-  const handlePreview = async (file: FileNode) => {
+  const handlePreview = useRefFunction(async (file: FileNode) => {
     // 如果用户提供了预览方法，尝试使用用户的方法
     if (onPreview) {
       const currentCallId = ++previewRequestIdRef.current;
@@ -978,7 +1036,7 @@ export const FileComponent: FC<{
     }
     setCustomPreviewContent(null);
     setPreviewFile(file);
-  };
+  });
 
   // 通过 actionRef 暴露可编程接口
   React.useEffect(() => {
@@ -1003,7 +1061,7 @@ export const FileComponent: FC<{
   const hasKeyword = Boolean((keyword ?? '').trim());
 
   // 渲染搜索框组件 - 确保在所有情况下都保持一致
-  const renderSearchInput = () => {
+  const renderSearchInput = useRefFunction(() => {
     if (!showSearch) return null;
     return (
       <SearchInput
@@ -1015,10 +1073,10 @@ export const FileComponent: FC<{
         locale={locale}
       />
     );
-  };
+  });
 
   // 渲染空状态内容
-  const renderEmptyContent = () => {
+  const renderEmptyContent = useRefFunction(() => {
     if (hasKeyword) {
       return (
         <Typography.Text type="secondary">
@@ -1039,7 +1097,118 @@ export const FileComponent: FC<{
         <Empty description={locale?.['workspace.empty'] || 'No data'} />
       )
     );
-  };
+  });
+
+  const handleFlatShowMore = useRefFunction(() => {
+    setFlatVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
+  });
+
+  const handleFlatShowMoreKeyDown = useRefFunction((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleFlatShowMore();
+    }
+  });
+
+  // 渲染文件内容
+  const renderFileContent = useRefFunction(() => {
+    if ((!nodes || nodes.length === 0) && !loading) {
+      return (
+        <div className={classNames(`${prefixCls}-empty`, hashId)}>
+          {renderEmptyContent()}
+        </div>
+      );
+    }
+
+    if (safeNodes.length === 0) {
+      return (
+        <div className={classNames(`${prefixCls}-empty`, hashId)}>
+          {renderEmptyContent()}
+        </div>
+      );
+    }
+
+    // Determine whether this is a purely flat list (no groups) so we can paginate
+    const isFlat = safeNodes.every((n) => !('children' in n));
+    const nodesToRender = isFlat
+      ? safeNodes.slice(0, flatVisibleCount)
+      : safeNodes;
+    const flatRemaining = isFlat
+      ? safeNodes.length - flatVisibleCount
+      : 0;
+    const flatHasMore = flatRemaining > 0;
+
+    const items = nodesToRender.map((node: FileNode | GroupNode) => {
+      const nodeWithId = ensureNodeWithStableId(node);
+
+      if ('children' in nodeWithId) {
+        // 分组节点，使用内部状态覆盖外部的 collapsed 属性
+        const groupNode: GroupNode = {
+          ...nodeWithId,
+          collapsed: collapsedGroups[nodeWithId.id!] ?? nodeWithId.collapsed,
+          // 确保子节点也有唯一ID
+          children: nodeWithId.children.map(ensureNodeWithStableId),
+        };
+        return (
+          <FileGroupComponent
+            key={nodeWithId.id}
+            group={groupNode}
+            onToggle={handleToggleGroup}
+            onGroupDownload={onGroupDownload}
+            onDownload={onDownload}
+            onFileClick={onFileClick}
+            onPreview={handlePreview}
+            onShare={onShare}
+            onLocate={onLocate}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            locale={locale}
+            bindDomId={bindDomId}
+          />
+        );
+      }
+
+      // 文件节点
+      return (
+        <FileItemComponent
+          key={nodeWithId.id}
+          file={nodeWithId as FileNode}
+          onClick={onFileClick}
+          onDownload={onDownload}
+          onShare={onShare}
+          onPreview={handlePreview}
+          onLocate={onLocate}
+          prefixCls={prefixCls}
+          hashId={hashId}
+          locale={locale}
+          bindDomId={bindDomId}
+        />
+      );
+    });
+
+    if (!flatHasMore) return items;
+
+    const flatShowMoreLabel = compileTemplate(
+      locale?.['workspace.file.showMore'] || '查看更多（还有 ${count} 个）',
+      { count: String(flatRemaining) },
+    );
+
+    return (
+      <>
+        {items}
+        <div
+          role="button"
+          tabIndex={0}
+          className={classNames(`${prefixCls}-show-more`, hashId)}
+          onClick={handleFlatShowMore}
+          onKeyDown={handleFlatShowMoreKeyDown}
+          aria-label={flatShowMoreLabel}
+        >
+          {flatShowMoreLabel}
+        </div>
+      </>
+    );
+  });
 
   // 图片预览组件
   const ImagePreviewComponent = (
@@ -1088,71 +1257,6 @@ export const FileComponent: FC<{
       </>
     );
   }
-
-  // 渲染文件内容
-  const renderFileContent = () => {
-    if ((!nodes || nodes.length === 0) && !loading) {
-      return (
-        <div className={classNames(`${prefixCls}-empty`, hashId)}>
-          {renderEmptyContent()}
-        </div>
-      );
-    }
-
-    if (safeNodes.length === 0) {
-      return (
-        <div className={classNames(`${prefixCls}-empty`, hashId)}>
-          {renderEmptyContent()}
-        </div>
-      );
-    }
-
-    return safeNodes.map((node: FileNode | GroupNode) => {
-      const nodeWithId = ensureNodeWithStableId(node);
-
-      if ('children' in nodeWithId) {
-        // 分组节点，使用内部状态覆盖外部的 collapsed 属性
-        const groupNode: GroupNode = {
-          ...nodeWithId,
-          collapsed: collapsedGroups[nodeWithId.id!] ?? nodeWithId.collapsed,
-          // 确保子节点也有唯一ID
-          children: nodeWithId.children.map(ensureNodeWithStableId),
-        };
-        return (
-          <FileGroupComponent
-            key={nodeWithId.id}
-            group={groupNode}
-            onToggle={handleToggleGroup}
-            onGroupDownload={onGroupDownload}
-            onDownload={onDownload}
-            onFileClick={onFileClick}
-            onPreview={handlePreview}
-            onShare={onShare}
-            onLocate={onLocate}
-            prefixCls={prefixCls}
-            hashId={hashId}
-            bindDomId={bindDomId}
-          />
-        );
-      }
-
-      // 文件节点
-      return (
-        <FileItemComponent
-          key={nodeWithId.id}
-          file={nodeWithId as FileNode}
-          onClick={onFileClick}
-          onDownload={onDownload}
-          onShare={onShare}
-          onPreview={handlePreview}
-          onLocate={onLocate}
-          prefixCls={prefixCls}
-          hashId={hashId}
-          bindDomId={bindDomId}
-        />
-      );
-    });
-  };
 
   // 统一的渲染逻辑 - 确保搜索框位置稳定
   return wrapSSR(

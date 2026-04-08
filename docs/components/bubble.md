@@ -235,6 +235,61 @@ export default () => (
         <SuggestionList items={items} onItemClick={() => alert('ask')} />
       </div>
     </Card>
+
+    <Card title="媒体消息">
+      <Bubble
+        style={{
+          flex: 1,
+        }}
+        pure
+        {...props}
+        originData={{
+          id: '1',
+          content: `有几个人\n\`\`\`agentic-ui-filemap
+{
+    "fileList": [
+        {
+            "uuid": "1775017476829",
+            "name": "images_q75.webp",
+            url:"https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original",
+            "size": 140528,
+            "type": "image/webp",
+        },
+        {
+            "uuid": "1775017477422.~tplv-dy-aweme-images_q75.webp",
+            "name": "~tplv-dy-aweme-images_q75.webp",
+            "size": 93720,
+            url:"https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original",
+            "type": "image/webp",
+         
+        },
+        {
+            "uuid": "1775017477211.~tplv-dy-aweme-images_q75.webp",
+            "name": "~tplv-dy-aweme-images_q75.webp",
+            url:"https://mdn.alipayobjects.com/huamei_gcee1x/afts/img/A*rhTwTY6FkwIAAAAAAAAAAAAADml6AQ/original",
+            "size": 124462,
+            "type": "image/webp",
+           
+        },
+        {
+            "uuid": "1775017477404.~tplv-dy-aweme-images_q75.webp",
+            "name": "~tplv-dy-aweme-images_q75.webp",
+            url:"https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original",
+            "size": 108864,
+            "type": "image/webp",
+           
+        }
+    ]
+}
+\`\`\``,
+          createAt: Date.now(),
+          updateAt: Date.now(),
+          meta: { avatar: '...', title: 'AI 助手' },
+        }}
+        avatar={{ avatar: '...', title: 'AI 助手' }}
+        placement="left"
+      />
+    </Card>
   </div>
 );
 ```
@@ -261,27 +316,15 @@ export default () => (
 
 ### 基础功能展示
 
-展示气泡组件的基础功能，包括消息布局、加载状态、文件附件和交互操作。
+展示气泡组件的基础功能，包括消息布局、文件附件和交互操作（列表/流式加载请用 `isLoading` 等当前 API，勿使用已废弃的 `loading`）。
 
 <code src="../demos/bubble/basic.tsx">基础用法 - 消息布局与交互</code>
-
-### 消息加载状态演示
-
-演示 Bubble 组件的消息加载状态功能，包括消息生成时的加载效果和交互控制。
-
-<code src="../demos/bubble/message-loading-demo.tsx">消息加载状态</code>
 
 ### 思考中（DOM 轻量加载）演示
 
 演示 “思考中...” 分支的纯 DOM 渲染结构（dots 动效），以及 `bubbleLoadingIconClassName` / `bubbleLoadingIconStyle` 的定制入口。
 
 <code src="../demos/bubble/thinking-dom-demo.tsx">思考中 DOM 加载态</code>
-
-### 文件加载状态演示
-
-演示 Bubble 组件的文件上传加载状态功能，包括文件处理时的加载效果和文件类型支持。
-
-<code src="../demos/bubble/file-loading-demo.tsx">文件上传加载状态</code>
 
 ### 标题自定义渲染
 
@@ -369,9 +412,9 @@ export default () => (
 
 ### BubbleList 懒加载
 
-演示 BubbleList 组件的懒加载功能，包含 200 条消息，展示如何通过懒加载提升长列表的渲染性能。只有进入视口的气泡才会被渲染，减少初始 DOM 节点数量。
+演示 BubbleList 组件的懒加载功能（示例约 48 条消息），展示如何通过懒加载提升长列表的渲染性能。只有进入视口的气泡才会被渲染，减少初始 DOM 节点数量。
 
-<code src="../demos/bubble/bubblelist-lazy-demo.tsx">BubbleList 懒加载 - 200条消息</code>
+<code src="../demos/bubble/bubblelist-lazy-demo.tsx">BubbleList 懒加载</code>
 
 ## 📖 API 参考
 
@@ -379,8 +422,8 @@ export default () => (
 
 #### 核心属性
 
-| 属性       | 说明                   | 类型                | 默认值   | 废弃版本 |
-| ---------- | ---------------------- | ------------------- | -------- | -------- |
+| 属性       | 说明                   | 类型                | 默认值   | 版本 |
+| ---------- | ---------------------- | ------------------- | -------- | ---- |
 | originData | 消息的原始数据         | `MessageBubbleData` | -        | -        |
 | avatar     | 头像元数据配置         | `BubbleMetaData`    | -        | -        |
 | placement  | 消息布局位置           | `'left' \| 'right'` | `'left'` | -        |
@@ -390,23 +433,23 @@ export default () => (
 
 #### 样式配置
 
-| 属性      | 说明             | 类型                  | 默认值 |
-| --------- | ---------------- | --------------------- | ------ |
-| className | 自定义 CSS 类名  | `string`              | -      |
-| style     | 自定义内联样式   | `React.CSSProperties` | -      |
-| styles    | 详细样式配置对象 | `BubbleStylesConfig`  | -      |
+| 属性      | 说明             | 类型                  | 默认值 | 版本 |
+| --------- | ---------------- | --------------------- | ------ | ---- |
+| className | 自定义 CSS 类名  | `string`              | -      | -    |
+| style     | 自定义内联样式   | `React.CSSProperties` | -      | -    |
+| styles    | 详细样式配置对象 | `BubbleStylesConfig`  | -      | -    |
 
 #### 渲染配置
 
-| 属性                 | 说明              | 类型                  | 默认值 |
-| -------------------- | ----------------- | --------------------- | ------ |
-| bubbleRenderConfig   | 自定义渲染配置    | `BubbleRenderConfig`  | -      |
-| markdownRenderConfig | Markdown 渲染配置 | `MarkdownEditorProps` | -      |
+| 属性                 | 说明              | 类型                  | 默认值 | 版本 |
+| -------------------- | ----------------- | --------------------- | ------ | ---- |
+| bubbleRenderConfig   | 自定义渲染配置    | `BubbleRenderConfig`  | -      | -    |
+| markdownRenderConfig | Markdown 渲染配置 | `MarkdownEditorProps` | -      | -    |
 
 #### 交互回调
 
-| 属性             | 说明                                | 类型                                  | 默认值 | 废弃版本 |
-| ---------------- | ----------------------------------- | ------------------------------------- | ------ | -------- |
+| 属性             | 说明                                | 类型                                  | 默认值 | 版本 |
+| ---------------- | ----------------------------------- | ------------------------------------- | ------ | ---- |
 | onLike           | 点赞回调函数                        | `(bubble: MessageBubbleData) => void` | -      | -        |
 | onDislike        | 点踩回调函数（符合命名规范）        | `(bubble: MessageBubbleData) => void` | -      | -        |
 | ~~onDisLike~~    | 已废弃，请使用 `onDislike`          | `(bubble: MessageBubbleData) => void` | -      | 2.29.0   |
@@ -421,8 +464,8 @@ export default () => (
 
 #### 核心属性
 
-| 属性          | 说明                       | 类型                  | 默认值  | 废弃版本 |
-| ------------- | -------------------------- | --------------------- | ------- | -------- |
+| 属性          | 说明                       | 类型                  | 默认值  | 版本 |
+| ------------- | -------------------------- | --------------------- | ------- | ---- |
 | bubbleList    | 消息列表数据               | `MessageBubbleData[]` | `[]`    | -        |
 | assistantMeta | AI 助手元数据              | `BubbleMetaData`      | -       | -        |
 | userMeta      | 用户元数据                 | `BubbleMetaData`      | -       | -        |
@@ -432,13 +475,13 @@ export default () => (
 
 #### 引用和样式
 
-| 属性          | 说明            | 类型                                       | 默认值 |
-| ------------- | --------------- | ------------------------------------------ | ------ |
-| bubbleListRef | 列表容器引用    | `MutableRefObject<HTMLDivElement>`         | -      |
-| bubbleRef     | 气泡组件引用    | `MutableRefObject<BubbleImperativeHandle>` | -      |
-| className     | 自定义 CSS 类名 | `string`                                   | -      |
-| style         | 自定义内联样式  | `React.CSSProperties`                      | -      |
-| styles        | 详细样式配置    | `BubbleListStylesConfig`                   | -      |
+| 属性          | 说明            | 类型                                       | 默认值 | 版本 |
+| ------------- | --------------- | ------------------------------------------ | ------ | ---- |
+| bubbleListRef | 列表容器引用    | `MutableRefObject<HTMLDivElement>`         | -      | -    |
+| bubbleRef     | 气泡组件引用    | `MutableRefObject<BubbleImperativeHandle>` | -      | -    |
+| className     | 自定义 CSS 类名 | `string`                                   | -      | -    |
+| style         | 自定义内联样式  | `React.CSSProperties`                      | -      | -    |
+| styles        | 详细样式配置    | `BubbleListStylesConfig`                   | -      | -    |
 
 ### 核心数据类型
 
@@ -531,8 +574,8 @@ interface BubbleSlotStyles {
 
 #### AI 气泡属性
 
-| 属性              | 说明                           | 类型          | 默认值 | 废弃版本 |
-| ----------------- | ------------------------------ | ------------- | ------ | -------- |
+| 属性              | 说明                           | 类型          | 默认值 | 版本 |
+| ----------------- | ------------------------------ | ------------- | ------ | ---- |
 | aiBubbleProps     | AI 气泡的属性配置              | `BubbleProps` | -      | -        |
 | ~~aIBubbleProps~~ | 已废弃，请使用 `aiBubbleProps` | `BubbleProps` | -      | 2.30.0   |
 
@@ -754,9 +797,9 @@ const App = () => (
 
 #### 配置选项
 
-| 属性         | 类型                             | 说明                         | 默认值      |
-| ------------ | -------------------------------- | ---------------------------- | ----------- |
-| `preMessage` | `MessageBubbleData \| undefined` | 前一条消息数据，用于角色比较 | `undefined` |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| `preMessage` | 前一条消息数据，用于角色比较 | `MessageBubbleData \| undefined` | `undefined` | - |
 
 #### 注意事项
 

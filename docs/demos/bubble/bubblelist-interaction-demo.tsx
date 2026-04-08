@@ -28,7 +28,7 @@ const createMockMessage = (
   } as BubbleMetaData,
 });
 
-// 示例消息
+// 初始会话（多轮技术问答，便于演示点赞 / 回复 / 双击等）
 const sampleMessages: MessageBubbleData[] = [
   createMockMessage(
     '1',

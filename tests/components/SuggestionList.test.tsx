@@ -363,4 +363,28 @@ describe('SuggestionList 组件', () => {
 
     expect(asyncOnItemClick).toHaveBeenCalled();
   });
+
+  it('当项 text 非字符串时 label 为 undefined，onItemClick 收到空字符串', async () => {
+    const handleClick = vi.fn();
+    const items = [{ key: '1', text: 123 as unknown as string }];
+
+    render(<SuggestionList items={items} onItemClick={handleClick} />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /选择建议：追问/ }));
+      await Promise.resolve();
+    });
+
+    expect(handleClick).toHaveBeenCalledWith('');
+  });
+
+  it('带 tooltip 时 OverflowTooltip 传入 forceShow 与 title', () => {
+    const { container } = render(
+      <SuggestionList
+        items={[{ key: '1', text: '短', tooltip: '完整提示' }]}
+      />,
+    );
+
+    expect(container.querySelector('.ant-follow-up-label')).toBeTruthy();
+  });
 });

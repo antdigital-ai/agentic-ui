@@ -1,9 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`Schema - BubbleConfigContext 功能 > 应该支持 agentar-card 语言类型的特殊处理 1`] = `
-<div
-  class="schemaRenderer"
-  data-testid="schema-renderer"
-  style="font-size: 14px; line-height: 1.6; width: max-content; margin: 1em;"
-/>
-`;

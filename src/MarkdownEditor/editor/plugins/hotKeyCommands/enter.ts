@@ -86,6 +86,12 @@ export class EnterKey {
         return;
       }
 
+      if (el.type === 'code') {
+        Transforms.insertText(this.editor, '\n');
+        e.preventDefault();
+        return;
+      }
+
       if (el.type === 'break') {
         Transforms.insertNodes(this.editor, {
           type: 'paragraph',

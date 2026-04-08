@@ -1,4 +1,7 @@
-﻿import { ThoughtChainList } from '@ant-design/agentic-ui';
+/**
+ * 与 ThoughtChainList.tsx 展示场景重叠，用于本地调试；文档站见 ThoughtChainList.tsx。
+ */
+import { ThoughtChainList } from '@ant-design/agentic-ui';
 import React from 'react';
 
 export default function Home() {
@@ -13,7 +16,7 @@ export default function Home() {
       }}
     >
       <ThoughtChainList
-        loading={false}
+        isLoading={false}
         thoughtChainList={[
           {
             category: 'TableSql',
@@ -127,7 +130,8 @@ export default function Home() {
         <h4>Props 说明</h4>
         <ul>
           <li>
-            <code>loading</code> - 加载状态，设置为 false 表示已加载完成
+            <code>isLoading</code> - 加载状态，设置为 false 表示已加载完成（勿使用已废弃的{' '}
+            <code>loading</code>）
           </li>
           <li>
             <code>thoughtChainList</code> -

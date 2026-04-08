@@ -27,11 +27,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-vertical': {
         display: 'flex',
-        flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'flex-start',
         gap: 4,
-        padding: 0,
+        padding: 2,
         maxWidth: 'calc(285px * 3 + 4px * 2)', // 3列：每列285px，间距4px
         '& > :only-child': {
           marginTop: 8,
@@ -176,6 +175,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-more-file-name': {
         font: 'var(--font-size-h6)',
         color: 'var(--color-gray-text-secondary)',
+      },
+      '&-title': {
+        width: '100%',
+        color: 'var(--color-gray-text-light)',
+        font: 'var(--font-text-body-sm)',
+        lineHeight: '20px',
+        marginBottom: 2,
       },
       '&-item': {
         width: '285px',

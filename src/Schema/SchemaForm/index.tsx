@@ -12,7 +12,7 @@ import React, {
   useEffect,
   useMemo,
 } from 'react';
-import { I18nContext } from '../../I18n';
+import { I18nContext, compileTemplate } from '../../I18n';
 import { LowCodeSchema, SchemaProperty } from '../types';
 
 export interface SchemaFormProps {
@@ -103,21 +103,21 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
           pattern: new RegExp(property.pattern),
           message:
             property.patternMessage ||
-            `${property.title || property.description || ''}格式不正确`,
+            `${property.title || property.description || ''}${locale?.['schemaForm.invalidFormat'] || '格式不正确'}`,
         });
       }
 
       if (property.type === 'number') {
         rules.push({
           type: 'number',
-          message: `${property.title || property.description || ''}必须是数字`,
+          message: `${property.title || property.description || ''}${locale?.['schemaForm.mustBeNumber'] || '必须是数字'}`,
         });
 
         if (typeof property.minimum === 'number') {
           rules.push({
             type: 'number',
             min: property.minimum,
-            message: `${property.title || property.description || ''}不能小于 ${property.minimum}`,
+            message: `${property.title || property.description || ''}${compileTemplate(locale?.['schemaForm.minValue'] || '不能小于 ${min}', { min: String(property.minimum) })}`,
           });
         }
 
@@ -125,7 +125,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
           rules.push({
             type: 'number',
             max: property.maximum,
-            message: `${property.title || property.description || ''}不能大于 ${property.maximum}`,
+            message: `${property.title || property.description || ''}${compileTemplate(locale?.['schemaForm.maxValue'] || '不能大于 ${max}', { max: String(property.maximum) })}`,
           });
         }
       }
@@ -135,7 +135,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
           rules.push({
             type: 'array',
             min: property.minItems,
-            message: `${property.title || property.description || ''}至少需要 ${property.minItems} 项`,
+            message: `${property.title || property.description || ''}${compileTemplate(locale?.['schemaForm.minItems'] || '至少需要 ${min} 项', { min: String(property.minItems) })}`,
           });
         }
 
@@ -143,7 +143,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
           rules.push({
             type: 'array',
             max: property.maxItems,
-            message: `${property.title || property.description || ''}最多只能有 ${property.maxItems} 项`,
+            message: `${property.title || property.description || ''}${compileTemplate(locale?.['schemaForm.maxItems'] || '最多只能有 ${max} 项', { max: String(property.maxItems) })}`,
           });
         }
       }
@@ -294,7 +294,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
                     block
                     icon={<Plus />}
                   >
-                    添加 {getPropertyTitle(property, key)}
+                    {locale?.['schemaForm.addItem'] || '添加'} {getPropertyTitle(property, key)}
                   </Button>
                 </Form.Item>
               )}
@@ -303,7 +303,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
         </Form.List>
       );
     },
-    [readonly, renderArrayItemContent, getPropertyTitle],
+    [readonly, renderArrayItemContent, getPropertyTitle, locale],
   );
 
   // 渲染对象表单项

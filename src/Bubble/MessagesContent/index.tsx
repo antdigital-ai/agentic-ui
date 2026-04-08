@@ -284,7 +284,7 @@ export const BubbleMessageDisplay: React.FC<
             extra={extra}
             typing={false}
             originData={props.originData}
-            content={props.originData?.content as string}
+            content={content as string}
           />
         </div>,
       );
@@ -468,10 +468,10 @@ export const BubbleMessageDisplay: React.FC<
         content={
           props.originData?.isFinished &&
           props?.originData?.extra?.answerStatus === 'EXCEPTION'
-            ? (props.originData?.content as string) ||
+            ? (content as string) ||
               locale?.['chat.message.generateFailed'] ||
               '生成回答失败，请重试'
-            : (props.originData?.content as string) || ''
+            : (content as string) || ''
         }
         originData={props.originData}
       />,

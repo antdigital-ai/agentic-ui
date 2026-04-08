@@ -39,24 +39,24 @@ export default () => (
 
 ### ActionIconBoxProps
 
-| 参数            | 说明                                                    | 类型                                                           | 默认值    |
-| --------------- | ------------------------------------------------------- | -------------------------------------------------------------- | --------- |
-| children        | 图标内容                                                | `React.ReactNode \| ((isHovered: boolean) => React.ReactNode)` | -         |
-| title           | 按钮标题和工具提示文本                                  | `React.ReactNode`                                              | -         |
-| showTitle       | 是否显示标题文本                                        | `boolean`                                                      | `false`   |
-| onClick         | 点击回调函数                                            | `(e: any) => void`                                             | -         |
-| isLoading       | 加载状态                                                | `boolean`                                                      | `false`   |
-| loading         | **已废弃**，请使用 `isLoading`                          | `boolean`                                                      | `false`   |
-| type            | 按钮类型                                                | `'danger' \| 'primary'`                                        | -         |
-| active          | 是否处于激活状态                                        | `boolean`                                                      | `false`   |
-| disabled        | 是否禁用（虽然 Props 定义中未显式包含，但部分逻辑支持） | `boolean`                                                      | -         |
-| tooltipProps    | 工具提示配置                                            | `TooltipProps`                                                 | -         |
-| className       | 自定义 CSS 类名                                         | `string`                                                       | -         |
-| style           | 自定义样式                                              | `React.CSSProperties`                                          | -         |
-| iconStyle       | 图标样式                                                | `React.CSSProperties`                                          | -         |
-| borderLess      | 是否无边框样式                                          | `boolean`                                                      | `false`   |
-| noPadding       | 是否无内边距                                            | `boolean`                                                      | `false`   |
-| transform       | 是否启用变换效果                                        | `boolean`                                                      | `false`   |
-| theme           | 主题                                                    | `'light' \| 'dark'`                                            | `'light'` |
-| onInit          | 初始化回调函数                                          | `() => void`                                                   | -         |
-| onLoadingChange | 加载状态变更回调                                        | `(loading: boolean) => void`                                   | -         |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| children | 图标内容 | `React.ReactNode \| ((isHovered: boolean) => React.ReactNode)` | - | - |
+| title | 按钮标题和工具提示文本 | `React.ReactNode` | - | - |
+| showTitle | 是否显示标题文本 | `boolean` | `false` | - |
+| onClick | 点击回调函数 | `(e: any) => void` | - | - |
+| isLoading | 加载状态 | `boolean` | `false` | - |
+| loading | **已废弃**，请使用 `isLoading` | `boolean` | `false` | - |
+| type | 按钮类型 | `'danger' \| 'primary'` | - | - |
+| active | 是否处于激活状态 | `boolean` | `false` | - |
+| disabled | 是否禁用（虽然 Props 定义中未显式包含，但部分逻辑支持） | `boolean` | - | - |
+| tooltipProps | 工具提示配置 | `TooltipProps` | - | - |
+| className | 自定义 CSS 类名 | `string` | - | - |
+| style | 自定义样式 | `React.CSSProperties` | - | - |
+| iconStyle | 图标样式 | `React.CSSProperties` | - | - |
+| borderLess | 是否无边框样式 | `boolean` | `false` | - |
+| noPadding | 是否无内边距 | `boolean` | `false` | - |
+| transform | 是否启用变换效果 | `boolean` | `false` | - |
+| theme | 主题 | `'light' \| 'dark'` | `'light'` | - |
+| onInit | 初始化回调函数 | `() => void` | - | - |
+| onLoadingChange | 加载状态变更回调 | `(loading: boolean) => void` | - | - |

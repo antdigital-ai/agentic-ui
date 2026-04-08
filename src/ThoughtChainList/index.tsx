@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { motion } from 'framer-motion';
 import { merge } from 'lodash-es';
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ActionIconBox } from '../Components/ActionIconBox';
 import { useAutoScroll } from '../Hooks/useAutoScroll';
@@ -28,6 +28,8 @@ import {
   ThoughtChainListProps,
   WhiteBoxProcessInterface,
 } from './types';
+
+const COLLAPSE_ANIMATION_DURATION_MS = 160;
 
 // Initialize dayjs plugins
 try {
@@ -186,9 +188,25 @@ const ThoughtChainContent = React.memo<
     const { containerRef } = useAutoScroll({
       SCROLL_TOLERANCE: 30,
     });
+    const [shouldRenderItems, setShouldRenderItems] = useState(!collapse);
+
+    useEffect(() => {
+      if (!collapse) {
+        setShouldRenderItems(true);
+        return;
+      }
+
+      const timer = window.setTimeout(() => {
+        setShouldRenderItems(false);
+      }, COLLAPSE_ANIMATION_DURATION_MS);
+
+      return () => {
+        window.clearTimeout(timer);
+      };
+    }, [collapse]);
 
     const processedItems = useMemo(() => {
-      if (collapse) return [];
+      if (!shouldRenderItems) return [];
 
       return thoughtChainList.map((item, index) => {
         let info = item.info;
@@ -231,7 +249,7 @@ const ThoughtChainContent = React.memo<
           isFinished?: boolean;
         };
       });
-    }, [thoughtChainList, bubble?.isFinished, collapse]);
+    }, [thoughtChainList, bubble?.isFinished, shouldRenderItems]);
 
     const mergedMarkdownProps = useMemo(
       () =>

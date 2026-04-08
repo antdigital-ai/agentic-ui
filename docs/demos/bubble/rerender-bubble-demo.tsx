@@ -311,7 +311,8 @@ const RerenderBubbleDemo = () => {
             {
               id: 'rerender-bubble-stream',
               role: 'assistant',
-              content: '流式演示一下',
+              content:
+                '下面模拟 **流式追加**：未完成前保持 `isFinished: false`，结束时再置为 `true` 以配合队列与动画策略。',
               createAt: Date.now(),
               updateAt: Date.now(),
               isFinished: false,
@@ -319,7 +320,7 @@ const RerenderBubbleDemo = () => {
                 avatar:
                   'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original',
                 title: 'MarkdownRenderer · Bubble',
-                description: '流式演示',
+                description: 'MarkdownRenderer · 流式',
               },
             },
             message,

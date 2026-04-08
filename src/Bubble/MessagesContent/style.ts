@@ -5,6 +5,7 @@ const THINKING_DOT_SIZE = 4;
 const THINKING_DOT_GAP = 4;
 const THINKING_DOT_ANIMATION = 'agenticBubbleThinkingDotPulse';
 const THINKING_DOT_ANIMATION_DURATION = '1.2s';
+const THINKING_LOADING_MARGIN_TOP = 'var(--padding-2x)';
 const THINKING_LOADING_PADDING = {
   paddingLeft: 'var(--padding-5x)',
   paddingRight: 'var(--padding-5x)',
@@ -20,6 +21,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       display: 'flex',
       alignItems: 'center',
       gap: 'var(--padding-2x)',
+      marginTop: THINKING_LOADING_MARGIN_TOP,
       ...THINKING_LOADING_PADDING,
       color: 'rgb(102, 111, 141)',
       [`&-dots`]: {

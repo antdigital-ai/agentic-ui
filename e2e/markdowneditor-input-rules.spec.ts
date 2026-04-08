@@ -2,7 +2,7 @@ import { expect, test } from '../tests/fixtures/page-fixture';
 
 test.describe('MarkdownEditor 输入规则测试', () => {
   test.beforeEach(async ({ markdownEditorPage }) => {
-    await markdownEditorPage.goto('markdowneditor-demo-1');
+    await markdownEditorPage.goto();
   });
 
   test('应该通过空格触发代码块 (``` + Space)', async ({ markdownEditorPage }) => {

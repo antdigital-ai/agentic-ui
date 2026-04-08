@@ -19,7 +19,7 @@ import type { CreateRecognizer } from '../VoiceInput';
  * @property {React.CSSProperties} [style] - 应用于输入字段的内联样式
  * @property {string} [className] - 应用于输入字段的 CSS 类名
  * @property {boolean} [disabled] - 是否禁用输入字段
- * @property {boolean} [typing] - 用户是否正在输入的状态标志
+ * @property {boolean} [typing] - AI 回复中等场景下为 true，输入区只读并显示提示
  * @property {'Enter'} [triggerSendKey] - 触发发送操作的键盘快捷键（Enter 发送，Shift+Enter 换行）
  * @property {function} [onSend] - 当内容发送时触发的异步回调函数
  */
@@ -63,8 +63,8 @@ export type MarkdownInputFieldProps = {
   disabled?: boolean;
 
   /**
-   * 用户是否正在输入的状态标志。
-   * @example typing={isComposing}
+   * 为 true 时表示 AI 正在回复等场景：输入区只读、展示 typing 提示，且不可上传附件或语音输入。
+   * @example typing={isAssistantStreaming}
    */
   typing?: boolean;
 
@@ -142,7 +142,7 @@ export type MarkdownInputFieldProps = {
    *   attachment={{
    *     enable: true,
    *     accept: '.pdf,.doc,.docx',
-   *     maxSize: 10 * 1024 * 1024, // 10MB
+   *     maxFileSize: 10 * 1024 * 1024, // 10MB（字节）
    *     onUpload: async (file) => {
    *       const url = await uploadFile(file);
    *       return { url };

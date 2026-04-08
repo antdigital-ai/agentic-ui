@@ -74,6 +74,39 @@ function protectLineOutsideInlineCode(markdownLine: string): string {
 }
 
 /**
+ * 将行首的双冒号写法规范化为三冒号，使其能被 remarkDirectiveContainersOnly 正确解析。
+ *
+ * 处理两种模式：
+ * - `::name` → `:::name`（开启行，后跟合法标识符字母）
+ * - `::` 单独一行 → `:::`（关闭行，行首恰好两个冒号且后无非空字符）
+ *
+ * 代码围栏内的行不处理。
+ */
+export function preprocessNormalizeLeafToContainerDirective(
+  markdown: string,
+): string {
+  if (!markdown || markdown.length === 0) return markdown;
+  const lines = markdown.split('\n');
+  let inFence = false;
+  const out: string[] = [];
+  for (const line of lines) {
+    if (FENCE_DELIMITER_LINE.test(line)) {
+      inFence = !inFence;
+      out.push(line);
+      continue;
+    }
+    if (!inFence && /^:{2}(?!:)[a-zA-Z]/.test(line)) {
+      out.push(':' + line);
+    } else if (!inFence && /^:{2}\s*$/.test(line)) {
+      out.push(':::');
+    } else {
+      out.push(line);
+    }
+  }
+  return out.join('\n');
+}
+
+/**
  * 保护时间格式（如 02:20:31）不被 remark-directive 误解析为 textDirective。
  * remark-directive 会将 ":20"、":31" 等解析为指令，导致 "Cannot handle unknown node textDirective"。
  * 使用反斜杠转义冒号（remark-directive 推荐：\:port 可防止 :port 被解析为指令）。

@@ -18,12 +18,7 @@ ToolUseBar 是一个用于显示工具调用列表的组件，支持工具状态
 import { ToolUseBarThink } from '@ant-design/agentic-ui';
 import { useState, useEffect } from 'react';
 
-const fullThinkContent = `好的，我现在需要帮用户汇总谷歌I/O 2025大会的重要信息。首先，我得仔细看看用户提供的搜索结果，找出相关的信息点。
-      用户给了19个网页的结果，我需要逐一浏览，提取关键内容。
-      首先，大会的时间和地点。网页1、2、5、10、12、16都提到了时间，大部分说是在5月20日至21日举行，地点是加州山景城的Shoreline Amphitheatre。网页3和12提到具体日程，主题演讲在凌晨1点开始，开发者主题演讲在4：30 am。不过要注意时区转换，比如网页5提到北京时间是5月21日凌晨，这可能对国内用户来说需要换算时间。
-      接下来是大会的主要内容和亮点。AI肯定是重点，多个网页提到Gemini的更新，比如网页3、9、10、11、13、18. Gemini 2 5 Pro模型会被详细介绍，可能还有订阅服务的变化。网页18还提到250美元的UItra会员，这可能和Gemini Advanced有关。
-      此外，Project Astra作为下一代AI助手，网页3、10、13都有提到，可能涉及移动和可穿戴设备。
-      需要整合这些信息，分时间地点、核心内容、硬件动态、其他产品、合作与竞争几个部分。注意引用多个网页，避免重复引用同一个网页。比如AI部分可以引用网页3、9、10、11、13、18，智能眼镜引用4、6、7、8、19等。确保每个点都有对应的引用，并且正确标注。需要整合这些信息，分时间地点、核心内容、硬件动态、其他产品、合作与竞争几个部分。注意引用多个网页，避免重复引用同一个网页。比如AI部分可以引用网页3、9、10、11、13、18，智能眼镜引用4、6、7、8、19等。确保每个点都有对应的引用，并且正确标注。需要整合这些信息，分时间地点、核心内容、硬件动态、其他产品、合作与竞争几个部分。注意引用多个网页，避免重复引用同一个网页。比如AI部分可以引用网页3、9、10、11、13、18，智能眼镜引用4、6、7、8、19等。确保每个点都有对应的引用，并且正确标注。`;
+const fullThinkContent = `（示例）根据检索结果整理要点：时间地点、核心结论、待确认项。以下为流式输出占位正文。`;
 
 export default () => {
   const [thinkContent, setThinkContent] = useState('');
@@ -67,36 +62,36 @@ export default () => {
 
 ### ToolUseBarProps
 
-| 属性                 | 类型                                                    | 默认值 | 说明                                                         |
-| -------------------- | ------------------------------------------------------- | ------ | ------------------------------------------------------------ |
-| tools                | ToolCall[]                                              | -      | 工具列表                                                     |
-| onToolClick          | (id: string) => void                                    | -      | 工具点击回调                                                 |
-| className            | string                                                  | -      | 自定义类名                                                   |
-| activeKeys           | string[]                                                | []     | 激活的工具 ID 数组                                           |
-| defaultActiveKeys    | string[]                                                | []     | 默认激活的工具 ID 数组                                       |
-| onActiveKeysChange   | (activeKeys: string[]) => void                          | -      | 激活状态变化回调                                             |
-| expandedKeys         | string[]                                                | []     | 展开的工具 ID 数组                                           |
-| defaultExpandedKeys  | string[]                                                | []     | 默认展开的工具 ID 数组                                       |
-| onExpandedKeysChange | (expandedKeys: string[], removedKeys: string[]) => void | -      | 展开状态变化回调，`removedKeys` 为本次操作中被收起的工具项ID |
-| light                | boolean                                                 | false  | 启用亮色/轻量模式                                            |
-| disableAnimation     | boolean                                                 | false  | 关闭动画，在性能较弱设备上可减少卡顿                         |
-| testId               | string                                                  | -      | 测试 ID                                                      |
-| style                | React.CSSProperties                                     | -      | 自定义样式                                                   |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| tools | 工具列表 | ToolCall[] | - | - |
+| onToolClick | 工具点击回调 | (id: string) => void | - | - |
+| className | 自定义类名 | string | - | - |
+| activeKeys | 激活的工具 ID 数组 | string[] | [] | - |
+| defaultActiveKeys | 默认激活的工具 ID 数组 | string[] | [] | - |
+| onActiveKeysChange | 激活状态变化回调 | (activeKeys: string[]) => void | - | - |
+| expandedKeys | 展开的工具 ID 数组 | string[] | [] | - |
+| defaultExpandedKeys | 默认展开的工具 ID 数组 | string[] | [] | - |
+| onExpandedKeysChange | 展开状态变化回调，`removedKeys` 为本次操作中被收起的工具项ID | (expandedKeys: string[], removedKeys: string[]) => void | - | - |
+| light | 启用亮色/轻量模式 | boolean | false | - |
+| disableAnimation | 关闭动画，在性能较弱设备上可减少卡顿 | boolean | false | - |
+| testId | 测试 ID | string | - | - |
+| style | 自定义样式 | React.CSSProperties | - | - |
 
 ### ToolCall
 
-| 属性         | 类型                                        | 默认值 | 说明                               |
-| ------------ | ------------------------------------------- | ------ | ---------------------------------- |
-| id           | string                                      | -      | 工具唯一标识                       |
-| toolName     | React.ReactNode                             | -      | 工具名称                           |
-| toolTarget   | React.ReactNode                             | -      | 工具目标                           |
-| time         | React.ReactNode                             | -      | 时间信息                           |
-| icon         | React.ReactNode                             | -      | 自定义图标                         |
-| status       | 'idle' \| 'loading' \| 'success' \| 'error' | -      | 工具状态                           |
-| errorMessage | string                                      | -      | 错误信息，仅在 error 状态下有效    |
-| content      | React.ReactNode                             | -      | 工具详细内容，展开后显示           |
-| type         | 'summary' \| 'normal' \| string             | -      | 工具类型，'summary' 为特殊的总结项 |
-| testId       | string                                      | -      | 测试 ID                            |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| id | 工具唯一标识 | string | - | - |
+| toolName | 工具名称 | React.ReactNode | - | - |
+| toolTarget | 工具目标 | React.ReactNode | - | - |
+| time | 时间信息 | React.ReactNode | - | - |
+| icon | 自定义图标 | React.ReactNode | - | - |
+| status | 工具状态 | 'idle' \| 'loading' \| 'success' \| 'error' | - | - |
+| errorMessage | 错误信息，仅在 error 状态下有效 | string | - | - |
+| content | 工具详细内容，展开后显示 | React.ReactNode | - | - |
+| type | 工具类型，'summary' 为特殊的总结项 | 'summary' \| 'normal' \| string | - | - |
+| testId | 测试 ID | string | - | - |
 
 ## 状态样式
 
@@ -114,24 +109,24 @@ ToolUseBarThink 是一个专门为 Think 功能设计的独立组件，拥有独
 
 ### ToolUseBarThinkProps
 
-| 属性             | 类型                                        | 默认值 | 说明                    |
-| ---------------- | ------------------------------------------- | ------ | ----------------------- |
-| id               | string                                      | -      | 组件唯一标识            |
-| toolName         | React.ReactNode                             | -      | 工具名称                |
-| toolTarget       | React.ReactNode                             | -      | 工具目标                |
-| time             | React.ReactNode                             | -      | 工具执行时间            |
-| icon             | React.ReactNode                             | -      | 自定义图标              |
-| thinkContent     | React.ReactNode                             | -      | Think 模块完整内容      |
-| isThinkLoading   | boolean                                     | false  | Think 模块 loading 状态 |
-| status           | 'idle' \| 'loading' \| 'success' \| 'error' | 'idle' | 组件状态                |
-| onClick          | (id: string) => void                        | -      | 点击回调                |
-| isActive         | boolean                                     | false  | 是否激活                |
-| onActiveChange   | (id: string, active: boolean) => void       | -      | 激活状态变化回调        |
-| isExpanded       | boolean                                     | -      | 是否展开                |
-| onExpandedChange | (id: string, expanded: boolean) => void     | -      | 展开状态变化回调        |
-| defaultExpanded  | boolean                                     | false  | 默认展开状态            |
-| testId           | string                                      | -      | 测试 ID                 |
-| light            | boolean                                     | false  | 启用亮色/轻量模式       |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| id | 组件唯一标识 | string | - | - |
+| toolName | 工具名称 | React.ReactNode | - | - |
+| toolTarget | 工具目标 | React.ReactNode | - | - |
+| time | 工具执行时间 | React.ReactNode | - | - |
+| icon | 自定义图标 | React.ReactNode | - | - |
+| thinkContent | Think 模块完整内容 | React.ReactNode | - | - |
+| isThinkLoading | Think 模块 loading 状态 | boolean | false | - |
+| status | 组件状态 | 'idle' \| 'loading' \| 'success' \| 'error' | 'idle' | - |
+| onClick | 点击回调 | (id: string) => void | - | - |
+| isActive | 是否激活 | boolean | false | - |
+| onActiveChange | 激活状态变化回调 | (id: string, active: boolean) => void | - | - |
+| isExpanded | 是否展开 | boolean | - | - |
+| onExpandedChange | 展开状态变化回调 | (id: string, expanded: boolean) => void | - | - |
+| defaultExpanded | 默认展开状态 | boolean | false | - |
+| testId | 测试 ID | string | - | - |
+| light | 启用亮色/轻量模式 | boolean | false | - |
 
 ### ToolUseBarThink 特性
 

@@ -55,17 +55,17 @@ Markdown Editor 支持在 Markdown 中嵌入视频元素，支持多种视频格
 
 ## 支持的属性
 
-| 属性       | 类型    | 描述             |
-| ---------- | ------- | ---------------- |
-| `src`      | string  | 视频源URL        |
-| `controls` | boolean | 是否显示播放控件 |
-| `autoplay` | boolean | 是否自动播放     |
-| `loop`     | boolean | 是否循环播放     |
-| `muted`    | boolean | 是否静音         |
-| `poster`   | string  | 视频封面图片URL  |
-| `width`    | number  | 视频宽度（像素） |
-| `height`   | number  | 视频高度（像素） |
-| `alt`      | string  | 视频描述文本     |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| `src` | 视频源 URL | `string` | - | - |
+| `controls` | 是否显示播放控件 | `boolean` | - | - |
+| `autoplay` | 是否自动播放 | `boolean` | - | - |
+| `loop` | 是否循环播放 | `boolean` | - | - |
+| `muted` | 是否静音 | `boolean` | - | - |
+| `poster` | 视频封面图片 URL | `string` | - | - |
+| `width` | 视频宽度（像素） | `number` | - | - |
+| `height` | 视频高度（像素） | `number` | - | - |
+| `alt` | 视频描述文本 | `string` | - | - |
 
 ## 特殊格式支持
 

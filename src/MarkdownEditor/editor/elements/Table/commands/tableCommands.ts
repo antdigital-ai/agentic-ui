@@ -71,8 +71,12 @@ function forEachCellPath(
 
 export function clearTableSelection(editor: Editor, tablePath: number[]) {
   forEachCellPath(editor, tablePath, (_, cellNode) => {
-    const domNode = ReactEditor.toDOMNode(editor, cellNode as unknown as Node);
-    domNode?.removeAttribute('data-select');
+    try {
+      const domNode = ReactEditor.toDOMNode(editor, cellNode as unknown as Node);
+      domNode?.removeAttribute('data-select');
+    } catch {
+      // cell may not be mounted yet
+    }
   });
 }
 
@@ -97,11 +101,15 @@ export function selectTableRow(
     if (tableCellNode.type !== 'table-cell') {
       continue;
     }
-    const domNode = ReactEditor.toDOMNode(
-      editor,
-      tableCellNode as unknown as Node,
-    );
-    domNode?.setAttribute('data-select', 'true');
+    try {
+      const domNode = ReactEditor.toDOMNode(
+        editor,
+        tableCellNode as unknown as Node,
+      );
+      domNode?.setAttribute('data-select', 'true');
+    } catch {
+      // cell may not be mounted yet
+    }
   }
 }
 
@@ -124,18 +132,26 @@ export function selectTableColumn(
     if (tableCellNode.type !== 'table-cell') {
       continue;
     }
-    const domNode = ReactEditor.toDOMNode(
-      editor,
-      tableCellNode as unknown as Node,
-    );
-    domNode?.setAttribute('data-select', 'true');
+    try {
+      const domNode = ReactEditor.toDOMNode(
+        editor,
+        tableCellNode as unknown as Node,
+      );
+      domNode?.setAttribute('data-select', 'true');
+    } catch {
+      // cell may not be mounted yet
+    }
   }
 }
 
 export function selectWholeTable(editor: Editor, tablePath: number[]) {
   forEachCellPath(editor, tablePath, (_, cellNode) => {
-    const domNode = ReactEditor.toDOMNode(editor, cellNode as unknown as Node);
-    domNode?.setAttribute('data-select', 'true');
+    try {
+      const domNode = ReactEditor.toDOMNode(editor, cellNode as unknown as Node);
+      domNode?.setAttribute('data-select', 'true');
+    } catch {
+      // cell may not be mounted yet
+    }
   });
 }
 

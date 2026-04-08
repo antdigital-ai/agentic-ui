@@ -283,4 +283,160 @@ describe('useHistory Hook', () => {
       expect(result.current.handleFavorite).toBe(firstHandleFavorite);
     });
   });
+
+  describe('filterListByKeyword 与 request 边界', () => {
+    it('仅空白关键词时不过滤列表', async () => {
+      const { result } = renderHook(() => useHistory(defaultProps));
+
+      await act(async () => {
+        await result.current.loadHistory();
+      });
+
+      act(() => {
+        result.current.handleSearch('   ');
+      });
+
+      expect(result.current.filteredList).toEqual(mockHistoryData);
+    });
+
+    it('sessionTitle 非 string 时仍可按 String 结果搜索', async () => {
+      const dataWithNumericTitle = [
+        {
+          ...mockHistoryData[0],
+          sessionTitle: 404 as unknown as string,
+        },
+      ];
+      const request = vi.fn().mockResolvedValue(dataWithNumericTitle);
+      const { result } = renderHook(() =>
+        useHistory({ ...defaultProps, request }),
+      );
+
+      await act(async () => {
+        await result.current.loadHistory();
+      });
+
+      act(() => {
+        result.current.handleSearch('404');
+      });
+
+      expect(result.current.filteredList).toHaveLength(1);
+    });
+
+    it('request 返回 undefined 时列表为空数组', async () => {
+      const request = vi.fn().mockResolvedValue(undefined);
+      const { result } = renderHook(() =>
+        useHistory({ ...defaultProps, request }),
+      );
+
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 0));
+      });
+
+      expect(result.current.filteredList).toEqual([]);
+    });
+
+    it('actionRef 注入 reload', async () => {
+      const actionRef = { current: null as { reload: () => void } | null };
+      renderHook(() => useHistory({ ...defaultProps, actionRef }));
+
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 0));
+      });
+
+      expect(actionRef.current?.reload).toBeDefined();
+      await act(async () => {
+        await actionRef.current!.reload();
+      });
+      expect(defaultProps.request).toHaveBeenCalled();
+    });
+
+    it('sessionId 为空时不写入 selectedIds', async () => {
+      const { result } = renderHook(() =>
+        useHistory({ ...defaultProps, sessionId: undefined as unknown as string }),
+      );
+
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 0));
+      });
+
+      expect(result.current.selectedIds).toEqual([]);
+    });
+
+    it('handleSelectionChange 调用 agent.onSelectionChange', async () => {
+      const onSelectionChange = vi.fn();
+      const { result } = renderHook(() =>
+        useHistory({
+          ...defaultProps,
+          agent: { onSelectionChange },
+        }),
+      );
+
+      await act(async () => {
+        await result.current.loadHistory();
+      });
+
+      act(() => {
+        result.current.handleSelectionChange('session1', true);
+      });
+
+      expect(onSelectionChange).toHaveBeenCalledWith([
+        'current-session',
+        'session1',
+      ]);
+    });
+
+    it('handleSearch 调用 agent.onSearch', () => {
+      const onSearch = vi.fn();
+      const { result } = renderHook(() =>
+        useHistory({
+          ...defaultProps,
+          agent: { onSearch },
+        }),
+      );
+
+      act(() => {
+        result.current.handleSearch('kw');
+      });
+
+      expect(onSearch).toHaveBeenCalledWith('kw');
+    });
+
+    it('handleLoadMore 应 await onLoadMore', async () => {
+      const onLoadMore = vi.fn().mockResolvedValue(undefined);
+      const { result } = renderHook(() =>
+        useHistory({
+          ...defaultProps,
+          agent: { onLoadMore },
+        }),
+      );
+
+      await act(async () => {
+        await result.current.handleLoadMore();
+      });
+
+      expect(onLoadMore).toHaveBeenCalled();
+    });
+
+    it('handleNewChat 应 await onNewChat 并关闭菜单', async () => {
+      const onNewChat = vi.fn().mockResolvedValue(undefined);
+      const { result } = renderHook(() =>
+        useHistory({
+          ...defaultProps,
+          agent: { onNewChat },
+        }),
+      );
+
+      act(() => {
+        result.current.setOpen(true);
+      });
+      expect(result.current.open).toBe(true);
+
+      await act(async () => {
+        await result.current.handleNewChat();
+      });
+
+      expect(onNewChat).toHaveBeenCalled();
+      expect(result.current.open).toBe(false);
+    });
+  });
 });

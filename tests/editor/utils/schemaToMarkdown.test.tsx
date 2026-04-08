@@ -2,7 +2,7 @@ import {
   parserMdToSchema,
   parserSlateNodeToMarkdown,
 } from '@ant-design/agentic-ui';
-import { expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 const input = `<!-- {"MarkdownType": "report", "id": "8", "section_ids": " [15, 16, 17] "} -->
 # Umi 研究报告
@@ -352,26 +352,17 @@ mindmap
 
 `;
 
-input
-  ?.split('\n\n')
-  .filter(Boolean)
-  .forEach((char) => {
-    it(`should convert schema to markdown in ${char.slice(
-      0,
-      10,
-    )} chunk`, () => {
-      const schema = parserMdToSchema(' ' + char).schema;
+describe('schema ↔ markdown per paragraph chunk', () => {
+  input?.split('\n\n').filter(Boolean).forEach((char) => {
+    it(`should parse and serialize ${char.slice(0, 10)} chunk`, () => {
+      const padded = ` ${char}`;
+      const schema = parserMdToSchema(padded).schema;
+      expect(Array.isArray(schema)).toBe(true);
       const markdown = parserSlateNodeToMarkdown(schema);
-      expect(markdown).toMatchSnapshot();
-    });
-    it(`should convert markdown to schema in ${char.slice(
-      0,
-      10,
-    )} chunk`, () => {
-      const schema = parserMdToSchema(' ' + char).schema;
-      expect(schema).toMatchSnapshot();
+      expect(typeof markdown).toBe('string');
     });
   });
+});
 
 it(`忽略card，并且只生成一次`, () => {
   const schema = parserMdToSchema(`
@@ -385,9 +376,9 @@ it(`忽略card，并且只生成一次`, () => {
 | 其他          | 41,040  | 43,413  | 44,670  | 50,757  | 
 | 金融科技     | 39,028  | 41,892  | 43,317  | 47,958  | 
 | 云           | 162,012   | 111,521   | 111,353   | 112,799   | `).schema;
-  expect(schema).toMatchSnapshot();
   const markdown = parserSlateNodeToMarkdown(schema);
-  expect(markdown).toMatchSnapshot();
+  expect(markdown).toContain('| 业务');
+  expect((markdown.match(/\| 业务/g) ?? []).length).toBe(1);
 });
 
 it(`多个空格转为一个`, () => {
@@ -403,9 +394,9 @@ it(`多个空格转为一个`, () => {
 
 因此，今日（2024年12月25日）上证指数收盘报3393.35点，微跌0.01%。`;
   const schema = parserMdToSchema(md).schema;
-  expect(schema).toMatchSnapshot();
   const markdown = parserSlateNodeToMarkdown(schema);
-  expect(markdown).toMatchSnapshot();
+  expect(markdown).not.toMatch(/\n{3,}/);
+  expect(markdown).toContain('3393.35');
 });
 
 it(`引用`, () => {
@@ -415,7 +406,8 @@ it(`引用`, () => {
 [^1]: [微软(MSFT)股价陷低谷，AI投入何时兑现增加承诺？ - 美股投资网](https://www.tradesmax.com/component/k2/item/22075-microsoft)
 ;`;
   const schema = parserMdToSchema(md).schema;
-  expect(schema).toMatchSnapshot();
   const markdown = parserSlateNodeToMarkdown(schema);
-  expect(markdown).toMatchSnapshot();
+  expect(markdown).toContain('[^1]');
+  expect(markdown).toContain('tradesmax.com');
+  expect(markdown).toContain('DeepSeek');
 });

@@ -102,7 +102,7 @@ export default function VisualListDemo() {
       <h2>加载状态</h2>
       <VisualList
         data={[]}
-        loading={true}
+        isLoading={true}
         loadingRender={() => (
           <div style={{ color: '#007acc' }}>🔄 正在加载图片...</div>
         )}

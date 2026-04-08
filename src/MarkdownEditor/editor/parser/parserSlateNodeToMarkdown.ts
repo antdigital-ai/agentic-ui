@@ -253,6 +253,7 @@ const parserNode = (
     case 'agentic-ui-task':
     case 'agentic-ui-toolusebar':
     case 'agentic-ui-usertoolbar':
+    case 'agentic-ui-filemap':
       str += handleCode(node, preString);
       break;
     case 'attach':
@@ -1226,6 +1227,15 @@ const handleCode = (node: any, preString: string) => {
       code = JSON.stringify(code, null, 2);
     } catch (e) {
       console.warn('Invalid code object', e);
+    }
+  } else if (node?.type === 'code') {
+    // 对于普通代码块（type === 'code'），优先从 Slate children 中读取文本
+    // 因为用户编辑后 Slate 只更新 children，而 value 保留的是初始解析值
+    const childrenText = node?.children
+      ?.map((child: any) => child?.text ?? '')
+      .join('');
+    if (childrenText !== undefined && childrenText !== null) {
+      code = childrenText;
     }
   }
 

@@ -1,4 +1,4 @@
-import { JINJA_DOLLAR_PLACEHOLDER } from '../../MarkdownEditor/editor/parser/constants';
+import { JINJA_DOLLAR_PLACEHOLDER, preprocessNormalizeLeafToContainerDirective } from '../../MarkdownEditor/editor/parser/constants';
 import React, { useMemo, useRef } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 
@@ -41,6 +41,7 @@ export const useStreamingMarkdownReact = (
         options?.components || {},
         options?.streaming,
         options?.linkConfig,
+        options?.fncProps,
         options?.streamingParagraphAnimation,
         options?.eleRender,
       ),
@@ -49,6 +50,7 @@ export const useStreamingMarkdownReact = (
       options?.components,
       options?.streaming,
       options?.linkConfig,
+      options?.fncProps,
       options?.streamingParagraphAnimation,
       options?.eleRender,
     ],
@@ -70,9 +72,8 @@ export const useStreamingMarkdownReact = (
     prevRevisionRef.current = revisionSource;
 
     try {
-      const preprocessed = content.replace(
-        new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'),
-        '$',
+      const preprocessed = preprocessNormalizeLeafToContainerDirective(
+        content.replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$'),
       );
 
       const blocks = splitMarkdownBlocks(preprocessed);

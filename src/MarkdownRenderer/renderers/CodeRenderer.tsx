@@ -6,6 +6,8 @@ import { I18nContext } from '../../I18n';
 import { CodeContainer } from '../../Plugins/code/components/CodeContainer';
 import { LoadImage } from '../../Plugins/code/components/LoadImage';
 import { langIconMap } from '../../Plugins/code/langIconMap';
+import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
+import { debugInfo } from '../../Utils/debugUtils';
 import type { RendererBlockProps } from '../types';
 
 const extractTextContent = (children: React.ReactNode): string => {
@@ -22,9 +24,15 @@ const extractTextContent = (children: React.ReactNode): string => {
  * 代码块渲染器——复用 MarkdownEditor 的 CodeContainer 和样式体系。
  * 不依赖 Slate 上下文，提供与 CodeRenderer readonly 模式一致的视觉效果。
  */
-export const CodeBlockRenderer: React.FC<RendererBlockProps> = (props) => {
-  const { language, children } = props;
-  const [theme, setTheme] = useState('github');
+export const CodeBlockRenderer: React.FC<
+  RendererBlockProps & {
+    editorCodeProps?: MarkdownEditorProps['codeProps'];
+  }
+> = (props) => {
+  const { language, children, editorCodeProps } = props;
+  const [theme, setTheme] = useState(
+    () => (editorCodeProps?.theme as string) || 'github',
+  );
   const [isExpanded, setIsExpanded] = useState(true);
   const i18n = useContext(I18nContext);
 
@@ -50,7 +58,7 @@ export const CodeBlockRenderer: React.FC<RendererBlockProps> = (props) => {
 
   const langIcon = langIconMap.get(language?.toLowerCase() || '');
 
-  return (
+  const defaultDom = (
     <CodeContainer
       element={fakeElement as any}
       showBorder={false}
@@ -180,6 +188,33 @@ export const CodeBlockRenderer: React.FC<RendererBlockProps> = (props) => {
       </div>
     </CodeContainer>
   );
+
+  const customRender = editorCodeProps?.render;
+  if (!customRender) {
+    return defaultDom;
+  }
+
+  try {
+    const renderElementProps = {
+      attributes: {},
+      children: null,
+      element: fakeElement,
+    } as any;
+    const rendered = customRender(
+      renderElementProps,
+      defaultDom,
+      editorCodeProps,
+    );
+    if (rendered === undefined) {
+      return defaultDom;
+    }
+    return rendered;
+  } catch (error) {
+    debugInfo('CodeBlockRenderer - codeProps.render 异常，回退默认', {
+      error: (error as Error)?.message || String(error),
+    });
+    return defaultDom;
+  }
 };
 
 CodeBlockRenderer.displayName = 'CodeBlockRenderer';

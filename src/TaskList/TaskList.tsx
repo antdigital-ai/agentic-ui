@@ -96,18 +96,23 @@ export const TaskList = memo(
       };
     }, [items, locale]);
 
-    const renderItems = () =>
-      items.map((item, index) => (
+    const isCancelled = items.some((i) => i.status === 'error');
+
+    const renderItems = () => {
+      const visibleItems = isCancelled ? items.slice(-1) : items;
+
+      return visibleItems.map((item, index) => (
         <TaskListItem
           key={item.key}
           item={item}
-          isLast={index === items.length - 1}
+          isLast={index === visibleItems.length - 1}
           prefixCls={prefixCls}
           hashId={hashId}
           expandedKeys={internalExpandedKeys}
           onToggle={handleToggle}
         />
       ));
+    };
 
     if (variant !== 'simple') {
       return wrapSSR(<div className={className}>{renderItems()}</div>);

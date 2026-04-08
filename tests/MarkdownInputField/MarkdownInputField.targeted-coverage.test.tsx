@@ -117,6 +117,7 @@ vi.mock('../../src/MarkdownInputField/hooks/useMarkdownInputFieldRefs', () => ({
     quickActionsRef: { current: null },
     actionsRef: { current: null },
     isSendingRef: { current: false },
+    onEditorChange: vi.fn(),
   }),
 }));
 

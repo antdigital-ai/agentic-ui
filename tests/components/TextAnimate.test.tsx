@@ -217,4 +217,28 @@ describe('TextAnimate 组件', () => {
     expect(spans).toHaveLength(1);
     expect(spans[0]).toHaveTextContent('element child');
   });
+
+  it('animation 为 null 时使用默认容器与片段变体分支', () => {
+    render(<TextAnimate animation={null as any}>plain</TextAnimate>);
+    expect(screen.getByTestId('animate-presence')).toBeInTheDocument();
+  });
+
+  it('accessible=false 时片段不设置 aria-hidden', () => {
+    render(
+      <TextAnimate accessible={false} by="character">
+        ab
+      </TextAnimate>,
+    );
+    const spans = screen.getAllByTestId('motion-span');
+    expect(spans[0]).not.toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('startOnView=false 时使用 animate=show 而非 whileInView', () => {
+    render(
+      <TextAnimate startOnView={false} by="word">
+        hi
+      </TextAnimate>,
+    );
+    expect(screen.getByTestId('animate-presence')).toBeInTheDocument();
+  });
 });

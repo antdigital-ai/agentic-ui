@@ -32,8 +32,12 @@ let histogramChartComponentsRegistered = false;
  * 直方图数据项接口
  */
 export interface HistogramChartDataItem {
-  /** 原始数据值 */
+  /** 原始数据值（自动分箱时为原始数值；预分箱时为该箱的 y 轴值） */
   value: number;
+  /** 预分箱左边界（设置后与 right 一起跳过自动分箱） */
+  left?: number;
+  /** 预分箱右边界 */
+  right?: number;
   /** 数据系列（用于分组显示） */
   type?: string;
   /** 分类（用于筛选） */
@@ -134,14 +138,17 @@ function calculateBinEdges(
 }
 
 /**
- * 格式化分箱标签
+ * 格式化分箱标签，对超出范围的数字使用普通计数格式而非科学记数法
  */
 function formatBinLabel(start: number, end: number): string {
   const formatNum = (n: number) => {
-    if (Math.abs(n) >= 1000 || (Math.abs(n) < 0.01 && n !== 0)) {
-      return n.toExponential(1);
+    if (Math.abs(n) < 0.01 && n !== 0) {
+      return n.toFixed(4);
     }
-    return n.toFixed(2);
+    if (Number.isInteger(n)) {
+      return n.toLocaleString('en-US', { useGrouping: false });
+    }
+    return parseFloat(n.toFixed(2)).toString();
   };
   return `${formatNum(start)} - ${formatNum(end)}`;
 }
@@ -285,10 +292,47 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     return allTypes.length > 0 ? [...new Set(allTypes)] : ['默认'];
   }, [filteredData]);
 
+  // 判断是否为预分箱数据（所有项都有 left 和 right 字段）
+  const isPreBinned = useMemo(() => {
+    return (
+      filteredData.length > 0 &&
+      filteredData.every(
+        (item) =>
+          typeof item.left === 'number' && typeof item.right === 'number',
+      )
+    );
+  }, [filteredData]);
+
   // 计算分箱
   const binning = useMemo(() => {
     if (filteredData.length === 0) {
       return { edges: [], labels: [], binCount: 0 };
+    }
+
+    if (isPreBinned) {
+      // 预分箱模式：按 left 排序，直接生成区间标签
+      const sorted = [...filteredData].sort(
+        (a, b) => (a.left as number) - (b.left as number),
+      );
+      const uniqueEdgePairs = sorted.reduce<
+        { left: number; right: number }[]
+      >((acc, item) => {
+        const l = item.left as number;
+        const r = item.right as number;
+        if (!acc.some((p) => p.left === l && p.right === r)) {
+          acc.push({ left: l, right: r });
+        }
+        return acc;
+      }, []);
+
+      const edges = [
+        ...uniqueEdgePairs.map((p) => p.left),
+        uniqueEdgePairs[uniqueEdgePairs.length - 1].right,
+      ];
+      const labels = uniqueEdgePairs.map((p) =>
+        formatBinLabel(p.left, p.right),
+      );
+      return { edges, labels, binCount: labels.length };
     }
 
     const allValues = filteredData.map((item) => item.value);
@@ -302,7 +346,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     }
 
     return { edges, labels, binCount: autoBinCount };
-  }, [filteredData, customBinCount]);
+  }, [filteredData, customBinCount, isPreBinned]);
 
   // 计算每个分箱的频率/计数
   const histogramData = useMemo(() => {
@@ -312,6 +356,29 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     }
 
     const result: Record<string, number[]> = {};
+
+    if (isPreBinned) {
+      // 预分箱模式：直接将 value 映射到对应区间
+      types.forEach((type) => {
+        if (!type) return;
+        const typeData = filteredData.filter(
+          (item) => (item.type || '默认') === type,
+        );
+        const counts = new Array(labels.length).fill(0);
+
+        typeData.forEach((item) => {
+          const l = item.left as number;
+          const r = item.right as number;
+          const idx = labels.indexOf(formatBinLabel(l, r));
+          if (idx !== -1) {
+            counts[idx] += showFrequency ? item.value : item.value;
+          }
+        });
+
+        result[type] = counts;
+      });
+      return result;
+    }
 
     types.forEach((type) => {
       if (!type) return; // Skip undefined types
@@ -344,7 +411,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     });
 
     return result;
-  }, [filteredData, types, binning, showFrequency]);
+  }, [filteredData, types, binning, showFrequency, isPreBinned]);
 
   // 构建 Chart.js 数据结构
   const processedData: ChartData<'bar'> = useMemo(() => {

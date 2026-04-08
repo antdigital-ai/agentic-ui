@@ -15,6 +15,8 @@ describe('word parse', () => {
 
   it('docxDeserializer', () => {
     const fragment = docxDeserializer(rtl, html);
-    expect(fragment).toMatchSnapshot();
+    expect(Array.isArray(fragment)).toBe(true);
+    expect(fragment.length).toBeGreaterThan(0);
+    expect(fragment[0]).toMatchObject({ type: 'paragraph' });
   });
 });

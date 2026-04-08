@@ -96,6 +96,7 @@ vi.mock('../../../../src/Plugins/code/hooks', () => ({
       onSelectionChange: config?.onSelectionChange ?? vi.fn(),
       onViewModeToggle: config?.onViewModeToggle,
       viewMode: config?.viewMode,
+      onLocalPreview: config?.onLocalPreview,
     },
   }),
 }));
@@ -690,6 +691,34 @@ describe('CodeRenderer Component', () => {
       render(<CodeRenderer {...props} />);
       expect(screen.queryByTestId('code-toolbar')).not.toBeInTheDocument();
       mockEditorStore.editorProps.codeProps.hideToolBar = false;
+    });
+  });
+
+  describe('本地预览 handleLocalPreview', () => {
+    it('HTML 代码块应正常渲染，工具栏包含 onLocalPreview 配置', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'html',
+          value: '<div>Hello</div>',
+        },
+      };
+      render(<CodeRenderer {...props} />);
+      expect(screen.getByTestId('code-container')).toBeInTheDocument();
+    });
+
+    it('Markdown 代码块应正常渲染，工具栏包含 onLocalPreview 配置', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'markdown',
+          value: '# Title',
+        },
+      };
+      render(<CodeRenderer {...props} />);
+      expect(screen.getByTestId('code-container')).toBeInTheDocument();
     });
   });
 });

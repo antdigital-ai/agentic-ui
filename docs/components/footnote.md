@@ -35,22 +35,22 @@ group:
 
 脚注配置通过 `markdownRenderConfig.fncProps` 传入：
 
-| 属性                       | 说明                   | 类型                                                                             | 默认值 |
-| -------------------------- | ---------------------- | -------------------------------------------------------------------------------- | ------ |
-| render                     | 自定义脚注引用渲染函数 | `(props: { identifier?: string }, children: React.ReactNode) => React.ReactNode` | -      |
-| onFootnoteDefinitionChange | 脚注定义变化回调       | `(list: FootnoteDefinition[]) => void`                                           | -      |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| render | 自定义脚注引用渲染函数 | `(props: { identifier?: string }, children: React.ReactNode) => React.ReactNode` | - | - |
+| onFootnoteDefinitionChange | 脚注定义变化回调 | `(list: FootnoteDefinition[]) => void` | - | - |
 
 ### FootnoteDefinition
 
 脚注定义数据结构：
 
-| 属性        | 说明           | 类型     |
-| ----------- | -------------- | -------- |
-| id          | 脚注唯一标识   | `string` |
-| placeholder | 脚注占位符标识 | `string` |
-| origin_text | 原始文本内容   | `string` |
-| url         | 链接地址       | `string` |
-| origin_url  | 原始链接地址   | `string` |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| id | 脚注唯一标识 | `string` | - | - |
+| placeholder | 脚注占位符标识 | `string` | - | - |
+| origin_text | 原始文本内容 | `string` | - | - |
+| url | 链接地址 | `string` | - | - |
+| origin_url | 原始链接地址 | `string` | - | - |
 
 ## 使用说明
 
