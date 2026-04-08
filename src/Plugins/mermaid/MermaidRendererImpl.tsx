@@ -1,3 +1,11 @@
+﻿import {
+  BorderOutlined,
+  ExpandOutlined,
+  FullscreenExitOutlined,
+  FullscreenOutlined,
+  ZoomInOutlined,
+  ZoomOutOutlined,
+} from '@ant-design/icons';
 import { ConfigProvider, theme } from 'antd';
 import classNames from 'clsx';
 import React, {
@@ -8,6 +16,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { ActionIconBox } from '../../Components/ActionIconBox';
 import { useIntersectionOnce } from '../../Hooks/useIntersectionOnce';
 import { CodeNode } from '../../MarkdownEditor/el';
 import { useStyle } from './style';
@@ -391,58 +400,6 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
       contentEditable={false}
       data-mermaid-theme={mermaidTheme.darkMode ? 'dark' : 'light'}
     >
-      {isRendered && (
-        <div className={classNames(`${baseCls}-toolbar`, hashId)}>
-          <button
-            type="button"
-            className={classNames(`${baseCls}-toolbar-btn`, hashId)}
-            onClick={handleFitToScreen}
-            aria-label="Fit mermaid diagram to screen"
-            data-mermaid-action="fit"
-          >
-            适配
-          </button>
-          <button
-            type="button"
-            className={classNames(`${baseCls}-toolbar-btn`, hashId)}
-            onClick={handleZoomOut}
-            aria-label="Zoom out mermaid diagram"
-            data-mermaid-action="zoom-out"
-          >
-            -
-          </button>
-          <button
-            type="button"
-            className={classNames(`${baseCls}-toolbar-btn`, hashId)}
-            onClick={handleZoomIn}
-            aria-label="Zoom in mermaid diagram"
-            data-mermaid-action="zoom-in"
-          >
-            +
-          </button>
-          <button
-            type="button"
-            className={classNames(`${baseCls}-toolbar-btn`, hashId)}
-            onClick={() => {
-              setShowGrid((prev) => !prev);
-            }}
-            aria-label="Toggle mermaid grid background"
-            data-mermaid-action="grid"
-          >
-            网格
-          </button>
-          <button
-            type="button"
-            className={classNames(`${baseCls}-toolbar-btn`, hashId)}
-            onClick={handleToggleFullscreen}
-            aria-label="Toggle mermaid fullscreen mode"
-            data-mermaid-action="fullscreen"
-          >
-            {isFullscreen ? '退出全屏' : '全屏'}
-          </button>
-        </div>
-      )}
-
       <div
         contentEditable={false}
         className={classNames(`${baseCls}-viewport`, hashId)}
@@ -456,6 +413,72 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
         data-mermaid-viewport="true"
         style={viewportStyle}
       >
+        {isRendered && (
+          <div
+            className={classNames(`${baseCls}-toolbar-float`, hashId)}
+            role="toolbar"
+            aria-label="Mermaid diagram controls"
+          >
+            <span data-mermaid-action="fit">
+              <ActionIconBox
+                title="适配画布"
+                borderLess
+                noPadding
+                onClick={handleFitToScreen}
+                iconStyle={{ color: token.colorTextSecondary }}
+              >
+                <ExpandOutlined />
+              </ActionIconBox>
+            </span>
+            <span data-mermaid-action="zoom-out">
+              <ActionIconBox
+                title="缩小"
+                borderLess
+                noPadding
+                onClick={handleZoomOut}
+                iconStyle={{ color: token.colorTextSecondary }}
+              >
+                <ZoomOutOutlined />
+              </ActionIconBox>
+            </span>
+            <span data-mermaid-action="zoom-in">
+              <ActionIconBox
+                title="放大"
+                borderLess
+                noPadding
+                onClick={handleZoomIn}
+                iconStyle={{ color: token.colorTextSecondary }}
+              >
+                <ZoomInOutlined />
+              </ActionIconBox>
+            </span>
+            <span data-mermaid-action="grid">
+              <ActionIconBox
+                title={showGrid ? '隐藏背景网格' : '显示背景网格'}
+                borderLess
+                noPadding
+                active={showGrid}
+                onClick={() => {
+                  setShowGrid((prev) => !prev);
+                }}
+                iconStyle={{ color: token.colorTextSecondary }}
+              >
+                <BorderOutlined />
+              </ActionIconBox>
+            </span>
+            <span data-mermaid-action="fullscreen">
+              <ActionIconBox
+                title={isFullscreen ? '退出全屏' : '全屏'}
+                borderLess
+                noPadding
+                onClick={handleToggleFullscreen}
+                iconStyle={{ color: token.colorTextSecondary }}
+              >
+                {isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+              </ActionIconBox>
+            </span>
+          </div>
+        )}
         <div
           contentEditable={false}
           ref={divRef}

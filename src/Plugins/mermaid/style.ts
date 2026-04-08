@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChatTokenType,
   GenerateStyle,
   useEditorStyleRegister,
@@ -7,8 +7,6 @@ import {
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   const gridLightColor = 'rgba(0, 0, 0, 0.08)';
   const gridDarkColor = 'rgba(255, 255, 255, 0.14)';
-  const controlBackgroundColor = token.colorBgElevated || token.colorBgContainer;
-  const controlBorderColor = token.colorBorder;
 
   return {
     [token.componentCls]: {
@@ -38,34 +36,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         height: '100%',
       },
 
-      '&-toolbar': {
+      '&-toolbar-float': {
+        position: 'absolute',
+        top: token.paddingSM,
+        insetInlineEnd: token.paddingSM,
+        left: 'auto',
+        zIndex: 5,
         display: 'flex',
         alignItems: 'center',
         gap: token.paddingXS,
-        width: '100%',
-        padding: `${token.paddingXS}px ${token.paddingSM}px`,
-        borderBottom: `1px solid ${controlBorderColor}`,
-        backgroundColor: controlBackgroundColor,
-      },
-
-      '&-toolbar-btn': {
-        border: `1px solid ${controlBorderColor}`,
-        background: token.colorBgContainer,
-        color: token.colorText,
-        borderRadius: token.borderRadius,
-        padding: `0 ${token.paddingXS}px`,
-        fontSize: token.fontSizeSM,
-        lineHeight: `${token.controlHeightSM || 24}px`,
-        height: token.controlHeightSM || 24,
-        cursor: 'pointer',
-        transition: 'all 0.2s',
-        '&:hover': {
-          color: token.colorPrimary,
-          borderColor: token.colorPrimary,
-        },
+        pointerEvents: 'auto',
       },
 
       '&-viewport': {
+        flex: 1,
         width: '100%',
         minHeight: 220,
         overflow: 'hidden',
