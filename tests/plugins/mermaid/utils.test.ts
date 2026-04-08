@@ -16,7 +16,12 @@ const mockMermaidApi = {
 };
 
 vi.mock('mermaid', () => ({
-  default: mockMermaidApi,
+  get default() {
+    if ((globalThis as any).__MERMAID_LOAD_FAIL__) {
+      throw new Error('load failed');
+    }
+    return mockMermaidApi;
+  },
 }));
 
 describe('Mermaid utils', () => {
@@ -65,19 +70,15 @@ describe('Mermaid utils', () => {
       global.window = originalWindow;
     });
 
-    it('应该在加载失败时重置 loader', async () => {
-      // 由于模块缓存，这个测试可能无法完全模拟失败场景
-      // 但我们可以测试错误处理逻辑
-      const originalLoader = (
-        await import('../../../src/Plugins/mermaid/utils')
-      ).loadMermaid;
-
-      // 测试错误处理
+    it('应该在加载失败时重置 loader 并抛出', async () => {
+      (globalThis as any).__MERMAID_LOAD_FAIL__ = true;
       try {
-        await originalLoader();
-      } catch (error) {
-        // 如果加载失败，loader 应该被重置
-        expect(error).toBeDefined();
+        const { loadMermaid } = await import(
+          '../../../src/Plugins/mermaid/utils'
+        );
+        await expect(loadMermaid()).rejects.toThrow('load failed');
+      } finally {
+        (globalThis as any).__MERMAID_LOAD_FAIL__ = false;
       }
     });
 
@@ -149,8 +150,30 @@ describe('Mermaid utils', () => {
       await new Promise((resolve) => requestAnimationFrame(resolve));
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
-      // 应该直接设置 innerHTML
       expect(container.innerHTML).toContain('Not SVG');
+    });
+
+    it('当 XML 解析无 svg 时用 tempDiv 提取并设置样式', async () => {
+      const OriginalParser = global.DOMParser;
+      global.DOMParser = class MockParser {
+        parseFromString(str: string, type: string): Document {
+          if (type === 'image/svg+xml') {
+            return document.implementation.createDocument(null, 'root', null);
+          }
+          return new OriginalParser().parseFromString(str, type as any);
+        }
+      } as any;
+
+      const svg = '<svg><path d="M0 0"/></svg>';
+      renderSvgToContainer(svg, container);
+
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      const svgEl = container.querySelector('svg[data-mermaid-svg]');
+      expect(svgEl).toBeTruthy();
+      expect(svgEl?.getAttribute('style')).toContain('max-width: 100%');
+
+      global.DOMParser = OriginalParser;
     });
 
     it('应该为 SVG 元素设置样式和属性', async () => {
@@ -168,19 +191,18 @@ describe('Mermaid utils', () => {
     });
 
     it('应该为所有 SVG 子元素设置 data-mermaid-internal', async () => {
-      const svg = '<svg><rect/><circle/><path/></svg>';
+      const svg =
+        '<svg xmlns="http://www.w3.org/2000/svg"><rect/><circle/><path/></svg>';
 
       renderSvgToContainer(svg, container);
 
       await new Promise((resolve) => requestAnimationFrame(resolve));
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
-      // 查找所有设置了 data-mermaid-internal 的元素
       const internalElements = container.querySelectorAll(
         '[data-mermaid-internal]',
       );
-      // 至少应该有子元素（rect, circle, path）
-      expect(internalElements.length).toBeGreaterThanOrEqual(0);
+      expect(internalElements.length).toBeGreaterThanOrEqual(1);
     });
 
     it('应该为 wrapper 设置正确的样式', async () => {

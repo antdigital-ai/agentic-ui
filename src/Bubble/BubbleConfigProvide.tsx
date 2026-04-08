@@ -1,5 +1,4 @@
 import React from 'react';
-import { cnLabels } from '../I18n/locales';
 import { ThoughtChainListProps } from '../ThoughtChainList/types';
 import { BubbleProps } from './type';
 
@@ -22,7 +21,6 @@ export type ChatConfigType = {
      */
     enable: boolean;
   };
-  locale: Partial<typeof cnLabels>;
   bubble?: BubbleProps<{
     /**
      * 聊天内容
@@ -34,11 +32,15 @@ export type ChatConfigType = {
     uuid: number;
   }>;
   compact?: boolean;
+  /**
+   * extra（点赞、踩、复制等）是否仅在 hover 时展示
+   * @default false 默认常驻展示
+   */
+  extraShowOnHover?: boolean;
 };
 
 export const BubbleConfigContext = React.createContext<
   ChatConfigType | undefined
 >({
   standalone: false,
-  locale: cnLabels,
 });

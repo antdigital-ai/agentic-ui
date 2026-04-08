@@ -100,18 +100,21 @@ describe('TaskRunning Component', () => {
       <TaskRunning {...baseProps} taskStatus={TASK_STATUS.ERROR} />,
     );
 
-    // 任务出错状态：重试按钮 + 新任务按钮
+    // 任务出错状态：重试按钮 + 提交按钮 + 新任务按钮
     expect(screen.getByText('重试')).toBeInTheDocument();
+    expect(screen.getByText('提交')).toBeInTheDocument();
     expect(screen.getByText('新任务')).toBeInTheDocument();
 
     rerender(<TaskRunning {...baseProps} taskStatus={TASK_STATUS.STOPPED} />);
 
-    // 任务已停止状态：创建新任务按钮
+    // 任务已停止状态：提交按钮 + 创建新任务按钮
+    expect(screen.getByText('提交')).toBeInTheDocument();
     expect(screen.getByText('创建新任务')).toBeInTheDocument();
 
     rerender(<TaskRunning {...baseProps} taskStatus={TASK_STATUS.CANCELLED} />);
 
-    // 任务已取消状态：创建新任务按钮
+    // 任务已取消状态：提交按钮 + 创建新任务按钮
+    expect(screen.getByText('提交')).toBeInTheDocument();
     expect(screen.getByText('创建新任务')).toBeInTheDocument();
   });
 
@@ -383,6 +386,71 @@ describe('TaskRunning Component', () => {
     expect(screen.getByText('提交')).toBeInTheDocument();
     expect(screen.getByText('重试')).toBeInTheDocument();
     expect(screen.getByText('新任务')).toBeInTheDocument();
+  });
+
+  // 测试 onViewResult 在 ERROR 状态下显示
+  it('should show onViewResult button in ERROR state', () => {
+    const onViewResult = vi.fn();
+    render(
+      <TaskRunning
+        {...baseProps}
+        taskStatus={TASK_STATUS.ERROR}
+        taskRunningStatus={TASK_RUNNING_STATUS.COMPLETE}
+        onViewResult={onViewResult}
+      />,
+    );
+
+    const viewButton = screen.getByText('提交');
+    fireEvent.click(viewButton);
+    expect(onViewResult).toHaveBeenCalledTimes(1);
+  });
+
+  // 测试 onViewResult 在 STOPPED 状态下显示
+  it('should show onViewResult button in STOPPED state', () => {
+    const onViewResult = vi.fn();
+    render(
+      <TaskRunning
+        {...baseProps}
+        taskStatus={TASK_STATUS.STOPPED}
+        taskRunningStatus={TASK_RUNNING_STATUS.COMPLETE}
+        onViewResult={onViewResult}
+      />,
+    );
+
+    const viewButton = screen.getByText('提交');
+    fireEvent.click(viewButton);
+    expect(onViewResult).toHaveBeenCalledTimes(1);
+  });
+
+  // 测试 onViewResult 在 CANCELLED 状态下显示
+  it('should show onViewResult button in CANCELLED state', () => {
+    const onViewResult = vi.fn();
+    render(
+      <TaskRunning
+        {...baseProps}
+        taskStatus={TASK_STATUS.CANCELLED}
+        taskRunningStatus={TASK_RUNNING_STATUS.COMPLETE}
+        onViewResult={onViewResult}
+      />,
+    );
+
+    const viewButton = screen.getByText('提交');
+    fireEvent.click(viewButton);
+    expect(onViewResult).toHaveBeenCalledTimes(1);
+  });
+
+  // 测试未提供 onViewResult 时不展示按钮
+  it('should not show onViewResult button when callback is not provided', () => {
+    render(
+      <TaskRunning
+        {...baseProps}
+        taskStatus={TASK_STATUS.ERROR}
+        taskRunningStatus={TASK_RUNNING_STATUS.COMPLETE}
+        onViewResult={undefined}
+      />,
+    );
+
+    expect(screen.queryByText('提交')).not.toBeInTheDocument();
   });
 
   // 测试自定义按钮

@@ -7,6 +7,8 @@ import {
   MarkdownEditorProps,
   parserMdToSchema,
 } from '../../';
+import { useLocale } from '../../I18n';
+import { MarkdownRenderer } from '../../MarkdownRenderer';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { MessageBubbleData } from '../type';
 import { MessagesContext } from './BubbleContext';
@@ -102,19 +104,58 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
 
   const { hidePadding } = useContext(MessagesContext) || {};
 
-  const { locale, standalone } = useContext(BubbleConfigContext) || {};
+  const config = useContext(BubbleConfigContext);
+  const locale = useLocale();
+  const standalone = config?.standalone;
+  const extraShowOnHover = config?.extraShowOnHover;
   const { token } = theme.useToken();
+
+  const renderMode =
+    props.markdownRenderConfig?.renderMode ??
+    props.markdownRenderConfig?.renderType ??
+    'slate';
+  const shouldAnimateMarkdown =
+    Boolean(typing) && (props.originData?.isLast ?? true);
 
   const isPaddingHidden = useMemo(() => {
     return !!extra;
   }, [extra, typing]);
 
   useEffect(() => {
+    if (renderMode !== 'slate') return;
     const schema = parserMdToSchema(content).schema;
     MarkdownEditorRef.current?.store.updateNodeList(schema);
-  }, [content]);
+  }, [content, renderMode]);
 
   const markdown = useMemo(() => {
+    // MarkdownRenderer 渲染路径——轻量，不创建 Slate 实例
+    if (renderMode === 'markdown') {
+      return (
+        <MarkdownRenderer
+          content={content}
+          streaming={shouldAnimateMarkdown}
+          isFinished={props.originData?.isFinished}
+          plugins={props.markdownRenderConfig?.plugins}
+          queueOptions={props.markdownRenderConfig?.queueOptions}
+          streamingParagraphAnimation={
+            props.markdownRenderConfig?.streamingParagraphAnimation
+          }
+          fncProps={fncProps}
+          linkConfig={props.markdownRenderConfig?.linkConfig}
+          style={{
+            maxWidth: standalone ? '100%' : undefined,
+            padding: isPaddingHidden ? 0 : undefined,
+            margin: isPaddingHidden ? 0 : undefined,
+            ...(props.markdownRenderConfig?.style || {}),
+          }}
+          codeProps={props.markdownRenderConfig?.codeProps}
+          apaasify={props.markdownRenderConfig?.apaasify}
+          fileMapConfig={props.markdownRenderConfig?.fileMapConfig}
+        />
+      );
+    }
+
+    // Slate 渲染路径——保持向后兼容
     const minWidth = content?.includes?.('chartType')
       ? standalone
         ? Math.max((htmlRef?.current?.clientWidth || 600) - 23, 500)
@@ -146,7 +187,10 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           fontSize: 14,
           ...(props.markdownRenderConfig?.editorStyle || {}),
         }}
-        typewriter={props.markdownRenderConfig?.typewriter ?? typing}
+        typewriter={
+          (props.markdownRenderConfig?.typewriter ?? shouldAnimateMarkdown) &&
+          (props.originData?.isLast ?? true)
+        }
         style={{
           minWidth: minWidth ? `min(${minWidth}px,100%)` : undefined,
           maxWidth: standalone ? '100%' : undefined,
@@ -157,7 +201,18 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         readonly
       />
     );
-  }, [hidePadding, typing, props.originData?.isLast, isPaddingHidden, content]);
+  }, [
+    hidePadding,
+    typing,
+    props.originData?.isLast,
+    props.originData?.isFinished,
+    isPaddingHidden,
+    content,
+    renderMode,
+    props.markdownRenderConfig,
+    fncProps,
+    standalone,
+  ]);
 
   const errorDom = (
     <div
@@ -175,7 +230,8 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     </div>
   );
 
-  if (props.placement !== 'right') {
+  // 未开启 extraShowOnHover 时，extra 常驻展示（左右均作为兄弟节点渲染）
+  if (!extraShowOnHover) {
     return (
       <div
         style={{
@@ -196,12 +252,45 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     );
   }
 
+  // extraShowOnHover 开启时，无 extra 直接返回内容，避免 hover 出现空浮层
+  // 生成中（typing）时不使用 Popover，避免 hover 展示 extra
+  if (!extra || typing) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0,
+          maxWidth: '100%',
+        }}
+      >
+        <ErrorBoundary fallback={errorDom}>
+          {beforeContent}
+          {markdown}
+          {docListNode}
+          {afterContent}
+        </ErrorBoundary>
+      </div>
+    );
+  }
+
+  // extraShowOnHover 开启时，左右两侧均通过 Popover 在 hover 时展示 extra
+  const isLeft = props.placement === 'left';
+  const popoverAlign = isLeft
+    ? {
+        points: ['tl', 'bl'] as [string, string],
+        offset: [0, -12] as [number, number],
+      }
+    : {
+        points: ['tr', 'br'] as [string, string],
+        offset: [0, -12] as [number, number],
+      };
+  const popoverPlacement = isLeft ? 'bottomLeft' : 'bottomRight';
+
   return (
     <Popover
-      align={{
-        points: ['tr', 'br'],
-        offset: [0, -12],
-      }}
+      trigger="hover"
+      align={popoverAlign}
       content={extra}
       styles={{
         root: {
@@ -218,7 +307,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         },
       }}
       arrow={false}
-      placement="bottomRight"
+      placement={popoverPlacement}
     >
       <div
         style={{

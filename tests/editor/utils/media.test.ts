@@ -38,11 +38,25 @@ describe('Media Utils', () => {
       expect(result).toBe('other');
     });
 
-    it('应该处理data URL', async () => {
+    it('应该处理 data URL 图片', async () => {
       const result = await getRemoteMediaType(
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
       );
-      expect(result).toBe('png');
+      expect(result).toBe('image');
+    });
+
+    it('应该处理 data URL 视频', async () => {
+      const result = await getRemoteMediaType(
+        'data:video/mp4;base64,AAAAGGZ0eXBNNEEgAAACAE00QSBpc29t',
+      );
+      expect(result).toBe('video');
+    });
+
+    it('应该处理 data URL 音频', async () => {
+      const result = await getRemoteMediaType(
+        'data:audio/mpeg;base64,//uQx',
+      );
+      expect(result).toBe('audio');
     });
 
     it('应该处理无效的data URL', async () => {
@@ -52,6 +66,11 @@ describe('Media Utils', () => {
 
     it('应该处理非字符串URL', async () => {
       const result = await getRemoteMediaType(null as any);
+      expect(result).toBe('other');
+    });
+
+    it('应在 url 类型非 string 时返回 other', async () => {
+      const result = await getRemoteMediaType(123 as any);
       expect(result).toBe('other');
     });
 

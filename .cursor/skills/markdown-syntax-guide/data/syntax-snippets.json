@@ -1,0 +1,27 @@
+{
+  "table": {
+    "basic": "| 标题 1 | 标题 2 |\n| :----- | :----: |\n| 左对齐 |  居中  |",
+    "advanced": "<!-- {\"chartType\": \"table\"} -->\n\n| 姓名 | 年龄 |\n| :--- | :--- |\n| 张三 | 28   |",
+    "asChart": "<!-- {\"chartType\": \"bar\", \"x\": \"产品\", \"y\": \"销量\"} -->\n\n| 产品 | 销量 |\n| :--- | :--- |\n| A    | 100  |"
+  },
+  "video": {
+    "html": "<video src=\"https://example.com/video.mp4\" controls width=\"400\"></video>",
+    "imageStyle": "![video:视频名称](https://example.com/video.mp4)"
+  },
+  "chart": {
+    "mermaid": "```mermaid\ngraph TD\n    A[开始] --> B[结束]\n```",
+    "bar": "<!-- {\"chartType\": \"bar\", \"x\": \"类别\", \"y\": \"数值\"} -->\n\n| 类别 | 数值 |\n| :--- | :--- |\n| A    | 100  |",
+    "pie": "<!-- {\"chartType\": \"pie\", \"x\": \"类型\", \"y\": \"占比\"} -->\n\n| 类型 | 占比 |\n| :--- | :--- |\n| A    | 40   |",
+    "line": "<!-- {\"chartType\": \"line\", \"x\": \"月份\", \"y\": \"销量\"} -->\n\n| 月份 | 销量 |\n| :--- | :--- |\n| 1月  | 100  |"
+  },
+  "card": {
+    "linkCard": "<!-- {\"type\": \"card\", \"title\": \"标题\", \"description\": \"描述\"} -->\n[链接文本](https://example.com \"提示\")"
+  },
+  "alert": {
+    "info": ":::info\n信息内容\n:::",
+    "warning": ":::warning\n警告内容\n:::"
+  },
+  "attachment": {
+    "basic": "![attachment:文件名.pdf](https://example.com/file.pdf)"
+  }
+}

@@ -51,7 +51,7 @@ const matchText = (
 ) => {
   return (ctx: CheckMdParams) => {
     const { sel, editor, match, startText } = ctx;
-    const leaf = Node.leaf(editor, sel.anchor.path);
+    const [leaf] = Editor.leaf(editor, sel.anchor);
     if (EditorUtils.isDirtLeaf(leaf)) return false;
     if (matchString) {
       const preStr = Node.string(leaf) + matchString;

@@ -5,33 +5,37 @@ import React, { useState } from 'react';
 const CustomHistoryDemo = () => {
   const [currentSessionId, setCurrentSessionId] = useState('session-1');
 
+  const now = new Date();
+  const today = now.getTime();
+  const yesterday = today - 86400000;
+  const threeDaysAgo = today - 259200000;
+
   // 模拟请求函数
   const mockRequest = async ({ agentId }: { agentId: string }) => {
-    // 模拟 API 请求
     return [
       {
         id: '1',
         sessionId: 'session-1',
-        sessionTitle: '重要会议记录',
+        sessionTitle: '重构用户权限管理模块',
         agentId: agentId,
-        gmtCreate: 1718332800000, // 2024-04-15
-        gmtLastConverse: 1718332800000,
+        gmtCreate: today - 3600000,
+        gmtLastConverse: today - 3600000,
       },
       {
         id: '2',
         sessionId: 'session-2',
-        sessionTitle: '项目讨论',
+        sessionTitle: '排查生产环境内存泄漏问题',
         agentId: agentId,
-        gmtCreate: 1718246400000, // 2024-04-14
-        gmtLastConverse: 1718246400000,
+        gmtCreate: yesterday,
+        gmtLastConverse: yesterday,
       },
       {
         id: '3',
         sessionId: 'session-3',
-        sessionTitle: '技术分享',
+        sessionTitle: '编写单元测试覆盖核心业务逻辑',
         agentId: agentId,
-        gmtCreate: 1718160000000, // 2024-04-13
-        gmtLastConverse: 1718160000000,
+        gmtCreate: threeDaysAgo,
+        gmtLastConverse: threeDaysAgo,
       },
     ] as HistoryDataType[];
   };
@@ -43,19 +47,18 @@ const CustomHistoryDemo = () => {
 
   const handleDeleteItem = async (sessionId: string) => {
     console.log('删除会话:', sessionId);
-    // 这里可以调用删除 API
   };
 
   // 自定义日期格式化函数
   const customDateFormatter = (date: number | string | Date) => {
     const dateObj = new Date(date);
-    const today = new Date('2023-12-21');
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+    const todayDate = new Date();
+    const yesterdayDate = new Date(todayDate);
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
-    if (dateObj.toDateString() === today.toDateString()) {
+    if (dateObj.toDateString() === todayDate.toDateString()) {
       return '今天';
-    } else if (dateObj.toDateString() === yesterday.toDateString()) {
+    } else if (dateObj.toDateString() === yesterdayDate.toDateString()) {
       return '昨天';
     } else {
       return dayjs(date).format('MM月DD日');
@@ -65,13 +68,13 @@ const CustomHistoryDemo = () => {
   // 自定义分组函数
   const customGroupBy = (item: HistoryDataType) => {
     const date = new Date(item.gmtCreate as number);
-    const today = new Date('2023-12-21');
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+    const todayDate = new Date();
+    const yesterdayDate = new Date(todayDate);
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
-    if (date.toDateString() === today.toDateString()) {
+    if (date.toDateString() === todayDate.toDateString()) {
       return '今天';
-    } else if (date.toDateString() === yesterday.toDateString()) {
+    } else if (date.toDateString() === yesterdayDate.toDateString()) {
       return '昨天';
     } else {
       return '更早';
@@ -108,41 +111,6 @@ const CustomHistoryDemo = () => {
           sessionSort={customSort}
           standalone
         />
-      </div>
-
-      <div style={{ marginTop: '20px', padding: '20px' }}>
-        <h4>Props 说明：</h4>
-        <ul>
-          <li>
-            <strong>customDateFormatter</strong>:
-            自定义日期格式化函数，用于显示分组标题
-          </li>
-          <li>
-            <strong>groupBy</strong>:
-            自定义分组函数，用于将历史记录按自定义规则分组
-          </li>
-          <li>
-            <strong>sessionSort</strong>: 自定义排序函数，用于对历史记录进行排序
-          </li>
-          <li>
-            <strong>agentId</strong>: 代理ID，用于获取历史记录
-          </li>
-          <li>
-            <strong>sessionId</strong>: 当前会话ID，变更时会触发数据重新获取
-          </li>
-          <li>
-            <strong>request</strong>: 请求函数，用于获取历史数据
-          </li>
-          <li>
-            <strong>onClick</strong>: 点击历史记录项时的回调函数
-          </li>
-          <li>
-            <strong>onDeleteItem</strong>: 删除历史记录项时的回调函数
-          </li>
-          <li>
-            <strong>standalone</strong>: 设置为 true 时，直接显示菜单列表
-          </li>
-        </ul>
       </div>
     </div>
   );

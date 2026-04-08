@@ -1,8 +1,7 @@
 import designStrategyIcon from '../../../../../assets/design-strategy-icon.png';
-import { AGENT_EVALUATION_URL, COMPONENT_LIBRARY_URL } from '../../../../../constants/links';
+import { COMPONENT_LIBRARY_URL } from '../../../../../constants/links';
 import { Button } from 'antd';
 import React from 'react';
-import { ArrowRightOutlined } from '@ant-design/icons';
 import { getGradientSvg } from '../../BacksideCard';
 import { Rotate3DIcon } from '../../Rotate3DIcon';
 import { FeatureItem } from '../types';
@@ -150,62 +149,6 @@ export const IntroBacksideCard: React.FC<IntroBacksideCardProps> = ({
             marginTop: 'auto',
           }}
         >
-          {/* 立即评估 Button */}
-          <Button
-            type="primary"
-            block
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // Handle evaluate action
-              window.open(
-                AGENT_EVALUATION_URL,
-                '_blank',
-                'noopener,noreferrer',
-              );
-            }}
-            style={{
-              backgroundColor: '#14161C',
-              borderColor: '#14161C',
-              borderRadius: '200px',
-              fontSize: '15px',
-              fontWeight: 500,
-              transition: 'all 0.2s ease',
-              display: 'flex',
-              height: '48px',
-              width: '132px',
-              padding: '12px 8px',
-              alignItems: 'center',
-              gap: '8px',
-              marginRight: '12px',
-              position: 'relative',
-              zIndex: 11,
-              cursor: 'pointer',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = '0.9';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = '1';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            立即评估
-            <span
-              style={{
-                borderRadius: '200px',
-                background: '#FFF',
-                padding: '4px',
-                display: 'flex',
-                marginLeft: '4px',
-              }}
-            >
-              <ArrowRightOutlined style={{ color: '#14161C' }} size={32} />
-            </span>
-          </Button>
-
-          {/* 了解更多 Button */}
           <Button
             block
             onClick={() => {

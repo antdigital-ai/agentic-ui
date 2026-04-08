@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HistorySearch } from '../../../src/History/components/SearchComponent';
 import { I18nContext } from '../../../src/I18n';
 
@@ -77,6 +77,43 @@ describe('HistorySearch', () => {
     expect(screen.getByPlaceholderText('搜索话题')).toBeInTheDocument();
   });
 
+  it('展开后点击外部且 inputValue 为空时应收起', () => {
+    const onSearch = vi.fn();
+    render(
+      <TestWrapper>
+        <HistorySearch onSearch={onSearch} />
+      </TestWrapper>,
+    );
+
+    const searchButton = screen.getByTestId('action-icon-box');
+    fireEvent.click(searchButton);
+    expect(screen.getByPlaceholderText('搜索话题')).toBeInTheDocument();
+
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByPlaceholderText('搜索话题')).not.toBeInTheDocument();
+  });
+
+  it('展开且有输入内容时点击外部不收起', async () => {
+    const onSearch = vi.fn().mockResolvedValue(undefined);
+    render(
+      <TestWrapper>
+        <HistorySearch onSearch={onSearch} />
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByTestId('action-icon-box'));
+    const input = screen.getByPlaceholderText('搜索话题');
+    fireEvent.change(input, { target: { value: 'x' } });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 360));
+    });
+
+    fireEvent.mouseDown(document.body);
+
+    expect(screen.getByPlaceholderText('搜索话题')).toBeInTheDocument();
+  });
+
   it('应该显示 task 类型的 placeholder', () => {
     const onSearch = vi.fn();
     render(
@@ -106,6 +143,60 @@ describe('HistorySearch', () => {
     fireEvent.click(searchButton);
 
     expect(screen.getByPlaceholderText('自定义搜索')).toBeInTheDocument();
+  });
+
+  it('无自定义 placeholder 时 type=task 应显示默认 placeholder', () => {
+    const onSearch = vi.fn();
+    render(
+      <ConfigProvider>
+        <I18nContext.Provider value={{ locale: {}, language: 'zh-CN' } as any}>
+          <HistorySearch onSearch={onSearch} type="task" />
+        </I18nContext.Provider>
+      </ConfigProvider>,
+    );
+    fireEvent.click(screen.getByTestId('action-icon-box'));
+    expect(screen.getByPlaceholderText('搜索任务')).toBeInTheDocument();
+  });
+
+  it('无自定义 placeholder 且非 task 时应显示搜索话题', () => {
+    const onSearch = vi.fn();
+    render(
+      <ConfigProvider>
+        <I18nContext.Provider value={{ locale: {}, language: 'zh-CN' } as any}>
+          <HistorySearch onSearch={onSearch} />
+        </I18nContext.Provider>
+      </ConfigProvider>,
+    );
+    fireEvent.click(screen.getByTestId('action-icon-box'));
+    expect(screen.getByPlaceholderText('搜索话题')).toBeInTheDocument();
+  });
+
+  it('点击清空按钮应触发 onClear', async () => {
+    const onSearch = vi.fn();
+    const { container } = render(
+      <TestWrapper>
+        <HistorySearch onSearch={onSearch} />
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByTestId('action-icon-box'));
+    const input = screen.getByPlaceholderText('搜索话题');
+    fireEvent.change(input, { target: { value: 'keyword' } });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 360));
+    });
+    await waitFor(() => {
+      expect(onSearch).toHaveBeenCalledWith('keyword');
+    });
+
+    const clearBtn = container.querySelector('.ant-input-clear-icon');
+    expect(clearBtn).toBeInTheDocument();
+    fireEvent.click(clearBtn as HTMLElement);
+    expect(input).toHaveValue('');
+    await waitFor(() => {
+      expect(onSearch).toHaveBeenCalledWith('');
+    });
   });
 
   it('应该使用自定义默认文本', () => {

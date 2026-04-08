@@ -1,5 +1,5 @@
 import { ConfigProvider, Spin } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext } from 'react';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { useStyle } from './style';
@@ -88,6 +88,11 @@ const MenuItem: React.FC<{
       item.onClick?.();
     }
   });
+
+  // 分组类型但子项为空时不展示
+  if (item.type === 'group' && (!item.children || !item.children.length)) {
+    return null;
+  }
 
   // 如果是分组且有子项，并且嵌套层级小于2
   if (item.type === 'group' && item.children && level < 2) {

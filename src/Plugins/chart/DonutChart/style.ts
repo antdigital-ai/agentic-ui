@@ -39,6 +39,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '&-chart-wrapper': {
+        overflow: 'visible',
         [`@media (max-width: 768px)`]: {
           marginBottom: 12,
         },
@@ -48,6 +49,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'row',
+        overflow: 'visible',
         [`@media (max-width: 768px)`]: {
           flexDirection: 'column',
           alignItems: 'stretch',
@@ -57,6 +59,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-chart': {
         width: 'var(--donut-chart-width, 200px)',
         height: 'var(--donut-chart-height, 200px)',
+        overflow: 'visible',
         [`@media (max-width: 768px)`]: {
           alignSelf: 'center',
           marginBottom: 8,
@@ -76,8 +79,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         [`@media (max-width: 768px)`]: {
           marginLeft: 0,
           marginTop: 8,
-          maxHeight: '120px',
-          overflowY: 'auto',
         },
       },
 
@@ -148,6 +149,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           fontSize: 10,
           marginTop: 1,
         },
+      },
+
+      '&-legend-pagination': {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        marginTop: 8,
+        paddingTop: 8,
+        borderTop: '1px solid rgba(0,0,0,0.06)',
       },
 
       '&-statistic-container': {

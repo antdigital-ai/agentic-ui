@@ -16,18 +16,9 @@ export default () => {
     {
       id: '1',
       role: 'assistant',
-      content: `# contentRender 自定义内容渲染演示
+      content: `# 自定义气泡内容（contentRender）
 
-contentRender 允许你完全自定义消息气泡的内容区域，可以：
-
-## 功能特点
-- 🎨 **样式定制**：自定义内容的样式和布局
-- 📊 **元数据显示**：显示模型信息、耗时、置信度等
-- ⏳ **加载状态**：自定义加载中的显示效果
-- 🏷️ **标签展示**：显示业务相关的标签信息
-- 📍 **位置信息**：显示用户位置和设备信息
-
-通过下方的按钮可以切换不同的内容渲染样式。`,
+下面同一条助手消息，可用按钮切换：**默认** / **元数据条** / **加载态** / **增强信息区**，观察 \`contentRender\` 如何包一层自定义布局而不改 \`originData.content\` 的正文 Markdown。`,
       createAt: Date.now() - 120000,
       updateAt: Date.now() - 120000,
       isFinished: true,
@@ -49,7 +40,7 @@ contentRender 允许你完全自定义消息气泡的内容区域，可以：
     {
       id: '2',
       role: 'user',
-      content: '请帮我分析这段代码的性能问题，并提供优化建议。',
+      content: '请简要分析这段代码的性能问题。',
       createAt: Date.now() - 60000,
       updateAt: Date.now() - 60000,
       isFinished: true,
@@ -68,30 +59,13 @@ contentRender 允许你完全自定义消息气泡的内容区域，可以：
     {
       id: '3',
       role: 'assistant',
-      content: `## 性能分析报告
+      content: `## 简要结论
+1. 清理副作用，避免泄漏  
+2. 对纯展示子树使用 \`React.memo\`
 
-### 问题识别
-1. **内存泄漏**：事件监听器未正确清理
-2. **重复渲染**：组件缺少 memo 优化
-3. **大列表渲染**：未使用虚拟滚动
-
-### 优化建议
-\`\`\`typescript
-// 使用 React.memo 优化
-const OptimizedComponent = React.memo(({ data }) => {
-  return <div>{data.title}</div>;
-});
-
-// 使用 useCallback 优化回调
-const handleClick = useCallback(() => {
-  // 处理点击事件
-}, [dependency]);
-\`\`\`
-
-### 预期效果
-- 性能提升 40%
-- 内存使用减少 30%
-- 渲染时间缩短 50%`,
+\`\`\`tsx
+const Row = React.memo(({ title }: { title: string }) => <div>{title}</div>);
+\`\`\``,
       createAt: Date.now() - 10000,
       updateAt: Date.now() - 10000,
       isFinished: true,

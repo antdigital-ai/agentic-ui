@@ -142,6 +142,59 @@ export interface ChartDataItem {
   filterLabel?: string;
 }
 
+/** 1 亿（人民币口语单位）对应的「元」数量 */
+const CHINESE_YI_TO_YUAN = 1e8;
+/** 1 万对应的「元」数量 */
+const CHINESE_WAN_TO_YUAN = 1e4;
+
+/**
+ * 将含「亿元 / 万元 / 元」的人民币口语字符串转为数值（以「元」为数值单位）。
+ *
+ * - `533亿元` → `533 * 1e8`
+ * - `549万元` → `549 * 1e4`
+ * - `128.5元` → `128.5`
+ *
+ * 不含上述单位且无法识别为纯数字时返回 `null`，避免误解析如 `8%`。
+ *
+ * @param value - 原始单元格或字段值
+ * @returns 解析后的有限数字，无法解析则为 `null`
+ */
+export const parseChineseCurrencyToNumber = (value: unknown): number | null => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value !== 'string') return null;
+
+  let s = value.trim();
+  if (!s) return null;
+
+  s = s
+    .replace(/,/g, '')
+    .replace(/，/g, '')
+    .replace(/[￥¥\s]/g, '');
+
+  const yi = s.match(/(-?\d+(?:\.\d+)?)\s*亿/);
+  if (yi) {
+    const n = parseFloat(yi[1]);
+    return Number.isFinite(n) ? n * CHINESE_YI_TO_YUAN : null;
+  }
+
+  const wan = s.match(/(-?\d+(?:\.\d+)?)\s*万/);
+  if (wan) {
+    const n = parseFloat(wan[1]);
+    return Number.isFinite(n) ? n * CHINESE_WAN_TO_YUAN : null;
+  }
+
+  const yuan = s.match(/(-?\d+(?:\.\d+)?)\s*元/);
+  if (yuan) {
+    const n = parseFloat(yuan[1]);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  return null;
+};
+
 /**
  * 归一化 X 轴值
  *
@@ -167,7 +220,9 @@ export const normalizeXValue = (value: number | string): number | string => {
   const s = String(value).trim();
   if (s === '') return value;
   const n = Number(s);
-  return Number.isFinite(n) ? n : value;
+  if (Number.isFinite(n)) return n;
+  const cn = parseChineseCurrencyToNumber(s);
+  return cn !== null ? cn : value;
 };
 
 /**
@@ -338,6 +393,7 @@ export const findDataPointByXValue = (
  *
  * 安全地将任意值转换为数字类型，转换失败时返回默认值。
  * 如果输入已经是有效的数字，直接返回；否则尝试转换。
+ * 字符串支持「亿元 / 万元 / 元」等人民币口语格式（见 `parseChineseCurrencyToNumber`）。
  *
  * @param {any} val - 要转换的值
  * @param {number} fallback - 转换失败时的默认值
@@ -356,7 +412,12 @@ export const findDataPointByXValue = (
 export const toNumber = (val: any, fallback: number): number => {
   if (typeof val === 'number' && !Number.isNaN(val)) return val;
   const n = Number(val);
-  return Number.isFinite(n) ? n : fallback;
+  if (Number.isFinite(n)) return n;
+  if (typeof val === 'string') {
+    const cn = parseChineseCurrencyToNumber(val);
+    if (cn !== null && Number.isFinite(cn)) return cn;
+  }
+  return fallback;
 };
 
 /**

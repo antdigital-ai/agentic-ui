@@ -3,7 +3,7 @@
  */
 
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Head } from '../../../../src/MarkdownEditor/editor/elements/Head';
@@ -60,6 +60,12 @@ describe('Head Component', () => {
       const heading = document.querySelector('h1');
       expect(heading).toBeInTheDocument();
       expect(heading).toHaveTextContent('Test Heading');
+    });
+
+    it('应在 onDragStart 时触发 store.dragStart', () => {
+      const { container } = render(<Head {...defaultProps} />);
+      const heading = container.querySelector('h1');
+      fireEvent.dragStart(heading!);
     });
 
     it('应该正确渲染 h2 标题', () => {

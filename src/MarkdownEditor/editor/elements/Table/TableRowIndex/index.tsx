@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext } from 'react';
 import { TableCellIndexSpacer } from '../TableCellIndexSpacer';
 
@@ -7,8 +7,10 @@ import { TableCellIndexSpacer } from '../TableCellIndexSpacer';
  * TableRowIndex 组件的属性接口
  */
 export interface TableRowIndexProps {
-  /** 列宽度数组 */
+  /** 列宽度数组，为空时使用 columnCount 渲染占位单元格 */
   colWidths?: number[];
+  /** 数据列数，colWidths 为空时用于渲染占位单元格数量 */
+  columnCount?: number;
   /** 自定义样式 */
   style?: React.CSSProperties;
   /** 自定义类名 */
@@ -51,10 +53,12 @@ export interface TableRowIndexProps {
  */
 export const TableRowIndex: React.FC<TableRowIndexProps> = ({
   colWidths = [],
+  columnCount = 0,
   style,
   className,
   tablePath,
 }) => {
+  const spacerCount = colWidths.length > 0 ? colWidths.length : columnCount;
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(
     'agentic-md-editor-table-row-index',
@@ -77,7 +81,7 @@ export const TableRowIndex: React.FC<TableRowIndexProps> = ({
         key={-1}
         tablePath={tablePath}
       />
-      {colWidths.map((_: number, index: number) => (
+      {Array.from({ length: spacerCount }).map((_, index: number) => (
         <TableCellIndexSpacer
           key={index}
           columnIndex={index}

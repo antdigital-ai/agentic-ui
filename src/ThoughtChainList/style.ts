@@ -43,7 +43,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             backgroundSize: '150%',
             backgroundPosition: '0 0',
             backgroundImage: `conic-gradient(
-    from var(--angle) at 50% 50%,
+    from var(--angle, 0deg) at 50% 50%,
     rgba(46, 255, 127, 0.7) 0deg,
     rgba(120, 133, 255, 1) 90deg,
     rgba(255, 0, 153, 0.4) 180deg,
@@ -77,6 +77,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontSize: '1em',
         borderTopLeftRadius: 6,
         borderTopRightRadius: 12,
+        '&-icon': {
+          width: 15,
+          height: 15,
+          color: token.colorSuccess || '#0CE0AD',
+        },
         '&&-collapse': {
           borderRadius: '6px 12px 12px 12px',
         },
@@ -108,12 +113,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           flex: 1,
         },
       },
+      '&-content-wrapper': {
+        backgroundColor: token.colorBgContainer || '#FFF',
+        position: 'relative',
+        borderRadius: '6px 12px 12px 12px',
+        zIndex: 9,
+      },
       '&-content': {
         backgroundColor: 'var(--color-gray-bg-card-white)',
         borderRadius: '0px 0px 12px 12px',
         maxHeight: '566px',
         padding: '12px 12px',
-        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        opacity: 1,
+        transition:
+          'max-height 0.16s cubic-bezier(0.4, 0, 0.2, 1), padding 0.16s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.12s linear',
         overflow: 'auto',
         '&&-compact': {
           padding: 8,
@@ -122,6 +135,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           maxHeight: '0px',
           padding: '0',
           opacity: 0,
+          overflow: 'hidden',
         },
         '&-list': {
           display: 'flex',

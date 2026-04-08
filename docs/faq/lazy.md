@@ -67,12 +67,12 @@ export default () => {
 
 ### 配置说明
 
-| 参数                   | 说明                   | 类型     | 默认值  |
-| ---------------------- | ---------------------- | -------- | ------- |
-| lazy.enable            | 是否启用懒加载         | boolean  | false   |
-| lazy.placeholderHeight | 占位符高度（单位：px） | number   | 25      |
-| lazy.rootMargin        | 提前加载距离           | string   | '200px' |
-| lazy.renderPlaceholder | 自定义占位符渲染函数   | function | -       |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| lazy.enable | 是否启用懒加载 | boolean | false | - |
+| lazy.placeholderHeight | 占位符高度（单位：px） | number | 25 | - |
+| lazy.rootMargin | 提前加载距离 | string | '200px' | - |
+| lazy.renderPlaceholder | 自定义占位符渲染函数 | function | - | - |
 
 ## 自定义占位符渲染
 
@@ -102,15 +102,15 @@ export default () => {
 
 ### renderPlaceholder 参数说明
 
-| 参数              | 类型          | 说明                 |
-| ----------------- | ------------- | -------------------- |
-| height            | number        | 占位符高度（px）     |
-| style             | CSSProperties | 计算后的占位符样式   |
-| isIntersecting    | boolean       | 元素是否即将进入视口 |
-| elementInfo       | object        | 元素信息（可选）     |
-| elementInfo.type  | string        | 元素类型             |
-| elementInfo.index | number        | 元素在文档中的索引   |
-| elementInfo.total | number        | 元素总数量           |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| height | 占位符高度（px） | `number` | - | - |
+| style | 计算后的占位符样式 | `CSSProperties` | - | - |
+| isIntersecting | 元素是否即将进入视口 | `boolean` | - | - |
+| elementInfo | 元素信息（可选） | `object` | - | - |
+| elementInfo.type | 元素类型 | `string` | - | - |
+| elementInfo.index | 元素在文档中的索引 | `number` | - | - |
+| elementInfo.total | 元素总数量 | `number` | - | - |
 
 ### 占位符样式示例
 
@@ -239,13 +239,13 @@ export default () => {
 
 #### setMDContent Options 配置说明
 
-| 参数       | 说明                                                        | 类型                       | 默认值 |
-| ---------- | ----------------------------------------------------------- | -------------------------- | ------ |
-| chunkSize  | 分块大小阈值，超过此大小会启用分批处理                      | number                     | 5000   |
-| separator  | 分隔符，用于拆分长文本                                      | string                     | '\n\n' |
-| useRAF     | 是否使用 RAF 优化，分批解析和插入内容，避免长文本处理时卡顿 | boolean                    | true   |
-| batchSize  | 每帧处理的节点数量（仅在 useRAF=true 时生效）               | number                     | 50     |
-| onProgress | 进度回调函数，接收当前进度 (0-1) 作为参数，边解析边插入     | (progress: number) => void | -      |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| chunkSize | 分块大小阈值，超过此大小会启用分批处理 | `number` | `5000` | - |
+| separator | 分隔符，用于拆分长文本 | `string` | `'\n\n'` | - |
+| useRAF | 是否使用 RAF 优化，分批解析和插入内容，避免长文本处理时卡顿 | `boolean` | `true` | - |
+| batchSize | 每帧处理的节点数量（仅在 useRAF=true 时生效） | `number` | `50` | - |
+| onProgress | 进度回调函数，接收当前进度 (0-1) 作为参数，边解析边插入 | `(progress: number) => void` | - | - |
 
 **使用建议**：
 

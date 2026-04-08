@@ -19,7 +19,7 @@ import type { CreateRecognizer } from '../VoiceInput';
  * @property {React.CSSProperties} [style] - 应用于输入字段的内联样式
  * @property {string} [className] - 应用于输入字段的 CSS 类名
  * @property {boolean} [disabled] - 是否禁用输入字段
- * @property {boolean} [typing] - 用户是否正在输入的状态标志
+ * @property {boolean} [typing] - AI 回复中等场景下为 true，输入区只读并显示提示
  * @property {'Enter'} [triggerSendKey] - 触发发送操作的键盘快捷键（Enter 发送，Shift+Enter 换行）
  * @property {function} [onSend] - 当内容发送时触发的异步回调函数
  */
@@ -63,8 +63,8 @@ export type MarkdownInputFieldProps = {
   disabled?: boolean;
 
   /**
-   * 用户是否正在输入的状态标志。
-   * @example typing={isComposing}
+   * 为 true 时表示 AI 正在回复等场景：输入区只读、展示 typing 提示，且不可上传附件或语音输入。
+   * @example typing={isAssistantStreaming}
    */
   typing?: boolean;
 
@@ -135,13 +135,14 @@ export type MarkdownInputFieldProps = {
   /**
    * 附件配置
    * @description 配置附件功能，可以启用或禁用附件上传，并自定义附件按钮的属性
+   * @default { enable: false } 默认关闭文件上传
    * @example
    * ```tsx
    * <BubbleChat
    *   attachment={{
    *     enable: true,
    *     accept: '.pdf,.doc,.docx',
-   *     maxSize: 10 * 1024 * 1024, // 10MB
+   *     maxFileSize: 10 * 1024 * 1024, // 10MB（字节）
    *     onUpload: async (file) => {
    *       const url = await uploadFile(file);
    *       return { url };
@@ -150,7 +151,14 @@ export type MarkdownInputFieldProps = {
    * />
    * ```
    */
+  /**
+   * 附件配置，默认 enable 为 false，需显式开启文件上传
+   */
   attachment?: {
+    /**
+     * 是否启用文件上传（包含粘贴图片上传）
+     * @default false
+     */
     enable?: boolean;
   } & AttachmentButtonProps;
 
@@ -333,7 +341,7 @@ export type MarkdownInputFieldProps = {
     enabled?: boolean;
     /**
      * 允许的粘贴内容类型
-     * @default ['application/x-slate-md-fragment', 'text/html', 'Files', 'text/markdown', 'text/plain']
+     * MarkdownInputField 默认为 ['text/plain']，仅粘贴纯文本
      */
     allowedTypes?: Array<
       | 'application/x-slate-md-fragment'
@@ -342,6 +350,11 @@ export type MarkdownInputFieldProps = {
       | 'text/markdown'
       | 'text/plain'
     >;
+    /**
+     * 是否仅插入纯文本，不处理 HTML、链接、Markdown 解析等
+     * MarkdownInputField 默认为 true
+     */
+    plainTextOnly?: boolean;
   };
 
   /**
@@ -410,6 +423,12 @@ export type MarkdownInputFieldProps = {
    * ```
    */
   targetRef?: React.RefObject<HTMLDivElement>;
+
+  /**
+   * 测试 ID
+   * @description 用于 E2E 或自动化测试中的 `data-testid` 属性，覆盖根元素的默认 `markdown-input-field`
+   */
+  testId?: string;
 
   /**
    * 顶部操作区域自定义操作按钮渲染函数

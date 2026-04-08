@@ -8,17 +8,49 @@ const mockDownloadChart = vi.fn();
 const mockRegisterLineChartComponents = vi.fn();
 
 vi.mock('react-chartjs-2', () => ({
-  Line: ({ data, options }: any) => (
-    <div
-      data-testid="line-chart"
-      data-labels={JSON.stringify(data?.labels)}
-      data-datasets={JSON.stringify(data?.datasets)}
-      data-options={JSON.stringify({
-        plugins: options?.plugins,
-        scales: options?.scales,
-      })}
-    />
-  ),
+  Line: ({ data, options }: any) => {
+    // 调用 backgroundColor（chartArea 无/有）
+    const datasets = data?.datasets ?? [];
+    datasets.forEach((ds: any) => {
+      if (typeof ds.backgroundColor === 'function') {
+        ds.backgroundColor({ chart: { chartArea: null } });
+        const addColorStop = vi.fn();
+        ds.backgroundColor({
+          chart: {
+            chartArea: { top: 0, bottom: 100 },
+            ctx: {
+              createLinearGradient: () => ({ addColorStop }),
+            },
+          },
+        });
+      }
+    });
+    // 调用 tooltip callbacks.label
+    const labelCb = options?.plugins?.tooltip?.callbacks?.label;
+    if (typeof labelCb === 'function') {
+      labelCb({
+        dataset: { label: 'Series A' },
+        parsed: { y: 15 },
+      });
+    }
+    return (
+      <div
+        data-testid="line-chart"
+        data-labels={JSON.stringify(data?.labels)}
+        data-datasets={JSON.stringify(
+          datasets.map((d: any) =>
+            typeof d.backgroundColor !== 'function'
+              ? d
+              : { ...d, backgroundColor: '[Function]' },
+          ),
+        )}
+        data-options={JSON.stringify({
+          plugins: options?.plugins,
+          scales: options?.scales,
+        })}
+      />
+    );
+  },
 }));
 
 vi.mock('../../../src/Plugins/chart/hooks', () => ({
@@ -100,6 +132,7 @@ vi.mock('../../../src/Plugins/chart/AreaChart/style', () => ({
 }));
 
 import AreaChart from '../../../src/Plugins/chart/AreaChart';
+import { hexToRgba } from '../../../src/Plugins/chart/utils';
 
 describe('AreaChart 额外覆盖用例', () => {
   it('在工具栏渲染过滤器并触发下载', () => {
@@ -124,5 +157,11 @@ describe('AreaChart 额外覆盖用例', () => {
     const chart = screen.getByTestId('line-chart');
     const labels = JSON.parse(chart.getAttribute('data-labels') || '[]');
     expect(labels).toEqual(['2024-01', '2024-02']);
+  });
+
+  it('应执行 backgroundColor 渐变与 tooltip label 回调', () => {
+    render(<AreaChart data={[{ x: '2024-01', y: 10, type: 'A' }]} />);
+    expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+    expect(hexToRgba).toHaveBeenCalled();
   });
 });

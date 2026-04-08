@@ -3,7 +3,7 @@
  */
 
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -88,6 +88,42 @@ describe('CodeContainer Component', () => {
       await user.click(container);
 
       expect(onContainerClick).not.toHaveBeenCalled();
+    });
+
+    it('点击外层 code-container 时应阻止冒泡且不触发 onEditorClick', async () => {
+      const user = userEvent.setup();
+      const onContainerClick = vi.fn();
+      const onEditorClick = vi.fn();
+
+      render(
+        <div onClick={onContainerClick}>
+          <CodeContainer
+            {...defaultProps}
+            onEditorClick={onEditorClick}
+          />
+        </div>,
+      );
+
+      const outerContainer = screen.getByTestId('code-container');
+      await user.click(outerContainer);
+
+      expect(onContainerClick).not.toHaveBeenCalled();
+      expect(onEditorClick).not.toHaveBeenCalled();
+    });
+
+    it('外层 code-container 失焦时应执行 onBlur 并阻止冒泡', () => {
+      const onBlur = vi.fn();
+
+      render(
+        <div onBlur={onBlur}>
+          <CodeContainer {...defaultProps} />
+        </div>,
+      );
+
+      const outerContainer = screen.getByTestId('code-container');
+      fireEvent.blur(outerContainer);
+
+      expect(outerContainer).toBeInTheDocument();
     });
   });
 

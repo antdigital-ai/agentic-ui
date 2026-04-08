@@ -8,48 +8,20 @@ const WorkspaceTaskDemo: React.FC = () => {
   useEffect(() => {
     // 模拟任务数据
     const initialTasks = [
-      {
-        key: '1',
-        title: '创建全面的 Tesla 股票分析任务列表',
-        status: 'success',
-      },
+      { key: '1', title: '步骤一：完成', status: 'success' },
       {
         key: '2',
-        title: '下载指定的Bilibili视频分集并确保唯一文件名',
+        title: '步骤二：失败',
         content: (
           <div>
-            任务已停止
+            已停止
             <QuestionCircleOutlined style={{ marginLeft: 4 }} />
           </div>
         ),
         status: 'error',
       },
-
-      {
-        key: '3',
-        title: '提取下载的视频帧',
-        status: 'loading',
-      },
-      {
-        key: '4',
-        title: '对提取的视频帧进行文字识别',
-        status: 'pending',
-      },
-      {
-        key: '5',
-        title: '筛选掉OCR识别结果为乱码的图片',
-        status: 'pending',
-      },
-      {
-        key: '6',
-        title: '报告结果并将Word文档发送给用户',
-        status: 'pending',
-      },
-      {
-        key: '7',
-        title: <span>用户可自定义title</span>,
-        status: 'pending',
-      },
+      { key: '3', title: '步骤三：进行中', status: 'loading' },
+      { key: '4', title: <span>自定义 title</span>, status: 'pending' },
     ];
 
     setTasks(initialTasks);

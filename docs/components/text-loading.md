@@ -26,14 +26,14 @@ group:
 
 ### TextLoading
 
-| 参数      | 说明                                                    | 类型                  | 默认值         |
-| --------- | ------------------------------------------------------- | --------------------- | -------------- |
-| text      | 要显示的文本内容                                        | `string`              | `"Loading..."` |
-| disabled  | 是否禁用闪光动画                                        | `boolean`             | `false`        |
-| theme     | 主题模式，`light` 适用于白色背景，`dark` 适用于黑色背景 | `'light' \| 'dark'`   | `'light'`      |
-| className | 容器类名                                                | `string`              | -              |
-| style     | 容器样式                                                | `React.CSSProperties` | -              |
-| fontSize  | 字体大小                                                | `number \| string`    | -              |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| text | 要显示的文本内容 | `string` | `"Loading..."` | - |
+| disabled | 是否禁用闪光动画 | `boolean` | `false` | - |
+| theme | 主题模式，`light` 适用于白色背景，`dark` 适用于黑色背景 | `'light' \| 'dark'` | `'light'` | - |
+| className | 容器类名 | `string` | - | - |
+| style | 容器样式 | `React.CSSProperties` | - | - |
+| fontSize | 字体大小 | `number \| string` | - | - |
 
 ### 特性
 

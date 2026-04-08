@@ -93,6 +93,7 @@ export function saveUserLanguage(language: 'zh-CN' | 'en-US'): void {
  * 国际化上下文
  *
  * 提供国际化功能的React Context，包含当前语言环境和设置语言的方法。
+ * 所有国际化文案应统一通过 I18nContext 获取，保证单一数据源。
  */
 export const I18nContext = React.createContext<{
   locale: LocalKeys;
@@ -103,6 +104,25 @@ export const I18nContext = React.createContext<{
   locale: cnLabels,
   language: 'zh-CN',
 });
+
+/**
+ * 从 I18nContext 获取当前 locale，国际化统一入口
+ */
+export function useLocale(): LocalKeys {
+  return useContext(I18nContext).locale;
+}
+
+/**
+ * 获取合并后的 locale：以 I18nContext 为基准，用 override 覆盖部分 key
+ * 用于 Bubble 等支持 config 级文案覆盖的场景，仍以 I18nContext 为主
+ */
+export function useMergedLocale(override?: Partial<LocalKeys>): LocalKeys {
+  const { locale } = useContext(I18nContext);
+  return useMemo(
+    () => (override ? { ...locale, ...override } : locale),
+    [locale, override],
+  );
+}
 
 /**
  * I18nProvide 组件 - 国际化提供者组件

@@ -1,7 +1,9 @@
 import React from 'react';
 import { Editor, Transforms } from 'slate';
+import { ReactEditor } from 'slate-react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
+import { EditorUtils } from '../../MarkdownEditor/editor/utils/editorUtils';
 import { upLoadFileToServer } from '../AttachmentButton';
 import type { AttachmentFile } from '../AttachmentButton/types';
 import { isMobileDevice } from '../AttachmentButton/utils';
@@ -107,19 +109,18 @@ export const useMarkdownInputFieldHandlers = ({
     }
   });
 
-  // 图片粘贴上传
+  // 图片粘贴上传（仅在 attachment.enable 时生效，默认关闭）
   const handlePaste = useRefFunction(
     async (e: React.ClipboardEvent<HTMLDivElement>) => {
-      // 优先使用 props.attachment，如果没有则使用 markdownProps?.attachment
       const attachmentConfig =
         props.attachment || props.markdownProps?.attachment;
-      // 如果没有配置 upload 或 uploadWithResponse，不支持粘贴图片
+      if (!attachmentConfig?.enable) return;
       if (!attachmentConfig?.upload && !attachmentConfig?.uploadWithResponse) {
         return;
       }
       const imageFiles = (await getFileListFromDataTransferItems(e)).filter(
         (file) => {
-          return file.type.startsWith('image/');
+          return file?.type?.startsWith('image/');
         },
       );
       // 如果没有图片文件，直接返回
@@ -129,7 +130,7 @@ export const useMarkdownInputFieldHandlers = ({
       upLoadFileToServer(imageFiles, {
         ...attachmentConfig,
         fileMap,
-        onFileMapChange: setFileMap,
+        onFileMapChange: setFileMap as any,
       });
     },
   );
@@ -207,6 +208,38 @@ export const useMarkdownInputFieldHandlers = ({
     },
   );
 
+  const handleContainerClick = useRefFunction(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (props.disabled) return;
+      if (props.typing) return;
+
+      const editor = markdownEditorRef?.current?.markdownEditorRef?.current;
+      if (!editor) return;
+
+      try {
+        if (ReactEditor.isFocused(editor)) return;
+      } catch {
+        // ignore
+      }
+
+      const target = e.target as HTMLElement;
+      const isInteractive =
+        target.closest('button') ||
+        target.closest('a') ||
+        target.closest('input') ||
+        target.closest('[contenteditable="true"]');
+      if (isInteractive) return;
+
+      EditorUtils.focus(editor);
+      try {
+        const end = Editor.end(editor, []);
+        Transforms.select(editor, end);
+      } catch {
+        // editor may have no valid content points yet; focus is still applied
+      }
+    },
+  );
+
   const activeInput = useRefFunction((active: boolean) => {
     if (inputRef.current) {
       if (active) {
@@ -224,6 +257,7 @@ export const useMarkdownInputFieldHandlers = ({
     sendMessage,
     handlePaste,
     handleKeyDown,
+    handleContainerClick,
     activeInput,
   };
 };

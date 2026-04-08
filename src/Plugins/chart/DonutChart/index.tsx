@@ -6,9 +6,12 @@ import {
   Legend,
   Tooltip,
 } from 'chart.js';
-import classNames from 'classnames';
+import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
+import classNames from 'clsx';
 import React, { useContext, useMemo, useRef, useState } from 'react';
+
 import { Doughnut } from 'react-chartjs-2';
+import { useLocale } from '../../../I18n';
 import {
   ChartContainer,
   ChartFilter,
@@ -17,6 +20,8 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
+import { isWindowDefined } from '../env';
+import { useChartTheme } from '../hooks';
 import { resolveCssVariable } from '../utils';
 import {
   SINGLE_MODE_DESKTOP_CUTOUT,
@@ -28,8 +33,12 @@ import {
   useMobile,
   useResponsiveDimensions,
 } from './hooks';
-import LegendView from './Legend';
-import { createBackgroundArcPlugin, createCenterTextPlugin } from './plugins';
+import DonutChartLegend from './Legend';
+import {
+  createBackgroundArcPlugin,
+  createCenterTextPlugin,
+  createDataLabelsLeaderLinePlugin,
+} from './plugins';
 import { useStyle } from './style';
 import type { DonutChartConfig, DonutChartProps } from './types';
 
@@ -90,6 +99,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   title,
   showToolbar = true,
   onDownload,
+  theme = 'light',
   dataTime,
   filterList,
   selectedFilter,
@@ -107,16 +117,20 @@ const DonutChart: React.FC<DonutChartProps> = ({
       return undefined;
     }
 
-    if (typeof window === 'undefined') {
+    if (!isWindowDefined()) {
       return undefined;
     }
 
-    ChartJS.register(ArcElement, Tooltip, Legend);
+    ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
     donutChartComponentsRegistered = true;
     return undefined;
   }, []);
 
   const { isMobile, windowWidth } = useMobile();
+  const locale = useLocale();
+
+  // 使用 useChartTheme hook 获取主题相关颜色
+  const { isLight } = useChartTheme(theme);
 
   // 默认配置：当 configs 不传时，使用默认配置，showLegend 默认为 true
   const defaultConfigs: DonutChartConfig[] = [{ showLegend: true }];
@@ -273,8 +287,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
   const finalSelectedFilter = selectedFilter || internalSelectedCategory;
   const finalOnFilterChange = onFilterChange || handleInternalCategoryChange;
 
-  const chartFilterTheme: 'light' | 'dark' =
-    (finalConfigs[0]?.theme as 'light' | 'dark') || 'light';
+  // 使用组件级别的 theme prop，而不是从 configs 中获取
+  const chartFilterTheme: 'light' | 'dark' = theme;
 
   const dimensions = useResponsiveDimensions(
     isMobile,
@@ -300,6 +314,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
       baseClassName={baseClassName}
       className={classNames(classNamesProp?.root, className)}
       variant={props.variant}
+      theme={theme}
+      isMobile={isMobile}
       style={{
         ['--donut-item-min-width' as any]: `${dimensions.width}px`,
         ...props.style,
@@ -310,10 +326,13 @@ const DonutChart: React.FC<DonutChartProps> = ({
         <ChartContainer
           baseClassName={`${baseClassName}-toolbar-wrapper`}
           variant="borderless"
+          theme={theme}
+          isMobile={isMobile}
         >
           {title && (
             <ChartToolBar
               title={title}
+              theme={chartFilterTheme}
               onDownload={handleDownload}
               extra={toolbarExtra}
               dataTime={dataTime}
@@ -379,6 +398,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
       <ChartContainer
         baseClassName={`${baseClassName}-content`}
         variant="borderless"
+        theme={theme}
+        isMobile={isMobile}
       >
         {renderConfigs.map((cfg, idx) => {
           const currentDataItem = filteredData[idx];
@@ -397,7 +418,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
             chartData = [
               currentDataItem,
               {
-                label: '剩余',
+                label: locale['chart.legend.remaining'],
                 value: remainingValue,
                 category: currentDataItem.category,
               },
@@ -406,8 +427,12 @@ const DonutChart: React.FC<DonutChartProps> = ({
 
           const hiddenSetForChart =
             hiddenDataIndicesByChart[idx] || new Set<number>();
-          const visibleData = chartData.filter(
-            (_, index) => !hiddenSetForChart.has(index),
+          const visibleDataWithIndex = chartData
+            .map((d, index) => ({ d, originalIndex: index }))
+            .filter(({ originalIndex }) => !hiddenSetForChart.has(originalIndex));
+          const visibleData = visibleDataWithIndex.map(({ d }) => d);
+          const visibleOriginalIndices = visibleDataWithIndex.map(
+            ({ originalIndex }) => originalIndex,
           );
           const toNum = (v: any) => (typeof v === 'number' ? v : Number(v));
           const rawLabels = visibleData.map((d) => d.label);
@@ -422,15 +447,61 @@ const DonutChart: React.FC<DonutChartProps> = ({
           );
           const backgroundColors = cfg.backgroundColor || defaultColorList;
 
-          // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值）
-          const resolvedBackgroundColors = backgroundColors.map((color) =>
-            resolveCssVariable(color),
+          // 解析 CSS 变量为实际颜色值（Canvas 需要实际颜色值），按原始索引取色保证与图例颜色一致
+          const resolvedVisibleBackgroundColors = visibleOriginalIndices.map(
+            (originalIndex) =>
+              resolveCssVariable(
+                backgroundColors[originalIndex % backgroundColors.length],
+              ),
           );
 
           const mainColor =
             cfg.backgroundColor?.[0] ??
             defaultColorList[idx % defaultColorList.length];
           const resolvedMainColor = resolveCssVariable(mainColor);
+
+          const isDarkTheme = !isLight;
+          /** 与 ChartContainer 暗色底一致，扇区描边融进背景，避免亮白描边突兀 */
+          const donutDarkSegmentBorder = '#1f1f1f';
+          const donutDarkSegmentBorderHover = 'rgba(255, 255, 255, 0.14)';
+
+          const chartBorderColor = (() => {
+            if (isSingleValueMode) {
+              if (isDarkTheme) {
+                return [
+                  cfg.borderColor || 'rgba(255, 255, 255, 0.14)',
+                  'transparent',
+                ] as const;
+              }
+              return [cfg.borderColor || '#fff', 'transparent'] as const;
+            }
+            if (cfg.chartStyle === 'pie') {
+              return cfg.borderColor || '#fff';
+            }
+            if (isDarkTheme) {
+              return donutDarkSegmentBorder;
+            }
+            return cfg.borderColor || '#fff';
+          })();
+
+          const chartHoverBorderColor = (() => {
+            if (isSingleValueMode) {
+              if (isDarkTheme) {
+                return [
+                  cfg.borderColor || 'rgba(255, 255, 255, 0.22)',
+                  'transparent',
+                ] as const;
+              }
+              return [cfg.borderColor || '#fff', 'transparent'] as const;
+            }
+            if (cfg.chartStyle === 'pie') {
+              return cfg.borderColor || '#fff';
+            }
+            if (isDarkTheme) {
+              return donutDarkSegmentBorderHover;
+            }
+            return cfg.borderColor || '#fff';
+          })();
 
           const chartJsData = {
             labels,
@@ -439,24 +510,24 @@ const DonutChart: React.FC<DonutChartProps> = ({
                 data: safeValues,
                 backgroundColor: isSingleValueMode
                   ? [resolvedMainColor, 'transparent']
-                  : resolvedBackgroundColors.slice(0, values.length),
-                borderColor: isSingleValueMode
-                  ? [cfg.borderColor || '#fff', 'transparent']
-                  : cfg.borderColor || '#fff',
+                  : resolvedVisibleBackgroundColors.slice(0, values.length),
+                borderColor: chartBorderColor,
                 hoverBackgroundColor: isSingleValueMode
                   ? [resolvedMainColor, 'transparent']
-                  : resolvedBackgroundColors.slice(0, values.length),
-                hoverBorderColor: isSingleValueMode
-                  ? [cfg.borderColor || '#fff', 'transparent']
-                  : cfg.borderColor || '#fff',
-                borderWidth: cfg.chartStyle === 'pie' ? 0 : isMobile ? 1 : 1,
+                  : resolvedVisibleBackgroundColors.slice(0, values.length),
+                hoverBorderColor: chartHoverBorderColor,
+                borderWidth: cfg.chartStyle === 'pie' ? 2 : isMobile ? 1 : 1,
                 spacing: isSingleValueMode
                   ? 0
                   : cfg.chartStyle === 'pie'
                     ? 0
-                    : isMobile
-                      ? 3
-                      : 6,
+                    : isDarkTheme
+                      ? isMobile
+                        ? 4
+                        : 8
+                      : isMobile
+                        ? 3
+                        : 6,
                 borderRadius: cfg.chartStyle === 'pie' ? 0 : 4,
                 hoverOffset: (ctx: any) =>
                   isSingleValueMode && ctx?.dataIndex === 1
@@ -488,7 +559,6 @@ const DonutChart: React.FC<DonutChartProps> = ({
             );
           })();
 
-          const isDarkTheme = cfg.theme === 'dark';
           const tooltipBackgroundColor = isDarkTheme ? '#1F2937' : '#FFFFFF';
           const tooltipBorderColor = isDarkTheme ? '#374151' : '#E5E7EB';
           const tooltipTitleColor = isDarkTheme ? '#F9FAFB' : '#111827';
@@ -502,6 +572,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
               legend: {
                 display: false,
               },
+              /** 默认不展示扇区上的数值与占比，仅通过 configs[].showDataLabels === true 开启 */
+              datalabels: { display: false },
               tooltip: {
                 enabled: cfg.showTooltip !== false,
                 filter: (tooltipItem) =>
@@ -525,7 +597,10 @@ const DonutChart: React.FC<DonutChartProps> = ({
                       total > 0 && Number.isFinite(val)
                         ? ((val / total) * 100).toFixed(0)
                         : '0';
-                    return `${label}: ${Number.isFinite(val) ? val : raw} (${pct}%)`;
+                    if (cfg.showDataLabels) {
+                      return `${label}: ${Number.isFinite(val) ? val : raw} (${pct}%)`;
+                    }
+                    return `${label} (${pct}%)`;
                   },
                 },
               },
@@ -542,16 +617,69 @@ const DonutChart: React.FC<DonutChartProps> = ({
             },
           };
 
+          const dataLabelOffset = isMobile ? 22 : 36;
+          const optionsWithDataLabels: ChartOptions<'doughnut'> = {
+            ...options,
+            ...(cfg.showDataLabels === true &&
+              !isSingleValueMode && {
+                layout: {
+                  ...options.layout,
+                  padding: isMobile ? 36 : 52,
+                },
+              }),
+            plugins: {
+              ...options.plugins,
+              ...(cfg.showDataLabels === true &&
+                !isSingleValueMode && {
+                  datalabels: {
+                    display: (context: Context) => {
+                      const value = context.dataset?.data?.[context.dataIndex];
+                      const numVal =
+                        typeof value === 'number' ? value : Number(value);
+                      if (!Number.isFinite(numVal) || total <= 0) return false;
+                      const pct = (numVal / total) * 100;
+                      if (pct < 2) return false;
+                      return true;
+                    },
+                    formatter: (value: number, context: Context) => {
+                      const pct =
+                        total > 0 ? ((value / total) * 100).toFixed(2) : '0';
+                      const label =
+                        context.chart.data.labels?.[context.dataIndex];
+                      const labelStr =
+                        label !== undefined && label !== null
+                          ? String(label)
+                          : '';
+                      return labelStr
+                        ? `${labelStr}: ${pct}%`
+                        : `${value} (${pct}%)`;
+                    },
+                    color: isDarkTheme ? '#F9FAFB' : '#343A45',
+                    font: { size: isMobile ? 10 : 11, weight: 'normal' },
+                    anchor: 'end',
+                    align: 'end',
+                    offset: dataLabelOffset,
+                    clamp: false,
+                    clip: false,
+                  },
+                }),
+            },
+          };
+
           return (
             <ChartContainer
               key={idx}
               baseClassName={`${baseClassName}-chart-wrapper`}
               variant="borderless"
+              theme={theme}
+              isMobile={isMobile}
             >
               {isSingleValueMode ? (
                 <ChartContainer
                   baseClassName={`${baseClassName}-single`}
                   variant="borderless"
+                  theme={theme}
+                  isMobile={isMobile}
                   style={{
                     ['--donut-chart-height' as any]: `${dimensions.height}px`,
                     ['--donut-chart-width' as any]: `${dimensions.width}px`,
@@ -580,8 +708,13 @@ const DonutChart: React.FC<DonutChartProps> = ({
                                 100,
                               (currentDataItem as any).label,
                               isMobile,
+                              isDarkTheme,
                             ),
-                            createBackgroundArcPlugin(), // 背景色
+                            createBackgroundArcPlugin(
+                              isDarkTheme
+                                ? 'rgba(255, 255, 255, 0.08)'
+                                : '#F7F8F9',
+                            ),
                           ]
                         : []),
                     ]}
@@ -591,6 +724,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
                 <ChartContainer
                   baseClassName={`${baseClassName}-row`}
                   variant="borderless"
+                  theme={theme}
+                  isMobile={isMobile}
                   style={{
                     ...(isMobile
                       ? { flexDirection: 'column', alignItems: 'stretch' }
@@ -600,6 +735,8 @@ const DonutChart: React.FC<DonutChartProps> = ({
                   <ChartContainer
                     baseClassName={`${baseClassName}-chart`}
                     variant="borderless"
+                    theme={theme}
+                    isMobile={isMobile}
                     style={{
                       ['--donut-chart-width' as any]: `${dimensions.chartWidth}px`,
                       ['--donut-chart-height' as any]: `${dimensions.chartHeight}px`,
@@ -613,13 +750,26 @@ const DonutChart: React.FC<DonutChartProps> = ({
                         chartRefs.current[idx] = instance as any;
                       }}
                       data={chartJsData}
-                      options={options}
+                      options={optionsWithDataLabels}
+                      plugins={
+                        cfg.showDataLabels === true && !isSingleValueMode
+                          ? [
+                              createDataLabelsLeaderLinePlugin(
+                                dataLabelOffset,
+                                isDarkTheme,
+                              ),
+                              ChartDataLabels,
+                            ]
+                          : []
+                      }
                     />
                   </ChartContainer>
                   {cfg.showLegend && (
-                    <LegendView
+                    <DonutChartLegend
                       chartData={chartData}
-                      backgroundColors={backgroundColors}
+                      backgroundColors={chartData.map(
+                        (_, i) => backgroundColors[i % backgroundColors.length],
+                      )}
                       hiddenDataIndicesByChart={hiddenDataIndicesByChart}
                       chartIndex={idx}
                       onLegendItemClick={(dataIndex) =>
@@ -629,6 +779,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                       baseClassName={baseClassName}
                       hashId={hashId}
                       isMobile={isMobile}
+                      theme={theme}
                     />
                   )}
                 </ChartContainer>

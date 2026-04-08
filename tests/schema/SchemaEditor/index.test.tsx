@@ -1,9 +1,11 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { message } from 'antd';
 import copy from 'copy-to-clipboard';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nProvide } from '../../../src/I18n';
 import { SchemaEditor } from '../../../src/Schema/SchemaEditor';
+import type { SchemaEditorRef } from '../../../src/Schema/SchemaEditor';
 import { LowCodeSchema } from '../../../src/Schema/types';
 
 // Mock AceEditorWrapper
@@ -341,6 +343,100 @@ describe('SchemaEditor', () => {
 
       const jsonEditor = screen.getByTestId('ace-textarea-json');
       expect(jsonEditor).toBeInTheDocument();
+    });
+
+    it('应该在复制HTML成功时提示成功消息', () => {
+      const editorRef = React.createRef<SchemaEditorRef>();
+      render(
+        <TestWrapper>
+          <SchemaEditor ref={editorRef} initialSchema={mockSchema} />
+        </TestWrapper>,
+      );
+
+      editorRef.current?.copyHtml();
+
+      expect(copy).toHaveBeenCalledWith('<div>Hello {{name}}</div>');
+      expect(message.success).toHaveBeenCalledWith('HTML内容已复制到剪贴板');
+      expect(message.error).not.toHaveBeenCalled();
+      expect(message.warning).not.toHaveBeenCalled();
+    });
+
+    it('应该在复制JSON成功时提示成功消息', () => {
+      const editorRef = React.createRef<SchemaEditorRef>();
+      render(
+        <TestWrapper>
+          <SchemaEditor ref={editorRef} initialSchema={mockSchema} />
+        </TestWrapper>,
+      );
+
+      editorRef.current?.copyJson();
+
+      expect(copy).toHaveBeenCalledWith(expect.stringContaining('"name": "Test Schema"'));
+      expect(message.success).toHaveBeenCalledWith('JSON内容已复制到剪贴板');
+      expect(message.error).not.toHaveBeenCalled();
+      expect(message.warning).not.toHaveBeenCalled();
+    });
+
+    it('应该在复制空内容时提示警告且不触发复制', () => {
+      const editorRef = React.createRef<SchemaEditorRef>();
+      const emptySchema: LowCodeSchema = {
+        ...mockSchema,
+        component: {
+          ...mockSchema.component,
+          schema: '   ',
+        },
+      };
+      render(
+        <TestWrapper>
+          <SchemaEditor ref={editorRef} initialSchema={emptySchema} />
+        </TestWrapper>,
+      );
+
+      editorRef.current?.copyHtml();
+
+      expect(copy).not.toHaveBeenCalled();
+      expect(message.warning).toHaveBeenCalledWith('无可复制的内容');
+      expect(message.success).not.toHaveBeenCalled();
+      expect(message.error).not.toHaveBeenCalled();
+    });
+
+    it('应该在复制失败时提示错误消息', () => {
+      (copy as any).mockReturnValue(false);
+      const editorRef = React.createRef<SchemaEditorRef>();
+      render(
+        <TestWrapper>
+          <SchemaEditor ref={editorRef} initialSchema={mockSchema} />
+        </TestWrapper>,
+      );
+
+      editorRef.current?.copyHtml();
+
+      expect(copy).toHaveBeenCalledWith('<div>Hello {{name}}</div>');
+      expect(message.error).toHaveBeenCalledWith('复制失败');
+      expect(message.success).not.toHaveBeenCalled();
+      expect(message.warning).not.toHaveBeenCalled();
+    });
+
+    it('应该在复制抛出异常时提示错误消息', () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
+      (copy as any).mockImplementation(() => {
+        throw new Error('copy failed');
+      });
+      const editorRef = React.createRef<SchemaEditorRef>();
+      render(
+        <TestWrapper>
+          <SchemaEditor ref={editorRef} initialSchema={mockSchema} />
+        </TestWrapper>,
+      );
+
+      editorRef.current?.copyHtml();
+
+      expect(message.error).toHaveBeenCalledWith('复制失败');
+      expect(message.success).not.toHaveBeenCalled();
+      expect(message.warning).not.toHaveBeenCalled();
+      consoleErrorSpy.mockRestore();
     });
   });
 

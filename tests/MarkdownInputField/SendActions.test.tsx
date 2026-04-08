@@ -350,7 +350,9 @@ describe('SendActions', () => {
         />,
       );
 
-      expect(screen.getByTestId('action-icon-box')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('markdown-input-field-more-actions'),
+      ).toBeInTheDocument();
     });
     it('少于两个按钮时不折叠', () => {
       render(

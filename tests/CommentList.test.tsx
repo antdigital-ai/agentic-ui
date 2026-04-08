@@ -9,6 +9,26 @@ import {
 } from '../src/MarkdownEditor/BaseMarkdownEditor';
 import { CommentList } from '../src/MarkdownEditor/editor/components/CommentList';
 
+const { setShowCommentMock, mockMarkdownEditorRef } = vi.hoisted(() => ({
+  setShowCommentMock: vi.fn(),
+  mockMarkdownEditorRef: { current: {} },
+}));
+
+vi.mock('../src/MarkdownEditor/editor/store', async (importOriginal) => {
+  const actual = (await importOriginal()) as any;
+  const React = await import('react');
+  return {
+    ...actual,
+    useEditorStore: () => ({
+      markdownEditorRef: mockMarkdownEditorRef,
+    }),
+    EditorStoreContext: React.createContext({
+      setShowComment: setShowCommentMock,
+      markdownEditorRef: mockMarkdownEditorRef,
+    }),
+  };
+});
+
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
   motion: {
@@ -190,7 +210,6 @@ describe('CommentList Component', () => {
     const deleteButton = screen.getByLabelText('delete');
     fireEvent.click(deleteButton);
 
-    // 查找并点击确认按钮
     const confirmButton = screen.getByText('OK') || screen.getByText('确定');
     if (confirmButton) {
       fireEvent.click(confirmButton);
@@ -200,6 +219,23 @@ describe('CommentList Component', () => {
       'comment-1',
       mockCommentData[0],
     );
+  });
+
+  it('onDelete 抛出时静默捕获', () => {
+    const onDeleteReject = vi.fn().mockRejectedValue(new Error('delete failed'));
+    renderWithProvider(
+      <CommentList
+        commentList={[mockCommentData[0]]}
+        comment={{ ...mockComment, onDelete: onDeleteReject }}
+        style={{ width: '300px' }}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('delete'));
+    const confirmButton = screen.getByText('OK') || screen.getByText('确定');
+    if (confirmButton) {
+      fireEvent.click(confirmButton);
+    }
+    expect(onDeleteReject).toHaveBeenCalled();
   });
 
   it('should handle empty comment data', () => {
@@ -343,6 +379,18 @@ describe('CommentList Component', () => {
     expect(screen.getByLabelText('close')).toBeInTheDocument();
   });
 
+  it('点击关闭按钮应调用 setShowComment([])', () => {
+    renderWithProvider(
+      <CommentList
+        commentList={mockCommentData}
+        comment={mockComment}
+        style={{ width: '300px' }}
+      />,
+    );
+    fireEvent.click(screen.getByLabelText('close'));
+    expect(setShowCommentMock).toHaveBeenCalledWith([]);
+  });
+
   it('should handle missing comment prop gracefully', () => {
     renderWithProvider(
       <CommentList
@@ -353,5 +401,80 @@ describe('CommentList Component', () => {
     );
 
     expect(screen.getByText('This is a test comment')).toBeInTheDocument();
+  });
+
+  it('pure 为 false 时渲染 300px 占位 div', () => {
+    const { container } = renderWithProvider(
+      <CommentList
+        commentList={[mockCommentData[0]]}
+        comment={mockComment}
+        pure={false}
+      />,
+    );
+    const placeholder = container.querySelector('div[style*="300px"]');
+    expect(placeholder).toBeInTheDocument();
+  });
+
+  it('pure 为 true 时不渲染占位 div', () => {
+    const { container } = renderWithProvider(
+      <CommentList
+        commentList={[mockCommentData[0]]}
+        comment={mockComment}
+        pure={true}
+      />,
+    );
+    const placeholder = container.querySelector('div[style*="width: 300px"]');
+    expect(placeholder).toBeNull();
+  });
+
+  it('点击跳转按钮时执行 scrollIntoView、scrollBy 并调用 comment.onClick', () => {
+    const scrollIntoViewMock = vi.fn();
+    const scrollByMock = vi.fn();
+    const mockEl = {
+      scrollIntoView: scrollIntoViewMock,
+    };
+    const getElementByIdSpy = vi
+      .spyOn(document, 'getElementById')
+      .mockReturnValue(mockEl as any);
+    const scrollBySpy = vi.spyOn(window, 'scrollBy').mockImplementation(scrollByMock);
+
+    renderWithProvider(
+      <CommentList
+        commentList={[mockCommentData[0]]}
+        comment={mockComment}
+        style={{ width: '300px' }}
+      />,
+    );
+
+    const jumpButton = screen.getByLabelText('export');
+    fireEvent.click(jumpButton);
+
+    expect(getElementByIdSpy).toHaveBeenCalledWith('comment-comment-1');
+    expect(scrollIntoViewMock).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    });
+    expect(scrollBySpy).toHaveBeenCalledWith(0, -40);
+    expect(mockComment.onClick).toHaveBeenCalledWith(
+      'comment-1',
+      mockCommentData[0],
+    );
+
+    getElementByIdSpy.mockRestore();
+    scrollBySpy.mockRestore();
+  });
+
+  it('无 comment 时点击编辑或删除不报错', () => {
+    renderWithProvider(
+      <CommentList
+        commentList={[mockCommentData[0]]}
+        comment={undefined as any}
+        style={{ width: '300px' }}
+      />,
+    );
+    const editButton = screen.queryByLabelText('edit');
+    const deleteButton = screen.queryByLabelText('delete');
+    expect(editButton).not.toBeInTheDocument();
+    expect(deleteButton).not.toBeInTheDocument();
   });
 });

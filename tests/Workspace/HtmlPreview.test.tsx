@@ -413,6 +413,36 @@ describe('HtmlPreview Component', () => {
     expect(onViewModeChange).toHaveBeenCalledWith('code');
   });
 
+  it('未传 segmentedItems 时默认 Segmented 的 onChange 应切换模式', async () => {
+    const onViewModeChange = vi.fn();
+
+    render(
+      <TestWrapper>
+        <HtmlPreview
+          html="<h1>测试</h1>"
+          status="done"
+          showSegmented={true}
+          onViewModeChange={onViewModeChange}
+        />
+      </TestWrapper>,
+    );
+
+    expect(document.querySelector('iframe')).toBeInTheDocument();
+
+    const previewButton = screen.getByText('预览');
+    const codeButton = screen.getByText('代码');
+    fireEvent.click(codeButton);
+
+    await waitFor(() => {
+      expect(onViewModeChange).toHaveBeenCalledWith('code');
+    });
+
+    fireEvent.click(previewButton);
+    await waitFor(() => {
+      expect(onViewModeChange).toHaveBeenCalledWith('preview');
+    });
+  });
+
   it('应该处理空白字符串', () => {
     render(
       <TestWrapper>

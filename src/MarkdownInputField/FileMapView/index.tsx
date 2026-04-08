@@ -1,19 +1,38 @@
-import { FileSearch } from '@sofa-design/icons';
-import { ConfigProvider, Image } from 'antd';
-import classNames from 'classnames';
+import { FileSearch, Play } from '@sofa-design/icons';
+import { ConfigProvider, Image, Modal } from 'antd';
+import classNames from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useContext, useMemo, useState } from 'react';
+import { FileMetaPlaceholder } from '../AttachmentButton/AttachmentFileList/AttachmentFileIcon';
 import { AttachmentFile } from '../AttachmentButton/types';
-import { isImageFile } from '../AttachmentButton/utils';
+import {
+  isFileMetaPlaceholderState,
+  isImageFile,
+  isVideoFile,
+} from '../AttachmentButton/utils';
 import { FileMapViewItem } from './FileMapViewItem';
 import { useStyle } from './style';
+
+const IMAGE_THUMBNAIL_SIZE = 124;
+const SINGLE_VIDEO_THUMBNAIL_SIZE = { width: 330, height: 188 } as const;
+
+const getMediaPlaceholderStyle = (size: { width: number; height: number }) => ({
+  width: size.width,
+  height: size.height,
+  minWidth: size.width,
+});
 
 export type FileMapViewProps = {
   /** 是否显示"查看更多"按钮 */
   showMoreButton?: boolean;
   /** 文件映射表 */
   fileMap?: Map<string, AttachmentFile>;
-  /** 预览文件回调 */
+  /**
+   * 预览文件回调。
+   * - 对于非图片/视频文件：点击预览按钮时触发，传入时阻止默认的 window.open 行为。
+   * - 对于图片文件：点击缩略图时触发，传入时阻止 antd Image 内置灯箱预览。
+   * - 对于视频文件：点击缩略图时触发，传入时阻止内置弹窗播放。
+   */
   onPreview?: (file: AttachmentFile) => void;
   /** 下载文件回调 */
   onDownload?: (file: AttachmentFile) => void;
@@ -30,6 +49,16 @@ export type FileMapViewProps = {
   /** 最多展示的非图片文件数量，传入则开启溢出控制并在超出时显示"查看所有文件"按钮，不传则展示所有文件且不显示按钮 */
   maxDisplayCount?: number;
   placement?: 'left' | 'right';
+  /**
+   * 自定义每个媒体（图片/视频）条目的渲染。
+   * 接收文件对象和默认渲染节点，返回自定义节点即可替换默认展示，常用于回显场景。
+   * @param file - 当前文件
+   * @param defaultDom - 默认渲染的 React 节点
+   */
+  itemRender?: (
+    file: AttachmentFile,
+    defaultDom: React.ReactNode,
+  ) => React.ReactNode;
 };
 
 /**
@@ -90,19 +119,43 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
     return fileList.filter((file) => isImageFile(file));
   }, [fileList]);
 
-  // 所有非图片文件列表
-  const allNoImageFiles = useMemo(() => {
-    return fileList.filter((file) => !isImageFile(file));
+  // 视频列表，与图片一样以缩略图形式展示
+  const videoList = useMemo(() => {
+    return fileList.filter((file) => isVideoFile(file));
   }, [fileList]);
 
-  // 根据 maxDisplayCount 限制显示的非图片文件列表
-  const noImageFileList = useMemo(() => {
-    // 如果已展开所有文件，或者未设置最大显示数量，则显示所有文件
+  // 所有非图片、非视频文件列表
+  const allNoMediaFiles = useMemo(() => {
+    return fileList.filter((file) => !isImageFile(file) && !isVideoFile(file));
+  }, [fileList]);
+
+  // 根据 maxDisplayCount 限制显示的非媒体文件列表
+  const noMediaFileList = useMemo(() => {
     if (showAllFiles || props.maxDisplayCount === undefined) {
-      return allNoImageFiles;
+      return allNoMediaFiles;
     }
-    return allNoImageFiles.slice(0, Math.max(0, props.maxDisplayCount));
-  }, [allNoImageFiles, props.maxDisplayCount, showAllFiles]);
+    return allNoMediaFiles.slice(0, Math.max(0, props.maxDisplayCount));
+  }, [allNoMediaFiles, props.maxDisplayCount, showAllFiles]);
+
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [previewingVideo, setPreviewingVideo] = useState<AttachmentFile | null>(
+    null,
+  );
+
+  const handleVideoClick = (file: AttachmentFile) => {
+    if (file.status === 'error') return;
+    if (props.onPreview) {
+      props.onPreview(file);
+    } else {
+      setPreviewingVideo(file);
+      setVideoModalOpen(true);
+    }
+  };
+
+  const handleVideoModalClose = () => {
+    setVideoModalOpen(false);
+    setPreviewingVideo(null);
+  };
 
   const handleViewAllClick = async () => {
     if (props.onViewAll) {
@@ -116,8 +169,14 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
     }
   };
 
+  const imagePlaceholderStyle = getMediaPlaceholderStyle({
+    width: IMAGE_THUMBNAIL_SIZE,
+    height: IMAGE_THUMBNAIL_SIZE,
+  });
+
   return wrapSSR(
     <div
+      data-testid="file-view-list"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -128,124 +187,275 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
         width: 'max-content',
       }}
     >
-      <motion.div
-        variants={{
-          visible: {
-            opacity: 1,
-            transition: {
-              when: 'beforeChildren',
-              staggerChildren: 0.1,
+      {imgList.length > 0 && (
+        <motion.div
+          variants={{
+            visible: {
+              opacity: 1,
+              transition: {
+                when: 'beforeChildren',
+                staggerChildren: 0.1,
+              },
             },
-          },
-          hidden: {
-            opacity: 0,
-            transition: {
-              when: 'afterChildren',
+            hidden: {
+              opacity: 0,
+              transition: {
+                when: 'afterChildren',
+              },
             },
-          },
-        }}
-        whileInView="visible"
-        initial="hidden"
-        animate={'visible'}
-        style={props.style}
-        className={classNames(
-          prefix,
-          hashId,
-          props.className,
-          `${prefix}-${placement}`,
-          {
-            [`${prefix}-image-list-view`]: imgList.length > 1,
-            [`${prefix}-image-list-view-${placement}`]: imgList.length > 1,
-          },
-        )}
+          }}
+          whileInView="visible"
+          initial="hidden"
+          animate={'visible'}
+          style={props.style}
+          data-testid="file-view-image-list"
+          className={classNames(
+            prefix,
+            hashId,
+            props.className,
+            `${prefix}-${placement}`,
+            {
+              [`${prefix}-image-list-view`]: imgList.length > 1,
+              [`${prefix}-image-list-view-${placement}`]: imgList.length > 1,
+            },
+          )}
+        >
+          <Image.PreviewGroup>
+            {imgList.map((file, index) => {
+              const key = file.uuid || file.name || index;
+
+              if (isFileMetaPlaceholderState(file)) {
+                const placeholderDom = (
+                  <FileMetaPlaceholder
+                    file={file}
+                    key={key}
+                    className={classNames(`${prefix}-image`, hashId)}
+                    style={imagePlaceholderStyle}
+                  />
+                );
+                return props.itemRender
+                  ? props.itemRender(file, placeholderDom)
+                  : placeholderDom;
+              }
+
+              const defaultImageDom = (
+                <Image
+                  rootClassName={classNames(`${prefix}-image`, hashId)}
+                  width={124}
+                  height={124}
+                  src={file.previewUrl || file.url}
+                  key={key}
+                  preview={
+                    props.onPreview
+                      ? {
+                          visible: false,
+                          onVisibleChange: () => props.onPreview?.(file),
+                          mask: (
+                            <div
+                              className={classNames(
+                                `${prefix}-image-mask`,
+                                hashId,
+                              )}
+                            />
+                          ),
+                        }
+                      : undefined
+                  }
+                />
+              );
+
+              return props.itemRender
+                ? props.itemRender(file, defaultImageDom)
+                : defaultImageDom;
+            })}
+          </Image.PreviewGroup>
+        </motion.div>
+      )}
+      {videoList.length > 0 && (
+        <motion.div
+          variants={{
+            visible: { opacity: 1 },
+            hidden: { opacity: 0 },
+          }}
+          whileInView="visible"
+          initial="hidden"
+          animate="visible"
+          data-testid="file-view-video-list"
+          className={classNames(
+            `${prefix}-video-row`,
+            `${prefix}-video-row-${placement}`,
+            hashId,
+          )}
+          style={props.style}
+        >
+          {videoList.map((file, index) => {
+            const videoUrl = file.previewUrl || file.url || '';
+            const isSingleVideo = videoList.length === 1;
+            const thumbSize = isSingleVideo
+              ? SINGLE_VIDEO_THUMBNAIL_SIZE
+              : { width: IMAGE_THUMBNAIL_SIZE, height: IMAGE_THUMBNAIL_SIZE };
+            const key = file.uuid || file.name || index;
+
+            if (isFileMetaPlaceholderState(file)) {
+              const placeholderDom = (
+                <FileMetaPlaceholder
+                  file={file}
+                  key={key}
+                  className={classNames(
+                    `${prefix}-image`,
+                    `${prefix}-video-thumb`,
+                    hashId,
+                  )}
+                  style={getMediaPlaceholderStyle(thumbSize)}
+                />
+              );
+              return props.itemRender
+                ? props.itemRender(file, placeholderDom)
+                : placeholderDom;
+            }
+
+            const defaultVideoDom = (
+              <div
+                role="button"
+                tabIndex={0}
+                className={classNames(
+                  `${prefix}-image`,
+                  `${prefix}-video-thumb`,
+                  hashId,
+                )}
+                key={key}
+                onClick={() => handleVideoClick(file)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleVideoClick(file);
+                  }
+                }}
+                aria-label={`播放视频：${file.name}`}
+                data-testid="file-view-video-thumb"
+                style={thumbSize}
+              >
+                <video
+                  src={videoUrl}
+                  preload="metadata"
+                  muted
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
+                <div
+                  className={classNames(`${prefix}-video-play-overlay`, hashId)}
+                  aria-hidden
+                >
+                  <Play />
+                </div>
+              </div>
+            );
+
+            return props.itemRender
+              ? props.itemRender(file, defaultVideoDom)
+              : defaultVideoDom;
+          })}
+        </motion.div>
+      )}
+      <Modal
+        open={videoModalOpen}
+        onCancel={handleVideoModalClose}
+        footer={null}
+        width="auto"
+        centered
+        destroyOnHidden
+        styles={{ body: { padding: 0 } }}
       >
-        <Image.PreviewGroup>
-          {imgList.map((file, index) => {
+        {previewingVideo && (
+          <video
+            src={previewingVideo.previewUrl || previewingVideo.url}
+            controls
+            autoPlay
+            style={{ maxWidth: '80vw', maxHeight: '80vh' }}
+          />
+        )}
+      </Modal>
+      {allNoMediaFiles.length > 0 && (
+        <motion.div
+          variants={{
+            visible: {
+              opacity: 1,
+              transition: {
+                when: 'beforeChildren',
+                staggerChildren: 0.1,
+              },
+            },
+            hidden: {
+              opacity: 0,
+              transition: {
+                when: 'afterChildren',
+              },
+            },
+          }}
+          whileInView="visible"
+          initial="hidden"
+          animate={'visible'}
+          data-testid="file-view-file-list"
+          className={classNames(
+            prefix,
+            hashId,
+            props.className,
+            `${prefix}-${placement}`,
+            `${prefix}-vertical`,
+          )}
+          style={props.style}
+        >
+          {noMediaFileList.map((file, index) => {
             return (
-              <Image
-                rootClassName={classNames(`${prefix}-image`, hashId)}
-                width={124}
-                height={124}
-                src={file.previewUrl || file.url}
-                key={file.uuid || file.name || index}
+              <FileMapViewItem
+                style={{ width: props.style?.width }}
+                onPreview={
+                  props.onPreview
+                    ? () => {
+                        props.onPreview?.(file);
+                      }
+                    : undefined
+                }
+                onDownload={
+                  props.onDownload
+                    ? () => {
+                        props.onDownload?.(file);
+                      }
+                    : undefined
+                }
+                renderMoreAction={props.renderMoreAction}
+                customSlot={props.customSlot}
+                key={file?.uuid || file?.name || index}
+                prefixCls={`${prefix}-item`}
+                hashId={hashId}
+                className={classNames(hashId, `${prefix}-item`)}
+                file={file}
               />
             );
           })}
-        </Image.PreviewGroup>
-      </motion.div>
-      <motion.div
-        variants={{
-          visible: {
-            opacity: 1,
-            transition: {
-              when: 'beforeChildren',
-              staggerChildren: 0.1,
-            },
-          },
-          hidden: {
-            opacity: 0,
-            transition: {
-              when: 'afterChildren',
-            },
-          },
-        }}
-        whileInView="visible"
-        initial="hidden"
-        animate={'visible'}
-        className={classNames(
-          prefix,
-          hashId,
-          props.className,
-          `${prefix}-${placement}`,
-          `${prefix}-vertical`,
-        )}
-        style={props.style}
-      >
-        {noImageFileList.map((file, index) => {
-          return (
-            <FileMapViewItem
+          {props.maxDisplayCount !== undefined &&
+          allNoMediaFiles.length > props.maxDisplayCount &&
+          !showAllFiles ? (
+            <div
+              data-testid="file-view-view-all"
               style={{ width: props.style?.width }}
-              onPreview={
-                props.onPreview
-                  ? () => {
-                      props.onPreview?.(file);
-                    }
-                  : undefined
-              }
-              onDownload={
-                props.onDownload
-                  ? () => {
-                      props.onDownload?.(file);
-                    }
-                  : undefined
-              }
-              renderMoreAction={props.renderMoreAction}
-              customSlot={props.customSlot}
-              key={file?.uuid || file?.name || index}
-              prefixCls={`${prefix}-item`}
-              hashId={hashId}
-              className={classNames(hashId, `${prefix}-item`)}
-              file={file}
-            />
-          );
-        })}
-        {props.maxDisplayCount !== undefined &&
-        allNoImageFiles.length > props.maxDisplayCount &&
-        !showAllFiles ? (
-          <div
-            style={{ width: props.style?.width }}
-            className={classNames(hashId, `${prefix}-more-file-container`)}
-            onClick={handleViewAllClick}
-          >
-            <FileSearch color="var(--color-gray-text-secondary)" />
-            <div className={classNames(hashId, `${prefix}-more-file-name`)}>
-              <span style={{ whiteSpace: 'nowrap' }}>
-                查看此任务中的所有文件
-              </span>
+              className={classNames(hashId, `${prefix}-more-file-container`)}
+              onClick={handleViewAllClick}
+            >
+              <FileSearch color="var(--color-gray-text-secondary)" />
+              <div className={classNames(hashId, `${prefix}-more-file-name`)}>
+                <span style={{ whiteSpace: 'nowrap' }}>
+                  查看此任务中的所有文件
+                </span>
+              </div>
             </div>
-          </div>
-        ) : null}
-      </motion.div>
+          ) : null}
+        </motion.div>
+      )}
     </div>,
   );
 };

@@ -5,7 +5,7 @@ import {
   SquareTerminal,
 } from '@sofa-design/icons';
 import { ConfigProvider, Empty, Segmented, Spin } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import useAutoScroll from '../../Hooks/useAutoScroll';
 import { I18nContext } from '../../I18n';
@@ -283,7 +283,8 @@ const Overlay: React.FC<{
   );
 };
 
-const getContentForEditor = (
+/** 供测试覆盖使用：根据 type 将 content 转为编辑器所需字符串 */
+export const getContentForEditor = (
   type: RealtimeFollowMode,
   content: string | DiffContent | undefined,
 ): string => {
@@ -294,7 +295,8 @@ const getContentForEditor = (
   return String(content);
 };
 
-const shouldUpdateEditor = (
+/** 供测试覆盖使用：决定是否根据 type/htmlViewMode 更新编辑器内容 */
+export const shouldUpdateEditor = (
   type: RealtimeFollowMode,
   htmlViewMode: 'preview' | 'code',
 ): boolean => {

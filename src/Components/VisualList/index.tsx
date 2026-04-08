@@ -1,5 +1,5 @@
 import { SquareArrowUpRight } from '@sofa-design/icons';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { memo, useMemo, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { useStyle } from './style';
@@ -37,7 +37,7 @@ export interface VisualListProps {
   /** 自定义列表项渲染函数 */
   renderItem?: (item: VisualListItem, index: number) => React.ReactNode;
   /**
-   * @deprecated 请使用 isLoading 代替
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除
    */
   loading?: boolean;

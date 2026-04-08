@@ -1,9 +1,9 @@
-﻿import { HistoryOutlined } from '@ant-design/icons';
+import { HistoryOutlined } from '@ant-design/icons';
 import { ConfigProvider, Popover } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { memo, useContext, useMemo, useRef } from 'react';
 import useClickAway from '../Hooks/useClickAway';
-import { ActionIconBox, BubbleConfigContext } from '../index';
+import { ActionIconBox, I18nContext } from '../index';
 import {
   HistoryEmpty,
   HistoryLoadMore,
@@ -56,7 +56,7 @@ export * from './utils';
 const HistoryComponent: React.FC<HistoryProps> = (props) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const menuPrefixCls = getPrefixCls('agentic-chat-history-menu');
-  const { locale } = useContext(BubbleConfigContext) || {};
+  const { locale } = useContext(I18nContext);
   const containerRef = useRef<HTMLDivElement>(null);
   // 注册样式
   const { wrapSSR, hashId } = useStyle(menuPrefixCls);

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable no-param-reassign */
-import { message } from 'antd';
 import { Editor, Element, Node, Path, Range, Transforms } from 'slate';
 import { jsx } from 'slate-hyperscript';
 import { debugInfo } from '../../../Utils/debugUtils';
@@ -400,11 +399,7 @@ const upLoadFileBatch = async (fragmentList: any[], editorProps: any) => {
     return;
   }
 
-  // 显示上传进度
-  const hideLoading = message.loading(
-    `Uploading ${mediaFragments.length} files...`,
-    0,
-  );
+  const hideLoading = () => {};
 
   try {
     // 分批处理文件上传
@@ -435,27 +430,13 @@ const upLoadFileBatch = async (fragmentList: any[], editorProps: any) => {
         }),
       );
 
-      // 更新进度
-      const progress = Math.min(
-        ((i + BATCH_SIZE) / mediaFragments.length) * 100,
-        100,
-      );
-      hideLoading();
-      message.loading(
-        `Uploading ${mediaFragments.length} files... ${Math.round(progress)}%`,
-        0,
-      );
-
       // 添加延迟，让出主线程
       if (i + BATCH_SIZE < mediaFragments.length) {
         await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY));
       }
     }
-
-    message.success('Upload completed');
   } catch (error) {
     console.error('文件上传失败:', error);
-    message.error('Some files failed to upload');
   } finally {
     hideLoading();
   }
@@ -865,7 +846,6 @@ export const insertParsedHtmlNodes = async (
     return true;
   } catch (error) {
     console.error('插入HTML节点失败:', error);
-    message.error('Content parsing failed, please try again');
 
     return false;
   }

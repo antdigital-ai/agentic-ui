@@ -61,6 +61,9 @@ const INPUT_FIELD_PADDING = {
   SMALL: `${GLOW_BORDER_OFFSET}px`,
 } as const;
 
+// MarkdownInputField 中 code block 的默认高度，避免初始占位过高
+const DEFAULT_INPUT_CODE_BLOCK_HEIGHT = 120;
+
 // 定义旋转动画
 const stopIconRotate = new Keyframes('stopIconRotate', {
   '0%': {
@@ -152,7 +155,9 @@ const genStyle: GenerateStyle<
         maxHeight: 400,
         height: '100%',
         overflowY: 'visible',
-        scrollbarColor: 'var(--color-gray-text-tertiary) transparent',
+        cursor: 'text',
+        scrollbarColor:
+          'var(--color-gray-text-tertiary, #505c716b) transparent',
         scrollbarWidth: 'thin',
         '&&-disabled': {
           backgroundColor: 'rgba(0,0,0,0.04)',
@@ -163,6 +168,11 @@ const genStyle: GenerateStyle<
           padding: '0 !important',
         },
       },
+      // 仅覆盖 MarkdownInputField 内的代码块默认高度
+      '& [data-language][data-is-unclosed="true"]': {
+        height: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
+        minHeight: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
+      },
       '&-editor-content': {
         display: 'flex',
         flexDirection: 'column',
@@ -171,6 +181,7 @@ const genStyle: GenerateStyle<
         minHeight: 0,
         borderRadius: 'inherit',
         overflow: 'hidden',
+        position: 'relative',
         [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
           padding: `${MOBILE_PADDING} !important`,
         },
@@ -187,6 +198,27 @@ const genStyle: GenerateStyle<
       },
       '&-loading': {
         cursor: 'not-allowed',
+      },
+      '&-typing': {
+        cursor: 'not-allowed',
+      },
+      '&-typing-hint': {
+        position: 'absolute',
+        left: 'var(--padding-3x)',
+        top: '10%',
+        pointerEvents: 'none',
+        zIndex: 10,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        color: 'rgba(0,0,0,0.35)',
+        fontSize: 13,
+        userSelect: 'none',
+      },
+      '&-typing-hint-dots': {
+        display: 'inline-flex',
+        gap: 3,
+        alignItems: 'center',
       },
       '&-send-tools': {
         boxSizing: 'border-box',

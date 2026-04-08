@@ -5,7 +5,7 @@ import {
   SquareArrowOutUpRight,
 } from '@sofa-design/icons';
 import { Button, ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
 import React, { useContext } from 'react';
 import { I18nContext } from '../../I18n';

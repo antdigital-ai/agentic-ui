@@ -57,6 +57,13 @@ describe('Markdown to HTML Utils', () => {
       expect(result).toContain('<strong>test</strong>');
     });
 
+    it('应保留 HH:mm 时间文本（仅 ::: 容器为指令）', async () => {
+      const markdown = '提醒时间 **10:15**';
+      const result = await markdownToHtml(markdown);
+
+      expect(result).toContain('10:15');
+    });
+
     it('允许通过插件数组新增插件', async () => {
       const plugins = createDefaultRemarkPlugins();
       plugins.splice(1, 0, remarkReplaceFooWithBar);
@@ -136,6 +143,77 @@ title: Test
 
       expect(result).toContain('<div>HTML content</div>');
       expect(result).toContain('<h1>Markdown content</h1>');
+    });
+
+    it('应该支持 markdown-it-container 风格的 ::: 自定义容器', async () => {
+      // 注意：::: 容器需要空行分隔，否则会被解析为同一段落
+      const markdown = `:::info
+
+这是信息提示块。
+
+:::
+
+:::warning
+
+这是警告提示块。
+
+:::
+
+:::success
+
+这是成功提示块。
+
+:::
+
+:::error
+
+这是错误提示块。
+
+:::`;
+      const result = await markdownToHtml(markdown);
+      expect(result).toContain('markdown-container');
+      expect(result).toContain('info');
+      expect(result).toContain('warning');
+      expect(result).toContain('success');
+      expect(result).toContain('error');
+      expect(result).toContain('这是信息提示块');
+      expect(result).toContain('这是警告提示块');
+      expect(result).toContain('这是成功提示块');
+      expect(result).toContain('这是错误提示块');
+    });
+
+    it('应该支持 :: 双冒号容器语法（::warning 规范化为 :::warning）', async () => {
+      const markdown = `::warning
+No API key found.
+Logs: openclaw logs --follow
+
+:::`;
+      const result = await markdownToHtml(markdown);
+      expect(result).toContain('markdown-container');
+      expect(result).toContain('warning');
+    });
+
+    it('应该支持带标题的 ::: 容器（remark-directive 语法 title 属性）', async () => {
+      const markdown = `:::tip{title="提示"}
+
+这是一条带标题的提示块。
+
+:::`;
+      const result = await markdownToHtml(markdown);
+
+      expect(result).toContain('markdown-container');
+      expect(result).toContain('tip');
+      expect(result).toContain('markdown-container__title');
+      expect(result).toContain('提示');
+      expect(result).toContain('这是一条带标题的提示块');
+    });
+
+    it('行内 :name[label] 不作为指令解析（仅 ::: 容器为指令）', async () => {
+      const markdown = '文本中有 :icon[check] 这样的内容';
+      const result = await markdownToHtml(markdown);
+
+      expect(result).not.toContain('directive-icon');
+      expect(result).toContain(':icon[check]');
     });
 
     it('应该处理无效的Markdown并返回空字符串', async () => {

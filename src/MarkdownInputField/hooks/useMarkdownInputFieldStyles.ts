@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
 interface UseMarkdownInputFieldStylesParams {
-  toolsRender?: MarkdownInputFieldProps['toolsRender'];
+  hasTools?: boolean;
   maxHeight?: MarkdownInputFieldProps['maxHeight'];
   style?: React.CSSProperties;
   attachment?: { enable?: boolean };
@@ -29,7 +29,7 @@ interface UseMarkdownInputFieldStylesReturn {
  * 计算组件所需的样式值
  */
 export const useMarkdownInputFieldStyles = ({
-  toolsRender,
+  hasTools,
   maxHeight,
   style,
   attachment,
@@ -43,10 +43,10 @@ export const useMarkdownInputFieldStyles = ({
   isMultiRowLayout,
 }: UseMarkdownInputFieldStylesParams): UseMarkdownInputFieldStylesReturn => {
   const computedRightPadding = useMemo(() => {
-    const bottomOverlayPadding = toolsRender ? 0 : rightPadding || 52;
+    const bottomOverlayPadding = hasTools ? 0 : rightPadding || 52;
     const topOverlayPadding = (topRightPadding || 0) + (quickRightOffset || 0);
     return Math.max(bottomOverlayPadding, topOverlayPadding);
-  }, [toolsRender, rightPadding, topRightPadding, quickRightOffset]);
+  }, [hasTools, rightPadding, topRightPadding, quickRightOffset]);
 
   const collapsedHeight = useMemo(() => {
     // 优先使用 maxHeight prop，其次使用 style.maxHeight，最后使用默认值

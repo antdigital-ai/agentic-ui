@@ -53,63 +53,13 @@ const WorkspaceHeaderExtraDemo: React.FC = () => {
           tab={{ key: 'realtime', title: '实时跟随' }}
           data={{
             type: 'md',
-            content: `# Header 自定义示例
+            content: `# headerExtra
 
-## 功能说明
-
-通过 \`headerExtra\` 属性，您可以在 Workspace 的 header 右侧区域添加自定义内容。
-
-## 示例功能
-
-- 使用竖向三点图标（\`MoreOutlined\`）展示更多操作
-- 结合 \`Dropdown\` 实现下拉菜单
-- 支持分组和分隔线，组织多个操作项
-- 节省空间，适合收纳大量操作
-
-## 代码示例
+在 Workspace 标题栏右侧插入 \`ReactNode\`（本页为 \`Dropdown\` + \`MoreOutlined\`）。
 
 \`\`\`tsx
-import { MoreOutlined } from '@ant-design/icons';
-import { ActionIconBox } from '@ant-design/agentic-ui';
-
-const headerExtra = (
-  <Dropdown
-    menu={{
-      items: [
-        { key: 'download', label: '下载' },
-        { key: 'share', label: '分享' },
-        { type: 'divider' },
-        { key: 'export-md', label: '导出为 Markdown' },
-        { key: 'export-pdf', label: '导出为 PDF' },
-        { type: 'divider' },
-        { key: 'settings', label: '设置' },
-      ],
-    }}
-    placement="bottomRight"
-    trigger={['click']}
-  >
-    <ActionIconBox aria-label="更多操作">
-      <MoreOutlined />
-    </ActionIconBox>
-  </Dropdown>
-);
-
-<Workspace
-  title="工作空间"
-  onClose={handleClose}
-  headerExtra={headerExtra}
->
-  {/* 子组件 */}
-</Workspace>
+<Workspace headerExtra={headerExtra} />
 \`\`\`
-
-## 最佳实践
-
-1. **保持简洁**：header 右侧区域空间有限，避免放置过多按钮
-2. **使用图标**：优先使用图标按钮，节省空间且更美观
-3. **统一风格**：使用 \`ActionIconBox\` 保持与关闭按钮一致的交互效果
-4. **合理分组**：使用 \`Space\` 控制按钮间距，或使用 \`Dropdown\` 收纳更多操作
-5. **响应式设计**：考虑在小屏幕上的显示效果
 `,
             typewriter: false,
           }}

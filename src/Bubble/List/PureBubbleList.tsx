@@ -2,10 +2,15 @@ import SkeletonList from './SkeletonList';
 
 import { MutableRefObject, useContext, useMemo, useRef } from 'react';
 
-import type { BubbleMetaData, BubbleProps, MessageBubbleData } from '../type';
+import type {
+  BubbleImperativeHandle,
+  BubbleMetaData,
+  BubbleProps,
+  MessageBubbleData,
+} from '../type';
 
 import { ConfigProvider } from 'antd';
-import cx from 'classnames';
+import clsx from 'clsx';
 import { nanoid } from 'nanoid';
 import React from 'react';
 import { LazyElement } from '../../MarkdownEditor/editor/components/LazyElement';
@@ -18,7 +23,7 @@ export interface PureBubbleListProps {
   bubbleList: MessageBubbleData[];
   readonly?: boolean;
   bubbleListRef?: MutableRefObject<HTMLDivElement | null>;
-  bubbleRef?: MutableRefObject<any | undefined>;
+  bubbleRef?: MutableRefObject<BubbleImperativeHandle | null | undefined>;
   isLoading?: boolean;
   className?: string;
   bubbleRenderConfig?: BubbleProps['bubbleRenderConfig'];
@@ -30,14 +35,14 @@ export interface PureBubbleListProps {
   markdownRenderConfig?: BubbleProps['markdownRenderConfig'];
   docListProps?: BubbleProps['docListProps'];
   /**
-   * @deprecated 请使用 onDislike 替代（符合命名规范）
+   * @deprecated @since 2.29.0 请使用 onDislike 替代（符合命名规范）
    */
   onDisLike?: BubbleProps['onDisLike'];
   /** 不喜欢回调 */
   onDislike?: BubbleProps['onDislike'];
   onLike?: BubbleProps['onLike'];
   /**
-   * @deprecated 请使用 onLikeCancel 替代（符合命名规范）
+   * @deprecated @since 2.29.0 请使用 onLikeCancel 替代（符合命名规范）
    */
   onCancelLike?: BubbleProps['onCancelLike'];
   /** Like 子组件取消事件 */
@@ -99,7 +104,7 @@ export interface PureBubbleListProps {
   };
 }
 
-export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
+export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
   const {
     bubbleList,
     bubbleListRef,
@@ -133,10 +138,11 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
   const prefixClass = getPrefixCls('agentic-bubble-list');
   const { wrapSSR, hashId } = useStyle(prefixClass);
 
-  const deps = useMemo(() => [props.style], [JSON.stringify(props.style)]);
+  const deps = useMemo(() => [props.style], [props.style]);
 
-  // 为 loading 项生成唯一的 key，使用 ref 缓存以确保稳定性
   const loadingKeysRef = useRef<Map<string, string>>(new Map());
+  const loadingKeyByIndexRef = useRef<Map<number, string>>(new Map());
+  const realIdToStableKeyRef = useRef<Map<string, string>>(new Map());
 
   const listDom = useMemo(() => {
     const isLazyEnabled = props.lazy?.enable;
@@ -147,18 +153,32 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
       const BubbleComponent =
         placement === 'right' ? PureUserBubble : PureAIBubble;
       const isLast = index === bubbleList.length - 1;
-      (item as any).isLatest = isLast;
-      (item as any).isLast = isLast;
+      const originDataWithFlags = {
+        ...item,
+        isLatest: isLast,
+        isLast,
+      };
 
-      // 如果 id 是 LOADING_FLAT，使用 uuid 作为 key
-      // 使用 index 和 createAt 的组合作为缓存 key，确保同一项在重新渲染时保持相同的 key
-      let itemKey = item.id;
+      let itemKey: string;
       if (item.id === LOADING_FLAT) {
         const cacheKey = `${index}-${item.createAt || Date.now()}`;
         if (!loadingKeysRef.current.has(cacheKey)) {
           loadingKeysRef.current.set(cacheKey, nanoid());
         }
         itemKey = loadingKeysRef.current.get(cacheKey)!;
+        loadingKeyByIndexRef.current.set(index, itemKey);
+      } else {
+        const realId = item.id as string;
+        const prevLoadingKey = loadingKeyByIndexRef.current.get(index);
+        if (prevLoadingKey) {
+          itemKey = prevLoadingKey;
+          realIdToStableKeyRef.current.set(realId, prevLoadingKey);
+          loadingKeyByIndexRef.current.delete(index);
+        } else if (realIdToStableKeyRef.current.has(realId)) {
+          itemKey = realIdToStableKeyRef.current.get(realId)!;
+        } else {
+          itemKey = realId;
+        }
       }
 
       const bubbleElement = (
@@ -174,7 +194,7 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
           style={{
             ...styles?.bubbleListItemStyle,
           }}
-          originData={item}
+          originData={originDataWithFlags}
           placement={placement}
           time={item.updateAt || item.createAt}
           deps={deps}
@@ -261,7 +281,12 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
   if (isLoading) {
     return wrapSSR(
       <div
-        className={cx(prefixClass, `${prefixClass}-loading`, className, hashId)}
+        className={clsx(
+          prefixClass,
+          `${prefixClass}-loading`,
+          className,
+          hashId,
+        )}
         ref={bubbleListRef}
         style={{
           padding: 24,
@@ -274,7 +299,7 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
 
   return wrapSSR(
     <div
-      className={cx(`${prefixClass}`, className, hashId, {
+      className={clsx(`${prefixClass}`, className, hashId, {
         [`${prefixClass}-readonly`]: props.readonly,
         [`${prefixClass}-compact`]: compact,
       })}
@@ -290,6 +315,8 @@ export const PureBubbleList: React.FC<PureBubbleListProps> = (props) => {
       {listDom}
     </div>,
   );
-};
+});
+
+PureBubbleList.displayName = 'PureBubbleList';
 
 export default PureBubbleList;

@@ -33,6 +33,8 @@ describe('AttachmentButtonPopover', () => {
       expect(imageFormat?.extensions).toContain('jpeg');
       expect(imageFormat?.extensions).toContain('png');
       expect(imageFormat?.extensions).toContain('gif');
+      expect(imageFormat?.extensions).toContain('webp');
+      expect(imageFormat?.extensions).toContain('svg');
     });
 
     it('should have correct file extensions for documents', () => {
@@ -40,14 +42,6 @@ describe('AttachmentButtonPopover', () => {
       expect(docFormat?.extensions).toContain('pdf');
       expect(docFormat?.extensions).toContain('docx');
       expect(docFormat?.extensions).toContain('xlsx');
-    });
-
-    it('should have appropriate max sizes', () => {
-      const imageFormat = SupportedFileFormats.image;
-      const videoFormat = SupportedFileFormats.video;
-
-      expect(imageFormat?.maxSize).toBe(10 * 1024);
-      expect(videoFormat?.maxSize).toBe(100 * 1024);
     });
   });
 
@@ -59,8 +53,8 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/每个文件不超过/)).toBeInTheDocument();
-      expect(screen.getByText(/jpg, jpeg, png, gif/)).toBeInTheDocument();
+      expect(screen.getByText(/支持 jpg, jpeg, png, gif/)).toBeInTheDocument();
+      expect(screen.getByText(/webp, svg/)).toBeInTheDocument();
     });
 
     it('should use custom format message when locale.input.supportedFormatMessage is provided', () => {
@@ -69,13 +63,13 @@ describe('AttachmentButtonPopover', () => {
           supportedFormat={SupportedFileFormats.image}
           locale={{
             'input.supportedFormatMessage':
-              'Max ${maxSize}, formats: ${extensions}.',
+              'Formats: ${extensions}.',
           }}
         />,
       );
 
       expect(
-        screen.getByText(/Max 10 MB, formats: jpg, jpeg, png, gif\./),
+        screen.getByText(/Formats: jpg, jpeg, png, gif/),
       ).toBeInTheDocument();
     });
 
@@ -87,7 +81,7 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/每个文件不超过/)).toBeInTheDocument();
+      expect(screen.getByText(/支持/)).toBeInTheDocument();
       expect(screen.getByText(/pdf/)).toBeInTheDocument();
     });
 
@@ -102,7 +96,7 @@ describe('AttachmentButtonPopover', () => {
 
       expect(
         screen.getByText(
-          /Supports file upload, each file not exceeding 10 MB, formats such as jpg, jpeg, png, gif\./,
+          /Supports jpg, jpeg, png, gif, bmp, webp, svg formats/,
         ),
       ).toBeInTheDocument();
     });
@@ -114,7 +108,7 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/每个文件不超过/)).toBeInTheDocument();
+      expect(screen.getByText(/支持/)).toBeInTheDocument();
       expect(screen.getByText(/pdf/)).toBeInTheDocument();
     });
 
@@ -125,7 +119,7 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/每个文件不超过/)).toBeInTheDocument();
+      expect(screen.getByText(/支持/)).toBeInTheDocument();
       expect(screen.getByText(/mp3, wav/)).toBeInTheDocument();
     });
 
@@ -133,7 +127,6 @@ describe('AttachmentButtonPopover', () => {
       const customFormat = {
         icon: <span>Custom Icon</span>,
         type: 'Custom',
-        maxSize: 1024,
         extensions: ['custom'],
         content: <div>每个文件不超过1024kb，支持custom格式</div>,
       };
@@ -150,7 +143,7 @@ describe('AttachmentButtonPopover', () => {
       render(<AttachmentSupportedFormatsContent />);
 
       // Should show default image format content
-      expect(screen.getByText(/每个文件不超过/)).toBeInTheDocument();
+      expect(screen.getByText(/支持/)).toBeInTheDocument();
       expect(screen.getByText(/jpg, jpeg, png, gif/)).toBeInTheDocument();
     });
   });
@@ -184,7 +177,6 @@ describe('AttachmentButtonPopover', () => {
       const customFormat = {
         icon: <span>📄</span>,
         type: 'Custom Document',
-        maxSize: 2048,
         extensions: ['custom', 'doc'],
       };
 
@@ -218,7 +210,7 @@ describe('AttachmentButtonPopover', () => {
               'input.openGallery': 'Open Gallery',
               'input.openFile': 'Open File',
               'input.supportedFormatMessage':
-                'Custom: ${maxSize}, exts ${extensions}',
+                'Custom formats: ${extensions}',
             }}
           >
             <button type="button">Attach</button>
@@ -274,7 +266,6 @@ describe('AttachmentButtonPopover', () => {
       const formatWithEmptyExtensions = {
         icon: <span>📄</span>,
         type: 'Empty Extensions',
-        maxSize: 1024,
         extensions: [],
       };
 
@@ -284,14 +275,13 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/每个文件不超过/)).toBeInTheDocument();
+      expect(screen.getByText(/支持/)).toBeInTheDocument();
     });
 
     it('should handle format with zero max size', () => {
       const formatWithZeroSize = {
         icon: <span>📄</span>,
         type: 'Zero Size',
-        maxSize: 0,
         extensions: ['test'],
       };
 
@@ -301,14 +291,13 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/每个文件不超过/)).toBeInTheDocument();
+      expect(screen.getByText(/支持/)).toBeInTheDocument();
     });
 
     it('should handle format with very large max size', () => {
       const formatWithLargeSize = {
         icon: <span>📄</span>,
         type: 'Large Size',
-        maxSize: 1024 * 1024 * 1024, // 1GB in KB
         extensions: ['large'],
       };
 
@@ -318,14 +307,13 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/每个文件不超过/)).toBeInTheDocument();
+      expect(screen.getByText(/支持/)).toBeInTheDocument();
     });
 
     it('should handle single extension', () => {
       const singleExtensionFormat = {
         icon: <span>📄</span>,
         type: 'Single',
-        maxSize: 1024,
         extensions: ['single'],
       };
 

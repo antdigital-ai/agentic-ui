@@ -8,7 +8,7 @@
  */
 
 import '@testing-library/jest-dom';
-import { render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -70,6 +70,14 @@ describe('FootnoteDefinition Component', () => {
       );
       expect(footnoteElement).toBeInTheDocument();
       expect(footnoteElement).toHaveTextContent('test-id.');
+    });
+
+    it('应在 onDragStart 时触发 store.dragStart', () => {
+      const { container } = renderWithProvider(
+        <FootnoteDefinition {...defaultProps} />,
+      );
+      const el = container.querySelector('[data-be="footnoteDefinition"]');
+      fireEvent.dragStart(el!);
     });
 
     it('应该显示拖拽手柄', () => {

@@ -6,12 +6,15 @@ import { getMediaType } from './dom';
 
 export const getRemoteMediaType = async (url: string) => {
   if (!url) return 'other';
+  if (typeof url !== 'string') return 'other';
   if (url.startsWith('data:')) {
-    const m = url.match(/data:image\/(\w+);base64,(.*)/);
-    if (m) return m[1];
+    const mimeMatch = url.match(/^data:([^/]+)\/[^;]+/);
+    const mainType = mimeMatch?.[1]?.toLowerCase();
+    if (mainType === 'image') return 'image';
+    if (mainType === 'video') return 'video';
+    if (mainType === 'audio') return 'audio';
     return 'other';
   }
-  if (typeof url !== 'string') return 'other';
   try {
     const type = getMediaType(url);
     if (type !== 'other') return type;
@@ -60,8 +63,12 @@ export const convertRemoteImages = async (
             }
           }
         } else if (item?.url?.startsWith('data:')) {
-          const m = item?.url.match(/data:image\/(\w+);base64,(.*)/);
-          if (m) {
+          const dataUrlType = getMediaType(item?.url);
+          if (
+            dataUrlType === 'image' ||
+            dataUrlType === 'video' ||
+            dataUrlType === 'audio'
+          ) {
             try {
               Transforms.setNodes(
                 store?.editor,

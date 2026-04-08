@@ -144,6 +144,14 @@ export class SchemaEditorBridgeManager {
   }
 
   /**
+   * 获取指定 id 的当前内容（用于测试或调试）
+   */
+  getContentById(id: string): string | undefined {
+    const handler = this.registry.get(id);
+    return handler?.getContent();
+  }
+
+  /**
    * 启动 Bridge（幂等，已启动时直接返回）
    */
   private startBridge(): void {

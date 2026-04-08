@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { BaseRange, Editor, Range, Transforms } from 'slate';
@@ -122,10 +122,10 @@ export const FloatBar = (props: { readonly: boolean }) => {
     };
     window.addEventListener('resize', change);
     return () => window.removeEventListener('resize', change);
-  }, []);
+  }, [isOpen]);
 
   const context = useContext(ConfigProvider.ConfigContext);
-  const baseClassName = context?.getPrefixCls(`md-editor-float-bar`);
+  const baseClassName = context?.getPrefixCls(`agentic-md-editor-float-bar`);
 
   const { wrapSSR, hashId } = useStyle(baseClassName);
 

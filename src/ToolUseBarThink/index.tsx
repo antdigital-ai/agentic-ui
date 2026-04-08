@@ -5,11 +5,20 @@ import {
   ChevronsUpDown,
 } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
-import { AnimatePresence, motion } from 'framer-motion';
+import classNames from 'clsx';
+import { motion } from 'framer-motion';
 import { useMergedState } from 'rc-util';
-import React, { memo, useContext, useEffect, useMemo } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useRefFunction } from '../Hooks/useRefFunction';
+import { useLocale } from '../I18n';
 import { useStyle } from './style';
 
 const getChevronStyle = (expanded: boolean): React.CSSProperties => ({
@@ -21,6 +30,9 @@ const FLOATING_ICON_STYLE: React.CSSProperties = {
   fontSize: 16,
   color: 'var(--color-gray-text-light)',
 };
+
+/** 内容超出此高度时自动收起 */
+const CONTENT_COLLAPSE_THRESHOLD = 200;
 
 const LOADING_ANIMATION = {
   animate: {
@@ -241,6 +253,11 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
   styles,
   onToggleFloatingExpand,
 }) => {
+  const locale = useLocale();
+  const contentInnerRef = useRef<HTMLDivElement>(null);
+  const [isContentOverflowing, setIsContentOverflowing] = useState(false);
+  const [contentExpanded, setContentExpanded] = useState(false);
+
   const containerClassName = buildClassName(
     `${prefixCls}-container`,
     hashId,
@@ -266,101 +283,135 @@ const ThinkContainer: React.FC<ThinkContainerProps> = ({
     customClassNames?.floatingExpand,
   );
 
+  const contentExpandClassName = buildClassName(
+    `${prefixCls}-content-expand`,
+    hashId,
+  );
+
   const floatingIcon = floatingExpandedState ? (
     <ChevronsDownUp style={FLOATING_ICON_STYLE} />
   ) : (
     <ChevronsUpDown style={FLOATING_ICON_STYLE} />
   );
 
-  const floatingText = floatingExpandedState ? '收起' : '展开';
+  const floatingText = floatingExpandedState ? locale.collapse : locale.expand;
 
   const showFloatingExpand = status === 'loading' && !light;
 
-  // 缓存容器元素
-  const contentVariants = useMemo(
-    () => ({
-      expanded: {
-        height: 'auto',
-        opacity: 1,
-      },
-      collapsed: {
-        height: 0,
-        opacity: 0,
-      },
-    }),
-    [],
-  );
+  const checkOverflow = useCallback(() => {
+    const el = contentInnerRef.current;
+    if (!el) return;
+    const { scrollHeight } = el;
+    setIsContentOverflowing(scrollHeight > CONTENT_COLLAPSE_THRESHOLD);
+  }, []);
 
-  const contentTransition = useMemo(
-    () => ({
-      height: {
-        duration: 0.26,
-        ease: [0.4, 0, 0.2, 1],
-      },
-      opacity: {
-        duration: 0.2,
-        ease: 'linear',
-      },
-    }),
-    [],
-  );
+  useEffect(() => {
+    if (!expandedState || !thinkContent) return;
+    checkOverflow();
+    const el = contentInnerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(checkOverflow);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [expandedState, thinkContent, checkOverflow]);
 
-  return (
-    <AnimatePresence initial={false} mode="sync">
-      {expandedState ? (
-        <motion.div
-          variants={contentVariants}
-          initial="collapsed"
-          key="think-container"
-          animate="expanded"
-          exit="collapsed"
-          transition={contentTransition}
-          className={containerClassName}
-          data-testid="tool-use-bar-think-container"
-        >
-          <div className={contentClassName} style={styles?.content}>
-            {thinkContent}
-          </div>
-          {showFloatingExpand ? (
-            <div
-              className={floatingExpandClassName}
-              onClick={onToggleFloatingExpand}
-              data-testid="tool-use-bar-think-floating-expand"
-              style={styles?.floatingExpand}
-            >
-              {floatingIcon}
-              {floatingText}
-            </div>
-          ) : null}
-        </motion.div>
-      ) : null}
-      {!expandedState ? (
+  const handleContentExpandToggle = useRefFunction(() => {
+    setContentExpanded((prev) => !prev);
+  });
+
+  const showContentExpand =
+    expandedState &&
+    thinkContent &&
+    status !== 'loading' &&
+    isContentOverflowing;
+
+  const contentInnerStyle = useMemo((): React.CSSProperties | undefined => {
+    if (!showContentExpand) return undefined;
+    if (contentExpanded) return undefined;
+    return {
+      maxHeight: CONTENT_COLLAPSE_THRESHOLD,
+      overflow: 'hidden',
+    };
+  }, [showContentExpand, contentExpanded]);
+
+  const contentExpandButton = useMemo(() => {
+    if (!showContentExpand) return null;
+    const icon = contentExpanded ? <ChevronsDownUp /> : <ChevronsUpDown />;
+    const text = contentExpanded ? locale.collapse : locale.expand;
+    return (
+      <div
+        className={contentExpandClassName}
+        onClick={handleContentExpandToggle}
+        data-testid="tool-use-bar-think-content-expand"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleContentExpandToggle();
+          }
+        }}
+      >
+        {icon}
+        {text}
+      </div>
+    );
+  }, [
+    showContentExpand,
+    contentExpanded,
+    contentExpandClassName,
+    handleContentExpandToggle,
+    locale,
+  ]);
+
+  const innerContent = (
+    <>
+      <div ref={contentInnerRef} style={contentInnerStyle}>
+        <div className={contentClassName} style={styles?.content}>
+          {thinkContent}
+        </div>
+      </div>
+      {contentExpandButton}
+      {showFloatingExpand ? (
         <div
-          style={{
-            visibility: 'hidden',
-            height: 1,
-            overflow: 'hidden',
-            opacity: 0,
-          }}
+          className={floatingExpandClassName}
+          onClick={onToggleFloatingExpand}
+          data-testid="tool-use-bar-think-floating-expand"
+          style={styles?.floatingExpand}
         >
-          <div className={contentClassName} style={styles?.content}>
-            {thinkContent}
-          </div>
-          {showFloatingExpand ? (
-            <div
-              className={floatingExpandClassName}
-              onClick={onToggleFloatingExpand}
-              data-testid="tool-use-bar-think-floating-expand"
-              style={styles?.floatingExpand}
-            >
-              {floatingIcon}
-              {floatingText}
-            </div>
-          ) : null}
+          {floatingIcon}
+          {floatingText}
         </div>
       ) : null}
-    </AnimatePresence>
+    </>
   );
+
+  // 收起时不渲染 thinkContent，无动画避免展开/收起卡顿
+  if (expandedState) {
+    return (
+      <div
+        className={containerClassName}
+        data-testid="tool-use-bar-think-container"
+        style={{ overflow: 'hidden' }}
+      >
+        {innerContent}
+      </div>
+    );
+  }
+  if (showFloatingExpand) {
+    return (
+      <div
+        className={floatingExpandClassName}
+        onClick={onToggleFloatingExpand}
+        data-testid="tool-use-bar-think-floating-expand"
+        style={styles?.floatingExpand}
+      >
+        {floatingIcon}
+        {floatingText}
+      </div>
+    );
+  }
+  return null;
 };
 
 /**

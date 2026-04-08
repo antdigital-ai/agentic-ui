@@ -5,68 +5,34 @@ import React, { useState } from 'react';
 const StandaloneHistoryDemo = () => {
   const [currentSessionId, setCurrentSessionId] = useState('session-2');
 
-  // 模拟请求函数
   const mockRequest = async ({ agentId }: { agentId: string }) => {
-    // 模拟 API 请求
+    const now = Date.now();
     return [
       {
         id: '1',
         sessionId: 'session-1',
-        sessionTitle: '让黄河成为造福人民的幸福河',
-        agentId: agentId,
-        gmtCreate: 1703123456789, // 2023-12-21 10:30:56
-        gmtLastConverse: 1703123456789,
+        sessionTitle: 'Python 爬虫入门',
+        agentId,
+        gmtCreate: now - 1800000,
+        gmtLastConverse: now - 1800000,
         isFavorite: true,
       },
       {
         id: '2',
         sessionId: 'session-2',
-        sessionTitle: '才读昔楚雄，又见今人勇。',
-        agentId: agentId,
-        gmtCreate: 1703037056789, // 2023-12-20 10:30:56
-        gmtLastConverse: 1703037056789,
+        sessionTitle: 'useEffect 清理函数',
+        agentId,
+        gmtCreate: now - 7200000,
+        gmtLastConverse: now - 7200000,
         isFavorite: false,
       },
       {
         id: '3',
         sessionId: 'session-3',
-        sessionTitle:
-          '金山银山不如绿水青山，生态环境保护是一个长期任务，要久久为功。',
-        agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
-        gmtLastConverse: 1702950656789,
-      },
-      {
-        id: '4',
-        sessionId: 'session-4',
-        sessionTitle: '才读昔楚雄，又见今人勇。',
-        agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
-        gmtLastConverse: 1702950656789,
-      },
-      {
-        id: '5',
-        sessionId: 'session-5',
-        sessionTitle: '县县通高速，铺就乡村幸福路',
-        agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
-        gmtLastConverse: 1702950656789,
-      },
-      {
-        id: '6',
-        sessionId: 'session-6',
-        sessionTitle: '请为我生成一个关于AI的报告',
-        agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
-        gmtLastConverse: 1702950656789,
-      },
-      {
-        id: '7',
-        sessionId: 'session-7',
-        sessionTitle: '请帮我规划一条重庆两日游路线',
-        agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
-        gmtLastConverse: 1702950656789,
+        sessionTitle: '高并发推送架构',
+        agentId,
+        gmtCreate: now - 86400000,
+        gmtLastConverse: now - 86400000,
       },
     ] as HistoryDataType[];
   };
@@ -80,7 +46,6 @@ const StandaloneHistoryDemo = () => {
   const handleLoadMore = async () => {
     message.loading('正在加载更多数据...');
 
-    // 模拟加载更多
     await new Promise((resolve) => {
       setTimeout(resolve, 2000);
     });
@@ -122,28 +87,6 @@ const StandaloneHistoryDemo = () => {
             },
           }}
         />
-      </div>
-
-      <div style={{ marginTop: '20px' }}>
-        <h4>Props 说明：</h4>
-        <ul>
-          <li>
-            <strong>standalone</strong>: 设置为 true
-            时，直接显示菜单列表而不是下拉菜单
-          </li>
-          <li>
-            <strong>agentId</strong>: 代理ID，用于获取历史记录
-          </li>
-          <li>
-            <strong>sessionId</strong>: 当前会话ID，变更时会触发数据重新获取
-          </li>
-          <li>
-            <strong>request</strong>: 请求函数，用于获取历史数据
-          </li>
-          <li>
-            <strong>onClick</strong>: 选择历史记录项时的回调函数
-          </li>
-        </ul>
       </div>
     </div>
   );

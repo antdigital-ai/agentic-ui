@@ -150,6 +150,15 @@ const message: MessageBubbleData = {
       ),
     ],
     [
+      'preview.mp4',
+      createMockFile(
+        'preview.mp4',
+        'video/mp4',
+        1048576,
+        'https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/90LVRoQeGdkAAAAAAAAAAAAAK4eUAQBr',
+      ),
+    ],
+    [
       'image.png',
       createMockFile(
         'image.png',
@@ -226,6 +235,61 @@ export default () => (
         <SuggestionList items={items} onItemClick={() => alert('ask')} />
       </div>
     </Card>
+
+    <Card title="媒体消息">
+      <Bubble
+        style={{
+          flex: 1,
+        }}
+        pure
+        {...props}
+        originData={{
+          id: '1',
+          content: `有几个人\n\`\`\`agentic-ui-filemap
+{
+    "fileList": [
+        {
+            "uuid": "1775017476829",
+            "name": "images_q75.webp",
+            url:"https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original",
+            "size": 140528,
+            "type": "image/webp",
+        },
+        {
+            "uuid": "1775017477422.~tplv-dy-aweme-images_q75.webp",
+            "name": "~tplv-dy-aweme-images_q75.webp",
+            "size": 93720,
+            url:"https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original",
+            "type": "image/webp",
+         
+        },
+        {
+            "uuid": "1775017477211.~tplv-dy-aweme-images_q75.webp",
+            "name": "~tplv-dy-aweme-images_q75.webp",
+            url:"https://mdn.alipayobjects.com/huamei_gcee1x/afts/img/A*rhTwTY6FkwIAAAAAAAAAAAAADml6AQ/original",
+            "size": 124462,
+            "type": "image/webp",
+           
+        },
+        {
+            "uuid": "1775017477404.~tplv-dy-aweme-images_q75.webp",
+            "name": "~tplv-dy-aweme-images_q75.webp",
+            url:"https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original",
+            "size": 108864,
+            "type": "image/webp",
+           
+        }
+    ]
+}
+\`\`\``,
+          createAt: Date.now(),
+          updateAt: Date.now(),
+          meta: { avatar: '...', title: 'AI 助手' },
+        }}
+        avatar={{ avatar: '...', title: 'AI 助手' }}
+        placement="left"
+      />
+    </Card>
   </div>
 );
 ```
@@ -252,105 +316,105 @@ export default () => (
 
 ### 基础功能展示
 
-展示气泡组件的基础功能，包括消息布局、加载状态、文件附件和交互操作。
+展示气泡组件的基础功能，包括消息布局、文件附件和交互操作（列表/流式加载请用 `isLoading` 等当前 API，勿使用已废弃的 `loading`）。
 
-<code src="../demos/bubble/basic.tsx"></code>
+<code src="../demos/bubble/basic.tsx">基础用法 - 消息布局与交互</code>
 
-### 消息加载状态演示
+### 思考中（DOM 轻量加载）演示
 
-演示 Bubble 组件的消息加载状态功能，包括消息生成时的加载效果和交互控制。
+演示 “思考中...” 分支的纯 DOM 渲染结构（dots 动效），以及 `bubbleLoadingIconClassName` / `bubbleLoadingIconStyle` 的定制入口。
 
-<code src="../demos/bubble/message-loading-demo.tsx"></code>
-
-### 文件加载状态演示
-
-演示 Bubble 组件的文件上传加载状态功能，包括文件处理时的加载效果和文件类型支持。
-
-<code src="../demos/bubble/file-loading-demo.tsx"></code>
+<code src="../demos/bubble/thinking-dom-demo.tsx">思考中 DOM 加载态</code>
 
 ### 标题自定义渲染
 
 专门演示 `titleRender` 功能，展示如何自定义消息标题的显示方式。
 
-<code src="../demos/bubble/title-render-demo.tsx"></code>
+<code src="../demos/bubble/title-render-demo.tsx">自定义渲染 - 标题 titleRender</code>
 
 ### 内容自定义渲染
 
 专门演示 `contentRender` 功能，展示如何自定义消息内容的显示方式。
 
-<code src="../demos/bubble/content-render-demo.tsx"></code>
+<code src="../demos/bubble/content-render-demo.tsx">自定义渲染 - 内容 contentRender</code>
 
 ### 头像自定义渲染
 
 专门演示 `avatarRender` 功能，展示如何自定义头像的显示方式。
 
-<code src="../demos/bubble/avatar-render-demo.tsx"></code>
+<code src="../demos/bubble/avatar-render-demo.tsx">自定义渲染 - 头像 avatarRender</code>
 
 ### 脚注（Footnote）
 
 展示如何实现脚注弹框及消息底部的脚注汇总功能。
 
-<code src="../demos/bubble/footnote-demo.tsx"></code>
+<code src="../demos/bubble/footnote-demo.tsx">脚注引用 - Footnote</code>
 
 ### 操作区域定制
 
 展示 `extraRender` 功能，自定义气泡的操作按钮和交互区域。
 
-<code src="../demos/bubble/extra-render.tsx"></code>
+<code src="../demos/bubble/extra-render.tsx">自定义渲染 - 操作区 extraRender</code>
 
 ### 语音播报（TTS）
 
 展示内置的语音播报按钮及倍速选择功能：
 
-<code src="../demos/bubble/voice.tsx"></code>
+<code src="../demos/bubble/voice.tsx">语音播报 - TTS</code>
 
 ### 文件附件处理
 
 演示如何处理和展示不同类型的文件附件，支持多种文件格式。
 
-<code src="../demos/bubble/file-view.tsx"></code>
+<code src="../demos/bubble/file-view.tsx">文件附件 - 多格式预览</code>
+
+### FileMapView 文件展示
+
+消息列表中 FileMapView 的完整展示场景：单独图片、多张图片、单个视频、多个视频、混合文件（图片 + 视频 + 文档）。
+
+<code src="../demos/bubble/fileMapView-demo.tsx">FileMapView - 消息列表展示</code>
 
 ### Pure 简洁模式
 
 展示 Pure 模式的使用，提供无边框的简洁设计，适合嵌入式场景。
 
-<code src="../demos/bubble/pure.tsx"></code>
+<code src="../demos/bubble/pure.tsx">Pure 简洁模式</code>
 
 ### 消息连续性优化
 
 演示 `preMessageSameRole` 功能，展示如何通过传入前一条消息来优化连续对话的视觉体验。
 
-<code src="../demos/bubble/preMessageSameRole.tsx"></code>
+<code src="../demos/bubble/preMessageSameRole.tsx">连续消息合并 - preMessageSameRole</code>
 
 ### BubbleList 基础用法
 
 演示 BubbleList 组件的基础用法，包括消息列表的创建和管理。
 
-<code src="../demos/bubble/bubblelist-basic-demo.tsx"></code>
+<code src="../demos/bubble/bubblelist-basic-demo.tsx">BubbleList 基础用法</code>
 
 ### BubbleList 交互功能
 
 演示 BubbleList 组件的交互功能，包括点赞、点踩、回复等操作。
 
-<code src="../demos/bubble/bubblelist-interaction-demo.tsx"></code>
+<code src="../demos/bubble/bubblelist-interaction-demo.tsx">BubbleList 交互 - 点赞回复</code>
 
 ### BubbleList 配置选项
 
 演示 BubbleList 组件的配置选项，包括加载状态、只读模式等。
 
-<code src="../demos/bubble/bubblelist-config-demo.tsx"></code>
+<code src="../demos/bubble/bubblelist-config-demo.tsx">BubbleList 配置 - 加载与只读</code>
 
 ### BubbleList 性能优化
 
 演示 BubbleList 组件的性能优化特性，包括虚拟滚动和大数据量处理。
 
-<code src="../demos/bubble/bubblelist-performance-demo.tsx"></code>
+<code src="../demos/bubble/bubblelist-performance-demo.tsx">BubbleList 性能优化</code>
 
 ### BubbleList 懒加载
 
-演示 BubbleList 组件的懒加载功能，包含 200 条消息，展示如何通过懒加载提升长列表的渲染性能。只有进入视口的气泡才会被渲染，减少初始 DOM 节点数量。
+演示 BubbleList 组件的懒加载功能（示例约 48 条消息），展示如何通过懒加载提升长列表的渲染性能。只有进入视口的气泡才会被渲染，减少初始 DOM 节点数量。
 
-<code src="../demos/bubble/bubblelist-lazy-demo.tsx"></code>
+<code src="../demos/bubble/bubblelist-lazy-demo.tsx">BubbleList 懒加载</code>
 
 ## 📖 API 参考
 
@@ -358,65 +422,66 @@ export default () => (
 
 #### 核心属性
 
-| 属性       | 说明                   | 类型                | 默认值   |
-| ---------- | ---------------------- | ------------------- | -------- |
-| originData | 消息的原始数据         | `MessageBubbleData` | -        |
-| avatar     | 头像元数据配置         | `BubbleMetaData`    | -        |
-| placement  | 消息布局位置           | `'left' \| 'right'` | `'left'` |
-| loading    | 加载状态显示           | `boolean`           | `false`  |
-| readonly   | 只读模式               | `boolean`           | `false`  |
-| pure       | 简洁模式（无边框阴影） | `boolean`           | `false`  |
+| 属性       | 说明                   | 类型                | 默认值   | 版本 |
+| ---------- | ---------------------- | ------------------- | -------- | ---- |
+| originData | 消息的原始数据         | `MessageBubbleData` | -        | -        |
+| avatar     | 头像元数据配置         | `BubbleMetaData`    | -        | -        |
+| placement  | 消息布局位置           | `'left' \| 'right'` | `'left'` | -        |
+| loading    | 加载状态显示           | `boolean`           | `false`  | -        |
+| readonly   | 只读模式               | `boolean`           | `false`  | -        |
+| pure       | 简洁模式（无边框阴影） | `boolean`           | `false`  | -        |
 
 #### 样式配置
 
-| 属性      | 说明             | 类型                  | 默认值 |
-| --------- | ---------------- | --------------------- | ------ |
-| className | 自定义 CSS 类名  | `string`              | -      |
-| style     | 自定义内联样式   | `React.CSSProperties` | -      |
-| styles    | 详细样式配置对象 | `BubbleStylesConfig`  | -      |
+| 属性      | 说明             | 类型                  | 默认值 | 版本 |
+| --------- | ---------------- | --------------------- | ------ | ---- |
+| className | 自定义 CSS 类名  | `string`              | -      | -    |
+| style     | 自定义内联样式   | `React.CSSProperties` | -      | -    |
+| styles    | 详细样式配置对象 | `BubbleStylesConfig`  | -      | -    |
 
 #### 渲染配置
 
-| 属性                 | 说明              | 类型                  | 默认值 |
-| -------------------- | ----------------- | --------------------- | ------ |
-| bubbleRenderConfig   | 自定义渲染配置    | `BubbleRenderConfig`  | -      |
-| markdownRenderConfig | Markdown 渲染配置 | `MarkdownEditorProps` | -      |
+| 属性                 | 说明              | 类型                  | 默认值 | 版本 |
+| -------------------- | ----------------- | --------------------- | ------ | ---- |
+| bubbleRenderConfig   | 自定义渲染配置    | `BubbleRenderConfig`  | -      | -    |
+| markdownRenderConfig | Markdown 渲染配置 | `MarkdownEditorProps` | -      | -    |
 
 #### 交互回调
 
-| 属性          | 说明                                        | 类型                                  | 默认值 |
-| ------------- | ------------------------------------------- | ------------------------------------- | ------ |
-| onLike        | 点赞回调函数                                | `(bubble: MessageBubbleData) => void` | -      |
-| onDislike     | 点踩回调函数（符合命名规范）                | `(bubble: MessageBubbleData) => void` | -      |
-| onDisLike     | 点踩回调函数（已废弃，请使用 onDislike）    | `(bubble: MessageBubbleData) => void` | -      |
-| onLikeCancel  | Like 子组件取消事件（符合命名规范）         | `(bubble: MessageBubbleData) => void` | -      |
-| onCancelLike  | 取消点赞回调（已废弃，请使用 onLikeCancel） | `(bubble: MessageBubbleData) => void` | -      |
-| onReply       | 回复回调函数                                | `(message: string) => void`           | -      |
-| onAvatarClick | 头像点击回调                                | `() => void`                          | -      |
-| onDoubleClick | 双击回调函数                                | `() => void`                          | -      |
-| preMessage    | 前一条消息数据                              | `MessageBubbleData \| undefined`      | -      |
+| 属性             | 说明                                | 类型                                  | 默认值 | 版本 |
+| ---------------- | ----------------------------------- | ------------------------------------- | ------ | ---- |
+| onLike           | 点赞回调函数                        | `(bubble: MessageBubbleData) => void` | -      | -        |
+| onDislike        | 点踩回调函数（符合命名规范）        | `(bubble: MessageBubbleData) => void` | -      | -        |
+| ~~onDisLike~~    | 已废弃，请使用 `onDislike`          | `(bubble: MessageBubbleData) => void` | -      | 2.29.0   |
+| onLikeCancel     | Like 子组件取消事件（符合命名规范） | `(bubble: MessageBubbleData) => void` | -      | -        |
+| ~~onCancelLike~~ | 已废弃，请使用 `onLikeCancel`       | `(bubble: MessageBubbleData) => void` | -      | 2.29.0   |
+| onReply          | 回复回调函数                        | `(message: string) => void`           | -      | -        |
+| onAvatarClick    | 头像点击回调                        | `() => void`                          | -      | -        |
+| onDoubleClick    | 双击回调函数                        | `() => void`                          | -      | -        |
+| preMessage       | 前一条消息数据                      | `MessageBubbleData \| undefined`      | -      | -        |
 
 ### BubbleList 消息列表组件
 
 #### 核心属性
 
-| 属性          | 说明          | 类型                  | 默认值  |
-| ------------- | ------------- | --------------------- | ------- |
-| bubbleList    | 消息列表数据  | `MessageBubbleData[]` | `[]`    |
-| assistantMeta | AI 助手元数据 | `BubbleMetaData`      | -       |
-| userMeta      | 用户元数据    | `BubbleMetaData`      | -       |
-| loading       | 列表加载状态  | `boolean`             | `false` |
-| readonly      | 只读模式      | `boolean`             | `false` |
+| 属性          | 说明                       | 类型                  | 默认值  | 版本 |
+| ------------- | -------------------------- | --------------------- | ------- | ---- |
+| bubbleList    | 消息列表数据               | `MessageBubbleData[]` | `[]`    | -        |
+| assistantMeta | AI 助手元数据              | `BubbleMetaData`      | -       | -        |
+| userMeta      | 用户元数据                 | `BubbleMetaData`      | -       | -        |
+| ~~loading~~   | 已废弃，请使用 `isLoading` | `boolean`             | `false` | 2.29.0   |
+| isLoading     | 列表加载状态               | `boolean`             | `false` | -        |
+| readonly      | 只读模式                   | `boolean`             | `false` | -        |
 
 #### 引用和样式
 
-| 属性          | 说明            | 类型                               | 默认值 |
-| ------------- | --------------- | ---------------------------------- | ------ |
-| bubbleListRef | 列表容器引用    | `MutableRefObject<HTMLDivElement>` | -      |
-| bubbleRef     | 气泡组件引用    | `MutableRefObject<any>`            | -      |
-| className     | 自定义 CSS 类名 | `string`                           | -      |
-| style         | 自定义内联样式  | `React.CSSProperties`              | -      |
-| styles        | 详细样式配置    | `BubbleListStylesConfig`           | -      |
+| 属性          | 说明            | 类型                                       | 默认值 | 版本 |
+| ------------- | --------------- | ------------------------------------------ | ------ | ---- |
+| bubbleListRef | 列表容器引用    | `MutableRefObject<HTMLDivElement>`         | -      | -    |
+| bubbleRef     | 气泡组件引用    | `MutableRefObject<BubbleImperativeHandle>` | -      | -    |
+| className     | 自定义 CSS 类名 | `string`                                   | -      | -    |
+| style         | 自定义内联样式  | `React.CSSProperties`                      | -      | -    |
+| styles        | 详细样式配置    | `BubbleListStylesConfig`                   | -      | -    |
 
 ### 核心数据类型
 
@@ -444,11 +509,14 @@ interface MessageBubbleData {
 interface BubbleMetaData {
   avatar?: string; // 头像 URL
   title?: string; // 显示名称
+  name?: string; // 名称（别名）
   description?: string; // 描述信息
   backgroundColor?: string; // 背景色
-  [key: string]: any; // 其他自定义字段
+  metadata?: Record<string, unknown>; // 扩展元数据
 }
 ```
+
+> **变更说明**：移除了 `[key: string]: any` 索引签名，新增 `name` 和 `metadata` 属性。如需传递自定义数据，请使用 `metadata` 字段。
 
 #### BubbleRenderConfig
 
@@ -470,6 +538,46 @@ type CustomRenderFunction = (
   defaultDom: ReactNode,
 ) => ReactNode;
 ```
+
+#### BubbleImperativeHandle
+
+通过 `bubbleRef` 暴露的命令式方法：
+
+```typescript
+interface BubbleImperativeHandle {
+  /** 更新消息项数据 */
+  setMessageItem?: (id: string, data: Partial<MessageBubbleData>) => void;
+}
+```
+
+#### BubbleSlotStyles（推荐）
+
+简洁版样式配置接口，属性名不带 `bubble` 前缀：
+
+```typescript
+interface BubbleSlotStyles {
+  root?: React.CSSProperties; // 气泡根容器
+  avatarTitle?: React.CSSProperties; // 头像标题区域
+  container?: React.CSSProperties; // 主容器
+  loadingIcon?: React.CSSProperties; // 加载图标
+  name?: React.CSSProperties; // 名称区域
+  content?: React.CSSProperties; // 内容
+  before?: React.CSSProperties; // 内容前置区域
+  after?: React.CSSProperties; // 内容后置区域
+  title?: React.CSSProperties; // 标题
+  avatar?: React.CSSProperties; // 头像
+  extra?: React.CSSProperties; // 额外内容
+}
+```
+
+> **变更说明**：新增 `BubbleSlotStyles` / `BubbleSlotClassNames` 作为推荐的样式接口，属性名更简洁。原 `BubbleStyles` / `BubbleClassNames`（带 `bubble` 前缀）仍可使用，但已标记为 deprecated。
+
+#### AI 气泡属性
+
+| 属性              | 说明                           | 类型          | 默认值 | 版本 |
+| ----------------- | ------------------------------ | ------------- | ------ | ---- |
+| aiBubbleProps     | AI 气泡的属性配置              | `BubbleProps` | -      | -        |
+| ~~aIBubbleProps~~ | 已废弃，请使用 `aiBubbleProps` | `BubbleProps` | -      | 2.30.0   |
 
 ## 🎯 功能特性详解
 
@@ -689,9 +797,9 @@ const App = () => (
 
 #### 配置选项
 
-| 属性         | 类型                             | 说明                         | 默认值      |
-| ------------ | -------------------------------- | ---------------------------- | ----------- |
-| `preMessage` | `MessageBubbleData \| undefined` | 前一条消息数据，用于角色比较 | `undefined` |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| `preMessage` | 前一条消息数据，用于角色比较 | `MessageBubbleData \| undefined` | `undefined` | - |
 
 #### 注意事项
 

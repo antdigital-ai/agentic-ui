@@ -1,7 +1,7 @@
 import { LoadingOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip, TooltipProps } from 'antd';
-import cx from 'classnames';
-import { isFunction } from 'lodash';
+import classNames from 'clsx';
+import { isFunction } from 'lodash-es';
 import { useMergedState } from 'rc-util';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useStyle } from './style';
@@ -17,7 +17,7 @@ export type ActionIconBoxProps = {
   className?: string;
   borderLess?: boolean;
   /**
-   * @deprecated 请使用 isLoading 代替
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除
    */
   loading?: boolean;
@@ -161,7 +161,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
           role="button"
           tabIndex={0}
           aria-label={props.title?.toString()}
-          className={cx(prefixCls, hashId, props.className, {
+          className={classNames(prefixCls, hashId, props.className, {
             [`${prefixCls}-danger`]: props.type === 'danger',
             [`${prefixCls}-primary`]: props.type === 'primary',
             [`${prefixCls}-border-less`]: props.borderLess,
@@ -172,6 +172,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
           })}
           onClick={async (e) => {
             e.preventDefault();
+            e.stopPropagation();
             if (!props.onClick) return;
             if (loading) return;
             setLoading(true);
@@ -186,6 +187,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
           onKeyDown={async (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
+              e.stopPropagation();
               if (!props.onClick) return;
               if (loading) return;
               setLoading(true);
@@ -217,7 +219,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
         tabIndex={0}
         aria-label={props.title?.toString()}
         title={props.title?.toString()}
-        className={cx(prefixCls, hashId, props.className, {
+        className={classNames(prefixCls, hashId, props.className, {
           [`${prefixCls}-danger`]: props.type === 'danger',
           [`${prefixCls}-primary`]: props.type === 'primary',
           [`${prefixCls}-border-less`]: props.borderLess,
@@ -228,6 +230,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
         })}
         onClick={async (e) => {
           e.preventDefault();
+          e.stopPropagation();
           if (!props.onClick) return;
           if (loading) return;
           setLoading(true);
@@ -242,6 +245,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
         onKeyDown={async (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
+            e.stopPropagation();
             if (!props.onClick) return;
             if (loading) return;
             setLoading(true);

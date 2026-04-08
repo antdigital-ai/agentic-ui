@@ -10,8 +10,15 @@ import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 import {
+  JINJA_DOLLAR_PLACEHOLDER,
+  preprocessNormalizeLeafToContainerDirective,
+} from '../parser/constants';
+import { remarkDirectiveContainer } from '../parser/remarkDirectiveContainer';
+import remarkDirectiveContainersOnly from '../parser/remarkDirectiveContainersOnly';
+import {
   convertParagraphToImage,
   fixStrongWithSpecialChars,
+  protectJinjaDollarInText,
 } from '../parser/remarkParse';
 
 // 使用 any 类型避免 hast 类型依赖问题
@@ -86,6 +93,53 @@ const INLINE_MATH_WITH_SINGLE_DOLLAR = { singleDollarTextMath: true };
 const FRONTMATTER_LANGUAGES: readonly string[] = ['yaml'];
 
 const remarkRehypePlugin = remarkRehype as unknown as Plugin;
+
+/**
+ * mdast-util-to-hast 自定义 handler：将 remark-directive 的 textDirective 转为 span 元素
+ * 避免 "Cannot handle unknown node textDirective" 错误
+ */
+function textDirectiveHandler(state: any, node: any) {
+  const result = {
+    type: 'element',
+    tagName: 'span',
+    properties: {
+      className: ['directive', `directive-${String(node.name || 'unknown')}`],
+    },
+    children: state.all(node),
+  };
+  state.patch(node, result);
+  return state.applyData(node, result);
+}
+
+/**
+ * mdast-util-to-hast 自定义 handler：将 remark-directive 的 leafDirective 转为 span 元素
+ * 避免 "Cannot handle unknown node leafDirective" 错误
+ */
+function leafDirectiveHandler(state: any, node: any) {
+  const result = {
+    type: 'element',
+    tagName: 'span',
+    properties: {
+      className: [
+        'directive',
+        'leaf',
+        `directive-${String(node.name || 'unknown')}`,
+      ],
+    },
+    children: state.all(node),
+  };
+  state.patch(node, result);
+  return state.applyData(node, result);
+}
+
+/**
+ * remark-rehype 的 directive 节点 handlers，用于避免 "Cannot handle unknown node textDirective" 等错误
+ * 可复用于 parseTable 等其他使用 remark-rehype 的场景
+ */
+export const REMARK_REHYPE_DIRECTIVE_HANDLERS = {
+  textDirective: textDirectiveHandler,
+  leafDirective: leafDirectiveHandler,
+};
 
 /**
  * 配置链接渲染器，在新标签页打开链接
@@ -193,15 +247,30 @@ function rehypeCodeBlock(): Plugin<[], HastRoot> {
   };
 }
 
+/** 内置容器插件配置：remark-directive 容器转 div.markdown-container（兼容 markdown-it-container 风格） */
+const REMARK_DIRECTIVE_CONTAINER_OPTIONS = {
+  className: 'markdown-container',
+  titleElement: { className: ['markdown-container__title'] },
+};
+
 export const DEFAULT_MARKDOWN_REMARK_PLUGINS: readonly MarkdownRemarkPlugin[] =
   [
     remarkParse,
     [remarkGfm, { singleTilde: false }],
     fixStrongWithSpecialChars,
     convertParagraphToImage,
+    protectJinjaDollarInText,
     [remarkMath as unknown as Plugin, INLINE_MATH_WITH_SINGLE_DOLLAR],
     [remarkFrontmatter, FRONTMATTER_LANGUAGES],
-    [remarkRehypePlugin, { allowDangerousHtml: true }],
+    remarkDirectiveContainersOnly as unknown as Plugin,
+    [remarkDirectiveContainer, REMARK_DIRECTIVE_CONTAINER_OPTIONS],
+    [
+      remarkRehypePlugin,
+      {
+        allowDangerousHtml: true,
+        handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
+      },
+    ],
   ] as const;
 
 const DEFAULT_REMARK_PLUGINS: MarkdownRemarkPlugin[] = [
@@ -307,11 +376,16 @@ export const markdownToHtml = async (
   config?: MarkdownToHtmlConfig,
 ): Promise<string> => {
   try {
-    const htmlContent = await createMarkdownProcessor(plugins, config).process(
-      markdown,
+    const normalizedMarkdown =
+      preprocessNormalizeLeafToContainerDirective(markdown);
+    const file = await createMarkdownProcessor(plugins, config).process(
+      normalizedMarkdown,
     );
-
-    return String(htmlContent);
+    const htmlContent =
+      file && typeof file === 'object' && 'value' in file
+        ? String((file as { value: unknown }).value ?? '')
+        : String(file);
+    return htmlContent.split(JINJA_DOLLAR_PLACEHOLDER).join('$');
   } catch (error) {
     console.error('Error converting markdown to HTML:', error);
     return '';
@@ -354,8 +428,16 @@ export const markdownToHtmlSync = (
   config?: MarkdownToHtmlConfig,
 ): string => {
   try {
-    const file = createMarkdownProcessor(plugins, config).processSync(markdown);
-    return String(file);
+    const normalizedMarkdown =
+      preprocessNormalizeLeafToContainerDirective(markdown);
+    const file = createMarkdownProcessor(plugins, config).processSync(
+      normalizedMarkdown,
+    );
+    const htmlContent =
+      file && typeof file === 'object' && 'value' in file
+        ? String((file as { value: unknown }).value ?? '')
+        : String(file);
+    return htmlContent.split(JINJA_DOLLAR_PLACEHOLDER).join('$');
   } catch (error) {
     console.error('Error converting markdown to HTML:', error);
     return '';

@@ -5,14 +5,19 @@ import {
 } from '../../src/Schema/validator';
 
 // Mock Ajv
-vi.mock('ajv', () => {
+const { mockValidate, mockCompile } = vi.hoisted(() => {
   const mockValidate = vi.fn();
   const mockCompile = vi.fn(() => mockValidate);
+  return { mockValidate, mockCompile };
+});
 
+vi.mock('ajv', () => {
   return {
-    default: vi.fn().mockImplementation(() => ({
-      compile: mockCompile,
-    })),
+    default: vi.fn(function MockAjv() {
+      return {
+        compile: mockCompile,
+      };
+    }),
   };
 });
 
@@ -37,10 +42,28 @@ describe('SchemaValidator', () => {
 
   describe('validate方法', () => {
     it('应该能够调用validate方法', () => {
+      mockValidate.mockReturnValue(true);
+      mockValidate.errors = null;
       const result = validator.validate({ test: 'data' });
       expect(typeof result).toBe('object');
       expect(result).toHaveProperty('valid');
       expect(result).toHaveProperty('errors');
+    });
+
+    it('应在 error.message 为空时使用默认值 "未知错误" (line 36)', () => {
+      mockValidate.mockReturnValue(false);
+      mockValidate.errors = [
+        {
+          instancePath: '/test',
+          message: undefined,
+        },
+      ];
+
+      const result = validator.validate({ test: 'data' });
+      expect(result.valid).toBe(false);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].message).toBe('未知错误');
+      expect(result.errors[0].path).toBe('/test');
     });
   });
 });

@@ -107,6 +107,76 @@ describe('HTML to Markdown Utils', () => {
       const result = htmlToMarkdown(html, options);
       expect(result).toBe('[链接](https://example.com?processed)');
     });
+
+    it('preserveComments 为 true 时应保留 HTML 注释 (37-38)', () => {
+      const html = '<p>before</p><!-- comment --><p>after</p>';
+      const result = htmlToMarkdown(html, { preserveComments: true });
+      expect(result).toContain('<!-- comment -->');
+    });
+
+    it('preserveComments 为 false 时应忽略 HTML 注释 (37, 41)', () => {
+      const html = '<p>before</p><!-- comment --><p>after</p>';
+      const result = htmlToMarkdown(html, { preserveComments: false });
+      expect(result).not.toContain('<!-- comment -->');
+      expect(result).toContain('before');
+      expect(result).toContain('after');
+    });
+
+    it('空表格应返回空字符串 (112)', () => {
+      const html = '<table></table>';
+      const result = htmlToMarkdown(html);
+      expect(result).toBe('');
+    });
+
+    it('应转换 br 为换行 (181)', () => {
+      const html = '<p>line1<br>line2</p>';
+      const result = htmlToMarkdown(html);
+      expect(result).toContain('\n');
+      expect(result).toContain('line1');
+      expect(result).toContain('line2');
+    });
+
+    it('应转换 b 标签为粗体 (183)', () => {
+      const html = '<p>text <b>bold</b> end</p>';
+      const result = htmlToMarkdown(html);
+      expect(result).toBe('text **bold** end\n\n');
+    });
+
+    it('应转换 i 标签为斜体 (185)', () => {
+      const html = '<p>text <i>italic</i> end</p>';
+      const result = htmlToMarkdown(html);
+      expect(result).toBe('text *italic* end\n\n');
+    });
+
+    it('应转换内联 code 标签 (191)', () => {
+      const html = '<p>use <code>fn()</code> here</p>';
+      const result = htmlToMarkdown(html);
+      expect(result).toBe('use `fn()` here\n\n');
+    });
+
+    it('pre 内无 code 子元素时应使用 textContent (214)', () => {
+      const html = '<pre>plain text\nno code tag</pre>';
+      const result = htmlToMarkdown(html);
+      expect(result).toBe('```\nplain text\nno code tag\n```\n\n');
+    });
+
+    it('应转换 div 为段落式换行 (246)', () => {
+      const html = '<div>div content</div>';
+      const result = htmlToMarkdown(html);
+      expect(result).toBe('div content\n\n');
+    });
+
+    it('应转换 span 为内联无换行 (249)', () => {
+      const html = '<p><span>span content</span></p>';
+      const result = htmlToMarkdown(html);
+      expect(result).toBe('span content\n\n');
+    });
+
+    it('未知标签应走 default 返回 children (252)', () => {
+      const html = '<article>article content</article>';
+      const result = htmlToMarkdown(html);
+      expect(result).toBe('article content');
+    });
   });
 
   describe('batchHtmlToMarkdown', () => {

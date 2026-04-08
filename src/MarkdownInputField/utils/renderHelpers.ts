@@ -3,6 +3,7 @@ import type { AttachmentButtonProps } from '../AttachmentButton';
 import { AttachmentFileList } from '../AttachmentButton/AttachmentFileList';
 import type { AttachmentFile } from '../AttachmentButton/types';
 import { SendActions } from '../SendActions';
+import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
 interface UseAttachmentListParams {
@@ -32,6 +33,7 @@ export const useAttachmentList = ({
       onClearFileMap: () => {
         updateAttachmentFiles(undefined);
       },
+      dataTestId: MARKDOWN_INPUT_FIELD_TEST_IDS.ATTACHMENT_LIST,
     });
   }, [
     attachment?.enable,
@@ -88,6 +90,13 @@ interface UseSendActionsNodeParams {
   setFileMap?: (fileMap?: Map<string, AttachmentFile>) => void;
   supportedFormat: AttachmentButtonProps['supportedFormat'];
   fileUploadDone: boolean;
+  fileUploadStatus: 'uploading' | 'done' | 'error';
+  fileUploadSummary: {
+    totalCount: number;
+    doneCount: number;
+    uploadingCount: number;
+    errorCount: number;
+  };
   recording: boolean;
   isLoading: boolean;
   collapseSendActions: boolean;
@@ -111,6 +120,8 @@ export const useSendActionsNode = ({
   setFileMap,
   supportedFormat,
   fileUploadDone,
+  fileUploadStatus,
+  fileUploadSummary,
   recording,
   isLoading,
   collapseSendActions,
@@ -142,6 +153,8 @@ export const useSendActionsNode = ({
         typing: sendProps.typing,
         isLoading,
         fileUploadDone,
+        fileUploadStatus,
+        fileUploadSummary,
         recording,
         collapseSendActions,
         allowEmptySubmit: sendProps.allowEmptySubmit,
@@ -176,6 +189,8 @@ export const useSendActionsNode = ({
       setFileMap,
       supportedFormat,
       fileUploadDone,
+      fileUploadStatus,
+      fileUploadSummary,
       recording,
       isLoading,
       collapseSendActions,

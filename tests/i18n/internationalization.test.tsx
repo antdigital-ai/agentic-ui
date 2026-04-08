@@ -64,7 +64,7 @@ const TestI18nComponent: React.FC<{ locale: any }> = ({ locale }) => {
         {locale?.['markdownInput.fileSizeExceeded']?.replace(
           '${maxSize}',
           '1024',
-        ) || '文件大小超过 1024 KB'}
+        ) || '超过 1024 KB'}
       </div>
 
       {/* History 组件相关测试 */}
@@ -212,7 +212,7 @@ describe('Internationalization Tests', () => {
 
       expect(
         screen.getByTestId('markdown-input-file-size-exceeded'),
-      ).toHaveTextContent('文件大小超过 1024 KB');
+      ).toHaveTextContent('超过 1024 KB');
     });
 
     it('should render History component labels in Chinese', () => {
@@ -360,7 +360,7 @@ describe('Internationalization Tests', () => {
 
       expect(
         screen.getByTestId('markdown-input-file-size-exceeded'),
-      ).toHaveTextContent('File size exceeds 1024 KB');
+      ).toHaveTextContent('Exceeds 1024 KB');
     });
 
     it('should render History component labels in English', () => {
@@ -435,13 +435,13 @@ describe('Internationalization Tests', () => {
     it('should support template string replacement in Chinese', () => {
       const templateText = cnLabels['markdownInput.fileSizeExceeded'];
       const replacedText = templateText.replace('${maxSize}', '2048');
-      expect(replacedText).toBe('文件大小超过 2048 KB');
+      expect(replacedText).toBe('超过 2048 KB');
     });
 
     it('should support template string replacement in English', () => {
       const templateText = enLabels['markdownInput.fileSizeExceeded'];
       const replacedText = templateText.replace('${maxSize}', '2048');
-      expect(replacedText).toBe('File size exceeds 2048 KB');
+      expect(replacedText).toBe('Exceeds 2048 KB');
     });
 
     it('should support task name replacement in Chinese', () => {

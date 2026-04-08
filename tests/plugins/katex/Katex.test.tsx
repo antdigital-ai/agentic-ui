@@ -164,6 +164,29 @@ describe('Katex', () => {
       consoleErrorSpy.mockRestore();
       process.env.NODE_ENV = originalEnv;
     });
+
+    it('空公式时走 else 分支 setState({ error: "" })', async () => {
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
+      mockLoadKatex.mockResolvedValue({ default: mockKatex });
+
+      const emptyEl: CodeNode = { ...mockElement, value: '' };
+      render(<Katex el={emptyEl} />);
+
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(400);
+      });
+      await act(async () => {
+        await Promise.resolve();
+      });
+
+      expect(mockLoadKatex).toHaveBeenCalled();
+      process.env.NODE_ENV = originalEnv;
+    });
   });
 
   describe('公式渲染测试', () => {
@@ -469,6 +492,29 @@ describe('Katex', () => {
       // 即使 render 抛出错误，组件也不应该崩溃
       expect(container.firstChild).toBeInTheDocument();
 
+      process.env.NODE_ENV = originalEnv;
+    });
+
+    it('应在 katex.render 抛出时执行 catch 分支且不崩溃', async () => {
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
+      mockLoadKatex.mockResolvedValue({ default: mockKatex });
+      mockRender.mockImplementation(() => {
+        throw new Error('KaTeX render failed');
+      });
+
+      const { container } = render(<Katex el={mockElement} />);
+
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+        vi.advanceTimersByTime(0);
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(350);
+      });
+
+      expect(container.firstChild).toBeInTheDocument();
       process.env.NODE_ENV = originalEnv;
     });
 

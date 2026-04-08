@@ -219,6 +219,6 @@ export const HistorySearch: React.FC<HistorySearchProps> = ({
 };
 
 /**
- * @deprecated 请使用 HistorySearch 替代
+ * @deprecated @since 2.29.0 请使用 HistorySearch 替代
  */
 export const SearchComponent: React.FC<HistorySearchProps> = HistorySearch;

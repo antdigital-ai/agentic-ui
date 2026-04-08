@@ -361,7 +361,12 @@ describe('BubbleMessageDisplay', () => {
 
       renderWithContext(props);
 
-      expect(screen.getByText('思考中...')).toBeInTheDocument();
+      const loadingContainer = screen.getByTestId('message-content');
+      expect(loadingContainer).toHaveAttribute('role', 'status');
+      expect(loadingContainer).toHaveAttribute('aria-label', '思考中...');
+      expect(screen.queryByText('思考中...')).not.toBeInTheDocument();
+      expect(screen.getByTestId('message-thinking-dots')).toBeInTheDocument();
+      expect(screen.getAllByTestId('message-thinking-dot')).toHaveLength(3);
     });
 
     it('应该渲染异常状态', () => {
@@ -439,7 +444,10 @@ describe('BubbleMessageDisplay', () => {
 
       renderWithContext(props);
 
-      expect(screen.getByTestId('markdown-preview')).toBeInTheDocument();
+      expect(screen.getByTestId('message-box-content')).toBeInTheDocument();
+      expect(screen.getByTestId('react-content')).toHaveTextContent(
+        'React Content',
+      );
     });
 
     it('应该处理thoughtChain.alwaysRender为true的情况', () => {
@@ -769,9 +777,7 @@ describe('BubbleMessageDisplay', () => {
 
       renderWithContext(props);
 
-      expect(screen.getByTestId('content')).toHaveTextContent(
-        '生成回答失败，请重试',
-      );
+      expect(screen.getByTestId('content')).toHaveTextContent('');
     });
 
     it('应该处理用户角色消息', () => {
@@ -833,6 +839,31 @@ describe('BubbleMessageDisplay', () => {
   });
 
   describe('配置测试', () => {
+    it('应该应用自定义 loading icon class 和 style', () => {
+      const props = {
+        ...defaultProps,
+        content: '...',
+        classNames: {
+          bubbleLoadingIconClassName: 'custom-loading-dots',
+        },
+        styles: {
+          bubbleLoadingIconStyle: {
+            marginLeft: 10,
+          },
+        },
+        originData: {
+          ...defaultProps.originData,
+          isFinished: false,
+        },
+      };
+
+      renderWithContext(props);
+
+      const dots = screen.getByTestId('message-thinking-dots');
+      expect(dots).toHaveClass('custom-loading-dots');
+      expect(dots).toHaveStyle('margin-left: 10px');
+    });
+
     it('应该应用紧凑模式样式', () => {
       const context = {
         ...defaultContext,

@@ -10,7 +10,7 @@ import {
   LinearScale,
   Tooltip,
 } from 'chart.js';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import ChartStatistic from '../ChartStatistic';
@@ -22,6 +22,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
+import { useChartTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
@@ -427,10 +428,8 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     return filterLabels?.map((l) => ({ key: l, label: l }));
   }, [filterLabels]);
 
-  const isLight = theme === 'light';
-  const axisTextColor = isLight
-    ? 'rgba(0, 25, 61, 0.3255)'
-    : 'rgba(255, 255, 255, 0.8)';
+  // 使用 useChartTheme hook 获取主题相关颜色
+  const { axisTextColor, isLight } = useChartTheme(theme);
 
   const options: ChartOptions<'bar'> = {
     responsive: true,
@@ -481,12 +480,15 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
               return true;
             });
             if (!anyNonTopProvided) return base;
+            const trapezoidLegendFill = isLight
+              ? '#F1F2F4'
+              : 'rgba(255, 255, 255, 0.3)';
             return [
               ...base,
               {
                 text: typeNames?.rate || '转化率',
-                fillStyle: '#F1F2F4',
-                strokeStyle: '#F1F2F4',
+                fillStyle: trapezoidLegendFill,
+                strokeStyle: trapezoidLegendFill,
                 lineWidth: 0,
                 hidden: !showTrapezoid,
                 datasetIndex: chart.data.datasets.length,
@@ -644,14 +646,19 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           ctx.lineTo(botR, botY);
           ctx.lineTo(botL, botY);
           ctx.closePath();
-          ctx.fillStyle = '#F1F2F4';
+          ctx.fillStyle = isLight ? '#F1F2F4' : 'rgba(255, 255, 255, 0.28)';
           ctx.fill();
+          if (!isLight) {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
 
           // 文本（展示该比率）
           const midY = (topY + botY) / 2;
           const cx =
             centerX ?? (Math.min(topL, botL) + Math.max(topR, botR)) / 2;
-          ctx.fillStyle = '#626F86';
+          ctx.fillStyle = isLight ? '#626F86' : 'rgba(255, 255, 255, 0.95)';
           ctx.font = `${isMobile ? 10 : 12}px sans-serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
@@ -661,6 +668,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
       },
     };
   }, [
+    isLight,
     isMobile,
     showTrapezoid,
     JSON.stringify(filteredData.map((d) => d?.ratio)),
@@ -676,11 +684,6 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
         if (!meta) return;
         const xScale = scales?.x;
         const labels = data?.labels || [];
-        ctx.save();
-        ctx.fillStyle = axisTextColor;
-        ctx.font = `${isMobile ? 10 : 12}px sans-serif`;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
         const ds = data?.datasets?.[0]?.data || [];
 
         // 计算所有条末端的像素坐标，找最大值作为对齐基准
@@ -700,7 +703,14 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           if (!raw || !Array.isArray(raw)) return;
           const y = el.y;
           const label = labels?.[i] ?? '';
+
+          ctx.save();
+          ctx.fillStyle = axisTextColor;
+          ctx.font = `${isMobile ? 10 : 12}px sans-serif`;
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
           ctx.fillText(label, maxEnd + padding, y);
+          ctx.restore();
 
           // 在柱体中心绘制数值文本（白色）- 使用原始值
           const start = Number(raw[0] ?? 0);
@@ -713,13 +723,13 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
           ctx.save();
           ctx.fillStyle = '#fff';
           ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
           ctx.fillText(String(Math.round(originalValue)), cx, y);
           ctx.restore();
         });
-        ctx.restore();
       },
     };
-  }, [isMobile, axisTextColor, originalValues]);
+  }, [isMobile, axisTextColor, originalValues, theme]);
 
   const containerClassName = useMemo(() => {
     if (isMobile) return 'w-full';
@@ -817,7 +827,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
         }}
       >
         <Bar
-          key={`funnel-${pluginToggleKey}`}
+          key={`funnel-${theme}-${pluginToggleKey}`}
           ref={chartRef}
           data={processedData}
           options={options}

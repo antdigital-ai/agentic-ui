@@ -1,3 +1,4 @@
+import type { CSSInterpolation } from '@ant-design/cssinjs';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
@@ -5,6 +6,288 @@ import {
   resetComponent,
   useEditorStyleRegister,
 } from '../Hooks/useStyle';
+
+// ── Table ──────────────────────────────────────────────────────────────────
+const TABLE_BORDER = '1px solid var(--agentic-ui-table-border-color, #E7E9E8)';
+const TABLE_RADIUS = 'var(--agentic-ui-table-border-radius, 8px)';
+const TABLE_ACTION_BUTTON_SIZE = 20;
+const TABLE_ACTION_BUTTON_GAP = '2px';
+const TABLE_ACTION_BUTTON_ICON_SIZE = 12;
+const TABLE_CELL = {
+  verticalAlign: 'top' as const,
+  padding: 'var(--agentic-ui-table-cell-padding, 16px 12px)',
+  textAlign: 'left' as const,
+  lineHeight: '24px',
+  fontSize: '1em',
+  minWidth: 'var(--agentic-ui-table-cell-min-width, 40px)',
+  width: 'var(--agentic-ui-table-cell-min-width, 40px)',
+  whiteSpace: 'nowrap' as const,
+  overflow: 'hidden' as const,
+  textOverflow: 'ellipsis' as const,
+  zIndex: 1,
+  background: 'inherit',
+};
+
+const genTableStyle = (
+  token: ChatTokenType,
+  mobileBreakpoint: string,
+  mobilePadding: string,
+): Record<string, CSSInterpolation> => {
+  const tableCls = `${token.componentCls}-content-table`;
+
+  return {
+    [tableCls]: {
+      width: '100%',
+      maxWidth: '100%',
+      minWidth: 0,
+      position: 'relative',
+
+      '&-container': {
+        maxWidth: '100%',
+        minWidth: 0,
+        outline: 'none',
+        position: 'relative',
+        marginBottom: 12,
+        [`&:hover ${tableCls}-readonly-table-actions`]: {
+          opacity: 1,
+          transform: 'translateX(50%)',
+          top: -24,
+        },
+      },
+      '&-editor-table': { marginTop: '1em' },
+      '&-readonly-table-actions': {
+        opacity: 0,
+        position: 'absolute',
+        top: 20,
+        display: 'flex',
+        gap: 8,
+        right: '50%',
+        zIndex: 1000,
+        backgroundColor: 'var(--color-gray-bg-page-light)',
+        borderRadius: 'var(--radius-control-base)',
+        padding: '4px 8px',
+        boxShadow: 'var(--shadow-control-base)',
+        border: 'none',
+        transform: 'translateX(50%)',
+        transition: 'all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)',
+      },
+
+      table: {
+        borderCollapse: 'separate',
+        borderSpacing: 0,
+        width: 'max-content',
+        tableLayout: 'fixed',
+        margin: '16px 0',
+        maxWidth: '100%',
+        position: 'relative',
+        fontVariant: 'tabular-nums',
+        borderRadius: TABLE_RADIUS,
+        border: TABLE_BORDER,
+
+        // readonly：overflow: hidden，不影响编辑态 UI
+        [`&${tableCls}-readonly-table`]: {
+          width: '100%',
+          tableLayout: 'auto',
+          overflow: 'hidden',
+          border: TABLE_BORDER,
+        },
+
+        th: {
+          ...TABLE_CELL,
+          backgroundColor: 'var(--agentic-ui-table-header-bg, #f7f7f9)',
+          border: 'none',
+          borderBottom: TABLE_BORDER,
+          borderLeft: 'none',
+          borderTop: 'none',
+          fontWeight: 600,
+        },
+        'th:not(:first-child)': { borderLeft: TABLE_BORDER },
+
+        'td:not(.config-td)': {
+          ...TABLE_CELL,
+          position: 'relative',
+          borderBottom: TABLE_BORDER,
+          borderLeft: TABLE_BORDER,
+          'div[data-be="paragraph"]': { margin: 0, textWrap: 'auto' },
+        },
+
+        'th.config-th, td.config-td': {
+          borderBottom: TABLE_BORDER,
+          borderLeft: TABLE_BORDER,
+        },
+        'tr td.config-td:first-child': { borderLeft: 'none' },
+        'td:first-child:not(.config-td)': { borderLeft: 'none' },
+        'tr:last-child td:not(.config-td)': { borderBottom: 'none' },
+        'tr td:first-child:not(.config-td)': { fontWeight: 600 },
+
+        'tbody tr:not(.config-tr)': {
+          animation: 'agenticTableRowFadeIn 0.3s ease both',
+        },
+        'tbody tr:not(.config-tr):hover': {
+          background:
+            'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))',
+        },
+        [`@media (max-width: ${mobileBreakpoint})`]: {
+          'th, td': { padding: mobilePadding },
+        },
+      },
+    },
+
+    [`${token.componentCls}-table-td`]: {
+      padding: '8px',
+      verticalAlign: 'middle',
+      wordWrap: 'break-word',
+      wordBreak: 'break-all',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'pre-wrap',
+      '&[data-select="true"]:after': {
+        content: '" "',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 2,
+        pointerEvents: 'none',
+        backgroundColor: 'var(--color-primary-control-fill-secondary-hover)',
+      },
+      [`@media (max-width: ${mobileBreakpoint})`]: { padding: '2px' },
+    },
+    [`${token.componentCls}-table-row-index`]: { display: 'table-row' },
+    [`${token.componentCls}-table-cell-index`]: {
+      width: 12,
+      maxWidth: 12,
+      padding: 0,
+      position: 'relative',
+      verticalAlign: 'middle',
+      backgroundColor: 'var(--color-gray-control-fill-secondary)',
+      '&:hover': {
+        backgroundColor: 'var(--color-gray-control-fill-secondary-hover)',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-action-buttons`]: {
+      position: 'absolute',
+      top: 4,
+      left: -24,
+      zIndex: 1000,
+      alignItems: 'center',
+      flexDirection: 'column',
+      gap: TABLE_ACTION_BUTTON_GAP,
+      opacity: 0,
+      display: 'none',
+      transition: 'opacity 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+    },
+    [`${token.componentCls}-table-cell-index-action-buttons-visible`]: {
+      opacity: 1,
+      display: 'flex',
+    },
+    [`${token.componentCls}-table-cell-index-action-button`]: {
+      padding: 2,
+      display: 'flex',
+      alignItems: 'center',
+      zIndex: 1000,
+      justifyContent: 'center',
+      fontSize: TABLE_ACTION_BUTTON_ICON_SIZE,
+      border: TABLE_BORDER,
+      width: TABLE_ACTION_BUTTON_SIZE,
+      height: TABLE_ACTION_BUTTON_SIZE,
+      cursor: 'pointer',
+      backgroundPosition: '50%',
+      backgroundRepeat: 'no-repeat',
+      transition:
+        'color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+      borderRadius: '4px',
+      background: 'var(--color-gray-bg-card-white)',
+      boxShadow: 'var(--shadow-border-base)',
+      color: 'var(--color-gray-text-secondary)',
+      '&:hover': {
+        backgroundColor: '#FFF',
+        boxShadow: 'var(--shadow-control-lg)',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-delete-icon`]: {
+      '&:hover': {
+        color: '#ff4d4f',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-insert-row-before`]: {
+      '&:hover': {
+        color: '#52c41a',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-insert-row-after`]: {
+      '&:hover': {
+        color: '#52c41a',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-spacer`]: {
+      cursor: 'pointer',
+      backgroundColor: 'var(--color-gray-control-fill-secondary)',
+      '&:hover': {
+        backgroundColor: 'var(--color-gray-control-fill-secondary-hover)',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-spacer-action-buttons`]: {
+      position: 'absolute',
+      top: -28,
+      right: '50%',
+      transform: 'translateX(50%)',
+      zIndex: 10,
+      display: 'flex',
+      alignItems: 'center',
+      gap: TABLE_ACTION_BUTTON_GAP,
+      opacity: 0,
+      transition: 'opacity 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+    },
+    [`${token.componentCls}-table-cell-index-spacer-action-buttons-visible`]: {
+      opacity: 1,
+    },
+    [`${token.componentCls}-table-cell-index-spacer-action-button`]: {
+      padding: 2,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: TABLE_ACTION_BUTTON_ICON_SIZE,
+      border: TABLE_BORDER,
+      width: TABLE_ACTION_BUTTON_SIZE,
+      height: TABLE_ACTION_BUTTON_SIZE,
+      cursor: 'pointer',
+      backgroundPosition: '50%',
+      backgroundRepeat: 'no-repeat',
+      transition:
+        'color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
+      borderRadius: '4px',
+      background: 'var(--color-gray-bg-card-white)',
+      boxShadow: 'var(--shadow-border-base)',
+      color: 'var(--color-gray-text-secondary)',
+      '&:hover': {
+        backgroundColor: '#FFF',
+        boxShadow: 'var(--shadow-control-lg)',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-spacer-delete-icon`]: {
+      '&:hover': {
+        color: '#ff4d4f',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-spacer-insert-column-before`]: {
+      '&:hover': {
+        color: '#52c41a',
+      },
+    },
+    [`${token.componentCls}-table-cell-index-spacer-insert-column-after`]: {
+      '&:hover': {
+        color: '#52c41a',
+      },
+    },
+
+    '@keyframes agenticTableRowFadeIn': {
+      from: { opacity: 0, transform: 'translateY(4px)' },
+      to: { opacity: 1, transform: 'translateY(0)' },
+    },
+  };
+};
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
@@ -56,14 +339,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-container': {
         // 默认 padding，可以通过 contentStyle 覆盖
         // 使用 CSS 变量，允许通过内联样式覆盖
-        padding: 'var(--content-padding, 4px 20px)',
+        padding: 'var(--agentic-ui-content-padding, 4px 20px)',
         overflow: 'auto',
         display: 'flex',
         position: 'relative',
         gap: 24,
         outline: 'none',
         [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
-          padding: 'var(--content-padding, 4px 4px)',
+          padding: 'var(--agentic-ui-content-padding, 4px 4px)',
         },
       },
       '&-content': {},
@@ -165,74 +448,74 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
 
-      // --- LinkCard ---
+      // --- LinkCard (BEM: block__element) ---
       [`${token.componentCls}-link-card`]: {
         cursor: 'pointer',
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        '&-container': {
-          padding: 12,
-          border: '1px solid #f0f0f0',
-          borderRadius: '0.5em',
-          margin: '8px 0',
-          width: '100%',
-          maxHeight: '120px',
-          minHeight: 72,
-          backgroundImage:
-            'linear-gradient(rgb(249, 251, 255) 0%, rgb(243, 248, 255) 100%)',
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          color: '#262626',
-          justifyContent: 'space-between',
-          '&-content': {
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            color: '#262626',
-            fontSize: 16,
-            flex: 1,
-            minWidth: 0,
-            '& &-title': {
-              overflow: 'ellipsis',
-              textOverflow: 'ellipsis',
-              textWrap: 'nowrap',
-              textDecoration: 'none',
-              display: 'block',
-              color: '#262626',
-            },
-            '& &-description': {
-              flex: 1,
-              minWidth: 0,
-              marginTop: 4,
-              lineHeight: '24px',
-              display: 'flex',
-              fontSize: 12,
-              color: 'rgba(0,0,0,0.45)',
-              justifyContent: 'space-between',
-            },
-            '& &-collaborators': {
-              flex: 1,
-              minWidth: 0,
-              display: 'flex',
-              justifyContent: 'space-between',
-            },
-            '& &-updateTime': {
-              color: 'rgba(0,0,0,0.45)',
-              fontSize: 12,
-            },
-          },
-          '& [data-icon-box]': {
-            padding: '0 18px',
-            color: '#6b7280',
-            cursor: 'pointer',
-            '&:hover': {
-              color: '#1667ff',
-            },
+      },
+      [`${token.componentCls}-link-card__container`]: {
+        padding: 12,
+        border: '1px solid #f0f0f0',
+        borderRadius: '0.5em',
+        margin: '8px 0',
+        width: '100%',
+        maxHeight: '120px',
+        minHeight: 72,
+        backgroundImage:
+          'linear-gradient(rgb(249, 251, 255) 0%, rgb(243, 248, 255) 100%)',
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        color: '#262626',
+        justifyContent: 'space-between',
+        '& [data-icon-box]': {
+          padding: '0 18px',
+          color: '#6b7280',
+          cursor: 'pointer',
+          '&:hover': {
+            color: '#1667ff',
           },
         },
+      },
+      [`${token.componentCls}-link-card__content`]: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        color: '#262626',
+        fontSize: 16,
+        flex: 1,
+        minWidth: 0,
+      },
+      [`${token.componentCls}-link-card__title`]: {
+        overflow: 'ellipsis',
+        textOverflow: 'ellipsis',
+        textWrap: 'nowrap',
+        textDecoration: 'none',
+        display: 'block',
+        color: '#262626',
+      },
+      [`${token.componentCls}-link-card__description`]: {
+        flex: 1,
+        minWidth: 0,
+        marginTop: 4,
+        lineHeight: '24px',
+        display: 'flex',
+        fontSize: 12,
+        color: 'rgba(0,0,0,0.45)',
+        justifyContent: 'space-between',
+      },
+      [`${token.componentCls}-link-card__collaborators`]: {
+        flex: 1,
+        minWidth: 0,
+        display: 'flex',
+        justifyContent: 'space-between',
+      },
+      [`${token.componentCls}-link-card__update-time`]: {
+        color: 'rgba(0,0,0,0.45)',
+        fontSize: 12,
       },
 
       // --- TagPopup ---
@@ -370,394 +653,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
 
-      // --- Table ---
-      [`${token.componentCls}-content-table`]: {
-        width: '100%',
-        overflow: 'auto',
-        flex: 1,
-        minWidth: 0,
-        position: 'relative',
-        '--table-border-radius': '8px',
-        '--table-border-color': '#E7E9E8',
-        '--table-header-bg': '#f7f7f9',
-        '--table-odd-row-bg': 'rgba(35,35,38,.04)',
-        '--table-hover-bg': 'rgba(0, 0, 0, 0.04)',
-        '--table-cell-min-width': '120px',
-        '&-container': {
-          display: 'flex',
-          gap: 1,
-          maxWidth: '100%',
-          minWidth: 0,
-          outline: 'none',
-          position: 'relative',
-          marginBottom: 12,
-          [`&:hover ${token.componentCls}-content-table-readonly-table-actions`]:
-            {
-              opacity: 1,
-              transform: 'translateX(50%)',
-              top: -24,
-            },
-        },
-        '&-editor-table': {
-          marginTop: '1em',
-        },
-        '&-readonly-table-actions': {
-          opacity: 0,
-          position: 'absolute',
-          top: 20,
-          display: 'flex',
-          gap: 8,
-          right: '50%',
-          zIndex: 1000,
-          backgroundColor: 'var(--color-gray-bg-page-light)',
-          borderRadius: 'var(--radius-control-base)',
-          padding: '4px 8px',
-          boxShadow: 'var(--shadow-control-base)',
-          border: 'none',
-          transform: 'translateX(50%)',
-          transition: 'all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)',
-        },
-        table: {
-          borderCollapse: 'separate',
-          borderSpacing: 0,
-          width: 'max-content',
-          tableLayout: 'fixed',
-          margin: '16px 0',
-          maxWidth: '100%',
-          position: 'relative',
-          fontVariant: 'tabular-nums',
-          borderRadius: 'var(--table-border-radius)',
-          border: '1px solid var(--table-border-color)',
-
-          [`&${token.componentCls}-content-table-readonly-pure`]: {
-            border: 'none',
-            borderRadius: 'none',
-            'tr:not(.config-tr) td:not(.config-td)': {
-              borderLeft: 'none',
-            },
-            'tr:not(.config-tr):last-child td:not(.config-td)': {
-              borderBottom: '1px solid var(--table-border-color)',
-            },
-            'tr:not(.config-tr):first-child th:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:first-child:not(.config-td):not([colspan]):not([rowspan])':
-              {
-                borderTopLeftRadius: 'unset',
-              },
-            'tr:not(.config-tr):first-child th:last-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:last-child:not(.config-td):not([colspan]):not([rowspan])':
-              {
-                borderTopRightRadius: 'unset',
-              },
-            'tr:not(.config-tr):last-child td:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):last-child th:first-child:not(.config-td):not([colspan]):not([rowspan])':
-              {
-                borderBottomLeftRadius: 'unset',
-              },
-            'tr:not(.config-tr):last-child td:last-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):last-child th:last-child:not(.config-td):not([colspan]):not([rowspan])':
-              {
-                borderBottomRightRadius: 'unset',
-              },
-          },
-
-          'th.config-th,td.config-td': {
-            borderBottom: '1px solid var(--table-border-color)',
-            borderLeft: '1px solid var(--table-border-color)',
-          },
-          'tr td.config-td:first-child': {
-            borderLeft: 'none',
-          },
-
-          'th:not(.config-td)': {
-            backgroundColor: 'var(--table-header-bg)',
-            borderBottom: '1px solid var(--table-border-color)',
-            textWrap: 'nowrap',
-            verticalAlign: 'top',
-            padding: '16px 12px',
-            textAlign: 'left',
-            lineHeight: '24px',
-            fontSize: '1em',
-            fontWeight: 600,
-            borderTop: 'none',
-            minWidth: 'var(--table-cell-min-width)',
-            width: 'var(--table-cell-min-width)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            zIndex: 1,
-            background: 'inherit',
-          },
-          'td:not(.config-td)': {
-            verticalAlign: 'top',
-            padding: '16px 12px',
-            textAlign: 'left',
-            position: 'relative',
-            lineHeight: '24px',
-            fontSize: '1em',
-            minWidth: 'var(--table-cell-min-width)',
-            width: 'var(--table-cell-min-width)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            zIndex: 1,
-            background: 'inherit',
-            'div[data-be="paragraph"]': {
-              margin: 0,
-              textWrap: 'auto',
-            },
-          },
-          'tr:not(.config-tr)': {
-            background: 'inherit',
-
-            '&:first-child td:not(.config-td)': {
-              borderTop: 'none',
-            },
-            'td:not(.config-td)': {
-              borderBottom: '1px solid var(--table-border-color)',
-              borderLeft: '1px solid var(--table-border-color)',
-
-              '&:first-child': {
-                fontSize: '1em',
-                lineHeight: '24px',
-                fontWeight: 600,
-              },
-            },
-            'td:first-child:not(.config-td)': {
-              borderLeft: 'none',
-            },
-            '&:last-child td:not(.config-td)': {
-              borderBottom: 'none',
-            },
-          },
-          'tbody tr:not(.config-tr):hover': {
-            background:
-              'linear-gradient(var(--table-hover-bg), var(--table-hover-bg)), linear-gradient(white, white)',
-          },
-          // 表格圆角处理
-          'th:not(.config-td), td:not(.config-td)': {
-            borderRadius: '0',
-          },
-
-          'tr:not(.config-tr):first-child th:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:first-child:not(.config-td):not([colspan]):not([rowspan])':
-            {
-              borderTopLeftRadius: 'var(--table-border-radius)',
-            },
-          'tr:not(.config-tr):first-child th:last-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):first-child td:last-child:not(.config-td):not([colspan]):not([rowspan])':
-            {
-              borderTopRightRadius: 'var(--table-border-radius)',
-            },
-          'tr:not(.config-tr):last-child td:first-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):last-child th:first-child:not(.config-td):not([colspan]):not([rowspan])':
-            {
-              borderBottomLeftRadius: 'var(--table-border-radius)',
-            },
-          'tr:not(.config-tr):last-child td:last-child:not(.config-td):not([colspan]):not([rowspan]), tr:not(.config-tr):last-child th:last-child:not(.config-td):not([colspan]):not([rowspan])':
-            {
-              borderBottomRightRadius: 'var(--table-border-radius)',
-            },
-
-          // 处理合并单元格的圆角
-          'tr:not(.config-tr):first-child th:not(.config-td)[colspan]:first-child, tr:not(.config-tr):first-child td:not(.config-td)[colspan]:first-child,tr:not(.config-tr):first-child th:not(.config-td)[rowspan]:first-child, tr:not(.config-tr):first-child td:not(.config-td)[rowspan]:first-child':
-            {
-              borderTopLeftRadius: 'var(--table-border-radius)',
-            },
-
-          'tr:not(.config-tr):first-child th:not(.config-td)[colspan]:last-child, tr:not(.config-tr):first-child td:not(.config-td)[colspan]:last-child,tr:not(.config-tr):first-child th:not(.config-td)[rowspan]:last-child, tr:not(.config-tr):first-child td:not(.config-td)[rowspan]:last-child':
-            {
-              borderTopRightRadius: 'var(--table-border-radius)',
-            },
-
-          'tr:not(.config-tr):last-child td:not(.config-td)[colspan]:first-child, tr:not(.config-tr):last-child th:not(.config-td)[colspan]:first-child,tr:not(.config-tr):last-child td:not(.config-td)[rowspan]:first-child, tr:not(.config-tr):last-child th:not(.config-td)[rowspan]:first-child':
-            {
-              borderBottomLeftRadius: 'var(--table-border-radius)',
-            },
-
-          'tr:not(.config-tr):last-child td:not(.config-td)[colspan]:last-child, tr:not(.config-tr):last-child th:not(.config-td)[colspan]:last-child,tr:not(.config-tr):last-child td:not(.config-td)[rowspan]:last-child, tr:not(.config-tr):last-child th:not(.config-td)[rowspan]:last-child':
-            {
-              borderBottomRightRadius: 'var(--table-border-radius)',
-            },
-
-          'tr:not(.config-tr):first-child:last-child th:not(.config-td)[colspan]:first-child:last-child, tr:not(.config-tr):first-child:last-child td:not(.config-td)[colspan]:first-child:last-child':
-            {
-              borderRadius: 'var(--table-border-radius)',
-            },
-
-          'th:not(.config-td)[rowspan]:first-child:last-child, td:not(.config-td)[rowspan]:first-child:last-child':
-            {
-              borderTopLeftRadius: 'var(--table-border-radius)',
-              borderBottomLeftRadius: 'var(--table-border-radius)',
-            },
-          [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
-            'th:not(.config-td), td:not(.config-td)': {
-              padding: `${MOBILE_PADDING}`,
-            },
-          },
-        },
-        'table.htCore': {
-          boxSizing: 'content-box',
-          '*': {
-            boxSizing: 'content-box',
-          },
-        },
-      },
-
-      // --- Table Td ---
-      [`${token.componentCls}-table-td`]: {
-        padding: '8px',
-        verticalAlign: 'middle',
-        wordWrap: 'break-word',
-        wordBreak: 'break-all',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'pre-wrap',
-        '&[data-select="true"]:after': {
-          content: '" "',
-          position: 'absolute',
-          top: '0',
-          left: '0',
-          right: '0',
-          bottom: '0',
-          zIndex: 2,
-          pointerEvents: 'none',
-          backgroundColor: 'var(--color-primary-control-fill-secondary-hover)',
-        },
-        [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
-          padding: '2px',
-        },
-      },
-
-      // --- Table Row Index ---
-      [`${token.componentCls}-table-row-index`]: {
-        display: 'table-row',
-      },
-
-      // --- Table Cell Index ---
-      [`${token.componentCls}-table-cell-index`]: {
-        width: '12px',
-        maxWidth: 12,
-        padding: 0,
-        position: 'relative',
-        verticalAlign: 'middle',
-        contentEditable: false,
-        backgroundColor: 'var(--color-gray-control-fill-secondary)',
-        '&:hover': {
-          backgroundColor: 'var(--color-gray-control-fill-secondary-hover)',
-        },
-      },
-      [`${token.componentCls}-table-cell-index-action-buttons`]: {
-        position: 'absolute',
-        top: '4px',
-        left: '-24px',
-        zIndex: 1000,
-        alignItems: 'center',
-        flexDirection: 'column',
-        gap: '2px',
-        opacity: 0,
-        display: 'none',
-        transition: 'opacity 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
-      },
-      [`${token.componentCls}-table-cell-index-action-buttons-visible`]: {
-        opacity: 1,
-        display: 'flex',
-      },
-      [`${token.componentCls}-table-cell-index-action-button`]: {
-        padding: '2px',
-        display: 'flex',
-        alignItems: 'center',
-        zIndex: 1000,
-        justifyContent: 'center',
-        fontSize: 12,
-        border: '1px solid var(--table-border-color)',
-        width: '20px',
-        height: '20px',
-        cursor: 'pointer',
-        backgroundPosition: '50%',
-        backgroundRepeat: 'no-repeat',
-        transition:
-          'color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
-        borderRadius: '4px',
-        background: 'var(--color-gray-bg-card-white)',
-        boxShadow: 'var(--shadow-border-base)',
-        color: 'var(--color-gray-text-secondary)',
-        '&:hover': {
-          backgroundColor: '#FFF',
-          boxShadow: 'var(--shadow-control-lg)',
-        },
-      },
-      [`${token.componentCls}-table-cell-index-delete-icon`]: {
-        '&:hover': {
-          color: '#ff4d4f',
-        },
-      },
-      [`${token.componentCls}-table-cell-index-insert-row-before`]: {
-        '&:hover': {
-          color: '#52c41a',
-        },
-      },
-      [`${token.componentCls}-table-cell-index-insert-row-after`]: {
-        '&:hover': {
-          color: '#52c41a',
-        },
-      },
-
-      // --- Table Cell Index Spacer ---
-      [`${token.componentCls}-table-cell-index-spacer`]: {
-        contentEditable: false,
-        cursor: 'pointer',
-        backgroundColor: 'var(--color-gray-control-fill-secondary)',
-        '&:hover': {
-          backgroundColor: 'var(--color-gray-control-fill-secondary-hover)',
-        },
-      },
-      [`${token.componentCls}-table-cell-index-spacer-action-buttons`]: {
-        position: 'absolute',
-        top: '-28px',
-        right: '50%',
-        transform: 'translateX(50%)',
-        zIndex: 10,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '2px',
-        opacity: 0,
-        transition: 'opacity 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
-      },
-      [`${token.componentCls}-table-cell-index-spacer-action-buttons-visible`]:
-        {
-          opacity: 1,
-        },
-      [`${token.componentCls}-table-cell-index-spacer-action-button`]: {
-        padding: '2px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 12,
-        border: '1px solid var(--table-border-color)',
-        width: '20px',
-        height: '20px',
-        cursor: 'pointer',
-        backgroundPosition: '50%',
-        backgroundRepeat: 'no-repeat',
-        transition:
-          'color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1), background-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
-        borderRadius: '4px',
-        background: 'var(--color-gray-bg-card-white)',
-        boxShadow: 'var(--shadow-border-base)',
-        color: 'var(--color-gray-text-secondary)',
-        '&:hover': {
-          backgroundColor: '#FFF',
-          boxShadow: 'var(--shadow-control-lg)',
-        },
-      },
-      [`${token.componentCls}-table-cell-index-spacer-delete-icon`]: {
-        '&:hover': {
-          color: '#ff4d4f',
-        },
-      },
-      [`${token.componentCls}-table-cell-index-spacer-insert-column-before`]: {
-        '&:hover': {
-          color: '#52c41a',
-        },
-      },
-      [`${token.componentCls}-table-cell-index-spacer-insert-column-after`]: {
-        '&:hover': {
-          color: '#52c41a',
-        },
-      },
+      // --- Table（全部样式统一在 genTableStyle 中）---
+      ...genTableStyle(token, MOBILE_BREAKPOINT, MOBILE_PADDING),
     },
   };
 };

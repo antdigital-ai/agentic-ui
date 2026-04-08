@@ -85,10 +85,10 @@ export const withListsPlugin = (editor: Editor) => {
         const child = node.children[i];
         if (Element.isElement(child)) {
           if (!isListType(child)) {
-            // 如果不是列表类型，且不是第一个块级元素，需要处理
-            // 如果它是块级元素，应该移到前面或转换为列表
             if (Editor.isBlock(editor, child)) {
-              // 将块级元素包裹为新的 list-item，并创建新的列表
+              // paragraph 不处理，直接返回，避免 "-" 等被误转为嵌套列表
+              if (child.type === 'paragraph') return;
+              const childPath = [...path, i];
               const listType = getListType();
               Transforms.wrapNodes(
                 editor,
@@ -99,15 +99,12 @@ export const withListsPlugin = (editor: Editor) => {
                   id: '',
                   children: [],
                 },
-                { at: [...path, i] },
+                { at: childPath },
               );
               Transforms.wrapNodes(
                 editor,
-                {
-                  type: listType,
-                  children: [],
-                },
-                { at: [...path, i] },
+                { type: listType, children: [] },
+                { at: childPath },
               );
               return;
             }

@@ -1,14 +1,14 @@
-import { memo, useContext } from 'react';
+import { memo } from 'react';
 
 import { CheckCircleFilled } from '@ant-design/icons';
-import { isFunction } from 'lodash';
+import { isFunction } from 'lodash-es';
 import React from 'react';
 import {
   ActionIconBox,
   ActionIconBoxProps,
 } from '../../../Components/ActionIconBox';
 import { useCopied } from '../../../Hooks/useCopied';
-import { BubbleConfigContext } from '../../BubbleConfigProvide';
+import { useLocale } from '../../../I18n';
 
 /**
  * CopyIcon 组件 - 复制图标组件
@@ -114,10 +114,9 @@ export type CopyButtonProps = {
 export const CopyButton = memo<CopyButtonProps>(
   ({ className, onClick, 'data-testid': dataTestId, ...props }) => {
     const { copied, setCopied } = useCopied();
-    const context = useContext(BubbleConfigContext);
+    const locale = useLocale();
 
-    const copySuccessText =
-      context?.locale?.['chat.message.copy.success'] || '复制成功';
+    const copySuccessText = locale?.['chat.message.copy.success'] || '复制成功';
 
     return (
       <ActionIconBox

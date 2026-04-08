@@ -7,6 +7,12 @@ import {
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
+      maxWidth: '100%',
+      '&-no-animation': {
+        '& *': {
+          transition: 'none !important',
+        },
+      },
       display: 'flex',
       flexDirection: 'column',
       gap: 4,
@@ -24,7 +30,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         minHeight: '20px',
         backdropFilter: 'blur(8px)',
         width: 'max-content',
-        transition: 'border-radius 0.4s ease',
+        transition: 'border-radius 0.16s cubic-bezier(0.4, 0, 0.2, 1)',
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'column',
@@ -224,6 +230,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontWeight: 'normal',
         lineHeight: '20px',
         flex: 1,
+        minWidth: 0,
+        maxWidth: 320,
         display: '-webkit-box',
         WebkitLineClamp: 1,
         WebkitBoxOrient: 'vertical',
@@ -264,9 +272,24 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-tool-container': {
         display: 'flex',
+        flexDirection: 'column',
         width: '100%',
+        maxHeight: 0,
+        overflow: 'hidden',
+        opacity: 0,
+        pointerEvents: 'none',
+        transition:
+          'max-height 0.16s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.12s linear',
+        position: 'relative',
         paddingInline: 4,
-        paddingBottom: 4,
+        paddingBottom: 0,
+        '&-expanded': {
+          maxHeight: 700,
+          opacity: 1,
+          pointerEvents: 'auto',
+          overflowY: 'auto',
+          paddingBottom: 4,
+        },
         '&-light': {
           borderLeft: '1px solid var(--color-gray-border-light)',
           paddingLeft: 12,
@@ -276,11 +299,31 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-tool-content': {
         flex: 1,
+        minWidth: 0,
         fontSize: 'var(--font-size-sm)',
         fontWeight: 'normal',
         lineHeight: '160%',
         letterSpacing: 'normal',
         color: '#767E8B',
+      },
+      '&-tool-content-expand': {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4,
+        marginTop: 8,
+        padding: '8px 16px',
+        fontSize: 'var(--font-size-base)',
+        cursor: 'pointer',
+        borderRadius: 'var(--radius-control-base)',
+        background: 'var(--color-gray-control-fill-active)',
+        color: 'var(--color-gray-text-secondary)',
+        font: 'var(--font-text-body-emphasized-sm)',
+        flexShrink: 0,
+        '&:hover': {
+          background: 'var(--color-gray-control-fill-hover)',
+          color: 'var(--color-gray-text-default)',
+        },
       },
       '&-tool-content-error': {
         display: 'flex',

@@ -1,6 +1,6 @@
 import { RefreshCcw, SwapRight } from '@sofa-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, {
   useCallback,
   useContext,

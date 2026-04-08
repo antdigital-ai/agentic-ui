@@ -31,6 +31,11 @@ describe('isMarkdown', () => {
     expect(isMarkdown('![alt text](image.jpg)')).toBe(true);
   });
 
+  it('应通过图片正则 ![]() 识别为 Markdown', () => {
+    expect(isMarkdown('![x](y)')).toBe(true);
+    expect(isMarkdown('![a](b.png)')).toBe(true);
+  });
+
   // Test for code blocks
   it('should identify Markdown code blocks', () => {
     expect(isMarkdown('```\ncode block\n```')).toBe(true);

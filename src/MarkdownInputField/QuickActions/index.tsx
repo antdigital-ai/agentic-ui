@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classNames from 'clsx';
 import RcResizeObserver from 'rc-resize-observer';
 import React, { useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
@@ -6,6 +6,7 @@ import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import type { AttachmentFile } from '../AttachmentButton/types';
 import Enlargement from '../Enlargement';
 import { RefinePromptButton } from '../RefinePromptButton';
+import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 
 export interface QuickActionsProps {
   /** 当前输入值 */
@@ -162,6 +163,7 @@ export const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
           className={classNames(`${prefixCls}-quick-actions`, hashId, {
             [`${prefixCls}-quick-actions-vertical`]: enlargeable,
           })}
+          data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.QUICK_ACTIONS}
         >
           {[
             // Enlargement组件 - 显示在最上方
@@ -183,8 +185,8 @@ export const QuickActions = React.forwardRef<HTMLDivElement, QuickActionsProps>(
                   fileUploadStatus,
                 })
               : []),
-            // 提示词优化按钮
-            ...(refinePrompt?.enable
+            // 提示词优化按钮（有 refinePrompt 即渲染，enable 由 handleRefine 内校验）
+            ...(refinePrompt
               ? [
                   <RefinePromptButton
                     key="refine-prompt"

@@ -494,6 +494,30 @@ describe('SchemaForm', () => {
     expect(document.querySelector('form')).toBeInTheDocument();
   });
 
+  it('renders Input for unknown property type (default branch in renderBasicFormItem)', () => {
+    // 使用非 string/number 的类型（如 integer）触发 renderBasicFormItem 的 default 分支
+    const schemaWithUnknownType: LowCodeSchema = {
+      ...mockSchema,
+      component: {
+        properties: {
+          customField: {
+            type: 'integer' as 'number',
+            title: '自定义整型',
+            description: '走 default 分支',
+          },
+        },
+      },
+    };
+
+    render(<SchemaForm schema={schemaWithUnknownType} />);
+
+    expect(screen.getByText('自定义整型')).toBeInTheDocument();
+    // default 分支渲染的是 Input，应存在占位符
+    expect(
+      screen.getByPlaceholderText(/请输入.*自定义整型/),
+    ).toBeInTheDocument();
+  });
+
   // New test cases for optimized code
   describe('Edge Cases and Optimized Features', () => {
     it('handles array without items definition', async () => {
@@ -613,6 +637,64 @@ describe('SchemaForm', () => {
         const tagInputs = screen.getAllByPlaceholderText('请输入 标签');
         expect(tagInputs).toHaveLength(1);
       });
+    });
+
+    it('renders object without properties as disabled input', () => {
+      render(<SchemaForm schema={edgeCaseSchema} />);
+
+      expect(screen.getByText('空对象')).toBeInTheDocument();
+      const emptyObjectInput = screen.getByPlaceholderText('请输入 空对象');
+      expect(emptyObjectInput).toBeDisabled();
+    });
+
+    it('应在 object 无 properties 时渲染 disabled Input (line 319-322)', () => {
+      const schemaWithoutProps: LowCodeSchema = {
+        ...mockSchema,
+        component: {
+          properties: {
+            emptyObj: {
+              type: 'object',
+              title: '空对象',
+              description: '没有 properties 的对象',
+            },
+          },
+        },
+      };
+
+      render(<SchemaForm schema={schemaWithoutProps} />);
+      const input = screen.getByPlaceholderText('请输入 空对象');
+      expect(input).toBeDisabled();
+    });
+
+    it('应在 renderObjectFormItem 中使用 baseName 构建 name (line 331-332)', () => {
+      const schemaWithNestedObject: LowCodeSchema = {
+        ...mockSchema,
+        component: {
+          properties: {
+            parent: {
+              type: 'object',
+              title: '父对象',
+              properties: {
+                child: {
+                  type: 'object',
+                  title: '子对象',
+                  properties: {
+                    name: {
+                      type: 'string',
+                      title: '名称',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      render(<SchemaForm schema={schemaWithNestedObject} />);
+      expect(screen.getByText('父对象')).toBeInTheDocument();
+      expect(screen.getByText('子对象')).toBeInTheDocument();
+      expect(screen.getByLabelText('名称')).toBeInTheDocument();
     });
 
     it('preserves form state when schema changes', () => {

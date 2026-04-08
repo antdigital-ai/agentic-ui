@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, {
   useContext,
   useEffect,
@@ -12,7 +12,8 @@ import { Subject } from 'rxjs';
 import { createEditor, Editor, Selection } from 'slate';
 import { withHistory } from 'slate-history';
 import { withReact } from 'slate-react';
-import { I18nProvide } from '../I18n';
+import { I18nContext, I18nProvide } from '../I18n';
+import { MarkdownRenderer } from '../MarkdownRenderer';
 import { CommentList } from './editor/components/CommentList';
 import { SlateMarkdownEditor } from './editor/Editor';
 import { parserMdToSchema } from './editor/parser/parserMdToSchema';
@@ -22,6 +23,7 @@ import { withErrorReporting } from './editor/plugins/catchError';
 import { EditorStore, EditorStoreContext } from './editor/store';
 import { InsertAutocomplete } from './editor/tools/InsertAutocomplete';
 import { InsertLink } from './editor/tools/InsertLink';
+import { JinjaTemplatePanel } from './editor/tools/JinjaTemplatePanel';
 import { TocHeading } from './editor/tools/Leading';
 import { FloatBar } from './editor/tools/ToolBar/FloatBar';
 import ToolBar from './editor/tools/ToolBar/ToolBar';
@@ -56,6 +58,21 @@ const composeEditors = (editor: Editor, plugins: MarkdownEditorPlugin[]) => {
     }, editor);
   }
   return editor;
+};
+
+const I18nBoundary: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const outerI18n = useContext(I18nContext);
+  const hasOuterI18nProvider = Boolean(
+    outerI18n?.setLanguage || outerI18n?.setLocale,
+  );
+
+  if (hasOuterI18nProvider) {
+    return <>{children}</>;
+  }
+
+  return <I18nProvide>{children}</I18nProvide>;
 };
 
 /**
@@ -124,8 +141,12 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
     editorStyle,
     height,
     children,
+    renderMode,
+    renderType,
     ...rest
   } = props;
+
+  const effectiveRenderMode = renderMode ?? renderType ?? 'slate';
   // 是否挂载
   const [editorMountStatus, setMountedStatus] = useState(false);
   const [isEditorFocused, setIsEditorFocused] = useState(false);
@@ -304,8 +325,86 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
 
   const [domRect, setDomRect] = useState<DOMRect | null>(null);
 
+  const jinjaEnabled =
+    props.jinja?.enable === true ||
+    (Array.isArray(props.plugins) &&
+      props.plugins.some(
+        (p) => (p as MarkdownEditorPlugin & { jinja?: boolean }).jinja === true,
+      ));
+  const pluginWithJinja = Array.isArray(props.plugins)
+    ? (props.plugins.find(
+        (p) => (p as MarkdownEditorPlugin & { jinja?: boolean }).jinja === true,
+      ) as
+        | (MarkdownEditorPlugin & { jinja?: boolean; jinjaConfig?: any })
+        | undefined)
+    : undefined;
+  const effectiveJinja = props.jinja
+    ? props.jinja
+    : pluginWithJinja?.jinjaConfig
+      ? pluginWithJinja.jinjaConfig
+      : pluginWithJinja
+        ? { enable: true as const }
+        : undefined;
+  const jinjaTemplatePanelEnabled =
+    jinjaEnabled &&
+    effectiveJinja !== undefined &&
+    effectiveJinja !== null &&
+    effectiveJinja.templatePanel !== false &&
+    (typeof effectiveJinja.templatePanel !== 'object' ||
+      effectiveJinja.templatePanel?.enable !== false);
+
+  const [openJinjaTemplate, setOpenJinjaTemplate] = useState(false);
+  const [jinjaAnchorPath, setJinjaAnchorPath] = useState<number[] | null>(null);
+
+  if (readonly && effectiveRenderMode === 'markdown') {
+    return wrapSSR(
+      <I18nBoundary>
+        <PluginContext.Provider value={props.plugins || []}>
+          <div
+            id={props.id ? String(props.id) || undefined : undefined}
+            className={classNames(
+              baseClassName,
+              'markdown-editor',
+              hashId,
+              props.className,
+              {
+                [`${baseClassName}-readonly`]: true,
+                [`${baseClassName}-report`]: props.reportMode,
+                [`${baseClassName}-slide`]: props.slideMode,
+              },
+            )}
+            style={{
+              width: width || '100%',
+              height: height || 'auto',
+              ...style,
+            }}
+            ref={markdownContainerRef}
+          >
+            <MarkdownRenderer
+              content={initValue || ''}
+              streaming={props.typewriter ?? false}
+              plugins={props.plugins}
+              remarkPlugins={props.markdownToHtmlOptions}
+              codeProps={props.codeProps}
+              apaasify={props.apaasify}
+              style={{
+                height: '100%',
+                ...contentStyle,
+              }}
+              prefixCls={baseClassName}
+              fncProps={props.fncProps}
+              linkConfig={props.linkConfig}
+              eleRender={props.eleRender}
+            />
+            {children}
+          </div>
+        </PluginContext.Provider>
+      </I18nBoundary>,
+    );
+  }
+
   return wrapSSR(
-    <I18nProvide>
+    <I18nBoundary>
       <PluginContext.Provider value={props.plugins || []}>
         <EditorStoreContext.Provider
           value={{
@@ -323,9 +422,18 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
             setDomRect,
             typewriter: props.typewriter ?? false,
             readonly: props.readonly ?? false,
-            editorProps: props || {},
+            editorProps:
+              effectiveJinja !== undefined
+                ? { ...props, jinja: effectiveJinja }
+                : props || {},
             markdownEditorRef,
             markdownContainerRef,
+            openJinjaTemplate,
+            setOpenJinjaTemplate,
+            jinjaAnchorPath,
+            setJinjaAnchorPath,
+            jinjaEnabled,
+            jinjaTemplatePanelEnabled,
           }}
         >
           <div
@@ -355,7 +463,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 })}
               >
                 <ToolBar
-                  hideTools={toolBar.hideTools}
+                  hideTools={toolBar.hideTools as any}
                   extra={toolBar.extra}
                   min={toolBar.min}
                 />
@@ -373,7 +481,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 // 如果 contentStyle 中设置了 padding，设置 CSS 变量和内联样式
                 ...(contentStyle?.padding !== undefined
                   ? {
-                      '--content-padding': `${
+                      '--agentic-ui-content-padding': `${
                         typeof contentStyle.padding === 'number'
                           ? `${contentStyle.padding}px`
                           : contentStyle.padding
@@ -447,12 +555,13 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 <InsertAutocomplete
                   {...(props?.insertAutocompleteProps || {})}
                 />
+                {jinjaTemplatePanelEnabled ? <JinjaTemplatePanel /> : null}
               </>
             )}
             {children}
           </div>
         </EditorStoreContext.Provider>
       </PluginContext.Provider>
-    </I18nProvide>,
+    </I18nBoundary>,
   );
 };

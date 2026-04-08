@@ -310,4 +310,46 @@ describe('ToolUseBar', () => {
     );
     expect(chevronButtons).toHaveLength(0);
   });
+
+  it('should add no-animation class when disableAnimation is true', () => {
+    const { container } = render(
+      <ToolUseBar tools={mockTools} disableAnimation />,
+    );
+
+    const rootElement = container.firstChild as HTMLElement;
+    expect(rootElement).toHaveClass('ant-agentic-tool-use-bar-no-animation');
+  });
+
+  it('should not add no-animation class when disableAnimation is false', () => {
+    const { container } = render(
+      <ToolUseBar tools={mockTools} disableAnimation={false} />,
+    );
+
+    const rootElement = container.firstChild as HTMLElement;
+    expect(rootElement).not.toHaveClass('ant-agentic-tool-use-bar-no-animation');
+  });
+
+  it('should expand and collapse content correctly when disableAnimation is true', () => {
+    const { container } = render(
+      <ToolUseBar tools={mockTools} disableAnimation />,
+    );
+
+    const toolBars = container.querySelectorAll(
+      '[data-testid="tool-user-item-tool-bar"]',
+    );
+    const tool4Bar = toolBars[3];
+
+    fireEvent.click(tool4Bar);
+    const contentContainer = container.querySelector(
+      '[data-testid="tool-user-item-tool-container"]',
+    );
+    expect(contentContainer).toBeInTheDocument();
+    expect(contentContainer).toHaveTextContent('Custom content');
+
+    fireEvent.click(tool4Bar);
+    const collapsedContainer = container.querySelector(
+      '[data-testid="tool-user-item-tool-container"]',
+    );
+    expect(collapsedContainer).toBeNull();
+  });
 });

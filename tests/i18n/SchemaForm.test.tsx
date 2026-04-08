@@ -52,4 +52,27 @@ describe('SchemaForm i18n tests', () => {
     // Test form labels and buttons in English
     expect(screen.getByPlaceholderText('Please input Age')).toBeDefined();
   });
+
+  it('should render Input for property type that falls through to default', () => {
+    const schemaWithOtherType = {
+      ...mockSchema,
+      component: {
+        properties: {
+          extra: {
+            type: 'object' as const,
+            title: 'Extra',
+          },
+        },
+      },
+      required: [] as string[],
+    };
+
+    render(
+      <I18nContext.Provider value={{ locale: enLabels, language: 'en-US' }}>
+        <SchemaForm schema={schemaWithOtherType} />
+      </I18nContext.Provider>,
+    );
+
+    expect(screen.getByText('Extra')).toBeInTheDocument();
+  });
 });

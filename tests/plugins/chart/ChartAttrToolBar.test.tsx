@@ -211,6 +211,23 @@ describe('ChartAttrToolBar', () => {
       expect(container).toHaveAttribute('contentEditable', 'false');
     });
 
+    it('点击标题 div 时应执行 stopPropagation 不触发父级点击', () => {
+      const onParentClick = vi.fn();
+
+      render(
+        <ConfigProvider>
+          <div onClick={onParentClick}>
+            <ChartAttrToolBar {...defaultProps} />
+          </div>
+        </ConfigProvider>,
+      );
+
+      const titleEl = screen.getByText('Chart Title');
+      fireEvent.click(titleEl);
+
+      expect(onParentClick).not.toHaveBeenCalled();
+    });
+
     it('应该处理删除按钮点击', () => {
       render(
         <ConfigProvider>

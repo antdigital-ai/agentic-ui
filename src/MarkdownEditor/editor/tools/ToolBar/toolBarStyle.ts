@@ -34,7 +34,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           backgroundColor: 'rgb(229 231 235 / 0.65)',
         },
       },
-      '&-item-min-plus-icon': {
+      '&-item--more': {
         color: '#1677ff',
       },
     },

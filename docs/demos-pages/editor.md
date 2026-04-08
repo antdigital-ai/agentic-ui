@@ -1,4 +1,4 @@
----
+﻿---
 nav:
   title: Demo
   order: 5
@@ -15,13 +15,13 @@ group:
 
 <code src="../demos/readonly.tsx" background="var(--main-bg-color)" iframe=540></code>
 
-<code src="../demos/markdown-editor-readonly-compare.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdown-editor-readonly-compare.tsx" id="editor-readonly-compare-basic" background="var(--main-bg-color)" iframe=540></code>
 
 <code src="../demos/comment-highlight-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 <code src="../demos/empty.tsx" background="var(--main-bg-color)" iframe=540 ></code>
 
-<code src="../demos/setmd-content-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/setmd-content-demo.tsx" id="editor-setmd-under-features" background="var(--main-bg-color)" iframe=540></code>
 
 ## 编辑器模式
 
@@ -37,15 +37,23 @@ group:
 
 <code src="../demos/markdownInputField.tsx"  background="var(--main-bg-color)" iframe=540 ></code>
 
+### Jinja 模板（`{}` 触发 + 语法高亮）
+
+<code src="../demos/jinja-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 ### 只读模式对比
 
-<code src="../demos/markdown-editor-readonly-compare.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdown-editor-readonly-compare.tsx" id="editor-readonly-compare-mode" background="var(--main-bg-color)" iframe=540></code>
 
 ## 自定义渲染
 
 ### 自定义render
 
 <code src="../demos/render.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+### Agentic UI 嵌入块（`agentic-ui-task` / `agentic-ui-toolusebar`）
+
+<code src="../demos/agentic-ui-embed-render-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ### render 地址
 
@@ -55,9 +63,17 @@ group:
 
 <code src="../demos/rerender.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+### Bubble 内动态 render（流式 Markdown）
+
+<code src="../demos/bubble/rerender-bubble-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+
 ### 编辑模式-动态render
 
 <code src="../demos/rerender-edit.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+### 编辑器与渲染器对比
+
+<code src="../demos/rerender-diff.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ### 相同渲染
 
@@ -71,4 +87,4 @@ group:
 
 ## 内容设置
 
-<code src="../demos/setmd-content-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/setmd-content-demo.tsx" id="editor-setmd-content-settings" background="var(--main-bg-color)" iframe=540></code>

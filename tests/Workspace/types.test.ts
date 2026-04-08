@@ -28,7 +28,7 @@ describe('Workspace types 工具函数', () => {
     it('应该根据扩展名识别视频文件', () => {
       expect(getFileType('video.mp4')).toBe('video');
       expect(getFileType('movie.webm')).toBe('video');
-      expect(getFileType('clip.ogg')).toBe('video');
+      expect(getFileType('clip.ogv')).toBe('video');
     });
 
     it('应该根据扩展名识别音频文件', () => {

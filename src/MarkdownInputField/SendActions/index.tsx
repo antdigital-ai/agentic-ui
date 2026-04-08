@@ -1,6 +1,6 @@
 import { EllipsisVertical } from '@sofa-design/icons';
 import { Popover } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import RcResizeObserver from 'rc-resize-observer';
 import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
@@ -12,6 +12,7 @@ import type { SendButtonCustomizationProps } from '../SendButton';
 import { SendButton } from '../SendButton';
 import type { CreateRecognizer } from '../VoiceInput';
 import { VoiceInputButton } from '../VoiceInput';
+import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 
 export interface SendActionsProps {
   /** 附件配置 */
@@ -41,6 +42,17 @@ export interface SendActionsProps {
 
   /** 文件上传是否完成 */
   fileUploadDone?: boolean;
+
+  /** 文件上传状态 */
+  fileUploadStatus?: 'uploading' | 'done' | 'error';
+
+  /** 文件上传状态统计 */
+  fileUploadSummary?: {
+    totalCount: number;
+    doneCount: number;
+    uploadingCount: number;
+    errorCount: number;
+  };
 
   /** 是否正在录音 */
   recording?: boolean;
@@ -104,6 +116,8 @@ export const SendActions: React.FC<SendActionsProps> = ({
   typing,
   isLoading,
   fileUploadDone = true,
+  fileUploadStatus = fileUploadDone ? 'done' : 'uploading',
+  fileUploadSummary,
   recording = false,
   collapseSendActions = false,
   allowEmptySubmit = false,
@@ -128,7 +142,6 @@ export const SendActions: React.FC<SendActionsProps> = ({
     '()',
   ].filter(Boolean).length;
   const { locale } = useContext(I18nContext);
-
   /**
    * 默认发送操作按钮
    */
@@ -148,7 +161,7 @@ export const SendActions: React.FC<SendActionsProps> = ({
           onFileMapChange={(fileMap) => {
             attachment?.onFileMapChange?.(fileMap);
           }}
-          disabled={!fileUploadDone || attachment?.disabled}
+          disabled={!fileUploadDone || attachment?.disabled || !!typing}
         />
       ) : null,
       voiceRecognizer ? (
@@ -160,7 +173,7 @@ export const SendActions: React.FC<SendActionsProps> = ({
               : ''
           }
           recording={recording}
-          disabled={disabled}
+          disabled={disabled || !!typing}
           onStart={onStartRecording || (() => Promise.resolve())}
           onStop={onStopRecording || (() => Promise.resolve())}
         />
@@ -225,7 +238,8 @@ export const SendActions: React.FC<SendActionsProps> = ({
           onStopRecording,
           onSend,
           onStop,
-          fileUploadStatus: fileUploadDone ? 'done' : 'uploading',
+          fileUploadStatus,
+          fileUploadSummary,
         },
         defaultActions,
       )
@@ -254,6 +268,7 @@ export const SendActions: React.FC<SendActionsProps> = ({
           },
           hashId,
         )}
+        data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.SEND_ACTIONS}
       >
         {collapseSendActions && actionsList.length > 2 ? (
           <>
@@ -291,6 +306,7 @@ export const SendActions: React.FC<SendActionsProps> = ({
                   fontSize: 16,
                   color: 'var(--color-gray-text-secondary)',
                 }}
+                data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.MORE_ACTIONS}
               >
                 <EllipsisVertical />
               </ActionIconBox>

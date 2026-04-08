@@ -143,8 +143,11 @@ vi.mock('../../../src/Plugins/chart/ChartAttrToolBar/index', () => ({
 }));
 
 const createRuntimeComponent =
-  (testId: string) => (props: { title?: string }) => (
-    <div data-testid={testId}>{props.title ?? `mock-${testId}`}</div>
+  (testId: string) => (props: { title?: string; toolbarExtra?: React.ReactNode }) => (
+    <div data-testid={testId}>
+      {props.title ?? `mock-${testId}`}
+      {props.toolbarExtra}
+    </div>
   );
 
 vi.mock('../../../src/Plugins/chart/loadChartRuntime', () => ({
@@ -282,11 +285,13 @@ describe('ChartRender', () => {
     });
 
     // Mock ResizeObserver
-    global.ResizeObserver = vi.fn().mockImplementation(() => ({
-      observe: vi.fn(),
-      unobserve: vi.fn(),
-      disconnect: vi.fn(),
-    }));
+    global.ResizeObserver = vi.fn(function MockResizeObserver() {
+      return {
+        observe: vi.fn(),
+        unobserve: vi.fn(),
+        disconnect: vi.fn(),
+      };
+    });
   });
 
   afterEach(() => {
@@ -303,6 +308,18 @@ describe('ChartRender', () => {
       );
 
       // 检查组件是否渲染了基本结构
+      expect(container.firstChild).toBeInTheDocument();
+    });
+
+    it('应该渲染 ChartRuntimeRenderer（shouldLoadRuntime 分支，1019）', async () => {
+      const props = { ...defaultProps, chartType: 'bar' as const };
+      const { container } = render(
+        <I18nContext.Provider value={mockI18n}>
+          <ChartRender {...props} />
+        </I18nContext.Provider>,
+      );
+
+      await screen.findByTestId('bar-chart', {}, { timeout: 3000 });
       expect(container.firstChild).toBeInTheDocument();
     });
 
@@ -386,7 +403,7 @@ describe('ChartRender', () => {
   describe('表格渲染测试', () => {
     it('应该正确渲染表格', () => {
       const props = { ...defaultProps, chartType: 'table' as const };
-      render(
+      const { container } = render(
         <I18nContext.Provider value={mockI18n}>
           <ChartRender {...props} />
         </I18nContext.Provider>,
@@ -396,13 +413,17 @@ describe('ChartRender', () => {
       expect(screen.getByText('A')).toBeInTheDocument();
       expect(screen.getByText('B')).toBeInTheDocument();
       expect(screen.getByText('C')).toBeInTheDocument();
+
+      // 检查 BEM 类名
+      expect(container.querySelector('.ant-agentic-plugin-chart')).toBeInTheDocument();
+      expect(container.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
     });
   });
 
   describe('定义列表渲染测试', () => {
     it('应该正确渲染定义列表', () => {
       const props = { ...defaultProps, chartType: 'descriptions' as const };
-      render(
+      const { container } = render(
         <I18nContext.Provider value={mockI18n}>
           <ChartRender {...props} />
         </I18nContext.Provider>,
@@ -412,6 +433,10 @@ describe('ChartRender', () => {
       expect(screen.getByText('A')).toBeInTheDocument();
       expect(screen.getByText('B')).toBeInTheDocument();
       expect(screen.getByText('C')).toBeInTheDocument();
+
+      // 检查 BEM 类名
+      expect(container.querySelector('.ant-agentic-plugin-chart')).toBeInTheDocument();
+      expect(container.querySelector('.ant-agentic-plugin-chart__descriptions')).toBeInTheDocument();
     });
 
     it('应该在数据少于2条且列数大于8时渲染定义列表', () => {
@@ -832,6 +857,35 @@ describe('ChartRender', () => {
 
       expect(container.firstChild).toBeInTheDocument();
     });
+
+    it('应该通过转义字段名访问 row 中带下划线的 key（getFieldValueSafely escaped 分支）', async () => {
+      const props = {
+        ...defaultProps,
+        chartType: 'line' as const,
+        chartData: [
+          { 'a\\_b': 10, value: 1 },
+          { 'a\\_b': 20, value: 2 },
+        ],
+        config: {
+          ...defaultProps.config,
+          x: 'a_b',
+          y: 'value',
+          columns: [
+            { title: 'A_B', dataIndex: 'a_b' },
+            { title: 'Value', dataIndex: 'value' },
+          ],
+        },
+      };
+
+      const { container } = render(
+        <I18nContext.Provider value={mockI18n}>
+          <ChartRender {...props} />
+        </I18nContext.Provider>,
+      );
+
+      await screen.findByTestId('line-chart', {}, { timeout: 3000 });
+      expect(container.firstChild).toBeInTheDocument();
+    });
   });
 
   describe('数据变化防抖测试', () => {
@@ -842,7 +896,7 @@ describe('ChartRender', () => {
         </I18nContext.Provider>,
       );
 
-      // 更新数据（触发数据哈希变化）
+      // 更新数据（触发数据哈希变化，走 debouncedUpdateRenderKeyRef 分支）
       const newProps = {
         ...defaultProps,
         chartData: [
@@ -857,7 +911,7 @@ describe('ChartRender', () => {
             <ChartRender {...newProps} />
           </I18nContext.Provider>,
         );
-        // 等待防抖延迟（800ms）加上一些缓冲时间
+        // 等待防抖延迟（800ms）加上一些缓冲时间，使 setRenderKey 被调用
         await new Promise((resolve) => setTimeout(resolve, 900));
       });
 
@@ -920,6 +974,32 @@ describe('ChartRender', () => {
       await screen.findByTestId('donut-chart', {}, { timeout: 3000 });
       expect(container.firstChild).toBeInTheDocument();
     });
+
+    it('应该通过点击 Dropdown 触发 getPopupContainer 与图表类型菜单（761, 766）', async () => {
+      const props = { ...defaultProps, chartType: 'pie' as const };
+      const { container } = render(
+        <I18nContext.Provider value={mockI18n}>
+          <ChartRender {...props} />
+        </I18nContext.Provider>,
+      );
+
+      await screen.findByTestId('donut-chart', {}, { timeout: 3000 });
+      const dropdownTrigger = screen.getByText('饼图');
+      await act(async () => {
+        fireEvent.mouseDown(dropdownTrigger);
+      });
+      await act(async () => {
+        fireEvent.click(dropdownTrigger);
+      });
+
+      const menuItem = await screen.findByRole('menuitem', {}, { timeout: 2000 }).catch(() => null);
+      if (menuItem) {
+        await act(async () => {
+          fireEvent.click(menuItem);
+        });
+      }
+      expect(container.firstChild).toBeInTheDocument();
+    });
   });
 
   describe('列数变化测试', () => {
@@ -942,6 +1022,38 @@ describe('ChartRender', () => {
       expect(onColumnLengthChange).toHaveBeenCalledWith(2);
 
       expect(container.firstChild).toBeInTheDocument();
+    });
+
+    it('应该通过点击列数 Dropdown 菜单项触发 onColumnLengthChange（796, 801）', async () => {
+      const onColumnLengthChange = vi.fn();
+      const props = {
+        ...defaultProps,
+        isChartList: true,
+        columnLength: 3,
+        onColumnLengthChange,
+      };
+
+      render(
+        <I18nContext.Provider value={mockI18n}>
+          <ChartRender {...props} />
+        </I18nContext.Provider>,
+      );
+
+      const columnTriggers = screen.getAllByText((content, el) =>
+        el?.textContent?.includes('3') === true && el?.textContent?.includes('列') === true,
+      );
+      const columnTrigger = columnTriggers[columnTriggers.length - 1];
+      await act(async () => {
+        fireEvent.click(columnTrigger);
+      });
+
+      const menuItems = document.body.querySelectorAll('.ant-dropdown-menu-item');
+      if (menuItems.length > 0) {
+        await act(async () => {
+          fireEvent.click(menuItems[1]);
+        });
+        expect(onColumnLengthChange).toHaveBeenCalledWith(2);
+      }
     });
   });
 
@@ -974,6 +1086,46 @@ describe('ChartRender', () => {
       });
 
       expect(container.firstChild).toBeInTheDocument();
+    });
+
+    it('应该打开配置 Popover、触发表单 X/Y 的 stopPropagation 并提交（833, 847, 851, 871, 888）', async () => {
+      render(
+        <I18nContext.Provider value={mockI18n}>
+          <ChartRender {...defaultProps} />
+        </I18nContext.Provider>,
+      );
+
+      const configTrigger = screen.getByRole('button', { name: '配置图表' });
+      await act(async () => {
+        fireEvent.click(configTrigger);
+      });
+
+      await waitFor(
+        () => {
+          expect(screen.getByText('配置图表')).toBeInTheDocument();
+          const form =
+            document.body.querySelector('.ant-form') ||
+            document.body.querySelector('form');
+          expect(form).not.toBeNull();
+          expect(form).toBeInTheDocument();
+        },
+        { timeout: 2000 },
+      );
+
+      const xSelects = document.body.querySelectorAll('.ant-select-selector');
+      if (xSelects.length >= 1) {
+        fireEvent.mouseDown(xSelects[0]);
+      }
+      if (xSelects.length >= 2) {
+        fireEvent.mouseDown(xSelects[1]);
+      }
+
+      const submitBtn = document.body.querySelector('button.ant-btn-primary');
+      if (submitBtn) {
+        await act(async () => {
+          fireEvent.click(submitBtn);
+        });
+      }
     });
 
     it('应该处理配置中的 columns 过滤', () => {

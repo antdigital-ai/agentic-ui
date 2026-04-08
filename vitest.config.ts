@@ -5,7 +5,6 @@ export default defineConfig({
   esbuild: {
     //jsxInject: "import React from 'react'",
   },
-  resolve: {},
   server: {
     host: '127.0.0.1',
   },
@@ -29,15 +28,32 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       reporter: ['text', 'json', 'html'],
-      include: ['src/**'],
+      include: ['src/**/*.{ts,tsx,js,jsx}'],
       all: true,
       exclude: [
         'tests/**',
+        /** 不把源码树内的测试文件计入覆盖率，避免拉低分支等指标 */
+        '**/src/**/__tests__/**',
+        '**/src/**/*.test.ts',
+        '**/src/**/*.test.tsx',
+        '**/src/**/*.spec.ts',
+        '**/src/**/*.spec.tsx',
         '**/MarkdownEditor/editor/slate-react/**',
         '**/slate-table/**',
         '**/icons/**',
+        '**/Icons/animated/**',
         'test/**',
+        '**/Hooks/useIntersectionOnce.ts',
       ],
+      // 启用 COVERAGE_ENFORCE=1 时强制覆盖率阈值；src 内 *.test / __tests__ 已排除在覆盖率外
+      ...(process.env.COVERAGE_ENFORCE === '1' && {
+        thresholds: {
+          lines: 90,
+          functions: 90,
+          branches: 84,
+          statements: 90,
+        },
+      }),
     },
   },
 });

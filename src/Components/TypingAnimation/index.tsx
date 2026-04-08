@@ -1,7 +1,7 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { motion, MotionProps, useInView } from 'framer-motion';
-import { isString } from 'lodash';
+import { isString } from 'lodash-es';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { resolveSegments } from '../TextAnimate';
 import { useTypingAnimationStyle } from './style';

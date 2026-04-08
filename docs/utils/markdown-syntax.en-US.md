@@ -142,26 +142,52 @@ Use three or more `-`, `*`, or `_`.
 - [ ] Incomplete task
 ```
 
-## Alerts
+## Tip blocks
 
-Use `:::` syntax to create different types of alert blocks.
+Use container syntax to create different types of tip blocks; they render as styled `div.markdown-container` (markdown-it-container style). Two equivalent syntaxes are supported:
+
+- **Triple-colon**: `:::type` … `:::` — standard container directive, supports `{title="Title"}` attribute.
+- **Double-colon**: `::type` … `:::` — shorthand form, opens with two colons at line start and closes with `:::`, useful for tool-generated content.
+
+**Note**: Blank lines between the opening line and content are allowed.
+
+<code src="../demos/tip-blocks-demo.tsx" background="var(--main-bg-color)" iframe=480></code>
 
 ```markdown
 :::info
+
 This is an info alert.
+
 :::
 
 :::warning
+
 This is a warning alert.
+
 :::
 
 :::success
+
 This is a success alert.
+
 :::
 
 :::error
+
 This is an error alert.
+
 :::
+
+:::tip{title="Tip"}
+
+This is a tip block with a title.
+
+:::
+
+::warning
+The double-colon ::warning syntax is also supported, equivalent to :::warning.
+
+::
 ```
 
 ## Charts

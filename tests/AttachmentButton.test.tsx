@@ -118,7 +118,44 @@ describe('AttachmentButton', () => {
         0, // index parameter
       );
       expect(mockOnFileMapChange).toHaveBeenCalled();
-      expect(message.success).toHaveBeenCalledWith('Upload success');
+    });
+
+    it('should use uploadWithResponse when provided', async () => {
+      const mockFiles = [
+        new File(['test'], 'test.txt', {
+          type: 'text/plain',
+        }) as AttachmentFile,
+      ];
+      const uploadWithResponse = vi.fn().mockResolvedValue({
+        fileUrl: 'response-url',
+        uploadStatus: 'SUCCESS',
+        errorMessage: null,
+      });
+
+      await upLoadFileToServer(mockFiles, {
+        uploadWithResponse,
+        onFileMapChange: mockOnFileMapChange,
+      });
+
+      expect(uploadWithResponse).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'test.txt' }),
+        0,
+      );
+    });
+
+    it('无 upload 时使用 file.previewUrl 作为 url', async () => {
+      // 使用非图片文件，避免 prepareFile 用 createObjectURL 覆盖 previewUrl
+      const fileWithPreview = new File(['test'], 'test.txt', {
+        type: 'text/plain',
+      }) as AttachmentFile;
+      fileWithPreview.previewUrl = 'blob:preview-url';
+
+      await upLoadFileToServer([fileWithPreview], {
+        onFileMapChange: mockOnFileMapChange,
+      });
+
+      expect(fileWithPreview.url).toBe('blob:preview-url');
+      expect(fileWithPreview.status).toBe('done');
     });
 
     it('should handle upload errors', async () => {
@@ -135,10 +172,44 @@ describe('AttachmentButton', () => {
         onFileMapChange: mockOnFileMapChange,
       });
 
-      expect(message.error).toHaveBeenCalledWith('Upload failed');
+      expect(mockFiles[0].status).toBe('error');
     });
 
-    it('should validate file count limits', async () => {
+    it('上传失败时 handleUploadError 应设置文件状态为 error', async () => {
+      const mockFiles = [
+        new File(['test'], 'test.txt', { type: 'text/plain' }) as AttachmentFile,
+      ];
+      const customErrorMsg = 'Custom upload error message';
+      mockUpload.mockRejectedValue(new Error(customErrorMsg));
+
+      await upLoadFileToServer(mockFiles, {
+        upload: mockUpload,
+        onFileMapChange: mockOnFileMapChange,
+      });
+
+      expect(mockFiles[0].status).toBe('error');
+    });
+
+    it('should handle processFile throw and hit outer catch', async () => {
+      const mockFiles = [
+        new File(['test'], 'test.txt', {
+          type: 'text/plain',
+        }) as AttachmentFile,
+      ];
+      mockUpload.mockRejectedValue(new Error('Upload failed'));
+      const throwingOnFileMapChange = vi.fn().mockImplementation((_map?: Map<string, AttachmentFile>) => {
+        if (throwingOnFileMapChange.mock.calls.length === 2) {
+          throw new Error('onFileMapChange throw');
+        }
+      });
+
+      await upLoadFileToServer(mockFiles, {
+        upload: mockUpload,
+        onFileMapChange: throwingOnFileMapChange,
+      });
+    });
+
+    it('should validate file count limits and show error in map', async () => {
       const mockFiles = [
         new File(['test1'], 'test1.txt', {
           type: 'text/plain',
@@ -148,16 +219,49 @@ describe('AttachmentButton', () => {
         }) as AttachmentFile,
       ];
 
+      const onExceedMaxCount = vi.fn();
+
       await upLoadFileToServer(mockFiles, {
         upload: mockUpload,
         onFileMapChange: mockOnFileMapChange,
         maxFileCount: 1,
+        onExceedMaxCount,
       });
 
-      expect(message.error).toHaveBeenCalledWith('最多只能上传 1 个文件');
+      // upload 不应该被调用
+      expect(mockUpload).not.toHaveBeenCalled();
+      // onExceedMaxCount 应被调用，携带正确参数
+      expect(onExceedMaxCount).toHaveBeenCalledWith({
+        maxCount: 1,
+        currentCount: 0,
+        selectedCount: 2,
+      });
+      // 文件应以 error 状态进入 fileMap
+      expect(mockOnFileMapChange).toHaveBeenCalled();
+      const lastMap = mockOnFileMapChange.mock.calls[mockOnFileMapChange.mock.calls.length - 1][0] as Map<string, AttachmentFile>;
+      const files = Array.from(lastMap.values());
+      expect(files.every((f) => f.status === 'error')).toBe(true);
+      expect(files.every((f) => f.errorCode === 'FILE_COUNT_EXCEEDED')).toBe(true);
     });
 
-    it('should validate total file count including existing files', async () => {
+    it('should call onExceedMaxCount without callback (backward compatible)', async () => {
+      const mockFiles = [
+        new File(['test1'], 'test1.txt', { type: 'text/plain' }) as AttachmentFile,
+        new File(['test2'], 'test2.txt', { type: 'text/plain' }) as AttachmentFile,
+      ];
+
+      // 不传 onExceedMaxCount，不应抛错，文件仍以 error 入 map
+      await expect(
+        upLoadFileToServer(mockFiles, {
+          upload: mockUpload,
+          onFileMapChange: mockOnFileMapChange,
+          maxFileCount: 1,
+        }),
+      ).resolves.toBeUndefined();
+      expect(mockUpload).not.toHaveBeenCalled();
+    });
+
+    it('should validate total file count including existing files and show error in map', async () => {
       // 创建已存在的文件
       const existingFile = new File(
         ['existing'],
@@ -178,17 +282,28 @@ describe('AttachmentButton', () => {
         }) as AttachmentFile,
       ];
 
+      const onExceedMaxCount = vi.fn();
+
       await upLoadFileToServer(mockFiles, {
         upload: mockUpload,
         onFileMapChange: mockOnFileMapChange,
         fileMap: existingFileMap,
         maxFileCount: 2,
+        onExceedMaxCount,
       });
 
-      // 应该显示错误，因为总数 3 超过了限制 2
-      expect(message.error).toHaveBeenCalledWith('最多只能上传 2 个文件');
-      // upload 函数不应该被调用
       expect(mockUpload).not.toHaveBeenCalled();
+      expect(onExceedMaxCount).toHaveBeenCalledWith({
+        maxCount: 2,
+        currentCount: 1,
+        selectedCount: 2,
+      });
+      // 新文件应以 error 状态进入 fileMap
+      expect(mockOnFileMapChange).toHaveBeenCalled();
+      const lastMap = mockOnFileMapChange.mock.calls[mockOnFileMapChange.mock.calls.length - 1][0] as Map<string, AttachmentFile>;
+      const newFiles = Array.from(lastMap.values()).filter((f) => f.name !== 'existing.txt');
+      expect(newFiles.every((f) => f.status === 'error')).toBe(true);
+      expect(newFiles.every((f) => f.errorCode === 'FILE_COUNT_EXCEEDED')).toBe(true);
     });
 
     it('should allow upload when total file count is within limit', async () => {
@@ -218,11 +333,6 @@ describe('AttachmentButton', () => {
         maxFileCount: 3,
       });
 
-      // 不应该显示错误
-      expect(message.error).not.toHaveBeenCalledWith(
-        expect.stringContaining('最多只能上传'),
-      );
-      // upload 函数应该被调用
       expect(mockUpload).toHaveBeenCalled();
     });
 
@@ -239,7 +349,7 @@ describe('AttachmentButton', () => {
         minFileCount: 2,
       });
 
-      expect(message.error).toHaveBeenCalledWith('至少需要上传 2 个文件');
+      expect(mockUpload).not.toHaveBeenCalled();
     });
 
     it('should validate file size limits', async () => {
@@ -258,8 +368,6 @@ describe('AttachmentButton', () => {
         maxFileSize: 1024, // 1KB limit
       });
 
-      expect(message.error).toHaveBeenCalledWith('文件大小超过 1 KB');
-      // upload 函数不应该被调用，因为文件大小超限
       expect(mockUpload).not.toHaveBeenCalled();
     });
 
@@ -281,13 +389,7 @@ describe('AttachmentButton', () => {
         maxFileSize: 1024, // 1KB limit
       });
 
-      // 不应该显示错误
-      expect(message.error).not.toHaveBeenCalledWith(
-        expect.stringContaining('文件大小超过'),
-      );
-      // upload 函数应该被调用
       expect(mockUpload).toHaveBeenCalled();
-      expect(message.success).toHaveBeenCalledWith('Upload success');
     });
 
     it('should allow upload when file size equals the limit', async () => {
@@ -308,13 +410,7 @@ describe('AttachmentButton', () => {
         maxFileSize: 1024, // 1KB limit
       });
 
-      // 不应该显示错误
-      expect(message.error).not.toHaveBeenCalledWith(
-        expect.stringContaining('文件大小超过'),
-      );
-      // upload 函数应该被调用
       expect(mockUpload).toHaveBeenCalled();
-      expect(message.success).toHaveBeenCalledWith('Upload success');
     });
 
     it('should handle image files with preview URL', async () => {
@@ -411,7 +507,6 @@ describe('AttachmentButton', () => {
       const customFormats = {
         icon: <span>Custom Icon</span>,
         type: 'Custom Type',
-        maxSize: 5 * 1024,
         extensions: ['custom'],
       };
 
@@ -491,7 +586,6 @@ describe('AttachmentButton', () => {
       const customFormat = {
         icon: <span>Test Icon</span>,
         type: 'Test Type',
-        maxSize: 1024,
         extensions: ['test'],
       };
 
@@ -632,7 +726,6 @@ describe('AttachmentButton', () => {
       const customFormat = {
         icon: <span>Image Icon</span>,
         type: 'Image',
-        maxSize: 5120,
         extensions: ['jpg', 'png'],
       };
 
@@ -671,7 +764,6 @@ describe('AttachmentButton', () => {
 
       const customFormat = {
         type: 'Document',
-        maxSize: 10240,
         extensions: ['pdf', 'doc'],
         icon: <span>Doc Icon</span>,
       };

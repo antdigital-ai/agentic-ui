@@ -19,7 +19,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       backgroundColor: '#FFF',
       boxShadow: 'var(--shadow-border-base)',
-      height: 32,
+      minHeight: 32,
       '&-overflow-container': {
         position: 'absolute',
         right: 0,

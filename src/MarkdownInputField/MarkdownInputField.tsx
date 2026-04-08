@@ -1,6 +1,8 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { memo, useContext, useState } from 'react';
+import { TextLoading } from '../Components/lotties/TextLoading';
+import { useLocale } from '../I18n';
 import { BaseMarkdownEditor } from '../MarkdownEditor';
 import { BorderBeamAnimation } from './BorderBeamAnimation';
 import { useFileUploadManager } from './FileUploadManager';
@@ -14,6 +16,7 @@ import { QuickActions } from './QuickActions';
 import { SkillModeBar } from './SkillModeBar';
 import { useStyle } from './style';
 import { Suggestion } from './Suggestion';
+import { MARKDOWN_INPUT_FIELD_TEST_IDS } from './testIds';
 import TopOperatingArea from './TopOperatingArea';
 import type { MarkdownInputFieldProps } from './types/MarkdownInputFieldProps';
 import {
@@ -40,7 +43,7 @@ export type { MarkdownInputFieldProps };
  * @param {string} [props.placeholder] - 占位符文本
  * @param {string} [props.triggerSendKey='Enter'] - 触发发送的快捷键（Enter 发送，Shift+Enter 换行）
  * @param {boolean} [props.disabled] - 是否禁用
- * @param {boolean} [props.typing] - 是否正在输入
+ * @param {boolean} [props.typing] - AI 回复中等场景下为 true，输入区只读并显示提示
  * @param {AttachmentProps} [props.attachment] - 附件配置
  * @param {string[]} [props.bgColorList] - 背景颜色列表，推荐使用3-4种颜色
  * @param {React.RefObject} [props.inputRef] - 输入框引用
@@ -67,6 +70,8 @@ export type { MarkdownInputFieldProps };
  * - 支持自动完成功能
  * - 支持自定义渲染配置
  */
+const DEFAULT_ATTACHMENT = { enable: false } as const;
+
 const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   tagInputProps,
   markdownProps,
@@ -74,11 +79,15 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   onBlur,
   onFocus,
   isShowTopOperatingArea = false,
+  testId,
   ...props
 }) => {
+  // 默认关闭文件上传，需显式传入 attachment.enable: true 开启
+  const attachment = { ...DEFAULT_ATTACHMENT, ...props.attachment };
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const baseCls = getPrefixCls('agentic-md-input-field');
   const { wrapSSR, hashId } = useStyle(baseCls, props.disableHoverAnimation);
+  const locale = useLocale();
 
   // 状态管理
   const {
@@ -95,7 +104,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   } = useMarkdownInputFieldState({
     value: props.value,
     onChange: props.onChange,
-    attachment: props.attachment,
+    attachment,
   });
 
   // 边框光束动画状态
@@ -135,10 +144,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     computedMinHeight,
     enlargedStyle,
   } = useMarkdownInputFieldStyles({
-    toolsRender: props.toolsRender,
+    hasTools: !!props.toolsRender || !!props.actionsRender,
     maxHeight: props.maxHeight,
     style: props.style,
-    attachment: props.attachment,
+    attachment,
     isEnlarged,
     rightPadding,
     topRightPadding,
@@ -150,25 +159,25 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   });
 
   // Refs 管理
-  const { markdownEditorRef, quickActionsRef, actionsRef, isSendingRef } =
-    useMarkdownInputFieldRefs(
-      {
-        inputRef: props.inputRef,
-        value: props.value,
-      },
-      value,
-    );
+  const { markdownEditorRef, quickActionsRef, actionsRef, isSendingRef, onEditorChange } =
+    useMarkdownInputFieldRefs({
+      inputRef: props.inputRef,
+      value: props.value,
+      setValue,
+    });
 
   // 文件上传管理
   const {
     fileUploadDone,
+    fileUploadStatus,
+    fileUploadSummary,
     supportedFormat,
     uploadImage,
     updateAttachmentFiles,
     handleFileRemoval,
     handleFileRetry,
   } = useFileUploadManager({
-    attachment: props.attachment,
+    attachment,
     fileMap,
     onFileMapChange: setFileMap,
   });
@@ -186,6 +195,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     sendMessage,
     handlePaste,
     handleKeyDown,
+    handleContainerClick,
     activeInput,
   } = useMarkdownInputFieldHandlers({
     props: {
@@ -195,7 +205,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
       onSend: props.onSend,
       allowEmptySubmit: props.allowEmptySubmit,
       markdownProps,
-      attachment: props.attachment,
+      attachment,
       triggerSendKey: props.triggerSendKey,
     },
     markdownEditorRef,
@@ -215,7 +225,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
 
   // 渲染辅助
   const attachmentList = useAttachmentList({
-    attachment: props.attachment,
+    attachment,
     fileMap,
     handleFileRemoval,
     handleFileRetry,
@@ -229,9 +239,11 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     isLoading,
   });
 
+  const editorReadonly = isLoading || !!props.typing;
+
   const sendActionsNode = useSendActionsNode({
     props: {
-      attachment: props.attachment,
+      attachment,
       voiceRecognizer: props.voiceRecognizer,
       value,
       disabled: props.disabled,
@@ -246,6 +258,8 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     setFileMap,
     supportedFormat,
     fileUploadDone,
+    fileUploadStatus,
+    fileUploadSummary,
     recording,
     isLoading,
     collapseSendActions,
@@ -263,7 +277,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   return wrapSSR(
     <>
       {isShowTopOperatingArea && (
-        <div className={classNames(`${baseCls}-top-area`, hashId)}>
+        <div
+          className={classNames(`${baseCls}-top-area`, hashId)}
+          data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.TOP_AREA}
+        >
           <TopOperatingArea
             targetRef={props.targetRef}
             operationBtnRender={props.operationBtnRender}
@@ -272,7 +289,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
         </div>
       )}
       {beforeTools ? (
-        <div className={classNames(`${baseCls}-before-tools`, hashId)}>
+        <div
+          className={classNames(`${baseCls}-before-tools`, hashId)}
+          data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.BEFORE_TOOLS}
+        >
           {beforeTools}
         </div>
       ) : null}
@@ -285,10 +305,11 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
       >
         <div
           ref={inputRef}
+          data-testid={testId ?? MARKDOWN_INPUT_FIELD_TEST_IDS.ROOT}
           className={classNames(baseCls, hashId, props.className, {
             [`${baseCls}-disabled`]: props.disabled,
             [`${baseCls}-skill-mode`]: props.skillMode?.open,
-            [`${baseCls}-typing`]: false,
+            [`${baseCls}-typing`]: !!props.typing,
             [`${baseCls}-loading`]: isLoading,
             [`${baseCls}-is-multi-row`]: isMultiRowLayout,
             [`${baseCls}-enlarged`]: isEnlarged,
@@ -314,6 +335,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
           tabIndex={1}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
+          onClick={handleContainerClick}
           onKeyDown={handleKeyDown}
         >
           <BorderBeamAnimation
@@ -336,6 +358,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
               [`${baseCls}-editor-hover`]: isHover,
               [`${baseCls}-editor-disabled`]: props.disabled,
             })}
+            data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.EDITOR}
           >
             {/* 技能模式部分 */}
             <SkillModeBar
@@ -343,8 +366,24 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
               onSkillModeOpenChange={props.onSkillModeOpenChange}
             />
 
-            <div className={classNames(`${baseCls}-editor-content`, hashId)}>
+            <div
+              className={classNames(`${baseCls}-editor-content`, hashId)}
+              data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.EDITOR_CONTENT}
+            >
               {attachmentList}
+
+              {(props.typing || isLoading) && !value && (
+                <div
+                  className={classNames(`${baseCls}-typing-hint`, hashId)}
+                  aria-live="polite"
+                  aria-label={locale['input.typing.hint']}
+                >
+                  <TextLoading
+                    text={locale['input.typing.hint']}
+                    fontSize={13}
+                  />
+                </div>
+              )}
 
               <BaseMarkdownEditor
                 editorRef={markdownEditorRef}
@@ -361,7 +400,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                 floatBar={{
                   enable: false,
                 }}
-                readonly={isLoading}
+                readonly={editorReadonly}
                 contentStyle={{
                   alignItems: 'flex-start',
                   padding: 'var(--padding-3x)',
@@ -382,6 +421,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   if (props.maxLength !== undefined) {
                     if (value.length > props.maxLength) {
                       const truncatedValue = value.slice(0, props.maxLength);
+                      onEditorChange(truncatedValue);
                       setValue(truncatedValue);
                       props.onChange?.(truncatedValue);
                       props.onMaxLengthExceeded?.(value);
@@ -392,6 +432,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                       return;
                     }
                   }
+                  // Record the value the editor just produced so the external
+                  // props.value sync effect skips the redundant setMDContent call
+                  // that would disrupt the live Slate selection while typing.
+                  onEditorChange(value);
                   setValue(value);
                   props.onChange?.(value);
                 }}
@@ -412,7 +456,11 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                 }}
                 titlePlaceholderContent={props.placeholder}
                 toc={false}
-                pasteConfig={props.pasteConfig}
+                pasteConfig={{
+                  allowedTypes: ['text/plain'],
+                  plainTextOnly: true,
+                  ...props.pasteConfig,
+                }}
                 {...markdownProps}
               >
                 {props?.quickActionRender ||
@@ -425,8 +473,8 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                     onFileMapChange={setFileMap}
                     isHover={isHover}
                     isLoading={isLoading}
-                    disabled={props.disabled}
-                    fileUploadStatus={fileUploadDone ? 'done' : 'uploading'}
+                    disabled={props.disabled || !!props.typing}
+                    fileUploadStatus={fileUploadStatus}
                     refinePrompt={props.refinePrompt}
                     editorRef={markdownEditorRef}
                     onValueChange={(text) => {
@@ -448,21 +496,26 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
               </BaseMarkdownEditor>
             </div>
           </div>
-          {props.toolsRender ? (
-            <div className={classNames(`${baseCls}-tools-wrapper`, hashId)}>
+          {props.toolsRender || props.actionsRender ? (
+            <div
+              className={classNames(`${baseCls}-tools-wrapper`, hashId)}
+              data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.TOOLS_WRAPPER}
+            >
               <div
                 ref={actionsRef}
                 contentEditable={false}
                 className={classNames(`${baseCls}-send-tools`, hashId)}
+                data-testid={MARKDOWN_INPUT_FIELD_TEST_IDS.SEND_TOOLS}
               >
-                {props.toolsRender({
+                {props?.toolsRender?.({
                   value,
                   fileMap,
                   onFileMapChange: setFileMap,
+                  attachment,
                   ...props,
                   isHover,
                   isLoading,
-                  fileUploadStatus: fileUploadDone ? 'done' : 'uploading',
+                  fileUploadStatus,
                 })}
               </div>
               {sendActionsNode}

@@ -158,6 +158,22 @@ const genStyle = (
         background: 'var(--color-primary-control-fill-secondary-active)',
         color: 'var(--color-gray-text-default)',
         boxShadow: 'none',
+        // inline-code 基础规则用 code.cls（元素+类）选择器，需匹配相同结构才能覆盖
+        [`& code${token.antCls}-agentic-md-editor-content-inline-code`]: {
+          background: 'var(--color-primary-a7)',
+        },
+        // blockquote 竖条：gray-control-fill-secondary（gray-a2）在蓝色背景上消失
+        [`& ${token.antCls}-agentic-md-editor-content blockquote::before`]: {
+          backgroundColor: 'var(--color-primary-a7)',
+        },
+        // hr 分割线：gray-border-light（gray-a3）在蓝色背景上不可见
+        [`& ${token.antCls}-agentic-md-editor-content hr`]: {
+          borderTopColor: 'var(--color-primary-a7)',
+        },
+        // 链接下划线：gray-border-light 在蓝色背景上不可见
+        [`& ${token.antCls}-agentic-md-editor-content a`]: {
+          textDecorationColor: 'var(--color-primary-a7)',
+        },
         '&&-pure': {
           background: 'var(--color-primary-control-fill-primary)',
         },
@@ -179,6 +195,22 @@ const genStyle = (
           color: 'var(--color-gray-text-default)',
           borderRadius: '12px 12px 2px 12px',
           maxWidth: '668px',
+          // inline-code 基础规则用 code.cls（元素+类）选择器，需匹配相同结构才能覆盖
+          [`& code${token.antCls}-agentic-md-editor-content-inline-code`]: {
+            background: 'var(--color-primary-control-fill-secondary-active)',
+          },
+          // blockquote 竖条：gray-control-fill-secondary（gray-a2）在浅蓝背景上消失
+          [`& ${token.antCls}-agentic-md-editor-content blockquote::before`]: {
+            backgroundColor: 'var(--color-primary-control-fill-primary)',
+          },
+          // hr 分割线：gray-border-light（gray-a3）在浅蓝背景上不可见
+          [`& ${token.antCls}-agentic-md-editor-content hr`]: {
+            borderTopColor: 'var(--color-primary-a5)',
+          },
+          // 链接下划线：gray-border-light 在浅蓝背景上不可见
+          [`& ${token.antCls}-agentic-md-editor-content a`]: {
+            textDecorationColor: 'var(--color-primary-a5)',
+          },
           '&&-pure': {
             background: 'var(--color-primary-control-fill-primary)',
           },

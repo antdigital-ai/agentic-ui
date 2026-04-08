@@ -150,7 +150,6 @@ describe('CodeToolbar', () => {
       fireEvent.click(copyButton);
 
       expect(mockCopy).toHaveBeenCalledWith('console.log("Hello World");');
-      expect(message.success).toHaveBeenCalledWith('复制成功');
     });
   });
 
@@ -226,7 +225,7 @@ describe('CodeToolbar', () => {
       expect(screen.getByText('Html Renderer')).toBeInTheDocument();
     });
 
-    it('应该为没有语言的代码显示 plain text', () => {
+    it('应该为没有语言的代码不显示语言标签', () => {
       const elementWithoutLanguage = { ...defaultElement, language: undefined };
       render(
         <CodeToolbar
@@ -237,7 +236,24 @@ describe('CodeToolbar', () => {
         />,
       );
 
-      expect(screen.getByText('plain text')).toBeInTheDocument();
+      expect(screen.queryByText('plain text')).not.toBeInTheDocument();
+    });
+
+    it('应该为 plain text 语言的代码不显示语言标签', () => {
+      const plainTextElement = {
+        ...defaultElement,
+        language: 'plain text' as any,
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={plainTextElement}
+          readonly={true}
+          isSelected={true}
+        />,
+      );
+
+      expect(screen.queryByText('plain text')).not.toBeInTheDocument();
     });
   });
 
@@ -525,6 +541,186 @@ describe('CodeToolbar', () => {
 
       // 不应该显示预览/代码切换按钮
       expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 HTML 代码为空或非字符串时 containsJavaScript 返回 false', () => {
+      const htmlEmpty = { ...defaultElement, language: 'html', value: '' };
+      render(
+        <CodeToolbar {...defaultProps} element={htmlEmpty} isSelected={true} />,
+      );
+      expect(screen.getByTestId('segmented')).toBeInTheDocument();
+    });
+
+    it('当 HTML 代码包含 Function() 时，应该隐藏预览/代码切换按钮', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value: '<div>Function("return 1")</div>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+
+    it('当 HTML 代码包含 setTimeout/setInterval 字符串代码时，应该隐藏预览', () => {
+      const htmlElement = {
+        ...defaultElement,
+        language: 'html',
+        value: '<div>setTimeout(\'alert(1)\')</div>',
+      };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={htmlElement}
+          isSelected={true}
+        />,
+      );
+      expect(screen.queryByTestId('segmented')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Markdown 视图模式与主题、复制、展开', () => {
+    it('Markdown 代码块切换预览/代码时调用 onViewModeToggle', () => {
+      const onViewModeToggle = vi.fn();
+      const markdownElement = { ...defaultElement, language: 'markdown' };
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          element={markdownElement}
+          isSelected={true}
+          viewMode="preview"
+          onViewModeToggle={onViewModeToggle}
+        />,
+      );
+      const codeOption = screen.getByTestId('segmented-option-1');
+      fireEvent.click(codeOption);
+      expect(onViewModeToggle).toHaveBeenCalledWith('code');
+    });
+
+    it('点击主题按钮时切换 theme', () => {
+      const setTheme = vi.fn();
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          isSelected={true}
+          theme="github"
+          setTheme={setTheme}
+        />,
+      );
+      const themeButton = screen.getByTitle('主题');
+      fireEvent.click(themeButton);
+      expect(setTheme).toHaveBeenCalledWith('chaos');
+    });
+
+    it('复制成功时调用 copy', () => {
+      const mockCopy = copy as any;
+      mockCopy.mockReturnValue(true);
+      render(<CodeToolbar {...defaultProps} isSelected={true} />);
+      const copyButton = screen.getByTitle('复制');
+      fireEvent.click(copyButton);
+      expect(mockCopy).toHaveBeenCalled();
+    });
+
+    it('复制失败时静默处理并输出 console.error', () => {
+      const mockCopy = copy as any;
+      mockCopy.mockImplementation(() => {
+        throw new Error('clipboard unavailable');
+      });
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      render(<CodeToolbar {...defaultProps} isSelected={true} />);
+      const copyButton = screen.getByTitle('复制');
+      fireEvent.click(copyButton);
+      expect(consoleSpy).toHaveBeenCalledWith('复制失败:', expect.any(Error));
+      consoleSpy.mockRestore();
+    });
+
+    it('点击展开/收起按钮时调用 onExpandToggle', () => {
+      const onExpandToggle = vi.fn();
+      render(
+        <CodeToolbar
+          {...defaultProps}
+          isSelected={true}
+          onExpandToggle={onExpandToggle}
+        />,
+      );
+      const expandButton = screen.getByTitle('展开/收起');
+      fireEvent.click(expandButton);
+      expect(onExpandToggle).toHaveBeenCalled();
+    });
+
+    describe('本地预览按钮测试', () => {
+      it('HTML 语言且提供 onLocalPreview 时显示本地预览按钮', () => {
+        const onLocalPreview = vi.fn();
+        const htmlElement = { ...defaultElement, language: 'html' };
+        render(
+          <CodeToolbar
+            {...defaultProps}
+            element={htmlElement}
+            isSelected={true}
+            onLocalPreview={onLocalPreview}
+          />,
+        );
+        expect(screen.getByTitle('本地预览')).toBeInTheDocument();
+      });
+
+      it('Markdown 语言且提供 onLocalPreview 时显示本地预览按钮', () => {
+        const onLocalPreview = vi.fn();
+        const mdElement = { ...defaultElement, language: 'markdown' };
+        render(
+          <CodeToolbar
+            {...defaultProps}
+            element={mdElement}
+            isSelected={true}
+            onLocalPreview={onLocalPreview}
+          />,
+        );
+        expect(screen.getByTitle('本地预览')).toBeInTheDocument();
+      });
+
+      it('JavaScript 语言不显示本地预览按钮（即使提供了回调）', () => {
+        const onLocalPreview = vi.fn();
+        render(
+          <CodeToolbar
+            {...defaultProps}
+            isSelected={true}
+            onLocalPreview={onLocalPreview}
+          />,
+        );
+        expect(screen.queryByTitle('本地预览')).not.toBeInTheDocument();
+      });
+
+      it('未提供 onLocalPreview 时 HTML 语言不显示本地预览按钮', () => {
+        const htmlElement = { ...defaultElement, language: 'html' };
+        render(
+          <CodeToolbar
+            {...defaultProps}
+            element={htmlElement}
+            isSelected={true}
+          />,
+        );
+        expect(screen.queryByTitle('本地预览')).not.toBeInTheDocument();
+      });
+
+      it('点击本地预览按钮时调用 onLocalPreview', () => {
+        const onLocalPreview = vi.fn();
+        const htmlElement = { ...defaultElement, language: 'html' };
+        render(
+          <CodeToolbar
+            {...defaultProps}
+            element={htmlElement}
+            isSelected={true}
+            onLocalPreview={onLocalPreview}
+          />,
+        );
+        const previewButton = screen.getByTitle('本地预览');
+        fireEvent.click(previewButton);
+        expect(onLocalPreview).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });

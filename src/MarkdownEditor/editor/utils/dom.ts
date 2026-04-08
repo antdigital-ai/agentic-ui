@@ -89,7 +89,14 @@ export const getMediaType = (name?: string, alt?: string) => {
     if (alt.startsWith('attachment:')) return 'attachment';
   }
   name = name || '';
-  if (name?.startsWith?.('data:')) return 'image';
+  if (name?.startsWith?.('data:')) {
+    const mimeMatch = name.match(/^data:([^/]+)\/[^;]+/);
+    const mainType = mimeMatch?.[1]?.toLowerCase();
+    if (mainType === 'image') return 'image';
+    if (mainType === 'video') return 'video';
+    if (mainType === 'audio') return 'audio';
+    return 'other';
+  }
   const originName = name.split('?')[0];
   const ext = originName.toLowerCase().match(/\.\w+$/)?.[0];
   if (!ext && originName !== name) return 'image';

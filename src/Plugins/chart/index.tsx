@@ -36,9 +36,11 @@ export { ChartRender } from './ChartRender';
 // 图表组件导出
 export { default as AreaChart } from './AreaChart';
 export { default as BarChart } from './BarChart';
+export { default as BoxPlotChart } from './BoxPlotChart';
 export { default as ChartStatistic } from './ChartStatistic';
 export { default as DonutChart } from './DonutChart';
 export { default as FunnelChart } from './FunnelChart';
+export { default as HistogramChart } from './HistogramChart';
 export { default as LineChart } from './LineChart';
 export { default as RadarChart } from './RadarChart';
 export { default as ScatterChart } from './ScatterChart';
@@ -54,13 +56,25 @@ export type {
   BarChartDataItem,
   BarChartProps,
 } from './BarChart';
-export type { ChartStatisticProps } from './ChartStatistic';
+export type {
+  BoxPlotChartDataItem,
+  BoxPlotChartProps,
+} from './BoxPlotChart';
+export type {
+  ChartStatisticClassNames,
+  ChartStatisticProps,
+  ChartStatisticStyles,
+} from './ChartStatistic';
 export type {
   DonutChartConfig,
   DonutChartData,
   DonutChartProps,
 } from './DonutChart';
 export type { FunnelChartDataItem, FunnelChartProps } from './FunnelChart';
+export type {
+  HistogramChartDataItem,
+  HistogramChartProps,
+} from './HistogramChart';
 export type {
   LineChartConfigItem,
   LineChartDataItem,
@@ -369,6 +383,7 @@ export const ChartElement = (props: RenderElementProps) => {
                 position: 'relative',
               }}
             >
+              {/* Slate 表格占位：必须在图表下方，避免 z-index 盖住 Canvas（否则部分浏览器只显示容器边框） */}
               <div
                 style={{
                   position: 'absolute',
@@ -376,7 +391,7 @@ export const ChartElement = (props: RenderElementProps) => {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  zIndex: 1,
+                  zIndex: 0,
                   width: '100%',
                   opacity: 0,
                   height: '100%',
@@ -388,6 +403,8 @@ export const ChartElement = (props: RenderElementProps) => {
               </div>
               <div
                 style={{
+                  position: 'relative',
+                  zIndex: 1,
                   display: 'flex',
                   flexWrap: 'wrap',
                   flexDirection: minWidth < 400 ? 'column' : 'row',

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -292,7 +292,7 @@ describe('BaseMarkdownEditor - 基本功能测试', () => {
 
     it('应该将数字 ID 转换为字符串', () => {
       const { container } = render(
-        <BaseMarkdownEditor {...defaultProps} id={123} />,
+        <BaseMarkdownEditor {...defaultProps} id={'123'} />,
       );
 
       const editorElement = container.querySelector('.markdown-editor');

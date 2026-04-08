@@ -451,6 +451,17 @@ describe('NativeTableEditor', () => {
 
       expect(Transforms.removeNodes).not.toHaveBeenCalled();
     });
+
+    it('findTable 返回 null 时应提前 return', () => {
+      const mockRowEntry = [{ type: 'table-row' }, [0, 1]];
+      (Editor.above as any)
+        .mockReturnValueOnce(mockRowEntry)
+        .mockReturnValueOnce(null);
+
+      NativeTableEditor.removeTableRow(mockEditor);
+
+      expect(Transforms.removeNodes).not.toHaveBeenCalled();
+    });
   });
 
   describe('insertTableColumn', () => {
@@ -577,7 +588,7 @@ describe('NativeTableEditor', () => {
 
       NativeTableEditor.removeTableColumn(mockEditor);
 
-      // 应该删除整个表格
+      // 应该删除整个表格（firstRow.children.length <= 1）
       expect(Transforms.removeNodes).toHaveBeenCalledWith(mockEditor, {
         at: [0],
       });
@@ -617,6 +628,25 @@ describe('NativeTableEditor', () => {
 
       NativeTableEditor.moveToNextCell(mockEditor);
 
+      expect(Transforms.select).toHaveBeenCalledWith(mockEditor, {
+        path: [0, 0, 1],
+        offset: 0,
+      });
+    });
+
+    it('应执行 Transforms.select 到下一格', () => {
+      const mockCellEntry = [{}, [0, 0, 0]];
+      const mockTableEntry = [
+        {
+          type: 'table',
+          children: [{ children: [{}, {}] }],
+        },
+        [0],
+      ];
+      (Editor.above as any)
+        .mockReturnValueOnce(mockCellEntry)
+        .mockReturnValueOnce(mockTableEntry);
+      NativeTableEditor.moveToNextCell(mockEditor);
       expect(Transforms.select).toHaveBeenCalledWith(mockEditor, {
         path: [0, 0, 1],
         offset: 0,
@@ -714,6 +744,25 @@ describe('NativeTableEditor', () => {
 
       NativeTableEditor.moveToPreviousCell(mockEditor);
 
+      expect(Transforms.select).toHaveBeenCalledWith(mockEditor, {
+        path: [0, 0, 0],
+        offset: 0,
+      });
+    });
+
+    it('应执行 Transforms.select 到上一格', () => {
+      const mockCellEntry = [{}, [0, 0, 1]];
+      const mockTableEntry = [
+        {
+          type: 'table',
+          children: [{ children: [{}, {}] }],
+        },
+        [0],
+      ];
+      (Editor.above as any)
+        .mockReturnValueOnce(mockCellEntry)
+        .mockReturnValueOnce(mockTableEntry);
+      NativeTableEditor.moveToPreviousCell(mockEditor);
       expect(Transforms.select).toHaveBeenCalledWith(mockEditor, {
         path: [0, 0, 0],
         offset: 0,

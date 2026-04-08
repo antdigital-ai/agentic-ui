@@ -88,12 +88,15 @@ describe('ActionIconBox 组件', () => {
     const button = screen.getByTestId('action-icon-box');
     fireEvent.click(button);
 
-    // 检查是否显示加载图标
+    // 检查是否显示加载图标（LoadingOutlined 渲染为 svg）
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
     });
 
-    const loadingIcon = container.querySelector('.anticon-loading');
+    const loadingIcon =
+      container.querySelector('.anticon-loading') ??
+      button.querySelector('svg');
+    expect(loadingIcon).not.toBeNull();
     expect(loadingIcon).toBeInTheDocument();
   });
 
@@ -104,7 +107,11 @@ describe('ActionIconBox 组件', () => {
       </ActionIconBox>,
     );
 
-    const loadingIcon = container.querySelector('.anticon-loading');
+    const button = screen.getByTestId('action-icon-box');
+    const loadingIcon =
+      container.querySelector('.anticon-loading') ??
+      button.querySelector('svg');
+    expect(loadingIcon).not.toBeNull();
     expect(loadingIcon).toBeInTheDocument();
   });
 

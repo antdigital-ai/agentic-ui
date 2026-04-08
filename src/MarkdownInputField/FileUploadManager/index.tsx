@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import { useContext } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
@@ -36,6 +35,17 @@ export interface FileUploadManagerReturn {
   /** 文件上传是否完成 */
   fileUploadDone: boolean;
 
+  /** 文件上传状态 */
+  fileUploadStatus: 'uploading' | 'done' | 'error';
+
+  /** 文件上传状态统计 */
+  fileUploadSummary: {
+    totalCount: number;
+    doneCount: number;
+    uploadingCount: number;
+    errorCount: number;
+  };
+
   /** 支持的文件格式 */
   supportedFormat: SupportedFileFormatsType;
 
@@ -64,12 +74,28 @@ export const useFileUploadManager = ({
 }: FileUploadManagerProps): FileUploadManagerReturn => {
   const { locale } = useContext(I18nContext);
 
-  // 判断是否所有文件上传完成
-  const fileUploadDone = fileMap?.size
-    ? Array.from(fileMap?.values() || []).every(
-        (file) => file.status === 'done',
-      )
-    : true;
+  const fileList = Array.from(fileMap?.values() || []);
+  const uploadingCount = fileList.filter(
+    (file) => file.status === 'uploading',
+  ).length;
+  const errorCount = fileList.filter((file) => file.status === 'error').length;
+  const totalCount = fileList.length;
+  const fileUploadSummary = {
+    totalCount,
+    uploadingCount,
+    errorCount,
+    // 兜底把未知状态也按完成态处理，避免统计缺口
+    doneCount: Math.max(0, totalCount - uploadingCount - errorCount),
+  };
+  const fileUploadStatus: 'uploading' | 'done' | 'error' =
+    fileUploadSummary.errorCount > 0
+      ? 'error'
+      : fileUploadSummary.uploadingCount > 0
+        ? 'uploading'
+        : 'done';
+  // 向后兼容：无文件时视为已完成
+  const fileUploadDone =
+    fileUploadSummary.totalCount > 0 ? fileUploadStatus === 'done' : true;
 
   // 默认支持的文件格式
   const supportedFormat =
@@ -142,22 +168,6 @@ export const useFileUploadManager = ({
       return;
     }
 
-    // 检查是否已达到最大文件数量限制
-    const currentFileCount = fileMap?.size || 0;
-    if (
-      attachment?.maxFileCount &&
-      currentFileCount >= attachment.maxFileCount
-    ) {
-      const errorMsg = locale?.['markdownInput.maxFileCountExceeded']
-        ? locale['markdownInput.maxFileCountExceeded'].replace(
-            '${maxFileCount}',
-            String(attachment.maxFileCount),
-          )
-        : `最多只能上传 ${attachment.maxFileCount} 个文件`;
-      message.error(errorMsg);
-      return;
-    }
-
     const accept = getAcceptValue(forGallery || false);
     const input = document.createElement('input');
     input.id = 'uploadImage' + '_' + Math.random();
@@ -177,35 +187,8 @@ export const useFileUploadManager = ({
           return;
         }
 
-        // 检查选择的文件数量是否超过限制
-        const currentFileCount = fileMap?.size || 0;
-        if (attachment?.maxFileCount) {
-          // 如果一次选择的文件数量超过最大限制，完全拒绝
-          if (selectedFiles.length > attachment.maxFileCount) {
-            const errorMsg = locale?.['markdownInput.maxFileCountExceeded']
-              ? locale['markdownInput.maxFileCountExceeded'].replace(
-                  '${maxFileCount}',
-                  String(attachment.maxFileCount),
-                )
-              : `最多只能上传 ${attachment.maxFileCount} 个文件`;
-            message.error(errorMsg);
-            return;
-          }
-
-          // 如果选择的文件数量加上已有文件数量超过限制，完全拒绝
-          const totalFileCount = selectedFiles.length + currentFileCount;
-          if (totalFileCount > attachment.maxFileCount) {
-            const errorMsg = locale?.['markdownInput.maxFileCountExceeded']
-              ? locale['markdownInput.maxFileCountExceeded'].replace(
-                  '${maxFileCount}',
-                  String(attachment.maxFileCount),
-                )
-              : `最多只能上传 ${attachment.maxFileCount} 个文件`;
-            message.error(errorMsg);
-            return;
-          }
-        }
-
+        // 检查选择的文件数量是否超过限制——超限时交由 upLoadFileToServer 统一处理
+        // （upLoadFileToServer 内 validateFileCount 失败时会把文件以 error 状态入 map 并触发 onExceedMaxCount）
         await upLoadFileToServer(selectedFiles, {
           ...attachment,
           fileMap,
@@ -248,22 +231,20 @@ export const useFileUploadManager = ({
    * 处理文件重试
    */
   const handleFileRetry = useRefFunction(async (file: AttachmentFile) => {
+    const map = new Map(fileMap);
     try {
       file.status = 'uploading';
-      const map = new Map(fileMap);
       map.set(file.uuid || '', file);
       updateAttachmentFiles(map);
 
       let url: string | undefined;
       let isSuccess = false;
-      let errorMsg: string | null = null;
 
       // 优先使用 uploadWithResponse，然后使用 upload
       if (attachment?.uploadWithResponse) {
         const uploadResult = await attachment.uploadWithResponse(file, 0);
         url = uploadResult.fileUrl;
         isSuccess = uploadResult.uploadStatus === 'SUCCESS';
-        errorMsg = uploadResult.errorMessage || null;
         // 将完整的响应数据存储到 file 对象中
         file.uploadResponse = uploadResult;
       } else if (attachment?.upload) {
@@ -276,31 +257,31 @@ export const useFileUploadManager = ({
         file.url = url;
         map.set(file.uuid || '', file);
         updateAttachmentFiles(map);
-        message.success(locale?.uploadSuccess || 'Upload success');
       } else {
         file.status = 'error';
         map.set(file.uuid || '', file);
         updateAttachmentFiles(map);
-        const failedMsg = errorMsg || locale?.uploadFailed || 'Upload failed';
-        message.error(failedMsg);
+        attachment?.onUploadError?.({ file, error: null });
       }
     } catch (error) {
+      if (attachment?.removeFileOnUploadError) {
+        map.delete(file.uuid || '');
+        updateAttachmentFiles(map);
+      } else {
+        file.status = 'error';
+        map.set(file.uuid || '', file);
+        updateAttachmentFiles(map);
+      }
+      attachment?.onUploadError?.({ file, error });
       console.error('Error retrying file upload:', error);
-      file.status = 'error';
-      const map = new Map(fileMap);
-      map.set(file.uuid || '', file);
-      updateAttachmentFiles(map);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : locale?.uploadFailed || 'Upload failed';
-      message.error(errorMessage);
     }
   });
 
   return {
     fileMap,
     fileUploadDone,
+    fileUploadStatus,
+    fileUploadSummary,
     supportedFormat,
     uploadImage,
     updateAttachmentFiles,

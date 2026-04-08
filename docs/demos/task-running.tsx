@@ -11,9 +11,9 @@ export default () => {
   );
   const [taskRunningStatus, setTaskRunningStatus] =
     useState<TASK_RUNNING_STATUS>(TASK_RUNNING_STATUS.RUNNING);
-  const [elapsedTime, setElapsedTime] = useState('1小时20分12秒');
-  const [progress, setProgress] = useState('4/6 模型训练');
-  const [totalTime] = useState('10小时02分10秒');
+  const [elapsedTime, setElapsedTime] = useState('2分35秒');
+  const [progress, setProgress] = useState('3/5 数据清洗');
+  const [totalTime] = useState('8分12秒');
 
   // 状态循环展示逻辑
   const [statusIndex, setStatusIndex] = useState(0);
@@ -22,37 +22,37 @@ export default () => {
       status: TASK_STATUS.RUNNING,
       runningStatus: TASK_RUNNING_STATUS.RUNNING,
       title: '任务运行中',
-      description: 'AI模型正在训练中，请耐心等待...',
+      description: '正在执行数据分析流水线，请耐心等待...',
     },
     {
       status: TASK_STATUS.PAUSE,
       runningStatus: TASK_RUNNING_STATUS.PAUSE,
       title: '任务已暂停',
-      description: '任务执行已暂停，点击继续按钮恢复执行',
+      description: '数据分析任务已暂停，点击继续按钮恢复执行',
     },
     {
       status: TASK_STATUS.RUNNING,
       runningStatus: TASK_RUNNING_STATUS.RUNNING,
       title: '任务继续运行',
-      description: '任务已恢复，继续执行中...',
+      description: '任务已恢复，继续执行数据清洗...',
     },
     {
       status: TASK_STATUS.STOPPED,
       runningStatus: TASK_RUNNING_STATUS.COMPLETE,
       title: '任务已停止',
-      description: '任务已停止，如需继续请新建任务重新开始。',
+      description: '任务已手动停止，如需继续请新建任务重新开始。',
     },
     {
       status: TASK_STATUS.ERROR,
       runningStatus: TASK_RUNNING_STATUS.COMPLETE,
       title: '任务执行出错',
-      description: '任务执行过程中发生错误，请重新执行或创建新任务',
+      description: '数据源连接中断，请检查网络后重试',
     },
     {
       status: TASK_STATUS.SUCCESS,
       runningStatus: TASK_RUNNING_STATUS.COMPLETE,
       title: '任务已完成',
-      description: '任务执行成功，请检查结果并选择后续操作',
+      description: '数据分析报告已生成，请查看结果',
     },
   ];
 
@@ -66,7 +66,7 @@ export default () => {
       const timer = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
-            return 5; // 重置倒计时
+            return 5;
           }
           return prev - 1;
         });
@@ -74,7 +74,7 @@ export default () => {
 
       return () => clearInterval(timer);
     } else {
-      setCountdown(5); // 非运行状态时重置倒计时
+      setCountdown(5);
     }
   }, [taskStatus, taskRunningStatus]);
 
@@ -84,9 +84,8 @@ export default () => {
       taskStatus === TASK_STATUS.RUNNING &&
       taskRunningStatus === TASK_RUNNING_STATUS.RUNNING
     ) {
-      // 运行中状态持续5秒后自动变为完成或错误
       const timer = setTimeout(() => {
-        const isSuccess = Math.random() > 0.3; // 70%概率成功，30%概率失败
+        const isSuccess = Math.random() > 0.3;
         if (isSuccess) {
           setTaskStatus(TASK_STATUS.SUCCESS);
           setTaskRunningStatus(TASK_RUNNING_STATUS.COMPLETE);
@@ -116,7 +115,6 @@ export default () => {
   };
 
   const handleCreateNewTask = () => {
-    // 循环展示不同状态
     const nextIndex = (statusIndex + 1) % statusSequence.length;
     setStatusIndex(nextIndex);
 
@@ -124,40 +122,38 @@ export default () => {
     setTaskStatus(nextStatus.status);
     setTaskRunningStatus(nextStatus.runningStatus);
 
-    // 重置进度和时间
-    setProgress('1/6 模型训练');
+    setProgress('1/5 数据采集');
     setElapsedTime('0分0秒');
   };
 
   const handleReplay = () => {
     setTaskStatus(TASK_STATUS.RUNNING);
     setTaskRunningStatus(TASK_RUNNING_STATUS.RUNNING);
-    setProgress('1/6 模型训练');
+    setProgress('1/5 数据采集');
     setElapsedTime('0分0秒');
   };
 
   const handleViewResult = () => {
-    console.log('查看任务结果');
+    console.log('查看分析报告');
   };
 
   const handleRetry = () => {
     setTaskStatus(TASK_STATUS.RUNNING);
     setTaskRunningStatus(TASK_RUNNING_STATUS.RUNNING);
-    setProgress('1/6 模型训练');
+    setProgress('1/5 数据采集');
     setElapsedTime('0分0秒');
   };
 
-  // 空函数，用于满足类型要求
   const noop = () => {};
 
-  // 获取当前状态对应的标题和描述
   const currentStatusInfo = statusSequence[statusIndex];
 
   return (
     <div style={{ padding: 24, maxWidth: 1200 }}>
       <h2>AgentRunBar 任务运行状态组件</h2>
       <p style={{ color: '#666', marginBottom: 24 }}>
-        展示AI任务运行的各种状态和操作按钮，支持运行中、暂停、停止、完成等状态管理
+        展示 AI
+        智能体任务运行的各种状态和操作按钮，支持运行中、暂停、停止、完成等状态管理
       </p>
 
       <h3>基础用法 - 状态循环展示</h3>
@@ -180,7 +176,7 @@ export default () => {
 
       <h3 style={{ marginTop: 32 }}>静态状态展示</h3>
       <p style={{ color: '#666', marginBottom: 16 }}>
-        以下是组件支持的所有状态的静态展示，每种状态都有对应的操作按钮和交互逻辑
+        以下是组件支持的所有状态的静态展示
       </p>
 
       <div
@@ -190,7 +186,6 @@ export default () => {
           gap: 16,
         }}
       >
-        {/* 状态1: 任务运行中 */}
         <div
           style={{ border: '1px solid #f0f0f0', borderRadius: 8, padding: 16 }}
         >
@@ -199,7 +194,7 @@ export default () => {
           </h4>
           <TaskRunning
             title={`任务运行中, 已耗时${elapsedTime}。`}
-            description="AI模型正在训练中，请耐心等待..."
+            description="正在执行数据分析流水线，请耐心等待..."
             taskStatus={TASK_STATUS.RUNNING}
             taskRunningStatus={TASK_RUNNING_STATUS.RUNNING}
             onPause={handlePause}
@@ -209,12 +204,8 @@ export default () => {
             onReplay={handleReplay}
             onViewResult={handleViewResult}
           />
-          <div style={{ marginTop: 12, fontSize: 12, color: '#999' }}>
-            包含：停止按钮 + 暂停按钮
-          </div>
         </div>
 
-        {/* 状态2: 任务已暂停 */}
         <div
           style={{ border: '1px solid #f0f0f0', borderRadius: 8, padding: 16 }}
         >
@@ -223,7 +214,7 @@ export default () => {
           </h4>
           <TaskRunning
             title="任务已暂停"
-            description="任务执行已暂停，点击继续按钮恢复执行"
+            description="数据分析任务已暂停，点击继续按钮恢复执行"
             taskStatus={TASK_STATUS.PAUSE}
             taskRunningStatus={TASK_RUNNING_STATUS.PAUSE}
             onPause={noop}
@@ -233,12 +224,8 @@ export default () => {
             onReplay={handleReplay}
             onViewResult={handleViewResult}
           />
-          <div style={{ marginTop: 12, fontSize: 12, color: '#999' }}>
-            包含：新任务按钮 + 停止按钮 + 继续按钮
-          </div>
         </div>
 
-        {/* 状态3: 任务已停止 */}
         <div
           style={{ border: '1px solid #f0f0f0', borderRadius: 8, padding: 16 }}
         >
@@ -247,7 +234,7 @@ export default () => {
           </h4>
           <TaskRunning
             title="任务已停止"
-            description="任务执行已停止，无法恢复，请创建新任务"
+            description="任务已手动停止，如需继续请创建新任务"
             taskStatus={TASK_STATUS.STOPPED}
             taskRunningStatus={TASK_RUNNING_STATUS.COMPLETE}
             onPause={noop}
@@ -257,12 +244,8 @@ export default () => {
             onReplay={handleReplay}
             onViewResult={handleViewResult}
           />
-          <div style={{ marginTop: 12, fontSize: 12, color: '#999' }}>
-            包含：创建新任务按钮
-          </div>
         </div>
 
-        {/* 状态4: 任务已完成 */}
         <div
           style={{ border: '1px solid #f0f0f0', borderRadius: 8, padding: 16 }}
         >
@@ -280,12 +263,8 @@ export default () => {
             onReplay={handleRetry}
             onViewResult={handleViewResult}
           />
-          <div style={{ marginTop: 12, fontSize: 12, color: '#999' }}>
-            包含：重试按钮 + 提交按钮 + 新任务按钮
-          </div>
         </div>
 
-        {/* 状态5: 任务出错 */}
         <div
           style={{ border: '1px solid #f0f0f0', borderRadius: 8, padding: 16 }}
         >
@@ -294,7 +273,7 @@ export default () => {
           </h4>
           <TaskRunning
             title="任务执行出错"
-            description="任务执行过程中发生错误，请重新执行或创建新任务"
+            description="数据源连接中断，请检查网络后重试"
             taskStatus={TASK_STATUS.ERROR}
             taskRunningStatus={TASK_RUNNING_STATUS.COMPLETE}
             onPause={noop}
@@ -304,12 +283,8 @@ export default () => {
             onReplay={handleRetry}
             onViewResult={handleViewResult}
           />
-          <div style={{ marginTop: 12, fontSize: 12, color: '#999' }}>
-            包含：重试按钮 + 新任务按钮
-          </div>
         </div>
 
-        {/* 状态6: 任务已取消 */}
         <div
           style={{ border: '1px solid #f0f0f0', borderRadius: 8, padding: 16 }}
         >
@@ -328,9 +303,6 @@ export default () => {
             onReplay={handleReplay}
             onViewResult={handleViewResult}
           />
-          <div style={{ marginTop: 12, fontSize: 12, color: '#999' }}>
-            包含：创建新任务按钮
-          </div>
         </div>
       </div>
 
@@ -350,118 +322,6 @@ export default () => {
         onResume={noop}
         onStop={handleStop}
       />
-
-      <div
-        style={{
-          marginTop: 32,
-          padding: 24,
-          backgroundColor: '#fafafa',
-          borderRadius: 8,
-        }}
-      >
-        <h4>组件特性说明：</h4>
-        <ul style={{ lineHeight: 1.8 }}>
-          <li>
-            <strong>状态管理</strong>:
-            支持运行中、暂停、停止、完成、出错等多种任务状态
-          </li>
-          <li>
-            <strong>动态按钮</strong>:
-            根据任务状态自动显示对应的操作按钮，支持自定义按钮
-          </li>
-          <li>
-            <strong>进度显示</strong>: 支持显示任务进度和耗时信息
-          </li>
-          <li>
-            <strong>机器人动画</strong>:
-            内置机器人图标，支持思考、暂停、完成等状态动画
-          </li>
-          <li>
-            <strong>响应式设计</strong>: 自适应不同屏幕尺寸，支持移动端
-          </li>
-          <li>
-            <strong>主题定制</strong>: 支持自定义主题色和样式
-          </li>
-          <li>
-            <strong>图标提示</strong>: 支持为图标添加tooltip提示信息
-          </li>
-        </ul>
-
-        <h4 style={{ marginTop: 20 }}>状态按钮说明：</h4>
-        <ul style={{ lineHeight: 1.8 }}>
-          <li>
-            <strong>任务运行中</strong>: 显示停止按钮 + 暂停按钮
-          </li>
-          <li>
-            <strong>任务已暂停</strong>: 显示新任务按钮 + 停止按钮 + 继续按钮
-          </li>
-          <li>
-            <strong>任务已停止</strong>: 显示创建新任务按钮
-          </li>
-          <li>
-            <strong>任务已完成</strong>: 显示重试按钮 + 提交按钮 + 新任务按钮
-          </li>
-          <li>
-            <strong>任务出错</strong>: 显示重试按钮 + 新任务按钮
-          </li>
-          <li>
-            <strong>任务已取消</strong>: 显示创建新任务按钮
-          </li>
-          <li>
-            <strong>自定义状态按钮</strong>: 通过 actionsRender
-            属性自定义状态按钮
-          </li>
-        </ul>
-
-        <h4 style={{ marginTop: 20 }}>Props 说明：</h4>
-        <ul style={{ lineHeight: 1.8 }}>
-          <li>
-            <strong>title</strong>: 标题文案，显示主要的任务状态信息
-          </li>
-          <li>
-            <strong>description</strong>: 描述文案，显示任务的详细描述信息
-          </li>
-          <li>
-            <strong>taskStatus</strong>: 任务状态，支持 TASK_STATUS.RUNNING |
-            SUCCESS | ERROR | PAUSE | STOPPED | CANCELLED
-          </li>
-          <li>
-            <strong>taskRunningStatus</strong>: 任务运行状态，支持
-            TASK_RUNNING_STATUS.RUNNING | COMPLETE | PAUSE
-          </li>
-          <li>
-            <strong>actionsRender</strong>:
-            自定义按钮，当不需要默认操作按钮时，可以设为 actionsRender=false
-          </li>
-          <li>
-            <strong>onPause</strong>: 暂停任务时的回调函数
-          </li>
-          <li>
-            <strong>onResume</strong>: 继续任务时的回调函数
-          </li>
-          <li>
-            <strong>onStop</strong>: 停止任务时的回调函数
-          </li>
-          <li>
-            <strong>onCreateNewTask</strong>: 创建新任务时的回调函数
-          </li>
-          <li>
-            <strong>onReplay</strong>: 重新执行任务时的回调函数
-          </li>
-          <li>
-            <strong>onViewResult</strong>: 查看结果时的回调函数
-          </li>
-          <li>
-            <strong>icon</strong>: 自定义图标，支持图片URL或React组件
-          </li>
-          <li>
-            <strong>iconTooltip</strong>: 图标提示文案，鼠标悬停时显示
-          </li>
-          <li>
-            <strong>variant</strong>: 主题样式变体，支持 'simple' | 'default'
-          </li>
-        </ul>
-      </div>
     </div>
   );
 };

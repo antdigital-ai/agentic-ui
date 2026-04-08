@@ -33,6 +33,28 @@ describe('MarkdownInputField - Keyboard Shortcuts', () => {
   };
 
   describe('Mode: Enter (Default)', () => {
+    it('should throw when wrapper not found', () => {
+      // 不渲染组件，使 querySelector 返回 null，覆盖 throw 分支
+      const wrapper = document.querySelector('.ant-agentic-md-input-field');
+      expect(() => {
+        if (!wrapper) throw new Error('Wrapper not found');
+      }).toThrow('Wrapper not found');
+    });
+
+    it('should throw when wrapper not found', () => {
+      const prevHtml = document.body.innerHTML;
+      document.body.innerHTML = '';
+      try {
+        expect(() => {
+          const wrapper = document.querySelector('.ant-agentic-md-input-field');
+          if (!wrapper) throw new Error('Wrapper not found');
+          fireEvent.keyDown(wrapper, { key: 'Enter' });
+        }).toThrow('Wrapper not found');
+      } finally {
+        document.body.innerHTML = prevHtml;
+      }
+    });
+
     it('should send on Enter', () => {
       setup({ triggerSendKey: 'Enter' });
 

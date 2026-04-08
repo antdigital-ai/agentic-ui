@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 import { BlockQuoteNode, ElementProps } from '../../../el';
 
@@ -5,7 +6,7 @@ import { BlockQuoteNode, ElementProps } from '../../../el';
  * ReadonlyBlockquote 组件 - 只读引用块预览组件
  *
  * 专门针对 readonly 模式优化的引用块组件，移除了拖拽功能。
- * 简化渲染逻辑，提升预览模式性能。
+ * 当 otherProps 含 markdownContainerType 时渲染为 div.markdown-container（提示块）。
  *
  * @component
  * @description 只读引用块预览组件，用于预览模式下的引用块渲染
@@ -30,9 +31,36 @@ import { BlockQuoteNode, ElementProps } from '../../../el';
  * - 移除拖拽相关事件处理
  * - 使用 React.memo 优化性能
  * - 保持预览模式的视觉效果
+ * - 支持 ::: 提示块（info/warning/success/error/tip）渲染为 markdown-container
  */
 export const ReadonlyBlockquote: React.FC<ElementProps<BlockQuoteNode>> =
   React.memo((props) => {
+    const containerType = props.element?.otherProps?.markdownContainerType as
+      | string
+      | undefined;
+    const containerTitle = props.element?.otherProps?.markdownContainerTitle as
+      | string
+      | undefined;
+
+    if (containerType) {
+      return (
+        <div
+          {...props.attributes}
+          data-be="blockquote"
+          className={clsx(
+            'markdown-container',
+            containerType,
+            (props.attributes as React.HTMLAttributes<HTMLElement>)?.className,
+          )}
+        >
+          {containerTitle ? (
+            <div className="markdown-container__title">{containerTitle}</div>
+          ) : null}
+          {props.children}
+        </div>
+      );
+    }
+
     return (
       <blockquote data-be={'blockquote'} {...props.attributes}>
         {props.children}

@@ -6,13 +6,14 @@ import {
 } from '@ant-design/agentic-ui';
 import { DislikeFilled, LikeFilled } from '@ant-design/icons';
 import { ConfigProvider, Divider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
 import { motion } from 'framer-motion';
 
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
+import { useLocale } from '../../I18n';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { BubbleExtraProps } from '../types/BubbleExtra';
 import { CopyButton } from './CopyButton';
@@ -52,6 +53,7 @@ export const BubbleExtra = ({
 }: BubbleExtraProps) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const context = useContext(BubbleConfigContext);
+  const locale = useLocale();
   const [feedbackLoading, setFeedbackLoading] = useState(false);
 
   // 获取聊天项的原始数据
@@ -84,33 +86,29 @@ export const BubbleExtra = ({
     if (alreadyFeedback && originalData?.feedback === 'thumbsUp') {
       // 已经点赞的情况
       if (props.onLikeCancel || props.onCancelLike) {
-        return context?.locale?.['chat.message.cancel-like'] || '取消点赞';
+        return locale?.['chat.message.cancel-like'] || '取消点赞';
       } else {
-        return (
-          context?.locale?.['chat.message.feedback-success'] || '已经反馈过了哦'
-        );
+        return locale?.['chat.message.feedback-success'] || '已经反馈过了哦';
       }
     } else {
       // 未点赞的情况
-      return context?.locale?.['chat.message.like'] || '喜欢';
+      return locale?.['chat.message.like'] || '喜欢';
     }
   }, [
     alreadyFeedback,
     originalData?.feedback,
     !!(props.onLikeCancel || props.onCancelLike),
-    context?.locale,
+    locale,
   ]);
 
   // 获取点踩按钮的标题文本
   const getDislikeButtonTitle = useMemo(() => {
     if (alreadyFeedback) {
-      return (
-        context?.locale?.['chat.message.feedback-success'] || '已经反馈过了哦'
-      );
+      return locale?.['chat.message.feedback-success'] || '已经反馈过了哦';
     } else {
-      return context?.locale?.['chat.message.dislike'] || '不喜欢';
+      return locale?.['chat.message.dislike'] || '不喜欢';
     }
-  }, [alreadyFeedback, context?.locale]);
+  }, [alreadyFeedback, locale]);
 
   const typing =
     originalData?.isAborted !== true &&
@@ -230,7 +228,7 @@ export const BubbleExtra = ({
       originalData?.content &&
       !originalData?.extra?.answerStatus &&
       originalData?.content !==
-        (context?.locale?.['chat.message.aborted'] || '回答已停止生成');
+        (locale?.['chat.message.aborted'] || '回答已停止生成');
 
     if (!defaultConditions) {
       return false;
@@ -248,7 +246,7 @@ export const BubbleExtra = ({
     bubble,
     originalData?.content,
     originalData?.extra?.answerStatus,
-    context?.locale,
+    locale,
   ]);
 
   const copyDom = useMemo(
@@ -256,7 +254,7 @@ export const BubbleExtra = ({
       shouldShowCopy ? (
         <CopyButton
           data-testid="chat-item-copy-button"
-          title={context?.locale?.['chat.message.copy'] || '复制'}
+          title={locale?.['chat.message.copy'] || '复制'}
           onClick={() => {
             try {
               copy(bubble.originData?.content || '');
@@ -270,7 +268,7 @@ export const BubbleExtra = ({
           {(isHovered) => <CopyLottie active={isHovered} />}
         </CopyButton>
       ) : null,
-    [shouldShowCopy, context?.locale, bubble.originData?.content],
+    [shouldShowCopy, locale, bubble.originData?.content],
   );
 
   const voiceDom = useMemo(() => {
@@ -288,7 +286,7 @@ export const BubbleExtra = ({
       !originalData?.extra?.answerStatus &&
       !typing &&
       originalData?.content !==
-        (context?.locale?.['chat.message.aborted'] || '回答已停止生成');
+        (locale?.['chat.message.aborted'] || '回答已停止生成');
     if (!props.shouldShowVoice || !defaultShow) return null;
     return (
       <VoiceButton
@@ -348,12 +346,9 @@ export const BubbleExtra = ({
   );
 
   const reSend = useMemo(() => {
-    console.log('originalData?.isAborted', originalData, typing);
     if (originalData?.isAborted && !originalData.isFinished) {
       return (
-        <span>
-          {context?.locale?.['chat.message.aborted'] || '回答已停止生成'}
-        </span>
+        <span>{locale?.['chat.message.aborted'] || '回答已停止生成'}</span>
       );
     }
     if (!originalData?.extra?.preMessage?.content) return null;
@@ -366,11 +361,11 @@ export const BubbleExtra = ({
         onClick={async () => {
           onReply?.(
             bubble.originData?.extra?.preMessage?.content ||
-              context?.locale?.['chat.message.retrySend'] ||
+              locale?.['chat.message.retrySend'] ||
               '重新生成',
           );
         }}
-        title={context?.locale?.['chat.message.retrySend'] || '重新生成'}
+        title={locale?.['chat.message.retrySend'] || '重新生成'}
       >
         {(isHovered) => (
           <div
@@ -378,14 +373,12 @@ export const BubbleExtra = ({
             data-messages-content-retry
           >
             <RefreshLottie active={isHovered} />
-            <span>
-              {context?.locale?.['chat.message.retrySend'] || '重新生成'}
-            </span>
+            <span>{locale?.['chat.message.retrySend'] || '重新生成'}</span>
           </div>
         )}
       </ActionIconBox>
     );
-  }, [originalData?.isAborted, typing, originalData?.isFinished]);
+  }, [originalData?.isAborted, typing, originalData?.isFinished, locale]);
 
   useEffect(() => {
     props.onRenderExtraNull?.(!dom && !reSend);
@@ -429,6 +422,7 @@ export const BubbleExtra = ({
   if (pure) {
     return [reSend, like, disLike, copyDom, voiceDom];
   }
+  const inPopover = context?.extraShowOnHover;
   return (
     <div
       className={prefixCls}
@@ -437,10 +431,14 @@ export const BubbleExtra = ({
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        paddingLeft: placement === 'right' ? 0 : 'var(--padding-5x)',
-        paddingRight: placement === 'right' ? 0 : 'var(--padding-5x)',
-        paddingTop: placement === 'right' ? 0 : 'var(--padding-1x)',
-        paddingBottom: placement === 'right' ? 0 : 'var(--padding-2x)',
+        ...(inPopover
+          ? { padding: 0 }
+          : {
+              paddingLeft: placement === 'right' ? 0 : 'var(--padding-5x)',
+              paddingRight: placement === 'right' ? 0 : 'var(--padding-5x)',
+              paddingTop: placement === 'right' ? 0 : 'var(--padding-1x)',
+              paddingBottom: placement === 'right' ? 0 : 'var(--padding-2x)',
+            }),
         color: 'var(--color-gray-text-secondary)',
         fontSize: context?.compact ? '11px' : '13px',
         gap: 4,
@@ -450,7 +448,7 @@ export const BubbleExtra = ({
       {typing && originalData.content !== '...' ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Loading style={{ fontSize: context?.compact ? 20 : 16 }} />
-          <span>{context?.locale?.['chat.message.generating'] || ''}</span>
+          <span>{locale?.['chat.message.generating'] || ''}</span>
         </div>
       ) : null}
       {reSend || null}

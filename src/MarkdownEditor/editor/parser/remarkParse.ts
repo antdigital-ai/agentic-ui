@@ -5,6 +5,8 @@ import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
+import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
+import remarkDirectiveContainersOnly from './remarkDirectiveContainersOnly';
 
 /**
  * 提取段落节点的文本内容
@@ -380,15 +382,35 @@ export function fixStrongWithSpecialChars() {
   };
 }
 
+/**
+ * 保护 Jinja 块内的 $，防止被 remark-math 误解析为行内数学（如 {{ $var }}）
+ * 须在 remark-math 之前运行
+ */
+export function protectJinjaDollarInText() {
+  return (tree: any) => {
+    visit(tree, 'text', (node: any) => {
+      if (!node.value || typeof node.value !== 'string') return;
+      const replaceInBlock = (str: string) =>
+        str.replace(/\$/g, JINJA_DOLLAR_PLACEHOLDER);
+      node.value = node.value
+        .replace(/\{\{[^}]*\}\}/g, replaceInBlock)
+        .replace(/\{%[^%]*%\}/g, replaceInBlock)
+        .replace(/\{#[\s\S]*?#\}/g, replaceInBlock);
+    });
+  };
+}
+
 // Markdown 解析器（用于解析 Markdown 为 mdast AST）
 // 注意：这个解析器只用于解析，不包含 HTML 渲染相关的插件
 const markdownParser = unified()
   .use(remarkParse) // 解析 Markdown
+  .use(remarkDirectiveContainersOnly) // 仅解析 ::: 容器（不解析行内 :foo）
   .use(remarkHtml)
   .use(remarkFrontmatter, ['yaml']) // 处理前置元数据
   .use(remarkGfm, { singleTilde: false }) // GFM 插件，禁用单波浪线删除线
   .use(fixStrongWithSpecialChars) // 修复包含特殊字符的加粗文本
   .use(convertParagraphToImage) // 将以 ! 开头的段落转换为图片,将 | 开头的段落转换为表格
+  .use(protectJinjaDollarInText) // 保护 Jinja 块内 $，避免被 remark-math 误解析
   .use(remarkMath as any, {
     singleDollarTextMath: true, // 允许单美元符号渲染内联数学公式
   });

@@ -126,6 +126,16 @@ export const parseText = (
       continue;
     }
 
+    // remark-directive 的 textDirective/leafDirective，提取其 children 的文本内容
+    if (n.type === 'textDirective' || n.type === 'leafDirective') {
+      const directiveResult = parseText((n as any).children || [], leaf);
+      leafs = leafs.concat(directiveResult);
+      if (directiveResult.length === 0 && hasFormattingProps(leaf)) {
+        leafs.push({ ...leaf, text: '' });
+      }
+      continue;
+    }
+
     // @ts-ignore
     leafs.push({ ...leaf, text: (n as any).value || '' });
   }
@@ -209,6 +219,13 @@ export const handleTextAndInlineElementsPure = (
     const leafWithHtmlTags = applyHtmlTagsToElement(formattedLeaf, htmlTag);
     const inlineCodeResult = handleInlineCode(currentElement);
     return { ...leafWithHtmlTags, ...inlineCodeResult };
+  }
+
+  // remark-directive 的 textDirective/leafDirective，递归解析其 children
+  if (elementType === 'textDirective' || elementType === 'leafDirective') {
+    const children = (currentElement as any).children || [];
+    const parsed = parseNodesFn(children, false, currentElement);
+    return parsed?.at(0) ?? { text: '' };
   }
 
   // 处理内联元素（strong, link, emphasis, delete）

@@ -13,3 +13,4 @@ export type {
   GroupNode,
 } from '../types';
 export { getFileTypeIcon, getGroupIcon } from './utils';
+export { getFileTypeName } from '../types';

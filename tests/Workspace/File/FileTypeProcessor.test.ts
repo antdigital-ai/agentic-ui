@@ -70,6 +70,19 @@ describe('FileTypeProcessor', () => {
       expect(result.category).toBe(FileCategory.Text);
     });
 
+    it('应该从 File 的 MIME 类型 image/png 推断为 image (141)', () => {
+      const fileObj = new File(['x'], 'pic.png', { type: 'image/png' });
+      const file = {
+        id: 'f1',
+        name: 'pic.png',
+        file: fileObj,
+      };
+      const result = processor.inferFileType(file);
+
+      expect(result.fileType).toBe('image');
+      expect(result.category).toBe(FileCategory.Image);
+    });
+
     it('应该从文件名扩展名推断', () => {
       const file = {
         id: 'f1',
@@ -126,6 +139,27 @@ describe('FileTypeProcessor', () => {
       expect(result.category).toBe(FileCategory.Text);
     });
 
+    it('文件名无有效扩展名时 getTypeFromFileName 返回 null', () => {
+      const file = { id: 'f1', name: '.' };
+      const result = processor.inferFileType(file);
+      expect(result.fileType).toBe('plainText');
+      expect(result.category).toBe(FileCategory.Text);
+    });
+
+    it('文件名为空字符串时 getTypeFromFileName 无扩展名分支 (141)', () => {
+      const file = { id: 'f1', name: '' };
+      const result = processor.inferFileType(file);
+      expect(result.fileType).toBeDefined();
+      expect(result.category).toBeDefined();
+    });
+
+    it('URL 无有效扩展名时 getTypeFromUrl 返回 null', () => {
+      const file = { id: 'f1', name: 'x', url: '' };
+      const result = processor.inferFileType(file);
+      expect(result.fileType).toBe('plainText');
+      expect(result.category).toBe(FileCategory.Text);
+    });
+
     it('应该处理各种图片类型', () => {
       const extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
 
@@ -137,7 +171,7 @@ describe('FileTypeProcessor', () => {
     });
 
     it('应该处理各种视频类型', () => {
-      const extensions = ['mp4', 'webm', 'ogg'];
+      const extensions = ['mp4', 'webm', 'ogv'];
 
       extensions.forEach((ext) => {
         const file = { id: `f-${ext}`, name: `video.${ext}` };
@@ -350,7 +384,6 @@ describe('FileTypeProcessor', () => {
       const file = {
         id: 'f1',
         name: 'test.txt',
-        // 没有任何数据源
       };
       const result = processor.processFile(file);
       expect(result.canPreview).toBe(false);
@@ -396,8 +429,43 @@ describe('FileTypeProcessor', () => {
         url: 'https://example.com/archive.zip',
       };
       const result = processor.processFile(file);
-      // URL数据源的压缩文件不支持预览
       expect(result.previewMode).toBe('none');
+    });
+
+    it('有内容的压缩文件不可预览', () => {
+      const file = {
+        id: 'f1',
+        name: 'archive.zip',
+        content: 'PK',
+      };
+      const result = processor.processFile(file);
+      expect(result.typeInference.category).toBe(FileCategory.Archive);
+      expect(result.canPreview).toBe(false);
+      expect(result.previewMode).toBe('none');
+    });
+
+    it('有内容的视频文件应返回 inline 预览模式 (223)', () => {
+      const file = {
+        id: 'f1',
+        name: 'video.mp4',
+        content: 'video-data',
+      };
+      const result = processor.processFile(file);
+      expect(result.typeInference.category).toBe(FileCategory.Video);
+      expect(result.canPreview).toBe(true);
+      expect(result.previewMode).toBe('inline');
+    });
+
+    it('有内容的音频文件应返回 inline 预览模式', () => {
+      const file = {
+        id: 'f1',
+        name: 'audio.mp3',
+        content: 'audio-data',
+      };
+      const result = processor.processFile(file);
+      expect(result.typeInference.category).toBe(FileCategory.Audio);
+      expect(result.canPreview).toBe(true);
+      expect(result.previewMode).toBe('inline');
     });
   });
 

@@ -1,30 +1,50 @@
-import { Api, ChevronUp, X } from '@sofa-design/icons';
-import classnames from 'classnames';
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { memo, useMemo } from 'react';
+import {
+  Api,
+  ChevronUp,
+  ChevronsDownUp,
+  ChevronsUpDown,
+  X,
+} from '@sofa-design/icons';
+import classNames from 'clsx';
+import { motion } from 'framer-motion';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ToolCall } from '.';
 import { useRefFunction } from '../../Hooks/useRefFunction';
+
+/** 内容超出此高度时自动收起 */
+const CONTENT_COLLAPSE_THRESHOLD = 200;
+/** 工具详情收起动画时长（毫秒） */
+const TOOL_CONTENT_COLLAPSE_DURATION_MS = 160;
 
 interface ToolImageProps {
   tool: ToolCall;
   prefixCls: string;
   hashId: string;
+  disableAnimation?: boolean;
 }
 
 const ToolImageComponent: React.FC<ToolImageProps> = ({
   tool,
   prefixCls,
   hashId,
+  disableAnimation = false,
 }) => {
   const toolImageWrapperClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-image-wrapper`, hashId, {
+    return classNames(`${prefixCls}-tool-image-wrapper`, hashId, {
       [`${prefixCls}-tool-image-wrapper-rotating`]: tool.status === 'loading',
       [`${prefixCls}-tool-image-wrapper-loading`]: tool.status === 'loading',
     });
   }, [prefixCls, hashId, tool.status]);
 
   const toolImageClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-image`, hashId);
+    return classNames(`${prefixCls}-tool-image`, hashId);
   }, [prefixCls, hashId]);
 
   // 缓存动画配置，避免重复创建对象
@@ -57,15 +77,29 @@ const ToolImageComponent: React.FC<ToolImageProps> = ({
   );
 
   const animationProps = useMemo(() => {
+    if (disableAnimation) return {};
     return tool.status === 'loading'
       ? loadingAnimationConfig
       : idleAnimationConfig;
-  }, [tool.status, loadingAnimationConfig, idleAnimationConfig]);
+  }, [
+    tool.status,
+    loadingAnimationConfig,
+    idleAnimationConfig,
+    disableAnimation,
+  ]);
 
   // 缓存图标渲染
   const iconElement = useMemo(() => {
     return tool.icon ? tool.icon : <Api />;
   }, [tool.icon]);
+
+  if (disableAnimation) {
+    return (
+      <div className={toolImageWrapperClassName}>
+        <div className={toolImageClassName}>{iconElement}</div>
+      </div>
+    );
+  }
 
   return (
     <motion.div className={toolImageWrapperClassName} {...animationProps}>
@@ -81,6 +115,7 @@ interface ToolHeaderRightProps {
   prefixCls: string;
   hashId: string;
   light: boolean;
+  disableAnimation?: boolean;
 }
 
 const ToolHeaderRightComponent: React.FC<ToolHeaderRightProps> = ({
@@ -88,9 +123,10 @@ const ToolHeaderRightComponent: React.FC<ToolHeaderRightProps> = ({
   prefixCls,
   hashId,
   light,
+  disableAnimation = false,
 }) => {
   const toolHeaderRightClassName = useMemo(() => {
-    return classnames(
+    return classNames(
       `${prefixCls}-tool-header-right`,
       {
         [`${prefixCls}-tool-header-right-light`]: light,
@@ -100,13 +136,13 @@ const ToolHeaderRightComponent: React.FC<ToolHeaderRightProps> = ({
   }, [prefixCls, hashId, light]);
 
   const toolNameClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-name`, hashId, {
+    return classNames(`${prefixCls}-tool-name`, hashId, {
       [`${prefixCls}-tool-name-loading`]: tool.status === 'loading',
     });
   }, [prefixCls, hashId, tool.status]);
 
   const toolTargetClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-target`, hashId, {
+    return classNames(`${prefixCls}-tool-target`, hashId, {
       [`${prefixCls}-tool-target-loading`]: tool.status === 'loading',
       [`${prefixCls}-tool-target-light`]: light,
     });
@@ -137,8 +173,9 @@ const ToolHeaderRightComponent: React.FC<ToolHeaderRightProps> = ({
   );
 
   const animationProps = useMemo(() => {
+    if (disableAnimation) return {};
     return tool.status === 'loading' ? loadingAnimationConfig : {};
-  }, [tool.status, loadingAnimationConfig]);
+  }, [tool.status, loadingAnimationConfig, disableAnimation]);
 
   // 缓存工具名称和目标渲染
   const toolNameElement = useMemo(() => {
@@ -157,6 +194,15 @@ const ToolHeaderRightComponent: React.FC<ToolHeaderRightProps> = ({
       </div>
     ) : null;
   }, [tool.toolTarget, toolTargetClassName]);
+
+  if (disableAnimation) {
+    return (
+      <div className={toolHeaderRightClassName}>
+        {toolNameElement}
+        {toolTargetElement}
+      </div>
+    );
+  }
 
   return (
     <motion.div className={toolHeaderRightClassName} {...animationProps}>
@@ -180,7 +226,7 @@ const ToolTimeComponent: React.FC<ToolTimeProps> = ({
   hashId,
 }) => {
   const toolTimeClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-time`, hashId);
+    return classNames(`${prefixCls}-tool-time`, hashId);
   }, [prefixCls, hashId]);
 
   // 缓存时间元素渲染
@@ -201,6 +247,7 @@ interface ToolExpandProps {
   prefixCls: string;
   hashId: string;
   onExpandClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  disableAnimation?: boolean;
 }
 
 const ToolExpandComponent: React.FC<ToolExpandProps> = ({
@@ -209,18 +256,19 @@ const ToolExpandComponent: React.FC<ToolExpandProps> = ({
   prefixCls,
   hashId,
   onExpandClick,
+  disableAnimation = false,
 }) => {
   const toolExpandClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-expand`, hashId);
+    return classNames(`${prefixCls}-tool-expand`, hashId);
   }, [prefixCls, hashId]);
 
   // 缓存样式对象，避免重复创建
   const chevronStyle = useMemo(() => {
     return {
-      transition: 'transform 0.3s ease-in-out',
+      ...(disableAnimation ? {} : { transition: 'transform 0.3s ease-in-out' }),
       transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
     };
-  }, [expanded]);
+  }, [expanded, disableAnimation]);
 
   // 使用 useRefFunction 优化点击处理函数
   const handleClick = useRefFunction((e: React.MouseEvent<HTMLDivElement>) => {
@@ -250,6 +298,7 @@ interface ToolContentProps {
   light: boolean;
   showContent: boolean;
   expanded: boolean;
+  disableAnimation?: boolean;
 }
 
 const ToolContentComponent: React.FC<ToolContentProps> = ({
@@ -259,28 +308,38 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
   light,
   showContent,
   expanded,
+  disableAnimation = false,
 }) => {
+  const contentInnerRef = useRef<HTMLDivElement>(null);
+  const [isContentOverflowing, setIsContentOverflowing] = useState(false);
+  const [contentExpanded, setContentExpanded] = useState(false);
+  const [shouldRenderContent, setShouldRenderContent] = useState(expanded);
+
   const toolContainerClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-container`, hashId, {
+    return classNames(`${prefixCls}-tool-container`, hashId, {
       [`${prefixCls}-tool-container-light`]: light,
     });
   }, [prefixCls, hashId, light]);
 
+  const contentExpandClassName = useMemo(() => {
+    return classNames(`${prefixCls}-tool-content-expand`, hashId);
+  }, [prefixCls, hashId]);
+
   // 缓存错误样式类名
   const errorClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-content-error`, hashId);
+    return classNames(`${prefixCls}-tool-content-error`, hashId);
   }, [prefixCls, hashId]);
 
   const errorIconClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-content-error-icon`, hashId);
+    return classNames(`${prefixCls}-tool-content-error-icon`, hashId);
   }, [prefixCls, hashId]);
 
   const errorTextClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-content-error-text`, hashId);
+    return classNames(`${prefixCls}-tool-content-error-text`, hashId);
   }, [prefixCls, hashId]);
 
   const contentClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-content`, hashId);
+    return classNames(`${prefixCls}-tool-content`, hashId);
   }, [prefixCls, hashId]);
 
   const errorDom = useMemo(() => {
@@ -306,61 +365,129 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
     ) : null;
   }, [tool.content, contentClassName]);
 
-  // 缓存容器元素
-  const contentVariants = useMemo(
-    () => ({
-      expanded: {
-        height: 'auto',
-        opacity: 1,
-      },
-      collapsed: {
-        height: 0,
-        opacity: 0,
-      },
-    }),
-    [],
-  );
+  const checkOverflow = useCallback(() => {
+    const el = contentInnerRef.current;
+    if (!el) return;
+    const { scrollHeight } = el;
+    setIsContentOverflowing(scrollHeight > CONTENT_COLLAPSE_THRESHOLD);
+  }, []);
 
-  const contentTransition = useMemo(
-    () => ({
-      height: {
-        duration: 0.26,
-        ease: [0.4, 0, 0.2, 1],
-      },
-      opacity: {
-        duration: 0.2,
-        ease: 'linear',
-      },
-    }),
-    [],
-  );
+  useEffect(() => {
+    if (!showContent || !expanded) return;
+    checkOverflow();
+    const el = contentInnerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(checkOverflow);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [showContent, expanded, tool.content, tool.errorMessage, checkOverflow]);
 
-  // 缓存样式对象
-  const containerStyle = useMemo(
-    () => ({
+  useEffect(() => {
+    if (!showContent) {
+      setShouldRenderContent(false);
+      return;
+    }
+
+    if (expanded) {
+      setShouldRenderContent(true);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setShouldRenderContent(false);
+    }, TOOL_CONTENT_COLLAPSE_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [expanded, showContent]);
+
+  const handleContentExpandToggle = useRefFunction(() => {
+    setContentExpanded((prev) => !prev);
+  });
+
+  const showContentExpandButton =
+    showContent && expanded && isContentOverflowing;
+
+  const contentInnerStyle = useMemo((): React.CSSProperties | undefined => {
+    if (!showContentExpandButton) return undefined;
+    if (contentExpanded) return undefined;
+    return {
+      maxHeight: CONTENT_COLLAPSE_THRESHOLD,
       overflow: 'hidden',
-      willChange: 'height, opacity',
-    }),
-    [],
+    };
+  }, [showContentExpandButton, contentExpanded]);
+
+  const contentExpandButton = useMemo(() => {
+    if (!showContentExpandButton) return null;
+    const expandIcon = contentExpanded ? (
+      <ChevronsDownUp />
+    ) : (
+      <ChevronsUpDown />
+    );
+    const expandText = contentExpanded ? '收起' : '展开';
+    return (
+      <div
+        className={contentExpandClassName}
+        onClick={handleContentExpandToggle}
+        data-testid="tool-content-expand"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleContentExpandToggle();
+          }
+        }}
+      >
+        {expandIcon}
+        {expandText}
+      </div>
+    );
+  }, [
+    showContentExpandButton,
+    contentExpanded,
+    contentExpandClassName,
+    handleContentExpandToggle,
+  ]);
+
+  const innerContent = (
+    <>
+      <div ref={contentInnerRef} style={contentInnerStyle}>
+        {contentDom}
+        {errorDom}
+      </div>
+      {contentExpandButton}
+    </>
   );
+
+  // 禁用动画时使用简单的显示/隐藏
+  if (disableAnimation) {
+    return showContent && expanded ? (
+      <div
+        className={classNames(toolContainerClassName, {
+          [`${prefixCls}-tool-container-expanded`]: true,
+        })}
+        data-testid="tool-user-item-tool-container"
+        style={{ overflow: 'hidden' }}
+      >
+        {innerContent}
+      </div>
+    ) : null;
+  }
 
   return (
-    <AnimatePresence initial={false} mode="sync">
-      {expanded ? (
-        <motion.div
-          key="tool-content"
-          className={toolContainerClassName}
+    <>
+      {showContent && shouldRenderContent ? (
+        <div
+          className={classNames(toolContainerClassName, {
+            [`${prefixCls}-tool-container-expanded`]: expanded,
+          })}
           data-testid="tool-user-item-tool-container"
-          variants={contentVariants}
-          initial="collapsed"
-          animate="expanded"
-          exit="collapsed"
-          transition={contentTransition}
-          style={containerStyle}
+          aria-hidden={!expanded}
         >
-          {contentDom}
-          {errorDom}
-        </motion.div>
+          {innerContent}
+        </div>
       ) : null}
 
       {!showContent ? (
@@ -378,7 +505,7 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
           {errorDom}
         </div>
       ) : null}
-    </AnimatePresence>
+    </>
   );
 };
 

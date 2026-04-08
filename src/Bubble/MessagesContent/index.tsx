@@ -1,6 +1,6 @@
 import { ExportOutlined } from '@ant-design/icons';
 import { ConfigProvider, Popover, Tooltip, Typography } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
@@ -15,6 +15,8 @@ import { MarkdownPreview } from './MarkdownPreview';
 import { useMessagesContentStyle } from './style';
 
 export const LOADING_FLAT = '...';
+const THINKING_FALLBACK_TEXT = '思考中...';
+const THINKING_DOT_INDICES = [0, 1, 2] as const;
 
 /**
  * BubbleMessageDisplay 组件 - 聊天气泡消息显示组件
@@ -125,7 +127,7 @@ export const BubbleMessageDisplay: React.FC<
     contentAfterDom,
   ]);
 
-  const memo = useMemo(() => {
+  const messageContent = useMemo(() => {
     if (
       content === LOADING_FLAT ||
       (!props.originData?.isFinished && !content)
@@ -142,8 +144,30 @@ export const BubbleMessageDisplay: React.FC<
               hashId,
             )}
             data-testid="message-content"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            aria-label={
+              locale?.['chat.message.thinking'] || THINKING_FALLBACK_TEXT
+            }
           >
-            {locale?.['chat.message.thinking'] || '思考中...'}
+            <span
+              className={classNames(
+                `${baseChatCls}-messages-content-loading-dots`,
+                props.classNames?.bubbleLoadingIconClassName,
+              )}
+              style={props.styles?.bubbleLoadingIconStyle}
+              data-testid="message-thinking-dots"
+              aria-hidden="true"
+            >
+              {THINKING_DOT_INDICES.map((dotIndex) => (
+                <span
+                  key={dotIndex}
+                  className={`${baseChatCls}-messages-content-loading-dot`}
+                  data-testid="message-thinking-dot"
+                />
+              ))}
+            </span>
           </div>,
         );
       }
@@ -213,9 +237,27 @@ export const BubbleMessageDisplay: React.FC<
           )
         : defaultExtra;
 
+    if (React.isValidElement(content)) {
+      return wrapSSR(
+        <div
+          className={classNames(
+            'agent-item-default-content',
+            `${baseChatCls}-messages-content-message`,
+            hashId,
+          )}
+          data-testid="message-box-content"
+          onDoubleClick={props.onDoubleClick}
+        >
+          {beforeContent}
+          {content}
+          {afterContent}
+          {extra}
+        </div>,
+      );
+    }
+
     if (
       content === '...' ||
-      React.isValidElement(content) ||
       props.placement !== 'left' ||
       props?.originData?.extra?.tags?.includes?.('REJECT_TO_ANSWER') ||
       props.originData?.role === 'bot'
@@ -242,7 +284,7 @@ export const BubbleMessageDisplay: React.FC<
             extra={extra}
             typing={false}
             originData={props.originData}
-            content={props.originData?.content as string}
+            content={content as string}
           />
         </div>,
       );
@@ -424,11 +466,12 @@ export const BubbleMessageDisplay: React.FC<
         extra={isExtraNull ? null : extra}
         htmlRef={props.bubbleListRef}
         content={
-          props.originData?.isFinished
-            ? (props.originData?.content as string) ||
+          props.originData?.isFinished &&
+          props?.originData?.extra?.answerStatus === 'EXCEPTION'
+            ? (content as string) ||
               locale?.['chat.message.generateFailed'] ||
               '生成回答失败，请重试'
-            : (props.originData?.content as string) || ''
+            : (content as string) || ''
         }
         originData={props.originData}
       />,
@@ -445,5 +488,5 @@ export const BubbleMessageDisplay: React.FC<
     props.bubbleRenderConfig?.afterMessageRender,
   ]);
 
-  return memo;
+  return messageContent;
 };

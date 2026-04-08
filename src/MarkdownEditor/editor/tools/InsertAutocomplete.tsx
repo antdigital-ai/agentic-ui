@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import { Button, ConfigProvider, Input, Menu, Tabs } from 'antd';
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import isHotkey from 'is-hotkey';
 import React, {
   useCallback,
@@ -639,20 +639,26 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
           isTop: EditorUtils.isTop(markdownEditorRef.current, node[1]),
         };
         if (node?.[0]?.type === 'paragraph') {
-          const el = ReactEditor.toDOMNode(markdownEditorRef.current, node[0]);
-          if (el) {
-            const position = calculatePosition(el, document.body);
-            if (position) {
-              setState(position);
-            } else {
-              setState({ top: 0, left: 0, bottom: undefined });
+          try {
+            const el = ReactEditor.toDOMNode(markdownEditorRef.current, node[0]);
+            if (el) {
+              const position = calculatePosition(el, document.body);
+              if (position) {
+                setState(position);
+              } else {
+                setState({ top: 0, left: 0, bottom: undefined });
+              }
             }
+          } catch {
+            // node may not be mounted yet; position update skipped
           }
         }
         setupEventListeners();
 
         setTimeout(() => {
-          dom.current?.scroll({ top: 0 });
+          if (dom.current && typeof dom.current.scroll === 'function') {
+            dom.current.scroll({ top: 0 });
+          }
         });
       }
     } else {
@@ -666,7 +672,9 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
   }, [openInsertCompletion]);
 
   const context = useContext(ConfigProvider.ConfigContext);
-  const baseClassName = context?.getPrefixCls(`md-editor-insert-autocomplete`);
+  const baseClassName = context?.getPrefixCls(
+    `agentic-md-editor-insert-autocomplete`,
+  );
 
   const { wrapSSR, hashId } = useStyle(baseClassName);
 

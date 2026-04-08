@@ -1,5 +1,5 @@
 import { ConfigProvider, Tooltip, TooltipProps } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { memo, useContext, useMemo, useState } from 'react';
 import { AIGraphic } from './AIGraphic';
 import { AIGraphicDisabled } from './AIGraphicDisabled';

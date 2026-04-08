@@ -269,6 +269,36 @@ describe('TitleInfo', () => {
       expect(screen.getByText('知识库1')).toBeInTheDocument();
       expect(onMetaClick).toBeDefined();
     });
+
+    it('应渲染带 onMetaClick 的元数据项（Popover 内容内点击由集成测试覆盖）', () => {
+      const onMetaClick = vi.fn();
+
+      render(
+        <TestWrapper>
+          <TitleInfo
+            {...defaultProps}
+            title="查询 ${knowledge} 数据"
+            category="RagRetrieval"
+            onMetaClick={onMetaClick}
+            prefixCls="test-prefix"
+            meta={{
+              knowledge: [
+                {
+                  name: '知识库A',
+                  icon: 'db',
+                  uuid: 'uuid-a',
+                  type: 'knowledge',
+                  description: '描述A',
+                },
+              ],
+            }}
+          />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByText('知识库A')).toBeInTheDocument();
+      expect(onMetaClick).toBeDefined();
+    });
   });
 
   describe('折叠/展开功能', () => {

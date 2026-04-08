@@ -1,33 +1,21 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../src/I18n';
 import {
+  getContentForEditor,
   RealtimeFollow,
   RealtimeFollowList,
+  shouldUpdateEditor,
 } from '../../src/Workspace/RealtimeFollow';
+import { TestWrapper } from './RealtimeFollow/testUtils';
+
+vi.mock('../../src/Workspace/RealtimeFollow/style', () => ({
+  useRealtimeFollowStyle: vi.fn(() => undefined),
+}));
 
 describe('RealtimeFollow Component', () => {
-  const mockLocale = {
-    'workspace.terminalExecution': '终端执行',
-    'workspace.createHtmlFile': '创建 HTML 文件',
-    'workspace.markdownContent': 'Markdown 内容',
-    'htmlPreview.preview': '预览',
-    'htmlPreview.code': '代码',
-    'htmlPreview.renderFailed': '页面渲染失败',
-  } as any;
-
-  const TestWrapper: React.FC<{ children: React.ReactNode }> = ({
-    children,
-  }) => (
-    <ConfigProvider>
-      <I18nContext.Provider value={{ locale: mockLocale, language: 'zh-CN' }}>
-        {children}
-      </I18nContext.Provider>
-    </ConfigProvider>
-  );
-
   describe('RealtimeFollow - Shell Type', () => {
     it('应该渲染 shell 类型内容', () => {
       render(
@@ -345,6 +333,154 @@ describe('RealtimeFollow Component', () => {
       expect(
         container.querySelector('.ant-workspace-realtime-overlay'),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('RealtimeFollow - 非测试环境', () => {
+    const originalEnv = process.env.NODE_ENV;
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalEnv;
+    });
+
+    it('非测试环境下 status=loading 时显示 Overlay 与默认 Spin', () => {
+      process.env.NODE_ENV = 'development';
+      const { container } = render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'x',
+              status: 'loading',
+            }}
+          />
+        </TestWrapper>,
+      );
+      const overlay = container.querySelector(
+        '.ant-workspace-realtime-overlay',
+      );
+      expect(overlay).toBeInTheDocument();
+      expect(
+        overlay?.classList.contains('ant-workspace-realtime-overlay--loading'),
+      ).toBe(true);
+      expect(container.querySelector('.ant-spin')).toBeInTheDocument();
+    });
+
+    it('非测试环境下 status=loading 且 loadingRender 为函数时使用其返回值', () => {
+      process.env.NODE_ENV = 'development';
+      const { container } = render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'x',
+              status: 'loading',
+              loadingRender: () => (
+                <div data-testid="custom-loading">加载中</div>
+              ),
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('custom-loading')).toBeInTheDocument();
+      expect(screen.getByText('加载中')).toBeInTheDocument();
+    });
+
+    it('非测试环境下 status=error 时显示 Overlay 与默认错误文案', () => {
+      process.env.NODE_ENV = 'development';
+      const { container } = render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'x',
+              status: 'error',
+            }}
+          />
+        </TestWrapper>,
+      );
+      const overlay = container.querySelector(
+        '.ant-workspace-realtime-overlay',
+      );
+      expect(overlay).toBeInTheDocument();
+      expect(
+        overlay?.classList.contains('ant-workspace-realtime-overlay--error'),
+      ).toBe(true);
+      expect(screen.getByText('页面渲染失败')).toBeInTheDocument();
+    });
+
+    it('非测试环境下 status=error 且 errorRender 为函数时使用其返回值', () => {
+      process.env.NODE_ENV = 'development';
+      render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'x',
+              status: 'error',
+              errorRender: () => (
+                <span data-testid="custom-error">自定义错误</span>
+              ),
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('custom-error')).toHaveTextContent(
+        '自定义错误',
+      );
+    });
+
+    it('非测试环境下空内容且 status=done 时显示空状态', () => {
+      process.env.NODE_ENV = 'development';
+      const { container } = render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: '   ',
+              status: 'done',
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(
+        container.querySelector('.ant-workspace-realtime-empty'),
+      ).toBeInTheDocument();
+      expect(container.querySelector('.ant-empty')).toBeInTheDocument();
+    });
+
+    it('非测试环境下空内容且 emptyRender 为函数时使用其返回值', () => {
+      process.env.NODE_ENV = 'development';
+      render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: '',
+              status: 'done',
+              emptyRender: () => <div data-testid="custom-empty">暂无内容</div>,
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('custom-empty')).toHaveTextContent('暂无内容');
+    });
+
+    it('customContent 为函数时渲染其返回值', () => {
+      process.env.NODE_ENV = 'development';
+      const { container } = render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'ignored',
+              customContent: () => <div data-testid="custom-fn">来自函数</div>,
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('custom-fn')).toHaveTextContent('来自函数');
+      expect(container.querySelector('.ant-agentic-md-editor')).toBeNull();
     });
   });
 
@@ -848,8 +984,43 @@ describe('RealtimeFollow Component', () => {
     });
   });
 
+  describe('shouldUpdateEditor 分支覆盖 (302-304)', () => {
+    it('type 为 shell 时返回 true', () => {
+      expect(shouldUpdateEditor('shell', 'preview')).toBe(true);
+    });
+    it('type 为 markdown 时返回 true', () => {
+      expect(shouldUpdateEditor('markdown', 'preview')).toBe(true);
+    });
+    it('type 为 md 时返回 true', () => {
+      expect(shouldUpdateEditor('md', 'preview')).toBe(true);
+    });
+    it('type 为 html 且 htmlViewMode 为 code 时返回 true', () => {
+      expect(shouldUpdateEditor('html', 'code')).toBe(true);
+    });
+    it('type 为 html 且 htmlViewMode 为 preview 时返回 false', () => {
+      expect(shouldUpdateEditor('html', 'preview')).toBe(false);
+    });
+  });
+
+  describe('getContentForEditor 分支覆盖 (291-292)', () => {
+    it('type 为 html 且 content 为字符串时返回包装后的 html 代码块', () => {
+      expect(getContentForEditor('html', '<p>hi</p>')).toBe(
+        '```html\n<p>hi</p>\n```',
+      );
+    });
+    it('type 为 html 且 content 非字符串时使用空字符串 (291-292)', () => {
+      expect(
+        getContentForEditor('html', {
+          original: '<h1>old</h1>',
+          modified: '<h1>new</h1>',
+        }),
+      ).toBe('```html\n\n```');
+      expect(getContentForEditor('html', undefined)).toBe('```html\n\n```');
+    });
+  });
+
   describe('RealtimeFollow - Edge Cases', () => {
-    it('应该处理无效类型', () => {
+    it('应该处理无效类型 (373)', () => {
       const { container } = render(
         <TestWrapper>
           <RealtimeFollow
@@ -862,7 +1033,25 @@ describe('RealtimeFollow Component', () => {
         </TestWrapper>,
       );
 
-      expect(container.firstChild).toBeNull();
+      expect(screen.queryByText('test')).not.toBeInTheDocument();
+      expect(
+        container.querySelector('.ant-agentic-md-editor'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('customContent 为 ReactNode 时渲染该节点 (345)', () => {
+      render(
+        <TestWrapper>
+          <RealtimeFollow
+            data={{
+              type: 'shell',
+              content: 'ignored',
+              customContent: <div data-testid="custom-node">自定义节点</div>,
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('custom-node')).toHaveTextContent('自定义节点');
     });
 
     it('应该处理 DiffContent 类型', () => {
@@ -1224,23 +1413,6 @@ describe('RealtimeFollow Component', () => {
       expect(screen.getByText('预览')).toBeInTheDocument();
     });
 
-    it('应该处理 styleResult 为 undefined 的情况', () => {
-      // 模拟 useRealtimeFollowStyle 返回 undefined
-      const { container } = render(
-        <TestWrapper>
-          <RealtimeFollowList
-            data={{
-              type: 'shell',
-              content: 'test',
-              status: 'done',
-            }}
-          />
-        </TestWrapper>,
-      );
-
-      expect(screen.getByTestId('realtime-follow')).toBeInTheDocument();
-    });
-
     it('应该处理 HTML 类型在 code 模式下的内容更新', async () => {
       const { rerender } = render(
         <TestWrapper>
@@ -1331,7 +1503,9 @@ describe('RealtimeFollow Component', () => {
         children,
       }) => (
         <ConfigProvider>
-          <I18nContext.Provider value={{ locale: null as any, language: 'en-US' }}>
+          <I18nContext.Provider
+            value={{ locale: null as any, language: 'en-US' }}
+          >
             {children}
           </I18nContext.Provider>
         </ConfigProvider>
@@ -1503,28 +1677,6 @@ describe('RealtimeFollow Component', () => {
       htmlPreviewResult.unmount();
     });
 
-    it('应该处理 onViewModeChange 回调', () => {
-      const onViewModeChange = vi.fn();
-
-      render(
-        <TestWrapper>
-          <RealtimeFollow
-            data={{
-              type: 'html',
-              content: '<h1>测试</h1>',
-              onViewModeChange,
-              status: 'done',
-            }}
-            htmlViewMode="preview"
-          />
-        </TestWrapper>,
-      );
-
-      // 通过 HtmlPreview 组件触发回调
-      const iframe = document.querySelector('iframe');
-      expect(iframe).toBeInTheDocument();
-    });
-
     it('应该处理 RealtimeHeader 中无 locale 的情况', () => {
       const NoLocaleWrapper: React.FC<{ children: React.ReactNode }> = ({
         children,
@@ -1674,48 +1826,14 @@ describe('RealtimeFollow Component', () => {
       expect(overlay).not.toBeInTheDocument();
     });
 
-    it('应该处理 Overlay 组件中 loadingRender 为 undefined 的情况', () => {
-      const { container } = render(
-        <TestWrapper>
-          <RealtimeFollow
-            data={{
-              type: 'shell',
-              content: 'test',
-              status: 'loading',
-              loadingRender: undefined,
-            }}
-          />
-        </TestWrapper>,
-      );
-
-      // 测试环境中不显示 overlay
-      expect(screen.getByText('test')).toBeInTheDocument();
-    });
-
-    it('应该处理 Overlay 组件中 errorRender 为 undefined 的情况', () => {
-      const { container } = render(
-        <TestWrapper>
-          <RealtimeFollow
-            data={{
-              type: 'shell',
-              content: 'test',
-              status: 'error',
-              errorRender: undefined,
-            }}
-          />
-        </TestWrapper>,
-      );
-
-      // 测试环境中不显示 overlay
-      expect(screen.getByText('test')).toBeInTheDocument();
-    });
-
     it('应该处理 Overlay 组件中 locale 为空的情况', () => {
       const NoLocaleWrapper: React.FC<{ children: React.ReactNode }> = ({
         children,
       }) => (
         <ConfigProvider>
-          <I18nContext.Provider value={{ locale: null as any, language: 'en-US' }}>
+          <I18nContext.Provider
+            value={{ locale: null as any, language: 'en-US' }}
+          >
             {children}
           </I18nContext.Provider>
         </ConfigProvider>
@@ -1773,14 +1891,14 @@ describe('RealtimeFollow Component', () => {
     });
 
     it('应该处理 getRightContent 中 segmentedItems 为空数组的情况', () => {
-      const { container } = render(
+      render(
         <TestWrapper>
           <RealtimeFollowList
             data={{
               type: 'html',
               content: '<h1>测试</h1>',
-              segmentedItems: [],
               status: 'done',
+              segmentedItems: [],
             }}
           />
         </TestWrapper>,

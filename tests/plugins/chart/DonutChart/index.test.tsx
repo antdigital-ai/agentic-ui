@@ -5,7 +5,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import DonutChart from '../../../../src/Plugins/chart/DonutChart';
 
 // Mock react-chartjs-2 - 支持 ref 回调
@@ -14,9 +14,13 @@ vi.mock('react-chartjs-2', () => ({
   Doughnut: React.forwardRef(({ data, options, plugins }: any, ref: any) => {
     React.useEffect(() => {
       if (ref) {
-        // 创建模拟的 Chart.js 实例
+        // 创建模拟的 Chart.js 实例；测试可设 __donutChartMockNoCanvas 使 canvas 为 null
+        const canvas =
+          (globalThis as any).__donutChartMockNoCanvas
+            ? null
+            : document.createElement('canvas');
         const mockInstance = {
-          canvas: document.createElement('canvas'),
+          canvas,
           toBase64Image: vi.fn(() => 'data:image/png;base64,test'),
           getDatasetMeta: vi.fn(() => ({ data: [] })),
           width: 200,
@@ -86,16 +90,16 @@ vi.mock('../../../../src/Plugins/chart/utils', () => ({
 // Mock hooks - 使用函数形式以便在测试中动态修改返回值
 const mockUseMobile = vi.fn(() => ({ isMobile: false, windowWidth: 1920 }));
 const mockUseFilterLabels = vi.fn((data: any) => ({
-  filterLabels: [],
+  filterLabels: [] as string[],
   filteredDataByFilterLabel: data,
-  selectedFilterLabel: null,
+  selectedFilterLabel: null as string | null,
   setSelectedFilterLabel: vi.fn(),
 }));
 const mockUseAutoCategory = vi.fn((data: any) => ({
-  autoCategoryData: null,
-  internalSelectedCategory: null,
+  autoCategoryData: null as { categories: string[]; allData: any[] } | null,
+  internalSelectedCategory: null as string | null,
   setInternalSelectedCategory: vi.fn(),
-  selectedCategory: null,
+  selectedCategory: null as string | null,
 }));
 const mockUseResponsiveDimensions = vi.fn(() => ({
   width: 200,
@@ -105,10 +109,15 @@ const mockUseResponsiveDimensions = vi.fn(() => ({
 }));
 
 vi.mock('../../../../src/Plugins/chart/DonutChart/hooks', () => ({
-  useMobile: (...args: any[]) => mockUseMobile(...args),
-  useFilterLabels: (...args: any[]) => mockUseFilterLabels(...args),
-  useAutoCategory: (...args: any[]) => mockUseAutoCategory(...args),
-  useResponsiveDimensions: (...args: any[]) => mockUseResponsiveDimensions(...args),
+  useMobile: () => mockUseMobile(),
+  useFilterLabels: (data: any) => mockUseFilterLabels(data),
+  useAutoCategory: (data: any) => mockUseAutoCategory(data),
+  useResponsiveDimensions: () => mockUseResponsiveDimensions(),
+}));
+
+// Mock chart env
+vi.mock('../../../../src/Plugins/chart/env', () => ({
+  isWindowDefined: vi.fn(() => true),
 }));
 
 // Mock Legend 组件
@@ -220,6 +229,23 @@ describe('DonutChart', () => {
       height: 200,
       chartWidth: 200,
       chartHeight: 200,
+    });
+  });
+
+  describe('SSR / 非浏览器环境', () => {
+    it('isWindowDefined 为 false 时不注册 Chart', async () => {
+      const { isWindowDefined } = await import(
+        '../../../../src/Plugins/chart/env'
+      );
+      vi.mocked(isWindowDefined).mockReturnValueOnce(false);
+
+      const { container } = render(
+        <TestWrapper>
+          <DonutChart data={mockData} />
+        </TestWrapper>,
+      );
+      expect(container).toBeInTheDocument();
+      expect(screen.getByTestId('doughnut-chart')).toBeInTheDocument();
     });
   });
 
@@ -549,6 +575,21 @@ describe('DonutChart', () => {
       );
 
       expect(screen.getByTestId('doughnut-chart')).toBeInTheDocument();
+    });
+
+    it('renderFilterInToolbar 且 filterList 含空串时 filterOptions 使用 item||""', () => {
+      render(
+        <TestWrapper>
+          <DonutChart
+            data={mockData}
+            filterList={['', 'A']}
+            renderFilterInToolbar={true}
+            showToolbar={true}
+            title="测试"
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('chart-filter')).toBeInTheDocument();
     });
   });
 
@@ -937,7 +978,9 @@ describe('DonutChart', () => {
   describe('下载功能', () => {
     beforeEach(() => {
       // Mock Chart.js 实例的 canvas
-      const originalCreateElement = document.createElement.bind(document);
+      const originalCreateElement = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
       vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
         if (tagName === 'canvas') {
           const canvas = originalCreateElement('canvas') as HTMLCanvasElement;
@@ -1028,21 +1071,34 @@ describe('DonutChart', () => {
       // 验证 canvas 拼接逻辑被调用
     });
 
-    it('应该处理下载异常并回退到单图下载', () => {
-      // Mock getContext 返回 null 触发异常
-      const originalCreateElement = document.createElement.bind(document);
+    it('应该处理下载异常并回退到单图下载', async () => {
+      const chartComponents = await import(
+        '../../../../src/Plugins/chart/components'
+      );
+      const downloadSpy = vi.spyOn(chartComponents, 'downloadChart');
+
+      const originalCreateElement = Document.prototype.createElement.bind(
+  document,
+) as typeof document.createElement;
       vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
         if (tagName === 'canvas') {
           const canvas = originalCreateElement('canvas') as HTMLCanvasElement;
           canvas.width = 200;
           canvas.height = 200;
-          canvas.getContext = vi.fn(() => null); // 返回 null 触发异常
+          const mockCtx = {
+            fillStyle: '',
+            fillRect: vi.fn(),
+            drawImage: vi.fn(),
+          };
+          canvas.getContext = vi.fn(() => mockCtx as any);
           canvas.toDataURL = vi.fn(() => 'data:image/png;base64,test');
           return canvas;
         }
         if (tagName === 'a') {
           const link = originalCreateElement('a') as HTMLAnchorElement;
-          link.click = vi.fn();
+          link.click = vi.fn(() => {
+            throw new Error('click failed');
+          });
           return link;
         }
         return originalCreateElement(tagName);
@@ -1065,31 +1121,31 @@ describe('DonutChart', () => {
         </TestWrapper>,
       );
 
-      // 直接查找下载按钮，不需要 setTimeout
       const downloadButton = screen.getByText('Download');
       fireEvent.click(downloadButton);
-      // 异常应该被捕获，回退到单图下载
+      expect(downloadSpy).toHaveBeenCalled();
     });
 
     it('应该处理多个图表时 canvas 数组为空的情况', () => {
-      render(
-        <TestWrapper>
-          <DonutChart
-            data={mockData}
-            configs={[{ showLegend: true }, { showLegend: true }]}
-            showToolbar={true}
-            title="空Canvas测试"
-          />
-        </TestWrapper>,
-      );
+      (globalThis as any).__donutChartMockNoCanvas = true;
+      try {
+        render(
+          <TestWrapper>
+            <DonutChart
+              data={mockData}
+              configs={[{ showLegend: true }, { showLegend: true }]}
+              showToolbar={true}
+              title="空Canvas测试"
+            />
+          </TestWrapper>,
+        );
 
-      // 清空图表实例数组，模拟 canvas 为空的情况
-      mockChartInstances.length = 0;
-
-      // 直接查找下载按钮，不需要 setTimeout
-      const downloadButton = screen.getByText('Download');
-      fireEvent.click(downloadButton);
-      // 应该提前返回，不执行下载
+        const downloadButton = screen.getByText('Download');
+        fireEvent.click(downloadButton);
+        // canvases.length === 0 时提前 return，不抛错
+      } finally {
+        (globalThis as any).__donutChartMockNoCanvas = false;
+      }
     });
   });
 

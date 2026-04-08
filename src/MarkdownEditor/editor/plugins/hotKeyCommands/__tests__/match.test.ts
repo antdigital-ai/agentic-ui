@@ -1,25 +1,27 @@
 import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
+import React from 'react';
 import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import * as elements from '../../elements';
 import { MatchKey } from '../match';
 
-// Mock TextMatchNodes
-vi.mock('../elements', () => ({
+// Mock TextMatchNodes：第一个节点 matchKey '**' 且 checkAllow 为 false，用于覆盖 continue 分支
+vi.mock('../../elements', () => ({
   TextMatchNodes: [
     {
       matchKey: '**',
       reg: /\*\*([^*]+)\*\*/,
       run: vi.fn(() => true),
-      checkAllow: vi.fn(() => true),
+      checkAllow: vi.fn(() => false),
     },
     {
       matchKey: '*',
       reg: /\*([^*]+)\*/,
       run: vi.fn(() => false),
-      checkAllow: vi.fn(() => true),
+      checkAllow: vi.fn(() => false),
     },
     {
       matchKey: /^`$/,
@@ -37,6 +39,7 @@ describe('MatchKey', () => {
   });
 
   let editor: BaseEditor & ReactEditor & HistoryEditor;
+  let editorRef: React.MutableRefObject<typeof editor | null>;
   let matchKey: MatchKey;
 
   beforeEach(() => {
@@ -44,7 +47,8 @@ describe('MatchKey', () => {
       ReactEditor &
       HistoryEditor;
     editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
-    matchKey = new MatchKey(editor);
+    editorRef = { current: editor };
+    matchKey = new MatchKey(editorRef);
   });
 
   describe('构造函数', () => {
@@ -135,18 +139,52 @@ describe('MatchKey', () => {
     });
 
     it('应该在 checkAllow 返回 false 时跳过匹配', () => {
-      // 这个测试需要访问 TextMatchNodes，暂时跳过
-      expect(true).toBe(true);
+      Transforms.insertText(editor, '**a**');
+      Transforms.select(editor, { path: [0, 0], offset: 6 });
+
+      const mockEvent = {
+        key: '**',
+        preventDefault: vi.fn(),
+      } as any;
+
+      matchKey.run(mockEvent);
+
+      expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+      expect((elements as any).TextMatchNodes[0].checkAllow).toHaveBeenCalled();
     });
 
-    it('应该在匹配成功时调用 run 方法', () => {
-      // 这个测试需要访问 TextMatchNodes，暂时跳过
-      expect(true).toBe(true);
+    it('应在 checkAllow 返回 true 且正则匹配时调用第一个节点的 run', () => {
+      const nodes = (elements as any).TextMatchNodes;
+      vi.mocked(nodes[0].checkAllow).mockReturnValueOnce(true);
+      Transforms.insertText(editor, '**a**');
+      Transforms.select(editor, { path: [0, 0], offset: 5 });
+      const mockEvent = { key: '**', preventDefault: vi.fn() } as any;
+      matchKey.run(mockEvent);
+      expect(nodes[0].checkAllow).toHaveBeenCalled();
+      expect(nodes[0].run).toHaveBeenCalled();
+      expect(mockEvent.preventDefault).toHaveBeenCalled();
     });
 
-    it('应该在 run 返回 false 时继续尝试其他匹配', () => {
-      // 这个测试需要访问 TextMatchNodes，暂时跳过
-      expect(true).toBe(true);
+    it('应在 key 为 * 时调用第二个节点的 checkAllow 与 run', () => {
+      const nodes = (elements as any).TextMatchNodes;
+      vi.mocked(nodes[1].checkAllow).mockReturnValueOnce(true);
+      Transforms.insertText(editor, '*a*');
+      Transforms.select(editor, { path: [0, 0], offset: 3 });
+      const mockEvent = { key: '*', preventDefault: vi.fn() } as any;
+      matchKey.run(mockEvent);
+      expect(nodes[1].checkAllow).toHaveBeenCalled();
+      expect(nodes[1].run).toHaveBeenCalled();
+    });
+
+    it('应在 key 为 ` 且正则匹配时调用第三个节点的 checkAllow 与 run', () => {
+      const nodes = (elements as any).TextMatchNodes;
+      Transforms.insertText(editor, '`x`');
+      Transforms.select(editor, { path: [0, 0], offset: 3 });
+      const mockEvent = { key: '`', preventDefault: vi.fn() } as any;
+      matchKey.run(mockEvent);
+      expect(nodes[2].checkAllow).toHaveBeenCalled();
+      expect(nodes[2].run).toHaveBeenCalled();
+      expect(mockEvent.preventDefault).toHaveBeenCalled();
     });
 
     it('应该处理复杂的文本匹配场景', () => {

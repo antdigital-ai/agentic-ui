@@ -39,6 +39,25 @@ describe('CaseReply 组件', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
+  it('应该在使用 buttonText 时点击按钮触发 onButtonClick', () => {
+    const onButtonClick = vi.fn();
+    render(
+      <CaseReply
+        quote="引用"
+        title="标题"
+        description="描述"
+        buttonText="确定"
+        onButtonClick={onButtonClick}
+      />,
+    );
+    fireEvent.mouseEnter(screen.getByText('引用').closest('div')!);
+    const btn = screen.getByText('确定').closest('button');
+    expect(btn).toBeInTheDocument();
+    fireEvent.click(btn!);
+    expect(onButtonClick).toHaveBeenCalledTimes(1);
+    expect(onButtonClick).toHaveBeenCalledWith(expect.any(Object));
+  });
+
   it('应该处理鼠标悬停事件', () => {
     render(
       <CaseReply

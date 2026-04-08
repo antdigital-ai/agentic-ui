@@ -2,7 +2,16 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useLocale } from '../../src/I18n';
 import { EXCEPTION } from '../../src/Bubble/MessagesContent/EXCEPTION';
+
+vi.mock('../../src/I18n', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/I18n')>();
+  return {
+    ...actual,
+    useLocale: vi.fn(() => ({})),
+  };
+});
 
 describe('EXCEPTION', () => {
   const defaultProps = {
@@ -12,6 +21,7 @@ describe('EXCEPTION', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useLocale).mockReturnValue({});
   });
 
   describe('基本渲染测试', () => {
@@ -22,31 +32,37 @@ describe('EXCEPTION', () => {
     });
 
     it('应该处理空内容', () => {
-      const { container } = render(<EXCEPTION content="" extra={null} />);
+      render(<EXCEPTION content="" extra={null} />);
 
-      // 检查组件是否渲染
-      const divElement = container.querySelector('div');
-      expect(divElement).toBeInTheDocument();
+      expect(
+        screen.getByText('生成回答失败，请重试'),
+      ).toBeInTheDocument();
     });
 
     it('应该处理undefined内容', () => {
-      const { container } = render(
-        <EXCEPTION content={undefined as any} extra={null} />,
-      );
+      render(<EXCEPTION content={undefined as any} extra={null} />);
 
-      // 检查组件是否渲染
-      const divElement = container.querySelector('div');
-      expect(divElement).toBeInTheDocument();
+      expect(
+        screen.getByText('生成回答失败，请重试'),
+      ).toBeInTheDocument();
     });
 
     it('应该处理null内容', () => {
-      const { container } = render(
-        <EXCEPTION content={null as any} extra={null} />,
-      );
+      render(<EXCEPTION content={null as any} extra={null} />);
 
-      // 检查组件是否渲染
-      const divElement = container.querySelector('div');
-      expect(divElement).toBeInTheDocument();
+      expect(
+        screen.getByText('生成回答失败，请重试'),
+      ).toBeInTheDocument();
+    });
+
+    it('空内容时使用 locale 中 chat.message.generateFailed (67)', () => {
+      vi.mocked(useLocale).mockReturnValue({
+        'chat.message.generateFailed': '接口异常，请稍后重试',
+      } as any);
+      render(<EXCEPTION content="   " extra={null} />);
+      expect(
+        screen.getByText('接口异常，请稍后重试'),
+      ).toBeInTheDocument();
     });
   });
 

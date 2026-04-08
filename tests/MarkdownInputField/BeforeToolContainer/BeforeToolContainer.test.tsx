@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ActionItemContainer } from '../../../src/MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
@@ -245,16 +245,19 @@ describe('ActionItemContainer', () => {
     });
 
     it('应该正确处理缺失 key 的子元素（开发环境）', () => {
-      // 在测试环境中 process.env.NODE_ENV 不是 'production'
       const originalEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
 
-      // 期望抛出错误
+      const childWithoutKey = (
+        <button type="button">Button without key</button>
+      ) as KeyedElement;
+
       expect(() => {
-        const childWithoutKey = (
-          <button type="button">Button without key</button>
-        ) as KeyedElement;
-        render(<ActionItemContainer>{childWithoutKey}</ActionItemContainer>);
+        act(() => {
+          render(
+            <ActionItemContainer>{childWithoutKey}</ActionItemContainer>,
+          );
+        });
       }).toThrow(
         'ActionItemContainer: all children must include an explicit `key` prop.',
       );

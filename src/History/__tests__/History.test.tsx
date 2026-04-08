@@ -10,7 +10,7 @@ import { ConfigProvider } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BubbleConfigContext } from '../../Bubble/BubbleConfigProvide';
+import { I18nContext, cnLabels } from '../../I18n';
 import { History, HistoryDataType } from '../index';
 
 // 模拟默认请求函数
@@ -48,16 +48,16 @@ const defaultProps = {
   request: mockRequest,
 };
 
-// 测试包装器
+// 测试包装器：国际化统一走 I18nContext
 const TestWrapper: React.FC<{ children: React.ReactNode; locale?: any }> = ({
   children,
-  locale = {},
+  locale = cnLabels,
 }) => {
   return (
     <ConfigProvider>
-      <BubbleConfigContext.Provider value={{ locale, standalone: false }}>
+      <I18nContext.Provider value={{ locale, language: 'zh-CN' }}>
         {children}
-      </BubbleConfigContext.Provider>
+      </I18nContext.Provider>
     </ConfigProvider>
   );
 };
@@ -168,6 +168,42 @@ describe('History Component', () => {
     });
   });
 
+  describe('LoadMore 与 Popover', () => {
+    it('应使用 loadMoreRender 时调用并渲染自定义 LoadMore', () => {
+      const loadMoreRender = vi.fn(() => (
+        <div data-testid="custom-load-more">自定义加载更多</div>
+      ));
+
+      render(
+        <TestWrapper>
+          <History {...defaultProps} loadMoreRender={loadMoreRender} />
+        </TestWrapper>,
+      );
+
+      expect(loadMoreRender).toHaveBeenCalled();
+    });
+
+    it('Popover 打开时 getPopupContainer 可被调用', async () => {
+      render(
+        <TestWrapper>
+          <History {...defaultProps} />
+        </TestWrapper>,
+      );
+
+      const historyButton = screen.getByTestId('history-button');
+      fireEvent.click(historyButton);
+
+      await waitFor(
+        () => {
+          expect(
+            document.querySelector('.ant-popover-open'),
+          ).toBeInTheDocument();
+        },
+        { timeout: 2000 },
+      );
+    });
+  });
+
   describe('User Interactions', () => {
     it('should open dropdown when clicking history button', async () => {
       render(
@@ -258,6 +294,33 @@ describe('History Component', () => {
   });
 
   describe('Custom Formatting and Sorting', () => {
+    const threeItemsInSameDayRequest = vi.fn().mockResolvedValue([
+      {
+        id: '1',
+        sessionId: 'session-1',
+        sessionTitle: '今日对话1',
+        agentId: 'agent-1',
+        gmtCreate: dayjs().valueOf(),
+        gmtLastConverse: dayjs().valueOf(),
+      },
+      {
+        id: '2',
+        sessionId: 'session-2',
+        sessionTitle: '今日对话2',
+        agentId: 'agent-1',
+        gmtCreate: dayjs().subtract(1, 'hour').valueOf(),
+        gmtLastConverse: dayjs().subtract(1, 'hour').valueOf(),
+      },
+      {
+        id: '3',
+        sessionId: 'session-3',
+        sessionTitle: '今日对话3',
+        agentId: 'agent-1',
+        gmtCreate: dayjs().subtract(2, 'hour').valueOf(),
+        gmtLastConverse: dayjs().subtract(2, 'hour').valueOf(),
+      },
+    ]);
+
     it('should use customDateFormatter when provided', async () => {
       const customDateFormatter = vi.fn().mockReturnValue('自定义日期');
 
@@ -265,6 +328,7 @@ describe('History Component', () => {
         <TestWrapper>
           <History
             {...defaultProps}
+            request={threeItemsInSameDayRequest}
             customDateFormatter={customDateFormatter}
             standalone
           />

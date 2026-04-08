@@ -6,12 +6,13 @@ import {
   MElement,
   MLeaf,
 } from '../../../../src/MarkdownEditor/editor/elements';
+import { EditorUtils } from '../../../../src/MarkdownEditor/editor/utils/editorUtils';
 
 // Mock antd theme - 这个 mock 会在后面被合并
 
 // Mock 依赖
 vi.mock('../../../../src/MarkdownEditor/editor/store', () => ({
-  useEditorStore: () => ({
+  useEditorStore: vi.fn(() => ({
     markdownEditorRef: { current: { focus: vi.fn() } },
     markdownContainerRef: { current: document.createElement('div') },
     readonly: false,
@@ -23,7 +24,7 @@ vi.mock('../../../../src/MarkdownEditor/editor/store', () => ({
     editorProps: {
       titlePlaceholderContent: '请输入内容...',
     },
-  }),
+  })),
 }));
 
 vi.mock('slate-react', () => ({
@@ -145,11 +146,14 @@ vi.mock('../../../../src/MarkdownEditor/editor/elements/Schema', () => ({
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/TagPopup', () => ({
-  TagPopup: ({ children, ...props }: any) => (
-    <div data-testid="tag-popup" {...props}>
-      {children}
-    </div>
-  ),
+  TagPopup: ({ children, onSelect, ...props }: any) => {
+    (window as any).__lastTagPopupOnSelect = onSelect;
+    return (
+      <div data-testid="tag-popup" {...props}>
+        {children}
+      </div>
+    );
+  },
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/Blockquote', () => ({
@@ -526,6 +530,20 @@ describe('Elements Index', () => {
         ).toBeInTheDocument();
       });
 
+      it('应该渲染 tag+code 只读时为 code 样式不渲染 TagPopup', () => {
+        const props = {
+          ...defaultLeafProps,
+          readonly: true,
+          leaf: { ...defaultLeafProps.leaf, tag: true, code: true, text: 'x' },
+          tagInputProps: { enable: true },
+        };
+        render(<MLeaf {...props} />);
+        expect(
+          screen.getByText('Test Content').closest('code'),
+        ).toBeInTheDocument();
+        expect(screen.queryByTestId('tag-popup')).not.toBeInTheDocument();
+      });
+
       it('应该渲染高亮颜色文本', () => {
         const props = {
           ...defaultLeafProps,
@@ -554,6 +572,21 @@ describe('Elements Index', () => {
         render(<MLeaf {...props} />);
         const element = screen.getByText('Test Content').parentElement;
         expect(element).toHaveStyle({ background: '#f59e0b' });
+      });
+
+      it('jinjaDelimiter 与 jinjaPlaceholder 追加类名 (568-572)', () => {
+        const props = {
+          ...defaultLeafProps,
+          leaf: {
+            ...defaultLeafProps.leaf,
+            jinjaDelimiter: true,
+            jinjaPlaceholder: true,
+          },
+        };
+        const { container } = render(<MLeaf {...props} />);
+        const span = container.querySelector('[data-be="text"]');
+        expect(span?.className).toContain('jinja-delimiter');
+        expect(span?.className).toContain('jinja-placeholder');
       });
 
       it('应该渲染 HTML 文本', () => {
@@ -748,6 +781,15 @@ describe('Elements Index', () => {
         fireEvent.dblClick(element!);
         // 验证事件处理逻辑（这里主要是确保不抛出错误）
         expect(element).toBeInTheDocument();
+      });
+
+      it('双击且 isDirtLeaf 为 true 时尝试选区 (585-592)', () => {
+        vi.mocked(EditorUtils.isDirtLeaf).mockReturnValueOnce(true);
+        const { container } = render(<MLeaf {...defaultLeafProps} />);
+        const span = container.querySelector('[data-be="text"]');
+        expect(span).toBeTruthy();
+        fireEvent.click(span!, { detail: 2 });
+        expect(EditorUtils.isDirtLeaf).toHaveBeenCalled();
       });
 
       it('应该处理拖拽开始事件', () => {
@@ -1253,6 +1295,60 @@ describe('Elements Index', () => {
       rerender(<MLeaf {...props2} />);
       expect(screen.getByText('Test Content')).toBeInTheDocument();
     });
+
+    it('MLeaf 应该在 attributes 变化时重新渲染', () => {
+      const props1 = {
+        leaf: { text: 'Test Text' },
+        text: { text: 'Test Text' },
+        attributes: { 'data-slate-leaf': true as const },
+        children: <div>Test Content</div>,
+        hashId: 'test-hash',
+        comment: {},
+        fncProps: {},
+        tagInputProps: {},
+      } as any;
+      const { rerender } = render(<MLeaf {...props1} />);
+      const props2 = {
+        ...props1,
+        attributes: { 'data-slate-leaf': true as const, 'data-other': 'x' },
+      };
+      rerender(<MLeaf {...props2} />);
+      expect(screen.getByText('Test Content')).toBeInTheDocument();
+    });
+
+    it('MLeaf 应该在 readonly 变化时重新渲染', () => {
+      const props1 = {
+        leaf: { text: 'Test Text' },
+        text: { text: 'Test Text' },
+        attributes: { 'data-slate-leaf': true as const },
+        children: <div>Test Content</div>,
+        hashId: 'test-hash',
+        comment: {},
+        fncProps: {},
+        tagInputProps: {},
+        readonly: false,
+      } as any;
+      const { rerender } = render(<MLeaf {...props1} />);
+      rerender(<MLeaf {...props1} readonly />);
+      expect(screen.getByText('Test Content')).toBeInTheDocument();
+    });
+
+    it('MLeaf 应该在 linkConfig 变化时重新渲染', () => {
+      const props1 = {
+        leaf: { text: 'Test Text' },
+        text: { text: 'Test Text' },
+        attributes: { 'data-slate-leaf': true as const },
+        children: <div>Test Content</div>,
+        hashId: 'test-hash',
+        comment: {},
+        fncProps: {},
+        tagInputProps: {},
+        linkConfig: {},
+      } as any;
+      const { rerender } = render(<MLeaf {...props1} />);
+      rerender(<MLeaf {...props1} linkConfig={{ openInNewTab: false }} />);
+      expect(screen.getByText('Test Content')).toBeInTheDocument();
+    });
   });
 
   describe('边界情况测试', () => {
@@ -1320,14 +1416,14 @@ describe('Elements Index', () => {
         attributes: {},
         children: <div>Test</div>,
         deps: ['dep1', 'dep2'],
-      };
+      } as any;
       const props2 = {
         element: { type: 'paragraph', children: [] },
         attributes: {},
         children: <div>Test</div>,
         deps: ['dep1', 'dep2'],
-      };
-      
+      } as any;
+
       // 通过 React.memo 的比较函数来测试
       const { rerender } = render(<MElement {...props1} />);
       rerender(<MElement {...props2} />);
@@ -1339,13 +1435,13 @@ describe('Elements Index', () => {
         element: { type: 'paragraph', children: [] },
         attributes: {},
         children: <div>Test</div>,
-      };
+      } as any;
       const props2 = {
         element: { type: 'paragraph', children: [] },
         attributes: {},
         children: <div>Test</div>,
-      };
-      
+      } as any;
+
       const { rerender } = render(<MElement {...props1} />);
       rerender(<MElement {...props2} />);
       expect(screen.getByText('Test')).toBeInTheDocument();
@@ -1357,14 +1453,49 @@ describe('Elements Index', () => {
         attributes: {},
         children: <div>Test</div>,
         deps: ['dep1'],
-      };
+      } as any;
       const props2 = {
         element: { type: 'paragraph', children: [] },
         attributes: {},
         children: <div>Test</div>,
         deps: ['dep1', 'dep2'],
-      };
-      
+      } as any;
+
+      const { rerender } = render(<MElement {...props1} />);
+      rerender(<MElement {...props2} />);
+      expect(screen.getByText('Test')).toBeInTheDocument();
+    });
+
+    it('应该在 deps 一方为 undefined 时按引用比较', () => {
+      const props1 = {
+        element: { type: 'paragraph', children: [] },
+        attributes: {},
+        children: <div>Test</div>,
+      } as any;
+      const props2 = {
+        element: { type: 'paragraph', children: [] },
+        attributes: {},
+        children: <div>Test</div>,
+        deps: ['only-next'],
+      } as any;
+      const { rerender } = render(<MElement {...props1} />);
+      rerender(<MElement {...props2} />);
+      expect(screen.getByText('Test')).toBeInTheDocument();
+    });
+
+    it('应该在 deps 同长度不同内容时返回 false', () => {
+      const props1 = {
+        element: { type: 'paragraph', children: [] },
+        attributes: {},
+        children: <div>Test</div>,
+        deps: ['a', 'b'],
+      } as any;
+      const props2 = {
+        element: { type: 'paragraph', children: [] },
+        attributes: {},
+        children: <div>Test</div>,
+        deps: ['a', 'c'],
+      } as any;
       const { rerender } = render(<MElement {...props1} />);
       rerender(<MElement {...props2} />);
       expect(screen.getByText('Test')).toBeInTheDocument();
@@ -1382,48 +1513,58 @@ describe('Elements Index', () => {
         attributes: {},
         children: <span>test</span>,
         readonly: false,
+        text: 'test',
         tagInputProps: {
           enable: true,
-          tagTextRender: vi.fn((props, text) => text),
+          tagTextRender: vi.fn((props: any, text: any) => text),
         },
         fncProps: {},
         comment: undefined,
         linkConfig: {},
-      };
+      } as any;
 
       render(<MLeaf {...props} />);
       expect(screen.getByText('test')).toBeInTheDocument();
     });
 
     it('应该处理 selectFormat 函数', async () => {
-      // EditorUtils 已经在文件顶部被 mock，使用 import 来获取 mock 的模块
-      const editorUtilsModule = await import('../../../../src/MarkdownEditor/editor/utils/editorUtils');
-      const mockIsDirtLeaf = vi.mocked(editorUtilsModule.EditorUtils.isDirtLeaf);
+      const editorUtilsModule =
+        await import('../../../../src/MarkdownEditor/editor/utils/editorUtils');
+      const mockIsDirtLeaf = vi.mocked(
+        editorUtilsModule.EditorUtils.isDirtLeaf,
+      );
       mockIsDirtLeaf.mockReturnValueOnce(true);
 
+      const slate = await import('slate');
+      const selectSpy = vi
+        .spyOn(slate.Transforms, 'select')
+        .mockImplementation(() => {});
+      vi.spyOn(slate.Editor, 'start').mockReturnValue({
+        path: [0, 0],
+        offset: 0,
+      } as any);
+      vi.spyOn(slate.Editor, 'end').mockReturnValue({
+        path: [0, 0],
+        offset: 4,
+      } as any);
+
       const props = {
-        leaf: {
-          text: 'test',
-        },
+        leaf: { text: 'test' },
         attributes: {},
         children: <span>test</span>,
         readonly: false,
-        text: {
-          type: 'text',
-          text: 'test',
-        },
+        text: { type: 'text', text: 'test' },
         tagInputProps: {},
         fncProps: {},
         comment: undefined,
         linkConfig: {},
-      };
+      } as any;
 
       const { container } = render(<MLeaf {...props} />);
       const span = container.querySelector('span[data-be="text"]');
-      if (span) {
-        fireEvent.dblClick(span);
-      }
       expect(span).toBeInTheDocument();
+      if (span) fireEvent.dblClick(span);
+      selectSpy.mockRestore();
     });
 
     it('应该处理 linkConfig.onClick 返回 false 的情况', () => {
@@ -1442,7 +1583,7 @@ describe('Elements Index', () => {
           onClick: vi.fn(() => false),
           openInNewTab: true,
         },
-      };
+      } as any;
 
       const { container } = render(<MLeaf {...props} />);
       const span = container.querySelector('span[data-be="text"]');
@@ -1470,7 +1611,7 @@ describe('Elements Index', () => {
         linkConfig: {
           openInNewTab: false,
         },
-      };
+      } as any;
 
       const { container } = render(<MLeaf {...props} />);
       const span = container.querySelector('span[data-be="text"]');
@@ -1492,14 +1633,190 @@ describe('Elements Index', () => {
         attributes: {},
         children: <span>test</span>,
         readonly: false,
+        text: 'test',
         tagInputProps: {},
         fncProps: {},
         comment: 'test comment',
         linkConfig: {},
-      };
+      } as any;
 
       render(<MLeaf {...props} />);
       expect(screen.getByText('test')).toBeInTheDocument();
+    });
+
+    it('应该在有 comment 无 fnc 时用 CommentLeaf 包裹普通 dom', () => {
+      const props = {
+        leaf: { text: 'plain', comment: 'c1' },
+        attributes: {},
+        children: <span>plain</span>,
+        readonly: false,
+        text: 'plain',
+        tagInputProps: {},
+        fncProps: {},
+        comment: 'c1',
+        linkConfig: {},
+      } as any;
+      render(<MLeaf {...props} />);
+      expect(screen.getByTestId('comment-view')).toBeInTheDocument();
+      expect(screen.getByText('plain')).toBeInTheDocument();
+    });
+
+    it('TagPopup onSelect 被调用时执行 Editor/Transforms 逻辑', async () => {
+      const slate = await import('slate');
+      const withoutNormalizingSpy = vi
+        .spyOn(slate.Editor, 'withoutNormalizing')
+        .mockImplementation((_e: any, fn: () => void) => fn());
+      const deleteSpy = vi
+        .spyOn(slate.Transforms, 'delete')
+        .mockImplementation(() => {});
+      const insertTextSpy = vi
+        .spyOn(slate.Transforms, 'insertText')
+        .mockImplementation(() => {});
+      const setNodesSpy = vi
+        .spyOn(slate.Transforms, 'setNodes')
+        .mockImplementation(() => {});
+      const insertNodesSpy = vi
+        .spyOn(slate.Transforms, 'insertNodes')
+        .mockImplementation(() => {});
+      const selectSpy = vi
+        .spyOn(slate.Transforms, 'select')
+        .mockImplementation(() => {});
+      vi.spyOn(slate.Editor, 'start').mockReturnValue({
+        path: [0, 0],
+        offset: 0,
+      } as any);
+      vi.spyOn(slate.Editor, 'end').mockReturnValue({
+        path: [0, 0],
+        offset: 1,
+      } as any);
+      vi.spyOn(slate.Path, 'previous').mockReturnValue([0, -1] as any);
+      vi.spyOn(slate.Path, 'next').mockReturnValue([0, 1] as any);
+      vi.spyOn(slate.Editor, 'hasPath').mockReturnValue(false);
+
+      const mockEditor = {
+        focus: vi.fn(),
+        withoutNormalizing: (fn: () => void) => fn(),
+      };
+      const storeModule =
+        await import('../../../../src/MarkdownEditor/editor/store');
+      (storeModule.useEditorStore as ReturnType<typeof vi.fn>).mockReturnValue({
+        markdownEditorRef: { current: mockEditor as any },
+        markdownContainerRef: { current: document.createElement('div') },
+        readonly: false,
+        store: {
+          dragStart: vi.fn(),
+          isLatestNode: vi.fn().mockReturnValue(false),
+        },
+        typewriter: false,
+        editorProps: { titlePlaceholderContent: '...' },
+      } as any);
+
+      const props = {
+        leaf: { text: 't', tag: true, code: true },
+        attributes: {},
+        children: <span>t</span>,
+        readonly: false,
+        text: 't',
+        tagInputProps: {
+          enable: true,
+          tagTextRender: (_p: any, t: string) => t,
+        },
+        fncProps: {},
+        comment: undefined,
+        linkConfig: {},
+      } as any;
+
+      render(<MLeaf {...props} />);
+      expect(screen.getByTestId('tag-popup')).toBeInTheDocument();
+
+      const onSelect = (window as any).__lastTagPopupOnSelect as
+        | ((v: string, path: number[], tagNode?: any) => void)
+        | undefined;
+      expect(onSelect).toBeDefined();
+      onSelect!('val', [0, 0], {});
+      await new Promise((r) => setTimeout(r, 30));
+
+      expect(withoutNormalizingSpy).toHaveBeenCalled();
+      expect(deleteSpy).toHaveBeenCalled();
+      expect(insertTextSpy).toHaveBeenCalled();
+      expect(setNodesSpy).toHaveBeenCalled();
+      expect(insertNodesSpy).toHaveBeenCalled();
+
+      withoutNormalizingSpy.mockRestore();
+      deleteSpy.mockRestore();
+      insertTextSpy.mockRestore();
+      setNodesSpy.mockRestore();
+      insertNodesSpy.mockRestore();
+      selectSpy.mockRestore();
+    });
+
+    it('TagPopup onSelect 在 hasPath 为 true 时走 Transforms.select 分支', async () => {
+      const slate = await import('slate');
+      vi.spyOn(slate.Editor, 'withoutNormalizing').mockImplementation(
+        (_e: any, fn: () => void) => fn(),
+      );
+      vi.spyOn(slate.Transforms, 'delete').mockImplementation(() => {});
+      vi.spyOn(slate.Transforms, 'insertText').mockImplementation(() => {});
+      vi.spyOn(slate.Transforms, 'setNodes').mockImplementation(() => {});
+      vi.spyOn(slate.Transforms, 'insertNodes').mockImplementation(() => {});
+      const selectSpy = vi
+        .spyOn(slate.Transforms, 'select')
+        .mockImplementation(() => {});
+      vi.spyOn(slate.Editor, 'start').mockReturnValue({
+        path: [0, 0],
+        offset: 0,
+      } as any);
+      vi.spyOn(slate.Editor, 'end').mockReturnValue({
+        path: [0, 0],
+        offset: 1,
+      } as any);
+      vi.spyOn(slate.Path, 'previous').mockReturnValue([0, -1] as any);
+      vi.spyOn(slate.Path, 'next').mockReturnValue([0, 1] as any);
+      vi.spyOn(slate.Editor, 'hasPath').mockReturnValue(true);
+
+      const mockEditor = {
+        focus: vi.fn(),
+        withoutNormalizing: (fn: () => void) => fn(),
+      };
+      const storeModule3 =
+        await import('../../../../src/MarkdownEditor/editor/store');
+      (storeModule3.useEditorStore as ReturnType<typeof vi.fn>).mockReturnValue(
+        {
+          markdownEditorRef: { current: mockEditor as any },
+          markdownContainerRef: { current: document.createElement('div') },
+          readonly: false,
+          store: {
+            dragStart: vi.fn(),
+            isLatestNode: vi.fn().mockReturnValue(false),
+          },
+          typewriter: false,
+          editorProps: { titlePlaceholderContent: '...' },
+        } as any,
+      );
+
+      const props = {
+        leaf: { text: 't', tag: true, code: true },
+        attributes: {},
+        children: <span>t</span>,
+        readonly: false,
+        text: 't',
+        tagInputProps: {
+          enable: true,
+          tagTextRender: (_p: any, t: string) => t,
+        },
+        fncProps: {},
+        comment: undefined,
+        linkConfig: {},
+      } as any;
+      render(<MLeaf {...props} />);
+      const onSelect = (window as any).__lastTagPopupOnSelect as (
+        v: string,
+        path: number[],
+        tagNode?: any,
+      ) => void;
+      onSelect('v', [0, 0], {});
+      await new Promise((r) => setTimeout(r, 30));
+      expect(selectSpy).toHaveBeenCalled();
     });
   });
 });

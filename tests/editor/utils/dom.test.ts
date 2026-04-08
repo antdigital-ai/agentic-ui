@@ -233,10 +233,22 @@ describe('DOM Utils', () => {
       expect(getMediaType('blob:http://example.com/123', 'image')).toBe(
         'image',
       );
+      expect(getMediaType('blob:http://example.com/123', 'data:image/png')).toBe(
+        'image',
+      );
+    });
+
+    it('应根据 alt 参数处理非 blob 文件名', () => {
+      expect(getMediaType('file.png', 'video:test')).toBe('video');
+      expect(getMediaType('file.png', 'audio:test')).toBe('audio');
+      expect(getMediaType('file.png', 'attachment:test')).toBe('attachment');
     });
 
     it('应该处理data URL', () => {
       expect(getMediaType('data:image/png;base64,123')).toBe('image');
+      expect(getMediaType('data:video/mp4;base64,xxx')).toBe('video');
+      expect(getMediaType('data:audio/mpeg;base64,xxx')).toBe('audio');
+      expect(getMediaType('data:invalid;base64,123')).toBe('other');
       expect(getMediaType('test.jpg', 'data:image/png;base64,123')).toBe(
         'image',
       );

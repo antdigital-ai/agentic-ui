@@ -162,7 +162,11 @@ export const Schema: React.FC<RenderElementProps> = (props) => {
   }
 
   try {
-    const renderContent = customRender(props as any, defaultDom, editorProps?.codeProps);
+    const renderContent = customRender(
+      props as any,
+      defaultDom,
+      editorProps?.codeProps,
+    );
     // 返回 undefined 表示“不覆盖”，回退内部默认渲染
     if (renderContent === undefined) {
       return defaultDom;

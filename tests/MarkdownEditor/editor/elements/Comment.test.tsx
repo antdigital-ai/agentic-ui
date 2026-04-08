@@ -13,8 +13,8 @@ import {
 } from '../../../../src/MarkdownEditor/editor/elements/Comment';
 import { TestSlateWrapper } from './TestSlateWrapper';
 
-// Mock dependencies
-const mockSetShowComment = vi.hoisted(() => vi.fn());
+// Mock dependencies：同一 setShowComment 引用以便覆盖 onClick 内 setShowComment 分支
+const commentMockRef = vi.hoisted(() => ({ setShowComment: vi.fn() }));
 
 vi.mock(
   '../../../../src/MarkdownEditor/editor/store',
@@ -25,7 +25,7 @@ vi.mock(
       EditorStoreContext: React.createContext({
         store: {},
         typewriter: false,
-        setShowComment: mockSetShowComment(),
+        setShowComment: commentMockRef.setShowComment,
         readonly: false,
         keyTask$: { next: vi.fn() },
         insertCompletionText$: { next: vi.fn() },
@@ -42,7 +42,7 @@ vi.mock(
         typewriter: false,
         editorProps: {},
         markdownEditorRef: { current: null },
-        setShowComment: mockSetShowComment(),
+        setShowComment: commentMockRef.setShowComment,
       })),
     };
   },
@@ -90,9 +90,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={mockCommentItem}
           id="test-id"
-         
         >
-          
           <span>Test content</span>
         </CommentView>,
       );
@@ -110,7 +108,7 @@ describe('Comment', () => {
           comment={{}}
           commentItem={mockCommentItem}
           id="test-id"
-         
+          setShowComment={commentMockRef.setShowComment}
         >
           <span>Test content</span>
         </CommentView>,
@@ -119,8 +117,10 @@ describe('Comment', () => {
       const commentElement = screen.getByTestId('comment-view');
       fireEvent.click(commentElement);
 
-      // 验证点击事件被触发
       expect(commentElement).toBeInTheDocument();
+      expect(commentMockRef.setShowComment).toHaveBeenCalledWith(
+        mockCommentItem.filter((item: any) => Boolean(item.content)),
+      );
     });
 
     it('应该处理点击事件并阻止默认行为', () => {
@@ -132,7 +132,6 @@ describe('Comment', () => {
           comment={{}}
           commentItem={mockCommentItem}
           id="test-id"
-         
         >
           <span>Test content</span>
         </CommentView>,
@@ -156,7 +155,6 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-         
         >
           <span>Test content</span>
         </CommentView>,
@@ -174,7 +172,6 @@ describe('Comment', () => {
           comment={{}}
           commentItem={undefined as any}
           id="test-id"
-         
         >
           <span>Test content</span>
         </CommentView>,
@@ -192,7 +189,6 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-         
         >
           <span>Test content</span>
         </CommentView>,
@@ -209,7 +205,6 @@ describe('Comment', () => {
           comment={{}}
           commentItem={mockCommentItem}
           id="test-id"
-         
         >
           <div>
             <span>Complex content</span>
@@ -271,7 +266,6 @@ describe('Comment', () => {
           comment={{}}
           commentItem={multipleCommentItems}
           id="test-id"
-         
         >
           <span>Test content</span>
         </CommentView>,
@@ -397,7 +391,6 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-         
         >
           {null}
         </CommentView>,
@@ -412,7 +405,6 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-         
         >
           {''}
         </CommentView>,
@@ -427,7 +419,6 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-         
         >
           {123}
         </CommentView>,
@@ -442,7 +433,6 @@ describe('Comment', () => {
           comment={{}}
           commentItem={[]}
           id="test-id"
-         
         >
           {true}
         </CommentView>,

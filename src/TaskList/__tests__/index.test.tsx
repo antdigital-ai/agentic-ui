@@ -64,6 +64,23 @@ describe('TaskList', () => {
       expect(loadingComponents).toHaveLength(0);
     });
 
+    it('应该正确渲染 loading 状态并传入 size', () => {
+      const itemsWithLoading = [
+        ...mockItems,
+        {
+          key: 'loading-1',
+          title: 'Loading Task',
+          content: 'Loading content',
+          status: 'loading' as const,
+        },
+      ];
+      render(<TaskList items={itemsWithLoading} />);
+
+      const loadingEl = screen.getByTestId('task-list-loading');
+      expect(loadingEl).toBeInTheDocument();
+      expect(loadingEl).toHaveAttribute('data-size', '16');
+    });
+
     it('应该正确渲染数组内容的任务', () => {
       render(<TaskList items={mockItems} />);
 
@@ -388,12 +405,13 @@ describe('TaskList', () => {
 
   describe('可访问性测试', () => {
     it('应该为可点击元素提供正确的ARIA标签', () => {
-      render(<TaskList items={mockItems} />);
+      const { container } = render(<TaskList items={mockItems} />);
 
-      // 检查是否有可点击的元素
-      const clickableElements = document.querySelectorAll('[onClick]');
+      // 检查任务列表中的可点击区域（TaskList 使用 data-testid="task-list-left" 等）
+      const clickableElements = container.querySelectorAll(
+        '[data-testid="task-list-left"], [data-testid="task-list-arrowContainer"]',
+      );
 
-      // 如果没有onClick属性，检查是否有其他可交互的元素
       if (clickableElements.length === 0) {
         const interactiveElements = document.querySelectorAll(
           'button, [role="button"], [tabindex]',
@@ -402,6 +420,27 @@ describe('TaskList', () => {
       } else {
         expect(clickableElements.length).toBeGreaterThan(0);
       }
+    });
+
+    it('无 task-list-left/arrowContainer 时走 interactiveElements 分支', () => {
+      const { container } = render(
+        <div>
+          <button type="button" aria-label="dummy">
+            dummy
+          </button>
+          <TaskList items={[]} />
+        </div>,
+      );
+
+      const clickableElements = container.querySelectorAll(
+        '[data-testid="task-list-left"], [data-testid="task-list-arrowContainer"]',
+      );
+      expect(clickableElements.length).toBe(0);
+
+      const interactiveElements = document.querySelectorAll(
+        'button, [role="button"], [tabindex]',
+      );
+      expect(interactiveElements.length).toBeGreaterThan(0);
     });
 
     it('应该支持键盘导航', async () => {
@@ -434,6 +473,51 @@ describe('TaskList', () => {
       expect(
         document.querySelector('[data-testid="task-list-thoughtChainItem"]'),
       ).toBeNull();
+    });
+  });
+
+  describe('取消状态测试', () => {
+    const cancelledItems = [
+      {
+        key: '1',
+        title: 'Task 1',
+        content: 'Content 1',
+        status: 'success' as const,
+      },
+      {
+        key: '2',
+        title: 'Task 2',
+        content: 'Content 2',
+        status: 'success' as const,
+      },
+      {
+        key: '3',
+        title: 'Cancelled Task',
+        content: 'Cancelled content',
+        status: 'error' as const,
+      },
+    ];
+
+    it('default 变体：有 error 任务时只渲染最后一条', () => {
+      render(<TaskList items={cancelledItems} />);
+
+      const taskItems = document.querySelectorAll(
+        '[data-testid="task-list-thoughtChainItem"]',
+      );
+      expect(taskItems).toHaveLength(1);
+      expect(screen.getByText('Cancelled Task')).toBeInTheDocument();
+      expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Task 2')).not.toBeInTheDocument();
+    });
+
+    it('default 变体：无 error 任务时渲染全部条目', () => {
+      const normalItems = cancelledItems.slice(0, 2);
+      render(<TaskList items={normalItems} />);
+
+      const taskItems = document.querySelectorAll(
+        '[data-testid="task-list-thoughtChainItem"]',
+      );
+      expect(taskItems).toHaveLength(2);
     });
   });
 
@@ -629,6 +713,261 @@ describe('TaskList', () => {
       });
       // 其他任务仍然展开
       expect(screen.getByText('Pending content 1')).toBeVisible();
+    });
+  });
+
+  describe('Simple 变体测试', () => {
+    const simpleItems = [
+      {
+        key: '1',
+        title: 'Completed Task',
+        content: 'Completed content',
+        status: 'success' as const,
+      },
+      {
+        key: '2',
+        title: 'Running Task',
+        content: 'Running content',
+        status: 'loading' as const,
+      },
+      {
+        key: '3',
+        title: 'Pending Task',
+        content: 'Pending content',
+        status: 'pending' as const,
+      },
+    ];
+
+    it('应该渲染紧凑摘要条', () => {
+      render(<TaskList items={simpleItems} variant="simple" />);
+
+      const bar = screen.getByTestId('task-list-simple-bar');
+      expect(bar).toBeInTheDocument();
+    });
+
+    it('初始状态下不应显示任务列表详情', () => {
+      render(<TaskList items={simpleItems} variant="simple" />);
+
+      expect(screen.queryByText('Completed content')).not.toBeInTheDocument();
+      expect(screen.queryByText('Running content')).not.toBeInTheDocument();
+    });
+
+    it('应该显示进度信息', () => {
+      render(<TaskList items={simpleItems} variant="simple" />);
+
+      expect(screen.getByText('1/3')).toBeInTheDocument();
+    });
+
+    it('应该显示当前正在运行的任务名称', () => {
+      render(<TaskList items={simpleItems} variant="simple" />);
+
+      expect(screen.getByText('正在进行Running Task任务')).toBeInTheDocument();
+    });
+
+    it('点击摘要条应展开任务列表', async () => {
+      render(<TaskList items={simpleItems} variant="simple" />);
+
+      const bar = screen.getByTestId('task-list-simple-bar');
+      fireEvent.click(bar);
+
+      await waitFor(() => {
+        expect(screen.getByText('Completed Task')).toBeInTheDocument();
+        expect(screen.getByText('Running Task')).toBeInTheDocument();
+        expect(screen.getByText('Pending Task')).toBeInTheDocument();
+      });
+    });
+
+    it('再次点击摘要条应收起任务列表', async () => {
+      render(<TaskList items={simpleItems} variant="simple" />);
+
+      const bar = screen.getByTestId('task-list-simple-bar');
+
+      fireEvent.click(bar);
+      await waitFor(() => {
+        expect(screen.getByText('Completed Task')).toBeInTheDocument();
+      });
+
+      fireEvent.click(bar);
+      await waitFor(() => {
+        expect(screen.queryByText('Completed content')).not.toBeInTheDocument();
+      });
+    });
+
+    it('所有任务完成时应显示完成状态', () => {
+      const allDoneItems = [
+        {
+          key: '1',
+          title: 'Task 1',
+          content: 'Content 1',
+          status: 'success' as const,
+        },
+        {
+          key: '2',
+          title: 'Task 2',
+          content: 'Content 2',
+          status: 'success' as const,
+        },
+      ];
+
+      render(<TaskList items={allDoneItems} variant="simple" />);
+
+      expect(screen.getByText('任务完成')).toBeInTheDocument();
+      expect(screen.getByText('2/2')).toBeInTheDocument();
+    });
+
+    it('有错误任务时应显示取消状态', () => {
+      const errorItems = [
+        {
+          key: '1',
+          title: 'Task 1',
+          content: 'Content 1',
+          status: 'success' as const,
+        },
+        {
+          key: '2',
+          title: 'Error Task',
+          content: 'Error content',
+          status: 'error' as const,
+        },
+      ];
+
+      render(<TaskList items={errorItems} variant="simple" />);
+
+      expect(screen.getByText('任务已取消')).toBeInTheDocument();
+    });
+
+    it('展开后取消状态只显示最后一条任务', async () => {
+      const errorItems = [
+        {
+          key: '1',
+          title: 'Task 1',
+          content: 'Content 1',
+          status: 'success' as const,
+        },
+        {
+          key: '2',
+          title: 'Error Task',
+          content: 'Error content',
+          status: 'error' as const,
+        },
+      ];
+
+      render(<TaskList items={errorItems} variant="simple" open={true} />);
+
+      expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
+      expect(screen.getByText('Error Task')).toBeInTheDocument();
+    });
+
+    it('应该支持自定义 className', () => {
+      render(
+        <TaskList
+          items={simpleItems}
+          variant="simple"
+          className="custom-simple"
+        />,
+      );
+
+      const wrapper = screen.getByTestId('task-list-simple-wrapper');
+      expect(wrapper).toHaveClass('custom-simple');
+    });
+
+    it('default variant 应保持原有行为', () => {
+      render(<TaskList items={mockItems} variant="default" />);
+
+      expect(screen.getByText('Success Task')).toBeInTheDocument();
+      expect(screen.getByText('Success content')).toBeInTheDocument();
+      expect(
+        screen.queryByTestId('task-list-simple-bar'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('不传 variant 时默认为 default 模式', () => {
+      render(<TaskList items={mockItems} />);
+
+      expect(
+        screen.queryByTestId('task-list-simple-bar'),
+      ).not.toBeInTheDocument();
+      expect(screen.getByText('Success Task')).toBeInTheDocument();
+    });
+
+    it('空列表时 simple 模式应正常渲染', () => {
+      render(<TaskList items={[]} variant="simple" />);
+
+      const bar = screen.getByTestId('task-list-simple-bar');
+      expect(bar).toBeInTheDocument();
+      expect(screen.getByText('0/0')).toBeInTheDocument();
+    });
+
+    describe('受控 open/onOpenChange', () => {
+      it('open=true 时应展开任务列表', () => {
+        render(<TaskList items={simpleItems} variant="simple" open={true} />);
+
+        expect(screen.getByText('Completed Task')).toBeInTheDocument();
+        expect(screen.getByText('Running Task')).toBeInTheDocument();
+      });
+
+      it('open=false 时应收起任务列表', () => {
+        render(<TaskList items={simpleItems} variant="simple" open={false} />);
+
+        expect(screen.queryByText('Completed content')).not.toBeInTheDocument();
+      });
+
+      it('点击时应调用 onOpenChange', () => {
+        const handleOpenChange = vi.fn();
+        render(
+          <TaskList
+            items={simpleItems}
+            variant="simple"
+            open={false}
+            onOpenChange={handleOpenChange}
+          />,
+        );
+
+        const bar = screen.getByTestId('task-list-simple-bar');
+        fireEvent.click(bar);
+
+        expect(handleOpenChange).toHaveBeenCalledWith(true);
+      });
+
+      it('受控模式下外部更新 open 应同步展开状态', async () => {
+        const handleOpenChange = vi.fn();
+        const { rerender } = render(
+          <TaskList
+            items={simpleItems}
+            variant="simple"
+            open={false}
+            onOpenChange={handleOpenChange}
+          />,
+        );
+
+        expect(screen.queryByText('Completed Task')).not.toBeInTheDocument();
+
+        rerender(
+          <TaskList
+            items={simpleItems}
+            variant="simple"
+            open={true}
+            onOpenChange={handleOpenChange}
+          />,
+        );
+
+        await waitFor(() => {
+          expect(screen.getByText('Completed Task')).toBeInTheDocument();
+        });
+      });
+
+      it('不传 open 时应为非受控模式', async () => {
+        render(<TaskList items={simpleItems} variant="simple" />);
+
+        expect(screen.queryByText('Completed Task')).not.toBeInTheDocument();
+
+        const bar = screen.getByTestId('task-list-simple-bar');
+        fireEvent.click(bar);
+
+        await waitFor(() => {
+          expect(screen.getByText('Completed Task')).toBeInTheDocument();
+        });
+      });
     });
   });
 });

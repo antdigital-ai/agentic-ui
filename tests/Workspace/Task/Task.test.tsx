@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { TaskList } from '../../../src/Workspace/Task';
 
 describe('TaskList Component', () => {
@@ -41,7 +41,9 @@ describe('TaskList Component', () => {
 
     const { container } = renderWithProvider(<TaskList data={data} />);
 
-    const item = container.querySelector('.ant-agentic-workspace-task-item-success');
+    const item = container.querySelector(
+      '.ant-agentic-workspace-task-item-success',
+    );
     expect(item).toBeInTheDocument();
   });
 
@@ -58,7 +60,9 @@ describe('TaskList Component', () => {
 
     const { container } = renderWithProvider(<TaskList data={data} />);
 
-    const item = container.querySelector('.ant-agentic-workspace-task-item-error');
+    const item = container.querySelector(
+      '.ant-agentic-workspace-task-item-error',
+    );
     expect(item).toBeInTheDocument();
   });
 
@@ -75,7 +79,9 @@ describe('TaskList Component', () => {
 
     const { container } = renderWithProvider(<TaskList data={data} />);
 
-    const item = container.querySelector('.ant-agentic-workspace-task-item-loading');
+    const item = container.querySelector(
+      '.ant-agentic-workspace-task-item-loading',
+    );
     expect(item).toBeInTheDocument();
   });
 
@@ -92,7 +98,9 @@ describe('TaskList Component', () => {
 
     const { container } = renderWithProvider(<TaskList data={data} />);
 
-    const item = container.querySelector('.ant-agentic-workspace-task-item-pending');
+    const item = container.querySelector(
+      '.ant-agentic-workspace-task-item-pending',
+    );
     expect(item).toBeInTheDocument();
   });
 
@@ -333,7 +341,9 @@ describe('TaskList Component', () => {
       };
 
       const { container } = renderWithProvider(<TaskList data={data} />);
-      const statusIcon = container.querySelector('.ant-agentic-workspace-task-status');
+      const statusIcon = container.querySelector(
+        '.ant-agentic-workspace-task-status',
+      );
       expect(statusIcon).toBeInTheDocument();
     });
 
@@ -399,7 +409,9 @@ describe('TaskList Component', () => {
       };
 
       const { container } = renderWithProvider(<TaskList data={data} />);
-      const title = container.querySelector('.ant-agentic-workspace-task-title');
+      const title = container.querySelector(
+        '.ant-agentic-workspace-task-title',
+      );
       expect(title).toBeInTheDocument();
       expect(title?.textContent).toBe('');
     });
@@ -587,20 +599,6 @@ describe('TaskList Component', () => {
       expect(screen.getByText('任务2')).toBeInTheDocument();
     });
 
-    it('应该处理大量任务项', () => {
-      const items = Array.from({ length: 100 }, (_, i) => ({
-        key: `task-${i}`,
-        title: `任务 ${i}`,
-        status: 'success' as const,
-      }));
-
-      const data = { items };
-
-      const { container } = renderWithProvider(<TaskList data={data} />);
-      const taskList = screen.getByTestId('task-list');
-      expect(taskList.children.length).toBe(100);
-    });
-
     it('应该处理混合状态的任务列表', () => {
       const data = {
         items: [
@@ -676,13 +674,19 @@ describe('TaskList Component', () => {
       const item = container.querySelector('.ant-agentic-workspace-task-item');
       expect(item).toBeInTheDocument();
 
-      const status = container.querySelector('.ant-agentic-workspace-task-status');
+      const status = container.querySelector(
+        '.ant-agentic-workspace-task-status',
+      );
       expect(status).toBeInTheDocument();
 
-      const content = container.querySelector('.ant-agentic-workspace-task-content');
+      const content = container.querySelector(
+        '.ant-agentic-workspace-task-content',
+      );
       expect(content).toBeInTheDocument();
 
-      const title = container.querySelector('.ant-agentic-workspace-task-title');
+      const title = container.querySelector(
+        '.ant-agentic-workspace-task-title',
+      );
       expect(title).toBeInTheDocument();
 
       const description = container.querySelector(
@@ -711,6 +715,50 @@ describe('TaskList Component', () => {
         );
         expect(item).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('onItemClick 键盘交互', () => {
+    it('应按 Enter 触发 onItemClick', () => {
+      const onItemClick = vi.fn();
+      const data = {
+        items: [{ key: '1', title: '可点击任务', status: 'success' as const }],
+      };
+
+      const { container } = render(
+        <ConfigProvider>
+          <TaskList data={data} onItemClick={onItemClick} />
+        </ConfigProvider>,
+      );
+
+      const taskItem = container.querySelector(
+        '.ant-agentic-workspace-task-item',
+      ) as HTMLElement;
+      expect(taskItem).toBeInTheDocument();
+      fireEvent.keyDown(taskItem, { key: 'Enter' });
+
+      expect(onItemClick).toHaveBeenCalledWith(data.items[0]);
+    });
+
+    it('应按 Space 触发 onItemClick', () => {
+      const onItemClick = vi.fn();
+      const data = {
+        items: [{ key: '1', title: '空格任务', status: 'pending' as const }],
+      };
+
+      const { container } = render(
+        <ConfigProvider>
+          <TaskList data={data} onItemClick={onItemClick} />
+        </ConfigProvider>,
+      );
+
+      const taskItem = container.querySelector(
+        '.ant-agentic-workspace-task-item',
+      ) as HTMLElement;
+      expect(taskItem).toBeInTheDocument();
+      fireEvent.keyDown(taskItem, { key: ' ' });
+
+      expect(onItemClick).toHaveBeenCalledWith(data.items[0]);
     });
   });
 

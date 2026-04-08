@@ -1,9 +1,10 @@
 import { X } from '@sofa-design/icons';
 import { ConfigProvider, Image } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { ActionIconBox } from '../../../Components/ActionIconBox';
+import { I18nContext } from '../../../I18n';
 import { AttachmentFile } from '../types';
 import { isImageFile } from '../utils';
 import { AttachmentFileListItem } from './AttachmentFileListItem';
@@ -16,6 +17,8 @@ export type AttachmentFileListProps = {
   onDownload?: (file: AttachmentFile) => void;
   onRetry?: (file: AttachmentFile) => void;
   onClearFileMap?: () => void;
+  /** E2E 测试 ID */
+  dataTestId?: string;
 };
 
 const ANIMATION_VARIANTS = {
@@ -81,8 +84,10 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
   onDownload,
   onRetry,
   onClearFileMap,
+  dataTestId,
 }) => {
   const context = useContext(ConfigProvider.ConfigContext);
+  const { locale } = useContext(I18nContext);
   const prefix = context?.getPrefixCls('agentic-md-editor-attachment-list');
   const { wrapSSR, hashId } = useStyle(prefix);
   const [imgSrc, setImgSrc] = React.useState<string | undefined>(undefined);
@@ -113,16 +118,12 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
     if (!visible) setImgSrc(undefined);
   };
 
-  const handleDelete = (file: AttachmentFile) => () => onDelete(file);
-  const handlePreviewFile = (file: AttachmentFile) => () => handlePreview(file);
-  const handleDownload = (file: AttachmentFile) => () => onDownload?.(file);
-  const handleRetry = (file: AttachmentFile) => () => onRetry?.(file);
-
   return wrapSSR(
     <div
       className={classNames(`${prefix}-container`, hashId, {
         [`${prefix}-container-empty`]: !hasFiles,
       })}
+      data-testid={dataTestId}
     >
       <motion.div
         variants={ANIMATION_VARIANTS}
@@ -132,6 +133,14 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
         style={containerStyle}
         className={classNames(prefix, hashId)}
       >
+        {hasFiles ? (
+          <div
+            className={classNames(`${prefix}-title`, hashId)}
+            data-testid="attachment-list-title"
+          >
+            {locale?.['input.attachmentListTitle'] || '上传附件'}
+          </div>
+        ) : null}
         <AnimatePresence initial={false}>
           {fileList.map((file, index) => (
             <AttachmentFileListItem
@@ -140,10 +149,10 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
               className={classNames(hashId, `${prefix}-item`)}
               key={getFileKey(file, index)}
               file={file}
-              onDelete={handleDelete(file)}
-              onPreview={handlePreviewFile(file)}
-              onDownload={handleDownload(file)}
-              onRetry={handleRetry(file)}
+              onDelete={onDelete}
+              onPreview={onPreview ?? handlePreview}
+              onDownload={onDownload}
+              onRetry={onRetry}
             />
           ))}
         </AnimatePresence>

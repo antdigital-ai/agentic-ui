@@ -1,16 +1,20 @@
-import { memo, MutableRefObject, useContext } from 'react';
+import { memo, MutableRefObject, useContext, useMemo, useRef } from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
-import cx from 'classnames';
+import clsx from 'clsx';
+import { nanoid } from 'nanoid';
 import React from 'react';
 import { WhiteBoxProcessInterface } from '../ThoughtChainList/types';
 import { BubbleAvatar } from './Avatar';
 import { BubbleBeforeNode } from './BubbleBeforeNode';
 import { BubbleConfigContext } from './BubbleConfigProvide';
+import { ContentFilemapView } from './ContentFilemapView';
 import { BubbleFileView } from './FileView';
 import { BubbleMessageDisplay } from './MessagesContent';
 import { MessagesContext } from './MessagesContent/BubbleContext';
+import { LOADING_FLAT } from './MessagesContent';
 import { BubbleExtra } from './MessagesContent/BubbleExtra';
+import { extractFilemapBlocks } from './extractFilemapBlocks';
 import { useStyle } from './style';
 import { BubbleTitle } from './Title';
 import type { BubbleMetaData, BubbleProps } from './type';
@@ -37,7 +41,8 @@ const getTaskList = (originData: any): WhiteBoxProcessInterface[] => {
   ).filter((item) => item?.info);
 };
 
-const shouldRenderBeforeContent = (
+/** @internal 供单测覆盖 placement !== 'left' 等分支 */
+export const shouldRenderBeforeContent = (
   placement: string,
   role: string | undefined,
   thoughtChainConfig: any,
@@ -83,10 +88,11 @@ export const AIBubble: React.FC<
   } = props;
 
   const [hidePadding, setHidePadding] = React.useState(false);
+  const messageDisplayKeyRef = useRef<string | null>(null);
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const context = useContext(BubbleConfigContext);
-  const { compact, standalone, locale } = context || {};
+  const { compact, standalone, extraShowOnHover } = context || {};
 
   const prefixClass = getPrefixCls('agentic');
   const { wrapSSR, hashId } = useStyle(prefixClass);
@@ -103,7 +109,7 @@ export const AIBubble: React.FC<
       bubbleNameClassName={classNames?.bubbleNameClassName}
       className={classNames?.bubbleListItemTitleClassName}
       style={styles?.bubbleListItemTitleStyle}
-      prefixClass={cx(`${prefixClass}-bubble-title`)}
+      prefixClass={clsx(`${prefixClass}-bubble-title`)}
       title={avatar?.title || avatar?.name}
       placement={placement}
       time={time}
@@ -124,6 +130,31 @@ export const AIBubble: React.FC<
     />,
   );
 
+  const id = props?.originData?.id;
+  if (id === undefined || id === LOADING_FLAT) {
+    if (!messageDisplayKeyRef.current) {
+      messageDisplayKeyRef.current = nanoid();
+    }
+  }
+  const messageDisplayKey =
+    messageDisplayKeyRef.current ?? id ?? nanoid();
+
+  const rawContent = props?.originData?.content as string | undefined;
+  const { blocks: filemapBlocks, stripped: strippedContent } = useMemo(
+    () =>
+      extractFilemapBlocks(
+        typeof rawContent === 'string' ? rawContent : '',
+      ),
+    [rawContent],
+  );
+
+  const contentForDisplay =
+    filemapBlocks.length > 0
+      ? strippedContent
+      : typeof rawContent === 'string'
+        ? rawContent
+        : strippedContent;
+
   const messageContent = (
     <BubbleMessageDisplay
       markdownRenderConfig={props.markdownRenderConfig}
@@ -131,8 +162,8 @@ export const AIBubble: React.FC<
       bubbleListRef={props.bubbleListRef}
       bubbleListItemExtraStyle={styles?.bubbleListItemExtraStyle}
       bubbleRef={props.bubbleRef}
-      content={props?.originData?.content}
-      key={props?.originData?.id}
+      content={contentForDisplay}
+      key={messageDisplayKey}
       data-id={props?.originData?.id}
       avatar={props?.originData?.meta as BubbleMetaData}
       readonly={props.readonly ?? false}
@@ -154,34 +185,34 @@ export const AIBubble: React.FC<
       renderFileMoreAction={props.renderFileMoreAction}
       shouldShowVoice={props.shouldShowVoice}
       bubbleRenderConfig={props.bubbleRenderConfig}
-      contentAfterDom={
-        (props?.originData?.fileMap?.size || 0) > 0 ? (
-          <div
-            style={{
-              minWidth: standalone ? 'min(296px,100%)' : '0px',
-              paddingLeft: 12,
-              maxWidth: '100%',
-              width: '100%',
-              ...styles?.bubbleListItemExtraStyle,
-            }}
-            className={cx(
-              `${prefixClass}-bubble-after`,
-              `${prefixClass}-bubble-after-${placement}`,
-              `${prefixClass}-bubble-after-ai`, // AI消息 after 特定样式
-              hashId,
-            )}
-            data-testid="message-after"
-          >
-            <BubbleFileView
-              placement={placement}
-              bubbleListRef={props.bubbleListRef}
-              bubble={props as any}
-            />
-          </div>
-        ) : null
-      }
     />
   );
+
+  const hasFileMap = (props?.originData?.fileMap?.size || 0) > 0;
+
+  const fileViewDom = hasFileMap ? (
+    <div
+      style={{
+        minWidth: standalone ? 'min(296px,100%)' : '0px',
+        paddingLeft: 12,
+        maxWidth: '100%',
+        ...styles?.bubbleListItemExtraStyle,
+      }}
+      className={clsx(
+        `${prefixClass}-bubble-after`,
+        `${prefixClass}-bubble-after-${placement}`,
+        `${prefixClass}-bubble-after-ai`,
+        hashId,
+      )}
+      data-testid="message-after"
+    >
+      <BubbleFileView
+        placement={placement}
+        bubbleListRef={props.bubbleListRef}
+        bubble={props as any}
+      />
+    </div>
+  ) : null;
 
   const childrenDom = runRender(
     bubbleRenderConfig?.contentRender,
@@ -218,12 +249,12 @@ export const AIBubble: React.FC<
       value={{
         compact,
         standalone: !!standalone,
-        locale: locale as any,
+        extraShowOnHover,
         bubble: props as any,
       }}
     >
       <Flex
-        className={cx(
+        className={clsx(
           hashId,
           className,
           `${prefixClass}-bubble`,
@@ -242,7 +273,7 @@ export const AIBubble: React.FC<
       >
         <div
           style={style}
-          className={cx(
+          className={clsx(
             `${prefixClass}-bubble-container`,
             `${prefixClass}-bubble-container-${placement}`,
             {
@@ -251,9 +282,10 @@ export const AIBubble: React.FC<
             hashId,
           )}
         >
-          {preMessageSameRole ? null : (
+          {!preMessageSameRole && (avatarDom || titleDom) ? (
             <div
-              className={cx(
+              data-testid="bubble-avatar-title"
+              className={clsx(
                 `${prefixClass}-bubble-avatar-title`,
                 `${prefixClass}-bubble-avatar-title-${placement}`,
                 `${prefixClass}-bubble-avatar-title-ai`, // AI消息头像标题特定样式
@@ -267,7 +299,7 @@ export const AIBubble: React.FC<
               {avatarDom}
               {titleDom}
             </div>
-          )}
+          ) : null}
           <div
             style={{
               display: 'flex',
@@ -275,7 +307,7 @@ export const AIBubble: React.FC<
               flexDirection: 'column',
               alignItems: 'flex-start', // AI消息内容左对齐
             }}
-            className={cx(
+            className={clsx(
               `${prefixClass}-bubble-container`,
               `${prefixClass}-bubble-container-${placement}`,
               `${prefixClass}-bubble-container-ai`, // AI消息容器特定样式
@@ -290,7 +322,7 @@ export const AIBubble: React.FC<
             {contentBeforeDom ? (
               <div
                 style={styles?.bubbleListItemExtraStyle}
-                className={cx(
+                className={clsx(
                   `${prefixClass}-bubble-before`,
                   `${prefixClass}-bubble-before-${placement}`,
                   `${prefixClass}-bubble-before-ai`, // AI消息 before 特定样式
@@ -301,29 +333,41 @@ export const AIBubble: React.FC<
                 {contentBeforeDom}
               </div>
             ) : null}
-            <div
-              style={{
-                minWidth: standalone ? 'min(16px,100%)' : '0px',
-                ...styles?.bubbleListItemContentStyle,
-              }}
-              className={cx(
-                `${prefixClass}-bubble-content`,
-                `${prefixClass}-bubble-content-${placement}`,
-                `${prefixClass}-bubble-content-ai`, // AI消息内容特定样式
-                {
-                  [`${prefixClass}-bubble-content-pure`]: props.pure,
-                },
-                classNames?.bubbleListItemContentClassName,
-                hashId,
-              )}
-              onDoubleClick={props.onDoubleClick}
-              data-testid="message-content"
-            >
-              {childrenDom}
-            </div>
+            {childrenDom ? (
+              <div
+                style={{
+                  minWidth: standalone ? 'min(16px,100%)' : '0px',
+                  ...styles?.bubbleListItemContentStyle,
+                }}
+                className={clsx(
+                  `${prefixClass}-bubble-content`,
+                  `${prefixClass}-bubble-content-${placement}`,
+                  `${prefixClass}-bubble-content-ai`, // AI消息内容特定样式
+                  {
+                    [`${prefixClass}-bubble-content-pure`]: props.pure,
+                  },
+                  classNames?.bubbleListItemContentClassName,
+                  hashId,
+                )}
+                onDoubleClick={props.onDoubleClick}
+                data-testid="message-content"
+              >
+                {childrenDom}
+              </div>
+            ) : null}
+            {fileViewDom}
             {contentAfterDom}
           </div>
         </div>
+        {filemapBlocks.length > 0 && (
+          <ContentFilemapView
+            blocks={filemapBlocks}
+            fileViewConfig={props.fileViewConfig}
+            fileViewEvents={props.fileViewEvents}
+            fileMapConfig={props.markdownRenderConfig?.fileMapConfig}
+            placement={placement}
+          />
+        )}
       </Flex>
     </BubbleConfigContext.Provider>,
   );
@@ -356,7 +400,7 @@ export const AIBubble: React.FC<
             title: titleDom,
             header: (
               <div
-                className={cx(
+                className={clsx(
                   `${prefixClass}-bubble-avatar-title`,
                   `${prefixClass}-bubble-avatar-title-${placement}`,
                   `${prefixClass}-bubble-avatar-title-ai`,

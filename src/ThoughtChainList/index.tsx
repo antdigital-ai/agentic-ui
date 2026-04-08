@@ -7,12 +7,12 @@ import {
   Sparkles,
 } from '@sofa-design/icons';
 import { ConfigProvider, Descriptions, Drawer, Typography } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { motion } from 'framer-motion';
 import { merge } from 'lodash-es';
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ActionIconBox } from '../Components/ActionIconBox';
 import { useAutoScroll } from '../Hooks/useAutoScroll';
@@ -28,6 +28,8 @@ import {
   ThoughtChainListProps,
   WhiteBoxProcessInterface,
 } from './types';
+
+const COLLAPSE_ANIMATION_DURATION_MS = 160;
 
 // Initialize dayjs plugins
 try {
@@ -84,18 +86,9 @@ const ThoughtChainTitle = React.memo<{
         <div className={classNames(`${prefixCls}-title-content`, hashId)}>
           <Sparkles
             data-testid="magic-icon"
-            style={{
-              width: 15,
-              height: 15,
-              color: '#0CE0AD',
-            }}
+            className={classNames(`${prefixCls}-title-icon`, hashId)}
           />
-          <span
-            className={classNames(`${prefixCls}-title-progress`, hashId)}
-            style={{
-              fontSize: '1em',
-            }}
-          >
+          <span className={classNames(`${prefixCls}-title-progress`, hashId)}>
             {endStatusDisplay}
           </span>
         </div>
@@ -195,9 +188,25 @@ const ThoughtChainContent = React.memo<
     const { containerRef } = useAutoScroll({
       SCROLL_TOLERANCE: 30,
     });
+    const [shouldRenderItems, setShouldRenderItems] = useState(!collapse);
+
+    useEffect(() => {
+      if (!collapse) {
+        setShouldRenderItems(true);
+        return;
+      }
+
+      const timer = window.setTimeout(() => {
+        setShouldRenderItems(false);
+      }, COLLAPSE_ANIMATION_DURATION_MS);
+
+      return () => {
+        window.clearTimeout(timer);
+      };
+    }, [collapse]);
 
     const processedItems = useMemo(() => {
-      if (collapse) return [];
+      if (!shouldRenderItems) return [];
 
       return thoughtChainList.map((item, index) => {
         let info = item.info;
@@ -240,7 +249,19 @@ const ThoughtChainContent = React.memo<
           isFinished?: boolean;
         };
       });
-    }, [thoughtChainList, bubble?.isFinished, collapse]);
+    }, [thoughtChainList, bubble?.isFinished, shouldRenderItems]);
+
+    const mergedMarkdownProps = useMemo(
+      () =>
+        merge(markdownRenderProps || {}, {
+          codeProps: {
+            showLineNumbers: false,
+            showGutter: false,
+            fontSize: 12,
+          },
+        }),
+      [markdownRenderProps],
+    );
 
     return (
       <motion.div
@@ -257,24 +278,8 @@ const ThoughtChainContent = React.memo<
         <motion.div
           role="list"
           className={classNames(`${prefixCls}-content-list`, hashId)}
-          variants={{
-            hidden: {
-              opacity: 0,
-              transition: {
-                when: 'afterChildren',
-              },
-            },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.3,
-                when: 'beforeChildren',
-              },
-            },
-          }}
-          whileInView="visible"
-          initial="hidden"
-          animate="visible"
+          initial={false}
+          animate={{ opacity: 1 }}
         >
           {processedItems.map((item, index) => {
             const info = item.info?.split(/(\$\{\w+\})/);
@@ -301,13 +306,7 @@ const ThoughtChainContent = React.memo<
               >
                 <ThoughtChainListItem
                   index={index}
-                  markdownRenderProps={merge(markdownRenderProps, {
-                    codeProps: {
-                      showLineNumbers: false,
-                      showGutter: false,
-                      fontSize: 12,
-                    },
-                  })}
+                  markdownRenderProps={mergedMarkdownProps}
                   bubble={bubble}
                   thoughtChainListItem={item}
                   hashId={hashId}
@@ -380,14 +379,16 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
     const {
       thoughtChainList,
       loading,
-      //@ts-ignore
-      bubble = props.chatItem,
+      bubble: bubbleProp,
+      chatItem,
       style: customStyle,
       compact,
       markdownRenderProps,
       finishAutoCollapse = true,
       onDocMetaClick,
     } = props;
+    // 兼容旧版 chatItem 属性，优先使用 bubble
+    const bubble = bubbleProp ?? chatItem;
     const context = useContext(ConfigProvider.ConfigContext);
     const [collapse, setCollapse] = React.useState<boolean>(false);
     const prefixCls = context?.getPrefixCls('thought-chain-list');
@@ -406,8 +407,8 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
 
     // memo 化的回调函数
     const handleCollapseToggle = React.useCallback(() => {
-      setCollapse(!collapse);
-    }, [collapse]);
+      setCollapse((prev) => !prev);
+    }, []);
 
     const handleDocMetaClose = React.useCallback(() => {
       setDocMeta(null);
@@ -434,14 +435,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
 
       if (!loading && bubble?.isFinished) {
         if (time > 0) {
-          if (bubble?.isFinished) {
-            return `${locale?.taskComplete}, ${locale?.totalTimeUsed} ${time.toFixed(2)}s`;
-          }
-          return (
-            <FlipText
-              word={`${locale?.taskComplete}, ${locale?.totalTimeUsed} ${time.toFixed(2)}s`}
-            />
-          );
+          return `${locale?.taskComplete}, ${locale?.totalTimeUsed} ${time.toFixed(2)}s`;
         }
         return <FlipText word={locale?.taskComplete} />;
       }
@@ -492,7 +486,6 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
 
         <div className={classNames(`${prefixCls}`, hashId)} style={restStyle}>
           <motion.div
-            transition={{ duration: 0.3 }}
             className={classNames(`${prefixCls}-container`, hashId, {
               [`${prefixCls}-container-loading`]: !bubble?.isFinished,
             })}
@@ -516,14 +509,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
                   : undefined
               }
             />
-            <div
-              style={{
-                backgroundColor: '#FFF',
-                position: 'relative',
-                borderRadius: '6px 12px 12px 12px',
-                zIndex: 9,
-              }}
-            >
+            <div className={classNames(`${prefixCls}-content-wrapper`, hashId)}>
               <ThoughtChainContent
                 prefixCls={prefixCls}
                 hashId={hashId}

@@ -235,10 +235,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           transform: 'translateX(0)',
         },
         '95%': {
-          transform: 'translateX(var(--scroll-width))',
+          transform: 'translateX(var(--scroll-width, 0px))',
         },
         '100%': {
-          transform: 'translateX(var(--scroll-width))',
+          transform: 'translateX(var(--scroll-width, 0px))',
         },
       },
 
@@ -298,6 +298,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     },
   };
 };
+
+/** @internal 供单测调用 genStyle 覆盖 token 回退分支 */
+export { genStyle };
 
 export function useStyle(prefixCls?: string) {
   return useEditorStyleRegister('history-group-menu', (token) => {

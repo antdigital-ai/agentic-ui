@@ -17,6 +17,7 @@ import { CardNode, ChartNode, CodeNode, Elements } from '../../../el';
 import { MarkdownEditorPlugin } from '../../../plugin';
 import { TableNode, TrNode as TableRowNode } from '../../types/Table';
 import { EditorUtils } from '../../utils';
+import { REMARK_REHYPE_DIRECTIVE_HANDLERS } from '../../utils/markdownToHtml';
 import type { ParserMarkdownToSlateNodeConfig } from '../parserMarkdownToSlateNode';
 
 // 表格相关常量
@@ -31,7 +32,10 @@ const stringifyObj = remark()
   .use(remarkMath as any, {
     singleDollarTextMath: false,
   })
-  .use(remarkRehype as any, { allowDangerousHtml: true })
+  .use(remarkRehype as any, {
+    allowDangerousHtml: true,
+    handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
+  })
   .use(rehypeRaw)
   .use(rehypeKatex as any)
   .use(remarkGfm, { singleTilde: false }) // 禁用单波浪线删除线
@@ -39,8 +43,13 @@ const stringifyObj = remark()
 
 const myRemark = {
   stringify: (obj: Root) => {
-    const mdStr = stringifyObj.stringify(obj);
-    return mdStr;
+    try {
+      const mdStr = stringifyObj.stringify(obj);
+      return mdStr;
+    } catch (error) {
+      console.error('myRemark.stringify error', obj);
+      return '';
+    }
   },
 };
 
@@ -279,16 +288,41 @@ export const parseTableOrChart = (
   const getChartType = (): string | undefined => {
     return (
       (chartConfig as ChartTypeConfig)?.chartType ||
-      (Array.isArray(chartConfig) &&
-        (chartConfig?.[0] as ChartTypeConfig)?.chartType) ||
+      (Array.isArray(chartConfig)
+        ? (chartConfig?.[0] as ChartTypeConfig)?.chartType
+        : undefined) ||
       (config as ChartTypeConfig)?.chartType ||
-      (config as ChartTypeConfig)?.at?.(0)?.chartType
+      (Array.isArray(config)
+        ? (config as ChartTypeConfig[])?.at?.(0)?.chartType
+        : undefined)
     );
   };
 
   const chartType = getChartType();
   // 如果 chartType 为 "table"，将其视为不存在，按普通表格处理
-  const isChart = chartType && chartType !== 'table';
+  let isChart = chartType && chartType !== 'table';
+
+  // 图表的 x、y 必须在表格列中存在，否则降级为表格渲染
+  if (isChart && chartConfig) {
+    const columnKeys = new Set(columns.map((c) => c.dataIndex));
+    const configsToValidate = Array.isArray(chartConfig)
+      ? chartConfig
+      : [chartConfig];
+
+    const isChartConfigValid = (cfg: ChartTypeConfig): boolean => {
+      if (!cfg || cfg.chartType === 'table') return true;
+      if (cfg.x && !columnKeys.has(cfg.x)) return false;
+      if (cfg.y && !columnKeys.has(cfg.y)) return false;
+      return true;
+    };
+
+    const allConfigsValid = configsToValidate.every((c) =>
+      isChartConfigValid(c as ChartTypeConfig),
+    );
+    if (!allConfigsValid) {
+      isChart = false;
+    }
+  }
 
   // 计算合并单元格信息
   const mergeCells = (config as CodeNode['otherProps'])?.mergeCells || [];

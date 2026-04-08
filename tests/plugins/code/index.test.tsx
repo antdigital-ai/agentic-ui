@@ -40,6 +40,57 @@ describe('code plugin index', () => {
     CodeElement = module.CodeElement;
   });
 
+  describe('csvToMarkdownTable', () => {
+    let csvToMarkdownTable: (csv: string | undefined) => string;
+
+    beforeAll(async () => {
+      const module = await import('../../../src/Plugins/code/index');
+      csvToMarkdownTable = module.csvToMarkdownTable;
+    });
+
+    it('undefined 时返回空字符串', () => {
+      expect(csvToMarkdownTable(undefined)).toBe('');
+    });
+
+    it('空字符串时返回空字符串', () => {
+      expect(csvToMarkdownTable('')).toBe('');
+    });
+
+    it('跳过空行', () => {
+      const csv = 'A,B\n\nC,D\n  \nE,F';
+      const result = csvToMarkdownTable(csv);
+      expect(result).toContain('| A | B |');
+      expect(result).toContain('| C | D |');
+      expect(result).toContain('| E | F |');
+    });
+
+    it('双引号内转义双引号 "" 解析为单个 "', () => {
+      const csv = 'Col1,"Say ""Hi""",Col3';
+      const result = csvToMarkdownTable(csv);
+      expect(result).toContain('Say "Hi"');
+    });
+
+    it('仅空行时返回空字符串', () => {
+      const csv = '\n  \n\n';
+      expect(csvToMarkdownTable(csv)).toBe('');
+    });
+
+    it('列数不一致时用空单元格补齐', () => {
+      const csv = 'A,B,C\nX,Y';
+      const result = csvToMarkdownTable(csv);
+      expect(result).toContain('| A | B | C |');
+      expect(result).toContain('| X | Y |  |');
+    });
+
+    it('\\r\\n 和 \\r 换行符被统一为 \\n', () => {
+      const csv = 'A,B\r\nC,D\rE,F';
+      const result = csvToMarkdownTable(csv);
+      expect(result).toContain('| A | B |');
+      expect(result).toContain('| C | D |');
+      expect(result).toContain('| E | F |');
+    });
+  });
+
   describe('CodeElement', () => {
     const baseProps: any = {
       element: {

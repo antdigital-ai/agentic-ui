@@ -1,4 +1,4 @@
-﻿import { FieldTimeOutlined } from '@ant-design/icons';
+import { FieldTimeOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import React, { useContext, useMemo } from 'react';
 import { I18nContext, LocalKeys } from '../I18n';
@@ -15,7 +15,8 @@ import { I18nContext, LocalKeys } from '../I18n';
  * msToTimes(65000, locale) // "1m 5s"
  * msToTimes(3665000, locale) // "1H 1m 5s"
  */
-const msToTimes = (ms: number | undefined, locale: LocalKeys) => {
+/** 导出供单测覆盖 undefined/null 分支 */
+export const msToTimes = (ms: number | undefined | null, locale: LocalKeys) => {
   if (ms === undefined || ms === null) {
     return '';
   }

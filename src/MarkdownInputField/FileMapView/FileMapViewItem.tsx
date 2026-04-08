@@ -1,14 +1,20 @@
 import { Download, EllipsisVertical, Eye } from '@sofa-design/icons';
 import { Tooltip } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
 import React, { useContext } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
-import { AttachmentFileIcon } from '../AttachmentButton/AttachmentFileList/AttachmentFileIcon';
+import {
+  AttachmentFileIcon,
+  FileMetaPlaceholder,
+} from '../AttachmentButton/AttachmentFileList/AttachmentFileIcon';
 import { AttachmentFile } from '../AttachmentButton/types';
-import { kbToSize } from '../AttachmentButton/utils';
+import {
+  isFileMetaPlaceholderState,
+  kbToSize,
+} from '../AttachmentButton/utils';
 
 /**
  * FileMapViewItem 组件 - 文件映射视图项组件
@@ -71,9 +77,128 @@ export const FileMapViewItem: React.FC<{
     lastDotIndex > 0 && lastDotIndex < fileName.length - 1
       ? fileName.slice(lastDotIndex + 1)
       : '';
+
+  const showSize = typeof file.size === 'number' && file.size > 0;
+  const fileSize = showSize ? kbToSize(file.size / 1024) : '';
+  const lastModifiedTime = file?.lastModified
+    ? dayjs(file.lastModified).format('HH:mm')
+    : '';
+
+  const renderExtensionContainer = () => {
+    if (file.status === 'error' && file.errorMessage) {
+      return (
+        <div
+          data-testid="file-item-extension-container"
+          className={classNames(
+            `${props.prefixCls}-file-name-extension-container`,
+            props.hashId,
+          )}
+        >
+          <span
+            className={classNames(
+              `${props.prefixCls}-file-error-msg`,
+              props.hashId,
+            )}
+            data-testid="file-item-error-msg"
+            style={{ color: 'var(--color-red-text-secondary)' }}
+          >
+            {file.errorMessage}
+          </span>
+        </div>
+      );
+    }
+
+    const items: React.ReactNode[] = [];
+    if (displayExtension) {
+      items.push(
+        <span
+          key="ext"
+          data-testid="file-item-extension"
+          className={classNames(
+            `${props.prefixCls}-file-name-extension`,
+            props.hashId,
+          )}
+        >
+          {displayExtension}
+        </span>,
+      );
+    }
+    if (fileSize) {
+      items.push(
+        <div
+          key="size"
+          data-testid="file-item-size"
+          className={classNames(
+            `${props.prefixCls}-file-size`,
+            props.hashId,
+          )}
+        >
+          {fileSize}
+        </div>,
+      );
+    }
+    if (lastModifiedTime) {
+      items.push(
+        <div key="time" data-testid="file-item-time">
+          {lastModifiedTime}
+        </div>,
+      );
+    }
+
+    if (items.length === 0) return null;
+
+    return (
+      <div
+        data-testid="file-item-extension-container"
+        className={classNames(
+          `${props.prefixCls}-file-name-extension-container`,
+          props.hashId,
+        )}
+      >
+        {items.map((item, index) => (
+          <React.Fragment key={index}>
+            {index > 0 && (
+              <span
+                className={classNames(
+                  `${props.prefixCls}-separator`,
+                  props.hashId,
+                )}
+              >
+                |
+              </span>
+            )}
+            {item}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
+
+  // 有 status 但无 url/previewUrl：文件内容未拿到，展示大小与格式占位块（loading 状态除外）
+  if (isFileMetaPlaceholderState(file)) {
+    return (
+      <FileMetaPlaceholder
+        file={file}
+        className={classNames(
+          props.className,
+          props.prefixCls ? `${props.prefixCls}-meta-placeholder` : undefined,
+        )}
+        style={{
+          height: 56,
+          ...props.style,
+        }}
+      />
+    );
+  }
   return (
     <Tooltip
-      title={<div>{locale?.clickToPreview}</div>}
+      title={
+        file.status === 'error' && file.errorMessage ? (
+          <div>{file.errorMessage}</div>
+        ) : (
+          <div>{locale?.clickToPreview}</div>
+        )
+      }
       placement="topLeft"
       arrow={false}
     >
@@ -96,10 +221,14 @@ export const FileMapViewItem: React.FC<{
           exit: { x: -20, opacity: 0 },
         }}
         exit={{ opacity: 0, x: -20 }}
-        className={props.className}
+        className={classNames(props.className, {
+          [`${props.prefixCls}-meta-placeholder`]:
+            isFileMetaPlaceholderState(file),
+        })}
         data-testid="file-item"
       >
         <div
+          data-testid="file-item-icon"
           className={classNames(`${props.prefixCls}-file-icon`, props.hashId)}
         >
           <AttachmentFileIcon
@@ -111,12 +240,14 @@ export const FileMapViewItem: React.FC<{
           />
         </div>
         <div
+          data-testid="file-item-info"
           className={classNames(`${props.prefixCls}-file-info`, props.hashId)}
         >
           <div
             className={classNames(`${props.prefixCls}-file-name`, props.hashId)}
           >
             <span
+              data-testid="file-item-name"
               className={classNames(
                 `${props.prefixCls}-file-name-text`,
                 props.hashId,
@@ -126,54 +257,12 @@ export const FileMapViewItem: React.FC<{
               {displayName}
             </span>
           </div>
-          <div
-            className={classNames(
-              `${props.prefixCls}-file-name-extension-container`,
-              props.hashId,
-            )}
-          >
-            <span
-              className={classNames(
-                `${props.prefixCls}-file-name-extension`,
-                props.hashId,
-              )}
-            >
-              {displayExtension}
-            </span>
-            <span
-              className={classNames(
-                `${props.prefixCls}-separator`,
-                props.hashId,
-              )}
-            >
-              |
-            </span>
-            <div
-              className={classNames(
-                `${props.prefixCls}-file-size`,
-                props.hashId,
-              )}
-            >
-              {kbToSize(file.size / 1024)}
-            </div>
-            <span
-              className={classNames(
-                `${props.prefixCls}-separator`,
-                props.hashId,
-              )}
-            >
-              |
-            </span>
-            <div>
-              {file?.lastModified
-                ? dayjs(file?.lastModified).format('HH:mm')
-                : ''}
-            </div>
-          </div>
+          {renderExtensionContainer()}
         </div>
 
         {hovered ? (
           <div
+            data-testid="file-item-action-bar"
             className={classNames(
               `${props.prefixCls}-action-bar`,
               props.hashId,
@@ -232,7 +321,7 @@ export const FileMapViewItem: React.FC<{
                 )}
                 {props.renderMoreAction && (
                   <ActionIconBox
-                    title="更多操作"
+                    title={locale?.moreActions || '更多操作'}
                     onClick={(e) => {
                       e.stopPropagation();
                     }}

@@ -62,7 +62,8 @@ vi.mock('../../../store', () => {
   const actual = vi.importActual('../../../store');
   return {
     ...actual,
-    EditorStore: vi.fn().mockImplementation(() => ({
+    EditorStore: vi.fn(function MockEditorStore() {
+      return {
       manual: false,
       highlightCache: new Map(),
       focus: false,
@@ -100,7 +101,8 @@ vi.mock('../../../store', () => {
       setState: vi.fn(),
       toPath: vi.fn(),
       dragStart: vi.fn(),
-    })) as unknown as typeof EditorStore,
+    };
+    }) as unknown as typeof EditorStore,
     useEditorStore: vi.fn(),
   };
 });

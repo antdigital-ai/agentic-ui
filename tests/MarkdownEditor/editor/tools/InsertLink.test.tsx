@@ -14,6 +14,14 @@ vi.mock('../../../../src/MarkdownEditor/editor/utils/editorUtils', () => ({
   },
 }));
 
+// Mock slate Transforms (close() calls Transforms.setNodes)
+vi.mock('slate', () => ({
+  Transforms: {
+    setNodes: vi.fn(),
+  },
+  Text: { isText: vi.fn(() => true) },
+}));
+
 // Mock parsePath and isLink
 vi.mock('../../../../src/MarkdownEditor/editor/utils/path', () => ({
   parsePath: vi.fn((path: string) => {
@@ -125,11 +133,6 @@ describe('InsertLink Component', () => {
     vi.mocked(EditorUtils.focus).mockImplementation(() => {});
   });
 
-  it('应该渲染插入链接组件', () => {
-    render(<InsertLink />);
-    expect(document.body).toBeInTheDocument();
-  });
-
   it('应该在 open 为 false 时返回 null', () => {
     mockState.open = false;
     const { container } = render(<InsertLink />);
@@ -169,7 +172,7 @@ describe('InsertLink Component', () => {
     vi.mocked(pathUtils.isLink).mockReturnValue(false);
 
     render(<InsertLink />);
-    
+
     const okButton = document.querySelector('.ant-modal .ant-btn-primary');
     if (okButton) {
       fireEvent.click(okButton);
@@ -301,18 +304,27 @@ describe('InsertLink Component', () => {
 
   it('应该处理 openInsertLink 事件（有 URL）', () => {
     vi.mocked(EditorUtils.getUrl).mockReturnValue('https://example.com');
-    
+    const addEventListenerSpy = vi.spyOn(
+      mockParentElement,
+      'addEventListener',
+    );
+
     render(<InsertLink />);
-    
-    // 触发 openInsertLink 事件
+
     if (mockOpenInsertLink$.callback) {
       mockOpenInsertLink$.callback({
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 5 },
       });
     }
-    
+
     expect(mockSetState).toHaveBeenCalled();
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      'wheel',
+      expect.any(Function),
+      { passive: false },
+    );
+    addEventListenerSpy.mockRestore();
   });
 
   it('应该处理 openInsertLink 事件（有 hash）', () => {
@@ -350,11 +362,9 @@ describe('InsertLink Component', () => {
     mockState.oldUrl = 'https://example.com';
 
     render(<InsertLink />);
-    
-    // 模拟 Modal 关闭
+
     const modal = document.querySelector('.ant-modal');
     if (modal) {
-      // 触发 afterClose 回调
       mockState.open = false;
     }
   });
@@ -401,5 +411,41 @@ describe('InsertLink Component', () => {
     if (okButton) {
       fireEvent.click(okButton);
     }
+  });
+
+  it('打开后关闭时应移除 wheel 的 addEventListener', () => {
+    vi.mocked(EditorUtils.getUrl).mockReturnValue('https://example.com');
+    const removeSpy = vi.spyOn(mockParentElement, 'removeEventListener');
+
+    const { rerender } = render(<InsertLink />);
+    if (mockOpenInsertLink$.callback) {
+      mockOpenInsertLink$.callback({
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 5 },
+      });
+    }
+    rerender(<InsertLink />);
+    expect(mockState.open).toBe(true);
+
+    const cancelButton = document.querySelector('.ant-modal .ant-btn-default');
+    if (cancelButton) {
+      fireEvent.click(cancelButton);
+    }
+
+    expect(removeSpy).toHaveBeenCalledWith('wheel', expect.any(Function));
+    removeSpy.mockRestore();
+  });
+
+  it('setPath 为 isLink 时直接 close(path)', () => {
+    mockState.open = true;
+    mockState.inputKeyword = 'https://example.com';
+    vi.mocked(pathUtils.isLink).mockReturnValue(true);
+
+    render(<InsertLink />);
+    const okButton = document.querySelector('.ant-modal .ant-btn-primary');
+    if (okButton) {
+      fireEvent.click(okButton);
+    }
+    expect(mockSetState).toHaveBeenCalledWith(expect.objectContaining({ open: false }));
   });
 });

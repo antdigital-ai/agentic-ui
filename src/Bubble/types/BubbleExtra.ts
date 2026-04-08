@@ -4,7 +4,9 @@ import { MessageBubbleData, WithFalse } from '../../Types';
 // 简化的 BubbleProps 类型，避免循环依赖
 export interface SimpleBubbleProps<T = Record<string, any>> {
   originData?: T & MessageBubbleData;
-  [key: string]: any;
+  id?: string;
+  placement?: 'left' | 'right';
+  readonly?: boolean;
 }
 
 /**
@@ -24,7 +26,7 @@ export type BubbleExtraProps = {
   /**
    * 点踩的回调函数
    * @description 当用户点击点踩按钮时触发
-   * @deprecated 请使用 onDislike 替代（符合命名规范），但为保持兼容性暂时保留
+   * @deprecated @since 2.29.0 请使用 onDislike 替代（符合命名规范），但为保持兼容性暂时保留
    * @callback
    * @optional
    */
@@ -43,7 +45,7 @@ export type BubbleExtraProps = {
   /**
    * 取消点赞的回调函数
    * @description 当用户点击取消点赞按钮时触发
-   * @deprecated 请使用 onLikeCancel 替代（符合命名规范），但为保持兼容性暂时保留
+   * @deprecated @since 2.29.0 请使用 onLikeCancel 替代（符合命名规范），但为保持兼容性暂时保留
    * @callback
    * @optional
    */
@@ -145,7 +147,7 @@ export type BubbleExtraProps = {
    * @param defaultDoms - 默认的操作按钮 DOM 节点
    * @returns 自定义的额外操作区域 React 节点
    * @optional
-   * @deprecated 此属性当前未被使用，extraRender 功能在 MessagesContent 层级处理
+   * @deprecated @since 2.29.0 此属性当前未被使用，extraRender 功能在 MessagesContent 层级处理
    */
   render?: WithFalse<
     (

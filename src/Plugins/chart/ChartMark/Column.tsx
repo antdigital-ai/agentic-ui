@@ -7,21 +7,22 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import React, { useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Bar as ChartBar } from 'react-chartjs-2';
+import { isWindowDefined } from '../env';
 import { stringFormatNumber } from '../utils';
 import { Container } from './Container';
 import { ChartProps } from './useChart';
 
 let chartMarkColumnRegistered = false;
 
-export const Column: React.FC<ChartProps> = (props) => {
+export const Column = forwardRef<ChartJS, ChartProps>((props, ref) => {
   React.useMemo(() => {
     if (chartMarkColumnRegistered) {
       return undefined;
     }
 
-    if (typeof window === 'undefined') {
+    if (!isWindowDefined()) {
       return undefined;
     }
 
@@ -41,7 +42,7 @@ export const Column: React.FC<ChartProps> = (props) => {
   const htmlRef = useRef<HTMLDivElement>(null);
   const barChartRef = useRef<any>(null);
 
-  useImperativeHandle(props.chartRef, () => chartRef.current, [
+  useImperativeHandle(ref, () => chartRef.current as ChartJS, [
     chartRef.current,
   ]);
 
@@ -183,4 +184,6 @@ export const Column: React.FC<ChartProps> = (props) => {
       <ChartBar ref={barChartRef} data={chartData} options={options} />
     </Container>
   );
-};
+});
+
+Column.displayName = 'Column';

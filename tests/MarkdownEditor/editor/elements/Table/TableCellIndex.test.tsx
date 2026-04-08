@@ -11,8 +11,11 @@ import { TablePropsContext } from '../../../../../src/MarkdownEditor/editor/elem
 // Mock dependencies
 vi.mock('../../../../../src/MarkdownEditor/editor/store');
 vi.mock('../../../../../src/MarkdownEditor/hooks/editor');
+let clickAwayCallback: (() => void) | null = null;
 vi.mock('../../../../../src/Hooks/useClickAway', () => ({
-  useClickAway: vi.fn(),
+  useClickAway: vi.fn((cb: () => void) => {
+    clickAwayCallback = cb;
+  }),
 }));
 
 // Mock useRefFunction
@@ -40,9 +43,9 @@ vi.mock('slate-react', async () => {
   const actual: any = await vi.importActual('slate-react');
   return {
     ...actual,
-    useSlate: vi.fn(() => withReact(createEditor())),
     useSlateSelection: vi.fn(),
     ReactEditor: {
+      ...actual.ReactEditor,
       toDOMNode: vi.fn(() => {
         const mockElement = document.createElement('td');
         mockElement.setAttribute = vi.fn();
@@ -239,6 +242,18 @@ describe('TableCellIndex 组件测试', () => {
     expect(td.style.position).toBe('relative');
   });
 
+  it('点击单元格应调用 setDeleteIconPosition 并执行 clearSelect 与行选中', () => {
+    mockSetDeleteIconPosition.mockClear();
+    renderTableCellIndex({ rowIndex: 0, tablePath: [0] });
+    const td = document.querySelector('td');
+    expect(td).toBeInTheDocument();
+    fireEvent.click(td!);
+    expect(mockSetDeleteIconPosition).toHaveBeenCalledWith({
+      rowIndex: 0,
+      columnIndex: undefined,
+    });
+  });
+
   it('应该在点击时设置删除图标位置', () => {
     // 重置 mock 函数
     mockSetDeleteIconPosition.mockClear();
@@ -406,7 +421,7 @@ describe('TableCellIndex 组件测试', () => {
     mockRemoveNodes.mockRestore();
   });
 
-  it('应该在删除按钮点击时删除整个表格（当只有一行时）', () => {
+  it('应该在删除按钮点击时删除整个表格（当只有一行时）', async () => {
     // 创建只有一行的表格
     const editor = createTestEditor();
     const testRow = {
@@ -465,8 +480,74 @@ describe('TableCellIndex 组件测试', () => {
       fireEvent.click(deleteButton);
     }
 
-    // Since we're mocking the module, we can't check the actual call
-    expect(deleteButton).toBeInTheDocument();
+    const { NativeTableEditor } = await import(
+      '../../../../../src/MarkdownEditor/utils/native-table'
+    );
+    expect(NativeTableEditor.removeTable).toHaveBeenCalledWith(editor, [0]);
+  });
+
+  it('应该在只有一行一列时删除整个表格', async () => {
+    const editor = createTestEditor();
+    const testRow = {
+      type: 'table-row',
+      children: [
+        {
+          type: 'table-cell',
+          children: [{ type: 'paragraph', children: [{ text: 'Only' }] }],
+        },
+      ],
+    };
+    editor.children = [{ type: 'table', children: [testRow] }];
+
+    const { NativeTableEditor } = await import(
+      '../../../../../src/MarkdownEditor/utils/native-table'
+    );
+
+    render(
+      <ConfigProvider>
+        <TablePropsContext.Provider
+          value={{
+            deleteIconPosition: { rowIndex: 0 },
+            setDeleteIconPosition: mockSetDeleteIconPosition,
+          }}
+        >
+          <Slate editor={editor} initialValue={editor.children as any}>
+            <table>
+              <tbody>
+                <tr>
+                  <TableCellIndex targetRow={testRow} rowIndex={0} tablePath={[0]} />
+                </tr>
+              </tbody>
+            </table>
+          </Slate>
+        </TablePropsContext.Provider>
+      </ConfigProvider>,
+    );
+
+    const deleteButton = document.querySelector(
+      '.ant-agentic-md-editor-table-cell-index-delete-icon',
+    );
+    fireEvent.click(deleteButton!);
+
+    expect(NativeTableEditor.removeTable).toHaveBeenCalledWith(editor, [0]);
+  });
+
+  it('应该在多行时删除指定行并调用 clearSelect', () => {
+    const mockRemoveNodes = vi.spyOn(Transforms, 'removeNodes').mockImplementation(() => {});
+
+    renderTableCellIndex(
+      { rowIndex: 0, tablePath: [0] },
+      { deleteIconPosition: { rowIndex: 0 } },
+    );
+
+    const deleteButton = document.querySelector(
+      '.ant-agentic-md-editor-table-cell-index-delete-icon',
+    );
+    fireEvent.click(deleteButton!);
+
+    expect(mockRemoveNodes).toHaveBeenCalled();
+    expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
+    mockRemoveNodes.mockRestore();
   });
 
   it('应该在前面插入行', () => {
@@ -474,21 +555,20 @@ describe('TableCellIndex 组件测试', () => {
       .spyOn(Transforms, 'insertNodes')
       .mockImplementation(() => {});
 
-    renderTableCellIndex({ rowIndex: 0, tablePath: [0] });
+    renderTableCellIndex(
+      { rowIndex: 0, tablePath: [0] },
+      { deleteIconPosition: { rowIndex: 0, columnIndex: undefined } },
+    );
 
     const insertBeforeButton = document.querySelector(
       '.ant-agentic-md-editor-table-cell-index-insert-row-before',
     );
 
-    if (insertBeforeButton) {
-      fireEvent.click(insertBeforeButton);
-    }
+    expect(insertBeforeButton).toBeInTheDocument();
+    fireEvent.click(insertBeforeButton!);
 
-    // 检查是否有插入按钮元素（即使不可见）
-    const actionButtons = document.querySelectorAll(
-      '.ant-agentic-md-editor-table-cell-index-action-button',
-    );
-    expect(actionButtons.length).toBeGreaterThan(0);
+    expect(mockInsertNodes).toHaveBeenCalled();
+    expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
     mockInsertNodes.mockRestore();
   });
 
@@ -497,22 +577,43 @@ describe('TableCellIndex 组件测试', () => {
       .spyOn(Transforms, 'insertNodes')
       .mockImplementation(() => {});
 
-    renderTableCellIndex({ rowIndex: 0, tablePath: [0] });
+    renderTableCellIndex(
+      { rowIndex: 0, tablePath: [0] },
+      { deleteIconPosition: { rowIndex: 0, columnIndex: undefined } },
+    );
 
     const insertAfterButton = document.querySelector(
       '.ant-agentic-md-editor-table-cell-index-insert-row-after',
     );
 
-    if (insertAfterButton) {
-      fireEvent.click(insertAfterButton);
-    }
+    expect(insertAfterButton).toBeInTheDocument();
+    fireEvent.click(insertAfterButton!);
 
-    // 检查是否有插入按钮元素（即使不可见）
-    const actionButtons = document.querySelectorAll(
-      '.ant-agentic-md-editor-table-cell-index-action-button',
-    );
-    expect(actionButtons.length).toBeGreaterThan(0);
+    expect(mockInsertNodes).toHaveBeenCalled();
+    expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
     mockInsertNodes.mockRestore();
+  });
+
+  it('插入行前应使用 locale 的 insertRowBefore 作为 title', () => {
+    renderTableCellIndex(
+      { rowIndex: 0, tablePath: [0] },
+      { deleteIconPosition: { rowIndex: 0 } },
+    );
+    const insertBefore = document.querySelector(
+      '.ant-agentic-md-editor-table-cell-index-insert-row-before',
+    );
+    expect(insertBefore).toHaveAttribute('title', '在上面增加一行');
+  });
+
+  it('插入行后应使用 locale 的 insertRowAfter 作为 title', () => {
+    renderTableCellIndex(
+      { rowIndex: 0, tablePath: [0] },
+      { deleteIconPosition: { rowIndex: 0 } },
+    );
+    const insertAfter = document.querySelector(
+      '.ant-agentic-md-editor-table-cell-index-insert-row-after',
+    );
+    expect(insertAfter).toHaveAttribute('title', '在下面增加一行');
   });
 
   it('应该处理插入行前的异常情况', () => {
@@ -597,6 +698,17 @@ describe('TableCellIndex 组件测试', () => {
     const td = document.querySelector('td') as HTMLElement;
     // 注意：由于是CSS变量，我们不能直接比较值，但可以检查是否设置了样式
     expect(td.style.backgroundColor).toBeDefined();
+  });
+
+  it('useClickAway 触发时应调用 clearSelect 并清除删除图标位置', () => {
+    mockSetDeleteIconPosition.mockClear();
+    renderTableCellIndex(
+      { rowIndex: 0, tablePath: [0] },
+      { deleteIconPosition: { rowIndex: 0, columnIndex: undefined } },
+    );
+    expect(clickAwayCallback).toBeDefined();
+    clickAwayCallback!();
+    expect(mockSetDeleteIconPosition).toHaveBeenCalledWith(null);
   });
 
   describe('clearSelect 函数测试', () => {

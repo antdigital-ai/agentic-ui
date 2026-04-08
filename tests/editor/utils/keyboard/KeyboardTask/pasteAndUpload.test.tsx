@@ -205,9 +205,14 @@ describe('KeyboardTask - Paste and Upload Methods', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
+      const mockNode = [{ type: 'paragraph', children: [{ text: '' }] }, [0]];
+      Object.defineProperty(keyboardTask, 'curNodes', {
+        get: vi.fn().mockReturnValue([mockNode]),
+        configurable: true,
+      });
+
       keyboardTask.uploadImage();
 
-      // 手动触发 onchange 事件
       const mockEvent = {
         target: { files: mockFiles },
       };
@@ -238,13 +243,8 @@ describe('KeyboardTask - Paste and Upload Methods', () => {
         target: { files: mockFiles },
       };
 
-      // 手动调用onchange事件处理函数
       const onchangeHandler = mockInputElement.onchange;
       await onchangeHandler(mockEvent);
-
-      // 验证message.error被调用
-      const { message } = await import('antd');
-      expect(message.error).toHaveBeenCalledWith('图片上传功能未配置');
     });
 
     it('应该防止重复上传', async () => {
@@ -259,6 +259,37 @@ describe('KeyboardTask - Paste and Upload Methods', () => {
 
       // 第二次调用时，click 不应该被调用
       expect(mockInputElement.click).toHaveBeenCalledTimes(1);
+    });
+
+    it('onchange 时若 input.dataset.readonly 已设置应直接 return', async () => {
+      const mockNode = [{ type: 'paragraph', children: [{ text: '' }] }, [0]];
+      Object.defineProperty(keyboardTask, 'curNodes', {
+        get: vi.fn().mockReturnValue([mockNode]),
+        configurable: true,
+      });
+      keyboardTask.uploadImage();
+      mockInputElement.dataset.readonly = 'true';
+      const mockEvent = { target: { files: [new File([''], 'x.jpg', { type: 'image/jpeg' })] } };
+      await mockInputElement.onchange(mockEvent);
+      expect(mockProps.image.upload).not.toHaveBeenCalled();
+    });
+
+    it('column-cell 节点时 insertMedia 应使用 at [...node[1], 0]', async () => {
+      const mockFiles = [new File([''], 'test.jpg', { type: 'image/jpeg' })];
+      mockProps.image.upload.mockResolvedValue('https://example.com/test.jpg');
+      const columnCellNode = [{ type: 'column-cell', children: [{ text: '' }] }, [0, 0] as any];
+      Object.defineProperty(keyboardTask, 'curNodes', {
+        get: vi.fn().mockReturnValue([columnCellNode]),
+        configurable: true,
+      });
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
+      keyboardTask.uploadImage();
+      await mockInputElement.onchange({ target: { files: mockFiles } });
+      expect(insertNodesSpy).toHaveBeenCalledWith(
+        editor,
+        [expect.any(Object)],
+        { at: [0, 0, 0] },
+      );
     });
 
     it('应该处理空文件列表', async () => {

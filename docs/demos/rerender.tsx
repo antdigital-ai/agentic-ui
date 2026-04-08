@@ -1,13 +1,5 @@
-﻿/* eslint-disable @typescript-eslint/no-loop-func */
-import {
-  MarkdownEditor,
-  MarkdownEditorInstance,
-  parserMarkdownToSlateNode,
-  useAutoScroll,
-} from '@ant-design/agentic-ui';
-import { ChartElement } from '@ant-design/agentic-ui/Plugins/chart';
-import { CodeElement } from '@ant-design/agentic-ui/Plugins/code';
-import { MermaidElement } from '@ant-design/agentic-ui/Plugins/mermaid';
+/* eslint-disable @typescript-eslint/no-loop-func */
+import { MarkdownRenderer, useAutoScroll } from '@ant-design/agentic-ui';
 import {
   ClearOutlined,
   PauseCircleOutlined,
@@ -17,30 +9,61 @@ import {
 import { Button, Input, Radio, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { newEnergyFundContent } from './shared/newEnergyFundContent';
+import { RERENDER_CARD_APPENDIX } from './shared/rerenderCardAppendix';
 
-const SPEED_CONFIG = {
-  fast: 1,
-  medium: 16,
-  slow: 160,
-} as const;
+const rerenderDemoMarkdown = `${newEnergyFundContent}\n\n${RERENDER_CARD_APPENDIX.trim()}`;
 
-type SpeedType = keyof typeof SPEED_CONFIG;
+type SpeedType = 'block' | 'fast' | 'medium' | 'slow';
 
-// md 逐字符渲染 demo
+/**
+ * 将 markdown 按 block（\n\n）分割，保留分隔符
+ */
+const splitBlocks = (text: string): string[] => {
+  const blocks: string[] = [];
+  let current = '';
+  let inFence = false;
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (
+      line.trimStart().startsWith('```') ||
+      line.trimStart().startsWith('~~~')
+    ) {
+      inFence = !inFence;
+    }
+    current += (current ? '\n' : '') + line;
+    if (
+      !inFence &&
+      line === '' &&
+      i + 1 < lines.length &&
+      lines[i + 1] === ''
+    ) {
+      continue;
+    }
+    if (!inFence && line === '' && current.trim()) {
+      blocks.push(current);
+      current = '';
+    }
+  }
+  if (current) blocks.push(current);
+  return blocks;
+};
+
+// md 渲染 demo —— 使用 MarkdownRenderer（无 Slate 实例）
 export const RerenderMdDemo = () => {
-  const instance = useRef<MarkdownEditorInstance>();
   const { containerRef } = useAutoScroll();
-  const [value, setValue] = useState('');
-  const [speed, setSpeed] = useState<SpeedType>('medium');
+  const [content, setContent] = useState('');
+  const [speed, setSpeed] = useState<SpeedType>('fast');
   const [isPaused, setIsPaused] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
   const pauseRef = useRef(false);
   const currentIndexRef = useRef(0);
-  const speedRef = useRef<number>(SPEED_CONFIG.medium);
+  const speedRef = useRef<SpeedType>('fast');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [restartKey, setRestartKey] = useState(0);
 
   useEffect(() => {
-    speedRef.current = SPEED_CONFIG[speed];
+    speedRef.current = speed;
   }, [speed]);
 
   useEffect(() => {
@@ -48,80 +71,85 @@ export const RerenderMdDemo = () => {
   }, [isPaused]);
 
   const clearContent = () => {
-    // 清除定时器
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    // 清空内容
-    setValue('');
+    setContent('');
+    setIsFinished(false);
     currentIndexRef.current = 0;
-    // 清空编辑器内容
-    instance.current?.store.updateNodeList(
-      parserMarkdownToSlateNode('').schema,
-    );
   };
 
   const restart = () => {
-    // 清除定时器
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    // 重置状态
-    setValue('');
+    setContent('');
+    setIsFinished(false);
     currentIndexRef.current = 0;
     setIsPaused(false);
     pauseRef.current = false;
-    // 触发重新渲染
     setRestartKey((prev) => prev + 1);
   };
 
   useEffect(() => {
+    const blocks = splitBlocks(rerenderDemoMarkdown);
+    const chars = rerenderDemoMarkdown.split('');
     let md = '';
-    const list = newEnergyFundContent.split('');
     currentIndexRef.current = 0;
+    setIsFinished(false);
 
-    const run = () => {
-      if (process.env.NODE_ENV === 'test') {
-        instance.current?.store.updateNodeList(
-          parserMarkdownToSlateNode(newEnergyFundContent).schema,
-        );
-        return;
-      }
+    if (process.env.NODE_ENV === 'test') {
+      setContent(rerenderDemoMarkdown);
+      setIsFinished(true);
+      return;
+    }
 
-      const processNext = async () => {
-        if (currentIndexRef.current >= list.length) {
-          await instance.current?.store.updateNodeList(
-            parserMarkdownToSlateNode(md).schema,
-          );
+    const processNext = () => {
+      const isBlock = speedRef.current === 'block';
 
+      if (isBlock) {
+        if (currentIndexRef.current >= blocks.length) {
+          setIsFinished(true);
           return;
         }
-
         if (pauseRef.current) {
           timeoutRef.current = setTimeout(processNext, 100);
           return;
         }
-
-        md += list[currentIndexRef.current];
-        const index = currentIndexRef.current;
-        currentIndexRef.current = index + 1;
-
+        md = blocks.slice(0, currentIndexRef.current + 1).join('\n');
+        currentIndexRef.current += 1;
         timeoutRef.current = setTimeout(() => {
-          instance.current?.store.updateNodeList(
-            parserMarkdownToSlateNode(md).schema,
-          );
-          setValue(md);
+          setContent(md);
           processNext();
-        }, speedRef.current);
-      };
-
-      processNext();
+        }, 50);
+      } else {
+        if (currentIndexRef.current >= chars.length) {
+          setIsFinished(true);
+          return;
+        }
+        if (pauseRef.current) {
+          timeoutRef.current = setTimeout(processNext, 100);
+          return;
+        }
+        md += chars[currentIndexRef.current];
+        currentIndexRef.current += 1;
+        const delay =
+          speedRef.current === 'fast'
+            ? 1
+            : speedRef.current === 'medium'
+              ? 16
+              : 160;
+        timeoutRef.current = setTimeout(() => {
+          setContent(md);
+          processNext();
+        }, delay);
+      }
     };
-    run();
 
-    // 清理函数
+    processNext();
+
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -165,6 +193,7 @@ export const RerenderMdDemo = () => {
             onChange={(e) => setSpeed(e.target.value)}
             buttonStyle="solid"
           >
+            <Radio.Button value="block">逐块</Radio.Button>
             <Radio.Button value="fast">快</Radio.Button>
             <Radio.Button value="medium">中</Radio.Button>
             <Radio.Button value="slow">慢</Radio.Button>
@@ -186,7 +215,7 @@ export const RerenderMdDemo = () => {
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', gap: 24 }}>
         <Input.TextArea
-          value={value}
+          value={content}
           style={{
             width: 'calc(50vw - 32px)',
             whiteSpace: 'pre-wrap',
@@ -204,72 +233,55 @@ export const RerenderMdDemo = () => {
             border: '1px solid #e0e0e0',
             color: '#333',
             fontWeight: 500,
-            fontStyle: 'normal',
-            fontVariant: 'normal',
-            fontStretch: 'normal',
-            fontVariantLigatures: 'normal',
-            fontVariantNumeric: 'normal',
-            fontVariantAlternates: 'normal',
           }}
         />
-        <MarkdownEditor
-          editorRef={instance}
-          toc={false}
-          plugins={[
-            {
-              elements: {
-                code: CodeElement,
-                chart: ChartElement,
-                mermaid: MermaidElement,
-              },
-            },
-          ]}
-          width={'100%'}
-          typewriter
-          height={'auto'}
-          readonly
+        <MarkdownRenderer
+          content={content}
+          streaming={!isFinished}
+          isFinished={isFinished}
+          queueOptions={{ animate: false }}
+          style={{ width: '100%' }}
         />
       </div>
 
       <div style={{ marginTop: '20px', padding: '20px' }}>
-        <h4>Props 说明：</h4>
+        <h4>MarkdownRenderer 模式说明：</h4>
         <ul>
           <li>
-            <strong>editorRef</strong>: 编辑器实例引用，用于调用编辑器方法
+            <strong>MarkdownRenderer</strong>: 使用轻量 Markdown 渲染器，不创建
+            Slate 实例
           </li>
           <li>
-            <strong>toc</strong>: 是否显示目录，设置为 false 隐藏目录
+            <strong>content</strong>: markdown 内容字符串（持续增长）
           </li>
           <li>
-            <strong>plugins</strong>: 插件数组，用于扩展编辑器功能
+            <strong>streaming</strong>: 是否处于流式状态
           </li>
           <li>
-            <strong>plugins[].elements</strong>: 自定义元素渲染配置
+            <strong>isFinished</strong>: 流式是否完成
           </li>
           <li>
-            <strong>width</strong>: 编辑器宽度
+            <strong>queueOptions</strong>: 字符队列配置，animate=false
+            表示由外部控制逐字输出
           </li>
           <li>
-            <strong>typewriter</strong>: 打字机模式，启用打字机效果
+            文末追加 <strong>agentar-card</strong> 示例：流式结束后应渲染 Schema
+            卡片（与编辑器只读态 <code>agentar-card</code> 代码块一致）
+          </li>
+        </ul>
+        <h4>与 Slate 模式对比：</h4>
+        <ul>
+          <li>
+            无需 <code>MarkdownEditorInstance</code>、
+            <code>store.updateNodeList</code>、
+            <code>parserMarkdownToSlateNode</code>
           </li>
           <li>
-            <strong>height</strong>: 编辑器高度，设置为 &apos;auto&apos; 自适应
+            无 Slate Editor 实例、无 Operation 队列、无 History 栈、无 Normalize
           </li>
           <li>
-            <strong>readonly</strong>: 只读模式，禁用编辑功能
-          </li>
-          <li>
-            <strong>useAutoScroll</strong>: 自动滚动 Hook，提供 containerRef
-          </li>
-          <li>
-            <strong>store.updateNodeList</strong>: 更新节点列表的方法
-          </li>
-          <li>
-            <strong>store.setMDContent</strong>: 设置 Markdown 内容的方法
-          </li>
-          <li>
-            <strong>parserMarkdownToSlateNode</strong>: 将 Markdown 解析为 Slate
-            节点的工具函数
+            Markdown → hast → React（两层），而非 Markdown → mdast → Slate →
+            React（四层）
           </li>
         </ul>
       </div>

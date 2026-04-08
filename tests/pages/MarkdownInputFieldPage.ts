@@ -1,5 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+
 /**
  * MarkdownInputField Page Object Model
  * 封装 MarkdownInputField 组件的所有交互操作
@@ -11,11 +13,9 @@ export class MarkdownInputFieldPage {
 
   constructor(page: Page) {
     this.page = page;
-    // 使用 data-testid 作为后备，优先使用语义化选择器
-    this.inputField = page
-      .getByTestId('markdown-input-field')
-      .or(page.locator('[contenteditable="true"]').first().locator('..'));
-    this.editableInput = page.locator('[contenteditable="true"]').first();
+    // 仅用 testid 并取第一个，避免多 demo 页面下 strict mode 匹配到多个元素
+    this.inputField = page.getByTestId('markdown-input-field').first();
+    this.editableInput = this.inputField.locator('[contenteditable="true"]');
   }
 
   get sendButton(): Locator {
@@ -33,10 +33,15 @@ export class MarkdownInputFieldPage {
 
   /**
    * 导航到 demo 页面
+   * 使用 domcontentloaded 先完成 DOM，减少 load 阶段资源压力，降低 headless 下 Page crashed 概率。
    */
-  async goto(demoPath: string = 'markdowninputfield-demo-1') {
-    await this.page.goto(`/~demos/${demoPath}`);
-    // 等待页面加载完成（DOMContentLoaded 和 networkidle）
+  async goto(
+    demoPath: string = PLAYWRIGHT_FIXTURE_DEMOS.markdownInputFieldOnFocus,
+  ) {
+    await this.page.goto(`/~demos/${demoPath}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60_000,
+    });
     await this.page.waitForLoadState('networkidle');
     await this.waitForReady();
   }

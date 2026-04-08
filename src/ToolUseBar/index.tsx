@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
 import React, { memo, useContext, useMemo } from 'react';
 import { useRefFunction } from '../Hooks/useRefFunction';
@@ -23,6 +23,8 @@ interface ToolUseBarProps {
   ) => void;
   testId?: string;
   light?: boolean;
+  /** 关闭动画，在性能较弱设备上可减少卡顿 */
+  disableAnimation?: boolean;
 }
 
 /**
@@ -72,6 +74,7 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
   onActiveKeysChange,
   onExpandedKeysChange,
   light = false,
+  disableAnimation = false,
   style,
   ...props
 }) => {
@@ -146,6 +149,7 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
         prefixCls={prefixCls}
         hashId={hashId}
         light={light}
+        disableAnimation={disableAnimation}
       />
     ));
   }, [
@@ -160,12 +164,15 @@ const ToolUseBarComponent: React.FC<ToolUseBarProps> = ({
     prefixCls,
     hashId,
     light,
+    disableAnimation,
   ]);
 
   // 使用 useMemo 优化样式类名
   const containerClassName = useMemo(() => {
-    return classNames(prefixCls, hashId, props.className);
-  }, [prefixCls, hashId, props.className]);
+    return classNames(prefixCls, hashId, props.className, {
+      [`${prefixCls}-no-animation`]: disableAnimation,
+    });
+  }, [prefixCls, hashId, props.className, disableAnimation]);
 
   if (!tools?.length)
     return (

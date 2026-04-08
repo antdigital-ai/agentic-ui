@@ -102,7 +102,9 @@ describe('ReadonlyTableComponent', () => {
     it('应该应用正确的类名', () => {
       renderComponent();
       const table = document.querySelector('table');
-      expect(table).toHaveClass('ant-agentic-md-editor-content-table-editor-table');
+      expect(table).toHaveClass(
+        'ant-agentic-md-editor-content-table-editor-table',
+      );
       expect(table).toHaveClass('readonly');
     });
 
@@ -129,28 +131,62 @@ describe('ReadonlyTableComponent', () => {
 
       renderComponent();
       const table = document.querySelector('table');
-      expect(table).toHaveClass('ant-agentic-md-editor-content-table-readonly-pure');
+      expect(table).toHaveClass(
+        'ant-agentic-md-editor-content-table-readonly-pure',
+      );
     });
   });
 
   describe('列宽计算测试', () => {
-    it('应该使用 otherProps 中的 colWidths', () => {
+    const elementWith3Columns = {
+      type: 'table',
+      children: [
+        {
+          type: 'table-row',
+          children: [
+            {
+              type: 'table-cell',
+              children: [{ type: 'paragraph', children: [{ text: 'A' }] }],
+            },
+            {
+              type: 'table-cell',
+              children: [{ type: 'paragraph', children: [{ text: 'B' }] }],
+            },
+            {
+              type: 'table-cell',
+              children: [{ type: 'paragraph', children: [{ text: 'C' }] }],
+            },
+          ],
+        },
+      ],
+    };
+
+    const threeColumnChildren = (
+      <tr>
+        <td>A</td>
+        <td>B</td>
+        <td>C</td>
+      </tr>
+    );
+
+    it('显式传入 otherProps.colWidths 时使用自定义列宽', () => {
       const elementWithColWidths = {
-        ...mockTableElement,
+        ...elementWith3Columns,
         otherProps: {
           colWidths: [150, 200, 250],
         },
       };
 
-      renderComponent(elementWithColWidths);
+      renderComponent(elementWithColWidths, { children: threeColumnChildren });
       const cols = document.querySelectorAll('col');
       expect(cols.length).toBe(3);
     });
 
-    it('应该为没有 colWidths 的表格使用默认宽度', () => {
+    it('1–4 列时使用百分比实现列平分', () => {
       renderComponent();
       const cols = document.querySelectorAll('col');
       expect(cols.length).toBe(2);
+      expect((cols[0] as HTMLElement).style.width).toBe('50%');
     });
 
     it('应该处理空的 children', () => {
@@ -164,15 +200,15 @@ describe('ReadonlyTableComponent', () => {
       expect(cols.length).toBe(0);
     });
 
-    it('应该为每一列应用正确的宽度样式', () => {
+    it('>= 5 列时为每一列应用默认宽度，或使用 otherProps.colWidths', () => {
       const elementWithColWidths = {
-        ...mockTableElement,
+        ...elementWith3Columns,
         otherProps: {
-          colWidths: [100, 150],
+          colWidths: [100, 150, 200],
         },
       };
 
-      renderComponent(elementWithColWidths);
+      renderComponent(elementWithColWidths, { children: threeColumnChildren });
       const cols = document.querySelectorAll('col');
       const firstCol = cols[0] as HTMLElement;
       expect(firstCol.style.width).toBe('100px');
@@ -310,6 +346,37 @@ describe('ReadonlyTableComponent', () => {
   });
 
   describe('模态框测试', () => {
+    it('全屏模态内 ConfigProvider 的 getPopupContainer/getTargetContainer 被调用时返回 modelTargetRef 或 body', async () => {
+      renderComponent();
+      const fullscreenButton = screen
+        .getAllByTestId('action-icon')
+        .find((el) => el.getAttribute('title') === '全屏');
+      fireEvent.click(fullscreenButton!);
+      await waitFor(() => {
+        expect(document.querySelector('.ant-modal-wrap')).toBeInTheDocument();
+      });
+      const modalBody = document.querySelector(
+        '.ant-modal-content .ant-agentic-md-editor-content-table',
+      ) as HTMLElement;
+      expect(modalBody).toBeInTheDocument();
+      const fiberKey = Object.keys(modalBody).find((k) =>
+        k.startsWith('__reactFiber'),
+      );
+      expect(fiberKey).toBeDefined();
+      const divFiber = (modalBody as any)[fiberKey!];
+      const configProviderFiber = divFiber?.child;
+      expect(
+        configProviderFiber?.memoizedProps?.getPopupContainer,
+      ).toBeDefined();
+      expect(
+        configProviderFiber?.memoizedProps?.getTargetContainer,
+      ).toBeDefined();
+      const container = configProviderFiber.memoizedProps.getPopupContainer();
+      const target = configProviderFiber.memoizedProps.getTargetContainer();
+      expect(container === modalBody || container === document.body).toBe(true);
+      expect(target === modalBody || target === document.body).toBe(true);
+    });
+
     it('应该在点击全屏后显示模态框', async () => {
       renderComponent();
       const fullscreenButton = screen
@@ -386,7 +453,9 @@ describe('ReadonlyTableComponent', () => {
         fireEvent.click(fullscreenButton);
 
         await waitFor(() => {
-          const modalContent = document.querySelector('.ant-agentic-md-editor-content');
+          const modalContent = document.querySelector(
+            '.ant-agentic-md-editor-content',
+          );
           if (modalContent) {
             const mouseDownEvent = new MouseEvent('mousedown', {
               bubbles: true,
@@ -398,12 +467,53 @@ describe('ReadonlyTableComponent', () => {
         });
       }
     });
+
+    it('应在模态框内容区触发 onMouseDown/onDragStart/onDoubleClick 时调用 preventDefault', async () => {
+      renderComponent();
+      const fullscreenButton = screen
+        .getAllByTestId('action-icon')
+        .find((el) => el.getAttribute('title') === '全屏');
+      expect(fullscreenButton).toBeDefined();
+      fireEvent.click(fullscreenButton!);
+
+      await waitFor(() => {
+        expect(screen.getByText('预览表格')).toBeInTheDocument();
+      });
+
+      const modalBody = document.querySelector('.ant-modal-body');
+      expect(modalBody).toBeInTheDocument();
+      const contentDiv =
+        modalBody?.querySelector(
+          '.ant-agentic-md-editor-content-table.ant-agentic-md-editor-content',
+        ) || modalBody?.firstElementChild;
+      expect(contentDiv).toBeInTheDocument();
+
+      const preventDefaultSpy = vi.fn();
+      const createEvent = (type: string) => {
+        const e = new Event(type, { bubbles: true }) as MouseEvent;
+        e.preventDefault = preventDefaultSpy;
+        return e;
+      };
+
+      contentDiv!.dispatchEvent(createEvent('mousedown'));
+      expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+
+      preventDefaultSpy.mockClear();
+      contentDiv!.dispatchEvent(createEvent('dragstart'));
+      expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+
+      preventDefaultSpy.mockClear();
+      contentDiv!.dispatchEvent(createEvent('dblclick'));
+      expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('样式和容器测试', () => {
     it('应该应用 baseCls', () => {
       renderComponent();
-      const wrapper = document.querySelector('.ant-agentic-md-editor-content-table');
+      const wrapper = document.querySelector(
+        '.ant-agentic-md-editor-content-table',
+      );
       expect(wrapper).toBeInTheDocument();
     });
   });
@@ -530,17 +640,39 @@ describe('ReadonlyTableComponent', () => {
       expect(cols.length).toBe(10);
     });
 
-    it('应该为每列应用默认宽度 120', () => {
-      renderComponent();
+    it('5 列及以上时按内容比例分配列宽（百分比），最后一列弹性', () => {
+      const elementWith5Cols = {
+        type: 'table',
+        children: [
+          {
+            type: 'table-row',
+            children: Array.from({ length: 5 }, (_, i) => ({
+              type: 'table-cell',
+              children: [
+                { type: 'paragraph', children: [{ text: `Col ${i + 1}` }] },
+              ],
+            })),
+          },
+        ],
+      };
+      const fiveColChildren = (
+        <tr>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <td key={i}>Col {i}</td>
+          ))}
+        </tr>
+      );
+      renderComponent(elementWith5Cols, { children: fiveColChildren });
       const cols = document.querySelectorAll('col');
+      expect(cols.length).toBe(5);
       cols.forEach((col, i) => {
         const htmlCol = col as HTMLElement;
         const isLastCol = i === cols.length - 1;
         if (isLastCol) {
-          // 最后一列仅设置 minWidth 以保持弹性
-          expect(htmlCol.style.minWidth).toBe('60px');
+          expect(htmlCol.style.minWidth).toBe('40px');
         } else {
-          expect(htmlCol.style.width).toBe('80px');
+          // 无 containerWidth 时走内容比例，5 列等分即为 20%
+          expect(htmlCol.style.width).toBe('20%');
         }
       });
     });

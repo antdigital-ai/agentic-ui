@@ -8,6 +8,7 @@ import { debugInfo } from '../../../Utils/debugUtils';
 import { ChartNode } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
 import { getMediaType } from '../utils/dom';
+import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
 
 const inlineNode = new Set(['break']);
 
@@ -249,6 +250,10 @@ const parserNode = (
       break;
     case 'code':
     case 'apaasify':
+    case 'agentic-ui-task':
+    case 'agentic-ui-toolusebar':
+    case 'agentic-ui-usertoolbar':
+    case 'agentic-ui-filemap':
       str += handleCode(node, preString);
       break;
     case 'attach':
@@ -741,7 +746,7 @@ export const isMix = (t: Text) => {
  * - `<a href="{url}">` if `url` is defined.
  */
 const textHtml = (t: Text) => {
-  let str = t.text || '';
+  let str = (t.text || '').split(JINJA_DOLLAR_PLACEHOLDER).join('$');
   if (t.highColor) str = `<span style="color:${t.highColor}">${str}</span>`;
   if (t.code) str = `<code>${str}</code>`;
   if (t.italic) str = `<i>${str}</i>`;
@@ -771,7 +776,12 @@ const textHtml = (t: Text) => {
  */
 const textStyle = (t: Text) => {
   if (!t.text && !t.tag) return '';
-  let str = t?.text?.replace(/(?<!\\)\\/g, '\\').replace(/\n/g, '  \n') || '';
+  let str =
+    (t?.text || '')
+      .split(JINJA_DOLLAR_PLACEHOLDER)
+      .join('$')
+      ?.replace(/(?<!\\)\\/g, '\\')
+      .replace(/\n/g, '  \n') || '';
   let preStr = '',
     afterStr = '';
 
@@ -866,7 +876,7 @@ const composeText = (t: Text, parent: any[]) => {
   const index = siblings?.findIndex((n) => n === t);
   let str = textStyle(t)!;
   if (t?.url) {
-    str = `[${t.text}](${encodeURI(t?.url)})`;
+    str = `[${(t.text || '').split(JINJA_DOLLAR_PLACEHOLDER).join('$')}](${encodeURI(t?.url)})`;
   } else if (isMix(t) && index !== -1) {
     const next = siblings[index + 1];
     if (!str.endsWith(' ') && next && !Node.string(next).startsWith(' ')) {
@@ -1218,6 +1228,15 @@ const handleCode = (node: any, preString: string) => {
     } catch (e) {
       console.warn('Invalid code object', e);
     }
+  } else if (node?.type === 'code') {
+    // 对于普通代码块（type === 'code'），优先从 Slate children 中读取文本
+    // 因为用户编辑后 Slate 只更新 children，而 value 保留的是初始解析值
+    const childrenText = node?.children
+      ?.map((child: any) => child?.text ?? '')
+      .join('');
+    if (childrenText !== undefined && childrenText !== null) {
+      code = childrenText;
+    }
   }
 
   // 如果语言是 think，转换为 <think> 标签
@@ -1286,6 +1305,32 @@ const handleBlockquote = (
   parent: any[],
   plugins?: MarkdownEditorPlugin[],
 ) => {
+  const containerType = node.otherProps?.markdownContainerType as
+    | string
+    | undefined;
+  const containerTitle = node.otherProps?.markdownContainerTitle as
+    | string
+    | undefined;
+
+  if (containerType) {
+    const innerContent =
+      node.children?.length > 0
+        ? node.children
+            .map((child: any) =>
+              parserNode(child, '', [...parent, node], plugins),
+            )
+            .join('\n\n')
+            .trim()
+        : '';
+    const open =
+      containerTitle !== null &&
+      containerTitle !== undefined &&
+      String(containerTitle).trim()
+        ? `:::${containerType}{title="${String(containerTitle).trim()}"}`
+        : `:::${containerType}`;
+    return `${open}\n\n${innerContent || ''}\n\n:::`;
+  }
+
   // Handle empty blockquotes
   if (!node.children || node.children.length === 0) {
     return '> ';

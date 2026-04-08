@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { memo, useCallback } from 'react';
 import { useStyle } from './ButtonTabStyle';
 

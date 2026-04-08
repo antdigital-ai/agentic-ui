@@ -1,4 +1,4 @@
-﻿import {
+import {
   CategoryScale,
   Chart as ChartJS,
   Filler,
@@ -9,20 +9,21 @@
   Title,
   Tooltip,
 } from 'chart.js';
-import React, { useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
+import { isWindowDefined } from '../env';
 import { Container } from './Container';
 import { ChartProps } from './useChart';
 
 let chartMarkAreaRegistered = false;
 
-export const Area: React.FC<ChartProps> = (props) => {
+export const Area = forwardRef<ChartJS, ChartProps>((props, ref) => {
   React.useMemo(() => {
     if (chartMarkAreaRegistered) {
       return undefined;
     }
 
-    if (typeof window === 'undefined') {
+    if (!isWindowDefined()) {
       return undefined;
     }
 
@@ -44,7 +45,7 @@ export const Area: React.FC<ChartProps> = (props) => {
   const htmlRef = useRef<HTMLDivElement>(null);
   const lineChartRef = useRef<any>(null);
 
-  useImperativeHandle(props.chartRef, () => chartRef.current, [
+  useImperativeHandle(ref, () => chartRef.current as ChartJS, [
     chartRef.current,
   ]);
 
@@ -180,4 +181,6 @@ export const Area: React.FC<ChartProps> = (props) => {
       <Line ref={lineChartRef} data={chartData} options={options} />
     </Container>
   );
-};
+});
+
+Area.displayName = 'Area';

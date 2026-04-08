@@ -7,30 +7,30 @@ const ToolUseBarActiveKeysDemo = () => {
   const tools = [
     {
       id: 'search',
-      toolName: '文件搜索',
-      toolTarget: '搜索 "react" 相关文件',
-      time: '3',
+      toolName: 'web_search',
+      toolTarget: '搜索「React Server Components 最佳实践」',
+      time: '1.8',
       status: 'success' as const,
     },
     {
       id: 'analyze',
-      toolName: '代码分析',
-      toolTarget: '分析 src/components 目录',
-      time: '3',
+      toolName: 'code_analysis',
+      toolTarget: '分析 src/app/ 路由结构',
+      time: '3.2',
       status: 'loading' as const,
     },
     {
       id: 'format',
-      toolName: '代码格式化',
-      toolTarget: '格式化 TypeScript 文件',
-      time: '3',
+      toolName: 'eslint_fix',
+      toolTarget: '自动修复 ESLint 规则冲突',
+      time: '0.9',
       status: 'error' as const,
     },
     {
       id: 'test',
-      toolName: '单元测试',
-      toolTarget: '运行 Jest 测试套件',
-      time: '3',
+      toolName: 'run_tests',
+      toolTarget: '执行 Vitest 单元测试',
+      time: '5.6',
       status: 'idle' as const,
     },
   ];
@@ -57,37 +57,6 @@ const ToolUseBarActiveKeysDemo = () => {
         onActiveKeysChange={handleActiveKeysChange}
         onToolClick={handleToolClick}
       />
-
-      <div style={{ marginTop: '20px' }}>
-        <h4>Props 说明：</h4>
-        <ul>
-          <li>
-            <strong>tools</strong>: 工具列表数组，每个工具包含
-            id、toolName、toolTarget、time、status 等属性
-          </li>
-          <li>
-            <strong>activeKeys</strong>: 当前激活的工具 ID 数组，受控模式
-          </li>
-          <li>
-            <strong>onActiveKeysChange</strong>: 激活工具变化时的回调函数
-          </li>
-          <li>
-            <strong>onToolClick</strong>: 点击工具项时的回调函数
-          </li>
-          <li>
-            <strong>status</strong>: 工具状态，支持 &apos;success&apos; |
-            &apos;loading&apos; | &apos;error&apos; | &apos;idle&apos;
-          </li>
-        </ul>
-
-        <h4>操作说明:</h4>
-        <ul>
-          <li>点击工具项可以激活/取消激活</li>
-          <li>支持多选激活</li>
-          <li>激活状态由外部 state 控制</li>
-          <li>不同状态的工具项有不同的视觉样式</li>
-        </ul>
-      </div>
     </div>
   );
 };

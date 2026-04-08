@@ -1,3 +1,5 @@
+import type { AttachmentFile } from './types';
+
 /**
  * 将KB转换为可读的文件大小格式
  * 支持从字节（B）到TB的所有单位，最小单位为B
@@ -43,7 +45,7 @@ export const kbToSize = (kb: number) => {
  */
 export const isImageFile = (file: File): boolean => {
   // 首先检查 MIME 类型
-  if (file.type.startsWith('image/')) {
+  if (file?.type?.startsWith('image/')) {
     return true;
   }
 
@@ -64,6 +66,72 @@ export const isImageFile = (file: File): boolean => {
   const fileName = file.name.toLowerCase();
   return imageExtensions.some((ext) => fileName.endsWith(ext));
 };
+
+const VIDEO_EXTENSIONS = [
+  '.mp4',
+  '.webm',
+  '.ogg',
+  '.ogv',
+  '.mov',
+  '.avi',
+  '.wmv',
+  '.flv',
+  '.m4v',
+  '.mkv',
+];
+
+const hasVideoExtension = (pathOrName: string): boolean => {
+  const lower = pathOrName?.toLowerCase() || '';
+  const beforeQuery = lower.split('?')[0];
+  return VIDEO_EXTENSIONS.some((ext) => beforeQuery.endsWith(ext));
+};
+
+/**
+ * 检查文件是否为视频类型
+ * 通过 MIME 类型和文件扩展名双重判断
+ *
+ * @param {File} file - 要检查的文件（含 AttachmentFile）
+ * @returns {boolean} 是否为视频文件
+ */
+export const isVideoFile = (file: File): boolean => {
+  if (file.type?.startsWith('video/')) {
+    return true;
+  }
+
+  if (hasVideoExtension(file.name)) {
+    return true;
+  }
+
+  const attachmentFile = file as File & { url?: string; previewUrl?: string };
+  const url = attachmentFile.previewUrl || attachmentFile.url;
+  return !!url && hasVideoExtension(url);
+};
+
+/**
+ * 检查文件是否为可展示的媒体类型（图片或视频）
+ */
+export const isMediaFile = (file: File): boolean =>
+  isImageFile(file) || isVideoFile(file);
+
+/**
+ * 是否为「仅元信息占位」状态：有 status 但无 url/previewUrl，内容未拿到时整行以 FileMetaPlaceholder 风格展示
+ */
+export const isAttachmentFileLoading = (
+  status?: AttachmentFile['status'] | null,
+): boolean => status === 'uploading' || status === 'pending';
+
+/**
+ * 是否应该展示 FileMetaPlaceholder：
+ * - 有状态
+ * - 非 loading（uploading/pending）
+ * - 且没有可预览 URL
+ */
+export const isFileMetaPlaceholderState = (file: AttachmentFile): boolean =>
+  file.status !== undefined &&
+  file.status !== null &&
+  !isAttachmentFileLoading(file.status) &&
+  !file.url &&
+  !file.previewUrl;
 
 /**
  * 设备品牌匹配列表

@@ -7,7 +7,7 @@
  */
 
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -74,6 +74,14 @@ describe('Blockquote Component', () => {
 
       const blockquoteElement = container.querySelector('blockquote');
       expect(blockquoteElement).toBeInTheDocument();
+    });
+
+    it('应在 onDragStart 时调用 store.dragStart', () => {
+      const { container } = renderWithProvider(
+        <Blockquote {...defaultProps} />,
+      );
+      const blockquote = container.querySelector('[data-be="blockquote"]');
+      fireEvent.dragStart(blockquote!);
     });
   });
 
@@ -271,6 +279,27 @@ describe('Blockquote Component', () => {
       render(<Blockquote {...props} />);
       expect(screen.getByText('Outer quote')).toBeInTheDocument();
       expect(screen.getByText('Inner quote')).toBeInTheDocument();
+    });
+  });
+
+  describe('markdown-container 提示块 (55-76)', () => {
+    it('otherProps 含 markdownContainerType 时渲染 div.markdown-container', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          otherProps: {
+            markdownContainerType: 'warning',
+            markdownContainerTitle: '注意',
+          },
+        },
+      };
+      renderWithProvider(<Blockquote {...props} />);
+      expect(screen.getByTestId('markdown-container')).toBeInTheDocument();
+      expect(screen.getByTestId('markdown-container-title')).toHaveTextContent(
+        '注意',
+      );
+      expect(screen.getByTestId('markdown-container')).toHaveClass('warning');
     });
   });
 });

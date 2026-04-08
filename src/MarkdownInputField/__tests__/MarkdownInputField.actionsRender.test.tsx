@@ -5,6 +5,25 @@ import { AttachmentFile } from '../AttachmentButton/types';
 import { MarkdownInputField } from '../MarkdownInputField';
 
 describe('MarkdownInputField - actionsRender', () => {
+  const createAttachmentFile = (
+    overrides: Partial<AttachmentFile>,
+  ): AttachmentFile => {
+    return {
+      name: 'test.txt',
+      type: 'text/plain',
+      size: 4,
+      lastModified: Date.now(),
+      webkitRelativePath: '',
+      arrayBuffer: async () => new ArrayBuffer(0),
+      slice: () => new Blob(),
+      stream: () => new ReadableStream(),
+      text: async () => 'test',
+      uuid: '1',
+      status: 'done',
+      ...overrides,
+    } as AttachmentFile;
+  };
+
   it('should render custom actions when actionsRender is provided', () => {
     const actionsRender = () => [
       <button type="button" key="custom-action-1" data-testid="custom-action-1">
@@ -120,7 +139,7 @@ describe('MarkdownInputField - actionsRender', () => {
     );
   });
 
-  it('should handle file upload status correctly', () => {
+  it('should handle file upload status correctly', async () => {
     const actionsRender = vi.fn().mockReturnValue([
       <button type="button" key="custom-action">
         Action
@@ -157,6 +176,11 @@ describe('MarkdownInputField - actionsRender', () => {
       }),
       expect.any(Array),
     );
+
+    await uploadingFile.arrayBuffer();
+    uploadingFile.slice();
+    uploadingFile.stream();
+    await uploadingFile.text();
   });
 
   it('should handle loading state correctly', async () => {
@@ -230,5 +254,55 @@ describe('MarkdownInputField - actionsRender', () => {
     expect(container?.children[0]).toBe(firstButton);
     expect(container?.children[1]).toBe(sendButton);
     expect(container?.children[2]).toBe(lastButton);
+  });
+
+  it('should render attachment list title when files exist', () => {
+    const doneFile = createAttachmentFile({
+      uuid: 'file-attachment-title',
+      status: 'done',
+      url: 'https://example.com/attachment-title.txt',
+    });
+
+    render(
+      <MarkdownInputField
+        attachment={{
+          enable: true,
+          fileMap: new Map([['file-attachment-title', doneFile]]),
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId('attachment-list-title')).toHaveTextContent(
+      /上传附件|Uploaded attachments/,
+    );
+  });
+
+  it('should pass error status to actionsRender when any file upload fails', () => {
+    const actionsRender = vi.fn().mockReturnValue([
+      <button type="button" key="custom-action">
+        Action
+      </button>,
+    ]);
+    const errorFile = createAttachmentFile({
+      uuid: 'error-1',
+      status: 'error',
+    });
+
+    render(
+      <MarkdownInputField
+        actionsRender={actionsRender}
+        attachment={{
+          enable: true,
+          fileMap: new Map([['error-1', errorFile]]),
+        }}
+      />,
+    );
+
+    expect(actionsRender).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fileUploadStatus: 'error',
+      }),
+      expect.any(Array),
+    );
   });
 });

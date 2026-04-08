@@ -1,6 +1,6 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
-import { isString } from 'lodash';
+import classNames from 'clsx';
+import { isString } from 'lodash-es';
 import React, { useContext } from 'react';
 import { TextLoading } from '../lotties';
 import { LoadingLottieProps } from '../lotties/LoadingLottie';

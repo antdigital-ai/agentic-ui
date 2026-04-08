@@ -135,22 +135,7 @@ const WorkspaceFileCustomRenderDemo: React.FC = () => {
       size: '856KB',
       lastModified: '2025-10-03 09:15',
       url: '/downloads/disabled.xlsx',
-      // 禁用状态
       disabled: true,
-    },
-    {
-      id: '4',
-      name: '仅自定义详情行.txt',
-      type: 'plainText',
-      size: '12KB',
-      lastModified: '2025-10-04 16:20',
-      content: '文件内容...',
-      // 仅自定义详情行
-      renderDetails: (ctx) => (
-        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-          创建于 {ctx.file.lastModified?.toString()} | 版本 v1.2.3
-        </Typography.Text>
-      ),
     },
   ];
 

@@ -1,7 +1,7 @@
 ﻿import { ExportOutlined, RightOutlined } from '@ant-design/icons';
 
 import { ConfigProvider, Descriptions, Drawer, Popover } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
 import React, { useContext } from 'react';

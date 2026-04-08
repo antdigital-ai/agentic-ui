@@ -31,8 +31,12 @@ const createMockMessage = (
 
 // 初始消息
 const initialMessages: MessageBubbleData[] = [
-  createMockMessage('1', 'assistant', '欢迎使用 BubbleList 组件！'),
-  createMockMessage('2', 'user', '这个组件功能很强大！'),
+  createMockMessage('1', 'assistant', '你好，需要我帮什么？'),
+  createMockMessage(
+    '2',
+    'user',
+    'useMemo 和 useCallback 区别是什么？',
+  ),
 ];
 
 export default () => {
@@ -61,7 +65,9 @@ export default () => {
     const newMessage = createMockMessage(
       `msg-${Date.now()}`,
       bubbleList.length % 2 === 0 ? 'user' : 'assistant',
-      `这是第 ${bubbleList.length + 1} 条消息`,
+      bubbleList.length % 2 === 0
+        ? '实际项目里怎么配合用？'
+        : '`useMemo` 缓存值，`useCallback` 缓存函数引用，可减少子组件无效更新。',
     );
     newMessage.extra = {
       ...newMessage.extra,

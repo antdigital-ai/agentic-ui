@@ -26,6 +26,34 @@ export type LanguageHandler = (
 /**
  * 处理schema类型语言的辅助函数
  */
+const processAgenticUiJsonBlock =
+  (
+    slateType:
+      | 'agentic-ui-task'
+      | 'agentic-ui-toolusebar'
+      | 'agentic-ui-filemap',
+  ): LanguageHandler =>
+  (element: CodeElement, value: string): CodeElement => {
+    let parsed: unknown = {};
+    try {
+      parsed = json5.parse(value || '{}');
+    } catch {
+      try {
+        parsed = partialJsonParse(value || '{}');
+      } catch (error) {
+        parsed = { _parseError: true, _raw: value };
+        console.error('parse agentic-ui embed block error', error);
+      }
+    }
+    return {
+      ...element,
+      type: slateType,
+      language: slateType,
+      value: parsed,
+      children: [{ text: value }],
+    };
+  };
+
 const processSchemaLanguage = (
   element: CodeElement,
   value: string,
@@ -65,6 +93,11 @@ const LANGUAGE_HANDLERS: Record<string, LanguageHandler> = {
     type: 'katex',
   }),
   'agentar-card': processSchemaLanguage,
+  'agentic-ui-task': processAgenticUiJsonBlock('agentic-ui-task'),
+  'agentic-ui-toolusebar': processAgenticUiJsonBlock('agentic-ui-toolusebar'),
+  /** @deprecated 使用 `agentic-ui-toolusebar`，保留解析以兼容旧内容 */
+  'agentic-ui-usertoolbar': processAgenticUiJsonBlock('agentic-ui-toolusebar'),
+  'agentic-ui-filemap': processAgenticUiJsonBlock('agentic-ui-filemap'),
 };
 
 /**

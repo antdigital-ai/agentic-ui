@@ -37,8 +37,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           height: 'var(--padding-1x)',
         },
         '&::-webkit-scrollbar-thumb': {
-          background: 'var(--color-gray-border-default)',
-          borderRadius: 'var(--radius-base)',
+          background: 'var(--color-gray-border-default, var(--color-gray-border-light))',
+          borderRadius: 'var(--radius-base, var(--radius-control-xs, 4px))',
         },
         '&::-webkit-scrollbar-track': {
           background: 'transparent',
@@ -59,6 +59,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '&:hover': {
           transform: 'scale(1.05)',
         },
+      },
+      '&-title': {
+        width: '100%',
+        flexBasis: '100%',
+        color: 'var(--color-gray-text-light)',
+        font: 'var(--font-text-body-sm)',
+        lineHeight: '20px',
+        marginBottom: 'var(--margin-0-5x)',
       },
       '&-item': {
         width: '168px',
@@ -97,7 +105,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             background: 'var(--color-gray-bg-card-white)',
             boxSizing: 'border-box',
             boxShadow: 'var(--shadow-control-base)',
-            borderRadius: 'var(--radius-base)',
+            borderRadius: 'var(--radius-base, var(--radius-control-xs, 4px))',
             border: 'none',
             overflow: 'hidden',
             img: {
@@ -157,6 +165,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           gap: 4,
           '&-error': {
             color: 'var(--color-red-a10)',
+            maxWidth: '100%',
+            overflow: 'auto',
           },
           '&-item:not(:last-child)': {
             lineHeight: '9px',
@@ -206,6 +216,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           height: '40px',
           fontSize: '40px',
           display: 'flex',
+        },
+      },
+      '&-item-meta-placeholder': {
+        background: 'var(--color-fill-quaternary, rgba(0,0,0,0.04))',
+        [`${token.componentCls}-item-file-name-text`]: {
+          color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
+        },
+        [`${token.componentCls}-item-file-size`]: {
+          color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
         },
       },
     },

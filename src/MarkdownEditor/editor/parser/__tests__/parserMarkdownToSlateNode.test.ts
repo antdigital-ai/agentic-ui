@@ -1,8 +1,12 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { handleDefinition } from '../parse/parseElements';
+import { handleMath, shouldTreatInlineMathAsText } from '../parse/parseMath';
+import { handleAttachmentLink, handleImage } from '../parse/parseMedia';
 import {
   clearParseCache,
   parserMarkdownToSlateNode,
 } from '../parserMarkdownToSlateNode';
+import { parserMdToSchema } from '../parserMdToSchema';
 
 import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
@@ -39,6 +43,27 @@ describe('parserMarkdownToSlateNode', () => {
         (child: any) => child?.text === '$a^2 + b^2 = c^2$',
       );
       expect(numericTextNode).toBeUndefined();
+    });
+
+    it('should keep $ inside Jinja {{ }} as plain text (system variable)', () => {
+      const markdown = 'Hello {{ $var }} world';
+      const { schema } = parserMarkdownToSlateNode(markdown);
+
+      expect(schema).toHaveLength(1);
+      const paragraph = schema[0] as any;
+      expect(paragraph.type).toBe('paragraph');
+
+      const inlineKatexNode = paragraph.children.find(
+        (child: any) => child?.type === 'inline-katex',
+      );
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('{{ ');
+      expect(textContent).toContain(' }}');
+      expect(textContent).toContain('var');
     });
 
     it('should keep numeric content wrapped in dollars as plain text', () => {
@@ -464,6 +489,36 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(result.schema[0].children).toHaveLength(2);
     });
+
+    it('should set start on ordered list when first item number is not 1', () => {
+      const markdown = '3. First\n4. Second\n5. Third';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'numbered-list',
+        start: 3,
+      });
+    });
+
+    it('should extract mentions from list item when first inline is link with multiple siblings', () => {
+      const markdown = '- [Alice](https://example.com/avatar?id=42) 参与讨论';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      const list = result.schema[0] as any;
+      expect(list.type).toBe('bulleted-list');
+      expect(list.children).toHaveLength(1);
+      const listItem = list.children[0];
+      expect(listItem.type).toBe('list-item');
+      expect(listItem.mentions).toBeDefined();
+      expect(listItem.mentions).toHaveLength(1);
+      expect(listItem.mentions[0]).toMatchObject({
+        avatar: 'https://example.com/avatar?id=42',
+        name: 'Alice',
+        id: '42',
+      });
+    });
   });
 
   describe('handleImage', () => {
@@ -528,6 +583,26 @@ describe('parserMarkdownToSlateNode', () => {
           },
         ],
       });
+    });
+  });
+
+  describe('parseMedia handleImage / handleAttachmentLink', () => {
+    it('handleImage 应处理图片元素并返回媒体节点', () => {
+      const el = {
+        url: 'http://example.com/pic.png',
+        alt: 'pic',
+        finished: true,
+      };
+      const result = handleImage(el);
+      expect(result).toBeDefined();
+      expect(JSON.stringify(result)).toContain('http://example.com/pic.png');
+      expect(JSON.stringify(result)).toContain('pic');
+    });
+
+    it('handleAttachmentLink 在未找到附件时应返回 null', () => {
+      const el = { children: [{ value: 'not an attachment link' }] };
+      const result = handleAttachmentLink(el);
+      expect(result).toBeNull();
     });
   });
 
@@ -942,6 +1017,45 @@ function hello() {
         type: 'paragraph',
         children: [{ text: 'Term 2\n: Definition 2' }],
       });
+    });
+  });
+
+  describe('handleDefinition', () => {
+    it('should format definition element to paragraph with label and url', () => {
+      const result = handleDefinition({
+        label: 'ref',
+        url: 'https://example.com',
+      });
+      expect(result).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: '[ref]: https://example.com' }],
+      });
+    });
+
+    it('should format definition element when url is empty', () => {
+      const result = handleDefinition({ label: 'x', url: '' });
+      expect(result).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: '[x]: ' }],
+      });
+    });
+  });
+
+  describe('parseMath', () => {
+    it('shouldTreatInlineMathAsText 空字符串应返回 true', () => {
+      expect(shouldTreatInlineMathAsText('')).toBe(true);
+      expect(shouldTreatInlineMathAsText('   ')).toBe(true);
+    });
+
+    it('handleMath 应返回 katex 块节点', () => {
+      const result = handleMath({ value: 'x^2 + y^2 = z^2' });
+      expect(result).toMatchObject({
+        type: 'katex',
+        language: 'latex',
+        katex: true,
+        value: 'x^2 + y^2 = z^2',
+      });
+      expect(result.children).toEqual([{ text: '' }]);
     });
   });
 
@@ -1586,6 +1700,23 @@ const y = 2;
       expect(result1.schema.length).toBe(result2.schema.length);
     });
 
+    it('应在 openLinksInNewTab 为 true 时为链接设置 otherProps.target 和 rel', () => {
+      const markdown = '[点击](https://example.com)';
+      const result = parserMarkdownToSlateNode(markdown, [], {
+        openLinksInNewTab: true,
+      });
+
+      expect(result.schema).toHaveLength(1);
+      const paragraph = result.schema[0] as any;
+      expect(paragraph.type).toBe('paragraph');
+      const linkLeaf = paragraph.children?.find((n: any) => n.url);
+      expect(linkLeaf).toBeDefined();
+      expect(linkLeaf.url).toBe('https://example.com');
+      expect(linkLeaf.otherProps).toBeDefined();
+      expect(linkLeaf.otherProps.target).toBe('_blank');
+      expect(linkLeaf.otherProps.rel).toBe('noopener noreferrer');
+    });
+
     it('应该为不同插件生成不同的 hash', () => {
       const markdown = '# 标题\n\n段落';
 
@@ -1603,6 +1734,118 @@ const y = 2;
 
       // 验证不同插件可能产生不同的 hash
       expect(result1.schema.length).toBe(result2.schema.length);
+    });
+
+    it('插件 match 为 true 且 convert 返回 null 时应调用 convert', () => {
+      const convertFn = vi.fn(() => null as any);
+      const plugin: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => true,
+            convert: convertFn,
+          },
+        ],
+      };
+      parserMarkdownToSlateNode('# a', [plugin]);
+      expect(convertFn).toHaveBeenCalled();
+    });
+
+    it('应在插件 match 为 true 时调用 convert', () => {
+      const convertFn = vi.fn(() => null as any);
+      const plugin: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => true,
+            convert: convertFn,
+          },
+        ],
+      };
+      parserMarkdownToSlateNode('# a', [plugin]);
+      expect(convertFn).toHaveBeenCalled();
+    });
+
+    it('parseWithPlugins 当 convert 返回长度为 2 的数组时取 converted[0]', () => {
+      const plugin: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => true,
+            convert: () =>
+              [
+                {
+                  type: 'paragraph',
+                  children: [{ text: 'from plugin' }],
+                },
+                null,
+              ] as any,
+          },
+        ],
+      };
+      const result = parserMarkdownToSlateNode('# a', [plugin]);
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: 'from plugin' }],
+      });
+    });
+
+    it('filterTopLevelSchema 应过滤仅含换行或空子节点的段落', () => {
+      const plugin: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => true,
+            convert: () =>
+              [{ type: 'paragraph', children: [{ text: '\n' }] }, null] as any,
+          },
+        ],
+      };
+      const result = parserMarkdownToSlateNode('# a', [plugin]);
+      expect(result.schema).toHaveLength(0);
+    });
+
+    it('parseHtmlCommentProps 在 HTML 注释内容非合法 JSON 时返回 null', () => {
+      const markdown = '<!-- invalid json -->';
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema.length).toBeGreaterThanOrEqual(0);
+    });
+
+    it('parserMdToSchema 应过滤掉 language===html 且 isConfig 的节点', () => {
+      const plugin: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => true,
+            convert: () =>
+              ({
+                type: 'code',
+                language: 'html',
+                isConfig: true,
+                children: [{ text: '' }],
+              }) as any,
+          },
+        ],
+      };
+      const result = parserMdToSchema('# a', [plugin]);
+      const htmlConfigNodes = result.schema.filter(
+        (s: any) => s.language === 'html' && s.isConfig,
+      );
+      expect(htmlConfigNodes).toHaveLength(0);
+    });
+
+    it('parserMdToSchema 应过滤掉无 type 且无 text 的节点', () => {
+      const convertFn = vi.fn(() => ({}) as any);
+      const plugin: import('../../../plugin').MarkdownEditorPlugin = {
+        parseMarkdown: [
+          {
+            match: () => true,
+            convert: convertFn,
+          },
+        ],
+      };
+      const result = parserMdToSchema('x', [plugin]);
+      expect(convertFn).toHaveBeenCalled();
+      const withoutTypeOrText = result.schema.filter(
+        (s: any) => s.type === null && s.text === null,
+      );
+      expect(withoutTypeOrText).toHaveLength(0);
     });
 
     it('应该限制缓存大小为 100 个条目', () => {
@@ -1697,6 +1940,94 @@ const y = 2;
 
       // 验证嵌套 HTML 被正确处理
       expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('应该正确解析语雀文档（含文档信息表、时间格式、有序列表）不触发 textDirective 错误', () => {
+      clearParseCache();
+      const markdown = `| 字段 | 内容 |
+|------|------|
+| 标题 | 跟业务侧的对接 |
+| slug | mgipy1eta0o1l13b |
+| 字数 | 258 |
+| 创建时间 | 2026-03-18 02:20:31 |
+| 更新时间 | 2026-03-18 04:53:36 |
+
+1. **317跟平台科技对接**（参会人：一啊，小雪，谷水拉的会）
+   1. 主要沟通了整个平台科技和创新孵化的产品流程，需要在prd中做更新
+   2. 平台科技提供：https://musepreview.alipay.com/app/eaivy8k98fpg#/market
+`;
+
+      expect(() => parserMarkdownToSlateNode(markdown)).not.toThrow();
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('行内 :name[content] 应作为普通文本解析（仅 ::: 为指令）', () => {
+      const markdown = '文本中有 :icon[check] 这样的行内指令';
+      expect(() => parserMarkdownToSlateNode(markdown)).not.toThrow();
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema.length).toBeGreaterThan(0);
+      const textContent = JSON.stringify(result.schema);
+      expect(textContent).toContain('check');
+    });
+
+    it('应该正确处理语雀文档（含文档信息表格、时间格式等，避免 textDirective 报错）', () => {
+      const markdown = `# 跟业务侧的对接
+
+| 字段 | 内容 |
+|------|------|
+| 标题 | 跟业务侧的对接 |
+| slug | mgipy1eta0o1l13b |
+| 字数 | 258 |
+| 创建时间 | 2026-03-18 02:20:31 |
+| 更新时间 | 2026-03-18 04:53:36 |
+
+1. **317跟平台科技对接**（参会人：一啊，小雪，谷水拉的会）
+   1. 主要沟通了整个平台科技和创新孵化的产品流程，需要在prd中做更新
+   2. 平台科技提供：https://musepreview.alipay.com/app/eaivy8k98fpg#/market
+`;
+
+      expect(() => parserMarkdownToSlateNode(markdown)).not.toThrow();
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('行内 :icon[check] 应稳定解析为普通段落', () => {
+      const markdown = '文本中有 :icon[check] 这样的行内指令';
+      expect(() => parserMarkdownToSlateNode(markdown)).not.toThrow();
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('应正确处理语雀文档格式（含文档信息表格、时间格式、编号列表）避免 textDirective 渲染错误', () => {
+      const markdown = `| 字段 | 内容 |
+|------|------|
+| 标题 | 跟业务侧的对接 |
+| slug | mgipy1eta0o1l13b |
+| 字数 | 258 |
+| 创建时间 | 2026-03-18 02:20:31 |
+| 更新时间 | 2026-03-18 04:53:36 |
+
+1. **317跟平台科技对接**（参会人：一啊，小雪，谷水拉的会）
+   1. 主要沟通了整个平台科技和创新孵化的产品流程，需要在prd中做更新
+   2. 平台科技提供：https://musepreview.alipay.com/app/eaivy8k98fpg#/market
+   3. 创新提供的能力是可以接平台的clawpool里面的agent和skills`;
+
+      expect(() => parserMarkdownToSlateNode(markdown)).not.toThrow();
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema.length).toBeGreaterThan(0);
+    });
+
+    it('行内 :icon[check] 应保留在段落文本中', () => {
+      const markdown = '文本中有 :icon[check] 这样的行内指令，需要正确解析';
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      const paragraph = result.schema[0] as any;
+      const textContent = paragraph.children
+        ?.map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain(':icon[check]');
     });
 
     it('应该正确处理包含表格的切分', () => {

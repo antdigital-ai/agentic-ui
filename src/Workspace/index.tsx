@@ -6,7 +6,7 @@ import {
   X,
 } from '@sofa-design/icons';
 import { ConfigProvider, Segmented } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, {
   FC,
   useContext,
@@ -143,7 +143,7 @@ const Workspace: FC<WorkspaceProps> & {
   const [resetKey, setResetKey] = useState(0);
 
   const displayTitle = title ?? (locale?.['workspace.title'] || 'Workspace');
-  const defaultConfig = DEFAULT_CONFIG(locale);
+  const defaultConfig = useMemo(() => DEFAULT_CONFIG(locale), [locale]);
   const [internalActiveTab, setInternalActiveTab] = useState('');
   const availableTabs = useMemo((): TabItem[] => {
     const tabs: TabItem[] = [];

@@ -1,6 +1,6 @@
 import { Check, CircleDashed, OctagonX } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { type FC, useContext } from 'react';
 import { LoadingEffect } from '../../Components/effects';
 import { useTaskStyle } from './style';

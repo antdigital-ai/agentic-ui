@@ -1,11 +1,41 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
+import clsx from 'clsx';
 import React, { useContext } from 'react';
 import { useStyle } from './style';
 import { formatNumber, NumberFormatOptions } from './utils';
 
+/** 各子区域类名，用于 Semantic 样式定制 */
+export interface ChartStatisticClassNames {
+  root?: string;
+  header?: string;
+  headerLeft?: string;
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
+  questionIcon?: string;
+  value?: string;
+  valuePrefix?: string;
+  valueSuffix?: string;
+  extra?: string;
+}
+
+/** 各子区域内联样式，用于 Semantic 样式定制 */
+export interface ChartStatisticStyles {
+  root?: React.CSSProperties;
+  header?: React.CSSProperties;
+  headerLeft?: React.CSSProperties;
+  title?: React.CSSProperties;
+  subtitle?: React.CSSProperties;
+  questionIcon?: React.CSSProperties;
+  value?: React.CSSProperties;
+  valuePrefix?: React.CSSProperties;
+  valueSuffix?: React.CSSProperties;
+  extra?: React.CSSProperties;
+}
+
 export interface ChartStatisticProps {
-  title?: string;
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
   tooltip?: string;
   value?: number | string | null | undefined;
   precision?: number;
@@ -14,19 +44,20 @@ export interface ChartStatisticProps {
   suffix?: React.ReactNode;
   formatter?: (value: number | string | null | undefined) => React.ReactNode;
   className?: string;
-  /** 自定义CSS类名（支持多个类名） */
-  classNames?: string | string[] | Record<string, boolean | undefined>;
+  /** 各子区域类名（Semantic 样式） */
+  classNames?: ChartStatisticClassNames;
   style?: React.CSSProperties;
+  /** 各子区域内联样式（Semantic 样式） */
+  styles?: ChartStatisticStyles;
   theme?: 'light' | 'dark';
   size?: 'small' | 'default' | 'large';
   block?: boolean;
   extra?: React.ReactNode;
-  /** 自定义样式对象（支持多个样式对象） */
-  styles?: React.CSSProperties | React.CSSProperties[];
 }
 
 const ChartStatistic: React.FC<ChartStatisticProps> = ({
   title,
+  subtitle,
   tooltip,
   value,
   precision,
@@ -63,72 +94,103 @@ const ChartStatistic: React.FC<ChartStatisticProps> = ({
     return formatNumber(value, formatOptions);
   };
 
-  // 渲染标题和问号图标
+  // 渲染标题、副标题和问号图标
   const renderHeader = () => {
-    if (!title && !extra) return null;
+    if (!title && !subtitle && !extra) return null;
 
     const titleElement = title ? (
       <span
-        className={[`${prefixCls}-title`, hashId].filter(Boolean).join(' ')}
+        className={clsx(`${prefixCls}-title`, hashId, classNames?.title)}
+        style={styles?.title}
       >
         {title}
+      </span>
+    ) : null;
+
+    const subtitleElement = subtitle ? (
+      <span
+        className={clsx(`${prefixCls}-subtitle`, hashId, classNames?.subtitle)}
+        style={styles?.subtitle}
+      >
+        {subtitle}
       </span>
     ) : null;
 
     const questionIcon = tooltip ? (
       <Tooltip mouseEnterDelay={0.3} title={tooltip} placement="top">
         <QuestionCircleOutlined
-          className={[`${prefixCls}-question-icon`, hashId]
-            .filter(Boolean)
-            .join(' ')}
+          className={clsx(
+            `${prefixCls}-question-icon`,
+            hashId,
+            classNames?.questionIcon,
+          )}
+          style={styles?.questionIcon}
         />
       </Tooltip>
     ) : null;
 
-    const extraElement = extra ? <div>{extra}</div> : null;
+    const extraElement = extra ? (
+      <div className={classNames?.extra} style={styles?.extra}>
+        {extra}
+      </div>
+    ) : null;
+
+    const hasHeaderLeft = titleElement || subtitleElement || questionIcon;
 
     return (
       <div
-        className={[`${prefixCls}-header`, hashId].filter(Boolean).join(' ')}
+        className={clsx(`${prefixCls}-header`, hashId, classNames?.header)}
+        style={styles?.header}
       >
-        <div
-          className={[`${prefixCls}-header-left`, hashId]
-            .filter(Boolean)
-            .join(' ')}
-        >
-          {titleElement}
-          {questionIcon}
-        </div>
+        {hasHeaderLeft && (
+          <div
+            className={clsx(
+              `${prefixCls}-header-left`,
+              hashId,
+              classNames?.headerLeft,
+            )}
+            style={styles?.headerLeft}
+          >
+            {(titleElement || questionIcon) && (
+              <div className={clsx(`${prefixCls}-header-row`, hashId)}>
+                {titleElement}
+                {questionIcon}
+              </div>
+            )}
+            {subtitleElement}
+          </div>
+        )}
         {extraElement}
       </div>
     );
   };
 
-  const mergedClassName = [
+  const rootClassName = clsx(
     prefixCls,
     `${prefixCls}-${theme}`,
     size !== 'default' && `${prefixCls}-${size}`,
     block && `${prefixCls}-block`,
     hashId,
     className,
-    classNames,
-  ]
-    .filter(Boolean)
-    .join(' ');
-  const mergedStyle = {
-    ...style,
-    ...(Array.isArray(styles) ? Object.assign({}, ...styles) : styles || {}),
-  };
+    classNames?.root,
+  );
+  const rootStyle = { ...style, ...styles?.root };
 
   return wrapSSR(
-    <div className={mergedClassName} style={mergedStyle}>
+    <div className={rootClassName} style={rootStyle}>
       {renderHeader()}
-      <div className={[`${prefixCls}-value`, hashId].filter(Boolean).join(' ')}>
+      <div
+        className={clsx(`${prefixCls}-value`, hashId, classNames?.value)}
+        style={styles?.value}
+      >
         {prefix && (
           <span
-            className={[`${prefixCls}-value-prefix`, hashId]
-              .filter(Boolean)
-              .join(' ')}
+            className={clsx(
+              `${prefixCls}-value-prefix`,
+              hashId,
+              classNames?.valuePrefix,
+            )}
+            style={styles?.valuePrefix}
           >
             {prefix}
           </span>
@@ -136,9 +198,12 @@ const ChartStatistic: React.FC<ChartStatisticProps> = ({
         {renderValue()}
         {suffix && (
           <span
-            className={[`${prefixCls}-value-suffix`, hashId]
-              .filter(Boolean)
-              .join(' ')}
+            className={clsx(
+              `${prefixCls}-value-suffix`,
+              hashId,
+              classNames?.valueSuffix,
+            )}
+            style={styles?.valueSuffix}
           >
             {suffix}
           </span>

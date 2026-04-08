@@ -2,6 +2,7 @@ import { TooltipProps } from 'antd';
 import { ReactNode } from 'react';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { AttachmentFile } from '../MarkdownInputField/AttachmentButton/types';
+import type { FileMapViewProps } from '../MarkdownInputField/FileMapView';
 import {
   BaseStyleProps,
   BubbleMetaData,
@@ -15,17 +16,84 @@ import { BubbleExtraProps } from './types/BubbleExtra';
 import { DocInfoListProps } from './types/DocInfo';
 
 /**
+ * 气泡命令式操作句柄
+ * @description 通过 bubbleRef 暴露给父组件的命令式方法
+ */
+export interface BubbleImperativeHandle {
+  /** 更新消息项数据 */
+  setMessageItem?: (id: string, data: Partial<MessageBubbleData>) => void;
+}
+
+/**
  * 基础样式属性
- * @deprecated 请使用 BaseStyleProps from '../Types'
+ * @deprecated @since 2.29.0 请使用 BaseStyleProps from '../Types'
  */
 export type BubbleStyleProps = BaseStyleProps;
 
 /**
+ * 气泡样式配置（简洁版）
+ * @description 推荐使用的气泡样式配置接口，属性名不带 bubble 前缀
+ */
+export interface BubbleSlotStyles {
+  /** 气泡根容器 */
+  root?: React.CSSProperties;
+  /** 头像标题区域 */
+  avatarTitle?: React.CSSProperties;
+  /** 主容器 */
+  container?: React.CSSProperties;
+  /** 加载图标 */
+  loadingIcon?: React.CSSProperties;
+  /** 名称区域 */
+  name?: React.CSSProperties;
+  /** 内容 */
+  content?: React.CSSProperties;
+  /** 内容前置区域 */
+  before?: React.CSSProperties;
+  /** 内容后置区域 */
+  after?: React.CSSProperties;
+  /** 标题 */
+  title?: React.CSSProperties;
+  /** 头像 */
+  avatar?: React.CSSProperties;
+  /** 额外内容 */
+  extra?: React.CSSProperties;
+}
+
+/**
+ * 气泡类名配置（简洁版）
+ * @description 推荐使用的气泡类名配置接口，属性名不带 bubble 前缀
+ */
+export interface BubbleSlotClassNames {
+  /** 气泡根容器 */
+  root?: string;
+  /** 头像标题区域 */
+  avatarTitle?: string;
+  /** 主容器 */
+  container?: string;
+  /** 加载图标 */
+  loadingIcon?: string;
+  /** 名称区域 */
+  name?: string;
+  /** 内容 */
+  content?: string;
+  /** 内容前置区域 */
+  before?: string;
+  /** 内容后置区域 */
+  after?: string;
+  /** 标题 */
+  title?: string;
+  /** 头像 */
+  avatar?: string;
+  /** 额外内容 */
+  extra?: string;
+}
+
+/**
  * 气泡样式配置
  * @description 气泡组件各部分的样式配置
+ * @deprecated @since 2.30.0 属性名带有冗余的 bubble 前缀，建议使用 BubbleSlotStyles 替代
  */
 export interface BubbleStyles {
-  [key: string]: React.CSSProperties | undefined;
   /**
    * 气泡根容器的自定义样式
    */
@@ -80,14 +148,29 @@ export interface BubbleStyles {
    * 额外内容的自定义样式
    */
   bubbleListItemExtraStyle?: React.CSSProperties;
+
+  /**
+   * 气泡列表项的自定义样式
+   */
+  bubbleListItemStyle?: React.CSSProperties;
+
+  /**
+   * 左侧气泡内容的自定义样式
+   */
+  bubbleListLeftItemContentStyle?: React.CSSProperties;
+
+  /**
+   * 右侧气泡内容的自定义样式
+   */
+  bubbleListRightItemContentStyle?: React.CSSProperties;
 }
 
 /**
  * 气泡类名配置
  * @description 气泡组件各部分的类名配置
+ * @deprecated @since 2.30.0 属性名带有冗余的 bubble 前缀，建议使用 BubbleSlotClassNames 替代
  */
 export interface BubbleClassNames {
-  [key: string]: string | undefined;
   /**
    * 气泡根容器的自定义类名
    */
@@ -142,6 +225,11 @@ export interface BubbleClassNames {
    * 额外内容的自定义类名
    */
   bubbleListItemExtraClassName?: string;
+
+  /**
+   * 气泡列表项的自定义类名
+   */
+  bubbleListItemClassName?: string;
 }
 
 /**
@@ -280,7 +368,7 @@ export interface BubbleProps<
   /**
    * 列表引用
    */
-  bubbleListRef?: any;
+  bubbleListRef?: React.RefObject<HTMLDivElement>;
 
   /**
    * 是否只读
@@ -293,6 +381,18 @@ export interface BubbleProps<
   markdownRenderConfig?: MarkdownEditorProps;
 
   /**
+   * 渲染模式快捷设置
+   * - 'slate': 使用 Slate 编辑器渲染（默认）
+   * - 'markdown': 使用轻量 MarkdownRenderer（无 Slate 实例，性能更优）
+   * 等效于 markdownRenderConfig={{ renderMode }}
+   */
+  renderMode?: 'slate' | 'markdown';
+  /**
+   * 与 `renderMode` 等价，兼容部分协议字段（如 `renderType=markdown`）
+   */
+  renderType?: 'slate' | 'markdown';
+
+  /**
    * 自定义配置
    */
   customConfig?: CustomConfig;
@@ -300,11 +400,11 @@ export interface BubbleProps<
   /**
    * 依赖项数组
    */
-  deps?: any[];
+  deps?: unknown[];
 
   /**
    * 不喜欢回调
-   * @deprecated 请使用 onDislike 替代（符合命名规范），但为保持兼容性暂时保留
+   * @deprecated @since 2.29.0 请使用 onDislike 替代（符合命名规范），但为保持兼容性暂时保留
    */
   onDisLike?: (
     bubble: MessageBubbleData<Record<string, any>>,
@@ -324,7 +424,7 @@ export interface BubbleProps<
   /**
    * 取消点赞的回调函数
    * @description 当用户点击取消点赞按钮时触发
-   * @deprecated 请使用 onLikeCancel 替代（符合命名规范），但为保持兼容性暂时保留
+   * @deprecated @since 2.29.0 请使用 onLikeCancel 替代（符合命名规范），但为保持兼容性暂时保留
    * @callback
    * @optional
    */
@@ -349,8 +449,9 @@ export interface BubbleProps<
 
   /**
    * 气泡引用
+   * @description 支持命令式操作的气泡实例引用，包含 setMessageItem 等方法
    */
-  bubbleRef?: any;
+  bubbleRef?: React.MutableRefObject<BubbleImperativeHandle | null | undefined>;
 
   /**
    * 控制复制按钮的显示
@@ -409,6 +510,8 @@ export interface BubbleProps<
     className?: string;
     /** 自定义根容器样式 */
     style?: React.CSSProperties;
+    /** 自定义每个媒体（图片/视频）条目的渲染，透传 FileMapView */
+    itemRender?: FileMapViewProps['itemRender'];
     /** 最大展示条目数（默认 3） */
     maxDisplayCount?: number;
     /** 是否显示"查看更多"按钮 */
@@ -430,5 +533,12 @@ export interface BubbleProps<
       | (() => (file: AttachmentFile) => React.ReactNode);
   };
   userBubbleProps?: BubbleProps;
+  /**
+   * AI 气泡的属性配置
+   */
+  aiBubbleProps?: BubbleProps;
+  /**
+   * @deprecated @since 2.30.0 请使用 aiBubbleProps 替代（符合命名规范）
+   */
   aIBubbleProps?: BubbleProps;
 }

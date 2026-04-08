@@ -1,4 +1,4 @@
-﻿import classNames from 'classnames';
+﻿import classNames from 'clsx';
 import { motion, Variants } from 'framer-motion';
 import React from 'react';
 

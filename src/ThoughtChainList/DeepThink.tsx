@@ -56,7 +56,7 @@ export const DeepThink = (
     markdownRenderProps?: MarkdownEditorProps;
     /**
      * Item 子组件变更事件
-     * @deprecated 请使用 onItemChange 替代（符合命名规范）
+     * @deprecated @since 2.29.0 请使用 onItemChange 替代（符合命名规范）
      */
     onChangeItem?: (
       item: WhiteBoxProcessInterface,

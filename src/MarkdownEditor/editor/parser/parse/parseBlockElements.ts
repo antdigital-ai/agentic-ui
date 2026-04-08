@@ -294,6 +294,58 @@ export const handleBlockquote = (
   return result;
 };
 
+/** 从 mdast 段落等节点提取纯文本（用于识别闭合标记 :::） */
+function getNodeText(node: any): string {
+  if (!node) return '';
+  if (node.type === 'text' && node.value !== null && node.value !== undefined)
+    return String(node.value);
+  if (Array.isArray(node.children)) {
+    return node.children.map((c: any) => getNodeText(c)).join('');
+  }
+  return '';
+}
+
+/**
+ * 处理 remark-directive 的 containerDirective（:::info / :::tip{title="提示"} 等）
+ * 转为 blockquote 并写入 otherProps，供只读渲染为 div.markdown-container。
+ * 过滤掉被误解析为内容的闭合标记段落（仅含 ::: 的段落）。
+ */
+export const handleContainerDirective = (
+  currentElement: any,
+  parseNodes: ParseNodesFn,
+) => {
+  const name = (currentElement.name ?? 'note').toLowerCase();
+  const attrs = currentElement.attributes ?? {};
+  const title =
+    typeof attrs.title === 'string'
+      ? attrs.title
+      : attrs.title !== null && attrs.title !== undefined
+        ? String(attrs.title)
+        : undefined;
+  const otherProps: Record<string, unknown> = {
+    markdownContainerType: name,
+  };
+  if (title?.trim()) {
+    otherProps.markdownContainerTitle = title.trim();
+  }
+  const rawChildren = currentElement.children ?? [];
+  const filteredChildren = rawChildren.filter((node: any) => {
+    if (node.type === 'paragraph') {
+      const text = getNodeText(node).trim();
+      if (text === ':::') return false;
+    }
+    return true;
+  });
+  return {
+    type: 'blockquote',
+    otherProps,
+    children:
+      filteredChildren.length > 0
+        ? parseNodes(filteredChildren, false, currentElement)
+        : [{ type: 'paragraph', children: [{ text: '' }] }],
+  };
+};
+
 /**
  * 应用内联格式到叶子节点
  */

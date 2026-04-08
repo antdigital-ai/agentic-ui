@@ -1,6 +1,6 @@
 /**
  * title: BubbleList 懒加载示例
- * description: 展示 BubbleList 的懒加载功能，适用于长列表场景，包含 200 个消息项
+ * description: 展示 BubbleList 懒加载，约 48 条消息即可观察滚动加载
  */
 import {
   BubbleList,
@@ -10,6 +10,8 @@ import {
 import { Space, Statistic, Switch } from 'antd';
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { BubbleDemoCard } from './BubbleDemoCard';
+
+const LAZY_DEMO_MESSAGE_COUNT = 48;
 
 // 创建模拟消息
 const createMockMessage = (
@@ -21,8 +23,8 @@ const createMockMessage = (
   id,
   role,
   content,
-  createAt: Date.now() - (200 - index) * 1000,
-  updateAt: Date.now() - (200 - index) * 1000,
+  createAt: Date.now() - (LAZY_DEMO_MESSAGE_COUNT - index) * 1000,
+  updateAt: Date.now() - (LAZY_DEMO_MESSAGE_COUNT - index) * 1000,
   isFinished: true,
   meta: {
     avatar:
@@ -33,23 +35,16 @@ const createMockMessage = (
   } as BubbleMetaData,
 });
 
-// 生成 200 条消息
 const generateMessages = (): MessageBubbleData[] => {
   const messages: MessageBubbleData[] = [];
   const contents = [
-    '这是一条测试消息，用于展示懒加载功能。',
-    '懒加载可以显著提升长列表的渲染性能。',
-    '只有进入视口的气泡才会被渲染。',
-    '这样可以减少初始渲染时间，提升用户体验。',
-    'IntersectionObserver API 用于检测元素是否进入视口。',
-    '占位符保持布局稳定，避免滚动时的跳动。',
-    '支持自定义占位符高度和提前加载距离。',
-    '适用于包含大量消息的聊天场景。',
-    '性能优化是前端开发的重要课题。',
-    '通过懒加载可以减少 DOM 节点数量。',
+    '接口变慢可能出在哪？',
+    '先看 DB 与 N+1，再加索引或批量查询。',
+    '索引已加，还要做什么？',
+    '可试 DataLoader / 缓存与 TTL。',
   ];
 
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < LAZY_DEMO_MESSAGE_COUNT; i++) {
     const role = i % 2 === 0 ? 'assistant' : 'user';
     const contentIndex = i % contents.length;
     const content = `[消息 ${i + 1}] ${contents[contentIndex]}`;
@@ -65,7 +60,6 @@ export default () => {
   const [lazyEnabled, setLazyEnabled] = useState(true);
   const [renderTime, setRenderTime] = useState<number | null>(null);
 
-  // 生成 200 条消息
   const bubbleList = useMemo(() => generateMessages(), []);
 
   // 元数据配置

@@ -6,9 +6,6 @@
 // 组件库相关链接
 export const COMPONENT_LIBRARY_URL = 'https://.antdigital.ai/components';
 
-// Agent 体验评估链接
-export const AGENT_EVALUATION_URL = 'https://fire-study-94125373.figma.site';
-
 export const ICON_LIBRARY_URL = '';
 
 export const MOBILE_COMPONENT_LIBRARY_URL = '';

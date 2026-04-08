@@ -59,9 +59,13 @@ vi.mock('../../src/MarkdownEditor/editor/components/CommentList', () => ({
   CommentList: () => <div data-testid="comment-list">Comment List</div>,
 }));
 
-vi.mock('../../src/I18n', () => ({
-  I18nProvide: ({ children }: any) => <div>{children}</div>,
-}));
+vi.mock('../../src/I18n', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/I18n')>();
+  return {
+    ...actual,
+    I18nProvide: ({ children }: any) => <div>{children}</div>,
+  };
+});
 
 describe('BaseMarkdownEditor - apaasify 功能', () => {
   const defaultProps: MarkdownEditorProps = {

@@ -18,7 +18,9 @@ vi.mock('@galacean/effects', () => {
     resize: vi.fn(),
   };
 
-  const Player = vi.fn().mockImplementation(() => mockPlayer);
+  const Player = vi.fn(function MockPlayer() {
+    return mockPlayer;
+  });
 
   return {
     Player,
@@ -68,7 +70,7 @@ describe('EffectPlayer Component', () => {
     const mockPlayer = new Player({ container: document.createElement('div') });
 
     // 创建带有 onError 的 Player
-    const PlayerWithError = vi.fn().mockImplementation((config: any) => {
+    const PlayerWithError = vi.fn(function PlayerWithError(config: any) {
       if (config.onError) {
         // 触发错误回调
         queueMicrotask(() => config.onError());

@@ -261,6 +261,17 @@ describe('Table Components', () => {
         const result = tableRenderElement(props);
         expect(result).toBeDefined();
       });
+
+      it('应通过 ThWrapper 渲染 header-cell 并输出 th 元素', () => {
+        const props = {
+          element: { type: 'header-cell' as const, children: [{ text: '' }] },
+          attributes: defaultAttributes,
+          children: [<div key="1">Header Content</div>],
+        };
+        const { container } = render(tableRenderElement(props) as any);
+        const th = container.querySelector('th');
+        expect(th).toBeInTheDocument();
+      });
     });
 
     describe('table-cell类型', () => {

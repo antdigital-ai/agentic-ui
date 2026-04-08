@@ -81,9 +81,9 @@ describe('Editor Component', () => {
   });
 
   it('应该正确导入Editor组件', () => {
-    // 测试组件导入
+    // 测试组件导入（React.memo 返回对象，普通函数组件为 function）
     expect(Editor).toBeDefined();
-    expect(typeof Editor).toBe('function');
+    expect(['function', 'object']).toContain(typeof Editor);
   });
 
   it('应该正确导入相关依赖', () => {

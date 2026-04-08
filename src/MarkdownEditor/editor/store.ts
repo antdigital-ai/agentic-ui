@@ -19,7 +19,6 @@ import {
 } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor } from 'slate-react';
-import { T } from 'vitest/dist/chunks/environment.LoooBwUu.js';
 import { Elements, FootnoteDefinitionNode, ListNode } from '../el';
 import type { MarkdownEditorPlugin } from '../plugin';
 import { CommentDataType, MarkdownEditorProps } from '../types';
@@ -68,6 +67,18 @@ export interface EditorStoreContextType {
   openInsertCompletion?: boolean;
   /** 设置打开插入自动完成状态 */
   setOpenInsertCompletion?: (open: boolean) => void;
+  /** 是否打开 Jinja 模板面板 */
+  openJinjaTemplate?: boolean;
+  /** 设置打开 Jinja 模板面板状态 */
+  setOpenJinjaTemplate?: (open: boolean) => void;
+  /** Jinja 弹层插入锚点 path（当前段落节点 path） */
+  jinjaAnchorPath?: number[] | null;
+  /** 设置 Jinja 弹层锚点 path */
+  setJinjaAnchorPath?: (path: number[] | null) => void;
+  /** 是否启用 Jinja（总开关，用于语法高亮等） */
+  jinjaEnabled?: boolean;
+  /** 是否启用 Jinja 模板面板（用于触发与弹层） */
+  jinjaTemplatePanelEnabled?: boolean;
   /** 编辑器属性配置 */
   editorProps: MarkdownEditorProps;
   /** Markdown编辑器引用 */
@@ -102,6 +113,12 @@ export const useEditorStore = () => {
       typewriter: false,
       editorProps: {} as MarkdownEditorProps,
       markdownEditorRef: {} as React.MutableRefObject<any>,
+      openJinjaTemplate: false,
+      setOpenJinjaTemplate: undefined,
+      jinjaAnchorPath: null,
+      setJinjaAnchorPath: undefined,
+      jinjaEnabled: false,
+      jinjaTemplatePanelEnabled: false,
     }
   );
 };
@@ -195,8 +212,14 @@ export class EditorStore {
   focus() {
     const editor = this._editor.current;
     try {
-      // 1. 确保编辑器获得焦点
-      setTimeout(() => ReactEditor.focus(editor), 0);
+      // 1. 确保编辑器获得焦点（异步，需要单独 try-catch 防止白屏）
+      setTimeout(() => {
+        try {
+          ReactEditor.focus(editor);
+        } catch (e) {
+          console.error('ReactEditor.focus 失败:', e);
+        }
+      }, 0);
       // 2. 处理空文档情况
       if (editor.children.length === 0) {
         const defaultNode = { type: 'paragraph', children: [{ text: '' }] };
@@ -436,7 +459,7 @@ export class EditorStore {
       const nodeList = parserMdToSchema(md, plugins).schema;
       this.setContent(nodeList);
       this._editor.current.children = nodeList;
-      ReactEditor.deselect(this._editor.current);
+      this._safeDeselect();
       onProgress?.(1);
     } catch (error) {
       console.error('Failed to set MD content:', error);
@@ -457,7 +480,7 @@ export class EditorStore {
       if (allNodes.length > 0) {
         this.setContent(allNodes);
         this._editor.current.children = allNodes;
-        ReactEditor.deselect(this._editor.current);
+        this._safeDeselect();
       }
       onProgress?.(1);
     } catch (error) {
@@ -490,6 +513,26 @@ export class EditorStore {
     if (this._currentAbortController) {
       this._currentAbortController.abort();
       this._currentAbortController = null;
+    }
+  }
+
+  /**
+   * 安全地取消编辑器选区。
+   *
+   * ReactEditor.deselect() 内部调用 window.getSelection().removeAllRanges()，
+   * 当编辑器处于聚焦状态时，浏览器要求必须存在活跃选区才能操作，
+   * 否则抛出 InvalidStateError("Failed to execute 'collapseToEnd' on 'Selection'")。
+   *
+   * 双重防御策略：
+   * 1. isFocused 检查 —— 大多数情况下直接跳过（性能优先）
+   * 2. try-catch —— 覆盖 isFocused 与 deselect 之间的竞态窗口
+   */
+  private _safeDeselect(): void {
+    if (ReactEditor.isFocused(this._editor.current)) return;
+    try {
+      ReactEditor.deselect(this._editor.current);
+    } catch {
+      // InvalidStateError：编辑器在 isFocused 检查与 deselect 调用之间获得了焦点，忽略即可
     }
   }
 
@@ -592,7 +635,7 @@ export class EditorStore {
             rafId = requestAnimationFrame(parseAndInsertNextBatch);
           } else {
             // 所有内容处理完成
-            ReactEditor.deselect(this._editor.current);
+            this._safeDeselect();
             rafId = null;
             this._currentAbortController = null;
             resolve();
@@ -773,7 +816,7 @@ export class EditorStore {
    */
   removeNodes: (options?: {
     at?: Location;
-    match?: NodeMatch<T>;
+    match?: NodeMatch<Node>;
     mode?: RangeMode;
     hanging?: boolean;
     voids?: boolean;

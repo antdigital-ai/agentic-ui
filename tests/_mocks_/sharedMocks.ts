@@ -70,10 +70,12 @@ export const mockSlate = {
 
 // 共享的 Chart.js mock
 export const mockChartJs = {
-  Chart: vi.fn().mockImplementation(() => ({
-    render: vi.fn(),
-    destroy: vi.fn(),
-  })),
+  Chart: vi.fn(function MockChart() {
+    return {
+      render: vi.fn(),
+      destroy: vi.fn(),
+    };
+  }),
 };
 
 // 共享的 KaTeX mock
@@ -87,10 +89,12 @@ export const mockCopyToClipboard = vi.fn().mockReturnValue(true);
 
 // 共享的 Day.js mock
 export const mockDayjs = {
-  default: vi.fn().mockImplementation(() => ({
-    format: vi.fn().mockReturnValue('2024-01-01'),
-    toDate: vi.fn().mockReturnValue(new Date('2024-01-01')),
-  })),
+  default: vi.fn(function MockDayjs() {
+    return {
+      format: vi.fn().mockReturnValue('2024-01-01'),
+      toDate: vi.fn().mockReturnValue(new Date('2024-01-01')),
+    };
+  }),
 };
 
 // 共享的 Mermaid mock
@@ -103,11 +107,13 @@ export const mockMermaid = {
 
 // 共享的 Resize Observer mock
 export const mockResizeObserver = {
-  ResizeObserver: vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  })),
+  ResizeObserver: vi.fn(function MockResizeObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    };
+  }),
 };
 
 // 设置全局 mock 的函数
@@ -116,11 +122,13 @@ export const setupGlobalMocks = () => {
   global.ResizeObserver = mockResizeObserver.ResizeObserver;
 
   // 设置 IntersectionObserver
-  global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  }));
+  global.IntersectionObserver = vi.fn(function MockIntersectionObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    };
+  });
 
   // 设置 matchMedia
   global.matchMedia = vi.fn().mockImplementation(() => ({

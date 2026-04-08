@@ -143,13 +143,23 @@ export interface ThoughtChainListProps extends BaseStyleProps {
   ) => React.ReactNode;
   thoughtChainList: WhiteBoxProcessInterface[];
   /**
-   * @deprecated 请使用 isLoading 代替
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除
    */
   loading?: boolean;
   /** 加载状态 */
   isLoading?: boolean;
   bubble?: {
+    isFinished?: boolean;
+    endTime?: number;
+    createAt?: number;
+    isAborted?: boolean;
+  };
+  /**
+   * @deprecated @since 2.30.0 请使用 bubble 代替
+   * @description 旧版本兼容属性，将在未来版本移除
+   */
+  chatItem?: {
     isFinished?: boolean;
     endTime?: number;
     createAt?: number;

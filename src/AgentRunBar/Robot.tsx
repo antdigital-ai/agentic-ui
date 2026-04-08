@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { isString } from 'lodash-es';
 import React from 'react';
 import RobotIcon from '../Components/Robot';

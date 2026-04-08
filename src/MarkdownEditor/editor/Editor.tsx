@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/no-children-prop */
 import { useDebounceFn } from '@ant-design/pro-components';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
@@ -159,7 +159,7 @@ const genTableMinSize = (
  * - 支持错误边界
  * - 响应式布局
  */
-export const SlateMarkdownEditor = (props: MEditorProps) => {
+export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   // 所有hooks必须在组件顶部按固定顺序调用
   const {
     store,
@@ -167,6 +167,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
     markdownContainerRef,
     readonly,
     setDomRect,
+    jinjaEnabled,
   } = useEditorStore();
 
   // 懒加载元素索引计数器
@@ -202,7 +203,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
 
   const onKeyDown = useKeyboard(store, markdownEditorRef, props);
   const onChange = useOnchange(markdownEditorRef.current, props.onChange);
-  const high = useHighlight(store);
+  const high = useHighlight(store, jinjaEnabled);
 
   const childrenIsEmpty = useMemo(() => {
     if (!markdownEditorRef.current?.children) return false;
@@ -486,16 +487,20 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
           !hasEditableTarget(markdownEditorRef.current, event.target)
         ) {
           const domSelection = window.getSelection();
-          markdownEditorRef.current.selection = getSelectionFromDomSelection(
-            markdownEditorRef.current,
-            domSelection!,
-          );
+          if (domSelection) {
+            markdownEditorRef.current.selection = getSelectionFromDomSelection(
+              markdownEditorRef.current,
+              domSelection,
+            );
+          }
         } else if (operationType === 'cut') {
           const domSelection = window.getSelection();
-          markdownEditorRef.current.selection = getSelectionFromDomSelection(
-            markdownEditorRef.current,
-            domSelection!,
-          );
+          if (domSelection) {
+            markdownEditorRef.current.selection = getSelectionFromDomSelection(
+              markdownEditorRef.current,
+              domSelection,
+            );
+          }
         }
 
         // 如果无法获取选区，则直接返回
@@ -625,9 +630,11 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
    * @description paste event
    * @param {React.ClipboardEvent<HTMLDivElement>} e
    */
-  const onPaste = async (event: React.ClipboardEvent<HTMLDivElement>) => {
-    await handlePasteEvent(event);
-  };
+  const onPaste = useRefFunction(
+    async (event: React.ClipboardEvent<HTMLDivElement>) => {
+      await handlePasteEvent(event);
+    },
+  );
 
   /**
    * 实际的粘贴处理逻辑
@@ -635,6 +642,8 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
   const handlePasteEvent = async (
     event: React.ClipboardEvent<HTMLDivElement>,
   ) => {
+    event.stopPropagation();
+    event.preventDefault();
     // 检查粘贴配置
     const pasteConfig = props.pasteConfig;
     if (pasteConfig?.enabled === false) {
@@ -704,18 +713,23 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
 
     // 2. 然后尝试处理 HTML
     if (types.includes('text/html') && allowedTypes.includes('text/html')) {
+      event.stopPropagation();
+      event.preventDefault();
       const result = await handleHtmlPaste(
         markdownEditorRef.current,
         event.clipboardData,
         props,
       );
-      if (result === false) {
+
+      if (result) {
         return;
       }
     }
 
     // 3. 处理文件
     if (types.includes('Files') && allowedTypes.includes('Files')) {
+      event.stopPropagation();
+      event.preventDefault();
       if (
         await handleFilesPaste(
           markdownEditorRef.current,
@@ -731,6 +745,8 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
       types.includes('text/markdown') &&
       allowedTypes.includes('text/markdown')
     ) {
+      event.stopPropagation();
+      event.preventDefault();
       const text =
         event.clipboardData?.getData?.('text/markdown')?.trim() || '';
       if (text) {
@@ -744,10 +760,26 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
     }
     // 4. 处理纯文本
     if (types.includes('text/plain') && allowedTypes.includes('text/plain')) {
+      event.stopPropagation();
+      event.preventDefault();
       const text = event.clipboardData?.getData?.('text/plain')?.trim() || '';
       if (!text) return;
 
       const selection = markdownEditorRef.current.selection;
+
+      // plainTextOnly 时仅插入纯文本，不做 HTML/Markdown/链接解析
+      if (pasteConfig?.plainTextOnly) {
+        if (selection) {
+          Transforms.insertText(markdownEditorRef.current, text, {
+            at: selection,
+          });
+        } else {
+          Transforms.insertNodes(markdownEditorRef.current, [
+            { type: 'paragraph', children: [{ text }] },
+          ]);
+        }
+        return;
+      }
 
       // 如果是表格或者代码块，直接插入文本
       if (shouldInsertTextDirectly(markdownEditorRef.current, selection)) {
@@ -795,7 +827,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
   /**
    * 处理输入法开始事件
    */
-  const onCompositionStart = (e: React.CompositionEvent) => {
+  const onCompositionStart = () => {
     if (markdownContainerRef.current) {
       markdownContainerRef.current.setAttribute('data-composition', '');
     }
@@ -808,21 +840,37 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
         markdownEditorRef.current.selection?.focus.path || [],
       );
       if (node) {
-        const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
-        if (dom) {
-          const tagInput = dom.querySelector('[data-tag-popup-input]');
-          if (tagInput) {
-            tagInput.setAttribute('data-composition', '');
+        try {
+          const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
+          if (dom) {
+            const tagInput = dom.querySelector('[data-tag-popup-input]');
+            if (tagInput) {
+              tagInput.setAttribute('data-composition', '');
+            }
           }
+        } catch {
+          // node may not be mounted yet; ignore
         }
       }
     }
 
+    // 注意：不在此处调用 e.preventDefault()。
+    // 移动端（Android GBoard / iOS 软键盘）所有输入都经过组合事件，
+    // 调用 preventDefault 会阻断浏览器将字符写入 contenteditable，
+    // 导致 Slate 模型永远为空，占位符无法消失。
+  };
+
+  /**
+   * 部分 Android WebView（如微信）可能跳过 compositionstart 直接触发
+   * compositionupdate，此处兜底确保 data-composition 始终被设置。
+   */
+  const onCompositionUpdate = () => {
     if (
-      markdownEditorRef.current.selection &&
-      Range.isCollapsed(markdownEditorRef.current.selection)
+      markdownContainerRef.current &&
+      !markdownContainerRef.current.hasAttribute('data-composition')
     ) {
-      e.preventDefault();
+      markdownContainerRef.current.setAttribute('data-composition', '');
+      store.inputComposition = true;
     }
   };
 
@@ -831,9 +879,6 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
    */
   const onCompositionEnd = () => {
     store.inputComposition = false;
-    if (markdownContainerRef.current) {
-      markdownContainerRef.current.removeAttribute('data-composition');
-    }
 
     const focusPath = markdownEditorRef.current.selection?.focus.path || [];
     if (focusPath.length > 0) {
@@ -842,15 +887,28 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
         markdownEditorRef.current.selection?.focus.path || [],
       );
       if (node) {
-        const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
-        if (dom) {
-          const tagInput = dom.querySelector('[data-tag-popup-input]');
-          if (tagInput) {
-            tagInput.removeAttribute('data-composition');
+        try {
+          const dom = ReactEditor.toDOMNode(markdownEditorRef.current, node);
+          if (dom) {
+            const tagInput = dom.querySelector('[data-tag-popup-input]');
+            if (tagInput) {
+              tagInput.removeAttribute('data-composition');
+            }
           }
+        } catch {
+          // node may have been unmounted during composition; ignore
         }
       }
     }
+
+    // 延迟到下一帧移除 data-composition，确保 Slate 完成模型更新、
+    // React 完成重渲染（isEmpty 变为 false、empty class 移除）后
+    // 再解除占位符隐藏，避免竞态导致占位符短暂闪现。
+    requestAnimationFrame(() => {
+      if (markdownContainerRef.current) {
+        markdownContainerRef.current.removeAttribute('data-composition');
+      }
+    });
   };
 
   const elementRenderElement = useRefFunction(
@@ -946,7 +1004,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
         <MLeaf
           {...leafComponentProps}
           fncProps={props.fncProps}
-          comment={props?.comment}
+          comment={props?.comment as any}
           children={leafComponentProps.children}
           tagInputProps={props.tagInputProps}
           linkConfig={props.linkConfig}
@@ -960,7 +1018,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
         {
           ...leafComponentProps,
           fncProps: props.fncProps,
-          comment: props?.comment,
+          comment: props?.comment as any,
           hashId: hashId,
           tagInputProps: props.tagInputProps,
         },
@@ -1145,6 +1203,7 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
           autoCorrect="off"
           autoCapitalize="none"
           onCompositionStart={onCompositionStart}
+          onCompositionUpdate={onCompositionUpdate}
           onCompositionEnd={onCompositionEnd}
           className={classNames(
             props.className,
@@ -1195,4 +1254,4 @@ export const SlateMarkdownEditor = (props: MEditorProps) => {
       </Slate>
     </>,
   );
-};
+});

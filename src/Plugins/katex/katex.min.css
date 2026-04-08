@@ -209,9 +209,7 @@
 .katex .base {
   position: relative;
   white-space: nowrap;
-  width: -webkit-min-content;
-  width: -moz-min-content;
-  width: min-content;
+  width: max-content;
 }
 .katex .base,
 .katex .strut {

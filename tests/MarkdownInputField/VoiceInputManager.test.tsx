@@ -70,6 +70,29 @@ describe('useVoiceInputManager', () => {
       // 验证清理逻辑被调用（虽然在测试中可能不会立即执行）
       expect(true).toBe(true);
     });
+
+    it('卸载时若有 recognizer 应调用 stop，stop 拒绝时 catch 不抛', async () => {
+      const mockRecognizer = createMockRecognizer({
+        stop: vi.fn().mockRejectedValue(new Error('cleanup stop failed')),
+      });
+      const mockVoiceRecognizer = vi.fn().mockResolvedValue(mockRecognizer);
+
+      const { result, unmount } = renderHook(() =>
+        useVoiceInputManager({
+          ...defaultProps,
+          voiceRecognizer: mockVoiceRecognizer,
+        }),
+      );
+
+      await result.current.startRecording();
+      await waitFor(() => expect(result.current.recording).toBe(true));
+
+      unmount();
+
+      await waitFor(() => {
+        expect(mockRecognizer.stop).toHaveBeenCalled();
+      });
+    });
   });
 
   describe('开始录音', () => {
@@ -298,6 +321,34 @@ describe('useVoiceInputManager', () => {
         expect(result.current.recording).toBe(false);
         expect(mockRecognizer.stop).toHaveBeenCalled();
       });
+    });
+
+    it('onError 时 stop 拒绝应被 catch 吞掉', async () => {
+      let errorCallback: any;
+      const mockRecognizer = createMockRecognizer({
+        stop: vi.fn().mockRejectedValue(new Error('stop failed')),
+      });
+      const mockVoiceRecognizer = vi.fn().mockImplementation((callbacks) => {
+        errorCallback = callbacks.onError;
+        return Promise.resolve(mockRecognizer);
+      });
+
+      const { result } = renderHook(() =>
+        useVoiceInputManager({
+          ...defaultProps,
+          voiceRecognizer: mockVoiceRecognizer,
+        }),
+      );
+
+      await result.current.startRecording();
+      await waitFor(() => expect(result.current.recording).toBe(true));
+
+      errorCallback();
+
+      await waitFor(() => {
+        expect(result.current.recording).toBe(false);
+      });
+      expect(mockRecognizer.stop).toHaveBeenCalled();
     });
   });
 

@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import Lottie, { LottieRef } from 'lottie-react';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useStyle } from './style';

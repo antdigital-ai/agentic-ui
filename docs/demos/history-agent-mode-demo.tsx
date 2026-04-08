@@ -8,51 +8,34 @@ const AgentModeHistoryDemo = () => {
   const [favorites, setFavorites] = useState(new Set(['session-1']));
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // 模拟历史数据
   const mockHistoryData: HistoryDataType[] = [
     {
       id: '1',
       sessionId: 'session-1',
-      sessionTitle: '如何实现 React 组件的懒加载？',
-
+      sessionTitle: 'React 懒加载示例',
       gmtCreate: Date.now() - 3600000,
       isFavorite: favorites.has('session-1'),
     },
     {
       id: '2',
       sessionId: 'session-2',
-      sessionTitle: 'TypeScript 高级类型的使用技巧',
-      gmtCreate: Date.now() - 7200000,
+      sessionTitle: 'TypeScript 泛型问题',
+      description: '带描述的会话',
+      icon: '📄',
+      gmtCreate: Date.now() - 86400000,
       isFavorite: favorites.has('session-2'),
     },
     {
       id: '3',
       sessionId: 'session-3',
-      sessionTitle: '前端性能优化的最佳实践',
-      description: '这是一个描述',
-      icon: '📄',
-      gmtCreate: Date.now() - 86400000,
-      isFavorite: favorites.has('session-3'),
-    },
-    {
-      id: '4',
-      sessionId: 'session-4',
-      sessionTitle: 'CSS Grid 布局详解',
+      sessionTitle: '性能优化咨询',
       gmtCreate: Date.now() - 172800000,
-      isFavorite: favorites.has('session-4'),
-    },
-    {
-      id: '5',
-      sessionId: 'session-5',
-      sessionTitle: 'JavaScript 异步编程模式',
-      gmtCreate: Date.now() - 259200000,
-      isFavorite: favorites.has('session-5'),
+      isFavorite: favorites.has('session-3'),
     },
   ];
 
-  // 模拟请求函数
   const mockRequest = async ({ agentId }: { agentId: string }) => {
-    console.log('请求历史数据，agentId:', agentId);
+    void agentId;
     // 模拟网络延迟
     await new Promise((resolve) => {
       setTimeout(resolve, 500);

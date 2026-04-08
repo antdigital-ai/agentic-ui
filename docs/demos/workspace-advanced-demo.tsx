@@ -13,48 +13,26 @@ const WorkspaceAdvancedDemo: React.FC = () => {
     html: '',
   });
 
-  // 模拟文件数据
   useEffect(() => {
     setFileNodes([
       {
-        name: '项目文档',
+        name: '文档',
         type: 'markdown',
         children: [
           {
             name: 'README.md',
             type: 'markdown',
-            size: '2.5KB',
+            size: '1KB',
             lastModified: '2024-01-15 10:00:00',
-            content: '# 项目说明\n\n这是一个示例项目...',
+            content: '# Demo\n示例文件树',
           },
           {
-            name: 'CHANGELOG.md',
-            type: 'markdown',
-            size: '1.8KB',
-            lastModified: '2024-01-14 15:30:00',
-            content: '# 更新日志\n\n## v1.0.0\n- 初始版本发布',
-          },
-        ],
-      },
-      {
-        name: '源代码',
-        type: 'javascript',
-        children: [
-          {
-            name: 'index.tsx',
+            name: 'App.tsx',
             type: 'react',
-            size: '3.2KB',
+            size: '2KB',
             lastModified: '2024-01-15 09:45:00',
             content:
-              'import React from "react";\n\nconst App = () => {\n  return <div>Hello World</div>;\n};\n\nexport default App;',
-          },
-          {
-            name: 'utils.ts',
-            type: 'typescript',
-            size: '1.5KB',
-            lastModified: '2024-01-14 16:20:00',
-            content:
-              'export const formatDate = (date: Date) => {\n  return date.toLocaleDateString();\n};',
+              'import React from "react";\nexport default () => <div>App</div>;',
           },
         ],
       },
@@ -63,13 +41,7 @@ const WorkspaceAdvancedDemo: React.FC = () => {
 
   // 模拟实时数据
   useEffect(() => {
-    const shellCommands = [
-      '$ git status',
-      'On branch main',
-      'Your branch is up to date with origin/main',
-      '$ npm run build',
-      'webpack compiled successfully',
-    ];
+    const shellCommands = ['$ git status', 'On branch main', '$ npm run build'];
 
     let shellIndex = 0;
     const shellInterval = setInterval(() => {
@@ -85,26 +57,14 @@ const WorkspaceAdvancedDemo: React.FC = () => {
       }
     }, 1500);
 
-    const markdownText = `# 高级功能演示
+    const markdownText = `# Workspace 高级示例
 
-## 动态内容更新
+- 受控标签与标题  
+- 文件树与实时区
 
-这个演示展示了 Workspace 组件的高级功能：
-
-- **动态标签页切换**
-- **自定义标题和关闭按钮**
-- **文件预览和下载**
-- **实时数据更新**
-
-## 代码示例
-
-\`\`\`typescript
-const [activeTab, setActiveTab] = useState('realtime');
+\`\`\`ts
+const [tab, setTab] = useState('realtime');
 \`\`\`
-
-## 数学公式
-
-$\\sum_{i=1}^{n} x_i = x_1 + x_2 + \\cdots + x_n$
 `;
 
     let mdIndex = 0;

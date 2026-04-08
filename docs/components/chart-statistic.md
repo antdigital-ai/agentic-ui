@@ -1,6 +1,7 @@
 ---
 title: ChartStatistic 指标卡
 atomId: ChartStatistic
+order: 10
 group:
   title: 图文输出
   order: 4
@@ -8,7 +9,7 @@ group:
 
 # ChartStatistic 指标卡
 
-用于显示单个关键指标数据的卡片组件，支持自定义格式化、主题切换、尺寸调整和弹性布局等功能。
+用于显示单个关键指标数据的卡片组件，支持自定义格式化、主题切换、尺寸调整和弹性布局等功能。常与面积图、折线图、柱状图等图表的 `statistic` 属性搭配使用。
 
 ## 何时使用
 
@@ -20,26 +21,27 @@ group:
 ## 代码演示
 
 <code src="../demos/charts/chartStatic.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/charts/chart-statistic-dark.tsx" background="#141414" iframe=320></code>
 
 ## API
 
 ### ChartStatisticProps
 
-| 属性           | 类型                                                                | 默认值      | 说明                                                   |
-| -------------- | ------------------------------------------------------------------- | ----------- | ------------------------------------------------------ |
-| title          | `string`                                                            | -           | 指标标题                                               |
-| tooltip        | `string`                                                            | -           | 鼠标悬停时显示的提示信息                               |
-| value          | `number \| string \| null \| undefined`                             | -           | 显示的数值                                             |
-| precision      | `number`                                                            | -           | 数值精度（小数点后位数）                               |
-| groupSeparator | `string`                                                            | `','`       | 千分位分隔符                                           |
-| prefix         | `string`                                                            | `''`        | 数值前缀（如货币符号）                                 |
-| suffix         | `string`                                                            | `''`        | 数值后缀（如单位）                                     |
-| formatter      | `(value: number \| string \| null \| undefined) => React.ReactNode` | -           | 自定义格式化函数，优先级高于其他格式化选项             |
-| className      | `string`                                                            | `''`        | 自定义类名                                             |
-| theme          | `'light' \| 'dark'`                                                 | `'light'`   | 主题风格                                               |
-| size           | `'small' \| 'default' \| 'large'`                                   | `'default'` | 组件尺寸                                               |
-| block          | `boolean`                                                           | `false`     | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） |
-| extra          | `React.ReactNode`                                                   | -           | 右上角自定义内容（图标、按钮等）                       |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| title | 指标标题 | `string` | - | - |
+| tooltip | 鼠标悬停时显示的提示信息 | `string` | - | - |
+| value | 显示的数值 | `number \| string \| null \| undefined` | - | - |
+| precision | 数值精度（小数点后位数） | `number` | - | - |
+| groupSeparator | 千分位分隔符 | `string` | `','` | - |
+| prefix | 数值前缀（如货币符号） | `string` | `''` | - |
+| suffix | 数值后缀（如单位） | `string` | `''` | - |
+| formatter | 自定义格式化函数，优先级高于其他格式化选项 | `(value: number \| string \| null \| undefined) => React.ReactNode` | - | - |
+| className | 自定义类名 | `string` | `''` | - |
+| theme | 主题风格 | `'light' \| 'dark'` | `'light'` | - |
+| size | 组件尺寸 | `'small' \| 'default' \| 'large'` | `'default'` | - |
+| block | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean` | `false` | - |
+| extra | 右上角自定义内容（图标、按钮等） | `React.ReactNode` | - | - |
 
 ## 特性说明
 

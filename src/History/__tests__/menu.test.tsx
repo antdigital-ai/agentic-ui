@@ -91,4 +91,29 @@ describe('GroupMenu', () => {
     // 检查自定义类名是否被应用
     expect(container.querySelector('.custom-menu-item')).toBeInTheDocument();
   });
+
+  it('子项为空的分组不应展示', () => {
+    const itemsWithEmptyGroup: MenuItemType[] = [
+      {
+        key: 'empty-group',
+        label: '空分组',
+        type: 'group',
+        children: [],
+      },
+      {
+        key: 'item1',
+        label: '菜单项 1',
+      },
+    ];
+
+    const { container } = renderWithConfig(
+      <GroupMenu items={itemsWithEmptyGroup} />,
+    );
+
+    expect(screen.getByText('菜单项 1')).toBeInTheDocument();
+    expect(screen.queryByText('空分组')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('.ant-agentic-chat-history-menu-item-group'),
+    ).not.toBeInTheDocument();
+  });
 });

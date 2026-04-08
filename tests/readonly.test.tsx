@@ -82,7 +82,7 @@ describe('Readonly Mode Tests', () => {
       });
 
       // 检查工具栏是否显示
-      const toolbar = document.querySelector('[class*="md-editor-float-bar"]');
+      const toolbar = document.querySelector('[class*="agentic-md-editor-float-bar"]');
       expect(toolbar).not.toBeNull();
       if (toolbar) {
         const style = window.getComputedStyle(toolbar);
@@ -159,7 +159,7 @@ describe('Readonly Mode Tests', () => {
 
         // 检查工具栏是否隐藏
         const toolbar = document.querySelector(
-          '[class*="md-editor-float-bar"]',
+          '[class*="agentic-md-editor-float-bar"]',
         );
         expect(toolbar).not.toBeNull();
       }
@@ -211,7 +211,7 @@ describe('Readonly Mode Tests', () => {
       });
 
       // 检查工具栏是否显示
-      let toolbar = document.querySelector('[class*="md-editor-float-bar"]');
+      let toolbar = document.querySelector('[class*="agentic-md-editor-float-bar"]');
       expect(toolbar).not.toBeNull();
       if (toolbar) {
         const style = window.getComputedStyle(toolbar);
@@ -245,7 +245,7 @@ describe('Readonly Mode Tests', () => {
       });
 
       // 检查工具栏是否隐藏
-      toolbar = document.querySelector('[class*="md-editor-float-bar"]');
+      toolbar = document.querySelector('[class*="agentic-md-editor-float-bar"]');
       expect(toolbar).not.toBeNull();
     }
   });

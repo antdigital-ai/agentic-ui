@@ -3,12 +3,9 @@ import { cleanup, render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { BaseEditor, createEditor, Editor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
+import { ReactEditor, withReact } from 'slate-react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { BaseMarkdownEditor } from '../../src/MarkdownEditor/BaseMarkdownEditor';
-import {
-  ReactEditor,
-  withReact,
-} from 'slate-react';
 import { EditorUtils } from '../../src/MarkdownEditor/editor/utils/editorUtils';
 
 describe('Editor Alignment Tests', () => {
@@ -26,26 +23,16 @@ describe('Editor Alignment Tests', () => {
 
   it('should apply text alignment and save it as comment in markdown', () => {
     const editor = createTestEditor();
-    const initValue = JSON.stringify(editor.children);
-
-    const { container } = render(
-      <BaseMarkdownEditor initValue={initValue} onChange={() => {}} />,
-    );
-
-    // Insert some test text and select it
     Transforms.insertText(editor, 'This is a test text');
-
     Transforms.select(editor, Editor.start(editor, []));
 
-    // Apply center alignment
     EditorUtils.setAlignment(editor, 'center');
 
-    waitFor(() => {
-      // Check if the text is visually centered
-      const paragraph = container.querySelector('[data-be="paragraph"]');
-      expect(paragraph).toBeTruthy();
-      expect(paragraph).toHaveAttribute('data-align', 'center');
+    const [node] = Editor.nodes(editor, {
+      match: (n) => n.type === 'paragraph',
     });
+    expect(node).toBeDefined();
+    expect((node?.[0] as any)?.align).toBe('center');
   });
 
   it('should toggle between different alignments', () => {

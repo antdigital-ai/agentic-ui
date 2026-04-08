@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { createElement, useContext } from 'react';
 import { ElementProps, ListNode } from '../../../el';
 

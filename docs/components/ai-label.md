@@ -18,15 +18,15 @@ AILabel 是一个用于明确标识 AI 生成内容的组件，在原有**非 AI
 
 ### AILabelProps
 
-| 参数      | 说明                                                       | 类型                                                         | 默认值      | 版本 |
-| --------- | ---------------------------------------------------------- | ------------------------------------------------------------ | ----------- | ---- |
-| status    | 标签状态，控制标签的视觉样式                               | `'default' \| 'emphasis' \| 'watermark'`                     | `'default'` | -    |
-| offset    | 标签偏移量，格式为 [水平偏移, 垂直偏移]                    | `[number, number]`                                           | -           | -    |
-| tooltip   | 提示框配置，鼠标悬停时显示提示信息                         | [TooltipProps](https://ant.design/components/tooltip-cn#api) | -           | -    |
-| className | 自定义根元素的 CSS 类名                                    | `string`                                                     | -           | -    |
-| style     | 自定义标签点（dot）的样式，会与 offset 计算的样式合并      | `React.CSSProperties`                                        | -           | -    |
-| rootStyle | 自定义根容器元素的样式                                     | `React.CSSProperties`                                        | -           | -    |
-| children  | 子元素，当存在时标签会以绝对定位的方式显示在子元素的右上角 | `React.ReactNode`                                            | -           | -    |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| status | 标签状态，控制标签的视觉样式 | `'default' \| 'emphasis' \| 'watermark'` | `'default'` | - |
+| offset | 标签偏移量，格式为 [水平偏移, 垂直偏移] | `[number, number]` | - | - |
+| tooltip | 提示框配置，鼠标悬停时显示提示信息 | [TooltipProps](https://ant.design/components/tooltip-cn#api) | - | - |
+| className | 自定义根元素的 CSS 类名 | `string` | - | - |
+| style | 自定义标签点（dot）的样式，会与 offset 计算的样式合并 | `React.CSSProperties` | - | - |
+| rootStyle | 自定义根容器元素的样式 | `React.CSSProperties` | - | - |
+| children | 子元素，当存在时标签会以绝对定位的方式显示在子元素的右上角 | `React.ReactNode` | - | - |
 
 ## 使用示例
 

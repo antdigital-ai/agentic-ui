@@ -1,6 +1,23 @@
 import { ToolUseBarThink } from '@ant-design/agentic-ui';
 import React, { useState } from 'react';
 
+const thinkContent = `让我分析一下这个电商后台系统的数据库设计方案。
+
+首先看核心实体关系：
+1. 用户表（users）和订单表（orders）是一对多关系，一个用户可以有多个订单
+2. 订单表和订单详情表（order_items）也是一对多关系
+3. 商品表（products）和分类表（categories）是多对一关系
+
+关于索引优化：
+- orders 表的 user_id 和 created_at 字段需要建立复合索引，因为查询经常按用户和时间范围筛选
+- products 表的 category_id 和 status 字段也需要索引
+- 考虑到热点查询，建议对 order_items 的 order_id 建立覆盖索引
+
+分表策略建议：
+- 订单量达到千万级后，按月份进行水平分表
+- 使用 ShardingSphere 作为分库分表中间件
+- 归档超过 6 个月的历史订单到冷存储`;
+
 const SimpleThinkDemo = () => {
   const [expanded, setExpanded] = useState(false);
   const [floatingExpanded, setFloatingExpanded] = useState(false);
@@ -16,24 +33,19 @@ const SimpleThinkDemo = () => {
     >
       <h3>ToolUseBarThink 基础用法</h3>
 
-      {/* Loading 状态 - 展示 hover 效果 */}
+      {/* Loading 状态 */}
       <div>
         <h4>Loading 状态（hover 显示浮动按钮）</h4>
         <ToolUseBarThink
           toolName="深度思考"
-          toolTarget="分析用户需求"
-          time="2.3s"
+          toolTarget="分析数据库设计方案"
+          time="3.5s"
           status="loading"
           expanded={expanded}
           onExpandedChange={setExpanded}
           floatingExpanded={floatingExpanded}
           onFloatingExpandedChange={setFloatingExpanded}
-          thinkContent={`好的，我现在需要帮用户汇总谷歌I/O 2025大会的重要信息。首先，我得仔细看看用户提供的搜索结果，找出相关的信息点。
-用户给了19个网页的结果，我需要逐一浏览，提取关键内容。
-首先，大会的时间和地点。网页1、2、5、10、12、16都提到了时间，大部分说是在5月20日至21日举行，地点是加州山景城的Shoreline Amphitheatre。网页3和12提到具体日程，主题演讲在凌晨1点开始，开发者主题演讲在4：30 am。不过要注意时区转换，比如网页5提到北京时间是5月21日凌晨，这可能对国内用户来说需要换算时间。
-接下来是大会的主要内容和亮点。AI肯定是重点，多个网页提到Gemini的更新，比如网页3、9、10、11、13、18. Gemini 2 5 Pro模型会被详细介绍，可能还有订阅服务的变化。网页18还提到250美元的UItra会员，这可能和Gemini Advanced有关。
-此外，Project Astra作为下一代AI助手，网页3、10、13都有提到，可能涉及移动和可穿戴设备。
-需要整合这些信息，分时间地点、核心内容、硬件动态、其他产品、合作与竞争几个部分。注意引用多个网页，避免重复引用同一个网页。比如AI部分可以引用网页3、9、10、11、13、18，智能眼镜引用4、6、7、8、19等。确保每个点都有对应的引用，并且正确标注。`}
+          thinkContent={thinkContent}
         />
       </div>
 
@@ -42,15 +54,10 @@ const SimpleThinkDemo = () => {
         <h4>Success 状态</h4>
         <ToolUseBarThink
           toolName="已完成思考"
-          toolTarget="总结要点"
-          time="1.8s"
+          toolTarget="数据库优化方案"
+          time="5.2s"
           status="success"
-          thinkContent={`好的，我现在需要帮用户汇总谷歌I/O 2025大会的重要信息。首先，我得仔细看看用户提供的搜索结果，找出相关的信息点。
-用户给了19个网页的结果，我需要逐一浏览，提取关键内容。
-首先，大会的时间和地点。网页1、2、5、10、12、16都提到了时间，大部分说是在5月20日至21日举行，地点是加州山景城的Shoreline Amphitheatre。网页3和12提到具体日程，主题演讲在凌晨1点开始，开发者主题演讲在4：30 am。不过要注意时区转换，比如网页5提到北京时间是5月21日凌晨，这可能对国内用户来说需要换算时间。
-接下来是大会的主要内容和亮点。AI肯定是重点，多个网页提到Gemini的更新，比如网页3、9、10、11、13、18. Gemini 2 5 Pro模型会被详细介绍，可能还有订阅服务的变化。网页18还提到250美元的UItra会员，这可能和Gemini Advanced有关。
-此外，Project Astra作为下一代AI助手，网页3、10、13都有提到，可能涉及移动和可穿戴设备。
-需要整合这些信息，分时间地点、核心内容、硬件动态、其他产品、合作与竞争几个部分。注意引用多个网页，避免重复引用同一个网页。比如AI部分可以引用网页3、9、10、11、13、18，智能眼镜引用4、6、7、8、19等。确保每个点都有对应的引用，并且正确标注。`}
+          thinkContent={thinkContent}
         />
       </div>
 
@@ -58,16 +65,11 @@ const SimpleThinkDemo = () => {
       <div>
         <h4>Error 状态</h4>
         <ToolUseBarThink
-          toolName="思考失败"
-          toolTarget="分析数据"
-          time="5.2s"
+          toolName="思考中断"
+          toolTarget="性能压测分析"
+          time="12.0s"
           status="error"
-          thinkContent={`好的，我现在需要帮用户汇总谷歌I/O 2025大会的重要信息。首先，我得仔细看看用户提供的搜索结果，找出相关的信息点。
-            用户给了19个网页的结果，我需要逐一浏览，提取关键内容。
-            首先，大会的时间和地点。网页1、2、5、10、12、16都提到了时间，大部分说是在5月20日至21日举行，地点是加州山景城的Shoreline Amphitheatre。网页3和12提到具体日程，主题演讲在凌晨1点开始，开发者主题演讲在4：30 am。不过要注意时区转换，比如网页5提到北京时间是5月21日凌晨，这可能对国内用户来说需要换算时间。
-            接下来是大会的主要内容和亮点。AI肯定是重点，多个网页提到Gemini的更新，比如网页3、9、10、11、13、18. Gemini 2 5 Pro模型会被详细介绍，可能还有订阅服务的变化。网页18还提到250美元的UItra会员，这可能和Gemini Advanced有关。
-            此外，Project Astra作为下一代AI助手，网页3、10、13都有提到，可能涉及移动和可穿戴设备。
-            需要整合这些信息，分时间地点、核心内容、硬件动态、其他产品、合作与竞争几个部分。注意引用多个网页，避免重复引用同一个网页。比如AI部分可以引用网页3、9、10、11、13、18，智能眼镜引用4、6、7、8、19等。确保每个点都有对应的引用，并且正确标注。`}
+          thinkContent={thinkContent}
         />
       </div>
     </div>

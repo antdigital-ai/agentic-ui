@@ -1,7 +1,7 @@
 import { runFunction } from '@ant-design/pro-components';
 import { ChevronDown } from '@sofa-design/icons';
 import { ConfigProvider, Dropdown, MenuProps } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, {
   MouseEvent,
   ReactNode,

@@ -6,6 +6,7 @@ import { MarkdownEditorPlugin } from '../../plugin';
 import { applyContextPropsAndConfig } from './parse/applyContextPropsAndConfig';
 import {
   handleBlockquote,
+  handleContainerDirective,
   handleFootnoteDefinition,
   handleHeading,
   handleList,
@@ -32,6 +33,7 @@ import {
   parseTableOrChart,
   preprocessMarkdownTableNewlines,
 } from './parse/parseTable';
+import { preprocessNormalizeLeafToContainerDirective } from './constants';
 import mdastParser from './remarkParse';
 
 // 全局解析缓存
@@ -74,6 +76,18 @@ interface ElementHandlerContext {
   parent?: RootContent;
   htmlTag: HtmlTagInfo[];
   preElement: Element | null;
+}
+
+/** 从 mdast 节点提取纯文本（用于识别仅含 ::: 的闭合标记段落） */
+function getMdastNodeText(node: RootContent): string {
+  if (!node || typeof node !== 'object') return '';
+  const n = node as any;
+  if (n.type === 'text' && n.value !== undefined && n.value !== null)
+    return String(n.value);
+  if (Array.isArray(n.children)) {
+    return n.children.map((c: any) => getMdastNodeText(c)).join('');
+  }
+  return '';
 }
 
 /**
@@ -248,7 +262,8 @@ export class MarkdownToSlateParser {
     const nonStandardProcessed = removeAnswerTags(
       preprocessNonStandardHtmlTags(thinkProcessed),
     );
-    return preprocessMarkdownTableNewlines(nonStandardProcessed);
+    const tableProcessed = preprocessMarkdownTableNewlines(nonStandardProcessed);
+    return preprocessNormalizeLeafToContainerDirective(tableProcessed);
   }
 
   private buildMarkdownRoot(md: string): RootContent[] {
@@ -386,6 +401,14 @@ export class MarkdownToSlateParser {
     const context = this.createParseContext();
 
     for (const currentElement of nodes) {
+      // 根级仅含 ::: 的段落为 remark-directive 闭合标记，不渲染
+      if (
+        top &&
+        (currentElement as any).type === 'paragraph' &&
+        getMdastNodeText(currentElement).trim() === ':::'
+      ) {
+        continue;
+      }
       const htmlCommentProps = this.parseHtmlCommentProps(currentElement);
       if (htmlCommentProps) {
         // 将注释属性存储到 contextProps 中，供下一个元素使用
@@ -497,6 +520,9 @@ export class MarkdownToSlateParser {
       },
       blockquote: {
         handler: (el) => handleBlockquote(el, parseNodesFn),
+      },
+      containerDirective: {
+        handler: (el) => handleContainerDirective(el, parseNodesFn),
       },
       footnoteDefinition: {
         handler: (el) => handleFootnoteDefinition(el, parseNodesFn),

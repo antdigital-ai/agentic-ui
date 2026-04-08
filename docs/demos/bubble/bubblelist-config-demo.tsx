@@ -28,11 +28,19 @@ const createMockMessage = (
   } as BubbleMetaData,
 });
 
-// 示例消息
+// 初始会话（用于展示 loading、只读与列表高度等配置）
 const sampleMessages: MessageBubbleData[] = [
-  createMockMessage('1', 'assistant', '这是第一条助手消息'),
-  createMockMessage('2', 'user', '这是用户消息'),
-  createMockMessage('3', 'assistant', '这是第二条助手消息'),
+  createMockMessage(
+    '1',
+    'assistant',
+    '你好！我可以帮你进行代码审查、性能优化建议和技术方案设计。',
+  ),
+  createMockMessage('2', 'user', '请帮我看一下这个 React 组件的渲染性能问题。'),
+  createMockMessage(
+    '3',
+    'assistant',
+    '好的，建议你先使用 React DevTools 的 Profiler 定位重渲染的组件，然后针对性地使用 `React.memo` 进行优化。',
+  ),
 ];
 
 export default () => {
@@ -40,7 +48,7 @@ export default () => {
   const bubbleRef = useRef<any>();
 
   // 配置状态
-  const [loading, setLoading] = useState(false);
+  const [listLoading, setListLoading] = useState(false);
   const [readonly, setReadonly] = useState(false);
   const [listHeight, setListHeight] = useState(400);
 
@@ -77,8 +85,8 @@ export default () => {
               加载状态:
             </label>
             <Switch
-              checked={loading}
-              onChange={setLoading}
+              checked={listLoading}
+              onChange={setListLoading}
               checkedChildren="加载中"
               unCheckedChildren="正常"
             />
@@ -130,7 +138,7 @@ export default () => {
           bubbleList={sampleMessages}
           bubbleListRef={bubbleListRef}
           bubbleRef={bubbleRef}
-          loading={loading}
+          isLoading={listLoading}
           readonly={readonly}
           assistantMeta={assistantMeta}
           userMeta={userMeta}
@@ -150,7 +158,8 @@ export default () => {
         <strong>📖 配置说明：</strong>
         <ul style={{ margin: '8px 0 0 0', paddingLeft: 20 }}>
           <li>
-            <strong>loading:</strong> 控制是否显示加载状态
+            <strong>isLoading:</strong> 是否显示列表加载状态（勿使用已废弃的{' '}
+            <code>loading</code>）
           </li>
           <li>
             <strong>readonly:</strong> 控制是否启用只读模式

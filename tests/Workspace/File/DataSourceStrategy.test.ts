@@ -119,6 +119,34 @@ describe('DataSourceStrategy', () => {
       expect(result.mimeType).toBe('application/octet-stream');
     });
 
+    it('应该处理 URL 路径末尾无扩展名时返回 Other 与默认 MIME', () => {
+      const file = {
+        id: 'f1',
+        name: 'file',
+        url: 'https://example.com/',
+      };
+      const result = strategy.process(file);
+      expect(result.previewCapability).toBe(PreviewCapability.NONE);
+      expect(result.mimeType).toBe('application/octet-stream');
+    });
+
+    it('url 无扩展名时 getFileCategory 返回 Other', () => {
+      const file = { id: 'f1', name: 'x', url: 'http://a.' };
+      const result = strategy.process(file);
+      expect(result.previewCapability).toBe(PreviewCapability.NONE);
+      expect(result.mimeType).toBe('application/octet-stream');
+    });
+
+    it('扩展名不在 FILE_TYPES 时 inferMimeType 返回默认', () => {
+      const file = {
+        id: 'f1',
+        name: 'file.xyz',
+        url: 'https://example.com/file.xyz',
+      };
+      const result = strategy.process(file);
+      expect(result.mimeType).toBe('application/octet-stream');
+    });
+
     it('应该在URL不存在时抛出错误', () => {
       const file = { id: 'f1', name: 'file.txt' };
       expect(() => strategy.process(file)).toThrow('URL not provided');
@@ -429,6 +457,33 @@ describe('DataSourceStrategy', () => {
 
       manager.cleanupResult(result);
       expect(mockRevokeObjectURL).not.toHaveBeenCalled();
+    });
+
+    it('needsCleanup 为 true 但 previewUrl 非 blob 时不调用 revokeObjectURL (272)', () => {
+      const result = {
+        sourceType: DataSourceType.URL,
+        previewCapability: PreviewCapability.FULL,
+        previewUrl: 'https://example.com/file.txt',
+        needsCleanup: true,
+      };
+
+      manager.cleanupResult(result);
+      expect(mockRevokeObjectURL).not.toHaveBeenCalled();
+    });
+
+    it('URL.revokeObjectURL 缺失时 cleanupResult 不抛错 (275)', () => {
+      (globalThis as any).URL = {
+        createObjectURL: mockCreateObjectURL,
+        revokeObjectURL: undefined,
+      };
+      const result = {
+        sourceType: DataSourceType.FILE,
+        previewCapability: PreviewCapability.FULL,
+        previewUrl: 'blob:mock-url',
+        needsCleanup: true,
+      };
+
+      expect(() => manager.cleanupResult(result)).not.toThrow();
     });
 
     it('应该支持注册自定义策略', () => {

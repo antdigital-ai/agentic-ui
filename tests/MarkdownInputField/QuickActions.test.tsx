@@ -55,6 +55,25 @@ vi.mock('../../src/MarkdownInputField/Enlargement', () => ({
   ),
 }));
 
+let capturedOnResize: ((e: { offsetWidth: number }) => void) | null = null;
+vi.mock('rc-resize-observer', () => {
+  const React = require('react');
+  return {
+    default: ({ children, onResize }: any) => {
+      if (onResize) {
+        capturedOnResize = onResize;
+        try {
+          onResize({ offsetWidth: 100 });
+        } catch (_) {}
+        React.useEffect(() => {
+          onResize({ offsetWidth: 200 });
+        }, []);
+      }
+      return children;
+    },
+  };
+});
+
 describe('QuickActions', () => {
   const mockEditorRef = {
     current: {
@@ -110,20 +129,17 @@ describe('QuickActions', () => {
       expect(screen.getByTestId('refine-prompt-button')).toBeInTheDocument();
     });
 
-    it('应该在未启用提示词优化时不渲染优化按钮', () => {
+    it('应在 enable 为 false 时仍渲染按钮但点击不调用 onRefine', () => {
+      const onRefine = vi.fn();
       render(
         <QuickActions
           {...defaultProps}
-          refinePrompt={{
-            enable: false,
-            onRefine: vi.fn(),
-          }}
+          refinePrompt={{ enable: false, onRefine }}
         />,
       );
-
-      expect(
-        screen.queryByTestId('refine-prompt-button'),
-      ).not.toBeInTheDocument();
+      expect(screen.getByTestId('refine-prompt-button')).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('refine-prompt-button'));
+      expect(onRefine).not.toHaveBeenCalled();
     });
 
     it('应该在没有提示词优化配置时不渲染优化按钮', () => {
@@ -406,6 +422,23 @@ describe('QuickActions', () => {
         await new Promise((resolve) => setTimeout(resolve, 50));
       });
     });
+
+    it('应该在 enable 为 true 但 onRefine 缺失时不执行优化（111）', async () => {
+      render(
+        <QuickActions
+          {...defaultProps}
+          refinePrompt={{ enable: true }}
+        />,
+      );
+
+      const refineButton = screen.getByTestId('refine-prompt-button');
+      await act(async () => {
+        fireEvent.click(refineButton);
+      });
+
+      expect(mockEditorRef.current.store.setMDContent).not.toHaveBeenCalled();
+      expect(mockOnValueChange).not.toHaveBeenCalled();
+    });
   });
 
   describe('自定义渲染', () => {
@@ -579,10 +612,16 @@ describe('QuickActions', () => {
   describe('Resize 观察', () => {
     it('应该在尺寸变化时调用 onResize 回调', async () => {
       const mockOnResize = vi.fn();
+      const getComputedStyleSpy = vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+        right: '12px',
+        getPropertyValue: vi.fn(),
+      } as any);
 
+      const ref = React.createRef<HTMLDivElement>();
       render(
         <QuickActions
           {...defaultProps}
+          ref={ref}
           onResize={mockOnResize}
           refinePrompt={{
             enable: true,
@@ -591,11 +630,71 @@ describe('QuickActions', () => {
         />,
       );
 
-      // 注意：RcResizeObserver 的测试可能需要模拟 ResizeObserver
-      // 这里我们主要验证组件能够正确渲染
+      await waitFor(
+        () => {
+          expect(mockOnResize).toHaveBeenCalled();
+          expect(mockOnResize).toHaveBeenCalledWith(100, 0);
+          expect(mockOnResize).toHaveBeenCalledWith(200, expect.any(Number));
+        },
+        { timeout: 500 },
+      );
+
+      getComputedStyleSpy.mockRestore();
+    });
+
+    it('应该在 window 为 undefined 时调用 onResize(width, 0)', async () => {
+      const mockOnResize = vi.fn();
+      render(
+        <QuickActions
+          {...defaultProps}
+          onResize={mockOnResize}
+        />,
+      );
+
       await waitFor(() => {
-        expect(screen.getByTestId('refine-prompt-button')).toBeInTheDocument();
+        expect(capturedOnResize).not.toBeNull();
       });
+
+      const origWindow = globalThis.window;
+      (globalThis as any).window = undefined;
+      try {
+        capturedOnResize!({ offsetWidth: 50 });
+        expect(mockOnResize).toHaveBeenCalledWith(50, 0);
+      } finally {
+        (globalThis as any).window = origWindow;
+      }
+    });
+
+    it('应该在 onResize 内部抛出时静默捕获（141）', () => {
+      const mockOnResize = vi.fn();
+      vi.spyOn(window, 'getComputedStyle').mockImplementation(() => {
+        throw new Error('getComputedStyle error');
+      });
+
+      render(
+        <QuickActions
+          {...defaultProps}
+          onResize={mockOnResize}
+        />,
+      );
+
+      expect(mockOnResize).toHaveBeenCalledWith(100, 0);
+      vi.restoreAllMocks();
+    });
+  });
+
+  describe('div 事件：onBlur / onFocus / onKeyDown（148, 151, 159, 160）', () => {
+    it('应该触发 blur/focus/keyDown 处理器', () => {
+      const { container } = render(
+        <QuickActions {...defaultProps} refinePrompt={{ enable: true, onRefine: vi.fn() }} />,
+      );
+
+      const quickActionsDiv = container.querySelector('.test-prefix-quick-actions');
+      expect(quickActionsDiv).toBeInTheDocument();
+
+      fireEvent.blur(quickActionsDiv!);
+      fireEvent.focus(quickActionsDiv!);
+      fireEvent.keyDown(quickActionsDiv!, { key: 'Enter' });
     });
   });
 });

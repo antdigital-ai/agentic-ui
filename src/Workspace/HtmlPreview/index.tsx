@@ -1,5 +1,5 @@
 import { ConfigProvider, Empty, Segmented, Spin } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import DOMPurify from 'dompurify';
 import React, { useContext, useMemo, useState } from 'react';
 import { I18nContext } from '../../I18n';

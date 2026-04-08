@@ -1,7 +1,7 @@
 import { FullscreenOutlined } from '@ant-design/icons';
 import { Copy } from '@sofa-design/icons';
 import { ConfigProvider, Modal } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
 import React, {
   useCallback,
@@ -15,6 +15,9 @@ import { I18nContext } from '../../../../I18n';
 import { useEditorStore } from '../../store';
 import { TableNode } from '../../types/Table';
 import { parserSlateNodeToMarkdown } from '../../utils';
+import { TableColgroup } from './TableColgroup';
+import type { ColWidthValue } from './utils/getTableColWidths';
+import { useReadonlyTableColWidths } from './utils/useReadonlyTableColWidths';
 
 interface ReadonlyTableComponentProps {
   children: React.ReactNode;
@@ -36,27 +39,27 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
         fullScreen: 'modal',
         copy: 'md',
       },
+      cssVariables: tableCssVariables,
     } = editorProps?.tableConfig || {};
 
     const tableTargetRef = useRef<HTMLTableElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const modelTargetRef = useRef<HTMLDivElement>(null);
     const [previewOpen, setPreviewOpen] = useState(false);
     const i18n = useContext(I18nContext);
 
-    // 简化的列宽计算 - 只为 readonly 模式设计
-    const colWidths = useMemo(() => {
-      const otherProps = element?.otherProps as any;
-      if (otherProps?.colWidths) {
-        return otherProps.colWidths;
-      }
+    const columnCount = element?.children?.[0]?.children?.length || 0;
+    const otherProps = element?.otherProps as
+      | { colWidths?: ColWidthValue[] }
+      | undefined;
 
-      const columnCount = element?.children?.[0]?.children?.length || 0;
-      if (columnCount === 0) return [];
-
-      // 使用固定宽度避免复杂计算
-      const defaultWidth = 80;
-      return Array(columnCount).fill(defaultWidth);
-    }, [element?.otherProps, element?.children?.[0]?.children?.length]);
+    const colWidths = useReadonlyTableColWidths({
+      columnCount,
+      otherProps,
+      containerRef,
+      tableRef: tableTargetRef,
+      element,
+    });
 
     // 缓存复制处理函数
     const handleCopy = useCallback(() => {
@@ -115,25 +118,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
             },
           )}
         >
-          <colgroup>
-            {colWidths.map((colWidth: number, index: number) => {
-              const isLastCol = index === colWidths.length - 1;
-              return (
-                <col
-                  key={index}
-                  style={
-                    isLastCol
-                      ? { minWidth: 60 }
-                      : {
-                          width: colWidth,
-                          minWidth: colWidth,
-                          maxWidth: colWidth,
-                        }
-                  }
-                />
-              );
-            })}
-          </colgroup>
+          <TableColgroup colWidths={colWidths} />
           <tbody>{children}</tbody>
         </table>
       ),
@@ -173,7 +158,13 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
 
     return (
       <>
-        <div className={classNames(baseCls)}>{tableDom}</div>
+        <div
+          ref={containerRef}
+          className={classNames(baseCls)}
+          style={tableCssVariables as React.CSSProperties}
+        >
+          {tableDom}
+        </div>
         {popoverContent}
         {previewOpen && (
           <Modal
@@ -190,40 +181,43 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
             onCancel={handleModalClose}
           >
             <div
-              className={classNames(
-                baseCls,
-                getPrefixCls('agentic-md-editor-content'),
-              )}
-              style={{
-                flex: 1,
-                minWidth: 0,
-                overflow: 'auto',
-                width: 'calc(80vw - 64px)',
-              }}
-              ref={modelTargetRef}
-              onMouseDown={(e) => {
-                // 阻止默认的文字选择行为
-                e.preventDefault();
-              }}
-              onDragStart={(e) => {
-                // 阻止拖拽开始时的文字选择
-                e.preventDefault();
-              }}
-              onDoubleClick={(e) => {
-                // 阻止双击选择文字
-                e.preventDefault();
-              }}
+              className={getPrefixCls('agentic-md-editor')}
+              style={{ flex: 1, minWidth: 0 }}
             >
-              <ConfigProvider
-                getPopupContainer={() =>
-                  modelTargetRef.current || document.body
-                }
-                getTargetContainer={() =>
-                  modelTargetRef.current || document.body
-                }
+              <div
+                className={classNames(
+                  baseCls,
+                  getPrefixCls('agentic-md-editor-content'),
+                )}
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  overflow: 'auto',
+                  width: 'calc(80vw - 64px)',
+                  ...(tableCssVariables as React.CSSProperties),
+                }}
+                ref={modelTargetRef}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                }}
+                onDragStart={(e) => {
+                  e.preventDefault();
+                }}
+                onDoubleClick={(e) => {
+                  e.preventDefault();
+                }}
               >
-                {tableDom}
-              </ConfigProvider>
+                <ConfigProvider
+                  getPopupContainer={() =>
+                    modelTargetRef.current || document.body
+                  }
+                  getTargetContainer={() =>
+                    modelTargetRef.current || document.body
+                  }
+                >
+                  {tableDom}
+                </ConfigProvider>
+              </div>
             </div>
           </Modal>
         )}

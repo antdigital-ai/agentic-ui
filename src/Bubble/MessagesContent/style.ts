@@ -1,6 +1,18 @@
 import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
 import { useEditorStyleRegister } from '../../Hooks/useStyle';
 
+const THINKING_DOT_SIZE = 4;
+const THINKING_DOT_GAP = 4;
+const THINKING_DOT_ANIMATION = 'agenticBubbleThinkingDotPulse';
+const THINKING_DOT_ANIMATION_DURATION = '1.2s';
+const THINKING_LOADING_MARGIN_TOP = 'var(--padding-2x)';
+const THINKING_LOADING_PADDING = {
+  paddingLeft: 'var(--padding-5x)',
+  paddingRight: 'var(--padding-5x)',
+  paddingTop: 'var(--padding-1x)',
+  paddingBottom: 'var(--padding-2x)',
+};
+
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     // 加载状态容器（compact模式）
@@ -9,12 +21,37 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       display: 'flex',
       alignItems: 'center',
       gap: 'var(--padding-2x)',
-      padding: 'var(--padding-3x)',
+      marginTop: THINKING_LOADING_MARGIN_TOP,
+      ...THINKING_LOADING_PADDING,
+      color: 'rgb(102, 111, 141)',
+      [`&-dots`]: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: THINKING_DOT_GAP,
+        lineHeight: 1,
+      },
+      [`&-dot`]: {
+        width: THINKING_DOT_SIZE,
+        height: THINKING_DOT_SIZE,
+        borderRadius: '50%',
+        backgroundColor: 'currentColor',
+        opacity: 0.35,
+        animationName: THINKING_DOT_ANIMATION,
+        animationDuration: THINKING_DOT_ANIMATION_DURATION,
+        animationTimingFunction: 'ease-in-out',
+        animationIterationCount: 'infinite',
+      },
+      [`&-dot:nth-of-type(2)`]: {
+        animationDelay: '0.2s',
+      },
+      [`&-dot:nth-of-type(3)`]: {
+        animationDelay: '0.4s',
+      },
       '&-compact': {
-        padding: 'var(--padding-2x)',
+        ...THINKING_LOADING_PADDING,
       },
       '&-default': {
-        padding: 'var(--padding-3x)',
+        ...THINKING_LOADING_PADDING,
       },
     },
 
@@ -88,6 +125,17 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       WebkitLineClamp: 2,
       display: '-webkit-box',
     },
+
+    [`@keyframes ${THINKING_DOT_ANIMATION}`]: {
+      '0%, 80%, 100%': {
+        transform: 'scale(0.6)',
+        opacity: 0.35,
+      },
+      '40%': {
+        transform: 'scale(1)',
+        opacity: 1,
+      },
+    },
   };
 };
 
@@ -95,7 +143,7 @@ export function useMessagesContentStyle(componentCls: string) {
   return useEditorStyleRegister('BubbleMessageDisplay', (token) => {
     const chatToken: ChatTokenType = {
       ...token,
-      componentCls: componentCls || '',
+      componentCls: `.${componentCls}`,
     };
     return genStyle(chatToken);
   });

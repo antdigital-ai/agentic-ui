@@ -1,7 +1,15 @@
-import { DownOutlined, SettingOutlined } from '@ant-design/icons';
+import { CopyOutlined, DownOutlined, SettingOutlined } from '@ant-design/icons';
 import { ProForm, ProFormSelect } from '@ant-design/pro-components';
-import { ConfigProvider, Descriptions, Dropdown, Popover, Table } from 'antd';
+import {
+  ConfigProvider,
+  Descriptions,
+  Dropdown,
+  message,
+  Popover,
+  Table,
+} from 'antd';
 import { DescriptionsItemType } from 'antd/es/descriptions';
+import copy from 'copy-to-clipboard';
 import React, { lazy, Suspense, useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
@@ -47,47 +55,67 @@ import {
 const getChartMap = (i18n: any) => ({
   pie: {
     title: i18n?.locale?.pieChart || '饼图',
-    changeData: ['donut'],
+    changeData: ['donut', 'table'],
   },
   donut: {
     title: i18n?.locale?.donutChart || '环形图',
-    changeData: ['pie'],
+    changeData: ['pie', 'table'],
   },
   bar: {
     title: i18n?.locale?.barChart || '条形图',
-    changeData: ['column', 'line', 'area'],
+    changeData: ['column', 'line', 'area', 'histogram', 'boxplot', 'table'],
   },
   line: {
     title: i18n?.locale?.lineChart || '折线图',
-    changeData: ['column', 'bar', 'area'],
+    changeData: ['column', 'bar', 'area', 'histogram', 'boxplot', 'table'],
   },
   column: {
     title: i18n?.locale?.columnChart || '柱状图',
-    changeData: ['bar', 'line', 'area'],
+    changeData: ['bar', 'line', 'area', 'histogram', 'boxplot', 'table'],
   },
   area: {
     title: i18n?.locale?.areaChart || '面积图',
-    changeData: ['column', 'bar', 'line'],
+    changeData: ['column', 'bar', 'line', 'histogram', 'boxplot', 'table'],
   },
   radar: {
     title: i18n?.locale?.radarChart || '雷达图',
-    changeData: [],
+    changeData: ['table'],
   },
   scatter: {
     title: i18n?.locale?.scatterChart || '散点图',
-    changeData: [],
+    changeData: ['histogram', 'boxplot', 'table'],
   },
   funnel: {
     title: i18n?.locale?.funnelChart || '漏斗图',
-    changeData: [],
+    changeData: ['table'],
+  },
+  boxplot: {
+    title: i18n?.locale?.boxplotChart || '箱线图',
+    changeData: ['histogram', 'column', 'bar', 'table'],
+  },
+  histogram: {
+    title: i18n?.locale?.histogramChart || '直方图',
+    changeData: ['boxplot', 'column', 'bar', 'table'],
   },
   table: {
     title: i18n?.locale?.table || '表格',
-    changeData: ['column', 'line', 'area', 'pie', 'donut'],
+    changeData: [
+      'column',
+      'line',
+      'area',
+      'pie',
+      'donut',
+      'bar',
+      'radar',
+      'scatter',
+      'funnel',
+      'boxplot',
+      'histogram',
+    ],
   },
   descriptions: {
     title: i18n?.locale?.descriptions || '定义列表',
-    changeData: ['column', 'line', 'area', 'pie', 'donut'],
+    changeData: ['column', 'line', 'area', 'pie', 'donut', 'table'],
   },
 });
 
@@ -105,7 +133,9 @@ const ChartRuntimeRendererImpl: React.FC<{
     | 'area'
     | 'radar'
     | 'scatter'
-    | 'funnel';
+    | 'funnel'
+    | 'boxplot'
+    | 'histogram';
   runtime: ChartRuntime;
   convertDonutData: any[];
   convertFlatData: any[];
@@ -119,6 +149,7 @@ const ChartRuntimeRendererImpl: React.FC<{
   colorLegend?: string;
   chartData: Record<string, any>[];
   getFieldValue: (row: any, field?: string) => string | undefined;
+  getFieldValueSafely: (row: any, field?: string) => any;
   loading?: boolean;
 }> = ({
   chartType,
@@ -134,25 +165,31 @@ const ChartRuntimeRendererImpl: React.FC<{
   colorLegend,
   chartData,
   getFieldValue,
+  getFieldValueSafely,
   loading = false,
 }) => {
+  const i18n = useContext(I18nContext);
   const {
     DonutChart,
     FunnelChart,
     AreaChart,
     BarChart,
+    BoxPlotChart,
+    HistogramChart,
     LineChart,
     RadarChart,
     ScatterChart,
   } = runtime;
 
   if (chartType === 'pie') {
+    const pieSize = config?.height || 400;
     return (
       <DonutChart
         key={`${config?.index}-pie`}
         data={convertDonutData}
         configs={[{ chartStyle: 'pie', showLegend: true }]}
-        height={config?.height || 400}
+        width={pieSize}
+        height={pieSize}
         title={title}
         showToolbar={true}
         dataTime={dataTime}
@@ -331,7 +368,127 @@ const ChartRuntimeRendererImpl: React.FC<{
         height={config?.height || 400}
         title={title || ''}
         dataTime={dataTime}
-        typeNames={{ rate: '转化率', name: colorLegend || '转化' }}
+        typeNames={{
+          rate: i18n?.locale?.['common.conversionRate'] || '转化率',
+          name: colorLegend || i18n?.locale?.['common.conversion'] || '转化',
+        }}
+        toolbarExtra={toolBar}
+        loading={loading}
+      />
+    );
+  }
+
+  if (chartType === 'boxplot') {
+    // 箱线图数据转换：将原始数据按标签分组
+    const boxplotData: {
+      label: string;
+      values: number[];
+      type?: string;
+      category?: string;
+    }[] = [];
+    const groupedByLabel: Record<
+      string,
+      { values: number[]; type?: string; category?: string }
+    > = {};
+
+    (chartData || []).forEach((row: any) => {
+      const label = getFieldValue(row, config?.x) || '默认';
+      const value = getFieldValueSafely(row, config?.y);
+      const type = getFieldValue(row, colorLegend);
+      const category = getFieldValue(row, groupBy);
+      // filterLabel 用于未来扩展，暂不使用
+
+      const key = `${label}_${type || 'default'}`;
+      if (!groupedByLabel[key]) {
+        groupedByLabel[key] = {
+          values: [],
+          type: type || undefined,
+          category: category || undefined,
+        };
+      }
+      const numValue =
+        typeof value === 'number' ? value : toNumber(value, Number.NaN);
+      if (Number.isFinite(numValue)) {
+        groupedByLabel[key].values.push(numValue);
+      }
+    });
+
+    Object.entries(groupedByLabel).forEach(([key, data]) => {
+      const label = key.split('_')[0];
+      if (data.values.length > 0) {
+        boxplotData.push({
+          label,
+          values: data.values,
+          ...(data.type ? { type: data.type } : {}),
+          ...(data.category ? { category: data.category } : {}),
+        });
+      }
+    });
+
+    return (
+      <BoxPlotChart
+        key={`${config?.index}-boxplot`}
+        data={boxplotData}
+        height={config?.height || 400}
+        title={title || ''}
+        dataTime={dataTime}
+        toolbarExtra={toolBar}
+        loading={loading}
+      />
+    );
+  }
+
+  if (chartType === 'histogram') {
+    // 直方图数据转换：提取原始值
+    // 同时支持预分箱格式：groupKey.DIM_LEFT / groupKey.DIM_RIGHT + MEASURE_PROB[0].actualValue
+    const histogramData = (chartData || []).map((row: any) => {
+      const dimLeft = row?.groupKey?.DIM_LEFT;
+      const dimRight = row?.groupKey?.DIM_RIGHT;
+      const measureProb = Array.isArray(row?.MEASURE_PROB)
+        ? row.MEASURE_PROB[0]?.actualValue
+        : undefined;
+
+      if (
+        typeof dimLeft === 'number' &&
+        typeof dimRight === 'number' &&
+        typeof measureProb === 'number'
+      ) {
+        const type = getFieldValue(row, colorLegend);
+        const category = getFieldValue(row, groupBy);
+        const filterLabel = getFieldValue(row, filterBy);
+        return {
+          value: measureProb,
+          left: dimLeft,
+          right: dimRight,
+          ...(type ? { type } : {}),
+          ...(category ? { category } : {}),
+          ...(filterLabel ? { filterLabel } : {}),
+        };
+      }
+
+      const value = getFieldValueSafely(row, config?.y);
+      const type = getFieldValue(row, colorLegend);
+      const category = getFieldValue(row, groupBy);
+      const filterLabel = getFieldValue(row, filterBy);
+      const numValue =
+        typeof value === 'number' ? value : toNumber(value, Number.NaN);
+
+      return {
+        value: Number.isFinite(numValue) ? numValue : 0,
+        ...(type ? { type } : {}),
+        ...(category ? { category } : {}),
+        ...(filterLabel ? { filterLabel } : {}),
+      };
+    });
+
+    return (
+      <HistogramChart
+        key={`${config?.index}-histogram`}
+        data={histogramData}
+        height={config?.height || 400}
+        title={title || ''}
+        stacked={config?.rest?.stacked ?? true}
+        dataTime={dataTime}
         toolbarExtra={toolBar}
         loading={loading}
       />
@@ -359,7 +516,9 @@ const ChartRuntimeRenderer = lazy(async () => {
         | 'area'
         | 'radar'
         | 'scatter'
-        | 'funnel';
+        | 'funnel'
+        | 'boxplot'
+        | 'histogram';
       convertDonutData: any[];
       convertFlatData: any[];
       config: any;
@@ -372,6 +531,7 @@ const ChartRuntimeRenderer = lazy(async () => {
       colorLegend?: string;
       chartData: Record<string, any>[];
       getFieldValue: (row: any, field?: string) => string | undefined;
+      getFieldValueSafely: (row: any, field?: string) => any;
       loading?: boolean;
     }) => <ChartRuntimeRendererImpl {...props} runtime={runtime} />,
   };
@@ -466,6 +626,8 @@ export const ChartRender: React.FC<{
     | 'radar'
     | 'scatter'
     | 'funnel'
+    | 'boxplot'
+    | 'histogram'
     | 'descriptions'
     | 'table';
   chartData: Record<string, any>[];
@@ -501,6 +663,8 @@ export const ChartRender: React.FC<{
     | 'descriptions'
     | 'table'
     | 'funnel'
+    | 'boxplot'
+    | 'histogram'
   >(() => props.chartType);
   const {
     chartData,
@@ -515,6 +679,8 @@ export const ChartRender: React.FC<{
     loading = false,
   } = props;
   const i18n = useContext(I18nContext);
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  const prefixCls = getPrefixCls('agentic-plugin-chart');
   const [config, setConfig] = useState(() => props.config);
   const [renderKey, setRenderKey] = useState(0);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -544,6 +710,13 @@ export const ChartRender: React.FC<{
       setRenderKey((k) => k + 1);
     }, 800), // 从 300ms 增加到 800ms
   );
+
+  // 卸载时取消未执行的防抖，避免在测试或 SSR 环境下 teardown 后回调触发 setState
+  React.useEffect(() => {
+    return () => {
+      debouncedUpdateRenderKeyRef.current?.cancel?.();
+    };
+  }, []);
 
   const renderDescriptionsFallback = React.useMemo(() => {
     const columnCount = config?.columns?.length || 0;
@@ -723,6 +896,7 @@ export const ChartRender: React.FC<{
       filterByChanged;
 
     if (hasChanged) {
+      const dataHashChanged = prevDataRef.current.dataHash !== dataHash;
       // 更新缓存
       prevDataRef.current = {
         dataHash,
@@ -733,7 +907,7 @@ export const ChartRender: React.FC<{
       };
 
       // 对于流式数据，使用防抖更新，避免频繁渲染
-      if (prevDataRef.current.dataHash !== dataHash) {
+      if (dataHashChanged) {
         debouncedUpdateRenderKeyRef.current();
       } else {
         // 配置变化时立即更新
@@ -741,6 +915,58 @@ export const ChartRender: React.FC<{
       }
     }
   }, [dataHash, config, groupBy, colorLegend, filterBy]);
+
+  const chartConfigFormPrefixCls =
+    getPrefixCls('agentic-chart-config-form') ??
+    'ant-agentic-chart-config-form';
+
+  /**
+   * 将表格数据转换为 Markdown 格式
+   */
+  const generateMarkdownTable = () => {
+    const columns = config?.columns || [];
+    const data = chartData || [];
+
+    if (columns.length === 0 || data.length === 0) {
+      return '';
+    }
+
+    // 表头
+    const headerRow = columns
+      .filter((col: any) => col?.title)
+      .map((col: any) => col.title)
+      .join(' | ');
+
+    // 分隔行
+    const separatorRow = columns
+      .filter((col: any) => col?.title)
+      .map(() => '---')
+      .join(' | ');
+
+    // 数据行
+    const dataRows = data.map((row: any) => {
+      return columns
+        .filter((col: any) => col?.title)
+        .map((col: any) => {
+          const value = row[col.dataIndex];
+          return value !== undefined && value !== null ? String(value) : '';
+        })
+        .join(' | ');
+    });
+
+    return [headerRow, separatorRow, ...dataRows].join('\n');
+  };
+
+  /**
+   * 复制表格 Markdown
+   */
+  const handleCopyMarkdown = () => {
+    const markdown = generateMarkdownTable();
+    if (markdown) {
+      copy(markdown);
+      message.success(i18n?.locale?.copySuccess || '复制成功');
+    }
+  };
 
   /**
    * 图表配置
@@ -834,6 +1060,7 @@ export const ChartRender: React.FC<{
         content={
           <ConfigProvider componentSize="small">
             <ProForm
+              prefixCls={chartConfigFormPrefixCls}
               submitter={{
                 searchConfig: {
                   submitText: i18n?.locale?.updateChart || '更新',
@@ -852,12 +1079,14 @@ export const ChartRender: React.FC<{
               }}
             >
               <div
+                className={`${chartConfigFormPrefixCls}__content`}
                 style={{
                   maxHeight: '70vh',
                   overflow: 'auto',
                 }}
               >
                 <div
+                  className={`${chartConfigFormPrefixCls}__fields`}
                   style={{
                     display: 'flex',
                     gap: 8,
@@ -907,6 +1136,15 @@ export const ChartRender: React.FC<{
           <SettingOutlined style={{ color: 'rgba(0, 25, 61, 0.3255)' }} />
         </ActionIconBox>
       </Popover>,
+      <ActionIconBox
+        key="copy-markdown"
+        title={i18n?.locale?.copyMarkdown || '复制表格'}
+      >
+        <CopyOutlined
+          style={{ color: 'rgba(0, 25, 61, 0.3255)' }}
+          onClick={handleCopyMarkdown}
+        />
+      </ActionIconBox>,
     ].filter((item) => !!item) as JSX.Element[];
   }, [
     chartType,
@@ -917,6 +1155,8 @@ export const ChartRender: React.FC<{
     onColumnLengthChange,
     config,
     props.config,
+    chartConfigFormPrefixCls,
+    chartData,
   ]);
 
   const chartDom = useMemo(() => {
@@ -929,6 +1169,7 @@ export const ChartRender: React.FC<{
       return (
         <div
           key={config?.index}
+          className={`${prefixCls}__table`}
           contentEditable={false}
           style={{
             margin: 12,
@@ -939,15 +1180,36 @@ export const ChartRender: React.FC<{
             maxWidth: 'calc(100% - 32px)',
             maxHeight: 400,
             userSelect: 'none',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
-          <Table
-            size="small"
-            dataSource={chartData}
-            columns={config?.columns}
-            pagination={false}
-            rowKey={(record) => record.key}
-          />
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 12px',
+              borderBottom: '1px solid #eee',
+              flexShrink: 0,
+            }}
+          >
+            {title && (
+              <span style={{ fontSize: 14, fontWeight: 500 }}>{title}</span>
+            )}
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+              {toolBar}
+            </div>
+          </div>
+          <div style={{ flex: 1, overflow: 'auto' }}>
+            <Table
+              size="small"
+              dataSource={chartData}
+              columns={config?.columns}
+              pagination={false}
+              rowKey={(record) => record.key}
+            />
+          </div>
         </div>
       );
     }
@@ -956,12 +1218,30 @@ export const ChartRender: React.FC<{
       return (
         <div
           key={config?.index}
+          className={`${prefixCls}__descriptions`}
           style={{
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
+            margin: 12,
           }}
         >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 0',
+              flexShrink: 0,
+            }}
+          >
+            {title && (
+              <span style={{ fontSize: 14, fontWeight: 500 }}>{title}</span>
+            )}
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+              {toolBar}
+            </div>
+          </div>
           {chartData.map((row: Record<string, any>, rowIndex: number) => (
             <Descriptions
               bordered
@@ -1011,6 +1291,7 @@ export const ChartRender: React.FC<{
             colorLegend={colorLegend}
             chartData={chartData}
             getFieldValue={getFieldValue}
+            getFieldValueSafely={getFieldValueSafely}
           />
         </Suspense>
       );
@@ -1025,6 +1306,7 @@ export const ChartRender: React.FC<{
     config?.y,
     config?.height,
     config?.index,
+    renderKey,
     toolBar,
     convertDonutData,
     convertFlatData,
@@ -1044,7 +1326,12 @@ export const ChartRender: React.FC<{
   ]);
 
   return (
-    <div ref={containerRef} style={{ width: '100%' }} contentEditable={false}>
+    <div
+      ref={containerRef}
+      className={prefixCls}
+      style={{ width: '100%' }}
+      contentEditable={false}
+    >
       {chartDom}
     </div>
   );

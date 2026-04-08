@@ -28,17 +28,21 @@ vi.mock('chart.js', () => ({
   Legend: vi.fn(),
 }));
 
-// Mock react-chartjs-2
+// Mock react-chartjs-2：保存 options 与 plugins 供覆盖率用例调用
 vi.mock('react-chartjs-2', () => ({
-  Bar: React.forwardRef((props: any, ref: any) => (
-    <div
-      data-testid="bar-chart"
-      ref={ref}
-      data-chart-data={JSON.stringify(props.data)}
-    >
-      Mocked Bar Chart
-    </div>
-  )),
+  Bar: React.forwardRef((props: any, ref: any) => {
+    (globalThis as any).__funnelChartLastOptions = props.options;
+    (globalThis as any).__funnelChartLastPlugins = props.plugins;
+    return (
+      <div
+        data-testid="bar-chart"
+        ref={ref}
+        data-chart-data={JSON.stringify(props.data)}
+      >
+        Mocked Bar Chart
+      </div>
+    );
+  }),
 }));
 
 // Mock utils
@@ -59,27 +63,46 @@ vi.mock('../../../src/Plugins/chart/components', () => ({
       {children}
     </div>
   ),
-  ChartFilter: ({ filterOptions, onFilterChange }: any) => (
+  ChartFilter: ({
+    filterOptions,
+    onFilterChange,
+    customOptions,
+    selectedCustomSelection,
+    onSelectionChange,
+  }: any) => (
     <div data-testid="chart-filter">
       {filterOptions?.map((option: any) => (
         <button
           type="button"
           key={option.value}
-          onClick={() => onFilterChange(option.value)}
+          onClick={() => onFilterChange?.(option.value)}
           data-testid={`filter-${option.value}`}
         >
           {option.label}
         </button>
       ))}
+      {customOptions?.map((opt: any) => (
+        <button
+          type="button"
+          key={opt.key}
+          data-testid={`filter-label-${opt.key}`}
+          onClick={() => onSelectionChange?.(opt.key)}
+        >
+          {opt.label}
+        </button>
+      ))}
     </div>
   ),
-  ChartToolBar: ({ title, onDownload, dataTime }: any) => (
+  ChartToolBar: ({ title, onDownload, dataTime, extra, loading, filter }: any) => (
     <div data-testid="chart-toolbar">
       {title && <span data-testid="chart-title">{title}</span>}
       {dataTime && <span data-testid="chart-datatime">{dataTime}</span>}
+      {loading && <span data-testid="chart-loading">loading</span>}
       <button type="button" onClick={onDownload} data-testid="download-button">
         下载
       </button>
+      {extra}
+      {filter}
     </div>
   ),
   downloadChart: vi.fn(),
@@ -854,6 +877,199 @@ describe('FunnelChart', () => {
       );
       expect(chartData.datasets[0].backgroundColor).toBeDefined();
       expect(Array.isArray(chartData.datasets[0].backgroundColor)).toBe(true);
+    });
+  });
+
+  describe('options 与插件回调覆盖', () => {
+    const dataWithRatio = [
+      { category: '默认', x: '阶段A', y: 1000, ratio: 100 },
+      { category: '默认', x: '阶段B', y: 600, ratio: 60 },
+      { category: '默认', x: '阶段C', y: 200, ratio: 33 },
+    ];
+
+    it('应调用 legend generateLabels 并包含转化率图例项', () => {
+      render(<FunnelChart data={dataWithRatio} />);
+      const options = (globalThis as any).__funnelChartLastOptions as any;
+      expect(options?.plugins?.legend?.labels?.generateLabels).toBeDefined();
+      const mockChart = {
+        data: {
+          datasets: [{ data: [[0, 1000], [0, 600], [0, 200]] }],
+          labels: ['阶段A', '阶段B', '阶段C'],
+        },
+      };
+      const labels = options.plugins.legend.labels.generateLabels(mockChart);
+      expect(Array.isArray(labels)).toBe(true);
+      const rateItem = labels?.find((l: any) => l.text === '转化率');
+      expect(rateItem).toBeDefined();
+    });
+
+    it('应调用 legend onClick 对转化率项切换显隐', () => {
+      render(<FunnelChart data={dataWithRatio} />);
+      const options = (globalThis as any).__funnelChartLastOptions as any;
+      const onClick = options?.plugins?.legend?.onClick;
+      expect(onClick).toBeDefined();
+      const legendItem = { text: '转化率', datasetIndex: 1 };
+      expect(() =>
+        onClick({}, legendItem, { chart: {}, legend: {} }),
+      ).not.toThrow();
+    });
+
+    it('应调用 tooltip callbacks title 与 label', () => {
+      render(<FunnelChart data={dataWithRatio} showPercent />);
+      const options = (globalThis as any).__funnelChartLastOptions as any;
+      const callbacks = options?.plugins?.tooltip?.callbacks;
+      expect(callbacks?.title).toBeDefined();
+      expect(callbacks?.label).toBeDefined();
+      expect(callbacks.title([{ label: '阶段A' }])).toBe('阶段A');
+      const ctx = { dataIndex: 0, datasetIndex: 0 };
+      const labelResult = callbacks.label(ctx);
+      expect(typeof labelResult === 'string').toBe(true);
+    });
+
+    it('应调用 scales.y.afterFit', () => {
+      render(<FunnelChart data={dataWithRatio} />);
+      const options = (globalThis as any).__funnelChartLastOptions as any;
+      const afterFit = options?.scales?.y?.afterFit;
+      expect(afterFit).toBeDefined();
+      const scale = { height: 0 };
+      afterFit(scale);
+      expect(scale.height).toBeGreaterThan(0);
+    });
+  });
+
+  describe('插件 afterDatasetsDraw 覆盖', () => {
+    const dataWithRatio = [
+      { category: '默认', x: '阶段A', y: 1000, ratio: 100 },
+      { category: '默认', x: '阶段B', y: 600, ratio: 60 },
+      { category: '默认', x: '阶段C', y: 200, ratio: 33 },
+    ];
+
+    const createMockCtx = () => ({
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      closePath: vi.fn(),
+      fill: vi.fn(),
+      fillStyle: '',
+      font: '',
+      textAlign: '',
+      textBaseline: '',
+      fillText: vi.fn(),
+    });
+
+    it('应安全执行 trapezoid 与 rightLabel 插件', () => {
+      render(<FunnelChart data={dataWithRatio} />);
+      const plugins = (globalThis as any).__funnelChartLastPlugins as any[];
+      expect(Array.isArray(plugins)).toBe(true);
+      const trapezoid = plugins?.find((p: any) => p.id === 'funnelTrapezoidLabels');
+      const rightLabel = plugins?.find((p: any) => p.id === 'funnelRightLabels');
+      expect(trapezoid?.afterDatasetsDraw).toBeDefined();
+      expect(rightLabel?.afterDatasetsDraw).toBeDefined();
+
+      const ctx = createMockCtx();
+      const xScale = {
+        getPixelForValue: vi.fn((v: number) => 100 + v * 2),
+      };
+      const metaData = [
+        { x: 200, y: 20, height: 24, width: 400 },
+        { x: 200, y: 52, height: 24, width: 240 },
+        { x: 200, y: 84, height: 24, width: 80 },
+      ];
+      const mockChart = {
+        ctx,
+        data: {
+          datasets: [{ data: [[0, 1000], [0, 600], [0, 200]] }],
+          labels: ['阶段A', '阶段B', '阶段C'],
+        },
+        scales: { x: xScale },
+        getDatasetMeta: vi.fn(() => ({ data: metaData })),
+      };
+
+      expect(() => rightLabel.afterDatasetsDraw(mockChart)).not.toThrow();
+      expect(ctx.save).toHaveBeenCalled();
+      expect(ctx.restore).toHaveBeenCalled();
+      expect(ctx.fillText).toHaveBeenCalled();
+    });
+
+    it('trapezoid 插件在 showTrapezoid 为 true 时应绘制', () => {
+      render(<FunnelChart data={dataWithRatio} />);
+      const plugins = (globalThis as any).__funnelChartLastPlugins as any[];
+      const trapezoid = plugins?.find((p: any) => p.id === 'funnelTrapezoidLabels');
+      const ctx = createMockCtx();
+      const xScale = {
+        getPixelForValue: vi.fn((v: number) => 100 + v * 2),
+      };
+      const metaData = [
+        { x: 200, y: 20, height: 24, width: 400 },
+        { x: 200, y: 52, height: 24, width: 240 },
+        { x: 200, y: 84, height: 24, width: 80 },
+      ];
+      const mockChart = {
+        ctx,
+        data: {
+          datasets: [{ data: [[0, 1000], [0, 600], [0, 200]] }],
+          labels: ['阶段A', '阶段B', '阶段C'],
+        },
+        scales: { x: xScale },
+        getDatasetMeta: vi.fn(() => ({ data: metaData })),
+      };
+      expect(() => trapezoid.afterDatasetsDraw(mockChart)).not.toThrow();
+      expect(ctx.save).toHaveBeenCalled();
+      expect(ctx.fillText).toHaveBeenCalled();
+    });
+  });
+
+  describe('二次渲染与工具栏/筛选/统计分支', () => {
+    it('二次渲染时仍正常显示', () => {
+      const { rerender } = render(<FunnelChart data={sampleData} />);
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+      rerender(<FunnelChart data={sampleData} />);
+      expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+    });
+
+    it('loading 时工具栏显示 loading 状态', () => {
+      render(<FunnelChart data={sampleData} loading />);
+      expect(screen.getByTestId('chart-loading')).toBeInTheDocument();
+    });
+
+    it('renderFilterInToolbar 为 true 时筛选在工具栏内', () => {
+      const multiCategory = [
+        { category: 'A', filterLabel: 'L1', x: '步骤1', y: 100 },
+        { category: 'A', filterLabel: 'L2', x: '步骤1', y: 200 },
+        { category: 'B', filterLabel: 'L1', x: '步骤1', y: 150 },
+      ];
+      render(
+        <FunnelChart data={multiCategory} renderFilterInToolbar />,
+      );
+      expect(screen.getByTestId('chart-toolbar')).toBeInTheDocument();
+      expect(screen.getByTestId('chart-filter')).toBeInTheDocument();
+    });
+
+    it('statistic 为数组时渲染多个 ChartStatistic', () => {
+      const stats = [
+        { title: '总量', value: 1000 },
+        { title: '转化', value: 200 },
+      ];
+      render(<FunnelChart data={sampleData} statistic={stats} />);
+      const items = screen.getAllByTestId('chart-statistic');
+      expect(items).toHaveLength(2);
+    });
+
+    it('renderFilterInToolbar 为 false 时筛选在工具栏外独立展示', () => {
+      const multiCategory = [
+        { category: 'A', x: '步骤1', y: 100 },
+        { category: 'A', x: '步骤2', y: 80 },
+        { category: 'B', x: '步骤1', y: 200 },
+        { category: 'B', x: '步骤2', y: 150 },
+      ];
+      render(
+        <FunnelChart data={multiCategory} renderFilterInToolbar={false} />,
+      );
+      expect(screen.getByTestId('chart-filter')).toBeInTheDocument();
+      expect(screen.getByTestId('filter-A')).toBeInTheDocument();
+      expect(screen.getByTestId('filter-B')).toBeInTheDocument();
     });
   });
 });

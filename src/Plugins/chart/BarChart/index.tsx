@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from 'chart.js';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
-import classNamesLib from 'classnames';
+import clsx from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -31,7 +31,9 @@ import {
   findDataPointByXValue,
   hexToRgba,
   resolveCssVariable,
+  toNumber,
 } from '../utils';
+import { useChartTheme } from '../hooks';
 import { useStyle } from './style';
 
 /**
@@ -374,13 +376,15 @@ const BarChart: React.FC<BarChartProps> = ({
   // 是否是正负柱图（同一批次同时存在正值与负值）
   const hasPositive = useMemo(() => {
     return filteredData.some((item) => {
-      const v = typeof item.y === 'number' ? item.y : Number(item.y);
+      const v =
+        typeof item.y === 'number' ? item.y : toNumber(item.y, Number.NaN);
       return Number.isFinite(v) && v > 0;
     });
   }, [filteredData]);
   const hasNegative = useMemo(() => {
     return filteredData.some((item) => {
-      const v = typeof item.y === 'number' ? item.y : Number(item.y);
+      const v =
+        typeof item.y === 'number' ? item.y : toNumber(item.y, Number.NaN);
       return Number.isFinite(v) && v < 0;
     });
   }, [filteredData]);
@@ -412,7 +416,7 @@ const BarChart: React.FC<BarChartProps> = ({
       const typeData = xValues.map((x) => {
         const dataPoint = findDataPointByXValue(filteredData, x, type);
         const v = dataPoint?.y;
-        const n = typeof v === 'number' ? v : Number(v);
+        const n = typeof v === 'number' ? v : toNumber(v, Number.NaN);
         return Number.isFinite(n) ? n : null;
       });
 
@@ -627,11 +631,8 @@ const BarChart: React.FC<BarChartProps> = ({
     }));
   }, [filterLabels]);
 
-  const isLight = theme === 'light';
-  const axisTextColor = isLight
-    ? 'rgba(0, 25, 61, 0.3255)'
-    : 'rgba(255, 255, 255, 0.8)';
-  const gridColor = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.2)';
+  // 使用 useChartTheme hook 获取主题相关颜色
+  const { axisTextColor, gridColor, isLight } = useChartTheme(theme);
 
   // 标签宽度计算函数
   const calculateLabelWidth = (text: string, fontSize: number = 11): number => {
@@ -659,7 +660,8 @@ const BarChart: React.FC<BarChartProps> = ({
 
     // 遍历所有数据点，计算标签文本的最大宽度
     filteredData.forEach((item) => {
-      const value = typeof item.y === 'number' ? item.y : Number(item.y);
+      const value =
+        typeof item.y === 'number' ? item.y : toNumber(item.y, Number.NaN);
       if (Number.isFinite(value)) {
         let labelText = '';
 
@@ -975,7 +977,7 @@ const BarChart: React.FC<BarChartProps> = ({
     downloadChart(chartRef.current, 'bar-chart');
   };
 
-  const rootClassName = classNamesLib(classNames?.root, className);
+  const rootClassName = clsx(classNames?.root, className);
   const rootStyle = {
     width: responsiveWidth,
     height: responsiveHeight,
@@ -983,19 +985,19 @@ const BarChart: React.FC<BarChartProps> = ({
     ...styles?.root,
   };
 
-  const toolbarClassName = classNamesLib(classNames?.toolbar);
+  const toolbarClassName = clsx(classNames?.toolbar);
   const toolbarStyle = styles?.toolbar;
 
-  const statisticContainerClassName = classNamesLib(
+  const statisticContainerClassName = clsx(
     classNames?.statisticContainer,
     `${baseClassName}-statistic-container`,
   );
   const statisticContainerStyle = styles?.statisticContainer;
 
-  const filterClassName = classNamesLib(classNames?.filter);
+  const filterClassName = clsx(classNames?.filter);
   const filterStyle = styles?.filter;
 
-  const wrapperClassName = classNamesLib(
+  const wrapperClassName = clsx(
     classNames?.wrapper,
     `${baseClassName}-wrapper`,
   );

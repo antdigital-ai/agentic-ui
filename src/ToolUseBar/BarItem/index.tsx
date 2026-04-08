@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
 import React, { memo, useMemo } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
@@ -34,6 +34,7 @@ export interface ToolUseBarItemProps {
   onExpandedChange?: (id: string, expanded: boolean) => void;
   defaultExpanded?: boolean;
   light?: boolean;
+  disableAnimation?: boolean;
 }
 
 const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
@@ -47,6 +48,7 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
   onExpandedChange,
   defaultExpanded,
   light = false,
+  disableAnimation = false,
 }) => {
   // 使用 useMergedState 来管理展开状态
   const [expanded, setExpanded] = useMergedState(defaultExpanded ?? false, {
@@ -62,7 +64,7 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
 
   // 使用 useMemo 优化样式类名
   const toolClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool ${hashId}`, {
+    return classNames(`${prefixCls}-tool ${hashId}`, {
       [`${prefixCls}-tool-success`]: tool.status === 'success',
       [`${prefixCls}-tool-loading`]: tool.status === 'loading',
       [`${prefixCls}-tool-loading-light`]: tool.status === 'loading' && light,
@@ -75,11 +77,11 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
   }, [prefixCls, hashId, tool.status, light, isActive, expanded]);
 
   const toolBarClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-bar`, hashId);
+    return classNames(`${prefixCls}-tool-bar`, hashId);
   }, [prefixCls, hashId]);
 
   const toolHeaderClassName = useMemo(() => {
-    return classnames(`${prefixCls}-tool-header`, hashId);
+    return classNames(`${prefixCls}-tool-header`, hashId);
   }, [prefixCls, hashId]);
 
   const handleClick = useRefFunction((e: React.MouseEvent<HTMLDivElement>) => {
@@ -118,6 +120,7 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
         light={light}
         showContent={true}
         expanded={true}
+        disableAnimation={disableAnimation}
       />
     );
   }
@@ -126,12 +129,12 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
     <div
       key={tool.id}
       data-testid="ToolUserItem"
-      className={classnames(toolClassName, {
+      className={classNames(toolClassName, {
         [`${prefixCls}-tool-collapsed`]: !showContent,
       })}
     >
       <div
-        className={classnames(toolBarClassName, {
+        className={classNames(toolBarClassName, {
           [`${prefixCls}-tool-bar-collapsed`]: !showContent,
         })}
         data-testid="tool-user-item-tool-bar"
@@ -141,16 +144,22 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
           className={toolHeaderClassName}
           data-testid="tool-user-item-tool-header"
         >
-          <ToolImage tool={tool} prefixCls={prefixCls} hashId={hashId} />
+          <ToolImage
+            tool={tool}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            disableAnimation={disableAnimation}
+          />
         </div>
         <ToolHeaderRight
           tool={tool}
           prefixCls={prefixCls}
           hashId={hashId}
           light={light}
+          disableAnimation={disableAnimation}
         />
         {tool.time || showContent ? (
-          <div className={classnames(`${prefixCls}-tool-time-expand`, hashId)}>
+          <div className={classNames(`${prefixCls}-tool-time-expand`, hashId)}>
             <ToolTime tool={tool} prefixCls={prefixCls} hashId={hashId} />
             <ToolExpand
               showContent={showContent}
@@ -158,6 +167,7 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
               prefixCls={prefixCls}
               hashId={hashId}
               onExpandClick={handleExpandClick}
+              disableAnimation={disableAnimation}
             />
           </div>
         ) : null}
@@ -169,6 +179,7 @@ const ToolUseBarItemComponent: React.FC<ToolUseBarItemProps> = ({
         light={light}
         showContent={showContent}
         expanded={expanded}
+        disableAnimation={disableAnimation}
       />
     </div>
   );

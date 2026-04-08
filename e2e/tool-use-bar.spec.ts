@@ -1,3 +1,4 @@
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
 import { expect, test } from '../tests/fixtures/page-fixture';
 
 test.describe('ToolUseBar 组件', () => {
@@ -33,7 +34,7 @@ test.describe('ToolUseBar 组件', () => {
   });
 
   test('应该能够激活和取消激活工具项', async ({ toolUseBarPage }) => {
-    await toolUseBarPage.goto('toolusebar-demo-tool-use-bar-active-keys');
+    await toolUseBarPage.goto(PLAYWRIGHT_FIXTURE_DEMOS.toolUseBarActiveKeys);
     const firstTool = toolUseBarPage.getFirstToolItem();
     await firstTool.click();
     await expect(firstTool).toHaveClass(/active/);

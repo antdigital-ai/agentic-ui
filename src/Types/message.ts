@@ -23,9 +23,20 @@ export interface BubbleMetaData {
   title?: string;
 
   /**
-   * 其他元数据
+   * 名称（别名）
    */
-  [key: string]: any;
+  name?: string;
+
+  /**
+   * 描述信息
+   */
+  description?: string;
+
+  /**
+   * 扩展元数据
+   * @description 用于存放自定义的额外信息，避免使用索引签名
+   */
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -207,7 +218,7 @@ export interface MessageBubbleData<
   fileMap?: Map<string, AttachmentFile>;
 
   /**
-   * @deprecated 已废弃，请使用 isLast 代替
+   * @deprecated @since 2.29.0 已废弃，请使用 isLast 代替
    * @description 已废弃，请使用 isLast 代替
    * @example true
    */

@@ -6,7 +6,7 @@ import {
   Wrench,
 } from '@sofa-design/icons';
 import { Popover } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useContext, useMemo } from 'react';
 import { DocMeta } from '.';

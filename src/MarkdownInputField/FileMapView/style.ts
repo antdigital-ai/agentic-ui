@@ -27,11 +27,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '&-vertical': {
         display: 'flex',
-        flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'flex-start',
         gap: 4,
+        padding: 2,
         maxWidth: 'calc(285px * 3 + 4px * 2)', // 3列：每列285px，间距4px
+        '& > :only-child': {
+          marginTop: 8,
+          padding: 2,
+        },
       },
       '&::-webkit-scrollbar': {
         width: 6,
@@ -95,6 +99,54 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
         },
       },
+      '&-video-row': {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 8,
+        width: 'fit-content',
+        '&-right': {
+          alignSelf: 'flex-end',
+        },
+      },
+      '&-video-thumb': {
+        position: 'relative',
+        cursor: 'pointer',
+        opacity: 1,
+        background: 'var(--color-gray-bg-card-white)',
+        boxSizing: 'border-box',
+        boxShadow: 'var(--shadow-control-base)',
+        borderRadius: 'var(--radius-card-base)',
+        border: 'none',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        '&:hover': {
+          boxShadow: 'var(--shadow-control-lg)',
+          '& video': {
+            transform: 'scale(1.05)',
+          },
+        },
+        '& video': {
+          transition: 'transform 0.3s',
+        },
+      },
+      '&-video-play-overlay': {
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(0, 0, 0, 0.35)',
+        borderRadius: 'inherit',
+        pointerEvents: 'none',
+        opacity: 0.9,
+        '& svg': {
+          width: 48,
+          height: 48,
+          color: '#fff',
+        },
+      },
       '&-image-list-view': {
         background: 'var(--color-gray-bg-tip)',
         padding: '4px',
@@ -123,6 +175,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-more-file-name': {
         font: 'var(--font-size-h6)',
         color: 'var(--color-gray-text-secondary)',
+      },
+      '&-title': {
+        width: '100%',
+        color: 'var(--color-gray-text-light)',
+        font: 'var(--font-text-body-sm)',
+        lineHeight: '20px',
+        marginBottom: 2,
       },
       '&-item': {
         width: '285px',
@@ -185,7 +244,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             background: 'var(--color-gray-bg-card-white)',
             boxSizing: 'border-box',
             boxShadow: 'var(--shadow-control-base)',
-            borderRadius: 'var(--radius-base)',
+            borderRadius: 'var(--radius-base, 4px)',
             border: 'none',
             overflow: 'hidden',
             img: {
@@ -250,6 +309,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '&-file-size': {
           color: 'var(--color-gray-text-light)',
           fontSize: '12px',
+        },
+      },
+      '&-item-meta-placeholder': {
+        background: 'var(--color-fill-quaternary, rgba(0,0,0,0.04))',
+        [`${token.componentCls}-item-file-name-text`]: {
+          color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
+        },
+        [`${token.componentCls}-item-file-size`]: {
+          color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
+        },
+        [`${token.componentCls}-item-file-name-extension-container`]: {
+          color: 'var(--color-text-tertiary, rgba(0,0,0,0.45))',
         },
       },
     },

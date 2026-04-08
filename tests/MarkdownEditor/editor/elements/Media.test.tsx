@@ -6,14 +6,23 @@ import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider, Modal } from 'antd';
 import React from 'react';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import {
   Media,
   ResizeImage,
 } from '../../../../src/MarkdownEditor/editor/elements/Media';
+import { useEditorStore } from '../../../../src/MarkdownEditor/editor/store';
 import * as utils from '../../../../src/MarkdownEditor/editor/utils';
 import { MediaNode } from '../../../../src/MarkdownEditor/el';
-import { useEditorStore } from '../../../../src/MarkdownEditor/editor/store';
 import { TestSlateWrapper } from './TestSlateWrapper';
 
 // Mock 依赖
@@ -459,17 +468,17 @@ describe('Media', () => {
       expect(resizeImage).toBeInTheDocument();
     });
 
-      it('应该在选中时显示视觉反馈', () => {
-        renderWithProvider(
-          <ResizeImage
-            src="https://example.com/image.jpg"
-            selected={true}
-            onResizeStart={vi.fn()}
-            onResizeStop={vi.fn()}
-          />,
-        );
-      });
+    it('应该在选中时显示视觉反馈', () => {
+      renderWithProvider(
+        <ResizeImage
+          src="https://example.com/image.jpg"
+          selected={true}
+          onResizeStart={vi.fn()}
+          onResizeStop={vi.fn()}
+        />,
+      );
     });
+  });
 
   describe('Media linkConfig 功能测试', () => {
     const mockWindowOpen = vi.fn();
@@ -483,9 +492,8 @@ describe('Media', () => {
 
     it('视频加载失败时应该显示链接并支持 linkConfig', async () => {
       const onClick = vi.fn();
-      const { useEditorStore } = await import(
-        '../../../../src/MarkdownEditor/editor/store'
-      );
+      const { useEditorStore } =
+        await import('../../../../src/MarkdownEditor/editor/store');
       vi.mocked(useEditorStore).mockReturnValue({
         markdownEditorRef: {
           current: {
@@ -545,9 +553,8 @@ describe('Media', () => {
 
     it('音频加载失败时应该显示链接并支持 linkConfig', async () => {
       const onClick = vi.fn();
-      const { useEditorStore } = await import(
-        '../../../../src/MarkdownEditor/editor/store'
-      );
+      const { useEditorStore } =
+        await import('../../../../src/MarkdownEditor/editor/store');
       vi.mocked(useEditorStore).mockReturnValue({
         markdownEditorRef: {
           current: {
@@ -607,9 +614,8 @@ describe('Media', () => {
 
     it('当 linkConfig.onClick 返回 false 时应该阻止视频链接的默认行为', async () => {
       const onClick = vi.fn().mockReturnValue(false);
-      const { useEditorStore } = await import(
-        '../../../../src/MarkdownEditor/editor/store'
-      );
+      const { useEditorStore } =
+        await import('../../../../src/MarkdownEditor/editor/store');
       vi.mocked(useEditorStore).mockReturnValue({
         markdownEditorRef: {
           current: {
@@ -718,7 +724,6 @@ describe('Media', () => {
 
   describe('ResizeImage 详细测试', () => {
     it('应该处理图片加载完成事件', async () => {
-      const mockOnLoad = vi.fn();
       renderWithProvider(
         <ResizeImage
           src="https://example.com/image.jpg"
@@ -728,13 +733,19 @@ describe('Media', () => {
       );
 
       const img = screen.getByTestId('resize-image');
-      
+
       // 模拟图片加载
-      Object.defineProperty(img, 'naturalWidth', { value: 800, writable: true });
-      Object.defineProperty(img, 'naturalHeight', { value: 600, writable: true });
-      
+      Object.defineProperty(img, 'naturalWidth', {
+        value: 800,
+        writable: true,
+      });
+      Object.defineProperty(img, 'naturalHeight', {
+        value: 600,
+        writable: true,
+      });
+
       fireEvent.load(img);
-      
+
       expect(img).toBeInTheDocument();
     });
 
@@ -885,7 +896,10 @@ describe('Media', () => {
       const setStateFn = vi.fn((updates) => {
         errorStateData = { ...errorStateData, ...updates };
       });
-      mockedUseGetSetState.mockReturnValueOnce([() => errorStateData, setStateFn]);
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => errorStateData,
+        setStateFn,
+      ]);
 
       renderWithProvider(
         <Media element={elementWithError} attributes={mockAttributes}>
@@ -903,18 +917,13 @@ describe('Media', () => {
       // 或者模拟 ResizeImage 组件中的 img 元素的错误
       // 但 ResizeImage 中的 img 没有 onerror 处理程序
       // 所以我们需要等待 initial 函数中的 img 元素触发错误
-      
+
       // 由于 initial 函数是异步的，并且创建的 img 元素不在 DOM 中
       // 我们需要等待一段时间让错误处理程序执行
       await act(async () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
-      // 检查是否至少有一次调用包含 loadSuccess: false
-      const callsWithLoadSuccessFalse = (setStateFn as any).mock.calls.filter((call: any[]) => 
-        call[0] && typeof call[0] === 'object' && call[0].loadSuccess === false
-      );
-      
       // 如果 initial 函数中的 img 元素加载失败，应该会调用 setState({ loadSuccess: false })
       // 但由于这是异步的，我们至少验证 setStateFn 被调用了
       expect(setStateFn).toHaveBeenCalled();
@@ -938,7 +947,10 @@ describe('Media', () => {
       const setStateFn = vi.fn((updates) => {
         videoStateData = { ...videoStateData, ...updates };
       });
-      mockedUseGetSetState.mockReturnValueOnce([() => videoStateData, setStateFn]);
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => videoStateData,
+        setStateFn,
+      ]);
 
       renderWithProvider(
         <Media element={videoElement} attributes={mockAttributes}>
@@ -971,7 +983,10 @@ describe('Media', () => {
       const setStateFn = vi.fn((updates) => {
         audioStateData = { ...audioStateData, ...updates };
       });
-      mockedUseGetSetState.mockReturnValueOnce([() => audioStateData, setStateFn]);
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => audioStateData,
+        setStateFn,
+      ]);
 
       renderWithProvider(
         <Media element={audioElement} attributes={mockAttributes}>
@@ -1004,7 +1019,10 @@ describe('Media', () => {
       const setStateFn = vi.fn((updates) => {
         videoStateData = { ...videoStateData, ...updates };
       });
-      mockedUseGetSetState.mockReturnValueOnce([() => videoStateData, setStateFn]);
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => videoStateData,
+        setStateFn,
+      ]);
 
       renderWithProvider(
         <Media element={videoElement} attributes={mockAttributes}>
@@ -1015,10 +1033,10 @@ describe('Media', () => {
       // 视频元素应该已经渲染（因为 loadSuccess: true）
       const video = screen.getByTestId('video-element');
       expect(video).toBeInTheDocument();
-      
+
       // 模拟视频加载成功事件（虽然已经成功，但可以测试事件处理）
       fireEvent.loadedMetadata(video);
-      
+
       // 由于 loadSuccess 已经是 true，可能不会再次调用 setState
       // 或者检查视频元素是否正确渲染
       expect(video).toHaveAttribute('src', 'https://example.com/video.mp4');
@@ -1042,7 +1060,10 @@ describe('Media', () => {
       const setStateFn = vi.fn((updates) => {
         audioStateData = { ...audioStateData, ...updates };
       });
-      mockedUseGetSetState.mockReturnValueOnce([() => audioStateData, setStateFn]);
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => audioStateData,
+        setStateFn,
+      ]);
 
       renderWithProvider(
         <Media element={audioElement} attributes={mockAttributes}>
@@ -1163,7 +1184,7 @@ describe('Media', () => {
 
   describe('音频 finished 状态', () => {
     it('应该处理音频 finished 为 false 且 showAsText 为 true', () => {
-      const audioElement: MediaNode = {
+      const audioElement: MediaNode & { rawMarkdown?: string } = {
         ...mockElement,
         url: 'https://example.com/audio.mp3',
         finished: false,
@@ -1197,7 +1218,7 @@ describe('Media', () => {
     });
 
     it('应该处理音频 finished 为 false 且 showAsText 为 false（显示 loading）', () => {
-      const audioElement: MediaNode = {
+      const audioElement: MediaNode & { rawMarkdown?: string } = {
         ...mockElement,
         url: 'https://example.com/audio.mp3',
         finished: false,
@@ -1293,7 +1314,10 @@ describe('Media', () => {
       const setStateFn = vi.fn((updates) => {
         selectedStateData = { ...selectedStateData, ...updates };
       });
-      mockedUseGetSetState.mockReturnValueOnce([() => selectedStateData, setStateFn]);
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => selectedStateData,
+        setStateFn,
+      ]);
 
       renderWithProvider(
         <Media element={mockElement} attributes={mockAttributes}>
@@ -1310,18 +1334,18 @@ describe('Media', () => {
       // Popover 的 open 属性是: open={state().selected && !readonly ? undefined : false}
       // 当 selected 为 true 且 readonly 为 false 时，open 是 undefined，Popover 使用默认触发行为（click）
       // 但是 ActionIconBox 只有在 Popover 打开时才会渲染到 DOM 中
-      
+
       // 查找 Popover 的 trigger（media-container 或其子元素）
       const mediaContainer = screen.getByTestId('media-container');
       expect(mediaContainer).toBeInTheDocument();
-      
+
       // 由于 Popover 的 trigger 是 "click"，我们需要点击来打开它
       // 但根据代码，当 selected 为 true 时，open 是 undefined，这意味着 Popover 会响应点击
       // 让我们尝试点击 media-container 来打开 Popover
       await act(async () => {
         fireEvent.click(mediaContainer);
       });
-      
+
       // 等待 Popover 打开并渲染 ActionIconBox
       await act(async () => {
         await new Promise((resolve) => setTimeout(resolve, 150));
@@ -1330,18 +1354,18 @@ describe('Media', () => {
       // 查找删除按钮（ActionIconBox 应该在 Popover 打开时显示）
       // 使用 queryByTestId，因为可能不存在
       const deleteButton = screen.queryByTestId('action-icon-box');
-      
+
       // 如果 deleteButton 存在，点击它来触发 Modal.confirm
       if (deleteButton) {
         await act(async () => {
           fireEvent.click(deleteButton);
         });
-        
+
         // 等待 Modal.confirm 被调用
         await act(async () => {
           await new Promise((resolve) => setTimeout(resolve, 100));
         });
-        
+
         expect(confirmSpy).toHaveBeenCalled();
       } else {
         // 如果 ActionIconBox 没有渲染（可能是因为 Popover 没有正确打开），
@@ -1359,7 +1383,7 @@ describe('Media', () => {
       const attachmentElement: MediaNode = {
         ...mockElement,
         url: 'https://example.com/attachment.pdf',
-        alt: undefined,
+        alt: '',
       };
 
       const mockedUseGetSetState = vi.mocked(utils.useGetSetState);
@@ -1475,13 +1499,14 @@ describe('Media', () => {
         fireEvent.click(eyeIcon);
       }
 
-      expect(mockWindowOpen).toHaveBeenCalledWith('https://example.com/attachment.pdf');
+      expect(mockWindowOpen).toHaveBeenCalledWith(
+        'https://example.com/attachment.pdf',
+      );
     });
 
     it('应该处理 window 未定义的情况', () => {
-      const originalWindow = global.window;
       const originalWindowOpen = global.window?.open;
-      
+
       // 模拟 window 未定义的情况，但不完全删除 window（因为 React DOM 需要它）
       // 只模拟 window.open 未定义的情况
       if (global.window) {
@@ -1542,7 +1567,10 @@ describe('Media', () => {
       const setStateFn = vi.fn((updates) => {
         resizeStateData = { ...resizeStateData, ...updates };
       });
-      mockedUseGetSetState.mockReturnValueOnce([() => resizeStateData, setStateFn]);
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => resizeStateData,
+        setStateFn,
+      ]);
 
       renderWithProvider(
         <Media element={mockElement} attributes={mockAttributes}>
@@ -1551,7 +1579,7 @@ describe('Media', () => {
       );
 
       const resizeStartButton = screen.getByTestId('resize-start');
-      
+
       // 使用 act 包装状态更新
       act(() => {
         fireEvent.click(resizeStartButton);
@@ -1584,7 +1612,10 @@ describe('Media', () => {
       const setStateFn = vi.fn((updates) => {
         resizeStateData = { ...resizeStateData, ...updates };
       });
-      mockedUseGetSetState.mockReturnValueOnce([() => resizeStateData, setStateFn]);
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => resizeStateData,
+        setStateFn,
+      ]);
 
       renderWithProvider(
         <Media element={mockElement} attributes={mockAttributes}>
@@ -1593,7 +1624,7 @@ describe('Media', () => {
       );
 
       const resizeStopButton = screen.getByTestId('resize-stop');
-      
+
       // 使用 act 包装状态更新
       act(() => {
         fireEvent.click(resizeStopButton);
@@ -1618,7 +1649,10 @@ describe('Media', () => {
       const setStateFn = vi.fn((updates) => {
         selectedStateData = { ...selectedStateData, ...updates };
       });
-      mockedUseGetSetState.mockReturnValueOnce([() => selectedStateData, setStateFn]);
+      mockedUseGetSetState.mockReturnValueOnce([
+        () => selectedStateData,
+        setStateFn,
+      ]);
 
       renderWithProvider(
         <Media element={mockElement} attributes={mockAttributes}>
@@ -1628,7 +1662,7 @@ describe('Media', () => {
 
       const container = screen.getByTestId('media-container');
       const clickableDiv = container.querySelector('div[tabIndex="-1"]');
-      
+
       // 使用 act 包装状态更新
       await act(async () => {
         if (clickableDiv) {

@@ -677,7 +677,7 @@ describe('PreviewComponent', () => {
         content: '# Hello',
       };
 
-      const markdownEditorProps = {
+      const markdownEditorProps: any = {
         theme: 'dark' as const,
       };
 
@@ -803,6 +803,261 @@ describe('PreviewComponent', () => {
       );
 
       expect(screen.queryByLabelText('下载')).not.toBeInTheDocument();
+    });
+
+    it('HTML 文件且无 customContent 时显示预览/代码 Segmented (702-706)', async () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'page.html',
+        content: '<p>Hello</p>',
+      };
+
+      const { container } = render(
+        <TestWrapper>
+          <PreviewComponent file={file} onBack={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('预览')).toBeInTheDocument();
+        expect(screen.getByText('代码')).toBeInTheDocument();
+      });
+    });
+
+    it('同时存在 onLocate/canLocate、onShare/canShare、onDownload 时显示对应按钮 (723,733,743)', () => {
+      const handleLocate = vi.fn();
+      const handleShare = vi.fn();
+      const handleDownload = vi.fn();
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.txt',
+        content: 'Content',
+        canLocate: true,
+        canShare: true,
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent
+            file={file}
+            onBack={vi.fn()}
+            onLocate={handleLocate}
+            onShare={handleShare}
+            onDownload={handleDownload}
+          />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByLabelText('定位')).toBeInTheDocument();
+      expect(screen.getByLabelText('分享')).toBeInTheDocument();
+      expect(screen.getByLabelText('下载')).toBeInTheDocument();
+    });
+
+    it('HTML 文件且传入 customActions 时同时显示 Segmented 与 customActions (702-706, 723)', async () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'doc.html',
+        content: '<p>Hi</p>',
+      };
+      const customActions = (
+        <span data-testid="extra-actions">Extra</span>
+      );
+
+      render(
+        <TestWrapper>
+          <PreviewComponent
+            file={file}
+            onBack={vi.fn()}
+            customActions={customActions}
+          />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('预览')).toBeInTheDocument();
+        expect(screen.getByText('代码')).toBeInTheDocument();
+      });
+      expect(screen.getByTestId('extra-actions')).toBeInTheDocument();
+    });
+  });
+
+  describe('覆盖率补充', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('processFile 抛出时设置 contentState.error 为 err.message', async () => {
+      const { fileTypeProcessor } = await import(
+        '../../../src/Workspace/File/FileTypeProcessor'
+      );
+      vi.spyOn(fileTypeProcessor, 'processFile').mockImplementation(() => {
+        throw new Error('custom process error');
+      });
+
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.txt',
+        content: 'x',
+      };
+
+      const { container } = render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(fileTypeProcessor.processFile).toHaveBeenCalledWith(file);
+      });
+      expect(container.querySelector('.ant-spin')).toBeInTheDocument();
+    });
+
+    it('HTML 文件且 contentState 为 ready 时 getContentStatus 返回 done', async () => {
+      const { fileTypeProcessor } = await import(
+        '../../../src/Workspace/File/FileTypeProcessor'
+      );
+      vi.spyOn(fileTypeProcessor, 'processFile').mockReturnValue({
+        typeInference: {
+          fileType: 'html',
+          category: 'text',
+        },
+        dataSource: {
+          content: '<p>hello</p>',
+          mimeType: 'text/html',
+        },
+        canPreview: true,
+        previewMode: 'inline',
+      } as any);
+
+      const file: FileNode = {
+        id: 'f1',
+        name: 'page.html',
+        content: '<p>hello</p>',
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('预览')).toBeInTheDocument();
+      });
+    });
+
+    it('点击下载按钮时应调用 onDownload', async () => {
+      const handleDownload = vi.fn();
+      const file: FileNode = {
+        id: 'f1',
+        name: 'data.bin',
+        type: 'archive',
+        url: 'https://example.com/data.bin',
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} onDownload={handleDownload} />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        const downloadBtns = screen.getAllByRole('button', { name: '下载' });
+        expect(downloadBtns.length).toBeGreaterThan(0);
+        fireEvent.click(downloadBtns[0]);
+      });
+
+      expect(handleDownload).toHaveBeenCalledWith(file);
+    });
+
+    it('contentState 为 loading 时显示加载文案', async () => {
+      const { fileTypeProcessor } = await import(
+        '../../../src/Workspace/File/FileTypeProcessor'
+      );
+      vi.spyOn(fileTypeProcessor, 'processFile').mockReturnValue({
+        typeInference: {
+          fileType: 'plainText',
+          category: 'text',
+        },
+        dataSource: { previewUrl: 'https://example.com/f.txt', content: undefined },
+        canPreview: true,
+        previewMode: 'inline',
+      } as any);
+      (global.fetch as any).mockImplementation(
+        () => new Promise(() => {}),
+      );
+
+      const file: FileNode = {
+        id: 'f1',
+        name: 'test.txt',
+        url: 'https://example.com/f.txt',
+      };
+
+      const { container } = render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(container.querySelector('.ant-spin')).toBeInTheDocument();
+      });
+    });
+
+    it('媒体无 previewUrl 时显示 getPreviewErrorMessage', async () => {
+      const { fileTypeProcessor } = await import(
+        '../../../src/Workspace/File/FileTypeProcessor'
+      );
+      vi.spyOn(fileTypeProcessor, 'processFile').mockReturnValue({
+        typeInference: { fileType: 'image', category: 'image' },
+        dataSource: { previewUrl: undefined },
+        canPreview: true,
+        previewMode: 'inline',
+      });
+
+      const file: FileNode = {
+        id: 'f1',
+        name: 'image.png',
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/无法获取图片预览|无法获取.*预览/),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('未知文件类型走 default 分支显示未知类型提示', async () => {
+      const { fileTypeProcessor } = await import(
+        '../../../src/Workspace/File/FileTypeProcessor'
+      );
+      vi.spyOn(fileTypeProcessor, 'processFile').mockReturnValue({
+        typeInference: { fileType: 'word', category: 'word' },
+        dataSource: {},
+        canPreview: true,
+        previewMode: 'inline',
+      } as any);
+
+      const file: FileNode = {
+        id: 'f1',
+        name: 'doc.doc',
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('未知的文件类型')).toBeInTheDocument();
+      });
     });
   });
 
@@ -1140,7 +1395,7 @@ describe('PreviewComponent', () => {
         content: '# Title',
       };
 
-      const markdownEditorProps = {
+      const markdownEditorProps: any = {
         theme: 'dark' as const,
         contentStyle: { padding: '10px' },
       };

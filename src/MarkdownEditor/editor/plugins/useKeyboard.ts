@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import {
   BaseEditor,
   Editor,
@@ -21,6 +21,20 @@ import { TabKey } from './hotKeyCommands/tab';
 
 import { NativeTableKeyboard } from '../../utils/native-table';
 import { useEditorStore } from '../store';
+
+// Block types where plain Enter must be handled by EnterKey (not Slate's default insertBreak
+// and not the outer MarkdownInputField send handler). These are blocks where entering would
+// incorrectly split the node into two nodes with Slate's default behavior.
+const SPECIAL_ENTER_BLOCK_TYPES = new Set([
+  'list-item',
+  'code',
+  'table-cell',
+  'head',
+  'blockquote',
+  'card-before',
+  'card-after',
+  'break',
+]);
 
 /**
  * 键盘事件处理 Hook - 管理 Markdown 编辑器的所有键盘交互
@@ -73,12 +87,29 @@ export const useKeyboard = (
     openInsertCompletion,
     insertCompletionText$,
     setOpenInsertCompletion,
+    openJinjaTemplate,
+    setOpenJinjaTemplate,
+    setJinjaAnchorPath,
+    jinjaTemplatePanelEnabled,
+    editorProps,
   } = useEditorStore();
+  // 从 editorProps.jinja 读取（BaseMarkdownEditor 已写入 effectiveJinja），支持插件配置的 trigger
+  const effectiveJinja = editorProps?.jinja;
+  const jinjaTrigger =
+    (effectiveJinja?.templatePanel &&
+      typeof effectiveJinja.templatePanel === 'object' &&
+      effectiveJinja.templatePanel.trigger) ||
+    '{}';
+  const matchKeyRef = useRef<MatchKey | null>(null);
+  if (matchKeyRef.current === null) {
+    matchKeyRef.current = new MatchKey(
+      markdownEditorRef as React.MutableRefObject<Editor | null>,
+    );
+  }
   return useMemo(() => {
     const tab = new TabKey(markdownEditorRef.current);
     const backspace = new BackspaceKey(markdownEditorRef.current);
     const enter = new EnterKey(store, backspace);
-    const match = new MatchKey(markdownEditorRef.current);
     return (e: React.KeyboardEvent) => {
       // 只读模式下跳过所有键盘处理，提升性能
       if (props.readonly) return;
@@ -96,6 +127,10 @@ export const useKeyboard = (
       }
 
       if (openInsertCompletion && (isHotkey('up', e) || isHotkey('down', e))) {
+        e.preventDefault();
+        return;
+      }
+      if (openJinjaTemplate && (isHotkey('up', e) || isHotkey('down', e))) {
         e.preventDefault();
         return;
       }
@@ -137,8 +172,13 @@ export const useKeyboard = (
         e.preventDefault();
       }
 
-      if (props?.markdown?.matchInputToNode) {
-        if (match.run(e)) return;
+      // 仅当显式开启 matchInputToNode 时才执行输入转节点（如 "- " 转列表），默认关闭
+      // IME 输入法组合期间不触发，避免输入「-」后按空格选字时误转为列表
+      if (
+        props?.markdown?.matchInputToNode === true &&
+        !e.nativeEvent?.isComposing
+      ) {
+        if (matchKeyRef.current!.run(e)) return;
       }
 
       if (e.key.toLowerCase().startsWith('arrow')) {
@@ -188,25 +228,25 @@ export const useKeyboard = (
         enter.run(e);
         return;
       }
-      // Enter 键（无 Shift）处理：如果在列表项中，让 EnterKey 处理；否则由 MarkdownInputField 处理发送
+      // Enter 键（无 Shift）处理：如果在特殊块类型中（列表项、代码块等），让 EnterKey 处理；否则由 MarkdownInputField 处理发送
       if (e.key === 'Enter' && !(e.ctrlKey || e.metaKey) && !e.shiftKey) {
-        // 检查当前是否在列表项中
         const selection = markdownEditorRef.current.selection;
         if (selection && Range.isCollapsed(selection)) {
           const [node] = Editor.nodes(markdownEditorRef.current, {
             at: selection.focus.path,
-            match: (n) => Element.isElement(n) && n.type === 'list-item',
+            match: (n) =>
+              Element.isElement(n) && SPECIAL_ENTER_BLOCK_TYPES.has(n.type),
             mode: 'lowest',
           });
           if (node) {
-            // 在列表项中，让 EnterKey 处理
+            // 在特殊块中，让 EnterKey 处理（如代码块插入换行、列表项创建新列表等）
             e.stopPropagation();
             e.preventDefault();
             enter.run(e);
             return;
           }
         }
-        // 不在列表项中，让 MarkdownInputField 处理发送
+        // 不在特殊块中，让 MarkdownInputField 处理发送
         return;
       }
 
@@ -216,10 +256,41 @@ export const useKeyboard = (
       });
       if (!node) return;
       if (node?.[0]?.type === 'paragraph') {
-        const [node] = Editor.nodes<any>(markdownEditorRef.current, {
+        const [paraNode] = Editor.nodes<any>(markdownEditorRef.current, {
           match: (n) => Element.isElement(n) && n.type === 'paragraph',
           mode: 'lowest',
         });
+        const node = paraNode;
+        if (node) {
+          const sel = markdownEditorRef.current.selection;
+          // Jinja 触发：基于光标位置检测，支持在任意位置输入 {}（含两个模板中间）
+          if (
+            jinjaTemplatePanelEnabled &&
+            e.key.length === 1 &&
+            !e.nativeEvent?.isComposing &&
+            sel &&
+            Range.isCollapsed(sel) &&
+            Path.isAncestor(node[1], sel.anchor.path) &&
+            setOpenJinjaTemplate &&
+            setJinjaAnchorPath
+          ) {
+            const strBeforeCursor = Editor.string(
+              markdownEditorRef.current,
+              Editor.range(
+                markdownEditorRef.current,
+                Editor.start(markdownEditorRef.current, node[1]),
+                sel.anchor,
+              ),
+            );
+            const strAfterKeyAtCursor =
+              strBeforeCursor + (e.key.length === 1 ? e.key : '');
+            if (strAfterKeyAtCursor.endsWith(jinjaTrigger)) {
+              setJinjaAnchorPath(node[1]);
+              setTimeout(() => setOpenJinjaTemplate(true));
+              return;
+            }
+          }
+        }
         if (
           node &&
           node[0].children.length === 1 &&
@@ -248,5 +319,17 @@ export const useKeyboard = (
         }
       }
     };
-  }, [markdownEditorRef.current, props?.readonly]);
+  }, [
+    markdownEditorRef.current,
+    props?.readonly,
+    props?.markdown?.matchInputToNode,
+    openInsertCompletion,
+    insertCompletionText$,
+    setOpenInsertCompletion,
+    openJinjaTemplate,
+    setOpenJinjaTemplate,
+    setJinjaAnchorPath,
+    jinjaTemplatePanelEnabled,
+    jinjaTrigger,
+  ]);
 };

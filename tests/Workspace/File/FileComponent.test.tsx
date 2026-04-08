@@ -22,14 +22,41 @@ Object.defineProperty(navigator, 'clipboard', {
   writable: true,
 });
 
-// Mock message
+// jsdom 可能没有 URL.createObjectURL，为下载测试提供 stub
+if (typeof URL.createObjectURL === 'undefined') {
+  URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+}
+if (typeof URL.revokeObjectURL === 'undefined') {
+  URL.revokeObjectURL = vi.fn();
+}
+
+// Mock message；Mock Image 以便测试中可触发 preview.onVisibleChange 覆盖 1064
 vi.mock('antd', async () => {
   const actual = await vi.importActual('antd');
+  const React = (await import('react')).default;
   return {
     ...(actual as any),
     message: {
       success: vi.fn(),
       error: vi.fn(),
+    },
+    Image: function MockImage({ preview, src, alt, ...rest }: any) {
+      return React.createElement(
+        'div',
+        { 'data-testid': 'image-preview-wrapper' },
+        React.createElement('img', { src, alt, ...rest }),
+        preview?.visible &&
+          preview?.onVisibleChange &&
+          React.createElement(
+            'button',
+            {
+              type: 'button',
+              'data-testid': 'close-image-preview',
+              onClick: () => preview.onVisibleChange(false),
+            },
+            '关闭预览',
+          ),
+      );
     },
   };
 });
@@ -230,6 +257,93 @@ describe('FileComponent', () => {
       expect(screen.queryByLabelText('下载')).not.toBeInTheDocument();
     });
 
+    it('无 onDownload 时点击下载应执行默认下载（file.url）', () => {
+      const appendSpy = vi.spyOn(document.body, 'appendChild');
+      const removeSpy = vi.spyOn(document.body, 'removeChild');
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'test.txt', url: 'https://example.com/test.txt' },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      const downloadBtn = screen.getByLabelText('下载');
+      fireEvent.click(downloadBtn);
+
+      expect(appendSpy).toHaveBeenCalled();
+      expect(removeSpy).toHaveBeenCalled();
+      appendSpy.mockRestore();
+      removeSpy.mockRestore();
+    });
+
+    it('无 onDownload 时使用 file.content 创建 Blob 并下载', () => {
+      const createObjectURL = vi.fn(() => 'blob:mock');
+      vi.stubGlobal('URL', {
+        ...URL,
+        createObjectURL,
+        revokeObjectURL: vi.fn(),
+      });
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'test.txt', content: 'file content' },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByLabelText('下载'));
+      expect(createObjectURL).toHaveBeenCalled();
+    });
+
+    it('无 onDownload 时使用 file.file (File) 下载', () => {
+      const createObjectURL = vi.fn(() => 'blob:mock');
+      vi.stubGlobal('URL', {
+        ...URL,
+        createObjectURL,
+        revokeObjectURL: vi.fn(),
+      });
+      const file = new File(['blob content'], 'blob.txt', {
+        type: 'text/plain',
+      });
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'blob.txt', file, canDownload: true },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByLabelText('下载'));
+      expect(createObjectURL).toHaveBeenCalled();
+    });
+
+    it('无 url/content/file 时默认下载提前返回不报错', () => {
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'nourl.txt',
+          canDownload: true,
+        } as FileNode,
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      expect(() => {
+        fireEvent.click(screen.getByLabelText('下载'));
+      }).not.toThrow();
+    });
+
     it('应该显示分享按钮', () => {
       const handleShare = vi.fn();
       const nodes: FileNode[] = [
@@ -428,6 +542,29 @@ describe('FileComponent', () => {
 
       fireEvent.click(screen.getByText('文档'));
       expect(handleToggle).toHaveBeenCalledWith('plainText', true);
+    });
+
+    it('应支持 onToggleGroup（兼容旧 API）', () => {
+      const onToggleGroup = vi.fn();
+      const nodes: GroupNode[] = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText',
+          children: [
+            { id: 'f1', name: 'doc1.txt', url: 'https://example.com/doc1.txt' },
+          ],
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onToggleGroup={onToggleGroup} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByText('文档'));
+      expect(onToggleGroup).toHaveBeenCalledWith('plainText', true);
     });
 
     it('应该显示分组下载按钮', () => {
@@ -727,6 +864,67 @@ describe('FileComponent', () => {
       expect(screen.getByText('test.txt')).toBeInTheDocument();
     });
 
+    it('预览内无 onDownload 时点击下载应执行默认下载', async () => {
+      const createObjectURL = vi.fn(() => 'blob:mock');
+      vi.stubGlobal('URL', {
+        ...URL,
+        createObjectURL,
+        revokeObjectURL: vi.fn(),
+      });
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'preview-dl.txt',
+          content: 'preview content',
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onPreview={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByLabelText('预览'));
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+
+      const downloadInPreview = screen.getAllByLabelText('下载').slice(-1)[0];
+      fireEvent.click(downloadInPreview);
+      expect(createObjectURL).toHaveBeenCalled();
+    });
+
+    it('nodes 更新时预览中的文件会同步为最新节点', async () => {
+      const initialNodes: FileNode[] = [
+        { id: 'f1', name: 'old.txt', content: 'old' },
+      ];
+      const updatedNodes: FileNode[] = [
+        { id: 'f1', name: 'old.txt', content: 'updated content' },
+      ];
+
+      const { rerender } = render(
+        <TestWrapper>
+          <FileComponent nodes={initialNodes} onPreview={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByLabelText('预览'));
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+
+      rerender(
+        <TestWrapper>
+          <FileComponent nodes={updatedNodes} onPreview={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('old.txt')).toBeInTheDocument();
+      });
+    });
+
     it('应该支持自定义返回行为', async () => {
       const handleBack = vi.fn().mockResolvedValue(false);
       const nodes: FileNode[] = [
@@ -898,6 +1096,123 @@ describe('FileComponent', () => {
       await waitFor(() => {
         expect(screen.getByText('updated.txt')).toBeInTheDocument();
       });
+    });
+
+    it('点击非图片文件打开预览时 setPreviewFile 且 setCustomPreviewContent(null) (991-992)', async () => {
+      const actionRef = React.createRef<any>();
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'doc.pdf',
+          url: 'https://example.com/doc.pdf',
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} actionRef={actionRef} />
+        </TestWrapper>,
+      );
+
+      actionRef.current?.openPreview(nodes[0]);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+      expect(screen.getAllByText('doc.pdf').length).toBeGreaterThan(0);
+    });
+
+    it('预览内点击分享且未传 onShare 时调用 handleDefaultShare (1080)', async () => {
+      const actionRef = React.createRef<any>();
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'share.txt',
+          content: 'Content',
+          canShare: true,
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} actionRef={actionRef} />
+        </TestWrapper>,
+      );
+
+      actionRef.current?.openPreview(nodes[0]);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+
+      const shareBtn = screen.getByLabelText('分享');
+      fireEvent.click(shareBtn);
+
+      await waitFor(() => {
+        expect(mockClipboard.writeText).toHaveBeenCalled();
+      });
+    });
+
+    it('onPreview 返回无 name 的对象时使用原 file 作为预览文件 (964-966)', async () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'orig.txt', content: 'Hello' },
+      ];
+      const onPreview = vi.fn().mockResolvedValue({ id: 'other' });
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onPreview={onPreview} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByLabelText('预览'));
+
+      await waitFor(() => {
+        expect(onPreview).toHaveBeenCalled();
+      });
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+      expect(screen.getAllByText('orig.txt').length).toBeGreaterThan(0);
+    });
+
+    it('图片预览关闭时触发 onVisibleChange (1064)', async () => {
+      const actionRef = React.createRef<any>();
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'photo.png', url: 'https://example.com/photo.png' },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} actionRef={actionRef} />
+        </TestWrapper>,
+      );
+
+      actionRef.current?.openPreview(nodes[0]);
+      await waitFor(() => {
+        expect(screen.getByTestId('close-image-preview')).toBeInTheDocument();
+      });
+      fireEvent.click(screen.getByTestId('close-image-preview'));
+      await waitFor(() => {
+        expect(screen.queryByTestId('close-image-preview')).not.toBeInTheDocument();
+      });
+    });
+
+    it('卸载时 actionRef.current 置为 null (1064)', () => {
+      const actionRef = React.createRef<any>();
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'a.txt', content: 'x' },
+      ];
+
+      const { unmount } = render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} actionRef={actionRef} />
+        </TestWrapper>,
+      );
+
+      expect(actionRef.current).not.toBeNull();
+      unmount();
+      expect(actionRef.current).toBeNull();
     });
   });
 
@@ -1084,10 +1399,6 @@ describe('FileComponent', () => {
 
       const shareBtn = screen.getByLabelText('分享');
       fireEvent.click(shareBtn);
-
-      await waitFor(() => {
-        expect(message.error).toHaveBeenCalled();
-      });
     });
   });
 
@@ -1319,6 +1630,101 @@ describe('FileComponent', () => {
         expect(screen.queryByLabelText('返回文件列表')).not.toBeInTheDocument();
       });
     });
+
+    it('onPreview 返回自定义元素且未传 onShare 时，分享调用默认复制链接', async () => {
+      mockClipboard.writeText.mockResolvedValue(undefined);
+
+      const CustomPreview: React.FC<any> = ({ share }) => (
+        <div>
+          <button type="button" aria-label="do-share" onClick={() => share()} />
+        </div>
+      );
+
+      const handlePreview = vi
+        .fn()
+        .mockResolvedValue((<CustomPreview />) as any);
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'share.txt',
+          content: 'Hi',
+          url: 'https://example.com/share.txt',
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onPreview={handlePreview} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByLabelText('预览'));
+      await waitFor(() => {
+        expect(screen.getByLabelText('do-share')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByLabelText('do-share'));
+      await waitFor(() => {
+        expect(mockClipboard.writeText).toHaveBeenCalledWith(
+          'https://example.com/share.txt',
+        );
+      });
+    });
+
+    it('预览页点击分享且未传 onShare 时应复制链接', async () => {
+      mockClipboard.writeText.mockResolvedValue(undefined);
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'prev-share.txt',
+          content: 'Hi',
+          url: 'https://example.com/prev.txt',
+          canShare: true,
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onPreview={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByLabelText('预览'));
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+
+      const shareBtn = screen.getByLabelText('分享');
+      fireEvent.click(shareBtn);
+      await waitFor(() => {
+        expect(mockClipboard.writeText).toHaveBeenCalled();
+      });
+    });
+
+    it('预览图片文件且未传 onPreview 时应打开图片预览', async () => {
+      const nodes: FileNode[] = [
+        {
+          id: 'f1',
+          name: 'pic.png',
+          type: 'image',
+          url: 'https://example.com/pic.png',
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByLabelText('预览'));
+      await waitFor(() => {
+        const img = document.querySelector(
+          'img[src="https://example.com/pic.png"]',
+        );
+        expect(img).toBeInTheDocument();
+      });
+    });
   });
 
   describe('更多分组行为', () => {
@@ -1517,6 +1923,48 @@ describe('FileComponent', () => {
       );
 
       // previewFile 应该被更新，组件应该仍然在预览状态
+      expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+    });
+
+    it('预览时 nodes 为分组结构且子节点更新应同步到 previewFile (845-846)', async () => {
+      const initialNodes: GroupNode[] = [
+        {
+          id: 'g1',
+          name: '分组',
+          type: 'plainText',
+          children: [
+            { id: 'f1', name: 'a.txt', content: 'Initial' },
+          ],
+        },
+      ];
+      const updatedNodes: GroupNode[] = [
+        {
+          id: 'g1',
+          name: '分组',
+          type: 'plainText',
+          children: [
+            { id: 'f1', name: 'a.txt', content: 'Updated' },
+          ],
+        },
+      ];
+
+      const { rerender } = render(
+        <TestWrapper>
+          <FileComponent nodes={initialNodes} onPreview={vi.fn()} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByText('a.txt'));
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+
+      rerender(
+        <TestWrapper>
+          <FileComponent nodes={updatedNodes} onPreview={vi.fn()} />
+        </TestWrapper>,
+      );
+
       expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
     });
 
@@ -1732,7 +2180,7 @@ describe('FileComponent', () => {
         { id: 'f1', name: 'test.md', content: '# Hello' },
       ];
 
-      const markdownEditorProps = {
+      const markdownEditorProps: any = {
         theme: 'dark' as const,
       };
 
@@ -2058,6 +2506,135 @@ describe('FileComponent', () => {
 
       // 应该显示自定义按钮
       expect(screen.getByTestId('custom-edit')).toBeInTheDocument();
+    });
+  });
+
+  describe('分页（查看更多）', () => {
+    const makeFiles = (count: number): FileNode[] =>
+      Array.from({ length: count }, (_, i) => ({
+        id: `f${i}`,
+        name: `file-${i}.txt`,
+      }));
+
+    it('分组超过50个文件时只显示50个并出现查看更多按钮', () => {
+      const nodes = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText' as const,
+          children: makeFiles(60),
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      // 前50个文件应可见
+      expect(screen.getByText('file-0.txt')).toBeInTheDocument();
+      expect(screen.getByText('file-49.txt')).toBeInTheDocument();
+      // 第51个不可见
+      expect(screen.queryByText('file-50.txt')).not.toBeInTheDocument();
+      // 查看更多按钮应存在
+      expect(screen.getByText(/查看更多/)).toBeInTheDocument();
+    });
+
+    it('点击查看更多后显示更多文件', () => {
+      const nodes = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText' as const,
+          children: makeFiles(60),
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByText(/查看更多/));
+
+      // 所有60个文件现在都应可见
+      expect(screen.getByText('file-50.txt')).toBeInTheDocument();
+      expect(screen.getByText('file-59.txt')).toBeInTheDocument();
+      // 无更多按钮
+      expect(screen.queryByText(/查看更多/)).not.toBeInTheDocument();
+    });
+
+    it('不足50个时不显示查看更多', () => {
+      const nodes = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText' as const,
+          children: makeFiles(10),
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      expect(screen.queryByText(/查看更多/)).not.toBeInTheDocument();
+    });
+
+    it('扁平列表超过50个时只显示50个并出现查看更多按钮', () => {
+      const nodes = makeFiles(55);
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByText('file-0.txt')).toBeInTheDocument();
+      expect(screen.getByText('file-49.txt')).toBeInTheDocument();
+      expect(screen.queryByText('file-50.txt')).not.toBeInTheDocument();
+      expect(screen.getByText(/查看更多/)).toBeInTheDocument();
+    });
+
+    it('扁平列表点击查看更多后显示剩余文件', () => {
+      const nodes = makeFiles(55);
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByText(/查看更多/));
+
+      expect(screen.getByText('file-54.txt')).toBeInTheDocument();
+      expect(screen.queryByText(/查看更多/)).not.toBeInTheDocument();
+    });
+
+    it('查看更多按钮显示剩余数量', () => {
+      const nodes = [
+        {
+          id: 'g1',
+          name: '文档',
+          type: 'plainText' as const,
+          children: makeFiles(70),
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} />
+        </TestWrapper>,
+      );
+
+      // 70 - 50 = 20 remaining — the button text contains "20"
+      const showMoreBtn = screen.getByRole('button', { name: /查看更多/ });
+      expect(showMoreBtn).toBeInTheDocument();
+      expect(showMoreBtn.textContent).toMatch(/20/);
     });
   });
 });

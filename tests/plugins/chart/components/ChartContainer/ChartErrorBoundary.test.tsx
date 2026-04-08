@@ -151,9 +151,54 @@ describe('ChartErrorBoundary', () => {
       consoleError.mockRestore();
       process.env.NODE_ENV = originalEnv;
     });
+
+    it('应该在非 development 环境下不打印边界调试日志', () => {
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      render(
+        <ChartErrorBoundary>
+          <ThrowError />
+        </ChartErrorBoundary>,
+      );
+
+      expect(consoleError).not.toHaveBeenCalledWith(
+        'ChartErrorBoundary caught an error:',
+        expect.any(Error),
+        expect.any(Object),
+      );
+
+      consoleError.mockRestore();
+      process.env.NODE_ENV = originalEnv;
+    });
   });
 
   describe('错误恢复', () => {
+    it('应该在自动重试后恢复瞬时错误', async () => {
+      let hasThrown = false;
+      const ThrowOnceThenRecover: React.FC = () => {
+        if (!hasThrown) {
+          hasThrown = true;
+          throw new Error('Transient error');
+        }
+
+        return <div>恢复成功</div>;
+      };
+
+      render(
+        <ChartErrorBoundary>
+          <ThrowOnceThenRecover />
+        </ChartErrorBoundary>,
+      );
+
+      expect(await screen.findByText('恢复成功')).toBeInTheDocument();
+      expect(screen.queryByText('图表渲染失败')).not.toBeInTheDocument();
+    });
+
     it('应该保持错误状态直到组件重新挂载', () => {
       const { rerender } = render(
         <ChartErrorBoundary>

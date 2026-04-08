@@ -65,7 +65,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '&:active': {
-        backgroundColor: 'var(--color-gray-control-fill-pressed)',
+        backgroundColor:
+          'var(--color-gray-control-fill-pressed, var(--color-gray-control-fill-secondary-active))',
         outline: 'none',
         border: 'none',
       },

@@ -12,7 +12,7 @@ vi.mock('nanoid', () => {
   };
 });
 // Mock useEditorStore
-const mockMarkdownContainerRef = {
+const mockMarkdownContainerRef: { current: HTMLDivElement | null } = {
   current: null,
 };
 

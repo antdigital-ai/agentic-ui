@@ -21,8 +21,8 @@ const DonutChartToolbarFilterExample: React.FC = () => {
         <DonutChart
           title="环形图工具栏过滤器"
           data={data}
-          width={400}
-          height={400}
+          width={260}
+          height={200}
           renderFilterInToolbar
           dataTime="2024年数据"
         />

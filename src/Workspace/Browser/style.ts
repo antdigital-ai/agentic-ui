@@ -49,7 +49,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             color: 'var(--color-gray-text-secondary)',
           },
         },
-        '.ant-tag': {
+        [`${token.antCls}-tag`]: {
           marginInlineEnd: '0',
         },
       },
@@ -62,7 +62,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         width: 'calc(100% - 20px)',
         padding: '8px',
         margin: '4px',
-        '.ant-tag': {
+        [`${token.antCls}-tag`]: {
           marginInlineEnd: '0',
         },
         [`${componentCls}-header-left`]: {

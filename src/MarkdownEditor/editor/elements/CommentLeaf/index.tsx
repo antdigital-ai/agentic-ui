@@ -14,8 +14,9 @@ interface CommentLeafProps {
 
 /**
  * 比较函数，用于优化 CommentLeaf 组件的渲染性能
+ * @internal 供 React.memo 及单测使用
  */
-const areCommentLeafPropsEqual = (
+export const areCommentLeafPropsEqual = (
   prevProps: CommentLeafProps,
   nextProps: CommentLeafProps,
 ) => {

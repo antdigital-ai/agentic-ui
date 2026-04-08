@@ -4,11 +4,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { ChatLayout, type ChatLayoutRef } from '../index';
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+global.ResizeObserver = vi.fn(function MockResizeObserver() {
+  return {
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  };
+});
 
 describe('ChatLayout', () => {
   it('renders with default props', () => {
@@ -29,6 +31,25 @@ describe('ChatLayout', () => {
     );
 
     expect(screen.getByText('Custom Title')).toBeInTheDocument();
+  });
+
+  it('renders with ReactNode title', () => {
+    render(
+      <ChatLayout
+        header={{
+          title: (
+            <span>
+              <strong>AI</strong> 助手
+            </span>
+          ),
+        }}
+      >
+        <div>Test content</div>
+      </ChatLayout>,
+    );
+
+    expect(screen.getByText('AI')).toBeInTheDocument();
+    expect(screen.getByText('助手')).toBeInTheDocument();
   });
 
   it('calls onLeftCollapse when left collapse button is clicked', () => {

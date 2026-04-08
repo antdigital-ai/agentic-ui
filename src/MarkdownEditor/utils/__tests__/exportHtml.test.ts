@@ -29,12 +29,14 @@ describe('exportHtml utils', () => {
       },
     } as any;
 
-    // Mock Blob
-    global.Blob = vi.fn().mockImplementation((content, options) => ({
-      content,
-      options,
-      type: options?.type,
-    })) as any;
+    // Mock Blob（Vitest 4：`new Blob()` 要求 mock 实现为 function/class）
+    global.Blob = vi.fn(function BlobMock(content: unknown, options?: { type?: string }) {
+      return {
+        content,
+        options,
+        type: options?.type,
+      };
+    }) as any;
 
     // Mock console.error
     vi.spyOn(console, 'error').mockImplementation(() => {});

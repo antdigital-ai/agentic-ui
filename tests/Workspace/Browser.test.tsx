@@ -44,6 +44,16 @@ describe('BrowserList Component', () => {
     },
   ];
 
+  const mockItemsWithIcon: BrowserItem[] = [
+    {
+      id: '1',
+      title: '带图标的结果',
+      site: 'example.com',
+      url: 'https://example.com',
+      icon: 'https://example.com/favicon.ico',
+    },
+  ];
+
   it('应该正确渲染结果列表和计数标签', () => {
     renderWithProvider(<BrowserList items={mockItems} activeLabel="搜索A" />);
 
@@ -52,6 +62,18 @@ describe('BrowserList Component', () => {
     expect(screen.getByText('结果标题2')).toBeInTheDocument();
     // 默认计数文案
     expect(screen.getByText('共2个结果')).toBeInTheDocument();
+  });
+
+  it('当 item 带 icon 时应渲染站点头像为 Image', () => {
+    renderWithProvider(
+      <BrowserList items={mockItemsWithIcon} activeLabel="搜索Icon" />,
+    );
+
+    const img = screen.getByRole('img', { name: 'example.com' });
+    expect(img).toBeInTheDocument();
+    expect((img as HTMLImageElement).src).toBe(
+      'https://example.com/favicon.ico',
+    );
   });
 
   it('点击站点信息时应通过 window.open 打开链接', async () => {
@@ -221,7 +243,11 @@ describe('Browser Component', () => {
 
   it('在结果视图中点击返回按钮应回到搜索建议视图', async () => {
     const user = userEvent.setup();
-    const suggestions = createSuggestions();
+    // 多建议时才显示返回按钮
+    const suggestions: BrowserSuggestion[] = [
+      { id: 's1', label: '搜索建议1', count: 2 },
+      { id: 's2', label: '搜索建议2', count: 1 },
+    ];
 
     const request = vi.fn().mockReturnValue({
       items: [
@@ -249,6 +275,40 @@ describe('Browser Component', () => {
     await user.click(backButton);
 
     expect(screen.getByText('搜索建议1')).toBeInTheDocument();
+    expect(screen.getByText('搜索建议2')).toBeInTheDocument();
+  });
+
+  it('单个搜索建议时应直接展示结果视图且无返回按钮', () => {
+    const suggestions = createSuggestions();
+
+    const request = vi.fn().mockReturnValue({
+      items: [
+        {
+          id: '1',
+          title: '结果标题1',
+          site: 'example.com',
+          url: 'https://example.com',
+        },
+      ] satisfies BrowserItem[],
+      loading: false,
+    });
+
+    renderBrowserWithProvider(
+      <Browser
+        suggestions={suggestions}
+        request={request}
+        suggestionIcon={null}
+      />,
+    );
+
+    // 直接展示结果视图，无需点击建议
+    expect(screen.getByTestId('browser-list')).toBeInTheDocument();
+    expect(screen.getByText('结果标题1')).toBeInTheDocument();
+    // 单建议无返回按钮
+    expect(screen.queryByRole('button')).toBeNull();
+    // request 在初始化时已调用
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledWith(suggestions[0]);
   });
 
   it('结果列表中点击定位按钮应触发 onLocate', async () => {

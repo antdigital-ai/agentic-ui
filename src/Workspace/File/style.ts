@@ -212,10 +212,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         transition: 'opacity 0.2s ease, visibility 0.2s ease',
 
         // 保持图标按钮颜色一致
-        [`.ant-btn, .ant-btn .anticon`]: {
+        [`${token.antCls}-btn, ${token.antCls}-btn .anticon`]: {
           color: 'var(--color-gray-text-light)',
         },
-        [`.ant-btn:hover, .ant-btn:focus, .ant-btn:active, .ant-btn:hover .anticon, .ant-btn:focus .anticon, .ant-btn:active .anticon`]:
+        [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover .anticon, ${token.antCls}-btn:focus .anticon, ${token.antCls}-btn:active .anticon`]:
           {
             color: 'var(--color-gray-text-light)',
           },
@@ -338,10 +338,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         gap: '8px',
 
         // 保持预览头部操作按钮的图标颜色一致
-        [`.ant-btn, .ant-btn .anticon`]: {
+        [`${token.antCls}-btn, ${token.antCls}-btn .anticon`]: {
           color: '#767E8B',
         },
-        [`.ant-btn:hover, .ant-btn:focus, .ant-btn:active, .ant-btn:hover .anticon, .ant-btn:focus .anticon, .ant-btn:active .anticon`]:
+        [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover .anticon, ${token.antCls}-btn:focus .anticon, ${token.antCls}-btn:active .anticon`]:
           {
             color: '#767E8B',
           },
@@ -470,13 +470,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 不可预览说明文案
       [`&-unsupported-text`]: {
         font: 'var(--font-text-body-sm)',
-        color: 'var(--color-text-secondary)',
+        color: 'var(--color-text-secondary, var(--color-gray-text-secondary))',
       },
     },
 
     // 搜索框样式
     [`${token.componentCls}-search`]: {
-      '.ant-input-outlined': {
+      [`${token.antCls}-input-outlined`]: {
         borderRadius: 'var(--radius-control-base)',
         borderColor: 'transparent',
         background: 'var(--color-gray-bg-card-light)',
@@ -484,11 +484,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         marginBottom: 8,
       },
 
-      '.ant-input-outlined:hover, .ant-input-outlined:focus-within': {
-        borderColor: 'var(--color-primary-control-fill-primary-active)',
-      },
+      [`${token.antCls}-input-outlined:hover, ${token.antCls}-input-outlined:focus-within`]:
+        {
+          borderColor: 'var(--color-primary-control-fill-primary-active)',
+        },
 
-      '.ant-input-affix-wrapper >input.ant-input': {
+      [`${token.antCls}-input-affix-wrapper >input${token.antCls}-input`]: {
         color: 'var(--color-gray-text-default)',
         font: 'var(--font-text-body-base)',
         letterSpacing: 'var(--letter-spacing-body-base, normal)',
@@ -522,6 +523,30 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     // 隐藏的图片预览组件
     [`${token.componentCls}-hidden-image`]: {
       display: 'none',
+    },
+
+    // 查看更多按钮
+    [`${token.componentCls}-show-more`]: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '6px 0',
+      cursor: 'pointer',
+      color: 'var(--color-gray-text-secondary)',
+      font: 'var(--font-text-body-sm)',
+      letterSpacing: 'var(--letter-spacing-body-sm, normal)',
+      transition: 'color 0.2s ease',
+      userSelect: 'none',
+
+      '&:hover': {
+        color: 'var(--color-primary-control-fill-primary-active)',
+      },
+
+      svg: {
+        marginLeft: '4px',
+        width: '12px',
+        height: '12px',
+      },
     },
   };
 };

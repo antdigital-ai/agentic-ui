@@ -9,4 +9,4 @@ tsconfig.tsbuildinfo
 coverage/**
 playwright-report/*
 test-results/*
-benchmarks/*package-lock.json
+benchmarks/

@@ -1,13 +1,15 @@
-import { memo, MutableRefObject, useContext } from 'react';
+import { memo, MutableRefObject, useContext, useMemo } from 'react';
 
 import { ConfigProvider, Flex } from 'antd';
-import cx from 'classnames';
+import clsx from 'clsx';
 import React from 'react';
 import { Quote, QuoteProps } from '../Quote';
 import { BubbleConfigContext } from './BubbleConfigProvide';
+import { ContentFilemapView } from './ContentFilemapView';
 import { BubbleMessageDisplay } from './MessagesContent';
 import { MessagesContext } from './MessagesContent/BubbleContext';
 import { BubbleExtra } from './MessagesContent/BubbleExtra';
+import { extractFilemapBlocks } from './extractFilemapBlocks';
 import { useStyle } from './style';
 import type { BubbleMetaData, BubbleProps } from './type';
 
@@ -79,7 +81,7 @@ export const UserBubble: React.FC<
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const context = useContext(BubbleConfigContext);
-  const { compact, standalone, locale } = context || {};
+  const { compact, standalone, extraShowOnHover } = context || {};
 
   const prefixClass = getPrefixCls('agentic');
   const { wrapSSR, hashId } = useStyle(prefixClass, classNames);
@@ -87,6 +89,15 @@ export const UserBubble: React.FC<
   const time = originData?.createAt || props.time;
   const placement = USER_PLACEMENT;
   const hasFileMap = (originData?.fileMap?.size || 0) > 0;
+
+  const rawContent = originData?.content as string | undefined;
+  const { blocks: filemapBlocks, stripped: strippedContent } = useMemo(
+    () =>
+      extractFilemapBlocks(
+        typeof rawContent === 'string' ? rawContent : '',
+      ),
+    [rawContent],
+  );
 
   const quoteElement = quote?.quoteDescription ? <Quote {...quote} /> : null;
 
@@ -98,7 +109,7 @@ export const UserBubble: React.FC<
       bubbleNameClassName={classNames?.bubbleNameClassName}
       className={classNames?.bubbleListItemTitleClassName}
       style={styles?.bubbleListItemTitleStyle}
-      prefixClass={cx(`${prefixClass}-bubble-title`)}
+      prefixClass={clsx(`${prefixClass}-bubble-title`)}
       title={''}
       placement={placement}
       time={time}
@@ -112,7 +123,9 @@ export const UserBubble: React.FC<
       bubbleListRef={props.bubbleListRef}
       bubbleListItemExtraStyle={styles?.bubbleListItemExtraStyle}
       bubbleRef={props.bubbleRef}
-      content={originData?.content}
+      content={
+        filemapBlocks.length > 0 ? strippedContent : originData?.content
+      }
       key={originData?.id}
       data-id={originData?.id}
       avatar={originData?.meta as BubbleMetaData}
@@ -160,17 +173,20 @@ export const UserBubble: React.FC<
     styles?.bubbleListItemContentStyle,
   );
 
+  // 用户气泡默认 hover 展示复制等操作，父级可透传覆盖
+  const effectiveExtraShowOnHover = extraShowOnHover ?? true;
+
   const itemDom = wrapSSR(
     <BubbleConfigContext.Provider
       value={{
         compact,
         standalone: !!standalone,
-        locale: locale as any,
+        extraShowOnHover: effectiveExtraShowOnHover,
         bubble: props as any,
       }}
     >
       <Flex
-        className={cx(
+        className={clsx(
           hashId,
           className,
           `${prefixClass}-bubble`,
@@ -187,11 +203,11 @@ export const UserBubble: React.FC<
       >
         <div
           style={style}
-          className={cx(`${prefixClass}-bubble-container`, hashId)}
+          className={clsx(`${prefixClass}-bubble-container`, hashId)}
         >
           <div
             style={contentContainerStyle}
-            className={cx(
+            className={clsx(
               `${prefixClass}-bubble-container`,
               `${prefixClass}-bubble-container-${placement}`,
               `${prefixClass}-bubble-container-user`,
@@ -201,26 +217,29 @@ export const UserBubble: React.FC<
             )}
             data-testid="chat-message"
           >
-            <div
-              className={cx(
-                `${prefixClass}-bubble-avatar-title`,
-                `${prefixClass}-bubble-avatar-title-${placement}`,
-                `${prefixClass}-bubble-avatar-title-ai`,
-                classNames?.bubbleAvatarTitleClassName,
-                hashId,
-                {
-                  [`${prefixClass}-bubble-avatar-title-pure`]: props.pure,
-                  [`${prefixClass}-bubble-avatar-title-quote`]:
-                    quote?.quoteDescription,
-                },
-              )}
-            >
-              {titleDom}
-            </div>
+            {titleDom ? (
+              <div
+                data-testid="bubble-avatar-title"
+                className={clsx(
+                  `${prefixClass}-bubble-avatar-title`,
+                  `${prefixClass}-bubble-avatar-title-${placement}`,
+                  `${prefixClass}-bubble-avatar-title-ai`,
+                  classNames?.bubbleAvatarTitleClassName,
+                  hashId,
+                  {
+                    [`${prefixClass}-bubble-avatar-title-pure`]: props.pure,
+                    [`${prefixClass}-bubble-avatar-title-quote`]:
+                      quote?.quoteDescription,
+                  },
+                )}
+              >
+                {titleDom}
+              </div>
+            ) : null}
             {contentBeforeDom && (
               <div
                 style={styles?.bubbleListItemExtraStyle}
-                className={cx(
+                className={clsx(
                   `${prefixClass}-bubble-before`,
                   `${prefixClass}-bubble-before-${placement}`,
                   `${prefixClass}-bubble-before-user`,
@@ -231,42 +250,54 @@ export const UserBubble: React.FC<
                 {contentBeforeDom}
               </div>
             )}
-            {hasFileMap && (
+            {childrenDom ? (
               <div
-                style={fileViewStyle}
-                className={cx(
-                  `${prefixClass}-bubble-after`,
-                  `${prefixClass}-bubble-after-${placement}`,
-                  `${prefixClass}-bubble-after-ai`,
+                style={contentStyle}
+                className={clsx(
+                  `${prefixClass}-bubble-content`,
+                  `${prefixClass}-bubble-content-${placement}`,
+                  `${prefixClass}-bubble-content-user`,
+                  { [`${prefixClass}-bubble-content-pure`]: props.pure },
+                  classNames?.bubbleListItemContentClassName,
                   hashId,
                 )}
-                data-testid="message-after"
+                onDoubleClick={props.onDoubleClick}
+                data-testid="message-content"
               >
-                <BubbleFileView
-                  bubbleListRef={props.bubbleListRef}
-                  bubble={props as any}
-                  placement={placement}
-                />
+                {childrenDom}
               </div>
-            )}
-            <div
-              style={contentStyle}
-              className={cx(
-                `${prefixClass}-bubble-content`,
-                `${prefixClass}-bubble-content-${placement}`,
-                `${prefixClass}-bubble-content-user`,
-                { [`${prefixClass}-bubble-content-pure`]: props.pure },
-                classNames?.bubbleListItemContentClassName,
-                hashId,
-              )}
-              onDoubleClick={props.onDoubleClick}
-              data-testid="message-content"
-            >
-              {childrenDom}
-            </div>
+            ) : null}
             {contentAfterDom}
           </div>
         </div>
+        {hasFileMap && (
+          <div
+            style={{ ...fileViewStyle, alignSelf: 'flex-end' }}
+            className={clsx(
+              `${prefixClass}-bubble-after`,
+              `${prefixClass}-bubble-after-${placement}`,
+              `${prefixClass}-bubble-after-user`,
+              hashId,
+            )}
+            data-testid="message-after"
+          >
+            <BubbleFileView
+              bubbleListRef={props.bubbleListRef}
+              bubble={props as any}
+              placement={placement}
+            />
+          </div>
+        )}
+        {filemapBlocks.length > 0 && (
+          <ContentFilemapView
+            blocks={filemapBlocks}
+            fileViewConfig={props.fileViewConfig}
+            fileViewEvents={props.fileViewEvents}
+            fileMapConfig={props.markdownRenderConfig?.fileMapConfig}
+            placement={placement}
+            style={{ alignSelf: 'flex-end' }}
+          />
+        )}
       </Flex>
     </BubbleConfigContext.Provider>,
   );

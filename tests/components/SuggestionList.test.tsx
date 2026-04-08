@@ -87,6 +87,27 @@ describe('SuggestionList 组件', () => {
     expect(screen.queryByText('建议5')).not.toBeInTheDocument();
   });
 
+  it('应创建 MutationObserver 并 observe 文本节点', () => {
+    const observeSpy = vi.spyOn(MutationObserver.prototype, 'observe');
+    render(
+      <SuggestionList
+        items={[{ key: '1', text: '较长文本用于触发 OverflowTooltip 挂载' }]}
+      />,
+    );
+    expect(observeSpy).toHaveBeenCalled();
+    observeSpy.mockRestore();
+  });
+
+  it('MutationObserver 不存在时 useEffect 提前 return', () => {
+    const origMO = global.MutationObserver;
+    (global as any).MutationObserver = undefined;
+    render(
+      <SuggestionList items={[{ key: '1', text: 'text' }]} />,
+    );
+    expect(screen.getByText('text')).toBeInTheDocument();
+    (global as any).MutationObserver = origMO;
+  });
+
   it('应该支持垂直布局', () => {
     const { container } = render(
       <SuggestionList items={mockItems} layout="vertical" />,
@@ -341,5 +362,29 @@ describe('SuggestionList 组件', () => {
     });
 
     expect(asyncOnItemClick).toHaveBeenCalled();
+  });
+
+  it('当项 text 非字符串时 label 为 undefined，onItemClick 收到空字符串', async () => {
+    const handleClick = vi.fn();
+    const items = [{ key: '1', text: 123 as unknown as string }];
+
+    render(<SuggestionList items={items} onItemClick={handleClick} />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /选择建议：追问/ }));
+      await Promise.resolve();
+    });
+
+    expect(handleClick).toHaveBeenCalledWith('');
+  });
+
+  it('带 tooltip 时 OverflowTooltip 传入 forceShow 与 title', () => {
+    const { container } = render(
+      <SuggestionList
+        items={[{ key: '1', text: '短', tooltip: '完整提示' }]}
+      />,
+    );
+
+    expect(container.querySelector('.ant-follow-up-label')).toBeTruthy();
   });
 });

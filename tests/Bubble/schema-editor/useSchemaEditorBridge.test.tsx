@@ -82,6 +82,22 @@ describe('useSchemaEditorBridge', () => {
       expect(manager.has('test-id')).toBe(true);
     });
 
+    it('开发环境下 getContent 应返回 contentRef 当前值', () => {
+      process.env.NODE_ENV = 'development';
+
+      const { result } = renderHook(() =>
+        useSchemaEditorBridge('getcontent-id', 'initial'),
+      );
+
+      const manager = SchemaEditorBridgeManager.getInstance();
+      expect(manager.getContentById('getcontent-id')).toBe('initial');
+
+      act(() => {
+        result.current.setContent('updated');
+      });
+      expect(manager.getContentById('getcontent-id')).toBe('updated');
+    });
+
     it('生产环境不应该注册到管理器', () => {
       process.env.NODE_ENV = 'production';
 

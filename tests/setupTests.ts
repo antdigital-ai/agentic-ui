@@ -52,13 +52,15 @@ vi.mock('ace-builds/src-noconflict/ext-modelist', () => ({
 
 // Mock @galacean/effects 模块，避免在测试环境中访问 DOM 属性导致错误
 vi.mock('@galacean/effects', () => {
-  const mockPlayer = vi.fn().mockImplementation(() => ({
-    loadScene: vi.fn(),
-    dispose: vi.fn(),
-    resume: vi.fn(),
-    pause: vi.fn(),
-    resize: vi.fn(),
-  }));
+  const mockPlayer = vi.fn(function MockPlayer(this: unknown) {
+    return {
+      loadScene: vi.fn(),
+      dispose: vi.fn(),
+      resume: vi.fn(),
+      pause: vi.fn(),
+      resize: vi.fn(),
+    };
+  });
 
   return {
     Player: mockPlayer,
@@ -89,7 +91,27 @@ Object.defineProperty(document, 'doctype', {
   },
 });
 
-// 修复canvas相关的问题
+// 修复 canvas 相关的问题：BarChart 等组件会调用 canvas.getContext('2d') 测量文本
+// 同时 patch window.HTMLCanvasElement，确保 document.createElement('canvas') 使用的构造器被 mock
+const installCanvasMock = () => {
+  const mockContext = {
+    measureText: vi.fn(() => ({ width: 50 })),
+    fillText: vi.fn(),
+    font: '',
+    canvas: null as unknown as HTMLCanvasElement,
+  };
+  const getContextFn = vi.fn(function (this: HTMLCanvasElement) {
+    mockContext.canvas = this;
+    return mockContext;
+  }) as any;
+  if (typeof (globalThis as any).window?.HTMLCanvasElement?.prototype !== 'undefined') {
+    (globalThis as any).window.HTMLCanvasElement.prototype.getContext = getContextFn;
+  }
+  if (typeof (globalThis as any).HTMLCanvasElement?.prototype !== 'undefined') {
+    (globalThis as any).HTMLCanvasElement.prototype.getContext = getContextFn;
+  }
+};
+installCanvasMock();
 
 global.window.scrollTo = vi.fn();
 Element.prototype.scrollTo = vi.fn();
@@ -107,7 +129,7 @@ const idleCallbacks = new Map<number, () => void>();
 
 vi.stubGlobal(
   'requestIdleCallback',
-  vi.fn((cb: () => void, options?: { timeout?: number }) => {
+  vi.fn(function requestIdleCallbackStub(cb: () => void, options?: { timeout?: number }) {
     const id = ++idleCallbackIdCounter;
     idleCallbacks.set(id, cb);
     // 在测试环境中立即同步执行，避免异步操作阻塞测试
@@ -138,7 +160,7 @@ vi.stubGlobal(
 
 vi.stubGlobal(
   'cancelIdleCallback',
-  vi.fn((id: number) => {
+  vi.fn(function cancelIdleCallbackStub(id: number) {
     idleCallbacks.delete(id);
   }),
 );
@@ -159,7 +181,7 @@ console.error = (...args: any[]) => {
   ) {
     return;
   }
-  originalError.call(console, args[0]);
+  originalError.apply(console, args);
 };
 
 // 重写 console.error 来过滤 act() 警告
@@ -174,7 +196,7 @@ console.warn = (...args: any[]) => {
   ) {
     return;
   }
-  originalWarn.call(console, args[0]);
+  originalWarn.apply(console, args);
 };
 
 Object.defineProperty(globalThis, 'cancelAnimationFrame', {
@@ -184,21 +206,21 @@ Object.defineProperty(globalThis, 'cancelAnimationFrame', {
 
 // Mock requestAnimationFrame to prevent unhandled errors in tests
 Object.defineProperty(globalThis, 'requestAnimationFrame', {
-  value: vi.fn((callback) => {
+  value: vi.fn(function requestAnimationFrameStub(callback: FrameRequestCallback) {
     return setTimeout(callback, 16); // ~60fps
   }),
   writable: true,
 });
 
 Object.defineProperty(globalThis.window, 'requestAnimationFrame', {
-  value: vi.fn((callback) => {
+  value: vi.fn(function windowRequestAnimationFrameStub(callback: FrameRequestCallback) {
     return setTimeout(callback, 16); // ~60fps
   }),
   writable: true,
 });
 
 Object.defineProperty(globalThis.window, 'cancelAnimationFrame', {
-  value: vi.fn((id) => {
+  value: vi.fn(function cancelAnimationFrameStub(id: number) {
     clearTimeout(id);
   }),
   writable: true,
@@ -207,22 +229,26 @@ Object.defineProperty(globalThis.window, 'cancelAnimationFrame', {
 Object.defineProperty(globalThis, 'IntersectionObserver', {
   writable: true,
   configurable: true,
-  value: vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  })),
+  value: vi.fn(function MockIntersectionObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    };
+  }),
 });
 
 // Mock ResizeObserver
 Object.defineProperty(globalThis, 'ResizeObserver', {
   writable: true,
   configurable: true,
-  value: vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  })),
+  value: vi.fn(function MockResizeObserver() {
+    return {
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    };
+  }),
 });
 
 // ref: https://github.com/ant-design/ant-design/issues/18774

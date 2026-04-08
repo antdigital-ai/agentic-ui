@@ -1,6 +1,6 @@
 import { Paragraph } from '@ant-design/agentic-ui/MarkdownEditor/editor/elements/Paragraph';
 import { ParagraphNode } from '@ant-design/agentic-ui/MarkdownEditor/el';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -84,6 +84,16 @@ describe('Paragraph Component', () => {
     expect(paragraphElement).toBeInTheDocument();
     expect(paragraphElement).toHaveAttribute('data-be', 'paragraph');
     expect(paragraphElement).toHaveAttribute('data-align', 'left');
+  });
+
+  it('应在 onDragStart 时触发 store.dragStart', () => {
+    const { container } = render(
+      <Paragraph element={mockElement} attributes={mockAttributes}>
+        {mockChildren}
+      </Paragraph>,
+    );
+    const p = container.querySelector('[data-be="paragraph"]');
+    fireEvent.dragStart(p!);
   });
 
   it('应该包含DragHandle组件', () => {

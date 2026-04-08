@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useMemo } from 'react';
 import { ReactEditor, RenderElementProps, useSlate } from 'slate-react';
 import { TableNode } from '../../types/Table';
@@ -15,10 +15,13 @@ export const SimpleTable = (props: RenderElementProps) => {
   const baseCls = getPrefixCls('agentic-md-editor-content-table');
   const editor = useSlate();
 
-  const tablePath = useMemo(
-    () => ReactEditor.findPath(editor, props.element),
-    [props.element],
-  );
+  const tablePath = useMemo(() => {
+    try {
+      return ReactEditor.findPath(editor, props.element);
+    } catch {
+      return [];
+    }
+  }, [props.element]);
 
   return (
     <TablePropsProvider

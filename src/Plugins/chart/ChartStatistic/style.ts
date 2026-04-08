@@ -20,9 +20,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         [`${token.componentCls}-header-left`]: {
           display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: '2px',
+          flex: 1,
+        },
+
+        [`${token.componentCls}-header-row`]: {
+          display: 'flex',
           alignItems: 'center',
           gap: '4px',
-          flex: 1,
         },
 
         [`${token.componentCls}-title`]: {
@@ -31,6 +38,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           fontWeight: 500,
           color: '#2C3E5D',
           margin: 0,
+        },
+
+        [`${token.componentCls}-subtitle`]: {
+          fontFamily: 'PingFang SC',
+          fontSize: '12px',
+          fontWeight: 400,
+          color: '#8C8C8C',
+          margin: 0,
+          lineHeight: 1.4,
         },
 
         [`${token.componentCls}-question-icon`]: {
@@ -71,6 +87,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             color: 'rgba(255, 255, 255, 0.65)',
           },
 
+          [`${token.componentCls}-subtitle`]: {
+            color: 'rgba(255, 255, 255, 0.45)',
+          },
+
           [`${token.componentCls}-question-icon`]: {
             color: 'rgba(255, 255, 255, 0.45)',
 
@@ -98,6 +118,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             fontSize: '12px',
           },
 
+          [`${token.componentCls}-subtitle`]: {
+            fontSize: '11px',
+          },
+
           [`${token.componentCls}-question-icon`]: {
             fontSize: '14px',
           },
@@ -113,6 +137,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         [`${token.componentCls}-header`]: {
           [`${token.componentCls}-title`]: {
+            fontSize: '13px',
+          },
+
+          [`${token.componentCls}-subtitle`]: {
             fontSize: '13px',
           },
 

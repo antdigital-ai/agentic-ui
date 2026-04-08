@@ -1,4 +1,5 @@
 import { Break } from '@ant-design/agentic-ui/MarkdownEditor/editor/elements/Break';
+import { ReadonlyBreak } from '@ant-design/agentic-ui/MarkdownEditor/editor/elements/Break/ReadonlyBreak';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
@@ -62,5 +63,16 @@ describe('Break Component', () => {
     );
     expect(breakElement).toBeInTheDocument();
     expect(breakElement).toHaveAttribute('contentEditable', 'false');
+  });
+
+  it('ReadonlyBreak 渲染 br (33)', () => {
+    render(
+      <ReadonlyBreak
+        attributes={mockAttributes}
+        children={<span>ro</span>}
+        element={{ type: 'break', children: [] } as any}
+      />,
+    );
+    expect(screen.getByText('ro').parentElement?.querySelector('br')).toBeInTheDocument();
   });
 });

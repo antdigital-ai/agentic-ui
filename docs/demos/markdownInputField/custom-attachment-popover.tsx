@@ -59,10 +59,6 @@ const CustomAttachmentPopoverDemo: React.FC = () => {
         <div style={{ fontSize: 12, color: '#666' }}>
           支持格式: {supportedFormat?.extensions?.join(', ')}
         </div>
-        <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>
-          最大大小:{' '}
-          {supportedFormat?.maxSize ? `${supportedFormat.maxSize}KB` : '无限制'}
-        </div>
         <Divider style={{ margin: '8px 0' }} />
         <Button type="link" size="small" icon={<InfoCircleOutlined />}>
           查看上传帮助
@@ -159,12 +155,6 @@ const CustomAttachmentPopoverDemo: React.FC = () => {
                   </span>
                 ))}
               </div>
-            </div>
-            <div>
-              <strong>文件大小限制:</strong>{' '}
-              {supportedFormat?.maxSize
-                ? `${supportedFormat.maxSize}KB`
-                : '无限制'}
             </div>
           </Space>
         </Modal>

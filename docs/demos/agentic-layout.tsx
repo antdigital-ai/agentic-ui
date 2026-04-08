@@ -51,60 +51,23 @@ const createMockFile = (
   slice: () => new Blob(),
 });
 
-// 用于在回答内容中内联展示的文件列表（不挂载到 originData.fileMap）
 const mockInlineFileMap = new Map<string, AttachmentFile>([
   [
-    'bubble-design-spec.pdf',
+    'demo-spec.pdf',
     createMockFile(
-      'bubble-design-spec.pdf',
+      'demo-spec.pdf',
       'application/pdf',
       2048576,
-      'https://example.com/bubble-design-spec.pdf',
+      'https://example.com/demo-spec.pdf',
     ),
   ],
   [
-    'component-preview.png',
+    'preview.png',
     createMockFile(
-      'component-preview.png',
+      'preview.png',
       'image/png',
       1048576,
       'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-    ),
-  ],
-  [
-    'api-reference-henchangehnchangmingzichang.json',
-    createMockFile(
-      'api-reference-henchangehnchangmingzichang.json',
-      'application/json',
-      512000,
-      'https://example.com/api-reference-henchangehnchangmingzichang.json',
-    ),
-  ],
-  [
-    'more-example.docx',
-    createMockFile(
-      'more-example.docx',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      8847360,
-      'https://example.com/more-example.docx',
-    ),
-  ],
-  [
-    'more-example.xlsx',
-    createMockFile(
-      'more-example.xlsx',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      6647360,
-      'https://example.com/more-example.xlsx',
-    ),
-  ],
-  [
-    'more-example.pptx',
-    createMockFile(
-      'more-example.pptx',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      7747360,
-      'https://example.com/more-example.pptx',
     ),
   ],
 ]);
@@ -129,30 +92,14 @@ const createMockMessage = (
   fileMap: fileMap || new Map(),
 });
 
-// 初始消息内容模板
 const INITIAL_MESSAGES = {
-  assistant: `### 我是 Ant Design 聊天助手
-  可以帮你：
+  assistant: `### Ant Design 聊天助手
+可协助解答问题、提供示例与文档说明。`,
 
-  - **回答问题** - 解答技术相关疑问
-  - **代码示例** - 提供组件使用示例
-  - **设计建议** - 给出设计方案建议
-  - **文档说明** - 解释 API 和功能
+  user: `请简要说明 AgenticLayout 里聊天区与侧栏如何配合。`,
 
-  你想了解什么呢？`,
-
-  user: `这是第 2 条消息, 生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。生成式 AI 可以用于自动化迄今只有人类能够完成的创造性任务，这样可以为个人和公司节省时间和金钱。如果你能向生成式 AI 描述你的任务，它很可能为你完成任务或者为你提供一个良好的起点。`,
-
-  bubbleDoc: `## Bubble 组件功能文档
-
-  Bubble 组件是一个功能丰富的聊天气泡组件，支持：
-
-  - 多种消息类型（文本、文件、图片等）
-  - 自定义渲染配置
-  - 左右布局切换
-  - 文件附件展示
-
-  以下是相关的设计文档和示例图片：`,
+  bubbleDoc: `## 附件示例
+下方为内联文件：`,
 };
 
 // 重试任务配置
@@ -165,51 +112,32 @@ const RETRY_CONFIG = {
 const StandaloneHistoryDemo = () => {
   const [currentSessionId, setCurrentSessionId] = useState('session-2');
 
-  // 模拟请求函数
   const mockRequest = async ({ agentId }: { agentId: string }) => {
-    // 模拟 API 请求
     return [
       {
         id: '1',
         sessionId: 'session-1',
-        sessionTitle: '让黄河成为造福人民的幸福河',
-        agentId: agentId,
-        gmtCreate: 1703123456789, // 2023-12-21 10:30:56
+        sessionTitle: '布局示例会话 A',
+        agentId,
+        gmtCreate: 1703123456789,
         gmtLastConverse: 1703123456789,
         isFavorite: true,
       },
       {
         id: '2',
         sessionId: 'session-2',
-        sessionTitle: '才读昔楚雄，又见今人勇。',
-        agentId: agentId,
-        gmtCreate: 1703037056789, // 2023-12-20 10:30:56
+        sessionTitle: '布局示例会话 B',
+        agentId,
+        gmtCreate: 1703037056789,
         gmtLastConverse: 1703037056789,
         isFavorite: false,
       },
       {
         id: '3',
         sessionId: 'session-3',
-        sessionTitle:
-          '金山银山不如绿水青山，生态环境保护是一个长期任务，要久久为功。',
-        agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
-        gmtLastConverse: 1702950656789,
-      },
-      {
-        id: '4',
-        sessionId: 'session-4',
-        sessionTitle: '才读昔楚雄，又见今人勇。',
-        agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
-        gmtLastConverse: 1702950656789,
-      },
-      {
-        id: '5',
-        sessionId: 'session-5',
-        sessionTitle: '县县通高速，铺就乡村幸福路',
-        agentId: agentId,
-        gmtCreate: 1702950656789, // 2023-12-19 10:30:56
+        sessionTitle: '布局示例会话 C',
+        agentId,
+        gmtCreate: 1702950656789,
         gmtLastConverse: 1702950656789,
       },
     ] as HistoryDataType[];

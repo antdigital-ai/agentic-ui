@@ -1,5 +1,7 @@
 import { Locator, Page, expect } from '@playwright/test';
 
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+
 /**
  * MarkdownEditor Page Object Model
  * 封装 MarkdownEditor 组件的所有交互操作
@@ -17,7 +19,9 @@ export class MarkdownEditorPage {
   /**
    * 导航到 demo 页面
    */
-  async goto(demoPath: string = 'markdowneditor-demo-1') {
+  async goto(
+    demoPath: string = PLAYWRIGHT_FIXTURE_DEMOS.markdownEditor,
+  ) {
     await this.page.goto(`/~demos/${demoPath}`);
     // 等待页面加载完成
     await this.page.waitForLoadState('networkidle');
@@ -152,5 +156,31 @@ export class MarkdownEditorPage {
    */
   getCommentMarker(): Locator {
     return this.page.locator('[data-comment-marker]').first();
+  }
+
+  /**
+   * 模拟粘贴 HTML 内容（用于 E2E 测试 handlePasteEvent 的 HTML 分支）
+   * 通过派发带自定义 clipboardData 的 paste 事件实现
+   */
+  async pasteHtml(html: string, plainText?: string): Promise<void> {
+    await this.focus();
+    const text = plainText ?? (html.replace(/<[^>]+>/g, '').trim() || 'pasted');
+    await this.editableInput.evaluate(
+      (
+        element: HTMLElement,
+        { html: h, text: t }: { html: string; text: string },
+      ) => {
+        const dt = new DataTransfer();
+        dt.setData('text/html', h);
+        dt.setData('text/plain', t);
+        const ev = new ClipboardEvent('paste', {
+          clipboardData: dt,
+          bubbles: true,
+        });
+        element.focus();
+        element.dispatchEvent(ev);
+      },
+      { html, text },
+    );
   }
 }

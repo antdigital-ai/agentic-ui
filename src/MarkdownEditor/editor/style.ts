@@ -11,7 +11,22 @@ import './code.css';
 import { TAG_STYLES } from './tagStyles';
 
 const COMMENT_HIGHLIGHT_COLOR =
-  'var(--agentic-comment-highlight-color, rgba(21, 0, 255, 0.15))';
+  'var(--agentic-ui-comment-highlight-color, rgba(21, 0, 255, 0.15))';
+
+/** Jinja 语法高亮 CSS 变量名，在 .ant-agentic-md-editor-content 上覆盖即可定制 */
+const JINJA_CSS_VAR = {
+  variable: '--agentic-ui-md-editor-color-jinja-variable',
+  tag: '--agentic-ui-md-editor-color-jinja-tag',
+  comment: '--agentic-ui-md-editor-color-jinja-comment',
+  keyword: '--agentic-ui-md-editor-color-jinja-keyword',
+  string: '--agentic-ui-md-editor-color-jinja-string',
+  number: '--agentic-ui-md-editor-color-jinja-number',
+  filter: '--agentic-ui-md-editor-color-jinja-filter',
+  variableName: '--agentic-ui-md-editor-color-jinja-variable-name',
+  placeholder: '--agentic-ui-md-editor-color-jinja-placeholder',
+  placeholderBg: '--agentic-ui-md-editor-color-jinja-placeholder-bg',
+  delimiter: '--agentic-ui-md-editor-color-jinja-delimiter',
+} as const;
 
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
@@ -157,9 +172,24 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       whiteSpace: 'pre-wrap',
       wordWrap: 'break-word',
       fontSize: '15px',
+      // Jinja 语法高亮，仅通过 CSS 变量定制（在 .ant-agentic-md-editor-content 上覆盖）
+      [JINJA_CSS_VAR.variable]:
+        'var(--color-primary-control-fill-primary, #1677ff)',
+      [JINJA_CSS_VAR.tag]: 'var(--color-orange-6, #d46b08)',
+      [JINJA_CSS_VAR.comment]: 'var(--color-text-tertiary, rgba(0,0,0,0.25))',
+      [JINJA_CSS_VAR.keyword]: '#5c4033',
+      [JINJA_CSS_VAR.string]: 'var(--color-green-10, #10af74)',
+      [JINJA_CSS_VAR.number]: 'var(--color-primary-10, #066ced)',
+      [JINJA_CSS_VAR.filter]: 'var(--color-primary-8, #689ef0)',
+      [JINJA_CSS_VAR.variableName]: 'var(--color-green-10, #10af74)',
+      [JINJA_CSS_VAR.placeholder]:
+        'var(--color-primary-control-fill-primary, #1677ff)',
+      [JINJA_CSS_VAR.placeholderBg]:
+        'var(--color-primary-bg-tip, rgba(0,102,255,0.08))',
+      [JINJA_CSS_VAR.delimiter]: '#d4b84b',
       '::-webkit-scrollbar': { width: '8px', height: '8px' },
       '::-webkit-scrollbar-thumb': {
-        backgroundColor: 'var(--color-gray-text-tertiary)',
+        backgroundColor: 'var(--color-gray-text-tertiary, var(--color-gray-text-light))',
         borderRadius: '20px',
       },
       '&-edit': {
@@ -180,6 +210,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             lineHeight: '21px',
             wordBreak: 'break-word',
             whiteSpace: 'wrap',
+            // 防止占位符伪元素响应触摸/点击事件，避免在移动端
+            // 竞态窗口内占位符遮挡用户对实际文字的交互。
+            pointerEvents: 'none',
+            userSelect: 'none',
           },
         },
         '> div.empty:first-child [data-slate-node="text"]': {
@@ -360,7 +394,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           fontSize: '0.9rem',
           lineHeight: 'var(--line-height-base)',
           letterSpacing: 'var(--letter-spacing-base)',
-          fontFamily: 'var(--font-family-base)',
+          fontFamily: 'var(--font-family-base, var(--font-family-text))',
         },
 
         'ul, ol': {
@@ -379,10 +413,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       'li > p': { marginTop: '1em' },
       'li + li': { marginTop: '0.25em' },
       blockquote: {
-        display: 'flex',
+        display: 'block',
+        boxSizing: 'border-box',
         padding: '8px 12px',
-        gap: '10px',
-        flexGrow: 1,
         zIndex: 1,
         fontSize: 'var(--font-size-base)',
         fontWeight: 'normal',
@@ -391,6 +424,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         position: 'relative',
         color: 'var(--color-gray-text-secondary)',
         margin: '0 !important',
+        // 原 flex + gap 在子节点之间的间距（::before 为 absolute，不参与 flex）
+        '& > * + *': {
+          marginTop: '10px',
+        },
         '&:before': {
           content: "''",
           left: '0',
@@ -399,10 +436,42 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           height: 'calc(100% - 22px)',
           borderRadius: '4px',
           width: '3px',
-          display: 'flex',
-          alignSelf: 'stretch',
+          display: 'block',
           zIndex: 0,
           backgroundColor: 'var(--color-gray-control-fill-secondary)',
+        },
+      },
+      // markdown-it-container 风格的自定义容器（::: info / warning / success / error）
+      '.markdown-container': {
+        padding: '12px 16px',
+        margin: '1em 0',
+        borderRadius: '6px',
+        borderLeft: '4px solid',
+        fontSize: 'var(--font-size-base)',
+        lineHeight: '160%',
+        '&__title': {
+          fontWeight: 600,
+          marginBottom: '8px',
+        },
+        '&.info': {
+          borderLeftColor: 'var(--color-info, #1677ff)',
+          backgroundColor: 'var(--color-info-bg, rgba(22, 119, 255, 0.08))',
+        },
+        '&.warning': {
+          borderLeftColor: 'var(--color-warning, #faad14)',
+          backgroundColor: 'var(--color-warning-bg, rgba(250, 173, 20, 0.08))',
+        },
+        '&.success': {
+          borderLeftColor: 'var(--color-success, #52c41a)',
+          backgroundColor: 'var(--color-success-bg, rgba(82, 196, 26, 0.08))',
+        },
+        '&.error': {
+          borderLeftColor: 'var(--color-error, #ff4d4f)',
+          backgroundColor: 'var(--color-error-bg, rgba(255, 77, 79, 0.08))',
+        },
+        '&.tip': {
+          borderLeftColor: 'var(--color-info, #1677ff)',
+          backgroundColor: 'var(--color-info-bg, rgba(22, 119, 255, 0.08))',
         },
       },
       '[data-be="media-container"], [data-be="image-container"]': {
@@ -482,7 +551,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         marginTop: '0.5em',
         marginBottom: '0.5em',
       },
-      '& &-inline-code': {
+      '& code&-inline-code': {
         display: 'inline',
         fontFamily: `'Roboto,Mono SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace`,
         margin: '1px 3px',
@@ -512,6 +581,40 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       '& &-m-html': {
         color: 'rgba(0,0,0,0.45)',
+      },
+      '& &-jinja-variable': {
+        color: `var(${JINJA_CSS_VAR.variable})`,
+      },
+      '& &-jinja-tag': {
+        color: `var(${JINJA_CSS_VAR.tag})`,
+      },
+      '& &-jinja-comment': {
+        color: `var(${JINJA_CSS_VAR.comment})`,
+        fontStyle: 'italic',
+      },
+      '& &-jinja-keyword': {
+        color: `var(${JINJA_CSS_VAR.keyword})`,
+      },
+      '& &-jinja-string': {
+        color: `var(${JINJA_CSS_VAR.string})`,
+      },
+      '& &-jinja-number': {
+        color: `var(${JINJA_CSS_VAR.number})`,
+      },
+      '& &-jinja-filter': {
+        color: `var(${JINJA_CSS_VAR.filter})`,
+      },
+      '& &-jinja-variable-name': {
+        color: `var(${JINJA_CSS_VAR.variableName})`,
+      },
+      '& &-jinja-placeholder': {
+        color: `var(${JINJA_CSS_VAR.placeholder})`,
+        backgroundColor: `var(${JINJA_CSS_VAR.placeholderBg})`,
+        borderRadius: '2px',
+        padding: '0 2px',
+      },
+      '& &-jinja-delimiter': {
+        color: `var(${JINJA_CSS_VAR.delimiter})`,
       },
       '&:not(:last-child)': {
         marginBottom: '0.5em',

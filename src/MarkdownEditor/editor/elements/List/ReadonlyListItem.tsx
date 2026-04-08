@@ -1,5 +1,5 @@
 import { Checkbox, ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { useContext, useMemo } from 'react';
 import { ElementProps, ListItemNode } from '../../../el';
 

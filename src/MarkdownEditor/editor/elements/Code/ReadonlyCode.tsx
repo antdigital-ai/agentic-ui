@@ -67,7 +67,7 @@ export const ReadonlyCode: React.FC<RenderElementProps> = React.memo(
     return (
       <div
         {...attributes}
-        data-is-unclosed={isUnclosed}
+        data-is-unclosed={isUnclosed || undefined}
         data-language={element?.language}
         style={
           element?.language === 'html'

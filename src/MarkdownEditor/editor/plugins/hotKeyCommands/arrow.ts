@@ -45,7 +45,7 @@ export const keyArrow = (
     if (isHotkey('left', e)) {
       e.preventDefault();
       e.stopPropagation();
-      const leaf = Node.leaf(editor, sel.focus.path);
+      const [leaf] = Editor.leaf(editor, sel.focus);
       const dirt = EditorUtils.isDirtLeaf(leaf);
       const pre = Editor.previous<any>(editor, { at: sel.focus.path });
       if (
@@ -78,7 +78,7 @@ export const keyArrow = (
       e.preventDefault();
       e.stopPropagation();
       if (!isMod(e)) {
-        const leaf = Node.leaf(editor, sel.focus.path);
+        const [leaf] = Editor.leaf(editor, sel.focus);
         const dirt = EditorUtils.isDirtLeaf(leaf);
         const next = Editor.next<any>(editor, { at: sel.focus.path });
         const [node] = Editor.nodes<any>(editor, {
@@ -103,7 +103,7 @@ export const keyArrow = (
         ) {
           EditorUtils.moveAfterSpace(editor, sel.focus.path);
         } else {
-          const leaf = Node.leaf(editor, sel.focus.path);
+          const [leaf] = Editor.leaf(editor, sel.focus);
           if (
             sel.focus.offset === leaf.text?.length &&
             Editor.hasPath(editor, Path.next(sel.focus.path)) &&

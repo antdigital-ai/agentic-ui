@@ -1,5 +1,5 @@
 import { ConfigProvider } from 'antd';
-import classNames from 'classnames';
+import classNames from 'clsx';
 import React, { CSSProperties, useContext } from 'react';
 import { Editor, Path, Transforms } from 'slate';
 
@@ -7,8 +7,21 @@ import { ReactEditor, RenderElementProps, RenderLeafProps } from 'slate-react';
 import { I18nContext } from '../../../I18n';
 import { debugInfo } from '../../../Utils/debugUtils';
 import { MarkdownEditorProps } from '../../types';
+import { JINJA_DOLLAR_PLACEHOLDER } from '../parser/constants';
 import { useEditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
+import {
+  AgenticUiTaskBlock,
+  ReadonlyAgenticUiTaskBlock,
+} from './AgenticUiBlocks/AgenticUiTaskBlock';
+import {
+  AgenticUiToolUseBarBlock,
+  ReadonlyAgenticUiToolUseBarBlock,
+} from './AgenticUiBlocks/AgenticUiToolUseBarBlock';
+import {
+  AgenticUiFileMapBlock,
+  ReadonlyAgenticUiFileMapBlock,
+} from './AgenticUiBlocks/AgenticUiFileMapBlock';
 import { Blockquote } from './Blockquote';
 import { ReadonlyBlockquote } from './Blockquote/ReadonlyBlockquote';
 import { Break } from './Break';
@@ -49,6 +62,26 @@ import { ReadonlySchema } from './Schema/ReadonlySchema';
 import { tableRenderElement } from './Table';
 import { ReadonlyTableComponent } from './Table/ReadonlyTableComponent';
 import { TagPopup } from './TagPopup';
+
+/** 递归将 Jinja 占位符还原为 $ 显示 */
+const restoreJinjaDollarInChildren = (
+  children: React.ReactNode,
+): React.ReactNode =>
+  React.Children.map(children, (child) => {
+    if (typeof child === 'string') {
+      return child.split(JINJA_DOLLAR_PLACEHOLDER).join('$');
+    }
+    if (
+      React.isValidElement(child) &&
+      child.props.children !== undefined &&
+      child.props.children !== null
+    ) {
+      return React.cloneElement(child as React.ReactElement<any>, {
+        children: restoreJinjaDollarInChildren(child.props.children),
+      });
+    }
+    return child;
+  });
 
 /**
  * 性能优化说明：
@@ -205,6 +238,25 @@ const MElementComponent = (
         <ReadonlySchema {...readonlyElementProps} />
       ) : (
         <Schema {...props} />
+      );
+    case 'agentic-ui-task':
+      return props.readonly ? (
+        <ReadonlyAgenticUiTaskBlock {...readonlyElementProps} />
+      ) : (
+        <AgenticUiTaskBlock {...props} />
+      );
+    case 'agentic-ui-toolusebar':
+    case 'agentic-ui-usertoolbar':
+      return props.readonly ? (
+        <ReadonlyAgenticUiToolUseBarBlock {...readonlyElementProps} />
+      ) : (
+        <AgenticUiToolUseBarBlock {...props} />
+      );
+    case 'agentic-ui-filemap':
+      return props.readonly ? (
+        <ReadonlyAgenticUiFileMapBlock {...readonlyElementProps} />
+      ) : (
+        <AgenticUiFileMapBlock {...props} />
       );
     case 'image':
       return props.readonly ? (
@@ -425,20 +477,24 @@ const MLeafComponent = (
               setTimeout(() => {
                 if (!markdownEditorRef.current) return;
                 if (!path?.length) return;
-                const nextPath = Path.next(path);
-                if (!Editor.hasPath(markdownEditorRef.current, nextPath)) {
-                  Transforms.insertNodes(
-                    markdownEditorRef.current,
-                    [{ text: ' ' }],
-                    {
-                      select: true,
-                    },
-                  );
-                } else {
-                  Transforms.select(markdownEditorRef.current, {
-                    anchor: Editor.end(markdownEditorRef.current, path),
-                    focus: Editor.end(markdownEditorRef.current, path),
-                  });
+                try {
+                  const nextPath = Path.next(path);
+                  if (!Editor.hasPath(markdownEditorRef.current, nextPath)) {
+                    Transforms.insertNodes(
+                      markdownEditorRef.current,
+                      [{ text: ' ' }],
+                      {
+                        select: true,
+                      },
+                    );
+                  } else {
+                    Transforms.select(markdownEditorRef.current, {
+                      anchor: Editor.end(markdownEditorRef.current, path),
+                      focus: Editor.end(markdownEditorRef.current, path),
+                    });
+                  }
+                } catch {
+                  // path may have become stale after the timeout; ignore
                 }
               }, 0);
             }}
@@ -474,6 +530,66 @@ const MLeafComponent = (
   }
   if (leaf.html) {
     prefixClassName = classNames(mdEditorBaseClass + '-m-html');
+  }
+  if (leaf.jinjaVariable) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-variable`,
+    );
+  }
+  if (leaf.jinjaTag) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-tag`,
+    );
+  }
+  if (leaf.jinjaComment) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-comment`,
+    );
+  }
+  if (leaf.jinjaKeyword) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-keyword`,
+    );
+  }
+  if (leaf.jinjaString) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-string`,
+    );
+  }
+  if (leaf.jinjaNumber) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-number`,
+    );
+  }
+  if (leaf.jinjaFilter) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-filter`,
+    );
+  }
+  if (leaf.jinjaVariableName) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-variable-name`,
+    );
+  }
+  if (leaf.jinjaPlaceholder) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-placeholder`,
+    );
+  }
+  if (leaf.jinjaDelimiter) {
+    prefixClassName = classNames(
+      prefixClassName,
+      `${mdEditorBaseClass}-jinja-delimiter`,
+    );
   }
   if (leaf.current) {
     style.background = '#f59e0b';
@@ -550,7 +666,7 @@ const MLeafComponent = (
       style={style}
       className={prefixClassName?.trim() ? prefixClassName?.trim() : undefined}
     >
-      {children}
+      {restoreJinjaDollarInChildren(children)}
     </span>
   );
 

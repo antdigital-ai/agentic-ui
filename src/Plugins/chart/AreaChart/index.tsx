@@ -5,8 +5,8 @@ import {
   ChartOptions,
   ScriptableContext,
 } from 'chart.js';
-import classNames from 'classnames';
-import React, { useContext, useMemo, useRef } from 'react';
+import classNames from 'clsx';
+import React, { useContext, useLayoutEffect, useMemo, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   ChartContainer,
@@ -233,8 +233,10 @@ const AreaChart: React.FC<AreaChartProps> = ({
   variant,
   loading = false,
 }) => {
+  useLayoutEffect(() => {
+    registerLineChartComponents();
+  }, []);
   // 注册 Chart.js 组件
-  registerLineChartComponents();
 
   // 响应式尺寸
   const { responsiveWidth, responsiveHeight, isMobile } = useResponsiveSize(
@@ -333,8 +335,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
           return gradient;
         },
         pointBackgroundColor: resolvedColor,
-        pointBorderColor: '#fff',
-        pointBorderWidth: 1,
+        pointBorderColor: isLight ? '#fff' : resolvedColor,
+        pointBorderWidth: isLight ? 1 : 0,
         borderWidth: 3,
         tension: 0,
         fill: true,
@@ -342,7 +344,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
     });
 
     return { labels, datasets };
-  }, [filteredData, types, xValues, color]);
+  }, [filteredData, types, xValues, color, isLight]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,

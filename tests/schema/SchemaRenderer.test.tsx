@@ -40,85 +40,80 @@ describe('SchemaRenderer', () => {
       const { container } = render(<SchemaRenderer {...defaultProps} />);
       expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
     });
-
-    it('应该显示数据值', () => {
-      const { container } = render(<SchemaRenderer {...defaultProps} />);
-      expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
-    });
   });
 
   describe('不同类型字段测试', () => {
-    it('应该渲染字符串字段', () => {
-      const props = {
-        schema: {
-          version: '1.0.0',
-          name: 'StringComponent',
-          description: '字符串组件',
-          component: {
-            type: 'html' as const,
-            schema: '<div>标题: {{title}}</div>',
-            properties: {
-              title: {
-                type: 'string' as const,
-                title: '标题',
+    it.each([
+      [
+        '字符串',
+        {
+          schema: {
+            version: '1.0.0',
+            name: 'StringComponent',
+            description: '字符串组件',
+            component: {
+              type: 'html' as const,
+              schema: '<div>标题: {{title}}</div>',
+              properties: {
+                title: {
+                  type: 'string' as const,
+                  title: '标题',
+                },
               },
             },
           },
+          values: {
+            title: '测试标题',
+          },
         },
-        values: {
-          title: '测试标题',
-        },
-      };
-      const { container } = render(<SchemaRenderer {...props} />);
-      expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
-    });
-
-    it('应该渲染数字字段', () => {
-      const props = {
-        schema: {
-          version: '1.0.0',
-          name: 'NumberComponent',
-          description: '数字组件',
-          component: {
-            type: 'html' as const,
-            schema: '<div>数量: {{count}}</div>',
-            properties: {
-              count: {
-                type: 'number' as const,
-                title: '数量',
+      ],
+      [
+        '数字',
+        {
+          schema: {
+            version: '1.0.0',
+            name: 'NumberComponent',
+            description: '数字组件',
+            component: {
+              type: 'html' as const,
+              schema: '<div>数量: {{count}}</div>',
+              properties: {
+                count: {
+                  type: 'number' as const,
+                  title: '数量',
+                },
               },
             },
           },
+          values: {
+            count: 100,
+          },
         },
-        values: {
-          count: 100,
-        },
-      };
-      const { container } = render(<SchemaRenderer {...props} />);
-      expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
-    });
-
-    it('应该渲染布尔字段', () => {
-      const props = {
-        schema: {
-          version: '1.0.0',
-          name: 'BooleanComponent',
-          description: '布尔组件',
-          component: {
-            type: 'html' as const,
-            schema: '<div>状态: {{active}}</div>',
-            properties: {
-              active: {
-                type: 'string' as const,
-                title: '是否激活',
+      ],
+      [
+        '布尔',
+        {
+          schema: {
+            version: '1.0.0',
+            name: 'BooleanComponent',
+            description: '布尔组件',
+            component: {
+              type: 'html' as const,
+              schema: '<div>状态: {{active}}</div>',
+              properties: {
+                active: {
+                  type: 'string' as const,
+                  title: '是否激活',
+                },
               },
             },
           },
+          values: {
+            active: 'true',
+          },
         },
-        values: {
-          active: 'true',
-        },
-      };
+      ],
+    ])('应该渲染 %s 字段', (_label, props) => {
       const { container } = render(<SchemaRenderer {...props} />);
       expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
     });
@@ -195,18 +190,6 @@ describe('SchemaRenderer', () => {
     });
   });
 
-  describe('性能优化测试', () => {
-    it('应该正确处理 useMemo 优化', () => {
-      const { container } = render(<SchemaRenderer {...defaultProps} />);
-      expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
-    });
-
-    it('应该正确处理 useCallback 优化', () => {
-      const { container } = render(<SchemaRenderer {...defaultProps} />);
-      expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
-    });
-  });
-
   describe('边界情况测试', () => {
     it('应该处理特殊字符', () => {
       const props = {
@@ -234,51 +217,27 @@ describe('SchemaRenderer', () => {
       expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
     });
 
-    it('应该处理 null 值', () => {
+    it.each([
+      ['null', { edge: null }],
+      ['undefined', { edge: undefined }],
+    ])('应该处理占位值为 %s', (_label, values) => {
       const props = {
         schema: {
           version: '1.0.0',
-          name: 'NullComponent',
-          description: '空值组件',
+          name: 'EdgeComponent',
+          description: '边界组件',
           component: {
             type: 'html' as const,
-            schema: '<div>空值: {{nullValue}}</div>',
+            schema: '<div>边界: {{edge}}</div>',
             properties: {
-              nullValue: {
+              edge: {
                 type: 'string' as const,
-                title: '空值',
+                title: '边界',
               },
             },
           },
         },
-        values: {
-          nullValue: null,
-        },
-      };
-      const { container } = render(<SchemaRenderer {...props} />);
-      expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
-    });
-
-    it('应该处理 undefined 值', () => {
-      const props = {
-        schema: {
-          version: '1.0.0',
-          name: 'UndefinedComponent',
-          description: '未定义组件',
-          component: {
-            type: 'html' as const,
-            schema: '<div>未定义值: {{undefinedValue}}</div>',
-            properties: {
-              undefinedValue: {
-                type: 'string' as const,
-                title: '未定义值',
-              },
-            },
-          },
-        },
-        values: {
-          undefinedValue: undefined,
-        },
+        values,
       };
       const { container } = render(<SchemaRenderer {...props} />);
       expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
@@ -286,21 +245,16 @@ describe('SchemaRenderer', () => {
   });
 
   describe('组件属性测试', () => {
-    it('应该正确处理 debug 属性', () => {
-      const props = {
-        ...defaultProps,
-        debug: false,
-      };
-      const { container } = render(<SchemaRenderer {...props} />);
-      expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
-    });
-
-    it('应该正确处理 useDefaultValues 属性', () => {
-      const props = {
-        ...defaultProps,
-        useDefaultValues: false,
-      };
-      const { container } = render(<SchemaRenderer {...props} />);
+    it.each([
+      { label: 'debug', extra: { debug: false } as const },
+      {
+        label: 'useDefaultValues',
+        extra: { useDefaultValues: false } as const,
+      },
+    ])('应该接受 $label 覆盖', ({ extra }) => {
+      const { container } = render(
+        <SchemaRenderer {...defaultProps} {...extra} />,
+      );
       expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
     });
   });

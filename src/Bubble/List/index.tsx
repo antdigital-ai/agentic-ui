@@ -3,10 +3,15 @@ export { PureBubbleList } from './PureBubbleList';
 
 import { MutableRefObject, useContext, useMemo, useRef } from 'react';
 
-import type { BubbleMetaData, BubbleProps, MessageBubbleData } from '../type';
+import type {
+  BubbleImperativeHandle,
+  BubbleMetaData,
+  BubbleProps,
+  MessageBubbleData,
+} from '../type';
 
 import { ConfigProvider } from 'antd';
-import cx from 'classnames';
+import clsx from 'clsx';
 import { nanoid } from 'nanoid';
 import React from 'react';
 import { LazyElement } from '../../MarkdownEditor/editor/components/LazyElement';
@@ -28,9 +33,9 @@ export type BubbleListProps = {
    */
   bubbleListRef?: MutableRefObject<HTMLDivElement | null>;
 
-  bubbleRef?: MutableRefObject<any | undefined>;
+  bubbleRef?: MutableRefObject<BubbleImperativeHandle | null | undefined>;
   /**
-   * @deprecated 请使用 isLoading 代替
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
    * @description 已废弃，将在未来版本移除
    */
   loading?: boolean;
@@ -55,6 +60,12 @@ export type BubbleListProps = {
    * 组件的样式
    */
   style?: React.CSSProperties;
+
+  /**
+   * extra（点赞、踩、复制等）是否仅在 hover 时展示
+   * @default false 默认常驻展示
+   */
+  extraShowOnHover?: boolean;
 
   /**
    * 用户元数据
@@ -195,14 +206,14 @@ export type BubbleListProps = {
   };
 
   /**
-   * @deprecated 请使用 onDislike 替代（符合命名规范）
+   * @deprecated @since 2.29.0 请使用 onDislike 替代（符合命名规范）
    */
   onDisLike?: BubbleProps['onDisLike'];
   /** 不喜欢回调 */
   onDislike?: BubbleProps['onDislike'];
   onLike?: BubbleProps['onLike'];
   /**
-   * @deprecated 请使用 onLikeCancel 替代（符合命名规范）
+   * @deprecated @since 2.29.0 请使用 onLikeCancel 替代（符合命名规范）
    */
   onCancelLike?: BubbleProps['onCancelLike'];
   /** Like 子组件取消事件 */
@@ -211,6 +222,17 @@ export type BubbleListProps = {
   onAvatarClick?: BubbleProps['onAvatarClick'];
   onDoubleClick?: BubbleProps['onDoubleClick'];
   markdownRenderConfig?: BubbleProps['markdownRenderConfig'];
+  /**
+   * 渲染模式快捷设置
+   * - 'slate': 使用 Slate 编辑器渲染（默认）
+   * - 'markdown': 使用轻量 MarkdownRenderer（无 Slate 实例，性能更优）
+   * 等效于 markdownRenderConfig={{ renderMode }}
+   */
+  renderMode?: 'slate' | 'markdown';
+  /**
+   * 与 `renderMode` 等价，兼容协议字段 `renderType=markdown`
+   */
+  renderType?: 'slate' | 'markdown';
   docListProps?: BubbleProps['docListProps'];
 
   /**
@@ -356,7 +378,9 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
     isLoading,
     styles,
     classNames,
-    markdownRenderConfig,
+    markdownRenderConfig: markdownRenderConfigProp,
+    renderMode,
+    renderType,
     userMeta,
     assistantMeta,
     bubbleList = [],
@@ -366,19 +390,49 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
     onTouchMove,
   } = props;
 
+  // 合并 renderMode / renderType 快捷属性到 markdownRenderConfig
+  const markdownRenderConfig = useMemo(() => {
+    const mode =
+      renderMode ??
+      renderType ??
+      markdownRenderConfigProp?.renderMode ??
+      markdownRenderConfigProp?.renderType;
+    return mode
+      ? { ...markdownRenderConfigProp, renderMode: mode }
+      : markdownRenderConfigProp;
+  }, [markdownRenderConfigProp, renderMode, renderType]);
+
   // 兼容旧属性
   const loading = isLoading ?? legacyLoading;
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
 
-  const { compact } = useContext(BubbleConfigContext) || {};
+  const parentContext = useContext(BubbleConfigContext);
+  const { compact } = parentContext || {};
+  const mergedContext = useMemo(
+    () =>
+      parentContext
+        ? {
+            ...parentContext,
+            extraShowOnHover:
+              props.extraShowOnHover ?? parentContext.extraShowOnHover,
+          }
+        : {
+            standalone: false,
+            extraShowOnHover: props.extraShowOnHover,
+          },
+    [parentContext, props.extraShowOnHover],
+  );
 
   const prefixClass = getPrefixCls('agentic-bubble-list');
   const { wrapSSR, hashId } = useStyle(prefixClass);
   const deps = useMemo(() => [props.style], [JSON.stringify(props.style)]);
 
   // 为 loading 项生成唯一的 key，使用 ref 缓存以确保稳定性
-  // 使用 item 的唯一标识（index + createAt）作为缓存 key
   const loadingKeysRef = useRef<Map<string, string>>(new Map());
+  // 记录每个 index 在上一轮是否是 loading，用于 loading→real 过渡时保持 key 稳定，避免闪动
+  const loadingKeyByIndexRef = useRef<Map<number, string>>(new Map());
+  // 真实 id 映射到稳定 key（过渡后沿用），避免同一条消息因 id 变化导致 remount
+  const realIdToStableKeyRef = useRef<Map<string, string>>(new Map());
 
   const bubbleListDom = useMemo(() => {
     const isLazyEnabled = props.lazy?.enable;
@@ -391,15 +445,26 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
       (item as any).isLatest = isLast;
       (item as any).isLast = isLast;
 
-      // 如果 id 是 LOADING_FLAT，使用 uuid 作为 key
-      // 使用 index 和 createAt 的组合作为缓存 key，确保同一项在重新渲染时保持相同的 key
-      let itemKey = item.id;
+      let itemKey: string;
       if (item.id === LOADING_FLAT) {
         const cacheKey = `${index}-${item.createAt || Date.now()}`;
         if (!loadingKeysRef.current.has(cacheKey)) {
           loadingKeysRef.current.set(cacheKey, nanoid());
         }
         itemKey = loadingKeysRef.current.get(cacheKey)!;
+        loadingKeyByIndexRef.current.set(index, itemKey);
+      } else {
+        const realId = item.id as string;
+        const prevLoadingKey = loadingKeyByIndexRef.current.get(index);
+        if (prevLoadingKey) {
+          itemKey = prevLoadingKey;
+          realIdToStableKeyRef.current.set(realId, prevLoadingKey);
+          loadingKeyByIndexRef.current.delete(index);
+        } else if (realIdToStableKeyRef.current.has(realId)) {
+          itemKey = realIdToStableKeyRef.current.get(realId)!;
+        } else {
+          itemKey = realId;
+        }
       }
 
       const bubbleElement = (
@@ -503,32 +568,41 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
 
   if (loading)
     return wrapSSR(
-      <div
-        className={cx(prefixClass, `${prefixClass}-loading`, className, hashId)}
-        ref={bubbleListRef}
-        style={{
-          padding: 24,
-        }}
-      >
-        <SkeletonList />
-      </div>,
+      <BubbleConfigContext.Provider value={mergedContext}>
+        <div
+          className={clsx(
+            prefixClass,
+            `${prefixClass}-loading`,
+            className,
+            hashId,
+          )}
+          ref={bubbleListRef}
+          style={{
+            padding: 24,
+          }}
+        >
+          <SkeletonList />
+        </div>
+      </BubbleConfigContext.Provider>,
     );
 
   return wrapSSR(
-    <div
-      className={cx(`${prefixClass}`, className, hashId, {
-        [`${prefixClass}-readonly`]: props.readonly,
-        [`${prefixClass}-compact`]: compact,
-      })}
-      data-chat-list={bubbleList.length}
-      style={style}
-      ref={bubbleListRef}
-      onScroll={onScroll}
-      onWheel={(e) => onWheel?.(e, bubbleListRef?.current || null)}
-      onTouchMove={(e) => onTouchMove?.(e, bubbleListRef?.current || null)}
-    >
-      {bubbleListDom}
-    </div>,
+    <BubbleConfigContext.Provider value={mergedContext}>
+      <div
+        className={clsx(`${prefixClass}`, className, hashId, {
+          [`${prefixClass}-readonly`]: props.readonly,
+          [`${prefixClass}-compact`]: compact,
+        })}
+        data-chat-list={bubbleList.length}
+        style={style}
+        ref={bubbleListRef}
+        onScroll={onScroll}
+        onWheel={(e) => onWheel?.(e, bubbleListRef?.current || null)}
+        onTouchMove={(e) => onTouchMove?.(e, bubbleListRef?.current || null)}
+      >
+        {bubbleListDom}
+      </div>
+    </BubbleConfigContext.Provider>,
   );
 };
 

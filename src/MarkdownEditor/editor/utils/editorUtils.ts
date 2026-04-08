@@ -431,18 +431,19 @@ export class EditorUtils {
    * @returns 返回指定范围内的文本内容。
    */
   static copyText(editor: Editor, start: Point, end?: Point) {
-    let leaf = Node.leaf(editor, start.path);
+    const [leaf, leafPath] = Editor.leaf(editor, start);
     let text = '';
 
     // Handle first leaf node from start offset
     text += leaf.text?.slice(start.offset) || '';
 
     // Get next nodes until we reach the end point
-    let next = Editor.next(editor, { at: start.path });
+    let next = Editor.next(editor, { at: leafPath });
+    const endLeafPath = end ? Editor.leaf(editor, end)[1] : null;
     while (next) {
-      if (end && Path.equals(next[1], end.path)) {
+      if (endLeafPath && Path.equals(next[1], endLeafPath)) {
         // If we reach the end path, slice until end offset
-        text += next[0].text?.slice(0, end.offset) || '';
+        text += next[0].text?.slice(0, end!.offset) || '';
         break;
       } else {
         // Add full text content of intermediate nodes
@@ -463,16 +464,17 @@ export class EditorUtils {
    * @returns 剪切的文本数组，每个元素为一个 CustomLeaf 对象。
    */
   static cutText(editor: Editor, start: Point, end?: Point) {
-    let leaf = Node.leaf(editor, start.path);
+    const [leaf, leafPath] = Editor.leaf(editor, start);
     let texts: CustomLeaf[] = [
       { ...leaf, text: leaf.text?.slice(start.offset) || '' },
     ];
-    let next = Editor.next(editor, { at: start.path });
+    const endLeafPath = end ? Editor.leaf(editor, end)[1] : null;
+    let next = Editor.next(editor, { at: leafPath });
     while (next) {
-      if (end && Path.equals(next[1], end.path)) {
+      if (endLeafPath && Path.equals(next[1], endLeafPath)) {
         texts.push({
           ...next[0],
-          text: next[0].text?.slice(0, end.offset) || '',
+          text: next[0].text?.slice(0, end!.offset) || '',
         });
         break;
       } else {

@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { I18nContext } from '../../src/I18n';
-import { CostMillis } from '../../src/ThoughtChainList/CostMillis';
+import { CostMillis, msToTimes } from '../../src/ThoughtChainList/CostMillis';
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <I18nContext.Provider value={{ locale: {} as any, language: 'zh-CN' }}>
@@ -124,6 +124,16 @@ describe('CostMillis', () => {
       // 检查组件是否正确渲染，包含时间文本
       // Ant Design Tooltip 在测试环境中可能不会立即渲染 tooltip DOM
       expect(screen.getByText('1.5s')).toBeInTheDocument();
+    });
+  });
+
+  describe('msToTimes 工具函数', () => {
+    it('应在 ms 为 undefined 时返回空串', () => {
+      expect(msToTimes(undefined, {} as any)).toBe('');
+    });
+
+    it('应在 ms 为 null 时返回空串', () => {
+      expect(msToTimes(null as any, {} as any)).toBe('');
     });
   });
 
