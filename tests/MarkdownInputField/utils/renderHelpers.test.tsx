@@ -58,7 +58,7 @@ vi.mock(
       );
     },
   }),
-}));
+);
 
 describe('renderHelpers', () => {
   describe('useAttachmentList', () => {
