@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -89,5 +89,76 @@ describe('MermaidRendererImpl', () => {
       container.querySelector('.plugin-mermaid-empty') ||
         container.querySelector('[class*="mermaid-empty"]'),
     ).toBeTruthy();
+  });
+
+  it('应忽略工具栏触发的滚轮缩放，仅在视口区域缩放', async () => {
+    const { container } = render(<MermaidRendererImpl element={defaultElement} />);
+    const viewport = container.querySelector('[data-mermaid-viewport="true"]');
+    const transformedContainer = container.querySelector('[data-mermaid-container="true"]');
+    const toolbarZoomIn = container.querySelector(
+      '[data-mermaid-toolbar] [data-mermaid-action="zoom-in"]',
+    );
+
+    expect(viewport).toBeInTheDocument();
+    expect(transformedContainer).toBeInTheDocument();
+    expect(toolbarZoomIn).toBeInTheDocument();
+    expect(transformedContainer?.style.getPropertyValue('--mermaid-scale')).toBe('1');
+
+    fireEvent.wheel(toolbarZoomIn as Element, {
+      deltaY: -100,
+      clientX: 20,
+      clientY: 20,
+    });
+    await waitFor(() => {
+      expect(transformedContainer?.style.getPropertyValue('--mermaid-scale')).toBe('1');
+    });
+
+    fireEvent.wheel(viewport as Element, {
+      deltaY: -100,
+      clientX: 20,
+      clientY: 20,
+    });
+    await waitFor(() => {
+      expect(transformedContainer?.style.getPropertyValue('--mermaid-scale')).toBe('1.2');
+    });
+  });
+
+  it('应忽略工具栏 pointerDown，且仅视口 pointerDown 开启拖拽态', async () => {
+    const { container } = render(<MermaidRendererImpl element={defaultElement} />);
+    const viewport = container.querySelector('[data-mermaid-viewport="true"]');
+    const toolbarFit = container.querySelector(
+      '[data-mermaid-toolbar] [data-mermaid-action="fit"]',
+    );
+
+    expect(viewport).toBeInTheDocument();
+    expect(toolbarFit).toBeInTheDocument();
+    expect(viewport).toHaveAttribute('data-mermaid-panning', 'false');
+
+    fireEvent.pointerDown(toolbarFit as Element, {
+      button: 0,
+      clientX: 8,
+      clientY: 8,
+      pointerId: 1,
+    });
+    await waitFor(() => {
+      expect(viewport).toHaveAttribute('data-mermaid-panning', 'false');
+    });
+
+    fireEvent.pointerDown(viewport as Element, {
+      button: 0,
+      clientX: 12,
+      clientY: 12,
+      pointerId: 2,
+    });
+    await waitFor(() => {
+      expect(viewport).toHaveAttribute('data-mermaid-panning', 'true');
+    });
+
+    fireEvent.pointerUp(viewport as Element, {
+      pointerId: 2,
+    });
+    await waitFor(() => {
+      expect(viewport).toHaveAttribute('data-mermaid-panning', 'false');
+    });
   });
 });
