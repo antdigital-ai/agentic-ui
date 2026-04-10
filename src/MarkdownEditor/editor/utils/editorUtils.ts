@@ -391,7 +391,7 @@ export class EditorUtils {
   ) {
     const nodesToInsert = insertNodes || [EditorUtils.p];
 
-    // 深克隆节点以避免引用问题
+    editor.selection = null;
     editor.children = JSON.parse(JSON.stringify(nodesToInsert));
 
     if (force) {
