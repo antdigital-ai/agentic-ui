@@ -123,42 +123,40 @@ describe('MermaidRendererImpl', () => {
     });
   });
 
-  it('应忽略工具栏 pointerDown，且仅视口 pointerDown 开启拖拽态', async () => {
+  it('应忽略工具栏 pointerDown，避免误触发拖拽会话', async () => {
     const { container } = render(<MermaidRendererImpl element={defaultElement} />);
     const viewport = container.querySelector('[data-mermaid-viewport="true"]');
+    const transformedContainer = container.querySelector('[data-mermaid-container="true"]');
     const toolbarFit = container.querySelector(
       '[data-mermaid-toolbar] [data-mermaid-action="fit"]',
     );
 
     expect(viewport).toBeInTheDocument();
+    expect(transformedContainer).toBeInTheDocument();
     expect(toolbarFit).toBeInTheDocument();
-    expect(viewport).toHaveAttribute('data-mermaid-panning', 'false');
+    expect(transformedContainer?.style.getPropertyValue('--mermaid-pan-x')).toBe('0px');
+    expect(transformedContainer?.style.getPropertyValue('--mermaid-pan-y')).toBe('0px');
 
     fireEvent.pointerDown(toolbarFit as Element, {
       button: 0,
       clientX: 8,
       clientY: 8,
       pointerId: 1,
+      pointerType: 'mouse',
+      isPrimary: true,
+      buttons: 1,
+    });
+    fireEvent.pointerMove(viewport as Element, {
+      clientX: 32,
+      clientY: 28,
+      pointerId: 1,
+      pointerType: 'mouse',
+      isPrimary: true,
+      buttons: 1,
     });
     await waitFor(() => {
-      expect(viewport).toHaveAttribute('data-mermaid-panning', 'false');
-    });
-
-    fireEvent.pointerDown(viewport as Element, {
-      button: 0,
-      clientX: 12,
-      clientY: 12,
-      pointerId: 2,
-    });
-    await waitFor(() => {
-      expect(viewport).toHaveAttribute('data-mermaid-panning', 'true');
-    });
-
-    fireEvent.pointerUp(viewport as Element, {
-      pointerId: 2,
-    });
-    await waitFor(() => {
-      expect(viewport).toHaveAttribute('data-mermaid-panning', 'false');
+      expect(transformedContainer?.style.getPropertyValue('--mermaid-pan-x')).toBe('0px');
+      expect(transformedContainer?.style.getPropertyValue('--mermaid-pan-y')).toBe('0px');
     });
   });
 });
