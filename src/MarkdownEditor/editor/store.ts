@@ -919,9 +919,19 @@ export class EditorStore {
    * @param nodeList - 要设置为编辑器内容的节点列表
    */
   setContent(nodeList: Node[]) {
+    const currentChildren = this._editor.current.children;
     this._editor.current.selection = null;
     this._editor.current.children = nodeList;
     this._editor.current.onChange();
+    const lastNode = currentChildren[currentChildren.length - 1];
+    if (lastNode && Text.isText(lastNode)) {
+      const text = Node.string(lastNode);
+      if (!text.endsWith('\n')) {
+        this._editor.current.insertText('\n', {
+          at: [currentChildren.length - 1],
+        });
+      }
+    }
   }
 
   /**
