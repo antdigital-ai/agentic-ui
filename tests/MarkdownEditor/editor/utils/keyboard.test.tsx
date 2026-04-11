@@ -1,13 +1,56 @@
 import '@testing-library/jest-dom';
 import isHotkey from 'is-hotkey';
+import { Editor, Range, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { KeyboardTask } from '../../../../src/MarkdownEditor/editor/utils/keyboard';
+import { EditorUtils } from '../../../../src/MarkdownEditor/editor/utils/editorUtils';
+
+vi.mock('slate', async () => {
+  const actual = await vi.importActual('slate') as any;
+  return {
+    ...actual,
+    Transforms: {
+      ...actual.Transforms,
+      select: vi.fn(),
+    },
+    Editor: {
+      ...actual.Editor,
+      start: vi.fn(() => ({ path: [0, 0], offset: 0 })),
+      end: vi.fn(() => ({ path: [0, 0], offset: 5 })),
+      leaf: vi.fn(() => [{ text: '' }, [0, 0]]),
+    },
+    Range: {
+      ...actual.Range,
+      isCollapsed: vi.fn(() => true),
+    },
+  };
+});
+
+vi.mock('../../../../src/MarkdownEditor/editor/utils/editorUtils', () => ({
+  EditorUtils: {
+    toggleFormat: vi.fn(),
+    clearMarks: vi.fn(),
+    p: { type: 'paragraph', children: [{ text: '' }] },
+  },
+}));
+
+vi.mock('../../../../src/MarkdownEditor/editor/utils/editorCommands', () => ({
+  convertToParagraph: vi.fn(),
+  createList: vi.fn(),
+  decreaseHeadingLevel: vi.fn(),
+  increaseHeadingLevel: vi.fn(),
+  insertCodeBlock: vi.fn(),
+  insertHorizontalLine: vi.fn(),
+  insertTable: vi.fn(),
+  setHeading: vi.fn(),
+  toggleQuote: vi.fn(),
+}));
 
 describe('keyboard utils', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  // 创建一个更完整的 KeyboardEvent 对象
   const createKeyboardEvent = (
     options: Partial<KeyboardEvent>,
   ): KeyboardEvent => {
@@ -454,6 +497,244 @@ describe('keyboard utils', () => {
       });
 
       expect(isHotkey('ctrl+shift+alt+a', event)).toBe(true);
+    });
+  });
+
+  describe('KeyboardTask', () => {
+    const createMockStore = (opts: { selection?: any; text?: string } = {}) => {
+      const {
+        selection = {
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 0 },
+        },
+        text = '',
+      } = opts;
+      const editor = {
+        selection,
+        children: [{ type: 'paragraph', children: [{ text }] }],
+        undo: vi.fn(),
+        redo: vi.fn(),
+        [Symbol.iterator]: function* () {
+          yield [{ type: 'paragraph', children: [{ text }] }, [0]];
+        },
+      } as any;
+
+      vi.mocked(Editor.leaf).mockReturnValue([{ text }, [0, 0]] as any);
+
+      return { editor, store: { editor } as any };
+    };
+
+    describe('selectWord', () => {
+      it('selects English word at cursor position', () => {
+        const { store, editor } = createMockStore({ text: 'hello world' });
+        editor.selection = {
+          anchor: { path: [0, 0], offset: 2 },
+          focus: { path: [0, 0], offset: 2 },
+        };
+        vi.mocked(Range.isCollapsed).mockReturnValue(true);
+        vi.mocked(Editor.leaf).mockReturnValue([{ text: 'hello world' }, [0, 0]] as any);
+
+        const task = new KeyboardTask(store, {});
+        task.selectWord();
+
+        expect(Transforms.select).toHaveBeenCalled();
+      });
+
+      it('selects Chinese characters at cursor position', () => {
+        const { store, editor } = createMockStore({ text: '你好世界test' });
+        editor.selection = {
+          anchor: { path: [0, 0], offset: 1 },
+          focus: { path: [0, 0], offset: 1 },
+        };
+        vi.mocked(Range.isCollapsed).mockReturnValue(true);
+        vi.mocked(Editor.leaf).mockReturnValue([{ text: '你好世界test' }, [0, 0]] as any);
+
+        const task = new KeyboardTask(store, {});
+        task.selectWord();
+
+        expect(Transforms.select).toHaveBeenCalled();
+      });
+
+      it('falls back to word match from pre text', () => {
+        const { store, editor } = createMockStore({ text: 'hello ' });
+        editor.selection = {
+          anchor: { path: [0, 0], offset: 6 },
+          focus: { path: [0, 0], offset: 6 },
+        };
+        vi.mocked(Range.isCollapsed).mockReturnValue(true);
+        vi.mocked(Editor.leaf).mockReturnValue([{ text: 'hello ' }, [0, 0]] as any);
+
+        const task = new KeyboardTask(store, {});
+        task.selectWord();
+
+        expect(Transforms.select).toHaveBeenCalled();
+      });
+
+      it('falls back to Chinese match from pre text when no word', () => {
+        const { store, editor } = createMockStore({ text: '你好 ' });
+        editor.selection = {
+          anchor: { path: [0, 0], offset: 3 },
+          focus: { path: [0, 0], offset: 3 },
+        };
+        vi.mocked(Range.isCollapsed).mockReturnValue(true);
+        vi.mocked(Editor.leaf).mockReturnValue([{ text: '你好 ' }, [0, 0]] as any);
+
+        const task = new KeyboardTask(store, {});
+        task.selectWord();
+
+        expect(Transforms.select).toHaveBeenCalled();
+      });
+
+      it('selects single character when nothing matches', () => {
+        const { store, editor } = createMockStore({ text: '.,!' });
+        editor.selection = {
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 0 },
+        };
+        vi.mocked(Range.isCollapsed).mockReturnValue(true);
+        vi.mocked(Editor.leaf).mockReturnValue([{ text: '.,!' }, [0, 0]] as any);
+
+        const task = new KeyboardTask(store, {});
+        task.selectWord();
+
+        expect(Transforms.select).toHaveBeenCalled();
+      });
+
+      it('does nothing when selection is not collapsed', () => {
+        const { store, editor } = createMockStore({ text: 'hello' });
+        editor.selection = {
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 5 },
+        };
+        vi.mocked(Range.isCollapsed).mockReturnValue(false);
+
+        const task = new KeyboardTask(store, {});
+        task.selectWord();
+
+        expect(Transforms.select).not.toHaveBeenCalled();
+      });
+
+      it('does nothing when no selection', () => {
+        const { store, editor } = createMockStore();
+        editor.selection = null;
+
+        const task = new KeyboardTask(store, {});
+        task.selectWord();
+
+        expect(Transforms.select).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('selectLine', () => {
+      it('does nothing when no selection', () => {
+        const { store, editor } = createMockStore();
+        editor.selection = null;
+
+        const task = new KeyboardTask(store, {});
+        task.selectLine();
+
+        expect(Transforms.select).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('selectFormatToCode', () => {
+      it('does nothing when no selection', () => {
+        const { store, editor } = createMockStore();
+        editor.selection = null;
+
+        const task = new KeyboardTask(store, {});
+        task.selectFormatToCode();
+
+        expect(EditorUtils.toggleFormat).not.toHaveBeenCalled();
+      });
+
+      it('toggles code format when selection exists', () => {
+        const { store, editor } = createMockStore();
+        editor.selection = {
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 3 },
+        };
+
+        const task = new KeyboardTask(store, {});
+        task.selectFormatToCode();
+
+        expect(EditorUtils.toggleFormat).toHaveBeenCalledWith(editor, 'code');
+      });
+    });
+
+    describe('head', () => {
+      it('calls paragraph when level is 4', () => {
+        const { store } = createMockStore();
+        const task = new KeyboardTask(store, {});
+        const spy = vi.spyOn(task, 'paragraph');
+        task.head(4);
+        expect(spy).toHaveBeenCalled();
+      });
+    });
+
+    describe('clear', () => {
+      it('does nothing when no selection', () => {
+        const { store, editor } = createMockStore();
+        editor.selection = null;
+
+        const task = new KeyboardTask(store, {});
+        task.clear();
+
+        expect(EditorUtils.clearMarks).not.toHaveBeenCalled();
+      });
+
+      it('clears marks when selection is collapsed', () => {
+        const { store, editor } = createMockStore();
+        editor.selection = {
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 0 },
+        };
+        vi.mocked(Range.isCollapsed).mockReturnValue(true);
+
+        const task = new KeyboardTask(store, {});
+        task.clear();
+
+        expect(EditorUtils.clearMarks).toHaveBeenCalledWith(editor, false);
+      });
+    });
+
+    describe('undo/redo', () => {
+      it('undo calls editor.undo', () => {
+        const { store, editor } = createMockStore();
+        const task = new KeyboardTask(store, {});
+        task.undo();
+        expect(editor.undo).toHaveBeenCalled();
+      });
+
+      it('redo calls editor.redo', () => {
+        const { store, editor } = createMockStore();
+        const task = new KeyboardTask(store, {});
+        task.redo();
+        expect(editor.redo).toHaveBeenCalled();
+      });
+
+      it('undo catches errors', () => {
+        const { store, editor } = createMockStore();
+        editor.undo.mockImplementation(() => { throw new Error('fail'); });
+        const task = new KeyboardTask(store, {});
+        expect(() => task.undo()).not.toThrow();
+      });
+
+      it('redo catches errors', () => {
+        const { store, editor } = createMockStore();
+        editor.redo.mockImplementation(() => { throw new Error('fail'); });
+        const task = new KeyboardTask(store, {});
+        expect(() => task.redo()).not.toThrow();
+      });
+    });
+
+    describe('format', () => {
+      it('toggles the given format', () => {
+        const { store } = createMockStore();
+        const task = new KeyboardTask(store, {});
+        task.format('bold');
+        expect(EditorUtils.toggleFormat).toHaveBeenCalledWith(expect.anything(), 'bold');
+      });
     });
   });
 });
