@@ -731,4 +731,235 @@ describe('useStreaming', () => {
       expect(result.current).toBe('...');
     });
   });
+
+  it('table header not starting with pipe is not a table', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: 'not a table',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('not a table');
+    });
+  });
+
+  it('table with separator not matching header col count commits', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| A | B |\n| --- |\n| data |',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toContain('| A | B |');
+    });
+  });
+
+  it('table with invalid separator cells commits', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| A |\n| abc |\n| data |',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toContain('| A |');
+    });
+  });
+
+  it('table with third row not starting with pipe commits', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| A |\n| --- |\nnot a table row',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toContain('| A |');
+    });
+  });
+
+  it('table with empty third row stays pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| A |\n| --- |\n',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('table with double newline commits immediately', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| A |\n\n| B |',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toContain('| A |');
+    });
+  });
+
+  it('list with inline code commits list prefix', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '- `incomplete code',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toContain('- ');
+    });
+  });
+
+  it('parsePipeRowCells returns null for line not ending with pipe', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| incomplete',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('table with header row having empty cells parsed', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '|||\n| --- | --- |\n| a | b |',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toContain('||');
+    });
+  });
+
+  it('non-prefix reset when input changes non-monotonically', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: 'hello world',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('hello world');
+    });
+
+    rerender({
+      input: 'different content',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toBe('different content');
+    });
+  });
+
+  it('code block with 4 backticks', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '````\ncode here',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+
+    rerender({
+      input: '````\ncode here\n````\nafter code',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toContain('````');
+    });
+  });
+
+  it('handles empty input resetting cache', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: 'some text',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('some text');
+    });
+
+    rerender({
+      input: '',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toBe('');
+    });
+  });
 });
