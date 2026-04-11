@@ -457,6 +457,38 @@ describe('Editor branches - handleSelectionChange', () => {
     window.getSelection = origGetSelection;
   });
 
+  it('readonly: stale selection path should skip toDOMRange and clear domRect', async () => {
+    const setDomRect = vi.fn();
+    setupStore({ readonly: true, setDomRect });
+
+    const staleSelection = {
+      anchor: { path: [99, 0], offset: 0 },
+      focus: { path: [99, 0], offset: 1 },
+    };
+    vi.mocked(getSelectionFromDomSelection).mockReturnValue(
+      staleSelection as any,
+    );
+    vi.mocked(Range.isCollapsed).mockReturnValue(false);
+    vi.mocked(Editor.hasPath).mockReturnValue(false);
+
+    const origGetSelection = window.getSelection;
+    window.getSelection = vi.fn(
+      () =>
+        ({
+          anchorNode: document.createElement('div'),
+          focusNode: document.createElement('div'),
+          rangeCount: 1,
+        }) as any,
+    );
+
+    renderEditor({ reportMode: true });
+    await editableProps.onSelect({});
+
+    expect(ReactEditor.toDOMRange).not.toHaveBeenCalled();
+    expect(setDomRect).toHaveBeenCalledWith(null);
+    window.getSelection = origGetSelection;
+  });
+
   it('readonly: collapsed selection sets domRect to null', async () => {
     const setDomRect = vi.fn();
     setupStore({ readonly: true, setDomRect });
