@@ -24,6 +24,7 @@ vi.mock('slate', async () => {
       normalizeNode: vi.fn(),
       onChange: vi.fn(),
       hasPath: vi.fn(() => true),
+      withoutNormalizing: vi.fn((fn: () => void) => fn()),
     })),
     Transforms: {
       insertNodes: vi.fn((editor, nodes, options) => {
@@ -78,6 +79,10 @@ vi.mock('slate-react', () => ({
 vi.mock('slate-history', () => ({
   ...vi.importActual('slate-history'),
   withHistory: vi.fn((editor) => editor),
+  HistoryEditor: {
+    isHistoryEditor: vi.fn(() => false),
+    withoutSaving: vi.fn((_editor: any, fn: () => void) => fn()),
+  },
 }));
 
 describe('EditorStore', () => {
@@ -292,20 +297,12 @@ describe('EditorStore', () => {
   });
 
   describe('setContent', () => {
-    it('当旧内容最后一项为无尾换行的文本节点时追加 insertText(\\n)', () => {
-      editor.children = [
-        { type: 'paragraph', children: [{ text: 'a' }] },
-        { text: 'x' },
+    it('应通过 Transforms API 安全替换编辑器内容', () => {
+      const newContent = [
+        { type: 'paragraph', children: [{ text: 'b' }] },
       ];
-      editor.insertText = vi.fn();
-      vi.mocked(Text.isText).mockImplementation((n: any) => !!n?.text);
-      vi.mocked(Node.string).mockImplementation(
-        (n: any) => (n?.text ?? '') as string,
-      );
-      store.setContent([{ type: 'paragraph', children: [{ text: 'b' }] }]);
-      expect(editor.insertText).toHaveBeenCalledWith('\n', {
-        at: [1],
-      });
+      store.setContent(newContent);
+      expect(Editor.withoutNormalizing).toHaveBeenCalled();
     });
   });
 

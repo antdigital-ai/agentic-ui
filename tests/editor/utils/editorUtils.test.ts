@@ -1,4 +1,5 @@
 import { createEditor, Editor, Point, Range, Transforms } from 'slate';
+import { withHistory } from 'slate-history';
 import { ReactEditor } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -454,14 +455,22 @@ describe('EditorUtils', () => {
     });
 
     it('should reset editor with force history', () => {
-      EditorUtils.reset(editor, undefined, true);
-      expect(editor.history).toBeDefined();
+      const historyEditor = withHistory(createEditor());
+      historyEditor.children = [
+        { type: 'paragraph', children: [{ text: 'test' }] },
+      ];
+      EditorUtils.reset(historyEditor, undefined, true);
+      expect(historyEditor.history).toEqual({ redos: [], undos: [] });
     });
 
     it('should reset editor with History object', () => {
+      const historyEditor = withHistory(createEditor());
+      historyEditor.children = [
+        { type: 'paragraph', children: [{ text: 'test' }] },
+      ];
       const history = { undos: [[]], redos: [[]] };
-      EditorUtils.reset(editor, undefined, history as any);
-      expect(editor.history).toBe(history);
+      EditorUtils.reset(historyEditor, undefined, history as any);
+      expect(historyEditor.history).toBe(history);
     });
   });
 

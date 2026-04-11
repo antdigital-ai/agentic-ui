@@ -44,6 +44,7 @@ describe('enter.ts 分支覆盖', () => {
       selection: null,
       children: [],
       insertBreak: vi.fn(),
+      withoutNormalizing: vi.fn((fn: () => void) => fn()),
     };
     mockStore = { editor: mockEditor, inputComposition: false };
     mockBackspace = { range: vi.fn() };
@@ -275,7 +276,7 @@ describe('enter.ts 分支覆盖', () => {
   });
 
   describe('paragraph — list-item isMod 路径，hasPath false', () => {
-    it('next path 不存在时仍然调用 select', () => {
+    it('next path 不存在时不应调用 select', () => {
       const e = makeEvent({ ctrlKey: true });
       const node = [
         { type: 'paragraph', children: [{ text: 'item' }] },
@@ -291,7 +292,6 @@ describe('enter.ts 分支覆盖', () => {
         [0],
       ] as any);
       vi.spyOn(Editor, 'end').mockReturnValue({ path: [0, 0, 0], offset: 4 });
-      // Point.equals 全部返回 false：
       vi.spyOn(Point, 'equals').mockReturnValue(false);
       vi.spyOn(Path, 'hasPrevious').mockReturnValue(true);
       vi.spyOn(Path, 'next').mockReturnValue([0, 1]);
@@ -312,7 +312,7 @@ describe('enter.ts 分支覆盖', () => {
       const result = (enterKey as any).paragraph(e, node, sel);
 
       expect(insertSpy).toHaveBeenCalled();
-      expect(selectSpy).toHaveBeenCalled();
+      expect(selectSpy).not.toHaveBeenCalled();
       expect(e.preventDefault).toHaveBeenCalled();
       expect(result).toBe(true);
     });
@@ -338,6 +338,7 @@ describe('enter.ts 分支覆盖', () => {
       vi.spyOn(Point, 'equals').mockReturnValue(false);
       vi.spyOn(Path, 'hasPrevious').mockReturnValue(false);
       vi.spyOn(Path, 'next').mockReturnValue([1]);
+      vi.spyOn(Editor, 'hasPath').mockReturnValue(true);
       vi.spyOn(Editor, 'start').mockReturnValue({
         path: [1, 0, 0],
         offset: 0,
