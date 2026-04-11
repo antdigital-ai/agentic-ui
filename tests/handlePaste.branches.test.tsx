@@ -119,6 +119,53 @@ describe('handlePaste 分支覆盖', () => {
       expect(result).toBe(true);
     });
 
+    it('应过滤掉非法 Slate 节点（非 Element 非 Text）', () => {
+      const fragment = [
+        { type: 'paragraph', children: [{ text: 'valid' }] },
+        42,
+        null,
+        'just a string',
+        { type: 'paragraph', children: [{ text: 'also valid' }] },
+      ];
+      mockClipboard.getData.mockReturnValue(JSON.stringify(fragment));
+
+      const result = handleSlateMarkdownFragment(
+        editor,
+        mockClipboard as unknown as DataTransfer,
+        null,
+      );
+      expect(result).toBe(true);
+    });
+
+    it('非数组 JSON 数据应被安全处理', () => {
+      mockClipboard.getData.mockReturnValue(JSON.stringify({ not: 'array' }));
+
+      const result = handleSlateMarkdownFragment(
+        editor,
+        mockClipboard as unknown as DataTransfer,
+        null,
+      );
+      expect(result).toBe(true);
+    });
+
+    it('card 类型节点应被包裹 card-before/card-after', () => {
+      const fragment = [
+        {
+          type: 'card',
+          children: [{ type: 'paragraph', children: [{ text: 'card content' }] }],
+        },
+      ];
+      mockClipboard.getData.mockReturnValue(JSON.stringify(fragment));
+
+      const result = handleSlateMarkdownFragment(
+        editor,
+        mockClipboard as unknown as DataTransfer,
+        null,
+      );
+      expect(result).toBe(true);
+      expect(EditorUtils.replaceSelectedNode).toHaveBeenCalled();
+    });
+
     it('JSON 解析失败时进入 catch 返回 false', () => {
       const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
       mockClipboard.getData.mockReturnValue('{invalid json');

@@ -13,10 +13,6 @@ import {
 } from '../../../src/MarkdownInputField/utils/renderHelpers';
 
 const mockFile = new File(['content'], 'test.png', { type: 'image/png' });
-const mockAttachmentFile = new File(['attachment'], 'report.pdf', {
-  type: 'application/pdf',
-});
-let capturedAttachmentListProps: any = null;
 const capturedProps = vi.hoisted(() => ({
   attachmentListProps: undefined as any,
 }));
@@ -41,33 +37,6 @@ vi.mock(
   '../../../src/MarkdownInputField/AttachmentButton/AttachmentFileList',
   () => ({
     AttachmentFileList: (props: any) => {
-      capturedAttachmentListProps = props;
-      return (
-        <div data-testid="attachment-file-list-mock">
-          <button
-            data-testid="trigger-preview"
-            type="button"
-            onClick={() => props.onPreview?.(mockAttachmentFile)}
-          >
-            Trigger preview
-          </button>
-          <button
-            data-testid="trigger-clear"
-            type="button"
-            onClick={() => props.onClearFileMap?.()}
-          >
-            Trigger clear
-          </button>
-        </div>
-      );
-    },
-  }),
-);
-
-vi.mock(
-  '../../../src/MarkdownInputField/AttachmentButton/AttachmentFileList',
-  () => ({
-    AttachmentFileList: (props: any) => {
       capturedProps.attachmentListProps = props;
       return <div data-testid="attachment-file-list-mock" />;
     },
@@ -75,71 +44,6 @@ vi.mock(
 );
 
 describe('renderHelpers', () => {
-  describe('useAttachmentList', () => {
-    it('当 attachment.onPreview 存在时应透传到 AttachmentFileList 并可触发', () => {
-      const onPreview = vi.fn().mockResolvedValue(undefined);
-
-      function TestHostWithPreview() {
-        const [fileMap] = useState(new Map());
-        const node = useAttachmentList({
-          attachment: {
-            enable: true,
-            onPreview,
-          } as any,
-          fileMap,
-          handleFileRemoval: vi.fn(),
-          handleFileRetry: vi.fn(),
-          updateAttachmentFiles: vi.fn(),
-        });
-        return node;
-      }
-
-      render(<TestHostWithPreview />);
-      fireEvent.click(screen.getByTestId('trigger-preview'));
-
-      expect(onPreview).toHaveBeenCalledWith(mockAttachmentFile);
-    });
-
-    it('当 attachment.onPreview 不存在时，不应传递 onPreview 给 AttachmentFileList', () => {
-      function TestHostWithoutPreview() {
-        const [fileMap] = useState(new Map());
-        const node = useAttachmentList({
-          attachment: {
-            enable: true,
-          } as any,
-          fileMap,
-          handleFileRemoval: vi.fn(),
-          handleFileRetry: vi.fn(),
-          updateAttachmentFiles: vi.fn(),
-        });
-        return node;
-      }
-
-      render(<TestHostWithoutPreview />);
-      expect(screen.getByTestId('attachment-file-list-mock')).toBeInTheDocument();
-      expect(capturedAttachmentListProps?.onPreview).toBeUndefined();
-    });
-
-    it('触发清空附件时应调用 updateAttachmentFiles(undefined)', () => {
-      const updateAttachmentFiles = vi.fn();
-
-      function TestHostWithClear() {
-        const [fileMap] = useState(new Map());
-        const node = useAttachmentList({
-          attachment: {
-            enable: true,
-          } as any,
-          fileMap,
-          handleFileRemoval: vi.fn(),
-          handleFileRetry: vi.fn(),
-          updateAttachmentFiles,
-        });
-        return node;
-      }
-
-      render(<TestHostWithClear />);
-      fireEvent.click(screen.getByTestId('trigger-clear'));
-
   beforeEach(() => {
     capturedProps.attachmentListProps = undefined;
   });

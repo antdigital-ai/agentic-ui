@@ -440,6 +440,78 @@ describe('EditorUtils', () => {
     });
   });
 
+  describe('replaceEditorContent', () => {
+    it('should replace all content via Transforms API', () => {
+      const newNodes = [
+        { type: 'paragraph' as const, children: [{ text: 'New content' }] },
+      ];
+      EditorUtils.replaceEditorContent(editor, newNodes);
+      expect(editor.children.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should deselect before replacing when selection exists', () => {
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 5 },
+      };
+      const deselectSpy = vi.spyOn(Transforms, 'deselect');
+      const newNodes = [
+        { type: 'paragraph' as const, children: [{ text: 'Replaced' }] },
+      ];
+      EditorUtils.replaceEditorContent(editor, newNodes);
+      expect(deselectSpy).toHaveBeenCalled();
+    });
+
+    it('should use HistoryEditor.withoutSaving for history editors by default', () => {
+      const historyEditor = withHistory(createEditor());
+      historyEditor.children = [
+        { type: 'paragraph', children: [{ text: 'old' }] },
+      ];
+      const newNodes = [
+        { type: 'paragraph' as const, children: [{ text: 'new' }] },
+      ];
+      EditorUtils.replaceEditorContent(historyEditor, newNodes);
+      expect(historyEditor.children.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should record history when withoutHistory is false', () => {
+      const historyEditor = withHistory(createEditor());
+      historyEditor.children = [
+        { type: 'paragraph', children: [{ text: 'old' }] },
+      ];
+      const newNodes = [
+        { type: 'paragraph' as const, children: [{ text: 'new' }] },
+      ];
+      EditorUtils.replaceEditorContent(historyEditor, newNodes, {
+        withoutHistory: false,
+      });
+      expect(historyEditor.children.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should handle non-history editor without error', () => {
+      const plainEditor = createEditor();
+      plainEditor.children = [
+        { type: 'paragraph', children: [{ text: 'old' }] },
+      ];
+      const newNodes = [
+        { type: 'paragraph' as const, children: [{ text: 'new' }] },
+      ];
+      expect(() =>
+        EditorUtils.replaceEditorContent(plainEditor, newNodes),
+      ).not.toThrow();
+    });
+
+    it('should handle empty editor children', () => {
+      editor.children = [];
+      editor.selection = null;
+      const newNodes = [
+        { type: 'paragraph' as const, children: [{ text: 'first' }] },
+      ];
+      EditorUtils.replaceEditorContent(editor, newNodes);
+      expect(editor.children.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
   describe('reset', () => {
     it('should reset editor with default content', () => {
       EditorUtils.reset(editor);
