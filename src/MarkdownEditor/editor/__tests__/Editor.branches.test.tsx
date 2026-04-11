@@ -648,7 +648,7 @@ describe('Editor branches - handleClipboardCopy', () => {
     };
     vi.mocked(isEventHandled).mockReturnValue(false);
     vi.mocked(hasEditableTarget).mockReturnValue(true);
-    vi.mocked(Editor.hasPath).mockReturnValue(false);
+    vi.mocked(Editor.hasPath).mockReturnValueOnce(false);
 
     renderEditor({});
 
