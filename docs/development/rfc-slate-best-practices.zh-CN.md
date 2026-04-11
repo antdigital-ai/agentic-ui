@@ -1,6 +1,6 @@
 # RFC: Slate.js 规范化使用改进
 
-> 状态：草案  
+> 状态：已实施  
 > 作者：Cursor Agent  
 > 日期：2026-04-10  
 > 影响范围：`src/MarkdownEditor/`、`src/Plugins/`、`src/MarkdownInputField/`
