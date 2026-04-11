@@ -500,9 +500,9 @@ export const useSystemKeyboard = (
         try {
           copy(url);
         } catch (error) {}
-        if (isHotkey('mod+x', e)) {
-          Transforms.delete(store?.editor, { at: node[1] });
-          ReactEditor.focus(store?.editor);
+        if (isHotkey('mod+x', e) && store?.editor) {
+          Transforms.delete(store.editor, { at: node[1] });
+          ReactEditor.focus(store.editor);
         }
       }
       if (node?.[0]?.type === 'attach') {
@@ -511,9 +511,9 @@ export const useSystemKeyboard = (
           copy(url);
         } catch (error) {}
 
-        if (isHotkey('mod+x', e)) {
-          Transforms.delete(store?.editor, { at: node[1] });
-          ReactEditor.focus(store?.editor);
+        if (isHotkey('mod+x', e) && store?.editor) {
+          Transforms.delete(store.editor, { at: node[1] });
+          ReactEditor.focus(store.editor);
         }
       }
     }
@@ -522,10 +522,12 @@ export const useSystemKeyboard = (
       const [node] = task.curNodes;
       if (node?.[0].type === 'media') {
         e.preventDefault();
-        Transforms.removeNodes(task.editor, { at: node[1] });
-        Transforms.insertNodes(task.editor, EditorUtils.p, {
-          at: node[1],
-          select: true,
+        Editor.withoutNormalizing(task.editor, () => {
+          Transforms.removeNodes(task.editor, { at: node[1] });
+          Transforms.insertNodes(task.editor, EditorUtils.p, {
+            at: node[1],
+            select: true,
+          });
         });
         ReactEditor.focus(task.editor);
       }

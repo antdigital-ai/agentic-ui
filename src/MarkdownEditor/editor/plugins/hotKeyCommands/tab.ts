@@ -86,14 +86,22 @@ export class TabKey {
         });
         if (node) {
           const [start, end] = Range.edges(sel);
-          const anchor = start.path.join(',').startsWith(node[1].join(','))
+          const isStartInNode =
+            Path.isDescendant(start.path, node[1]) ||
+            Path.equals(start.path, node[1]);
+          const isEndInNode =
+            Path.isDescendant(end.path, node[1]) ||
+            Path.equals(end.path, node[1]);
+          const anchor = isStartInNode
             ? start
             : Editor.start(this.editor, node[1]);
-          const focus = end.path.join(',').startsWith(node[1].join(','))
+          const focus = isEndInNode
             ? end
             : Editor.end(this.editor, node[1]);
-          Transforms.liftNodes(this.editor, { at: { anchor, focus } });
-          Transforms.liftNodes(this.editor);
+          Editor.withoutNormalizing(this.editor, () => {
+            Transforms.liftNodes(this.editor, { at: { anchor, focus } });
+            Transforms.liftNodes(this.editor);
+          });
         } else {
           Transforms.liftNodes(this.editor);
         }
@@ -210,34 +218,31 @@ export class TabKey {
         return true;
       }
     } else {
-      // 如果最后一个子节点不是列表，需要创建一个新的列表
       const listType = getListType();
       const currentListItem = Node.get(this.editor, listItemPath);
 
-      // 先创建新的列表，包含当前 list-item
       const newList = {
         type: listType,
         children: [currentListItem],
       };
 
-      // 将当前项移动到新列表中
-      Transforms.removeNodes(this.editor, { at: listItemPath });
-      Transforms.insertNodes(this.editor, newList, {
-        at: [...previousListItemPath, previousListItem.children.length],
+      Editor.withoutNormalizing(this.editor, () => {
+        Transforms.removeNodes(this.editor, { at: listItemPath });
+        Transforms.insertNodes(this.editor, newList, {
+          at: [...previousListItemPath, previousListItem.children.length],
+        });
+
+        const newListPath = [
+          ...previousListItemPath,
+          previousListItem.children.length,
+        ];
+        const newListItemPath = [...newListPath, 0];
+
+        Transforms.select(
+          this.editor,
+          Editor.start(this.editor, newListItemPath),
+        );
       });
-
-      // 更新路径，因为节点已移动
-      const newListPath = [
-        ...previousListItemPath,
-        previousListItem.children.length,
-      ];
-      const newListItemPath = [...newListPath, 0];
-
-      // 选中新位置
-      Transforms.select(
-        this.editor,
-        Editor.start(this.editor, newListItemPath),
-      );
       return true;
     }
 
@@ -266,14 +271,14 @@ export class TabKey {
         return false;
       }
 
-      // 使用 liftNodes 提升当前 list-item
-      Transforms.liftNodes(this.editor, { at: listItemPath });
+      Editor.withoutNormalizing(this.editor, () => {
+        Transforms.liftNodes(this.editor, { at: listItemPath });
 
-      // 如果提升后，原列表为空，需要删除空列表
-      const updatedList = Node.get(this.editor, listPath);
-      if (isListType(updatedList) && Node.string(updatedList).trim() === '') {
-        Transforms.removeNodes(this.editor, { at: listPath });
-      }
+        const updatedList = Node.get(this.editor, listPath);
+        if (isListType(updatedList) && Node.string(updatedList).trim() === '') {
+          Transforms.removeNodes(this.editor, { at: listPath });
+        }
+      });
 
       return true;
     } else {

@@ -355,14 +355,9 @@ export class EditorStore {
    * Clears all content from the editor, replacing it with an empty paragraph.
    */
   clearContent() {
-    this._editor.current.selection = null;
-    this._editor.current.children = [
-      {
-        type: 'paragraph',
-        children: [{ text: '' }],
-      },
-    ];
-    this._editor.current.onChange();
+    EditorUtils.replaceEditorContent(this._editor.current, [
+      { type: 'paragraph', children: [{ text: '' }] },
+    ]);
   }
 
   /**
@@ -601,9 +596,10 @@ export class EditorStore {
 
                 if (schema.length > 0) {
                   if (isFirstBatch) {
-                    this._editor.current.selection = null;
-                    this._editor.current.children = schema;
-                    this._editor.current.onChange();
+                    EditorUtils.replaceEditorContent(
+                      this._editor.current,
+                      schema,
+                    );
                     isFirstBatch = false;
                   } else {
                     // 后续批次：追加节点
@@ -909,8 +905,10 @@ export class EditorStore {
    * @private
    */
   private _replaceNodeAt(path: Path, newNode: Node): void {
-    Transforms.removeNodes(this._editor.current, { at: path });
-    Transforms.insertNodes(this._editor.current, newNode, { at: path });
+    Editor.withoutNormalizing(this._editor.current, () => {
+      Transforms.removeNodes(this._editor.current, { at: path });
+      Transforms.insertNodes(this._editor.current, newNode, { at: path });
+    });
   }
 
   /**
@@ -919,19 +917,7 @@ export class EditorStore {
    * @param nodeList - 要设置为编辑器内容的节点列表
    */
   setContent(nodeList: Node[]) {
-    const currentChildren = this._editor.current.children;
-    this._editor.current.selection = null;
-    this._editor.current.children = nodeList;
-    this._editor.current.onChange();
-    const lastNode = currentChildren[currentChildren.length - 1];
-    if (lastNode && Text.isText(lastNode)) {
-      const text = Node.string(lastNode);
-      if (!text.endsWith('\n')) {
-        this._editor.current.insertText('\n', {
-          at: [currentChildren.length - 1],
-        });
-      }
-    }
+    EditorUtils.replaceEditorContent(this._editor.current, nodeList);
   }
 
   /**
@@ -973,9 +959,7 @@ export class EditorStore {
       }
     } catch (error) {
       console.error('Failed to update nodes with optimized method:', error);
-      this._editor.current.selection = null;
-      this._editor.current.children = nodeList;
-      this._editor.current.onChange();
+      EditorUtils.replaceEditorContent(this._editor.current, nodeList);
     }
   }
 
