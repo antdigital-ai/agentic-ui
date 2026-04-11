@@ -111,4 +111,624 @@ describe('useStreaming', () => {
       expect(result.current).toBe('| Name |\n| --- |\n| Alice |');
     });
   });
+
+  it('disabled 时应直接透传 input', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '[incomplete',
+          enabled: false,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('[incomplete');
+    });
+  });
+
+  it('非 string 输入时应输出空字符串', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: 123 as any,
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('');
+    });
+  });
+
+  it('空字符串输入时应输出空字符串', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('');
+    });
+  });
+
+  it('image token 未闭合时应缓存', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '![alt text',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('image token 闭合后应提交', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '![alt',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+
+    rerender({
+      input: '![alt](img.png)',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toBe('![alt](img.png)');
+    });
+  });
+
+  it('HTML token 未闭合时应缓存', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '<div class="test"',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('HTML token 闭合后应提交', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '<div',
+          enabled: true,
+        },
+      },
+    );
+
+    rerender({
+      input: '<div>hello</div>',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toBe('<div>hello</div>');
+    });
+  });
+
+  it('emphasis token 未闭合时应缓存', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '*bold text',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('emphasis token 闭合后应提交', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '*bold',
+          enabled: true,
+        },
+      },
+    );
+
+    rerender({
+      input: '*bold*',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toBe('*bold*');
+    });
+  });
+
+  it('inline-code token 未闭合时应缓存', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '`code',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('inline-code token 闭合后应提交', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '`code',
+          enabled: true,
+        },
+      },
+    );
+
+    rerender({
+      input: '`code`',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toBe('`code`');
+    });
+  });
+
+  it('code block (fenced) 闭合后加新内容应提交', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '```js\nconst x = 1;\n```',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+
+    rerender({
+      input: '```js\nconst x = 1;\n```\nafter',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toBe('```js\nconst x = 1;\n```\nafter');
+    });
+  });
+
+  it('code block 打开但未关闭时应缓存', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '```\nsome code',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('list token 加 inline-code 应切换并提交 list 前缀', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '- `code',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('- ');
+    });
+  });
+
+  it('cache prefix mismatch should reset cache', async () => {
+    const { result, rerender } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: 'hello',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('hello');
+    });
+
+    rerender({
+      input: 'completely different',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toBe('completely different');
+    });
+  });
+
+  it('table with header-only followed by non-table row should commit', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| Name |\n| --- |\nsome text',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('| Name |\n| --- |\nsome text');
+    });
+  });
+
+  it('table header line only (1 line) should stay pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| Name |',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('table with double newline should commit', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| Name |\n\nsome text',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('| Name |\n\nsome text');
+    });
+  });
+
+  it('table with 2 lines (header + separator) should stay pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| A |\n| --- |',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('tilde fenced code block commits chars before fence detection', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '~~~\ncode',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('~~');
+    });
+  });
+
+  it('underscore emphasis should be recognized', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '_italic text',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('multiple backtick inline-code should be recognized', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '``',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('closing HTML tag should be recognized', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '</',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('table with less than 3 lines should stay pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| A |\n| --- |',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('plain text without special tokens should commit directly', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: 'hello world',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('hello world');
+    });
+  });
+
+  it('link with bracket only phase should stay pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '[text',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('image with partial paren should remain pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '![alt](partial',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('footnote link starting with [^ should not be treated as link', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '[^1]',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('[^1]');
+    });
+  });
+
+  it('list item with just marker should stay pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '- ',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('table first data row not starting with pipe should commit', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| H |\n| --- |\nplain text',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('| H |\n| --- |\nplain text');
+    });
+  });
+
+  it('pipe-only cell without closing pipe should remain pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| single',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('table data row with insufficient pipe count should remain pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| A | B |\n| --- | --- |\n| da',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('table data row not ending with pipe should remain pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| A |\n| --- |\n| data',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
+
+  it('table with mismatched data columns should remain pending', async () => {
+    const { result } = renderHook(
+      ({ input, enabled }: UseStreamingHookProps) =>
+        useStreaming(input, enabled),
+      {
+        initialProps: {
+          input: '| A | B |\n| --- | --- |\n| only one |',
+          enabled: true,
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe('...');
+    });
+  });
 });

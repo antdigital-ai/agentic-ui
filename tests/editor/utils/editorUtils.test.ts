@@ -896,6 +896,230 @@ describe('EditorUtils', () => {
       expect((result as any).customProp).toBe('value');
     });
   });
+  describe('setAlignment', () => {
+    it('should not set alignment without selection', () => {
+      editor.selection = null;
+      const setNodesSpy = vi.spyOn(Transforms, 'setNodes');
+      EditorUtils.setAlignment(editor, 'center');
+      expect(setNodesSpy).not.toHaveBeenCalled();
+      setNodesSpy.mockRestore();
+    });
+  });
+
+  describe('highColor', () => {
+    it('should not set highColor without selection', () => {
+      editor.selection = null;
+      const setNodesSpy = vi.spyOn(Transforms, 'setNodes');
+      EditorUtils.highColor(editor, 'red');
+      expect(setNodesSpy).not.toHaveBeenCalled();
+      setNodesSpy.mockRestore();
+    });
+  });
+
+  describe('isDirtLeaf extended', () => {
+    it('should detect code leaf', () => {
+      expect(EditorUtils.isDirtLeaf({ text: 'test', code: true } as any)).toBe(true);
+    });
+
+    it('should detect strikethrough leaf', () => {
+      expect(
+        EditorUtils.isDirtLeaf({ text: 'test', strikethrough: true } as any),
+      ).toBe(true);
+    });
+  });
+
+  describe('listToParagraph extended', () => {
+    it('should handle list with no children property', () => {
+      const listNode = { type: 'bulleted-list' as const } as any;
+      const result = EditorUtils.listToParagraph(editor, listNode);
+      expect(result).toEqual([]);
+    });
+
+    it('should handle nested bulleted-list', () => {
+      const listNode = {
+        type: 'bulleted-list' as const,
+        children: [
+          {
+            type: 'list-item' as const,
+            children: [
+              {
+                type: 'bulleted-list' as const,
+                children: [
+                  {
+                    type: 'list-item' as const,
+                    children: [
+                      {
+                        type: 'paragraph' as const,
+                        children: [{ text: 'Nested' }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      const result = EditorUtils.listToParagraph(editor, listNode as any);
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it('should handle nested numbered-list', () => {
+      const listNode = {
+        type: 'bulleted-list' as const,
+        children: [
+          {
+            type: 'list-item' as const,
+            children: [
+              {
+                type: 'numbered-list' as const,
+                children: [
+                  {
+                    type: 'list-item' as const,
+                    children: [
+                      {
+                        type: 'paragraph' as const,
+                        children: [{ text: 'Numbered' }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      const result = EditorUtils.listToParagraph(editor, listNode as any);
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it('should skip items without children', () => {
+      const listNode = {
+        type: 'list' as const,
+        children: [
+          { type: 'list-item' as const },
+        ],
+      } as any;
+      const result = EditorUtils.listToParagraph(editor, listNode);
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('checkEnd extended', () => {
+    it('should return false for empty editor', () => {
+      editor.children = [];
+      const spy = vi.spyOn(Editor, 'nodes').mockReturnValue([][Symbol.iterator]());
+      const result = EditorUtils.checkEnd(editor);
+      expect(result).toBe(false);
+      spy.mockRestore();
+    });
+
+    it('should return false for empty paragraph at end', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: '' }] },
+      ];
+      const result = EditorUtils.checkEnd(editor);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('createMediaNode extended', () => {
+    it('should handle data URL', () => {
+      const result = EditorUtils.createMediaNode(
+        'data:image/png;base64,abc',
+        'image',
+      );
+      expect(result).toBeDefined();
+      expect((result as any).type).toBe('card');
+    });
+
+    it('should handle file URL', () => {
+      const result = EditorUtils.createMediaNode(
+        'file:///tmp/image.png',
+        'image',
+      );
+      expect(result).toBeDefined();
+    });
+
+    it('should handle src starting with /', () => {
+      const result = EditorUtils.createMediaNode('/images/test.png', 'image');
+      expect(result).toBeDefined();
+    });
+
+    it('should create generic media for video type', () => {
+      const result = EditorUtils.createMediaNode(
+        'https://example.com/video.mp4',
+        'video',
+      );
+      expect(result).toBeDefined();
+      expect((result as any).type).toBe('card');
+      expect((result as any).children[1].type).toBe('media');
+    });
+
+    it('should handle error in URL parsing gracefully', () => {
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      const result = EditorUtils.createMediaNode(
+        'not a valid url at all',
+        'image',
+      );
+      expect(result).toBeDefined();
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle image with width/height params', () => {
+      const result = EditorUtils.createMediaNode(
+        'https://example.com/image.png?width=100&height=200',
+        'image',
+      );
+      expect(result).toBeDefined();
+    });
+
+    it('should handle image with block param', () => {
+      const result = EditorUtils.createMediaNode(
+        'https://example.com/image.png?block=true',
+        'image',
+      );
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('isFormatActive extended', () => {
+    it('should return true for matching format value', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'x', color: 'red' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 1 },
+      };
+      const result = EditorUtils.isFormatActive(editor, 'color', 'red');
+      expect(result).toBe(true);
+    });
+
+    it('should return false for non-matching format value', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'x', color: 'red' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 1 },
+      };
+      const result = EditorUtils.isFormatActive(editor, 'color', 'blue');
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('checkSelEnd extended', () => {
+    it('should return true for last path in editor', () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'only' }] },
+      ];
+      const result = EditorUtils.checkSelEnd(editor, [0]);
+      expect(result).toBe(true);
+    });
+  });
 });
 
 describe('Utility functions', () => {
@@ -1767,6 +1991,31 @@ describe('Utility functions', () => {
       expect(plainResult).toBeDefined();
       expect(plainResult?.isLink).toBe(false);
       expect(plainResult?.linkUrl).toBeUndefined();
+    });
+
+    it('should search entire editor when pathDescription is empty', () => {
+      const results = findByPathAndText(editor, [], 'Hello', {
+        maxResults: 5,
+      });
+      expect(results.length).toBeGreaterThan(0);
+    });
+
+    it('should handle Editor.nodes throwing for rangePath', () => {
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'hello' }] },
+      ];
+      const nodesSpy = vi.spyOn(Editor, 'nodes').mockImplementation(() => {
+        throw new Error('nodes error');
+      });
+      const results = findByPathAndText(editor, [0], 'hello', {
+        maxResults: 5,
+      });
+      expect(Array.isArray(results)).toBe(true);
+      nodesSpy.mockRestore();
+      consoleSpy.mockRestore();
     });
 
     it('should handle multiple link nodes with same text', () => {

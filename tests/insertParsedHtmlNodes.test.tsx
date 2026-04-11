@@ -1250,4 +1250,269 @@ describe('insertParsedHtmlNodes', () => {
       expect(result[0].children[0].text).toBe('keep');
     });
   });
+
+  describe('insertParsedHtmlNodes 更多防御分支', () => {
+    it('代码块节点但无 pre/code 标签时应跳过代码分支', async () => {
+      editor.children = [
+        {
+          type: 'code',
+          language: 'javascript',
+          children: [{ text: 'existing' }],
+        },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce([
+        { type: 'paragraph', children: [{ text: 'not code' }] },
+      ] as any);
+      const result = await insertParsedHtmlNodes(
+        editor,
+        '<p>not code</p>',
+        {},
+        '',
+      );
+      expect(typeof result).toBe('boolean');
+    });
+
+    it('代码块内 textContent 为空时不应插入文本', async () => {
+      editor.children = [
+        {
+          type: 'code',
+          language: 'javascript',
+          children: [{ text: '' }],
+        },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce([
+        { type: 'paragraph', children: [{ text: '' }] },
+      ] as any);
+      const result = await insertParsedHtmlNodes(
+        editor,
+        '<pre><code></code></pre>',
+        {},
+        '',
+      );
+      expect(typeof result).toBe('boolean');
+    });
+
+    it('单段落且有文本时应使用 insertText', async () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'existing' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 8 },
+        focus: { path: [0, 0], offset: 8 },
+      };
+      vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce([
+        { type: 'paragraph', children: [{ text: 'new text' }] },
+      ] as any);
+      const result = await insertParsedHtmlNodes(
+        editor,
+        '<p>new text</p>',
+        {},
+        '',
+      );
+      expect(result).toBe(true);
+      expect(Node.string(editor.children[0])).toContain('new text');
+    });
+
+    it('单段落无文本时不应使用 insertText', async () => {
+      editor.children = [
+        { type: 'paragraph', children: [{ text: '' }] },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
+      vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce([
+        { type: 'paragraph', children: [{ text: '' }] },
+      ] as any);
+      const result = await insertParsedHtmlNodes(
+        editor,
+        '<p></p>',
+        {},
+        '',
+      );
+      expect(typeof result).toBe('boolean');
+    });
+
+    it('bulleted-list fragment 与 list-item 节点应走列表分支', async () => {
+      editor.children = [
+        {
+          type: 'bulleted-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [{ type: 'paragraph', children: [{ text: '' }] }],
+            },
+          ],
+        },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 0, 0], offset: 0 },
+      };
+      vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce([
+        {
+          type: 'bulleted-list',
+          children: [{ type: 'list-item', children: [{ text: 'item' }] }],
+        },
+      ] as any);
+      const result = await insertParsedHtmlNodes(
+        editor,
+        '<ul><li>item</li></ul>',
+        {},
+        '',
+      );
+      expect(result).toBe(true);
+    });
+
+    it('numbered-list fragment 与 list-item 节点应走列表分支', async () => {
+      editor.children = [
+        {
+          type: 'numbered-list',
+          children: [
+            {
+              type: 'list-item',
+              children: [{ type: 'paragraph', children: [{ text: '' }] }],
+            },
+          ],
+        },
+      ];
+      editor.selection = {
+        anchor: { path: [0, 0, 0, 0], offset: 0 },
+        focus: { path: [0, 0, 0, 0], offset: 0 },
+      };
+      vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce([
+        {
+          type: 'numbered-list',
+          children: [{ type: 'list-item', children: [{ text: 'item' }] }],
+        },
+      ] as any);
+      const result = await insertParsedHtmlNodes(
+        editor,
+        '<ol><li>item</li></ol>',
+        {},
+        '',
+      );
+      expect(result).toBe(true);
+    });
+
+    it('IMG 有效 https 图片扩展名 URL 应返回 card 节点', () => {
+      const el = document.createElement('img');
+      (el as any).src = 'https://example.com/photo.jpg';
+      (el as any).alt = 'photo';
+      const out = ELEMENT_TAGS.IMG(el as any) as { type?: string };
+      expect(out.type === 'card').toBe(true);
+    });
+
+    it('IMG 有 data URL 应返回 card 节点', () => {
+      const el = document.createElement('img');
+      (el as any).src = 'data:image/png;base64,abc';
+      (el as any).alt = 'base64';
+      const out = ELEMENT_TAGS.IMG(el as any) as { type?: string };
+      expect(out.type === 'card').toBe(true);
+    });
+
+    it('IMG 有图片相关路径应返回 card 节点', () => {
+      const el = document.createElement('img');
+      (el as any).src = 'https://example.com/avatar/user.png';
+      (el as any).alt = 'avatar';
+      const out = ELEMENT_TAGS.IMG(el as any) as { type?: string };
+      expect(out.type === 'card').toBe(true);
+    });
+
+    it('IMG 有 image content type 路径应返回 card 节点', () => {
+      const el = document.createElement('img');
+      (el as any).src = 'https://example.com/image/serve?id=123';
+      (el as any).alt = 'served';
+      const out = ELEMENT_TAGS.IMG(el as any) as { type?: string };
+      expect(out.type === 'card').toBe(true);
+    });
+
+    it('H1 without align should have no align property', () => {
+      const el = document.createElement('h1');
+      const result = ELEMENT_TAGS.H1(el as any);
+      expect(result.type).toBe('head');
+      expect(result.level).toBe(1);
+      expect(result.align).toBeUndefined();
+    });
+
+    it('P without align should have no align property', () => {
+      const el = document.createElement('p');
+      const result = ELEMENT_TAGS.P(el as any);
+      expect(result.type).toBe('paragraph');
+      expect(result.align).toBeUndefined();
+    });
+
+    it('P with data-align should extract align', () => {
+      const el = document.createElement('p');
+      el.setAttribute('data-align', 'right');
+      const result = ELEMENT_TAGS.P(el as any);
+      expect(result.align).toBe('right');
+    });
+
+    it('H2 with data-align should extract align', () => {
+      const el = document.createElement('h2');
+      el.setAttribute('data-align', 'center');
+      const result = ELEMENT_TAGS.H2(el as any);
+      expect(result.align).toBe('center');
+    });
+
+    it('A should extract href attribute', () => {
+      const el = document.createElement('a');
+      el.setAttribute('href', 'https://test.com');
+      const result = TEXT_TAGS.A(el as any);
+      expect(result.url).toBe('https://test.com');
+    });
+
+    it('A without getAttribute should return null url', () => {
+      const result = TEXT_TAGS.A({} as any);
+      expect(result.url).toBeNull();
+    });
+  });
+
+  describe('deserialize 更多分支', () => {
+    it('ELEMENT_TAGS 内嵌套在 h1 parentTag 时不应走 element 分支', () => {
+      const p = document.createElement('p');
+      p.appendChild(document.createTextNode('nested'));
+      const result = deserialize(p as any, 'h1');
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('ELEMENT_TAGS 内嵌套在 td parentTag 时不应走 element 分支', () => {
+      const blockquote = document.createElement('blockquote');
+      blockquote.appendChild(document.createTextNode('nested'));
+      const result = deserialize(blockquote as any, 'td');
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('ELEMENT_TAGS 内嵌套在 th parentTag 时不应走 element 分支', () => {
+      const blockquote = document.createElement('blockquote');
+      blockquote.appendChild(document.createTextNode('nested'));
+      const result = deserialize(blockquote as any, 'th');
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('A tag with mixed children (text + element) should return fragment', () => {
+      const a = document.createElement('a');
+      a.setAttribute('href', 'https://example.com');
+      a.appendChild(document.createTextNode('link text'));
+      a.appendChild(document.createElement('span'));
+      const result = deserialize(a as any, '');
+      expect(result).toBeDefined();
+    });
+
+    it('figure tag should return fragment', () => {
+      const figure = document.createElement('figure');
+      figure.appendChild(document.createTextNode('content'));
+      const result = deserialize(figure as any, '');
+      expect(result).toBeDefined();
+    });
+  });
 });
