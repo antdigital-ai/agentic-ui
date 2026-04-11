@@ -445,6 +445,17 @@ describe('EditorUtils', () => {
       expect(editor.children).toBeDefined();
     });
 
+    it('should clear stale selection before resetting content', () => {
+      editor.selection = {
+        anchor: { path: [9, 0], offset: 0 },
+        focus: { path: [9, 0], offset: 1 },
+      };
+
+      EditorUtils.reset(editor);
+
+      expect(editor.selection).toBeNull();
+    });
+
     it('should reset editor with custom content', () => {
       const customNodes = [
         { type: 'paragraph' as const, children: [{ text: 'Custom' }] },

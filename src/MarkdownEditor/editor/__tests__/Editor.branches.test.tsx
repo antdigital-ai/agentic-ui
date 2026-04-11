@@ -640,6 +640,35 @@ describe('Editor branches - handleClipboardCopy', () => {
     window.getSelection = origGetSelection;
   });
 
+  it('copy with invalid selection path stops before writing clipboard payload', () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 5 },
+    };
+    vi.mocked(isEventHandled).mockReturnValue(false);
+    vi.mocked(hasEditableTarget).mockReturnValue(true);
+    vi.mocked(Editor.hasPath).mockReturnValue(false);
+
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      clipboardData: {
+        clearData: vi.fn(),
+        setData: vi.fn(),
+      },
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onCopy(event);
+
+    expect(event.clipboardData.clearData).toHaveBeenCalled();
+    expect(event.clipboardData.setData).not.toHaveBeenCalled();
+    expect(ReactEditor.setFragmentData).not.toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+  });
+
   it('cut gets selection from DOM, deletes content, and sets clipboard', () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = null;

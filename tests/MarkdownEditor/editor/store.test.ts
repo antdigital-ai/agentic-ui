@@ -307,6 +307,22 @@ describe('EditorStore', () => {
         at: [1],
       });
     });
+
+    it('当存在失效 selection 时会先清空 selection 再替换内容', () => {
+      editor.selection = {
+        anchor: { path: [99, 0], offset: 0 },
+        focus: { path: [99, 0], offset: 0 },
+      };
+      const nextNodeList = [
+        { type: 'paragraph', children: [{ text: 'safe content' }] },
+      ];
+
+      store.setContent(nextNodeList as any);
+
+      expect(editor.selection).toBeNull();
+      expect(editor.children).toEqual(nextNodeList);
+      expect(editor.onChange).toHaveBeenCalled();
+    });
   });
 
   describe('setMDContent', () => {
