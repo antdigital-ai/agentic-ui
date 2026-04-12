@@ -465,15 +465,17 @@ describe('EditorStore', () => {
       expect(editor.children).toEqual(newContent);
     });
 
-    it('应该调用 onChange', () => {
-      const onChangeSpy = vi.spyOn(editor, 'onChange');
+    it('应该通过 Transforms API 替换内容', () => {
+      const removeNodesSpy = vi.spyOn(Transforms, 'removeNodes');
+      const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
       const newContent = [
         { type: 'paragraph', children: [{ text: 'new content' }] },
       ];
 
       store.setContent(newContent);
 
-      expect(onChangeSpy).toHaveBeenCalled();
+      expect(removeNodesSpy).toHaveBeenCalled();
+      expect(insertNodesSpy).toHaveBeenCalled();
     });
   });
 

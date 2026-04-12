@@ -77,4 +77,64 @@ describe('markdownToHtml', () => {
     expect(html).toContain('target="_blank"');
     expect(html).toContain('rel="noopener noreferrer"');
   });
+
+  it('converts code block with language', () => {
+    const html = markdownToHtmlSync('```javascript\nvar x = 1;\n```');
+    expect(html).toContain('language-javascript');
+  });
+
+  it('converts frontmatter', () => {
+    const html = markdownToHtmlSync('---\ntitle: Test\n---\nContent');
+    expect(html).toContain('Content');
+  });
+
+  it('converts math blocks', () => {
+    const html = markdownToHtmlSync('$x^2$');
+    expect(html).toBeTruthy();
+  });
+
+  it('handles GFM table rendering', () => {
+    const md = '| A | B |\n|---|---|\n| 1 | 2 |';
+    const html = markdownToHtmlSync(md);
+    expect(html).toContain('<table>');
+    expect(html).toContain('<th>');
+  });
+
+  it('handles GFM strikethrough', () => {
+    const html = markdownToHtmlSync('~~deleted~~');
+    expect(html).toContain('<del>');
+  });
+
+  it('converts paragraph tag with custom config', () => {
+    const html = markdownToHtmlSync('hello', undefined, {
+      paragraphTag: 'div',
+    });
+    expect(html).toContain('hello');
+  });
+
+  it('handles empty input', () => {
+    const html = markdownToHtmlSync('');
+    expect(html).toBe('');
+  });
+
+  it('converts code block without newline (loading state)', () => {
+    const html = markdownToHtmlSync('```js\nvar x = 1\n```');
+    expect(html).toBeTruthy();
+  });
+
+  it('handles marked config', () => {
+    const fakePlugin = () => (tree: any) => tree;
+    const html = markdownToHtmlSync('test', undefined, {
+      markedConfig: [[fakePlugin as any, {}]],
+    });
+    expect(html).toContain('test');
+  });
+
+  it('handles marked config as single function', () => {
+    const fakePlugin = () => (tree: any) => tree;
+    const html = markdownToHtmlSync('test', undefined, {
+      markedConfig: [fakePlugin as any],
+    });
+    expect(html).toContain('test');
+  });
 });

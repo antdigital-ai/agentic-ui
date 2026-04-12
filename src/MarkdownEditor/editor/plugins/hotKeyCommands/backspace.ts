@@ -3,6 +3,7 @@ import { Elements } from '../../../el';
 import { EditorUtils } from '../../utils/editorUtils';
 import { isListType } from '../withListsPlugin';
 
+
 export class BackspaceKey {
   constructor(private readonly editor: Editor) {}
 
@@ -58,10 +59,12 @@ export class BackspaceKey {
       }
     }
     if (el.type === 'media' || el.type === 'attach') {
-      Transforms.removeNodes(this.editor, { at: path });
-      Transforms.insertNodes(this.editor, EditorUtils.p, {
-        at: node[1],
-        select: true,
+      Editor.withoutNormalizing(this.editor, () => {
+        Transforms.removeNodes(this.editor, { at: path });
+        Transforms.insertNodes(this.editor, EditorUtils.p, {
+          at: node[1],
+          select: true,
+        });
       });
       return true;
     }
@@ -91,71 +94,60 @@ export class BackspaceKey {
           const isLastItem =
             currentItemIndex === listNode[0].children.length - 1;
 
-          if (isLastItem) {
-            // 如果是最后一个项目，删除list-item并替换成paragraph
-            // 使用 removeNodes 删除元素节点
-            Transforms.removeNodes(this.editor, { at: parent[1] });
+          Editor.withoutNormalizing(this.editor, () => {
+            if (isLastItem) {
+              Transforms.removeNodes(this.editor, { at: parent[1] });
 
-            // 如果列表为空，删除列表容器
-            const updatedList = Node.get(this.editor, listPath);
-            if (
-              isListType(updatedList) &&
-              Node.string(updatedList).trim() === ''
-            ) {
-              Transforms.removeNodes(this.editor, { at: listPath });
-              // 在列表位置插入 paragraph
-              Transforms.insertNodes(
-                this.editor,
-                { type: 'paragraph', children: [{ text: '' }] },
-                { at: listPath, select: true },
-              );
+              const updatedList = Node.get(this.editor, listPath);
+              if (
+                isListType(updatedList) &&
+                Node.string(updatedList).trim() === ''
+              ) {
+                Transforms.removeNodes(this.editor, { at: listPath });
+                Transforms.insertNodes(
+                  this.editor,
+                  { type: 'paragraph', children: [{ text: '' }] },
+                  { at: listPath, select: true },
+                );
+              } else {
+                Transforms.insertNodes(
+                  this.editor,
+                  { type: 'paragraph', children: [{ text: '' }] },
+                  { at: parent[1], select: true },
+                );
+              }
             } else {
-              // 在删除的位置插入 paragraph
-              Transforms.insertNodes(
-                this.editor,
-                { type: 'paragraph', children: [{ text: '' }] },
-                { at: parent[1], select: true },
-              );
-            }
-          } else {
-            // 如果不是最后一个项目，删除当前item和之后的所有items
-            // 先删除后面的 items（从后往前删除，避免索引变化）
-            for (
-              let i = listNode[0].children.length - 1;
-              i > currentItemIndex;
-              i--
-            ) {
-              Transforms.removeNodes(this.editor, { at: [...listPath, i] });
-            }
+              for (
+                let i = listNode[0].children.length - 1;
+                i > currentItemIndex;
+                i--
+              ) {
+                Transforms.removeNodes(this.editor, { at: [...listPath, i] });
+              }
 
-            // 删除当前item
-            Transforms.removeNodes(this.editor, { at: parent[1] });
+              Transforms.removeNodes(this.editor, { at: parent[1] });
 
-            // 检查列表是否为空，如果为空则删除列表容器
-            const updatedList = Node.get(this.editor, listPath);
-            if (
-              isListType(updatedList) &&
-              Node.string(updatedList).trim() === ''
-            ) {
-              // 列表为空，删除列表容器
-              Transforms.removeNodes(this.editor, { at: listPath });
-              // 在列表位置插入 paragraph
-              Transforms.insertNodes(
-                this.editor,
-                { type: 'paragraph', children: [{ text: '' }] },
-                { at: listPath, select: true },
-              );
-            } else {
-              // 列表还有前面的 items，保持列表
-              // 在列表后插入 paragraph
-              const insertPath = Path.next(listPath);
-              Transforms.insertNodes(
-                this.editor,
-                { type: 'paragraph', children: [{ text: '' }] },
-                { at: insertPath, select: true },
-              );
+              const updatedList = Node.get(this.editor, listPath);
+              if (
+                isListType(updatedList) &&
+                Node.string(updatedList).trim() === ''
+              ) {
+                Transforms.removeNodes(this.editor, { at: listPath });
+                Transforms.insertNodes(
+                  this.editor,
+                  { type: 'paragraph', children: [{ text: '' }] },
+                  { at: listPath, select: true },
+                );
+              } else {
+                const insertPath = Path.next(listPath);
+                Transforms.insertNodes(
+                  this.editor,
+                  { type: 'paragraph', children: [{ text: '' }] },
+                  { at: insertPath, select: true },
+                );
+              }
             }
-          }
+          });
           return true;
         }
 
@@ -175,17 +167,17 @@ export class BackspaceKey {
               Element.isElement(listParent[0]) &&
               listParent[0].type === 'list-item'
             ) {
-              // 使用 liftNodes 提升当前 list-item
-              Transforms.liftNodes(this.editor, { at: listItemPath });
+              Editor.withoutNormalizing(this.editor, () => {
+                Transforms.liftNodes(this.editor, { at: listItemPath });
 
-              // 如果提升后，原列表为空，需要删除空列表
-              const updatedList = Node.get(this.editor, listPath);
-              if (
-                isListType(updatedList) &&
-                Node.string(updatedList).trim() === ''
-              ) {
-                Transforms.removeNodes(this.editor, { at: listPath });
-              }
+                const updatedList = Node.get(this.editor, listPath);
+                if (
+                  isListType(updatedList) &&
+                  Node.string(updatedList).trim() === ''
+                ) {
+                  Transforms.removeNodes(this.editor, { at: listPath });
+                }
+              });
 
               return true;
             }
@@ -223,18 +215,20 @@ export class BackspaceKey {
           if (['table', 'code'].includes(pre[0].type)) {
             const end = Editor.end(this.editor, pre[1]);
             if (!Node.string(Node.get(this.editor, end.path))) {
-              Transforms.delete(this.editor, { at: path });
-              const text = Node.string(el);
-              if (text) {
-                Transforms.insertNodes(
-                  this.editor,
-                  pre[0].type === 'code' ? [{ text }] : el.children,
-                  {
-                    at: end,
-                  },
-                );
-              }
-              Transforms.select(this.editor, end);
+              Editor.withoutNormalizing(this.editor, () => {
+                Transforms.delete(this.editor, { at: path });
+                const text = Node.string(el);
+                if (text) {
+                  Transforms.insertNodes(
+                    this.editor,
+                    pre[0].type === 'code' ? [{ text }] : el.children,
+                    {
+                      at: end,
+                    },
+                  );
+                }
+                Transforms.select(this.editor, end);
+              });
               return true;
             }
           }
@@ -252,32 +246,32 @@ export class BackspaceKey {
         ) {
           const parent = Editor.parent(this.editor, path);
           if (parent[0].type === 'blockquote') {
-            if (Editor.hasPath(this.editor, Path.next(path))) {
-              Transforms.delete(this.editor, { at: path });
-            } else {
-              Transforms.delete(this.editor, { at: parent[1] });
-            }
-            Transforms.insertNodes(
-              this.editor,
-              { type: 'paragraph', children: el.children },
-              { at: parent[1] },
-            );
-            Transforms.select(
-              this.editor,
-              Editor.start(this.editor, parent[1]),
-            );
+            Editor.withoutNormalizing(this.editor, () => {
+              if (Editor.hasPath(this.editor, Path.next(path))) {
+                Transforms.delete(this.editor, { at: path });
+              } else {
+                Transforms.delete(this.editor, { at: parent[1] });
+              }
+              Transforms.insertNodes(
+                this.editor,
+                { type: 'paragraph', children: el.children },
+                { at: parent[1] },
+              );
+              Transforms.select(
+                this.editor,
+                Editor.start(this.editor, parent[1]),
+              );
+            });
             return true;
           }
 
-          // 可删除顶级元素中的第一个段落
-          const next = Editor.hasPath(this.editor, Path.next(path));
-          if (
-            Editor.isEditor(parent[0]) &&
-            next &&
-            Editor?.node(this.editor, Path.next(path))[0].type !== 'hr'
-          ) {
-            Transforms.delete(this.editor, { at: path });
-            return true;
+          const nextPath = Path.next(path);
+          if (Editor.isEditor(parent[0]) && Editor.hasPath(this.editor, nextPath)) {
+            const [nextNode] = Editor.node(this.editor, nextPath);
+            if ((nextNode as Record<string, unknown>)?.type !== 'hr') {
+              Transforms.delete(this.editor, { at: path });
+              return true;
+            }
           }
         }
         return false;

@@ -457,6 +457,38 @@ describe('Editor branches - handleSelectionChange', () => {
     window.getSelection = origGetSelection;
   });
 
+  it('readonly: stale selection path should skip toDOMRange and clear domRect', async () => {
+    const setDomRect = vi.fn();
+    setupStore({ readonly: true, setDomRect });
+
+    const staleSelection = {
+      anchor: { path: [99, 0], offset: 0 },
+      focus: { path: [99, 0], offset: 1 },
+    };
+    vi.mocked(getSelectionFromDomSelection).mockReturnValue(
+      staleSelection as any,
+    );
+    vi.mocked(Range.isCollapsed).mockReturnValue(false);
+    vi.mocked(Editor.hasPath).mockReturnValue(false);
+
+    const origGetSelection = window.getSelection;
+    window.getSelection = vi.fn(
+      () =>
+        ({
+          anchorNode: document.createElement('div'),
+          focusNode: document.createElement('div'),
+          rangeCount: 1,
+        }) as any,
+    );
+
+    renderEditor({ reportMode: true });
+    await editableProps.onSelect({});
+
+    expect(ReactEditor.toDOMRange).not.toHaveBeenCalled();
+    expect(setDomRect).toHaveBeenCalledWith(null);
+    window.getSelection = origGetSelection;
+  });
+
   it('readonly: collapsed selection sets domRect to null', async () => {
     const setDomRect = vi.fn();
     setupStore({ readonly: true, setDomRect });
@@ -638,6 +670,35 @@ describe('Editor branches - handleClipboardCopy', () => {
     expect(getSelectionFromDomSelection).toHaveBeenCalled();
     expect(event.clipboardData.clearData).toHaveBeenCalled();
     window.getSelection = origGetSelection;
+  });
+
+  it('copy with invalid selection path stops before writing clipboard payload', () => {
+    const { editor } = setupStore({ readonly: false });
+    editor.selection = {
+      anchor: { path: [0, 0], offset: 0 },
+      focus: { path: [0, 0], offset: 5 },
+    };
+    vi.mocked(isEventHandled).mockReturnValue(false);
+    vi.mocked(hasEditableTarget).mockReturnValue(true);
+    vi.mocked(Editor.hasPath).mockReturnValueOnce(false);
+
+    renderEditor({});
+
+    const event = {
+      preventDefault: vi.fn(),
+      clipboardData: {
+        clearData: vi.fn(),
+        setData: vi.fn(),
+      },
+      target: document.createElement('div'),
+    } as any;
+
+    editableProps.onCopy(event);
+
+    expect(event.clipboardData.clearData).toHaveBeenCalled();
+    expect(event.clipboardData.setData).not.toHaveBeenCalled();
+    expect(ReactEditor.setFragmentData).not.toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
   });
 
   it('cut gets selection from DOM, deletes content, and sets clipboard', () => {

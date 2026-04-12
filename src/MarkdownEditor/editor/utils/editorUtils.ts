@@ -10,7 +10,7 @@ import {
   Transforms,
 } from 'slate';
 import { DOMNode } from 'slate-dom';
-import { History } from 'slate-history';
+import { History, HistoryEditor } from 'slate-history';
 import { ReactEditor } from 'slate-react';
 import {
   CardNode,
@@ -24,6 +24,41 @@ import { getMediaType } from './dom';
 export class EditorUtils {
   static get p() {
     return { type: 'paragraph', children: [{ text: '' }] } as const;
+  }
+
+  /**
+   * 通过 Slate Transforms API 安全替换编辑器全部内容。
+   * 避免直接赋值 editor.children，确保 Operation/History/Normalizer 管线正常运行。
+   *
+   * @param editor - 编辑器实例
+   * @param nodes - 新的节点列表
+   * @param options.withoutHistory - 是否跳过 History 记录（默认 true，适用于外部数据同步场景）
+   */
+  static replaceEditorContent(
+    editor: Editor,
+    nodes: Node[],
+    options?: { withoutHistory?: boolean },
+  ) {
+    const { withoutHistory = true } = options || {};
+
+    const doReplace = () => {
+      Editor.withoutNormalizing(editor, () => {
+        if (editor.selection) {
+          Transforms.deselect(editor);
+        }
+        const totalChildren = editor.children.length;
+        for (let i = totalChildren - 1; i >= 0; i--) {
+          Transforms.removeNodes(editor, { at: [i] });
+        }
+        Transforms.insertNodes(editor, nodes, { at: [0] });
+      });
+    };
+
+    if (withoutHistory && HistoryEditor.isHistoryEditor(editor)) {
+      HistoryEditor.withoutSaving(editor, doReplace);
+    } else {
+      doReplace();
+    }
   }
 
   static hasPath(editor: Editor, path: Path) {
@@ -389,17 +424,16 @@ export class EditorUtils {
     insertNodes?: Elements[],
     force?: boolean | History,
   ) {
-    const nodesToInsert = insertNodes || [EditorUtils.p];
+    const nodesToInsert = JSON.parse(
+      JSON.stringify(insertNodes || [EditorUtils.p]),
+    );
 
-    editor.selection = null;
-    editor.children = JSON.parse(JSON.stringify(nodesToInsert));
+    EditorUtils.replaceEditorContent(editor, nodesToInsert);
 
-    if (force) {
+    if (force && HistoryEditor.isHistoryEditor(editor)) {
       editor.history =
         typeof force === 'boolean' ? { redos: [], undos: [] } : force;
     }
-
-    editor.onChange();
   }
 
   /**
