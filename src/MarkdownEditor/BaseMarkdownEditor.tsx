@@ -356,6 +356,8 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
   const [openJinjaTemplate, setOpenJinjaTemplate] = useState(false);
   const [jinjaAnchorPath, setJinjaAnchorPath] = useState<number[] | null>(null);
 
+  const isStreaming = props.streaming ?? props.typewriter ?? false;
+
   if (readonly && effectiveRenderMode === 'markdown') {
     return wrapSSR(
       <I18nBoundary>
@@ -382,10 +384,8 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
           >
             <MarkdownRenderer
               content={initValue || ''}
-              streaming={props.streaming ?? props.typewriter ?? false}
-              isFinished={
-                props.isFinished ?? !(props.streaming ?? props.typewriter)
-              }
+              streaming={isStreaming}
+              isFinished={props.isFinished ?? !isStreaming}
               queueOptions={props.queueOptions}
               streamingParagraphAnimation={props.streamingParagraphAnimation}
               plugins={props.plugins}
@@ -426,7 +426,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
             store: instance.store,
             domRect,
             setDomRect,
-            typewriter: props.streaming ?? props.typewriter ?? false,
+            typewriter: isStreaming,
             readonly: props.readonly ?? false,
             editorProps:
               effectiveJinja !== undefined

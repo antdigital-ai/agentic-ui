@@ -41,12 +41,9 @@ export interface RealtimeFollowData {
   title?: string;
   subTitle?: string;
   icon?: React.ComponentType;
-  /**
-   * 流式输出模式（`typewriter` 的统一别名）
-   * @description 同时传入时 `streaming` 优先
-   */
+  /** 流式输出模式，同时传入时优先于 typewriter */
   streaming?: boolean;
-  /** @deprecated 请使用 `streaming` 代替 */
+  /** @deprecated 请使用 streaming */
   typewriter?: boolean;
   rightContent?: React.ReactNode;
   loadingRender?: React.ReactNode | (() => React.ReactNode);
@@ -401,9 +398,6 @@ export const RealtimeFollow: React.FC<{
     ...defaultProps,
     ...data.markdownEditorProps,
     streaming: isTestEnv
-      ? false
-      : (data.streaming ?? data.typewriter ?? defaultProps.typewriter),
-    typewriter: isTestEnv
       ? false
       : (data.streaming ?? data.typewriter ?? defaultProps.typewriter),
     style: {

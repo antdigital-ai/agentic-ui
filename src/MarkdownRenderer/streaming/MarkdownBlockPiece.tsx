@@ -4,21 +4,18 @@ import React, { memo, useMemo, useRef } from 'react';
 import { renderMarkdownBlock } from '../markdownReactShared';
 import { StreamingAnimationContext } from '../StreamingAnimationContext';
 import { StreamingCursor } from '../StreamingCursor';
-
 import { shouldReparseLastBlock } from './lastBlockThrottle';
 
 export interface MarkdownBlockPieceProps {
-  /** 末块为 tail（生长中）；一旦其后出现新块，同一段内容变为 sealed，保持同一 React key 可避免重组件卸载 */
   variant: 'sealed' | 'tail';
   blockSource: string;
   processor: Processor;
   components: Record<string, any>;
-  /** 仅末块且处于流式模式时为 true，用于节流与末段动画 */
   streaming: boolean;
 }
 
 /**
- * 统一的块级渲染：封版与末块使用同一组件类型；按 blockSource 缓存解析结果引用，使 tail→sealed 时与旧 Map 缓存一样复用同一棵 React 子树。
+ * 块级渲染单元：sealed 块缓存不动，tail 块节流重解析 + 闪烁光标。
  */
 export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
   variant,
@@ -27,26 +24,17 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
   components,
   streaming,
 }: MarkdownBlockPieceProps) {
-  const lastParsedRef = useRef<{
-    source: string;
-    node: React.ReactNode;
-  } | null>(null);
-
-  /** 完整 parse 结果缓存：键为 block 源串，供 sealed 与 tail 晋升时复用同一引用 */
-  const parseBySourceRef = useRef<Map<string, React.ReactNode>>(new Map());
+  const lastParsedRef = useRef<{ source: string; node: React.ReactNode } | null>(null);
+  const cacheRef = useRef<Map<string, React.ReactNode>>(new Map());
 
   const node = useMemo(() => {
-    const cached = parseBySourceRef.current.get(blockSource);
-    if (cached && variant === 'sealed') {
-      return cached;
-    }
+    const cached = cacheRef.current.get(blockSource);
+    if (cached && variant === 'sealed') return cached;
 
     if (variant === 'sealed' || !streaming) {
       const el = renderMarkdownBlock(blockSource, processor, components);
-      parseBySourceRef.current.set(blockSource, el);
-      if (variant === 'tail') {
-        lastParsedRef.current = { source: blockSource, node: el };
-      }
+      cacheRef.current.set(blockSource, el);
+      if (variant === 'tail') lastParsedRef.current = { source: blockSource, node: el };
       return el;
     }
 
@@ -56,7 +44,7 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
     }
 
     const el = renderMarkdownBlock(blockSource, processor, components);
-    parseBySourceRef.current.set(blockSource, el);
+    cacheRef.current.set(blockSource, el);
     lastParsedRef.current = { source: blockSource, node: el };
     return el;
   }, [variant, blockSource, processor, components, streaming]);

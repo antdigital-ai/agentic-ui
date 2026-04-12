@@ -1,11 +1,6 @@
 import React from 'react';
 
-/**
- * 流式闪烁光标——streaming 期间跟随末块末尾，streaming 结束自动消失。
- *
- * 由父级（MarkdownBlockPiece）控制是否挂载：
- * 仅 `variant === 'tail' && streaming` 时渲染，无需内部额外判断。
- */
+/** 流式闪烁光标，由 MarkdownBlockPiece 控制挂载/卸载 */
 const StreamingCursor: React.FC = () => (
   <span
     data-streaming-cursor=""

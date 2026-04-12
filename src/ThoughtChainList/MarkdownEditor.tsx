@@ -97,9 +97,6 @@ export const MarkdownEditorUpdate = (
       streaming={
         (props.streaming ?? props.typewriter) && !props.isFinished
       }
-      typewriter={
-        (props.streaming ?? props.typewriter) && !props.isFinished
-      }
       initValue=""
     />
   );

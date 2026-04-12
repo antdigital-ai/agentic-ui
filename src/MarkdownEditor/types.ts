@@ -644,26 +644,15 @@ export type MarkdownEditorProps = {
     defaultDom: React.ReactNode,
   ) => React.ReactNode;
 
-  /**
-   * 流式输出模式
-   * @description 启用后内容被视为"正在生成"，开启流式光标、字符队列等流式能力。
-   * 与 `typewriter` 语义相同，推荐使用 `streaming`，`typewriter` 保留向下兼容。
-   * 同时传入时 `streaming` 优先。
-   */
+  /** 流式输出模式，同时传入时优先于 `typewriter` */
   streaming?: boolean;
 
-  /**
-   * 流式是否完成
-   * @description 仅 `renderMode: 'markdown'` 时生效，触发 CharacterQueue flush。
-   * 未传入时回退到 `!streaming`（即 streaming 结束等于 finished）。
-   */
+  /** 流式是否完成（仅 renderMode: 'markdown'），未传入时回退到 `!streaming` */
   isFinished?: boolean;
 
   /**
-   * 打字机效果（`streaming` 的别名，向下兼容）
-   * @description 启用后编辑器将具有打字机效果的滚动行为。
-   * 推荐使用 `streaming`，两者同时传入时 `streaming` 优先。
-   * @deprecated 请使用 `streaming` 代替
+   * `streaming` 的别名，向下兼容
+   * @deprecated 请使用 `streaming`
    */
   typewriter?: boolean;
 
