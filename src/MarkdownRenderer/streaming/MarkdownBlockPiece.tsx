@@ -3,6 +3,7 @@ import React, { memo, useMemo, useRef } from 'react';
 
 import { renderMarkdownBlock } from '../markdownReactShared';
 import { StreamingAnimationContext } from '../StreamingAnimationContext';
+import { StreamingCursor } from '../StreamingCursor';
 
 import { shouldReparseLastBlock } from './lastBlockThrottle';
 
@@ -75,6 +76,7 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
   return (
     <StreamingAnimationContext.Provider value={{ animateBlock }}>
       {node}
+      {animateBlock && <StreamingCursor />}
     </StreamingAnimationContext.Provider>
   );
 });

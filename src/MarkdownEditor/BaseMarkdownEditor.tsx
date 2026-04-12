@@ -383,6 +383,9 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
             <MarkdownRenderer
               content={initValue || ''}
               streaming={props.typewriter ?? false}
+              isFinished={!props.typewriter}
+              queueOptions={props.queueOptions}
+              streamingParagraphAnimation={props.streamingParagraphAnimation}
               plugins={props.plugins}
               remarkPlugins={props.markdownToHtmlOptions}
               codeProps={props.codeProps}
@@ -395,6 +398,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
               fncProps={props.fncProps}
               linkConfig={props.linkConfig}
               eleRender={props.eleRender}
+              fileMapConfig={props.fileMapConfig}
             />
             {children}
           </div>

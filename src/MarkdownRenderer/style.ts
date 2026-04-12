@@ -27,6 +27,10 @@ export const useRendererVarStyle = (prefixCls: string) => {
         from: { opacity: 0, transform: 'translateY(2px)', filter: 'blur(1px)' },
         to: { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' },
       },
+
+      '@keyframes markdownStreamingCursorBlink': {
+        to: { opacity: 0 },
+      },
     };
   });
 };

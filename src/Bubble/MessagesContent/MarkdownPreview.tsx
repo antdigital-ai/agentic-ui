@@ -136,6 +136,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           streaming={shouldAnimateMarkdown}
           isFinished={props.originData?.isFinished}
           plugins={props.markdownRenderConfig?.plugins}
+          remarkPlugins={props.markdownRenderConfig?.markdownToHtmlOptions}
           queueOptions={props.markdownRenderConfig?.queueOptions}
           streamingParagraphAnimation={
             props.markdownRenderConfig?.streamingParagraphAnimation
@@ -151,6 +152,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           codeProps={props.markdownRenderConfig?.codeProps}
           apaasify={props.markdownRenderConfig?.apaasify}
           fileMapConfig={props.markdownRenderConfig?.fileMapConfig}
+          eleRender={props.markdownRenderConfig?.eleRender}
         />
       );
     }

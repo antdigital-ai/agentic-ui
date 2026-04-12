@@ -314,12 +314,21 @@ export const useStreaming = (input: string, enabled: boolean): string => {
     setOutput(getStreamingOutput(cache));
   }, []);
 
+  const prevEnabledRef = useRef(enabled);
+
   useEffect(() => {
     if (typeof input !== 'string') {
       setOutput('');
       cacheRef.current = getInitialCache();
+      prevEnabledRef.current = enabled;
       return;
     }
+
+    if (enabled && !prevEnabledRef.current) {
+      cacheRef.current = getInitialCache();
+    }
+    prevEnabledRef.current = enabled;
+
     if (enabled) {
       processStreaming(input);
     } else {
