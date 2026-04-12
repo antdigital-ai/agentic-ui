@@ -1,4 +1,4 @@
-import { Popover, theme } from 'antd';
+import { Popover } from 'antd';
 import React, { useContext, useEffect, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
@@ -59,8 +59,6 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
   const { hidePadding } = useContext(MessagesContext) || {};
   const config = useContext(BubbleConfigContext);
   const locale = useLocale();
-  const { token } = theme.useToken();
-
   const standalone = config?.standalone;
   const extraShowOnHover = config?.extraShowOnHover;
   const rc = props.markdownRenderConfig;
@@ -160,10 +158,10 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     <div
       style={{
         padding: 'var(--padding-5x)',
-        background: '#FFFFFF',
-        color: token.colorError,
+        background: 'var(--ant-color-bg-container, #fff)',
+        color: 'var(--ant-color-error, #ff4d4f)',
         borderRadius: '16px 16px 2px 16px',
-        border: `1px solid ${token.colorErrorBorder}`,
+        border: '1px solid var(--ant-color-error-border, #ffccc7)',
         marginLeft: props.placement === 'right' ? 0 : 24,
         marginRight: props.placement === 'right' ? 24 : 0,
       }}
