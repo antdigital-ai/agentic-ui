@@ -54,8 +54,11 @@ describe('withCodeTagPlugin', () => {
     );
   });
 
-  it('should handle insert_text when tag node and non-space text', () => {
-    const editor = withCodeTagPlugin(createEditor());
+  it('should apply insert_text directly when tag node has empty text', () => {
+    const base = createEditor();
+    const originalApply = vi.fn();
+    base.apply = originalApply;
+    const editor = withCodeTagPlugin(base);
     editor.children = [
       {
         type: 'paragraph',
@@ -67,9 +70,6 @@ describe('withCodeTagPlugin', () => {
       focus: { path: [0, 0], offset: 2 },
     };
 
-    const removeNodesSpy = vi.spyOn(Transforms, 'removeNodes');
-    const insertNodesSpy = vi.spyOn(Transforms, 'insertNodes');
-
     editor.apply({
       type: 'insert_text',
       path: [0, 0],
@@ -77,14 +77,9 @@ describe('withCodeTagPlugin', () => {
       text: 'a',
     });
 
-    expect(removeNodesSpy).toHaveBeenCalled();
-    expect(insertNodesSpy).toHaveBeenCalledWith(
-      editor,
-      expect.objectContaining({ text: 'a', tag: true, code: true }),
-      expect.objectContaining({ at: [0, 0], select: true }),
+    expect(originalApply).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'insert_text', text: 'a' }),
     );
-    removeNodesSpy.mockRestore();
-    insertNodesSpy.mockRestore();
   });
 
   it('should swallow split_node when node has tag', () => {
