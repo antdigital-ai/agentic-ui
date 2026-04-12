@@ -10,7 +10,11 @@ group:
 
 以下 Demo 仅用于 Playwright 端到端测试，通过稳定的 `id` 挂载，**请勿依赖文档中的 demo 顺序**。
 
-## MarkdownEditor
+## MarkdownEditor（可编辑，E2E 默认）
+
+<code src="../demos/e2e/markdown-editor-editable.tsx" id="e2e-markdown-editor-editable" background="var(--main-bg-color)" iframe=540></code>
+
+## MarkdownEditor（预览 / reportMode，非交互 E2E 勿用）
 
 <code src="../demos/e2e/markdown-editor.tsx" id="e2e-markdown-editor" background="var(--main-bg-color)" iframe=540></code>
 

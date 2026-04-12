@@ -160,11 +160,13 @@ test.describe('MarkdownEditor 高级功能', () => {
   });
 
   test('应该能够处理列表', async ({ markdownEditorPage }) => {
-    await markdownEditorPage.typeText('- List item 1');
+    // matchInputToNode 下行首 `- ` 会触发列表规则，过快 type 易与 Slate 竞态导致缺字
+    const stepDelay = 25;
+    await markdownEditorPage.typeText('- List item 1', stepDelay);
     await markdownEditorPage.pressKey('Enter');
-    await markdownEditorPage.typeText('- List item 2');
+    await markdownEditorPage.typeText('- List item 2', stepDelay);
     await markdownEditorPage.pressKey('Enter');
-    await markdownEditorPage.typeText('- List item 3');
+    await markdownEditorPage.typeText('- List item 3', stepDelay);
 
     // 验证包含列表内容
     await markdownEditorPage.expectContainsText('List item 1');

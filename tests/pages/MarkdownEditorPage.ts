@@ -1,6 +1,8 @@
+import type { Frame } from '@playwright/test';
 import { Locator, Page, expect } from '@playwright/test';
 
 import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+import { getDumiDemoContentRoot } from '../utils/dumiDemoFrame';
 
 /**
  * MarkdownEditor Page Object Model
@@ -8,12 +10,40 @@ import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
  */
 export class MarkdownEditorPage {
   readonly page: Page;
-  readonly editableInput: Locator;
+  /** Dumi demo 常在 iframe 内，键盘目标以该 root 为准 */
+  root: Page | Frame;
+  editableInput: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    // MarkdownEditor 使用 Slate 的 Editable 组件，通过 contenteditable 定位
+    this.root = page;
     this.editableInput = page.locator('[contenteditable="true"]').first();
+  }
+
+  private async bindDemoRoot() {
+    this.root = await getDumiDemoContentRoot(this.page);
+    const slate = this.root.locator(
+      '.ant-agentic-md-editor-content[contenteditable="true"]',
+    );
+    this.editableInput =
+      (await slate.count()) > 0
+        ? slate.first()
+        : this.root.locator('[contenteditable="true"]').first();
+  }
+
+  /** 键盘事件发往 iframe 所在的主 Page */
+  private get keyboardPage(): Page {
+    return this.root === this.page ? this.page : (this.root as Frame).page;
+  }
+
+  /** E2E 中快捷键需发往该 Page（与 Slate 所在 iframe 同属一个顶层 document） */
+  get keyboardTargetPage(): Page {
+    return this.keyboardPage;
+  }
+
+  /** 鼠标坐标与 keyboardTargetPage 一致（iframe 内元素用主 Page 的 mouse） */
+  get interactionTargetPage(): Page {
+    return this.keyboardPage;
   }
 
   /**
@@ -25,6 +55,7 @@ export class MarkdownEditorPage {
     await this.page.goto(`/~demos/${demoPath}`);
     // 等待页面加载完成
     await this.page.waitForLoadState('networkidle');
+    await this.bindDemoRoot();
     await this.waitForReady();
   }
 
@@ -46,10 +77,11 @@ export class MarkdownEditorPage {
 
   /**
    * 输入文本
+   * @param delayMs 大于 0 时逐字符延迟，避免 Slate 输入规则与快速 type 竞态（如行首 `- ` 转列表）
    */
-  async typeText(text: string) {
+  async typeText(text: string, delayMs: number = 0) {
     await this.focus();
-    await this.editableInput.type(text, { delay: 0 });
+    await this.editableInput.type(text, { delay: delayMs });
     // 等待文本输入完成
     await expect
       .poll(
@@ -82,10 +114,10 @@ export class MarkdownEditorPage {
     await this.focus();
     const isMac = process.platform === 'darwin';
     const modifierKey = isMac ? 'Meta' : 'Control';
-    await this.page.keyboard.press(`${modifierKey}+a`);
-    await this.page.waitForTimeout(100); // 等待全选操作完成
-    await this.page.keyboard.press('Delete');
-    await this.page.waitForTimeout(200); // 等待删除操作完成
+    await this.keyboardPage.keyboard.press(`${modifierKey}+a`);
+    await this.keyboardPage.waitForTimeout(100); // 等待全选操作完成
+    await this.keyboardPage.keyboard.press('Delete');
+    await this.keyboardPage.waitForTimeout(200); // 等待删除操作完成
   }
 
   /**
@@ -93,12 +125,16 @@ export class MarkdownEditorPage {
    */
   async pressKey(key: string) {
     const isMac = process.platform === 'darwin';
+    const kb = this.keyboardPage.keyboard;
     if (isMac && key === 'Home') {
-      await this.page.keyboard.press('Meta+ArrowLeft');
+      await kb.press('Meta+ArrowLeft');
     } else if (isMac && key === 'End') {
-      await this.page.keyboard.press('Meta+ArrowRight');
+      await kb.press('Meta+ArrowRight');
+    } else if (key === 'Space') {
+      // type 走文本输入路径，比 press 更接近真实 IME/浏览器对空格的 beforeinput 行为
+      await kb.type(' ');
     } else {
-      await this.page.keyboard.press(key);
+      await kb.press(key);
     }
   }
 
@@ -108,8 +144,8 @@ export class MarkdownEditorPage {
   async selectAll() {
     const isMac = process.platform === 'darwin';
     const modifierKey = isMac ? 'Meta' : 'Control';
-    await this.page.keyboard.press(`${modifierKey}+a`);
-    await this.page.waitForTimeout(100);
+    await this.keyboardPage.keyboard.press(`${modifierKey}+a`);
+    await this.keyboardPage.waitForTimeout(100);
   }
 
   /**
@@ -141,21 +177,21 @@ export class MarkdownEditorPage {
    * 查找工具栏按钮
    */
   getToolbarButton(name: string): Locator {
-    return this.page.getByRole('button', { name }).first();
+    return this.root.getByRole('button', { name }).first();
   }
 
   /**
    * 查找标签输入框
    */
   getTagInput(): Locator {
-    return this.page.locator('[data-tag-popup-input]').first();
+    return this.root.locator('[data-tag-popup-input]').first();
   }
 
   /**
    * 查找评论按钮或标记
    */
   getCommentMarker(): Locator {
-    return this.page.locator('[data-comment-marker]').first();
+    return this.root.locator('[data-comment-marker]').first();
   }
 
   /**

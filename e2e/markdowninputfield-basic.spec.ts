@@ -84,50 +84,14 @@ test.describe('MarkdownInputField 基础功能', () => {
     await markdownInputFieldPage.typeText('Copy Test Text');
     await markdownInputFieldPage.focus();
 
-    // 使用鼠标选择前 4 个字符 "Copy"
-    // 获取输入框的位置
-    const editableInput = markdownInputFieldPage.editableInput;
-    const boundingBox = await editableInput.boundingBox();
-    if (!boundingBox) {
-      throw new Error('无法获取输入框的位置');
+    // 用键盘选中前 4 个字符（避免 iframe 与 viewport 坐标系下鼠标拖拽失准）
+    await markdownInputFieldPage.pressKey('Home');
+    const kb = markdownInputFieldPage.keyboardTargetPage.keyboard;
+    await kb.down('Shift');
+    for (let i = 0; i < 4; i++) {
+      await kb.press('ArrowRight');
     }
-
-    // 计算文本的起始位置（在输入框左侧，稍微偏移以选择文本）
-    const startX = boundingBox.x + 5;
-    const startY = boundingBox.y + boundingBox.height / 2;
-
-    // 使用 evaluate 获取前 4 个字符的实际宽度
-    const textWidth = await editableInput.evaluate((el) => {
-      const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) {
-        return 0;
-      }
-
-      // 创建临时 range 来测量文本宽度
-      const range = document.createRange();
-      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
-
-      let textNode = walker.nextNode();
-      if (!textNode || !textNode.textContent) {
-        return 0;
-      }
-
-      range.setStart(textNode, 0);
-      range.setEnd(textNode, Math.min(4, textNode.textContent.length));
-      const rect = range.getBoundingClientRect();
-      return rect.width;
-    });
-
-    const endX = startX + textWidth;
-    const endY = startY;
-
-    // 使用鼠标拖拽选择文本
-    await page.mouse.move(startX, startY);
-    await page.mouse.down();
-    await page.mouse.move(endX, endY, { steps: 10 });
-    await page.mouse.up();
-
-    // 等待一小段时间，确保选择完成
+    await kb.up('Shift');
     await page.waitForTimeout(100);
 
     // 复制操作（copy() 方法内部已处理权限）

@@ -59,6 +59,7 @@ vi.mock('slate', () => ({
   },
   Path: {
     hasPrevious: () => false,
+    next: (p: number[]) => [...p.slice(0, -1), p[p.length - 1] + 1],
   },
 }));
 

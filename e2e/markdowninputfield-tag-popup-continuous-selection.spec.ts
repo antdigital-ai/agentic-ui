@@ -15,7 +15,7 @@ test.describe('TagPopup 连续选择功能', () => {
     );
 
     // 等待 tag popup 输入区域出现
-    const popupInputs = page.locator(
+    const popupInputs = markdownInputFieldPage.root.locator(
       '[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow',
     );
     await expect(popupInputs.first()).toBeVisible({ timeout: 5000 });
@@ -35,28 +35,17 @@ test.describe('TagPopup 连续选择功能', () => {
       // 点击 popup 输入区域打开下拉菜单
       await popupInput.click();
 
-      // 等待下拉菜单打开并等待菜单项实际出现
-      const menuItems = page.locator('.ant-dropdown-menu-item');
+      const menuItem = markdownInputFieldPage.keyboardTargetPage
+        .locator('.ant-dropdown-menu-item')
+        .last();
       await expect
-        .poll(
-          async () => {
-            const count = await menuItems.count();
-            return count;
-          },
-          {
-            timeout: 5000,
-            message: `等待第 ${i + 1} 个下拉菜单项加载完成`,
-          },
-        )
+        .poll(async () => menuItem.count(), {
+          timeout: 5000,
+          message: `等待第 ${i + 1} 个下拉菜单项加载完成`,
+        })
         .toBeGreaterThan(0);
-
-      // 等待第一个菜单项可见并可交互
-      const firstMenuItem = menuItems.first();
-      await expect(firstMenuItem).toBeVisible({ timeout: 3000 });
-      await firstMenuItem.scrollIntoViewIfNeeded();
-
-      // 点击第一个菜单项（连续选择）
-      await firstMenuItem.click({ timeout: 2000 });
+      await expect(menuItem).toBeVisible({ timeout: 5000 });
+      await menuItem.click();
 
       // 等待输入框内容更新
       await expect
@@ -105,7 +94,7 @@ test.describe('TagPopup 连续选择功能', () => {
     );
 
     // 等待 tag popup 输入区域出现
-    const popupInputs = page.locator(
+    const popupInputs = markdownInputFieldPage.root.locator(
       '[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow',
     );
     await expect(popupInputs.first()).toBeVisible({ timeout: 5000 });
@@ -121,34 +110,24 @@ test.describe('TagPopup 连续选择功能', () => {
       }
     });
 
-    // 快速连续点击多个 popup
-    const clickPromises: Promise<void>[] = [];
-    for (let i = 0; i < Math.min(popupCount, 2); i++) {
+    // 顺序操作：并行点击两个 popup 易导致下拉未挂载就点菜单、或 iframe 焦点错乱
+    const n = Math.min(popupCount, 2);
+    for (let i = 0; i < n; i++) {
       const popupInput = popupInputs.nth(i);
-      clickPromises.push(
-        (async (): Promise<void> => {
-          try {
-            await popupInput.click({ timeout: 2000 });
-            // 等待菜单出现
-            const menuItems = page.locator('.ant-dropdown-menu-item');
-            await expect(menuItems.first()).toBeVisible({ timeout: 3000 });
-            const count = await menuItems.count();
-            if (count > 0) {
-              const firstMenuItem = menuItems.first();
-              await firstMenuItem.click({ timeout: 2000 });
-            }
-          } catch (error) {
-            // 忽略点击错误，因为可能菜单已经关闭
-          }
-        })(),
-      );
+      await popupInput.click({ timeout: 5000 });
+      const item = markdownInputFieldPage.keyboardTargetPage
+        .locator('.ant-dropdown-menu-item')
+        .last();
+      await expect
+        .poll(async () => item.count(), { timeout: 5000 })
+        .toBeGreaterThan(0);
+      await expect(item).toBeVisible({ timeout: 5000 });
+      await item.click();
     }
 
-    // 等待所有点击完成
-    await Promise.allSettled(clickPromises);
-
-    // 等待所有异步操作完成（等待输入框稳定）
-    await expect(markdownInputFieldPage.editableInput).toBeVisible();
+    await expect(markdownInputFieldPage.editableInput).toBeVisible({
+      timeout: 10000,
+    });
 
     // 验证没有 path 相关的错误
     const pathErrors = errors.filter(
@@ -166,7 +145,7 @@ test.describe('TagPopup 连续选择功能', () => {
     );
 
     // 等待 tag popup 输入区域出现
-    const popupInput = page
+    const popupInput = markdownInputFieldPage.root
       .locator('[data-tag-popup-input].ant-agentic-md-editor-tag-popup-has-arrow')
       .first();
     await expect(popupInput).toBeVisible({ timeout: 5000 });
@@ -179,50 +158,42 @@ test.describe('TagPopup 连续选择功能', () => {
       }
     });
 
+    const before = await markdownInputFieldPage.getText();
+
     // 第一次选择
     await popupInput.click();
-    const menuItems = page.locator('.ant-dropdown-menu-item');
+    const firstItem = markdownInputFieldPage.keyboardTargetPage
+      .locator('.ant-dropdown-menu-item')
+      .last();
     await expect
-      .poll(
-        async () => {
-          const count = await menuItems.count();
-          return count;
-        },
-        {
-          timeout: 5000,
-          message: '等待下拉菜单项加载完成',
-        },
-      )
+      .poll(async () => firstItem.count(), {
+        timeout: 5000,
+        message: '等待下拉菜单项加载完成',
+      })
       .toBeGreaterThan(0);
+    await expect(firstItem).toBeVisible({ timeout: 5000 });
+    await firstItem.click();
 
-    const firstMenuItem = menuItems.first();
-    await expect(firstMenuItem).toBeVisible({ timeout: 3000 });
-    await firstMenuItem.click({ timeout: 2000 });
-
-    // 等待菜单关闭（通过等待菜单项不可见来确认）
-    await expect(menuItems.first()).not.toBeVisible({ timeout: 2000 });
+    await expect
+      .poll(async () => await markdownInputFieldPage.getText(), {
+        timeout: 5000,
+        message: '等待第一次选择写入编辑器',
+      })
+      .not.toBe(before);
 
     // 立即再次打开下拉菜单（连续操作）
     await popupInput.click();
-
-    // 等待菜单再次打开
+    const secondItem = markdownInputFieldPage.keyboardTargetPage
+      .locator('.ant-dropdown-menu-item')
+      .last();
     await expect
-      .poll(
-        async () => {
-          const count = await menuItems.count();
-          return count;
-        },
-        {
-          timeout: 5000,
-          message: '等待下拉菜单再次打开',
-        },
-      )
+      .poll(async () => secondItem.count(), {
+        timeout: 5000,
+        message: '等待下拉菜单再次打开',
+      })
       .toBeGreaterThan(0);
-
-    // 再次选择
-    const secondMenuItem = menuItems.first();
-    await expect(secondMenuItem).toBeVisible({ timeout: 3000 });
-    await secondMenuItem.click({ timeout: 2000 });
+    await expect(secondItem).toBeVisible({ timeout: 5000 });
+    await secondItem.click();
 
     // 等待所有异步操作完成（等待输入框稳定）
     await expect(markdownInputFieldPage.editableInput).toBeVisible();

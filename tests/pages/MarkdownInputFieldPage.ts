@@ -1,6 +1,8 @@
+import type { Frame } from '@playwright/test';
 import { Locator, Page, expect } from '@playwright/test';
 
 import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
+import { getDumiDemoContentRoot } from '../utils/dumiDemoFrame';
 
 /**
  * MarkdownInputField Page Object Model
@@ -8,27 +10,53 @@ import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
  */
 export class MarkdownInputFieldPage {
   readonly page: Page;
-  readonly inputField: Locator;
-  readonly editableInput: Locator;
+  /** Dumi demo 常在 iframe 内 */
+  root: Page | Frame;
+  inputField: Locator;
+  editableInput: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    // 仅用 testid 并取第一个，避免多 demo 页面下 strict mode 匹配到多个元素
+    this.root = page;
     this.inputField = page.getByTestId('markdown-input-field').first();
     this.editableInput = this.inputField.locator('[contenteditable="true"]');
   }
 
+  private async bindDemoRoot() {
+    this.root = await getDumiDemoContentRoot(this.page);
+    this.inputField = this.root.getByTestId('markdown-input-field').first();
+    const inEditorContent = this.root
+      .getByTestId('markdown-input-field-editor-content')
+      .locator('[contenteditable="true"]');
+    this.editableInput =
+      (await inEditorContent.count()) > 0
+        ? inEditorContent.first()
+        : this.inputField.locator('[contenteditable="true"]').first();
+  }
+
+  private get keyboardPage(): Page {
+    return this.root === this.page ? this.page : (this.root as Frame).page;
+  }
+
+  get keyboardTargetPage(): Page {
+    return this.keyboardPage;
+  }
+
+  get interactionTargetPage(): Page {
+    return this.keyboardPage;
+  }
+
   get sendButton(): Locator {
     // 使用 .first() 确保只匹配第一个发送按钮，避免 strict mode 错误
-    return this.page.getByTestId('send-button').first();
+    return this.root.getByTestId('send-button').first();
   }
 
   get enlargeButton(): Locator {
-    return this.page.getByRole('button', { name: '放大' });
+    return this.root.getByRole('button', { name: '放大' });
   }
 
   get shrinkButton(): Locator {
-    return this.page.getByRole('button', { name: '缩小' });
+    return this.root.getByRole('button', { name: '缩小' });
   }
 
   /**
@@ -43,6 +71,7 @@ export class MarkdownInputFieldPage {
       timeout: 60_000,
     });
     await this.page.waitForLoadState('networkidle');
+    await this.bindDemoRoot();
     await this.waitForReady();
   }
 
@@ -133,7 +162,7 @@ export class MarkdownInputFieldPage {
           });
 
           // 使用 Shift+Enter 强制换行，避免 Enter 键触发发送消息
-          await this.page.keyboard.press('Shift+Enter');
+          await this.keyboardPage.keyboard.press('Shift+Enter');
 
           // 等待换行完成：等待段落数量增加或结构变化
           // 在 Slate 编辑器中，换行通过块级元素表示，不依赖 \n 字符
@@ -236,8 +265,8 @@ export class MarkdownInputFieldPage {
     await this.focus();
     const isMac = process.platform === 'darwin';
     const modifierKey = isMac ? 'Meta' : 'Control';
-    await this.page.keyboard.press(`${modifierKey}+a`);
-    await this.page.keyboard.press('Delete');
+    await this.keyboardPage.keyboard.press(`${modifierKey}+a`);
+    await this.keyboardPage.keyboard.press('Delete');
   }
 
   /**
@@ -246,7 +275,7 @@ export class MarkdownInputFieldPage {
    */
   async expectPlaceholderVisible() {
     // 检查是否有 empty 类的段落元素，且占位符属性存在
-    const hasPlaceholder = await this.page.evaluate(() => {
+    const hasPlaceholder = await this.root.evaluate(() => {
       const emptyParagraph = document.querySelector(
         '.empty[data-slate-placeholder]',
       );
@@ -264,7 +293,7 @@ export class MarkdownInputFieldPage {
    */
   async expectPlaceholderHidden() {
     // 使用 Playwright locator 查找 empty 类的占位符元素
-    const emptyPlaceholder = this.page.locator(
+    const emptyPlaceholder = this.root.locator(
       '.empty[data-slate-placeholder]',
     );
 
@@ -291,16 +320,17 @@ export class MarkdownInputFieldPage {
    */
   async pressKey(key: string) {
     const isMac = process.platform === 'darwin';
+    const kb = this.keyboardPage.keyboard;
     if (isMac && key === 'Home') {
       // Mac 上使用 Meta+Left 代替 Home
-      await this.page.keyboard.press('Meta+ArrowLeft');
+      await kb.press('Meta+ArrowLeft');
     } else if (isMac && key === 'End') {
       // Mac 上使用 Meta+Right 代替 End
-      await this.page.keyboard.press('Meta+ArrowRight');
+      await kb.press('Meta+ArrowRight');
     } else {
-      await this.page.keyboard.press(key);
+      await kb.press(key);
     }
-    await this.page.waitForTimeout(100);
+    await this.keyboardPage.waitForTimeout(100);
   }
 
   /**
@@ -311,10 +341,10 @@ export class MarkdownInputFieldPage {
   async selectAll() {
     const isMac = process.platform === 'darwin';
     const modifierKey = isMac ? 'Meta' : 'Control';
-    await this.page.keyboard.press(`${modifierKey}+a`);
+    await this.keyboardPage.keyboard.press(`${modifierKey}+a`);
     // 等待选中状态生效，确保后续输入能够替换选中内容
     // Mac 上可能需要更长的等待时间
-    await this.page.waitForTimeout(isMac ? 200 : 100);
+    await this.keyboardPage.waitForTimeout(isMac ? 200 : 100);
     // 验证选中状态是否生效（通过检查是否有选中文本）
     await expect
       .poll(
@@ -346,11 +376,11 @@ export class MarkdownInputFieldPage {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const isMac = process.platform === 'darwin';
     const modifierKey = isMac ? 'Meta' : 'Control';
-    await this.page.keyboard.press(`${modifierKey}+c`);
+    await this.keyboardPage.keyboard.press(`${modifierKey}+c`);
     // 等待一小段时间，确保复制操作完成
     // 注意：不验证剪贴板内容，因为 navigator.clipboard.readText() 可能不可靠
     // 复制是否成功应该通过后续的粘贴操作来验证
-    await this.page.waitForTimeout(200);
+    await this.keyboardPage.waitForTimeout(200);
   }
 
   /**
@@ -371,9 +401,9 @@ export class MarkdownInputFieldPage {
     // 确保输入框已聚焦，准备好接收粘贴
     await this.focus();
     // 等待一小段时间，确保输入框已准备好接收粘贴
-    await this.page.waitForTimeout(100);
+    await this.keyboardPage.waitForTimeout(100);
 
-    await this.page.keyboard.press(`${modifierKey}+v`);
+    await this.keyboardPage.keyboard.press(`${modifierKey}+v`);
 
     // 等待文本变化：如果之前是空的，等待文本变为非空；否则等待文本长度增加
     if (beforeLength === 0) {
@@ -413,7 +443,7 @@ export class MarkdownInputFieldPage {
       .grantPermissions(['clipboard-read', 'clipboard-write']);
     const isMac = process.platform === 'darwin';
     const modifierKey = isMac ? 'Meta' : 'Control';
-    await this.page.keyboard.press(`${modifierKey}+x`);
+    await this.keyboardPage.keyboard.press(`${modifierKey}+x`);
   }
 
   /**

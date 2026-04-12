@@ -37,8 +37,8 @@ export default defineConfig({
   webServer: process.env.SKIP_WEBSERVER
     ? undefined // 如果设置了 SKIP_WEBSERVER，跳过自动启动（假设服务器已运行）
     : {
-        // 先构建文档，然后启动预览服务器（比 dev 启动快得多）
-        command: 'pnpm run docs:build && pnpm run preview',
+        // 先编译库产物再构建文档，确保 demo 中 `@ant-design/agentic-ui` 指向的 dist 与当前 src 一致
+        command: 'pnpm run build && pnpm run docs:build && pnpm run preview',
         url: 'http://localhost:4172',
         reuseExistingServer: !process.env.CI, // 本地开发时复用已有服务器
         timeout: 180 * 1000, // 3 分钟超时（构建 + 预览启动通常比 dev 快）

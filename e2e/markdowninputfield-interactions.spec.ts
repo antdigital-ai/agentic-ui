@@ -38,7 +38,9 @@ test.describe('MarkdownInputField 交互功能', () => {
       await markdownInputFieldPage.typeText('Line 1');
 
       // 按 Shift+Enter
-      await markdownInputFieldPage.page.keyboard.press('Shift+Enter');
+      await markdownInputFieldPage.keyboardTargetPage.keyboard.press(
+        'Shift+Enter',
+      );
 
       // 输入第二行
       await markdownInputFieldPage.typeText('Line 2');
