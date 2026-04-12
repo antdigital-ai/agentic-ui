@@ -295,9 +295,6 @@ const extractLanguageFromClassName = (
   return undefined;
 };
 
-/**
- * 提取 React children 的文本内容
- */
 const extractChildrenText = (children: React.ReactNode): string => {
   if (typeof children === 'string') return children;
   if (typeof children === 'number') return String(children);
@@ -309,13 +306,7 @@ const extractChildrenText = (children: React.ReactNode): string => {
   return '';
 };
 
-/**
- * <think> 标签渲染组件——使用 ToolUseBarThink 替代原生 DOM。
- * 在 MarkdownEditor 中，<think> 被预处理为 ```think 代码块，
- * 然后由 ThinkBlock 组件（依赖 Slate 上下文）渲染为 ToolUseBarThink。
- * 在 MarkdownRenderer 中，<think> 通过 rehypeRaw 保留为 hast 元素，
- * 这里直接渲染为 ToolUseBarThink，无需 Slate 上下文。
- */
+/** <think> 标签 → ToolUseBarThink（MarkdownRenderer 无 Slate 上下文，直接渲染） */
 const ThinkBlockRendererComponent = (props: any) => {
   const { children } = props;
   const content = extractChildrenText(children);
@@ -336,12 +327,7 @@ const ThinkBlockRendererComponent = (props: any) => {
   });
 };
 
-/**
- * 构建与 MarkdownEditor Readonly 组件对齐的 hast→React 组件映射。
- *
- * MarkdownEditor 的 Slate 元素使用 data-be 属性和 prefixCls 类名，
- * 这里为原生 HTML 标签添加相同的属性，使共用的 CSS 能正确命中。
- */
+/** hast → React 组件映射，与 MarkdownEditor Readonly 的 data-be / prefixCls 对齐 */
 const buildEditorAlignedComponents = (
   prefixCls: string,
   userComponents: Record<string, React.ComponentType<RendererBlockProps>>,
@@ -1004,9 +990,7 @@ const buildEditorAlignedComponents = (
   };
 };
 
-/**
- * 将单个 markdown 片段转为 React 元素（内部函数）
- */
+/** markdown 片段 → React 元素 */
 const renderMarkdownBlock = (
   blockContent: string,
   processor: Processor,
@@ -1028,10 +1012,7 @@ const renderMarkdownBlock = (
   }
 };
 
-/**
- * 将 markdown 按块（双换行）拆分，尊重代码围栏边界。
- * 返回的每个块是一个独立的 markdown 片段，可单独解析。
- */
+/** 按双换行拆块，尊重代码围栏边界 */
 const splitMarkdownBlocks = (content: string): string[] => {
   const lines = content.split('\n');
   const blocks: string[] = [];
@@ -1065,32 +1046,18 @@ export interface UseMarkdownToReactOptions {
   remarkPlugins?: MarkdownRemarkPlugin[];
   htmlConfig?: MarkdownToHtmlConfig;
   components?: Record<string, React.ComponentType<RendererBlockProps>>;
-  /** MarkdownEditor 的 CSS 前缀，用于生成对齐的 className */
   prefixCls?: string;
-  /** 链接配置：onClick 拦截、openInNewTab 控制 */
   linkConfig?: {
     openInNewTab?: boolean;
     onClick?: (url?: string) => boolean | void;
   };
-  /** 脚注：与只读 Slate 路径 FncLeaf / fncProps 对齐 */
   fncProps?: MarkdownEditorProps['fncProps'];
-  /** 是否处于流式状态，用于最后一个块的打字动画 */
   streaming?: boolean;
-  /**
-   * 流式时是否对「生长中的末段」启用段落淡入（AnimationText）。
-   * 默认 false：重解析时频繁触发动画易导致整页闪动；需要时再显式传入 true。
-   */
+  /** 默认 false */
   streamingParagraphAnimation?: boolean;
-  /**
-   * 单调增长的原始流字符串，仅用于判断是否应保留分块缓存。
-   * 与 `content`（常为 useStreaming 输出的可解析串）分离，避免占位符与正文切换时误判为非前缀修订。
-   */
+  /** 原始流字符串，与 useStreaming 输出分离避免缓存误判 */
   contentRevisionSource?: string;
-  /**
-   * 自定义元素渲染拦截函数（markdown 渲染模式）。
-   * 允许在默认渲染结果基础上包装、替换任意元素。
-   * 返回 undefined 时回退到默认渲染。
-   */
+  /** 返回 undefined 回退默认渲染 */
   eleRender?: (
     props: MarkdownRendererEleProps,
     defaultDom: React.ReactNode,

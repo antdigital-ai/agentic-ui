@@ -246,16 +246,7 @@ const isInCodeBlock = (text: string, isFinalChunk = false): boolean => {
   return inFenced;
 };
 
-/**
- * 流式 Markdown 缓存 hook。
- *
- * 逐字符扫描输入，识别不完整的 Markdown token（link、image、table、emphasis 等），
- * 将已完成的内容输出，不完整的部分暂缓，避免 parser 错误解析。
- *
- * @param input - 完整的 markdown 内容（持续增长）
- * @param enabled - 是否启用流式缓存（非流式直接透传）
- * @returns 安全的可解析 markdown 字符串
- */
+/** 流式 token 缓存——暂缓不完整的 link/image/table 等，避免 parser 错误解析 */
 export const useStreaming = (input: string, enabled: boolean): string => {
   const [output, setOutput] = useState('');
   const cacheRef = useRef<StreamCache>(getInitialCache());
