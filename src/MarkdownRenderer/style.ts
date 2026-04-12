@@ -29,7 +29,13 @@ export const useRendererVarStyle = (prefixCls: string) => {
       },
 
       '@keyframes markdownStreamingCursorBlink': {
-        to: { opacity: 0 },
+        '0%, 100%': { opacity: 0.9, boxShadow: '0 0 4px currentColor' },
+        '50%': { opacity: 0, boxShadow: '0 0 0 currentColor' },
+      },
+
+      '@keyframes markdownStreamingCursorFadeIn': {
+        from: { opacity: 0, transform: 'scaleY(0.3)' },
+        to: { opacity: 0.9, transform: 'scaleY(1)' },
       },
     };
   });

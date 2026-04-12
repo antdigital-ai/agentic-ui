@@ -13,10 +13,9 @@ const StreamingCursor: React.FC = () => (
       marginLeft: 2,
       verticalAlign: 'text-bottom',
       backgroundColor: 'currentColor',
-      opacity: 0.8,
       borderRadius: 1,
       animation:
-        'markdownStreamingCursorBlink 0.8s steps(2, start) infinite',
+        'markdownStreamingCursorFadeIn 0.2s ease-out forwards, markdownStreamingCursorBlink 0.8s ease-in-out 0.2s infinite',
     }}
   />
 );
