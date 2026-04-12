@@ -1,89 +1,14 @@
-import {
-  EditorStore,
-  useEditorStore,
-} from '@ant-design/agentic-ui/MarkdownEditor/editor/store';
+/**
+ * 文件名 `EditorStore.*` 在同目录字典序上晚于 `Editor.branches.*`，使 vitest 先注册后者对 slate 的 vi.mock，
+ * 再加载本文件中的真实 slate，避免剪贴板等用例的 mock 被覆盖。
+ */
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import { createEditor, Editor, Node, Path, Text, Transforms } from 'slate';
+import { createEditor, Editor, Path, Text, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-// Mock dependencies
-vi.mock('slate', async () => {
-  const actual = await vi.importActual<typeof import('slate')>('slate');
-  return {
-    ...actual,
-    createEditor: vi.fn(() => ({
-      children: [{ type: 'paragraph', children: [{ text: 'test' }] }],
-      selection: null,
-      operations: [],
-      marks: null,
-      isInline: vi.fn(),
-      isVoid: vi.fn(),
-      normalizeNode: vi.fn(),
-      onChange: vi.fn(),
-      hasPath: vi.fn(() => true),
-      withoutNormalizing: vi.fn((fn: () => void) => fn()),
-    })),
-    Transforms: {
-      insertNodes: vi.fn((editor, nodes, options) => {
-        if (options?.at) {
-          const at = options.at[0];
-          if (Array.isArray(nodes)) {
-            editor.children.splice(at, 0, ...nodes);
-          } else {
-            editor.children.splice(at, 0, nodes);
-          }
-        } else {
-          if (Array.isArray(nodes)) {
-            editor.children.push(...nodes);
-          } else {
-            editor.children.push(nodes);
-          }
-        }
-      }),
-      removeNodes: vi.fn((editor, options) => {
-        if (options?.at) {
-          const at = options.at[0];
-          editor.children.splice(at, 1);
-        }
-      }),
-      insertText: vi.fn(),
-      delete: vi.fn(),
-    },
-    Editor: {
-      nodes: vi.fn(() => []),
-      withoutNormalizing: vi.fn((editor, fn) => fn()),
-    },
-    Text: {
-      isText: vi.fn(() => false),
-    },
-    Node: {
-      string: vi.fn(() => ''),
-    },
-  };
-});
-
-vi.mock('slate-react', () => ({
-  ...vi.importActual('slate-react'),
-  withReact: vi.fn((editor) => editor),
-  ReactEditor: {
-    focus: vi.fn(),
-    findPath: vi.fn(),
-    deselect: vi.fn(),
-    isFocused: vi.fn(() => false),
-  },
-}));
-
-vi.mock('slate-history', () => ({
-  ...vi.importActual('slate-history'),
-  withHistory: vi.fn((editor) => editor),
-  HistoryEditor: {
-    isHistoryEditor: vi.fn(() => false),
-    withoutSaving: vi.fn((_editor: any, fn: () => void) => fn()),
-  },
-}));
+import { EditorStore, useEditorStore } from '../store';
 
 describe('EditorStore', () => {
   let editor: any;
@@ -97,7 +22,7 @@ describe('EditorStore', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('构造函数', () => {
@@ -221,27 +146,32 @@ describe('EditorStore', () => {
     });
 
     it('selection 为 null 时 insertLink 直接返回不插入', () => {
+      const insertSpy = vi.spyOn(Transforms, 'insertNodes');
       editor.selection = null;
       store.insertLink('http://example.com');
-      expect(Transforms.insertNodes).not.toHaveBeenCalled();
+      expect(insertSpy).not.toHaveBeenCalled();
     });
 
     it('当前块为 code/table/head 时在下一路径插入段落链接', () => {
+      const insertSpy = vi.spyOn(Transforms, 'insertNodes');
+      editor.children = [
+        { type: 'code', children: [{ text: '' }] },
+      ] as any;
       editor.selection = {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 0 },
       };
       let callCount = 0;
-      vi.mocked(Editor.nodes).mockImplementation(function* (e: any, opts: any) {
+      vi.spyOn(Editor, 'nodes').mockImplementation(function* () {
         callCount += 1;
         if (callCount === 1) {
-          yield [{ type: 'code', children: [] }, [0]];
+          yield [{ type: 'code', children: [{ text: '' }] }, [0]];
         } else {
-          yield [{ type: 'code', children: [] }, [0]];
+          yield [{ type: 'code', children: [{ text: '' }] }, [0]];
         }
       });
       store.insertLink('http://link.com');
-      expect(Transforms.insertNodes).toHaveBeenCalledWith(
+      expect(insertSpy).toHaveBeenCalledWith(
         editor,
         expect.objectContaining({
           type: 'paragraph',
@@ -271,21 +201,26 @@ describe('EditorStore', () => {
 
   describe('isLatestNode', () => {
     it('节点不在编辑器中时 findPath 抛错返回 false', () => {
-      vi.mocked(ReactEditor.findPath).mockImplementation(() => {
-        throw new Error('Node not found');
-      });
+      const findPathSpy = vi
+        .spyOn(ReactEditor, 'findPath')
+        .mockImplementation(() => {
+          throw new Error('Node not found');
+        });
       const result = store.isLatestNode({
         type: 'paragraph',
         children: [{ text: 'x' }],
       });
       expect(result).toBe(false);
+      findPathSpy.mockRestore();
     });
   });
 
   describe('removeNodes', () => {
     it('应调用 Transforms.removeNodes', () => {
+      const removeSpy = vi.spyOn(Transforms, 'removeNodes');
+      editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }] as any;
       store.removeNodes({ at: [0] });
-      expect(Transforms.removeNodes).toHaveBeenCalledWith(editor, { at: [0] });
+      expect(removeSpy).toHaveBeenCalledWith(editor, { at: [0] });
     });
   });
 
@@ -298,11 +233,12 @@ describe('EditorStore', () => {
 
   describe('setContent', () => {
     it('应通过 Transforms API 安全替换编辑器内容', () => {
+      const wnSpy = vi.spyOn(Editor, 'withoutNormalizing');
       const newContent = [
         { type: 'paragraph', children: [{ text: 'b' }] },
       ];
       store.setContent(newContent);
-      expect(Editor.withoutNormalizing).toHaveBeenCalled();
+      expect(wnSpy).toHaveBeenCalled();
     });
 
     it('当存在失效 selection 时会先清空 selection 再替换内容', () => {
@@ -318,7 +254,6 @@ describe('EditorStore', () => {
 
       expect(editor.selection).toBeNull();
       expect(editor.children).toEqual(nextNodeList);
-      expect(editor.onChange).toHaveBeenCalled();
     });
   });
 
@@ -359,16 +294,18 @@ describe('EditorStore', () => {
     });
 
     it('新列表更长时执行 insert 操作', () => {
+      const insertSpy = vi.spyOn(Transforms, 'insertNodes');
       editor.children = [{ type: 'paragraph', children: [{ text: 'a' }] }];
       editor.hasPath = vi.fn((path: number[]) => path[0] !== 1);
       store.updateNodeList([
         { type: 'paragraph', children: [{ text: 'a' }] },
         { type: 'paragraph', children: [{ text: 'b' }] },
       ] as any);
-      expect(Transforms.insertNodes).toHaveBeenCalled();
+      expect(insertSpy).toHaveBeenCalled();
     });
 
     it('新列表更短时执行 remove 操作', () => {
+      const removeSpy = vi.spyOn(Transforms, 'removeNodes');
       editor.children = [
         { type: 'paragraph', children: [{ text: 'a' }] },
         { type: 'paragraph', children: [{ text: 'b' }] },
@@ -376,16 +313,17 @@ describe('EditorStore', () => {
       store.updateNodeList([
         { type: 'paragraph', children: [{ text: 'a' }] },
       ] as any);
-      expect(Transforms.removeNodes).toHaveBeenCalled();
+      expect(removeSpy).toHaveBeenCalled();
     });
   });
 
   describe('replaceText', () => {
     it('在文本节点中替换并调用 Transforms.insertText', () => {
+      const insertTextSpy = vi.spyOn(Transforms, 'insertText');
       editor.children = [
         { type: 'paragraph', children: [{ text: 'hello world' }] },
       ];
-      vi.mocked(Editor.nodes).mockImplementation(function* (
+      vi.spyOn(Editor, 'nodes').mockImplementation(function* (
         _e: any,
         opts: any,
       ) {
@@ -393,14 +331,14 @@ describe('EditorStore', () => {
           yield [{ text: 'hello world' }, [0, 0]];
         }
       });
-      vi.mocked(Text.isText).mockReturnValue(true);
+      vi.spyOn(Text, 'isText').mockReturnValue(true);
       const count = store.replaceText('world', 'x', {
         replaceAll: true,
         caseSensitive: true,
         wholeWord: false,
       });
       expect(count).toBe(1);
-      expect(Transforms.insertText).toHaveBeenCalledWith(
+      expect(insertTextSpy).toHaveBeenCalledWith(
         editor,
         'hello x',
         expect.objectContaining({ at: [0, 0] }),

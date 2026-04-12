@@ -594,6 +594,16 @@ describe('Editor branches - handleClipboardCopy', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     editableProps = {};
+    /**
+     * 同 worker 内若先有测试加载真实 slate（如 EditorStore.unit.test），此处 vi.mock('slate') 不生效，
+     * 真实 Editor.hasPath 在 createMockEditor 上会对 [0,0] 返回 false，导致 clearData 后即 return，
+     * setData / Transforms.delete / 内层 catch 均无法覆盖。
+     */
+    vi.spyOn(Editor, 'hasPath').mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('copy with valid selection sets clipboard data and returns true', () => {
