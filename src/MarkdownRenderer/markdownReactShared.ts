@@ -707,7 +707,7 @@ const buildEditorAlignedComponents = (
         ...rest,
         'data-testid': 'markdown-mark',
         style: {
-          background: '#f59e0b',
+          background: 'var(--ant-color-warning-bg, #f59e0b)',
           padding: '0.1em 0.2em',
           borderRadius: 2,
         },
