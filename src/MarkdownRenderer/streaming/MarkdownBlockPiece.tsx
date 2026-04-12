@@ -41,20 +41,12 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
       return cached;
     }
 
-    if (variant === 'sealed') {
-      const el = renderMarkdownBlock(blockSource, processor, components, {
-        markStreamingTailParagraph: false,
-      });
+    if (variant === 'sealed' || !streaming) {
+      const el = renderMarkdownBlock(blockSource, processor, components);
       parseBySourceRef.current.set(blockSource, el);
-      return el;
-    }
-
-    if (!streaming) {
-      const el = renderMarkdownBlock(blockSource, processor, components, {
-        markStreamingTailParagraph: false,
-      });
-      parseBySourceRef.current.set(blockSource, el);
-      lastParsedRef.current = { source: blockSource, node: el };
+      if (variant === 'tail') {
+        lastParsedRef.current = { source: blockSource, node: el };
+      }
       return el;
     }
 
@@ -63,9 +55,7 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
       return prev.node;
     }
 
-    const el = renderMarkdownBlock(blockSource, processor, components, {
-      markStreamingTailParagraph: true,
-    });
+    const el = renderMarkdownBlock(blockSource, processor, components);
     parseBySourceRef.current.set(blockSource, el);
     lastParsedRef.current = { source: blockSource, node: el };
     return el;

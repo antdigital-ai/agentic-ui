@@ -115,7 +115,8 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     props.markdownRenderConfig?.renderType ??
     'slate';
   const shouldAnimateMarkdown =
-    Boolean(typing) && (props.originData?.isLast ?? true);
+    (props.markdownRenderConfig?.typewriter ?? Boolean(typing)) &&
+    (props.originData?.isLast ?? true);
 
   const isPaddingHidden = useMemo(() => {
     return !!extra;
@@ -134,7 +135,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         <MarkdownRenderer
           content={content}
           streaming={shouldAnimateMarkdown}
-          isFinished={props.originData?.isFinished}
+          isFinished={props.originData?.isFinished ?? props.isFinished}
           plugins={props.markdownRenderConfig?.plugins}
           remarkPlugins={props.markdownRenderConfig?.markdownToHtmlOptions}
           queueOptions={props.markdownRenderConfig?.queueOptions}

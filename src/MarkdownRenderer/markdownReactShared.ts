@@ -1005,38 +1005,17 @@ const buildEditorAlignedComponents = (
 };
 
 /**
- * 在 hast 上标记「最后一个 p」，用于流式时仅该段落播放入场（单块长文时避免全页 p 一起闪）
- */
-const markLastParagraphStreamingTail = (hast: any) => {
-  const paragraphs: any[] = [];
-  visit(hast, 'element', (node: any) => {
-    if (node.tagName === 'p') {
-      paragraphs.push(node);
-    }
-  });
-  const last = paragraphs[paragraphs.length - 1];
-  if (last) {
-    last.properties = last.properties || {};
-    last.properties.dataStreamingTail = true;
-  }
-};
-
-/**
  * 将单个 markdown 片段转为 React 元素（内部函数）
  */
 const renderMarkdownBlock = (
   blockContent: string,
   processor: Processor,
   components: Record<string, any>,
-  blockOpts?: { markStreamingTailParagraph?: boolean },
 ): React.ReactNode => {
   if (!blockContent.trim()) return null;
   try {
     const mdast = processor.parse(blockContent);
     const hast = processor.runSync(mdast);
-    if (blockOpts?.markStreamingTailParagraph) {
-      markLastParagraphStreamingTail(hast);
-    }
     return toJsxRuntime(hast as any, {
       Fragment,
       jsx: jsx as any,
@@ -1121,7 +1100,6 @@ export interface UseMarkdownToReactOptions {
 export {
   buildEditorAlignedComponents,
   createHastProcessor,
-  markLastParagraphStreamingTail,
   renderMarkdownBlock,
   splitMarkdownBlocks,
 };
