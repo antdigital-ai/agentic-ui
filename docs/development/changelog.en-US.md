@@ -11,7 +11,12 @@ group:
 
 ## v2.30.22
 
+- MarkdownRenderer
+  - 🐞 Fix missing paragraph fade-in when `streamingParagraphAnimation` is omitted in streaming markdown mode; default is now on, set `streamingParagraphAnimation: false` to disable. [#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
+- MarkdownEditor
+  - 🛠 Align `streamingParagraphAnimation` semantics with MarkdownRenderer (on by default, pass `false` to disable). [#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
 - Bubble
+  - 📖 Docs and streaming demo add `markdownRenderConfig.streamingParagraphAnimation: false` migration example (matches legacy “omit means no paragraph animation”). [#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
   - 🆕 Add `useOpenAIMessageBubbleData` hook and `mapOpenAIMessagesToMessageBubbleData` to convert OpenAI Chat Completions-style `messages` into `MessageBubbleData[]` for `BubbleList` and SSE streaming.
   - 🆕 Add `useOpenClawMessageBubbleData`, `mapOpenClawMessagesToMessageBubbleData`, and `normalizeOpenClawMessagesToOpenAI` for OpenClaw session/transcript-style messages (`timestamp`, `toolResult`, etc.).
   - 🆕 Add `useOllamaMessageBubbleData`, `mapOllamaMessagesToMessageBubbleData`, and `normalizeOllamaMessagesToOpenAI` for Ollama `/api/chat` `messages` (`images`, `tool_calls`, `thinking`, etc.).
