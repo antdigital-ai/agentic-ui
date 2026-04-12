@@ -1,12 +1,13 @@
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import {
   buildEditorAlignedComponents,
   createHastProcessor,
-  markLastParagraphStreamingTail,
   renderMarkdownBlock,
   splitMarkdownBlocks,
 } from '../markdownReactShared';
+import { StreamingAnimationContext } from '../StreamingAnimationContext';
 
 describe('splitMarkdownBlocks', () => {
   it('splits on double blank lines', () => {
@@ -104,11 +105,9 @@ describe('renderMarkdownBlock', () => {
     expect(result).not.toBeNull();
   });
 
-  it('marks streaming tail paragraph when option set', () => {
+  it('renders single-paragraph markdown', () => {
     const proc = createHastProcessor();
-    const result = renderMarkdownBlock('hello', proc, {}, {
-      markStreamingTailParagraph: true,
-    });
+    const result = renderMarkdownBlock('hello', proc, {});
     expect(result).not.toBeNull();
   });
 
@@ -119,43 +118,6 @@ describe('renderMarkdownBlock', () => {
     } as any;
     const result = renderMarkdownBlock('test', badProcessor, {});
     expect(result).toBeNull();
-  });
-});
-
-describe('markLastParagraphStreamingTail', () => {
-  it('marks the last paragraph with dataStreamingTail', () => {
-    const hast = {
-      type: 'root',
-      children: [
-        { type: 'element', tagName: 'p', properties: {} },
-        { type: 'element', tagName: 'p', properties: {} },
-      ],
-    };
-    markLastParagraphStreamingTail(hast);
-    expect(hast.children[1].properties.dataStreamingTail).toBe(true);
-    expect(hast.children[0].properties.dataStreamingTail).toBeUndefined();
-  });
-
-  it('handles tree with no paragraphs gracefully', () => {
-    const hast = {
-      type: 'root',
-      children: [
-        { type: 'element', tagName: 'div', properties: {} },
-      ],
-    };
-    markLastParagraphStreamingTail(hast);
-    expect(hast.children[0].properties.dataStreamingTail).toBeUndefined();
-  });
-
-  it('initializes properties if not present', () => {
-    const hast = {
-      type: 'root',
-      children: [
-        { type: 'element', tagName: 'p' },
-      ],
-    } as any;
-    markLastParagraphStreamingTail(hast);
-    expect(hast.children[0].properties.dataStreamingTail).toBe(true);
   });
 });
 
@@ -184,6 +146,50 @@ describe('buildEditorAlignedComponents', () => {
       const comps = buildComponents();
       const result = comps.p({ node: {}, children: 'hello' });
       expect(result).toBeDefined();
+    });
+
+    it('wraps streaming paragraph with AnimationText when prop omitted', () => {
+      const comps = buildComponents({ streaming: true });
+      render(
+        React.createElement(
+          StreamingAnimationContext.Provider,
+          { value: { animateBlock: true } },
+          comps.p({ node: {}, children: 'stream' }),
+        ),
+      );
+      const para = screen.getByTestId('markdown-paragraph');
+      const animated = para.querySelector('span[style*="animation"]');
+      expect(animated).toBeTruthy();
+      expect(animated).toHaveTextContent('stream');
+    });
+
+    it('does not wrap streaming paragraph when streamingParagraphAnimation is false', () => {
+      const comps = buildComponents({
+        streaming: true,
+        streamingParagraphAnimation: false,
+      });
+      render(
+        React.createElement(
+          StreamingAnimationContext.Provider,
+          { value: { animateBlock: true } },
+          comps.p({ node: {}, children: 'plain' }),
+        ),
+      );
+      const para = screen.getByTestId('markdown-paragraph');
+      expect(para.querySelector('span[style*="animation"]')).toBeNull();
+    });
+
+    it('does not wrap when animateBlock context is false', () => {
+      const comps = buildComponents({ streaming: true });
+      render(
+        React.createElement(
+          StreamingAnimationContext.Provider,
+          { value: { animateBlock: false } },
+          comps.p({ node: {}, children: 'x' }),
+        ),
+      );
+      const para = screen.getByTestId('markdown-paragraph');
+      expect(para.querySelector('span[style*="animation"]')).toBeNull();
     });
 
     it('applies eleRender when provided', () => {

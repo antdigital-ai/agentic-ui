@@ -73,7 +73,7 @@ export interface MarkdownRendererProps {
     /** 返回 false 阻止跳转 */
     onClick?: (url?: string) => boolean | void;
   };
-  /** 末段淡入动画，默认 false */
+  /** 末段淡入动画，默认开启；传 false 关闭 */
   streamingParagraphAnimation?: boolean;
   apaasify?: {
     enable?: boolean;

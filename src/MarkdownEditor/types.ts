@@ -245,7 +245,7 @@ export type MarkdownEditorProps = {
 
   /** 字符队列配置（仅 renderMode: 'markdown'），默认关闭逐字 RAF */
   queueOptions?: CharacterQueueOptions;
-  /** 末段淡入动画（仅 renderMode: 'markdown'），默认 false */
+  /** 末段淡入动画（仅 renderMode: 'markdown'），默认开启；传 false 关闭 */
   streamingParagraphAnimation?: boolean;
   /** MElement 刷新依赖 */
   deps?: string[];

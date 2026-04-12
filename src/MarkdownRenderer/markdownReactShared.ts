@@ -347,11 +347,12 @@ const buildEditorAlignedComponents = (
   const tableCls = `${prefixCls}-content-table`;
   const contentCls = prefixCls; // e.g. ant-agentic-md-editor-content
 
-  /** 仅当 streaming、末块动画上下文允许且显式开启段落动画时包 AnimationText */
+  /** 仅当 streaming、末块动画上下文允许且未显式关闭段落动画时包 AnimationText */
   const StreamAnimWrap = ({ children }: { children: any }) => {
     const ctx = useContext(StreamingAnimationContext);
     const animateBlock = ctx?.animateBlock ?? true;
-    const allow = !!streaming && animateBlock && !!streamingParagraphAnimation;
+    const allow =
+      !!streaming && animateBlock && streamingParagraphAnimation !== false;
     if (!allow) return children;
     return jsx(AnimationText as any, { children });
   };
@@ -1053,7 +1054,7 @@ export interface UseMarkdownToReactOptions {
   };
   fncProps?: MarkdownEditorProps['fncProps'];
   streaming?: boolean;
-  /** 默认 false */
+  /** 默认开启；传 false 关闭末段段落动画 */
   streamingParagraphAnimation?: boolean;
   /** 原始流字符串，与 useStreaming 输出分离避免缓存误判 */
   contentRevisionSource?: string;
