@@ -382,8 +382,10 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
           >
             <MarkdownRenderer
               content={initValue || ''}
-              streaming={props.typewriter ?? false}
-              isFinished={!props.typewriter}
+              streaming={props.streaming ?? props.typewriter ?? false}
+              isFinished={
+                props.isFinished ?? !(props.streaming ?? props.typewriter)
+              }
               queueOptions={props.queueOptions}
               streamingParagraphAnimation={props.streamingParagraphAnimation}
               plugins={props.plugins}
@@ -424,7 +426,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
             store: instance.store,
             domRect,
             setDomRect,
-            typewriter: props.typewriter ?? false,
+            typewriter: props.streaming ?? props.typewriter ?? false,
             readonly: props.readonly ?? false,
             editorProps:
               effectiveJinja !== undefined

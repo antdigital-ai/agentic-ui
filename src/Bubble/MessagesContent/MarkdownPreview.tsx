@@ -115,7 +115,9 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     props.markdownRenderConfig?.renderType ??
     'slate';
   const shouldAnimateMarkdown =
-    (props.markdownRenderConfig?.typewriter ?? Boolean(typing)) &&
+    (props.markdownRenderConfig?.streaming ??
+      props.markdownRenderConfig?.typewriter ??
+      Boolean(typing)) &&
     (props.originData?.isLast ?? true);
 
   const isPaddingHidden = useMemo(() => {
