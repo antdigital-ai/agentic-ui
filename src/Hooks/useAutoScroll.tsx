@@ -141,15 +141,20 @@ export const useAutoScroll = <T extends HTMLDivElement>(
     if (!container) return;
 
     observer.current = new MutationObserver((mutations) => {
-      const hasAddedNodes = mutations.some((m) => m.addedNodes.length > 0);
-      if (hasAddedNodes) checkScroll?.();
+      const shouldCheck = mutations.some(
+        (m) =>
+          (m.addedNodes?.length ?? 0) > 0 ||
+          (m.removedNodes?.length ?? 0) > 0 ||
+          m.type === 'characterData',
+      );
+      if (shouldCheck) checkScroll?.();
     });
 
     observer.current.observe(container, {
       childList: true,
       subtree: true,
       attributes: false,
-      characterData: false,
+      characterData: true,
     });
 
     return () => observer.current?.disconnect();
