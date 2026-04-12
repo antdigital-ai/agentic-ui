@@ -4,6 +4,9 @@ import { Locator, Page, expect } from '@playwright/test';
 import { PLAYWRIGHT_FIXTURE_DEMOS } from '../constants/playwrightDemoRoutes';
 import { getDumiDemoContentRoot } from '../utils/dumiDemoFrame';
 
+/** 与 `markdown.matchInputToNode` 等输入规则联用时，逐字输入的默认间隔（ms） */
+const DEFAULT_INPUT_RULE_TYPE_DELAY_MS = 25;
+
 /**
  * MarkdownEditor Page Object Model
  * 封装 MarkdownEditor 组件的所有交互操作
@@ -75,14 +78,9 @@ export class MarkdownEditorPage {
     await this.editableInput.click();
   }
 
-  /**
-   * 输入文本
-   * @param delayMs 大于 0 时逐字符延迟，避免 Slate 输入规则与快速 type 竞态（如行首 `- ` 转列表）
-   */
-  async typeText(text: string, delayMs: number = 0) {
+  private async typeTextWithDelay(text: string, delayMs: number) {
     await this.focus();
     await this.editableInput.type(text, { delay: delayMs });
-    // 等待文本输入完成
     await expect
       .poll(
         async () => {
@@ -95,6 +93,23 @@ export class MarkdownEditorPage {
         },
       )
       .toBe(true);
+  }
+
+  /**
+   * 输入文本（最快路径，delay 0）
+   */
+  async typeText(text: string) {
+    await this.typeTextWithDelay(text, 0);
+  }
+
+  /**
+   * 逐字输入，降低与 Slate 输入规则（如行首 `- ` 转列表）的竞态
+   */
+  async typeTextWithInputRuleDelay(
+    text: string,
+    delayMs: number = DEFAULT_INPUT_RULE_TYPE_DELAY_MS,
+  ) {
+    await this.typeTextWithDelay(text, delayMs);
   }
 
   /**
