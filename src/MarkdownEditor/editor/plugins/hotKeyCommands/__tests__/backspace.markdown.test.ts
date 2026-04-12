@@ -341,6 +341,19 @@ describe('BackspaceKey - Markdown 输出测试', () => {
       expect(result).toBeUndefined();
     });
 
+    it('折叠选区在空段落时不应误判为全选并 deleteAll', () => {
+      editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
+      Transforms.select(editor, {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      });
+      const deleteAllSpy = vi.spyOn(EditorUtils, 'deleteAll');
+      const result = backspaceKey.range();
+      expect(result).toBe(false);
+      expect(deleteAllSpy).not.toHaveBeenCalled();
+      deleteAllSpy.mockRestore();
+    });
+
     it('应该在非全选时返回 false', () => {
       editor.children = [{ type: 'paragraph', children: [{ text: 'Test' }] }];
 

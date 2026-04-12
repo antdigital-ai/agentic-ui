@@ -3,13 +3,14 @@ import { Elements } from '../../../el';
 import { EditorUtils } from '../../utils/editorUtils';
 import { isListType } from '../withListsPlugin';
 
-
 export class BackspaceKey {
   constructor(private readonly editor: Editor) {}
 
   range() {
     const sel = this.editor.selection;
     if (!sel) return;
+    // 折叠选区下 start/end 与文档起止可能重合（如空段落），不能当作「全选」
+    if (!Range.isExpanded(sel)) return false;
     let [start, end] = Range.edges(sel);
     if (
       Point.equals(start, Editor.start(this.editor, [])) &&
@@ -266,7 +267,10 @@ export class BackspaceKey {
           }
 
           const nextPath = Path.next(path);
-          if (Editor.isEditor(parent[0]) && Editor.hasPath(this.editor, nextPath)) {
+          if (
+            Editor.isEditor(parent[0]) &&
+            Editor.hasPath(this.editor, nextPath)
+          ) {
             const [nextNode] = Editor.node(this.editor, nextPath);
             if ((nextNode as Record<string, unknown>)?.type !== 'hr') {
               Transforms.delete(this.editor, { at: path });
