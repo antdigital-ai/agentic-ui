@@ -51,4 +51,15 @@ describe('withSanitizeInvalidChildren', () => {
 
     expect((editor.children[1] as any).children).toEqual([{ text: '' }]);
   });
+
+  it('does not throw when normalizeNode runs on a text leaf', () => {
+    const editor = withSanitizeInvalidChildren(createEditor());
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'hi' }] },
+    ] as any;
+
+    expect(() =>
+      editor.normalizeNode([{ text: 'hi' }, [0, 0]] as any),
+    ).not.toThrow();
+  });
 });

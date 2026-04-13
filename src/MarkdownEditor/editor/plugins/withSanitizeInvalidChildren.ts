@@ -132,6 +132,12 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
   editor.normalizeNode = (entry: NodeEntry) => {
     const [node, path] = entry;
 
+    // `Node.isNode` is true for text leaves, but they have no `children`; never call `.some` on them.
+    if (Node.isText(node)) {
+      normalizeNode(entry);
+      return;
+    }
+
     if (Editor.isEditor(node) && path.length === 0) {
       const childList = getChildList(node);
       const hasInvalid = childList.some((c) => !isValidChild(c));
