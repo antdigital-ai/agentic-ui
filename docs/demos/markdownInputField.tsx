@@ -1,10 +1,10 @@
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { ChevronDown } from '@sofa-design/icons';
+import { Divider, Dropdown, Slider, Typography, theme } from 'antd';
 import {
   MarkdownEditorInstance,
   MarkdownInputField,
 } from '@ant-design/agentic-ui';
-import { ChevronDown } from '@sofa-design/icons';
-import { Divider, Dropdown, Slider, Typography, theme } from 'antd';
-import React, { useCallback, useMemo, useState } from 'react';
 
 const { Text, Title } = Typography;
 
@@ -29,7 +29,8 @@ const TagRender: React.FC<{
   placeholder: string;
   readonly?: boolean;
   style?: React.CSSProperties;
-}> = ({ onSelect, defaultDom, readonly, style, placeholder }) => {
+  chevronColor: string;
+}> = ({ onSelect, defaultDom, readonly, style, placeholder, chevronColor }) => {
   const items = useMemo(
     () => [
       { key: '1', label: '选项1' },
@@ -58,7 +59,7 @@ const TagRender: React.FC<{
         title={placeholder || undefined}
       >
         {defaultDom}
-        <ChevronDown style={{ color: '#999', fontSize: 12 }} />
+        <ChevronDown style={{ color: chevronColor, fontSize: 12 }} />
       </div>
     </Dropdown>
   );
@@ -89,18 +90,43 @@ export default () => {
     [token.colorPrimary, token.colorPrimaryBg],
   );
 
-  const markdownRefCustomTag = React.useRef<MarkdownEditorInstance>();
+  const markdownRefCustomTag = useRef<MarkdownEditorInstance>();
 
   const [sentList, setSentList] = useState<string[]>([]);
   const [borderRadius, setBorderRadius] = useState(0);
+  const sendAbortRef = useRef<AbortController | null>(null);
 
   const handleSend = useCallback(async (value: string) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setSentList((prev) => [...prev, value]);
+    sendAbortRef.current?.abort();
+    const controller = new AbortController();
+    sendAbortRef.current = controller;
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const timer = window.setTimeout(resolve, 1000);
+        controller.signal.addEventListener(
+          'abort',
+          () => {
+            window.clearTimeout(timer);
+            reject(new DOMException('Aborted', 'AbortError'));
+          },
+          { once: true },
+        );
+      });
+      setSentList((prev) => [...prev, value]);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return;
+      }
+      throw err;
+    } finally {
+      if (sendAbortRef.current === controller) {
+        sendAbortRef.current = null;
+      }
+    }
   }, []);
 
   const handleStop = useCallback(() => {
-    // Demo：停止发送为占位逻辑，真实场景可中断请求
+    sendAbortRef.current?.abort();
   }, []);
 
   const asyncTagItems = useCallback(
@@ -225,7 +251,7 @@ export default () => {
         自定义 Tag
       </Divider>
       <Text type="secondary" style={{ display: 'block', marginTop: -12 }}>
-        `tagRender` 外裹下拉，`dropdownRender` 置空关闭浮层
+        `tagRender` 外裹下拉，`dropdownRender` 置空关闭浮层；`onSelect` 仅传入选中项文案
       </Text>
       <MarkdownInputField
         inputRef={markdownRefCustomTag}
@@ -238,6 +264,7 @@ export default () => {
           items: TAG_ITEMS,
           tagRender: (props, defaultDom: React.ReactNode) => (
             <TagRender
+              chevronColor={token.colorTextQuaternary}
               style={{
                 width: '100%',
                 display: 'flex',
@@ -246,9 +273,7 @@ export default () => {
               }}
               defaultDom={defaultDom}
               placeholder={props.placeholder || ''}
-              onSelect={(value: string) =>
-                props.onSelect?.(value, { value: '123' })
-              }
+              onSelect={(value: string) => props.onSelect?.(value)}
             />
           ),
         }}

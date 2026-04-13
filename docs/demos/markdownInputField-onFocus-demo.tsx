@@ -1,9 +1,9 @@
+import React, { useCallback, useState } from 'react';
+import { Card, Space, Tag, Typography } from 'antd';
 import {
   MarkdownInputField,
   type MarkdownInputFieldProps,
 } from '@ant-design/agentic-ui';
-import { Card, Space, Tag, Typography } from 'antd';
-import React, { useCallback, useState } from 'react';
 
 const { Paragraph, Text, Title } = Typography;
 
@@ -67,7 +67,7 @@ export default () => {
       <ul style={{ marginTop: 8, paddingInlineStart: 20 }}>
         <li>
           <Text code>onFocus</Text> / <Text code>onBlur</Text>：首参为当前
-          Markdown 文本，次参为编辑器 schema
+          Markdown 文本，次参为编辑器 schema，第三参为对应的原生事件
         </li>
       </ul>
     </div>
