@@ -5,5 +5,6 @@ export * from './withInlineNodes';
 export * from './withLinkAndMediaPlugin';
 export * from './withListsPlugin';
 export * from './withMarkdown';
+export * from './withSanitizeInvalidChildren';
 export * from './withSchemaPlugin';
 export * from './withVoidNodes';
