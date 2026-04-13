@@ -9,17 +9,41 @@ group:
 
 # Markdown 输入框
 
-## 基础用法
+## 基本用法
 
-<code src="../demos/markdownInputField.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## 圆角
+
+<code src="../demos/markdownInputField/border-radius.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## dropdownRender
+
+<code src="../demos/markdownInputField/dropdown-render.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## 自定义 Tag
+
+<code src="../demos/markdownInputField/custom-tag.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## 文件上传
+
+<code src="../demos/markdownInputField/attachment-basic.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## 多行滚动
+
+<code src="../demos/markdownInputField/scroll.tsx" background="var(--main-bg-color)" iframe=540></code>
+
+## 禁用
+
+<code src="../demos/markdownInputField/disabled.tsx" background="var(--main-bg-color)" iframe=420></code>
 
 ## 焦点事件
 
-<code src="../demos/markdownInputField-onFocus-demo.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/on-focus.tsx" background="var(--main-bg-color)" iframe=540></code>
 
 ## webllm 助手集成
 
-<code src="../demos/markdownInputField-webllm.tsx" background="var(--main-bg-color)" iframe=540></code>
+<code src="../demos/markdownInputField/web-llm.tsx" background="var(--main-bg-color)" iframe=720></code>
 
 ## 自定义发送按钮
 
