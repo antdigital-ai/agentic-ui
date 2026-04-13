@@ -24,6 +24,7 @@ group:
 
 ## 📚 相关文档
 
+- [多厂商聊天消息 → BubbleList 适配](./chat-message-bubble-adapters.md) - OpenAI / OpenClaw / Ollama `messages` 与 `BubbleList` 对接说明（[English](./chat-message-bubble-adapters.en-US.md)）
 - [Pull Request 提交指南](./pull-request-guide.md) - 了解如何正确提交 PR
 - [发布测试版本指南](./release-guide.md) - 学习如何发布和管理测试版本
 

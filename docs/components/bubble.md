@@ -418,19 +418,19 @@ export default () => (
 
 ### OpenAI messages 适配 BubbleList
 
-将 OpenAI Chat Completions 风格的 `messages` 转为 `MessageBubbleData[]`，配合 `useOpenAIMessageBubbleData` 接入 `BubbleList`；默认按索引生成稳定 `id`，适合 SSE 流式更新同一条 assistant 内容。
+将 OpenAI Chat Completions 风格的 `messages` 转为 `MessageBubbleData[]`，配合 `useOpenAIMessageBubbleData` 接入 `BubbleList`；默认按索引生成稳定 `id`，适合 SSE 流式更新同一条 assistant 内容。完整说明见 [多厂商聊天消息适配](../development/chat-message-bubble-adapters.md)（[English](../development/chat-message-bubble-adapters.en-US.md)）。
 
 <code src="../demos/bubble/openai-messages-bubblelist.tsx">OpenAI messages - useOpenAIMessageBubbleData</code>
 
 ### OpenClaw 风格 messages 适配 BubbleList
 
-OpenClaw 会话 / transcript 常见字段：`timestamp`（毫秒）、工具结果角色 `toolResult`（内部归一为 OpenAI 的 `tool` 再映射）。使用 `useOpenClawMessageBubbleData` 或 `mapOpenClawMessagesToMessageBubbleData`；可选 `normalizeOpenClawMessagesToOpenAI` 仅做结构转换。
+OpenClaw 会话 / transcript 常见字段：`timestamp`（毫秒）、工具结果角色 `toolResult`（内部归一为 OpenAI 的 `tool` 再映射）。使用 `useOpenClawMessageBubbleData` 或 `mapOpenClawMessagesToMessageBubbleData`；可选 `normalizeOpenClawMessagesToOpenAI` 仅做结构转换。完整说明见 [开发文档](../development/chat-message-bubble-adapters.md)（[English](../development/chat-message-bubble-adapters.en-US.md)）。
 
 <code src="../demos/bubble/openclaw-messages-bubblelist.tsx">OpenClaw messages - useOpenClawMessageBubbleData</code>
 
 ### Ollama /api/chat messages 适配 BubbleList
 
-与 [Ollama Chat API](https://docs.ollama.com/api/chat) 的 `messages` 一致：`role` 为 `system` | `user` | `assistant` | `tool`，可选 `images`（base64）、`tool_calls`、`thinking` 等。使用 `useOllamaMessageBubbleData` 或 `mapOllamaMessagesToMessageBubbleData`；默认消息 id 为 `` msg.id ?? `ollama-msg-${index}` ``。
+与 [Ollama Chat API](https://docs.ollama.com/api/chat) 的 `messages` 一致：`role` 为 `system` | `user` | `assistant` | `tool`，可选 `images`（base64）、`tool_calls`、`thinking` 等。使用 `useOllamaMessageBubbleData` 或 `mapOllamaMessagesToMessageBubbleData`；默认消息 id 为 `` msg.id ?? `ollama-msg-${index}` ``。完整说明见 [开发文档](../development/chat-message-bubble-adapters.md)（[English](../development/chat-message-bubble-adapters.en-US.md)）。
 
 <code src="../demos/bubble/ollama-messages-bubblelist.tsx">Ollama messages - useOllamaMessageBubbleData</code>
 
