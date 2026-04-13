@@ -19,6 +19,39 @@ describe('withSanitizeInvalidChildren', () => {
     ).toBe('');
   });
 
+  it('compacts sparse children arrays (holes) so Node.string does not throw', () => {
+    const editor = withSanitizeInvalidChildren(createEditor());
+    const paragraph = {
+      type: 'paragraph',
+      children: [{ text: '' }],
+    } as any;
+    paragraph.children.length = 2;
+
+    editor.children = [paragraph] as any;
+
+    Editor.normalize(editor, { force: true });
+
+    expect(editor.children[0].children).toEqual([{ text: '' }]);
+    expect(
+      Node.string(editor.children[0] as Parameters<typeof Node.string>[0]),
+    ).toBe('');
+  });
+
+  it('compacts sparse editor root without duplicating blocks', () => {
+    const editor = withSanitizeInvalidChildren(createEditor());
+    const root = [
+      { type: 'paragraph', children: [{ text: 'a' }] },
+    ] as any;
+    root.length = 2;
+    editor.children = root;
+
+    Editor.normalize(editor, { force: true });
+
+    expect(editor.children).toEqual([
+      { type: 'paragraph', children: [{ text: 'a' }] },
+    ]);
+  });
+
   it('restores a default paragraph when editor root has no blocks', () => {
     const editor = withSanitizeInvalidChildren(createEditor());
     editor.children = [] as any;

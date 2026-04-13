@@ -6,6 +6,19 @@ import { EditorUtils } from '../utils/editorUtils';
 const isValidChild = (child: unknown): child is Node =>
   child !== undefined && child !== null && Node.isNode(child);
 
+/**
+ * `Array.prototype.some` skips sparse holes; Slate still sees missing indices and
+ * can pass `undefined` as `leaf` into `renderLeaf`, which then throws in `Text.isText`.
+ */
+const childArrayHasInvalidEntries = (rawChildren: unknown[]): boolean => {
+  for (let i = 0; i < rawChildren.length; i += 1) {
+    if (!(i in rawChildren) || !isValidChild(rawChildren[i])) {
+      return true;
+    }
+  }
+  return false;
+};
+
 const getChildList = (node: Node): unknown[] => {
   if (!('children' in node)) {
     return [];
@@ -57,6 +70,26 @@ const rebuildOrDefaultBlock = (raw: unknown): Node => {
   return createDefaultBlock();
 };
 
+/** 压缩根级子节点：去掉空洞与 null/undefined；残缺元素对象则 rebuild，不凭空多插空段落。 */
+const compactEditorRootChildren = (raw: unknown[]): Node[] => {
+  const out: Node[] = [];
+  for (let i = 0; i < raw.length; i += 1) {
+    if (!(i in raw)) {
+      continue;
+    }
+    const c = raw[i];
+    if (isValidChild(c)) {
+      out.push(c);
+      continue;
+    }
+    if (c === undefined || c === null) {
+      continue;
+    }
+    out.push(rebuildOrDefaultBlock(c));
+  }
+  return out;
+};
+
 const repairBrokenChildArrays = (editor: Editor): boolean => {
   if (!Array.isArray(editor.children)) {
     /* eslint-disable no-param-reassign */
@@ -70,14 +103,16 @@ const repairBrokenChildArrays = (editor: Editor): boolean => {
     return true;
   }
 
-  for (let i = 0; i < editor.children.length; i++) {
-    const child = editor.children[i];
-    if (!isValidChild(child)) {
+  if (childArrayHasInvalidEntries(editor.children)) {
+    const fixedRoot = compactEditorRootChildren(editor.children);
+    if (fixedRoot.length === 0) {
+      EditorUtils.replaceEditorContent(editor, [createDefaultBlock()]);
+    } else {
       /* eslint-disable no-param-reassign */
-      editor.children[i] = rebuildOrDefaultBlock(child);
+      editor.children = fixedRoot;
       /* eslint-enable no-param-reassign */
-      return true;
     }
+    return true;
   }
 
   const fixBranch = (node: unknown): boolean => {
@@ -93,7 +128,7 @@ const repairBrokenChildArrays = (editor: Editor): boolean => {
       Object.assign(node as object, rebuildElement(node as Node));
       return true;
     }
-    if (rawChildren?.some((c) => !isValidChild(c))) {
+    if (childArrayHasInvalidEntries(rawChildren)) {
       const fixedChildren = rawChildren.filter(isValidChild) as Node[];
       (node as { children: Node[] }).children =
         fixedChildren.length === 0 ? [{ text: '' }] : fixedChildren;
@@ -143,14 +178,11 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
 
     if (Editor.isEditor(node) && path.length === 0) {
       const childList = getChildList(node);
-      const hasInvalid = childList.some((c) => !isValidChild(c));
+      const hasInvalid = childArrayHasInvalidEntries(childList);
       if (hasInvalid || childList.length === 0) {
+        const fixedTop = compactEditorRootChildren(childList);
         const nextNodes =
-          childList.length === 0
-            ? [createDefaultBlock()]
-            : (childList.map((c) =>
-                isValidChild(c) ? c : rebuildOrDefaultBlock(c),
-              ) as Node[]);
+          fixedTop.length === 0 ? [createDefaultBlock()] : fixedTop;
         EditorUtils.replaceEditorContent(editor, nextNodes);
         normalizeNode(entry);
         return;
@@ -172,7 +204,7 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
     //@ts-ignore
     if (Node.isElement(node)) {
       const childList = getChildList(node);
-      const hasInvalid = childList.some((c) => !isValidChild(c));
+      const hasInvalid = childArrayHasInvalidEntries(childList);
       if (hasInvalid) {
         const applyRebuild = () => {
           Editor.withoutNormalizing(editor, () => {
