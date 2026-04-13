@@ -86,26 +86,26 @@ export default App;
 
 ## 属性
 
-| 属性                     | 类型                               | 必需 | 描述                          | 废弃版本 |
-| ------------------------ | ---------------------------------- | ---- | ----------------------------- | -------- |
-| `thoughtChainList`       | `WhiteBoxProcessInterface[]`       | 是   | 思维链项目数组                | -        |
-| `isLoading`              | `boolean`                          | 否   | 表示组件是否处于加载状态      | -        |
-| ~~`loading`~~            | `boolean`                          | 否   | 已废弃，请使用 `isLoading`    | 2.29.0   |
-| `bubble`                 | `object`                           | 否   | 聊天状态信息                  | -        |
-| ~~`chatItem`~~           | `object`                           | 否   | 已废弃，请使用 `bubble`       | 2.30.0   |
-| `bubble.isFinished`      | `boolean`                          | 否   | 聊天/任务是否已完成           |
-| `bubble.endTime`         | `number`                           | 否   | 聊天结束的时间戳              |
-| `bubble.createAt`        | `number`                           | 否   | 聊天创建的时间戳              |
-| `bubble.isAborted`       | `boolean`                          | 否   | 聊天/任务是否被中止           |
-| `style`                  | `React.CSSProperties`              | 否   | 自定义 CSS 样式               | -        |
-| `compact`                | `boolean`                          | 否   | 启用紧凑显示模式              | -        |
-| `markdownRenderProps`    | `MarkdownEditorProps`              | 否   | Markdown 渲染属性             | -        |
-| `finishAutoCollapse`     | `boolean`                          | 否   | 完成时自动折叠（默认为 true） | -        |
-| `locale`                 | `object`                           | 否   | 本地化字符串                  | -        |
-| `titleRender`            | `(props, defaultDom) => ReactNode` | 否   | 自定义标题渲染                | -        |
-| `titleExtraRender`       | `(props, defaultDom) => ReactNode` | 否   | 自定义标题右侧额外内容渲染    | -        |
-| `thoughtChainItemRender` | `object`                           | 否   | 自定义思维链项目的渲染        | -        |
-| `onDocMetaClick`         | `(docMeta: DocMeta) => void`       | 否   | 文档元数据点击回调            | -        |
+| 属性                     | 说明                                       | 类型                               | 默认值 | 版本   |
+| ------------------------ | ------------------------------------------ | ---------------------------------- | ------ | ------ |
+| `thoughtChainList`       | 思维链项目数组（必填）                     | `WhiteBoxProcessInterface[]`       | -      | -      |
+| `isLoading`              | 表示组件是否处于加载状态                   | `boolean`                          | -      | -      |
+| ~~`loading`~~            | 已废弃，请使用 `isLoading`                 | `boolean`                          | -      | 2.29.0 |
+| `bubble`                 | 聊天状态信息                               | `object`                           | -      | -      |
+| ~~`chatItem`~~           | 已废弃，请使用 `bubble`                    | `object`                           | -      | 2.30.0 |
+| `bubble.isFinished`      | 聊天/任务是否已完成                        | `boolean`                          | -      | -      |
+| `bubble.endTime`         | 聊天结束的时间戳                           | `number`                           | -      | -      |
+| `bubble.createAt`        | 聊天创建的时间戳                           | `number`                           | -      | -      |
+| `bubble.isAborted`       | 聊天/任务是否被中止                        | `boolean`                          | -      | -      |
+| `style`                  | 自定义 CSS 样式                            | `React.CSSProperties`              | -      | -      |
+| `compact`                | 启用紧凑显示模式                           | `boolean`                          | -      | -      |
+| `markdownRenderProps`    | Markdown 渲染属性                          | `MarkdownEditorProps`              | -      | -      |
+| `finishAutoCollapse`     | 完成时自动折叠（默认为 true）              | `boolean`                          | -      | -      |
+| `locale`                 | 本地化字符串                               | `object`                           | -      | -      |
+| `titleRender`            | 自定义标题渲染                             | `(props, defaultDom) => ReactNode` | -      | -      |
+| `titleExtraRender`       | 自定义标题右侧额外内容渲染                 | `(props, defaultDom) => ReactNode` | -      | -      |
+| `thoughtChainItemRender` | 自定义思维链项目的渲染                     | `object`                           | -      | -      |
+| `onDocMetaClick`         | 文档元数据点击回调                         | `(docMeta: DocMeta) => void`       | -      | -      |
 
 ## 类型定义
 
@@ -113,30 +113,30 @@ export default App;
 
 思维链项目接口，定义了单个推理步骤的数据结构。
 
-| 属性         | 类型      | 说明                                                                                            |
-| ------------ | --------- | ----------------------------------------------------------------------------------------------- |
-| `category`   | `string`  | 分类类型：`'TableSql' \| 'ToolCall' \| 'RagRetrieval' \| 'DeepThink' \| 'WebSearch' \| 'other'` |
-| `isLoading`  | `boolean` | 是否正在加载                                                                                    |
-| `info`       | `string`  | 信息描述                                                                                        |
-| `costMillis` | `number`  | 执行耗时（毫秒）                                                                                |
-| `input`      | `object`  | 输入参数，包含 `sql`, `inputArgs`, `searchQueries` 等                                           |
-| `meta`       | `object`  | 元数据，包含工具名称、HTTP方法、路径等                                                          |
-| `runId`      | `string`  | 任务 ID                                                                                         |
-| `output`     | `object`  | 输出结果                                                                                        |
+| 属性         | 说明                                                                                            | 类型      | 默认值 | 版本 |
+| ------------ | ----------------------------------------------------------------------------------------------- | --------- | ------ | ---- |
+| `category`   | 分类类型：`'TableSql' \| 'ToolCall' \| 'RagRetrieval' \| 'DeepThink' \| 'WebSearch' \| 'other'` | `string`  | -      | -    |
+| `isLoading`  | 是否正在加载                                                                                    | `boolean` | -      | -    |
+| `info`       | 信息描述                                                                                        | `string`  | -      | -    |
+| `costMillis` | 执行耗时（毫秒）                                                                                | `number`  | -      | -    |
+| `input`      | 输入参数，包含 `sql`, `inputArgs`, `searchQueries` 等                                           | `object`  | -      | -    |
+| `meta`       | 元数据，包含工具名称、HTTP方法、路径等                                                          | `object`  | -      | -    |
+| `runId`      | 任务 ID                                                                                         | `string`  | -      | -    |
+| `output`     | 输出结果                                                                                        | `object`  | -      | -    |
 
 ### Output
 
 输出结果对象结构。
 
-| 属性        | 类型       | 说明                                                                       |
-| ----------- | ---------- | -------------------------------------------------------------------------- |
-| `type`      | `string`   | 输出类型：`'TOKEN' \| 'TABLE' \| 'CHUNK' \| 'ERROR' \| 'END' \| 'RUNNING'` |
-| `data`      | `string`   | 文本数据                                                                   |
-| `errorMsg`  | `string`   | 错误信息                                                                   |
-| `response`  | `object`   | API 响应数据                                                               |
-| `chunks`    | `Chunk[]`  | 文档块数组                                                                 |
-| `tableData` | `object`   | 表格数据                                                                   |
-| `columns`   | `string[]` | 表格列名                                                                   |
+| 属性        | 说明                                                                       | 类型       | 默认值 | 版本 |
+| ----------- | -------------------------------------------------------------------------- | ---------- | ------ | ---- |
+| `type`      | 输出类型：`'TOKEN' \| 'TABLE' \| 'CHUNK' \| 'ERROR' \| 'END' \| 'RUNNING'` | `string`   | -      | -    |
+| `data`      | 文本数据                                                                   | `string`   | -      | -    |
+| `errorMsg`  | 错误信息                                                                   | `string`   | -      | -    |
+| `response`  | API 响应数据                                                               | `object`   | -      | -    |
+| `chunks`    | 文档块数组                                                                 | `Chunk[]`  | -      | -    |
+| `tableData` | 表格数据                                                                   | `object`   | -      | -    |
+| `columns`   | 表格列名                                                                   | `string[]` | -      | -    |
 
 ### Chunk & DocMeta
 

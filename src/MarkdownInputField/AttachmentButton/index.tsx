@@ -44,7 +44,7 @@ export type AttachmentButtonProps = {
   /** 删除文件回调 */
   onDelete?: (file: AttachmentFile) => Promise<void>;
   /** 预览文件回调 */
-  onPreview?: (file: AttachmentFile) => Promise<void>;
+  onPreview?: (file: AttachmentFile) => void | Promise<void>;
   /** 下载文件回调 */
   onDownload?: (file: AttachmentFile) => Promise<void>;
   /** 单个文件最大大小（字节） */

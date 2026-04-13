@@ -341,16 +341,19 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
             props.onSelectionChange?.(selection, markdown, nodes);
           }
 
-          // 只有在有实际选中文本时才显示工具栏
-          if (!Range.isCollapsed(selection)) {
-            const range = ReactEditor.toDOMRange(
-              markdownEditorRef.current,
-              selection,
-            );
-            const rect = range?.getBoundingClientRect();
-            if (rect) {
-              setDomRect?.(rect);
-            } else {
+          if (
+            !Range.isCollapsed(selection) &&
+            Editor.hasPath(markdownEditorRef.current, selection.anchor.path) &&
+            Editor.hasPath(markdownEditorRef.current, selection.focus.path)
+          ) {
+            try {
+              const range = ReactEditor.toDOMRange(
+                markdownEditorRef.current,
+                selection,
+              );
+              const rect = range?.getBoundingClientRect();
+              setDomRect?.(rect ?? null);
+            } catch {
               setDomRect?.(null);
             }
           } else {
@@ -512,14 +515,18 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         if (markdownEditorRef.current?.selection) {
           event.clipboardData?.clearData();
           const editor = markdownEditorRef.current;
+          const sel = editor.selection as Range;
+
+          if (
+            !Editor.hasPath(editor, sel.anchor.path) ||
+            !Editor.hasPath(editor, sel.focus.path)
+          ) {
+            return false;
+          }
 
           try {
-            // 复制HTML内容
             const tempDiv = document.createElement('div');
-            const domRange = ReactEditor.toDOMRange(
-              editor,
-              editor.selection as Range,
-            );
+            const domRange = ReactEditor.toDOMRange(editor, sel);
             const selectedHtml = domRange.cloneContents();
             tempDiv.appendChild(selectedHtml);
             event.clipboardData.setData('text/html', tempDiv.innerHTML);

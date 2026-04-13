@@ -39,11 +39,12 @@ test.describe('MarkdownInputField 高级功能', () => {
 
     // 选中前 6 个字符 "Select"
     // 使用 Shift+ArrowRight 6次来选中
-    await page.keyboard.down('Shift');
+    const kb = markdownInputFieldPage.keyboardTargetPage.keyboard;
+    await kb.down('Shift');
     for (let i = 0; i < 6; i++) {
-      await page.keyboard.press('ArrowRight');
+      await kb.press('ArrowRight');
     }
-    await page.keyboard.up('Shift');
+    await kb.up('Shift');
     await page.waitForTimeout(200); // 等待选择完成
 
     // 验证选择是否正确

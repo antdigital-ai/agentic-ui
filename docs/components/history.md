@@ -60,8 +60,8 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 
 ### History
 
-| 参数                | 说明                                 | 类型                                                                               | 默认值  | 废弃版本 |
-| ------------------- | ------------------------------------ | ---------------------------------------------------------------------------------- | ------- | -------- |
+| 属性                | 说明                                 | 类型                                                                               | 默认值  | 版本 |
+| ------------------- | ------------------------------------ | ---------------------------------------------------------------------------------- | ------- | ---- |
 | agentId             | 代理ID，用于获取历史记录             | `string`                                                                           | -       | -        |
 | sessionId           | 会话ID，变更时会触发数据重新获取     | `string`                                                                           | -       | -        |
 | request             | 请求函数，用于获取历史数据           | `(params: { agentId: string }) => Promise<HistoryDataType[]>`                      | -       | -        |
@@ -83,30 +83,30 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 
 ### HistoryDataType
 
-| 参数            | 说明         | 类型               | 默认值  |
-| --------------- | ------------ | ------------------ | ------- |
-| id              | 会话记录ID   | `number \| string` | -       |
-| tenantId        | 租户ID       | `string`           | -       |
-| sessionTitle    | 会话标题     | `React.ReactNode`  | -       |
-| agentId         | AI代理ID     | `string`           | -       |
-| sessionId       | 会话唯一标识 | `string`           | -       |
-| gmtCreate       | 记录创建时间 | `number \| string` | -       |
-| gmtLastConverse | 最近对话时间 | `number \| string` | -       |
-| isFavorite      | 是否收藏     | `boolean`          | `false` |
-| isSelected      | 是否选中     | `boolean`          | `false` |
+| 属性            | 说明         | 类型               | 默认值  | 版本 |
+| --------------- | ------------ | ------------------ | ------- | ---- |
+| id              | 会话记录ID   | `number \| string` | -       | -    |
+| tenantId        | 租户ID       | `string`           | -       | -    |
+| sessionTitle    | 会话标题     | `React.ReactNode`  | -       | -    |
+| agentId         | AI代理ID     | `string`           | -       | -    |
+| sessionId       | 会话唯一标识 | `string`           | -       | -    |
+| gmtCreate       | 记录创建时间 | `number \| string` | -       | -    |
+| gmtLastConverse | 最近对话时间 | `number \| string` | -       | -    |
+| isFavorite      | 是否收藏     | `boolean`          | `false` | -    |
+| isSelected      | 是否选中     | `boolean`          | `false` | -    |
 
 ### HistoryChatType
 
-| 参数            | 说明         | 类型                                                                                                        | 默认值 |
-| --------------- | ------------ | ----------------------------------------------------------------------------------------------------------- | ------ |
-| feedback        | 问答对状态   | `'median' \| 'thumbsUp' \| 'thumbsDown'`                                                                    | -      |
-| tenantId        | 租户ID       | `string`                                                                                                    | -      |
-| agentId         | AI代理ID     | `string`                                                                                                    | -      |
-| questionContent | 提问内容     | `{ role?: string; content?: string; contentType?: string }`                                                 | -      |
-| answerContent   | 回答内容     | `{ role?: string; content?: string; contentType?: string; white_box_process?: WhiteBoxProcessInterface[] }` | -      |
-| sessionId       | 会话唯一标识 | `string`                                                                                                    | -      |
-| clientId        | 客户ID       | `string`                                                                                                    | -      |
-| gmtCreate       | 记录创建时间 | `string \| number`                                                                                          | -      |
+| 属性            | 说明         | 类型                                                                                                        | 默认值 | 版本 |
+| --------------- | ------------ | ----------------------------------------------------------------------------------------------------------- | ------ | ---- |
+| feedback        | 问答对状态   | `'median' \| 'thumbsUp' \| 'thumbsDown'`                                                                    | -      | -    |
+| tenantId        | 租户ID       | `string`                                                                                                    | -      | -    |
+| agentId         | AI代理ID     | `string`                                                                                                    | -      | -    |
+| questionContent | 提问内容     | `{ role?: string; content?: string; contentType?: string }`                                                 | -      | -    |
+| answerContent   | 回答内容     | `{ role?: string; content?: string; contentType?: string; white_box_process?: WhiteBoxProcessInterface[] }` | -      | -    |
+| sessionId       | 会话唯一标识 | `string`                                                                                                    | -      | -    |
+| clientId        | 客户ID       | `string`                                                                                                    | -      | -    |
+| gmtCreate       | 记录创建时间 | `string \| number`                                                                                          | -      | -    |
 
 ## 功能特性
 
@@ -164,27 +164,27 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 
 通过 `agent` 属性启用并配置 Agent 模式。组件会根据提供的回调函数自动显示对应的功能按钮：
 
-| 属性              | 类型                                               | 默认值  | 说明                                |
-| ----------------- | -------------------------------------------------- | ------- | ----------------------------------- |
-| enabled           | `boolean`                                          | `false` | 是否启用 agent 模式                 |
-| onSearch          | `(keyword: string) => void`                        | -       | 搜索回调函数                        |
-| onFavorite        | `(sessionId: string, isFavorite: boolean) => void` | -       | 收藏/取消收藏回调                   |
-| onSelectionChange | `(selectedIds: string[]) => void`                  | -       | 多选变更回调                        |
-| onLoadMore        | `() => void`                                       | -       | 加载更多回调                        |
-| onNewChat         | `() => void`                                       | -       | 新对话回调函数                      |
-| loadingMore       | `boolean`                                          | `false` | 是否正在加载更多                    |
-| runningId         | `string[]`                                         | -       | 正在运行的记录 ID 列表              |
-| searchOptions     | `SearchOptions`                                    | -       | 搜索框配置，详见 SearchOptions 说明 |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| enabled | 是否启用 agent 模式 | `boolean` | `false` | - |
+| onSearch | 搜索回调函数 | `(keyword: string) => void` | - | - |
+| onFavorite | 收藏/取消收藏回调 | `(sessionId: string, isFavorite: boolean) => void` | - | - |
+| onSelectionChange | 多选变更回调 | `(selectedIds: string[]) => void` | - | - |
+| onLoadMore | 加载更多回调 | `() => void` | - | - |
+| onNewChat | 新对话回调函数 | `() => void` | - | - |
+| loadingMore | 是否正在加载更多 | `boolean` | `false` | - |
+| runningId | 正在运行的记录 ID 列表 | `string[]` | - | - |
+| searchOptions | 搜索框配置，详见 SearchOptions 说明 | `SearchOptions` | - | - |
 
 ### SearchOptions 配置
 
 搜索框相关配置选项：
 
-| 属性        | 类型                  | 默认值     | 说明                                                                |
-| ----------- | --------------------- | ---------- | ------------------------------------------------------------------- |
-| placeholder | `string`              | -          | 搜索输入框 placeholder 文案                                         |
-| text        | `string`              | -          | 未展开时的默认文本                                                  |
-| trigger     | `'change' \| 'enter'` | `'change'` | 搜索触发方式：'change' 为实时搜索（防抖 360ms），'enter' 为回车触发 |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| placeholder | 搜索输入框 placeholder 文案 | `string` | - | - |
+| text | 未展开时的默认文本 | `string` | - | - |
+| trigger | 搜索触发方式：'change' 为实时搜索（防抖 360ms），'enter' 为回车触发 | `'change' \| 'enter'` | `'change'` | - |
 
 ## 注意事项
 

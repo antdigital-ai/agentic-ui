@@ -22,6 +22,7 @@ interface UseMarkdownInputFieldHandlersParams {
     | 'attachment'
     | 'triggerSendKey'
   >;
+  sendDisabled?: boolean;
   markdownEditorRef: React.MutableRefObject<MarkdownEditorInstance | undefined>;
   inputRef: React.RefObject<HTMLDivElement>;
   isSendingRef: React.MutableRefObject<boolean>;
@@ -43,6 +44,7 @@ interface UseMarkdownInputFieldHandlersParams {
  */
 export const useMarkdownInputFieldHandlers = ({
   props,
+  sendDisabled,
   markdownEditorRef,
   inputRef,
   isSendingRef,
@@ -71,12 +73,16 @@ export const useMarkdownInputFieldHandlers = ({
    * @returns {Promise<void>} 发送操作的Promise
    */
   const sendMessage = useRefFunction(async () => {
+    // 这个 disable 是整体 input 的禁用
     if (props.disabled) return;
     if (props.typing) return;
     // 防止重复触发：如果正在加载中，直接返回
     if (isLoading) return;
     // 使用 ref 防止快速连续触发
     if (isSendingRef.current) return;
+
+    // 这个是发送按钮的单独禁用
+    if (sendDisabled) return;
 
     // 如果处于录音中：优先停止录音或输入
     if (recording) await stopRecording();

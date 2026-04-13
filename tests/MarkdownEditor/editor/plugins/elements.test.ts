@@ -576,7 +576,7 @@ describe('elements.ts', () => {
       expect(result).toBe(true);
     });
 
-    it('hr.checkAllow 当为首行 path[0]===0 时返回 false', () => {
+    it('hr.checkAllow 首段 paragraph 时返回 true', () => {
       const node: [any, number[]] = [
         { type: 'paragraph', children: [{ text: '---' }] },
         [0],
@@ -586,10 +586,10 @@ describe('elements.ts', () => {
         focus: { path: [0, 0], offset: 0 },
       };
       const result = MdElements.hr.checkAllow!({ editor, node, sel });
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
 
-    it('hrSpace.checkAllow 当为首行时返回 false', () => {
+    it('hrSpace.checkAllow 首段 paragraph 时返回 true', () => {
       const node: [any, number[]] = [
         { type: 'paragraph', children: [{ text: '---' }] },
         [0],
@@ -599,7 +599,7 @@ describe('elements.ts', () => {
         focus: { path: [0, 0], offset: 0 },
       };
       const result = MdElements.hrSpace.checkAllow!({ editor, node, sel });
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
 
     it('frontmatter.run 应插入 frontmatter 代码块', () => {

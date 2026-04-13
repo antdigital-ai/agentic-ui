@@ -43,6 +43,7 @@ vi.mock('../../src/MarkdownInputField/VoiceInput', () => ({
 }));
 
 vi.mock('../../src/MarkdownInputField/SendButton', () => ({
+  resolveSendDisabled: () => false,
   SendButton: ({ onClick, typing, disabled, isSendable }: any) => (
     <button
       data-testid="send-button"

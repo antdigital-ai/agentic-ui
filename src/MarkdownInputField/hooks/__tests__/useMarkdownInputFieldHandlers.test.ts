@@ -122,6 +122,21 @@ describe('useMarkdownInputFieldHandlers', () => {
       expect(params.props.onSend).not.toHaveBeenCalled();
     });
 
+    it('sendDisabled 为 true 时直接 return，不触发 onSend 且 isSendingRef 不变', async () => {
+      const params = createDefaultParams({ sendDisabled: true });
+      params.props.onSend = vi.fn().mockResolvedValue(undefined);
+      params.markdownEditorRef.current!.store.getMDContent.mockReturnValue(
+        'content',
+      );
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
+      await result.current.sendMessage();
+      expect(params.props.onSend).not.toHaveBeenCalled();
+      expect(params.setIsLoading).not.toHaveBeenCalled();
+      expect(params.isSendingRef.current).toBe(false);
+    });
+
     it('onSend 抛错时应 catch 并 rethrow', async () => {
       const params = createDefaultParams();
       const err = new Error('send failed');
@@ -346,6 +361,32 @@ describe('useMarkdownInputFieldHandlers', () => {
       await vi.waitFor(() => {
         expect(params.props.onSend).toHaveBeenCalled();
       });
+    });
+
+    it('sendDisabled 为 true 时 Enter 键不触发发送', async () => {
+      const params = createDefaultParams({ sendDisabled: true });
+      params.props.onSend = vi.fn().mockResolvedValue(undefined);
+      params.markdownEditorRef.current!.store.getMDContent.mockReturnValue(
+        'text',
+      );
+      const { result } = renderHook(() =>
+        useMarkdownInputFieldHandlers(params),
+      );
+      const e = {
+        key: 'Enter',
+        ctrlKey: false,
+        metaKey: false,
+        shiftKey: false,
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
+        nativeEvent: { isComposing: false },
+      } as any;
+      result.current.handleKeyDown(e);
+      // sendMessage is called but returns early due to sendDisabled
+      await vi.waitFor(() => {
+        expect(params.props.onSend).not.toHaveBeenCalled();
+      });
+      expect(params.isSendingRef.current).toBe(false);
     });
 
     it('移动端时 effectiveTriggerKey 为 Mod+Enter，Ctrl+Enter 触发发送', async () => {

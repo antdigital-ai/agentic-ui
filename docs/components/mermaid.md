@@ -21,12 +21,12 @@ group:
 
 Mermaid 图表渲染组件，支持各种 Mermaid 图表类型。
 
-| 参数        | 说明                            | 类型       | 默认值    |
-| ----------- | ------------------------------- | ---------- | --------- |
-| el          | 代码节点，包含 Mermaid 图表代码 | `CodeNode` | -         |
-| el.value    | Mermaid 图表代码字符串          | `string`   | -         |
-| el.language | 图表语言类型，通常为 'mermaid'  | `string`   | 'mermaid' |
-| el.type     | 节点类型，通常为 'code'         | `string`   | 'code'    |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| el | 代码节点，包含 Mermaid 图表代码 | `CodeNode` | - | - |
+| el.value | Mermaid 图表代码字符串 | `string` | - | - |
+| el.language | 图表语言类型，通常为 'mermaid' | `string` | 'mermaid' | - |
+| el.type | 节点类型，通常为 'code' | `string` | 'code' | - |
 
 ### CodeNode
 

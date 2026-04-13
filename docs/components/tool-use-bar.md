@@ -62,36 +62,36 @@ export default () => {
 
 ### ToolUseBarProps
 
-| 属性                 | 类型                                                    | 默认值 | 说明                                                         |
-| -------------------- | ------------------------------------------------------- | ------ | ------------------------------------------------------------ |
-| tools                | ToolCall[]                                              | -      | 工具列表                                                     |
-| onToolClick          | (id: string) => void                                    | -      | 工具点击回调                                                 |
-| className            | string                                                  | -      | 自定义类名                                                   |
-| activeKeys           | string[]                                                | []     | 激活的工具 ID 数组                                           |
-| defaultActiveKeys    | string[]                                                | []     | 默认激活的工具 ID 数组                                       |
-| onActiveKeysChange   | (activeKeys: string[]) => void                          | -      | 激活状态变化回调                                             |
-| expandedKeys         | string[]                                                | []     | 展开的工具 ID 数组                                           |
-| defaultExpandedKeys  | string[]                                                | []     | 默认展开的工具 ID 数组                                       |
-| onExpandedKeysChange | (expandedKeys: string[], removedKeys: string[]) => void | -      | 展开状态变化回调，`removedKeys` 为本次操作中被收起的工具项ID |
-| light                | boolean                                                 | false  | 启用亮色/轻量模式                                            |
-| disableAnimation     | boolean                                                 | false  | 关闭动画，在性能较弱设备上可减少卡顿                         |
-| testId               | string                                                  | -      | 测试 ID                                                      |
-| style                | React.CSSProperties                                     | -      | 自定义样式                                                   |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| tools | 工具列表 | ToolCall[] | - | - |
+| onToolClick | 工具点击回调 | (id: string) => void | - | - |
+| className | 自定义类名 | string | - | - |
+| activeKeys | 激活的工具 ID 数组 | string[] | [] | - |
+| defaultActiveKeys | 默认激活的工具 ID 数组 | string[] | [] | - |
+| onActiveKeysChange | 激活状态变化回调 | (activeKeys: string[]) => void | - | - |
+| expandedKeys | 展开的工具 ID 数组 | string[] | [] | - |
+| defaultExpandedKeys | 默认展开的工具 ID 数组 | string[] | [] | - |
+| onExpandedKeysChange | 展开状态变化回调，`removedKeys` 为本次操作中被收起的工具项ID | (expandedKeys: string[], removedKeys: string[]) => void | - | - |
+| light | 启用亮色/轻量模式 | boolean | false | - |
+| disableAnimation | 关闭动画，在性能较弱设备上可减少卡顿 | boolean | false | - |
+| testId | 测试 ID | string | - | - |
+| style | 自定义样式 | React.CSSProperties | - | - |
 
 ### ToolCall
 
-| 属性         | 类型                                        | 默认值 | 说明                               |
-| ------------ | ------------------------------------------- | ------ | ---------------------------------- |
-| id           | string                                      | -      | 工具唯一标识                       |
-| toolName     | React.ReactNode                             | -      | 工具名称                           |
-| toolTarget   | React.ReactNode                             | -      | 工具目标                           |
-| time         | React.ReactNode                             | -      | 时间信息                           |
-| icon         | React.ReactNode                             | -      | 自定义图标                         |
-| status       | 'idle' \| 'loading' \| 'success' \| 'error' | -      | 工具状态                           |
-| errorMessage | string                                      | -      | 错误信息，仅在 error 状态下有效    |
-| content      | React.ReactNode                             | -      | 工具详细内容，展开后显示           |
-| type         | 'summary' \| 'normal' \| string             | -      | 工具类型，'summary' 为特殊的总结项 |
-| testId       | string                                      | -      | 测试 ID                            |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| id | 工具唯一标识 | string | - | - |
+| toolName | 工具名称 | React.ReactNode | - | - |
+| toolTarget | 工具目标 | React.ReactNode | - | - |
+| time | 时间信息 | React.ReactNode | - | - |
+| icon | 自定义图标 | React.ReactNode | - | - |
+| status | 工具状态 | 'idle' \| 'loading' \| 'success' \| 'error' | - | - |
+| errorMessage | 错误信息，仅在 error 状态下有效 | string | - | - |
+| content | 工具详细内容，展开后显示 | React.ReactNode | - | - |
+| type | 工具类型，'summary' 为特殊的总结项 | 'summary' \| 'normal' \| string | - | - |
+| testId | 测试 ID | string | - | - |
 
 ## 状态样式
 
@@ -109,24 +109,24 @@ ToolUseBarThink 是一个专门为 Think 功能设计的独立组件，拥有独
 
 ### ToolUseBarThinkProps
 
-| 属性             | 类型                                        | 默认值 | 说明                    |
-| ---------------- | ------------------------------------------- | ------ | ----------------------- |
-| id               | string                                      | -      | 组件唯一标识            |
-| toolName         | React.ReactNode                             | -      | 工具名称                |
-| toolTarget       | React.ReactNode                             | -      | 工具目标                |
-| time             | React.ReactNode                             | -      | 工具执行时间            |
-| icon             | React.ReactNode                             | -      | 自定义图标              |
-| thinkContent     | React.ReactNode                             | -      | Think 模块完整内容      |
-| isThinkLoading   | boolean                                     | false  | Think 模块 loading 状态 |
-| status           | 'idle' \| 'loading' \| 'success' \| 'error' | 'idle' | 组件状态                |
-| onClick          | (id: string) => void                        | -      | 点击回调                |
-| isActive         | boolean                                     | false  | 是否激活                |
-| onActiveChange   | (id: string, active: boolean) => void       | -      | 激活状态变化回调        |
-| isExpanded       | boolean                                     | -      | 是否展开                |
-| onExpandedChange | (id: string, expanded: boolean) => void     | -      | 展开状态变化回调        |
-| defaultExpanded  | boolean                                     | false  | 默认展开状态            |
-| testId           | string                                      | -      | 测试 ID                 |
-| light            | boolean                                     | false  | 启用亮色/轻量模式       |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| id | 组件唯一标识 | string | - | - |
+| toolName | 工具名称 | React.ReactNode | - | - |
+| toolTarget | 工具目标 | React.ReactNode | - | - |
+| time | 工具执行时间 | React.ReactNode | - | - |
+| icon | 自定义图标 | React.ReactNode | - | - |
+| thinkContent | Think 模块完整内容 | React.ReactNode | - | - |
+| isThinkLoading | Think 模块 loading 状态 | boolean | false | - |
+| status | 组件状态 | 'idle' \| 'loading' \| 'success' \| 'error' | 'idle' | - |
+| onClick | 点击回调 | (id: string) => void | - | - |
+| isActive | 是否激活 | boolean | false | - |
+| onActiveChange | 激活状态变化回调 | (id: string, active: boolean) => void | - | - |
+| isExpanded | 是否展开 | boolean | - | - |
+| onExpandedChange | 展开状态变化回调 | (id: string, expanded: boolean) => void | - | - |
+| defaultExpanded | 默认展开状态 | boolean | false | - |
+| testId | 测试 ID | string | - | - |
+| light | 启用亮色/轻量模式 | boolean | false | - |
 
 ### ToolUseBarThink 特性
 

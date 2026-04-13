@@ -11,7 +11,12 @@ group:
 
 ## v2.30.22
 
+- MarkdownRenderer
+  - 🐞 修复流式 Markdown 未传 `streamingParagraphAnimation` 时段落不应用淡入动画的问题；未传时默认开启，仅 `streamingParagraphAnimation: false` 关闭。[#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
+- MarkdownEditor
+  - 🛠 `streamingParagraphAnimation` 与 MarkdownRenderer 语义对齐（默认开启，显式 `false` 关闭）。[#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
 - Bubble
+  - 📖 文档与流式演示补充 `markdownRenderConfig.streamingParagraphAnimation: false` 迁移示例（与旧版「未传即无段落动画」行为一致）。[#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
   - 🆕 新增 `useOpenAIMessageBubbleData` Hook 与 `mapOpenAIMessagesToMessageBubbleData`，支持将 OpenAI Chat Completions 风格的 `messages` 转为 `MessageBubbleData[]`，便于接入 `BubbleList` 与 SSE 流式内容。
   - 🆕 新增 `useOpenClawMessageBubbleData`、`mapOpenClawMessagesToMessageBubbleData` 与 `normalizeOpenClawMessagesToOpenAI`，支持 OpenClaw 会话 / transcript 风格（`timestamp`、`toolResult` 等）。
   - 🆕 新增 `useOllamaMessageBubbleData`、`mapOllamaMessagesToMessageBubbleData` 与 `normalizeOllamaMessagesToOpenAI`，支持 Ollama `/api/chat` 的 `messages`（`images`、`tool_calls`、`thinking` 等）。

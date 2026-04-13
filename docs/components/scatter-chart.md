@@ -22,72 +22,72 @@ group:
 
 ### ScatterChartProps
 
-| 属性                  | 类型                                             | 默认值     | 说明                                                                                |
-| --------------------- | ------------------------------------------------ | ---------- | ----------------------------------------------------------------------------------- |
-| data                  | `ScatterChartDataItem[]`                         | -          | 扁平化数据数组                                                                      |
-| title                 | `string`                                         | -          | 图表标题                                                                            |
-| width                 | `number \| string`                               | `800`      | 宽度（px），移动端自适应为 100%                                                     |
-| height                | `number \| string`                               | `600`      | 高度（px），移动端最大约 80% 屏宽（上限 400）                                       |
-| className             | `string`                                         | -          | 自定义类名                                                                          |
-| toolbarExtra          | `React.ReactNode`                                | -          | 头部工具条额外按钮                                                                  |
-| renderFilterInToolbar | `boolean`                                        | `false`    | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧）            |
-| dataTime              | `string`                                         | -          | 数据时间                                                                            |
-| theme                 | `'dark' \| 'light'`                              | `'light'`  | 图表与容器主题；`dark` 时容器内嵌 Ant Design 暗色算法；图例为实心色块并与折线图一致 |
-| xUnit                 | `string`                                         | `'月'`     | X 轴单位                                                                            |
-| yUnit                 | `string`                                         | -          | Y 轴单位                                                                            |
-| xAxisLabel            | `string`                                         | -          | X 轴标签                                                                            |
-| yAxisLabel            | `string`                                         | -          | Y 轴标签                                                                            |
-| xPosition             | `'top' \| 'bottom'`                              | `'bottom'` | X 轴位置                                                                            |
-| yPosition             | `'left' \| 'right'`                              | `'left'`   | Y 轴位置                                                                            |
-| hiddenX               | `boolean`                                        | `false`    | 是否隐藏 X 轴                                                                       |
-| hiddenY               | `boolean`                                        | `false`    | 是否隐藏 Y 轴                                                                       |
-| showGrid              | `boolean`                                        | `true`     | 是否显示网格线                                                                      |
-| color                 | `string \| string[]`                             | -          | 自定义主色；数组按序对应各数据序列                                                  |
-| textMaxWidth          | `number`                                         | `80`       | 图例文字最大宽度（px），超出截断并加省略号                                          |
-| statistic             | `ChartStatisticConfig \| ChartStatisticConfig[]` | -          | 指标卡配置，单个对象或数组                                                          |
-| xMin                  | `number`                                         | -          | X 轴最小值；不传时从数据自动推算（含 10% 边距）                                     |
-| xMax                  | `number`                                         | -          | X 轴最大值；不传时从数据自动推算（含 10% 边距）                                     |
-| yMin                  | `number`                                         | -          | Y 轴最小值；不传时从数据自动推算（含 10% 边距）                                     |
-| yMax                  | `number`                                         | -          | Y 轴最大值；不传时从数据自动推算（含 10% 边距）                                     |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| data | 扁平化数据数组 | `ScatterChartDataItem[]` | - | - |
+| title | 图表标题 | `string` | - | - |
+| width | 宽度（px），移动端自适应为 100% | `number \| string` | `800` | - |
+| height | 高度（px），移动端最大约 80% 屏宽（上限 400） | `number \| string` | `600` | - |
+| className | 自定义类名 | `string` | - | - |
+| toolbarExtra | 头部工具条额外按钮 | `React.ReactNode` | - | - |
+| renderFilterInToolbar | 是否将过滤器渲染到工具栏（当为 true 时，ChartFilter 会显示在工具栏右侧） | `boolean` | `false` | - |
+| dataTime | 数据时间 | `string` | - | - |
+| theme | 图表与容器主题；`dark` 时容器内嵌 Ant Design 暗色算法；图例为实心色块并与折线图一致 | `'dark' \| 'light'` | `'light'` | - |
+| xUnit | X 轴单位 | `string` | `'月'` | - |
+| yUnit | Y 轴单位 | `string` | - | - |
+| xAxisLabel | X 轴标签 | `string` | - | - |
+| yAxisLabel | Y 轴标签 | `string` | - | - |
+| xPosition | X 轴位置 | `'top' \| 'bottom'` | `'bottom'` | - |
+| yPosition | Y 轴位置 | `'left' \| 'right'` | `'left'` | - |
+| hiddenX | 是否隐藏 X 轴 | `boolean` | `false` | - |
+| hiddenY | 是否隐藏 Y 轴 | `boolean` | `false` | - |
+| showGrid | 是否显示网格线 | `boolean` | `true` | - |
+| color | 自定义主色；数组按序对应各数据序列 | `string \| string[]` | - | - |
+| textMaxWidth | 图例文字最大宽度（px），超出截断并加省略号 | `number` | `80` | - |
+| statistic | 指标卡配置，单个对象或数组 | `ChartStatisticConfig \| ChartStatisticConfig[]` | - | - |
+| xMin | X 轴最小值；不传时从数据自动推算（含 10% 边距） | `number` | - | - |
+| xMax | X 轴最大值；不传时从数据自动推算（含 10% 边距） | `number` | - | - |
+| yMin | Y 轴最小值；不传时从数据自动推算（含 10% 边距） | `number` | - | - |
+| yMax | Y 轴最大值；不传时从数据自动推算（含 10% 边距） | `number` | - | - |
 
 ### ChartContainerProps（继承）
 
-| 属性       | 类型                        | 默认值  | 说明                                                                            |
-| ---------- | --------------------------- | ------- | ------------------------------------------------------------------------------- |
-| classNames | `ChartClassNames`           | -       | 分层类名：`root`、`toolbar`、`statisticContainer`、`filter`、`wrapper`、`chart` |
-| loading    | `boolean`                   | `false` | 加载态                                                                          |
-| style      | `React.CSSProperties`       | -       | 根容器内联样式                                                                  |
-| styles     | `ChartStyles`               | -       | 与各层 DOM 对应的内联样式                                                       |
-| variant    | `'outline' \| 'borderless'` | -       | 容器描边变体                                                                    |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| classNames | 分层类名：`root`、`toolbar`、`statisticContainer`、`filter`、`wrapper`、`chart` | `ChartClassNames` | - | - |
+| loading | 加载态 | `boolean` | `false` | - |
+| style | 根容器内联样式 | `React.CSSProperties` | - | - |
+| styles | 与各层 DOM 对应的内联样式 | `ChartStyles` | - | - |
+| variant | 容器描边变体 | `'outline' \| 'borderless'` | - | - |
 
 ### ScatterChartDataItem
 
-| 字段        | 类型               | 必填 | 说明                             |
-| ----------- | ------------------ | ---- | -------------------------------- |
-| category    | `string`           | 否   | 分类（用于外层筛选）             |
-| type        | `string`           | 否   | 数据序列名称（映射为 dataset）   |
-| x           | `number \| string` | 是   | 横坐标                           |
-| y           | `number \| string` | 是   | 纵坐标                           |
-| filterLabel | `string`           | 否   | 二级筛选标签（可选，支持"全部"） |
+| 字段 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| category | 分类（用于外层筛选） | `string` | - | - |
+| type | 数据序列名称（映射为 dataset） | `string` | - | - |
+| x | 横坐标（必填） | `number \| string` | - | - |
+| y | 纵坐标（必填） | `number \| string` | - | - |
+| filterLabel | 二级筛选标签（可选，支持"全部"） | `string` | - | - |
 
 ### ChartStatisticConfig
 
 `ChartStatisticConfig` 继承自 [ChartStatistic](/components/chart-statistic#chartstatisticprops) 组件的所有属性，详细 API 请参考 [ChartStatistic 文档](/components/chart-statistic)。
 
-| 字段           | 类型                                                                | 默认值      | 说明                                                   |
-| -------------- | ------------------------------------------------------------------- | ----------- | ------------------------------------------------------ |
-| title          | `string`                                                            | -           | 指标标题                                               |
-| tooltip        | `string`                                                            | -           | 鼠标悬停时显示的提示信息                               |
-| value          | `number \| string \| null \| undefined`                             | -           | 显示的数值                                             |
-| precision      | `number`                                                            | -           | 数值精度（小数点后位数）                               |
-| groupSeparator | `string`                                                            | `','`       | 千分位分隔符                                           |
-| prefix         | `string`                                                            | `''`        | 数值前缀（如货币符号）                                 |
-| suffix         | `string`                                                            | `''`        | 数值后缀（如单位）                                     |
-| formatter      | `(value: number \| string \| null \| undefined) => React.ReactNode` | -           | 自定义格式化函数，优先级高于其他格式化选项             |
-| className      | `string`                                                            | `''`        | 自定义类名                                             |
-| size           | `'small' \| 'default' \| 'large'`                                   | `'default'` | 组件尺寸                                               |
-| block          | `boolean`                                                           | `false`     | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） |
-| extra          | `React.ReactNode`                                                   | -           | 右上角自定义内容（图标、按钮等）                       |
+| 字段 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| title | 指标标题 | `string` | - | - |
+| tooltip | 鼠标悬停时显示的提示信息 | `string` | - | - |
+| value | 显示的数值 | `number \| string \| null \| undefined` | - | - |
+| precision | 数值精度（小数点后位数） | `number` | - | - |
+| groupSeparator | 千分位分隔符 | `string` | `','` | - |
+| prefix | 数值前缀（如货币符号） | `string` | `''` | - |
+| suffix | 数值后缀（如单位） | `string` | `''` | - |
+| formatter | 自定义格式化函数，优先级高于其他格式化选项 | `(value: number \| string \| null \| undefined) => React.ReactNode` | - | - |
+| className | 自定义类名 | `string` | `''` | - |
+| size | 组件尺寸 | `'small' \| 'default' \| 'large'` | `'default'` | - |
+| block | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean` | `false` | - |
+| extra | 右上角自定义内容（图标、按钮等） | `React.ReactNode` | - | - |
 
 ## 说明
 

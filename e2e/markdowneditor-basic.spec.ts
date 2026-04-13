@@ -160,11 +160,11 @@ test.describe('MarkdownEditor 高级功能', () => {
   });
 
   test('应该能够处理列表', async ({ markdownEditorPage }) => {
-    await markdownEditorPage.typeText('- List item 1');
+    await markdownEditorPage.typeTextWithInputRuleDelay('- List item 1');
     await markdownEditorPage.pressKey('Enter');
-    await markdownEditorPage.typeText('- List item 2');
+    await markdownEditorPage.typeTextWithInputRuleDelay('- List item 2');
     await markdownEditorPage.pressKey('Enter');
-    await markdownEditorPage.typeText('- List item 3');
+    await markdownEditorPage.typeTextWithInputRuleDelay('- List item 3');
 
     // 验证包含列表内容
     await markdownEditorPage.expectContainsText('List item 1');

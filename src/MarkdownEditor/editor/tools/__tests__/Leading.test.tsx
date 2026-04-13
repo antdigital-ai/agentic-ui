@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
@@ -130,7 +131,7 @@ describe('TocHeading Component', () => {
 
     const anchor = container.querySelector('.ant-anchor');
     expect(anchor).toBeDefined();
-    expect(container).toMatchSnapshot();
+    expect(container.innerHTML).toContain('background-color: red');
   });
 
   it('applies max height and scrollbar styles', () => {
@@ -153,7 +154,9 @@ describe('TocHeading Component', () => {
     );
     const anchor = container.querySelector('.ant-anchor');
     expect(anchor).toBeDefined();
-    expect(container).toMatchSnapshot();
+    expect(
+      container.querySelectorAll('.ant-anchor-link-title'),
+    ).toHaveLength(10);
   });
 });
 

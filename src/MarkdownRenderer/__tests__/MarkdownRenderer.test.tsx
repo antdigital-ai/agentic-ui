@@ -747,4 +747,31 @@ describe('MarkdownRenderer', () => {
       container.querySelector('[data-testid="file-view-file-list"]'),
     ).toBeTruthy();
   });
+
+  it('streaming 时应显示闪烁光标，结束后自动消失', () => {
+    const { container, rerender } = render(
+      <MarkdownRenderer content="Hello" streaming={true} />,
+    );
+
+    const cursor = container.querySelector('[data-testid="streaming-cursor"]');
+    expect(cursor).toBeTruthy();
+    expect(cursor?.getAttribute('aria-hidden')).toBe('true');
+
+    rerender(<MarkdownRenderer content="Hello" streaming={false} />);
+
+    const cursorAfter = container.querySelector(
+      '[data-testid="streaming-cursor"]',
+    );
+    expect(cursorAfter).toBeFalsy();
+  });
+
+  it('非 streaming 模式不应渲染闪烁光标', () => {
+    const { container } = render(
+      <MarkdownRenderer content="Static content" streaming={false} />,
+    );
+
+    expect(
+      container.querySelector('[data-testid="streaming-cursor"]'),
+    ).toBeFalsy();
+  });
 });

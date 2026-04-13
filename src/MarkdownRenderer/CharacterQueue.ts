@@ -101,12 +101,10 @@ export class CharacterQueue {
     }
   }
 
-  /** 当前已展示的长度 */
   getDisplayedLength(): number {
     return this.displayedLength;
   }
 
-  /** 完整内容 */
   getFullContent(): string {
     return this.fullContent;
   }

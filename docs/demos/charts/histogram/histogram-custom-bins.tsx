@@ -1,7 +1,8 @@
-/**
+﻿/**
  * title: 自定义分箱数量
  * description: 手动指定分箱数量，而非使用自动计算
  */
+import React from 'react';
 import { HistogramChart } from '@ant-design/agentic-ui';
 
 export default () => {

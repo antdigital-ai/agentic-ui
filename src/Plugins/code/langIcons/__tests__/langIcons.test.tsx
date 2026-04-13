@@ -31,20 +31,22 @@ describe('Language Icons', () => {
   iconNames.forEach((name) => {
     it(`应该渲染 ${name} 图标`, () => {
       const IconComponent = Icons[name as 'AplIcon'] as unknown as any;
-      const { container } = render(
-        <IconComponent data-testid={`${name.toLowerCase()}-icon`} />,
-      );
-      expect(container).toMatchSnapshot();
+      render(<IconComponent data-testid={`${name.toLowerCase()}-icon`} />);
+      const icon = screen.getByTestId(`${name.toLowerCase()}-icon`);
+      expect(icon.tagName).toBe('svg');
+      expect(icon).toHaveAttribute('xmlns', 'http://www.w3.org/2000/svg');
     });
   });
 
   iconNames.forEach((name) => {
     it(`应该渲染 ${name} 48 size 图标`, () => {
       const IconComponent = Icons[name as 'AplIcon'] as unknown as any;
-      const { container } = render(
-        <IconComponent size={48} data-testid={`${name.toLowerCase()}-icon`} />,
+      render(
+        <IconComponent size={48} data-testid={`${name.toLowerCase()}-icon-48`} />,
       );
-      expect(container).toMatchSnapshot();
+      const icon = screen.getByTestId(`${name.toLowerCase()}-icon-48`);
+      expect(icon).toHaveAttribute('width', '48');
+      expect(icon).toHaveAttribute('height', '48');
     });
   });
   describe('Popular Programming Languages', () => {

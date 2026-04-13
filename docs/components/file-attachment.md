@@ -35,17 +35,17 @@ group:
 
 文件附件数据结构：
 
-| 属性               | 说明              | 类型                               | 必填 |
-| ------------------ | ----------------- | ---------------------------------- | ---- |
-| name               | 文件名            | `string`                           | 是   |
-| type               | 文件 MIME 类型    | `string`                           | 是   |
-| size               | 文件大小（字节）  | `number`                           | 是   |
-| url                | 文件下载/预览地址 | `string`                           | 是   |
-| lastModified       | 最后修改时间戳    | `number`                           | 否   |
-| webkitRelativePath | 相对路径          | `string`                           | 否   |
-| previewUrl         | 预览图地址        | `string`                           | 否   |
-| status             | 文件状态          | `'uploading' \| 'done' \| 'error'` | 否   |
-| uuid               | 文件唯一标识      | `string`                           | 否   |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| name | 文件名（必填） | `string` | - | - |
+| type | 文件 MIME 类型（必填） | `string` | - | - |
+| size | 文件大小（字节）（必填） | `number` | - | - |
+| url | 文件下载/预览地址（必填） | `string` | - | - |
+| lastModified | 最后修改时间戳 | `number` | - | - |
+| webkitRelativePath | 相对路径 | `string` | - | - |
+| previewUrl | 预览图地址 | `string` | - | - |
+| status | 文件状态 | `'uploading' \| 'done' \| 'error'` | - | - |
+| uuid | 文件唯一标识 | `string` | - | - |
 
 ### MessageBubbleData.fileMap
 
@@ -62,11 +62,11 @@ interface MessageBubbleData {
 
 文件视图配置（在 Bubble 组件中使用）：
 
-| 属性                 | 说明                     | 类型                                        | 默认值 |
-| -------------------- | ------------------------ | ------------------------------------------- | ------ |
-| maxDisplayCount      | 最多展示的非图片文件数量 | `number`                                    | -      |
-| showMoreButton       | 是否显示"查看更多"按钮   | `boolean`                                   | false  |
-| renderFileMoreAction | 自定义文件更多操作渲染   | `(file: AttachmentFile) => React.ReactNode` | -      |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| maxDisplayCount | 最多展示的非图片文件数量 | `number` | - | - |
+| showMoreButton | 是否显示"查看更多"按钮 | `boolean` | `false` | - |
+| renderFileMoreAction | 自定义文件更多操作渲染 | `(file: AttachmentFile) => React.ReactNode` | - | - |
 
 ### fileViewEvents
 

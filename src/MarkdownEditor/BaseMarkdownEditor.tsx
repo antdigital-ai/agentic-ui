@@ -75,56 +75,7 @@ const I18nBoundary: React.FC<{ children: React.ReactNode }> = ({
   return <I18nProvide>{children}</I18nProvide>;
 };
 
-/**
- * BaseMarkdownEditor 组件 - 基础Markdown编辑器组件
- *
- * 该组件是Markdown编辑器的核心实现，基于Slate.js构建，提供完整的Markdown编辑功能。
- * 支持插件系统、工具栏、目录、只读模式等功能，是MarkdownEditor的基础组件。
- *
- * @component
- * @description 基础Markdown编辑器组件，提供核心的Markdown编辑功能
- * @param {MarkdownEditorProps} props - 组件属性
- * @param {string} [props.initValue] - 初始值
- * @param {(value: string) => void} [props.onChange] - 内容变化回调
- * @param {React.RefObject} [props.editorRef] - 编辑器引用
- * @param {boolean} [props.readonly] - 是否只读模式
- * @param {Plugin[]} [props.plugins] - 插件列表
- * @param {ToolBarConfig} [props.toolBar] - 工具栏配置
- * @param {boolean} [props.toc] - 是否显示目录
- * @param {string|number} [props.width] - 编辑器宽度
- * @param {string|number} [props.height] - 编辑器高度
- * @param {React.CSSProperties} [props.style] - 容器样式
- * @param {React.CSSProperties} [props.contentStyle] - 内容区域样式
- * @param {React.CSSProperties} [props.editorStyle] - 编辑器样式
- * @param {MarkdownRenderConfig} [props.markdownRenderConfig] - Markdown渲染配置
- * @param {Function} [props.onBlur] - 失焦回调
- * @param {Function} [props.onFocus] - 聚焦回调
- *
- * @example
- * ```tsx
- * <BaseMarkdownEditor
- *   initValue="# Hello World"
- *   onChange={(value) => console.log('内容变化:', value)}
- *   editorRef={editorRef}
- *   readonly={false}
- *   toc={true}
- *   toolBar={{ show: true }}
- * />
- * ```
- *
- * @returns {React.ReactElement} 渲染的基础Markdown编辑器组件
- *
- * @remarks
- * - 基于Slate.js构建
- * - 支持插件系统扩展
- * - 提供完整的工具栏功能
- * - 支持目录生成
- * - 支持只读模式
- * - 提供焦点管理
- * - 支持错误捕获
- * - 支持键盘事件处理
- * - 提供Markdown解析和渲染
- */
+/** 基于 Slate.js 的 Markdown 编辑器核心组件，readonly + renderMode='markdown' 时走轻量 MarkdownRenderer */
 export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
   const {
     initValue,
@@ -356,6 +307,8 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
   const [openJinjaTemplate, setOpenJinjaTemplate] = useState(false);
   const [jinjaAnchorPath, setJinjaAnchorPath] = useState<number[] | null>(null);
 
+  const isStreaming = props.streaming ?? props.typewriter ?? false;
+
   if (readonly && effectiveRenderMode === 'markdown') {
     return wrapSSR(
       <I18nBoundary>
@@ -382,7 +335,10 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
           >
             <MarkdownRenderer
               content={initValue || ''}
-              streaming={props.typewriter ?? false}
+              streaming={isStreaming}
+              isFinished={props.isFinished ?? !isStreaming}
+              queueOptions={props.queueOptions}
+              streamingParagraphAnimation={props.streamingParagraphAnimation}
               plugins={props.plugins}
               remarkPlugins={props.markdownToHtmlOptions}
               codeProps={props.codeProps}
@@ -395,6 +351,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
               fncProps={props.fncProps}
               linkConfig={props.linkConfig}
               eleRender={props.eleRender}
+              fileMapConfig={props.fileMapConfig}
             />
             {children}
           </div>
@@ -420,7 +377,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
             store: instance.store,
             domRect,
             setDomRect,
-            typewriter: props.typewriter ?? false,
+            typewriter: isStreaming,
             readonly: props.readonly ?? false,
             editorProps:
               effectiveJinja !== undefined

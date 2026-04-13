@@ -36,6 +36,7 @@ describe('enter.ts', () => {
       children: [],
       insertBreak: vi.fn(),
       hasPath: vi.fn().mockReturnValue(true),
+      withoutNormalizing: vi.fn((fn: () => void) => fn()),
     };
 
     // Create mock store

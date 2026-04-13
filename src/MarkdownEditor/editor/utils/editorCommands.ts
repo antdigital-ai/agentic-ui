@@ -25,6 +25,74 @@ export function getCurrentNodes(editor: Editor) {
   });
 }
 
+/** 光标所在段落/标题；避免 getCurrentNodes 取到 list-item 等子块导致插入路径错误 */
+function resolveParagraphOrHead(
+  editor: Editor,
+  preferred?: [any, Path],
+): [any, Path] | undefined {
+  if (
+    preferred?.[0] &&
+    ['paragraph', 'head'].includes((preferred[0] as any).type)
+  ) {
+    return preferred;
+  }
+  const { selection } = editor;
+  if (selection) {
+    const above = Editor.above(editor, {
+      at: selection.anchor,
+      match: (n) =>
+        Element.isElement(n) &&
+        ['paragraph', 'head'].includes((n as any).type),
+    });
+    if (above) {
+      return above as [any, Path];
+    }
+  }
+  const nodesResult = Editor.nodes(editor, {
+    at: [],
+    match: (n) =>
+      Element.isElement(n) &&
+      ['paragraph', 'head'].includes((n as any).type),
+    mode: 'lowest',
+  }) as Iterable<[any, Path]> | Iterator<[any, Path]>;
+
+  if (Array.isArray(nodesResult) && nodesResult.length > 0) {
+    const entry = nodesResult[0] as [any, Path];
+    if (
+      entry?.[0] &&
+      ['paragraph', 'head'].includes((entry[0] as any).type)
+    ) {
+      return entry;
+    }
+    return undefined;
+  }
+
+  const iter = nodesResult as Iterator<[any, Path]>;
+  if (iter && typeof iter.next === 'function') {
+    const first = iter.next();
+    return first.done ? undefined : (first.value as [any, Path]);
+  }
+  return undefined;
+}
+
+function firstLowestElement(editor: Editor): [any, Path] | undefined {
+  const nodesResult = Editor.nodes(editor, {
+    at: [],
+    match: (n) => Element.isElement(n),
+    mode: 'lowest',
+  }) as Iterable<[any, Path]> | Iterator<[any, Path]>;
+
+  if (Array.isArray(nodesResult) && nodesResult.length > 0) {
+    return nodesResult[0] as [any, Path];
+  }
+  const iter = nodesResult as Iterator<[any, Path]>;
+  if (iter && typeof iter.next === 'function') {
+    const first = iter.next();
+    return first.done ? undefined : (first.value as [any, Path]);
+  }
+  return undefined;
+}
+
 /**
  * 插入表格
  *
@@ -36,7 +104,26 @@ export function getCurrentNodes(editor: Editor) {
  * @param node 可选的节点，如果不提供则从编辑器获取
  */
 export function insertTable(editor: Editor, node?: [any, Path]) {
-  const currentNode = node || Array.from(getCurrentNodes(editor))[0];
+  if (node?.[0]?.type === 'column-cell') {
+    NativeTableEditor.insertTable(editor, {
+      rows: 3,
+      cols: 3,
+      at: [...node[1], 0],
+    });
+    return;
+  }
+
+  if (
+    node !== undefined &&
+    !['paragraph', 'head'].includes(node[0]?.type as string)
+  ) {
+    return;
+  }
+
+  const currentNode =
+    node === undefined
+      ? resolveParagraphOrHead(editor) ?? firstLowestElement(editor)
+      : resolveParagraphOrHead(editor, node);
   if (currentNode && ['paragraph', 'head'].includes(currentNode?.[0]?.type)) {
     const path =
       currentNode?.[0]?.type === 'paragraph' && !Node.string(currentNode[0])
@@ -59,13 +146,6 @@ export function insertTable(editor: Editor, node?: [any, Path]) {
     Transforms.select(editor, Editor.start(editor, path));
   }
 
-  if (currentNode && ['column-cell'].includes(currentNode?.[0]?.type)) {
-    NativeTableEditor.insertTable(editor, {
-      rows: 3,
-      cols: 3,
-      at: [...currentNode[1], 0],
-    });
-  }
 }
 
 /**
@@ -83,7 +163,17 @@ export function insertCodeBlock(
   type?: 'mermaid' | 'html',
   node?: [any, Path],
 ) {
-  const currentNode = node || Array.from(getCurrentNodes(editor))[0];
+  if (
+    node !== undefined &&
+    !['paragraph', 'head'].includes(node[0]?.type as string)
+  ) {
+    return;
+  }
+
+  const currentNode =
+    node === undefined
+      ? resolveParagraphOrHead(editor) ?? firstLowestElement(editor)
+      : resolveParagraphOrHead(editor, node);
   if (
     currentNode &&
     currentNode[0] &&

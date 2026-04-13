@@ -1,4 +1,4 @@
-import { Popover, theme } from 'antd';
+import { Popover } from 'antd';
 import React, { useContext, useEffect, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
@@ -13,80 +13,36 @@ import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { MessageBubbleData } from '../type';
 import { MessagesContext } from './BubbleContext';
 
-/**
- * MarkdownPreview 组件用于渲染 Markdown 内容的预览。
- *
- * @param {Object} props - 组件的属性。
- * @param {string} props.content - 要渲染的 Markdown 内容。
- * @param {MarkdownEditorProps['fncProps']} props.fncProps - Markdown 编辑器的函数属性。
- * @param {boolean} [props.typing] - 是否启用打字机效果。
- * @param {React.ReactNode} props.extra - 额外的 React 节点。
- * @param {React.ReactNode} props.docListNode - 文档列表节点。
- * @param {React.RefObject<HTMLDivElement>} props.htmlRef - HTML 元素的引用。
- *
- * @returns {JSX.Element} 渲染的 Markdown 预览组件。
- */
 export interface MarkdownPreviewProps {
-  /** markdown 源文本内容，例如: "# 标题\n这是正文" */
   content: string;
-  /** markdown 编辑器的功能属性配置，控制编辑器行为 */
   fncProps?: MarkdownEditorProps['fncProps'];
   placement?: 'left' | 'right';
-  /** 是否启用打字机效果，例如: true */
   typing?: boolean;
-  /** 额外的 React 节点，用于显示附加内容，例如: <Button>更多</Button> */
   extra?: React.ReactNode;
-  /** 文档列表节点，用于展示相关文档，例如: <DocList items={[...]} /> */
   docListNode?: React.ReactNode;
-  /** HTML 元素的引用，用于获取容器尺寸，例如: useRef<HTMLDivElement>(null) */
   htmlRef?: React.RefObject<HTMLDivElement>;
-  /** 内容是否已完成加载，例如: true */
   isFinished?: boolean;
   style?: React.CSSProperties;
   originData?: MessageBubbleData;
   markdownRenderConfig?: MarkdownEditorProps;
-  /** 在 content 前面插入的 DOM 元素，例如: <div>前置内容</div> */
   beforeContent: React.ReactNode;
-  /** 在 content 后面插入的 DOM 元素，例如: <div>后置内容</div> */
   afterContent: React.ReactNode;
 }
 
-/**
- * Markdown 预览组件
- * @component MarkdownPreview
- *
- * @param {Object} props - 组件属性
- * @param {string} props.content - Markdown 内容
- * @param {ReactNode} props.extra - 额外的内容
- * @param {boolean} props.typing - 是否正在输入
- * @param {React.RefObject} props.htmlRef - HTML 元素的引用
- * @param {Object} props.fncProps - 功能属性
- * @param {ReactNode} props.docListNode - 文档列表节点
- * @param {boolean} props.isFinished - 内容是否已完成
- * @param {ReactNode} props.beforeContent - 在 content 前面插入的 DOM 元素
- * @param {ReactNode} props.afterContent - 在 content 后面插入的 DOM 元素
- *
- * @description
- * 这是一个用于渲染 Markdown 内容的预览组件。它支持以下功能：
- * - 普通 Markdown 渲染
- * - 支持打字机效果
- * - 错误边界处理
- * - 支持 Apaasify 自定义渲染
- * - 支持紧凑模式和标准模式
- * - 支持弹出层展示额外内容
- * - 支持在 content 前后插入自定义 DOM 元素
- *
- * @example
- * ```tsx
- * <MarkdownPreview
- *   content="# Hello World"
- *   typing={false}
- *   htmlRef={ref}
- *   beforeContent={<div>前置内容</div>}
- *   afterContent={<div>后置内容</div>}
- * />
- * ```
- */
+const CONTAINER_STYLE: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  minWidth: 0,
+  maxWidth: '100%',
+};
+
+const POPOVER_SHARED_STYLE: React.CSSProperties = {
+  padding: 0,
+  borderRadius: 'var(--radius-control-sm)',
+  background: 'var(--color-primary-bg-page)',
+  boxShadow: 'var(--shadow-control-base)',
+};
+
 export const MarkdownPreview = (props: MarkdownPreviewProps) => {
   const {
     content,
@@ -98,84 +54,74 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     beforeContent,
     afterContent,
   } = props;
-  const MarkdownEditorRef = React.useRef<MarkdownEditorInstance | undefined>(
-    undefined,
-  );
 
+  const editorRef = React.useRef<MarkdownEditorInstance | undefined>(undefined);
   const { hidePadding } = useContext(MessagesContext) || {};
-
   const config = useContext(BubbleConfigContext);
   const locale = useLocale();
   const standalone = config?.standalone;
   const extraShowOnHover = config?.extraShowOnHover;
-  const { token } = theme.useToken();
-
-  const renderMode =
-    props.markdownRenderConfig?.renderMode ??
-    props.markdownRenderConfig?.renderType ??
-    'slate';
-  const shouldAnimateMarkdown =
-    Boolean(typing) && (props.originData?.isLast ?? true);
-
-  const isPaddingHidden = useMemo(() => {
-    return !!extra;
-  }, [extra, typing]);
+  const rc = props.markdownRenderConfig;
+  const renderMode = rc?.renderMode ?? rc?.renderType ?? 'slate';
+  const isStreaming =
+    (rc?.streaming ?? rc?.typewriter ?? Boolean(typing)) &&
+    (props.originData?.isLast ?? true);
+  const isFinished = props.originData?.isFinished ?? props.isFinished;
+  const noPadding = !!extra;
 
   useEffect(() => {
     if (renderMode !== 'slate') return;
-    const schema = parserMdToSchema(content).schema;
-    MarkdownEditorRef.current?.store.updateNodeList(schema);
+    editorRef.current?.store.updateNodeList(
+      parserMdToSchema(content).schema,
+    );
   }, [content, renderMode]);
 
   const markdown = useMemo(() => {
-    // MarkdownRenderer 渲染路径——轻量，不创建 Slate 实例
     if (renderMode === 'markdown') {
       return (
         <MarkdownRenderer
           content={content}
-          streaming={shouldAnimateMarkdown}
-          isFinished={props.originData?.isFinished}
-          plugins={props.markdownRenderConfig?.plugins}
-          queueOptions={props.markdownRenderConfig?.queueOptions}
-          streamingParagraphAnimation={
-            props.markdownRenderConfig?.streamingParagraphAnimation
-          }
+          streaming={isStreaming}
+          isFinished={isFinished}
+          plugins={rc?.plugins}
+          remarkPlugins={rc?.markdownToHtmlOptions}
+          queueOptions={rc?.queueOptions}
+          streamingParagraphAnimation={rc?.streamingParagraphAnimation}
           fncProps={fncProps}
-          linkConfig={props.markdownRenderConfig?.linkConfig}
+          linkConfig={rc?.linkConfig}
+          codeProps={rc?.codeProps}
+          apaasify={rc?.apaasify}
+          fileMapConfig={rc?.fileMapConfig}
+          eleRender={rc?.eleRender}
           style={{
             maxWidth: standalone ? '100%' : undefined,
-            padding: isPaddingHidden ? 0 : undefined,
-            margin: isPaddingHidden ? 0 : undefined,
-            ...(props.markdownRenderConfig?.style || {}),
+            padding: noPadding ? 0 : undefined,
+            margin: noPadding ? 0 : undefined,
+            ...(rc?.style || {}),
           }}
-          codeProps={props.markdownRenderConfig?.codeProps}
-          apaasify={props.markdownRenderConfig?.apaasify}
-          fileMapConfig={props.markdownRenderConfig?.fileMapConfig}
         />
       );
     }
 
-    // Slate 渲染路径——保持向后兼容
     const minWidth = content?.includes?.('chartType')
       ? standalone
         ? Math.max((htmlRef?.current?.clientWidth || 600) - 23, 500)
         : Math.min((htmlRef?.current?.clientWidth || 600) - 128, 500)
       : undefined;
+
     return (
       <MarkdownEditor
-        {...(props.markdownRenderConfig || {})}
+        {...(rc || {})}
         fncProps={fncProps}
-        editorRef={MarkdownEditorRef}
+        editorRef={editorRef}
         initValue={content}
         toc={false}
         width="100%"
         height="auto"
         contentStyle={props.style}
         tableConfig={{
-          actions: {
-            fullScreen: 'modal',
-          },
-          ...(props.markdownRenderConfig?.tableConfig || {}),
+          actions: { fullScreen: 'modal' },
+          ...(rc?.tableConfig || {}),
         }}
         deps={[
           String(props.originData?.isLast),
@@ -183,20 +129,14 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
           String(props.originData?.isAborted),
         ]}
         rootContainer={htmlRef as any}
-        editorStyle={{
-          fontSize: 14,
-          ...(props.markdownRenderConfig?.editorStyle || {}),
-        }}
-        typewriter={
-          (props.markdownRenderConfig?.typewriter ?? shouldAnimateMarkdown) &&
-          (props.originData?.isLast ?? true)
-        }
+        editorStyle={{ fontSize: 14, ...(rc?.editorStyle || {}) }}
+        streaming={isStreaming}
         style={{
           minWidth: minWidth ? `min(${minWidth}px,100%)` : undefined,
           maxWidth: standalone ? '100%' : undefined,
-          padding: isPaddingHidden ? 0 : undefined,
-          margin: isPaddingHidden ? 0 : undefined,
-          ...(props.markdownRenderConfig?.style || {}),
+          padding: noPadding ? 0 : undefined,
+          margin: noPadding ? 0 : undefined,
+          ...(rc?.style || {}),
         }}
         readonly
       />
@@ -206,10 +146,10 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     typing,
     props.originData?.isLast,
     props.originData?.isFinished,
-    isPaddingHidden,
+    noPadding,
     content,
     renderMode,
-    props.markdownRenderConfig,
+    rc,
     fncProps,
     standalone,
   ]);
@@ -218,10 +158,10 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     <div
       style={{
         padding: 'var(--padding-5x)',
-        background: ' #FFFFFF',
-        color: token.colorError,
+        background: 'var(--ant-color-bg-container, #fff)',
+        color: 'var(--ant-color-error, #ff4d4f)',
         borderRadius: '16px 16px 2px 16px',
-        border: '1px solid ' + token.colorErrorBorder,
+        border: '1px solid var(--ant-color-error-border, #ffccc7)',
         marginLeft: props.placement === 'right' ? 0 : 24,
         marginRight: props.placement === 'right' ? 24 : 0,
       }}
@@ -230,100 +170,35 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
     </div>
   );
 
-  // 未开启 extraShowOnHover 时，extra 常驻展示（左右均作为兄弟节点渲染）
-  if (!extraShowOnHover) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minWidth: 0,
-          maxWidth: '100%',
-        }}
-      >
-        <ErrorBoundary fallback={errorDom}>
-          {beforeContent}
-          {markdown}
-          {docListNode}
-          {afterContent}
-        </ErrorBoundary>
-        {extra}
-      </div>
-    );
-  }
+  const body = (
+    <div style={CONTAINER_STYLE}>
+      <ErrorBoundary fallback={errorDom}>
+        {beforeContent}
+        {markdown}
+        {docListNode}
+        {afterContent}
+      </ErrorBoundary>
+      {!extraShowOnHover && extra}
+    </div>
+  );
 
-  // extraShowOnHover 开启时，无 extra 直接返回内容，避免 hover 出现空浮层
-  // 生成中（typing）时不使用 Popover，避免 hover 展示 extra
-  if (!extra || typing) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minWidth: 0,
-          maxWidth: '100%',
-        }}
-      >
-        <ErrorBoundary fallback={errorDom}>
-          {beforeContent}
-          {markdown}
-          {docListNode}
-          {afterContent}
-        </ErrorBoundary>
-      </div>
-    );
-  }
+  if (!extraShowOnHover || !extra || typing) return body;
 
-  // extraShowOnHover 开启时，左右两侧均通过 Popover 在 hover 时展示 extra
   const isLeft = props.placement === 'left';
-  const popoverAlign = isLeft
-    ? {
-        points: ['tl', 'bl'] as [string, string],
-        offset: [0, -12] as [number, number],
-      }
-    : {
-        points: ['tr', 'br'] as [string, string],
-        offset: [0, -12] as [number, number],
-      };
-  const popoverPlacement = isLeft ? 'bottomLeft' : 'bottomRight';
 
   return (
     <Popover
       trigger="hover"
-      align={popoverAlign}
-      content={extra}
-      styles={{
-        root: {
-          padding: 0,
-          borderRadius: 'var(--radius-control-sm)',
-          background: 'var(--color-primary-bg-page)',
-          boxShadow: 'var(--shadow-control-base)',
-        },
-        body: {
-          padding: 'var(--padding-0-5x)',
-          borderRadius: 'var(--radius-control-sm)',
-          background: 'var(--color-primary-bg-page)',
-          boxShadow: 'var(--shadow-control-base)',
-        },
+      align={{
+        points: isLeft ? ['tl', 'bl'] : ['tr', 'br'],
+        offset: [0, -12],
       }}
+      content={extra}
+      styles={{ root: POPOVER_SHARED_STYLE, body: { ...POPOVER_SHARED_STYLE, padding: 'var(--padding-0-5x)' } }}
       arrow={false}
-      placement={popoverPlacement}
+      placement={isLeft ? 'bottomLeft' : 'bottomRight'}
     >
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minWidth: 0,
-          maxWidth: '100%',
-        }}
-      >
-        <ErrorBoundary fallback={errorDom}>
-          {beforeContent}
-          {markdown}
-          {docListNode}
-          {afterContent}
-        </ErrorBoundary>
-      </div>
+      {body}
     </Popover>
   );
 };

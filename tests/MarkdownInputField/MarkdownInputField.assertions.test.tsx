@@ -57,6 +57,7 @@ vi.mock('../../src/MarkdownEditor', () => ({
 }));
 
 vi.mock('../../src/MarkdownInputField/SendButton', () => ({
+  resolveSendDisabled: () => false,
   SendButton: ({ onClick, disabled, loading, ...props }: any) => (
     <button
       data-testid="send-button"

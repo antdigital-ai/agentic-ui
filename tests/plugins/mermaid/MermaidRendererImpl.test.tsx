@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -89,5 +89,56 @@ describe('MermaidRendererImpl', () => {
       container.querySelector('.plugin-mermaid-empty') ||
         container.querySelector('[class*="mermaid-empty"]'),
     ).toBeTruthy();
+  });
+
+  it('应在工具栏触发滚轮时跳过缩放拦截', () => {
+    const { container } = render(<MermaidRendererImpl element={defaultElement} />);
+    const toolbar = container.querySelector('[data-mermaid-toolbar]') as HTMLElement;
+
+    expect(toolbar).toBeInTheDocument();
+
+    const wheelEvent = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      deltaY: -120,
+      clientX: 64,
+      clientY: 64,
+    });
+    toolbar.dispatchEvent(wheelEvent);
+
+    expect(wheelEvent.defaultPrevented).toBe(false);
+  });
+
+  it('应允许工具栏网格按钮切换背景网格状态', () => {
+    const { container } = render(<MermaidRendererImpl element={defaultElement} />);
+    const viewport = container.querySelector(
+      '[data-mermaid-viewport="true"]',
+    ) as HTMLElement;
+
+    expect(viewport).toHaveAttribute('data-mermaid-grid', 'true');
+
+    fireEvent.click(screen.getByRole('button', { name: '隐藏背景网格' }));
+    expect(viewport).toHaveAttribute('data-mermaid-grid', 'false');
+    expect(
+      screen.getByRole('button', { name: '显示背景网格' }),
+    ).toBeInTheDocument();
+  });
+
+  it('应避免工具栏触发拖拽态', () => {
+    const { container } = render(<MermaidRendererImpl element={defaultElement} />);
+    const viewport = container.querySelector(
+      '[data-mermaid-viewport="true"]',
+    ) as HTMLElement;
+    const toolbar = container.querySelector('[data-mermaid-toolbar]') as HTMLElement;
+
+    expect(viewport).toHaveAttribute('data-mermaid-panning', 'false');
+
+    fireEvent.pointerDown(toolbar, {
+      button: 0,
+      clientX: 20,
+      clientY: 20,
+      pointerId: 1,
+    });
+    expect(viewport).toHaveAttribute('data-mermaid-panning', 'false');
   });
 });

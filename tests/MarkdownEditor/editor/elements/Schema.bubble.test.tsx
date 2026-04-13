@@ -13,8 +13,8 @@ import { Schema } from '../../../../src/MarkdownEditor/editor/elements/Schema';
 import { EditorStoreContext } from '../../../../src/MarkdownEditor/editor/store';
 import { CodeNode } from '../../../../src/MarkdownEditor/el';
 
-// Mock SchemaRenderer
-vi.mock('../../../src/Schema', () => ({
+// Mock SchemaRenderer（路径需与 Schema 组件中的 import 一致）
+vi.mock('../../../../src/Schema', () => ({
   SchemaRenderer: ({
     schema,
     values,
@@ -160,9 +160,19 @@ describe('Schema - BubbleConfigContext 功能', () => {
     expect(screen.getByTestId('agentar-card-container')).toBeInTheDocument();
     expect(screen.getByTestId('schema-renderer')).toBeInTheDocument();
 
-    // 验证 SchemaRenderer 接收到正确的 props
     const schemaRenderer = screen.getByTestId('schema-renderer');
-    expect(schemaRenderer).toMatchSnapshot();
+    const schemaAttr = schemaRenderer.getAttribute('data-schema');
+    expect(schemaAttr).toBeTruthy();
+    let parsed = JSON.parse(schemaAttr as string);
+    if (typeof parsed === 'string') {
+      parsed = JSON.parse(parsed);
+    }
+    expect(parsed).toMatchObject({
+      type: 'form',
+      properties: expect.objectContaining({
+        title: expect.objectContaining({ type: 'string' }),
+      }),
+    });
   });
 
   it('应该在 bubble 数据变化时正确更新 apaasify.render', () => {

@@ -20,18 +20,18 @@ group:
 
 Loading 组件是主要的加载组件，支持多种使用模式。
 
-| 参数               | 说明                                                                                                                              | 类型                                                                                | 默认值 | 必填 |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------ | ---- |
-| `size`             | 动画尺寸（宽度和高度），支持数字（px）或字符串（如 `'1em'`, `'2rem'`）。未设置时，嵌套模式默认为 `32px`，非嵌套模式默认为 `'1em'` | `number \| string`                                                                  | -      | 否   |
-| `tip`              | 加载提示文本，支持 ReactNode。设置为 `false` 或 `null` 时不显示提示                                                               | `React.ReactNode \| false \| null`                                                  | -      | 否   |
-| `indicator`        | 自定义加载指示器，支持 ReactNode                                                                                                  | `React.ReactNode`                                                                   | -      | 否   |
-| `percent`          | 加载进度百分比（0-100），设置后会显示进度条                                                                                       | `number`                                                                            | -      | 否   |
-| `children`         | 子元素，传入后会启用嵌套模式（覆盖在内容上方显示加载状态）                                                                        | `React.ReactNode`                                                                   | -      | 否   |
-| `className`        | 自定义类名                                                                                                                        | `string`                                                                            | -      | 否   |
-| `wrapperClassName` | 最外层容器的自定义类名                                                                                                            | `string`                                                                            | -      | 否   |
-| `style`            | 自定义样式                                                                                                                        | `React.CSSProperties`                                                               | -      | 否   |
-| `styles`           | 语义化样式配置，可分别设置 root、wrapper、indicator、tip 的样式                                                                   | `Partial<Record<'root' \| 'wrapper' \| 'indicator' \| 'tip', React.CSSProperties>>` | -      | 否   |
-| `spinning`         | 是否显示加载状态，仅在嵌套模式下生效，控制是否显示加载指示器和背景动画效果                                                        | `boolean`                                                                           | `true` | 否   |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| `size` | 动画尺寸（宽度和高度），支持数字（px）或字符串（如 `'1em'`, `'2rem'`）。未设置时，嵌套模式默认为 `32px`，非嵌套模式默认为 `'1em'` | `number \| string` | - | - |
+| `tip` | 加载提示文本，支持 ReactNode。设置为 `false` 或 `null` 时不显示提示 | `React.ReactNode \| false \| null` | - | - |
+| `indicator` | 自定义加载指示器，支持 ReactNode | `React.ReactNode` | - | - |
+| `percent` | 加载进度百分比（0-100），设置后会显示进度条 | `number` | - | - |
+| `children` | 子元素，传入后会启用嵌套模式（覆盖在内容上方显示加载状态） | `React.ReactNode` | - | - |
+| `className` | 自定义类名 | `string` | - | - |
+| `wrapperClassName` | 最外层容器的自定义类名 | `string` | - | - |
+| `style` | 自定义样式 | `React.CSSProperties` | - | - |
+| `styles` | 语义化样式配置，可分别设置 root、wrapper、indicator、tip 的样式 | `Partial<Record<'root' \| 'wrapper' \| 'indicator' \| 'tip', React.CSSProperties>>` | - | - |
+| `spinning` | 是否显示加载状态，仅在嵌套模式下生效，控制是否显示加载指示器和背景动画效果 | `boolean` | `true` | - |
 
 ## 组件概览
 
@@ -48,13 +48,13 @@ Loading 组件库提供了三种不同风格的加载动画组件：
 - `CreativeSparkLoading` 基于 Lottie 动画实现
 - `CreativeRecommendationLoading` 基于 Effect 动画实现
 
-| 参数        | 说明                                                                   | 类型                  | 默认值  | 必填 |
-| ----------- | ---------------------------------------------------------------------- | --------------------- | ------- | ---- |
-| `autoplay`  | 是否自动播放动画                                                       | `boolean`             | `true`  | 否   |
-| `loop`      | 是否循环播放动画                                                       | `boolean`             | `true`  | 否   |
-| `className` | 动画容器类名                                                           | `string`              | -       | 否   |
-| `style`     | 动画容器样式                                                           | `React.CSSProperties` | -       | 否   |
-| `size`      | 动画尺寸（宽度和高度），支持数字（px）或字符串（如 `'1em'`, `'2rem'`） | `number \| string`    | `'1em'` | 否   |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| `autoplay` | 是否自动播放动画 | `boolean` | `true` | - |
+| `loop` | 是否循环播放动画 | `boolean` | `true` | - |
+| `className` | 动画容器类名 | `string` | - | - |
+| `style` | 动画容器样式 | `React.CSSProperties` | - | - |
+| `size` | 动画尺寸（宽度和高度），支持数字（px）或字符串（如 `'1em'`, `'2rem'`） | `number \| string` | `'1em'` | - |
 
 ## 特性
 

@@ -29,22 +29,22 @@ export default () => (
 
 ### LayoutHeaderProps (LayoutHeaderConfig)
 
-| 参数                  | 说明                           | 类型                           | 默认值  |
-| --------------------- | ------------------------------ | ------------------------------ | ------- |
-| title                 | 标题文本                       | `string`                       | -       |
-| showShare             | 是否显示分享按钮               | `boolean`                      | `true`  |
-| leftCollapsible       | 左侧是否可折叠                 | `boolean`                      | `true`  |
-| rightCollapsible      | 右侧是否可折叠                 | `boolean`                      | `true`  |
-| leftCollapsed         | 左侧折叠状态（受控）           | `boolean`                      | -       |
-| rightCollapsed        | 右侧折叠状态（受控）           | `boolean`                      | -       |
-| leftDefaultCollapsed  | 左侧默认折叠状态（非受控）     | `boolean`                      | `false` |
-| rightDefaultCollapsed | 右侧默认折叠状态（非受控）     | `boolean`                      | `false` |
-| onLeftCollapse        | 左侧折叠按钮点击事件           | `(collapsed: boolean) => void` | -       |
-| onRightCollapse       | 右侧折叠按钮点击事件           | `(collapsed: boolean) => void` | -       |
-| onShare               | 分享按钮点击事件               | `() => void`                   | -       |
-| leftExtra             | 自定义左侧内容（标题左侧）     | `ReactNode`                    | -       |
-| rightExtra            | 自定义右侧内容（分享按钮右侧） | `ReactNode`                    | -       |
-| className             | 自定义类名                     | `string`                       | -       |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| title | 标题文本 | `string` | - | - |
+| showShare | 是否显示分享按钮 | `boolean` | `true` | - |
+| leftCollapsible | 左侧是否可折叠 | `boolean` | `true` | - |
+| rightCollapsible | 右侧是否可折叠 | `boolean` | `true` | - |
+| leftCollapsed | 左侧折叠状态（受控） | `boolean` | - | - |
+| rightCollapsed | 右侧折叠状态（受控） | `boolean` | - | - |
+| leftDefaultCollapsed | 左侧默认折叠状态（非受控） | `boolean` | `false` | - |
+| rightDefaultCollapsed | 右侧默认折叠状态（非受控） | `boolean` | `false` | - |
+| onLeftCollapse | 左侧折叠按钮点击事件 | `(collapsed: boolean) => void` | - | - |
+| onRightCollapse | 右侧折叠按钮点击事件 | `(collapsed: boolean) => void` | - | - |
+| onShare | 分享按钮点击事件 | `() => void` | - | - |
+| leftExtra | 自定义左侧内容（标题左侧） | `ReactNode` | - | - |
+| rightExtra | 自定义右侧内容（分享按钮右侧） | `ReactNode` | - | - |
+| className | 自定义类名 | `string` | - | - |
 
 ## 模式说明
 

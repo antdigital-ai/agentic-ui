@@ -74,14 +74,7 @@ const handleCodeTagOperation = (
       operation.text.trim().length > 0 &&
       currentNode.text.trim().length === 0
     ) {
-      Editor.withoutNormalizing(editor, () => {
-        Transforms.removeNodes(editor, { at: operation.path });
-        Transforms.insertNodes(
-          editor,
-          { ...currentNode, tag: true, code: true, text: operation.text },
-          { at: operation.path, select: true },
-        );
-      });
+      apply(operation);
       return true;
     }
   }

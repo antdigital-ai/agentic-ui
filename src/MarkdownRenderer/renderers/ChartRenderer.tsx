@@ -194,14 +194,24 @@ export const ChartBlockRenderer: React.FC<RendererBlockProps> = (props) => {
   useEffect(() => {
     // 延迟一帧渲染图表，确保容器已挂载到 DOM 且有正确的宽度
     // 解决 recharts ResponsiveContainer 在零宽容器中崩溃的问题
+    let cancelled = false;
     const raf = requestAnimationFrame(() => {
+      if (cancelled) {
+        return;
+      }
       setMounted(true);
     });
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
+    if (typeof window === 'undefined') {
+      return;
+    }
     const updateWidth = () => {
       const width = containerRef.current?.clientWidth || 400;
       const configs = chartData?.config

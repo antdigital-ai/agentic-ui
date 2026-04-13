@@ -6,6 +6,7 @@ import { useLocale } from '../I18n';
 import { BaseMarkdownEditor } from '../MarkdownEditor';
 import { BorderBeamAnimation } from './BorderBeamAnimation';
 import { useFileUploadManager } from './FileUploadManager';
+import { resolveSendDisabled } from './SendButton';
 import { useMarkdownInputFieldActions } from './hooks/useMarkdownInputFieldActions';
 import { useMarkdownInputFieldHandlers } from './hooks/useMarkdownInputFieldHandlers';
 import { useMarkdownInputFieldLayout } from './hooks/useMarkdownInputFieldLayout';
@@ -159,12 +160,17 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   });
 
   // Refs 管理
-  const { markdownEditorRef, quickActionsRef, actionsRef, isSendingRef, onEditorChange } =
-    useMarkdownInputFieldRefs({
-      inputRef: props.inputRef,
-      value: props.value,
-      setValue,
-    });
+  const {
+    markdownEditorRef,
+    quickActionsRef,
+    actionsRef,
+    isSendingRef,
+    onEditorChange,
+  } = useMarkdownInputFieldRefs({
+    inputRef: props.inputRef,
+    value: props.value,
+    setValue,
+  });
 
   // 文件上传管理
   const {
@@ -208,6 +214,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
       attachment,
       triggerSendKey: props.triggerSendKey,
     },
+    sendDisabled: resolveSendDisabled(props.sendButtonProps, fileUploadStatus),
     markdownEditorRef,
     inputRef,
     isSendingRef,

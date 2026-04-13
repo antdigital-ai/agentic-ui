@@ -17,9 +17,6 @@ export interface AnimationTextProps {
   animationConfig?: AnimationConfig;
 }
 
-/**
- * 提取 React children 的纯文本
- */
 const extractText = (children: React.ReactNode): string => {
   if (typeof children === 'string') return children;
   if (typeof children === 'number') return String(children);
@@ -34,11 +31,7 @@ const extractText = (children: React.ReactNode): string => {
 const isStreamingCompatible = (prev: string, next: string) =>
   prev.startsWith(next) || next.startsWith(prev);
 
-/**
- * 流式文字淡入动画组件。
- *
- * 同一段流式前缀追加（或尾部截断修正）只触发一次入场动画；非前缀替换时重播。
- */
+/** 流式文字淡入，前缀追加只触发一次入场，非前缀替换时重播 */
 const AnimationText = React.memo<AnimationTextProps>(
   ({ children, animationConfig }) => {
     const { fadeDuration = 250, easing = 'ease-out' } = animationConfig || {};

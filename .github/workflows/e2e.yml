@@ -28,13 +28,9 @@ jobs:
         run: pnpm install
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: Start Dev Server
-        run: |
-          pnpm start &
-          echo "Waiting for server..."
-          npx wait-on http://localhost:8000 -t 300000
+        run: pnpm run playwright:install
 
       - name: Run E2E Tests
         run: pnpm run test:e2e
+        env:
+          CI: true

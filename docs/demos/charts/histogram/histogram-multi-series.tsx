@@ -1,7 +1,8 @@
-/**
+﻿/**
  * title: 多系列直方图
  * description: 支持多系列堆叠显示，便于对比不同组别的数据分布
  */
+import React from 'react';
 import { HistogramChart } from '@ant-design/agentic-ui';
 
 export default () => {

@@ -4,7 +4,7 @@
  */
 export const PLAYWRIGHT_FIXTURE_DEMOS = {
   markdownEditor:
-    'docs-demos-pages-playwright-fixtures-demo-e2e-markdown-editor',
+    'docs-demos-pages-playwright-fixtures-demo-e2e-markdown-editor-editable',
   markdownInputFieldTags:
     'docs-demos-pages-playwright-fixtures-demo-e2e-markdown-input-field-tags',
   markdownInputFieldOnFocus:

@@ -1,8 +1,8 @@
 import { AreaChart, AreaChartDataItem } from '@ant-design/agentic-ui';
-import React, { useState } from 'react';
+import React from 'react';
 
 const ChartWithStaticDemo: React.FC = () => {
-  const [data, setData] = useState<AreaChartDataItem[]>([
+  const data: AreaChartDataItem[] = [
     // 本年营收数据
     {
       type: '本年营收',
@@ -76,7 +76,7 @@ const ChartWithStaticDemo: React.FC = () => {
       y: 85000,
       xtitle: '月份',
     },
-  ]);
+  ];
 
   return (
     <div style={{ padding: '12px' }}>

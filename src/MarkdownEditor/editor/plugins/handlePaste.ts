@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Transforms } from 'slate';
+import { Editor, Element, Node, Path, Text, Transforms } from 'slate';
 import { Elements, MarkdownEditorProps } from '../../BaseMarkdownEditor';
 import { isMarkdown } from '../utils';
 import { getMediaType } from '../utils/dom';
@@ -7,6 +7,12 @@ import { isHtml } from '../utils/htmlToMarkdown';
 import { toUnixPath } from '../utils/path';
 import { insertParsedHtmlNodes } from './insertParsedHtmlNodes';
 import { parseMarkdownToNodesAndInsert } from './parseMarkdownToNodesAndInsert';
+
+const isValidSlateNode = (node: unknown): node is Node => {
+  if (Element.isElement(node)) return true;
+  if (Text.isText(node)) return true;
+  return false;
+};
 
 /**
  * 处理粘贴的 Slate Markdown 片段
@@ -18,8 +24,10 @@ export const handleSlateMarkdownFragment = (
 ) => {
   try {
     const encoded = clipboardData.getData('application/x-slate-md-fragment');
-    const fragment = JSON.parse(encoded || '[]').map((node: any) => {
-      if (node.type === 'card') {
+    const raw = JSON.parse(encoded || '[]');
+    const parsed = (Array.isArray(raw) ? raw : []).filter(isValidSlateNode);
+    const fragment = parsed.map((node: Node) => {
+      if (Element.isElement(node) && node.type === 'card') {
         return {
           ...node,
           children: [
@@ -158,33 +166,37 @@ export const handleSpecialTextPaste = (
     }
     if (path && url) {
       if (text.startsWith('media://')) {
-        Transforms.insertNodes(
-          editor,
-          EditorUtils.createMediaNode(url!, 'image'),
-          { select: true, at: path },
-        );
-        const next = Editor.next(editor, { at: path });
-        if (next && next[0].type === 'paragraph' && !Node.string(next[0])) {
-          Transforms.delete(editor, { at: selection! });
-        }
+        Editor.withoutNormalizing(editor, () => {
+          Transforms.insertNodes(
+            editor,
+            EditorUtils.createMediaNode(url!, 'image'),
+            { select: true, at: path },
+          );
+          const next = Editor.next(editor, { at: path });
+          if (next && next[0].type === 'paragraph' && !Node.string(next[0])) {
+            Transforms.delete(editor, { at: selection! });
+          }
+        });
         return true;
       }
       if (text.startsWith('attach://')) {
-        Transforms.insertNodes(
-          editor,
-          {
-            type: 'attach',
-            name: urlObject.searchParams.get('name'),
-            size: Number(urlObject.searchParams.get('size') || 0),
-            url: url || undefined,
-            children: [{ text: '' }],
-          },
-          { select: true, at: path },
-        );
-        const next = Editor.next(editor, { at: path });
-        if (next && next[0].type === 'paragraph' && !Node.string(next[0])) {
-          Transforms.delete(editor, { at: selection! });
-        }
+        Editor.withoutNormalizing(editor, () => {
+          Transforms.insertNodes(
+            editor,
+            {
+              type: 'attach',
+              name: urlObject.searchParams.get('name'),
+              size: Number(urlObject.searchParams.get('size') || 0),
+              url: url || undefined,
+              children: [{ text: '' }],
+            },
+            { select: true, at: path },
+          );
+          const next = Editor.next(editor, { at: path });
+          if (next && next[0].type === 'paragraph' && !Node.string(next[0])) {
+            Transforms.delete(editor, { at: selection! });
+          }
+        });
         return true;
       }
     }

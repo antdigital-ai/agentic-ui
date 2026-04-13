@@ -24,39 +24,39 @@ group:
 
 ### HistogramChartProps
 
-| 属性                  | 类型                                             | 默认值     | 说明                                                                                                               |
-| --------------------- | ------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------ |
-| title                 | `string`                                         | -          | 图表标题                                                                                                           |
-| data                  | `HistogramChartDataItem[]`                       | -          | 扁平化数据数组                                                                                                     |
-| width                 | `number \| string`                               | `600`      | 图表宽度（px），移动端自适应为 100%                                                                                |
-| height                | `number \| string`                               | `400`      | 图表高度（px），移动端最大约 80% 屏宽（上限 400）                                                                  |
-| className             | `string`                                         | -          | 自定义类名                                                                                                         |
-| classNames            | `ChartClassNames`                                | -          | 自定义CSS类名（支持对象格式，为每层DOM设置类名）                                                                   |
-| styles                | `ChartStyles`                                    | -          | 自定义样式对象                                                                                                     |
-| dataTime              | `string`                                         | -          | 数据时间                                                                                                           |
-| theme                 | `'dark' \| 'light'`                              | `'light'`  | 图表与容器主题；`dark` 时容器内嵌 Ant Design 暗色算法，工具栏/筛选与画布一致；暗色下图例色块无白边，与浅色视觉区分 |
-| color                 | `string \| string[]`                             | -          | 自定义主色，支持 CSS 变量                                                                                          |
-| showLegend            | `boolean`                                        | `true`     | 是否显示图例                                                                                                       |
-| legendPosition        | `'top' \| 'left' \| 'bottom' \| 'right'`         | `'bottom'` | 图例位置                                                                                                           |
-| showGrid              | `boolean`                                        | `true`     | 是否显示网格线                                                                                                     |
-| xAxisLabel            | `string`                                         | -          | X 轴标签                                                                                                           |
-| yAxisLabel            | `string`                                         | -          | Y 轴标签                                                                                                           |
-| stacked               | `boolean`                                        | `true`     | 是否堆叠显示                                                                                                       |
-| binCount              | `number`                                         | -          | 自定义分箱数量（不设置则自动计算）                                                                                 |
-| showFrequency         | `boolean`                                        | `false`    | 是否显示频率而非计数                                                                                               |
-| toolbarExtra          | `React.ReactNode`                                | -          | 头部工具条额外按钮                                                                                                 |
-| renderFilterInToolbar | `boolean`                                        | `false`    | 是否将过滤器渲染到工具栏                                                                                           |
-| statistic             | `ChartStatisticConfig \| ChartStatisticConfig[]` | -          | ChartStatistic组件配置                                                                                             |
-| loading               | `boolean`                                        | `false`    | 是否显示加载状态                                                                                                   |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| title | 图表标题 | `string` | - | - |
+| data | 扁平化数据数组 | `HistogramChartDataItem[]` | - | - |
+| width | 图表宽度（px），移动端自适应为 100% | `number \| string` | `600` | - |
+| height | 图表高度（px），移动端最大约 80% 屏宽（上限 400） | `number \| string` | `400` | - |
+| className | 自定义类名 | `string` | - | - |
+| classNames | 自定义CSS类名（支持对象格式，为每层DOM设置类名） | `ChartClassNames` | - | - |
+| styles | 自定义样式对象 | `ChartStyles` | - | - |
+| dataTime | 数据时间 | `string` | - | - |
+| theme | 图表与容器主题；`dark` 时容器内嵌 Ant Design 暗色算法，工具栏/筛选与画布一致；暗色下图例色块无白边，与浅色视觉区分 | `'dark' \| 'light'` | `'light'` | - |
+| color | 自定义主色，支持 CSS 变量 | `string \| string[]` | - | - |
+| showLegend | 是否显示图例 | `boolean` | `true` | - |
+| legendPosition | 图例位置 | `'top' \| 'left' \| 'bottom' \| 'right'` | `'bottom'` | - |
+| showGrid | 是否显示网格线 | `boolean` | `true` | - |
+| xAxisLabel | X 轴标签 | `string` | - | - |
+| yAxisLabel | Y 轴标签 | `string` | - | - |
+| stacked | 是否堆叠显示 | `boolean` | `true` | - |
+| binCount | 自定义分箱数量（不设置则自动计算） | `number` | - | - |
+| showFrequency | 是否显示频率而非计数 | `boolean` | `false` | - |
+| toolbarExtra | 头部工具条额外按钮 | `React.ReactNode` | - | - |
+| renderFilterInToolbar | 是否将过滤器渲染到工具栏 | `boolean` | `false` | - |
+| statistic | ChartStatistic组件配置 | `ChartStatisticConfig \| ChartStatisticConfig[]` | - | - |
+| loading | 是否显示加载状态 | `boolean` | `false` | - |
 
 ### HistogramChartDataItem
 
-| 字段        | 类型     | 必填 | 说明                     |
-| ----------- | -------- | ---- | ------------------------ |
-| value       | `number` | 是   | 原始数据值               |
-| type        | `string` | 否   | 数据系列（用于分组显示） |
-| category    | `string` | 否   | 分类（用于筛选）         |
-| filterLabel | `string` | 否   | 二级筛选标签（可选）     |
+| 字段 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| value | 原始数据值（必填） | `number` | - | - |
+| type | 数据系列（用于分组显示） | `string` | - | - |
+| category | 分类（用于筛选） | `string` | - | - |
+| filterLabel | 二级筛选标签（可选） | `string` | - | - |
 
 ## 说明
 

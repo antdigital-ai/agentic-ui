@@ -27,6 +27,16 @@ export const useRendererVarStyle = (prefixCls: string) => {
         from: { opacity: 0, transform: 'translateY(2px)', filter: 'blur(1px)' },
         to: { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' },
       },
+
+      '@keyframes markdownStreamingCursorBlink': {
+        '0%, 100%': { opacity: 0.9, boxShadow: '0 0 4px currentColor' },
+        '50%': { opacity: 0, boxShadow: '0 0 0 currentColor' },
+      },
+
+      '@keyframes markdownStreamingCursorFadeIn': {
+        from: { opacity: 0, transform: 'scaleY(0.3)' },
+        to: { opacity: 0.9, transform: 'scaleY(1)' },
+      },
     };
   });
 };

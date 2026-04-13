@@ -18,15 +18,15 @@ group:
 
 ### WelcomeMessageProps
 
-| 参数                    | 说明                 | 类型                                       | 默认值 |
-| ----------------------- | -------------------- | ------------------------------------------ | ------ |
-| title                   | 标题内容             | `React.ReactNode`                          | -      |
-| description             | 描述内容             | `React.ReactNode`                          | -      |
-| classNames              | 自定义样式类名       | `Record<'title' \| 'description', string>` | -      |
-| titleAnimateProps       | 标题动画属性         | `WelcomeMessageTitleAnimateProps`          | -      |
-| descriptionAnimateProps | 描述动画属性         | `WelcomeMessageDescriptionAnimateProps`    | -      |
-| style                   | 自定义样式           | `React.CSSProperties`                      | -      |
-| rootClassName           | 自定义根节点样式类名 | `string`                                   | -      |
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| title | 标题内容 | `React.ReactNode` | - | - |
+| description | 描述内容 | `React.ReactNode` | - | - |
+| classNames | 自定义样式类名 | `Record<'title' \| 'description', string>` | - | - |
+| titleAnimateProps | 标题动画属性 | `WelcomeMessageTitleAnimateProps` | - | - |
+| descriptionAnimateProps | 描述动画属性 | `WelcomeMessageDescriptionAnimateProps` | - | - |
+| style | 自定义样式 | `React.CSSProperties` | - | - |
+| rootClassName | 自定义根节点样式类名 | `string` | - | - |
 
 ### 类型定义
 

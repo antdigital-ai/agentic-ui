@@ -41,6 +41,7 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
   return (
     <div
       {...attributes}
+      data-be="code"
       data-is-unclosed={isUnclosed || undefined}
       data-language={element?.language}
       style={{

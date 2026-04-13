@@ -134,6 +134,49 @@ describe('useAutoScroll targeted coverage', () => {
     expect(div.scrollTo).toHaveBeenCalled();
   });
 
+  it('MutationObserver invokes checkScroll on characterData (streaming text updates)', () => {
+    let observerCallback: MutationCallback = () => {};
+    global.MutationObserver = vi.fn(function MockMutationObserver(callback: MutationCallback) {
+      observerCallback = callback;
+      return {
+        observe: mutationObserverObserve,
+        disconnect: mutationObserverDisconnect,
+        takeRecords: () => [],
+      };
+    });
+
+    const Wrapper = () => {
+      const { containerRef } = useAutoScroll({ timeout: 16 });
+      return (
+        <div
+          ref={containerRef as React.RefObject<HTMLDivElement>}
+          data-testid="scroll-container"
+          style={{ height: 50, overflow: 'auto' }}
+        />
+      );
+    };
+    const { container } = render(<Wrapper />);
+    const div = container.querySelector('[data-testid="scroll-container"]') as HTMLDivElement;
+    Object.defineProperty(div, 'scrollHeight', { value: 100, configurable: true });
+    Object.defineProperty(div, 'scrollTop', { value: 80, writable: true, configurable: true });
+    Object.defineProperty(div, 'clientHeight', { value: 50, configurable: true });
+    div.scrollTo = vi.fn();
+
+    expect(mutationObserverObserve).toHaveBeenCalled();
+
+    act(() => {
+      observerCallback(
+        [{ type: 'characterData' } as MutationRecord],
+        {} as MutationObserver,
+      );
+    });
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    expect(div.scrollTo).toHaveBeenCalled();
+  });
+
   it('disconnect called on unmount', () => {
     const Wrapper = () => {
       const { containerRef } = useAutoScroll({ timeout: 16 });

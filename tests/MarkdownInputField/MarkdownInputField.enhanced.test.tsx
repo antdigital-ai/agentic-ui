@@ -110,6 +110,7 @@ vi.mock('../../src/MarkdownInputField/AttachmentButton', () => ({
 }));
 
 vi.mock('../../src/MarkdownInputField/SendButton', () => ({
+  resolveSendDisabled: () => false,
   SendButton: ({ typing, disabled, onClick, ...props }: any) => {
     const handleClick = () => {
       if (!disabled && onClick) {

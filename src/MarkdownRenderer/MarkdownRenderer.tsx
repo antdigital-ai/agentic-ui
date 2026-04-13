@@ -132,15 +132,7 @@ const DefaultCodeRouter: React.FC<
   );
 };
 
-/**
- * MarkdownRenderer —— 流式/只读场景下的轻量 Markdown 渲染器。
- *
- * 核心优势：
- * - 不创建 Slate 实例，无编辑态开销
- * - 字符队列驱动流式逐字输出动画
- * - Markdown → hast → React 元素树（hast-util-to-jsx-runtime）
- * - 特殊块（code / mermaid / chart / katex）通过组件映射拦截渲染
- */
+/** 轻量流式 Markdown 渲染器——无 Slate 实例，Markdown → hast → React */
 const InternalMarkdownRenderer = forwardRef<
   MarkdownRendererRef,
   MarkdownRendererProps

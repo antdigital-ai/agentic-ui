@@ -21,11 +21,11 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 按 Cmd/Ctrl+A
-      await page.keyboard.press(`${modifierKey}+a`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+a`);
       await page.waitForTimeout(100);
 
       // 输入新文本替换选中内容
-      await page.keyboard.type('Replaced');
+      await markdownEditorPage.keyboardTargetPage.keyboard.type('Replaced');
       const text = await markdownEditorPage.getText();
       expect(text).toContain('Replaced');
       expect(text).not.toContain('Test content');
@@ -49,11 +49,11 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 按 Cmd/Ctrl+Shift+L 选择当前行
-      await page.keyboard.press(`${modifierKey}+Shift+l`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+Shift+l`);
       await page.waitForTimeout(100);
 
       // 输入替换文本
-      await page.keyboard.type('Selected Line');
+      await markdownEditorPage.keyboardTargetPage.keyboard.type('Selected Line');
       const text = await markdownEditorPage.getText();
       expect(text).toContain('Selected Line');
     });
@@ -73,11 +73,11 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 按 Cmd/Ctrl+D 选择单词
-      await page.keyboard.press(`${modifierKey}+d`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+d`);
       await page.waitForTimeout(100);
 
       // 输入替换文本
-      await page.keyboard.type('replaced');
+      await markdownEditorPage.keyboardTargetPage.keyboard.type('replaced');
       const text = await markdownEditorPage.getText();
       expect(text).toContain('replaced');
     });
@@ -97,11 +97,11 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 按 Cmd/Ctrl+D 选择汉字
-      await page.keyboard.press(`${modifierKey}+d`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+d`);
       await page.waitForTimeout(100);
 
       // 输入替换文本
-      await page.keyboard.type('替换');
+      await markdownEditorPage.keyboardTargetPage.keyboard.type('替换');
       const text = await markdownEditorPage.getText();
       expect(text).toContain('替换');
     });
@@ -117,7 +117,7 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 按 Cmd/Ctrl+1
-      await page.keyboard.press(`${modifierKey}+1`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+1`);
       await page.waitForTimeout(200);
 
       // 验证标题样式（通过检查 DOM 结构）
@@ -156,7 +156,7 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const isMac = process.platform === 'darwin';
       const modifierKey = isMac ? 'Meta' : 'Control';
 
-      await page.keyboard.press(`${modifierKey}+2`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+2`);
       await page.waitForTimeout(200);
 
       const isHeading = await markdownEditorPage.editableInput.evaluate(
@@ -194,7 +194,7 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const isMac = process.platform === 'darwin';
       const modifierKey = isMac ? 'Meta' : 'Control';
 
-      await page.keyboard.press(`${modifierKey}+3`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+3`);
       await page.waitForTimeout(200);
 
       const isHeading = await markdownEditorPage.editableInput.evaluate(
@@ -233,11 +233,11 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 先设置为标题
-      await page.keyboard.press(`${modifierKey}+1`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+1`);
       await page.waitForTimeout(200);
 
       // 再按 Cmd/Ctrl+4 转换为段落
-      await page.keyboard.press(`${modifierKey}+4`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+4`);
       await page.waitForTimeout(200);
 
       const isParagraph = await markdownEditorPage.editableInput.evaluate(
@@ -276,11 +276,11 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 先设置为标题
-      await page.keyboard.press(`${modifierKey}+1`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+1`);
       await page.waitForTimeout(200);
 
       // 再按 Cmd/Ctrl+0 转换为段落
-      await page.keyboard.press(`${modifierKey}+0`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+0`);
       await page.waitForTimeout(200);
 
       const isParagraph = await markdownEditorPage.editableInput.evaluate(
@@ -319,11 +319,11 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 先设置为1级标题
-      await page.keyboard.press(`${modifierKey}+1`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+1`);
       await page.waitForTimeout(200);
 
       // 按 Cmd/Ctrl+] 增加级别（应该变成段落）
-      await page.keyboard.press(`${modifierKey}+]`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+]`);
       await page.waitForTimeout(200);
 
       const text = await markdownEditorPage.getText();
@@ -339,7 +339,7 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 按 Cmd/Ctrl+[ 降低级别（段落变成1级标题）
-      await page.keyboard.press(`${modifierKey}+[`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+[`);
       await page.waitForTimeout(200);
 
       const isHeading = await markdownEditorPage.editableInput.evaluate(
@@ -376,11 +376,8 @@ test.describe('KeyboardTask 快捷键功能', () => {
       page,
     }) => {
       await markdownEditorPage.typeText('Quote text');
-      const isMac = process.platform === 'darwin';
-      const modifierKey = isMac ? 'Meta' : 'Alt';
-
-      // 按 Option/Alt+Q
-      await page.keyboard.press(`${modifierKey}+q`);
+      // isHotkey('option+q') 对应 Playwright 的 Alt+q（macOS 上 Option 即 Alt）
+      await markdownEditorPage.keyboardTargetPage.keyboard.press('Alt+q');
       await page.waitForTimeout(200);
 
       // 验证引用块存在
@@ -398,15 +395,13 @@ test.describe('KeyboardTask 快捷键功能', () => {
       page,
     }) => {
       await markdownEditorPage.typeText('Quote text');
-      const isMac = process.platform === 'darwin';
-      const modifierKey = isMac ? 'Meta' : 'Alt';
 
       // 先插入引用块
-      await page.keyboard.press(`${modifierKey}+q`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press('Alt+q');
       await page.waitForTimeout(200);
 
       // 再次按 Option/Alt+Q 移除引用块
-      await page.keyboard.press(`${modifierKey}+q`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press('Alt+q');
       await page.waitForTimeout(200);
 
       const hasBlockquote = await markdownEditorPage.editableInput.evaluate(
@@ -424,22 +419,18 @@ test.describe('KeyboardTask 快捷键功能', () => {
     }) => {
       const isMac = process.platform === 'darwin';
       const modifierKey = isMac ? 'Meta' : 'Control';
-      const optionKey = isMac ? 'Meta' : 'Alt';
 
-      // 按 Cmd/Ctrl+Option/Alt+T
-      if (isMac) {
-        await page.keyboard.press(`${modifierKey}+${optionKey}+t`);
-      } else {
-        await page.keyboard.press(`${modifierKey}+Alt+t`);
-      }
-      await page.waitForTimeout(500);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+Alt+t`);
 
-      // 验证表格存在
-      const hasTable = await markdownEditorPage.editableInput.evaluate((el) => {
-        const tables = el.querySelectorAll('table');
-        return tables.length > 0;
-      });
-      expect(hasTable).toBe(true);
+      await expect
+        .poll(
+          async () =>
+            markdownEditorPage.editableInput.evaluate((el) => {
+              return el.querySelectorAll('table').length;
+            }),
+          { timeout: 8000, message: '等待表格插入完成' },
+        )
+        .toBeGreaterThan(0);
     });
 
     test('Cmd/Ctrl+Option/Alt+C 应该插入代码块', async ({
@@ -448,24 +439,16 @@ test.describe('KeyboardTask 快捷键功能', () => {
     }) => {
       const isMac = process.platform === 'darwin';
       const modifierKey = isMac ? 'Meta' : 'Control';
-      const optionKey = isMac ? 'Meta' : 'Alt';
 
-      // 按 Cmd/Ctrl+Option/Alt+C
-      if (isMac) {
-        await page.keyboard.press(`${modifierKey}+${optionKey}+c`);
-      } else {
-        await page.keyboard.press(`${modifierKey}+Alt+c`);
-      }
-      await page.waitForTimeout(500);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+Alt+c`);
 
-      // 验证代码块存在
-      const hasCodeBlock = await markdownEditorPage.editableInput.evaluate(
-        (el) => {
-          const codeBlocks = el.querySelectorAll('[data-be="code"]');
-          return codeBlocks.length > 0;
-        },
-      );
-      expect(hasCodeBlock).toBe(true);
+      await expect
+        .poll(
+          async () =>
+            markdownEditorPage.root.locator('[data-be="code"]').count(),
+          { timeout: 8000, message: '等待代码块插入完成' },
+        )
+        .toBeGreaterThan(0);
     });
 
 
@@ -480,14 +463,8 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await markdownEditorPage.typeText('List item');
       const isMac = process.platform === 'darwin';
       const modifierKey = isMac ? 'Meta' : 'Control';
-      const optionKey = isMac ? 'Meta' : 'Alt';
 
-      // 按 Cmd/Ctrl+Option/Alt+O
-      if (isMac) {
-        await page.keyboard.press(`${modifierKey}+${optionKey}+o`);
-      } else {
-        await page.keyboard.press(`${modifierKey}+Alt+o`);
-      }
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+Alt+o`);
       await page.waitForTimeout(300);
 
       // 验证有序列表存在
@@ -517,14 +494,8 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await markdownEditorPage.typeText('List item');
       const isMac = process.platform === 'darwin';
       const modifierKey = isMac ? 'Meta' : 'Control';
-      const optionKey = isMac ? 'Meta' : 'Alt';
 
-      // 按 Cmd/Ctrl+Option/Alt+U
-      if (isMac) {
-        await page.keyboard.press(`${modifierKey}+${optionKey}+u`);
-      } else {
-        await page.keyboard.press(`${modifierKey}+Alt+u`);
-      }
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+Alt+u`);
       await page.waitForTimeout(300);
 
       // 验证无序列表存在
@@ -554,14 +525,8 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await markdownEditorPage.typeText('Task item');
       const isMac = process.platform === 'darwin';
       const modifierKey = isMac ? 'Meta' : 'Control';
-      const optionKey = isMac ? 'Meta' : 'Alt';
 
-      // 按 Cmd/Ctrl+Option/Alt+S
-      if (isMac) {
-        await page.keyboard.press(`${modifierKey}+${optionKey}+s`);
-      } else {
-        await page.keyboard.press(`${modifierKey}+Alt+s`);
-      }
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+Alt+s`);
       await page.waitForTimeout(300);
 
       // 验证任务列表存在
@@ -603,11 +568,13 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
       
       // 全选
-      await page.keyboard.press(`${modifierKey}+a`);
+      await markdownInputFieldPage.keyboardTargetPage.keyboard.press(
+        `${modifierKey}+a`,
+      );
       await page.waitForTimeout(200); // 增加等待时间确保全选完成
-      
+
       // 删除
-      await page.keyboard.press('Delete');
+      await markdownInputFieldPage.keyboardTargetPage.keyboard.press('Delete');
       await page.waitForTimeout(300); // 等待删除完成
       
       // 验证编辑器已清空
@@ -622,7 +589,9 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await markdownInputFieldPage.selectAll();
 
       // 按 Cmd/Ctrl+B
-      await page.keyboard.press(`${modifierKey}+b`);
+      await markdownInputFieldPage.keyboardTargetPage.keyboard.press(
+        `${modifierKey}+b`,
+      );
       await page.waitForTimeout(300);
 
       // 验证加粗格式（通过检查文本是否包含加粗标记）
@@ -697,7 +666,7 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 按 Cmd/Ctrl+I
-      await page.keyboard.press(`${modifierKey}+i`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+i`);
       await page.waitForTimeout(200);
 
       // 验证斜体格式
@@ -745,7 +714,7 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 按 Cmd/Ctrl+Shift+S
-      await page.keyboard.press(`${modifierKey}+Shift+s`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+Shift+s`);
       await page.waitForTimeout(200);
 
       // 验证删除线格式
@@ -793,19 +762,11 @@ test.describe('KeyboardTask 快捷键功能', () => {
     }) => {
       await markdownEditorPage.typeText('Code text');
       await markdownEditorPage.selectAll();
-      const isMac = process.platform === 'darwin';
 
-      // 按 Option/Alt+` (反引号)
-      // 使用 keyboard.down/up 来模拟组合键，因为反引号字符在字符串中需要特殊处理
-      if (isMac) {
-        await page.keyboard.down('Meta');
-        await page.keyboard.press('`');
-        await page.keyboard.up('Meta');
-      } else {
-        await page.keyboard.down('Alt');
-        await page.keyboard.press('`');
-        await page.keyboard.up('Alt');
-      }
+      // Option/Alt+`（反引号）：统一用 Alt，与 isHotkey('option+`') 一致
+      await markdownEditorPage.keyboardTargetPage.keyboard.down('Alt');
+      await markdownEditorPage.keyboardTargetPage.keyboard.press('`');
+      await markdownEditorPage.keyboardTargetPage.keyboard.up('Alt');
       await page.waitForTimeout(200);
 
       // 验证行内代码格式
@@ -849,11 +810,11 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 先应用加粗格式
-      await page.keyboard.press(`${modifierKey}+b`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+b`);
       await page.waitForTimeout(200);
 
       // 再按 Cmd/Ctrl+\ 清除格式
-      await page.keyboard.press(`${modifierKey}+\\`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+\\`);
       await page.waitForTimeout(200);
 
       // 验证格式已清除（文本应该不再有加粗样式）
@@ -904,14 +865,14 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await page
         .context()
         .grantPermissions(['clipboard-read', 'clipboard-write']);
-      await page.keyboard.press(`${modifierKey}+c`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+c`);
       await page.waitForTimeout(200);
 
       // 清空编辑器
       await markdownEditorPage.clear();
 
       // 按 Cmd/Ctrl+Shift+V 粘贴纯文本
-      await page.keyboard.press(`${modifierKey}+Shift+v`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+Shift+v`);
       await page.waitForTimeout(300);
 
       // 验证文本已粘贴
@@ -928,7 +889,7 @@ test.describe('KeyboardTask 快捷键功能', () => {
 
       // 删除文本
       await markdownEditorPage.selectAll();
-      await page.keyboard.press('Delete');
+      await markdownEditorPage.keyboardTargetPage.keyboard.press('Delete');
       await page.waitForTimeout(200);
 
       const afterDelete = await markdownEditorPage.getText();
@@ -938,7 +899,7 @@ test.describe('KeyboardTask 快捷键功能', () => {
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 按 Cmd/Ctrl+Z 撤销
-      await page.keyboard.press(`${modifierKey}+z`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+z`);
       await page.waitForTimeout(300);
 
       // 验证文本已恢复
@@ -955,21 +916,21 @@ test.describe('KeyboardTask 快捷键功能', () => {
 
       // 删除文本
       await markdownEditorPage.selectAll();
-      await page.keyboard.press('Delete');
+      await markdownEditorPage.keyboardTargetPage.keyboard.press('Delete');
       await page.waitForTimeout(200);
 
       const isMac = process.platform === 'darwin';
       const modifierKey = isMac ? 'Meta' : 'Control';
 
       // 撤销
-      await page.keyboard.press(`${modifierKey}+z`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+z`);
       await page.waitForTimeout(200);
 
       // 重做（Mac 使用 Cmd+Shift+Z，Windows 使用 Ctrl+Y）
       if (isMac) {
-        await page.keyboard.press(`${modifierKey}+Shift+z`);
+        await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+Shift+z`);
       } else {
-        await page.keyboard.press(`${modifierKey}+y`);
+        await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+y`);
       }
       await page.waitForTimeout(300);
 
@@ -989,11 +950,11 @@ test.describe('KeyboardTask 快捷键功能', () => {
       await markdownEditorPage.selectAll();
 
       // 应用加粗
-      await page.keyboard.press(`${modifierKey}+b`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+b`);
       await page.waitForTimeout(100);
 
       // 应用斜体
-      await page.keyboard.press(`${modifierKey}+i`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+i`);
       await page.waitForTimeout(100);
 
       // 验证文本仍然存在
@@ -1007,12 +968,12 @@ test.describe('KeyboardTask 快捷键功能', () => {
 
       // 输入文本并设置为标题
       await markdownEditorPage.typeText('Formatted Heading');
-      await page.keyboard.press(`${modifierKey}+1`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+1`);
       await page.waitForTimeout(200);
 
       // 选中文本并应用加粗
       await markdownEditorPage.selectAll();
-      await page.keyboard.press(`${modifierKey}+b`);
+      await markdownEditorPage.keyboardTargetPage.keyboard.press(`${modifierKey}+b`);
       await page.waitForTimeout(200);
 
       // 验证文本仍然存在

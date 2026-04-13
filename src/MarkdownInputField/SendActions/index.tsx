@@ -9,7 +9,7 @@ import type { AttachmentButtonProps } from '../AttachmentButton';
 import { AttachmentButton } from '../AttachmentButton';
 import type { AttachmentFile } from '../AttachmentButton/types';
 import type { SendButtonCustomizationProps } from '../SendButton';
-import { SendButton } from '../SendButton';
+import { SendButton, resolveSendDisabled } from '../SendButton';
 import type { CreateRecognizer } from '../VoiceInput';
 import { VoiceInputButton } from '../VoiceInput';
 import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
@@ -135,6 +135,7 @@ export const SendActions: React.FC<SendActionsProps> = ({
   triggerSendKey,
 }) => {
   const fileMap = attachment?.fileMap;
+  const sendDisabled = resolveSendDisabled(sendButtonProps, fileUploadStatus);
 
   const defaultActionsLen = [
     attachment?.enable ? '()' : null,
@@ -187,7 +188,6 @@ export const SendActions: React.FC<SendActionsProps> = ({
           (fileMap && fileMap.size > 0) ||
           recording
         }
-        disabled={disabled}
         onClick={() => {
           if (typing || isLoading) {
             onStop?.();
@@ -197,11 +197,13 @@ export const SendActions: React.FC<SendActionsProps> = ({
         }}
         triggerSendKey={triggerSendKey}
         {...sendButtonProps}
+        disabled={disabled || sendDisabled}
       />,
     ].filter(Boolean);
   }, [
     attachment,
     fileUploadDone,
+    sendDisabled,
     value,
     collapseSendActions,
     isLoading,

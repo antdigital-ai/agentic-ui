@@ -5,6 +5,7 @@ import React, { useContext, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { StopIcon } from '../../AgentRunBar/icons';
 import { I18nContext } from '../../I18n';
+import type { FileUploadManagerReturn } from '../FileUploadManager';
 import { useStyle } from './style';
 
 /**
@@ -27,7 +28,18 @@ export type SendButtonColors = {
 export type SendButtonCustomizationProps = {
   compact?: boolean;
   colors?: SendButtonColors;
+  disabled?: boolean;
 };
+
+/**
+ * 解析发送按钮的最终禁用状态：用户显式传入优先，否则按上传状态判断
+ */
+export function resolveSendDisabled(
+  sendButtonProps: SendButtonCustomizationProps | undefined,
+  fileUploadStatus: FileUploadManagerReturn['fileUploadStatus'] | undefined,
+): boolean {
+  return sendButtonProps?.disabled ?? fileUploadStatus === 'uploading';
+}
 
 const DEFAULT_SEND_BUTTON_COLORS = {
   icon: '#00183D',

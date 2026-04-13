@@ -46,27 +46,27 @@ group:
 
 ### ChatLayoutProps
 
-| 参数                  | 说明                                                                           | 类型                                                                                                                           | 默认值     |
-| --------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| header                | 头部配置（详见 [LayoutHeader](/components/layout-header)）                     | `LayoutHeaderConfig`                                                                                                           | -          |
-| children              | 聊天内容区域（通常放置 `BubbleList`）                                          | `ReactNode`                                                                                                                    | -          |
-| footer                | 底部内容（通常放置输入框）                                                     | `ReactNode`                                                                                                                    | -          |
-| footerHeight          | 底部区域最小高度（px），用于为 footer 预留空间                                 | `number`                                                                                                                       | `48`       |
-| scrollBehavior        | 滚动动画行为                                                                   | `'auto' \| 'smooth'`                                                                                                           | `'smooth'` |
-| showFooterBackground  | 是否在底部显示渐变背景遮罩                                                     | `boolean`                                                                                                                      | `true`     |
-| className             | 根容器自定义类名                                                               | `string`                                                                                                                       | -          |
-| style                 | 根容器自定义样式                                                               | `React.CSSProperties`                                                                                                          | -          |
-| classNames            | 各区域自定义类名                                                               | `{ root?: string; content?: string; scrollable?: string; footer?: string; footerBackground?: string }`                        | -          |
-| styles                | 各区域自定义内联样式                                                           | `{ root?: React.CSSProperties; content?: React.CSSProperties; scrollable?: React.CSSProperties; footer?: React.CSSProperties; footerBackground?: React.CSSProperties }` | -          |
+| 属性                  | 说明                                                                           | 类型                                                                                                                           | 默认值     | 版本 |
+| --------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ---------- | ---- |
+| header                | 头部配置（详见 [LayoutHeader](/components/layout-header)）                     | `LayoutHeaderConfig`                                                                                                           | -          | -    |
+| children              | 聊天内容区域（通常放置 `BubbleList`）                                          | `ReactNode`                                                                                                                    | -          | -    |
+| footer                | 底部内容（通常放置输入框）                                                     | `ReactNode`                                                                                                                    | -          | -    |
+| footerHeight          | 底部区域最小高度（px），用于为 footer 预留空间                                 | `number`                                                                                                                       | `48`       | -    |
+| scrollBehavior        | 滚动动画行为                                                                   | `'auto' \| 'smooth'`                                                                                                           | `'smooth'` | -    |
+| showFooterBackground  | 是否在底部显示渐变背景遮罩                                                     | `boolean`                                                                                                                      | `true`     | -    |
+| className             | 根容器自定义类名                                                               | `string`                                                                                                                       | -          | -    |
+| style                 | 根容器自定义样式                                                               | `React.CSSProperties`                                                                                                          | -          | -    |
+| classNames            | 各区域自定义类名                                                               | `{ root?: string; content?: string; scrollable?: string; footer?: string; footerBackground?: string }`                        | -          | -    |
+| styles                | 各区域自定义内联样式                                                           | `{ root?: React.CSSProperties; content?: React.CSSProperties; scrollable?: React.CSSProperties; footer?: React.CSSProperties; footerBackground?: React.CSSProperties }` | -          | -    |
 
 ### ChatLayoutRef
 
 通过 `ref` 获取组件实例，用于控制滚动行为或访问底层 DOM。
 
-| 属性            | 说明                 | 类型                    |
-| --------------- | -------------------- | ----------------------- |
-| scrollContainer | 滚动容器的 DOM 元素  | `HTMLDivElement \| null` |
-| scrollToBottom  | 滚动到底部           | `() => void`            |
+| 属性            | 说明                 | 类型                    | 默认值 | 版本 |
+| --------------- | -------------------- | ----------------------- | ------ | ---- |
+| scrollContainer | 滚动容器的 DOM 元素  | `HTMLDivElement \| null` | -      | -    |
+| scrollToBottom  | 滚动到底部           | `() => void`            | -      | -    |
 
 ```tsx | pure
 import { useRef } from 'react';
@@ -84,22 +84,22 @@ console.log(el?.scrollTop, el?.scrollHeight);
 
 ### LayoutHeaderConfig（header 属性）
 
-| 参数                  | 说明                                 | 类型                           | 默认值  |
-| --------------------- | ------------------------------------ | ------------------------------ | ------- |
-| title                 | 标题，支持文本或自定义 ReactNode     | `ReactNode`                    | -       |
-| showShare             | 是否显示分享按钮                     | `boolean`                      | `false` |
-| leftCollapsible       | 左侧是否显示折叠按钮                 | `boolean`                      | `false` |
-| rightCollapsible      | 右侧是否显示折叠按钮                 | `boolean`                      | `false` |
-| leftCollapsed         | 左侧折叠状态（受控）                 | `boolean`                      | -       |
-| rightCollapsed        | 右侧折叠状态（受控）                 | `boolean`                      | -       |
-| leftDefaultCollapsed  | 左侧默认折叠状态（非受控）           | `boolean`                      | `false` |
-| rightDefaultCollapsed | 右侧默认折叠状态（非受控）           | `boolean`                      | `false` |
-| onLeftCollapse        | 左侧折叠按钮点击回调                 | `(collapsed: boolean) => void` | -       |
-| onRightCollapse       | 右侧折叠按钮点击回调                 | `(collapsed: boolean) => void` | -       |
-| onShare               | 分享按钮点击回调                     | `() => void`                   | -       |
-| leftExtra             | 标题右侧自定义内容                   | `ReactNode`                    | -       |
-| rightExtra            | 右侧操作区自定义内容                 | `ReactNode`                    | -       |
-| className             | 头部自定义类名                       | `string`                       | -       |
+| 属性                  | 说明                                 | 类型                           | 默认值  | 版本 |
+| --------------------- | ------------------------------------ | ------------------------------ | ------- | ---- |
+| title                 | 标题，支持文本或自定义 ReactNode     | `ReactNode`                    | -       | -    |
+| showShare             | 是否显示分享按钮                     | `boolean`                      | `false` | -    |
+| leftCollapsible       | 左侧是否显示折叠按钮                 | `boolean`                      | `false` | -    |
+| rightCollapsible      | 右侧是否显示折叠按钮                 | `boolean`                      | `false` | -    |
+| leftCollapsed         | 左侧折叠状态（受控）                 | `boolean`                      | -       | -    |
+| rightCollapsed        | 右侧折叠状态（受控）                 | `boolean`                      | -       | -    |
+| leftDefaultCollapsed  | 左侧默认折叠状态（非受控）           | `boolean`                      | `false` | -    |
+| rightDefaultCollapsed | 右侧默认折叠状态（非受控）           | `boolean`                      | `false` | -    |
+| onLeftCollapse        | 左侧折叠按钮点击回调                 | `(collapsed: boolean) => void` | -       | -    |
+| onRightCollapse       | 右侧折叠按钮点击回调                 | `(collapsed: boolean) => void` | -       | -    |
+| onShare               | 分享按钮点击回调                     | `() => void`                   | -       | -    |
+| leftExtra             | 标题右侧自定义内容                   | `ReactNode`                    | -       | -    |
+| rightExtra            | 右侧操作区自定义内容                 | `ReactNode`                    | -       | -    |
+| className             | 头部自定义类名                       | `string`                       | -       | -    |
 
 ## 特性
 

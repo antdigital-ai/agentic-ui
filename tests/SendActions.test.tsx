@@ -409,6 +409,129 @@ describe('SendActions', () => {
     });
   });
 
+  describe('Disable send during file upload', () => {
+    it('should disable send button when fileUploadStatus is uploading', () => {
+      const onSend = vi.fn();
+      const { container } = render(
+        <SendActions
+          value="test"
+          fileUploadStatus="uploading"
+          fileUploadDone={false}
+          onSend={onSend}
+        />,
+      );
+
+      const sendButton = container.querySelector(
+        '.ant-agentic-md-input-field-send-button',
+      );
+      expect(sendButton).toHaveClass(
+        'ant-agentic-md-input-field-send-button-disabled',
+      );
+      fireEvent.click(sendButton!);
+      expect(onSend).not.toHaveBeenCalled();
+    });
+
+    it('should enable send button when fileUploadStatus is done', () => {
+      const onSend = vi.fn();
+      const { container } = render(
+        <SendActions
+          value="test"
+          fileUploadStatus="done"
+          fileUploadDone={true}
+          onSend={onSend}
+        />,
+      );
+
+      const sendButton = container.querySelector(
+        '.ant-agentic-md-input-field-send-button',
+      );
+      expect(sendButton).not.toHaveClass(
+        'ant-agentic-md-input-field-send-button-disabled',
+      );
+      fireEvent.click(sendButton!);
+      expect(onSend).toHaveBeenCalled();
+    });
+
+    it('should not disable send button when fileUploadStatus is error', () => {
+      const onSend = vi.fn();
+      const { container } = render(
+        <SendActions
+          value="test"
+          fileUploadStatus="error"
+          fileUploadDone={false}
+          onSend={onSend}
+        />,
+      );
+
+      const sendButton = container.querySelector(
+        '.ant-agentic-md-input-field-send-button',
+      );
+      expect(sendButton).not.toHaveClass(
+        'ant-agentic-md-input-field-send-button-disabled',
+      );
+    });
+
+    it('should respect external sendButtonProps.disabled=false even when uploading', () => {
+      const onSend = vi.fn();
+      const { container } = render(
+        <SendActions
+          value="test"
+          fileUploadStatus="uploading"
+          fileUploadDone={false}
+          sendButtonProps={{ disabled: false }}
+          onSend={onSend}
+        />,
+      );
+
+      const sendButton = container.querySelector(
+        '.ant-agentic-md-input-field-send-button',
+      );
+      expect(sendButton).not.toHaveClass(
+        'ant-agentic-md-input-field-send-button-disabled',
+      );
+      fireEvent.click(sendButton!);
+      expect(onSend).toHaveBeenCalled();
+    });
+
+    it('should respect external sendButtonProps.disabled=true even when upload is done', () => {
+      const onSend = vi.fn();
+      const { container } = render(
+        <SendActions
+          value="test"
+          fileUploadStatus="done"
+          fileUploadDone={true}
+          sendButtonProps={{ disabled: true }}
+          onSend={onSend}
+        />,
+      );
+
+      const sendButton = container.querySelector(
+        '.ant-agentic-md-input-field-send-button',
+      );
+      expect(sendButton).toHaveClass(
+        'ant-agentic-md-input-field-send-button-disabled',
+      );
+      fireEvent.click(sendButton!);
+      expect(onSend).not.toHaveBeenCalled();
+    });
+
+    it('should not affect behavior when no files are present', () => {
+      const onSend = vi.fn();
+      const { container } = render(
+        <SendActions value="test" onSend={onSend} />,
+      );
+
+      const sendButton = container.querySelector(
+        '.ant-agentic-md-input-field-send-button',
+      );
+      expect(sendButton).not.toHaveClass(
+        'ant-agentic-md-input-field-send-button-disabled',
+      );
+      fireEvent.click(sendButton!);
+      expect(onSend).toHaveBeenCalled();
+    });
+  });
+
   describe('Edge Cases', () => {
     it('should handle undefined callbacks', () => {
       const { container } = render(<SendActions />);

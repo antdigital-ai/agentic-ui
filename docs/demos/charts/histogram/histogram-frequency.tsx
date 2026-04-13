@@ -1,7 +1,8 @@
-/**
+﻿/**
  * title: 频率直方图
  * description: 显示频率而非计数，便于比较不同样本量的分布
  */
+import React from 'react';
 import { HistogramChart } from '@ant-design/agentic-ui';
 
 export default () => {

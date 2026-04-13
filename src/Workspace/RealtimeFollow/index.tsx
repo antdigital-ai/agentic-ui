@@ -41,6 +41,9 @@ export interface RealtimeFollowData {
   title?: string;
   subTitle?: string;
   icon?: React.ComponentType;
+  /** 流式输出模式，同时传入时优先于 typewriter */
+  streaming?: boolean;
+  /** @deprecated 请使用 streaming */
   typewriter?: boolean;
   rightContent?: React.ReactNode;
   loadingRender?: React.ReactNode | (() => React.ReactNode);
@@ -343,7 +346,7 @@ export const RealtimeFollow: React.FC<{
     );
     mdInstance.current.store.updateNodeList(schema);
 
-    if (data.typewriter && !isTestEnv) {
+    if ((data.streaming ?? data.typewriter) && !isTestEnv) {
       setTimeout(() => scrollToBottom(), SCROLL_DELAY);
     }
   }, [
@@ -351,6 +354,7 @@ export const RealtimeFollow: React.FC<{
     data.type,
     htmlViewMode,
     isTestEnv,
+    data.streaming,
     data.typewriter,
     scrollToBottom,
   ]);
@@ -393,9 +397,9 @@ export const RealtimeFollow: React.FC<{
   const mergedProps = {
     ...defaultProps,
     ...data.markdownEditorProps,
-    typewriter: isTestEnv
+    streaming: isTestEnv
       ? false
-      : (data.typewriter ?? defaultProps.typewriter),
+      : (data.streaming ?? data.typewriter ?? defaultProps.typewriter),
     style: {
       maxHeight: 'auto',
       ...defaultProps.style,

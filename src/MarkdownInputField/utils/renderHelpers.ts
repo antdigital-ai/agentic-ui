@@ -30,6 +30,11 @@ export const useAttachmentList = ({
       fileMap,
       onDelete: handleFileRemoval,
       onRetry: handleFileRetry,
+      onPreview: attachment?.onPreview
+        ? (file: AttachmentFile) => {
+            void Promise.resolve(attachment.onPreview?.(file)).catch(() => {});
+          }
+        : undefined,
       onClearFileMap: () => {
         updateAttachmentFiles(undefined);
       },
@@ -37,6 +42,7 @@ export const useAttachmentList = ({
     });
   }, [
     attachment?.enable,
+    attachment?.onPreview,
     fileMap,
     handleFileRemoval,
     handleFileRetry,
