@@ -14,9 +14,9 @@ describe('withSanitizeInvalidChildren', () => {
     Editor.normalize(editor, { force: true });
 
     expect(editor.children[0].children).toEqual([{ text: '' }]);
-    expect(Node.string(editor.children[0] as Parameters<typeof Node.string>[0])).toBe(
-      '',
-    );
+    expect(
+      Node.string(editor.children[0] as Parameters<typeof Node.string>[0]),
+    ).toBe('');
   });
 
   it('restores a default paragraph when editor root has no blocks', () => {
@@ -28,5 +28,27 @@ describe('withSanitizeInvalidChildren', () => {
     expect(editor.children).toEqual([
       { type: 'paragraph', children: [{ text: '' }] },
     ]);
+  });
+
+  it('does not throw when editor.children is undefined', () => {
+    const editor = withSanitizeInvalidChildren(createEditor());
+    (editor as any).children = undefined;
+
+    expect(() => Editor.normalize(editor, { force: true })).not.toThrow();
+    expect(editor.children).toEqual([
+      { type: 'paragraph', children: [{ text: '' }] },
+    ]);
+  });
+
+  it('repairs element nodes with missing children array', () => {
+    const editor = withSanitizeInvalidChildren(createEditor());
+    editor.children = [
+      { type: 'paragraph', children: [{ text: 'ok' }] },
+      { type: 'paragraph' } as any,
+    ] as any;
+
+    Editor.normalize(editor, { force: true });
+
+    expect((editor.children[1] as any).children).toEqual([{ text: '' }]);
   });
 });

@@ -53,8 +53,11 @@ export const withListsPlugin = (editor: Editor) => {
 
     // 规则 2: list-item 的子节点结构规范化
     if (Element.isElement(node) && node.type === 'list-item') {
+      const listItemChildren = Array.isArray(node.children)
+        ? node.children
+        : [];
       // 确保 list-item 至少有一个子节点
-      if (node.children.length === 0) {
+      if (listItemChildren.length === 0) {
         Transforms.insertNodes(
           editor,
           { type: 'paragraph', children: [{ text: '' }] },
@@ -64,7 +67,7 @@ export const withListsPlugin = (editor: Editor) => {
       }
 
       // 确保第一个子节点是块级元素（paragraph 或其他块级元素）
-      const firstChild = node.children[0];
+      const firstChild = listItemChildren[0];
       if (
         Element.isElement(firstChild) &&
         !Editor.isBlock(editor, firstChild) &&
@@ -81,8 +84,8 @@ export const withListsPlugin = (editor: Editor) => {
 
       // 确保 list-item 的子节点中，除了第一个块级元素外，其他都是列表类型
       // 允许的结构: [paragraph, bulleted-list?, numbered-list?]
-      for (let i = 1; i < node.children.length; i++) {
-        const child = node.children[i];
+      for (let i = 1; i < listItemChildren.length; i++) {
+        const child = listItemChildren[i];
         if (Element.isElement(child)) {
           if (!isListType(child)) {
             if (Editor.isBlock(editor, child)) {
