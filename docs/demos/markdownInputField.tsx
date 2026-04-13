@@ -3,8 +3,10 @@ import {
   MarkdownInputField,
 } from '@ant-design/agentic-ui';
 import { ChevronDown } from '@sofa-design/icons';
-import { Dropdown, Slider } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Divider, Dropdown, Slider, Typography, theme } from 'antd';
+import React, { useCallback, useMemo, useState } from 'react';
+
+const { Text, Title } = Typography;
 
 const TEMPLATE_VALUE =
   '帮我查询`${placeholder:目标企业}` `${placeholder:近3年;initialValue:近6年}`的`${placeholder:资产总额}`。';
@@ -14,14 +16,12 @@ const TAG_ITEMS = ['tag1', 'tag2', 'tag3'].map((item) => ({
   label: item,
 }));
 
-const TAG_STYLE = {
-  background: '#EEF1FF',
-  color: '#4C4BDF',
-  lineHeight: '22px',
-  borderWidth: 0,
-};
+const LONG_SCROLL_SAMPLE =
+  '这是一段用于演示多行滚动与换行的占位文本。重复若干次以撑满输入区域高度，便于观察滚动条与内边距表现。\n\n'.repeat(
+    12,
+  );
 
-const tagTextRender = (_props: any, text: string) => text.replaceAll('$', '');
+const tagTextDisplay = (_props: unknown, text: string) => text.replaceAll('$', '');
 
 const TagRender: React.FC<{
   onSelect: (value: string) => void;
@@ -30,11 +30,14 @@ const TagRender: React.FC<{
   readonly?: boolean;
   style?: React.CSSProperties;
 }> = ({ onSelect, defaultDom, readonly, style, placeholder }) => {
-  const [items] = useState([
-    { key: '1', label: '选项1' },
-    { key: '2', label: '选项2' },
-    { key: '3', label: '选项3' },
-  ]);
+  const items = useMemo(
+    () => [
+      { key: '1', label: '选项1' },
+      { key: '2', label: '选项2' },
+      { key: '3', label: '选项3' },
+    ],
+    [],
+  );
 
   return (
     <Dropdown
@@ -43,7 +46,9 @@ const TagRender: React.FC<{
         items,
         onClick: (e) => {
           const item = items.find((i) => i.key === e.key);
-          if (item) onSelect?.(item.label);
+          if (item) {
+            onSelect(item.label);
+          }
         },
       }}
       trigger={['click']}
@@ -59,148 +64,227 @@ const TagRender: React.FC<{
   );
 };
 
+const pageStyle: React.CSSProperties = {
+  boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 24,
+  margin: '0 auto',
+  maxWidth: 880,
+  padding: '16px 12px 32px',
+  width: '100%',
+};
+
+const inputMinStyle: React.CSSProperties = { minHeight: 66 };
+
 export default () => {
-  const markdownRef = React.useRef<MarkdownEditorInstance>();
-  const markdownRefTwo = React.useRef<MarkdownEditorInstance>();
-  const [list, setList] = useState<Set<string>>(() => new Set());
+  const { token } = theme.useToken();
+  const tagTokenStyle = useMemo(
+    () => ({
+      background: token.colorPrimaryBg,
+      color: token.colorPrimary,
+      lineHeight: '22px',
+      borderWidth: 0,
+    }),
+    [token.colorPrimary, token.colorPrimaryBg],
+  );
+
+  const markdownRefCustomTag = React.useRef<MarkdownEditorInstance>();
+
+  const [sentList, setSentList] = useState<string[]>([]);
   const [borderRadius, setBorderRadius] = useState(0);
 
-  const handleSend = async (value: string) => {
+  const handleSend = useCallback(async (value: string) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    setList((prev) => {
-      const next = new Set(prev);
-      next.add(value);
-      return next;
-    });
-  };
-
-  useEffect(() => {
-    markdownRefTwo.current?.store?.setMDContent(TEMPLATE_VALUE);
+    setSentList((prev) => [...prev, value]);
   }, []);
 
+  const handleStop = useCallback(() => {
+    // Demo：停止发送为占位逻辑，真实场景可中断请求
+  }, []);
+
+  const asyncTagItems = useCallback(
+    async (props: { placeholder?: string } | undefined) =>
+      ['tag1', 'tag2', 'tag3'].map((item) => ({
+        key: item,
+        label: `${props?.placeholder ?? ''}${item}`,
+      })),
+    [],
+  );
+
+  const attachmentConfig = useMemo(
+    () => ({
+      enable: true as const,
+      upload: async (file: File) =>
+        new Promise<string>((resolve) => {
+          setTimeout(() => resolve(URL.createObjectURL(file)), 1000);
+        }),
+      onDelete: async (file: {
+        url?: string;
+        previewUrl?: string;
+      }) => {
+        const fileUrl = typeof file.url === 'string' ? file.url : undefined;
+        const previewUrl =
+          typeof file.previewUrl === 'string' ? file.previewUrl : undefined;
+        if (fileUrl?.startsWith('blob:')) {
+          URL.revokeObjectURL(fileUrl);
+        }
+        if (previewUrl?.startsWith('blob:') && previewUrl !== fileUrl) {
+          URL.revokeObjectURL(previewUrl);
+        }
+      },
+    }),
+    [],
+  );
+
   return (
-    <div style={{ padding: 20, margin: 'auto', maxWidth: 800, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={pageStyle}>
       <div>
-        圆角：
-        <Slider value={borderRadius} onChange={setBorderRadius} />
+        <Title level={4} style={{ marginTop: 0, marginBottom: 8 }}>
+          MarkdownInputField 示例
+        </Title>
+        <Text type="secondary">
+          下方各区块独立展示一种能力；圆角滑块会同步作用到带该属性的示例。
+        </Text>
       </div>
 
-      <ul>
-        {[...list].map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
+      <div>
+        <Text>全局圆角</Text>
+        <Slider
+          min={0}
+          max={16}
+          value={borderRadius}
+          onChange={setBorderRadius}
+        />
+      </div>
 
-      <h2>基本</h2>
+      {sentList.length > 0 && (
+        <div>
+          <Text strong>最近发送（模拟 1s 延迟后落库）</Text>
+          <ul style={{ margin: '8px 0 0', paddingInlineStart: 20 }}>
+            {sentList.map((item, index) => (
+              <li key={`${index}-${item.slice(0, 24)}`}>
+                <Text ellipsis style={{ maxWidth: '100%' }}>
+                  {item}
+                </Text>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <Divider orientation="left" plain>
+        基本
+      </Divider>
+      <Text type="secondary" style={{ display: 'block', marginTop: -12 }}>
+        异步标签候选、`value` 与占位符模板
+      </Text>
       <MarkdownInputField
-        style={{ minHeight: 66 }}
+        style={inputMinStyle}
         value={TEMPLATE_VALUE}
-        inputRef={markdownRefTwo}
         borderRadius={borderRadius}
         tagInputProps={{
           enable: true,
-          items: async (props) =>
-            ['tag1', 'tag2', 'tag3'].map((item) => ({
-              key: item,
-              label: props?.placeholder + item,
-            })),
+          items: asyncTagItems,
         }}
         onSend={handleSend}
-        onStop={() => console.log('stop...')}
+        onStop={handleStop}
         placeholder="请输入内容"
       />
 
-      <h2>dropdownRender</h2>
+      <Divider orientation="left" plain>
+        dropdownRender
+      </Divider>
+      <Text type="secondary" style={{ display: 'block', marginTop: -12 }}>
+        自定义下拉容器，保留默认菜单
+      </Text>
       <MarkdownInputField
-        style={{ minHeight: 66 }}
+        style={inputMinStyle}
         value={TEMPLATE_VALUE}
-        inputRef={markdownRefTwo}
         borderRadius={borderRadius}
         tagInputProps={{
           dropdownRender: (defaultDom, props) => (
-            <div>
-              placeholder: {props.placeholder} text: {props.text}
+            <div style={{ padding: token.paddingXS }}>
+              <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
+                placeholder: {props.placeholder} · text: {props.text}
+              </Text>
               {defaultDom}
             </div>
           ),
-          tagTextStyle: TAG_STYLE,
-          tagTextRender,
+          tagTextStyle: tagTokenStyle,
+          tagTextRender: tagTextDisplay,
           enable: true,
-          items: async (props) =>
-            ['tag1', 'tag2', 'tag3'].map((item) => ({
-              key: item,
-              label: props?.placeholder + item,
-            })),
+          items: asyncTagItems,
         }}
         onSend={handleSend}
-        onStop={() => console.log('stop...')}
+        onStop={handleStop}
         placeholder="请输入内容"
       />
 
-      <h2>自定义的 Tag</h2>
+      <Divider orientation="left" plain>
+        自定义 Tag
+      </Divider>
+      <Text type="secondary" style={{ display: 'block', marginTop: -12 }}>
+        `tagRender` 外裹下拉，`dropdownRender` 置空关闭浮层
+      </Text>
       <MarkdownInputField
-        inputRef={markdownRef}
+        inputRef={markdownRefCustomTag}
         value={TEMPLATE_VALUE}
         tagInputProps={{
           dropdownRender: () => null,
-          tagTextStyle: TAG_STYLE,
-          tagTextRender,
+          tagTextStyle: tagTokenStyle,
+          tagTextRender: tagTextDisplay,
           enable: true,
           items: TAG_ITEMS,
           tagRender: (props, defaultDom: React.ReactNode) => (
             <TagRender
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
               defaultDom={defaultDom}
               placeholder={props.placeholder || ''}
-              onSelect={(value: string) => props.onSelect?.(value, { value: '123' })}
+              onSelect={(value: string) =>
+                props.onSelect?.(value, { value: '123' })
+              }
             />
           ),
         }}
         onSend={handleSend}
-        onStop={() => console.log('stop...')}
+        onStop={handleStop}
         placeholder="请输入内容"
       />
 
-      <h2>文件上传</h2>
+      <Divider orientation="left" plain>
+        文件上传
+      </Divider>
       <MarkdownInputField
         borderRadius={borderRadius}
-        attachment={{
-          enable: true,
-          upload: async (file) => {
-            return new Promise((resolve) => {
-              setTimeout(() => resolve(URL.createObjectURL(file)), 1000);
-            });
-          },
-          onDelete: async (file) => {
-            const fileUrl = typeof file.url === 'string' ? file.url : undefined;
-            const previewUrl =
-              typeof file.previewUrl === 'string' ? file.previewUrl : undefined;
-            if (fileUrl?.startsWith('blob:')) {
-              URL.revokeObjectURL(fileUrl);
-            }
-            if (previewUrl?.startsWith('blob:') && previewUrl !== fileUrl) {
-              URL.revokeObjectURL(previewUrl);
-            }
-          },
-        }}
+        attachment={attachmentConfig}
         value={TEMPLATE_VALUE}
         tagInputProps={{ enable: true, items: TAG_ITEMS }}
         onSend={handleSend}
-        onStop={() => console.log('stop...')}
+        onStop={handleStop}
         placeholder="请输入内容"
       />
 
-      <h2>滚动条</h2>
+      <Divider orientation="left" plain>
+        多行滚动
+      </Divider>
       <MarkdownInputField
         borderRadius={borderRadius}
         tagInputProps={{ enable: true, items: TAG_ITEMS }}
         onSend={handleSend}
-        value={'《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。《原神》克洛琳德将于6月正式上线，官方也放出了克洛琳德的突破材料，那么克洛琳德的突破材料都是什么，又要在哪里采集呢？下面请看由\u201C关蝎\u201D为大家分享的《原神》克洛琳德突破材料一览，希望可以帮助到大家。'}
-        onStop={() => console.log('stop...')}
+        value={LONG_SCROLL_SAMPLE}
+        onStop={handleStop}
         placeholder="请输入内容"
       />
 
-      <h2>disable</h2>
+      <Divider orientation="left" plain>
+        禁用
+      </Divider>
       <MarkdownInputField
         borderRadius={borderRadius}
         onSend={handleSend}

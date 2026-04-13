@@ -1,54 +1,75 @@
-import { MarkdownInputField } from '@ant-design/agentic-ui';
-import React from 'react';
+import {
+  MarkdownInputField,
+  type MarkdownInputFieldProps,
+} from '@ant-design/agentic-ui';
+import { Card, Space, Tag, Typography } from 'antd';
+import React, { useCallback, useState } from 'react';
+
+const { Paragraph, Text, Title } = Typography;
 
 export default () => {
-  const [value, setValue] = React.useState('');
-  const [isFocused, setIsFocused] = React.useState(false);
-  const [focusCount, setFocusCount] = React.useState(0);
+  const [value, setValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
+  const [focusCount, setFocusCount] = useState(0);
+  const [blurCount, setBlurCount] = useState(0);
+
+  const handleFocus = useCallback(
+    (_value: string, _schema: unknown, _e: React.FocusEvent<HTMLDivElement>) => {
+      setIsFocused(true);
+      setFocusCount((c) => c + 1);
+    },
+    [],
+  );
+
+  const handleBlur = useCallback<NonNullable<MarkdownInputFieldProps['onBlur']>>(
+    (_value, _schema, _e) => {
+      setIsFocused(false);
+      setBlurCount((c) => c + 1);
+    },
+    [],
+  );
 
   return (
-    <div style={{ padding: 12 }}>
-      <h3>MarkdownInputField onFocus 功能演示</h3>
+    <div style={{ boxSizing: 'border-box', maxWidth: 720, padding: 12 }}>
+      <Title level={4} style={{ marginTop: 0 }}>
+        onFocus / onBlur
+      </Title>
+      <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+        获得或失去焦点时更新状态；可与埋点、高亮边框等逻辑联动。
+      </Paragraph>
 
-      <div style={{ marginBottom: 16 }}>
-        <p>
-          当前焦点状态:{' '}
-          <strong>{isFocused ? '已获得焦点' : '未获得焦点'}</strong>
-        </p>
-        <p>
-          焦点次数: <strong>{focusCount}</strong>
-        </p>
-      </div>
+      <Card size="small" style={{ marginBottom: 16 }}>
+        <Space size="middle" wrap>
+          <Text>焦点：</Text>
+          <Tag color={isFocused ? 'processing' : 'default'}>
+            {isFocused ? '已获得焦点' : '未获得焦点'}
+          </Tag>
+          <Text type="secondary">
+            聚焦次数 {focusCount} · 失焦次数 {blurCount}
+          </Text>
+        </Space>
+      </Card>
 
       <MarkdownInputField
         value={value}
         onChange={setValue}
-        placeholder="点击输入框获得焦点..."
-        onFocus={(value, schema) => {
-          console.log('输入框获得焦点:', { value, schema });
-          setIsFocused(true);
-          setFocusCount((prev) => prev + 1);
-        }}
-        onSend={async (text) => {
-          console.log('发送内容:', text);
+        placeholder="点击输入框获得焦点…"
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onSend={async () => {
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }}
       />
 
-      <div style={{ marginTop: 16 }}>
-        <h4>功能说明</h4>
-        <ul>
-          <li>
-            <code>onFocus</code> - 当输入字段获得焦点时触发的回调函数
-          </li>
-          <li>
-            <code>value</code> - 当前的 markdown 文本值
-          </li>
-          <li>
-            <code>schema</code> - 当前的编辑器 schema
-          </li>
-        </ul>
-      </div>
+      <Paragraph style={{ marginTop: 16, marginBottom: 0 }}>
+        <Text strong>回调参数</Text>
+      </Paragraph>
+      <ul style={{ marginTop: 8, paddingInlineStart: 20 }}>
+        <li>
+          <Text code>onFocus</Text> / <Text code>onBlur</Text>：首参为当前
+          Markdown 文本，次参为编辑器 schema
+        </li>
+      </ul>
     </div>
   );
 };

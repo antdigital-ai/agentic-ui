@@ -51,8 +51,6 @@ export default () => {
   const [loadProgress, setLoadProgress] = useState(0);
   const [loadProgressText, setLoadProgressText] = useState('');
 
-  console.log('当前消息数:', messages);
-
   // WebLLM 引擎实例
   const engineRef = useRef<any>(null);
 
@@ -82,7 +80,6 @@ export default () => {
           const progressPercent = Math.round(report.progress * 100);
           setLoadProgress(progressPercent);
           setLoadProgressText(report.text || '');
-          console.log('模型加载进度:', report);
         },
       });
 
