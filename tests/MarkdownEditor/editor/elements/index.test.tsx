@@ -8,7 +8,17 @@ import {
 } from '../../../../src/MarkdownEditor/editor/elements';
 import { EditorUtils } from '../../../../src/MarkdownEditor/editor/utils/editorUtils';
 
-// Mock antd theme - 这个 mock 会在后面被合并
+const elementStubs = vi.hoisted(() => {
+  const box =
+    (testId: string) =>
+    ({ children, ...props }: Record<string, unknown>) =>
+      (
+        <div data-testid={testId} {...props}>
+          {children}
+        </div>
+      );
+  return { box };
+});
 
 // Mock 依赖
 vi.mock('../../../../src/MarkdownEditor/editor/store', () => ({
@@ -55,98 +65,54 @@ vi.mock('../../../../src/MarkdownEditor/editor/elements/Table', () => ({
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/Card', () => ({
-  WarpCard: ({ children, ...props }: any) => (
-    <div data-testid="warp-card" {...props}>
-      {children}
-    </div>
-  ),
+  WarpCard: elementStubs.box('warp-card'),
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/Comment', () => ({
-  CommentView: ({ children, ...props }: any) => (
-    <div data-testid="comment-view" {...props}>
-      {children}
-    </div>
-  ),
+  CommentView: elementStubs.box('comment-view'),
 }));
 
 vi.mock(
   '../../../../src/MarkdownEditor/editor/elements/FootnoteDefinition',
   () => ({
-    FootnoteDefinition: ({ children, ...props }: any) => (
-      <div data-testid="footnote-definition" {...props}>
-        {children}
-      </div>
-    ),
+    FootnoteDefinition: elementStubs.box('footnote-definition'),
   }),
 );
 
 vi.mock(
   '../../../../src/MarkdownEditor/editor/elements/FootnoteReference',
   () => ({
-    FootnoteReference: ({ children, ...props }: any) => (
-      <div data-testid="footnote-reference" {...props}>
-        {children}
-      </div>
-    ),
+    FootnoteReference: elementStubs.box('footnote-reference'),
   }),
 );
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/Image', () => ({
-  EditorImage: ({ children, ...props }: any) => (
-    <div data-testid="editor-image" {...props}>
-      {children}
-    </div>
-  ),
+  EditorImage: elementStubs.box('editor-image'),
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/LinkCard', () => ({
-  LinkCard: ({ children, ...props }: any) => (
-    <div data-testid="link-card" {...props}>
-      {children}
-    </div>
-  ),
+  LinkCard: elementStubs.box('link-card'),
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/List', () => ({
-  List: ({ children, ...props }: any) => (
-    <div data-testid="list" {...props}>
-      {children}
-    </div>
-  ),
-  ListItem: ({ children, ...props }: any) => (
-    <div data-testid="list-item" {...props}>
-      {children}
-    </div>
-  ),
+  List: elementStubs.box('list'),
+  ListItem: elementStubs.box('list-item'),
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/Media', () => ({
-  Media: ({ children, ...props }: any) => (
-    <div data-testid="media" {...props}>
-      {children}
-    </div>
-  ),
+  Media: elementStubs.box('media'),
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/Paragraph', () => ({
-  Paragraph: ({ children, ...props }: any) => (
-    <div data-testid="paragraph" {...props}>
-      {children}
-    </div>
-  ),
+  Paragraph: elementStubs.box('paragraph'),
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/Schema', () => ({
-  Schema: ({ children, ...props }: any) => (
-    <div data-testid="schema" {...props}>
-      {children}
-    </div>
-  ),
+  Schema: elementStubs.box('schema'),
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/TagPopup', () => ({
-  TagPopup: ({ children, onSelect, ...props }: any) => {
+  TagPopup: ({ children, onSelect, ...props }: Record<string, unknown>) => {
     (window as any).__lastTagPopupOnSelect = onSelect;
     return (
       <div data-testid="tag-popup" {...props}>
@@ -157,19 +123,11 @@ vi.mock('../../../../src/MarkdownEditor/editor/elements/TagPopup', () => ({
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/Blockquote', () => ({
-  Blockquote: ({ children, ...props }: any) => (
-    <div data-testid="blockquote" {...props}>
-      {children}
-    </div>
-  ),
+  Blockquote: elementStubs.box('blockquote'),
 }));
 
 vi.mock('../../../../src/MarkdownEditor/editor/elements/Head', () => ({
-  Head: ({ children, ...props }: any) => (
-    <div data-testid="head" {...props}>
-      {children}
-    </div>
-  ),
+  Head: elementStubs.box('head'),
 }));
 
 // Mock Ant Design components

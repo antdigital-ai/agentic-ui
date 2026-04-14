@@ -14,17 +14,33 @@ export default defineConfig({
     setupFiles: './tests/setupTests.ts',
     testTimeout: 500000,
     exclude: ['**/node_modules/**', '**/dist/**'],
-    alias: {
-      '@ant-design/agentic-ui': path.resolve(__dirname, './src'),
-      '@schema-element-editor/host-sdk/core': path.resolve(
-        __dirname,
-        './tests/_mocks_/schemaEditorHostSdkMock.ts',
-      ),
-      '@schema-element-editor/host-sdk': path.resolve(
-        __dirname,
-        './tests/_mocks_/schemaEditorHostSdkMock.ts',
-      ),
-    },
+    alias: [
+      {
+        find: '@ant-design/agentic-ui',
+        replacement: path.resolve(__dirname, './src'),
+      },
+      {
+        find: '@schema-element-editor/host-sdk/core',
+        replacement: path.resolve(
+          __dirname,
+          './tests/_mocks_/schemaEditorHostSdkMock.ts',
+        ),
+      },
+      {
+        find: '@schema-element-editor/host-sdk',
+        replacement: path.resolve(
+          __dirname,
+          './tests/_mocks_/schemaEditorHostSdkMock.ts',
+        ),
+      },
+      {
+        find: /^ace-builds\/src-noconflict\/(mode|theme)-.+/,
+        replacement: path.resolve(
+          __dirname,
+          './tests/_mocks_/aceBuildsSideEffectStub.ts',
+        ),
+      },
+    ],
     coverage: {
       provider: 'istanbul',
       reporter: ['text', 'json', 'html'],
