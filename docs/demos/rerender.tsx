@@ -61,6 +61,7 @@ export const RerenderMdDemo = () => {
   const speedRef = useRef<SpeedType>('fast');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [restartKey, setRestartKey] = useState(0);
+  const [manualContentMode, setManualContentMode] = useState(false);
 
   useEffect(() => {
     speedRef.current = speed;
@@ -85,6 +86,7 @@ export const RerenderMdDemo = () => {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+    setManualContentMode(false);
     setContent('');
     setIsFinished(false);
     currentIndexRef.current = 0;
@@ -93,7 +95,21 @@ export const RerenderMdDemo = () => {
     setRestartKey((prev) => prev + 1);
   };
 
+  const handleSourceChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setManualContentMode(true);
+    setContent(event.target.value);
+    setIsFinished(true);
+  };
+
   useEffect(() => {
+    if (manualContentMode) {
+      return;
+    }
+
     const blocks = splitBlocks(rerenderDemoMarkdown);
     const chars = rerenderDemoMarkdown.split('');
     let md = '';
@@ -156,7 +172,7 @@ export const RerenderMdDemo = () => {
         timeoutRef.current = null;
       }
     };
-  }, [restartKey]);
+  }, [restartKey, manualContentMode]);
 
   return (
     <div
@@ -211,11 +227,18 @@ export const RerenderMdDemo = () => {
           <Button type="primary" icon={<ReloadOutlined />} onClick={restart}>
             再来一次
           </Button>
+          {manualContentMode && (
+            <span style={{ color: '#595959', fontSize: 12 }}>
+              已切换为手动编辑；点「再来一次」恢复自动流式演示
+            </span>
+          )}
         </Space>
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', gap: 24 }}>
         <Input.TextArea
           value={content}
+          onChange={handleSourceChange}
+          aria-label="Markdown 源码，可直接编辑"
           style={{
             width: 'calc(50vw - 32px)',
             whiteSpace: 'pre-wrap',
@@ -237,8 +260,8 @@ export const RerenderMdDemo = () => {
         />
         <MarkdownRenderer
           content={content}
-          streaming={!isFinished}
-          isFinished={isFinished}
+          streaming={!manualContentMode && !isFinished}
+          isFinished={manualContentMode || isFinished}
           queueOptions={{ animate: false }}
           style={{ width: '100%' }}
         />
