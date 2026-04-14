@@ -92,6 +92,7 @@ export const useKeyboard = (
     setJinjaAnchorPath,
     jinjaTemplatePanelEnabled,
     editorProps,
+    readonly,
   } = useEditorStore();
   // 从 editorProps.jinja 读取（BaseMarkdownEditor 已写入 effectiveJinja），支持插件配置的 trigger
   const effectiveJinja = editorProps?.jinja;
@@ -115,8 +116,8 @@ export const useKeyboard = (
     const backspace = new BackspaceKey(markdownEditorRef.current);
     const enter = new EnterKey(store, backspace);
     return (e: React.KeyboardEvent) => {
-      // 只读模式下跳过所有键盘处理，提升性能
-      if (props.readonly) return;
+      // 只读模式下跳过所有键盘处理，提升性能（以 EditorStoreContext 为准，避免 props 闭包陈旧）
+      if (readonly) return;
 
       // 处理表格键盘事件
       if (NativeTableKeyboard.shouldHandle(markdownEditorRef.current)) {
@@ -323,7 +324,7 @@ export const useKeyboard = (
     };
   }, [
     markdownEditorRef.current,
-    props?.readonly,
+    readonly,
     openInsertCompletion,
     insertCompletionText$,
     setOpenInsertCompletion,

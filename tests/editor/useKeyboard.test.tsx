@@ -61,6 +61,7 @@ const mockStoreState = {
   openInsertCompletion: false,
   insertCompletionText$: mockInsertCompletionText$,
   setOpenInsertCompletion: mockSetOpenInsertCompletion,
+  readonly: false,
 };
 
 vi.mock('../../src/MarkdownEditor/editor/store', () => ({
@@ -120,6 +121,7 @@ describe('useKeyboard Hook Tests', () => {
     store = { editor } as EditorStore;
     mockProps = {} as MarkdownEditorProps;
     mockStoreState.openInsertCompletion = false;
+    mockStoreState.readonly = false;
     mockNativeTableShouldHandle.mockReturnValue(false);
     mockNativeTableHandleKeyDown.mockReturnValue(false);
   });
@@ -142,6 +144,7 @@ describe('useKeyboard Hook Tests', () => {
     });
 
     it('readonly 时跳过所有键盘处理 (84)', () => {
+      mockStoreState.readonly = true;
       const propsReadonly = { ...mockProps, readonly: true };
       const { result } = renderHook(() =>
         useKeyboard(store, editorRef, propsReadonly),
@@ -152,6 +155,22 @@ describe('useKeyboard Hook Tests', () => {
         keyboardHandler(tabEvent);
       });
       expect(tabEvent.preventDefault).not.toHaveBeenCalled();
+    });
+
+    it('以 EditorStoreContext.readonly 为准：props.readonly 陈旧为 true 时仍可处理快捷键', () => {
+      mockStoreState.readonly = false;
+      const staleProps = { ...mockProps, readonly: true };
+      const { result } = renderHook(() =>
+        useKeyboard(store, editorRef, staleProps),
+      );
+      const keyboardHandler = result.current;
+      const modDown = createKeyboardEvent('ArrowDown', {
+        metaKey: true,
+      } as Partial<KeyboardEvent>);
+      act(() => {
+        keyboardHandler(modDown);
+      });
+      expect(modDown.preventDefault).toHaveBeenCalled();
     });
 
     it('NativeTableKeyboard.shouldHandle 且 handleKeyDown 返回 true 时直接 return (88,94)', () => {
@@ -588,6 +607,7 @@ describe('useKeyboard Hook Tests', () => {
       setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
       setJinjaAnchorPath: mockSetJinjaAnchorPath,
       jinjaTemplatePanelEnabled: false,
+      readonly: false,
     } as any;
 
     beforeEach(() => {
@@ -610,6 +630,7 @@ describe('useKeyboard Hook Tests', () => {
         setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
         setJinjaAnchorPath: mockSetJinjaAnchorPath,
         jinjaTemplatePanelEnabled: true,
+        readonly: false,
       } as any);
 
       editor.children = [{ type: 'paragraph', children: [{ text: '{' }] }];
@@ -644,6 +665,7 @@ describe('useKeyboard Hook Tests', () => {
         setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
         setJinjaAnchorPath: mockSetJinjaAnchorPath,
         jinjaTemplatePanelEnabled: true,
+        readonly: false,
       } as any);
 
       editor.children = [
@@ -678,6 +700,7 @@ describe('useKeyboard Hook Tests', () => {
         setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
         setJinjaAnchorPath: mockSetJinjaAnchorPath,
         jinjaTemplatePanelEnabled: false,
+        readonly: false,
       } as any);
 
       editor.children = [{ type: 'paragraph', children: [{ text: '{' }] }];
@@ -709,6 +732,7 @@ describe('useKeyboard Hook Tests', () => {
         setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
         setJinjaAnchorPath: mockSetJinjaAnchorPath,
         jinjaTemplatePanelEnabled: true,
+        readonly: false,
       } as any);
 
       editor.children = [{ type: 'paragraph', children: [{ text: 'ab' }] }];
@@ -740,6 +764,7 @@ describe('useKeyboard Hook Tests', () => {
         setOpenJinjaTemplate: mockSetOpenJinjaTemplate,
         setJinjaAnchorPath: mockSetJinjaAnchorPath,
         jinjaTemplatePanelEnabled: true,
+        readonly: true,
       } as any);
 
       editor.children = [{ type: 'paragraph', children: [{ text: '{' }] }];
