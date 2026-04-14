@@ -1,6 +1,6 @@
 import classNames from 'clsx';
 import React, { useContext } from 'react';
-import { Node } from 'slate';
+import { Descendant, Element, Node } from 'slate';
 import { I18nContext } from '../../../../I18n';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ParagraphNode } from '../../../el';
@@ -36,6 +36,9 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     const hasOnlyTextNodes = props.element?.children?.every?.(
       (child: any) => !child.type && !child.code && !child.tag,
     );
+    const hasNestedElement = props.element.children.some((child: Descendant) =>
+      Element.isElement(child),
+    );
     // 组合输入进行中时，Slate 模型尚未更新（字符还在 IME 候选区），
     // 此时强制视为非空以隐藏占位符，避免用户输入时占位符仍然可见。
     const isEmpty =
@@ -66,7 +69,7 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
         }}
         data-empty={isEmpty}
         style={{
-          display: !!str || !!props.children?.at(0).type ? undefined : 'none',
+          display: str || hasNestedElement ? undefined : 'none',
           textAlign: align,
         }}
       >
@@ -74,6 +77,7 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
       </div>
     );
   }, [
+    props.element,
     props.element.children,
     align,
     readonly,

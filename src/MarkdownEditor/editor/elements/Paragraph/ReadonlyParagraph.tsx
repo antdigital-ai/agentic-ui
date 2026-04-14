@@ -1,6 +1,6 @@
 import classNames from 'clsx';
 import React from 'react';
-import { Node } from 'slate';
+import { Descendant, Element, Node } from 'slate';
 import { ElementProps, ParagraphNode } from '../../../el';
 
 /**
@@ -39,6 +39,9 @@ export const ReadonlyParagraph: React.FC<ElementProps<ParagraphNode>> =
   React.memo((props) => {
     const str = Node.string(props.element).trim();
     const align = props.element.align ?? props.element.otherProps?.align;
+    const hasNestedElement = props.element.children.some((child: Descendant) =>
+      Element.isElement(child),
+    );
 
     return (
       <div
@@ -47,7 +50,7 @@ export const ReadonlyParagraph: React.FC<ElementProps<ParagraphNode>> =
         className={classNames({})}
         data-align={align}
         style={{
-          display: !!str || !!props.children?.at(0).type ? undefined : 'none',
+          display: str || hasNestedElement ? undefined : 'none',
           textAlign: align,
         }}
       >
