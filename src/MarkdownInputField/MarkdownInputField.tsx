@@ -246,11 +246,24 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     isLoading,
   });
 
-  const markdownEditorPassThroughProps = useMemo(() => {
-    if (!markdownProps) return undefined;
-    const { readonly: _readonlyFromMarkdownProps, ...rest } = markdownProps;
-    return rest;
-  }, [markdownProps]);
+  const { markdownEditorRestProps, markdownPropsEditorOnChange } =
+    useMemo(() => {
+      if (!markdownProps) {
+        return {
+          markdownEditorRestProps: undefined,
+          markdownPropsEditorOnChange: undefined,
+        };
+      }
+      const {
+        readonly: _readonlyFromMarkdownProps,
+        onChange: mdEditorOnChange,
+        ...rest
+      } = markdownProps;
+      return {
+        markdownEditorRestProps: rest,
+        markdownPropsEditorOnChange: mdEditorOnChange,
+      };
+    }, [markdownProps]);
 
   const editorReadonly = isLoading || !!props.typing;
 
@@ -428,7 +441,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   ...tagInputProps,
                 }}
                 initValue={props.value}
-                onChange={(value) => {
+                onChange={(value, schema) => {
                   // 检查并限制字符数
                   if (props.maxLength !== undefined) {
                     if (value.length > props.maxLength) {
@@ -437,6 +450,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                       setValue(truncatedValue);
                       props.onChange?.(truncatedValue);
                       props.onMaxLengthExceeded?.(value);
+                      markdownPropsEditorOnChange?.(truncatedValue, schema);
                       // 更新编辑器内容以反映截断后的值
                       markdownEditorRef.current?.store?.setMDContent(
                         truncatedValue,
@@ -450,6 +464,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   onEditorChange(value);
                   setValue(value);
                   props.onChange?.(value);
+                  markdownPropsEditorOnChange?.(value, schema);
                 }}
                 onFocus={(value, schema, e) => {
                   onFocus?.(value, schema, e);
@@ -473,7 +488,7 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   plainTextOnly: true,
                   ...props.pasteConfig,
                 }}
-                {...markdownEditorPassThroughProps}
+                {...markdownEditorRestProps}
                 readonly={editorReadonly}
               >
                 {props?.quickActionRender ||
