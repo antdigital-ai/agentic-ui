@@ -1,6 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import type { MarkdownEditorProps } from '../../MarkdownEditor';
 import { MarkdownInputField } from '../MarkdownInputField';
 import { CreateRecognizer } from '../VoiceInput';
 
@@ -421,6 +422,23 @@ describe('MarkdownInputField - click to focus', () => {
         '[class*="markdown-editor"][class*="readonly"]',
       ),
     ).toBeTruthy();
+  });
+
+  it('should ignore markdownProps.readonly so the field stays editable', async () => {
+    render(
+      <MarkdownInputField
+        markdownProps={{ readonly: true } satisfies MarkdownEditorProps}
+      />,
+    );
+    const editorContent = screen.getByTestId(
+      'markdown-input-field-editor-content',
+    );
+    await waitFor(() => {
+      const editable = editorContent.querySelector(
+        '[contenteditable="true"]',
+      );
+      expect(editable).toBeTruthy();
+    });
   });
 
   it('should allow clicking on the editor area', () => {

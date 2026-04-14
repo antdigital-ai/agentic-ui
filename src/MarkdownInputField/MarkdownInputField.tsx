@@ -1,6 +1,6 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { memo, useContext, useState } from 'react';
+import React, { memo, useContext, useMemo, useState } from 'react';
 import { TextLoading } from '../Components/lotties/TextLoading';
 import { useLocale } from '../I18n';
 import { BaseMarkdownEditor } from '../MarkdownEditor';
@@ -246,6 +246,12 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
     isLoading,
   });
 
+  const markdownEditorPassThroughProps = useMemo(() => {
+    if (!markdownProps) return undefined;
+    const { readonly: _readonlyFromMarkdownProps, ...rest } = markdownProps;
+    return rest;
+  }, [markdownProps]);
+
   const editorReadonly = isLoading || !!props.typing;
 
   const sendActionsNode = useSendActionsNode({
@@ -407,7 +413,6 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                 floatBar={{
                   enable: false,
                 }}
-                readonly={editorReadonly}
                 contentStyle={{
                   alignItems: 'flex-start',
                   padding: 'var(--padding-3x)',
@@ -468,7 +473,8 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   plainTextOnly: true,
                   ...props.pasteConfig,
                 }}
-                {...markdownProps}
+                {...markdownEditorPassThroughProps}
+                readonly={editorReadonly}
               >
                 {props?.quickActionRender ||
                 props.refinePrompt?.enable ||
