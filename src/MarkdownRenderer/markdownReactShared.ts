@@ -1013,7 +1013,99 @@ const renderMarkdownBlock = (
   }
 };
 
-/** 按双换行拆块，尊重代码围栏边界 */
+const isPipeTableRowLine = (line: string): boolean =>
+  line.trimStart().startsWith('|');
+
+const parsePipeRowCellsForSplit = (line: string): string[] | null => {
+  const trimmedLine = line.trim();
+  if (!trimmedLine.startsWith('|') || !trimmedLine.endsWith('|')) {
+    return null;
+  }
+  const cells = trimmedLine
+    .split('|')
+    .slice(1, -1)
+    .map((cell) => cell.trim());
+  if (!cells.length) return null;
+  return cells;
+};
+
+/** GFM 对齐行单元格：`:---`、`:--:`、`---:` 等，中间至少 1 个 `-` */
+const isTableSeparatorCellForSplit = (cell: string): boolean =>
+  /^:?-{1,}:?$/.test(cell);
+
+/**
+ * 连续管道行是否构成完整 GFM 表格（不含表后空行）。
+ * 用于拆块：表完成后可密封，避免与后续段落同处 tail 反复 parse。
+ */
+const isCompleteGfmPipeTableLines = (tableLines: string[]): boolean => {
+  if (tableLines.length < 3) return false;
+  const [header, separator, ...dataRows] = tableLines;
+  const headerCells = parsePipeRowCellsForSplit(header);
+  if (!headerCells) return false;
+  const separatorCells = parsePipeRowCellsForSplit(separator);
+  if (
+    !separatorCells ||
+    separatorCells.length !== headerCells.length ||
+    !separatorCells.every(isTableSeparatorCellForSplit)
+  ) {
+    return false;
+  }
+  for (const row of dataRows) {
+    const cells = parsePipeRowCellsForSplit(row);
+    if (!cells || cells.length !== headerCells.length) return false;
+  }
+  return true;
+};
+
+/**
+ * 若缓冲区以「完整 GFM 管道表 +（可选空行）+ 非管道续行」结尾，则拆出表为独立块。
+ * tail 保留表后的空行与续行，以便流式末块继续增长且与单块解析字符串一致。
+ */
+const maybeSplitTrailingCompletedTable = (
+  current: string[],
+  blocks: string[],
+): void => {
+  if (current.length < 4) return;
+  const ls = current;
+
+  let lastNonEmpty = ls.length - 1;
+  while (lastNonEmpty >= 0 && ls[lastNonEmpty].trim() === '') {
+    lastNonEmpty -= 1;
+  }
+  if (lastNonEmpty < 0) return;
+  // 末尾仍是管道行：仍在扩表或仅表后空白，勿拆（避免 table+\n 时误封）
+  if (isPipeTableRowLine(ls[lastNonEmpty])) return;
+
+  let end = lastNonEmpty - 1;
+  while (end >= 0 && ls[end].trim() === '') end -= 1;
+  if (end < 0 || !isPipeTableRowLine(ls[end])) return;
+
+  let i = end;
+  while (i >= 0 && isPipeTableRowLine(ls[i])) i -= 1;
+  const tableLines = ls.slice(i + 1, end + 1);
+  if (tableLines.length < 3 || !isCompleteGfmPipeTableLines(tableLines)) {
+    return;
+  }
+
+  const prefixLines = ls.slice(0, i + 1);
+  const prefixJoined = prefixLines.join('\n');
+  const tableJoined = tableLines.join('\n');
+  const tailLines = ls.slice(end + 1);
+
+  if (prefixJoined) {
+    blocks.push(prefixJoined);
+  }
+  blocks.push(tableJoined);
+
+  current.length = 0;
+  // 保留「表末行之后」的首个换行：仅用 slice 会丢掉行分隔符，导致 tail 与原文前缀不一致
+  const tailStr = tailLines.length ? `\n${tailLines.join('\n')}` : '';
+  if (tailStr) {
+    current.push(...tailStr.split('\n'));
+  }
+};
+
+/** 按双换行拆块，尊重代码围栏边界；完整管道表结束后拆块（利于流式缓存） */
 const splitMarkdownBlocks = (content: string): string[] => {
   const lines = content.split('\n');
   const blocks: string[] = [];
@@ -1022,20 +1114,32 @@ const splitMarkdownBlocks = (content: string): string[] => {
 
   for (const line of lines) {
     const trimmed = line.trimStart();
-    if (trimmed.startsWith('```') || trimmed.startsWith('~~~')) {
-      inFence = !inFence;
-    }
-    if (!inFence && line === '' && current.length > 0) {
+    const isFenceLine =
+      trimmed.startsWith('```') || trimmed.startsWith('~~~');
+
+    if (!inFence && !isFenceLine && line === '' && current.length > 0) {
       const prev = current[current.length - 1];
       if (prev === '') {
         // 触发分割的是「第二个连续空行」，不应并入上一块末尾，否则与单块解析结果字符串不一致、缓存失效
         const withoutTrailingBlank = current.slice(0, -1);
-        blocks.push(withoutTrailingBlank.join('\n'));
+        const flushed = withoutTrailingBlank.join('\n');
+        if (flushed) {
+          blocks.push(flushed);
+        }
         current = [];
         continue;
       }
     }
+
+    if (isFenceLine) {
+      inFence = !inFence;
+    }
+
     current.push(line);
+
+    if (!inFence) {
+      maybeSplitTrailingCompletedTable(current, blocks);
+    }
   }
   if (current.length > 0) {
     blocks.push(current.join('\n'));

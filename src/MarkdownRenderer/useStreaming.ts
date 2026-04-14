@@ -68,7 +68,7 @@ const parsePipeRowCells = (line: string): string[] | null => {
 };
 
 const isTableSeparatorCell = (cell: string): boolean => {
-  return /^:?-{3,}:?$/.test(cell);
+  return /^:?-{1,}:?$/.test(cell);
 };
 
 /**

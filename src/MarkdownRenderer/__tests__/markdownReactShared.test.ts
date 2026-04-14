@@ -48,6 +48,30 @@ describe('splitMarkdownBlocks', () => {
     const result = splitMarkdownBlocks(md);
     expect(result.length).toBe(3);
   });
+
+  it('splits a completed pipe table from following content on a single blank line', () => {
+    const table =
+      '| a | b |\n|:-:|:-:|\n| 1 | 2 |';
+    const md = `${table}\n\n### Next`;
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe(table);
+    expect(result[1]).toBe('\n\n### Next');
+  });
+
+  it('keeps prose and fenced block in one chunk without double blank between them', () => {
+    const md = 'Intro\n```mermaid\nx\n```\n\nAfter';
+    const result = splitMarkdownBlocks(md);
+    expect(result).toEqual([md]);
+  });
+
+  it('does not split pipe table until the table is complete', () => {
+    const partial =
+      '| a | b |\n|:-:|:-:|\n| 1 |';
+    const result = splitMarkdownBlocks(`${partial}\n\nMore`);
+    expect(result.length).toBe(1);
+    expect(result[0]).toBe(`${partial}\n\nMore`);
+  });
 });
 
 describe('createHastProcessor', () => {
