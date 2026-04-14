@@ -441,9 +441,11 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
     return bubbleList.map((item, index) => {
       const isLast = bubbleList.length - 1 === index;
       const placement = item.role === 'user' ? 'right' : 'left';
-      // 保持向后兼容性，设置isLatest
-      (item as any).isLatest = isLast;
-      (item as any).isLast = isLast;
+      const originDataWithFlags = {
+        ...item,
+        isLatest: isLast,
+        isLast,
+      };
 
       let itemKey: string;
       if (item.id === LOADING_FLAT) {
@@ -468,51 +470,57 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
       }
 
       const bubbleElement = (
-        <Bubble
+        <div
           key={itemKey}
-          data-id={item.id}
-          avatar={{
-            ...(item.role === 'user' ? userMeta : assistantMeta),
-            ...(item as any).meta,
-          }}
-          preMessage={bubbleList[index - 1]}
-          id={item.id}
-          style={{
-            ...styles?.bubbleListItemStyle,
-          }}
-          originData={item}
-          placement={placement}
-          time={item.updateAt || item.createAt}
-          deps={deps}
-          pure={props.pure}
-          bubbleListRef={bubbleListRef}
-          bubbleRenderConfig={bubbleRenderConfig}
-          classNames={classNames}
-          bubbleRef={props.bubbleRef}
-          markdownRenderConfig={markdownRenderConfig}
-          docListProps={props.docListProps}
-          styles={{
-            ...styles,
-            bubbleListItemContentStyle: {
-              ...styles?.bubbleListItemContentStyle,
-              ...(placement === 'right'
-                ? styles?.bubbleListRightItemContentStyle
-                : styles?.bubbleListLeftItemContentStyle),
-            },
-          }}
-          readonly={props.readonly}
-          onReply={props.onReply}
-          onDisLike={props.onDisLike}
-          onDislike={props.onDislike}
-          onLike={props.onLike}
-          onCancelLike={props.onCancelLike}
-          onLikeCancel={props.onLikeCancel}
-          onAvatarClick={props.onAvatarClick}
-          onDoubleClick={props.onDoubleClick}
-          customConfig={props?.bubbleRenderConfig?.customConfig}
-          shouldShowCopy={props.shouldShowCopy}
-          shouldShowVoice={props.shouldShowVoice}
-        />
+          style={{ display: 'contents' }}
+          data-bubble-list-item
+          data-is-last={isLast ? 'true' : 'false'}
+        >
+          <Bubble
+            data-id={item.id}
+            avatar={{
+              ...(item.role === 'user' ? userMeta : assistantMeta),
+              ...(item as any).meta,
+            }}
+            preMessage={bubbleList[index - 1]}
+            id={item.id}
+            style={{
+              ...styles?.bubbleListItemStyle,
+            }}
+            originData={originDataWithFlags}
+            placement={placement}
+            time={item.updateAt || item.createAt}
+            deps={deps}
+            pure={props.pure}
+            bubbleListRef={bubbleListRef}
+            bubbleRenderConfig={bubbleRenderConfig}
+            classNames={classNames}
+            bubbleRef={props.bubbleRef}
+            markdownRenderConfig={markdownRenderConfig}
+            docListProps={props.docListProps}
+            styles={{
+              ...styles,
+              bubbleListItemContentStyle: {
+                ...styles?.bubbleListItemContentStyle,
+                ...(placement === 'right'
+                  ? styles?.bubbleListRightItemContentStyle
+                  : styles?.bubbleListLeftItemContentStyle),
+              },
+            }}
+            readonly={props.readonly}
+            onReply={props.onReply}
+            onDisLike={props.onDisLike}
+            onDislike={props.onDislike}
+            onLike={props.onLike}
+            onCancelLike={props.onCancelLike}
+            onLikeCancel={props.onLikeCancel}
+            onAvatarClick={props.onAvatarClick}
+            onDoubleClick={props.onDoubleClick}
+            customConfig={props?.bubbleRenderConfig?.customConfig}
+            shouldShowCopy={props.shouldShowCopy}
+            shouldShowVoice={props.shouldShowVoice}
+          />
+        </div>
       );
 
       // 如果启用了懒加载，用 LazyElement 包裹

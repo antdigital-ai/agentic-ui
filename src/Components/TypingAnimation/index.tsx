@@ -2,7 +2,14 @@ import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { motion, MotionProps, useInView } from 'framer-motion';
 import { isString } from 'lodash-es';
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { resolveSegments } from '../TextAnimate';
 import { useTypingAnimationStyle } from './style';
 
@@ -23,7 +30,7 @@ export interface TypingAnimationProps extends MotionProps {
   cursorStyle?: 'line' | 'block' | 'underscore';
 }
 
-export function TypingAnimation({
+const TypingAnimationBase = ({
   children,
   words,
   className,
@@ -39,7 +46,7 @@ export function TypingAnimation({
   blinkCursor = true,
   cursorStyle = 'line',
   ...props
-}: TypingAnimationProps) {
+}: TypingAnimationProps) => {
   const MotionComponent = motion(Component, {
     forwardMotionProps: true,
   });
@@ -183,4 +190,8 @@ export function TypingAnimation({
       )}
     </MotionComponent>,
   );
-}
+};
+
+TypingAnimationBase.displayName = 'TypingAnimation';
+
+export const TypingAnimation = memo(TypingAnimationBase);
