@@ -418,6 +418,17 @@ describe('BaseMarkdownEditor', () => {
   });
 
   describe('initSchemaValue 过滤', () => {
+    it('initValue 为空字符串时不应追加重复空段落（保证占位符等单块逻辑）', async () => {
+      render(
+        <BaseMarkdownEditor initValue="" readonly={false} onChange={vi.fn()} />,
+      );
+      await waitFor(() => {
+        expect(capturedInitSchemaValue?.length).toBeGreaterThan(0);
+      });
+      expect(capturedInitSchemaValue.length).toBe(1);
+      expect(capturedInitSchemaValue[0].type).toBe('paragraph');
+    });
+
     it('应过滤掉空 paragraph、空 list、空 listItem、空 heading', async () => {
       const schemaWithEmpties = [
         { type: 'paragraph', children: [] },

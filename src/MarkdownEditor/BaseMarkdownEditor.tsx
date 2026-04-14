@@ -198,8 +198,9 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
     const parseResult = parserMdToSchema(initValue || '', props.plugins);
     let list = parseResult?.schema || [];
 
-    // 如果不是只读模式，添加一个空段落以便编辑
-    if (!props.readonly) {
+    // 非只读时保证末尾有可编辑块：解析结果常已含空段落（如空 initValue），
+    // 再追加会导致 Slate 根下两个空段，Paragraph 的占位符依赖 children.length===1 而失效
+    if (!props.readonly && list.length === 0) {
       list = [...list, EditorUtils.p];
     }
 
