@@ -103,9 +103,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       '& [data-mermaid-svg="true"]': {
-        maxWidth: '100%',
+        display: 'block',
+        maxWidth: 'none',
+        width: 'auto',
         height: 'auto',
-        overflow: 'hidden',
+        overflow: 'visible',
       },
 
       '&-error': {

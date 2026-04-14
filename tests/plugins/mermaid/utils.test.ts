@@ -171,7 +171,7 @@ describe('Mermaid utils', () => {
 
       const svgEl = container.querySelector('svg[data-mermaid-svg]');
       expect(svgEl).toBeTruthy();
-      expect(svgEl?.getAttribute('style')).toContain('max-width: 100%');
+      expect(svgEl?.getAttribute('style')).toContain('max-width: none');
 
       global.DOMParser = OriginalParser;
     });
@@ -185,7 +185,7 @@ describe('Mermaid utils', () => {
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
       const svgElement = container.querySelector('svg');
-      expect(svgElement?.getAttribute('style')).toContain('max-width: 100%');
+      expect(svgElement?.getAttribute('style')).toContain('max-width: none');
       expect(svgElement?.getAttribute('class')).toContain('mermaid-isolated');
       expect(svgElement?.getAttribute('data-mermaid-svg')).toBe('true');
     });

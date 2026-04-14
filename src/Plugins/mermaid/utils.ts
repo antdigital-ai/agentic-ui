@@ -259,8 +259,10 @@ export const renderSvgToContainer = (
 
   if (svgElement) {
     const existingStyle = svgElement.getAttribute('style') || '';
+    // Do not set max-width: 100% — it shrinks the SVG in the DOM and breaks
+    // fit-to-viewport math (viewBox vs clientWidth). Pan/zoom uses transform scale.
     const newStyle =
-      `${existingStyle}; max-width: 100%; height: auto; overflow: hidden;`.trim();
+      `${existingStyle}; display: block; max-width: none; width: auto; height: auto; overflow: visible;`.trim();
     svgElement.setAttribute('style', newStyle);
     svgElement.setAttribute('data-mermaid-svg', 'true');
     svgElement.setAttribute(
@@ -283,7 +285,7 @@ export const renderSvgToContainer = (
     if (extractedSvg) {
       extractedSvg.setAttribute(
         'style',
-        'max-width: 100%; height: auto; overflow: hidden;',
+        'display: block; max-width: none; width: auto; height: auto; overflow: visible;',
       );
       extractedSvg.setAttribute('data-mermaid-svg', 'true');
       wrapper.appendChild(extractedSvg);
