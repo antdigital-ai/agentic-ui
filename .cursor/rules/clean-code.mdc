@@ -27,8 +27,7 @@ alwaysApply: true
    - 代码即文档，代码的结构和逻辑应该清晰易懂，不需要过多的注释
 5. 原子化执行
    - 每个任务都拆分成原子化操作，每个操作都只做一件事
-   - 准备一个 todo.md 文件，记录所有任务
-   - 每次完成一个任务，就更新 todo.md 文件
+   - 复杂任务用 issue / 设计说明或 PR 描述跟踪进度，不在仓库里维护单独的 todo 清单文件
    - 生成 commit 使用中文
 
 ## Constants Over Magic Numbers
