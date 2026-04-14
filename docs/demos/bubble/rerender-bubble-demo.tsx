@@ -7,7 +7,7 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import { Button, Radio, Space } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { RERENDER_CARD_APPENDIX } from '../shared/rerenderCardAppendix';
 
 const rerenderDemoMarkdown = `> 用户再次要求基于中国 10 年的 GDP 数据，用 markdown 语法绘制图表展示 2020-2026 年 GDP 增长情况。这个请求我已经回答过很多次了，我应该提供一致的回复。
@@ -105,6 +105,25 @@ const splitBlocks = (text: string): string[] => {
   return blocks;
 };
 
+const STATIC_INTRO_AVATAR =
+  'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original';
+
+/** 与流式气泡 id 必须不同，否则 BubbleList 内 React key 冲突会导致整列表异常重挂载 */
+const STATIC_INTRO_BUBBLE: MessageBubbleData = {
+  id: 'rerender-bubble-intro',
+  role: 'assistant',
+  content:
+    '下面模拟 **流式追加**：未完成前保持 `isFinished: false`，结束时再置为 `true` 以配合队列与动画策略。',
+  createAt: 1,
+  updateAt: 1,
+  isFinished: false,
+  meta: {
+    avatar: STATIC_INTRO_AVATAR,
+    title: 'MarkdownRenderer · Bubble',
+    description: 'MarkdownRenderer · 流式',
+  },
+};
+
 const createInitialMessage = (): MessageBubbleData => ({
   id: 'rerender-bubble-stream',
   role: 'assistant',
@@ -113,8 +132,7 @@ const createInitialMessage = (): MessageBubbleData => ({
   updateAt: Date.now(),
   isFinished: false,
   meta: {
-    avatar:
-      'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original',
+    avatar: STATIC_INTRO_AVATAR,
     title: 'MarkdownRenderer · Bubble',
     description: '流式演示',
   },
@@ -257,6 +275,20 @@ const RerenderBubbleDemo = () => {
     };
   }, [restartKey]);
 
+  const markdownRenderConfig = useMemo(
+    () => ({
+      renderMode: 'markdown' as const,
+      queueOptions: { animate: false },
+      streamingParagraphAnimation: false,
+    }),
+    [],
+  );
+
+  const bubbleListData = useMemo(
+    () => [{ ...STATIC_INTRO_BUBBLE }, message],
+    [message],
+  );
+
   return (
     <div
       style={{
@@ -307,30 +339,8 @@ const RerenderBubbleDemo = () => {
 
       <div style={{ background: '#fff', borderRadius: 8, padding: 16 }}>
         <BubbleList
-          bubbleList={[
-            {
-              id: 'rerender-bubble-stream',
-              role: 'assistant',
-              content:
-                '下面模拟 **流式追加**：未完成前保持 `isFinished: false`，结束时再置为 `true` 以配合队列与动画策略。',
-              createAt: Date.now(),
-              updateAt: Date.now(),
-              isFinished: false,
-              meta: {
-                avatar:
-                  'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original',
-                title: 'MarkdownRenderer · Bubble',
-                description: 'MarkdownRenderer · 流式',
-              },
-            },
-            message,
-          ]}
-          markdownRenderConfig={{
-            renderMode: 'markdown',
-            queueOptions: { animate: false },
-            // 与旧版一致：未传时曾无末段段落淡入；若需关闭请显式 false
-            streamingParagraphAnimation: false,
-          }}
+          bubbleList={bubbleListData}
+          markdownRenderConfig={markdownRenderConfig}
           shouldShowCopy={false}
         />
       </div>
