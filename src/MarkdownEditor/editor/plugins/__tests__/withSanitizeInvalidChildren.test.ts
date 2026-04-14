@@ -1,4 +1,6 @@
 import { createEditor, Editor, Node } from 'slate';
+import { withReact } from 'slate-react';
+import { withMarkdown } from '../withMarkdown';
 import { withSanitizeInvalidChildren } from '../withSanitizeInvalidChildren';
 
 describe('withSanitizeInvalidChildren', () => {
@@ -94,5 +96,22 @@ describe('withSanitizeInvalidChildren', () => {
     expect(() =>
       editor.normalizeNode([{ text: 'hi' }, [0, 0]] as any),
     ).not.toThrow();
+  });
+
+  it('wraps bare text at editor root into a paragraph (fixes duplicate DOM / broken delete)', () => {
+    const editor = withSanitizeInvalidChildren(withMarkdown(withReact(createEditor())));
+    editor.children = [
+      { text: '山西' },
+      { type: 'paragraph', children: [{ text: '山西' }] },
+    ] as any;
+
+    Editor.normalize(editor, { force: true });
+
+    expect(editor.children).toEqual([
+      {
+        type: 'paragraph',
+        children: [{ text: '山西' }],
+      },
+    ]);
   });
 });

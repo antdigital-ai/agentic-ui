@@ -32,6 +32,82 @@ const createDefaultBlock = () => ({
   children: [{ text: '' }],
 });
 
+/**
+ * Slate 要求 editor 根下只能是块级节点；若出现裸 Text 或根级 inline，
+ * 会导致 DOM 异常（如文本与块并列）、重复显示与 Backspace 失效。
+ * 将连续的「非块」根子节点合并为一个段落包裹。
+ */
+const isSingletonTextParagraph = (node: Node): node is Element & { children: [Text] } => {
+  if (!Element.isElement(node) || (node as { type?: string }).type !== 'paragraph') {
+    return false;
+  }
+  const ch = (node as { children?: unknown }).children;
+  if (!Array.isArray(ch) || ch.length !== 1 || !Text.isText(ch[0])) {
+    return false;
+  }
+  return true;
+};
+
+/**
+ * 裸 Text 与紧随其后的「同文单段」常来自非法根结构的双份展示；保留块节点、丢弃缓冲重复。
+ */
+const bufferMatchesFollowingSingletonParagraph = (
+  buffer: Node[],
+  block: Node,
+): boolean => {
+  if (buffer.length !== 1 || !Text.isText(buffer[0])) return false;
+  if (!isSingletonTextParagraph(block)) return false;
+  return buffer[0].text === Node.string(block);
+};
+
+const ensureRootOnlyBlockChildren = (editor: Editor, nodes: Node[]): Node[] => {
+  const out: Node[] = [];
+  let nonBlockBuffer: Node[] = [];
+
+  const flushNonBlocks = () => {
+    if (nonBlockBuffer.length === 0) return;
+    out.push({
+      type: 'paragraph',
+      children: nonBlockBuffer,
+    } as Node);
+    nonBlockBuffer = [];
+  };
+
+  for (const child of nodes) {
+    if (!isValidChild(child)) continue;
+    if (Text.isText(child)) {
+      nonBlockBuffer.push(child);
+      continue;
+    }
+    if (Element.isElement(child) && Editor.isBlock(editor, child)) {
+      if (bufferMatchesFollowingSingletonParagraph(nonBlockBuffer, child)) {
+        nonBlockBuffer = [];
+        out.push(child);
+        continue;
+      }
+      flushNonBlocks();
+      out.push(child);
+      continue;
+    }
+    nonBlockBuffer.push(child);
+  }
+  flushNonBlocks();
+  return out.length > 0 ? out : [createDefaultBlock()];
+};
+
+const rootHasNonBlockChild = (editor: Editor, childList: unknown[]): boolean => {
+  for (let i = 0; i < childList.length; i += 1) {
+    if (!(i in childList)) continue;
+    const c = childList[i];
+    if (!isValidChild(c)) continue;
+    if (Text.isText(c as Node)) return true;
+    if (Element.isElement(c as Node) && !Editor.isBlock(editor, c as Node)) {
+      return true;
+    }
+  }
+  return false;
+};
+
 const rebuildElement = (node: Node): Node => {
   let children = getChildList(node).filter(isValidChild) as Node[];
   if (
@@ -192,7 +268,17 @@ export const withSanitizeInvalidChildren = (editor: Editor) => {
         const fixedTop = compactEditorRootChildren(childList);
         const nextNodes =
           fixedTop.length === 0 ? [createDefaultBlock()] : fixedTop;
-        EditorUtils.replaceEditorContent(editor, nextNodes);
+        const wrapped = ensureRootOnlyBlockChildren(editor, nextNodes);
+        EditorUtils.replaceEditorContent(editor, wrapped);
+        normalizeNode(entry);
+        return;
+      }
+      if (rootHasNonBlockChild(editor, childList)) {
+        const wrapped = ensureRootOnlyBlockChildren(
+          editor,
+          childList.filter(isValidChild) as Node[],
+        );
+        EditorUtils.replaceEditorContent(editor, wrapped);
         normalizeNode(entry);
         return;
       }
