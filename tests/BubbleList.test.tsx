@@ -1101,6 +1101,45 @@ describe('BubbleList', () => {
       expect(observeSpy).toHaveBeenCalled();
     });
 
+    it('lazy 模式下列表行不应使用 display:contents，以便 LazyElement 能观测到几何尺寸', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'user', 'Test message'),
+      ];
+
+      global.IntersectionObserver = class {
+        constructor(public callback: IntersectionObserverCallback) {}
+        observe = (el: Element) => {
+          this.callback(
+            [
+              {
+                isIntersecting: true,
+                target: el,
+              } as IntersectionObserverEntry,
+            ],
+            this as unknown as IntersectionObserver,
+          );
+        };
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+        takeRecords = vi.fn(() => []);
+        root = null;
+        rootMargin = '';
+        thresholds = [];
+      } as any;
+
+      const { container } = render(
+        <BubbleConfigProvide>
+          <BubbleList bubbleList={bubbleList} lazy={{ enable: true }} />
+        </BubbleConfigProvide>,
+      );
+
+      const row = container.querySelector('[data-bubble-list-item]');
+      expect(row).toBeTruthy();
+      const inlineStyle = row?.getAttribute('style') || '';
+      expect(inlineStyle).not.toMatch(/display:\s*contents/);
+      expect(inlineStyle).toMatch(/min-width:\s*0/);
+    });
+
     it('should use default placeholderHeight when not provided', () => {
       const bubbleList: MessageBubbleData[] = [
         createMockBubbleData('1', 'user', 'Test message'),

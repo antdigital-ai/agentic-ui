@@ -505,10 +505,16 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
       }
       const mergedStyles = bubbleMergedStylesRef.current.get(itemKey)!;
 
+      // LazyElement 依赖被观察元素的几何尺寸；display:contents 不产生盒子，会导致
+      // IntersectionObserver 在部分环境下永不触发，气泡永远不渲染。
+      const useLazyWrapper =
+        !!isLazyEnabled &&
+        (props.lazy?.shouldLazyLoad?.(index, totalCount) ?? true);
+
       const bubbleElement = (
         <div
           key={itemKey}
-          style={{ display: 'contents' }}
+          style={useLazyWrapper ? { minWidth: 0, width: '100%' } : { display: 'contents' }}
           data-bubble-list-item
           data-is-last={isLast ? 'true' : 'false'}
         >
@@ -548,7 +554,15 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         </div>
       );
 
-      return { itemKey, bubbleElement, isLazyEnabled, index, item, totalCount };
+      return {
+        itemKey,
+        bubbleElement,
+        isLazyEnabled,
+        index,
+        item,
+        totalCount,
+        useLazyWrapper,
+      };
     });
 
     for (const k of bubbleMergedStylesRef.current.keys()) {
@@ -570,15 +584,12 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         index,
         item,
         totalCount: count,
+        useLazyWrapper,
       }) => {
       // 如果启用了懒加载，用 LazyElement 包裹
       if (lazyOn) {
-        // 检查是否应该对该消息启用懒加载
-        const shouldLazyLoad =
-          props.lazy?.shouldLazyLoad?.(index, count) ?? true;
-
         // 如果不需要懒加载，直接返回元素
-        if (!shouldLazyLoad) {
+        if (!useLazyWrapper) {
           return bubbleElement;
         }
 
