@@ -242,6 +242,33 @@ export const loadMermaid = async (): Promise<MermaidApi> => {
 };
 
 /**
+ * 若整段文本误带了 Markdown 围栏（常见于从 ```mermaid 块复制），去掉首尾围栏再交给 Mermaid。
+ */
+export const stripMermaidMarkdownFence = (raw: string): string => {
+  let text = raw.trim();
+  if (!text.startsWith('```')) {
+    return raw;
+  }
+
+  const firstNewline = text.indexOf('\n');
+  const openLine =
+    firstNewline === -1 ? text.slice(3).trim() : text.slice(3, firstNewline).trim();
+  const openLower = openLine.toLowerCase();
+  if (openLower !== 'mermaid' && !openLower.startsWith('mermaid ')) {
+    return raw;
+  }
+
+  const bodyStart = firstNewline === -1 ? text.length : firstNewline + 1;
+  let body = text.slice(bodyStart);
+  const closeIdx = body.lastIndexOf('```');
+  if (closeIdx !== -1) {
+    body = body.slice(0, closeIdx);
+  }
+
+  return body.trimEnd();
+};
+
+/**
  * 渲染 SVG 到容器
  */
 export const renderSvgToContainer = (

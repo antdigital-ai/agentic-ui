@@ -156,6 +156,26 @@ describe('useMermaidRender', () => {
       expect(result.current.renderedCode).toBe('graph TD');
     });
 
+    it('应在整段为 ```mermaid 围栏时把内文传给 mermaid.render', async () => {
+      const mockRender = vi.fn().mockResolvedValue({ svg: '<svg></svg>' });
+      mockLoadMermaid.mockResolvedValue({ render: mockRender });
+
+      const fenced =
+        '```mermaid\nflowchart LR\n  A[政策] --> B[装机]\n```';
+
+      renderHook(() => useMermaidRender(fenced, divRef, 'test-id', true));
+
+      await act(async () => {
+        vi.advanceTimersByTime(200);
+        await vi.runAllTimersAsync();
+      });
+
+      expect(mockRender).toHaveBeenCalledWith(
+        'test-id',
+        'flowchart LR\n  A[政策] --> B[装机]',
+      );
+    });
+
     it('应该处理空代码（trim 后为空）', async () => {
       const { result } = renderHook(() =>
         useMermaidRender('   ', divRef, 'test-id', true),

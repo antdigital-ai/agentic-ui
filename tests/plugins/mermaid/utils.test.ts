@@ -7,6 +7,7 @@ import {
   cleanupTempElement,
   loadMermaid,
   renderSvgToContainer,
+  stripMermaidMarkdownFence,
 } from '../../../src/Plugins/mermaid/utils';
 
 // Mock mermaid module
@@ -87,6 +88,22 @@ describe('Mermaid utils', () => {
       // 但我们可以验证 API 的基本结构
       const api = await loadMermaid();
       expect(api).toBeDefined();
+    });
+  });
+
+  describe('stripMermaidMarkdownFence', () => {
+    it('应去掉 ```mermaid 围栏，保留正文', () => {
+      const raw = '```mermaid\nflowchart LR\n  A --> B\n```';
+      expect(stripMermaidMarkdownFence(raw)).toBe('flowchart LR\n  A --> B');
+    });
+
+    it('非 mermaid 围栏或普通文本应原样返回', () => {
+      expect(stripMermaidMarkdownFence('```js\nconst x = 1\n```')).toBe(
+        '```js\nconst x = 1\n```',
+      );
+      expect(stripMermaidMarkdownFence('flowchart LR\nA --> B')).toBe(
+        'flowchart LR\nA --> B',
+      );
     });
   });
 

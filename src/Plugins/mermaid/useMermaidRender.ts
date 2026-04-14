@@ -7,6 +7,7 @@ import {
   createMermaidThemeConfig,
   loadMermaid,
   renderSvgToContainer,
+  stripMermaidMarkdownFence,
 } from './utils';
 
 /**
@@ -75,7 +76,7 @@ export const useMermaidRender = (
           appliedThemeCacheKeyRef.current = themeConfig.cacheKey;
         }
 
-        const trimmedCode = code.trim();
+        const trimmedCode = stripMermaidMarkdownFence(code).trim();
         if (!trimmedCode) {
           renderedSignatureRef.current = '';
           setRenderedCode('');
@@ -87,10 +88,7 @@ export const useMermaidRender = (
           return;
         }
 
-        const { svg } = await api.render(
-          id,
-          trimmedCode.endsWith('```') ? trimmedCode : trimmedCode,
-        );
+        const { svg } = await api.render(id, trimmedCode);
 
         if (latestRenderSignatureRef.current !== currentSignature) {
           timer.current = null;
