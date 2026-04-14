@@ -1,3 +1,13 @@
+/**
+ * Bubble 自定义 memo 比较（见 Bubble.tsx）。
+ *
+ * 维护约定：
+ * - 在 BubbleProps 上新增「会影响渲染」的字段时，必须在此补充比较逻辑，否则可能漏更新。
+ * - `markdownRenderConfig` / `bubbleRenderConfig` / `docListProps` / `customConfig`：按**顶层键**浅比较；
+ *   顶层值为普通对象时再浅比较一层；数组与函数仍按引用比较。父组件用 `useMemo` 稳定子对象引用更佳。
+ * - `originData`：按列出的标量与引用字段比较；`meta` 顶层浅比较；`meta.metadata` 再浅比较一层。
+ *   对 `extra` 等对象请勿原地 mutate，应替换引用，否则可能与 `extra !==` 不一致（若仅改嵌套且未换引用会漏更新）。
+ */
 import type { BubbleMetaData, BubbleProps, MessageBubbleData } from './type';
 
 export const shallowEqualRecord = (
@@ -61,8 +71,60 @@ const shallowEqualClassNames = (
   return true;
 };
 
+/** 配置型 props：顶层浅比较；顶层值为非数组对象时再浅比较一层 */
+const shallowEqualConfigObject = (
+  a: object | undefined | null,
+  b: object | undefined | null,
+): boolean => {
+  if (a === b) return true;
+  if (!a || !b) return !a && !b;
+  const ra = a as Record<string, unknown>;
+  const rb = b as Record<string, unknown>;
+  const keys = new Set([...Object.keys(ra), ...Object.keys(rb)]);
+  for (const k of keys) {
+    if (!(k in ra) || !(k in rb)) return false;
+    const va = ra[k];
+    const vb = rb[k];
+    if (va === vb) continue;
+    if (
+      va &&
+      vb &&
+      typeof va === 'object' &&
+      typeof vb === 'object' &&
+      !Array.isArray(va) &&
+      !Array.isArray(vb)
+    ) {
+      if (!shallowEqualRecord(va as Record<string, unknown>, vb as Record<string, unknown>)) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+  return true;
+};
+
 const metaAffectsBubble = (m: BubbleMetaData | undefined): boolean =>
-  Boolean(m?.avatar || m?.title || m?.name || m?.description || m?.backgroundColor);
+  Boolean(
+    m?.avatar ||
+      m?.title ||
+      m?.name ||
+      m?.description ||
+      m?.backgroundColor ||
+      (m?.metadata && Object.keys(m.metadata).length > 0),
+  );
+
+const metaEqualForMemo = (a: BubbleMetaData | undefined, b: BubbleMetaData | undefined): boolean => {
+  if (a === b) return true;
+  if (!shallowEqualRecord((a || {}) as Record<string, unknown>, (b || {}) as Record<string, unknown>)) {
+    return false;
+  }
+  const ma = a?.metadata;
+  const mb = b?.metadata;
+  if (ma === mb) return true;
+  if (!ma || !mb) return !ma && !mb;
+  return shallowEqualRecord(ma as Record<string, unknown>, mb as Record<string, unknown>);
+};
 
 const originDataEqualForMemo = (
   a: MessageBubbleData | undefined,
@@ -90,10 +152,7 @@ const originDataEqualForMemo = (
   }
   if (a.meta === b.meta) return true;
   if (!metaAffectsBubble(a.meta) && !metaAffectsBubble(b.meta)) return true;
-  return shallowEqualRecord(
-    (a.meta || {}) as Record<string, unknown>,
-    (b.meta || {}) as Record<string, unknown>,
-  );
+  return metaEqualForMemo(a.meta, b.meta);
 };
 
 const preMessageEqualForMemo = (
@@ -143,10 +202,28 @@ export const bubblePropsAreEqual = (
   if (!originDataEqualForMemo(prev.originData, next.originData)) return false;
   if (!preMessageEqualForMemo(prev.preMessage, next.preMessage)) return false;
 
-  if (prev.markdownRenderConfig !== next.markdownRenderConfig) return false;
-  if (prev.bubbleRenderConfig !== next.bubbleRenderConfig) return false;
-  if (prev.docListProps !== next.docListProps) return false;
-  if (prev.customConfig !== next.customConfig) return false;
+  if (
+    !shallowEqualConfigObject(
+      prev.markdownRenderConfig as object | undefined,
+      next.markdownRenderConfig as object | undefined,
+    )
+  ) {
+    return false;
+  }
+  if (
+    !shallowEqualConfigObject(
+      prev.bubbleRenderConfig as object | undefined,
+      next.bubbleRenderConfig as object | undefined,
+    )
+  ) {
+    return false;
+  }
+  if (!shallowEqualConfigObject(prev.docListProps as object | undefined, next.docListProps as object | undefined)) {
+    return false;
+  }
+  if (!shallowEqualConfigObject(prev.customConfig as object | undefined, next.customConfig as object | undefined)) {
+    return false;
+  }
   if (prev.bubbleListRef !== next.bubbleListRef) return false;
   if (prev.bubbleRef !== next.bubbleRef) return false;
 

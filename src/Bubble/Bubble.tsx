@@ -114,5 +114,5 @@ const BubbleComponent: React.FC<
 
 BubbleComponent.displayName = 'Bubble';
 
-// 自定义比较：列表侧常传入新的 styles / avatar 对象引用，避免无数据变化时整表重绘
+// 自定义比较：列表侧常传入新的 styles / avatar 对象引用；扩展 props 时同步 bubblePropsAreEqual
 export const Bubble = memo(BubbleComponent, bubblePropsAreEqual);

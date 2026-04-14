@@ -1567,6 +1567,9 @@ export default App;
    />
    ```
 
+4. **列表与 Bubble 的 memo 行为**  
+   `Bubble` 使用自定义 `memo` 比较，避免列表每次渲染因 `styles` / `avatar` 等新对象引用触发整表重绘。更新 `BubbleProps` 或 `originData` 时：对 `extra`、`meta` 等对象请**替换引用**（不可变更新），勿仅原地修改嵌套字段；`markdownRenderConfig` 等配置对象若每次 `render` 新建，请用 `useMemo` 稳定子对象引用。扩展 `BubbleProps` 时需在 `bubblePropsAreEqual` 中同步维护比较逻辑。
+
 ### 常见问题解决
 
 **Q: 如何实现消息流式更新？**
