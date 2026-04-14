@@ -96,6 +96,41 @@ describe('Chart Configuration Parsing', () => {
       }
     });
 
+    it('y 为短名且表头为全角括号单位时应解析为图表并规范 y 为表头列名', () => {
+      const markdown = `<!-- {"chartType": "column", "x": "年份", "y": "GDP总量", "title": "中国GDP增长趋势（2020-2025）"} -->
+| 年份 | GDP总量（万亿元） |
+| :--- | ---: |
+| 2020 | 103.49 |
+| 2021 | 117.38 |`;
+
+      const result = parserMarkdownToSlateNode(markdown);
+      const cardNode = result.schema.find((node: any) => node.type === 'card');
+      expect(cardNode).toBeDefined();
+
+      const findChartNode = (node: any): any => {
+        if (node.type === 'chart') return node;
+        if (node.children) {
+          for (const child of node.children) {
+            const found = findChartNode(child);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+
+      const chartNode = findChartNode(cardNode);
+      expect(chartNode).toBeDefined();
+      if (chartNode) {
+        const config = chartNode.otherProps?.config || chartNode.otherProps;
+        const chartConfig = Array.isArray(config) ? config[0] : config;
+        expect(chartConfig?.chartType).toBe('column');
+        expect(chartConfig?.x).toBe('年份');
+        expect(chartConfig?.y).toBe('GDP总量（万亿元）');
+        const row = chartNode.otherProps?.dataSource?.[0];
+        expect(row?.['GDP总量（万亿元）']).toBe('103.49');
+      }
+    });
+
     it('应该处理饼图配置', () => {
       const markdown = `<!-- {"chartType": "pie", "x": "技术路线", "y": "市场份额(%)", "title": "2030年中国新能源汽车技术路线预测"} -->
 | 技术路线 | 市场份额(%) |

@@ -112,6 +112,53 @@ export const normalizeFieldName = (fieldName: string): string => {
     .trim();
 };
 
+/** 表头列名在「逻辑名」后仅跟括号单位说明时的后缀，如 GDP总量（万亿元）、销量(万台) */
+const TRAILING_UNIT_SUFFIX_PATTERN = /^(\s*[（(][^）)]+[）)])+\s*$/;
+
+/**
+ * 判断表头列名 columnKey 是否对应注释里配置的轴字段 configuredField
+ *（精确相等，或列名为「配置名 + 中英文括号内的单位/补充说明」）
+ */
+export const columnKeyMatchesConfiguredField = (
+  columnKey: string,
+  configuredField: string,
+): boolean => {
+  const ck = (columnKey || '').trim();
+  const f = (configuredField || '').trim();
+  if (!ck || !f) return false;
+  if (ck === f) return true;
+  if (!ck.startsWith(f)) return false;
+  const rest = ck.slice(f.length);
+  return rest === '' || TRAILING_UNIT_SUFFIX_PATTERN.test(rest);
+};
+
+/**
+ * 将注释中的 x/y 字段名解析为表格列的 dataIndex（表头可带单位括号而注释写短名）
+ */
+export const resolveChartAxisFieldToColumnKey = (
+  configuredField: string | undefined,
+  columnKeys: string[],
+): string | undefined => {
+  if (configuredField === undefined || configuredField === null) {
+    return configuredField;
+  }
+  const f = configuredField.trim();
+  if (!f) return configuredField;
+  const keySet = new Set(columnKeys);
+  if (keySet.has(f)) return f;
+  const hit = columnKeys.find((k) => columnKeyMatchesConfiguredField(k, f));
+  return hit ?? configuredField;
+};
+
+const normalizeChartConfigAxisFields = (
+  cfg: ChartTypeConfig,
+  columnKeys: string[],
+): ChartTypeConfig => ({
+  ...cfg,
+  x: resolveChartAxisFieldToColumnKey(cfg.x, columnKeys),
+  y: resolveChartAxisFieldToColumnKey(cfg.y, columnKeys),
+});
+
 /**
  * 获取列对齐方式
  */
@@ -224,6 +271,8 @@ export const parseTableOrChart = (
         };
       }) || [];
 
+  const columnDataIndexList = columns.map((c) => c.dataIndex);
+
   const dataSource =
     table?.children?.slice(1)?.map((row) => {
       return row.children?.reduce((acc, cell, index) => {
@@ -283,6 +332,17 @@ export const parseTableOrChart = (
 
   // 如果 chartConfig 是对象且键都是数字（如 {0: {...}}），转换为数组
   chartConfig = convertObjectToArray(chartConfig);
+
+  if (chartConfig) {
+    chartConfig = Array.isArray(chartConfig)
+      ? (chartConfig as ChartTypeConfig[]).map((c) =>
+          normalizeChartConfigAxisFields(c, columnDataIndexList),
+        )
+      : normalizeChartConfigAxisFields(
+          chartConfig as ChartTypeConfig,
+          columnDataIndexList,
+        );
+  }
 
   // 获取 chartType，支持多种配置格式
   const getChartType = (): string | undefined => {
