@@ -73,41 +73,33 @@ describe('EditorUtils', () => {
   });
 
   describe('focus and blur', () => {
-    it('should handle focus with error', () => {
+    it('should log console.error when focus or blur throws', () => {
       const consoleSpy = vi
         .spyOn(console, 'error')
         .mockImplementation(() => {});
-      vi.mocked(ReactEditor.focus).mockImplementation(() => {
+
+      vi.mocked(ReactEditor.focus).mockImplementationOnce(() => {
         throw new Error('Focus error');
       });
-
       EditorUtils.focus(editor);
       expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
-    });
 
-    it('should handle blur with error', () => {
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-      vi.mocked(ReactEditor.blur).mockImplementation(() => {
+      vi.mocked(ReactEditor.blur).mockImplementationOnce(() => {
         throw new Error('Blur error');
       });
-
       EditorUtils.blur(editor);
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledTimes(2);
+
       consoleSpy.mockRestore();
     });
   });
 
   describe('path comparison methods', () => {
-    it('should check if path is previous', () => {
+    it('should compare previous and next paths', () => {
       expect(EditorUtils.isPrevious([0, 0], [0, 1])).toBe(true);
       expect(EditorUtils.isPrevious([0, 1], [0, 0])).toBe(false);
       expect(EditorUtils.isPrevious([0, 0], [1, 0])).toBe(false);
-    });
 
-    it('should check if path is next', () => {
       expect(EditorUtils.isNextPath([0, 0], [0, 1])).toBe(false);
       expect(EditorUtils.isNextPath([0, 1], [0, 0])).toBe(true);
       expect(EditorUtils.isNextPath([0, 0], [1, 0])).toBe(false);
@@ -180,12 +172,9 @@ describe('EditorUtils', () => {
   });
 
   describe('findMediaInsertPath', () => {
-    it('should find media insert path', () => {
-      const result = EditorUtils.findMediaInsertPath(editor);
-      expect(result).toBeDefined();
-    });
+    it('should resolve insert path for default, table, head, paragraph trees', () => {
+      expect(EditorUtils.findMediaInsertPath(editor)).toBeDefined();
 
-    it('should handle table-cell type', () => {
       editor.children = [
         {
           type: 'table',
@@ -202,11 +191,8 @@ describe('EditorUtils', () => {
           ],
         },
       ];
-      const result = EditorUtils.findMediaInsertPath(editor);
-      expect(result).toBeDefined();
-    });
+      expect(EditorUtils.findMediaInsertPath(editor)).toBeDefined();
 
-    it('should handle head type', () => {
       editor.children = [
         { type: 'head', level: 1, children: [{ text: 'Title' }] },
         { type: 'paragraph', children: [{ text: 'Body' }] },
@@ -215,18 +201,14 @@ describe('EditorUtils', () => {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 5 },
       };
-      const result = EditorUtils.findMediaInsertPath(editor);
-      expect(result).toBeDefined();
-    });
+      expect(EditorUtils.findMediaInsertPath(editor)).toBeDefined();
 
-    it('should handle paragraph with text', () => {
       editor.children = [{ type: 'paragraph', children: [{ text: 'Hello' }] }];
       editor.selection = {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 5 },
       };
-      const result = EditorUtils.findMediaInsertPath(editor);
-      expect(result).toBeDefined();
+      expect(EditorUtils.findMediaInsertPath(editor)).toBeDefined();
     });
 
     it('should return null when Editor.nodes returns no match', () => {
@@ -240,14 +222,9 @@ describe('EditorUtils', () => {
   });
 
   describe('findNext', () => {
-    it('should find next path', () => {
-      const result = EditorUtils.findNext(editor, [0, 0]);
-      expect(result).toBeDefined();
-    });
-
-    it('should return undefined when no next path', () => {
-      const result = EditorUtils.findNext(editor, [1, 0]);
-      expect(result).toBeUndefined();
+    it('should return next path or undefined when absent', () => {
+      expect(EditorUtils.findNext(editor, [0, 0])).toBeDefined();
+      expect(EditorUtils.findNext(editor, [1, 0])).toBeUndefined();
     });
   });
 
@@ -578,48 +555,34 @@ describe('EditorUtils', () => {
   });
 
   describe('copyText', () => {
-    it('should copy text from start to end', () => {
+    it('should copy text for range, to document end, and across paths', () => {
       const start: Point = { path: [0, 0], offset: 0 };
-      const end: Point = { path: [0, 0], offset: 5 };
-      const result = EditorUtils.copyText(editor, start, end);
-      expect(typeof result).toBe('string');
-    });
+      const endSame: Point = { path: [0, 0], offset: 5 };
+      expect(typeof EditorUtils.copyText(editor, start, endSame)).toBe(
+        'string',
+      );
+      expect(typeof EditorUtils.copyText(editor, start)).toBe('string');
 
-    it('should copy text from start to end of document', () => {
-      const start: Point = { path: [0, 0], offset: 0 };
-      const result = EditorUtils.copyText(editor, start);
-      expect(typeof result).toBe('string');
-    });
-
-    it('should copy text across multiple nodes when end in different path', () => {
-      const start: Point = { path: [0, 0], offset: 0 };
-      const end: Point = { path: [1, 0], offset: 3 };
-      const result = EditorUtils.copyText(editor, start, end);
-      expect(typeof result).toBe('string');
-      expect(result.length).toBeGreaterThan(0);
+      const endCross: Point = { path: [1, 0], offset: 3 };
+      const cross = EditorUtils.copyText(editor, start, endCross);
+      expect(typeof cross).toBe('string');
+      expect(cross.length).toBeGreaterThan(0);
     });
   });
 
   describe('cutText', () => {
-    it('should cut text from start to end', () => {
+    it('should cut text for range, to document end, and across paths', () => {
       const start: Point = { path: [0, 0], offset: 0 };
-      const end: Point = { path: [0, 0], offset: 5 };
-      const result = EditorUtils.cutText(editor, start, end);
-      expect(Array.isArray(result)).toBe(true);
-    });
+      const endSame: Point = { path: [0, 0], offset: 5 };
+      expect(Array.isArray(EditorUtils.cutText(editor, start, endSame))).toBe(
+        true,
+      );
+      expect(Array.isArray(EditorUtils.cutText(editor, start))).toBe(true);
 
-    it('should cut text from start to end of document', () => {
-      const start: Point = { path: [0, 0], offset: 0 };
-      const result = EditorUtils.cutText(editor, start);
-      expect(Array.isArray(result)).toBe(true);
-    });
-
-    it('should cut text across multiple nodes when end in different path', () => {
-      const start: Point = { path: [0, 0], offset: 0 };
-      const end: Point = { path: [1, 0], offset: 3 };
-      const result = EditorUtils.cutText(editor, start, end);
-      expect(Array.isArray(result)).toBe(true);
-      expect(result.length).toBeGreaterThan(0);
+      const endCross: Point = { path: [1, 0], offset: 3 };
+      const cross = EditorUtils.cutText(editor, start, endCross);
+      expect(Array.isArray(cross)).toBe(true);
+      expect(cross.length).toBeGreaterThan(0);
     });
   });
 
