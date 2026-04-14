@@ -1,19 +1,19 @@
 import { Editor, Element, Node, Path, Range, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { getListType, isListType } from '../../plugins/withListsPlugin';
-import { EditorUtils } from '../editorUtils';
 import {
-  createList,
-  insertTable,
-  insertCodeBlock,
-  toggleQuote,
-  insertHorizontalLine,
-  setHeading,
-  increaseHeadingLevel,
-  decreaseHeadingLevel,
   convertToParagraph,
+  createList,
+  decreaseHeadingLevel,
   getCurrentNodes,
+  increaseHeadingLevel,
+  insertCodeBlock,
+  insertHorizontalLine,
+  insertTable,
+  setHeading,
+  toggleQuote,
 } from '../editorCommands';
+import { EditorUtils } from '../editorUtils';
 
 // Mock Slate's Editor, Transforms, and other dependencies
 vi.mock('slate', () => {
@@ -946,7 +946,9 @@ describe('toggleQuote', () => {
 
     toggleQuote(editor, [paragraphNode, path]);
 
-    expect(Transforms.unwrapNodes).toHaveBeenCalledWith(editor, { at: parentPath });
+    expect(Transforms.unwrapNodes).toHaveBeenCalledWith(editor, {
+      at: parentPath,
+    });
   });
 
   it('should convert head to paragraph before wrapping in quote', () => {

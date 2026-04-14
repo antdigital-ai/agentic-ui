@@ -1,6 +1,9 @@
 import { extractTextFromContent } from './mapOpenAIMessages';
+import type {
+  OpenClawChatMessage,
+  OpenClawChatMessageToolResult,
+} from './openClawTypes';
 import type { OpenAIChatMessage } from './types';
-import type { OpenClawChatMessage, OpenClawChatMessageToolResult } from './openClawTypes';
 
 /**
  * 将单条 OpenClaw 风格消息转为可与 {@link mapOpenAIMessagesToMessageBubbleData} 兼容的 OpenAI 形状（`toolResult` → `tool`）。

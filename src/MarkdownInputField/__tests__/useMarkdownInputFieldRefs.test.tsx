@@ -23,7 +23,8 @@ const makeMockEditorInstance = (isFocused = false) => {
 // ReactEditor.isFocused reads from internal Slate state.  We mock the module
 // so we can control the focused state without mounting a real Slate editor.
 vi.mock('slate-react', async () => {
-  const actual = await vi.importActual<typeof import('slate-react')>('slate-react');
+  const actual =
+    await vi.importActual<typeof import('slate-react')>('slate-react');
   return {
     ...actual,
     ReactEditor: {
@@ -41,8 +42,7 @@ describe('useMarkdownInputFieldRefs — setMDContent sync guard', () => {
   it('calls setMDContent when props.value changes and did not originate from the editor', async () => {
     const setValue = vi.fn();
     const { result, rerender } = renderHook(
-      ({ value }) =>
-        useMarkdownInputFieldRefs({ value, setValue }),
+      ({ value }) => useMarkdownInputFieldRefs({ value, setValue }),
       { initialProps: { value: '' } },
     );
 
@@ -57,14 +57,15 @@ describe('useMarkdownInputFieldRefs — setMDContent sync guard', () => {
 
     await act(async () => {});
 
-    expect(mockEditor.store.setMDContent).toHaveBeenCalledWith('external update');
+    expect(mockEditor.store.setMDContent).toHaveBeenCalledWith(
+      'external update',
+    );
   });
 
   it('skips setMDContent when props.value matches the last editor-emitted value', async () => {
     const setValue = vi.fn();
     const { result, rerender } = renderHook(
-      ({ value }) =>
-        useMarkdownInputFieldRefs({ value, setValue }),
+      ({ value }) => useMarkdownInputFieldRefs({ value, setValue }),
       { initialProps: { value: '' } },
     );
 
@@ -94,8 +95,7 @@ describe('useMarkdownInputFieldRefs — setMDContent sync guard', () => {
 
     const setValue = vi.fn();
     const { result, rerender } = renderHook(
-      ({ value }) =>
-        useMarkdownInputFieldRefs({ value, setValue }),
+      ({ value }) => useMarkdownInputFieldRefs({ value, setValue }),
       { initialProps: { value: 'a' } },
     );
 

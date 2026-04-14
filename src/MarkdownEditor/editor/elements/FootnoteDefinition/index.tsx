@@ -4,7 +4,6 @@ import { Node } from 'slate';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, FootnoteDefinitionNode } from '../../../el';
 import { useEditorStore } from '../../store';
-import { DragHandle } from '../../tools/DragHandle';
 
 export const FootnoteDefinition = (
   props: ElementProps<FootnoteDefinitionNode>,
@@ -47,7 +46,6 @@ export const FootnoteDefinition = (
           store.dragStart(e, markdownContainerRef.current!);
         }}
       >
-        <DragHandle />
         {element.identifier}.
         <span
           style={{

@@ -1,5 +1,5 @@
-import type { Processor } from 'unified';
 import React, { memo, useMemo, useRef } from 'react';
+import type { Processor } from 'unified';
 
 import { renderMarkdownBlock } from '../markdownReactShared';
 import { StreamingAnimationContext } from '../StreamingAnimationContext';
@@ -24,7 +24,10 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
   components,
   streaming,
 }: MarkdownBlockPieceProps) {
-  const lastParsedRef = useRef<{ source: string; node: React.ReactNode } | null>(null);
+  const lastParsedRef = useRef<{
+    source: string;
+    node: React.ReactNode;
+  } | null>(null);
   const cacheRef = useRef<Map<string, React.ReactNode>>(new Map());
 
   const node = useMemo(() => {
@@ -34,7 +37,8 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
     if (variant === 'sealed' || !streaming) {
       const el = renderMarkdownBlock(blockSource, processor, components);
       cacheRef.current.set(blockSource, el);
-      if (variant === 'tail') lastParsedRef.current = { source: blockSource, node: el };
+      if (variant === 'tail')
+        lastParsedRef.current = { source: blockSource, node: el };
       return el;
     }
 

@@ -290,7 +290,8 @@ export const JinjaTemplatePanel: React.FC = () => {
             <div
               style={{
                 padding: 12,
-                color: 'var(--color-text-secondary, var(--color-gray-text-secondary, rgba(0,0,0,0.45)))',
+                color:
+                  'var(--color-text-secondary, var(--color-gray-text-secondary, rgba(0,0,0,0.45)))',
               }}
             >
               {locale.loading}
@@ -300,7 +301,8 @@ export const JinjaTemplatePanel: React.FC = () => {
               <div
                 style={{
                   padding: 12,
-                  color: 'var(--color-text-secondary, var(--color-gray-text-secondary, rgba(0,0,0,0.45)))',
+                  color:
+                    'var(--color-text-secondary, var(--color-gray-text-secondary, rgba(0,0,0,0.45)))',
                 }}
               >
                 {locale['jinja.panel.noTemplates']}

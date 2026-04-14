@@ -11,12 +11,13 @@ import React, {
 } from 'react';
 import { useStyle as useContentStyle } from '../MarkdownEditor/editor/style';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
-import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
+import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { CharacterQueue } from './CharacterQueue';
+import { extractFootnoteDefinitionsFromMarkdown } from './extractFootnoteDefinitions';
+import { AgenticUiFileMapBlockRenderer } from './renderers/AgenticUiFileMapBlockRenderer';
 import { AgenticUiTaskBlockRenderer } from './renderers/AgenticUiTaskBlockRenderer';
 import { AgenticUiToolUseBarBlockRenderer } from './renderers/AgenticUiToolUseBarBlockRenderer';
-import { AgenticUiFileMapBlockRenderer } from './renderers/AgenticUiFileMapBlockRenderer';
 import { ChartBlockRenderer } from './renderers/ChartRenderer';
 import { CodeBlockRenderer } from './renderers/CodeRenderer';
 import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
@@ -28,7 +29,6 @@ import type {
   MarkdownRendererRef,
   RendererBlockProps,
 } from './types';
-import { extractFootnoteDefinitionsFromMarkdown } from './extractFootnoteDefinitions';
 import { useMarkdownToReact } from './useMarkdownToReact';
 import { useStreaming } from './useStreaming';
 
@@ -110,7 +110,11 @@ const DefaultCodeRouter: React.FC<
     const FileMapComp =
       pluginComponents['agentic-ui-filemap'] || AgenticUiFileMapBlockRenderer;
     return (
-      <FileMapComp {...rest} language={language} fileMapConfig={fileMapConfig} />
+      <FileMapComp
+        {...rest}
+        language={language}
+        fileMapConfig={fileMapConfig}
+      />
     );
   }
 

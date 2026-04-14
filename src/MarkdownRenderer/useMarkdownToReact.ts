@@ -2,7 +2,10 @@ import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 
-import { JINJA_DOLLAR_PLACEHOLDER, preprocessNormalizeLeafToContainerDirective } from '../MarkdownEditor/editor/parser/constants';
+import {
+  JINJA_DOLLAR_PLACEHOLDER,
+  preprocessNormalizeLeafToContainerDirective,
+} from '../MarkdownEditor/editor/parser/constants';
 import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,

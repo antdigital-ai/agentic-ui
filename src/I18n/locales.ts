@@ -919,9 +919,12 @@ export const enLabels: typeof cnLabels = {
   'fileType.config': 'Configuration file',
   'fileType.powerpoint': 'PowerPoint presentation',
   // PreviewComponent messages
-  'workspace.file.unsupportedPreview': 'This file cannot be previewed, please download to view.',
+  'workspace.file.unsupportedPreview':
+    'This file cannot be previewed, please download to view.',
   'workspace.file.downloadButton': 'Download',
-  'workspace.file.videoNotSupported': 'Your browser does not support video playback',
-  'workspace.file.audioNotSupported': 'Your browser does not support audio playback',
+  'workspace.file.videoNotSupported':
+    'Your browser does not support video playback',
+  'workspace.file.audioNotSupported':
+    'Your browser does not support audio playback',
   'workspace.file.fileType': 'File type: ',
 };

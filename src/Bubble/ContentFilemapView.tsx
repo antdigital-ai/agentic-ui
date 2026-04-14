@@ -73,7 +73,9 @@ const FilemapItem: React.FC<{
       style={fileViewConfig?.style}
       placement={placement}
       onPreview={
-        events?.onPreview ?? fileMapConfig?.onPreview ?? defaultHandlers.onPreview
+        events?.onPreview ??
+        fileMapConfig?.onPreview ??
+        defaultHandlers.onPreview
       }
       onDownload={events?.onDownload}
       itemRender={fileViewConfig?.itemRender ?? fileMapConfig?.itemRender}
@@ -96,7 +98,14 @@ export const ContentFilemapView: React.FC<{
   fileMapConfig?: FileMapConfig;
   placement?: 'left' | 'right';
   style?: React.CSSProperties;
-}> = ({ blocks, fileViewConfig, fileViewEvents, fileMapConfig, placement, style }) => {
+}> = ({
+  blocks,
+  fileViewConfig,
+  fileViewEvents,
+  fileMapConfig,
+  placement,
+  style,
+}) => {
   if (blocks.length === 0) return null;
   return (
     <div style={style} data-testid="content-filemap-view">

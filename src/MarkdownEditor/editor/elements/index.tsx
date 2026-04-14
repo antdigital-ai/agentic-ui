@@ -11,6 +11,10 @@ import { JINJA_DOLLAR_PLACEHOLDER } from '../parser/constants';
 import { useEditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
 import {
+  AgenticUiFileMapBlock,
+  ReadonlyAgenticUiFileMapBlock,
+} from './AgenticUiBlocks/AgenticUiFileMapBlock';
+import {
   AgenticUiTaskBlock,
   ReadonlyAgenticUiTaskBlock,
 } from './AgenticUiBlocks/AgenticUiTaskBlock';
@@ -18,10 +22,6 @@ import {
   AgenticUiToolUseBarBlock,
   ReadonlyAgenticUiToolUseBarBlock,
 } from './AgenticUiBlocks/AgenticUiToolUseBarBlock';
-import {
-  AgenticUiFileMapBlock,
-  ReadonlyAgenticUiFileMapBlock,
-} from './AgenticUiBlocks/AgenticUiFileMapBlock';
 import { Blockquote } from './Blockquote';
 import { ReadonlyBlockquote } from './Blockquote/ReadonlyBlockquote';
 import { Break } from './Break';

@@ -1,7 +1,7 @@
 import { DeleteOutlined } from '@ant-design/icons';
 import { ConfigProvider, Tooltip } from 'antd';
-import React, { useContext, useRef } from 'react';
 import clsx from 'clsx';
+import React, { useContext, useRef } from 'react';
 import { NodeEntry, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { I18nContext } from '../../../I18n';
@@ -133,9 +133,7 @@ export const ChartAttrToolBar: React.FC<{
       })}
       {readonly ? null : (
         <Tooltip mouseEnterDelay={0.3} title={i18n?.locale?.delete || '删除'}>
-          <div
-            className={clsx(`${baseClassName}-item`, hashId)}
-          >
+          <div className={clsx(`${baseClassName}-item`, hashId)}>
             <DeleteOutlined onClick={remove} />
           </div>
         </Tooltip>

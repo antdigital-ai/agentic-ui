@@ -2,13 +2,7 @@ import { AgenticLayout, ChatLayout } from '@ant-design/agentic-ui';
 import { Button, Space, Tag } from 'antd';
 import React, { useState } from 'react';
 
-const SidebarPanel = ({
-  label,
-  bg,
-}: {
-  label: string;
-  bg: string;
-}) => (
+const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
   <div
     style={{
       height: '100%',
@@ -52,7 +46,14 @@ const CollapseDemo = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
         <Space>
           <Tag color={leftCollapsed ? 'red' : 'green'}>
             leftCollapsed: {String(leftCollapsed)}

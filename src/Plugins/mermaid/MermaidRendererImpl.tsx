@@ -51,7 +51,12 @@ const getSvgNaturalSize = (
 
   const widthAttr = Number.parseFloat(svgElement.getAttribute('width') || '');
   const heightAttr = Number.parseFloat(svgElement.getAttribute('height') || '');
-  if (Number.isFinite(widthAttr) && Number.isFinite(heightAttr) && widthAttr > 0 && heightAttr > 0) {
+  if (
+    Number.isFinite(widthAttr) &&
+    Number.isFinite(heightAttr) &&
+    widthAttr > 0 &&
+    heightAttr > 0
+  ) {
     return {
       width: widthAttr,
       height: heightAttr,
@@ -133,13 +138,13 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     id,
     isVisible,
     {
-        colorBgContainer: token.colorBgContainer,
-        colorBgElevated: token.colorBgElevated,
-        colorText: token.colorText,
-        colorTextSecondary: token.colorTextSecondary,
-        colorBorder: token.colorBorder,
-        colorPrimary: token.colorPrimary,
-        fontFamily: token.fontFamily,
+      colorBgContainer: token.colorBgContainer,
+      colorBgElevated: token.colorBgElevated,
+      colorText: token.colorText,
+      colorTextSecondary: token.colorTextSecondary,
+      colorBorder: token.colorBorder,
+      colorPrimary: token.colorPrimary,
+      fontFamily: token.fontFamily,
     },
   );
 
@@ -224,13 +229,18 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     const usableWidth = Math.max(size.viewportWidth - FIT_PADDING * 2, 1);
     const usableHeight = Math.max(size.viewportHeight - FIT_PADDING * 2, 1);
     const fittedScale = clamp(
-      Math.min(usableWidth / size.diagramWidth, usableHeight / size.diagramHeight),
+      Math.min(
+        usableWidth / size.diagramWidth,
+        usableHeight / size.diagramHeight,
+      ),
       MIN_ZOOM_SCALE,
       MAX_ZOOM_SCALE,
     );
 
-    const centeredPanX = (size.viewportWidth - size.diagramWidth * fittedScale) / 2;
-    const centeredPanY = (size.viewportHeight - size.diagramHeight * fittedScale) / 2;
+    const centeredPanX =
+      (size.viewportWidth - size.diagramWidth * fittedScale) / 2;
+    const centeredPanY =
+      (size.viewportHeight - size.diagramHeight * fittedScale) / 2;
 
     setScale(fittedScale);
     setPanX(centeredPanX);
@@ -250,8 +260,10 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
       }
 
       const viewportRect = viewportElement.getBoundingClientRect();
-      const targetClientX = clientX ?? viewportRect.left + viewportRect.width / 2;
-      const targetClientY = clientY ?? viewportRect.top + viewportRect.height / 2;
+      const targetClientX =
+        clientX ?? viewportRect.left + viewportRect.width / 2;
+      const targetClientY =
+        clientY ?? viewportRect.top + viewportRect.height / 2;
       const relativeX = targetClientX - viewportRect.left;
       const relativeY = targetClientY - viewportRect.top;
 
@@ -298,7 +310,8 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
       }
 
       event.preventDefault();
-      const scaleMultiplier = event.deltaY < 0 ? ZOOM_STEP_RATIO : 1 / ZOOM_STEP_RATIO;
+      const scaleMultiplier =
+        event.deltaY < 0 ? ZOOM_STEP_RATIO : 1 / ZOOM_STEP_RATIO;
       applyScaleAtPoint(scale * scaleMultiplier, event.clientX, event.clientY);
     },
     [applyScaleAtPoint, isRendered, scale],
@@ -327,25 +340,31 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     [isRendered, panX, panY],
   );
 
-  const handlePointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    const panSession = panSessionRef.current;
-    if (!panSession) {
-      return;
-    }
+  const handlePointerMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const panSession = panSessionRef.current;
+      if (!panSession) {
+        return;
+      }
 
-    setPanX(panSession.startPanX + event.clientX - panSession.startClientX);
-    setPanY(panSession.startPanY + event.clientY - panSession.startClientY);
-  }, []);
+      setPanX(panSession.startPanX + event.clientX - panSession.startClientX);
+      setPanY(panSession.startPanY + event.clientY - panSession.startClientY);
+    },
+    [],
+  );
 
-  const finishPointerSession = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    if (!panSessionRef.current) {
-      return;
-    }
+  const finishPointerSession = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (!panSessionRef.current) {
+        return;
+      }
 
-    panSessionRef.current = null;
-    setIsPanning(false);
-    event.currentTarget.releasePointerCapture?.(event.pointerId);
-  }, []);
+      panSessionRef.current = null;
+      setIsPanning(false);
+      event.currentTarget.releasePointerCapture?.(event.pointerId);
+    },
+    [],
+  );
 
   useEffect(() => {
     const syncFullscreenState = () => {
@@ -495,7 +514,11 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
                 onClick={handleToggleFullscreen}
                 iconStyle={{ color: token.colorTextSecondary }}
               >
-                {isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                {isFullscreen ? (
+                  <FullscreenExitOutlined />
+                ) : (
+                  <FullscreenOutlined />
+                )}
               </ActionIconBox>
             </span>
           </div>

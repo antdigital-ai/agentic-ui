@@ -294,7 +294,8 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
                     block
                     icon={<Plus />}
                   >
-                    {locale?.['schemaForm.addItem'] || '添加'} {getPropertyTitle(property, key)}
+                    {locale?.['schemaForm.addItem'] || '添加'}{' '}
+                    {getPropertyTitle(property, key)}
                   </Button>
                 </Form.Item>
               )}

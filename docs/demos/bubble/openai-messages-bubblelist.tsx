@@ -16,7 +16,10 @@ export default () => {
   const sessionStartedAt = useRef(Date.now()).current;
   const [messages, setMessages] = useState<OpenAIChatMessage[]>([
     { role: 'user', content: '用一句话介绍 React Hooks' },
-    { role: 'assistant', content: 'React Hooks 让函数组件也能使用 state 与生命周期' },
+    {
+      role: 'assistant',
+      content: 'React Hooks 让函数组件也能使用 state 与生命周期',
+    },
   ]);
 
   const bubbleList = useOpenAIMessageBubbleData(messages, {
@@ -52,7 +55,10 @@ export default () => {
   const reset = useCallback(() => {
     setMessages([
       { role: 'user', content: '用一句话介绍 React Hooks' },
-      { role: 'assistant', content: 'React Hooks 让函数组件也能使用 state 与生命周期' },
+      {
+        role: 'assistant',
+        content: 'React Hooks 让函数组件也能使用 state 与生命周期',
+      },
     ]);
   }, []);
 

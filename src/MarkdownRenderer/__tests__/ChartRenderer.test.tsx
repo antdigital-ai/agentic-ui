@@ -1,20 +1,23 @@
-import React from 'react';
 import { render } from '@testing-library/react';
+import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { ChartBlockRenderer } from '../renderers/ChartRenderer';
 
 vi.mock('../../Plugins/chart/ChartRender', () => ({
   ChartRender: (props: any) =>
-    React.createElement('div', { 'data-testid': 'chart-render' }, JSON.stringify({
-      chartType: props.chartType,
-      dataLen: props.chartData?.length,
-    })),
+    React.createElement(
+      'div',
+      { 'data-testid': 'chart-render' },
+      JSON.stringify({
+        chartType: props.chartType,
+        dataLen: props.chartData?.length,
+      }),
+    ),
 }));
 
 vi.mock('../../Plugins/chart/loadChartRuntime', () => ({
   loadChartRuntime: vi.fn().mockResolvedValue({}),
 }));
-
 
 describe('ChartBlockRenderer', () => {
   it('renders error state for invalid JSON', () => {

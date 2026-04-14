@@ -2,8 +2,8 @@
  * title: 带筛选的直方图
  * description: 支持按分类筛选数据
  */
-import React from 'react';
 import { HistogramChart } from '@ant-design/agentic-ui';
+import React from 'react';
 
 export default () => {
   // 生成模拟数据

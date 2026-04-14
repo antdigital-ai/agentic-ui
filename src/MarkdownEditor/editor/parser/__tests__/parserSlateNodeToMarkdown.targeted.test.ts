@@ -302,9 +302,9 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
   });
 
   it('覆盖 parserNode default-arg (no preString)', () => {
-    const result = parserSlateNodeToMarkdown(
-      [{ type: 'paragraph', children: [{ text: 'no pre' }] }],
-    );
+    const result = parserSlateNodeToMarkdown([
+      { type: 'paragraph', children: [{ text: 'no pre' }] },
+    ]);
     expect(result).toBe('no pre');
   });
 
@@ -485,9 +485,7 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
     const result = parserSlateNodeToMarkdown([
       {
         type: 'paragraph',
-        children: [
-          { text: 'colored', highColor: '#ff0000' },
-        ],
+        children: [{ text: 'colored', highColor: '#ff0000' }],
       },
     ] as any);
     expect(result).toContain('style="color:#ff0000"');
@@ -569,14 +567,20 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
       {
         type: 'bulleted-list',
         children: [
-          { type: 'list-item', children: [{ type: 'paragraph', children: [{ text: 'a' }] }] },
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: 'a' }] }],
+          },
         ],
       },
       { type: 'paragraph', children: [{ text: '' }] },
       {
         type: 'bulleted-list',
         children: [
-          { type: 'list-item', children: [{ type: 'paragraph', children: [{ text: 'b' }] }] },
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: 'b' }] }],
+          },
         ],
       },
     ] as any);
@@ -588,14 +592,20 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
       {
         type: 'bulleted-list',
         children: [
-          { type: 'list-item', children: [{ type: 'paragraph', children: [{ text: 'a' }] }] },
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: 'a' }] }],
+          },
         ],
       },
       { type: 'paragraph', children: [{ text: 'middle' }] },
       {
         type: 'numbered-list',
         children: [
-          { type: 'list-item', children: [{ type: 'paragraph', children: [{ text: 'c' }] }] },
+          {
+            type: 'list-item',
+            children: [{ type: 'paragraph', children: [{ text: 'c' }] }],
+          },
         ],
       },
     ] as any);
@@ -613,7 +623,9 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
           },
           {
             type: 'table-cell',
-            children: [{ type: 'paragraph', children: [{ text: 'direct cell' }] }],
+            children: [
+              { type: 'paragraph', children: [{ text: 'direct cell' }] },
+            ],
           },
         ],
       },
@@ -631,9 +643,7 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
             children: [
               {
                 type: 'table-cell',
-                children: [
-                  { type: 'paragraph', children: [{ text: 'H1' }] },
-                ],
+                children: [{ type: 'paragraph', children: [{ text: 'H1' }] }],
               },
             ],
           },
@@ -643,7 +653,12 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
               {
                 type: 'table-cell',
                 children: [
-                  { type: 'code', language: 'js', value: 'x=1', children: [{ text: 'x=1' }] },
+                  {
+                    type: 'code',
+                    language: 'js',
+                    value: 'x=1',
+                    children: [{ text: 'x=1' }],
+                  },
                 ],
               },
             ],
@@ -826,10 +841,7 @@ describe('parserSlateNodeToMarkdown targeted coverage', () => {
     const result = parserSlateNodeToMarkdown([
       {
         type: 'paragraph',
-        children: [
-          { text: 'ab', bold: true, italic: true },
-          { text: 'cd' },
-        ],
+        children: [{ text: 'ab', bold: true, italic: true }, { text: 'cd' }],
       },
     ] as any);
     expect(result).toContain('***ab***');

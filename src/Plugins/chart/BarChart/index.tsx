@@ -23,6 +23,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
+import { useChartTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
@@ -33,7 +34,6 @@ import {
   resolveCssVariable,
   toNumber,
 } from '../utils';
-import { useChartTheme } from '../hooks';
 import { useStyle } from './style';
 
 /**

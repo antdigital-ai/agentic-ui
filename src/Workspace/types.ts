@@ -111,7 +111,17 @@ export const FILE_TYPES: Record<string, FileTypeDefinition> = {
   },
   video: {
     category: FileCategory.Video,
-    extensions: ['mp4', 'webm', 'ogv', 'mov', 'avi', 'mkv', 'flv', '3gp', 'm4v'],
+    extensions: [
+      'mp4',
+      'webm',
+      'ogv',
+      'mov',
+      'avi',
+      'mkv',
+      'flv',
+      '3gp',
+      'm4v',
+    ],
     mimeTypes: [
       'video/mp4',
       'video/webm',

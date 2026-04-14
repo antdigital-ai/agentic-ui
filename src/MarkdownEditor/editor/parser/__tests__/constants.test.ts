@@ -15,18 +15,23 @@ describe('preprocessNormalizeLeafToContainerDirective', () => {
   it('支持所有常见指令名称', () => {
     const types = ['info', 'warning', 'error', 'success', 'tip', 'note'];
     for (const type of types) {
-      const result = preprocessNormalizeLeafToContainerDirective(`::${type}\ncontent\n:::`);
+      const result = preprocessNormalizeLeafToContainerDirective(
+        `::${type}\ncontent\n:::`,
+      );
       expect(result.startsWith(`:::${type}`)).toBe(true);
     }
   });
 
   it('支持单字母类型名（如 ::a）', () => {
-    const result = preprocessNormalizeLeafToContainerDirective('::a\ncontent\n:::');
+    const result =
+      preprocessNormalizeLeafToContainerDirective('::a\ncontent\n:::');
     expect(result.startsWith(':::a')).toBe(true);
   });
 
   it('支持大写类型名（::WARNING → :::WARNING）', () => {
-    const result = preprocessNormalizeLeafToContainerDirective('::WARNING\ncontent\n:::');
+    const result = preprocessNormalizeLeafToContainerDirective(
+      '::WARNING\ncontent\n:::',
+    );
     expect(result.startsWith(':::WARNING')).toBe(true);
   });
 
@@ -38,14 +43,18 @@ describe('preprocessNormalizeLeafToContainerDirective', () => {
   });
 
   it(':: 行首后有空白也视为关闭符', () => {
-    const result = preprocessNormalizeLeafToContainerDirective('::warning\ncontent\n::  ');
+    const result = preprocessNormalizeLeafToContainerDirective(
+      '::warning\ncontent\n::  ',
+    );
     expect(result).toBe(':::warning\ncontent\n:::');
   });
 
   it(':: 关闭符与 ::: 关闭符混用时各自处理正确', () => {
     const md = '::info\ncontent-a\n::\n\n::warning\ncontent-b\n:::';
     const result = preprocessNormalizeLeafToContainerDirective(md);
-    expect(result).toBe(':::info\ncontent-a\n:::\n\n:::warning\ncontent-b\n:::');
+    expect(result).toBe(
+      ':::info\ncontent-a\n:::\n\n:::warning\ncontent-b\n:::',
+    );
   });
 
   // ── 连续多块 ──────────────────────────────────────────────────────────────
@@ -99,14 +108,16 @@ describe('preprocessNormalizeLeafToContainerDirective', () => {
   });
 
   it('不修改 URL 路径（如 /home/node/.openclaw）', () => {
-    const md = '配置路径 /home/node/.openclaw/agents/main/agent/auth-profiles.json';
+    const md =
+      '配置路径 /home/node/.openclaw/agents/main/agent/auth-profiles.json';
     const result = preprocessNormalizeLeafToContainerDirective(md);
     expect(result).toBe(md);
   });
 
   // ── 代码围栏保护 ──────────────────────────────────────────────────────────
   it('围栏代码块内不规范化开启行', () => {
-    const md = '```bash\n::warning inside fence\n```\n::warning outside fence\n:::';
+    const md =
+      '```bash\n::warning inside fence\n```\n::warning outside fence\n:::';
     const result = preprocessNormalizeLeafToContainerDirective(md);
     expect(result).toContain('::warning inside fence');
     expect(result).toContain(':::warning outside fence');

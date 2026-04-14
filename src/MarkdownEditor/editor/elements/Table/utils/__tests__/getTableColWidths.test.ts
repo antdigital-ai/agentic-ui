@@ -171,8 +171,8 @@ describe('SmartTableScouter', () => {
       measureText: (text: string) => ({ width: text.length * 8 }),
     });
     const originalCreateElement = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
+      document,
+    ) as typeof document.createElement;
     vi.spyOn(document, 'createElement').mockImplementation(
       (tagName: string) => {
         if (tagName === 'canvas') {

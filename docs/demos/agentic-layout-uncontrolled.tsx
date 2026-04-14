@@ -1,13 +1,7 @@
 import { AgenticLayout, ChatLayout } from '@ant-design/agentic-ui';
 import React from 'react';
 
-const SidebarPanel = ({
-  label,
-  bg,
-}: {
-  label: string;
-  bg: string;
-}) => (
+const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
   <div
     style={{
       height: '100%',
@@ -52,7 +46,8 @@ const CenterContent = () => (
 const UncontrolledDemo = () => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
     <p style={{ margin: 0, fontSize: 13, color: '#888' }}>
-      使用 <code>leftDefaultCollapsed</code> / <code>rightDefaultCollapsed</code>{' '}
+      使用 <code>leftDefaultCollapsed</code> /{' '}
+      <code>rightDefaultCollapsed</code>{' '}
       设置初始折叠状态，折叠行为由组件内部管理，无需外部 state。
     </p>
     <div

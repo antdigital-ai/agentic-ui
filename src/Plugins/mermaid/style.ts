@@ -96,7 +96,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
         minHeight: 0,
-        transform: 'translate(var(--mermaid-pan-x), var(--mermaid-pan-y)) scale(var(--mermaid-scale))',
+        transform:
+          'translate(var(--mermaid-pan-x), var(--mermaid-pan-y)) scale(var(--mermaid-scale))',
         transformOrigin: '0 0',
         willChange: 'transform',
       },

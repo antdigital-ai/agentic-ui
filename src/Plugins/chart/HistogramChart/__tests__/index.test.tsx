@@ -69,11 +69,7 @@ describe('HistogramChart 组件', () => {
 
   it('应该支持自定义分箱数量', () => {
     const { container } = renderWithProvider(
-      <HistogramChart
-        title="自定义分箱"
-        data={basicData}
-        binCount={5}
-      />,
+      <HistogramChart title="自定义分箱" data={basicData} binCount={5} />,
     );
 
     expect(container).toBeInTheDocument();
@@ -81,11 +77,7 @@ describe('HistogramChart 组件', () => {
 
   it('应该支持频率模式', () => {
     const { container } = renderWithProvider(
-      <HistogramChart
-        title="频率直方图"
-        data={basicData}
-        showFrequency
-      />,
+      <HistogramChart title="频率直方图" data={basicData} showFrequency />,
     );
 
     expect(container).toBeInTheDocument();
@@ -98,11 +90,7 @@ describe('HistogramChart 组件', () => {
     ];
 
     const { container } = renderWithProvider(
-      <HistogramChart
-        title="堆叠直方图"
-        data={multiSeriesData}
-        stacked
-      />,
+      <HistogramChart title="堆叠直方图" data={multiSeriesData} stacked />,
     );
 
     expect(container).toBeInTheDocument();

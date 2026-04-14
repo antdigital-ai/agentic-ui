@@ -3,10 +3,10 @@ import copy from 'copy-to-clipboard';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
+import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
 import { CodeContainer } from '../../Plugins/code/components/CodeContainer';
 import { LoadImage } from '../../Plugins/code/components/LoadImage';
 import { langIconMap } from '../../Plugins/code/langIconMap';
-import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
 import { debugInfo } from '../../Utils/debugUtils';
 import type { RendererBlockProps } from '../types';
 

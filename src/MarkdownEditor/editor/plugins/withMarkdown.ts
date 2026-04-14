@@ -4,8 +4,8 @@ import { withCodeTagPlugin } from './withCodeTagPlugin';
 import { withInlineNodes } from './withInlineNodes';
 import { withLinkAndMediaPlugin } from './withLinkAndMediaPlugin';
 import { withListsPlugin } from './withListsPlugin';
-import { withSchemaPlugin } from './withSchemaPlugin';
 import { withSanitizeInvalidChildren } from './withSanitizeInvalidChildren';
+import { withSchemaPlugin } from './withSchemaPlugin';
 import { withVoidNodes } from './withVoidNodes';
 
 /**
@@ -30,7 +30,9 @@ export const withMarkdown = (editor: Editor) => {
     withCodeTagPlugin(
       withSchemaPlugin(
         withLinkAndMediaPlugin(
-          withCardPlugin(withListsPlugin(withVoidNodes(withInlineNodes(editor)))),
+          withCardPlugin(
+            withListsPlugin(withVoidNodes(withInlineNodes(editor))),
+          ),
         ),
       ),
     ),

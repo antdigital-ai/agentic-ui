@@ -30,15 +30,15 @@ export function useEditableTableContentWidth({
 
   const resolvedContentWidth = useMemo(() => {
     if (contentWidth > 0) return contentWidth;
-    return (
-      getEditorContentWidth(markdownContainerRef) || DEFAULT_CONTENT_WIDTH
-    );
+    return getEditorContentWidth(markdownContainerRef) || DEFAULT_CONTENT_WIDTH;
   }, [contentWidth, markdownContainerRef]);
 
   const availableTableWidth = useMemo(
     () =>
       Math.max(
-        resolvedContentWidth - TABLE_HORIZONTAL_PADDING - TABLE_ROW_INDEX_COL_WIDTH,
+        resolvedContentWidth -
+          TABLE_HORIZONTAL_PADDING -
+          TABLE_ROW_INDEX_COL_WIDTH,
         minContainerWidth,
       ),
     [resolvedContentWidth, minContainerWidth],

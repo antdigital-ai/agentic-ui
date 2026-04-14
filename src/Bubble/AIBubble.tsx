@@ -9,12 +9,11 @@ import { BubbleAvatar } from './Avatar';
 import { BubbleBeforeNode } from './BubbleBeforeNode';
 import { BubbleConfigContext } from './BubbleConfigProvide';
 import { ContentFilemapView } from './ContentFilemapView';
-import { BubbleFileView } from './FileView';
-import { BubbleMessageDisplay } from './MessagesContent';
-import { MessagesContext } from './MessagesContent/BubbleContext';
-import { LOADING_FLAT } from './MessagesContent';
-import { BubbleExtra } from './MessagesContent/BubbleExtra';
 import { extractFilemapBlocks } from './extractFilemapBlocks';
+import { BubbleFileView } from './FileView';
+import { BubbleMessageDisplay, LOADING_FLAT } from './MessagesContent';
+import { MessagesContext } from './MessagesContent/BubbleContext';
+import { BubbleExtra } from './MessagesContent/BubbleExtra';
 import { useStyle } from './style';
 import { BubbleTitle } from './Title';
 import type { BubbleMetaData, BubbleProps } from './type';
@@ -136,15 +135,12 @@ export const AIBubble: React.FC<
       messageDisplayKeyRef.current = nanoid();
     }
   }
-  const messageDisplayKey =
-    messageDisplayKeyRef.current ?? id ?? nanoid();
+  const messageDisplayKey = messageDisplayKeyRef.current ?? id ?? nanoid();
 
   const rawContent = props?.originData?.content as string | undefined;
   const { blocks: filemapBlocks, stripped: strippedContent } = useMemo(
     () =>
-      extractFilemapBlocks(
-        typeof rawContent === 'string' ? rawContent : '',
-      ),
+      extractFilemapBlocks(typeof rawContent === 'string' ? rawContent : ''),
     [rawContent],
   );
 

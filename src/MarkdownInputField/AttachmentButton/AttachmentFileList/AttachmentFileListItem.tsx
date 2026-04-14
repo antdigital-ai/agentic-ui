@@ -190,9 +190,7 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
       >
         <FileIcon file={file} prefixCls={prefixCls} hashId={hashId} />
         <div className={classNames(`${prefixCls}-file-info`, hashId)}>
-          <div
-            className={classNames(`${prefixCls}-file-name`, hashId)}
-          >
+          <div className={classNames(`${prefixCls}-file-name`, hashId)}>
             <span className={classNames(`${prefixCls}-file-name-text`, hashId)}>
               {getFileNameWithoutExtension(file.name)}
             </span>

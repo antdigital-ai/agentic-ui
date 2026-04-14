@@ -417,8 +417,7 @@ export const ThoughtChainListItem: React.FC<
               display: 'grid',
               gridTemplateRows: collapse ? '0fr' : '1fr',
               opacity: collapse ? 0 : 1,
-              transition:
-                'grid-template-rows 0.16s ease, opacity 0.12s ease',
+              transition: 'grid-template-rows 0.16s ease, opacity 0.12s ease',
               pointerEvents: collapse ? 'none' : 'auto',
             }}
             aria-hidden={collapse}

@@ -23,8 +23,7 @@ describe('extractFootnoteDefinitionsFromMarkdown', () => {
   });
 
   it('extracts multiple footnote definitions', () => {
-    const md =
-      '[^a]: First note\n\n[^b]: Second note';
+    const md = '[^a]: First note\n\n[^b]: Second note';
     const result = extractFootnoteDefinitionsFromMarkdown(md);
     expect(result.length).toBe(2);
   });

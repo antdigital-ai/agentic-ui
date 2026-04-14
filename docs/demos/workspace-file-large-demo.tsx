@@ -1,8 +1,5 @@
 import { Workspace } from '@ant-design/agentic-ui';
-import {
-  FileNode,
-  GroupNode,
-} from '@ant-design/agentic-ui/Workspace/types';
+import { FileNode, GroupNode } from '@ant-design/agentic-ui/Workspace/types';
 import { Segmented } from 'antd';
 import React, { useMemo, useState } from 'react';
 

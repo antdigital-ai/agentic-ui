@@ -32,14 +32,23 @@ const FooterApiDemo = () => {
         <Tag color="blue" style={{ marginBottom: 8 }}>
           footerHeight — 底部区域最小高度
         </Tag>
-        <div style={{ marginBottom: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div
+          style={{
+            marginBottom: 8,
+            display: 'flex',
+            gap: 8,
+            alignItems: 'center',
+          }}
+        >
           <span style={{ fontSize: 13, color: '#666' }}>footerHeight:</span>
           <Segmented
             options={[48, 80, 120]}
             value={footerHeight}
             onChange={(v) => setFooterHeight(v as number)}
           />
-          <span style={{ fontSize: 13, color: '#999' }}>当前: {footerHeight}px</span>
+          <span style={{ fontSize: 13, color: '#999' }}>
+            当前: {footerHeight}px
+          </span>
         </div>
         <div style={{ height: 320 }}>
           <ChatLayout
@@ -73,8 +82,17 @@ const FooterApiDemo = () => {
         <Tag color="purple" style={{ marginBottom: 8 }}>
           showFooterBackground — 底部渐变背景
         </Tag>
-        <div style={{ marginBottom: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ fontSize: 13, color: '#666' }}>showFooterBackground:</span>
+        <div
+          style={{
+            marginBottom: 8,
+            display: 'flex',
+            gap: 8,
+            alignItems: 'center',
+          }}
+        >
+          <span style={{ fontSize: 13, color: '#666' }}>
+            showFooterBackground:
+          </span>
           <Button
             size="small"
             type={showBg ? 'primary' : 'default'}

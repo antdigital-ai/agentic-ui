@@ -184,10 +184,7 @@ export const TableCellIndexSpacer: React.FC<TableCellIndexSpacerProps> = ({
   const ref = useRef<HTMLTableDataCellElement>(null);
 
   useClickAway(() => {
-    if (
-      deleteIconPosition &&
-      deleteIconPosition.columnIndex === columnIndex
-    ) {
+    if (deleteIconPosition && deleteIconPosition.columnIndex === columnIndex) {
       clearSelect();
     }
   }, ref);

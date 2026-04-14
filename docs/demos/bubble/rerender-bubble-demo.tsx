@@ -349,8 +349,7 @@ const RerenderBubbleDemo = () => {
         <p style={{ margin: 0 }}>
           当前演示通过{' '}
           <code>markdownRenderConfig.streamingParagraphAnimation: false</code>{' '}
-          关闭末段段落淡入；若需默认淡入，去掉该字段或设为{' '}
-          <code>true</code>。
+          关闭末段段落淡入；若需默认淡入，去掉该字段或设为 <code>true</code>。
         </p>
       </div>
     </div>

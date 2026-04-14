@@ -97,30 +97,28 @@ describe('parseBlockElements', () => {
 
   describe('handleListItem', () => {
     it('should extract mentions when first child of paragraph is link with multiple children', () => {
-      const parseNodes = vi.fn(
-        (nodes: any[], _top: boolean, _parent: any) => {
-          if (!nodes?.length)
-            return [{ type: 'paragraph', children: [{ text: '' }] }];
-          const first = nodes[0];
-          if (
-            first.type === 'paragraph' &&
-            first.children?.length > 1 &&
-            first.children[0]?.type === 'link'
-          ) {
-            const link = first.children[0];
-            return [
-              {
-                type: 'paragraph',
-                children: [
-                  { url: link.url, text: link.text },
-                  { text: (first.children[1] as any)?.value ?? '' },
-                ],
-              },
-            ];
-          }
+      const parseNodes = vi.fn((nodes: any[], _top: boolean, _parent: any) => {
+        if (!nodes?.length)
           return [{ type: 'paragraph', children: [{ text: '' }] }];
-        },
-      );
+        const first = nodes[0];
+        if (
+          first.type === 'paragraph' &&
+          first.children?.length > 1 &&
+          first.children[0]?.type === 'link'
+        ) {
+          const link = first.children[0];
+          return [
+            {
+              type: 'paragraph',
+              children: [
+                { url: link.url, text: link.text },
+                { text: (first.children[1] as any)?.value ?? '' },
+              ],
+            },
+          ];
+        }
+        return [{ type: 'paragraph', children: [{ text: '' }] }];
+      });
 
       const currentElement = {
         checked: null,
@@ -162,30 +160,32 @@ describe('parseBlockElements', () => {
     });
 
     it('handles mention link url without query params', () => {
-      const parseNodes = vi.fn(
-        (nodes: any[]) => {
-          const first = nodes[0];
-          if (first?.children?.[0]?.type === 'link') {
-            return [
-              {
-                type: 'paragraph',
-                children: [
-                  { url: first.children[0].url, text: first.children[0].text },
-                  { text: 'rest' },
-                ],
-              },
-            ];
-          }
-          return [{ type: 'paragraph', children: [{ text: '' }] }];
-        },
-      );
+      const parseNodes = vi.fn((nodes: any[]) => {
+        const first = nodes[0];
+        if (first?.children?.[0]?.type === 'link') {
+          return [
+            {
+              type: 'paragraph',
+              children: [
+                { url: first.children[0].url, text: first.children[0].text },
+                { text: 'rest' },
+              ],
+            },
+          ];
+        }
+        return [{ type: 'paragraph', children: [{ text: '' }] }];
+      });
       const el = {
         checked: null,
         children: [
           {
             type: 'paragraph',
             children: [
-              { type: 'link', url: 'https://example.com/avatar', text: 'Alice' },
+              {
+                type: 'link',
+                url: 'https://example.com/avatar',
+                text: 'Alice',
+              },
               { type: 'text', value: ' text' },
             ],
           },
@@ -244,7 +244,12 @@ describe('parseBlockElements', () => {
       );
       const el = {
         children: [
-          { type: 'image', url: 'http://example.com/img.png', alt: 'pic', finished: false },
+          {
+            type: 'image',
+            url: 'http://example.com/img.png',
+            alt: 'pic',
+            finished: false,
+          },
         ],
       };
       const result = processParagraphChildren(el, parseNodes);
@@ -294,7 +299,11 @@ describe('parseBlockElements', () => {
       );
       const el = {
         children: [
-          { type: 'link', url: 'https://example.com', children: [{ type: 'text', value: 'Link' }] },
+          {
+            type: 'link',
+            url: 'https://example.com',
+            children: [{ type: 'text', value: 'Link' }],
+          },
         ],
       };
       const result = handleParagraph(el, { type: 'card' }, parseNodes);
@@ -327,9 +336,16 @@ describe('parseBlockElements', () => {
 
     it('parses children when present', () => {
       const parseNodes = vi.fn((nodes: any[]) =>
-        nodes.map(() => ({ type: 'paragraph', children: [{ text: 'quoted' }] })),
+        nodes.map(() => ({
+          type: 'paragraph',
+          children: [{ text: 'quoted' }],
+        })),
       );
-      const el = { children: [{ type: 'paragraph', children: [{ type: 'text', value: 'quoted' }] }] };
+      const el = {
+        children: [
+          { type: 'paragraph', children: [{ type: 'text', value: 'quoted' }] },
+        ],
+      };
       const result = handleBlockquote(el, parseNodes);
       expect(result.type).toBe('blockquote');
       expect(result.children.length).toBe(1);
@@ -339,12 +355,17 @@ describe('parseBlockElements', () => {
   describe('handleContainerDirective', () => {
     it('creates blockquote with markdownContainerType from name', () => {
       const parseNodes = vi.fn((nodes: any[]) =>
-        nodes.map(() => ({ type: 'paragraph', children: [{ text: 'content' }] })),
+        nodes.map(() => ({
+          type: 'paragraph',
+          children: [{ text: 'content' }],
+        })),
       );
       const el = {
         name: 'INFO',
         attributes: {},
-        children: [{ type: 'paragraph', children: [{ type: 'text', value: 'content' }] }],
+        children: [
+          { type: 'paragraph', children: [{ type: 'text', value: 'content' }] },
+        ],
       };
       const result = handleContainerDirective(el, parseNodes);
       expect(result.type).toBe('blockquote');
@@ -358,7 +379,9 @@ describe('parseBlockElements', () => {
       const el = {
         name: 'tip',
         attributes: { title: 'My Title' },
-        children: [{ type: 'paragraph', children: [{ type: 'text', value: 'body' }] }],
+        children: [
+          { type: 'paragraph', children: [{ type: 'text', value: 'body' }] },
+        ],
       };
       const result = handleContainerDirective(el, parseNodes);
       expect(result.otherProps.markdownContainerTitle).toBe('My Title');
@@ -405,7 +428,10 @@ describe('parseBlockElements', () => {
 
     it('filters out closing ::: paragraph from children', () => {
       const parseNodes = vi.fn((nodes: any[]) =>
-        nodes.map(() => ({ type: 'paragraph', children: [{ text: 'content' }] })),
+        nodes.map(() => ({
+          type: 'paragraph',
+          children: [{ text: 'content' }],
+        })),
       );
       const el = {
         name: 'info',

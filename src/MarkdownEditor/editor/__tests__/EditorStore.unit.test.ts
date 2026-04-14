@@ -154,9 +154,7 @@ describe('EditorStore', () => {
 
     it('当前块为 code/table/head 时在下一路径插入段落链接', () => {
       const insertSpy = vi.spyOn(Transforms, 'insertNodes');
-      editor.children = [
-        { type: 'code', children: [{ text: '' }] },
-      ] as any;
+      editor.children = [{ type: 'code', children: [{ text: '' }] }] as any;
       editor.selection = {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 0 },
@@ -218,7 +216,9 @@ describe('EditorStore', () => {
   describe('removeNodes', () => {
     it('应调用 Transforms.removeNodes', () => {
       const removeSpy = vi.spyOn(Transforms, 'removeNodes');
-      editor.children = [{ type: 'paragraph', children: [{ text: 'x' }] }] as any;
+      editor.children = [
+        { type: 'paragraph', children: [{ text: 'x' }] },
+      ] as any;
       store.removeNodes({ at: [0] });
       expect(removeSpy).toHaveBeenCalledWith(editor, { at: [0] });
     });
@@ -234,9 +234,7 @@ describe('EditorStore', () => {
   describe('setContent', () => {
     it('应通过 Transforms API 安全替换编辑器内容', () => {
       const wnSpy = vi.spyOn(Editor, 'withoutNormalizing');
-      const newContent = [
-        { type: 'paragraph', children: [{ text: 'b' }] },
-      ];
+      const newContent = [{ type: 'paragraph', children: [{ text: 'b' }] }];
       store.setContent(newContent);
       expect(wnSpy).toHaveBeenCalled();
     });

@@ -34,9 +34,7 @@ describe('mapOpenAIMessagesToMessageBubbleData', () => {
   });
 
   it('keeps same id when content grows at same index (SSE)', () => {
-    const short: OpenAIChatMessage[] = [
-      { role: 'assistant', content: 'a' },
-    ];
+    const short: OpenAIChatMessage[] = [{ role: 'assistant', content: 'a' }];
     const long: OpenAIChatMessage[] = [
       { role: 'assistant', content: 'a'.repeat(100) },
     ];
@@ -50,7 +48,10 @@ describe('mapOpenAIMessagesToMessageBubbleData', () => {
     const messages: OpenAIChatMessage[] = [
       {
         role: 'user',
-        content: [{ type: 'text', text: 'A' }, { type: 'text', text: 'B' }],
+        content: [
+          { type: 'text', text: 'A' },
+          { type: 'text', text: 'B' },
+        ],
       },
     ];
     const out = mapOpenAIMessagesToMessageBubbleData(messages, { baseTime });
@@ -76,7 +77,13 @@ describe('mapOpenAIMessagesToMessageBubbleData', () => {
       {
         role: 'assistant',
         content: 'ok',
-        tool_calls: [{ id: '1', type: 'function', function: { name: 'fn', arguments: '{}' } }],
+        tool_calls: [
+          {
+            id: '1',
+            type: 'function',
+            function: { name: 'fn', arguments: '{}' },
+          },
+        ],
       },
     ];
     const out = mapOpenAIMessagesToMessageBubbleData(messages, {
@@ -133,7 +140,9 @@ describe('mapOpenAIMessagesToMessageBubbleData', () => {
     });
 
     it('renders image_url parts as [image]', () => {
-      const parts = [{ type: 'image_url', image_url: { url: 'http://x' } } as any];
+      const parts = [
+        { type: 'image_url', image_url: { url: 'http://x' } } as any,
+      ];
       expect(extractTextFromContent(parts)).toBe('[image]');
     });
 
@@ -165,7 +174,13 @@ describe('mapOpenAIMessagesToMessageBubbleData', () => {
       {
         role: 'assistant',
         content: 'ok',
-        tool_calls: [{ id: '1', type: 'function', function: { name: 'fn', arguments: '{}' } }],
+        tool_calls: [
+          {
+            id: '1',
+            type: 'function',
+            function: { name: 'fn', arguments: '{}' },
+          },
+        ],
       },
     ];
     const out = mapOpenAIMessagesToMessageBubbleData(messages, {
@@ -190,9 +205,7 @@ describe('mapOpenAIMessagesToMessageBubbleData', () => {
   });
 
   it('uses default options when options is undefined', () => {
-    const messages: OpenAIChatMessage[] = [
-      { role: 'user', content: 'hi' },
-    ];
+    const messages: OpenAIChatMessage[] = [{ role: 'user', content: 'hi' }];
     const out = mapOpenAIMessagesToMessageBubbleData(messages);
     expect(out).toHaveLength(1);
     expect(out[0].role).toBe('user');
@@ -226,17 +239,13 @@ describe('mapOpenAIMessagesToMessageBubbleData', () => {
   });
 
   it('handles function role message without name and without content', () => {
-    const messages: OpenAIChatMessage[] = [
-      { role: 'function' } as any,
-    ];
+    const messages: OpenAIChatMessage[] = [{ role: 'function' } as any];
     const out = mapOpenAIMessagesToMessageBubbleData(messages, { baseTime });
     expect(out[0].originContent).toBe('');
   });
 
   it('omits extra when preserveRawInExtra is false', () => {
-    const messages: OpenAIChatMessage[] = [
-      { role: 'user', content: 'hi' },
-    ];
+    const messages: OpenAIChatMessage[] = [{ role: 'user', content: 'hi' }];
     const out = mapOpenAIMessagesToMessageBubbleData(messages, {
       baseTime,
       preserveRawInExtra: false,

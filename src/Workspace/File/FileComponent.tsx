@@ -20,8 +20,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
 import { ActionIconBox } from '../../Components/ActionIconBox';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext, compileTemplate } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor';
 import type { FileNode, FileProps, FileType, GroupNode } from '../types';
@@ -188,292 +188,291 @@ const FileItemComponent: FC<{
   locale?: any;
   /** 是否在元素上绑定 id（默认 false） */
   bindDomId?: boolean;
-}> = React.memo(({
-  file,
-  onClick,
-  onDownload,
-  onPreview,
-  onShare,
-  onLocate,
-  prefixCls,
-  hashId,
-  locale,
-  bindDomId = false,
-}) => {
-  // 确保文件有唯一ID
-  const fileWithId = ensureNodeWithId(file);
-  const fileTypeInfo = fileTypeProcessor.inferFileType(fileWithId);
-
-  // 禁用状态
-  const isDisabled = fileWithId.disabled === true;
-
-  const handleClick = () => {
-    // 禁用状态下不响应点击
-    if (isDisabled) return;
-
-    // 如果有传入 onClick 事件，优先使用
-    if (onClick) {
-      onClick(fileWithId);
-      return;
-    }
-
-    // 如果没有传入 onClick 事件，默认打开预览页面
-    if (onPreview) {
-      onPreview(fileWithId);
-    }
-  };
-
-  // 判断是否显示下载按钮：优先使用用户 canDownload；否则当存在 onDownload/url/content/file 时显示
-  const showDownloadButton = (() => {
-    if (fileWithId.canDownload !== undefined) {
-      return fileWithId.canDownload;
-    }
-    return Boolean(
-      onDownload || fileWithId.url || fileWithId.content || fileWithId.file,
-    );
-  })();
-
-  const handleDownload = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    // 优先使用用户传入的下载方法
-    if (onDownload) {
-      onDownload(fileWithId);
-      return;
-    }
-
-    handleFileDownload(fileWithId);
-  };
-
-  const handlePreview = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onPreview?.(fileWithId);
-  };
-
-  const handleShare = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    // 如果有自定义的分享方法，优先使用
-    if (onShare) {
-      onShare(fileWithId, {
-        anchorEl: e.currentTarget as HTMLElement,
-        origin: 'list',
-      });
-      return;
-    }
-
-    // 使用默认分享行为
-    handleDefaultShare(fileWithId);
-  };
-
-  // 判断是否显示预览按钮：
-  // 1. 如果用户设置了 canPreview，优先使用用户的设置
-  // 2. 如果没有设置，则使用系统默认逻辑：图片类型有 url 就可以预览；其他类型按原有逻辑判断
-  const showPreviewButton = (() => {
-    // 如果用户明确设置了 canPreview，直接使用用户设置
-    if (fileWithId.canPreview !== undefined) {
-      return fileWithId.canPreview;
-    }
-
-    // 否则使用系统默认逻辑
-    return (
-      onPreview &&
-      (isImageFile(fileWithId)
-        ? !!(fileWithId.url || fileWithId.previewUrl)
-        : fileTypeProcessor.processFile(fileWithId).canPreview)
-    );
-  })();
-
-  const showShareButton = fileWithId.canShare === true;
-
-  const showLocationButton = fileWithId.canLocate === true;
-
-  const handleLocate = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onLocate?.(fileWithId);
-  };
-
-  // 内置操作按钮
-  const actionBtnClass = classNames(
-    `${prefixCls}-item-action-btn`,
-    hashId,
-  );
-
-  const builtinActions = {
-    preview: showPreviewButton ? (
-      <ActionIconBox
-        key="preview"
-        title={locale?.['workspace.file.preview'] || '预览'}
-        onClick={handlePreview}
-        tooltipProps={{ mouseEnterDelay: 0.3 }}
-        className={actionBtnClass}
-      >
-        <EyeIcon />
-      </ActionIconBox>
-    ) : null,
-    locate: showLocationButton ? (
-      <ActionIconBox
-        key="locate"
-        title={locale?.['workspace.file.location'] || '定位'}
-        onClick={handleLocate}
-        tooltipProps={{ mouseEnterDelay: 0.3 }}
-        className={actionBtnClass}
-      >
-        <Locate />
-      </ActionIconBox>
-    ) : null,
-    share: showShareButton ? (
-      <ActionIconBox
-        key="share"
-        title={locale?.['workspace.file.share'] || '分享'}
-        onClick={handleShare}
-        tooltipProps={{ mouseEnterDelay: 0.3 }}
-        className={actionBtnClass}
-      >
-        <ShareIcon />
-      </ActionIconBox>
-    ) : null,
-    download: showDownloadButton ? (
-      <ActionIconBox
-        key="download"
-        title={locale?.['workspace.file.download'] || '下载'}
-        onClick={handleDownload}
-        tooltipProps={{ mouseEnterDelay: 0.3 }}
-        className={actionBtnClass}
-      >
-        <DownloadIcon />
-      </ActionIconBox>
-    ) : null,
-  };
-
-  // 自定义渲染上下文
-  const renderContext = {
-    file: fileWithId,
+}> = React.memo(
+  ({
+    file,
+    onClick,
+    onDownload,
+    onPreview,
+    onShare,
+    onLocate,
     prefixCls,
     hashId,
-    disabled: isDisabled,
-    actions: builtinActions,
-  };
+    locale,
+    bindDomId = false,
+  }) => {
+    // 确保文件有唯一ID
+    const fileWithId = ensureNodeWithId(file);
+    const fileTypeInfo = fileTypeProcessor.inferFileType(fileWithId);
 
-  return (
-    <AccessibleButton
-      icon={
-        <>
-          <div className={classNames(`${prefixCls}-item-icon`, hashId)}>
-            {getFileTypeIcon(
-              fileTypeInfo.fileType,
-              fileWithId.icon,
-              fileWithId.name,
-            )}
-          </div>
-          <div className={classNames(`${prefixCls}-item-info`, hashId)}>
-            <div className={classNames(`${prefixCls}-item-name`, hashId)}>
-              {fileWithId.renderName ? (
-                fileWithId.renderName(renderContext)
-              ) : (
-                <Typography.Text ellipsis={{ tooltip: fileWithId.name }}>
-                  {fileWithId.name}
-                </Typography.Text>
+    // 禁用状态
+    const isDisabled = fileWithId.disabled === true;
+
+    const handleClick = () => {
+      // 禁用状态下不响应点击
+      if (isDisabled) return;
+
+      // 如果有传入 onClick 事件，优先使用
+      if (onClick) {
+        onClick(fileWithId);
+        return;
+      }
+
+      // 如果没有传入 onClick 事件，默认打开预览页面
+      if (onPreview) {
+        onPreview(fileWithId);
+      }
+    };
+
+    // 判断是否显示下载按钮：优先使用用户 canDownload；否则当存在 onDownload/url/content/file 时显示
+    const showDownloadButton = (() => {
+      if (fileWithId.canDownload !== undefined) {
+        return fileWithId.canDownload;
+      }
+      return Boolean(
+        onDownload || fileWithId.url || fileWithId.content || fileWithId.file,
+      );
+    })();
+
+    const handleDownload = (e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      // 优先使用用户传入的下载方法
+      if (onDownload) {
+        onDownload(fileWithId);
+        return;
+      }
+
+      handleFileDownload(fileWithId);
+    };
+
+    const handlePreview = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onPreview?.(fileWithId);
+    };
+
+    const handleShare = (e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      // 如果有自定义的分享方法，优先使用
+      if (onShare) {
+        onShare(fileWithId, {
+          anchorEl: e.currentTarget as HTMLElement,
+          origin: 'list',
+        });
+        return;
+      }
+
+      // 使用默认分享行为
+      handleDefaultShare(fileWithId);
+    };
+
+    // 判断是否显示预览按钮：
+    // 1. 如果用户设置了 canPreview，优先使用用户的设置
+    // 2. 如果没有设置，则使用系统默认逻辑：图片类型有 url 就可以预览；其他类型按原有逻辑判断
+    const showPreviewButton = (() => {
+      // 如果用户明确设置了 canPreview，直接使用用户设置
+      if (fileWithId.canPreview !== undefined) {
+        return fileWithId.canPreview;
+      }
+
+      // 否则使用系统默认逻辑
+      return (
+        onPreview &&
+        (isImageFile(fileWithId)
+          ? !!(fileWithId.url || fileWithId.previewUrl)
+          : fileTypeProcessor.processFile(fileWithId).canPreview)
+      );
+    })();
+
+    const showShareButton = fileWithId.canShare === true;
+
+    const showLocationButton = fileWithId.canLocate === true;
+
+    const handleLocate = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onLocate?.(fileWithId);
+    };
+
+    // 内置操作按钮
+    const actionBtnClass = classNames(`${prefixCls}-item-action-btn`, hashId);
+
+    const builtinActions = {
+      preview: showPreviewButton ? (
+        <ActionIconBox
+          key="preview"
+          title={locale?.['workspace.file.preview'] || '预览'}
+          onClick={handlePreview}
+          tooltipProps={{ mouseEnterDelay: 0.3 }}
+          className={actionBtnClass}
+        >
+          <EyeIcon />
+        </ActionIconBox>
+      ) : null,
+      locate: showLocationButton ? (
+        <ActionIconBox
+          key="locate"
+          title={locale?.['workspace.file.location'] || '定位'}
+          onClick={handleLocate}
+          tooltipProps={{ mouseEnterDelay: 0.3 }}
+          className={actionBtnClass}
+        >
+          <Locate />
+        </ActionIconBox>
+      ) : null,
+      share: showShareButton ? (
+        <ActionIconBox
+          key="share"
+          title={locale?.['workspace.file.share'] || '分享'}
+          onClick={handleShare}
+          tooltipProps={{ mouseEnterDelay: 0.3 }}
+          className={actionBtnClass}
+        >
+          <ShareIcon />
+        </ActionIconBox>
+      ) : null,
+      download: showDownloadButton ? (
+        <ActionIconBox
+          key="download"
+          title={locale?.['workspace.file.download'] || '下载'}
+          onClick={handleDownload}
+          tooltipProps={{ mouseEnterDelay: 0.3 }}
+          className={actionBtnClass}
+        >
+          <DownloadIcon />
+        </ActionIconBox>
+      ) : null,
+    };
+
+    // 自定义渲染上下文
+    const renderContext = {
+      file: fileWithId,
+      prefixCls,
+      hashId,
+      disabled: isDisabled,
+      actions: builtinActions,
+    };
+
+    return (
+      <AccessibleButton
+        icon={
+          <>
+            <div className={classNames(`${prefixCls}-item-icon`, hashId)}>
+              {getFileTypeIcon(
+                fileTypeInfo.fileType,
+                fileWithId.icon,
+                fileWithId.name,
               )}
             </div>
-            {(fileWithId.renderDetails ||
-            fileTypeInfo.displayType ||
-            fileWithId.size ||
-            fileWithId.lastModified) && (
-            <div
-              className={classNames(`${prefixCls}-item-details`, hashId)}
-            >
-              {fileWithId.renderDetails ? (
-                fileWithId.renderDetails(renderContext)
-              ) : (
-                <Typography.Text type="secondary" ellipsis>
-                  {fileTypeInfo.displayType && (
-                    <span
-                      className={classNames(
-                        `${prefixCls}-item-type`,
-                        hashId,
-                      )}
-                    >
-                      {fileTypeInfo.displayType}
-                    </span>
-                  )}
-                  {fileWithId.size && (
-                    <>
+            <div className={classNames(`${prefixCls}-item-info`, hashId)}>
+              <div className={classNames(`${prefixCls}-item-name`, hashId)}>
+                {fileWithId.renderName ? (
+                  fileWithId.renderName(renderContext)
+                ) : (
+                  <Typography.Text ellipsis={{ tooltip: fileWithId.name }}>
+                    {fileWithId.name}
+                  </Typography.Text>
+                )}
+              </div>
+              {(fileWithId.renderDetails ||
+                fileTypeInfo.displayType ||
+                fileWithId.size ||
+                fileWithId.lastModified) && (
+                <div
+                  className={classNames(`${prefixCls}-item-details`, hashId)}
+                >
+                  {fileWithId.renderDetails ? (
+                    fileWithId.renderDetails(renderContext)
+                  ) : (
+                    <Typography.Text type="secondary" ellipsis>
                       {fileTypeInfo.displayType && (
                         <span
                           className={classNames(
-                            `${prefixCls}-item-separator`,
+                            `${prefixCls}-item-type`,
                             hashId,
                           )}
                         >
-                          |
+                          {fileTypeInfo.displayType}
                         </span>
                       )}
-                      <span
-                        className={classNames(
-                          `${prefixCls}-item-size`,
-                          hashId,
-                        )}
-                      >
-                        {formatFileSize(fileWithId.size)}
-                      </span>
-                    </>
-                  )}
-                  {fileWithId.lastModified && (
-                    <>
-                      {(fileTypeInfo.displayType || fileWithId.size) && (
-                        <span
-                          className={classNames(
-                            `${prefixCls}-item-separator`,
-                            hashId,
+                      {fileWithId.size && (
+                        <>
+                          {fileTypeInfo.displayType && (
+                            <span
+                              className={classNames(
+                                `${prefixCls}-item-separator`,
+                                hashId,
+                              )}
+                            >
+                              |
+                            </span>
                           )}
-                        >
-                          |
-                        </span>
+                          <span
+                            className={classNames(
+                              `${prefixCls}-item-size`,
+                              hashId,
+                            )}
+                          >
+                            {formatFileSize(fileWithId.size)}
+                          </span>
+                        </>
                       )}
-                      <span
-                        className={classNames(
-                          `${prefixCls}-item-time`,
-                          hashId,
-                        )}
-                      >
-                        {formatLastModified(fileWithId.lastModified)}
-                      </span>
-                    </>
+                      {fileWithId.lastModified && (
+                        <>
+                          {(fileTypeInfo.displayType || fileWithId.size) && (
+                            <span
+                              className={classNames(
+                                `${prefixCls}-item-separator`,
+                                hashId,
+                              )}
+                            >
+                              |
+                            </span>
+                          )}
+                          <span
+                            className={classNames(
+                              `${prefixCls}-item-time`,
+                              hashId,
+                            )}
+                          >
+                            {formatLastModified(fileWithId.lastModified)}
+                          </span>
+                        </>
+                      )}
+                    </Typography.Text>
                   )}
-                </Typography.Text>
+                </div>
               )}
             </div>
-          )}
-          </div>
-          <div
-            className={classNames(`${prefixCls}-item-actions`, hashId)}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {fileWithId.renderActions ? (
-              fileWithId.renderActions(renderContext)
-            ) : !isDisabled ? (
-              <>
-                {builtinActions.preview}
-                {builtinActions.locate}
-                {builtinActions.share}
-                {builtinActions.download}
-              </>
-            ) : null}
-          </div>
-        </>
-      }
-      onClick={handleClick}
-      className={classNames(
-        `${prefixCls}-item`,
-        { [`${prefixCls}-item-disabled`]: isDisabled },
-        hashId,
-      )}
-      ariaLabel={`${locale?.['workspace.file'] || '文件'}：${fileWithId.name}`}
-      id={bindDomId ? fileWithId.id : undefined}
-    />
-  );
-});
+            <div
+              className={classNames(`${prefixCls}-item-actions`, hashId)}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {fileWithId.renderActions ? (
+                fileWithId.renderActions(renderContext)
+              ) : !isDisabled ? (
+                <>
+                  {builtinActions.preview}
+                  {builtinActions.locate}
+                  {builtinActions.share}
+                  {builtinActions.download}
+                </>
+              ) : null}
+            </div>
+          </>
+        }
+        onClick={handleClick}
+        className={classNames(
+          `${prefixCls}-item`,
+          { [`${prefixCls}-item-disabled`]: isDisabled },
+          hashId,
+        )}
+        ariaLabel={`${locale?.['workspace.file'] || '文件'}：${fileWithId.name}`}
+        id={bindDomId ? fileWithId.id : undefined}
+      />
+    );
+  },
+);
 
 // 分组标题栏组件
 const GroupHeader: FC<{
@@ -483,107 +482,92 @@ const GroupHeader: FC<{
   prefixCls: string;
   hashId: string;
   locale?: any;
-}> = React.memo(({ group, onToggle, onGroupDownload, prefixCls, hashId, locale }) => {
-  const groupTypeInfo = fileTypeProcessor.inferFileType(group);
-  const groupType = group.type || groupTypeInfo.fileType;
+}> = React.memo(
+  ({ group, onToggle, onGroupDownload, prefixCls, hashId, locale }) => {
+    const groupTypeInfo = fileTypeProcessor.inferFileType(group);
+    const groupType = group.type || groupTypeInfo.fileType;
 
-  const handleToggle = () => {
-    onToggle?.(group.id!, groupType, !group.collapsed);
-  };
+    const handleToggle = () => {
+      onToggle?.(group.id!, groupType, !group.collapsed);
+    };
 
-  const handleDownload = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onGroupDownload?.(group.children, groupType);
-  };
+    const handleDownload = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onGroupDownload?.(group.children, groupType);
+    };
 
-  const CollapseIcon = group.collapsed ? RightIcon : DownIcon;
+    const CollapseIcon = group.collapsed ? RightIcon : DownIcon;
 
-  // 获取分组图标
-  const groupIcon = getGroupIcon(group, groupType, group.icon);
+    // 获取分组图标
+    const groupIcon = getGroupIcon(group, groupType, group.icon);
 
-  // 判断是否显示下载按钮：优先使用用户 canDownload；否则当存在 onGroupDownload 时显示
-  const showDownloadButton = (() => {
-    if (group.canDownload !== undefined) {
-      return group.canDownload;
-    }
-    if (!onGroupDownload) {
-      return false;
-    }
-    // 如果组内所有文件都明确禁止下载，则不显示分组下载
-    return group.children.some(
-      (child) =>
-        child.canDownload === true ||
-        (child.canDownload !== false &&
-          Boolean(child.url || child.content || child.file)),
-    );
-  })();
-
-  return (
-    <AccessibleButton
-      icon={
-        <>
-          <div
-            className={classNames(
-              `${prefixCls}-group-header-left`,
-              hashId,
-            )}
-          >
-            <CollapseIcon
-              className={classNames(
-                `${prefixCls}-group-toggle-icon`,
-                hashId,
-              )}
-            />
-            <div
-              className={classNames(
-                `${prefixCls}-group-type-icon`,
-                hashId,
-              )}
-            >
-              {groupIcon}
-            </div>
-            <span
-              className={classNames(
-                `${prefixCls}-group-type-name`,
-                hashId,
-              )}
-            >
-              {group.name}
-            </span>
-          </div>
-          <div
-            className={classNames(
-              `${prefixCls}-group-header-right`,
-              hashId,
-            )}
-          >
-            <span
-              className={classNames(`${prefixCls}-group-count`, hashId)}
-            >
-              {group.children.length}
-            </span>
-            {showDownloadButton && (
-              <ActionIconBox
-                title={locale?.['workspace.file.download'] || '下载'}
-                onClick={handleDownload}
-                tooltipProps={{ mouseEnterDelay: 0.3 }}
-                className={classNames(
-                  `${prefixCls}-group-action-btn`,
-                  hashId,
-                )}
-              >
-                <DownloadIcon />
-              </ActionIconBox>
-            )}
-          </div>
-        </>
+    // 判断是否显示下载按钮：优先使用用户 canDownload；否则当存在 onGroupDownload 时显示
+    const showDownloadButton = (() => {
+      if (group.canDownload !== undefined) {
+        return group.canDownload;
       }
-      onClick={handleToggle}
-      className={classNames(`${prefixCls}-group-header`, hashId)}
-      ariaLabel={`${group.collapsed ? locale?.['workspace.expand'] || '展开' : locale?.['workspace.collapse'] || '收起'}${group.name}${locale?.['workspace.group'] || '分组'}`}
-    />
-  );
-});
+      if (!onGroupDownload) {
+        return false;
+      }
+      // 如果组内所有文件都明确禁止下载，则不显示分组下载
+      return group.children.some(
+        (child) =>
+          child.canDownload === true ||
+          (child.canDownload !== false &&
+            Boolean(child.url || child.content || child.file)),
+      );
+    })();
+
+    return (
+      <AccessibleButton
+        icon={
+          <>
+            <div
+              className={classNames(`${prefixCls}-group-header-left`, hashId)}
+            >
+              <CollapseIcon
+                className={classNames(`${prefixCls}-group-toggle-icon`, hashId)}
+              />
+              <div
+                className={classNames(`${prefixCls}-group-type-icon`, hashId)}
+              >
+                {groupIcon}
+              </div>
+              <span
+                className={classNames(`${prefixCls}-group-type-name`, hashId)}
+              >
+                {group.name}
+              </span>
+            </div>
+            <div
+              className={classNames(`${prefixCls}-group-header-right`, hashId)}
+            >
+              <span className={classNames(`${prefixCls}-group-count`, hashId)}>
+                {group.children.length}
+              </span>
+              {showDownloadButton && (
+                <ActionIconBox
+                  title={locale?.['workspace.file.download'] || '下载'}
+                  onClick={handleDownload}
+                  tooltipProps={{ mouseEnterDelay: 0.3 }}
+                  className={classNames(
+                    `${prefixCls}-group-action-btn`,
+                    hashId,
+                  )}
+                >
+                  <DownloadIcon />
+                </ActionIconBox>
+              )}
+            </div>
+          </>
+        }
+        onClick={handleToggle}
+        className={classNames(`${prefixCls}-group-header`, hashId)}
+        ariaLabel={`${group.collapsed ? locale?.['workspace.expand'] || '展开' : locale?.['workspace.collapse'] || '收起'}${group.name}${locale?.['workspace.group'] || '分组'}`}
+      />
+    );
+  },
+);
 
 // 文件分组组件
 const FileGroupComponent: FC<{
@@ -602,134 +586,136 @@ const FileGroupComponent: FC<{
   hashId: string;
   locale?: any;
   bindDomId?: boolean;
-}> = React.memo(({
-  group,
-  onToggle,
-  onGroupDownload,
-  onDownload,
-  onFileClick,
-  onPreview,
-  onShare,
-  onLocate,
-  prefixCls,
-  hashId,
-  locale,
-  bindDomId,
-}) => {
-  const [visibleCount, setVisibleCount] = useState(GROUP_INITIAL_PAGE_SIZE);
+}> = React.memo(
+  ({
+    group,
+    onToggle,
+    onGroupDownload,
+    onDownload,
+    onFileClick,
+    onPreview,
+    onShare,
+    onLocate,
+    prefixCls,
+    hashId,
+    locale,
+    bindDomId,
+  }) => {
+    const [visibleCount, setVisibleCount] = useState(GROUP_INITIAL_PAGE_SIZE);
 
-  // 分组数据变化时重置分页，避免切换数据源后一次性展示过多节点
-  useEffect(() => {
-    setVisibleCount(GROUP_INITIAL_PAGE_SIZE);
-  }, [group.id, group.children.length]);
+    // 分组数据变化时重置分页，避免切换数据源后一次性展示过多节点
+    useEffect(() => {
+      setVisibleCount(GROUP_INITIAL_PAGE_SIZE);
+    }, [group.id, group.children.length]);
 
-  const totalCount = group.children.length;
-  const visibleFiles = group.children.slice(0, visibleCount);
-  const remainingCount = totalCount - visibleCount;
-  const hasMore = remainingCount > 0;
+    const totalCount = group.children.length;
+    const visibleFiles = group.children.slice(0, visibleCount);
+    const remainingCount = totalCount - visibleCount;
+    const hasMore = remainingCount > 0;
 
-  const handleShowMore = useRefFunction((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
-  });
-
-  const handleShowMoreKeyDown = useRefFunction((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
+    const handleShowMore = useRefFunction((e: React.MouseEvent) => {
       e.stopPropagation();
       setVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
-    }
-  });
+    });
 
-  const contentVariants = useMemo(
-    () => ({
-      expanded: {
-        height: 'auto',
-        opacity: 1,
-      },
-      collapsed: {
-        height: 0,
-        opacity: 0,
-      },
-    }),
-    [],
-  );
+    const handleShowMoreKeyDown = useRefFunction((e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        e.stopPropagation();
+        setVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
+      }
+    });
 
-  const contentTransition = useMemo(
-    () => ({
-      height: {
-        duration: 0.26,
-        ease: [0.4, 0, 0.2, 1],
-      },
-      opacity: {
-        duration: 0.2,
-        ease: 'linear',
-      },
-    }),
-    [],
-  );
+    const contentVariants = useMemo(
+      () => ({
+        expanded: {
+          height: 'auto',
+          opacity: 1,
+        },
+        collapsed: {
+          height: 0,
+          opacity: 0,
+        },
+      }),
+      [],
+    );
 
-  const showMoreLabel = hasMore
-    ? compileTemplate(
-        locale?.['workspace.file.showMore'] || '查看更多（还有 ${count} 个）',
-        { count: String(remainingCount) },
-      )
-    : (locale?.['workspace.file.showMoreFiles'] || '查看更多文件');
+    const contentTransition = useMemo(
+      () => ({
+        height: {
+          duration: 0.26,
+          ease: [0.4, 0, 0.2, 1],
+        },
+        opacity: {
+          duration: 0.2,
+          ease: 'linear',
+        },
+      }),
+      [],
+    );
 
-  return (
-    <div className={classNames(`${prefixCls}-container--group`, hashId)}>
-      <GroupHeader
-        group={group}
-        onToggle={onToggle}
-        onGroupDownload={onGroupDownload}
-        prefixCls={prefixCls}
-        hashId={hashId}
-        locale={locale}
-      />
-      <AnimatePresence initial={false}>
-        {!group.collapsed && (
-          <motion.div
-            key="group-content"
-            variants={contentVariants}
-            initial="collapsed"
-            animate="expanded"
-            exit="collapsed"
-            transition={contentTransition}
-            className={classNames(`${prefixCls}-group-content`, hashId)}
-          >
-            {visibleFiles.map((file) => (
-              <FileItemComponent
-                key={file.id}
-                file={file}
-                onClick={onFileClick}
-                onDownload={onDownload}
-                onPreview={onPreview}
-                onShare={onShare}
-                onLocate={onLocate}
-                prefixCls={prefixCls}
-                hashId={hashId}
-                locale={locale}
-                bindDomId={!!bindDomId}
-              />
-            ))}
-            {hasMore && (
-              <div
-                role="button"
-                tabIndex={0}
-                className={classNames(`${prefixCls}-show-more`, hashId)}
-                onClick={handleShowMore}
-                onKeyDown={handleShowMoreKeyDown}
-                aria-label={showMoreLabel}
-              >
-                {showMoreLabel}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-});
+    const showMoreLabel = hasMore
+      ? compileTemplate(
+          locale?.['workspace.file.showMore'] || '查看更多（还有 ${count} 个）',
+          { count: String(remainingCount) },
+        )
+      : locale?.['workspace.file.showMoreFiles'] || '查看更多文件';
+
+    return (
+      <div className={classNames(`${prefixCls}-container--group`, hashId)}>
+        <GroupHeader
+          group={group}
+          onToggle={onToggle}
+          onGroupDownload={onGroupDownload}
+          prefixCls={prefixCls}
+          hashId={hashId}
+          locale={locale}
+        />
+        <AnimatePresence initial={false}>
+          {!group.collapsed && (
+            <motion.div
+              key="group-content"
+              variants={contentVariants}
+              initial="collapsed"
+              animate="expanded"
+              exit="collapsed"
+              transition={contentTransition}
+              className={classNames(`${prefixCls}-group-content`, hashId)}
+            >
+              {visibleFiles.map((file) => (
+                <FileItemComponent
+                  key={file.id}
+                  file={file}
+                  onClick={onFileClick}
+                  onDownload={onDownload}
+                  onPreview={onPreview}
+                  onShare={onShare}
+                  onLocate={onLocate}
+                  prefixCls={prefixCls}
+                  hashId={hashId}
+                  locale={locale}
+                  bindDomId={!!bindDomId}
+                />
+              ))}
+              {hasMore && (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className={classNames(`${prefixCls}-show-more`, hashId)}
+                  onClick={handleShowMore}
+                  onKeyDown={handleShowMoreKeyDown}
+                  aria-label={showMoreLabel}
+                >
+                  {showMoreLabel}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  },
+);
 
 export const FileComponent: FC<{
   nodes: FileProps['nodes'];
@@ -816,7 +802,9 @@ export const FileComponent: FC<{
     Record<string, boolean>
   >({});
   // 扁平文件列表（非分组模式）分页状态
-  const [flatVisibleCount, setFlatVisibleCount] = useState(GROUP_INITIAL_PAGE_SIZE);
+  const [flatVisibleCount, setFlatVisibleCount] = useState(
+    GROUP_INITIAL_PAGE_SIZE,
+  );
 
   // nodes 或 keyword 变化时重置扁平列表分页，避免切换数据源后一次性渲染过多节点
   useEffect(() => {
@@ -840,24 +828,24 @@ export const FileComponent: FC<{
   const { wrapSSR, hashId } = useFileStyle(prefixCls);
 
   // 确保节点有稳定的唯一 ID（使用缓存）
-  const ensureNodeWithStableId = useRefFunction(<T extends FileNode | GroupNode>(
-    node: T,
-  ): T => {
-    if (node.id) return { ...node };
+  const ensureNodeWithStableId = useRefFunction(
+    <T extends FileNode | GroupNode>(node: T): T => {
+      if (node.id) return { ...node };
 
-    // 尝试从缓存获取 ID
-    let cachedId = nodeIdCacheRef.current.get(node);
-    if (!cachedId) {
-      // 生成新 ID 并缓存
-      cachedId = generateUniqueId(node);
-      nodeIdCacheRef.current.set(node, cachedId);
-    }
+      // 尝试从缓存获取 ID
+      let cachedId = nodeIdCacheRef.current.get(node);
+      if (!cachedId) {
+        // 生成新 ID 并缓存
+        cachedId = generateUniqueId(node);
+        nodeIdCacheRef.current.set(node, cachedId);
+      }
 
-    return {
-      ...node,
-      id: cachedId,
-    };
-  });
+      return {
+        ...node,
+        id: cachedId,
+      };
+    },
+  );
 
   // 返回列表（供预览页调用）
   const handleBackToList = useRefFunction(() => {
@@ -912,23 +900,21 @@ export const FileComponent: FC<{
   }, [nodes]);
 
   // 处理分组折叠/展开
-  const handleToggleGroup = useRefFunction((
-    groupId: string,
-    type: FileType,
-    collapsed: boolean,
-  ) => {
-    // 更新内部状态，使用 groupId 作为 key
-    setCollapsedGroups((prev) => ({
-      ...prev,
-      [groupId]: collapsed,
-    }));
-    // 优先使用新的事件名，保持向后兼容
-    if (onGroupToggle) {
-      onGroupToggle(type, collapsed);
-    } else if (onToggleGroup) {
-      onToggleGroup(type, collapsed);
-    }
-  });
+  const handleToggleGroup = useRefFunction(
+    (groupId: string, type: FileType, collapsed: boolean) => {
+      // 更新内部状态，使用 groupId 作为 key
+      setCollapsedGroups((prev) => ({
+        ...prev,
+        [groupId]: collapsed,
+      }));
+      // 优先使用新的事件名，保持向后兼容
+      if (onGroupToggle) {
+        onGroupToggle(type, collapsed);
+      } else if (onToggleGroup) {
+        onToggleGroup(type, collapsed);
+      }
+    },
+  );
 
   // 包装后的返回逻辑，允许外部拦截
   const handleBack = useRefFunction(async () => {
@@ -1133,9 +1119,7 @@ export const FileComponent: FC<{
     const nodesToRender = isFlat
       ? safeNodes.slice(0, flatVisibleCount)
       : safeNodes;
-    const flatRemaining = isFlat
-      ? safeNodes.length - flatVisibleCount
-      : 0;
+    const flatRemaining = isFlat ? safeNodes.length - flatVisibleCount : 0;
     const flatHasMore = flatRemaining > 0;
 
     const items = nodesToRender.map((node: FileNode | GroupNode) => {

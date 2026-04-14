@@ -17,10 +17,9 @@ describe('debugInfo', () => {
     (window as any).__DEBUG_AGENTIC__ = 1;
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     debugInfo('test message', { data: 1 });
-    expect(logSpy).toHaveBeenCalledWith(
-      '[Agentic Debug] test message',
-      { data: 1 },
-    );
+    expect(logSpy).toHaveBeenCalledWith('[Agentic Debug] test message', {
+      data: 1,
+    });
   });
 
   it('does not log when debug flag is other value', () => {

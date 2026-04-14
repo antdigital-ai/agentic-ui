@@ -95,9 +95,7 @@ export class TabKey {
           const anchor = isStartInNode
             ? start
             : Editor.start(this.editor, node[1]);
-          const focus = isEndInNode
-            ? end
-            : Editor.end(this.editor, node[1]);
+          const focus = isEndInNode ? end : Editor.end(this.editor, node[1]);
           Editor.withoutNormalizing(this.editor, () => {
             Transforms.liftNodes(this.editor, { at: { anchor, focus } });
             Transforms.liftNodes(this.editor);

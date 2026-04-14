@@ -60,26 +60,26 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 
 ### History
 
-| 属性                | 说明                                 | 类型                                                                               | 默认值  | 版本 |
-| ------------------- | ------------------------------------ | ---------------------------------------------------------------------------------- | ------- | ---- |
-| agentId             | 代理ID，用于获取历史记录             | `string`                                                                           | -       | -        |
-| sessionId           | 会话ID，变更时会触发数据重新获取     | `string`                                                                           | -       | -        |
-| request             | 请求函数，用于获取历史数据           | `(params: { agentId: string }) => Promise<HistoryDataType[]>`                      | -       | -        |
-| standalone          | 是否以独立模式显示                   | `boolean`                                                                          | `false` | -        |
-| onInit              | 组件初始化时的回调函数               | `() => void`                                                                       | -       | -        |
-| onShow              | 组件显示时的回调函数                 | `() => void`                                                                       | -       | -        |
-| ~~onSelected~~      | 已废弃，请使用 `onClick`             | `(item: HistoryDataType) => void`                                                  | -       | 2.29.0   |
-| ~~onDeleteItem~~    | 已废弃，建议使用 `onDelete`          | `(sessionId: string) => void`                                                      | -       | 2.29.0   |
-| customDateFormatter | 自定义日期格式化函数                 | `(date: number \| string \| Date) => string`                                       | -       | -        |
-| groupBy             | 自定义分组函数                       | `(item: HistoryDataType) => string`                                                | -       | -        |
-| extra               | 自定义额外内容渲染函数               | `(item: HistoryDataType) => React.ReactElement`                                    | -       | -        |
-| sessionSort         | 自定义排序函数或禁用排序             | `((pre: HistoryDataType, current: HistoryDataType) => number \| boolean) \| false` | -       | -        |
-| actionRef           | 外部操作引用，用于触发 reload 等功能 | `React.MutableRefObject<{ reload: () => void } \| null>`                           | -       | -        |
-| emptyRender         | 空状态渲染函数，当历史记录为空时显示 | `() => React.ReactNode`                                                            | -       | -        |
-| agent               | Agent 模式配置，详见 Agent 配置说明  | `AgentConfig`                                                                      | -       | -        |
-| slots               | 插槽配置                             | `{ beforeHistoryList?: (list: HistoryDataType[]) => React.ReactNode }`             | -       | -        |
-| ~~loading~~         | 已废弃，请使用 `isLoading`           | `boolean`                                                                          | `false` | 2.29.0   |
-| isLoading           | 加载状态，显示在 GroupMenu 区域      | `boolean`                                                                          | `false` | -        |
+| 属性                | 说明                                 | 类型                                                                               | 默认值  | 版本   |
+| ------------------- | ------------------------------------ | ---------------------------------------------------------------------------------- | ------- | ------ |
+| agentId             | 代理ID，用于获取历史记录             | `string`                                                                           | -       | -      |
+| sessionId           | 会话ID，变更时会触发数据重新获取     | `string`                                                                           | -       | -      |
+| request             | 请求函数，用于获取历史数据           | `(params: { agentId: string }) => Promise<HistoryDataType[]>`                      | -       | -      |
+| standalone          | 是否以独立模式显示                   | `boolean`                                                                          | `false` | -      |
+| onInit              | 组件初始化时的回调函数               | `() => void`                                                                       | -       | -      |
+| onShow              | 组件显示时的回调函数                 | `() => void`                                                                       | -       | -      |
+| ~~onSelected~~      | 已废弃，请使用 `onClick`             | `(item: HistoryDataType) => void`                                                  | -       | 2.29.0 |
+| ~~onDeleteItem~~    | 已废弃，建议使用 `onDelete`          | `(sessionId: string) => void`                                                      | -       | 2.29.0 |
+| customDateFormatter | 自定义日期格式化函数                 | `(date: number \| string \| Date) => string`                                       | -       | -      |
+| groupBy             | 自定义分组函数                       | `(item: HistoryDataType) => string`                                                | -       | -      |
+| extra               | 自定义额外内容渲染函数               | `(item: HistoryDataType) => React.ReactElement`                                    | -       | -      |
+| sessionSort         | 自定义排序函数或禁用排序             | `((pre: HistoryDataType, current: HistoryDataType) => number \| boolean) \| false` | -       | -      |
+| actionRef           | 外部操作引用，用于触发 reload 等功能 | `React.MutableRefObject<{ reload: () => void } \| null>`                           | -       | -      |
+| emptyRender         | 空状态渲染函数，当历史记录为空时显示 | `() => React.ReactNode`                                                            | -       | -      |
+| agent               | Agent 模式配置，详见 Agent 配置说明  | `AgentConfig`                                                                      | -       | -      |
+| slots               | 插槽配置                             | `{ beforeHistoryList?: (list: HistoryDataType[]) => React.ReactNode }`             | -       | -      |
+| ~~loading~~         | 已废弃，请使用 `isLoading`           | `boolean`                                                                          | `false` | 2.29.0 |
+| isLoading           | 加载状态，显示在 GroupMenu 区域      | `boolean`                                                                          | `false` | -      |
 
 ### HistoryDataType
 
@@ -164,27 +164,27 @@ History 组件用于显示和管理聊天历史记录，支持两种显示模式
 
 通过 `agent` 属性启用并配置 Agent 模式。组件会根据提供的回调函数自动显示对应的功能按钮：
 
-| 属性 | 说明 | 类型 | 默认值 | 版本 |
-| --- | --- | --- | --- | --- |
-| enabled | 是否启用 agent 模式 | `boolean` | `false` | - |
-| onSearch | 搜索回调函数 | `(keyword: string) => void` | - | - |
-| onFavorite | 收藏/取消收藏回调 | `(sessionId: string, isFavorite: boolean) => void` | - | - |
-| onSelectionChange | 多选变更回调 | `(selectedIds: string[]) => void` | - | - |
-| onLoadMore | 加载更多回调 | `() => void` | - | - |
-| onNewChat | 新对话回调函数 | `() => void` | - | - |
-| loadingMore | 是否正在加载更多 | `boolean` | `false` | - |
-| runningId | 正在运行的记录 ID 列表 | `string[]` | - | - |
-| searchOptions | 搜索框配置，详见 SearchOptions 说明 | `SearchOptions` | - | - |
+| 属性              | 说明                                | 类型                                               | 默认值  | 版本 |
+| ----------------- | ----------------------------------- | -------------------------------------------------- | ------- | ---- |
+| enabled           | 是否启用 agent 模式                 | `boolean`                                          | `false` | -    |
+| onSearch          | 搜索回调函数                        | `(keyword: string) => void`                        | -       | -    |
+| onFavorite        | 收藏/取消收藏回调                   | `(sessionId: string, isFavorite: boolean) => void` | -       | -    |
+| onSelectionChange | 多选变更回调                        | `(selectedIds: string[]) => void`                  | -       | -    |
+| onLoadMore        | 加载更多回调                        | `() => void`                                       | -       | -    |
+| onNewChat         | 新对话回调函数                      | `() => void`                                       | -       | -    |
+| loadingMore       | 是否正在加载更多                    | `boolean`                                          | `false` | -    |
+| runningId         | 正在运行的记录 ID 列表              | `string[]`                                         | -       | -    |
+| searchOptions     | 搜索框配置，详见 SearchOptions 说明 | `SearchOptions`                                    | -       | -    |
 
 ### SearchOptions 配置
 
 搜索框相关配置选项：
 
-| 属性 | 说明 | 类型 | 默认值 | 版本 |
-| --- | --- | --- | --- | --- |
-| placeholder | 搜索输入框 placeholder 文案 | `string` | - | - |
-| text | 未展开时的默认文本 | `string` | - | - |
-| trigger | 搜索触发方式：'change' 为实时搜索（防抖 360ms），'enter' 为回车触发 | `'change' \| 'enter'` | `'change'` | - |
+| 属性        | 说明                                                                | 类型                  | 默认值     | 版本 |
+| ----------- | ------------------------------------------------------------------- | --------------------- | ---------- | ---- |
+| placeholder | 搜索输入框 placeholder 文案                                         | `string`              | -          | -    |
+| text        | 未展开时的默认文本                                                  | `string`              | -          | -    |
+| trigger     | 搜索触发方式：'change' 为实时搜索（防抖 360ms），'enter' 为回车触发 | `'change' \| 'enter'` | `'change'` | -    |
 
 ## 注意事项
 

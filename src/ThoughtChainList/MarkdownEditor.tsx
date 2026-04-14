@@ -38,9 +38,7 @@ export const MarkdownEditorUpdate = (
       contentStyle={{ padding: 0, width: '100%' }}
       codeProps={{ showLineNumbers: false }}
       {...props}
-      streaming={
-        (props.streaming ?? props.typewriter) && !props.isFinished
-      }
+      streaming={(props.streaming ?? props.typewriter) && !props.isFinished}
       initValue=""
     />
   );

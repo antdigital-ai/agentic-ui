@@ -248,12 +248,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       [`&--markdown`]: {
-        [`${token.antCls}-agentic-md-editor-content div[data-be="paragraph"]:last-child`]: {
-          paddingBottom: '16px',
-          color: 'var(--color-gray-text-light)',
-          font: 'var(--font-text-code-base)',
-          letterSpacing: 'var(--letter-spacing-code-base, normal)',
-        },
+        [`${token.antCls}-agentic-md-editor-content div[data-be="paragraph"]:last-child`]:
+          {
+            paddingBottom: '16px',
+            color: 'var(--color-gray-text-light)',
+            font: 'var(--font-text-code-base)',
+            letterSpacing: 'var(--letter-spacing-code-base, normal)',
+          },
       },
 
       [`&-content`]: {

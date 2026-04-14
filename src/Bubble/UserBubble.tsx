@@ -93,9 +93,7 @@ export const UserBubble: React.FC<
   const rawContent = originData?.content as string | undefined;
   const { blocks: filemapBlocks, stripped: strippedContent } = useMemo(
     () =>
-      extractFilemapBlocks(
-        typeof rawContent === 'string' ? rawContent : '',
-      ),
+      extractFilemapBlocks(typeof rawContent === 'string' ? rawContent : ''),
     [rawContent],
   );
 
@@ -123,9 +121,7 @@ export const UserBubble: React.FC<
       bubbleListRef={props.bubbleListRef}
       bubbleListItemExtraStyle={styles?.bubbleListItemExtraStyle}
       bubbleRef={props.bubbleRef}
-      content={
-        filemapBlocks.length > 0 ? strippedContent : originData?.content
-      }
+      content={filemapBlocks.length > 0 ? strippedContent : originData?.content}
       key={originData?.id}
       data-id={originData?.id}
       avatar={originData?.meta as BubbleMetaData}

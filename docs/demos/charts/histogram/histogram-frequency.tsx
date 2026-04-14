@@ -2,12 +2,17 @@
  * title: 频率直方图
  * description: 显示频率而非计数，便于比较不同样本量的分布
  */
-import React from 'react';
 import { HistogramChart } from '@ant-design/agentic-ui';
+import React from 'react';
 
 export default () => {
   // 生成模拟数据
-  const generateData = (count: number, min: number, max: number, type: string) => {
+  const generateData = (
+    count: number,
+    min: number,
+    max: number,
+    type: string,
+  ) => {
     const data = [];
     for (let i = 0; i < count; i++) {
       const value = min + Math.random() * (max - min);

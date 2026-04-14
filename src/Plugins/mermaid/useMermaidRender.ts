@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { MermaidApi } from './types';
+import type { MermaidThemeToken } from './utils';
 import {
   applyMermaidTheme,
   cleanupTempElement,
@@ -7,7 +8,6 @@ import {
   loadMermaid,
   renderSvgToContainer,
 } from './utils';
-import type { MermaidThemeToken } from './utils';
 
 /**
  * Mermaid 渲染 Hook

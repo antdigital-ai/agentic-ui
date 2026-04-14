@@ -36,7 +36,11 @@ const MaxFileCountExceedDemo: React.FC = () => {
                 enable: true,
                 maxFileCount: MAX_FILE_COUNT,
                 allowMultiple: true,
-                onExceedMaxCount: ({ maxCount, currentCount, selectedCount }) => {
+                onExceedMaxCount: ({
+                  maxCount,
+                  currentCount,
+                  selectedCount,
+                }) => {
                   const remaining = maxCount - currentCount;
                   if (remaining <= 0) {
                     message.warning(`最多上传 ${maxCount} 个文件，已达上限`);

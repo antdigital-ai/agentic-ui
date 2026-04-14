@@ -49,7 +49,14 @@ const StyleDemo = () => {
         <Tag color="blue" style={{ marginBottom: 8 }}>
           minHeight — 组件最小高度
         </Tag>
-        <div style={{ marginBottom: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div
+          style={{
+            marginBottom: 8,
+            display: 'flex',
+            gap: 8,
+            alignItems: 'center',
+          }}
+        >
           <Segmented
             options={[300, 400, 500, '100%']}
             value={minHeight}
@@ -108,7 +115,8 @@ const StyleDemo = () => {
           右侧栏可拖拽调整宽度（拖动分割线）
         </Tag>
         <p style={{ margin: '0 0 8px', fontSize: 13, color: '#888' }}>
-          右侧栏左边缘有拖拽手柄，鼠标悬停时高亮，拖动可调整宽度（最小 400px，最大窗口的 70%）。
+          右侧栏左边缘有拖拽手柄，鼠标悬停时高亮，拖动可调整宽度（最小
+          400px，最大窗口的 70%）。
         </p>
         <div
           style={{
@@ -123,7 +131,9 @@ const StyleDemo = () => {
             rightWidth={280}
             left={<SidebarPanel label="历史记录" bg="#f6ffed" />}
             center={<CenterContent />}
-            right={<SidebarPanel label="工作区（可拖拽调整宽度）" bg="#fff7e6" />}
+            right={
+              <SidebarPanel label="工作区（可拖拽调整宽度）" bg="#fff7e6" />
+            }
             header={{
               title: '拖拽调整右侧宽度',
               leftCollapsible: true,

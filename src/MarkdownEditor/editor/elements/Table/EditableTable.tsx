@@ -4,12 +4,10 @@ import { MOBILE_BREAKPOINT } from '../../../../Constants/mobile';
 import { TableNode } from '../../types/Table';
 import { TABLE_ROW_INDEX_COL_WIDTH, TableColgroup } from './TableColgroup';
 import { TableRowIndex } from './TableRowIndex';
-import {
-  getEditableTableMinWidth,
-} from './utils/editableTableWidth';
+import useScrollShadow from './useScrollShadow';
+import { getEditableTableMinWidth } from './utils/editableTableWidth';
 import { useEditableTableColWidths } from './utils/useEditableTableColWidths';
 import { useEditableTableContentWidth } from './utils/useEditableTableContentWidth';
-import useScrollShadow from './useScrollShadow';
 
 const TABLE_MIN_CONTAINER_WIDTH = 200;
 

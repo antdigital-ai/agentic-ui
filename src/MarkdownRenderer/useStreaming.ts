@@ -59,7 +59,10 @@ const parsePipeRowCells = (line: string): string[] | null => {
   if (!trimmedLine.startsWith('|') || !trimmedLine.endsWith('|')) {
     return null;
   }
-  const cells = trimmedLine.split('|').slice(1, -1).map((cell) => cell.trim());
+  const cells = trimmedLine
+    .split('|')
+    .slice(1, -1)
+    .map((cell) => cell.trim());
   if (!cells.length) return null;
   return cells;
 };
@@ -272,9 +275,7 @@ export const useStreaming = (input: string, enabled: boolean): string => {
     let wasInCodeBlock = isInCodeBlock(cache.completeMarkdown + cache.pending);
     for (const char of chunk) {
       cache.pending += char;
-      const inCodeBlock = isInCodeBlock(
-        cache.completeMarkdown + cache.pending,
-      );
+      const inCodeBlock = isInCodeBlock(cache.completeMarkdown + cache.pending);
       if (inCodeBlock) {
         wasInCodeBlock = true;
         continue;

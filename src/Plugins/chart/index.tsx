@@ -56,10 +56,7 @@ export type {
   BarChartDataItem,
   BarChartProps,
 } from './BarChart';
-export type {
-  BoxPlotChartDataItem,
-  BoxPlotChartProps,
-} from './BoxPlotChart';
+export type { BoxPlotChartDataItem, BoxPlotChartProps } from './BoxPlotChart';
 export type {
   ChartStatisticClassNames,
   ChartStatisticProps,

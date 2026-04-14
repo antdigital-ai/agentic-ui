@@ -68,7 +68,12 @@ describe('BoxPlotChart 组件', () => {
 
   it('应该支持自定义尺寸', () => {
     const { container } = renderWithProvider(
-      <BoxPlotChart title="自定义尺寸" data={basicData} width={800} height={500} />,
+      <BoxPlotChart
+        title="自定义尺寸"
+        data={basicData}
+        width={800}
+        height={500}
+      />,
     );
 
     expect(container).toBeInTheDocument();
@@ -160,9 +165,7 @@ describe('BoxPlotChart 组件', () => {
 describe('calculateBoxPlotStats 函数', () => {
   // 由于 calculateBoxPlotStats 是内部函数，我们通过组件行为来测试
   it('应该正确计算统计值', () => {
-    const data = [
-      { label: '测试', values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
-    ];
+    const data = [{ label: '测试', values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }];
 
     const { container } = renderWithProvider(
       <BoxPlotChart title="统计值测试" data={data} />,
@@ -173,9 +176,7 @@ describe('calculateBoxPlotStats 函数', () => {
 
   it('应该正确处理异常值', () => {
     // 包含明显异常值的数据
-    const data = [
-      { label: '有异常值', values: [1, 2, 3, 4, 5, 100, -50] },
-    ];
+    const data = [{ label: '有异常值', values: [1, 2, 3, 4, 5, 100, -50] }];
 
     const { container } = renderWithProvider(
       <BoxPlotChart title="异常值测试" data={data} showOutliers />,

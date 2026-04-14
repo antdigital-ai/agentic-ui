@@ -1,6 +1,9 @@
-import { JINJA_DOLLAR_PLACEHOLDER, preprocessNormalizeLeafToContainerDirective } from '../../MarkdownEditor/editor/parser/constants';
 import React, { useMemo, useRef } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
+import {
+  JINJA_DOLLAR_PLACEHOLDER,
+  preprocessNormalizeLeafToContainerDirective,
+} from '../../MarkdownEditor/editor/parser/constants';
 
 import {
   buildEditorAlignedComponents,

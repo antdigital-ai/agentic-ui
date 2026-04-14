@@ -62,9 +62,9 @@ flowchart LR
 
 Typical `chat.completions` `messages`: `role` + `content` (string or parts), optional `tool_calls`, `tool`, `function`, etc.
 
-| Entry point | Role |
-| --- | --- |
-| `useOpenAIMessageBubbleData(messages, mapOptions?, mapMessage?)` | React hook |
+| Entry point                                                                | Role          |
+| -------------------------------------------------------------------------- | ------------- |
+| `useOpenAIMessageBubbleData(messages, mapOptions?, mapMessage?)`           | React hook    |
 | `mapOpenAIMessagesToMessageBubbleData(messages, mapOptions?, mapMessage?)` | Pure function |
 
 **Default id**: `msg.id ?? \`openai-msg-${index}\`` (content is **not** hashed, to keep streaming stable).
@@ -80,11 +80,11 @@ Extra fields on top of the OpenAI-like shape:
 - **`timestamp`** (ms): optionally applied to `createAt` / `updateAt` (`useOpenClawTimestamps`, default on).
 - **`toolResult`**: normalized to an OpenAI `tool` row; original role is available under `extra.openclaw.raw` (`preserveOpenClawRawInExtra`, default on).
 
-| Entry point | Role |
-| --- | --- |
-| `useOpenClawMessageBubbleData` | Hook |
-| `mapOpenClawMessagesToMessageBubbleData` | Pure function |
-| `normalizeOpenClawMessage(s)ToOpenAI` | Structure-only conversion |
+| Entry point                              | Role                      |
+| ---------------------------------------- | ------------------------- |
+| `useOpenClawMessageBubbleData`           | Hook                      |
+| `mapOpenClawMessagesToMessageBubbleData` | Pure function             |
+| `normalizeOpenClawMessage(s)ToOpenAI`    | Structure-only conversion |
 
 ## Ollama /api/chat {#ollama}
 
@@ -92,11 +92,11 @@ Aligned with [Ollama Chat API](https://docs.ollama.com/api/chat) `ChatMessage`: 
 
 `thinking` and image-count hints are appended as readable placeholders (toggle with `appendThinkingToContent`, `appendImagesPlaceholder`). Default id: `msg.id ?? \`ollama-msg-${index}\``; originals under `extra.ollama.raw` (`preserveOllamaRawInExtra`, default on).
 
-| Entry point | Role |
-| --- | --- |
-| `useOllamaMessageBubbleData` | Hook |
-| `mapOllamaMessagesToMessageBubbleData` | Pure function |
-| `normalizeOllamaMessage(s)ToOpenAI` | Structure-only conversion |
+| Entry point                            | Role                      |
+| -------------------------------------- | ------------------------- |
+| `useOllamaMessageBubbleData`           | Hook                      |
+| `mapOllamaMessagesToMessageBubbleData` | Pure function             |
+| `normalizeOllamaMessage(s)ToOpenAI`    | Structure-only conversion |
 
 ## Streaming (SSE) and stable ids {#streaming}
 
@@ -104,7 +104,7 @@ The adapters **do not parse SSE**; they only consume the `messages` array you ke
 
 Avoid using a **hash of `content`** as the message id, or keys will change every token and the list will remount. Prefer:
 
-- A stable **`id`** assigned when the turn starts (server- or client-side), or  
+- A stable **`id`** assigned when the turn starts (server- or client-side), or
 - The default **index-based** id (index stays fixed while streaming that row).
 
 ## API cheat sheet {#api-reference}

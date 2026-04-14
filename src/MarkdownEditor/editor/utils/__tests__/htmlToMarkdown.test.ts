@@ -75,9 +75,9 @@ describe('htmlToMarkdown', () => {
   });
 
   it('converts links', () => {
-    expect(
-      htmlToMarkdown('<a href="https://example.com">link</a>'),
-    ).toContain('[link](https://example.com)');
+    expect(htmlToMarkdown('<a href="https://example.com">link</a>')).toContain(
+      '[link](https://example.com)',
+    );
   });
 
   it('converts images', () => {

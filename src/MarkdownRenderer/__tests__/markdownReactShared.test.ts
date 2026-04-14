@@ -113,7 +113,9 @@ describe('renderMarkdownBlock', () => {
 
   it('returns null on parse error', () => {
     const badProcessor = {
-      parse: () => { throw new Error('parse error'); },
+      parse: () => {
+        throw new Error('parse error');
+      },
       runSync: () => ({}),
     } as any;
     const result = renderMarkdownBlock('test', badProcessor, {});
@@ -123,14 +125,16 @@ describe('renderMarkdownBlock', () => {
 
 describe('buildEditorAlignedComponents', () => {
   const prefixCls = 'ant-md-editor-content';
-  const buildComponents = (opts: {
-    streaming?: boolean;
-    linkConfig?: any;
-    fncProps?: any;
-    streamingParagraphAnimation?: boolean;
-    eleRender?: any;
-    userComponents?: Record<string, any>;
-  } = {}) =>
+  const buildComponents = (
+    opts: {
+      streaming?: boolean;
+      linkConfig?: any;
+      fncProps?: any;
+      streamingParagraphAnimation?: boolean;
+      eleRender?: any;
+      userComponents?: Record<string, any>;
+    } = {},
+  ) =>
     buildEditorAlignedComponents(
       prefixCls,
       opts.userComponents || {},
@@ -415,7 +419,9 @@ describe('buildEditorAlignedComponents', () => {
       const comps = buildComponents({
         userComponents: { __codeBlock: CodeBlock },
       });
-      const codeChild = { props: { className: 'language-js', children: 'code' } };
+      const codeChild = {
+        props: { className: 'language-js', children: 'code' },
+      };
       const result = comps.pre({
         node: { children: [] },
         children: codeChild,

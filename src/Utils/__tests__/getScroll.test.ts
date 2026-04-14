@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import getScroll, { getScrollRailHeight, isWindow } from '../getScroll';
 import { easeInOutCubic } from '../easings';
+import getScroll, { getScrollRailHeight, isWindow } from '../getScroll';
 
 describe('isWindow', () => {
   it('returns true for window object', () => {

@@ -3,6 +3,7 @@ import { Element } from 'slate';
 
 import { ChartTypeConfig, Elements } from '../../el';
 import { MarkdownEditorPlugin } from '../../plugin';
+import { preprocessNormalizeLeafToContainerDirective } from './constants';
 import { applyContextPropsAndConfig } from './parse/applyContextPropsAndConfig';
 import {
   handleBlockquote,
@@ -33,7 +34,6 @@ import {
   parseTableOrChart,
   preprocessMarkdownTableNewlines,
 } from './parse/parseTable';
-import { preprocessNormalizeLeafToContainerDirective } from './constants';
 import mdastParser from './remarkParse';
 
 // 全局解析缓存
@@ -262,7 +262,8 @@ export class MarkdownToSlateParser {
     const nonStandardProcessed = removeAnswerTags(
       preprocessNonStandardHtmlTags(thinkProcessed),
     );
-    const tableProcessed = preprocessMarkdownTableNewlines(nonStandardProcessed);
+    const tableProcessed =
+      preprocessMarkdownTableNewlines(nonStandardProcessed);
     return preprocessNormalizeLeafToContainerDirective(tableProcessed);
   }
 

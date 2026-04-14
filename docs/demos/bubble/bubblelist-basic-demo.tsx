@@ -32,11 +32,7 @@ const createMockMessage = (
 // 初始消息
 const initialMessages: MessageBubbleData[] = [
   createMockMessage('1', 'assistant', '你好，需要我帮什么？'),
-  createMockMessage(
-    '2',
-    'user',
-    'useMemo 和 useCallback 区别是什么？',
-  ),
+  createMockMessage('2', 'user', 'useMemo 和 useCallback 区别是什么？'),
 ];
 
 export default () => {

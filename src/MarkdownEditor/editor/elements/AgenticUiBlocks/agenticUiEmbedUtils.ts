@@ -175,8 +175,7 @@ const fileItemFromRecord = (
 ): AttachmentFile => {
   const name =
     x.name !== undefined && x.name !== null ? String(x.name) : `file-${index}`;
-  const url =
-    x.url !== undefined && x.url !== null ? String(x.url) : undefined;
+  const url = x.url !== undefined && x.url !== null ? String(x.url) : undefined;
   const previewUrl =
     x.previewUrl !== undefined && x.previewUrl !== null
       ? String(x.previewUrl)

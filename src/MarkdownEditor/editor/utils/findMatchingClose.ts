@@ -124,18 +124,34 @@ function checkUnclosedBrackets(code: string): boolean {
 }
 
 const MERMAID_DIAGRAM_KEYWORDS = [
-  'graph', 'flowchart', 'sequenceDiagram', 'gantt', 'pie',
-  'classDiagram', 'stateDiagram', 'erDiagram', 'journey', 'gitgraph',
-  'xychart-beta', 'mindmap', 'timeline', 'quadrantChart',
-  'sankey-beta', 'block-beta', 'packet-beta', 'kanban',
-  'architecture-beta', 'requirementDiagram', 'zenuml',
-  'C4Context', 'C4Container', 'C4Component', 'C4Deployment',
+  'graph',
+  'flowchart',
+  'sequenceDiagram',
+  'gantt',
+  'pie',
+  'classDiagram',
+  'stateDiagram',
+  'erDiagram',
+  'journey',
+  'gitgraph',
+  'xychart-beta',
+  'mindmap',
+  'timeline',
+  'quadrantChart',
+  'sankey-beta',
+  'block-beta',
+  'packet-beta',
+  'kanban',
+  'architecture-beta',
+  'requirementDiagram',
+  'zenuml',
+  'C4Context',
+  'C4Container',
+  'C4Component',
+  'C4Deployment',
 ] as const;
 
-const MERMAID_INCOMPLETE_TAIL = [
-  /graph\s*$/i,
-  /-->?\s*$/,
-];
+const MERMAID_INCOMPLETE_TAIL = [/graph\s*$/i, /-->?\s*$/];
 
 function isMermaidCodeComplete(code: string): boolean {
   if (!MERMAID_DIAGRAM_KEYWORDS.some((kw) => code.includes(kw))) return false;

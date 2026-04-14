@@ -3,7 +3,6 @@ import classNames from 'clsx';
 import React, { useContext, useEffect, useState } from 'react';
 import { ElementProps, LinkCardNode } from '../../../el';
 import { AvatarList } from '../../components/ContributorAvatar';
-import { DragHandle } from '../../tools/DragHandle';
 
 export function LinkCard({
   element,
@@ -97,7 +96,6 @@ export function LinkCard({
         >
           {children.at(0)}
         </div>
-        <DragHandle />
         <div
           ref={htmlRef}
           style={{

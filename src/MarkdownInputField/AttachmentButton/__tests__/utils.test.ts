@@ -33,7 +33,9 @@ describe('AttachmentButton utils', () => {
 
   it('should not treat done files with url as FileMetaPlaceholder', () => {
     expect(
-      isFileMetaPlaceholderState(makeFile('done', { url: 'https://example.com/file' })),
+      isFileMetaPlaceholderState(
+        makeFile('done', { url: 'https://example.com/file' }),
+      ),
     ).toBe(false);
   });
 });

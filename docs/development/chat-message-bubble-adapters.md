@@ -62,10 +62,10 @@ flowchart LR
 
 对应 `chat.completions` 常见的 `messages`：`role` + `content`（字符串或多段），可含 `tool_calls`、`tool`、`function` 等。
 
-| 入口 | 说明 |
-| --- | --- |
-| `useOpenAIMessageBubbleData(messages, mapOptions?, mapMessage?)` | React Hook |
-| `mapOpenAIMessagesToMessageBubbleData(messages, mapOptions?, mapMessage?)` | 纯函数 |
+| 入口                                                                       | 说明       |
+| -------------------------------------------------------------------------- | ---------- |
+| `useOpenAIMessageBubbleData(messages, mapOptions?, mapMessage?)`           | React Hook |
+| `mapOpenAIMessagesToMessageBubbleData(messages, mapOptions?, mapMessage?)` | 纯函数     |
 
 **默认 id**：`msg.id ?? \`openai-msg-${index}\``（**不**用 content 做 hash，避免流式抖动）。
 
@@ -80,11 +80,11 @@ flowchart LR
 - **`timestamp`**（毫秒）：可选写入 `createAt` / `updateAt`（`useOpenClawTimestamps`，默认开启）。
 - **`toolResult`**：归一为 OpenAI 的 `tool` 行；原始角色可在 `extra.openclaw.raw` 查看（`preserveOpenClawRawInExtra`，默认开启）。
 
-| 入口 | 说明 |
-| --- | --- |
-| `useOpenClawMessageBubbleData` | Hook |
-| `mapOpenClawMessagesToMessageBubbleData` | 纯函数 |
-| `normalizeOpenClawMessage(s)ToOpenAI` | 仅结构转换 |
+| 入口                                     | 说明       |
+| ---------------------------------------- | ---------- |
+| `useOpenClawMessageBubbleData`           | Hook       |
+| `mapOpenClawMessagesToMessageBubbleData` | 纯函数     |
+| `normalizeOpenClawMessage(s)ToOpenAI`    | 仅结构转换 |
 
 ## Ollama /api/chat {#ollama}
 
@@ -92,11 +92,11 @@ flowchart LR
 
 映射时会将 `thinking`、图片数量等以可读占位拼入正文（可通过 `appendThinkingToContent`、`appendImagesPlaceholder` 关闭）；默认 id：`msg.id ?? \`ollama-msg-${index}\``；原始消息可在 `extra.ollama.raw`（`preserveOllamaRawInExtra`，默认开启）。
 
-| 入口 | 说明 |
-| --- | --- |
-| `useOllamaMessageBubbleData` | Hook |
-| `mapOllamaMessagesToMessageBubbleData` | 纯函数 |
-| `normalizeOllamaMessage(s)ToOpenAI` | 仅结构转换 |
+| 入口                                   | 说明       |
+| -------------------------------------- | ---------- |
+| `useOllamaMessageBubbleData`           | Hook       |
+| `mapOllamaMessagesToMessageBubbleData` | 纯函数     |
+| `normalizeOllamaMessage(s)ToOpenAI`    | 仅结构转换 |
 
 ## 流式（SSE）与稳定 id {#streaming}
 
@@ -104,7 +104,7 @@ flowchart LR
 
 请避免用 **content 的 hash** 作为消息 id，否则每次增量都会变 key、列表会剧烈重挂载。优先使用：
 
-- 服务端或客户端在**本轮开始时**为消息分配的 **`id`**，或  
+- 服务端或客户端在**本轮开始时**为消息分配的 **`id`**，或
 - 默认的 **按索引** id（同一索引在流式过程中不变）。
 
 ## API 速查 {#api-reference}

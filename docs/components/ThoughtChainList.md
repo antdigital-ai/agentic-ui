@@ -86,26 +86,26 @@ export default App;
 
 ## 属性
 
-| 属性                     | 说明                                       | 类型                               | 默认值 | 版本   |
-| ------------------------ | ------------------------------------------ | ---------------------------------- | ------ | ------ |
-| `thoughtChainList`       | 思维链项目数组（必填）                     | `WhiteBoxProcessInterface[]`       | -      | -      |
-| `isLoading`              | 表示组件是否处于加载状态                   | `boolean`                          | -      | -      |
-| ~~`loading`~~            | 已废弃，请使用 `isLoading`                 | `boolean`                          | -      | 2.29.0 |
-| `bubble`                 | 聊天状态信息                               | `object`                           | -      | -      |
-| ~~`chatItem`~~           | 已废弃，请使用 `bubble`                    | `object`                           | -      | 2.30.0 |
-| `bubble.isFinished`      | 聊天/任务是否已完成                        | `boolean`                          | -      | -      |
-| `bubble.endTime`         | 聊天结束的时间戳                           | `number`                           | -      | -      |
-| `bubble.createAt`        | 聊天创建的时间戳                           | `number`                           | -      | -      |
-| `bubble.isAborted`       | 聊天/任务是否被中止                        | `boolean`                          | -      | -      |
-| `style`                  | 自定义 CSS 样式                            | `React.CSSProperties`              | -      | -      |
-| `compact`                | 启用紧凑显示模式                           | `boolean`                          | -      | -      |
-| `markdownRenderProps`    | Markdown 渲染属性                          | `MarkdownEditorProps`              | -      | -      |
-| `finishAutoCollapse`     | 完成时自动折叠（默认为 true）              | `boolean`                          | -      | -      |
-| `locale`                 | 本地化字符串                               | `object`                           | -      | -      |
-| `titleRender`            | 自定义标题渲染                             | `(props, defaultDom) => ReactNode` | -      | -      |
-| `titleExtraRender`       | 自定义标题右侧额外内容渲染                 | `(props, defaultDom) => ReactNode` | -      | -      |
-| `thoughtChainItemRender` | 自定义思维链项目的渲染                     | `object`                           | -      | -      |
-| `onDocMetaClick`         | 文档元数据点击回调                         | `(docMeta: DocMeta) => void`       | -      | -      |
+| 属性                     | 说明                          | 类型                               | 默认值 | 版本   |
+| ------------------------ | ----------------------------- | ---------------------------------- | ------ | ------ |
+| `thoughtChainList`       | 思维链项目数组（必填）        | `WhiteBoxProcessInterface[]`       | -      | -      |
+| `isLoading`              | 表示组件是否处于加载状态      | `boolean`                          | -      | -      |
+| ~~`loading`~~            | 已废弃，请使用 `isLoading`    | `boolean`                          | -      | 2.29.0 |
+| `bubble`                 | 聊天状态信息                  | `object`                           | -      | -      |
+| ~~`chatItem`~~           | 已废弃，请使用 `bubble`       | `object`                           | -      | 2.30.0 |
+| `bubble.isFinished`      | 聊天/任务是否已完成           | `boolean`                          | -      | -      |
+| `bubble.endTime`         | 聊天结束的时间戳              | `number`                           | -      | -      |
+| `bubble.createAt`        | 聊天创建的时间戳              | `number`                           | -      | -      |
+| `bubble.isAborted`       | 聊天/任务是否被中止           | `boolean`                          | -      | -      |
+| `style`                  | 自定义 CSS 样式               | `React.CSSProperties`              | -      | -      |
+| `compact`                | 启用紧凑显示模式              | `boolean`                          | -      | -      |
+| `markdownRenderProps`    | Markdown 渲染属性             | `MarkdownEditorProps`              | -      | -      |
+| `finishAutoCollapse`     | 完成时自动折叠（默认为 true） | `boolean`                          | -      | -      |
+| `locale`                 | 本地化字符串                  | `object`                           | -      | -      |
+| `titleRender`            | 自定义标题渲染                | `(props, defaultDom) => ReactNode` | -      | -      |
+| `titleExtraRender`       | 自定义标题右侧额外内容渲染    | `(props, defaultDom) => ReactNode` | -      | -      |
+| `thoughtChainItemRender` | 自定义思维链项目的渲染        | `object`                           | -      | -      |
+| `onDocMetaClick`         | 文档元数据点击回调            | `(docMeta: DocMeta) => void`       | -      | -      |
 
 ## 类型定义
 

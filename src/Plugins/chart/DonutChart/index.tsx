@@ -429,7 +429,9 @@ const DonutChart: React.FC<DonutChartProps> = ({
             hiddenDataIndicesByChart[idx] || new Set<number>();
           const visibleDataWithIndex = chartData
             .map((d, index) => ({ d, originalIndex: index }))
-            .filter(({ originalIndex }) => !hiddenSetForChart.has(originalIndex));
+            .filter(
+              ({ originalIndex }) => !hiddenSetForChart.has(originalIndex),
+            );
           const visibleData = visibleDataWithIndex.map(({ d }) => d);
           const visibleOriginalIndices = visibleDataWithIndex.map(
             ({ originalIndex }) => originalIndex,

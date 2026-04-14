@@ -130,29 +130,31 @@ export const generateHistoryItems = ({
         ),
       }));
 
-  const items: MenuItemType[] = sortedGroupKeys.flatMap((key): MenuItemType[] => {
-    const list = groupList[key];
+  const items: MenuItemType[] = sortedGroupKeys.flatMap(
+    (key): MenuItemType[] => {
+      const list = groupList[key];
 
-    // 少于最小数量时，直接平铺为普通条目，不展示分组标题
-    if (list.length < MIN_GROUP_SIZE) {
-      return buildItemNodes(list);
-    }
+      // 少于最小数量时，直接平铺为普通条目，不展示分组标题
+      if (list.length < MIN_GROUP_SIZE) {
+        return buildItemNodes(list);
+      }
 
-    const firstItem = list.at(0);
-    const label =
-      customDateFormatter && firstItem?.gmtCreate
-        ? customDateFormatter(firstItem.gmtCreate)
-        : formatTime(firstItem?.gmtCreate as number);
+      const firstItem = list.at(0);
+      const label =
+        customDateFormatter && firstItem?.gmtCreate
+          ? customDateFormatter(firstItem.gmtCreate)
+          : formatTime(firstItem?.gmtCreate as number);
 
-    return [
-      {
-        key: `group-${key}`,
-        type: 'group' as const,
-        label: groupLabelRender ? groupLabelRender(key, list, label) : label,
-        children: buildItemNodes(list),
-      },
-    ];
-  });
+      return [
+        {
+          key: `group-${key}`,
+          type: 'group' as const,
+          label: groupLabelRender ? groupLabelRender(key, list, label) : label,
+          children: buildItemNodes(list),
+        },
+      ];
+    },
+  );
 
   return items;
 };

@@ -4,7 +4,6 @@ import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, FootnoteDefinitionNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
-import { DragHandle } from '../../tools/DragHandle';
 
 export const FootnoteReference = (
   props: ElementProps<FootnoteDefinitionNode>,
@@ -33,7 +32,6 @@ export const FootnoteReference = (
         }}
         data-empty={!str && selected ? 'true' : undefined}
       >
-        <DragHandle />
         {props.children}
       </p>
     );

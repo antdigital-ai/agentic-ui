@@ -315,8 +315,10 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     const range = dataMax - dataMin || 1;
     const padding = range * 0.1;
     return {
-      min: overrideMin !== undefined ? overrideMin : Math.floor(dataMin - padding),
-      max: overrideMax !== undefined ? overrideMax : Math.ceil(dataMax + padding),
+      min:
+        overrideMin !== undefined ? overrideMin : Math.floor(dataMin - padding),
+      max:
+        overrideMax !== undefined ? overrideMax : Math.ceil(dataMax + padding),
     };
   };
 

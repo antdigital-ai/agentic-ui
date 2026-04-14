@@ -1,8 +1,11 @@
 import type { MessageBubbleData } from '../../Types/message';
 import { mapOpenAIMessagesToMessageBubbleData } from './mapOpenAIMessages';
 import { normalizeOllamaMessagesToOpenAI } from './normalizeOllamaMessages';
+import type {
+  OllamaChatMessage,
+  OllamaMessagesMapOptions,
+} from './ollamaTypes';
 import type { OpenAIChatMessage, OpenAIMessagesMapMessage } from './types';
-import type { OllamaChatMessage, OllamaMessagesMapOptions } from './ollamaTypes';
 
 function defaultOllamaGetMessageId(
   msg: OpenAIChatMessage,

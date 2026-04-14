@@ -14,10 +14,7 @@ export const MermaidCodePreview = (props: { code: string }) => {
   const { wrapSSR, hashId } = useStyle(baseCls);
 
   return wrapSSR(
-    <div
-      className={classNames(baseCls, hashId)}
-      contentEditable={false}
-    >
+    <div className={classNames(baseCls, hashId)} contentEditable={false}>
       <div className={classNames(`${baseCls}-empty`, hashId)}>
         <pre
           style={{

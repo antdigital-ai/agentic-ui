@@ -415,7 +415,11 @@ describe('useHighlight', () => {
         children: [{ text: 'text' }],
       } as any;
       store.highlightCache.set(node, [
-        { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 4 }, custom: true },
+        {
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 4 },
+          custom: true,
+        },
       ] as any);
       const high = useHighlight(store);
       const ranges = high([node, [0]]);

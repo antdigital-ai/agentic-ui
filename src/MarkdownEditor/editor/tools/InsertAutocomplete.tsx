@@ -640,7 +640,10 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
         };
         if (node?.[0]?.type === 'paragraph') {
           try {
-            const el = ReactEditor.toDOMNode(markdownEditorRef.current, node[0]);
+            const el = ReactEditor.toDOMNode(
+              markdownEditorRef.current,
+              node[0],
+            );
             if (el) {
               const position = calculatePosition(el, document.body);
               if (position) {

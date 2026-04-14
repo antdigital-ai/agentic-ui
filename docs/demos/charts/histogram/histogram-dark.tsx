@@ -2,8 +2,8 @@
  * title: 暗黑主题
  * description: 设置 theme="dark"，与 ChartContainer 暗色算法一致
  */
-import React from 'react';
 import { HistogramChart } from '@ant-design/agentic-ui';
+import React from 'react';
 
 /** 可复现的伪随机，保证文档预览每次一致 */
 const mulberry32 = (seed: number) => {

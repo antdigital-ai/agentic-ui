@@ -128,10 +128,7 @@ export const FileMapViewItem: React.FC<{
         <div
           key="size"
           data-testid="file-item-size"
-          className={classNames(
-            `${props.prefixCls}-file-size`,
-            props.hashId,
-          )}
+          className={classNames(`${props.prefixCls}-file-size`, props.hashId)}
         >
           {fileSize}
         </div>,

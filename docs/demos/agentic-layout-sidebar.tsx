@@ -2,13 +2,7 @@ import { AgenticLayout, ChatLayout } from '@ant-design/agentic-ui';
 import { Segmented, Tag } from 'antd';
 import React, { useState } from 'react';
 
-const SidebarPanel = ({
-  label,
-  bg,
-}: {
-  label: string;
-  bg: string;
-}) => (
+const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
   <div
     style={{
       height: '100%',
@@ -52,7 +46,14 @@ const SidebarDemo = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 16,
+          flexWrap: 'wrap',
+          alignItems: 'center',
+        }}
+      >
         <span style={{ fontSize: 13 }}>
           <Tag color="blue">leftWidth</Tag>
         </span>
@@ -63,7 +64,14 @@ const SidebarDemo = () => {
         />
         <span style={{ fontSize: 13, color: '#999' }}>当前: {leftWidth}px</span>
       </div>
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 16,
+          flexWrap: 'wrap',
+          alignItems: 'center',
+        }}
+      >
         <span style={{ fontSize: 13 }}>
           <Tag color="purple">rightWidth</Tag>
         </span>
@@ -72,7 +80,9 @@ const SidebarDemo = () => {
           value={rightWidth}
           onChange={(v) => setRightWidth(v as number)}
         />
-        <span style={{ fontSize: 13, color: '#999' }}>当前: {rightWidth}px</span>
+        <span style={{ fontSize: 13, color: '#999' }}>
+          当前: {rightWidth}px
+        </span>
       </div>
 
       <div
@@ -89,7 +99,9 @@ const SidebarDemo = () => {
           rightWidth={rightWidth}
           left={<SidebarPanel label="左侧边栏 (History / 导航)" bg="#f6ffed" />}
           center={<CenterContent />}
-          right={<SidebarPanel label="右侧边栏 (Workspace / 详情)" bg="#fff7e6" />}
+          right={
+            <SidebarPanel label="右侧边栏 (Workspace / 详情)" bg="#fff7e6" />
+          }
           header={{
             title: '三栏布局',
             leftCollapsible: true,

@@ -27,21 +27,21 @@ group:
 
 ### ChartStatisticProps
 
-| 属性 | 说明 | 类型 | 默认值 | 版本 |
-| --- | --- | --- | --- | --- |
-| title | 指标标题 | `string` | - | - |
-| tooltip | 鼠标悬停时显示的提示信息 | `string` | - | - |
-| value | 显示的数值 | `number \| string \| null \| undefined` | - | - |
-| precision | 数值精度（小数点后位数） | `number` | - | - |
-| groupSeparator | 千分位分隔符 | `string` | `','` | - |
-| prefix | 数值前缀（如货币符号） | `string` | `''` | - |
-| suffix | 数值后缀（如单位） | `string` | `''` | - |
-| formatter | 自定义格式化函数，优先级高于其他格式化选项 | `(value: number \| string \| null \| undefined) => React.ReactNode` | - | - |
-| className | 自定义类名 | `string` | `''` | - |
-| theme | 主题风格 | `'light' \| 'dark'` | `'light'` | - |
-| size | 组件尺寸 | `'small' \| 'default' \| 'large'` | `'default'` | - |
-| block | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean` | `false` | - |
-| extra | 右上角自定义内容（图标、按钮等） | `React.ReactNode` | - | - |
+| 属性           | 说明                                                   | 类型                                                                | 默认值      | 版本 |
+| -------------- | ------------------------------------------------------ | ------------------------------------------------------------------- | ----------- | ---- |
+| title          | 指标标题                                               | `string`                                                            | -           | -    |
+| tooltip        | 鼠标悬停时显示的提示信息                               | `string`                                                            | -           | -    |
+| value          | 显示的数值                                             | `number \| string \| null \| undefined`                             | -           | -    |
+| precision      | 数值精度（小数点后位数）                               | `number`                                                            | -           | -    |
+| groupSeparator | 千分位分隔符                                           | `string`                                                            | `','`       | -    |
+| prefix         | 数值前缀（如货币符号）                                 | `string`                                                            | `''`        | -    |
+| suffix         | 数值后缀（如单位）                                     | `string`                                                            | `''`        | -    |
+| formatter      | 自定义格式化函数，优先级高于其他格式化选项             | `(value: number \| string \| null \| undefined) => React.ReactNode` | -           | -    |
+| className      | 自定义类名                                             | `string`                                                            | `''`        | -    |
+| theme          | 主题风格                                               | `'light' \| 'dark'`                                                 | `'light'`   | -    |
+| size           | 组件尺寸                                               | `'small' \| 'default' \| 'large'`                                   | `'default'` | -    |
+| block          | 是否使用块级布局（弹性占用空间，多个时平分父容器宽度） | `boolean`                                                           | `false`     | -    |
+| extra          | 右上角自定义内容（图标、按钮等）                       | `React.ReactNode`                                                   | -           | -    |
 
 ## 特性说明
 

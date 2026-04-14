@@ -314,16 +314,17 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
       const sorted = [...filteredData].sort(
         (a, b) => (a.left as number) - (b.left as number),
       );
-      const uniqueEdgePairs = sorted.reduce<
-        { left: number; right: number }[]
-      >((acc, item) => {
-        const l = item.left as number;
-        const r = item.right as number;
-        if (!acc.some((p) => p.left === l && p.right === r)) {
-          acc.push({ left: l, right: r });
-        }
-        return acc;
-      }, []);
+      const uniqueEdgePairs = sorted.reduce<{ left: number; right: number }[]>(
+        (acc, item) => {
+          const l = item.left as number;
+          const r = item.right as number;
+          if (!acc.some((p) => p.left === l && p.right === r)) {
+            acc.push({ left: l, right: r });
+          }
+          return acc;
+        },
+        [],
+      );
 
       const edges = [
         ...uniqueEdgePairs.map((p) => p.left),

@@ -2,8 +2,8 @@
  * title: 基础直方图
  * description: 展示数据分布频率，自动使用 Sturges 规则计算分箱数量
  */
-import React from 'react';
 import { HistogramChart } from '@ant-design/agentic-ui';
+import React from 'react';
 
 export default () => {
   // 生成正态分布的模拟数据

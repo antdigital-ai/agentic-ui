@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  normalizeFileMapPropsFromJson,
   normalizeTaskListPropsFromJson,
   normalizeToolUseBarPropsFromJson,
-  normalizeFileMapPropsFromJson,
 } from '../agenticUiEmbedUtils';
 
 describe('normalizeTaskListPropsFromJson', () => {
@@ -81,7 +81,14 @@ describe('normalizeToolUseBarPropsFromJson', () => {
   it('handles tools with content and errorMessage', () => {
     const result = normalizeToolUseBarPropsFromJson({
       tools: [
-        { id: '1', toolName: 'api', content: 'result data', errorMessage: 'err', time: '2s', type: 'summary' },
+        {
+          id: '1',
+          toolName: 'api',
+          content: 'result data',
+          errorMessage: 'err',
+          time: '2s',
+          type: 'summary',
+        },
       ],
     });
     expect(result.tools[0].content).toBe('result data');
@@ -116,9 +123,7 @@ describe('normalizeFileMapPropsFromJson', () => {
   });
 
   it('handles array of files', () => {
-    const result = normalizeFileMapPropsFromJson([
-      { name: 'file.ts' },
-    ]);
+    const result = normalizeFileMapPropsFromJson([{ name: 'file.ts' }]);
     expect(result.fileList.length).toBe(1);
   });
 
@@ -137,13 +142,23 @@ describe('normalizeFileMapPropsFromJson', () => {
   });
 
   it('filters invalid file entries', () => {
-    const result = normalizeFileMapPropsFromJson([null, 42, { name: 'valid.ts' }]);
+    const result = normalizeFileMapPropsFromJson([
+      null,
+      42,
+      { name: 'valid.ts' },
+    ]);
     expect(result.fileList.length).toBe(1);
   });
 
   it('handles file with various properties', () => {
     const result = normalizeFileMapPropsFromJson([
-      { name: 'test.pdf', url: 'http://x.com/f', size: 1024, status: 'done', uuid: 'abc' },
+      {
+        name: 'test.pdf',
+        url: 'http://x.com/f',
+        size: 1024,
+        status: 'done',
+        uuid: 'abc',
+      },
     ]);
     expect(result.fileList[0].name).toBe('test.pdf');
     expect(result.fileList[0].url).toBe('http://x.com/f');

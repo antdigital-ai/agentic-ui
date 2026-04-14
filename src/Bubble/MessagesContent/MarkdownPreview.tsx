@@ -71,9 +71,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
 
   useEffect(() => {
     if (renderMode !== 'slate') return;
-    editorRef.current?.store.updateNodeList(
-      parserMdToSchema(content).schema,
-    );
+    editorRef.current?.store.updateNodeList(parserMdToSchema(content).schema);
   }, [content, renderMode]);
 
   const markdown = useMemo(() => {
@@ -194,7 +192,10 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         offset: [0, -12],
       }}
       content={extra}
-      styles={{ root: POPOVER_SHARED_STYLE, body: { ...POPOVER_SHARED_STYLE, padding: 'var(--padding-0-5x)' } }}
+      styles={{
+        root: POPOVER_SHARED_STYLE,
+        body: { ...POPOVER_SHARED_STYLE, padding: 'var(--padding-0-5x)' },
+      }}
       arrow={false}
       placement={isLeft ? 'bottomLeft' : 'bottomRight'}
     >

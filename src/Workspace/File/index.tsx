@@ -3,6 +3,7 @@ export { PreviewComponent } from './PreviewComponent';
 export type { PreviewComponentProps } from './PreviewComponent';
 
 // 导出类型和工具函数
+export { getFileTypeName } from '../types';
 export type {
   FileActionRef,
   FileBuiltinActions,
@@ -13,4 +14,3 @@ export type {
   GroupNode,
 } from '../types';
 export { getFileTypeIcon, getGroupIcon } from './utils';
-export { getFileTypeName } from '../types';

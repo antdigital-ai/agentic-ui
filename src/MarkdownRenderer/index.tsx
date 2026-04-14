@@ -1,6 +1,7 @@
 export { default as AnimationText } from './AnimationText';
 export type { AnimationConfig, AnimationTextProps } from './AnimationText';
 export { CharacterQueue } from './CharacterQueue';
+export type { UseMarkdownToReactOptions } from './markdownReactShared';
 export { default as MarkdownRenderer } from './MarkdownRenderer';
 export { AgenticUiFileMapBlockRenderer } from './renderers/AgenticUiFileMapBlockRenderer';
 export { AgenticUiTaskBlockRenderer } from './renderers/AgenticUiTaskBlockRenderer';
@@ -9,6 +10,7 @@ export { ChartBlockRenderer } from './renderers/ChartRenderer';
 export { CodeBlockRenderer } from './renderers/CodeRenderer';
 export { MermaidBlockRenderer } from './renderers/MermaidRenderer';
 export { SchemaBlockRenderer } from './renderers/SchemaRenderer';
+export { useStreamingMarkdownReact } from './streaming/useStreamingMarkdownReact';
 export type {
   CharacterQueueOptions,
   FileMapConfig,
@@ -18,7 +20,5 @@ export type {
   RenderMode,
   RendererBlockProps,
 } from './types';
-export type { UseMarkdownToReactOptions } from './markdownReactShared';
 export { markdownToReactSync, useMarkdownToReact } from './useMarkdownToReact';
-export { useStreamingMarkdownReact } from './streaming/useStreamingMarkdownReact';
 export { useStreaming } from './useStreaming';

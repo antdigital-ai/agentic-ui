@@ -13,11 +13,10 @@ import {
 } from './shared';
 
 const mockMessages = [
-  createAssistantMessage(
-    '1',
-    '你好！我是AI助手，请问有什么可以帮助你的吗？',
-    { createAt: 1703123396789, updateAt: 1703123396789 },
-  ),
+  createAssistantMessage('1', '你好！我是AI助手，请问有什么可以帮助你的吗？', {
+    createAt: 1703123396789,
+    updateAt: 1703123396789,
+  }),
   createUserMessage('2', '帮我写一首关于春天的诗', {
     createAt: 1703123426789,
     updateAt: 1703123426789,

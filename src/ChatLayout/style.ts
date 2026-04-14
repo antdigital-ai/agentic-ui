@@ -6,8 +6,7 @@ import {
   useEditorStyleRegister,
 } from '../Hooks/useStyle';
 
-const RADIUS_XL =
-  'var(--radius-xl, var(--radius-card-lg, 16px))';
+const RADIUS_XL = 'var(--radius-xl, var(--radius-card-lg, 16px))';
 const COLOR_GRAY_BG_ACTIVE =
   'var(--color-gray-bg-active, var(--color-gray-control-fill-active, rgba(20, 22, 28, 0.12)))';
 const COLOR_GRAY_BORDER_DEFAULT =

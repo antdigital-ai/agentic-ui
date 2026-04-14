@@ -37,7 +37,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           height: 'var(--padding-1x)',
         },
         '&::-webkit-scrollbar-thumb': {
-          background: 'var(--color-gray-border-default, var(--color-gray-border-light))',
+          background:
+            'var(--color-gray-border-default, var(--color-gray-border-light))',
           borderRadius: 'var(--radius-base, var(--radius-control-xs, 4px))',
         },
         '&::-webkit-scrollbar-track': {

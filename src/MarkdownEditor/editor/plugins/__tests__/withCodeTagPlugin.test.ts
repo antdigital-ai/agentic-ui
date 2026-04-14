@@ -292,11 +292,9 @@ describe('withCodeTagPlugin', () => {
         focus: { path: [0, 0], offset: 1 },
       };
 
-      const spy = vi
-        .spyOn(Editor, 'previous')
-        .mockImplementation(() => {
-          throw new Error('fail');
-        });
+      const spy = vi.spyOn(Editor, 'previous').mockImplementation(() => {
+        throw new Error('fail');
+      });
 
       expect(() => editor.deleteBackward('character')).not.toThrow();
       spy.mockRestore();
@@ -346,10 +344,7 @@ describe('withCodeTagPlugin', () => {
 
       const prev = tagNode('b');
       const prevPath: [number, number] = [0, 1];
-      vi.spyOn(Editor, 'previous').mockReturnValue([
-        prev,
-        prevPath,
-      ] as any);
+      vi.spyOn(Editor, 'previous').mockReturnValue([prev, prevPath] as any);
       vi.spyOn(Node, 'get').mockImplementation((_e, path) => {
         if (Path.equals(path, [1, 0])) return { text: 'c' } as any;
         if (Path.equals(path, [0]))
@@ -401,10 +396,7 @@ describe('withCodeTagPlugin', () => {
       };
 
       const prev = tagNode('x');
-      vi.spyOn(Editor, 'previous').mockReturnValue([
-        prev,
-        [0, 0],
-      ] as any);
+      vi.spyOn(Editor, 'previous').mockReturnValue([prev, [0, 0]] as any);
 
       editor.deleteBackward('character');
 

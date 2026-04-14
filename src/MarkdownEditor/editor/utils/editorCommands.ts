@@ -41,8 +41,7 @@ function resolveParagraphOrHead(
     const above = Editor.above(editor, {
       at: selection.anchor,
       match: (n) =>
-        Element.isElement(n) &&
-        ['paragraph', 'head'].includes((n as any).type),
+        Element.isElement(n) && ['paragraph', 'head'].includes((n as any).type),
     });
     if (above) {
       return above as [any, Path];
@@ -51,17 +50,13 @@ function resolveParagraphOrHead(
   const nodesResult = Editor.nodes(editor, {
     at: [],
     match: (n) =>
-      Element.isElement(n) &&
-      ['paragraph', 'head'].includes((n as any).type),
+      Element.isElement(n) && ['paragraph', 'head'].includes((n as any).type),
     mode: 'lowest',
   }) as Iterable<[any, Path]> | Iterator<[any, Path]>;
 
   if (Array.isArray(nodesResult) && nodesResult.length > 0) {
     const entry = nodesResult[0] as [any, Path];
-    if (
-      entry?.[0] &&
-      ['paragraph', 'head'].includes((entry[0] as any).type)
-    ) {
+    if (entry?.[0] && ['paragraph', 'head'].includes((entry[0] as any).type)) {
       return entry;
     }
     return undefined;
@@ -122,7 +117,7 @@ export function insertTable(editor: Editor, node?: [any, Path]) {
 
   const currentNode =
     node === undefined
-      ? resolveParagraphOrHead(editor) ?? firstLowestElement(editor)
+      ? (resolveParagraphOrHead(editor) ?? firstLowestElement(editor))
       : resolveParagraphOrHead(editor, node);
   if (currentNode && ['paragraph', 'head'].includes(currentNode?.[0]?.type)) {
     const path =
@@ -145,7 +140,6 @@ export function insertTable(editor: Editor, node?: [any, Path]) {
     }
     Transforms.select(editor, Editor.start(editor, path));
   }
-
 }
 
 /**
@@ -172,7 +166,7 @@ export function insertCodeBlock(
 
   const currentNode =
     node === undefined
-      ? resolveParagraphOrHead(editor) ?? firstLowestElement(editor)
+      ? (resolveParagraphOrHead(editor) ?? firstLowestElement(editor))
       : resolveParagraphOrHead(editor, node);
   if (
     currentNode &&

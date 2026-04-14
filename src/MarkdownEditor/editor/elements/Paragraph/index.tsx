@@ -1,12 +1,11 @@
 import classNames from 'clsx';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { Node } from 'slate';
 import { I18nContext } from '../../../../I18n';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ParagraphNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
 import { useEditorStore } from '../../store';
-import { DragHandle } from '../../tools/DragHandle';
 
 export const Paragraph = (props: ElementProps<ParagraphNode>) => {
   const align = props.element.align ?? props.element.otherProps?.align;
@@ -23,21 +22,6 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
   } = useEditorStore();
   const { locale } = useContext(I18nContext);
   const [selected] = useSelStatus(props.element);
-
-  // 将 store.inputComposition（可变对象属性）同步到 React state，
-  // 使 useMemo 能在组合输入状态变化时重新评估 isEmpty，
-  // 避免竞态导致占位符在组合结束后短暂闪现。
-  const [isComposing, setIsComposing] = useState(false);
-  useEffect(() => {
-    const container = markdownContainerRef.current;
-    if (!container) return;
-
-    const observer = new MutationObserver(() => {
-      setIsComposing(container.hasAttribute('data-composition'));
-    });
-    observer.observe(container, { attributes: true, attributeFilter: ['data-composition'] });
-    return () => observer.disconnect();
-  }, [markdownContainerRef]);
 
   return React.useMemo(() => {
     const str = Node.string(props.element).trim();
@@ -56,7 +40,6 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     // 此时强制视为非空以隐藏占位符，避免用户输入时占位符仍然可见。
     const isEmpty =
       !str &&
-      !isComposing &&
       markdownEditorRef.current?.children.length === 1 &&
       hasOnlyTextNodes
         ? true
@@ -87,7 +70,6 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
           textAlign: align,
         }}
       >
-        <DragHandle />
         {props.children}
       </div>
     );
@@ -96,7 +78,6 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     align,
     readonly,
     selected,
-    isComposing,
     markdownEditorRef.current?.children.length,
     editorProps.titlePlaceholderContent,
   ]);

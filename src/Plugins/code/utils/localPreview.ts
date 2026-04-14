@@ -96,7 +96,9 @@ function openBlobInNewTab(html: string): void {
   const win = window.open(url, '_blank');
   if (win) {
     // 在新窗口加载完毕后释放 Blob URL
-    win.addEventListener('load', () => URL.revokeObjectURL(url), { once: true });
+    win.addEventListener('load', () => URL.revokeObjectURL(url), {
+      once: true,
+    });
   } else {
     // 弹窗被拦截时延迟释放
     setTimeout(() => URL.revokeObjectURL(url), 10000);
@@ -120,7 +122,9 @@ export function openHtmlLocalPreview(htmlCode: string): void {
 /**
  * 将 Markdown 转换为 HTML 后在新标签页打开本地预览
  */
-export async function openMarkdownLocalPreview(markdownCode: string): Promise<void> {
+export async function openMarkdownLocalPreview(
+  markdownCode: string,
+): Promise<void> {
   const bodyHtml = await markdownToHtml(markdownCode, undefined, {
     openLinksInNewTab: true,
   });

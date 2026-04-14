@@ -189,7 +189,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       [JINJA_CSS_VAR.delimiter]: '#d4b84b',
       '::-webkit-scrollbar': { width: '8px', height: '8px' },
       '::-webkit-scrollbar-thumb': {
-        backgroundColor: 'var(--color-gray-text-tertiary, var(--color-gray-text-light))',
+        backgroundColor:
+          'var(--color-gray-text-tertiary, var(--color-gray-text-light))',
         borderRadius: '20px',
       },
       '&-edit': {
