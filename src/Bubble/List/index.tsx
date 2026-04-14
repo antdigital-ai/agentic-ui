@@ -17,6 +17,7 @@ import React from 'react';
 import { LazyElement } from '../../MarkdownEditor/editor/components/LazyElement';
 import { Bubble } from '../Bubble';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
+import { shallowEqualRecord, shallowEqualStyles } from '../bubblePropsAreEqual';
 import { LOADING_FLAT } from '../MessagesContent';
 import { useStyle } from './style';
 
@@ -433,12 +434,20 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
   const loadingKeyByIndexRef = useRef<Map<number, string>>(new Map());
   // 真实 id 映射到稳定 key（过渡后沿用），避免同一条消息因 id 变化导致 remount
   const realIdToStableKeyRef = useRef<Map<string, string>>(new Map());
+  /** 按列表行稳定 key 缓存合并后的 Bubble styles，避免每条消息每次父级渲染都换引用 */
+  const bubbleMergedStylesRef = useRef<Map<string, BubbleProps['styles']>>(
+    new Map(),
+  );
+  const bubbleMergedAvatarRef = useRef<Map<string, BubbleMetaData>>(
+    new Map(),
+  );
 
   const bubbleListDom = useMemo(() => {
     const isLazyEnabled = props.lazy?.enable;
     const totalCount = bubbleList.length;
+    const activeRowKeys = new Set<string>();
 
-    return bubbleList.map((item, index) => {
+    const rows = bubbleList.map((item, index) => {
       const isLast = bubbleList.length - 1 === index;
       const placement = item.role === 'user' ? 'right' : 'left';
       const originDataWithFlags = {
@@ -469,6 +478,33 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         }
       }
 
+      activeRowKeys.add(itemKey);
+
+      const candidateAvatar = {
+        ...(item.role === 'user' ? userMeta : assistantMeta),
+        ...(item as any).meta,
+      } as BubbleMetaData;
+      const prevAvatar = bubbleMergedAvatarRef.current.get(itemKey);
+      if (!prevAvatar || !shallowEqualRecord(prevAvatar as any, candidateAvatar as any)) {
+        bubbleMergedAvatarRef.current.set(itemKey, candidateAvatar);
+      }
+      const mergedAvatar = bubbleMergedAvatarRef.current.get(itemKey)!;
+
+      const candidateStyles: BubbleProps['styles'] = {
+        ...styles,
+        bubbleListItemContentStyle: {
+          ...styles?.bubbleListItemContentStyle,
+          ...(placement === 'right'
+            ? styles?.bubbleListRightItemContentStyle
+            : styles?.bubbleListLeftItemContentStyle),
+        },
+      };
+      const prevMergedStyles = bubbleMergedStylesRef.current.get(itemKey);
+      if (!prevMergedStyles || !shallowEqualStyles(prevMergedStyles, candidateStyles)) {
+        bubbleMergedStylesRef.current.set(itemKey, candidateStyles);
+      }
+      const mergedStyles = bubbleMergedStylesRef.current.get(itemKey)!;
+
       const bubbleElement = (
         <div
           key={itemKey}
@@ -478,10 +514,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         >
           <Bubble
             data-id={item.id}
-            avatar={{
-              ...(item.role === 'user' ? userMeta : assistantMeta),
-              ...(item as any).meta,
-            }}
+            avatar={mergedAvatar}
             preMessage={bubbleList[index - 1]}
             id={item.id}
             style={{
@@ -498,15 +531,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
             bubbleRef={props.bubbleRef}
             markdownRenderConfig={markdownRenderConfig}
             docListProps={props.docListProps}
-            styles={{
-              ...styles,
-              bubbleListItemContentStyle: {
-                ...styles?.bubbleListItemContentStyle,
-                ...(placement === 'right'
-                  ? styles?.bubbleListRightItemContentStyle
-                  : styles?.bubbleListLeftItemContentStyle),
-              },
-            }}
+            styles={mergedStyles}
             readonly={props.readonly}
             onReply={props.onReply}
             onDisLike={props.onDisLike}
@@ -523,11 +548,34 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         </div>
       );
 
+      return { itemKey, bubbleElement, isLazyEnabled, index, item, totalCount };
+    });
+
+    for (const k of bubbleMergedStylesRef.current.keys()) {
+      if (!activeRowKeys.has(k)) {
+        bubbleMergedStylesRef.current.delete(k);
+      }
+    }
+    for (const k of bubbleMergedAvatarRef.current.keys()) {
+      if (!activeRowKeys.has(k)) {
+        bubbleMergedAvatarRef.current.delete(k);
+      }
+    }
+
+    return rows.map(
+      ({
+        itemKey,
+        bubbleElement,
+        isLazyEnabled: lazyOn,
+        index,
+        item,
+        totalCount: count,
+      }) => {
       // 如果启用了懒加载，用 LazyElement 包裹
-      if (isLazyEnabled) {
+      if (lazyOn) {
         // 检查是否应该对该消息启用懒加载
         const shouldLazyLoad =
-          props.lazy?.shouldLazyLoad?.(index, totalCount) ?? true;
+          props.lazy?.shouldLazyLoad?.(index, count) ?? true;
 
         // 如果不需要懒加载，直接返回元素
         if (!shouldLazyLoad) {
@@ -562,7 +610,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
             elementInfo={{
               type: 'bubble',
               index,
-              total: totalCount,
+              total: count,
             }}
           >
             {bubbleElement}
@@ -572,7 +620,33 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
 
       return bubbleElement;
     });
-  }, [bubbleList, props.style, props.lazy]);
+  }, [
+    bubbleList,
+    bubbleListRef,
+    bubbleRenderConfig,
+    classNames,
+    deps,
+    markdownRenderConfig,
+    props.bubbleRef,
+    props.docListProps,
+    props.lazy,
+    props.onAvatarClick,
+    props.onCancelLike,
+    props.onDisLike,
+    props.onDislike,
+    props.onDoubleClick,
+    props.onLike,
+    props.onLikeCancel,
+    props.onReply,
+    props.pure,
+    props.readonly,
+    props.shouldShowCopy,
+    props.shouldShowVoice,
+    props.style,
+    styles,
+    userMeta,
+    assistantMeta,
+  ]);
 
   if (loading)
     return wrapSSR(

@@ -3,6 +3,7 @@ import { memo, MutableRefObject, useMemo } from 'react';
 import React from 'react';
 import { debugInfo } from '../Utils/debugUtils';
 import { AIBubble } from './AIBubble';
+import { bubblePropsAreEqual } from './bubblePropsAreEqual';
 import { useSchemaEditorBridge } from './schema-editor';
 import type { BubbleProps } from './type';
 import { UserBubble } from './UserBubble';
@@ -113,5 +114,5 @@ const BubbleComponent: React.FC<
 
 BubbleComponent.displayName = 'Bubble';
 
-// 使用 React.memo 优化性能，避免不必要的重新渲染
-export const Bubble = memo(BubbleComponent);
+// 自定义比较：列表侧常传入新的 styles / avatar 对象引用，避免无数据变化时整表重绘
+export const Bubble = memo(BubbleComponent, bubblePropsAreEqual);
