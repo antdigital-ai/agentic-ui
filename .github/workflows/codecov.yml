@@ -25,7 +25,7 @@ jobs:
         run: npm i pnpm -g && pnpm install
 
       - name: Run tests
-        run: npm run test:coverage
+        run: npm run test:coverage:full
 
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v4

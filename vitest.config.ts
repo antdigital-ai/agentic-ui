@@ -1,6 +1,51 @@
 import path from 'path';
 import { defineConfig } from 'vitest/config';
 
+/**
+ * 默认排除「非单元」或「纯覆盖率补洞」测试，降低 `pnpm test` 用例数量与耗时。
+ * CI 全量：`VITEST_FULL_SUITE=1 pnpm test` 或 `pnpm run test:full`
+ */
+const defaultTestExcludes = [
+  '**/node_modules/**',
+  '**/dist/**',
+  /** Playwright E2E（由 `pnpm run test:e2e` 运行） */
+  '**/e2e/**',
+  '**/*.spec.ts',
+  '**/*.spec.tsx',
+  /** 性能 / 基准，按需：`pnpm run bench:parsemd` 或 `VITEST_FULL_SUITE=1` */
+  '**/*.benchmark.test.ts',
+  '**/*.benchmark.test.tsx',
+  '**/*.performance.test.ts',
+  '**/*.performance.test.tsx',
+  /** 覆盖率定向 / 大而全的重复场景，全量 CI 再跑 */
+  '**/*targeted-coverage*.test.ts',
+  '**/*targeted-coverage*.test.tsx',
+  '**/*comprehensive*.test.ts',
+  '**/*comprehensive*.test.tsx',
+  /** 分支 / 覆盖率补洞 / 增强断言等重复套件（`src/Plugins/chart` 单测仍保留） */
+  '**/tests/plugins/chart/**',
+  '**/tests/plugins/chart.test.tsx',
+  '**/*.branches.test.ts',
+  '**/*.branches.test.tsx',
+  '**/*.coverage.test.ts',
+  '**/*.coverage.test.tsx',
+  '**/*.enhanced.test.ts',
+  '**/*.enhanced.test.tsx',
+  '**/*.assertions.test.ts',
+  '**/*.assertions.test.tsx',
+  '**/*.targeted.test.ts',
+  '**/*.targeted.test.tsx',
+  '**/*missing-coverage.test.ts',
+  '**/*missing-coverage.test.tsx',
+  /** Workspace 子系统用例体量大，与 E2E 重叠多；改 Workspace 时用 `pnpm test tests/Workspace` 或 `pnpm run test:full` */
+  '**/tests/Workspace/**',
+];
+
+const testExclude =
+  process.env.VITEST_FULL_SUITE === '1'
+    ? ['**/node_modules/**', '**/dist/**', '**/e2e/**']
+    : defaultTestExcludes;
+
 export default defineConfig({
   esbuild: {
     //jsxInject: "import React from 'react'",
@@ -13,7 +58,7 @@ export default defineConfig({
     globals: true,
     setupFiles: './tests/setupTests.ts',
     testTimeout: 500000,
-    exclude: ['**/node_modules/**', '**/dist/**'],
+    exclude: testExclude,
     alias: [
       {
         find: '@ant-design/agentic-ui',

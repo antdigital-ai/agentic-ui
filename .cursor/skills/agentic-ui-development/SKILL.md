@@ -18,7 +18,7 @@ description: Guides development workflow, design system, scripts, and component 
 | -------- | ---- |
 | 文档站点 | `pnpm start`（http://localhost:8000） |
 | 构建     | `pnpm run build` |
-| 单元测试 | `pnpm test`，覆盖率 `pnpm run test:coverage` |
+| 单元测试 | 日常 `pnpm test`（精简）；全量 `pnpm run test:full`；覆盖率 `pnpm run test:coverage` / 全量 `pnpm run test:coverage:full` |
 | E2E     | `pnpm run test:e2e`，调试 `pnpm run test:e2e:debug` |
 | 检查     | `pnpm run lint`、`pnpm tsc` |
 | 格式化   | `pnpm run prettier` |

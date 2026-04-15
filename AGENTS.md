@@ -74,8 +74,10 @@ pnpm install
 ```bash
 pnpm start              # 启动文档站点（http://localhost:8000）
 pnpm run build          # 构建项目
-pnpm test               # 运行单元测试
-pnpm run test:coverage  # 运行测试并生成覆盖率报告
+pnpm test               # 运行单元测试（默认跳过 e2e、大体积 chart/Workspace 目录、branches/coverage 等补洞套件，见 vitest.config.ts）
+pnpm run test:full      # 与 CI 覆盖率任务一致的全量 Vitest
+pnpm run test:coverage  # 生成覆盖率（默认同上精简集）
+pnpm run test:coverage:full  # 全量测试 + 覆盖率（Codecov / 发布前）
 pnpm run test:e2e       # 运行 E2E 测试
 pnpm run lint           # 代码检查（ESLint + Stylelint）
 pnpm run prettier       # 代码格式化
@@ -420,14 +422,20 @@ import type { RefType } from './types';
 #### 运行测试
 
 ```bash
-# 运行单元测试
+# 运行单元测试（默认精简集，见 vitest.config.ts 的 exclude）
 pnpm test
 
-# 运行测试并生成覆盖率（`src/**` 内 `__tests__`、`*.test.*` 不计入覆盖率）
+# 全量 Vitest（含 targeted-coverage、comprehensive、benchmark 等）
+pnpm run test:full
+
+# 运行测试并生成覆盖率（默认精简集）
 pnpm run test:coverage
 
+# 全量测试 + 覆盖率（与 codecov workflow 一致）
+pnpm run test:coverage:full
+
 # 与 CI 一致：开启覆盖率阈值（见 vitest.config.ts）
-COVERAGE_ENFORCE=1 pnpm run test:coverage
+COVERAGE_ENFORCE=1 pnpm run test:coverage:full
 
 # 运行 E2E 测试
 pnpm run test:e2e
@@ -627,7 +635,7 @@ export default InternalComponent;
 ### PR 检查清单
 
 - [ ] 代码通过 Lint 检查（`pnpm run lint`）
-- [ ] 所有测试通过（`pnpm test`）
+- [ ] 所有测试通过（PR 前建议 `pnpm run test:full`；日常可用 `pnpm test`）
 - [ ] 类型检查通过（`pnpm tsc`）
 - [ ] 代码已格式化（`pnpm run prettier`）
 - [ ] 相关文档已更新
