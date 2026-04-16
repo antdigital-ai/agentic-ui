@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 
 /**
  * 默认排除「非单元」或「纯覆盖率补洞」测试，降低 `pnpm test` 用例数量与耗时。
- * CI 全量：`VITEST_FULL_SUITE=1 pnpm test` 或 `pnpm run test:full`
+ * 目标约 5000 条用例；CI 全量：`VITEST_FULL_SUITE=1 pnpm test` 或 `pnpm run test:full`
  */
 const defaultTestExcludes = [
   '**/node_modules/**',
@@ -39,6 +39,18 @@ const defaultTestExcludes = [
   '**/*missing-coverage.test.tsx',
   /** Workspace 子系统用例体量大，与 E2E 重叠多；改 Workspace 时用 `pnpm test tests/Workspace` 或 `pnpm run test:full` */
   '**/tests/Workspace/**',
+  /** 体量大的集成区：默认套件外跑，见 `pnpm run test:full` 或按目录单跑 */
+  '**/tests/plugins/**',
+  '**/tests/MarkdownEditor/editor/**',
+  '**/tests/Bubble/**',
+  '**/tests/Bubble*.tsx',
+  '**/tests/schema/**',
+  '**/tests/MarkdownInputField/**',
+  '**/tests/History/**',
+  '**/src/MarkdownRenderer/**',
+  '**/src/MarkdownInputField/**',
+  '**/tests/editor/utils/editorUtils.test.ts',
+  '**/tests/utils/language.test.ts',
 ];
 
 const testExclude =
