@@ -20,7 +20,7 @@ vi.mock('../../src/ThoughtChainList/DotAni', () => ({
 }));
 
 const locale = {
-  deepThinkingInProgress: '正在深度思考中',
+  'think.deepThinkingLoading': '正在深度思考中',
   taskExecutionFailed: '任务执行失败',
 };
 

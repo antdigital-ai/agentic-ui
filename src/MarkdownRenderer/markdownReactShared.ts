@@ -25,6 +25,7 @@ import {
   type MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
+import { cnLabels, I18nContext } from '../I18n';
 import { parseChineseCurrencyToNumber } from '../Plugins/chart/utils';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import AnimationText from './AnimationText';
@@ -306,22 +307,29 @@ const extractChildrenText = (children: React.ReactNode): string => {
   return '';
 };
 
+const THINK_BLOCK_RENDERER_ROOT_STYLES = {
+  root: {
+    boxSizing: 'border-box' as const,
+    maxWidth: '680px',
+    marginTop: 8,
+  },
+};
+
 /** <think> 标签 → ToolUseBarThink（MarkdownRenderer 无 Slate 上下文，直接渲染） */
 const ThinkBlockRendererComponent = (props: any) => {
   const { children } = props;
+  const { locale } = useContext(I18nContext);
   const content = extractChildrenText(children);
   const isLoading = content.endsWith('...');
+  const toolName = isLoading
+    ? locale?.['think.deepThinkingInProgress'] ??
+      cnLabels['think.deepThinkingInProgress']
+    : locale?.['think.deepThinking'] ?? cnLabels['think.deepThinking'];
 
   return React.createElement(ToolUseBarThink, {
     testId: 'think-block-renderer',
-    styles: {
-      root: {
-        boxSizing: 'border-box',
-        maxWidth: '680px',
-        marginTop: 8,
-      },
-    },
-    toolName: isLoading ? '深度思考...' : '深度思考',
+    styles: THINK_BLOCK_RENDERER_ROOT_STYLES,
+    toolName,
     thinkContent: content,
     status: isLoading ? 'loading' : 'success',
   });

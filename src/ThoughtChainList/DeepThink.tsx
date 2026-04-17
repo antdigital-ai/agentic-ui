@@ -2,7 +2,7 @@ import { CloseCircleFilled } from '@ant-design/icons';
 import { Typography } from 'antd';
 import React, { useContext, useMemo } from 'react';
 import { LoadingSpinnerIcon } from '../Components/icons/LoadingSpinnerIcon';
-import { I18nContext } from '../I18n';
+import { cnLabels, I18nContext } from '../I18n';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { DotLoading } from './DotAni';
 import { MarkdownEditorUpdate } from './MarkdownEditor';
@@ -113,7 +113,8 @@ export const DeepThink = (
               }}
             >
               <LoadingSpinnerIcon size={24} />
-              {i18n?.locale?.deepThinkingInProgress || '正在深度思考中'}
+              {i18n?.locale?.['think.deepThinkingLoading'] ??
+                cnLabels['think.deepThinkingLoading']}
               <DotLoading />
             </div>
           ) : null}
@@ -197,8 +198,8 @@ export const DeepThink = (
                     }}
                   />
                   <Typography.Text>
-                    {i18n?.locale?.taskExecutionFailed ||
-                      '任务执行失败，需要修改'}
+                    {i18n?.locale?.taskExecutionFailed ??
+                      cnLabels.taskExecutionFailed}
                   </Typography.Text>
                 </div>
                 <Typography
@@ -216,5 +217,13 @@ export const DeepThink = (
         </div>
       </>
     );
-  }, [props.category, JSON.stringify(props.output), props.costMillis]);
+  }, [
+    props.category,
+    props.isFinished,
+    JSON.stringify(props.output),
+    props.costMillis,
+    i18n?.locale?.['think.deepThinkingLoading'],
+    i18n?.locale?.taskExecutionFailed,
+    props.markdownRenderProps,
+  ]);
 };

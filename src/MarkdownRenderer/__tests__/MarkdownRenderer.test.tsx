@@ -1,6 +1,7 @@
 import { act, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { cnLabels, enLabels, I18nProvide } from '../../I18n';
 import { MarkdownRenderer } from '../index';
 
 vi.mock('mermaid', () => ({
@@ -374,6 +375,25 @@ describe('MarkdownRenderer', () => {
     );
     expect(thinkBlock).toBeTruthy();
     expect(container.textContent).toContain('最终回答');
+  });
+
+  it('应将 <think> 标题随 I18n 语言切换', () => {
+    const thinkMarkdown =
+      '<think>\n一段内容\n</think>\n\n正文';
+    const { container, unmount } = render(
+      <I18nProvide key="zh" defaultLanguage="zh-CN" autoDetect={false}>
+        <MarkdownRenderer content={thinkMarkdown} />
+      </I18nProvide>,
+    );
+    expect(container.textContent).toContain(cnLabels['think.deepThinking']);
+    unmount();
+
+    const { container: enContainer } = render(
+      <I18nProvide key="en" defaultLanguage="en-US" autoDetect={false}>
+        <MarkdownRenderer content={thinkMarkdown} />
+      </I18nProvide>,
+    );
+    expect(enContainer.textContent).toContain(enLabels['think.deepThinking']);
   });
 
   it('应将 HTML 注释 + 表格组合渲染为图表', () => {

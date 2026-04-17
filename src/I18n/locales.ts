@@ -90,6 +90,8 @@ export const cnLabels = {
   // ThinkBlock 组件相关
   'think.deepThinking': '深度思考',
   'think.deepThinkingInProgress': '深度思考...',
+  /** DeepThink 无 output 且未完成时，加载行文案（与标题「深度思考...」区分） */
+  'think.deepThinkingLoading': '正在深度思考中',
   switchLanguage: '切换语言',
   welcome: '欢迎使用多语言支持',
   insertLink: '插入链接',
@@ -495,6 +497,7 @@ export const enLabels: typeof cnLabels = {
   // ThinkBlock component related
   'think.deepThinking': 'Deep Thinking',
   'think.deepThinkingInProgress': 'Deep Thinking...',
+  'think.deepThinkingLoading': 'Deep thinking in progress',
   bold: 'Bold',
   italic: 'Italic',
   strikethrough: 'Strikethrough',

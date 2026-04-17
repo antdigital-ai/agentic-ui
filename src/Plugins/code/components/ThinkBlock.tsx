@@ -12,7 +12,7 @@ import React, {
   useRef,
 } from 'react';
 import { MessagesContext } from '../../../Bubble/MessagesContent/BubbleContext';
-import { I18nContext } from '../../../I18n';
+import { cnLabels, I18nContext } from '../../../I18n';
 import {
   EditorStoreContext,
   useEditorStore,
@@ -179,8 +179,9 @@ export function ThinkBlock(props: ThinkBlockProps) {
   // 判断是否正在加载：内容以...结尾 或者 bubble 还未完成
   const isLoading = content.endsWith('...');
   const toolNameText = isLoading
-    ? locale?.['think.deepThinkingInProgress'] || '深度思考...'
-    : locale?.['think.deepThinking'] || '深度思考';
+    ? locale?.['think.deepThinkingInProgress'] ??
+      cnLabels['think.deepThinkingInProgress']
+    : locale?.['think.deepThinking'] ?? cnLabels['think.deepThinking'];
 
   return (
     <ToolUseBarThink
