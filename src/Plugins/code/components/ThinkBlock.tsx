@@ -182,16 +182,21 @@ export function ThinkBlock(props: ThinkBlockProps) {
     ? locale?.['think.deepThinkingInProgress'] || '深度思考...'
     : locale?.['think.deepThinking'] || '深度思考';
 
+  const thinkBlockRootStyles = useMemo(
+    () => ({
+      root: {
+        boxSizing: 'border-box' as const,
+        maxWidth: '680px',
+        marginTop: 8,
+      },
+    }),
+    [],
+  );
+
   return (
     <ToolUseBarThink
       testId="think-block"
-      styles={{
-        root: {
-          boxSizing: 'border-box',
-          maxWidth: '680px',
-          marginTop: 8,
-        },
-      }}
+      styles={thinkBlockRootStyles}
       expanded={expanded}
       onExpandedChange={setExpanded}
       toolName={toolNameText}

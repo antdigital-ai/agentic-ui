@@ -31,6 +31,14 @@ import {
 
 const COLLAPSE_ANIMATION_DURATION_MS = 160;
 
+/** 流式更新时复用同一引用，避免列表项 props 每次变引用导致 DeepThink 整树重渲染 */
+const THOUGHT_CHAIN_LOADING_ICON = <Loader />;
+const THOUGHT_CHAIN_SUCCESS_ICON = <CircleCheckBig />;
+const THOUGHT_CHAIN_ERROR_ICON_STYLE: React.CSSProperties = { color: 'red' };
+const THOUGHT_CHAIN_ERROR_ICON = (
+  <CloseCircleFilled style={THOUGHT_CHAIN_ERROR_ICON_STYLE} />
+);
+
 // Initialize dayjs plugins
 try {
   dayjs.extend(duration);
@@ -210,7 +218,7 @@ const ThoughtChainContent = React.memo<
 
       return thoughtChainList.map((item, index) => {
         let info = item.info;
-        let icon = <Loader />;
+        let icon: React.ReactNode = THOUGHT_CHAIN_LOADING_ICON;
         let isFinished = false;
 
         if (
@@ -219,17 +227,11 @@ const ThoughtChainContent = React.memo<
           item.output?.type !== 'RUNNING'
         ) {
           isFinished = true;
-          icon = <CircleCheckBig />;
+          icon = THOUGHT_CHAIN_SUCCESS_ICON;
         }
 
         if (item.output?.errorMsg) {
-          icon = (
-            <CloseCircleFilled
-              style={{
-                color: 'red',
-              }}
-            />
-          );
+          icon = THOUGHT_CHAIN_ERROR_ICON;
         }
 
         return {
