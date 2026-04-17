@@ -252,7 +252,9 @@ export function AceEditor({
     const codeProps = editorProps.codeProps || {};
 
     let value = element.value || '';
-    if (element.language === 'json') {
+    const shouldFormatJsonInAce =
+      element.language === 'json' && element.otherProps?.finished !== false;
+    if (shouldFormatJsonInAce) {
       try {
         value = JSON.stringify(partialParse(value), null, 2);
       } catch (e) {}
@@ -333,7 +335,11 @@ export function AceEditor({
   useEffect(() => {
     let value = element.value || '';
 
-    if (element.language === 'json') {
+    // 流式 JSON：partialParse + JSON.stringify 会随不完整结构变化而整块改写，
+    // 与 Slate 原文的 startsWith 关系断裂，反复 setValue 造成闪动；闭合后再格式化。
+    const shouldFormatJsonInAce =
+      element.language === 'json' && element.otherProps?.finished !== false;
+    if (shouldFormatJsonInAce) {
       try {
         value = JSON.stringify(partialParse(value), null, 2);
       } catch (e) {}
@@ -360,7 +366,7 @@ export function AceEditor({
       editor.setValue(value);
       editor.clearSelection();
     }
-  }, [element.value]);
+  }, [element.value, element.language, element.otherProps?.finished]);
 
   // 监听主题变化
   useEffect(() => {
