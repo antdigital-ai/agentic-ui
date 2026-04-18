@@ -3,7 +3,11 @@ import classNames from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useContext, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { StopIcon } from '../../AgentRunBar/icons';
+import {
+  STOP_ICON_DISK_FILL,
+  STOP_ICON_HALO_FILL,
+  StopIcon,
+} from '../../AgentRunBar/icons';
 import { I18nContext } from '../../I18n';
 import type { FileUploadManagerReturn } from '../FileUploadManager';
 import { useStyle } from './style';
@@ -41,11 +45,12 @@ export function resolveSendDisabled(
   return sendButtonProps?.disabled ?? fileUploadStatus === 'uploading';
 }
 
-const DEFAULT_SEND_BUTTON_COLORS = {
-  icon: '#00183D',
-  iconHover: '#fff',
-  background: '#001C39',
-  backgroundHover: '#14161C',
+/** 未传入 `colors` 时使用 CSS 语义变量（与原先全局 SVG 覆盖一致） */
+const SEND_BUTTON_THEME_COLORS = {
+  icon: 'var(--color-gray-bg-card-white, #ffffff)',
+  iconHover: 'var(--color-gray-bg-card-white, #ffffff)',
+  background: 'var(--color-primary-control-fill-primary, #1677ff)',
+  backgroundHover: 'var(--color-primary-control-fill-primary, #1677ff)',
 };
 
 function SendIcon(
@@ -64,15 +69,21 @@ function SendIcon(
   }, []);
 
   if (typing) {
-    return <StopIcon {...rest} />;
+    return (
+      <StopIcon
+        {...rest}
+        diskFill={STOP_ICON_DISK_FILL}
+        haloFill={STOP_ICON_HALO_FILL}
+      />
+    );
   }
 
   const currentColors = {
-    icon: colors?.icon ?? DEFAULT_SEND_BUTTON_COLORS.icon,
-    iconHover: colors?.iconHover ?? DEFAULT_SEND_BUTTON_COLORS.iconHover,
-    background: colors?.background ?? DEFAULT_SEND_BUTTON_COLORS.background,
+    icon: colors?.icon ?? SEND_BUTTON_THEME_COLORS.icon,
+    iconHover: colors?.iconHover ?? SEND_BUTTON_THEME_COLORS.iconHover,
+    background: colors?.background ?? SEND_BUTTON_THEME_COLORS.background,
     backgroundHover:
-      colors?.backgroundHover ?? DEFAULT_SEND_BUTTON_COLORS.backgroundHover,
+      colors?.backgroundHover ?? SEND_BUTTON_THEME_COLORS.backgroundHover,
   };
 
   return (
