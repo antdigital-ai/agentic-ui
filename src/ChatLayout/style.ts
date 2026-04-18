@@ -6,7 +6,8 @@ import {
   useEditorStyleRegister,
 } from '../Hooks/useStyle';
 
-const RADIUS_XL = 'var(--radius-xl, var(--radius-card-lg, 16px))';
+const RADIUS_XL =
+  'var(--radius-xl, var(--radius-chat-layout-footer, var(--radius-card-lg, 16px)))';
 const COLOR_GRAY_BG_ACTIVE =
   'var(--color-gray-bg-active, var(--color-gray-control-fill-active, rgba(20, 22, 28, 0.12)))';
 const COLOR_GRAY_BORDER_DEFAULT =
@@ -164,7 +165,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             },
           },
           '> div': {
-            maxWidth: '800px',
+            maxWidth: 'var(--agentic-chat-layout-content-max-width, 980px)',
             margin: '0 auto',
           },
         },
@@ -184,6 +185,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 100,
         borderBottomLeftRadius: RADIUS_XL,
         borderBottomRightRadius: RADIUS_XL,
+        '--radius-xl': '12px',
       },
       '&-footer-background': {
         position: 'absolute',

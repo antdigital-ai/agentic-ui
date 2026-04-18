@@ -26,6 +26,25 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       lineHeight: '32px',
       cursor: 'pointer',
       marginLeft: 4,
+      [`${token.componentCls}:not(${token.componentCls}-typing)`]: {
+        svg: {
+          circle: {
+            fill: 'var(--color-primary-control-fill-primary) !important',
+          },
+          path: {
+            fill: 'var(--color-gray-bg-card-white) !important',
+          },
+        },
+      },
+      '&-typing': {
+        color: 'var(--color-primary-control-fill-primary) !important',
+        [`svg > g > g:first-child > path:first-child`]: {
+          fill: 'var(--color-gray-bg-card-white) !important',
+        },
+        [`svg > g > g:first-child > path:last-child`]: {
+          fill: 'var(--color-primary-control-fill-primary) !important',
+        },
+      },
       '&&-disabled': {
         cursor: 'not-allowed',
         opacity: 1,

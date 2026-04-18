@@ -94,6 +94,7 @@ const genStyle: GenerateStyle<
       alignItems: 'center',
       justifyContent: 'center',
       padding: INPUT_FIELD_PADDING.NONE,
+      background: 'var(--color-gray-bg-card-white)',
       borderRadius: '12px',
       minHeight: '48px',
       maxWidth: 980,
@@ -139,7 +140,7 @@ const genStyle: GenerateStyle<
         boxSizing: 'border-box',
       },
       '&-content-wrapper': {
-        backgroundColor: '#fff',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
@@ -172,6 +173,10 @@ const genStyle: GenerateStyle<
       '& [data-language][data-is-unclosed="true"]': {
         height: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
         minHeight: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
+      },
+      '& [data-be="code"]': {
+        background: 'var(--color-gray-bg-card-light) !important',
+        color: 'var(--color-gray-text-default) !important',
       },
       '&-editor-content': {
         display: 'flex',
@@ -232,7 +237,8 @@ const genStyle: GenerateStyle<
         borderRadius: 0,
       },
       '&-tools-wrapper': {
-        backgroundColor: '#fff',
+        height: '32px',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         display: 'flex',
         boxSizing: 'border-box',
         borderRadius: 0,
@@ -318,7 +324,7 @@ const genStyle: GenerateStyle<
     },
 
     [`${token.componentCls}-top-area`]: {
-      display: 'flex',
+      display: 'none',
       width: '100%',
       maxWidth: '980px',
       marginBottom: '8px',

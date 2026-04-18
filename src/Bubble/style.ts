@@ -155,9 +155,13 @@ const genStyle = (
       '&-bubble-content-right': {
         maxWidth: '75%',
         borderRadius: '16px 16px 2px 16px',
-        background: 'var(--color-primary-control-fill-secondary-active)',
+        background: 'var(--color-primary-control-fill-tag)',
         color: 'var(--color-gray-text-default)',
         boxShadow: 'none',
+        '*:not(code)': {
+          wordBreak: 'normal',
+          whiteSpace: 'normal',
+        },
         // inline-code 基础规则用 code.cls（元素+类）选择器，需匹配相同结构才能覆盖
         [`& code${token.antCls}-agentic-md-editor-content-inline-code`]: {
           background: 'var(--color-primary-a7)',

@@ -62,7 +62,7 @@ export function CodeContainer({
               ? 'transparent'
               : theme === 'chaos'
                 ? 'var(--color-gray-text-default)'
-                : 'rgb(252, 252, 252)',
+                : 'var(--color-gray-bg-page-light)',
           color:
             theme === 'chaos' ? '#FFFFFF' : 'var(--color-gray-text-default)',
           height: hide ? 0 : 'auto',

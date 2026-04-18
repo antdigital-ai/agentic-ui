@@ -105,7 +105,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       boxShadow: 'none',
 
       [`${token.componentCls}-close-icon`]: {
-        color: 'rgba(235, 159, 0, 1)',
+        color: 'var(--color-yellow-text-secondary)',
 
         '&:hover': {
           backgroundColor: 'var(--color-yellow-control-fill-active)',

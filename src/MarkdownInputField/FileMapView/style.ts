@@ -16,7 +16,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       overflow: 'auto',
       gap: '8px',
       borderRadius: 'inherit',
-      padding: 8,
+      padding: '2px',
       position: 'relative',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       '&-left': {

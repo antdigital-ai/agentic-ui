@@ -330,7 +330,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         width: '100%',
         borderRadius: 'var(--radius-control-base)',
         background: 'var(--color-yellow-bg-tip)',
-        color: '#A56900',
+        color: 'var(--color-yellow-text-secondary)',
         padding: '8px',
         fontSize: 'var(--font-size-base)',
         alignItems: 'center',

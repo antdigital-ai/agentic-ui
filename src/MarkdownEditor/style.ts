@@ -10,6 +10,10 @@ import {
 // ── Table ──────────────────────────────────────────────────────────────────
 const TABLE_BORDER = '1px solid var(--agentic-ui-table-border-color, #E7E9E8)';
 const TABLE_RADIUS = 'var(--agentic-ui-table-border-radius, 8px)';
+const READONLY_TABLE_HEADER_BG =
+  'var(--agentic-ui-readonly-table-header-bg, var(--color-gray-bg-card-light))';
+const READONLY_TABLE_CELL_BG =
+  'var(--agentic-ui-readonly-table-cell-bg, var(--color-gray-bg-card-white))';
 const TABLE_ACTION_BUTTON_SIZE = 20;
 const TABLE_ACTION_BUTTON_GAP = '2px';
 const TABLE_ACTION_BUTTON_ICON_SIZE = 12;
@@ -89,7 +93,19 @@ const genTableStyle = (
           width: '100%',
           tableLayout: 'auto',
           overflow: 'hidden',
-          border: TABLE_BORDER,
+          border: `1px solid var(--agentic-ui-table-border-color, var(--color-gray-border-light))`,
+        },
+
+        [`&${tableCls}-readonly-table th`]: {
+          backgroundColor: `${READONLY_TABLE_HEADER_BG} !important`,
+          color: 'var(--color-gray-text-default) !important',
+        },
+        [`&${tableCls}-readonly-table td`]: {
+          backgroundColor: `${READONLY_TABLE_CELL_BG} !important`,
+          color: 'var(--color-gray-text-default) !important',
+        },
+        [`&${tableCls}-readonly-table th, &${tableCls}-readonly-table td`]: {
+          borderColor: 'var(--color-gray-border-light) !important',
         },
 
         th: {
@@ -292,6 +308,7 @@ const genTableStyle = (
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
+      '--agentic-ui-table-cell-padding': '6px 8px',
       boxSizing: 'border-box',
       height: 'max-content',
       maxWidth: '100%',
@@ -349,7 +366,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           padding: 'var(--agentic-ui-content-padding, 4px 4px)',
         },
       },
-      '&-content': {},
+      '&-content': {
+        '--margin-4x': '6px',
+        '--margin-2x': '4px',
+      },
       '&-focus': {
         height: 64,
       },
@@ -531,8 +551,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         background: 'var(--color-primary-bg-tip)',
 
         '[data-tag-popup-input]': {
+          border: '1px solid var(--color-gray-control-border-default)',
+          color: 'var(--color-primary-text-default)',
           '&:not([data-composition]).empty::before': {
-            color: 'var(--color-primary-text-disabled)',
+            color: 'var(--color-gray-text-light)',
             content: 'attr(title)',
             userSelect: 'none',
             position: 'absolute',

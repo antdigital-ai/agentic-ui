@@ -17,7 +17,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       gap: '12px',
       justifyContent: 'space-between',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      backgroundColor: '#FFF',
+      backgroundColor: 'var(--color-gray-bg-card-white)',
       boxShadow: 'var(--shadow-border-base)',
       minHeight: 32,
       '&-overflow-container': {
@@ -26,8 +26,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         top: 0,
         bottom: 0,
         pointerEvents: 'none',
-        background:
-          'linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 60%, #FFFFFF 100%)',
+        background: `linear-gradient(to right, transparent 0%, var(--color-gray-bg-card-white) 100%)`,
         borderRadius: 12,
         width: 72,
         height: '100%', // 防止遮挡下部的scrollbar
@@ -242,7 +241,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-container': {
         borderRadius: 'var(--radius-control-base)',
         position: 'relative',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         alignItems: 'center',
         width: '100%',
         cursor: 'pointer',

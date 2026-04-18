@@ -12,6 +12,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       flexDirection: 'column',
       gap: 32,
       overflowY: 'auto',
+      overflowX: 'hidden',
       minHeight: 200,
       padding: 'var(--padding-6x)',
       [`${token.componentCls}-content-list`]: {
