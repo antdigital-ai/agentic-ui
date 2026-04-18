@@ -1159,6 +1159,23 @@ console.log('测试代码');
       expect(value).toContain('【CODE_BLOCK:think】');
       expect(value).toContain('这是嵌套的 think 代码块');
     });
+
+    it('should fold nested ```json inside <think> into one think code node', () => {
+      const markdown = `<think>
+\`\`\`json
+{"file_type":"docx"}
+\`\`\`
+</think>`;
+      const result = parserMarkdownToSlateNode(markdown);
+
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'code',
+        language: 'think',
+      });
+      const codeNode = result.schema[0] as { value?: string };
+      expect(codeNode.value).toContain('【CODE_BLOCK:json】');
+    });
   });
 
   describe('handleCustomHtmlTags', () => {

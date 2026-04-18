@@ -3,6 +3,33 @@ import { htmlToFragmentList } from '../../plugins/insertParsedHtmlNodes';
 import { EditorUtils } from '../../utils';
 import partialJsonParse from '../json-parse';
 
+/** 与 `preprocessSpecialTags(..., 'think')`、序列化输出一致：`<think>`…`</think>` */
+const THINK_TAG_CANONICAL_OPEN = '<think>';
+const THINK_TAG_CANONICAL_CLOSE = '</think>';
+
+/** 部分模型会输出该别名；拼接避免与规范 `<think>` 在源码中混淆 */
+const REDACTED_THINKING_ALIAS_OPEN =
+  '<' + 'redacted_' + 'thinking' + '>';
+const REDACTED_THINKING_ALIAS_CLOSE =
+  '</' + 'redacted_' + 'thinking' + '>';
+
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * 将 `<think>`…`</think>` 归一成 `<think>`…`</think>`。
+ * 否则 `preprocessThinkTags` 无法把思考区内的 ```json 换成 【CODE_BLOCK】，JSON 会变成顶层独立 code 节点，DOM 分裂。
+ */
+export function normalizeThinkTagAliases(markdown: string): string {
+  if (!markdown) return markdown;
+  const openRe = new RegExp(escapeRegExp(REDACTED_THINKING_ALIAS_OPEN), 'gi');
+  const closeRe = new RegExp(escapeRegExp(REDACTED_THINKING_ALIAS_CLOSE), 'gi');
+  return markdown
+    .replace(openRe, THINK_TAG_CANONICAL_OPEN)
+    .replace(closeRe, THINK_TAG_CANONICAL_CLOSE);
+}
+
+
 /**
  * 解码 URI 组件，处理错误情况
  */
@@ -22,8 +49,19 @@ export const decodeURIComponentUrl = (url: string) => {
  */
 const findThinkElement = (str: string) => {
   try {
-    // 匹配 <think>内容</think> 格式
-    const thinkMatch = str.match(/^\s*<think>([\s\S]*?)<\/think>\s*$/);
+    const canonicalRe = new RegExp(
+      `^\\s*${escapeRegExp(THINK_TAG_CANONICAL_OPEN)}([\\s\\S]*?)${escapeRegExp(
+        THINK_TAG_CANONICAL_CLOSE,
+      )}\\s*$`,
+      'i',
+    );
+    const aliasRe = new RegExp(
+      `^\\s*${escapeRegExp(REDACTED_THINKING_ALIAS_OPEN)}([\\s\\S]*?)${escapeRegExp(
+        REDACTED_THINKING_ALIAS_CLOSE,
+      )}\\s*$`,
+      'i',
+    );
+    const thinkMatch = str.match(canonicalRe) || str.match(aliasRe);
     if (thinkMatch) {
       return {
         content: thinkMatch[1].trim(),
@@ -818,7 +856,7 @@ export function preprocessSpecialTags(
  * @returns 处理后的 Markdown 字符串
  */
 export function preprocessThinkTags(markdown: string): string {
-  return preprocessSpecialTags(markdown, 'think');
+  return preprocessSpecialTags(normalizeThinkTagAliases(markdown), 'think');
 }
 
 /**
