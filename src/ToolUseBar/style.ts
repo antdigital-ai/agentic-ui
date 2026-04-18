@@ -329,8 +329,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         width: '100%',
         borderRadius: 'var(--radius-control-base)',
-        background: 'var(--color-yellow-bg-tip)',
-        color: 'var(--color-yellow-text-secondary)',
+        background: 'var(--color-yellow-bg-tip, rgba(250, 173, 20, 0.08))',
+        color: 'var(--color-yellow-text-secondary, #ad6800)',
         padding: '8px',
         fontSize: 'var(--font-size-base)',
         alignItems: 'center',
@@ -340,7 +340,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         font: 'var(--font-text-body-emphasized-base)',
         letterSpacing: 'var(--letter-spacing-body-emphasized-base, normal)',
-        color: 'var(--color-yellow-text-secondary)',
+        color: 'var(--color-yellow-text-secondary, #ad6800)',
       },
       '&-tool-error': {
         '&-tool-image-wrapper': {

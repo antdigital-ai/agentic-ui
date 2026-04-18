@@ -202,7 +202,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           '&::before': {
             cursor: 'text',
             content: 'attr(data-slate-placeholder)',
-            color: 'var(--color-gray-text-disabled)',
+            color:
+              'var(--color-gray-text-disabled, rgba(20, 22, 28, 0.25))',
             display: 'inline-block',
             position: 'absolute',
             width: 'max-content',

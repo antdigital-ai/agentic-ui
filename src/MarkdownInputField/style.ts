@@ -94,7 +94,7 @@ const genStyle: GenerateStyle<
       alignItems: 'center',
       justifyContent: 'center',
       padding: INPUT_FIELD_PADDING.NONE,
-      background: 'var(--color-gray-bg-card-white)',
+      background: 'var(--color-gray-bg-card-white, #ffffff)',
       borderRadius: '12px',
       minHeight: '48px',
       maxWidth: 980,
@@ -140,7 +140,7 @@ const genStyle: GenerateStyle<
         boxSizing: 'border-box',
       },
       '&-content-wrapper': {
-        backgroundColor: 'var(--color-gray-bg-card-white)',
+        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
@@ -150,7 +150,7 @@ const genStyle: GenerateStyle<
       '&-editor': {
         boxSizing: 'border-box',
         borderRadius: 'inherit',
-        backgroundColor: 'var(--color-gray-bg-card-white)',
+        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
         width: '100%',
         zIndex: 9,
         maxHeight: 400,
@@ -175,8 +175,10 @@ const genStyle: GenerateStyle<
         minHeight: `${DEFAULT_INPUT_CODE_BLOCK_HEIGHT}px !important`,
       },
       '& [data-be="code"]': {
-        background: 'var(--color-gray-bg-card-light) !important',
-        color: 'var(--color-gray-text-default) !important',
+        background:
+          'var(--color-gray-bg-card-light, #f7f9fc) !important',
+        color:
+          'var(--color-gray-text-default, rgba(20, 22, 28, 0.88)) !important',
       },
       '&-editor-content': {
         display: 'flex',
@@ -238,7 +240,7 @@ const genStyle: GenerateStyle<
       },
       '&-tools-wrapper': {
         height: '32px',
-        backgroundColor: 'var(--color-gray-bg-card-white)',
+        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
         display: 'flex',
         boxSizing: 'border-box',
         borderRadius: 0,

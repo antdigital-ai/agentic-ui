@@ -17,7 +17,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       gap: '12px',
       justifyContent: 'space-between',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      backgroundColor: 'var(--color-gray-bg-card-white)',
+      backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
       boxShadow: 'var(--shadow-border-base)',
       minHeight: 32,
       '&-overflow-container': {
@@ -26,7 +26,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         top: 0,
         bottom: 0,
         pointerEvents: 'none',
-        background: `linear-gradient(to right, transparent 0%, var(--color-gray-bg-card-white) 100%)`,
+        background: `linear-gradient(to right, transparent 0%, var(--color-gray-bg-card-white, #ffffff) 100%)`,
         borderRadius: 12,
         width: 72,
         height: '100%', // 防止遮挡下部的scrollbar
@@ -76,18 +76,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             backgroundImage: 'none',
           },
           '&-disabled': {
-            backgroundColor: 'var(--color-gray-bg-card-white)',
+            backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
             color: 'var(--color-gray-text-disabled)',
             cursor: 'not-allowed',
             backgroundImage: 'none',
             boxShadow: 'var(--shadow-border-base)',
           },
           '&-disabled:hover': {
-            backgroundColor: 'var(--color-gray-bg-card-white)',
+            backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
             backgroundImage: 'none',
           },
           '&-disabled:active': {
-            backgroundColor: 'var(--color-gray-bg-card-white)',
+            backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
             backgroundImage: 'none',
           },
           '& svg': {
@@ -103,7 +103,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           overscrollBehaviorY: 'contain',
           touchAction: 'pan-y',
           WebkitOverflowScrolling: 'touch',
-          background: 'var(--color-gray-bg-card-white)',
+          background: 'var(--color-gray-bg-card-white, #ffffff)',
           borderRadius: 'var(--radius-card-base)',
           marginBottom: 8,
           zIndex: 1000,
@@ -241,7 +241,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-container': {
         borderRadius: 'var(--radius-control-base)',
         position: 'relative',
-        backgroundColor: 'var(--color-gray-bg-card-white)',
+        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
         alignItems: 'center',
         width: '100%',
         cursor: 'pointer',
@@ -298,22 +298,22 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       // disabled state: base + suppress hover/active
       '&-disabled': {
-        backgroundColor: 'var(--color-gray-bg-card-white)',
+        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
         color: 'var(--color-gray-text-disabled)',
         cursor: 'not-allowed',
         backgroundImage: 'none',
       },
       ['&-disabled:hover']: {
-        backgroundColor: 'var(--color-gray-bg-card-white)',
+        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
         backgroundImage: 'none',
       },
       ['&-disabled:active']: {
-        backgroundColor: 'var(--color-gray-bg-card-white)',
+        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
         backgroundImage: 'none',
       },
       // when container is active but inner item is disabled, keep disabled bg
       ['&-container-hover-bg:active ' + token.componentCls + '-disabled']: {
-        backgroundColor: 'var(--color-gray-bg-card-white)',
+        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
         backgroundImage: 'none',
       },
       // disabled text color for inner content

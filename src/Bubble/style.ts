@@ -155,8 +155,9 @@ const genStyle = (
       '&-bubble-content-right': {
         maxWidth: '75%',
         borderRadius: '16px 16px 2px 16px',
-        background: 'var(--color-primary-control-fill-tag)',
-        color: 'var(--color-gray-text-default)',
+        background:
+          'var(--color-primary-control-fill-tag, var(--color-primary-control-fill-secondary-active, rgba(230, 244, 255, 0.92)))',
+        color: 'var(--color-gray-text-default, rgba(20, 22, 28, 0.88))',
         boxShadow: 'none',
         '*:not(code)': {
           wordBreak: 'normal',
