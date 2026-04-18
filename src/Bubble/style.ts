@@ -110,10 +110,24 @@ const genStyle = (
         '&-standalone': {
           maxWidth: 'min(860px,100%)',
         },
-        '*': {
-          whiteSpace: 'pre-wrap',
+        // 换行仅作用于 Markdown 正文节点（不再对 bubble-content 使用 `*`）
+        [`& ${token.antCls}-agentic-md-editor-content div[data-be="paragraph"],
+          & ${token.antCls}-agentic-md-editor-content h1,
+          & ${token.antCls}-agentic-md-editor-content h2,
+          & ${token.antCls}-agentic-md-editor-content h3,
+          & ${token.antCls}-agentic-md-editor-content h4,
+          & ${token.antCls}-agentic-md-editor-content h5,
+          & ${token.antCls}-agentic-md-editor-content h6,
+          & ${token.antCls}-agentic-md-editor-content li,
+          & ${token.antCls}-agentic-md-editor-content blockquote`]: {
+          whiteSpace: 'normal',
+          wordBreak: 'normal',
           textWrap: 'wrap',
-          wordWrap: 'break-word',
+          overflowWrap: 'break-word',
+        },
+        [`& ${token.antCls}-agentic-md-editor-content div[data-be="code"]`]: {
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-all',
         },
         video: {
           borderRadius: '12px',
