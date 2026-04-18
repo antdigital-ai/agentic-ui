@@ -159,10 +159,6 @@ const genStyle = (
           'var(--color-primary-control-fill-tag, var(--color-primary-control-fill-secondary-active, rgba(230, 244, 255, 0.92)))',
         color: 'var(--color-gray-text-default, rgba(20, 22, 28, 0.88))',
         boxShadow: 'none',
-        '*:not(code)': {
-          wordBreak: 'normal',
-          whiteSpace: 'normal',
-        },
         // inline-code 基础规则用 code.cls（元素+类）选择器，需匹配相同结构才能覆盖
         [`& code${token.antCls}-agentic-md-editor-content-inline-code`]: {
           background: 'var(--color-primary-a7)',

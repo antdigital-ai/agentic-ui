@@ -326,7 +326,7 @@ const genStyle: GenerateStyle<
     },
 
     [`${token.componentCls}-top-area`]: {
-      display: 'none',
+      display: 'flex',
       width: '100%',
       maxWidth: '980px',
       marginBottom: '8px',

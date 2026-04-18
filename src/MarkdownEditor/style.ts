@@ -10,10 +10,6 @@ import {
 // ── Table ──────────────────────────────────────────────────────────────────
 const TABLE_BORDER = '1px solid var(--agentic-ui-table-border-color, #E7E9E8)';
 const TABLE_RADIUS = 'var(--agentic-ui-table-border-radius, 8px)';
-const READONLY_TABLE_HEADER_BG =
-  'var(--agentic-ui-readonly-table-header-bg, var(--color-gray-bg-card-light, #f7f9fc))';
-const READONLY_TABLE_CELL_BG =
-  'var(--agentic-ui-readonly-table-cell-bg, var(--color-gray-bg-card-white, #ffffff))';
 const TABLE_ACTION_BUTTON_SIZE = 20;
 const TABLE_ACTION_BUTTON_GAP = '2px';
 const TABLE_ACTION_BUTTON_ICON_SIZE = 12;
@@ -93,20 +89,7 @@ const genTableStyle = (
           width: '100%',
           tableLayout: 'auto',
           overflow: 'hidden',
-          border: `1px solid var(--agentic-ui-table-border-color, var(--color-gray-border-light, rgba(20, 22, 28, 0.12)))`,
-        },
-
-        [`&${tableCls}-readonly-table th`]: {
-          backgroundColor: `${READONLY_TABLE_HEADER_BG} !important`,
-          color: 'var(--color-gray-text-default, rgba(20, 22, 28, 0.88)) !important',
-        },
-        [`&${tableCls}-readonly-table td`]: {
-          backgroundColor: `${READONLY_TABLE_CELL_BG} !important`,
-          color: 'var(--color-gray-text-default, rgba(20, 22, 28, 0.88)) !important',
-        },
-        [`&${tableCls}-readonly-table th, &${tableCls}-readonly-table td`]: {
-          borderColor:
-            'var(--color-gray-border-light, rgba(20, 22, 28, 0.12)) !important',
+          border: TABLE_BORDER,
         },
 
         th: {
