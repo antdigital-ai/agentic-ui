@@ -3,11 +3,14 @@ import { htmlToFragmentList } from '../../plugins/insertParsedHtmlNodes';
 import { EditorUtils } from '../../utils';
 import partialJsonParse from '../json-parse';
 
-/** 与 `preprocessSpecialTags(..., 'think')`、序列化输出一致：`<think>`…`</think>` */
+/**
+ * 规范标签名必须与 `preprocessSpecialTags(markdown, 'think')` 一致：该函数用 `<${tagName}>` / `</${tagName}>`，
+ * 即字面量 `<think>`…`</think>`，再包成 `` ```think ``。若此处改名须同步改 `parserSlateNodeToMarkdown` 里 think 序列化。
+ */
 const THINK_TAG_CANONICAL_OPEN = '<think>';
 const THINK_TAG_CANONICAL_CLOSE = '</think>';
 
-/** 部分模型会输出该别名；拼接避免与规范 `<think>` 在源码中混淆 */
+/** 部分模型输出的外壳别名；拼接避免与规范标签在源码中混淆 */
 const REDACTED_THINKING_ALIAS_OPEN =
   '<' + 'redacted_' + 'thinking' + '>';
 const REDACTED_THINKING_ALIAS_CLOSE =
@@ -16,17 +19,41 @@ const REDACTED_THINKING_ALIAS_CLOSE =
 const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+/** 仅替换「成对」别名标签，避免正文里偶然出现的孤立字面量被误换 */
+const REDACTED_THINKING_ALIAS_PAIR_REGEX = new RegExp(
+  `${escapeRegExp(REDACTED_THINKING_ALIAS_OPEN)}([\\s\\S]*?)${escapeRegExp(
+    REDACTED_THINKING_ALIAS_CLOSE,
+  )}`,
+  'gi',
+);
+
+const FIND_THINK_CANONICAL_BLOCK_RE = new RegExp(
+  `^\\s*${escapeRegExp(THINK_TAG_CANONICAL_OPEN)}([\\s\\S]*?)${escapeRegExp(
+    THINK_TAG_CANONICAL_CLOSE,
+  )}\\s*$`,
+  'i',
+);
+
+const FIND_THINK_ALIAS_BLOCK_RE = new RegExp(
+  `^\\s*${escapeRegExp(REDACTED_THINKING_ALIAS_OPEN)}([\\s\\S]*?)${escapeRegExp(
+    REDACTED_THINKING_ALIAS_CLOSE,
+  )}\\s*$`,
+  'i',
+);
+
 /**
- * 将 `<think>`…`</think>` 归一成 `<think>`…`</think>`。
- * 否则 `preprocessThinkTags` 无法把思考区内的 ```json 换成 【CODE_BLOCK】，JSON 会变成顶层独立 code 节点，DOM 分裂。
+ * 将成对的别名标签 `<think>`…`</think>` 归一为与 `preprocessSpecialTags(..., 'think')` 契约一致的规范标签。
+ * 否则 `preprocessThinkTags` 无法把思考区内的 ``` 围栏换成 【CODE_BLOCK】，内层 JSON 会变成顶层独立 code 节点。
  */
 export function normalizeThinkTagAliases(markdown: string): string {
-  if (!markdown) return markdown;
-  const openRe = new RegExp(escapeRegExp(REDACTED_THINKING_ALIAS_OPEN), 'gi');
-  const closeRe = new RegExp(escapeRegExp(REDACTED_THINKING_ALIAS_CLOSE), 'gi');
-  return markdown
-    .replace(openRe, THINK_TAG_CANONICAL_OPEN)
-    .replace(closeRe, THINK_TAG_CANONICAL_CLOSE);
+  if (!markdown || markdown.indexOf(REDACTED_THINKING_ALIAS_OPEN) === -1) {
+    return markdown;
+  }
+  return markdown.replace(
+    REDACTED_THINKING_ALIAS_PAIR_REGEX,
+    (_match, inner: string) =>
+      `${THINK_TAG_CANONICAL_OPEN}${inner}${THINK_TAG_CANONICAL_CLOSE}`,
+  );
 }
 
 
@@ -49,19 +76,9 @@ export const decodeURIComponentUrl = (url: string) => {
  */
 const findThinkElement = (str: string) => {
   try {
-    const canonicalRe = new RegExp(
-      `^\\s*${escapeRegExp(THINK_TAG_CANONICAL_OPEN)}([\\s\\S]*?)${escapeRegExp(
-        THINK_TAG_CANONICAL_CLOSE,
-      )}\\s*$`,
-      'i',
-    );
-    const aliasRe = new RegExp(
-      `^\\s*${escapeRegExp(REDACTED_THINKING_ALIAS_OPEN)}([\\s\\S]*?)${escapeRegExp(
-        REDACTED_THINKING_ALIAS_CLOSE,
-      )}\\s*$`,
-      'i',
-    );
-    const thinkMatch = str.match(canonicalRe) || str.match(aliasRe);
+    const thinkMatch =
+      str.match(FIND_THINK_CANONICAL_BLOCK_RE) ||
+      str.match(FIND_THINK_ALIAS_BLOCK_RE);
     if (thinkMatch) {
       return {
         content: thinkMatch[1].trim(),
@@ -69,6 +86,9 @@ const findThinkElement = (str: string) => {
     }
     return null;
   } catch (e) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[parseHtml] findThinkElement failed', e);
+    }
     return null;
   }
 };

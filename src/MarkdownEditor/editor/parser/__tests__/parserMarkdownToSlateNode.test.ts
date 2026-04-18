@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleDefinition } from '../parse/parseElements';
 import { handleMath, shouldTreatInlineMathAsText } from '../parse/parseMath';
 import { handleAttachmentLink, handleImage } from '../parse/parseMedia';
+import { normalizeThinkTagAliases } from '../parse/parseHtml';
 import {
   clearParseCache,
   parserMarkdownToSlateNode,
@@ -1158,6 +1159,12 @@ console.log('测试代码');
       const value = codeNode.value as string;
       expect(value).toContain('【CODE_BLOCK:think】');
       expect(value).toContain('这是嵌套的 think 代码块');
+    });
+
+    it('should not alter markdown when alias open tag appears without closing pair', () => {
+      const aliasOpen = '<' + 'redacted_' + 'thinking' + '>';
+      const md = `正文里出现 ${aliasOpen} 但不闭合`;
+      expect(normalizeThinkTagAliases(md)).toBe(md);
     });
 
     it('should fold nested ```json inside <think> into one think code node', () => {
