@@ -133,7 +133,7 @@ const genStyle = (
           borderRadius: '12px',
           overflow: 'auto',
         },
-        [`div['data-be=code']`]: {
+        [`& ${token.antCls}-agentic-md-editor-content div[data-be="code"]`]: {
           borderRadius: '12px',
           overflow: 'auto',
         },

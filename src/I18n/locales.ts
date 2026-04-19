@@ -347,6 +347,8 @@ export const cnLabels = {
   'input.sendButtonTooltip.newline': '按 Shift+Enter 键换行',
   'input.sendButtonTooltip.send.mod': '按 Cmd/Ctrl+Enter 键发送',
   'input.sendButtonTooltip.newline.mod': '按 Enter 键换行',
+  'input.sendButtonAriaLabel.send': '发送消息',
+  'input.sendButtonAriaLabel.stop': '停止生成',
   'input.typing.hint': 'AI 正在回复中，请稍候...',
   // Other translations
   'common.name': '名称',
@@ -814,6 +816,8 @@ export const enLabels: typeof cnLabels = {
   'input.sendButtonTooltip.newline': 'Press Shift+Enter for new line',
   'input.sendButtonTooltip.send.mod': 'Press Cmd/Ctrl+Enter to send',
   'input.sendButtonTooltip.newline.mod': 'Press Enter for new line',
+  'input.sendButtonAriaLabel.send': 'Send message',
+  'input.sendButtonAriaLabel.stop': 'Stop generating',
   'input.typing.hint': 'AI is replying, please wait...',
   // Other translations
   'common.name': 'Name',

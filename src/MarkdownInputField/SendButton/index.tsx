@@ -58,15 +58,10 @@ function SendIcon(
     hover?: boolean;
     disabled?: boolean;
     typing?: boolean;
-    onInit?: () => void;
     colors?: SendButtonColors;
   },
 ) {
-  const { hover, typing, onInit, colors, ...rest } = props;
-
-  useEffect(() => {
-    onInit?.();
-  }, []);
+  const { hover, typing, colors, ...rest } = props;
 
   if (typing) {
     return (
@@ -244,6 +239,8 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
   } = props;
   useEffect(() => {
     props.onInit?.();
+    // 仅在挂载时触发一次，避免引用变化导致重复打点
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- onInit intentionally once on mount
   }, []);
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
@@ -282,10 +279,18 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
     </div>
   );
 
+  const ariaLabelSend =
+    locale?.['input.sendButtonAriaLabel.send'] ?? '发送消息';
+  const ariaLabelStop =
+    locale?.['input.sendButtonAriaLabel.stop'] ?? '停止生成';
+  const sendButtonAriaLabel = typing ? ariaLabelStop : ariaLabelSend;
+
   return wrapSSR(
     <Tooltip arrow={false} title={tooltipTitle} mouseEnterDelay={0.5}>
       <div
         data-testid="send-button"
+        aria-label={sendButtonAriaLabel}
+        aria-disabled={disabled ? true : undefined}
         onClick={() => {
           if (!disabled) {
             onClick();

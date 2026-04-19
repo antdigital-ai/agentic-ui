@@ -46,6 +46,17 @@ describe('SendButton', () => {
         '.ant-agentic-md-input-field-send-button',
       );
       expect(button).toBeInTheDocument();
+      expect(button).toHaveAttribute('aria-label', '发送消息');
+    });
+
+    it('typing 时应使用停止生成的无障碍标签', () => {
+      const { container } = render(
+        <SendButton isSendable={true} typing={true} onClick={vi.fn()} />,
+      );
+      const button = container.querySelector(
+        '.ant-agentic-md-input-field-send-button',
+      );
+      expect(button).toHaveAttribute('aria-label', '停止生成');
     });
 
     it('should call onInit when initialized', () => {
