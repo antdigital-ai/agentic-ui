@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  INITIAL_FENCE_STATE,
+  updateFenceStateForLine,
+  type FenceState,
+} from './streaming/fenceTracker';
 
 /**
  * 流式 token 缓存类型。
@@ -25,6 +30,8 @@ interface StreamCache {
   token: StreamCacheTokenType;
   processedLength: number;
   completeMarkdown: string;
+  fenceState: FenceState;
+  currentLine: string;
 }
 
 interface Recognizer {
@@ -209,44 +216,14 @@ const getInitialCache = (): StreamCache => ({
   token: StreamCacheTokenType.Text,
   processedLength: 0,
   completeMarkdown: '',
+  fenceState: { ...INITIAL_FENCE_STATE },
+  currentLine: '',
 });
 
 const getStreamingOutput = (cache: StreamCache): string => {
   if (cache.completeMarkdown) return cache.completeMarkdown;
   if (cache.pending) return STREAMING_LOADING_PLACEHOLDER;
   return '';
-};
-
-const isInCodeBlock = (text: string, isFinalChunk = false): boolean => {
-  const lines = text.split('\n');
-  let inFenced = false;
-  let fenceChar = '';
-  let fenceLen = 0;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].endsWith('\r') ? lines[i].slice(0, -1) : lines[i];
-    const match = line.match(/^(`{3,}|~{3,})(.*)$/);
-    if (match) {
-      const fence = match[1];
-      const after = match[2];
-      const char = fence[0];
-      const len = fence.length;
-      if (!inFenced) {
-        inFenced = true;
-        fenceChar = char;
-        fenceLen = len;
-      } else {
-        const isValidEnd =
-          char === fenceChar && len >= fenceLen && /^\s*$/.test(after);
-        if (isValidEnd && (isFinalChunk || i < lines.length - 1)) {
-          inFenced = false;
-          fenceChar = '';
-          fenceLen = 0;
-        }
-      }
-    }
-  }
-  return inFenced;
 };
 
 /** 流式 token 缓存——暂缓不完整的 link/image/table 等，避免 parser 错误解析 */
@@ -271,19 +248,40 @@ export const useStreaming = (input: string, enabled: boolean): string => {
     const chunk = text.slice(cache.processedLength);
     if (!chunk) return;
 
+    // 非前缀重置后重建围栏状态（全量兜底，仅此处 O(n)）
+    if (cache.processedLength === 0 && text.length > 0) {
+      const existingText = cache.completeMarkdown + cache.pending;
+      if (existingText.length === 0) {
+        cache.fenceState = { ...INITIAL_FENCE_STATE };
+        cache.currentLine = '';
+      }
+    }
+
     cache.processedLength += chunk.length;
-    let wasInCodeBlock = isInCodeBlock(cache.completeMarkdown + cache.pending);
+
     for (const char of chunk) {
       cache.pending += char;
-      const inCodeBlock = isInCodeBlock(cache.completeMarkdown + cache.pending);
-      if (inCodeBlock) {
-        wasInCodeBlock = true;
-        continue;
-      }
-      if (wasInCodeBlock) {
-        wasInCodeBlock = false;
-        commitCache(cache);
-        continue;
+
+      if (char === '\n') {
+        const prevInFenced = cache.fenceState.inFenced;
+        cache.fenceState = updateFenceStateForLine(
+          cache.fenceState,
+          cache.currentLine,
+        );
+        cache.currentLine = '';
+
+        if (cache.fenceState.inFenced) {
+          continue;
+        }
+        if (prevInFenced && !cache.fenceState.inFenced) {
+          commitCache(cache);
+          continue;
+        }
+      } else {
+        cache.currentLine += char;
+        if (cache.fenceState.inFenced) {
+          continue;
+        }
       }
       if (cache.token === StreamCacheTokenType.Text) {
         for (const handler of recognizeHandlers) handler.recognize(cache);

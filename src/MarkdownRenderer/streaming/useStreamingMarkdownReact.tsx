@@ -14,6 +14,7 @@ import {
 
 import { MarkdownBlockPiece } from './MarkdownBlockPiece';
 import { shouldResetRevisionProgress } from './revisionPolicy';
+import { useShallowMemo } from './useShallowMemo';
 
 /**
  * 流式优先的 Markdown → React：每块独立 MarkdownBlockPiece，末块 tail、其余 sealed。
@@ -38,23 +39,26 @@ export const useStreamingMarkdownReact = (
 
   const prefixCls = options?.prefixCls || 'ant-agentic-md-editor';
 
+  const stableComponents = useShallowMemo(options?.components);
+  const stableFncProps = useShallowMemo(options?.fncProps);
+
   const components = useMemo(
     () =>
       buildEditorAlignedComponents(
         prefixCls,
-        options?.components || {},
+        stableComponents || {},
         options?.streaming,
         options?.linkConfig,
-        options?.fncProps,
+        stableFncProps,
         options?.streamingParagraphAnimation,
         options?.eleRender,
       ),
     [
       prefixCls,
-      options?.components,
+      stableComponents,
       options?.streaming,
       options?.linkConfig,
-      options?.fncProps,
+      stableFncProps,
       options?.streamingParagraphAnimation,
       options?.eleRender,
     ],

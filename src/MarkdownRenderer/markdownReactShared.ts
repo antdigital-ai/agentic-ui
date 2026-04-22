@@ -32,6 +32,10 @@ import {
   FncRefForMarkdown,
   extractFootnoteRefFromSupChildren,
 } from './FncRefForMarkdown';
+import {
+  INITIAL_FENCE_STATE,
+  updateFenceStateForLine,
+} from './streaming/fenceTracker';
 import { StreamingAnimationContext } from './StreamingAnimationContext';
 import type { MarkdownRendererEleProps, RendererBlockProps } from './types';
 
@@ -1013,32 +1017,83 @@ const renderMarkdownBlock = (
   }
 };
 
-/** 按双换行拆块，尊重代码围栏边界 */
+const LIST_ITEM_PATTERN = /^(\s*)([-+*]|\d+[.)]) /;
+const BLOCKQUOTE_PATTERN = /^\s*>/;
+const HTML_COMMENT_PATTERN = /^\s*<!--/;
+const FOOTNOTE_DEF_PATTERN = /^\s*\[\^/;
+
+/** 按单空行拆块，保留围栏代码块、列表、blockquote、HTML 注释+表格、脚注定义的连续性 */
 const splitMarkdownBlocks = (content: string): string[] => {
   const lines = content.split('\n');
   const blocks: string[] = [];
   let current: string[] = [];
-  let inFence = false;
+  let fenceState = { ...INITIAL_FENCE_STATE };
+  let inList = false;
+  let inBlockquote = false;
+  let pendingBlankLines = 0;
+
+  const lastNonEmptyLine = (): string => {
+    for (let i = current.length - 1; i >= 0; i--) {
+      if (current[i] !== '') return current[i];
+    }
+    return '';
+  };
 
   for (const line of lines) {
-    const trimmed = line.trimStart();
-    if (trimmed.startsWith('```') || trimmed.startsWith('~~~')) {
-      inFence = !inFence;
-    }
-    if (!inFence && line === '' && current.length > 0) {
-      const prev = current[current.length - 1];
-      if (prev === '') {
-        // 触发分割的是「第二个连续空行」，不应并入上一块末尾，否则与单块解析结果字符串不一致、缓存失效
-        const withoutTrailingBlank = current.slice(0, -1);
-        blocks.push(withoutTrailingBlank.join('\n'));
-        current = [];
-        continue;
+    fenceState = updateFenceStateForLine(fenceState, line);
+
+    if (fenceState.inFenced) {
+      if (pendingBlankLines > 0) {
+        for (let i = 0; i < pendingBlankLines; i++) current.push('');
+        pendingBlankLines = 0;
       }
+      current.push(line);
+      continue;
     }
+
+    if (line === '') {
+      if (current.length > 0) {
+        pendingBlankLines++;
+      }
+      continue;
+    }
+
+    if (pendingBlankLines > 0) {
+      const nextIsListItem = LIST_ITEM_PATTERN.test(line);
+      const nextIsBlockquote = BLOCKQUOTE_PATTERN.test(line);
+      const nextIsContinuation =
+        (inList && (nextIsListItem || /^\s+\S/.test(line))) ||
+        (inBlockquote && nextIsBlockquote);
+
+      const prevIsHtmlComment = HTML_COMMENT_PATTERN.test(lastNonEmptyLine());
+      const nextIsFootnoteDef = FOOTNOTE_DEF_PATTERN.test(line);
+
+      if (
+        current.length > 0 &&
+        !nextIsContinuation &&
+        !prevIsHtmlComment &&
+        !nextIsFootnoteDef
+      ) {
+        blocks.push(current.join('\n'));
+        current = [];
+        inList = false;
+        inBlockquote = false;
+      } else {
+        for (let i = 0; i < pendingBlankLines; i++) current.push('');
+      }
+      pendingBlankLines = 0;
+    }
+
+    inList = LIST_ITEM_PATTERN.test(line) || (inList && /^\s+\S/.test(line));
+    inBlockquote = BLOCKQUOTE_PATTERN.test(line);
+
     current.push(line);
   }
   if (current.length > 0) {
     blocks.push(current.join('\n'));
+  }
+  if (blocks.length === 0) {
+    blocks.push('');
   }
   return blocks;
 };

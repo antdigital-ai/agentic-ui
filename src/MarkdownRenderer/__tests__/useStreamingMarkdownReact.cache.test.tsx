@@ -38,8 +38,9 @@ describe('useStreamingMarkdownReact sealed subtree cache', () => {
   it('does not call renderMarkdownBlock again for sealed blocks when only the tail block grows', () => {
     const spy = vi.spyOn(markdownReactShared, 'renderMarkdownBlock');
 
-    const md1 = 'sealed\n\n\n';
-    const md2 = 'sealed\n\n\ntail';
+    const md1 = 'sealed\n\ntail';
+    // 新增内容超过 LAST_BLOCK_THROTTLE_CHARS (20) 以触发 reparse
+    const md2 = 'sealed\n\ntail grows with enough extra content here';
 
     const { rerender } = render(<StreamingHarness content={md1} />);
 
@@ -48,14 +49,15 @@ describe('useStreamingMarkdownReact sealed subtree cache', () => {
 
     rerender(<StreamingHarness content={md2} />);
 
+    // 仅 tail 块重新 parse，sealed 块命中缓存
     expect(spy.mock.calls.length - countAfterFirst).toBe(1);
   });
 
   it('fncProps 仅换引用时密封块不应再次 renderMarkdownBlock', () => {
     const spy = vi.spyOn(markdownReactShared, 'renderMarkdownBlock');
 
-    const md1 = 'sealed\n\n\n';
-    const md2 = 'sealed\n\n\ntail';
+    const md1 = 'sealed\n\ntail';
+    const md2 = 'sealed\n\ntail grows with enough extra content here';
 
     const { rerender } = render(
       <StreamingHarness content={md1} fncProps={{ tag: 'a' }} />,
@@ -72,7 +74,7 @@ describe('useStreamingMarkdownReact sealed subtree cache', () => {
   it('remarkPlugins 引用变化导致 processor 重建时，密封块会再次 renderMarkdownBlock', () => {
     const spy = vi.spyOn(markdownReactShared, 'renderMarkdownBlock');
     const noop = () => {};
-    const fixedMd = 'sealed\n\n\n';
+    const fixedMd = 'sealed\n\ntail';
 
     const { rerender } = render(
       <StreamingHarness content={fixedMd} remarkPlugins={[noop]} />,

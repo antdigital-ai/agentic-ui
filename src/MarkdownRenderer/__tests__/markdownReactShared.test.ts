@@ -10,6 +10,14 @@ import {
 import { StreamingAnimationContext } from '../StreamingAnimationContext';
 
 describe('splitMarkdownBlocks', () => {
+  it('splits on single blank line', () => {
+    const md = 'block1\n\nblock2';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('block1');
+    expect(result[1]).toBe('block2');
+  });
+
   it('splits on double blank lines', () => {
     const md = 'block1\n\n\nblock2';
     const result = splitMarkdownBlocks(md);
@@ -47,6 +55,42 @@ describe('splitMarkdownBlocks', () => {
     const md = 'a\n\n\nb\n\n\nc';
     const result = splitMarkdownBlocks(md);
     expect(result.length).toBe(3);
+  });
+
+  it('does not split list items with blank lines (loose list)', () => {
+    const md = '- item1\n\n- item2\n\n- item3';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(1);
+    expect(result[0]).toBe(md);
+  });
+
+  it('does not split blockquote with blank lines', () => {
+    const md = '> line1\n\n> line2';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(1);
+    expect(result[0]).toBe(md);
+  });
+
+  it('splits paragraph after list ends', () => {
+    const md = '- item1\n- item2\n\nparagraph after list';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('- item1\n- item2');
+    expect(result[1]).toBe('paragraph after list');
+  });
+
+  it('splits multiple paragraphs', () => {
+    const md = 'para1\n\npara2\n\npara3';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(3);
+  });
+
+  it('handles nested code fences correctly', () => {
+    const md = '````\n```\ninner\n```\n````\n\nafter';
+    const result = splitMarkdownBlocks(md);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe('````\n```\ninner\n```\n````');
+    expect(result[1]).toBe('after');
   });
 });
 

@@ -47,14 +47,18 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
 
     const comps = componentsRef.current;
 
-    const cached = cacheRef.current.get(blockSource);
-    if (cached && variant === 'sealed') return cached;
-
-    if (variant === 'sealed' || !streaming) {
+    if (variant === 'sealed') {
+      const cached = cacheRef.current.get(blockSource);
+      if (cached) return cached;
       const el = renderMarkdownBlock(blockSource, processor, comps);
       cacheRef.current.set(blockSource, el);
-      if (variant === 'tail')
-        lastParsedRef.current = { source: blockSource, node: el };
+      return el;
+    }
+
+    // tail 块：不写入 cacheRef，仅用 lastParsedRef
+    if (!streaming) {
+      const el = renderMarkdownBlock(blockSource, processor, comps);
+      lastParsedRef.current = { source: blockSource, node: el };
       return el;
     }
 
@@ -64,7 +68,6 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
     }
 
     const el = renderMarkdownBlock(blockSource, processor, comps);
-    cacheRef.current.set(blockSource, el);
     lastParsedRef.current = { source: blockSource, node: el };
     return el;
   }, [variant, blockSource, processor, streaming]);

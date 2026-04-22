@@ -370,8 +370,9 @@ describe('useStreaming', () => {
       },
     );
 
+    // 围栏尚未被后续换行确认关闭，内容仍在 pending 中
     await waitFor(() => {
-      expect(result.current).toBe('...');
+      expect(result.current).toBe('```js');
     });
 
     rerender({
@@ -512,7 +513,7 @@ describe('useStreaming', () => {
     });
   });
 
-  it('tilde fenced code block commits chars before fence detection', async () => {
+  it('tilde fenced code block enters fence state on first line', async () => {
     const { result } = renderHook(
       ({ input, enabled }: UseStreamingHookProps) =>
         useStreaming(input, enabled),
@@ -524,8 +525,9 @@ describe('useStreaming', () => {
       },
     );
 
+    // 增量围栏追踪：~~~ 在换行时被识别为围栏开启，后续内容在围栏内
     await waitFor(() => {
-      expect(result.current).toBe('~~');
+      expect(result.current).toBe('~~~');
     });
   });
 

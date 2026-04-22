@@ -64,6 +64,9 @@ export class CharacterQueue {
 
   /** SSE token 到达时调用——接收完整的 content 字符串 */
   push(content: string): void {
+    if (content.length < this.displayedLength) {
+      this.displayedLength = 0;
+    }
     this.fullContent = content;
     if (!this.options.animate) {
       this.displayedLength = content.length;

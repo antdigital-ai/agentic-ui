@@ -200,10 +200,10 @@ const InternalMarkdownRenderer = forwardRef<
 
   useEffect(() => {
     if (!streaming) {
-      setDisplayedContent(content || '');
       queueRef.current?.dispose();
       queueRef.current = null;
       queueOptsSigRef.current = '';
+      setDisplayedContent(content || '');
       return;
     }
 
@@ -217,14 +217,11 @@ const InternalMarkdownRenderer = forwardRef<
       queueOptsSigRef.current = sig;
     }
     queueRef.current.push(content || '');
-  }, [content, streaming, resolvedQueueOptions]);
 
-  // 流式完成时 flush 所有剩余内容
-  useEffect(() => {
-    if (isFinished && queueRef.current) {
+    if (isFinished) {
       queueRef.current.complete();
     }
-  }, [isFinished]);
+  }, [content, streaming, resolvedQueueOptions, isFinished]);
 
   // 清理
   useEffect(() => {
@@ -233,13 +230,6 @@ const InternalMarkdownRenderer = forwardRef<
       queueRef.current = null;
     };
   }, []);
-
-  // 非流式内容变化时同步
-  useEffect(() => {
-    if (!streaming) {
-      setDisplayedContent(content || '');
-    }
-  }, [content, streaming]);
 
   useEffect(() => {
     const notify = fncProps?.onFootnoteDefinitionChange;

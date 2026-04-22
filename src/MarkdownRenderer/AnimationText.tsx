@@ -77,8 +77,7 @@ const AnimationText = React.memo<AnimationTextProps>(
 
     const doneChunkStyle = useMemo(
       () => ({
-        display: 'inline-block' as const,
-        color: 'inherit',
+        display: 'contents' as const,
       }),
       [],
     );
