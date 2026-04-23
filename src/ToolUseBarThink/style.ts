@@ -63,22 +63,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           boxShadow: 'var(--shadow-border-base)',
         },
       },
-      '&-light': {
-        boxShadow: 'none',
-        border: 'none',
-        borderRadius: '14px',
-        padding: 4,
-        background: LIGHT_MODE_BACKGROUND,
-        backdropFilter: LIGHT_MODE_BACKDROP_FILTER,
-        WebkitBackdropFilter: LIGHT_MODE_BACKDROP_FILTER,
-        '&:hover': {
-          background: 'none',
-          boxShadow: 'none',
-          [`${token.componentCls}-header-left-icon-light`]: {
-            color: 'var(--color-gray-text-secondary)',
-          },
-        },
-      },
       '&-loading': {
         background: 'var(--color-gray-bg-card-white)',
         boxSizing: 'border-box',
@@ -95,6 +79,23 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         borderRadius: 'var(--radius-card-base)',
         background: 'var(--color-gray-bg-card-light)',
         boxShadow: 'inset 0px 0px 1px 0px rgba(0, 19, 41, 0.15)',
+      },
+      // Placed after &-success so light mode wins when both classes apply (success + light).
+      '&-light': {
+        boxShadow: 'none',
+        border: 'none',
+        borderRadius: '14px',
+        padding: 4,
+        background: LIGHT_MODE_BACKGROUND,
+        backdropFilter: LIGHT_MODE_BACKDROP_FILTER,
+        WebkitBackdropFilter: LIGHT_MODE_BACKDROP_FILTER,
+        '&:hover': {
+          background: 'none',
+          boxShadow: 'none',
+          [`${token.componentCls}-header-left-icon-light`]: {
+            color: 'var(--color-gray-text-secondary)',
+          },
+        },
       },
       '&-bar': {
         borderRadius: 'var(--radius-card-base)',
