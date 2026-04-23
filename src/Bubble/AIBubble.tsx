@@ -135,7 +135,10 @@ export const AIBubble: React.FC<
       messageDisplayKeyRef.current = nanoid();
     }
   }
-  const messageDisplayKey = messageDisplayKeyRef.current ?? id ?? nanoid();
+  if (!messageDisplayKeyRef.current && !id) {
+    messageDisplayKeyRef.current = nanoid();
+  }
+  const messageDisplayKey = messageDisplayKeyRef.current ?? id!;
 
   const rawContent = props?.originData?.content as string | undefined;
   const { blocks: filemapBlocks, stripped: strippedContent } = useMemo(

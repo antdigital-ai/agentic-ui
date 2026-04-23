@@ -426,7 +426,20 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
 
   const prefixClass = getPrefixCls('agentic-bubble-list');
   const { wrapSSR, hashId } = useStyle(prefixClass);
-  const deps = useMemo(() => [props.style], [JSON.stringify(props.style)]);
+  const prevStyleRef = useRef(props.style);
+  if (
+    props.style !== prevStyleRef.current &&
+    !shallowEqualRecord(
+      (props.style || {}) as Record<string, unknown>,
+      (prevStyleRef.current || {}) as Record<string, unknown>,
+    )
+  ) {
+    prevStyleRef.current = props.style;
+  }
+  const deps = useMemo(
+    () => [prevStyleRef.current],
+    [prevStyleRef.current],
+  );
 
   // 为 loading 项生成唯一的 key，使用 ref 缓存以确保稳定性
   const loadingKeysRef = useRef<Map<string, string>>(new Map());

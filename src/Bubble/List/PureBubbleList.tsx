@@ -276,7 +276,32 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
 
       return bubbleElement;
     });
-  }, [bubbleList, props.style, props.lazy]);
+  }, [
+    bubbleList,
+    props.style,
+    props.lazy,
+    bubbleListRef,
+    bubbleRenderConfig,
+    classNames,
+    props.bubbleRef,
+    markdownRenderConfig,
+    docListProps,
+    styles,
+    props.readonly,
+    onReply,
+    onDislike,
+    onDisLike,
+    onLike,
+    onLikeCancel,
+    onCancelLike,
+    onAvatarClick,
+    onDoubleClick,
+    shouldShowCopy,
+    shouldShowVoice,
+    userMeta,
+    assistantMeta,
+    deps,
+  ]);
 
   if (isLoading) {
     return wrapSSR(

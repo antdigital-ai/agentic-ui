@@ -161,7 +161,8 @@ export const BubbleExtra = ({
       originalData?.isFinished,
       typing,
       feedbackLoading,
-      props.onLikeCancel || props.onCancelLike,
+      props.onLikeCancel,
+      props.onCancelLike,
     ],
   );
 
@@ -382,7 +383,7 @@ export const BubbleExtra = ({
 
   useEffect(() => {
     props.onRenderExtraNull?.(!dom && !reSend);
-  }, [dom]);
+  }, [dom, reSend]);
 
   // 检查是否有任何内容需要渲染
   const hasLeftContent = (typing && originalData.content !== '...') || reSend;
