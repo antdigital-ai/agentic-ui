@@ -11,6 +11,8 @@ group:
 
 ## v2.30.22
 
+- Workspace
+  - 📖 补充 `Workspace.FileTree` 懒加载文件树文档演示 `workspace-file-tree-demo`。
 - MarkdownRenderer
   - 🐞 修复流式 Markdown 未传 `streamingParagraphAnimation` 时段落不应用淡入动画的问题；未传时默认开启，仅 `streamingParagraphAnimation: false` 关闭。[#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
 - MarkdownEditor
