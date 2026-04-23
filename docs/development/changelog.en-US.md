@@ -13,6 +13,7 @@ group:
 
 - Workspace
   - 📖 Add `Workspace.FileTree` lazy file tree doc demo `workspace-file-tree-demo`.
+  - 🐞 `FileTree`: empty dirs / failed loads no longer force `isLeaf`; `onLoadChildren` rejection propagates for rc-tree retry; `toDataNode` defaults missing `isLeaf` with no children to a file; `resetKey` no longer wipes lazy-loaded state.
   - 🛠 Rename lazy-load callback on `FileTreeProps` to `onLoadChildren` (aligns with `on` prefix for callbacks).
   - 🛠 `resetKey` is only passed to the **active** `Workspace.File` / `Workspace.FileTree` tab, avoiding redundant updates in hidden panes.
   - ⚡️ Precompute `Segmented` options and the first `Realtime` index in one pass, avoiding repeated O(n) `findIndex` scans in the options reducer.

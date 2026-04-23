@@ -58,6 +58,70 @@ describe('Workspace.FileTree', () => {
     });
   });
 
+  it('keeps an empty directory as a directory (empty onLoadChildren)', async () => {
+    const onLoadChildren = vi.fn().mockResolvedValue([] as any);
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'd',
+                name: 'empty-dir',
+                isLeaf: false,
+                children: [] as any,
+              },
+            ]}
+            onLoadChildren={onLoadChildren}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(document.querySelector('.ant-tree-switcher')!);
+    await waitFor(() => expect(onLoadChildren).toHaveBeenCalledTimes(1));
+
+    const sw = document.querySelector('.ant-tree-switcher')!;
+    fireEvent.click(sw);
+    fireEvent.click(sw);
+    expect(onLoadChildren).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries onLoadChildren after rejection when re-expanding', async () => {
+    const onLoadChildren = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('network'))
+      .mockResolvedValueOnce([{ key: 'ok', name: 'f.txt', isLeaf: true }]);
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              { key: 'd', name: 'dir', isLeaf: false, children: [] as any },
+            ]}
+            onLoadChildren={onLoadChildren}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    const switcher = () => document.querySelector('.ant-tree-switcher')!;
+    fireEvent.click(switcher());
+    await waitFor(() => expect(onLoadChildren).toHaveBeenCalledTimes(1));
+    // 须等 rc-tree 结束 loading 后再展开，否则 loadingKeys 会阻止再次调用 loadData
+    await waitFor(() => {
+      expect(
+        document.querySelector('.ant-tree-treenode-loading'),
+      ).not.toBeInTheDocument();
+    });
+
+    fireEvent.click(switcher());
+    await waitFor(() => expect(onLoadChildren).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.getByText('f.txt')).toBeInTheDocument());
+  });
+
   it('invokes onSelect with node', async () => {
     const onSelect = vi.fn();
     const onLoadChildren = vi

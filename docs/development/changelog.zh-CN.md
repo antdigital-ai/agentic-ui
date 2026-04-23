@@ -13,6 +13,7 @@ group:
 
 - Workspace
   - 📖 补充 `Workspace.FileTree` 懒加载文件树文档演示 `workspace-file-tree-demo`。
+  - 🐞 `FileTree`：空目录或加载失败时不再将目录误标为叶子；`onLoadChildren` 失败时 `Promise` 正确 reject 以符合 rc-tree 重试；`toDataNode` 对未传 `isLeaf` 的节点按「无子项则文件」处理；`resetKey` 不再清空已懒加载状态。
   - 🛠 `FileTreeProps` 懒加载回调命名为 `onLoadChildren`，与事件回调 `on` 前缀规范一致。
   - 🛠 `resetKey` 仅注入**当前激活**的 `Workspace.File` / `Workspace.FileTree` 子项，非激活页不再随切换递增，减少隐藏面板的无效更新。
   - ⚡️ 标签栏构建时预计算 Segmented 选项、首个 `Realtime` 索引，避免 O(n²) 的 `findIndex` 重复扫描。

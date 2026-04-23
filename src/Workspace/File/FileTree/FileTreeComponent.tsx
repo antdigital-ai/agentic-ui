@@ -33,17 +33,25 @@ const walkAndIndex = (
 
 const toDataNode = (node: FileTreeNode): DataNode => {
   const { key, name, isLeaf, disabled, children } = node;
+  const hasChildren = Boolean(children && children.length > 0);
+  // `isLeaf: false` = 目录；未传时：有子节点 = 目录，无子节点 = 视为文件（与懒加载目录需显式 `isLeaf: false` 一致）
+  const resolvedIsLeaf = isLeaf ?? !hasChildren;
+
+  if (resolvedIsLeaf) {
+    return {
+      key,
+      title: name,
+      isLeaf: true,
+      disabled,
+    } as DataNode;
+  }
+
   return {
     key,
     title: name,
-    isLeaf,
+    isLeaf: false,
     disabled,
-    children:
-      children && children.length > 0
-        ? children.map(toDataNode)
-        : isLeaf
-          ? undefined
-          : [],
+    children: hasChildren ? (children as FileTreeNode[]).map(toDataNode) : [],
   } as DataNode;
 };
 
@@ -54,11 +62,9 @@ const replaceNodeChildren = (
 ): FileTreeNode[] => {
   return nodes.map((n) => {
     if (n.key === key) {
-      const isDirEmpty = newChildren.length === 0;
       return {
         ...n,
-        children: isDirEmpty ? [] : newChildren,
-        isLeaf: isDirEmpty,
+        children: newChildren,
       };
     }
     if (n.children?.length) {
@@ -85,7 +91,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   onLoadChildren,
   onSelect,
   showLine = true,
-  resetKey,
+  resetKey: _resetKey,
   emptyRender,
   blockNode = true,
 }) => {
@@ -95,13 +101,14 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   const { wrapSSR, hashId } = useFileTreeStyle(prefixCls);
 
   const [innerTree, setInnerTree] = useState<FileTreeNode[]>(treeData);
+
   const nodeMap = useMemo(() => buildMap(innerTree), [innerTree]);
 
   const onLoadChildrenRef = useRefFunction(onLoadChildren);
 
   useEffect(() => {
     setInnerTree(treeData);
-  }, [treeData, resetKey]);
+  }, [treeData]);
 
   const dataNodes = useMemo(
     () => innerTree.map(toDataNode) as NonNullable<TreeProps['treeData']>,
@@ -115,20 +122,23 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       if (!source) {
         return Promise.resolve();
       }
-      if (source.isLeaf) {
+      if (source.isLeaf === true) {
+        return Promise.resolve();
+      }
+      if (
+        source.isLeaf === undefined &&
+        (!source.children || source.children.length === 0)
+      ) {
         return Promise.resolve();
       }
       if (source.children && source.children.length > 0) {
         return Promise.resolve();
       }
 
-      return Promise.resolve(onLoadChildrenRef(source))
-        .then((loaded) => {
-          setInnerTree((prev) => replaceNodeChildren(prev, k, loaded));
-        })
-        .catch(() => {
-          setInnerTree((prev) => replaceNodeChildren(prev, k, []));
-        });
+      // 须让 `Promise` 在失败时 reject，以便 rc-tree 不将 key 记为已加载，从而可再次展开重试
+      return Promise.resolve(onLoadChildrenRef(source)).then((loaded) => {
+        setInnerTree((prev) => replaceNodeChildren(prev, k, loaded));
+      });
     },
     [onLoadChildrenRef, nodeMap],
   );
@@ -171,7 +181,6 @@ const FileTreeComponent: FC<FileTreeProps> = ({
         <span
           className={classNames(
             `${prefixCls}-icon`,
-            hashId,
             `${prefixCls}-icon--folder`,
             hashId,
           )}

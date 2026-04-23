@@ -551,11 +551,13 @@ export interface FileTreeNode {
   /** 展示名称 */
   name: string;
   /**
-   * 叶子节点
-   * @description 为 `true` 时不会触发 `onLoadChildren`；目录且懒加载时设为 `false` 并省略子节点
+   * 是否叶子（文件）节点
+   * @description
+   * - 懒加载**目录**必须 `isLeaf: false`；若未传 `isLeaf` 且也无 `children` 时视为**文件**（`isLeaf: true`），与「仅省略 `isLeaf` 表示普通文件」一致
+   * - 已有子节点时视为目录
    */
   isLeaf?: boolean;
-  /** 子节点；懒加载目录可省略或给空数组 */
+  /** 子节点；懒加载目录为 `isLeaf: false` 时可为 `[]` 或省略，展开后由 `onLoadChildren` 填充，空目录也保持为目录 */
   children?: FileTreeNode[];
   /** 节点图标 */
   icon?: ReactNode;
@@ -589,7 +591,7 @@ export interface FileTreeProps extends BaseChildProps {
   /** 是否显示连接线，透传 antd Tree */
   showLine?: boolean;
   /**
-   * 与 `Workspace.File` 的 `resetKey` 一致；仅在**当前激活**的 `FileTree` 上由 `Workspace` 注入
+   * 由 `Workspace` 在激活项上透传，与 `Workspace.File` 的 `resetKey` 同槽位；不用于清空已懒加载的树状态（树以 `treeData` 为唯一数据源同步）
    * @internal
    */
   resetKey?: number;
