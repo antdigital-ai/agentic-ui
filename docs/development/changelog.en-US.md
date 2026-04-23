@@ -11,6 +11,14 @@ group:
 
 ## v2.30.22
 
+- Workspace
+  - 📖 Add `Workspace.FileTree` lazy file tree doc demo `workspace-file-tree-demo`.
+  - 🐞 `FileTree`: empty dirs / failed loads no longer force `isLeaf`; `onLoadChildren` rejection propagates for rc-tree retry; `toDataNode` defaults missing `isLeaf` with no children to a file; `resetKey` no longer wipes lazy-loaded state.
+  - 🛠 Rename lazy-load callback on `FileTreeProps` to `onLoadChildren` (aligns with `on` prefix for callbacks).
+  - 🛠 `resetKey` is only passed to the **active** `Workspace.File` / `Workspace.FileTree` tab, avoiding redundant updates in hidden panes.
+  - ⚡️ Precompute `Segmented` options and the first `Realtime` index in one pass, avoiding repeated O(n) `findIndex` scans in the options reducer.
+  - 🛠 Stabilize `onLoadChildren` in `FileTree` via `useRefFunction` to keep Tree `loadData` from churning on parent re-renders.
+  - 🛠 Export `WorkspacePanelType` and narrow `TabItem.componentType` to that union; docs add a `TabItem` blurb.
 - MarkdownRenderer
   - 🐞 Fix missing paragraph fade-in when `streamingParagraphAnimation` is omitted in streaming markdown mode; default is now on, set `streamingParagraphAnimation: false` to disable. [#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
 - MarkdownEditor

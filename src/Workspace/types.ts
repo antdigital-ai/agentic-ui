@@ -14,6 +14,17 @@ export interface TabConfiguration {
   count?: number;
 }
 
+/**
+ * 工作区内置子面板类型，与 `Workspace.Realtime` / `Workspace.File` 等一一对应
+ */
+export type WorkspacePanelType =
+  | 'realtime'
+  | 'browser'
+  | 'task'
+  | 'file'
+  | 'fileTree'
+  | 'custom';
+
 // 标签页数据结构
 export interface TabItem {
   key: string;
@@ -21,7 +32,8 @@ export interface TabItem {
   title?: ReactNode;
   icon?: ReactNode;
   content?: ReactNode;
-  componentType?: string; // 组件类型，用于判断是否在特定组件后插入分隔符
+  /** 子面板类型，用于分割线与内容策略 */
+  componentType?: WorkspacePanelType;
 }
 
 // 工作空间主组件属性
@@ -451,7 +463,10 @@ export interface FileProps extends BaseChildProps {
   onToggleGroup?: (groupType: FileType, collapsed: boolean) => void;
   /** Group 子组件切换事件 */
   onGroupToggle?: (groupType: FileType, collapsed: boolean) => void;
-  /** 重置标识，用于重置预览状态（内部使用） */
+  /**
+   * 重置标识：切换工作区标签时 `Workspace` 会递增，仅在**当前激活**的 `Workspace.File` 上注入，用于关闭预览等；非激活页不接收以避免隐藏面板重复重置
+   * @internal
+   */
   resetKey?: number;
   onPreview?: (
     file: FileNode,
@@ -525,6 +540,70 @@ export interface FileProps extends BaseChildProps {
    * @description 置为 false 时，不会向元素写入 id 属性（不影响 React key）
    */
   bindDomId?: boolean;
+}
+
+/**
+ * 工作区文件树节点（用于 {@link FileTreeProps}，与 `antd` Tree 的 `key` 对齐）
+ */
+export interface FileTreeNode {
+  /** 树节点唯一 key，与 Ant Design Tree 一致 */
+  key: string;
+  /** 展示名称 */
+  name: string;
+  /**
+   * 是否叶子（文件）节点
+   * @description
+   * - 懒加载**目录**必须 `isLeaf: false`；若未传 `isLeaf` 且也无 `children` 时视为**文件**（`isLeaf: true`），与「仅省略 `isLeaf` 表示普通文件」一致
+   * - 已有子节点时视为目录
+   */
+  isLeaf?: boolean;
+  /** 子节点；懒加载目录为 `isLeaf: false` 时可为 `[]` 或省略，展开后由 `onLoadChildren` 填充，空目录也保持为目录 */
+  children?: FileTreeNode[];
+  /** 节点图标 */
+  icon?: ReactNode;
+  /** 是否禁用 */
+  disabled?: boolean;
+  /** 业务 id，可选，便于与接口字段对应 */
+  id?: string;
+}
+
+/**
+ * Workspace 文件树：懒加载目录子项
+ */
+export interface FileTreeProps extends BaseChildProps {
+  className?: string;
+  style?: React.CSSProperties;
+  /**
+   * 根级树数据
+   * @description 子目录可在展开时通过 `onLoadChildren` 拉取并注入
+   */
+  treeData: FileTreeNode[];
+  /**
+   * 展开非叶子节点时拉取子节点
+   * @param node 当前被展开的节点
+   * @returns 子节点列表，可同步或异步
+   */
+  onLoadChildren: (
+    node: FileTreeNode,
+  ) => FileTreeNode[] | Promise<FileTreeNode[]>;
+  /** 选中节点（点击标题区域）时触发 */
+  onSelect?: (node: FileTreeNode) => void;
+  /** 是否显示连接线，透传 antd Tree */
+  showLine?: boolean;
+  /**
+   * 由 `Workspace` 在激活项上透传，与 `Workspace.File` 的 `resetKey` 同槽位；不用于清空已懒加载的树状态（树以 `treeData` 为唯一数据源同步）
+   * @internal
+   */
+  resetKey?: number;
+  /**
+   * 无数据时展示
+   * @description 与 File 的 `emptyRender` 行为一致
+   */
+  emptyRender?: ReactNode | (() => ReactNode);
+  /**
+   * 是否整行可点选（antd Tree `blockNode`），默认 `true`
+   */
+  blockNode?: boolean;
 }
 
 export interface CustomProps extends BaseChildProps {
