@@ -239,7 +239,9 @@ const genStyle: GenerateStyle<
         borderRadius: 0,
       },
       '&-tools-wrapper': {
-        height: '32px',
+        // 使用 minHeight，避免在 border-box 下固定 height 与 paddingBottom
+        // 争用导致内容区 < 32px、Toggle 工具与发送区纵向错位
+        minHeight: '32px',
         backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
         display: 'flex',
         boxSizing: 'border-box',
