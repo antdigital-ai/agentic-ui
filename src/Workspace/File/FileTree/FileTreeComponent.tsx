@@ -81,7 +81,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   className,
   style,
   treeData,
-  loadChildren,
+  onLoadChildren,
   onSelect,
   showLine = true,
   resetKey,
@@ -119,7 +119,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
         return Promise.resolve();
       }
 
-      return Promise.resolve(loadChildren(source))
+      return Promise.resolve(onLoadChildren(source))
         .then((loaded) => {
           setInnerTree((prev) => replaceNodeChildren(prev, k, loaded));
         })
@@ -127,7 +127,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
           setInnerTree((prev) => replaceNodeChildren(prev, k, []));
         });
     },
-    [loadChildren, nodeMap],
+    [onLoadChildren, nodeMap],
   );
 
   const handleSelect: NonNullable<TreeProps['onSelect']> = useCallback(

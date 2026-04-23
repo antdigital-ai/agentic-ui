@@ -13,6 +13,7 @@ group:
 
 - Workspace
   - 📖 Add `Workspace.FileTree` lazy file tree doc demo `workspace-file-tree-demo`.
+  - 🛠 Rename lazy-load callback on `FileTreeProps` to `onLoadChildren` (aligns with `on` prefix for callbacks).
 - MarkdownRenderer
   - 🐞 Fix missing paragraph fade-in when `streamingParagraphAnimation` is omitted in streaming markdown mode; default is now on, set `streamingParagraphAnimation: false` to disable. [#478](https://github.com/antdigital-ai/agentic-ui/pull/478)
 - MarkdownEditor

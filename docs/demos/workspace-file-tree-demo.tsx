@@ -28,7 +28,7 @@ const LOAD_DELAY_MS = 360;
 const WorkspaceFileTreeDemo: React.FC = () => {
   const [lastSelected, setLastSelected] = useState<FileTreeNode | null>(null);
 
-  const loadChildren = async (node: FileTreeNode) => {
+  const handleLoadChildren = async (node: FileTreeNode) => {
     await new Promise<void>((resolve) => {
       setTimeout(resolve, LOAD_DELAY_MS);
     });
@@ -40,7 +40,8 @@ const WorkspaceFileTreeDemo: React.FC = () => {
       <div style={{ maxWidth: 560 }}>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            展开目录时通过 <Typography.Text code>loadChildren</Typography.Text>{' '}
+            展开目录时通过{' '}
+            <Typography.Text code>onLoadChildren</Typography.Text>{' '}
             拉取子节点（本示例为本地模拟延迟）
           </Typography.Paragraph>
           {lastSelected && (
@@ -73,7 +74,7 @@ const WorkspaceFileTreeDemo: React.FC = () => {
                   children: [] as FileTreeNode[],
                 },
               ]}
-              loadChildren={loadChildren}
+              onLoadChildren={handleLoadChildren}
               onSelect={setLastSelected}
             />
           </Workspace>

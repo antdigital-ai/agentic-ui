@@ -21,7 +21,7 @@ describe('Workspace.FileTree', () => {
   );
 
   it('renders and loads children on expand (lazy load)', async () => {
-    const loadChildren = vi
+    const onLoadChildren = vi
       .fn()
       .mockResolvedValue([{ key: 'c-1', name: 'a.txt', isLeaf: true }]);
 
@@ -37,7 +37,7 @@ describe('Workspace.FileTree', () => {
                 children: [] as any,
               },
             ]}
-            loadChildren={loadChildren}
+            onLoadChildren={onLoadChildren}
           />
         </Workspace>
       </TestWrapper>,
@@ -50,7 +50,7 @@ describe('Workspace.FileTree', () => {
     fireEvent.click(expander!);
 
     await waitFor(() => {
-      expect(loadChildren).toHaveBeenCalled();
+      expect(onLoadChildren).toHaveBeenCalled();
     });
 
     await waitFor(() => {
@@ -60,7 +60,7 @@ describe('Workspace.FileTree', () => {
 
   it('invokes onSelect with node', async () => {
     const onSelect = vi.fn();
-    const loadChildren = vi
+    const onLoadChildren = vi
       .fn()
       .mockResolvedValue([{ key: 'x', name: 'b.md', isLeaf: true }]);
 
@@ -71,7 +71,7 @@ describe('Workspace.FileTree', () => {
             treeData={[
               { key: 'd', name: 'dir', isLeaf: false, children: [] as any },
             ]}
-            loadChildren={loadChildren}
+            onLoadChildren={onLoadChildren}
             onSelect={onSelect}
           />
         </Workspace>

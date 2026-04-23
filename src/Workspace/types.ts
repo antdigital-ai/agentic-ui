@@ -537,7 +537,7 @@ export interface FileTreeNode {
   name: string;
   /**
    * 叶子节点
-   * @description 为 `true` 时不会触发 `loadChildren`；目录且懒加载时设为 `false` 并省略子节点
+   * @description 为 `true` 时不会触发 `onLoadChildren`；目录且懒加载时设为 `false` 并省略子节点
    */
   isLeaf?: boolean;
   /** 子节点；懒加载目录可省略或给空数组 */
@@ -558,7 +558,7 @@ export interface FileTreeProps extends BaseChildProps {
   style?: React.CSSProperties;
   /**
    * 根级树数据
-   * @description 子目录可在展开时通过 `loadChildren` 拉取并注入
+   * @description 子目录可在展开时通过 `onLoadChildren` 拉取并注入
    */
   treeData: FileTreeNode[];
   /**
@@ -566,7 +566,7 @@ export interface FileTreeProps extends BaseChildProps {
    * @param node 当前被展开的节点
    * @returns 子节点列表，可同步或异步
    */
-  loadChildren: (
+  onLoadChildren: (
     node: FileTreeNode,
   ) => FileTreeNode[] | Promise<FileTreeNode[]>;
   /** 选中节点（点击标题区域）时触发 */
