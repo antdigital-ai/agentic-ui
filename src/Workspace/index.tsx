@@ -3,6 +3,7 @@ import {
   Language,
   ListTodo,
   MousePointerClick,
+  TreeDownArrow,
   X,
 } from '@sofa-design/icons';
 import { ConfigProvider, Segmented } from 'antd';
@@ -18,7 +19,7 @@ import React, {
 import { ActionIconBox } from '../Components/ActionIconBox';
 import { I18nContext } from '../I18n';
 import Browser from './Browser';
-import { File } from './File';
+import { File, FileTree } from './File';
 import { RealtimeFollowList } from './RealtimeFollow';
 import { useWorkspaceStyle } from './style';
 import { TaskList } from './Task';
@@ -26,6 +27,7 @@ import type {
   BrowserProps,
   CustomProps,
   FileProps,
+  FileTreeProps,
   RealtimeProps,
   TabConfiguration,
   TabItem,
@@ -40,6 +42,7 @@ enum ComponentType {
   BROWSER = 'browser',
   TASK = 'task',
   FILE = 'file',
+  FILE_TREE = 'fileTree',
   CUSTOM = 'custom',
 }
 
@@ -68,6 +71,12 @@ const DEFAULT_CONFIG = (locale: any): Record<ComponentType, TabItem> => ({
     title: locale?.['workspace.file'] || '文件',
     label: locale?.['workspace.file'] || '文件',
   },
+  [ComponentType.FILE_TREE]: {
+    key: ComponentType.FILE_TREE,
+    icon: <TreeDownArrow />,
+    title: locale?.['workspace.fileTree'] || '文件树',
+    label: locale?.['workspace.fileTree'] || '文件树',
+  },
   [ComponentType.CUSTOM]: {
     key: ComponentType.CUSTOM,
     icon: null,
@@ -95,6 +104,7 @@ const BrowserComponent: FC<BrowserProps> = (props) => <Browser {...props} />;
 const TaskComponent: FC<TaskProps> = ({ data, onItemClick }) =>
   data ? <TaskList data={data} onItemClick={onItemClick} /> : null;
 const FileComponent: FC<FileProps> = (props) => <File {...props} />;
+const FileTreeComponent: FC<FileTreeProps> = (props) => <FileTree {...props} />;
 const CustomComponent: FC<CustomProps> = ({ children }) => children || null;
 
 type WorkspaceChildComponent =
@@ -102,6 +112,7 @@ type WorkspaceChildComponent =
   | typeof BrowserComponent
   | typeof TaskComponent
   | typeof FileComponent
+  | typeof FileTreeComponent
   | typeof CustomComponent;
 
 const COMPONENT_MAP = new Map<WorkspaceChildComponent, ComponentType>([
@@ -109,6 +120,7 @@ const COMPONENT_MAP = new Map<WorkspaceChildComponent, ComponentType>([
   [BrowserComponent, ComponentType.BROWSER],
   [TaskComponent, ComponentType.TASK],
   [FileComponent, ComponentType.FILE],
+  [FileTreeComponent, ComponentType.FILE_TREE],
   [CustomComponent, ComponentType.CUSTOM],
 ]);
 
@@ -121,6 +133,7 @@ const Workspace: FC<WorkspaceProps> & {
   Browser: typeof BrowserComponent;
   Task: typeof TaskComponent;
   File: typeof FileComponent;
+  FileTree: typeof FileTreeComponent;
   Custom: typeof CustomComponent;
 } = ({
   activeTabKey,
@@ -177,12 +190,13 @@ const Workspace: FC<WorkspaceProps> & {
         ),
         content: React.createElement(child.type, {
           ...child.props,
-          ...(componentType === ComponentType.FILE && { resetKey }),
+          ...((componentType === ComponentType.FILE ||
+            componentType === ComponentType.FILE_TREE) && { resetKey }),
         }),
       });
     });
     return tabs;
-  }, [children, defaultConfig, hashId, prefixCls]);
+  }, [children, defaultConfig, hashId, prefixCls, resetKey]);
 
   useEffect(() => {
     if (!availableTabs.length) return;
@@ -322,6 +336,7 @@ Workspace.Realtime = RealtimeComponent;
 Workspace.Browser = BrowserComponent;
 Workspace.Task = TaskComponent;
 Workspace.File = FileComponent;
+Workspace.FileTree = FileTreeComponent;
 Workspace.Custom = CustomComponent;
 
 export * from './File';
@@ -330,6 +345,8 @@ export type {
   BrowserProps,
   CustomProps,
   FileProps,
+  FileTreeNode,
+  FileTreeProps,
   RealtimeProps,
   TabConfiguration,
   TabItem,

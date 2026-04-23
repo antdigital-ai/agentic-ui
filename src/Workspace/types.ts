@@ -527,6 +527,68 @@ export interface FileProps extends BaseChildProps {
   bindDomId?: boolean;
 }
 
+/**
+ * 工作区文件树节点（用于 {@link FileTreeProps}，与 `antd` Tree 的 `key` 对齐）
+ */
+export interface FileTreeNode {
+  /** 树节点唯一 key，与 Ant Design Tree 一致 */
+  key: string;
+  /** 展示名称 */
+  name: string;
+  /**
+   * 叶子节点
+   * @description 为 `true` 时不会触发 `loadChildren`；目录且懒加载时设为 `false` 并省略子节点
+   */
+  isLeaf?: boolean;
+  /** 子节点；懒加载目录可省略或给空数组 */
+  children?: FileTreeNode[];
+  /** 节点图标 */
+  icon?: ReactNode;
+  /** 是否禁用 */
+  disabled?: boolean;
+  /** 业务 id，可选，便于与接口字段对应 */
+  id?: string;
+}
+
+/**
+ * Workspace 文件树：懒加载目录子项
+ */
+export interface FileTreeProps extends BaseChildProps {
+  className?: string;
+  style?: React.CSSProperties;
+  /**
+   * 根级树数据
+   * @description 子目录可在展开时通过 `loadChildren` 拉取并注入
+   */
+  treeData: FileTreeNode[];
+  /**
+   * 展开非叶子节点时拉取子节点
+   * @param node 当前被展开的节点
+   * @returns 子节点列表，可同步或异步
+   */
+  loadChildren: (
+    node: FileTreeNode,
+  ) => FileTreeNode[] | Promise<FileTreeNode[]>;
+  /** 选中节点（点击标题区域）时触发 */
+  onSelect?: (node: FileTreeNode) => void;
+  /** 是否显示连接线，透传 antd Tree */
+  showLine?: boolean;
+  /**
+   * 与 Workspace.File 一致：切 Tab 时内部会递增，用于重置树状态
+   * @internal
+   */
+  resetKey?: number;
+  /**
+   * 无数据时展示
+   * @description 与 File 的 `emptyRender` 行为一致
+   */
+  emptyRender?: ReactNode | (() => ReactNode);
+  /**
+   * 是否整行可点选（antd Tree `blockNode`），默认 `true`
+   */
+  blockNode?: boolean;
+}
+
 export interface CustomProps extends BaseChildProps {
   children?: ReactNode;
 }

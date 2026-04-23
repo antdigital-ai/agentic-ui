@@ -1,4 +1,5 @@
 export { FileComponent as File } from './FileComponent';
+export { FileTree } from './FileTree';
 export { PreviewComponent } from './PreviewComponent';
 export type { PreviewComponentProps } from './PreviewComponent';
 
@@ -10,6 +11,8 @@ export type {
   FileNode,
   FileProps,
   FileRenderContext,
+  FileTreeNode,
+  FileTreeProps,
   FileType,
   GroupNode,
 } from '../types';
