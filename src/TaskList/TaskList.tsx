@@ -62,45 +62,46 @@ export const TaskList = memo(
       setSimpleExpanded((prev: boolean) => !prev);
     });
 
-    const { summaryStatus, summaryText, progressText } = useMemo(() => {
-      const completedCount = items.filter((i) => i.status === 'success').length;
-      const loadingItem = items.find((i) => i.status === 'loading');
-      const hasError = items.some((i) => i.status === 'error');
-      const allDone = completedCount === items.length && items.length > 0;
+    const { summaryStatus, summaryText, progressText, isCancelled, lastItem } =
+      useMemo(() => {
+        const completedCount = items.filter(
+          (i) => i.status === 'success',
+        ).length;
+        const loadingItem = items.find((i) => i.status === 'loading');
+        const hasError = items.some((i) => i.status === 'error');
+        const allDone = completedCount === items.length && items.length > 0;
 
-      let status: TaskStatus = 'pending';
-      let text = locale?.['taskList.taskList'] || '任务列表';
+        let status: TaskStatus = 'pending';
+        let text = locale?.['taskList.taskList'] || '任务列表';
 
-      if (allDone) {
-        status = 'success';
-        text = locale?.['taskList.taskComplete'] || '任务完成';
-      } else if (loadingItem?.title) {
-        status = 'loading';
-        const tpl =
-          locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
-        const title = loadingItem.title;
-        const taskName =
-          typeof title === 'string' || typeof title === 'number'
-            ? String(title)
-            : '';
-        text = tpl.replace('${taskName}', taskName);
-      } else if (hasError) {
-        status = 'error';
-        text = locale?.['taskList.taskAborted'] || '任务已取消';
-      }
+        if (allDone) {
+          status = 'success';
+          text = locale?.['taskList.taskComplete'] || '任务完成';
+        } else if (loadingItem?.title) {
+          status = 'loading';
+          const tpl =
+            locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
+          const title = loadingItem.title;
+          const taskName =
+            typeof title === 'string' || typeof title === 'number'
+              ? String(title)
+              : '';
+          text = tpl.replace('${taskName}', taskName);
+        } else if (hasError) {
+          status = 'error';
+          text = locale?.['taskList.taskAborted'] || '任务已取消';
+        }
 
-      return {
-        summaryStatus: status,
-        summaryText: text,
-        progressText: `${completedCount}/${items.length}`,
-      };
-    }, [items, locale]);
+        return {
+          summaryStatus: status,
+          summaryText: text,
+          progressText: `${completedCount}/${items.length}`,
+          isCancelled: hasError,
+          lastItem: items[items.length - 1] as TaskItem | undefined,
+        };
+      }, [items, locale]);
 
-    const isCancelled = items.some((i) => i.status === 'error');
-
-    const renderItems = () => {
-      const visibleItems = isCancelled ? items.slice(-1) : items;
-
+    const renderItems = (visibleItems: TaskItem[]) => {
       return visibleItems.map((item, index) => (
         <TaskListItem
           key={item.key}
@@ -115,13 +116,23 @@ export const TaskList = memo(
     };
 
     if (variant !== 'simple') {
-      return wrapSSR(<div className={className}>{renderItems()}</div>);
+      return wrapSSR(
+        <div className={className}>{renderItems(items)}</div>,
+      );
     }
 
     const simpleCls = `${prefixCls}-simple`;
     const simpleArrowTitle = simpleExpanded
       ? locale?.['taskList.collapse'] || '收起'
       : locale?.['taskList.expand'] || '展开';
+
+    const visibleItems = simpleExpanded
+      ? isCancelled
+        ? items.slice(-1)
+        : items
+      : lastItem
+        ? [lastItem]
+        : [];
 
     return wrapSSR(
       <div
@@ -164,13 +175,13 @@ export const TaskList = memo(
             </ActionIconBox>
           </div>
         </div>
-        {simpleExpanded && (
-          <div className={classNames(`${simpleCls}-content`, hashId)}>
-            <div className={classNames(`${simpleCls}-list`, hashId)}>
-              {renderItems()}
-            </div>
+        <div
+          className={classNames(`${simpleCls}-content`, hashId)}
+        >
+          <div className={classNames(`${simpleCls}-list`, hashId)}>
+            {renderItems(visibleItems)}
           </div>
-        )}
+        </div>
       </div>,
     );
   },

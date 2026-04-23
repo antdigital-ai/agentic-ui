@@ -122,8 +122,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // Simple variant - wrapper
       '&-simple-wrapper': {
         borderRadius: 'var(--radius-control-base, 8px)',
-        background: 'var(--color-gray-bg-page-dark, #f5f5f5)',
-        boxShadow: 'var(--shadow-control-base, none)',
         overflow: 'hidden',
       },
 
@@ -136,6 +134,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         gap: 8,
         cursor: 'pointer',
         userSelect: 'none' as const,
+        borderRadius: 'var(--radius-control-base, 8px)',
         transition: 'background 0.2s ease',
 
         '&:hover': {
@@ -181,10 +180,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
 
-      // Simple variant - expanded content
-      '&-simple-content': {
-        overflow: 'hidden',
-      },
+      // Simple variant - content area
+      '&-simple-content': {},
 
       '&-simple-list': {
         padding: '4px 12px 8px',

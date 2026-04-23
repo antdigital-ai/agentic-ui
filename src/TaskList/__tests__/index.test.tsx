@@ -752,6 +752,14 @@ describe('TaskList', () => {
       expect(screen.queryByText('Running content')).not.toBeInTheDocument();
     });
 
+    it('收起时应始终显示最后一个任务', () => {
+      render(<TaskList items={simpleItems} variant="simple" />);
+
+      expect(screen.getByText('Pending Task')).toBeInTheDocument();
+      expect(screen.queryByText('Completed Task')).not.toBeInTheDocument();
+      expect(screen.queryByText('Running Task')).not.toBeInTheDocument();
+    });
+
     it('应该显示进度信息', () => {
       render(<TaskList items={simpleItems} variant="simple" />);
 
@@ -790,6 +798,7 @@ describe('TaskList', () => {
       fireEvent.click(bar);
       await waitFor(() => {
         expect(screen.queryByText('Completed content')).not.toBeInTheDocument();
+        expect(screen.getByText('Pending Task')).toBeInTheDocument();
       });
     });
 
