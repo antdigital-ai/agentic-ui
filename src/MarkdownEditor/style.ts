@@ -351,10 +351,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           padding: 'var(--agentic-ui-content-padding, 4px 4px)',
         },
       },
-      '&-content': {
-        '--margin-4x': 'var(--agentic-ui-editor-margin-4x, 6px)',
-        '--margin-2x': 'var(--agentic-ui-editor-margin-2x, 4px)',
-      },
       '&-focus': {
         height: 64,
       },

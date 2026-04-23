@@ -498,16 +498,16 @@ describe('TaskList', () => {
       },
     ];
 
-    it('default 变体：有 error 任务时只渲染最后一条', () => {
+    it('default 变体：有 error 任务时仍渲染全部条目', () => {
       render(<TaskList items={cancelledItems} />);
 
       const taskItems = document.querySelectorAll(
         '[data-testid="task-list-thoughtChainItem"]',
       );
-      expect(taskItems).toHaveLength(1);
+      expect(taskItems).toHaveLength(3);
       expect(screen.getByText('Cancelled Task')).toBeInTheDocument();
-      expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
-      expect(screen.queryByText('Task 2')).not.toBeInTheDocument();
+      expect(screen.getByText('Task 1')).toBeInTheDocument();
+      expect(screen.getByText('Task 2')).toBeInTheDocument();
     });
 
     it('default 变体：无 error 任务时渲染全部条目', () => {
@@ -760,10 +760,10 @@ describe('TaskList', () => {
       expect(screen.queryByText('Running Task')).not.toBeInTheDocument();
     });
 
-    it('应该显示进度信息', () => {
+    it('simple 模式摘要以当前进行中的任务为主（不展示 n/m 进度）', () => {
       render(<TaskList items={simpleItems} variant="simple" />);
 
-      expect(screen.getByText('1/3')).toBeInTheDocument();
+      expect(screen.getByText('正在进行Running Task任务')).toBeInTheDocument();
     });
 
     it('应该显示当前正在运行的任务名称', () => {
@@ -821,7 +821,6 @@ describe('TaskList', () => {
       render(<TaskList items={allDoneItems} variant="simple" />);
 
       expect(screen.getByText('任务完成')).toBeInTheDocument();
-      expect(screen.getByText('2/2')).toBeInTheDocument();
     });
 
     it('有错误任务时应显示取消状态', () => {
@@ -904,7 +903,7 @@ describe('TaskList', () => {
 
       const bar = screen.getByTestId('task-list-simple-bar');
       expect(bar).toBeInTheDocument();
-      expect(screen.getByText('0/0')).toBeInTheDocument();
+      expect(screen.getByText('任务列表')).toBeInTheDocument();
     });
 
     describe('受控 open/onOpenChange', () => {
