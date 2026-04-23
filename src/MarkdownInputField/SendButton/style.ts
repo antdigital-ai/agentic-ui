@@ -39,9 +39,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     // 使用完整 modifier 类名，避免嵌套 `&&-disabled` 与 BEM 类名拼接不一致导致 cursor 等未生效
     [`${token.componentCls}-disabled`]: {
       cursor: 'not-allowed',
-      // 发送图标圆形 fill 使用 var(--color-primary-control-fill-primary)，禁用时改为灰色语义
-      '--color-primary-control-fill-primary': '#8c8c8c',
-      '--color-gray-bg-card-white': 'black',
+      // StopIcon 等仍读语义变量：用 antd token 随亮色/暗色一致
+      '--color-primary-control-fill-primary': token.colorTextQuaternary,
+      '--color-gray-bg-card-white': token.colorBgContainer,
     },
   };
 };

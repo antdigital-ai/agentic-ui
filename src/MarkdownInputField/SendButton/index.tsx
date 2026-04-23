@@ -1,7 +1,7 @@
-import { ConfigProvider, Tooltip } from 'antd';
+import { ConfigProvider, Tooltip, theme as antdTheme } from 'antd';
 import classNames from 'clsx';
 import { motion } from 'framer-motion';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
   STOP_ICON_DISK_FILL,
@@ -10,6 +10,11 @@ import {
 } from '../../AgentRunBar/icons';
 import { I18nContext } from '../../I18n';
 import type { FileUploadManagerReturn } from '../FileUploadManager';
+import {
+  getSendButtonPalette,
+  resolveSendButtonDisplayColors,
+  type SendButtonResolvedColors,
+} from './sendButtonPalette';
 import { useStyle } from './style';
 
 /**
@@ -45,23 +50,17 @@ export function resolveSendDisabled(
   return sendButtonProps?.disabled ?? fileUploadStatus === 'uploading';
 }
 
-/** 未传入 `colors` 时使用 CSS 语义变量（与原先全局 SVG 覆盖一致） */
-const SEND_BUTTON_THEME_COLORS = {
-  icon: 'var(--color-gray-bg-card-white, #ffffff)',
-  iconHover: 'var(--color-gray-bg-card-white, #ffffff)',
-  background: 'var(--color-primary-control-fill-primary, #1677ff)',
-  backgroundHover: 'var(--color-primary-control-fill-primary, #1677ff)',
-};
-
 function SendIcon(
   props: React.SVGProps<SVGSVGElement> & {
-    hover?: boolean;
+    /** 可发送且非禁用 */
+    isActive: boolean;
+    /** 业务禁用（仍渲染弱态，与 !isActive 一致） */
     disabled?: boolean;
     typing?: boolean;
-    colors?: SendButtonColors;
+    displayColors: SendButtonResolvedColors;
   },
 ) {
-  const { hover, typing, colors, ...rest } = props;
+  const { isActive, disabled, typing, displayColors, ...rest } = props;
 
   if (typing) {
     return (
@@ -73,13 +72,13 @@ function SendIcon(
     );
   }
 
-  const currentColors = {
-    icon: colors?.icon ?? SEND_BUTTON_THEME_COLORS.icon,
-    iconHover: colors?.iconHover ?? SEND_BUTTON_THEME_COLORS.iconHover,
-    background: colors?.background ?? SEND_BUTTON_THEME_COLORS.background,
-    backgroundHover:
-      colors?.backgroundHover ?? SEND_BUTTON_THEME_COLORS.backgroundHover,
-  };
+  const useActive = isActive && !disabled;
+  const circleFill = useActive
+    ? displayColors.backgroundActive
+    : displayColors.backgroundMuted;
+  const arrowFill = useActive
+    ? displayColors.iconActive
+    : displayColors.iconMuted;
 
   return (
     <svg
@@ -96,10 +95,8 @@ function SendIcon(
         r="0.5em"
         initial={false}
         animate={{
-          fill: hover
-            ? currentColors.backgroundHover
-            : currentColors.background,
-          fillOpacity: hover ? 1 : 0.03530000150203705,
+          fill: circleFill,
+          fillOpacity: 1,
         }}
         transition={{
           duration: 0.6,
@@ -112,8 +109,8 @@ function SendIcon(
           fillRule="evenodd"
           initial={false}
           animate={{
-            fill: hover ? currentColors.iconHover : currentColors.icon,
-            fillOpacity: hover ? 1 : 0.24709999561309814,
+            fill: arrowFill,
+            fillOpacity: 1,
           }}
           transition={{
             duration: 0.2,
@@ -192,7 +189,7 @@ type SendButtonProps = {
  * @component
  * @description 发送按钮组件，支持多种状态和动画效果
  * @param {SendButtonProps} props - 组件属性
- * @param {boolean} props.isHover - 指示鼠标是否悬停在按钮上
+ * @param {boolean} props.isSendable - 是否处于可发送状态
  * @param {boolean} props.disabled - 指示按钮是否禁用
  * @param {boolean} props.typing - 指示是否处于输入状态
  * @param {() => void} props.onClick - 点击按钮时的回调函数
@@ -204,7 +201,7 @@ type SendButtonProps = {
  * @example
  * ```tsx
  * <SendButton
- *   isHover={false}
+ *   isSendable
  *   disabled={false}
  *   typing={false}
  *   onClick={() => console.log('发送消息')}
@@ -242,10 +239,43 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
     // 仅在挂载时触发一次，避免引用变化导致重复打点
     // eslint-disable-next-line react-hooks/exhaustive-deps -- onInit intentionally once on mount
   }, []);
+  const { token } = antdTheme.useToken();
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
   const baseCls = getPrefixCls('agentic-md-input-field-send-button');
   const { wrapSSR, hashId } = useStyle(baseCls);
+
+  const displayColors = useMemo(
+    () =>
+      resolveSendButtonDisplayColors(
+        getSendButtonPalette({
+          colorPrimary: token.colorPrimary,
+          colorBgContainer: token.colorBgContainer,
+          colorTextLightSolid: token.colorTextLightSolid,
+          colorTextTertiary: token.colorTextTertiary,
+          colorFillTertiary: token.colorFillTertiary,
+          colorText: token.colorText,
+        }),
+        colors,
+        {
+          colorPrimary: token.colorPrimary,
+          colorBgContainer: token.colorBgContainer,
+          colorTextLightSolid: token.colorTextLightSolid,
+          colorTextTertiary: token.colorTextTertiary,
+          colorFillTertiary: token.colorFillTertiary,
+          colorText: token.colorText,
+        },
+      ),
+    [
+      colors,
+      token.colorBgContainer,
+      token.colorFillTertiary,
+      token.colorPrimary,
+      token.colorText,
+      token.colorTextLightSolid,
+      token.colorTextTertiary,
+    ],
+  );
 
   if (
     typeof window === 'undefined' ||
@@ -314,10 +344,10 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
       >
         <ErrorBoundary fallback={<div />}>
           <SendIcon
-            hover={isSendable && !disabled}
+            isActive={isSendable}
             disabled={disabled}
             typing={typing}
-            colors={colors}
+            displayColors={displayColors}
           />
         </ErrorBoundary>
       </div>
