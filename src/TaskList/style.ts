@@ -181,7 +181,21 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
 
       // Simple variant - content area
-      '&-simple-content': {},
+      '&-simple-content': {
+        display: 'grid',
+        gridTemplateRows: '0fr',
+        opacity: 0,
+        transition: 'grid-template-rows 0.25s ease, opacity 0.25s ease',
+
+        '& > *': {
+          overflow: 'hidden',
+        },
+
+        '&-expanded': {
+          gridTemplateRows: '1fr',
+          opacity: 1,
+        },
+      },
 
       '&-simple-list': {
         padding: '4px 12px 8px',

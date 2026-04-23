@@ -176,7 +176,9 @@ export const TaskList = memo(
           </div>
         </div>
         <div
-          className={classNames(`${simpleCls}-content`, hashId)}
+          className={classNames(`${simpleCls}-content`, hashId, {
+            [`${simpleCls}-content-expanded`]: simpleExpanded,
+          })}
         >
           <div className={classNames(`${simpleCls}-list`, hashId)}>
             {renderItems(visibleItems)}
