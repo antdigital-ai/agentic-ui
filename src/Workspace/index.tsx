@@ -6,6 +6,7 @@ import {
   TreeDownArrow,
   X,
 } from '@sofa-design/icons';
+import type { SegmentedProps } from 'antd';
 import { ConfigProvider, Segmented } from 'antd';
 import classNames from 'clsx';
 import React, {
@@ -32,6 +33,7 @@ import type {
   TabConfiguration,
   TabItem,
   TaskProps,
+  WorkspacePanelType,
   WorkspaceProps,
 } from './types';
 
@@ -158,24 +160,54 @@ const Workspace: FC<WorkspaceProps> & {
   const displayTitle = title ?? (locale?.['workspace.title'] || 'Workspace');
   const defaultConfig = useMemo(() => DEFAULT_CONFIG(locale), [locale]);
   const [internalActiveTab, setInternalActiveTab] = useState('');
-  const availableTabs = useMemo((): TabItem[] => {
-    const tabs: TabItem[] = [];
+
+  const { availableTabs, segmentedOptions } = useMemo(() => {
+    type PanelEntry = {
+      wType: ComponentType;
+      child: React.ReactElement;
+      tabConfig: ReturnType<typeof resolveTabConfig>;
+    };
+
+    const panelEntries: PanelEntry[] = [];
     React.Children.forEach(children, (child, index) => {
       if (!React.isValidElement(child)) return;
-      const componentType = COMPONENT_MAP.get(
-        child.type as WorkspaceChildComponent,
-      );
-      if (!componentType) return;
-
+      const wType = COMPONENT_MAP.get(child.type as WorkspaceChildComponent);
+      if (!wType) return;
       const tabConfig = resolveTabConfig(
         child.props.tab,
-        defaultConfig[componentType],
-        componentType === ComponentType.CUSTOM ? index : undefined,
+        defaultConfig[wType],
+        wType === ComponentType.CUSTOM ? index : undefined,
       );
-      tabs.push({
-        key: tabConfig.key,
+      panelEntries.push({ wType, child, tabConfig });
+    });
+
+    const keys = panelEntries.map((e) => e.tabConfig.key);
+    const isControlled = activeTabKey !== undefined;
+    const effectiveKeyForReset =
+      isControlled &&
+      activeTabKey !== undefined &&
+      activeTabKey !== null &&
+      keys.includes(String(activeTabKey))
+        ? String(activeTabKey)
+        : internalActiveTab && keys.includes(internalActiveTab)
+          ? internalActiveTab
+          : (keys[0] ?? '');
+
+    const firstRealtimeIndex = panelEntries.findIndex(
+      (e) => e.wType === ComponentType.REALTIME,
+    );
+
+    const tabs: TabItem[] = panelEntries.map((entry) => {
+      const { wType, child, tabConfig } = entry;
+      const key = tabConfig.key;
+      const shouldPassResetKey =
+        (wType === ComponentType.FILE || wType === ComponentType.FILE_TREE) &&
+        key === effectiveKeyForReset;
+
+      return {
+        key,
         icon: tabConfig.icon,
-        componentType,
+        componentType: wType as WorkspacePanelType,
         label: (
           <div className={classNames(`${prefixCls}-tab-item`, hashId)}>
             <span className={classNames(`${prefixCls}-tab-title`, hashId)}>
@@ -190,13 +222,41 @@ const Workspace: FC<WorkspaceProps> & {
         ),
         content: React.createElement(child.type, {
           ...child.props,
-          ...((componentType === ComponentType.FILE ||
-            componentType === ComponentType.FILE_TREE) && { resetKey }),
+          ...(shouldPassResetKey ? { resetKey } : {}),
         }),
-      });
+      };
     });
-    return tabs;
-  }, [children, defaultConfig, hashId, prefixCls, resetKey]);
+
+    const options: NonNullable<SegmentedProps['options']> = [];
+    for (let i = 0; i < tabs.length; i += 1) {
+      const tab = tabs[i];
+      options.push({
+        label: tab.label,
+        value: tab.key,
+        icon: tab.icon,
+      });
+      const isFirstRealtime =
+        firstRealtimeIndex === i &&
+        tab.componentType === ComponentType.REALTIME;
+      if (isFirstRealtime && tabs.length > 1) {
+        options.push({
+          label: '',
+          value: '__divider__',
+          disabled: true,
+        });
+      }
+    }
+
+    return { availableTabs: tabs, segmentedOptions: options };
+  }, [
+    children,
+    defaultConfig,
+    hashId,
+    prefixCls,
+    resetKey,
+    activeTabKey,
+    internalActiveTab,
+  ]);
 
   useEffect(() => {
     if (!availableTabs.length) return;
@@ -294,26 +354,7 @@ const Workspace: FC<WorkspaceProps> & {
           <Segmented
             key={segmentedKey}
             className={classNames(`${prefixCls}-segmented`, hashId)}
-            options={availableTabs.reduce(
-              (acc, { label, key, icon, componentType }, index) => {
-                acc.push({ label, value: key, icon });
-                // 只在第一个"实时跟随"组件后插入分割线
-                const isFirstRealtime =
-                  componentType === ComponentType.REALTIME &&
-                  availableTabs.findIndex(
-                    (tab) => tab.componentType === ComponentType.REALTIME,
-                  ) === index;
-                if (isFirstRealtime && availableTabs.length > 1) {
-                  acc.push({
-                    label: '',
-                    value: '__divider__',
-                    disabled: true,
-                  });
-                }
-                return acc;
-              },
-              [] as any[],
-            )}
+            options={segmentedOptions}
             value={currentActiveTab}
             onChange={handleTabChange}
             block
@@ -351,6 +392,7 @@ export type {
   TabConfiguration,
   TabItem,
   TaskProps,
+  WorkspacePanelType,
   WorkspaceProps,
 } from './types';
 export default Workspace;

@@ -14,6 +14,17 @@ export interface TabConfiguration {
   count?: number;
 }
 
+/**
+ * 工作区内置子面板类型，与 `Workspace.Realtime` / `Workspace.File` 等一一对应
+ */
+export type WorkspacePanelType =
+  | 'realtime'
+  | 'browser'
+  | 'task'
+  | 'file'
+  | 'fileTree'
+  | 'custom';
+
 // 标签页数据结构
 export interface TabItem {
   key: string;
@@ -21,7 +32,8 @@ export interface TabItem {
   title?: ReactNode;
   icon?: ReactNode;
   content?: ReactNode;
-  componentType?: string; // 组件类型，用于判断是否在特定组件后插入分隔符
+  /** 子面板类型，用于分割线与内容策略 */
+  componentType?: WorkspacePanelType;
 }
 
 // 工作空间主组件属性
@@ -451,7 +463,10 @@ export interface FileProps extends BaseChildProps {
   onToggleGroup?: (groupType: FileType, collapsed: boolean) => void;
   /** Group 子组件切换事件 */
   onGroupToggle?: (groupType: FileType, collapsed: boolean) => void;
-  /** 重置标识，用于重置预览状态（内部使用） */
+  /**
+   * 重置标识：切换工作区标签时 `Workspace` 会递增，仅在**当前激活**的 `Workspace.File` 上注入，用于关闭预览等；非激活页不接收以避免隐藏面板重复重置
+   * @internal
+   */
   resetKey?: number;
   onPreview?: (
     file: FileNode,
@@ -574,7 +589,7 @@ export interface FileTreeProps extends BaseChildProps {
   /** 是否显示连接线，透传 antd Tree */
   showLine?: boolean;
   /**
-   * 与 Workspace.File 一致：切 Tab 时内部会递增，用于重置树状态
+   * 与 `Workspace.File` 的 `resetKey` 一致；仅在**当前激活**的 `FileTree` 上由 `Workspace` 注入
    * @internal
    */
   resetKey?: number;

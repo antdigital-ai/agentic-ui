@@ -12,6 +12,7 @@ import React, {
   useState,
 } from 'react';
 
+import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../I18n';
 import type { FileTreeNode, FileTreeProps } from '../../types';
 import { getFileType } from '../../types';
@@ -96,6 +97,8 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   const [innerTree, setInnerTree] = useState<FileTreeNode[]>(treeData);
   const nodeMap = useMemo(() => buildMap(innerTree), [innerTree]);
 
+  const onLoadChildrenRef = useRefFunction(onLoadChildren);
+
   useEffect(() => {
     setInnerTree(treeData);
   }, [treeData, resetKey]);
@@ -119,7 +122,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
         return Promise.resolve();
       }
 
-      return Promise.resolve(onLoadChildren(source))
+      return Promise.resolve(onLoadChildrenRef(source))
         .then((loaded) => {
           setInnerTree((prev) => replaceNodeChildren(prev, k, loaded));
         })
@@ -127,7 +130,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
           setInnerTree((prev) => replaceNodeChildren(prev, k, []));
         });
     },
-    [onLoadChildren, nodeMap],
+    [onLoadChildrenRef, nodeMap],
   );
 
   const handleSelect: NonNullable<TreeProps['onSelect']> = useCallback(
