@@ -101,7 +101,7 @@ export default () => {
       return;
     }
 
-    timerRef.current = setTimeout(advance, 1500);
+    timerRef.current = setTimeout(advance, 3000);
   }, [buildItems]);
 
   const handleStart = useCallback(() => {
@@ -114,8 +114,8 @@ export default () => {
 
     timerRef.current = setTimeout(() => {
       setOpen(true);
-      timerRef.current = setTimeout(advance, 500);
-    }, 300);
+      timerRef.current = setTimeout(advance, 800);
+    }, 500);
   }, [running, advance]);
 
   const handleReset = useCallback(() => {
