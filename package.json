@@ -23,6 +23,7 @@
     "lint": "pnpm run lint:es && pnpm run lint:css",
     "lint:css": "stylelint \"{src,test}/**/*.{css,less}\"",
     "lint:es": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
+    "playwright:install": "playwright install --with-deps chromium",
     "prepare": "husky install && dumi setup",
     "prepublishOnly": "npm run build && npm run test:full",
     "prettier": "prettier --write \"{src,docs,test}/**/*.{js,jsx,ts,tsx,css,less,json,md}\"",
@@ -30,14 +31,13 @@
     "report:demo": "node scripts/generateDemoReport.js",
     "start": "pnpm run dev",
     "test": "vitest --run",
-    "test:full": "cross-env VITEST_FULL_SUITE=1 vitest --run",
     "test:coverage": "vitest --run --coverage",
     "test:coverage:full": "cross-env VITEST_FULL_SUITE=1 vitest --run --coverage",
     "test:e2e": "playwright test",
-    "playwright:install": "playwright install --with-deps chromium",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:skip-server": "cross-env SKIP_WEBSERVER=1 playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:full": "cross-env VITEST_FULL_SUITE=1 vitest --run",
     "tsc": "tsc --noEmit"
   },
   "lint-staged": {

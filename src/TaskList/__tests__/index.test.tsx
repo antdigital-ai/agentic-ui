@@ -533,8 +533,12 @@ describe('TaskList', () => {
       const leftArea = document.querySelector('[data-testid="task-list-left"]');
       expect(leftArea).toBeInTheDocument();
 
-      // 由于右侧区域没有 data-testid，我们通过检查其子元素来验证
-      const arrowContainer = document.querySelector(
+      const rightArea = document.querySelector(
+        '[data-testid="task-list-right"]',
+      );
+      expect(rightArea).toBeInTheDocument();
+
+      const arrowContainer = rightArea?.querySelector(
         '[data-testid="task-list-arrowContainer"]',
       );
       expect(arrowContainer).toBeInTheDocument();

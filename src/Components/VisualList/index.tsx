@@ -264,6 +264,7 @@ const VisualListComponent: React.FC<VisualListProps> = ({
           hashId,
           className,
         )}
+        data-testid={`${prefixCls}-loading`}
         style={style}
       >
         {loadingRender ? loadingRender() : <span>加载中...</span>}
@@ -281,6 +282,7 @@ const VisualListComponent: React.FC<VisualListProps> = ({
           hashId,
           className,
         )}
+        data-testid={`${prefixCls}-empty`}
         style={style}
       >
         {emptyRender ? emptyRender() : <span>暂无数据</span>}
@@ -289,7 +291,11 @@ const VisualListComponent: React.FC<VisualListProps> = ({
   }
 
   return wrapSSR(
-    <div className={containerClassName} style={style}>
+    <div
+      className={containerClassName}
+      data-testid={prefixCls}
+      style={style}
+    >
       <ul className={classNames(prefixCls, hashId)}>{listItems}</ul>
       {/* 用来处理margin-8*/}
       <div style={{ width: 4 }} />

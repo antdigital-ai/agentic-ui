@@ -403,6 +403,7 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
 
   return (
     <Form
+      data-testid="schema-form"
       form={form}
       layout="vertical"
       initialValues={defaultValues}

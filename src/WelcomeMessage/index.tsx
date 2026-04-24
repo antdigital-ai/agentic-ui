@@ -112,7 +112,11 @@ export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
   const { ...restStyle } = customStyle || {};
 
   return wrapSSR(
-    <div className={clsx(prefixCls, hashId, rootClassName)} style={restStyle}>
+    <div
+      className={clsx(prefixCls, hashId, rootClassName)}
+      data-testid={prefixCls}
+      style={restStyle}
+    >
       {/* Title */}
       {title && (
         <TypingAnimation

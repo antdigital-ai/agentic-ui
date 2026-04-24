@@ -312,6 +312,7 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
           className,
           hashId,
         )}
+        data-testid={prefixClass}
         ref={bubbleListRef}
         style={{
           padding: 24,
@@ -329,6 +330,7 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
         [`${prefixClass}-compact`]: compact,
       })}
       data-chat-list={bubbleList.length}
+      data-testid={prefixClass}
       style={style}
       ref={bubbleListRef}
       onScroll={onScroll}

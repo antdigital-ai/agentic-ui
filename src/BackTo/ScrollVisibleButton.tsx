@@ -47,6 +47,8 @@ export interface ScrollVisibleButtonProps extends Omit<
   React.DOMAttributes<HTMLButtonElement>,
   'onClick'
 > {
+  /** 自动化测试用按钮标识，未设置时默认与主题前缀一致 */
+  'data-testid'?: string;
   /** 自定义类名 */
   className?: string;
   /** 自定义样式 */
@@ -97,6 +99,7 @@ export const ScrollVisibleButton = forwardRef<
       onClick,
       tooltip,
       children,
+      'data-testid': dataTestId,
       ...rest
     },
     ref,
@@ -127,6 +130,7 @@ export const ScrollVisibleButton = forwardRef<
       <button
         ref={internalRef}
         className={classNames(baseCls, className, hashId)}
+        data-testid={dataTestId ?? baseCls}
         style={style}
         type="button"
         onClick={handleClick}

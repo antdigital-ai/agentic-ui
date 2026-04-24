@@ -435,6 +435,7 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
     return wrapSSR(
       <div
         className={classNames(prefixCls, className, hashId)}
+        data-testid={prefixCls}
         style={{ height: typeof height === 'number' ? `${height}px` : height }}
       >
         <div className={classNames(`${prefixCls}-container`, hashId)}>

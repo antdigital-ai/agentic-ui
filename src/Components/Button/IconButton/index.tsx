@@ -46,7 +46,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   const rootCls = classNames(prefixCls, className, hashId);
 
   return wrapSSR(
-    <div className={rootCls} style={style}>
+    <div className={rootCls} data-testid={prefixCls} style={style}>
       <Tooltip title={tooltip}>
         <Button
           icon={icon}

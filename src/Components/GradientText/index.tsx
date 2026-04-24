@@ -28,7 +28,11 @@ export function GradientText({
   };
 
   return wrapSSR(
-    <div className={classNames(prefixCls, hashId, className)} style={style}>
+    <div
+      className={classNames(prefixCls, hashId, className)}
+      data-testid={prefixCls}
+      style={style}
+    >
       <div
         className={classNames(`${prefixCls}-text-content`, hashId)}
         style={gradientStyle}

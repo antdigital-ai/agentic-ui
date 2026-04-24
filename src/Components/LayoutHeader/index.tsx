@@ -119,7 +119,10 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = ({
   };
 
   return wrapSSR(
-    <div className={classNames(prefixCls, hashId, className)}>
+    <div
+      className={classNames(prefixCls, hashId, className)}
+      data-testid={prefixCls}
+    >
       {/* 左侧区域：标题和左侧折叠按钮 */}
       <div className={classNames(`${prefixCls}-left`, hashId)}>
         {leftCollapsible && (

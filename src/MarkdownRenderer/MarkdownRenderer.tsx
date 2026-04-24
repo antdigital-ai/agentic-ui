@@ -290,6 +290,7 @@ const InternalMarkdownRenderer = forwardRef<
             hashId,
             className,
           )}
+          data-testid="markdown-renderer"
           style={style}
         >
           <div

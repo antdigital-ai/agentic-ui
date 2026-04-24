@@ -46,7 +46,11 @@ const TitleComponent: React.FC<TitleProps> = ({
   const subtitleCls = classNames(`${prefixCls}-subtitle`, hashId);
 
   return wrapSSR(
-    <div className={classNames(prefixCls, hashId, className)} style={style}>
+    <div
+      className={classNames(prefixCls, hashId, className)}
+      data-testid={prefixCls}
+      style={style}
+    >
       {title && <div className={mainCls}>{title}</div>}
       {subtitle && <div className={subtitleCls}>{subtitle}</div>}
     </div>,

@@ -168,7 +168,7 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
   );
 
   return wrapSSR(
-    <div className={alertCls} style={style}>
+    <div className={alertCls} data-testid={prefixCls} style={style}>
       <div className={classNames(`${prefixCls}-content`, hashId)}>
         {showIcon ? (
           <IconNode

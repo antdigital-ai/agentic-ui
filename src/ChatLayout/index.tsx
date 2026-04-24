@@ -144,7 +144,11 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
     );
 
     return wrapSSR(
-      <div className={rootClassName} style={{ ...styles?.root, ...style }}>
+      <div
+        className={rootClassName}
+        data-testid={prefixCls}
+        style={{ ...styles?.root, ...style }}
+      >
         {header && <LayoutHeader {...header} />}
         <div className={contentClassName} style={styles?.content}>
           <div

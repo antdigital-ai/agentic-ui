@@ -107,6 +107,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
   return wrapSSR(
     <div
       className={containerCls}
+      data-testid={prefixCls}
       style={style}
       onClick={onClick}
       onMouseEnter={handleMouseEnter}

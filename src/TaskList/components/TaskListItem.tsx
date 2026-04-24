@@ -55,7 +55,10 @@ export const TaskListItem: React.FC<TaskListItemProps> = memo(
             )}
           </div>
         </div>
-        <div className={classNames(`${prefixCls}-right`, hashId)}>
+        <div
+          className={classNames(`${prefixCls}-right`, hashId)}
+          data-testid="task-list-right"
+        >
           <div
             className={classNames(`${prefixCls}-top`, hashId)}
             onClick={handleToggle}

@@ -38,6 +38,7 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
         [`${prefixCls}-active`]: active,
         [`${prefixCls}-disabled`]: disabled,
       })}
+      data-testid={prefixCls}
       style={style}
     >
       <ConfigProvider

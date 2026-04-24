@@ -134,6 +134,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
   return wrapSSR(
     <div
       className={rootCls}
+      data-testid={prefixCls}
       style={style}
       role="group"
       aria-label={locale?.['suggestion.area'] || '追问区域'}

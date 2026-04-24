@@ -159,6 +159,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
   if (props.standalone) {
     return wrapSSR(
       <div
+        data-testid="history-standalone"
         style={{
           display: 'flex',
           flexDirection: 'column',

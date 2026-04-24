@@ -412,6 +412,7 @@ const TextAnimateBase = ({
         animate={startOnView ? undefined : 'show'}
         exit="exit"
         className={classNames(prefixCls, hashId, className)}
+        data-testid={prefixCls}
         viewport={{ once }}
         aria-label={accessible && isString(children) ? children : undefined}
         {...props}

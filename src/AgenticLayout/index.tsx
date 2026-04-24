@@ -202,7 +202,11 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
   }, [handleResizeMove, handleResizeEnd]);
 
   return wrapSSR(
-    <div className={classNames(prefixCls, className, hashId)} style={style}>
+    <div
+      className={classNames(prefixCls, className, hashId)}
+      data-testid={prefixCls}
+      style={style}
+    >
       {/* 主体内容区域 */}
       <div
         className={`${prefixCls}-body ${hashId}`}

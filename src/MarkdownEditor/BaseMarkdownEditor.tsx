@@ -346,6 +346,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 [`${baseClassName}-slide`]: props.slideMode,
               },
             )}
+            data-testid="markdown-editor"
             style={{
               width: width || '100%',
               height: height || 'auto',
@@ -427,6 +428,7 @@ export const BaseMarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
                 [`${baseClassName}-slide`]: props.slideMode,
               },
             )}
+            data-testid="markdown-editor"
             style={{
               width: width || '100%',
               height: height || 'auto',

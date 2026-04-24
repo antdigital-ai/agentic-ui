@@ -174,6 +174,7 @@ const TypingAnimationBase = ({
     <MotionComponent
       ref={elementRef}
       className={classNames(prefixCls, hashId, className)}
+      data-testid={prefixCls}
       {...props}
     >
       {displayedText}

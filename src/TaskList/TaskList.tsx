@@ -2,7 +2,7 @@ import { ChevronUp } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
-import React, { memo, useContext, useMemo } from 'react';
+import React, { memo, useContext, useEffect, useMemo, useState } from 'react';
 import { ActionIconBox } from '../Components/ActionIconBox';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { I18nContext } from '../I18n';
@@ -11,6 +11,8 @@ import { TaskListItem } from './components/TaskListItem';
 import { getArrowRotation } from './constants';
 import { useStyle } from './style';
 import type { TaskItem, TaskListProps, TaskStatus } from './types';
+
+const SIMPLE_COLLAPSE_DURATION_MS = 350;
 
 const getDefaultExpandedKeys = (
   items: TaskItem[],
@@ -58,9 +60,26 @@ export const TaskList = memo(
       onChange: (val) => onOpenChange?.(val),
     });
 
+    const [shouldRenderContent, setShouldRenderContent] = useState(true);
+
     const handleSimpleToggle = useRefFunction(() => {
       setSimpleExpanded((prev: boolean) => !prev);
     });
+
+    useEffect(() => {
+      if (simpleExpanded) {
+        setShouldRenderContent(true);
+        return;
+      }
+
+      const timer = window.setTimeout(() => {
+        setShouldRenderContent(false);
+      }, SIMPLE_COLLAPSE_DURATION_MS);
+
+      return () => {
+        window.clearTimeout(timer);
+      };
+    }, [simpleExpanded]);
 
     const { summaryStatus, summaryText, isCancelled, lastItem } =
       useMemo(() => {
@@ -116,7 +135,9 @@ export const TaskList = memo(
 
     if (variant !== 'simple') {
       return wrapSSR(
-        <div className={className}>{renderItems(items)}</div>,
+        <div className={className} data-testid={prefixCls}>
+          {renderItems(items)}
+        </div>,
       );
     }
 
@@ -154,7 +175,10 @@ export const TaskList = memo(
               hashId={hashId}
             />
           </div>
-          <div key={summaryText} className={classNames(`${simpleCls}-text`, hashId)}>
+          <div
+            key={summaryText}
+            className={classNames(`${simpleCls}-text`, hashId)}
+          >
             {summaryText}
           </div>
           <div className={classNames(`${simpleCls}-arrow`, hashId)}>
@@ -176,9 +200,11 @@ export const TaskList = memo(
             [`${simpleCls}-content-expanded`]: simpleExpanded,
           })}
         >
-          <div className={classNames(`${simpleCls}-list`, hashId)}>
-            {renderItems(visibleItems)}
-          </div>
+          {shouldRenderContent ? (
+            <div className={classNames(`${simpleCls}-list`, hashId)}>
+              {renderItems(visibleItems)}
+            </div>
+          ) : null}
         </div>
       </div>,
     );

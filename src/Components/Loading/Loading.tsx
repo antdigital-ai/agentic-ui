@@ -189,6 +189,7 @@ export const Loading = ({
         [`${baseCls}-with-tip`]: !!tip,
         [`${baseCls}-with-children`]: isNestedPattern,
       })}
+      data-testid={baseCls}
       style={{
         fontSize: mergedSize,
         ...styles?.root,
@@ -214,6 +215,7 @@ export const Loading = ({
           wrapperClassName,
           spinning && `${baseCls}-spinning`,
         )}
+        data-testid={`${baseCls}-nested-pattern`}
         style={styles?.wrapper}
       >
         {spinning ? loadingElement : null}

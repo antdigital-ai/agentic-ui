@@ -130,7 +130,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         height: 36,
-        padding: '0 12px',
+        padding: '0 4px',
         gap: 8,
         cursor: 'pointer',
         userSelect: 'none' as const,
@@ -166,7 +166,6 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           whiteSpace: 'nowrap',
           animation: 'taskTextFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         },
-
 
         [`${componentCls}-simple-arrow`]: {
           flexShrink: 0,

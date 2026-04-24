@@ -518,6 +518,7 @@ const TaskRunningComponent: React.FC<TaskRunningProps> = (rest) => {
           [`${baseCls}-status-${robotStatus}`]: robotStatus,
         },
       )}
+      data-testid={baseCls}
       layout="size"
       transition={{ duration: 0.25, ease: 'easeOut' }}
       style={rest.style}

@@ -22,6 +22,8 @@ export type AILabelStatus = 'default' | 'watermark' | 'emphasis';
  * @extends React.HTMLAttributes<HTMLSpanElement>
  */
 export interface AILabelProps extends React.HTMLAttributes<HTMLSpanElement> {
+  /** 自动化测试用根节点标识，未设置时默认与主题前缀一致 */
+  'data-testid'?: string;
   /**
    * 标签状态
    * @description 控制标签的视觉样式，支持默认、水印和强调三种状态
@@ -121,6 +123,7 @@ const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
       style,
       rootStyle,
       children,
+      'data-testid': dataTestId,
       ...restProps
     } = props;
 
@@ -178,6 +181,7 @@ const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
         ref={ref}
         {...restProps}
         className={badgeClassName}
+        data-testid={dataTestId ?? baseCls}
         style={rootStyle}
       >
         {children}

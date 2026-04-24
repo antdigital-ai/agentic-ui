@@ -75,6 +75,7 @@ export const SwitchButton: React.FC<SwitchButtonProps> = ({
   return wrapSSR(
     <Button
       disabled={disabled}
+      data-testid={prefixCls}
       onClick={handleClick}
       className={rootCls}
       style={style}

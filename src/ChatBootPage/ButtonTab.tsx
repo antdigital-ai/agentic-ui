@@ -74,6 +74,7 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
     <button
       type="button"
       className={buttonClassName}
+      data-testid={prefixCls}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}

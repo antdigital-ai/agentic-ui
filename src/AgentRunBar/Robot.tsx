@@ -63,7 +63,6 @@ const Robot: React.FC<RobotProps> = ({
   return (
     <div
       className={classNames(className)}
-      data-testid="robot"
       style={
         React.isValidElement(icon)
           ? {

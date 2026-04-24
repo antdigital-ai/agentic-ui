@@ -31,6 +31,7 @@ export const ActionItemBox = (props: ActionItemBoxProps) => {
 
   return wrapSSR(
     <motion.div
+      data-testid={basePrefixCls}
       initial="hidden"
       animate="visible"
       style={{

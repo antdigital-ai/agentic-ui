@@ -486,7 +486,11 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
           locale={locale}
         />
 
-        <div className={classNames(`${prefixCls}`, hashId)} style={restStyle}>
+        <div
+          className={classNames(`${prefixCls}`, hashId)}
+          data-testid={prefixCls}
+          style={restStyle}
+        >
           <motion.div
             className={classNames(`${prefixCls}-container`, hashId, {
               [`${prefixCls}-container-loading`]: !bubble?.isFinished,

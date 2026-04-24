@@ -63,6 +63,7 @@ const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
   return wrapSSR(
     <div
       className={`${prefixCls} ${className || ''} ${hashId}`}
+      data-testid={prefixCls}
       role="group"
       aria-label="Tab group"
     >
