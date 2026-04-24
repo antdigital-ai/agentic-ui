@@ -1,10 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { BaseMarkdownEditor } from '../../src/MarkdownEditor/BaseMarkdownEditor';
 
 describe('BaseMarkdownEditor renderMode=markdown', () => {
-  it('应使用 MarkdownRenderer 渲染 agentic-ui-task 围栏', () => {
+  it('应使用 MarkdownRenderer 渲染 agentic-ui-task 围栏', async () => {
     const md = [
       '```agentic-ui-task',
       '{',
@@ -19,15 +19,17 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
       <BaseMarkdownEditor readonly initValue={md} renderMode="markdown" />,
     );
 
+    await waitFor(() => {
+      expect(
+        container.querySelector('[data-testid="agentic-ui-task-block"]'),
+      ).toBeTruthy();
+    });
     expect(
-      container.querySelector('[data-testid="agentic-ui-task-block"]'),
-    ).toBeTruthy();
-    expect(
-      screen.getByTestId('task-list-simple-wrapper'),
+      await screen.findByTestId('task-list-simple-wrapper'),
     ).toBeInTheDocument();
   });
 
-  it('renderType=markdown 与 renderMode=markdown 等价', () => {
+  it('renderType=markdown 与 renderMode=markdown 等价', async () => {
     const md = [
       '```agentic-ui-toolusebar',
       '{ "tools": [{ "id": "a", "toolName": "操作", "toolTarget": "目标", "status": "loading" }] }',
@@ -38,9 +40,13 @@ describe('BaseMarkdownEditor renderMode=markdown', () => {
       <BaseMarkdownEditor readonly initValue={md} renderType="markdown" />,
     );
 
+    await waitFor(() => {
+      expect(
+        container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
+      ).toBeTruthy();
+    });
     expect(
-      container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
-    ).toBeTruthy();
-    expect(container.querySelector('[data-testid="ToolUse"]')).toBeTruthy();
+      await screen.findByTestId('ToolUse', {}, { timeout: 10_000 }),
+    ).toBeInTheDocument();
   });
 });

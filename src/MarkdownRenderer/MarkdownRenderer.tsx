@@ -12,32 +12,17 @@ import React, {
 import { useStyle as useContentStyle } from '../MarkdownEditor/editor/style';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
-import type { MarkdownEditorProps } from '../MarkdownEditor/types';
+import { DefaultCodeRouter } from './DefaultCodeRouter';
 import { CharacterQueue } from './CharacterQueue';
 import { extractFootnoteDefinitionsFromMarkdown } from './extractFootnoteDefinitions';
-import { AgenticUiFileMapBlockRenderer } from './renderers/AgenticUiFileMapBlockRenderer';
-import { AgenticUiTaskBlockRenderer } from './renderers/AgenticUiTaskBlockRenderer';
-import { AgenticUiToolUseBarBlockRenderer } from './renderers/AgenticUiToolUseBarBlockRenderer';
-import { ChartBlockRenderer } from './renderers/ChartRenderer';
-import { CodeBlockRenderer } from './renderers/CodeRenderer';
-import { MermaidBlockRenderer } from './renderers/MermaidRenderer';
-import { SchemaBlockRenderer } from './renderers/SchemaRenderer';
 import { useRendererVarStyle } from './style';
 import type {
-  FileMapConfig,
   MarkdownRendererProps,
   MarkdownRendererRef,
   RendererBlockProps,
 } from './types';
 import { useMarkdownToReact } from './useMarkdownToReact';
 import { useStreaming } from './useStreaming';
-
-const SCHEMA_LANGUAGES = new Set([
-  'schema',
-  'apaasify',
-  'apassify',
-  'agentar-card',
-]);
 
 /**
  * 从插件列表中收集 rendererComponents
@@ -57,83 +42,6 @@ const collectRendererComponents = (
     }
   }
   return components;
-};
-
-/**
- * 默认的代码块路由——根据语言分发到对应渲染器
- */
-const DefaultCodeRouter: React.FC<
-  RendererBlockProps & {
-    pluginComponents: Record<string, React.ComponentType<RendererBlockProps>>;
-    apaasifyRender?: (value: any) => React.ReactNode;
-    fileMapConfig?: FileMapConfig;
-    editorCodeProps?: MarkdownEditorProps['codeProps'];
-  }
-> = (props) => {
-  const {
-    language,
-    pluginComponents,
-    apaasifyRender,
-    fileMapConfig,
-    editorCodeProps,
-    ...rest
-  } = props;
-
-  if (language === 'mermaid') {
-    const MermaidComp = pluginComponents.mermaid || MermaidBlockRenderer;
-    return <MermaidComp {...rest} language={language} />;
-  }
-
-  if (language === 'chart' || language === 'json-chart') {
-    const ChartComp = pluginComponents.chart || ChartBlockRenderer;
-    return <ChartComp {...rest} language={language} />;
-  }
-
-  if (language === 'agentic-ui-task') {
-    const TaskComp =
-      pluginComponents['agentic-ui-task'] || AgenticUiTaskBlockRenderer;
-    return <TaskComp {...rest} language={language} />;
-  }
-
-  if (
-    language === 'agentic-ui-toolusebar' ||
-    language === 'agentic-ui-usertoolbar'
-  ) {
-    const ToolbarComp =
-      pluginComponents['agentic-ui-toolusebar'] ||
-      pluginComponents['agentic-ui-usertoolbar'] ||
-      AgenticUiToolUseBarBlockRenderer;
-    return <ToolbarComp {...rest} language={language} />;
-  }
-
-  if (language === 'agentic-ui-filemap') {
-    const FileMapComp =
-      pluginComponents['agentic-ui-filemap'] || AgenticUiFileMapBlockRenderer;
-    return (
-      <FileMapComp
-        {...rest}
-        language={language}
-        fileMapConfig={fileMapConfig}
-      />
-    );
-  }
-
-  if (SCHEMA_LANGUAGES.has(language)) {
-    const SchemaComp = pluginComponents.schema || SchemaBlockRenderer;
-    return (
-      <SchemaComp
-        {...rest}
-        language={language}
-        apaasifyRender={apaasifyRender}
-        editorCodeProps={editorCodeProps}
-      />
-    );
-  }
-
-  const CodeComp = pluginComponents.code || CodeBlockRenderer;
-  return (
-    <CodeComp {...rest} language={language} editorCodeProps={editorCodeProps} />
-  );
 };
 
 /** 轻量流式 Markdown 渲染器——无 Slate 实例，Markdown → hast → React */

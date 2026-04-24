@@ -1,7 +1,8 @@
 import classNames from 'clsx';
 import { isString } from 'lodash-es';
 import React from 'react';
-import { DazingLottie, ThinkingLottie } from './lotties';
+import { DazingLottie } from './lotties/DazingLottie';
+import { ThinkingLottie } from './lotties/ThinkingLottie';
 
 export * from './lotties/BlowingWindLottie';
 export * from './lotties/BouncingLottie';

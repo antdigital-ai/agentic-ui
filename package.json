@@ -7,6 +7,45 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.less",
+    "**/*.scss"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./MarkdownEditor": {
+      "types": "./dist/MarkdownEditor/index.d.ts",
+      "import": "./dist/MarkdownEditor/index.js",
+      "default": "./dist/MarkdownEditor/index.js"
+    },
+    "./TaskList": {
+      "types": "./dist/TaskList/index.d.ts",
+      "import": "./dist/TaskList/index.js",
+      "default": "./dist/TaskList/index.js"
+    },
+    "./ToolUseBar": {
+      "types": "./dist/ToolUseBar/index.d.ts",
+      "import": "./dist/ToolUseBar/index.js",
+      "default": "./dist/ToolUseBar/index.js"
+    },
+    "./Components/Robot": {
+      "types": "./dist/Components/Robot/index.d.ts",
+      "import": "./dist/Components/Robot/index.js",
+      "default": "./dist/Components/Robot/index.js"
+    },
+    "./ReadonlyMarkdownEditorView": {
+      "types": "./dist/MarkdownEditor/ReadonlyMarkdownEditorView.d.ts",
+      "import": "./dist/MarkdownEditor/ReadonlyMarkdownEditorView.js",
+      "default": "./dist/MarkdownEditor/ReadonlyMarkdownEditorView.js"
+    },
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist",
     "guidelines"
@@ -14,6 +53,7 @@
   "scripts": {
     "bench:parsemd": "vitest --run tests/editor/parseMd.benchmark.test.ts",
     "build": "father build",
+    "minify:lottie": "node scripts/minify-lottie-json.mjs",
     "build:watch": "father dev",
     "check:demo": "node scripts/checkDemoFiles.js",
     "dev": "dumi dev",

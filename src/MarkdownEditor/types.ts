@@ -140,6 +140,11 @@ export type MarkdownEditorProps = {
     defaultDom: React.ReactNode,
   ) => React.ReactNode;
   initValue?: string;
+  /**
+   * 只读时是否仍挂载完整 Slate 取决于 `renderMode`：
+   * - 与 `renderMode: 'markdown'` 联用：走轻量 `MarkdownRenderer`，不加载 Slate（首包与运行时最小）
+   * - 默认或 `renderMode: 'slate'`：只读仍以 Slate 渲染（可选中、与编辑态 DOM 一致），但会包含 Slate 与相关依赖
+   */
   readonly?: boolean;
 
   /** 懒加载，只有进入视口才渲染 */
@@ -320,12 +325,14 @@ export type MarkdownEditorProps = {
   attachment?: Record<string, unknown>;
 
   /**
-   * 只读渲染模式，默认 'slate'
-   * - 'slate': Slate 编辑器渲染（向后兼容）
-   * - 'markdown': 轻量 MarkdownRenderer（无 Slate 实例）
+   * 只读渲染模式，默认 `'slate'`。仅在 `readonly` 为 true 时与只读分支强相关。
+   * - `'slate'`：Slate 文档树（与编辑态一致，体积含 Slate）
+   * - `'markdown'`：仅 `Markdown → hast → React`，无 Slate，仅当 `readonly` 时生效
    */
   renderMode?: RenderMode;
-  /** renderMode 的别名，同时传入时 renderMode 优先 */
+  /**
+   * `renderMode` 的别名，同时传入时以 `renderMode` 为准。
+   */
   renderType?: RenderMode;
   /**
    * 自定义元素渲染（仅 renderMode: 'markdown'），返回 undefined 回退默认渲染

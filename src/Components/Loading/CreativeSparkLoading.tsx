@@ -1,5 +1,6 @@
 import React from 'react';
-import { CreativeSparkLottie, LoadingLottieProps } from '../lotties';
+import { CreativeSparkLottie } from '../lotties/CreativeSparkLottie';
+import type { LoadingLottieProps } from '../lotties/LoadingLottie';
 
 /**
  * CreativeSparkLoading 组件 - 创意生成中火花动画组件

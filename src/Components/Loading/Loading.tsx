@@ -2,8 +2,8 @@ import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { isString } from 'lodash-es';
 import React, { useContext } from 'react';
-import { TextLoading } from '../lotties';
 import { LoadingLottieProps } from '../lotties/LoadingLottie';
+import { TextLoading } from '../lotties/TextLoading';
 import Indicator from './Indicator';
 import { prefixCls, useStyle } from './style';
 
