@@ -405,7 +405,6 @@ export const PreviewComponent: FC<PreviewComponentProps> = ({
                     ellipsis={{ tooltip: file.name }}
                     style={{
                       font: 'var(--font-text-h6-base)',
-                      color: 'var(--color-gray-text-default)',
                     }}
                   >
                     {file.name}

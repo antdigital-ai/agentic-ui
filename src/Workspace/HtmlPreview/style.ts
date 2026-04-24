@@ -25,7 +25,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         height: '100%',
         minHeight: '240px',
         border: 'none',
-        background: '#fff',
+        background: token.colorBgContainer,
       },
 
       [`${token.componentCls}-overlay`]: {
@@ -37,12 +37,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 1,
 
         [`&--loading`]: {
-          background: 'rgba(255, 255, 255, 0.6)',
+          // 与 antd 遮罩一致，随亮/暗主题变化
+          background: token.colorBgMask,
         },
 
         [`&--error`]: {
-          background: 'rgba(255, 245, 245, 0.6)',
-          color: '#cb1e1e',
+          background: token.colorErrorBg,
+          color: token.colorError,
         },
       },
 

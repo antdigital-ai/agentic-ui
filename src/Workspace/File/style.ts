@@ -44,7 +44,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           // 展开收起图标
           [`&-toggle-icon`]: {
             fontSize: 'var(--font-size-sm)',
-            color: '#6c757d',
+            color: token.colorTextTertiary || token.colorTextSecondary,
             transition: 'transform 0.2s ease',
           },
 
@@ -164,7 +164,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 文件名
       [`&-name`]: {
         fontSize: '13px',
-        color: '#343a40',
+        color: token.colorText,
         fontWeight: 400,
         lineHeight: 1.4,
         wordBreak: 'break-all',
@@ -197,7 +197,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 分割符
       [`&-separator`]: {
         fontSize: 'var(--font-size-xs)',
-        color: 'rgba(20, 22, 28, 0.07)',
+        color: token.colorSplit,
         margin: '0 4px',
       },
 
@@ -251,7 +251,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       height: '100%',
       marginLeft: '-12px',
       marginRight: '-12px',
-      background: '#fff',
+      background: token.colorBgContainer,
       position: 'relative',
 
       // 预览头部
@@ -260,8 +260,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         gap: '4px',
         padding: '8px 12px',
-        borderBottom: '1px solid rgba(20, 22, 28, 0.07)',
-        background: '#fff',
+        borderBottom: `1px solid ${token.colorBorderSecondary || token.colorBorder}`,
+        background: token.colorBgContainer,
         flexShrink: 0,
         position: 'sticky',
         top: 0,
@@ -278,12 +278,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         border: 'none',
         background: 'none',
         cursor: 'pointer',
-        color: '#767e8b',
+        color: token.colorTextTertiary || token.colorTextSecondary,
         transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
-        borderRadius: '4px',
+        borderRadius: token.borderRadiusSM || 4,
 
         '&:hover': {
-          background: '#f0f0f0',
+          background: token.colorFillTertiary || token.colorFillSecondary,
         },
       },
 
@@ -328,7 +328,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 生成时间
       [`&-generate-time`]: {
         fontSize: '12px',
-        color: '#767e8b',
+        color: token.colorTextTertiary || token.colorTextSecondary,
       },
 
       // 操作按钮容器
@@ -339,11 +339,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         // 保持预览头部操作按钮的图标颜色一致
         [`${token.antCls}-btn, ${token.antCls}-btn .anticon`]: {
-          color: '#767E8B',
+          color: token.colorTextTertiary || token.colorTextSecondary,
         },
         [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover .anticon, ${token.antCls}-btn:focus .anticon, ${token.antCls}-btn:active .anticon`]:
           {
-            color: '#767E8B',
+            color: token.colorTextTertiary || token.colorTextSecondary,
           },
       },
 
@@ -394,8 +394,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             left: 0,
             height: 48,
             right: 0,
-            background:
-              'linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%)',
+            background: `linear-gradient(to bottom, ${token.colorBgContainer}, transparent)`,
             zIndex: 1,
             pointerEvents: 'none',
           },
@@ -406,8 +405,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             left: 0,
             height: 48,
             right: 0,
-            background:
-              'linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%)',
+            background: `linear-gradient(to top, ${token.colorBgContainer}, transparent)`,
             zIndex: 1,
             pointerEvents: 'none',
           },
@@ -434,7 +432,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // 占位符内容
       [`&-placeholder-content`]: {
         textAlign: 'center',
-        color: '#8c8c8c',
+        color: token.colorTextTertiary || token.colorTextSecondary,
 
         p: {
           margin: '8px 0',
