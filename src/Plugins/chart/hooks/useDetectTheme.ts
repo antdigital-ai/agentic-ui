@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 
 /**
  * 主题检测配置选项
@@ -131,53 +131,35 @@ const detectTheme = (
   return 'light';
 };
 
-/**
- * 自动检测当前主题的 Hook
- *
- * 检测策略（按优先级）：
- * 1. 检查 `html[data-theme='dark']` 属性
- * 2. 检查指定 CSS 变量的亮度值
- * 3. 检查 `--color-gray-bg-page` 的亮度值
- *
- * @param options 检测配置选项
- * @returns 检测到的主题 'light' | 'dark'
- *
- * @example
- * ```tsx
- * const theme = useDetectTheme();
- * // theme: 'light' | 'dark'
- *
- * // 自定义配置
- * const theme = useDetectTheme({
- *   cssVariable: '--color-primary-bg-page',
- *   darknessThreshold: 128,
- *   observeChanges: true,
- * });
- * ```
- */
-export const useDetectTheme = (
-  options: DetectThemeOptions = {},
-): 'light' | 'dark' => {
-  const {
-    cssVariable = '--color-gray-bg-page',
-    darknessThreshold = 145,
-    observeChanges = true,
-  } = options;
+// --- 单例主题检测：所有 hook 实例共享一个 MutationObserver + matchMedia 监听 ---
 
-  const [theme, setTheme] = useState<'light' | 'dark'>(() =>
-    detectTheme(cssVariable, darknessThreshold),
-  );
+let listeners: Array<() => void> = [];
+let currentTheme: 'light' | 'dark' = 'light';
+let observerRef: MutationObserver | null = null;
+let mediaQueryRef: MediaQueryList | null = null;
+let refCount = 0;
 
-  useEffect(() => {
-    if (!observeChanges) return;
+const DEFAULT_CSS_VARIABLE = '--color-gray-bg-page';
+const DEFAULT_DARKNESS_THRESHOLD = 145;
+
+function subscribeTheme(listener: () => void): () => void {
+  listeners.push(listener);
+  refCount++;
+
+  // 第一个订阅者时初始化全局监听器
+  if (refCount === 1 && typeof window !== 'undefined') {
+    currentTheme = detectTheme(DEFAULT_CSS_VARIABLE, DEFAULT_DARKNESS_THRESHOLD);
 
     const updateTheme = () => {
-      setTheme(detectTheme(cssVariable, darknessThreshold));
+      const next = detectTheme(DEFAULT_CSS_VARIABLE, DEFAULT_DARKNESS_THRESHOLD);
+      if (next !== currentTheme) {
+        currentTheme = next;
+        listeners.forEach((fn) => fn());
+      }
     };
 
-    // 监听 data-theme 属性变化
     const htmlElement = document.documentElement;
-    const observer = new MutationObserver((mutations) => {
+    observerRef = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         if (
           mutation.type === 'attributes' &&
@@ -189,29 +171,82 @@ export const useDetectTheme = (
       }
     });
 
-    observer.observe(htmlElement, {
+    observerRef.observe(htmlElement, {
       attributes: true,
       attributeFilter: ['data-theme', 'class', 'style'],
     });
 
-    // 监听 prefers-color-scheme 变化
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleMediaChange = () => {
-      updateTheme();
-    };
+    mediaQueryRef = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQueryRef.addEventListener('change', updateTheme);
+  }
 
-    mediaQuery.addEventListener('change', handleMediaChange);
+  return () => {
+    listeners = listeners.filter((fn) => fn !== listener);
+    refCount--;
 
-    // 初始检测
-    updateTheme();
+    // 最后一个订阅者取消时清理全局监听器
+    if (refCount === 0) {
+      observerRef?.disconnect();
+      observerRef = null;
+      if (mediaQueryRef) {
+        mediaQueryRef.removeEventListener('change', () => {});
+        mediaQueryRef = null;
+      }
+    }
+  };
+}
 
-    return () => {
-      observer.disconnect();
-      mediaQuery.removeEventListener('change', handleMediaChange);
-    };
-  }, [cssVariable, darknessThreshold, observeChanges]);
+function getSnapshot(): 'light' | 'dark' {
+  return currentTheme;
+}
 
-  return theme;
+function getServerSnapshot(): 'light' | 'dark' {
+  return 'light';
+}
+
+/**
+ * 自动检测当前主题的 Hook（单例模式）
+ *
+ * 所有 hook 实例共享同一个 MutationObserver 和 matchMedia 监听器，
+ * 避免页面上多个图表时创建重复的 DOM 监听。
+ *
+ * 检测策略（按优先级）：
+ * 1. 检查 `html[data-theme='dark']` 属性
+ * 2. 检查指定 CSS 变量的亮度值
+ * 3. 检查 `--color-gray-bg-page` 的亮度值
+ *
+ * @param options 检测配置选项（observeChanges 为 false 时跳过监听）
+ * @returns 检测到的主题 'light' | 'dark'
+ *
+ * @example
+ * ```tsx
+ * const theme = useDetectTheme();
+ * // theme: 'light' | 'dark'
+ *
+ * // 禁用监听（仅检测一次）
+ * const theme = useDetectTheme({ observeChanges: false });
+ * ```
+ */
+export const useDetectTheme = (
+  options: DetectThemeOptions = {},
+): 'light' | 'dark' => {
+  const { observeChanges = true } = options;
+
+  // 当 observeChanges 为 false 时，只做一次性检测，不订阅变更
+  const liveTheme = useSyncExternalStore(
+    subscribeTheme,
+    getSnapshot,
+    getServerSnapshot,
+  );
+
+  if (!observeChanges) {
+    return detectTheme(
+      options.cssVariable ?? DEFAULT_CSS_VARIABLE,
+      options.darknessThreshold ?? DEFAULT_DARKNESS_THRESHOLD,
+    );
+  }
+
+  return liveTheme;
 };
 
 export default useDetectTheme;

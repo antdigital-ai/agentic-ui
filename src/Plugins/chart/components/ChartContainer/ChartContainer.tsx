@@ -148,8 +148,10 @@ const ChartContainer: React.FC<
   const ancestorDarkAntdProvided = useChartDarkAntdProvided();
 
   // 自动检测主题：当 themeProp 未指定且 autoDetectTheme 为 true 时，自动检测
-  const detectedTheme = useDetectTheme({ observeChanges: autoDetectTheme });
-  const theme = themeProp ?? (autoDetectTheme ? detectedTheme : 'light');
+  // 当 themeProp 已明确传入时，跳过监听以避免创建多余的 MutationObserver
+  const needDetect = autoDetectTheme && !themeProp;
+  const detectedTheme = useDetectTheme({ observeChanges: needDetect });
+  const theme = themeProp ?? (needDetect ? detectedTheme : 'light');
 
   const wrapDarkAntd = theme === 'dark' && !ancestorDarkAntdProvided;
 

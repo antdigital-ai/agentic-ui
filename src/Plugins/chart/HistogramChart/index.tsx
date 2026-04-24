@@ -21,8 +21,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { StatisticConfigType } from '../hooks/useChartStatistic';
-import { useDetectTheme } from '../hooks';
+import { StatisticConfigType, useDetectTheme } from '../hooks';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
