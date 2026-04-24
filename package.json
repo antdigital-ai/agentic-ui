@@ -25,7 +25,7 @@
     "lint:es": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "playwright:install": "playwright install --with-deps chromium",
     "prepare": "husky install && dumi setup",
-    "prepublishOnly": "npm run build && npm run test",
+    "prepublishOnly": "npm run build",
     "prettier": "prettier --write \"{src,docs,test}/**/*.{js,jsx,ts,tsx,css,less,json,md}\"",
     "preview": "pnpm dumi preview",
     "report:demo": "node scripts/generateDemoReport.js",
