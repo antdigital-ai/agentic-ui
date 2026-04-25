@@ -21,10 +21,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         gap: '8px',
 
         [`${token.componentCls}-region-dropdown-btn`]: {
-          border: '1px solid #d9d9d9',
+          border: '1px solid var(--color-gray-border-light)',
           borderRadius: '6px',
-          backgroundColor: '#fff',
-          color: '#666',
+          backgroundColor: 'var(--color-gray-bg-card-white)',
+          color: 'var(--color-gray-text-secondary)',
           fontSize: '14px',
           display: 'flex',
           alignItems: 'center',
@@ -35,24 +35,24 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           padding: '0 12px',
 
           '&:hover': {
-            borderColor: '#8c8c8c',
-            color: '#343a45',
-            backgroundColor: '#f9f9f9',
+            borderColor: 'var(--color-gray-text-light)',
+            color: 'var(--color-gray-text-default)',
+            backgroundColor: 'var(--color-gray-bg-page-light)',
 
             [`${token.componentCls}-dropdown-icon`]: {
-              color: '#8c8c8c',
+              color: 'var(--color-gray-text-light)',
             },
           },
 
           [`${token.componentCls}-dropdown-icon`]: {
             fontSize: '12px',
-            color: '#666',
+            color: 'var(--color-gray-text-secondary)',
           },
         },
       },
 
       [`${token.componentCls}-segmented-filter`]: {
-        backgroundColor: '#f5f5f5',
+        backgroundColor: 'var(--color-gray-control-fill-hover)',
         height: '32px',
         display: 'flex',
         alignItems: 'center',
@@ -76,8 +76,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           },
           '.ant-segmented-item-selected': {
             borderRadius: '8px',
-            backgroundColor: '#fff !important',
-            border: '1px solid #d9d9d9 !important',
+            backgroundColor: 'var(--color-gray-bg-card-white) !important',
+            border: '1px solid var(--color-gray-border-light) !important',
             boxShadow:
               '0px 0px 1px 0px rgba(0, 19, 41, 0.2), 0px 1.5px 4px -1px rgba(0, 19, 41, 0.04)',
             '.ant-segmented-item-label': {
@@ -89,7 +89,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
               fontVariationSettings: '"opsz" auto',
               /* gray/gray-文本-默认 */
               /* 样式描述：--gray-a12 */
-              color: '#343a45 !important',
+              color: 'var(--color-gray-text-default) !important',
             },
           },
         },
@@ -99,14 +99,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-dark': {
         [`${token.componentCls}-region-filter`]: {
           [`${token.componentCls}-region-dropdown-btn`]: {
-            border: '1px solid #434343',
-            backgroundColor: '#1a1a1a',
+            border: '1px solid var(--color-gray-border-dark)',
+            backgroundColor: 'var(--color-gray-bg-page-dark)',
             color: 'rgba(255, 255, 255, 0.85)',
 
             '&:hover': {
-              borderColor: '#595959',
-              color: '#fff',
-              backgroundColor: '#262626',
+              borderColor: 'var(--color-gray-text-light)',
+              color: 'var(--color-gray-bg-card-white)',
+              backgroundColor: 'var(--color-gray-bg-page-dark)',
 
               [`${token.componentCls}-dropdown-icon`]: {
                 color: 'rgba(255, 255, 255, 0.8)',
@@ -120,7 +120,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
 
         [`${token.componentCls}-segmented-filter`]: {
-          backgroundColor: '#262626',
+          backgroundColor: 'var(--color-gray-bg-page-dark)',
 
           '&.custom-segmented': {
             '.ant-segmented-item': {
@@ -129,15 +129,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
               },
             },
             '.ant-segmented-item-selected': {
-              backgroundColor: '#fff !important',
-              border: '1px solid #434343 !important',
+              backgroundColor: 'var(--color-gray-bg-card-white) !important',
+              border: '1px solid var(--color-gray-border-dark) !important',
 
               '.ant-segmented-item-label': {
-                color: '#343a45 !important',
+                color: 'var(--color-gray-text-default) !important',
               },
             },
             '.ant-segmented-thumb': {
-              backgroundColor: '#343a45 !important',
+              backgroundColor: 'var(--color-gray-bg-page-dark) !important',
             },
           },
         },

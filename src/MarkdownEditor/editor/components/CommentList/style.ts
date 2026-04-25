@@ -18,7 +18,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       gap: 8,
       borderLeft: '1px solid rgba(0,0,0,0.04)',
       maxWidth: '300px',
-      backgroundColor: '#fff',
+      backgroundColor: 'var(--color-gray-bg-card-white)',
       height: '100vh',
       '&-item': {
         padding: '12px',
@@ -29,7 +29,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         flexDirection: 'column',
         gap: 8,
         '&:hover': {
-          backgroundColor: '#f9f9f9',
+          backgroundColor: 'var(--color-gray-bg-page-light)',
         },
         '&-header': {
           display: 'flex',
@@ -47,7 +47,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             alignItems: 'center',
           },
           '&-time': {
-            color: '#bfbfbf',
+            color: 'var(--color-gray-text-disabled)',
             fontSize: '12px',
           },
           '&-action': {

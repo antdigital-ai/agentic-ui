@@ -59,7 +59,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         border: 'var(--color-gray-border-light)',
 
         '&:hover': {
-          background: '#F7F8FA',
+          background: 'var(--color-gray-bg-page)',
           transform: 'scale(1.05)',
         },
         '&-icon': {
@@ -144,7 +144,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '& svg': {
           width: 48,
           height: 48,
-          color: '#fff',
+          color: 'var(--color-gray-bg-card-white)',
         },
       },
       '&-image-list-view': {

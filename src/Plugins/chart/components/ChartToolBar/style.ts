@@ -20,7 +20,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         lineHeight: '24px',
         letterSpacing: '0em',
         fontVariationSettings: '"opsz" auto',
-        color: '#343a45',
+        color: 'var(--color-gray-text-default)',
         flex: 1,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -38,7 +38,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         [`${token.componentCls}-time-icon`]: {
           fontSize: '14px',
-          color: '#00183d',
+          color: 'var(--color-primary-text-default)',
           marginRight: '2px',
         },
 
@@ -79,7 +79,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // Dark theme styles
       '&-dark': {
         [`${token.componentCls}-header-title`]: {
-          color: '#fff',
+          color: 'var(--color-gray-bg-card-white)',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -87,7 +87,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         [`${token.componentCls}-header-actions`]: {
           [`${token.componentCls}-time-icon`]: {
-            color: '#fff',
+            color: 'var(--color-gray-bg-card-white)',
           },
 
           [`${token.componentCls}-data-time`]: {

@@ -94,7 +94,7 @@ const genStyle: GenerateStyle<
       alignItems: 'center',
       justifyContent: 'center',
       padding: INPUT_FIELD_PADDING.NONE,
-      background: 'var(--color-gray-bg-card-white, #ffffff)',
+      background: 'var(--color-gray-bg-card-white)',
       borderRadius: '12px',
       minHeight: '48px',
       maxWidth: 980,
@@ -140,7 +140,7 @@ const genStyle: GenerateStyle<
         boxSizing: 'border-box',
       },
       '&-content-wrapper': {
-        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
@@ -150,7 +150,7 @@ const genStyle: GenerateStyle<
       '&-editor': {
         boxSizing: 'border-box',
         borderRadius: 'inherit',
-        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         width: '100%',
         zIndex: 9,
         maxHeight: 400,
@@ -158,7 +158,7 @@ const genStyle: GenerateStyle<
         overflowY: 'visible',
         cursor: 'text',
         scrollbarColor:
-          'var(--color-gray-text-tertiary, #505c716b) transparent',
+          'var(--color-gray-text-secondary) transparent',
         scrollbarWidth: 'thin',
         '&&-disabled': {
           backgroundColor: 'rgba(0,0,0,0.04)',
@@ -176,7 +176,7 @@ const genStyle: GenerateStyle<
       },
       '& [data-be="code"]': {
         background:
-          'var(--color-gray-bg-card-light, #f7f9fc) !important',
+          'var(--color-gray-bg-card-light) !important',
         color:
           'var(--color-gray-text-default, rgba(20, 22, 28, 0.88)) !important',
       },
@@ -242,7 +242,7 @@ const genStyle: GenerateStyle<
         // 使用 minHeight，避免在 border-box 下固定 height 与 paddingBottom
         // 争用导致内容区 < 32px、Toggle 工具与发送区纵向错位
         minHeight: '32px',
-        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         display: 'flex',
         boxSizing: 'border-box',
         borderRadius: 0,

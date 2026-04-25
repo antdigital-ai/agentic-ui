@@ -7,7 +7,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     [`${token.componentCls}`]: {
       display: 'flex',
       flexDirection: 'column',
-      background: '#ffffff',
+      background: 'var(--color-gray-bg-card-white)',
       borderRadius: '8px',
       overflow: 'hidden',
       fontFamily:
@@ -18,7 +18,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       display: 'flex',
       flex: 1,
       gap: '4px',
-      background: '#FDFEFF',
+      background: 'var(--color-gray-bg-page-light)',
       minHeight: 0,
     },
 
@@ -48,7 +48,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       flexDirection: 'column',
       gap: '8px',
       padding: '12px',
-      background: '#FDFEFF',
+      background: 'var(--color-gray-bg-page-light)',
       border: '1px solid rgba(9, 30, 66, 0.07)',
       borderRadius: '8px',
     },
@@ -63,7 +63,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       margin: 0,
       fontSize: 'var(--font-size-base)',
       fontWeight: 600,
-      color: '#495057',
+      color: 'var(--color-gray-text-default)',
     },
 
     [`${token.componentCls}-html-header button`]: {
@@ -72,7 +72,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       gap: '4px',
       padding: '3px 8px',
       fontSize: 'var(--font-size-sm)',
-      color: '#626F86',
+      color: 'var(--color-gray-text-secondary)',
     },
 
     [`${token.componentCls}-html-content`]: {
@@ -93,7 +93,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       flexDirection: 'column',
       gap: '8px',
       padding: '12px',
-      background: '#FDFEFF',
+      background: 'var(--color-gray-bg-page-light)',
       border: '1px solid rgba(9, 30, 66, 0.07)',
       borderRadius: '8px',
     },
@@ -108,7 +108,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       margin: 0,
       fontSize: 'var(--font-size-base)',
       fontWeight: 600,
-      color: '#495057',
+      color: 'var(--color-gray-text-default)',
     },
 
     [`${token.componentCls}-json-header button`]: {
@@ -117,7 +117,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       gap: '4px',
       padding: '3px 8px',
       fontSize: 'var(--font-size-sm)',
-      color: '#626F86',
+      color: 'var(--color-gray-text-secondary)',
     },
 
     [`${token.componentCls}-json-content`]: {
@@ -139,7 +139,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       minHeight: 0,
       border: '1px solid rgba(9, 30, 66, 0.07)',
       borderRadius: '8px',
-      background: '#fff',
+      background: 'var(--color-gray-bg-card-white)',
       boxShadow: '0px 1.5px 2px -1px rgba(0, 19, 41, 0.07)',
     },
 
@@ -154,16 +154,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       margin: 0,
       fontSize: 'var(--font-size-base)',
       fontWeight: 600,
-      color: '#2c3e5d',
+      color: 'var(--color-gray-text-default)',
     },
 
     [`${token.componentCls}-error`]: {
-      background: '#fff5f5',
-      border: '1px solid #fed7d7',
+      background: 'var(--color-red-bg-page-light)',
+      border: '1px solid var(--color-red-border-light)',
       borderRadius: '4px',
       padding: '8px 12px',
       fontSize: 'var(--font-size-sm)',
-      color: '#c53030',
+      color: 'var(--color-red-text-default)',
       maxWidth: '300px',
       wordBreak: 'break-word',
     },
@@ -175,7 +175,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       flex: 1,
       padding: '16px',
       overflow: 'auto',
-      background: '#ffffff',
+      background: 'var(--color-gray-bg-card-white)',
       borderRadius: '0 0 8px 8px',
     },
 
@@ -189,7 +189,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     [`${token.componentCls}-preview-content-empty p`]: {
       fontSize: 'var(--font-size-base)',
       textAlign: 'center',
-      color: '#8590A2',
+      color: 'var(--color-gray-text-light)',
     },
 
     [`${token.componentCls}-fallback`]: {
@@ -198,7 +198,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100%',
-      color: '#6c757d',
+      color: 'var(--color-gray-text-secondary)',
       textAlign: 'center',
     },
 
@@ -215,7 +215,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       [`${token.componentCls}-left`]: {
         borderRight: 'none',
-        borderBottom: '1px solid #e1e5e9',
+        borderBottom: '1px solid var(--color-gray-border-light)',
       },
 
       [`${token.componentCls}-html, ${token.componentCls}-json`]: {
@@ -229,29 +229,29 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     },
 
     [`${token.componentCls}-preview-content::-webkit-scrollbar-track`]: {
-      background: '#f1f1f1',
+      background: 'var(--color-gray-control-fill-secondary)',
       borderRadius: '3px',
     },
 
     [`${token.componentCls}-preview-content::-webkit-scrollbar-thumb`]: {
-      background: '#c1c1c1',
+      background: 'var(--color-gray-text-light)',
       borderRadius: '3px',
     },
 
     [`${token.componentCls}-preview-content::-webkit-scrollbar-thumb:hover`]: {
-      background: '#a8a8a8',
+      background: 'var(--color-gray-text-secondary)',
     },
 
     // 编辑器主题适配
     [`${token.componentCls} .ace_editor`]: {
       borderRadius: '8px',
       background: 'rgba(9, 30, 66, 0.03)',
-      color: '#343a45',
+      color: 'var(--color-gray-text-default)',
     },
 
     [`${token.componentCls} .ace_editor.ace_dark`]: {
-      background: '#2d3748',
-      color: '#e2e8f0',
+      background: 'var(--color-gray-bg-page-dark)',
+      color: 'var(--color-gray-text-light)',
     },
 
     // 加载状态
@@ -260,15 +260,15 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100%',
-      color: '#6c757d',
+      color: 'var(--color-gray-text-secondary)',
     },
 
     [`${token.componentCls}-loading::after`]: {
       content: "''",
       width: '20px',
       height: '20px',
-      border: '2px solid #e1e5e9',
-      borderTop: '2px solid #3182ce',
+      border: '2px solid var(--color-gray-border-light)',
+      borderTop: '2px solid var(--color-primary-control-fill-primary)',
       borderRadius: '50%',
       animationName: 'spin',
       animationDuration: '1s',

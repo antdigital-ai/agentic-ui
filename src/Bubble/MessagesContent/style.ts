@@ -62,7 +62,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
     // 用户消息文本颜色
     [`${token.componentCls}-messages-content-user-text`]: {
-      color: '#343A45',
+      color: 'var(--color-gray-text-default)',
     },
 
     // Popover 标题容器
@@ -107,7 +107,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       padding: 'var(--padding-2x) var(--padding-3x)',
       gap: 'var(--padding-2x)',
       alignSelf: 'stretch',
-      background: '#FBFCFD',
+      background: 'var(--color-gray-bg-page-light)',
       cursor: 'pointer',
       zIndex: 1,
     },

@@ -100,12 +100,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
     },
 
     [`${token.componentCls}-warning`]: {
-      color: 'var(--color-yellow-text-secondary, #ad6800)',
+      color: 'var(--color-yellow-text-secondary)',
       backgroundColor: 'var(--color-yellow-bg-tip, rgba(250, 173, 20, 0.08))',
       boxShadow: 'none',
 
       [`${token.componentCls}-close-icon`]: {
-        color: 'var(--color-yellow-text-secondary, #ad6800)',
+        color: 'var(--color-yellow-text-secondary)',
 
         '&:hover': {
           backgroundColor: 'var(--color-yellow-control-fill-active)',

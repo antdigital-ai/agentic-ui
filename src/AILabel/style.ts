@@ -37,8 +37,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       [`&${token.componentCls}-status-emphasis`]: {
         [`${token.componentCls}-dot`]: {
-          background: 'linear-gradient(180deg, #ECF2FF 0%, #F3F7FF 100%)',
-          border: '1px solid #FFFFFF',
+          background: 'linear-gradient(180deg, var(--color-primary-bg-page-light) 0%, var(--color-primary-bg-page) 100%)',
+          border: '1px solid var(--color-gray-bg-card-white)',
         },
       },
 
@@ -55,7 +55,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       [`&${token.componentCls}-tooltip-visible`]: {
         [`${token.componentCls}-dot`]: {
           background:
-            'linear-gradient(293deg, #EBECFF 39%, #F0F4FF 62%, #EBF5FF 91%)',
+            'linear-gradient(293deg, var(--color-primary-bg-page-light) 39%, var(--color-primary-bg-page) 62%, var(--color-primary-bg-page-light) 91%)',
           backdropFilter: 'blur(40px)',
           transition: 'all 0.2s ease-in-out',
         },

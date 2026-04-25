@@ -95,7 +95,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           transition: 'background-color 0.2s ease',
         },
         '&:hover::before': {
-          backgroundColor: 'var(--color-primary-9, #1d7afc)',
+          backgroundColor: 'var(--color-primary-control-fill-primary)',
         },
       },
 

@@ -85,7 +85,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '&-icon': {
           width: 15,
           height: 15,
-          color: token.colorSuccess || '#0CE0AD',
+          color: 'var(--color-green-text-default)',
         },
         '&&-collapse': {
           borderRadius: '6px 12px 12px 12px',
@@ -119,7 +119,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
       '&-content-wrapper': {
-        backgroundColor: token.colorBgContainer || '#FFF',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         position: 'relative',
         borderRadius: '6px 12px 12px 12px',
         zIndex: 9,
@@ -169,7 +169,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
             },
             '& code[class*="language-"], pre[class*="language-"]': {
               whiteSpace: 'break-spaces!important',
-              color: 'rgb(102, 111, 141)',
+              color: 'var(--color-gray-a9)',
               fontFamily:
                 'SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif, Segoe UI-MONOSPACE',
             },
@@ -189,7 +189,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
               '&-tag': {
                 padding: '0px 6px',
                 background:
-                  'radial-gradient(22% 66% at 96% 113%, rgba(255, 255, 245, 0.52) 0%, rgba(230, 238, 255, 0) 100%), radial-gradient(14% 234% at 100% 50%, rgba(162, 255, 255, 0.28) 0%, rgba(153, 202, 255, 0.1193) 13%, rgba(229, 189, 255, 0.0826) 38%, rgba(235, 255, 245, 0) 100%), #FFFFFF',
+                  'radial-gradient(22% 66% at 96% 113%, rgba(255, 255, 245, 0.52) 0%, rgba(230, 238, 255, 0) 100%), radial-gradient(14% 234% at 100% 50%, rgba(162, 255, 255, 0.28) 0%, rgba(153, 202, 255, 0.1193) 13%, rgba(229, 189, 255, 0.0826) 38%, rgba(235, 255, 245, 0) 100%), var(--color-gray-bg-card-white)',
                 border: '1px solid rgba(227, 230, 234, 0.65)',
                 lineHeight: '26px',
               },
@@ -210,7 +210,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
                 lineHeight: '2em',
                 flexWrap: 'wrap',
                 letterSpacing: '0px',
-                color: 'rgba(0, 0, 0, 0.85)',
+                color: 'var(--color-gray-text-default)',
               },
               '&-action': {
                 opacity: 0,

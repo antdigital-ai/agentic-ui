@@ -517,4 +517,15 @@ export type MarkdownInputFieldProps = {
    * ```
    */
   disableHoverAnimation?: boolean;
+
+  /**
+   * 主题模式
+   * @description 控制组件的明暗主题样式
+   * @default 'light'
+   * @example
+   * ```tsx
+   * <MarkdownInputField theme="dark" />
+   * ```
+   */
+  theme?: 'light' | 'dark';
 };

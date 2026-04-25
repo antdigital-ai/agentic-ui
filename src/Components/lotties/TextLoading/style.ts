@@ -26,7 +26,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       // 亮色主题：深色文字 + 亮色光泽（适用于白色背景）
       '&-light': {
-        color: '#00000066',
+        color: 'var(--color-gray-text-default)',
         backgroundImage: `linear-gradient(
           120deg,
           rgba(255, 255, 255, 0.8) 40%,
@@ -40,7 +40,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       // 暗色主题：浅色文字 + 深色光泽（适用于黑色背景）
       '&-dark': {
-        color: '#ffffff40',
+        color: 'var(--color-gray-text-light)',
         backgroundImage: `linear-gradient(
           120deg,
           rgba(255, 255, 255, 0) 40%,

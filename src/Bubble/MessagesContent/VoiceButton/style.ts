@@ -37,7 +37,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         borderRadius: 6,
-        background: '#FFFFFF',
+        background: 'var(--color-gray-bg-card-white)',
         boxShadow: 'var(--shadow-control-base)',
         width: 86,
         height: 28,

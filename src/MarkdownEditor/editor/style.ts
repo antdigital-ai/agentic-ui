@@ -174,7 +174,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       fontSize: '15px',
       // Jinja 语法高亮，仅通过 CSS 变量定制（在 .ant-agentic-md-editor-content 上覆盖）
       [JINJA_CSS_VAR.variable]:
-        'var(--color-primary-control-fill-primary, #1677ff)',
+        'var(--color-primary-control-fill-primary)',
       [JINJA_CSS_VAR.tag]: 'var(--color-orange-6, #d46b08)',
       [JINJA_CSS_VAR.comment]: 'var(--color-text-tertiary, rgba(0,0,0,0.25))',
       [JINJA_CSS_VAR.keyword]: '#5c4033',
@@ -183,7 +183,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       [JINJA_CSS_VAR.filter]: 'var(--color-primary-8, #689ef0)',
       [JINJA_CSS_VAR.variableName]: 'var(--color-green-10, #10af74)',
       [JINJA_CSS_VAR.placeholder]:
-        'var(--color-primary-control-fill-primary, #1677ff)',
+        'var(--color-primary-control-fill-primary)',
       [JINJA_CSS_VAR.placeholderBg]:
         'var(--color-primary-bg-tip, rgba(0,102,255,0.08))',
       [JINJA_CSS_VAR.delimiter]: '#d4b84b',
@@ -465,7 +465,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           marginBottom: '8px',
         },
         '&.info': {
-          borderLeftColor: 'var(--color-info, #1677ff)',
+          borderLeftColor: 'var(--color-primary-control-fill-primary)',
           backgroundColor: 'var(--color-info-bg, rgba(22, 119, 255, 0.08))',
         },
         '&.warning': {
@@ -473,7 +473,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           backgroundColor: 'var(--color-warning-bg, rgba(250, 173, 20, 0.08))',
         },
         '&.success': {
-          borderLeftColor: 'var(--color-success, #52c41a)',
+          borderLeftColor: 'var(--color-green-text-default)',
           backgroundColor: 'var(--color-success-bg, rgba(82, 196, 26, 0.08))',
         },
         '&.error': {
@@ -481,7 +481,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           backgroundColor: 'var(--color-error-bg, rgba(255, 77, 79, 0.08))',
         },
         '&.tip': {
-          borderLeftColor: 'var(--color-info, #1677ff)',
+          borderLeftColor: 'var(--color-primary-control-fill-primary)',
           backgroundColor: 'var(--color-info-bg, rgba(22, 119, 255, 0.08))',
         },
       },

@@ -228,7 +228,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
       '&-item-meta-placeholder': {
-        background: 'var(--color-gray-bg-card-light, #f7f9fc) !important',
+        background: 'var(--color-gray-bg-card-light) !important',
         [`${token.componentCls}-item-file-name-text`]: {
           color:
             'var(--color-gray-text-light, rgba(80, 94, 119, 0.53)) !important',

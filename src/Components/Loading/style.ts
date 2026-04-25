@@ -48,7 +48,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       position: 'relative',
 
       [`&${token.componentCls}-spinning`]: {
-        background: 'var(--color-primary-bg-page, #f5f9ff)',
+        background: 'var(--color-primary-bg-page)',
         borderRadius: 'var(--radius-card-lg, 22px)',
         overflow: 'hidden',
 
@@ -66,7 +66,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           top: '-30%',
           left: '-40%',
           background:
-            'radial-gradient(ellipse 70% 60% at 50% 50%, var(--color-sub2-2, #f0fbfe) 0%, transparent 70%)',
+            'radial-gradient(ellipse 70% 60% at 50% 50%, var(--color-sub2-2) 0%, transparent 70%)',
           animationName: beforeAnimation,
           animationDuration: '6s',
           animationTimingFunction: 'ease-in-out',
@@ -79,7 +79,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           top: '-30%',
           right: '-40%',
           background:
-            'radial-gradient(ellipse 70% 60% at 50% 50%, var(--color-sub1-2, #f1f0ff) 0%, transparent 60%)',
+            'radial-gradient(ellipse 70% 60% at 50% 50%, var(--color-sub1-2) 0%, transparent 60%)',
           filter: 'blur(60px)',
           animationName: afterAnimation,
           animationDuration: '7s',
@@ -105,7 +105,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       // Dark theme
       '&-dark': {
         [`&${token.componentCls}-spinning`]: {
-          background: 'var(--color-gray-bg-page-dark, #141414)',
+          background: 'var(--color-gray-bg-page-dark)',
 
           '&::before': {
             background:
@@ -119,7 +119,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
 
         [`${token.componentCls}-tip`]: {
-          color: 'rgba(255, 255, 255, 0.65)',
+          color: 'var(--color-gray-text-light)',
         },
       },
     },

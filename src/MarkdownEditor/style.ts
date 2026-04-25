@@ -134,7 +134,7 @@ const genTableStyle = (
         },
         'tbody tr:not(.config-tr):hover': {
           background:
-            'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, #ffffff), var(--agentic-ui-table-cell-bg, #ffffff))',
+            'linear-gradient(var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04)), var(--agentic-ui-table-hover-bg, rgba(0, 0, 0, 0.04))), linear-gradient(var(--agentic-ui-table-cell-bg, var(--color-gray-bg-card-white)), var(--agentic-ui-table-cell-bg, var(--color-gray-bg-card-white)))',
         },
         [`@media (max-width: ${mobileBreakpoint})`]: {
           'th, td': { padding: mobilePadding },
@@ -211,23 +211,23 @@ const genTableStyle = (
       boxShadow: 'var(--shadow-border-base)',
       color: 'var(--color-gray-text-secondary)',
       '&:hover': {
-        backgroundColor: '#FFF',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         boxShadow: 'var(--shadow-control-lg)',
       },
     },
     [`${token.componentCls}-table-cell-index-delete-icon`]: {
       '&:hover': {
-        color: '#ff4d4f',
+        color: 'var(--color-red-text-default)',
       },
     },
     [`${token.componentCls}-table-cell-index-insert-row-before`]: {
       '&:hover': {
-        color: '#52c41a',
+        color: 'var(--color-green-text-default)',
       },
     },
     [`${token.componentCls}-table-cell-index-insert-row-after`]: {
       '&:hover': {
-        color: '#52c41a',
+        color: 'var(--color-green-text-default)',
       },
     },
     [`${token.componentCls}-table-cell-index-spacer`]: {
@@ -271,23 +271,23 @@ const genTableStyle = (
       boxShadow: 'var(--shadow-border-base)',
       color: 'var(--color-gray-text-secondary)',
       '&:hover': {
-        backgroundColor: '#FFF',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         boxShadow: 'var(--shadow-control-lg)',
       },
     },
     [`${token.componentCls}-table-cell-index-spacer-delete-icon`]: {
       '&:hover': {
-        color: '#ff4d4f',
+        color: 'var(--color-red-text-default)',
       },
     },
     [`${token.componentCls}-table-cell-index-spacer-insert-column-before`]: {
       '&:hover': {
-        color: '#52c41a',
+        color: 'var(--color-green-text-default)',
       },
     },
     [`${token.componentCls}-table-cell-index-spacer-insert-column-after`]: {
       '&:hover': {
-        color: '#52c41a',
+        color: 'var(--color-green-text-default)',
       },
     },
 
@@ -467,7 +467,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
       [`${token.componentCls}-link-card__container`]: {
         padding: 12,
-        border: '1px solid #f0f0f0',
+        border: '1px solid var(--color-gray-border-light)',
         borderRadius: '0.5em',
         margin: '8px 0',
         width: '100%',
@@ -479,14 +479,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        color: '#262626',
+        color: 'var(--color-gray-text-default)',
         justifyContent: 'space-between',
         '& [data-icon-box]': {
           padding: '0 18px',
-          color: '#6b7280',
+          color: 'var(--color-gray-text-light)',
           cursor: 'pointer',
           '&:hover': {
-            color: '#1667ff',
+            color: 'var(--color-primary-control-fill-primary)',
           },
         },
       },
@@ -494,7 +494,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        color: '#262626',
+        color: 'var(--color-gray-text-default)',
         fontSize: 16,
         flex: 1,
         minWidth: 0,
@@ -505,7 +505,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         textWrap: 'nowrap',
         textDecoration: 'none',
         display: 'block',
-        color: '#262626',
+        color: 'var(--color-gray-text-default)',
       },
       [`${token.componentCls}-link-card__description`]: {
         flex: 1,
@@ -602,7 +602,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontFamily: `'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace`,
         wordWrap: 'break-word',
         borderRadius: '12px',
-        background: '#FFFFFF',
+        background: 'var(--color-gray-bg-card-white)',
         boxShadow: 'var(--shadow-control-base)',
 
         // SVG 渲染优化
@@ -610,46 +610,46 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           // 节点样式
           '& .node': {
             '& rect, & circle, & ellipse, & polygon': {
-              stroke: '#333',
+              stroke: 'var(--color-gray-text-default)',
               strokeWidth: '1px',
-              fill: '#fff',
+              fill: 'var(--color-gray-bg-card-white)',
             },
           },
 
           // 节点标签 - 更大的字体
           '& .nodeLabel': {
             fontWeight: 500,
-            fill: '#333 !important',
+            fill: 'var(--color-gray-text-default) !important',
           },
 
           // 边标签 - 稍小一些但仍然清晰
           '& .edgeLabel': {
-            fill: '#666 !important',
+            fill: 'var(--color-gray-text-secondary) !important',
           },
 
           // 专门针对流程图的文字
           '& .flowchart-label': {
-            fill: '#333 !important',
+            fill: 'var(--color-gray-text-default) !important',
           },
 
           // 针对不同类型的标签
           '& .label': {
-            fill: '#333 !important',
+            fill: 'var(--color-gray-text-default) !important',
           },
         },
 
         // 错误状态样式
         '&-error': {
-          color: '#d73a49',
-          background: '#ffeaea',
-          border: '1px solid #f97583',
+          color: 'var(--color-red-text-default)',
+          background: 'var(--color-red-bg-page-light)',
+          border: '1px solid var(--color-red-border-default)',
           padding: '12px',
           borderRadius: '4px',
           textAlign: 'left',
 
           '& pre': {
             margin: '8px 0 0',
-            background: '#f6f8fa',
+            background: 'var(--color-gray-bg-page-light)',
             padding: '8px',
             borderRadius: '4px',
             fontSize: '12px',

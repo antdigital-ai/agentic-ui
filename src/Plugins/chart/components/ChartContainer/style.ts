@@ -19,14 +19,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       // 浅色主题边框
       '&&-light-theme': {
-        border: '1px solid #e8e8e8',
-        backgroundColor: '#fff',
+        border: '1px solid var(--color-gray-border-light)',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
       },
 
       // 深色主题：略浅于纯黑页面底，与雷达等图表的「卡片」层次一致
       '&&-dark-theme': {
         border: '1px solid rgba(255, 255, 255, 0.08)',
-        backgroundColor: '#1f1f1f',
+        backgroundColor: 'var(--color-gray-bg-page-dark)',
       },
 
       // 移动端适配

@@ -73,52 +73,52 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
 
       // Primary 变体 - 主要按钮
       '&-primary': {
-        backgroundColor: 'var(--color-blue-primary, #1677ff)',
-        color: 'var(--color-white, #ffffff)',
+        backgroundColor: 'var(--color-primary-control-fill-primary)',
+        color: 'var(--color-gray-bg-card-white)',
         boxShadow: 'var(--shadow-control-base, 0 1px 2px rgba(0, 0, 0, 0.1))',
 
         '&:hover:not(&-disabled)': {
-          backgroundColor: 'var(--color-blue-primary-hover, #4096ff)',
+          backgroundColor: 'var(--color-primary-control-fill-primary-hover)',
           boxShadow:
             'var(--shadow-control-hover, 0 2px 4px rgba(0, 0, 0, 0.15))',
           transform: 'translateY(-1px)',
         },
 
         '&:active:not(&-disabled)': {
-          backgroundColor: 'var(--color-blue-primary-active, #0958d9)',
+          backgroundColor: 'var(--color-primary-control-fill-primary-active)',
           boxShadow:
             'var(--shadow-control-active, 0 1px 2px rgba(0, 0, 0, 0.2))',
           transform: 'translateY(0)',
         },
 
         '&:focus-visible': {
-          boxShadow: '0 0 0 2px var(--color-blue-primary-light, #d6eeff)',
+          boxShadow: '0 0 0 2px var(--color-primary-bg-page-light)',
         },
       },
 
       // Secondary 变体 - 次要按钮
       '&-secondary': {
-        backgroundColor: 'var(--color-gray-bg-card-white, #ffffff)',
+        backgroundColor: 'var(--color-gray-bg-card-white)',
         color: 'var(--color-gray-text-default, #343a45)',
-        border: '1px solid var(--color-gray-border, #e6ecf4)',
+        border: '1px solid var(--color-gray-border-light)',
         boxShadow: 'var(--shadow-control-base, 0 1px 2px rgba(0, 0, 0, 0.1))',
 
         '&:hover:not(&-disabled)': {
           backgroundColor: 'var(--color-gray-bg-card-light, #fbfcfd)',
-          borderColor: 'var(--color-blue-primary, #1677ff)',
-          color: 'var(--color-blue-primary, #1677ff)',
+          borderColor: 'var(--color-primary-control-fill-primary)',
+          color: 'var(--color-primary-control-fill-primary)',
           boxShadow:
             'var(--shadow-control-hover, 0 2px 4px rgba(0, 0, 0, 0.15))',
         },
 
         '&:active:not(&-disabled)': {
-          backgroundColor: 'var(--color-gray-control-fill-active, #f0f0f0)',
-          borderColor: 'var(--color-blue-primary-active, #0958d9)',
-          color: 'var(--color-blue-primary-active, #0958d9)',
+          backgroundColor: 'var(--color-gray-control-fill-active)',
+          borderColor: 'var(--color-primary-control-fill-primary-active)',
+          color: 'var(--color-primary-control-fill-primary-active)',
         },
 
         '&:focus-visible': {
-          boxShadow: '0 0 0 2px var(--color-blue-primary-light, #d6eeff)',
+          boxShadow: '0 0 0 2px var(--color-primary-bg-page-light)',
         },
       },
 
@@ -129,18 +129,18 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
         border: '1px solid transparent',
 
         '&:hover:not(&-disabled)': {
-          backgroundColor: 'var(--color-gray-control-fill-hover, #f5f5f5)',
-          color: 'var(--color-blue-primary, #1677ff)',
+          backgroundColor: 'var(--color-gray-control-fill-hover)',
+          color: 'var(--color-primary-control-fill-primary)',
         },
 
         '&:active:not(&-disabled)': {
           backgroundColor: 'var(--color-gray-control-fill-active, #e6f7ff)',
-          color: 'var(--color-blue-primary-active, #0958d9)',
+          color: 'var(--color-primary-control-fill-primary-active)',
         },
 
         '&:focus-visible': {
-          backgroundColor: 'var(--color-gray-control-fill-hover, #f5f5f5)',
-          boxShadow: '0 0 0 2px var(--color-blue-primary-light, #d6eeff)',
+          backgroundColor: 'var(--color-gray-control-fill-hover)',
+          boxShadow: '0 0 0 2px var(--color-primary-bg-page-light)',
         },
       },
 
@@ -152,25 +152,25 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
         boxShadow: 'none',
 
         '&:hover:not(&-disabled)': {
-          backgroundColor: 'var(--color-gray-control-fill-hover, #f5f5f5)',
-          color: 'var(--color-blue-primary, #1677ff)',
+          backgroundColor: 'var(--color-gray-control-fill-hover)',
+          color: 'var(--color-primary-control-fill-primary)',
         },
 
         '&:active:not(&-disabled)': {
           backgroundColor: 'var(--color-gray-control-fill-active, #e6f7ff)',
-          color: 'var(--color-blue-primary-active, #0958d9)',
+          color: 'var(--color-primary-control-fill-primary-active)',
         },
 
         '&:focus-visible': {
-          backgroundColor: 'var(--color-gray-control-fill-hover, #f5f5f5)',
-          boxShadow: '0 0 0 2px var(--color-blue-primary-light, #d6eeff)',
+          backgroundColor: 'var(--color-gray-control-fill-hover)',
+          boxShadow: '0 0 0 2px var(--color-primary-bg-page-light)',
         },
       },
 
       // Float 变体 - 浮动按钮
       '&-float': {
-        backgroundColor: 'var(--color-blue-primary, #1677ff)',
-        color: 'var(--color-white, #ffffff)',
+        backgroundColor: 'var(--color-primary-control-fill-primary)',
+        color: 'var(--color-gray-bg-card-white)',
         borderRadius: '50%',
         width: 'var(--height-control-large, 40px)',
         height: 'var(--height-control-large, 40px)',
@@ -179,28 +179,28 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
         boxShadow: 'var(--shadow-float, 0 4px 12px rgba(22, 119, 255, 0.4))',
 
         '&:hover:not(&-disabled)': {
-          backgroundColor: 'var(--color-blue-primary-hover, #4096ff)',
+          backgroundColor: 'var(--color-primary-control-fill-primary-hover)',
           boxShadow:
             'var(--shadow-float-hover, 0 6px 16px rgba(22, 119, 255, 0.5))',
           transform: 'translateY(-2px) scale(1.05)',
         },
 
         '&:active:not(&-disabled)': {
-          backgroundColor: 'var(--color-blue-primary-active, #0958d9)',
+          backgroundColor: 'var(--color-primary-control-fill-primary-active)',
           boxShadow:
             'var(--shadow-float-active, 0 2px 8px rgba(22, 119, 255, 0.3))',
           transform: 'translateY(0) scale(1)',
         },
 
         '&:focus-visible': {
-          boxShadow: '0 0 0 2px var(--color-blue-primary-light, #d6eeff)',
+          boxShadow: '0 0 0 2px var(--color-primary-bg-page-light)',
         },
       },
 
       // CTA 变体 - 行动号召按钮
       '&-cta': {
-        backgroundColor: 'var(--color-green-success, #52c41a)',
-        color: 'var(--color-white, #ffffff)',
+        backgroundColor: 'var(--color-green-control-fill-primary)',
+        color: 'var(--color-gray-bg-card-white)',
         fontWeight: 'var(--font-weight-semibold, 600)',
         boxShadow: 'var(--shadow-cta, 0 2px 8px rgba(82, 196, 26, 0.3))',
         position: 'relative',
@@ -219,7 +219,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
         },
 
         '&:hover:not(&-disabled)': {
-          backgroundColor: 'var(--color-green-success-hover, #73d13d)',
+          backgroundColor: 'var(--color-green-control-fill-primary-hover)',
           boxShadow:
             'var(--shadow-cta-hover, 0 4px 12px rgba(82, 196, 26, 0.4))',
           transform: 'translateY(-1px)',
@@ -230,14 +230,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
         },
 
         '&:active:not(&-disabled)': {
-          backgroundColor: 'var(--color-green-success-active, #389e0d)',
+          backgroundColor: 'var(--color-green-control-fill-primary-active)',
           boxShadow:
             'var(--shadow-cta-active, 0 1px 4px rgba(82, 196, 26, 0.2))',
           transform: 'translateY(0)',
         },
 
         '&:focus-visible': {
-          boxShadow: '0 0 0 2px var(--color-green-success-light, #f6ffed)',
+          boxShadow: '0 0 0 2px var(--color-green-bg-page-light)',
         },
       },
 

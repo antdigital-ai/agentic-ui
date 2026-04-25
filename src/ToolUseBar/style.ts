@@ -139,7 +139,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         cursor: 'pointer',
         transition: 'all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)',
         '&:hover': {
-          color: '#959DA8',
+          color: 'var(--color-gray-text-light)',
         },
       },
 
@@ -154,7 +154,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         lineClamp: 1,
         '&-loading': {
           position: 'relative',
-          color: '#000',
+          color: 'var(--color-gray-text-default)',
         },
       },
 
@@ -246,7 +246,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
         '&-loading': {
           position: 'relative',
-          color: '#000',
+          color: 'var(--color-gray-text-default)',
         },
       },
       '&-tool-time-expand': {
@@ -266,7 +266,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         borderRadius: '12px',
         background: 'var(--color-gray-control-fill-active)',
         padding: '4px 6px',
-        color: '#767E8B',
+        color: 'var(--color-gray-text-secondary)',
         gap: '8px',
         zIndex: 1,
       },
@@ -304,7 +304,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         fontWeight: 'normal',
         lineHeight: '160%',
         letterSpacing: 'normal',
-        color: '#767E8B',
+        color: 'var(--color-gray-text-secondary)',
       },
       '&-tool-content-expand': {
         display: 'flex',
@@ -330,7 +330,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         width: '100%',
         borderRadius: 'var(--radius-control-base)',
         background: 'var(--color-yellow-bg-tip, rgba(250, 173, 20, 0.08))',
-        color: 'var(--color-yellow-text-secondary, #ad6800)',
+        color: 'var(--color-yellow-text-secondary)',
         padding: '8px',
         fontSize: 'var(--font-size-base)',
         alignItems: 'center',
@@ -340,12 +340,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         alignItems: 'center',
         font: 'var(--font-text-body-emphasized-base)',
         letterSpacing: 'var(--letter-spacing-body-emphasized-base, normal)',
-        color: 'var(--color-yellow-text-secondary, #ad6800)',
+        color: 'var(--color-yellow-text-secondary)',
       },
       '&-tool-error': {
         '&-tool-image-wrapper': {
           '& .anticon': {
-            color: '#F15B50',
+            color: 'var(--color-red-text-default)',
           },
         },
       },

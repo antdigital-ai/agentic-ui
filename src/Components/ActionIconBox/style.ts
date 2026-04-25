@@ -35,9 +35,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         },
       },
       '&-dark': {
-        color: '#fff',
+        color: 'var(--color-gray-bg-card-white)',
         '&:hover': {
-          background: '#444',
+          background: 'var(--color-gray-text-secondary)',
           boxSizing: 'border-box',
         },
       },
@@ -53,7 +53,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         minHeight: 'inherit',
         maxHeight: 'inherit',
         padding: '8px 12px',
-        color: '#000000',
+        color: 'var(--color-gray-text-default)',
         borderRadius: 18,
         border: '1px solid var(--color-gray-border-light)',
         background: `radial-gradient(22% 66% at 96% 113%, rgba(255, 255, 245, 0.52) 0%, rgba(230, 238, 255, 0) 100%),radial-gradient(14% 234% at 100% 50%, rgba(162, 255, 255, 0.28) 0%, rgba(153, 202, 255, 0.1193) 13%, rgba(229, 189, 255, 0.0826) 38%, rgba(231, 211, 252, 0.0544) 59%, rgba(235, 255, 245, 0) 100%)`,

@@ -172,7 +172,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         background: 'var(--color-gray-bg-card-white)',
         zIndex: 0,
         position: 'relative',
-        color: '#767E8B',
+        color: 'var(--color-gray-text-secondary)',
         fontSize: 'var(--font-size-lg)',
         '& > svg, & > *:first-child': {
           position: 'relative',
