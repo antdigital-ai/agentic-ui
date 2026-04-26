@@ -2,9 +2,9 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
+import type { DefaultCodeRouterProps } from '../DefaultCodeRouter';
 import { DefaultCodeRouter } from '../DefaultCodeRouter';
 import { extractBlockTextContent } from '../extractBlockTextContent';
-import type { DefaultCodeRouterProps } from '../DefaultCodeRouter';
 import type { RendererBlockProps } from '../types';
 
 const createPluginProbe = (testId: string) => {
@@ -18,14 +18,14 @@ const createPluginProbe = (testId: string) => {
   return { Probe, calls };
 };
 
-const renderRouter = (props: Partial<DefaultCodeRouterProps>) =>
+const renderRouter = ({
+  children = 'const answer = 42;',
+  ...props
+}: Partial<DefaultCodeRouterProps>) =>
   render(
-    <DefaultCodeRouter
-      language="tsx"
-      pluginComponents={{}}
-      children="const answer = 42;"
-      {...props}
-    />,
+    <DefaultCodeRouter language="tsx" pluginComponents={{}} {...props}>
+      {children}
+    </DefaultCodeRouter>,
   );
 
 describe('DefaultCodeRouter', () => {
@@ -51,8 +51,9 @@ describe('DefaultCodeRouter', () => {
       <DefaultCodeRouter
         language="json-chart"
         pluginComponents={{ chart: chart.Probe }}
-        children='{"config":[]}'
-      />,
+      >
+        {'{"config":[]}'}
+      </DefaultCodeRouter>,
     );
 
     expect(screen.getByTestId('chart-plugin')).toHaveTextContent('json-chart');
@@ -94,8 +95,9 @@ describe('DefaultCodeRouter', () => {
         language="tsx"
         pluginComponents={{ code: code.Probe }}
         editorCodeProps={editorCodeProps}
-        children="const value = 1;"
-      />,
+      >
+        const value = 1;
+      </DefaultCodeRouter>,
     );
 
     expect(screen.getByTestId('code-plugin')).toHaveTextContent('tsx');
@@ -136,8 +138,9 @@ describe('DefaultCodeRouter', () => {
         language="agentic-ui-filemap"
         pluginComponents={{ 'agentic-ui-filemap': fileMap.Probe }}
         fileMapConfig={fileMapConfig}
-        children='{"fileList":[]}'
-      />,
+      >
+        {'{"fileList":[]}'}
+      </DefaultCodeRouter>,
     );
 
     expect(screen.getByTestId('file-map-plugin')).toHaveTextContent(
