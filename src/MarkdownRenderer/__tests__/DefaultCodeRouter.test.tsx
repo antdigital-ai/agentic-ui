@@ -20,9 +20,8 @@ describe('DefaultCodeRouter', () => {
     );
 
     expect(getByTestId('plugin-mermaid').textContent).toBe('mermaid');
-    expect(MermaidRenderer).toHaveBeenCalledWith(
+    expect(MermaidRenderer.mock.calls[0][0]).toEqual(
       expect.objectContaining({ language: 'mermaid' }),
-      undefined,
     );
   });
 
@@ -48,9 +47,8 @@ describe('DefaultCodeRouter', () => {
     );
 
     expect(getByTestId('plugin-filemap').textContent).toBe('true');
-    expect(FileMapRenderer).toHaveBeenCalledWith(
+    expect(FileMapRenderer.mock.calls[0][0]).toEqual(
       expect.objectContaining({ fileMapConfig, language: 'agentic-ui-filemap' }),
-      undefined,
     );
   });
 
@@ -71,9 +69,8 @@ describe('DefaultCodeRouter', () => {
     expect(getByTestId('plugin-toolusebar').textContent).toBe(
       'agentic-ui-usertoolbar',
     );
-    expect(ToolUseBarRenderer).toHaveBeenCalledWith(
+    expect(ToolUseBarRenderer.mock.calls[0][0]).toEqual(
       expect.objectContaining({ language: 'agentic-ui-usertoolbar' }),
-      undefined,
     );
   });
 
@@ -104,13 +101,12 @@ describe('DefaultCodeRouter', () => {
     expect(getByTestId('plugin-schema').textContent).toBe(
       'apaasify|true|true',
     );
-    expect(SchemaRenderer).toHaveBeenCalledWith(
+    expect(SchemaRenderer.mock.calls[0][0]).toEqual(
       expect.objectContaining({
         apaasifyRender,
         editorCodeProps,
         language: 'apaasify',
       }),
-      undefined,
     );
   });
 });
