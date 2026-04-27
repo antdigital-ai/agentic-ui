@@ -880,9 +880,7 @@ describe('PreviewComponent', () => {
         name: 'doc.html',
         content: '<p>Hi</p>',
       };
-      const customActions = (
-        <span data-testid="extra-actions">Extra</span>
-      );
+      const customActions = <span data-testid="extra-actions">Extra</span>;
 
       render(
         <TestWrapper>
@@ -908,9 +906,8 @@ describe('PreviewComponent', () => {
     });
 
     it('processFile 抛出时设置 contentState.error 为 err.message', async () => {
-      const { fileTypeProcessor } = await import(
-        '../../../src/Workspace/File/FileTypeProcessor'
-      );
+      const { fileTypeProcessor } =
+        await import('../../../src/Workspace/File/FileTypeProcessor');
       vi.spyOn(fileTypeProcessor, 'processFile').mockImplementation(() => {
         throw new Error('custom process error');
       });
@@ -934,9 +931,8 @@ describe('PreviewComponent', () => {
     });
 
     it('HTML 文件且 contentState 为 ready 时 getContentStatus 返回 done', async () => {
-      const { fileTypeProcessor } = await import(
-        '../../../src/Workspace/File/FileTypeProcessor'
-      );
+      const { fileTypeProcessor } =
+        await import('../../../src/Workspace/File/FileTypeProcessor');
       vi.spyOn(fileTypeProcessor, 'processFile').mockReturnValue({
         typeInference: {
           fileType: 'html',
@@ -992,21 +988,21 @@ describe('PreviewComponent', () => {
     });
 
     it('contentState 为 loading 时显示加载文案', async () => {
-      const { fileTypeProcessor } = await import(
-        '../../../src/Workspace/File/FileTypeProcessor'
-      );
+      const { fileTypeProcessor } =
+        await import('../../../src/Workspace/File/FileTypeProcessor');
       vi.spyOn(fileTypeProcessor, 'processFile').mockReturnValue({
         typeInference: {
           fileType: 'plainText',
           category: 'text',
         },
-        dataSource: { previewUrl: 'https://example.com/f.txt', content: undefined },
+        dataSource: {
+          previewUrl: 'https://example.com/f.txt',
+          content: undefined,
+        },
         canPreview: true,
         previewMode: 'inline',
       } as any);
-      (global.fetch as any).mockImplementation(
-        () => new Promise(() => {}),
-      );
+      (global.fetch as any).mockImplementation(() => new Promise(() => {}));
 
       const file: FileNode = {
         id: 'f1',
@@ -1026,9 +1022,8 @@ describe('PreviewComponent', () => {
     });
 
     it('媒体无 previewUrl 时显示 getPreviewErrorMessage', async () => {
-      const { fileTypeProcessor } = await import(
-        '../../../src/Workspace/File/FileTypeProcessor'
-      );
+      const { fileTypeProcessor } =
+        await import('../../../src/Workspace/File/FileTypeProcessor');
       vi.spyOn(fileTypeProcessor, 'processFile').mockReturnValue({
         typeInference: { fileType: 'image', category: 'image' },
         dataSource: { previewUrl: undefined },
@@ -1055,9 +1050,8 @@ describe('PreviewComponent', () => {
     });
 
     it('未知文件类型走 default 分支显示未知类型提示', async () => {
-      const { fileTypeProcessor } = await import(
-        '../../../src/Workspace/File/FileTypeProcessor'
-      );
+      const { fileTypeProcessor } =
+        await import('../../../src/Workspace/File/FileTypeProcessor');
       vi.spyOn(fileTypeProcessor, 'processFile').mockReturnValue({
         typeInference: { fileType: 'word', category: 'word' },
         dataSource: {},
