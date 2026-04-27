@@ -621,6 +621,27 @@ describe('PreviewComponent', () => {
       expect(screen.getByText('正在生成')).toBeInTheDocument();
     });
 
+    it('文件生成中仅展示当前内容，不填充重复占位文本', () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'short.txt',
+        content: 'abc',
+        loading: true,
+      };
+
+      const { container } = render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      const loadingContent = container.querySelector(
+        '.ant-workspace-file-preview-content-loading-inner',
+      );
+      expect(loadingContent).toHaveTextContent('abc');
+      expect(loadingContent?.textContent).toBe('abc');
+    });
+
     it('应该正常渲染文本文件内容', () => {
       const file: FileNode = {
         id: 'f1',
@@ -1350,6 +1371,27 @@ describe('PreviewComponent', () => {
       );
 
       expect(screen.queryByLabelText('下载')).not.toBeInTheDocument();
+    });
+
+    it('无法预览且没有下载能力时不提示下载查看', async () => {
+      const file: FileNode = {
+        id: 'f1',
+        name: 'archive.zip',
+      };
+
+      render(
+        <TestWrapper>
+          <PreviewComponent file={file} />
+        </TestWrapper>,
+      );
+
+      expect(await screen.findByText('此文件无法预览。')).toBeInTheDocument();
+      expect(
+        screen.queryByText('此文件无法预览，请下载查看。'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: '下载' }),
+      ).not.toBeInTheDocument();
     });
 
     it('canDownload为true时显示下载按钮', () => {
