@@ -13,7 +13,7 @@ export const extractBlockTextContent = (children: React.ReactNode): string => {
   if (Array.isArray(children)) {
     return children.map(extractBlockTextContent).join('');
   }
-  if (React.isValidElement(children) && children.props?.children) {
+  if (React.isValidElement<{ children?: React.ReactNode }>(children)) {
     return extractBlockTextContent(children.props.children);
   }
   return '';
