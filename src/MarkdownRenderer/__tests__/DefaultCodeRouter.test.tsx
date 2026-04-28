@@ -47,9 +47,8 @@ describe('DefaultCodeRouter', () => {
     );
 
     expect(screen.getByTestId('plugin-mermaid')).toHaveTextContent('mermaid');
-    expect(MermaidRenderer).toHaveBeenCalledWith(
+    expect(MermaidRenderer.mock.calls[0][0]).toEqual(
       expect.objectContaining({ language: 'mermaid' }),
-      undefined,
     );
   });
 
@@ -72,13 +71,12 @@ describe('DefaultCodeRouter', () => {
     expect(screen.getByTestId('plugin-schema')).toHaveTextContent(
       'agentar-card',
     );
-    expect(SchemaRenderer).toHaveBeenCalledWith(
+    expect(SchemaRenderer.mock.calls[0][0]).toEqual(
       expect.objectContaining({
         apaasifyRender,
         editorCodeProps,
         language: 'agentar-card',
       }),
-      undefined,
     );
   });
 
@@ -101,9 +99,8 @@ describe('DefaultCodeRouter', () => {
     expect(screen.getByTestId('plugin-tooluse')).toHaveTextContent(
       'agentic-ui-usertoolbar',
     );
-    expect(ToolUseRenderer).toHaveBeenCalledWith(
+    expect(ToolUseRenderer.mock.calls[0][0]).toEqual(
       expect.objectContaining({ language: 'agentic-ui-usertoolbar' }),
-      undefined,
     );
 
     rerender(
@@ -120,12 +117,11 @@ describe('DefaultCodeRouter', () => {
       'data-file-map',
       'yes',
     );
-    expect(FileMapRenderer).toHaveBeenCalledWith(
+    expect(FileMapRenderer.mock.calls[0][0]).toEqual(
       expect.objectContaining({
         fileMapConfig,
         language: 'agentic-ui-filemap',
       }),
-      undefined,
     );
   });
 
