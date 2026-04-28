@@ -39,15 +39,15 @@ describe('Markdown to HTML Safe Conversion Tests', () => {
 
     it('should handle markdown with special characters', async () => {
       const specialMarkdown = `# Test & <script>alert('xss')</script>
-      
+
 Text with "quotes" and & symbols.`;
 
       const html = await markdownToHtml(specialMarkdown);
 
-      // 验证HTML转义 - 使用实际的转义格式
-      expect(html).toContain("<script>alert('xss')</script>"); // 脚本标签会被保留（因为 allowDangerousHtml: true）
+      // 验证危险脚本标签被过滤
+      expect(html).not.toContain('<script>');
       expect(html).toContain('&#x26;'); // & 符号被转义
-      expect(html).toContain('<script>alert'); // 脚本标签被保留
+      expect(html).toContain('<h1>Test'); // 标题内容保留
     });
   });
 
@@ -155,8 +155,11 @@ Empty code: \`\`
         "<code>&#x3C;script>alert('xss')&#x3C;/script></code>",
       );
 
-      // 验证JavaScript链接 - 允许，因为 allowDangerousHtml: true
-      expect(html).toContain('javascript:alert');
+      // 验证JavaScript链接被过滤
+      expect(html).not.toContain('javascript:alert');
+
+      // 验证img上的onerror事件被移除
+      expect(html).not.toContain('onerror');
 
       // 验证代码块中的内容被安全显示
       // 代码块中的内容被HTML转义，格式可能为 &#x26;lt; 或 &lt;

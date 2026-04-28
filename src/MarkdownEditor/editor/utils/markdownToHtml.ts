@@ -9,6 +9,7 @@ import remarkRehype from 'remark-rehype';
 import type { Plugin, Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
+import { rehypeSanitizeUserHtml } from '../../../Utils/rehypeSanitizeUserHtml';
 import {
   JINJA_DOLLAR_PLACEHOLDER,
   preprocessNormalizeLeafToContainerDirective,
@@ -315,7 +316,7 @@ const createMarkdownProcessor = (
   const processor = unified();
   const remarkPlugins = resolveRemarkPlugins(plugins);
   applyPlugins(processor, remarkPlugins);
-  processor.use(rehypeRaw).use(rehypeKatex as unknown as Plugin);
+  processor.use(rehypeRaw).use(rehypeSanitizeUserHtml as unknown as Plugin).use(rehypeKatex as unknown as Plugin);
 
   // 应用配置选项
   if (config?.openLinksInNewTab) {

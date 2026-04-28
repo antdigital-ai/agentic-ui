@@ -465,11 +465,11 @@ title: Test
       );
     });
 
-    it('应该启用危险HTML', async () => {
+    it('应该过滤危险HTML', async () => {
       const markdown = '<script>alert("test")</script>\n\n# Content';
       const result = await markdownToHtml(markdown);
 
-      expect(result).toContain('<script>alert("test")</script>');
+      expect(result).not.toContain('<script>');
       expect(result).toContain('<h1>Content</h1>');
     });
 

@@ -6,6 +6,7 @@ import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { ChartTypeConfig } from '../../../el';
+import { rehypeSanitizeUserHtml } from '../../../../Utils/rehypeSanitizeUserHtml';
 import {
   convertParagraphToImage,
   fixStrongWithSpecialChars,
@@ -37,6 +38,7 @@ const stringifyObj = remark()
     handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
   })
   .use(rehypeRaw)
+  .use(rehypeSanitizeUserHtml as any)
   .use(rehypeKatex as any)
   .use(remarkGfm, { singleTilde: false }) // 禁用单波浪线删除线
   .use(remarkFrontmatter, ['yaml']);

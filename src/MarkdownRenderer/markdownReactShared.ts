@@ -26,6 +26,7 @@ import {
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { parseChineseCurrencyToNumber } from '../Plugins/chart/utils';
+import { rehypeSanitizeUserHtml } from '../Utils/rehypeSanitizeUserHtml';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import AnimationText from './AnimationText';
 import {
@@ -251,6 +252,7 @@ const createHastProcessor = (
       handlers: REMARK_REHYPE_DIRECTIVE_HANDLERS,
     })
     .use(rehypeRaw)
+    .use(rehypeSanitizeUserHtml)
     .use(rehypeKatex, { strict: 'ignore' } as any)
     .use(rehypeFootnoteRef);
 
