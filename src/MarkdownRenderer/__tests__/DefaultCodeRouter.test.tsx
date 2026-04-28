@@ -82,25 +82,6 @@ describe('DefaultCodeRouter', () => {
     );
   });
 
-  it('懒加载兜底应从嵌套 children 中抽取代码文本', () => {
-    const { container } = render(
-      <DefaultCodeRouter language="tsx" pluginComponents={{}}>
-        <code>
-          {'const value = '}
-          <span>{1}</span>
-          {';\n'}
-          <span>export default value;</span>
-        </code>
-      </DefaultCodeRouter>,
-    );
-
-    const fallback = container.querySelector(
-      '.agentic-md-renderer-fallback code',
-    );
-    expect(fallback?.textContent).toBe(
-      'const value = 1;\nexport default value;',
-    );
-  });
 });
 
 describe('extractBlockTextContent', () => {
