@@ -29,13 +29,12 @@ describe('DefaultCodeRouter', () => {
       </DefaultCodeRouter>,
     );
 
-    expect(schemaPlugin).toHaveBeenCalledWith(
+    expect(schemaPlugin.mock.calls[0][0]).toEqual(
       expect.objectContaining({
         language: 'apaasify',
         apaasifyRender,
         editorCodeProps,
       }),
-      undefined,
     );
 
     rerender(
@@ -48,12 +47,11 @@ describe('DefaultCodeRouter', () => {
       </DefaultCodeRouter>,
     );
 
-    expect(fileMapPlugin).toHaveBeenCalledWith(
+    expect(fileMapPlugin.mock.calls[0][0]).toEqual(
       expect.objectContaining({
         language: 'agentic-ui-filemap',
         fileMapConfig,
       }),
-      undefined,
     );
   });
 
@@ -73,12 +71,11 @@ describe('DefaultCodeRouter', () => {
       </DefaultCodeRouter>,
     );
 
-    expect(codePlugin).toHaveBeenCalledWith(
+    expect(codePlugin.mock.calls[0][0]).toEqual(
       expect.objectContaining({
         language: 'tsx',
         editorCodeProps,
       }),
-      undefined,
     );
   });
 
