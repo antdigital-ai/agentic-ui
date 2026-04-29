@@ -247,7 +247,6 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
         >
           <div {...props.attributes}>
             <CodeContainer
-              theme={theme}
               element={props.element}
               showBorder={state.showBorder}
               hide={state.hide}
@@ -324,5 +323,6 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
     handleViewModeToggle,
     disableHtmlPreview,
     handleLocalPreview,
+    theme,
   ]);
 }

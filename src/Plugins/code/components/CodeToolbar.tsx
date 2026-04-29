@@ -177,9 +177,7 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
         boxSizing: 'border-box',
         userSelect: 'none',
         borderBottom: isExpanded
-          ? theme === 'chaos'
-            ? '1px solid #161616'
-            : '1px solid var(--color-gray-border-light)'
+          ? '1px solid var(--color-gray-border-light)'
           : 'none',
       }}
     >

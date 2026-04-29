@@ -64,7 +64,6 @@ export const CodeBlockRenderer: React.FC<
       showBorder={false}
       hide={false}
       onEditorClick={() => {}}
-      theme={theme}
     >
       <div
         data-testid="code-toolbar"
@@ -93,9 +92,7 @@ export const CodeBlockRenderer: React.FC<
           boxSizing: 'border-box',
           userSelect: 'none',
           borderBottom: isExpanded
-            ? theme === 'chaos'
-              ? '1px solid #161616'
-              : '1px solid var(--color-gray-border-light)'
+            ? '1px solid var(--color-gray-border-light)'
             : 'none',
         }}
       >
