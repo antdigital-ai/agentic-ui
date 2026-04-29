@@ -44,7 +44,7 @@ vi.mock('../../MarkdownEditor', () => ({
   parserSlateNodeToMarkdown: vi.fn(() => 'parsed content'),
 }));
 
-vi.mock('../../index', () => ({
+vi.mock('../../Components/ActionIconBox', () => ({
   ActionIconBox: ({ children, onClick, title }: any) => (
     <button
       type="button"

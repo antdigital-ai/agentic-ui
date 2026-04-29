@@ -10,7 +10,10 @@
   "sideEffects": [
     "**/*.css",
     "**/*.less",
-    "**/*.scss"
+    "**/*.scss",
+    "./dist/MarkdownEditor/editor/utils/index.js",
+    "./dist/Utils/proxySandbox/index.js",
+    "./dist/Plugins/chart/components/index.js"
   ],
   "exports": {
     ".": {

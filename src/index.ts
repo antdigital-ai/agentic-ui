@@ -144,4 +144,15 @@ export * from './Utils/proxySandbox/SecurityContextManager';
  * @description 原始 SDK 导出，一般用户无需直接使用
  * @deprecated @since 2.30.0 建议直接从 @schema-element-editor/host-sdk 导入
  */
-export * from '@schema-element-editor/host-sdk';
+export {
+  createSchemaElementEditorBridge,
+  useSchemaElementEditor,
+  type MethodLevelConfig,
+  type PostMessageSourceConfig,
+  type PostMessageTypeConfig,
+  type ReactSchemaElementEditorConfig,
+  type SchemaElementEditorBridge,
+  type SchemaElementEditorConfig,
+  type SchemaElementEditorRecording,
+  type SchemaValue,
+} from '@schema-element-editor/host-sdk';

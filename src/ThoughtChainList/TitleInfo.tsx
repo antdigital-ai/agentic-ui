@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 import React, { useContext, useMemo } from 'react';
 import { DocMeta } from '.';
 import { I18nContext } from '../I18n';
-import { ActionIconBox } from '../index';
+import { ActionIconBox } from '../Components/ActionIconBox';
 import { CostMillis } from './CostMillis';
 import { FlipText } from './FlipText';
 

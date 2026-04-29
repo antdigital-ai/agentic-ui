@@ -3,7 +3,8 @@ import { ConfigProvider, Popover } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useMemo, useRef } from 'react';
 import useClickAway from '../Hooks/useClickAway';
-import { ActionIconBox, I18nContext } from '../index';
+import { ActionIconBox } from '../Components/ActionIconBox';
+import { I18nContext } from '../I18n';
 import {
   HistoryEmpty,
   HistoryLoadMore,

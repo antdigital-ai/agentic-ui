@@ -5,7 +5,7 @@ import copy from 'copy-to-clipboard';
 import React, { useContext, useMemo } from 'react';
 import { WhiteBoxProcessInterface } from '.';
 import { I18nContext } from '../I18n';
-import { ActionIconBox } from '../index';
+import { ActionIconBox } from '../Components/ActionIconBox';
 import {
   MarkdownEditor,
   MarkdownEditorInstance,

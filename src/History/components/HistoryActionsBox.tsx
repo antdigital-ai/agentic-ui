@@ -2,7 +2,7 @@ import { Star, StarFill, Trash2 } from '@sofa-design/icons';
 import { ConfigProvider, Popconfirm, Space } from 'antd';
 import React, { useContext, useState } from 'react';
 import { I18nContext } from '../../I18n';
-import { ActionIconBox } from '../../index';
+import { ActionIconBox } from '../../Components/ActionIconBox';
 import { HistoryActionsBoxProps } from '../types';
 
 /**

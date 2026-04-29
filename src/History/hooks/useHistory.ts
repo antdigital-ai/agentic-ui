@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRefFunction } from '../../index';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { HistoryProps } from '../types';
 import { HistoryDataType } from '../types/HistoryData';
 
