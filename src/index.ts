@@ -30,7 +30,7 @@ export { AgenticLayout, type AgenticLayoutProps } from './AgenticLayout';
 export { default as Workspace } from './Workspace';
 export { type BrowserItem, type BrowserSuggestion } from './Workspace/types';
 export {
-  FileActionRef,
+  type FileActionRef,
   File,
   FileTree,
   PreviewComponent,
@@ -91,16 +91,16 @@ export {
   normalizeOllamaMessagesToOpenAI,
   normalizeOpenClawMessageToOpenAI,
   normalizeOpenClawMessagesToOpenAI,
-  OllamaChatMessage,
+  type OllamaChatMessage,
   type OllamaMessagesMapOptions,
-  OllamaToolCall,
-  OpenClawChatMessage,
-  OpenClawChatMessageToolResult,
+  type OllamaToolCall,
+  type OpenClawChatMessage,
+  type OpenClawChatMessageToolResult,
   type OpenClawChatMeta,
   type OpenClawMessagesMapOptions,
   type OpenAIChatContentPart,
   type OpenAIChatContentPartFallback,
-  OpenAIChatMessage,
+  type OpenAIChatMessage,
   type OpenAIChatMessageAssistant,
   type OpenAIChatMessageFunction,
   type OpenAIChatMessageSystem,
@@ -574,7 +574,7 @@ export { VisualList, type VisualListItem, type VisualListProps } from './Compone
 export { useAutoScroll } from './Hooks/useAutoScroll';
 export { useLanguage } from './Hooks/useLanguage';
 export { useRefFunction } from './Hooks/useRefFunction';
-export { CSSInterpolation, type GenerateStyle, type ChatTokenType, resetComponent, useEditorStyleRegister } from './Hooks/useStyle';
+export { type CSSInterpolation, type GenerateStyle, type ChatTokenType, resetComponent, useEditorStyleRegister } from './Hooks/useStyle';
 export { useThrottleFn } from './Hooks/useThrottleFn';
 
 // ─── 国际化 ──────────────────────────────────────────────────────────────────
