@@ -10,6 +10,7 @@ import { AttachmentButton } from '../AttachmentButton';
 import type { AttachmentFile } from '../AttachmentButton/types';
 import type { SendButtonCustomizationProps } from '../SendButton';
 import { SendButton, resolveSendDisabled } from '../SendButton';
+import type { FileUploadStatus, FileUploadSummary } from '../types/shared';
 import type { CreateRecognizer } from '../VoiceInput';
 import { VoiceInputButton } from '../VoiceInput';
 import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
@@ -44,15 +45,10 @@ export interface SendActionsProps {
   fileUploadDone?: boolean;
 
   /** 文件上传状态 */
-  fileUploadStatus?: 'uploading' | 'done' | 'error';
+  fileUploadStatus?: FileUploadStatus;
 
   /** 文件上传状态统计 */
-  fileUploadSummary?: {
-    totalCount: number;
-    doneCount: number;
-    uploadingCount: number;
-    errorCount: number;
-  };
+  fileUploadSummary?: FileUploadSummary;
 
   /** 是否正在录音 */
   recording?: boolean;

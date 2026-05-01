@@ -94,7 +94,7 @@ type UploadProps = {
   /** 最小文件数量 */
   minFileCount?: number;
   /** 国际化文案 */
-  locale?: any;
+  locale?: Partial<LocalKeys>;
   /** 文件数量超出 maxFileCount 限制时的回调 */
   onExceedMaxCount?: (info: {
     maxCount: number;
@@ -137,8 +137,12 @@ const prepareFile = (file: AttachmentFile) => {
   }
 };
 
-const getLocaleMessage = (locale: any, key: string, defaultMsg: string) => {
-  return locale?.[key] || defaultMsg;
+const getLocaleMessage = (
+  locale: Partial<LocalKeys> | undefined,
+  key: string,
+  defaultMsg: string,
+) => {
+  return (locale as Record<string, string> | undefined)?.[key] || defaultMsg;
 };
 
 const validateFileSize = (

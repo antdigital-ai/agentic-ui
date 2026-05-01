@@ -7,6 +7,7 @@ import type { AttachmentFile } from '../AttachmentButton/types';
 import Enlargement from '../Enlargement';
 import { RefinePromptButton } from '../RefinePromptButton';
 import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
+import type { FileUploadStatus } from '../types/shared';
 
 export interface QuickActionsProps {
   /** 当前输入值 */
@@ -28,7 +29,7 @@ export interface QuickActionsProps {
   disabled?: boolean;
 
   /** 文件上传状态 */
-  fileUploadStatus?: 'uploading' | 'done' | 'error';
+  fileUploadStatus?: FileUploadStatus;
 
   /** 提示词优化配置 */
   refinePrompt?: {

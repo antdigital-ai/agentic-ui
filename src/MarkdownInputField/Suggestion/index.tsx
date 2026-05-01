@@ -6,6 +6,18 @@ import { MarkdownEditorProps } from '../../MarkdownEditor';
 import { TagPopupProps } from '../../MarkdownEditor/editor/elements/TagPopup';
 
 /**
+ * Suggestion 内部维护的可点击菜单项形态
+ *
+ * 由 `tagInputProps.items`（静态数组或异步加载结果）映射而来，
+ * 在原始 item 上额外注入 `onClick`，供 Dropdown 菜单点击触发选择。
+ */
+type SuggestionMenuItem = {
+  label: string;
+  key: string | number;
+  onClick: () => void;
+};
+
+/**
  * 建议面板状态的 React 上下文
  *
  * 该上下文用于管理建议面板（Suggestion）的显示状态，允许组件树中的任何组件访问或修改面板的开关状态。
@@ -105,28 +117,37 @@ export const Suggestion: React.FC<{
   });
 
   const [loading, setLoading] = useState(false);
-  const [selectedItems, setSelectedItems] = useState(() => {
-    if (typeof items === 'function') {
-      return [];
-    }
-    return items.map((item) => {
-      const { key } = item || {};
+  const [selectedItems, setSelectedItems] = useState<SuggestionMenuItem[]>(
+    () => {
+      if (typeof items === 'function') {
+        return [];
+      }
+      return items.map((item) => {
+        const { key } = item || {};
 
-      return {
-        ...item,
-        onClick: () => {
-          setOpen(false);
-          onSelectRef.current?.(`${key}` || '');
-        },
-      };
-    });
-  });
+        return {
+          ...item,
+          onClick: () => {
+            setOpen(false);
+            onSelectRef.current?.(`${key}` || '');
+          },
+        };
+      });
+    },
+  );
 
   useEffect(() => {
+    if (typeof items !== 'function') {
+      return;
+    }
+    let cancelled = false;
     const loadingData = async () => {
-      if (typeof items === 'function') {
-        setLoading(true);
+      setLoading(true);
+      try {
         const result = await items(triggerNodeContext.current!);
+        if (cancelled) {
+          return;
+        }
         if (Array.isArray(result)) {
           setSelectedItems(
             result.map((item) => {
@@ -141,10 +162,23 @@ export const Suggestion: React.FC<{
             }),
           );
         }
-        setLoading(false);
+      } catch (error) {
+        // 异步加载失败不应抛到全局 unhandled rejection；
+        // 调用方可通过自身在 items 里 catch 来上报，这里只保证 UI 不卡在 loading。
+        if (process.env.NODE_ENV !== 'production') {
+          // eslint-disable-next-line no-console
+          console.warn('[Suggestion] items() loading failed:', error);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
     loadingData();
+    return () => {
+      cancelled = true;
+    };
   }, [open]);
 
   const dropdownRenderRender = useRefFunction(

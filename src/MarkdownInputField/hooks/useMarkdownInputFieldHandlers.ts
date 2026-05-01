@@ -31,7 +31,7 @@ interface UseMarkdownInputFieldHandlersParams {
   value: string;
   setValue: (value: string) => void;
   fileMap?: Map<string, AttachmentFile>;
-  setFileMap?: (fileMap: Map<string, AttachmentFile>) => void;
+  setFileMap?: (fileMap?: Map<string, AttachmentFile>) => void;
   recording: boolean;
   stopRecording: () => Promise<void>;
   isEnlarged: boolean;
@@ -136,7 +136,7 @@ export const useMarkdownInputFieldHandlers = ({
       upLoadFileToServer(imageFiles, {
         ...attachmentConfig,
         fileMap,
-        onFileMapChange: setFileMap as any,
+        onFileMapChange: setFileMap,
       });
     },
   );

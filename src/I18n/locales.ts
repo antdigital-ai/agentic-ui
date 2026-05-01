@@ -456,6 +456,8 @@ export const cnLabels = {
   'workspace.file.videoNotSupported': '您的浏览器不支持视频播放',
   'workspace.file.audioNotSupported': '您的浏览器不支持音频播放',
   'workspace.file.fileType': '文件类型：',
+  enlarge: '放大',
+  shrink: '缩小',
 };
 
 /**
@@ -928,4 +930,6 @@ export const enLabels: typeof cnLabels = {
   'workspace.file.audioNotSupported':
     'Your browser does not support audio playback',
   'workspace.file.fileType': 'File type: ',
+  enlarge: 'Enlarge',
+  shrink: 'Shrink',
 };

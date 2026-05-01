@@ -5,6 +5,7 @@ import type { AttachmentFile } from '../AttachmentButton/types';
 import { SendActions } from '../SendActions';
 import { MARKDOWN_INPUT_FIELD_TEST_IDS } from '../testIds';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
+import type { FileUploadStatus, FileUploadSummary } from '../types/shared';
 
 interface UseAttachmentListParams {
   attachment?: MarkdownInputFieldProps['attachment'];
@@ -96,13 +97,8 @@ interface UseSendActionsNodeParams {
   setFileMap?: (fileMap?: Map<string, AttachmentFile>) => void;
   supportedFormat: AttachmentButtonProps['supportedFormat'];
   fileUploadDone: boolean;
-  fileUploadStatus: 'uploading' | 'done' | 'error';
-  fileUploadSummary: {
-    totalCount: number;
-    doneCount: number;
-    uploadingCount: number;
-    errorCount: number;
-  };
+  fileUploadStatus: FileUploadStatus;
+  fileUploadSummary: FileUploadSummary;
   recording: boolean;
   isLoading: boolean;
   collapseSendActions: boolean;

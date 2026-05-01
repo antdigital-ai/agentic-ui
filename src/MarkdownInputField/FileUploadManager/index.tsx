@@ -11,6 +11,7 @@ import {
   isVivoOrOppoDevice,
   isWeChat,
 } from '../AttachmentButton/utils';
+import type { FileUploadStatus, FileUploadSummary } from '../types/shared';
 
 type SupportedFileFormatsType = AttachmentButtonPopoverProps['supportedFormat'];
 
@@ -36,15 +37,10 @@ export interface FileUploadManagerReturn {
   fileUploadDone: boolean;
 
   /** 文件上传状态 */
-  fileUploadStatus: 'uploading' | 'done' | 'error';
+  fileUploadStatus: FileUploadStatus;
 
   /** 文件上传状态统计 */
-  fileUploadSummary: {
-    totalCount: number;
-    doneCount: number;
-    uploadingCount: number;
-    errorCount: number;
-  };
+  fileUploadSummary: FileUploadSummary;
 
   /** 支持的文件格式 */
   supportedFormat: SupportedFileFormatsType;
@@ -87,7 +83,7 @@ export const useFileUploadManager = ({
     // 兜底把未知状态也按完成态处理，避免统计缺口
     doneCount: Math.max(0, totalCount - uploadingCount - errorCount),
   };
-  const fileUploadStatus: 'uploading' | 'done' | 'error' =
+  const fileUploadStatus: FileUploadStatus =
     fileUploadSummary.errorCount > 0
       ? 'error'
       : fileUploadSummary.uploadingCount > 0

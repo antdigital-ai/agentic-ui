@@ -138,10 +138,16 @@ describe('FilePaste', () => {
         file: vi.fn((callback) => callback(mockFile2)),
       } as any;
 
+      // 真实浏览器 API：readEntries 单次最多返回 100 条，需循环读取直到返回空数组
       const mockDirReader = {
-        readEntries: vi.fn((callback) => {
-          callback([mockFileEntry1, mockFileEntry2]);
-        }),
+        readEntries: vi
+          .fn()
+          .mockImplementationOnce((callback) => {
+            callback([mockFileEntry1, mockFileEntry2]);
+          })
+          .mockImplementationOnce((callback) => {
+            callback([]);
+          }),
       } as any;
 
       const mockDirEntry = {
@@ -189,9 +195,14 @@ describe('FilePaste', () => {
       } as any;
 
       const mockSubDirReader = {
-        readEntries: vi.fn((callback) => {
-          callback([mockFileEntry2]);
-        }),
+        readEntries: vi
+          .fn()
+          .mockImplementationOnce((callback) => {
+            callback([mockFileEntry2]);
+          })
+          .mockImplementationOnce((callback) => {
+            callback([]);
+          }),
       } as any;
 
       const mockSubDirEntry = {
@@ -201,9 +212,14 @@ describe('FilePaste', () => {
       } as any;
 
       const mockDirReader = {
-        readEntries: vi.fn((callback) => {
-          callback([mockFileEntry1, mockSubDirEntry]);
-        }),
+        readEntries: vi
+          .fn()
+          .mockImplementationOnce((callback) => {
+            callback([mockFileEntry1, mockSubDirEntry]);
+          })
+          .mockImplementationOnce((callback) => {
+            callback([]);
+          }),
       } as any;
 
       const mockDirEntry = {
