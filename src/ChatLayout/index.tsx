@@ -93,33 +93,41 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
       classNames,
       styles,
       showFooterBackground = true,
+      onScrollStateChange,
     },
     ref,
   ) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('chat-layout');
     const { wrapSSR, hashId } = useStyle(prefixCls);
-    const { containerRef, scrollToBottom } = useAutoScroll({
+    const { containerRef, scrollToBottom, isAtBottom } = useAutoScroll({
       SCROLL_TOLERANCE: 30,
-      onResize: () => {},
-      timeout: 200,
       scrollBehavior,
+      onScrollStateChange,
     });
 
     const footerRef = useRef<HTMLDivElement>(null);
     const { height: actualFooterHeight } = useElementSize(footerRef);
 
-    useImperativeHandle(ref, () => ({
-      scrollContainer: containerRef.current,
-      scrollToBottom,
-    }));
+    useImperativeHandle(
+      ref,
+      () => ({
+        // 用 getter 实时返回最新 DOM，避免首次渲染拿到 null
+        get scrollContainer() {
+          return containerRef.current;
+        },
+        scrollToBottom,
+        isAtBottom,
+      }),
+      [scrollToBottom, isAtBottom],
+    );
 
-    // footer 实际高度变化时（spacer 随之调整），保持列表贴底
+    // footer 实际高度变化时（spacer 随之调整），立即贴底，避免被遮挡
     useEffect(() => {
       if (actualFooterHeight > 0) {
-        scrollToBottom();
+        scrollToBottom('auto');
       }
-    }, [actualFooterHeight]);
+    }, [actualFooterHeight, scrollToBottom]);
 
     const rootClassName = clsx(prefixCls, className, classNames?.root, hashId);
     const contentClassName = clsx(
@@ -155,6 +163,9 @@ const ChatLayoutComponent = forwardRef<ChatLayoutRef, ChatLayoutProps>(
             className={scrollableClassName}
             ref={containerRef}
             style={styles?.scrollable}
+            // tabIndex 让 div 可获取焦点，否则 keydown 事件不会派发到该容器，
+            // 自动滚动 hook 内的键盘上滑判定将无法生效
+            tabIndex={-1}
           >
             {children}
             {footer && (
