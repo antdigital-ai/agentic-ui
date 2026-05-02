@@ -5,6 +5,12 @@ import { TextLoading } from '../Components/lotties/TextLoading';
 import { useLocale } from '../I18n';
 import { BaseMarkdownEditor } from '../MarkdownEditor';
 import { BorderBeamAnimation } from './BorderBeamAnimation';
+import {
+  DEFAULT_BORDER_RADIUS_PX,
+  ENLARGED_DEFAULT_HEIGHT_PX,
+  FALLBACK_BORDER_RADIUS_PX,
+  ROOT_TAB_INDEX,
+} from './constants';
 import { useFileUploadManager } from './FileUploadManager';
 import { useEnlargeAndContainerHandler } from './hooks/useEnlargeAndContainerHandler';
 import { useInputFieldGeometry } from './hooks/useInputFieldGeometry';

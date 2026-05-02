@@ -136,6 +136,25 @@ export const Suggestion: React.FC<{
     },
   );
 
+  // 同步外部静态 items 数组的变化（非函数形式时）
+  useEffect(() => {
+    if (typeof items === 'function') {
+      return;
+    }
+    setSelectedItems(
+      items.map((item) => {
+        const { key } = item || {};
+        return {
+          ...item,
+          onClick: () => {
+            setOpen(false);
+            onSelectRef.current?.(`${key}` || '');
+          },
+        };
+      }),
+    );
+  }, [items]);
+
   useEffect(() => {
     if (typeof items !== 'function') {
       return;
@@ -179,7 +198,8 @@ export const Suggestion: React.FC<{
     return () => {
       cancelled = true;
     };
-  }, [open]);
+    // 依赖 items：函数引用变化（如外部 useCallback 更新依赖）时重新加载，避免拿到陈旧结果
+  }, [open, items]);
 
   const dropdownRenderRender = useRefFunction(
     (defaultDropdownContent: React.ReactNode) => {

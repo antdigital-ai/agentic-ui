@@ -458,6 +458,8 @@ export const cnLabels = {
   'workspace.file.fileType': '文件类型：',
   enlarge: '放大',
   shrink: '缩小',
+  'skillMode.region': '技能模式',
+  'skillMode.close': '关闭技能模式',
 };
 
 /**
@@ -932,4 +934,6 @@ export const enLabels: typeof cnLabels = {
   'workspace.file.fileType': 'File type: ',
   enlarge: 'Enlarge',
   shrink: 'Shrink',
+  'skillMode.region': 'Skill mode',
+  'skillMode.close': 'Close skill mode',
 };

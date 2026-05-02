@@ -39,7 +39,10 @@ export const useVoiceInputManager = ({
 }: VoiceInputManagerProps): VoiceInputManagerReturn => {
   const [recording, setRecording] = useState(false);
   const recognizerRef = useRef<VoiceRecognizer | null>(null);
-  const pendingRef = useRef(false);
+  // 标记是否处于「正在启动」状态：start 已发起、recognizer 尚未完成 await
+  const startingRef = useRef(false);
+  // 取消标志：start 进行中收到 stop 请求时置为 true，start 完成后立即 stop 并不进入录音态
+  const cancelStartRef = useRef(false);
   // 句子开始索引
   const sentenceStartIndexRef = useRef<number>(0);
 
@@ -56,11 +59,16 @@ export const useVoiceInputManager = ({
 
   /**
    * 开始录音
+   *
+   * 关键保证：start 期间若外部调用了 stopRecording，会通过 cancelStartRef
+   * 通知本函数在 recognizer 创建完成后立即停止并清理，不进入 recording=true，
+   * 避免「start 还在 await，stop 直接被忽略」造成的 recognizer 泄漏。
    */
   const startRecording = useRefFunction(async () => {
     if (!voiceRecognizer) return;
-    if (recording || pendingRef.current) return;
-    pendingRef.current = true;
+    if (recording || startingRef.current) return;
+    startingRef.current = true;
+    cancelStartRef.current = false;
     try {
       const recognizer = await voiceRecognizer({
         onSentenceBegin: () => {
@@ -74,37 +82,58 @@ export const useVoiceInputManager = ({
           setRecording(false);
           recognizerRef.current?.stop?.().catch(() => void 0);
           recognizerRef.current = null;
-          pendingRef.current = false;
         },
       });
       recognizerRef.current = recognizer;
-      await recognizerRef.current.start();
+      // 若 await 期间被 cancel，立即停止并清理，不进入录音态
+      if (cancelStartRef.current) {
+        await recognizer.stop?.().catch(() => void 0);
+        recognizerRef.current = null;
+        return;
+      }
+      await recognizer.start();
+      // start 也可能耗时；再次检查取消标志
+      if (cancelStartRef.current) {
+        await recognizer.stop?.().catch(() => void 0);
+        recognizerRef.current = null;
+        return;
+      }
       setRecording(true);
     } catch (e) {
       recognizerRef.current = null;
     } finally {
-      pendingRef.current = false;
+      startingRef.current = false;
+      cancelStartRef.current = false;
     }
   });
 
   /**
    * 停止录音
+   *
+   * 兼容三种状态：
+   * 1. recording=true：正常停止；
+   * 2. recording=false 且 startingRef=true：start 还在 await，置 cancelStartRef，
+   *    交由 startRecording 在 await 完成后立即清理；
+   * 3. 其他：no-op。
    */
   const stopRecording = useRefFunction(async () => {
-    if (!recording || pendingRef.current) return;
-    pendingRef.current = true;
+    if (startingRef.current) {
+      cancelStartRef.current = true;
+      return;
+    }
+    if (!recording) return;
     try {
       await recognizerRef.current?.stop();
     } finally {
       setRecording(false);
       recognizerRef.current = null;
-      pendingRef.current = false;
     }
   });
 
   // 清理函数
   useEffect(() => {
     return () => {
+      cancelStartRef.current = true;
       recognizerRef.current?.stop().catch(() => void 0);
     };
   }, []);

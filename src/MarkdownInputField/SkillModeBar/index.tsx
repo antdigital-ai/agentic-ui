@@ -3,6 +3,7 @@ import { ConfigProvider, Divider, Flex } from 'antd';
 import classNames from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useContext } from 'react';
+import { useLocale } from '../../I18n';
 import { useSkillModeState } from './hooks';
 import { useStyle } from './style';
 
@@ -106,6 +107,9 @@ const SkillModeBarInner: React.FC<SkillModeBarProps> = ({
   // 注册样式
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
+  // 国际化
+  const locale = useLocale();
+
   // 使用技能模式状态管理 hook
   const handleInternalSkillModeChange = useSkillModeState(
     skillMode,
@@ -138,7 +142,7 @@ const SkillModeBarInner: React.FC<SkillModeBarProps> = ({
         <motion.div
           role="region"
           aria-live="polite"
-          aria-label="技能模式"
+          aria-label={locale?.['skillMode.region'] ?? '技能模式'}
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
@@ -200,7 +204,7 @@ const SkillModeBarInner: React.FC<SkillModeBarProps> = ({
               {isClosable && (
                 <button
                   type="button"
-                  aria-label="关闭技能模式"
+                  aria-label={locale?.['skillMode.close'] ?? '关闭技能模式'}
                   className={classNames(`${prefixCls}-close`, hashId)}
                   onClick={handleCloseClick}
                   data-testid="skill-mode-close"
