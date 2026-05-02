@@ -68,6 +68,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 10,
         flexShrink: 0,
         marginInline: 1,
+        // 键盘聚焦时给出可视化反馈（a11y 必要项）
+        '&:focus-visible': {
+          outline: `2px solid ${token.colorPrimaryBorderHover}`,
+          outlineOffset: -2,
+        },
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -77,7 +82,11 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
           width: 6,
           backgroundColor: 'transparent',
           transform: 'translateX(-50%)',
-          transition: `background-color ${token.motionDurationMid} ${token.motionEaseInOut}`,
+          // 拆成 transitionProperty/Duration/TimingFunction 三段式，
+          // 避免某些 IDE 对简写串的属性名归属告警。
+          transitionProperty: 'background-color',
+          transitionDuration: token.motionDurationMid,
+          transitionTimingFunction: token.motionEaseInOut,
         },
         '&:hover::before': {
           backgroundColor: token.colorPrimaryBorderHover,
