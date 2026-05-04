@@ -1,4 +1,12 @@
-import React, { memo, useCallback, useState } from 'react';
+import { ConfigProvider } from 'antd';
+import classNames from 'clsx';
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import ButtonTab from './ButtonTab';
 import { useStyle } from './ButtonTabGroupStyle';
 
@@ -36,34 +44,55 @@ const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
   defaultActiveKey,
   onChange,
   className,
-  prefixCls = 'md-editor-button-tab-group',
+  prefixCls: customPrefixCls,
 }) => {
-  const { wrapSSR, hashId } = useStyle(prefixCls);
-  const [internalActiveKey, setInternalActiveKey] = useState<string>(
-    defaultActiveKey || items[0]?.key || '',
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  // P0-4：与 ButtonTab 一同迁入 'agentic-chatboot-*' 命名空间，并接入 ConfigProvider。
+  const prefixCls = getPrefixCls(
+    'agentic-chatboot-button-tab-group',
+    customPrefixCls,
   );
+  const { wrapSSR, hashId } = useStyle(prefixCls);
 
-  const currentActiveKey =
-    activeKey !== undefined ? activeKey : internalActiveKey;
+  // P0-1：受控判定一次确定，避免后续读取 props 时状态漂移
+  const isControlled = activeKey !== undefined;
 
-  // 使用 useCallback 优化点击处理函数
+  const [internalActiveKey, setInternalActiveKey] = useState<
+    string | undefined
+  >(() => defaultActiveKey ?? items[0]?.key);
+
+  // P0-1：非受控模式下，items 异步加载或动态变更时，若当前选中项不在新 items 中，
+  // 回落到第一个有效项；这样首屏 items=[] 后 items 到达时也能默认选中第一项。
+  useEffect(() => {
+    if (isControlled) return;
+    if (
+      internalActiveKey &&
+      items.some((it) => it.key === internalActiveKey)
+    ) {
+      return;
+    }
+    setInternalActiveKey(items[0]?.key);
+  }, [items, isControlled, internalActiveKey]);
+
+  const currentActiveKey = isControlled ? activeKey : internalActiveKey;
+
   const handleTabClick = useCallback(
     (key: string, disabled?: boolean) => {
       if (disabled) return;
-
-      if (activeKey === undefined) {
+      if (!isControlled) {
         setInternalActiveKey(key);
       }
-
       onChange?.(key);
     },
-    [activeKey, onChange],
+    [isControlled, onChange],
   );
 
   return wrapSSR(
+    // P0-2：用 clsx 拼接 className，避免模板字符串产生连续空格与命名风格不一致
+    // P1-9：testid 与 prefixCls 解耦
     <div
-      className={`${prefixCls} ${className || ''} ${hashId}`}
-      data-testid={prefixCls}
+      className={classNames(prefixCls, className, hashId)}
+      data-testid="agentic-chatboot-button-tab-group"
       role="group"
       aria-label="Tab group"
     >
@@ -71,9 +100,12 @@ const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
         <ButtonTab
           key={item.key}
           selected={currentActiveKey === item.key}
+          // P0-3：disabled 显式下传，由 ButtonTab 走原生 disabled / aria-disabled / 键盘拦截
+          disabled={item.disabled}
           onClick={() => handleTabClick(item.key, item.disabled)}
           onIconClick={item.onIconClick}
           icon={item.icon}
+          // 兼容历史 className：保留 `<group-prefix>-item-disabled` 修饰符以便外部样式钩子
           className={item.disabled ? `${prefixCls}-item-disabled` : ''}
         >
           {item.label}

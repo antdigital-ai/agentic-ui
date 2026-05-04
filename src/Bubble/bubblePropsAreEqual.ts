@@ -195,9 +195,6 @@ export const bubblePropsAreEqual = (
   if (prev.renderType !== next.renderType) return false;
 
   if (prev.shouldShowCopy !== next.shouldShowCopy) return false;
-  if (typeof prev.shouldShowCopy === 'function' || typeof next.shouldShowCopy === 'function') {
-    if (prev.shouldShowCopy !== next.shouldShowCopy) return false;
-  }
 
   if (!originDataEqualForMemo(prev.originData, next.originData)) return false;
   if (!preMessageEqualForMemo(prev.preMessage, next.preMessage)) return false;
@@ -262,11 +259,94 @@ export const bubblePropsAreEqual = (
   if (prev.fileViewConfig !== next.fileViewConfig) return false;
   if (prev.renderFileMoreAction !== next.renderFileMoreAction) return false;
 
-  if (prev.userBubbleProps !== next.userBubbleProps) return false;
-  if (prev.aiBubbleProps !== next.aiBubbleProps) return false;
-  if (prev.aIBubbleProps !== next.aIBubbleProps) return false;
+  if (
+    !shallowEqualConfigObject(
+      prev.userBubbleProps as object | undefined,
+      next.userBubbleProps as object | undefined,
+    )
+  ) {
+    return false;
+  }
+  if (
+    !shallowEqualConfigObject(
+      prev.aiBubbleProps as object | undefined,
+      next.aiBubbleProps as object | undefined,
+    )
+  ) {
+    return false;
+  }
+  if (
+    !shallowEqualConfigObject(
+      prev.aIBubbleProps as object | undefined,
+      next.aIBubbleProps as object | undefined,
+    )
+  ) {
+    return false;
+  }
 
   if (!depsArrayEqual(prev.deps, next.deps)) return false;
 
   return true;
 };
+
+/**
+ * 编译期保障：所有「会影响渲染」的 BubbleProps 字段必须在上面 bubblePropsAreEqual 中被比较。
+ *
+ * - 当 BubbleProps 新增字段时，请在 bubblePropsAreEqual 内补上对应的比较，并把字段名追加进
+ *   COMPARED_KEYS。否则下方 EnsureAllKeysCompared 类型会触发编译错误，从而避免 memo 漏更新。
+ * - 若新增字段是「不影响渲染、纯透传」的元数据，请显式加入 NON_RENDER_AFFECTING_KEYS 白名单。
+ */
+const COMPARED_KEYS = [
+  'id',
+  'placement',
+  'pure',
+  'readonly',
+  'time',
+  'shouldShowVoice',
+  'renderMode',
+  'renderType',
+  'shouldShowCopy',
+  'originData',
+  'preMessage',
+  'markdownRenderConfig',
+  'bubbleRenderConfig',
+  'docListProps',
+  'customConfig',
+  'bubbleListRef',
+  'bubbleRef',
+  'avatar',
+  'styles',
+  'classNames',
+  'style',
+  'className',
+  'onReply',
+  'onDisLike',
+  'onDislike',
+  'onLike',
+  'onCancelLike',
+  'onLikeCancel',
+  'onAvatarClick',
+  'onDoubleClick',
+  'useSpeech',
+  'fileViewEvents',
+  'fileViewConfig',
+  'renderFileMoreAction',
+  'userBubbleProps',
+  'aiBubbleProps',
+  'aIBubbleProps',
+] as const;
+
+/** 显式标记「不影响渲染、不需要进入 memo 比较」的字段白名单。 */
+const NON_RENDER_AFFECTING_KEYS = ['deps'] as const;
+
+type ComparedKey = (typeof COMPARED_KEYS)[number];
+type NonRenderAffectingKey = (typeof NON_RENDER_AFFECTING_KEYS)[number];
+type AccountedKey = ComparedKey | NonRenderAffectingKey;
+
+// 编译期断言：BubbleProps 中所有字段都必须出现在 COMPARED_KEYS 或 NON_RENDER_AFFECTING_KEYS。
+// 漏掉时下方 `MissingKeys` 会变成非 never 联合类型，触发 ts(2322) 编译错误。
+type MissingKeys = Exclude<keyof BubbleProps, AccountedKey>;
+// 触发编译期校验：若有遗漏，等号右侧会从 never 变为遗漏字段名联合，无法赋值给 never。
+const _ensureAllKeysCompared: MissingKeys extends never ? true : never = true;
+void _ensureAllKeysCompared;
+void COMPARED_KEYS;

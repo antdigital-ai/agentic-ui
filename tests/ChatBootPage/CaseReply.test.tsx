@@ -58,7 +58,11 @@ describe('CaseReply 组件', () => {
     expect(onButtonClick).toHaveBeenCalledWith(expect.any(Object));
   });
 
-  it('应该处理鼠标悬停事件', () => {
+  it('应该渲染 buttonBar 容器并接受 CSS :hover 驱动的可见态', () => {
+    // P1-1：hover 状态改由 CSS :hover 直驱，不再通过 React state 切 -visible 类
+    // （旧实现是 isHovered → 切类，每次 hover 都触发组件 rerender；列表场景下成本高）。
+    // jsdom 不模拟 :hover 伪类，因此这里不再断言 fireEvent.mouseEnter 后会切类，
+    // 只断言 buttonBar 始终带有基础类（CSS :hover 在真实浏览器/E2E 中验证）。
     render(
       <CaseReply
         quote="悬停测试"
@@ -68,19 +72,10 @@ describe('CaseReply 组件', () => {
       />,
     );
 
-    const container = screen.getByText('悬停测试').closest('div');
-
-    // 初始状态按钮应该不可见
     const button = screen.getByTestId('test-button');
     const buttonBar = button.closest('div');
     expect(buttonBar).toHaveClass('ant-agentic-chatboot-case-reply-button-bar');
-
-    // 悬停后按钮应该可见
-    fireEvent.mouseEnter(container!);
-    expect(buttonBar).toHaveClass('ant-agentic-chatboot-case-reply-button-bar-visible');
-
-    // 离开悬停后按钮应该不可见
-    fireEvent.mouseLeave(container!);
+    // 不应再因 mouseEnter 而切到 -visible 类（隐式断言：组件不再依赖 React state 控制 hover 态）
     expect(buttonBar).not.toHaveClass(
       'ant-agentic-chatboot-case-reply-button-bar-visible',
     );

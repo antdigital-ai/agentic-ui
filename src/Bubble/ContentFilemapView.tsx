@@ -77,7 +77,8 @@ const FilemapItem: React.FC<{
         fileMapConfig?.onPreview ??
         defaultHandlers.onPreview
       }
-      onDownload={events?.onDownload}
+      // FileMapConfig 当前不暴露 onDownload，因此 fallback 链为 events → defaultHandlers
+      onDownload={events?.onDownload ?? defaultHandlers.onDownload}
       itemRender={fileViewConfig?.itemRender ?? fileMapConfig?.itemRender}
       maxDisplayCount={fileViewConfig?.maxDisplayCount}
       showMoreButton={fileViewConfig?.showMoreButton}

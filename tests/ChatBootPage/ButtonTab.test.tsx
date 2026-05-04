@@ -15,10 +15,13 @@ describe('ButtonTab 组件', () => {
   });
 
   it('应该显示选中状态', () => {
-    const { container } = render(<ButtonTab selected>选中按钮</ButtonTab>);
+    render(<ButtonTab selected>选中按钮</ButtonTab>);
 
-    const button = container.querySelector('.md-editor-button-tab');
-    expect(button).toHaveClass('md-editor-button-tab-selected');
+    // 接入 ConfigProvider 后默认 className 会被 antd 加上 'ant-' 前缀，
+    // 故用 getByRole 取按钮，再用正则匹配修饰符，避免对前缀做硬编码假设。
+    const button = screen.getByRole('button');
+    expect(button.className).toMatch(/agentic-chatboot-button-tab\b/);
+    expect(button.className).toMatch(/agentic-chatboot-button-tab-selected\b/);
   });
 
   it('应该处理点击事件', () => {
@@ -108,11 +111,9 @@ describe('ButtonTab 组件', () => {
   });
 
   it('应该支持自定义类名', () => {
-    const { container } = render(
-      <ButtonTab className="custom-class">自定义类名</ButtonTab>,
-    );
+    render(<ButtonTab className="custom-class">自定义类名</ButtonTab>);
 
-    const button = container.querySelector('.md-editor-button-tab');
+    const button = screen.getByRole('button');
     expect(button).toHaveClass('custom-class');
   });
 
@@ -128,14 +129,19 @@ describe('ButtonTab 组件', () => {
   it('应该在没有子元素时不显示文本', () => {
     const { container } = render(<ButtonTab />);
 
-    const textElement = container.querySelector('.md-editor-button-tab-text');
+    // antd ConfigProvider 默认会附加 'ant-' 前缀，使用 [class*=...] 兜底匹配
+    const textElement = container.querySelector(
+      '[class*="agentic-chatboot-button-tab-text"]',
+    );
     expect(textElement).not.toBeInTheDocument();
   });
 
   it('应该在没有图标时不显示图标容器', () => {
     const { container } = render(<ButtonTab>无图标</ButtonTab>);
 
-    const iconElement = container.querySelector('.md-editor-button-tab-icon');
+    const iconElement = container.querySelector(
+      '[class*="agentic-chatboot-button-tab-icon"]',
+    );
     expect(iconElement).not.toBeInTheDocument();
   });
 
@@ -146,8 +152,13 @@ describe('ButtonTab 组件', () => {
       </ButtonTab>,
     );
 
-    const iconElement = container.querySelector('.md-editor-button-tab-icon');
-    expect(iconElement).toHaveClass('md-editor-button-tab-icon-clickable');
+    const iconElement = container.querySelector(
+      '[class*="agentic-chatboot-button-tab-icon"]',
+    );
+    expect(iconElement).not.toBeNull();
+    expect(iconElement!.className).toMatch(
+      /agentic-chatboot-button-tab-icon-clickable\b/,
+    );
   });
 
   it('应该为不可点击图标不添加样式类', () => {
@@ -155,8 +166,13 @@ describe('ButtonTab 组件', () => {
       <ButtonTab icon={<TestIcon />}>不可点击图标</ButtonTab>,
     );
 
-    const iconElement = container.querySelector('.md-editor-button-tab-icon');
-    expect(iconElement).not.toHaveClass('md-editor-button-tab-icon-clickable');
+    const iconElement = container.querySelector(
+      '[class*="agentic-chatboot-button-tab-icon"]',
+    );
+    expect(iconElement).not.toBeNull();
+    expect(iconElement!.className).not.toMatch(
+      /agentic-chatboot-button-tab-icon-clickable\b/,
+    );
   });
 
   it('应该设置正确的 tabIndex', () => {
@@ -174,6 +190,8 @@ describe('ButtonTab 组件', () => {
   });
 
   it('应该在 ConfigProvider 中正确工作', () => {
+    // P0-4：接入 getPrefixCls 后，ConfigProvider 的 prefixCls 会作用到本组件，
+    // 因此默认 prefix 'agentic-chatboot-button-tab' 会被加上自定义前缀 'custom-'。
     const { container } = render(
       <ConfigProvider prefixCls="custom">
         <ButtonTab>配置提供者</ButtonTab>
@@ -181,7 +199,7 @@ describe('ButtonTab 组件', () => {
     );
 
     expect(
-      container.querySelector('.md-editor-button-tab'),
+      container.querySelector('.custom-agentic-chatboot-button-tab'),
     ).toBeInTheDocument();
   });
 
@@ -211,10 +229,13 @@ describe('ButtonTab 组件', () => {
   });
 
   it('应该正确处理默认值', () => {
-    const { container } = render(<ButtonTab>默认值测试</ButtonTab>);
+    render(<ButtonTab>默认值测试</ButtonTab>);
 
-    const button = container.querySelector('.md-editor-button-tab');
+    const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
-    expect(button).not.toHaveClass('md-editor-button-tab-selected');
+    expect(button.className).toMatch(/agentic-chatboot-button-tab\b/);
+    expect(button.className).not.toMatch(
+      /agentic-chatboot-button-tab-selected\b/,
+    );
   });
 });

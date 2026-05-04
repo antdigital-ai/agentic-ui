@@ -81,16 +81,19 @@ describe('ButtonTabGroup 组件', () => {
   it('应该正确处理默认选中项', () => {
     render(<ButtonTabGroup items={mockItems} defaultActiveKey="tab2" />);
 
-    // 检查第二个标签是否被选中
+    // P0-4：接入 ConfigProvider 后 className 会带上 antd 默认 'ant-' 前缀，
+    // 故用正则匹配 BEM 修饰符尾部，避免硬编码完整前缀。
     const tab2 = screen.getByText('标签2').closest('button');
-    expect(tab2).toHaveClass('md-editor-button-tab-selected');
+    expect(tab2).not.toBeNull();
+    expect(tab2!.className).toMatch(/agentic-chatboot-button-tab-selected\b/);
   });
 
   it('应该在没有指定默认选中项时选中第一个', () => {
     render(<ButtonTabGroup items={mockItems} />);
 
     const tab1 = screen.getByText('标签1').closest('button');
-    expect(tab1).toHaveClass('md-editor-button-tab-selected');
+    expect(tab1).not.toBeNull();
+    expect(tab1!.className).toMatch(/agentic-chatboot-button-tab-selected\b/);
   });
 
   it('应该阻止禁用标签的点击', () => {
@@ -108,7 +111,14 @@ describe('ButtonTabGroup 组件', () => {
     render(<ButtonTabGroup items={mockItems} />);
 
     const disabledTab = screen.getByText('标签3').closest('button');
-    expect(disabledTab).toHaveClass('md-editor-button-tab-group-item-disabled');
+    expect(disabledTab).not.toBeNull();
+    // 兼容 antd ConfigProvider 默认前缀 'ant-'，仅断言修饰符部分
+    expect(disabledTab!.className).toMatch(
+      /agentic-chatboot-button-tab-group-item-disabled\b/,
+    );
+    // P0-3：disabled 时原生 disabled 属性 + aria-disabled 必须正确
+    expect(disabledTab).toBeDisabled();
+    expect(disabledTab).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('应该传递图标点击事件', () => {
@@ -135,7 +145,10 @@ describe('ButtonTabGroup 组件', () => {
       <ButtonTabGroup items={mockItems} className="custom-class" />,
     );
 
-    const group = container.querySelector('.md-editor-button-tab-group');
+    const group = container.querySelector(
+      '[class*="agentic-chatboot-button-tab-group"]',
+    );
+    expect(group).not.toBeNull();
     expect(group).toHaveClass('custom-class');
   });
 
@@ -149,17 +162,18 @@ describe('ButtonTabGroup 组件', () => {
   });
 
   it('应该处理空数组', () => {
-    const { container } = render(<ButtonTabGroup items={[]} />);
+    render(<ButtonTabGroup items={[]} />);
 
-    const group = container.querySelector('.md-editor-button-tab-group');
+    // 用 role 取根节点更稳；结构本身就是 role="group"
+    const group = screen.getByRole('group');
     expect(group).toBeInTheDocument();
     expect(group).toBeEmptyDOMElement();
   });
 
   it('应该处理未定义的项目数组', () => {
-    const { container } = render(<ButtonTabGroup />);
+    render(<ButtonTabGroup />);
 
-    const group = container.querySelector('.md-editor-button-tab-group');
+    const group = screen.getByRole('group');
     expect(group).toBeInTheDocument();
     expect(group).toBeEmptyDOMElement();
   });
@@ -195,7 +209,8 @@ describe('ButtonTabGroup 组件', () => {
 
     // 显示状态应该由 activeKey 控制
     const tab3 = screen.getByText('标签3').closest('button');
-    expect(tab3).toHaveClass('md-editor-button-tab-selected');
+    expect(tab3).not.toBeNull();
+    expect(tab3!.className).toMatch(/agentic-chatboot-button-tab-selected\b/);
   });
 
   it('应该在没有默认选中项且数组为空时正确处理', () => {
@@ -214,6 +229,8 @@ describe('ButtonTabGroup 组件', () => {
   });
 
   it('应该在 ConfigProvider 中正确工作', () => {
+    // P0-4：接入 getPrefixCls 后，外层 ConfigProvider 的 prefixCls 会作用到本组件，
+    // 因此 className 会变成 'custom-agentic-chatboot-button-tab-group'。
     const { container } = render(
       <ConfigProvider prefixCls="custom">
         <ButtonTabGroup items={mockItems} />
@@ -221,7 +238,7 @@ describe('ButtonTabGroup 组件', () => {
     );
 
     expect(
-      container.querySelector('.md-editor-button-tab-group'),
+      container.querySelector('.custom-agentic-chatboot-button-tab-group'),
     ).toBeInTheDocument();
   });
 
@@ -256,9 +273,11 @@ describe('ButtonTabGroup 组件', () => {
   });
 
   it('应该正确处理默认值', () => {
-    const { container } = render(<ButtonTabGroup items={mockItems} />);
+    render(<ButtonTabGroup items={mockItems} />);
 
-    const group = container.querySelector('.md-editor-button-tab-group');
+    const group = screen.getByRole('group');
     expect(group).toBeInTheDocument();
+    // 修饰符仍可断言（不依赖 antd 前缀）
+    expect(group.className).toMatch(/agentic-chatboot-button-tab-group\b/);
   });
 });

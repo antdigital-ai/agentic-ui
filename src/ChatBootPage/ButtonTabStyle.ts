@@ -28,11 +28,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       whiteSpace: 'nowrap',
       flexShrink: 0,
 
-      '&:hover': {
-        // borderColor: 'rgba(0, 0, 0, 0.3)',
-        // color: 'rgba(0, 0, 0, 0.85)',
-      },
-
+      // P1-4：删除遗留的注释式占位 hover 块；'&:active' / '&:focus-visible' 仍然有效保留
       '&:active': {
         transform: 'scale(0.98)',
       },
@@ -45,14 +41,16 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         backgroundColor: 'var(--color-gray-control-fill-primary)',
         color: 'var(--color-gray-contrast)',
 
-        '&:hover': {
-          // backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          // borderColor: 'rgba(0, 0, 0, 0.85)',
-        },
-
         [`${token.componentCls}-icon`]: {
           borderLeft: '1px solid rgba(255, 255, 255, 0.3)',
         },
+      },
+
+      // P0-3 配套：disabled 视觉态（避免只在 group 上加 .item-disabled，单用 ButtonTab 也能呈现）
+      '&-disabled': {
+        opacity: 0.5,
+        cursor: 'not-allowed',
+        pointerEvents: 'none',
       },
 
       '&-icon': {

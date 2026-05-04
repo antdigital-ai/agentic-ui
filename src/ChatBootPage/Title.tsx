@@ -48,7 +48,7 @@ const TitleComponent: React.FC<TitleProps> = ({
   return wrapSSR(
     <div
       className={classNames(prefixCls, hashId, className)}
-      data-testid={prefixCls}
+      data-testid="agentic-chatboot-title"
       style={style}
     >
       {title && <div className={mainCls}>{title}</div>}
