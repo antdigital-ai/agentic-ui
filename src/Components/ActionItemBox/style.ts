@@ -347,6 +347,27 @@ export const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 };
 
 /**
+ * 入场动画：从左侧 -10px 滑入并淡入
+ *
+ * 替代 framer-motion 的 `initial={x:-10, opacity:0}` → `animate={x:0, opacity:1}`，
+ * 通过 CSS keyframes 实现，无需 JS 动画运行时。
+ */
+const genMotionStyle: GenerateStyle<ChatTokenType> = (token) => {
+  return {
+    [`${token.componentCls}-motion-slide-in-left`]: {
+      animationName: `${token.componentCls}-slideInLeft`,
+      animationDuration: '0.3s',
+      animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      animationFillMode: 'both',
+    },
+    [`@keyframes ${token.componentCls}-slideInLeft`]: {
+      from: { transform: 'translateX(-10px)', opacity: 0 },
+      to: { transform: 'translateX(0)', opacity: 1 },
+    },
+  };
+};
+
+/**
  * ActionItemBox
  * @param prefixCls
  * @returns
@@ -359,6 +380,10 @@ export function useStyle(prefixCls?: string) {
     };
 
     // Apply reset first, then component styles to allow overrides like padding
-    return [resetComponent(proChatToken), genStyle(proChatToken)];
+    return [
+      resetComponent(proChatToken),
+      genStyle(proChatToken),
+      genMotionStyle(proChatToken),
+    ];
   });
 }

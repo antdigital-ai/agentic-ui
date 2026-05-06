@@ -1,6 +1,5 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import { motion } from 'framer-motion';
 import React, { useContext, useEffect } from 'react';
 import { useStyle } from './style';
 
@@ -32,22 +31,14 @@ export const ActionItemBox = (props: ActionItemBoxProps) => {
   }, []);
 
   return wrapSSR(
-    <motion.div
+    <div
       data-testid={basePrefixCls}
-      initial="hidden"
-      animate="visible"
+      className={classNames(`${basePrefixCls}-motion-slide-in-left`, hashId)}
       style={{
         flex: props.size ? 'none' : 1,
         display: 'flex',
         height: 'min-content',
         ...props.style,
-      }}
-      variants={{
-        hidden: { x: -10, opacity: 0 },
-        visible: {
-          x: 0,
-          opacity: 1,
-        },
       }}
     >
       <div
@@ -149,7 +140,7 @@ export const ActionItemBox = (props: ActionItemBoxProps) => {
           </div>
         </div>
       </div>
-    </motion.div>,
+    </div>,
   );
 };
 
