@@ -16,19 +16,19 @@ group:
 
 最简用法：只传 `center`，即可获得一个带圆角阴影的内容容器。
 
-<code src="../demos/agentic-layout-basic.tsx" iframe=460>基础用法</code>
+<code src="../demos/agentic-layout-basic.tsx" iframe=520>基础用法</code>
 
 ### 三栏布局与侧边栏宽度
 
 通过 `left`、`center`、`right` 填充三栏内容，`leftWidth` 和 `rightWidth` 控制侧边栏宽度。
 
-<code src="../demos/agentic-layout-sidebar.tsx" iframe=560>三栏布局 + leftWidth / rightWidth</code>
+<code src="../demos/agentic-layout-sidebar.tsx" iframe=580>三栏布局 + leftWidth / rightWidth</code>
 
 ### 受控折叠
 
 通过 `header.leftCollapsed` / `header.rightCollapsed` 与对应回调受控管理折叠状态，可在外部完全控制折叠逻辑（例如根据窗口宽度自动折叠）。
 
-<code src="../demos/agentic-layout-collapse.tsx" iframe=520>受控折叠</code>
+<code src="../demos/agentic-layout-collapse.tsx" iframe=560>受控折叠</code>
 
 ### 非受控折叠
 

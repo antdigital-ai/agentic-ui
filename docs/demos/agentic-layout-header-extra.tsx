@@ -4,14 +4,17 @@ import React from 'react';
 
 const CenterContent = () => (
   <ChatLayout>
-    <div style={{ padding: '24px 32px' }}>
+    <div style={{ padding: '16px 24px' }}>
       {Array.from({ length: 4 }, (_, i) => (
         <div
           key={i}
           style={{
-            padding: '10px 14px',
+            padding: '8px 12px',
             marginBottom: 8,
-            background: i % 2 === 0 ? '#f0f5ff' : '#fff7e6',
+            background:
+              i % 2 === 0
+                ? 'var(--ant-color-bg-text-hover, #f5f5f5)'
+                : 'transparent',
             borderRadius: 8,
             fontSize: 14,
           }}
@@ -23,16 +26,15 @@ const CenterContent = () => (
   </ChatLayout>
 );
 
-const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
+const SidebarPanel = ({ label }: { label: string }) => (
   <div
     style={{
       height: '100%',
-      background: bg,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       fontSize: 14,
-      color: '#555',
+      color: 'var(--ant-color-text-secondary, #555)',
     }}
   >
     {label}
@@ -48,14 +50,14 @@ const HeaderExtraDemo = () => (
       </Tag>
       <div
         style={{
-          height: 300,
-          background: 'var(--color-gray-bg-page, #f5f5f5)',
+          height: 360,
+          background: 'var(--ant-color-bg-layout, #f5f5f5)',
           padding: 6,
           borderRadius: 16,
         }}
       >
         <AgenticLayout
-          style={{ height: '100%' }}
+          style={{ height: '100%', minHeight: 0 }}
           center={<CenterContent />}
           header={{
             title: (
@@ -78,14 +80,14 @@ const HeaderExtraDemo = () => (
       </Tag>
       <div
         style={{
-          height: 300,
-          background: 'var(--color-gray-bg-page, #f5f5f5)',
+          height: 360,
+          background: 'var(--ant-color-bg-layout, #f5f5f5)',
           padding: 6,
           borderRadius: 16,
         }}
       >
         <AgenticLayout
-          style={{ height: '100%' }}
+          style={{ height: '100%', minHeight: 0 }}
           center={<CenterContent />}
           header={{
             title: '智能助手',
@@ -103,17 +105,17 @@ const HeaderExtraDemo = () => (
       </Tag>
       <div
         style={{
-          height: 340,
-          background: 'var(--color-gray-bg-page, #f5f5f5)',
+          height: 480,
+          background: 'var(--ant-color-bg-layout, #f5f5f5)',
           padding: 6,
           borderRadius: 16,
         }}
       >
         <AgenticLayout
-          style={{ height: '100%' }}
-          left={<SidebarPanel label="历史记录" bg="#f6ffed" />}
+          style={{ height: '100%', minHeight: 0 }}
+          left={<SidebarPanel label="历史记录" />}
           center={<CenterContent />}
-          right={<SidebarPanel label="工作区" bg="#fff7e6" />}
+          right={<SidebarPanel label="工作区" />}
           header={{
             title: '工作台',
             leftCollapsible: true,

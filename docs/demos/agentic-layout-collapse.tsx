@@ -2,16 +2,15 @@ import { AgenticLayout, ChatLayout } from '@ant-design/agentic-ui';
 import { Button, Space, Tag } from 'antd';
 import React, { useState } from 'react';
 
-const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
+const SidebarPanel = ({ label }: { label: string }) => (
   <div
     style={{
       height: '100%',
-      background: bg,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       fontSize: 14,
-      color: '#555',
+      color: 'var(--ant-color-text-secondary, #555)',
       fontWeight: 500,
     }}
   >
@@ -21,14 +20,17 @@ const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
 
 const CenterContent = () => (
   <ChatLayout>
-    <div style={{ padding: '24px 32px' }}>
+    <div style={{ padding: '16px 24px' }}>
       {Array.from({ length: 6 }, (_, i) => (
         <div
           key={i}
           style={{
-            padding: '10px 14px',
+            padding: '8px 12px',
             marginBottom: 8,
-            background: i % 2 === 0 ? '#f0f5ff' : '#fff7e6',
+            background:
+              i % 2 === 0
+                ? 'var(--ant-color-bg-text-hover, #f5f5f5)'
+                : 'transparent',
             borderRadius: 8,
             fontSize: 14,
           }}
@@ -80,26 +82,26 @@ const CollapseDemo = () => {
           </Button>
         </Space>
       </div>
-      <p style={{ margin: 0, fontSize: 13, color: '#888' }}>
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--ant-color-text-tertiary, #888)' }}>
         点击头部折叠按钮或上方按钮切换折叠状态。状态由外部受控管理。
       </p>
       <div
         style={{
-          height: 420,
-          background: 'var(--color-gray-bg-page, #f5f5f5)',
+          height: 480,
+          background: 'var(--ant-color-bg-layout, #f5f5f5)',
           padding: 6,
           borderRadius: 16,
         }}
       >
         <AgenticLayout
-          style={{ height: '100%' }}
-          left={<SidebarPanel label="历史记录" bg="#f6ffed" />}
+          style={{ height: '100%', minHeight: 0 }}
+          left={<SidebarPanel label="历史记录" />}
           center={<CenterContent />}
-          right={<SidebarPanel label="工作区" bg="#fff7e6" />}
+          right={<SidebarPanel label="工作区" />}
           header={{
             title: '受控折叠',
-            leftCollapsed: leftCollapsed,
-            rightCollapsed: rightCollapsed,
+            leftCollapsed,
+            rightCollapsed,
             onLeftCollapse: (v) => {
               setLeftCollapsed(v);
               console.log('左侧折叠:', v);

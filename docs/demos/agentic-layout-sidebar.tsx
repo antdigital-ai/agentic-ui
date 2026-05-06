@@ -2,16 +2,15 @@ import { AgenticLayout, ChatLayout } from '@ant-design/agentic-ui';
 import { Segmented, Tag } from 'antd';
 import React, { useState } from 'react';
 
-const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
+const SidebarPanel = ({ label }: { label: string }) => (
   <div
     style={{
       height: '100%',
-      background: bg,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       fontSize: 14,
-      color: '#555',
+      color: 'var(--ant-color-text-secondary, #555)',
       fontWeight: 500,
     }}
   >
@@ -21,14 +20,17 @@ const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
 
 const CenterContent = () => (
   <ChatLayout header={{ title: '中间内容区' }}>
-    <div style={{ padding: '24px 32px' }}>
+    <div style={{ padding: '16px 24px' }}>
       {Array.from({ length: 5 }, (_, i) => (
         <div
           key={i}
           style={{
-            padding: '10px 14px',
+            padding: '8px 12px',
             marginBottom: 8,
-            background: i % 2 === 0 ? '#f0f5ff' : '#fff7e6',
+            background:
+              i % 2 === 0
+                ? 'var(--ant-color-bg-text-hover, #f5f5f5)'
+                : 'transparent',
             borderRadius: 8,
             fontSize: 14,
           }}
@@ -54,15 +56,15 @@ const SidebarDemo = () => {
           alignItems: 'center',
         }}
       >
-        <span style={{ fontSize: 13 }}>
-          <Tag color="blue">leftWidth</Tag>
-        </span>
+        <Tag color="blue">leftWidth</Tag>
         <Segmented
           options={[160, 200, 256, 320]}
           value={leftWidth}
           onChange={(v) => setLeftWidth(v as number)}
         />
-        <span style={{ fontSize: 13, color: '#999' }}>当前: {leftWidth}px</span>
+        <span style={{ fontSize: 13, color: 'var(--ant-color-text-tertiary, #999)' }}>
+          当前: {leftWidth}px
+        </span>
       </div>
       <div
         style={{
@@ -72,36 +74,31 @@ const SidebarDemo = () => {
           alignItems: 'center',
         }}
       >
-        <span style={{ fontSize: 13 }}>
-          <Tag color="purple">rightWidth</Tag>
-        </span>
+        <Tag color="purple">rightWidth</Tag>
         <Segmented
           options={[200, 280, 360, 440]}
           value={rightWidth}
           onChange={(v) => setRightWidth(v as number)}
         />
-        <span style={{ fontSize: 13, color: '#999' }}>
+        <span style={{ fontSize: 13, color: 'var(--ant-color-text-tertiary, #999)' }}>
           当前: {rightWidth}px
         </span>
       </div>
-
       <div
         style={{
-          height: 420,
-          background: 'var(--color-gray-bg-page, #f5f5f5)',
+          height: 480,
+          background: 'var(--ant-color-bg-layout, #f5f5f5)',
           padding: 6,
           borderRadius: 16,
         }}
       >
         <AgenticLayout
-          style={{ height: '100%' }}
+          style={{ height: '100%', minHeight: 0 }}
           leftWidth={leftWidth}
           rightWidth={rightWidth}
-          left={<SidebarPanel label="左侧边栏 (History / 导航)" bg="#f6ffed" />}
+          left={<SidebarPanel label="左侧边栏（History / 导航）" />}
           center={<CenterContent />}
-          right={
-            <SidebarPanel label="右侧边栏 (Workspace / 详情)" bg="#fff7e6" />
-          }
+          right={<SidebarPanel label="右侧边栏（Workspace / 详情）" />}
           header={{
             title: '三栏布局',
             leftCollapsible: true,

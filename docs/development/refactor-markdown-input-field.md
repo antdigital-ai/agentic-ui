@@ -152,7 +152,7 @@ FileUploadManager/index.tsx
 
 **现状**
 
-```tsx
+```text
 <Suggestion tagInputProps={{ enable: true, type: 'dropdown', ...tagInputProps }}>
   <div ref={inputRef} ...>
     ...

@@ -5,16 +5,15 @@ import React, { useState } from 'react';
 // 通过外部 style 控制根容器 minHeight，AgenticLayout 不再内置 minHeight prop。
 // 这里演示如何借助 style.minHeight 实现等价能力。
 
-const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
+const SidebarPanel = ({ label }: { label: string }) => (
   <div
     style={{
       height: '100%',
-      background: bg,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       fontSize: 14,
-      color: '#555',
+      color: 'var(--ant-color-text-secondary, #555)',
     }}
   >
     {label}
@@ -23,14 +22,17 @@ const SidebarPanel = ({ label, bg }: { label: string; bg: string }) => (
 
 const CenterContent = () => (
   <ChatLayout>
-    <div style={{ padding: '24px 32px' }}>
+    <div style={{ padding: '16px 24px' }}>
       {Array.from({ length: 5 }, (_, i) => (
         <div
           key={i}
           style={{
-            padding: '10px 14px',
+            padding: '8px 12px',
             marginBottom: 8,
-            background: i % 2 === 0 ? '#f0f5ff' : '#fff7e6',
+            background:
+              i % 2 === 0
+                ? 'var(--ant-color-bg-text-hover, #f5f5f5)'
+                : 'transparent',
             borderRadius: 8,
             fontSize: 14,
           }}
@@ -43,7 +45,7 @@ const CenterContent = () => (
 );
 
 const StyleDemo = () => {
-  const [minHeight, setMinHeight] = useState<string | number>(400);
+  const [minHeight, setMinHeight] = useState<string | number>(300);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -61,24 +63,27 @@ const StyleDemo = () => {
           }}
         >
           <Segmented
-            options={[300, 400, 500, '100%']}
+            options={[200, 300, 400, 500]}
             value={minHeight}
-            onChange={(v) => setMinHeight(v as string | number)}
+            onChange={(v) => setMinHeight(v as number)}
           />
-          <span style={{ fontSize: 13, color: '#999' }}>当前: {minHeight}</span>
+          <span style={{ fontSize: 13, color: 'var(--ant-color-text-tertiary, #999)' }}>
+            当前: {minHeight}px
+          </span>
         </div>
         <div
           style={{
-            background: 'var(--color-gray-bg-page, #f5f5f5)',
+            height: 480,
+            background: 'var(--ant-color-bg-layout, #f5f5f5)',
             padding: 6,
             borderRadius: 16,
           }}
         >
           <AgenticLayout
-            style={{ minHeight }}
-            left={<SidebarPanel label="左侧" bg="#f6ffed" />}
+            style={{ height: '100%', minHeight }}
+            left={<SidebarPanel label="左侧" />}
             center={<CenterContent />}
-            right={<SidebarPanel label="右侧" bg="#fff7e6" />}
+            right={<SidebarPanel label="右侧" />}
             header={{
               title: 'minHeight 演示',
               leftCollapsible: true,
@@ -95,15 +100,17 @@ const StyleDemo = () => {
         </Tag>
         <div
           style={{
-            background: 'var(--color-gray-bg-page, #f5f5f5)',
+            height: 360,
+            background: 'var(--ant-color-bg-layout, #f5f5f5)',
             padding: 6,
             borderRadius: 16,
           }}
         >
           <AgenticLayout
             style={{
-              height: 300,
-              border: '2px dashed #1677ff',
+              height: '100%',
+              minHeight: 0,
+              border: '2px dashed var(--ant-color-primary, #1677ff)',
               borderRadius: 12,
             }}
             center={<CenterContent />}
@@ -117,26 +124,24 @@ const StyleDemo = () => {
         <Tag color="green" style={{ marginBottom: 8 }}>
           右侧栏可拖拽调整宽度（拖动分割线）
         </Tag>
-        <p style={{ margin: '0 0 8px', fontSize: 13, color: '#888' }}>
+        <p style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--ant-color-text-tertiary, #888)' }}>
           右侧栏左边缘有拖拽手柄，鼠标悬停时高亮，拖动可调整宽度（最小
           400px，最大窗口的 70%）。
         </p>
         <div
           style={{
-            height: 340,
-            background: 'var(--color-gray-bg-page, #f5f5f5)',
+            height: 480,
+            background: 'var(--ant-color-bg-layout, #f5f5f5)',
             padding: 6,
             borderRadius: 16,
           }}
         >
           <AgenticLayout
-            style={{ height: '100%' }}
+            style={{ height: '100%', minHeight: 0 }}
             rightWidth={280}
-            left={<SidebarPanel label="历史记录" bg="#f6ffed" />}
+            left={<SidebarPanel label="历史记录" />}
             center={<CenterContent />}
-            right={
-              <SidebarPanel label="工作区（可拖拽调整宽度）" bg="#fff7e6" />
-            }
+            right={<SidebarPanel label="工作区（可拖拽调整宽度）" />}
             header={{
               title: '拖拽调整右侧宽度',
               leftCollapsible: true,
