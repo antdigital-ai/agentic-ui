@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   UseSpeechSynthesisOptions,
   UseSpeechSynthesisResult,
@@ -9,10 +9,9 @@ export const useSpeechSynthesis = (
 ): UseSpeechSynthesisResult => {
   const { text, defaultRate = 1 } = options;
 
-  const isSupported = useMemo(
-    () => typeof window !== 'undefined' && !!window.speechSynthesis,
-    [],
-  );
+  // 仅依赖宿主环境特性，无任何依赖；直接 const 即可，无需 useMemo
+  const isSupported =
+    typeof window !== 'undefined' && !!window.speechSynthesis;
 
   const [rate, setRate] = useState<number>(defaultRate);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -26,7 +25,10 @@ export const useSpeechSynthesis = (
         utterRef.current.onerror = null;
       }
       window.speechSynthesis.cancel();
-    } catch (e) {}
+    } catch (e) {
+      // 浏览器拒绝 cancel（如未授权 / 焦点丢失）。降级为不抛错，但需可观测
+      console.warn('[useSpeechSynthesis] cancel failed', e);
+    }
     utterRef.current = null;
     setIsPlaying(false);
   }, [isSupported]);
@@ -58,6 +60,8 @@ export const useSpeechSynthesis = (
       window.speechSynthesis.speak(utter);
       setIsPlaying(true);
     } catch (e) {
+      // 常见原因：缺少用户手势、quota 超限、voices 尚未加载完成
+      console.warn('[useSpeechSynthesis] speak failed', e);
       setIsPlaying(false);
     }
   }, [isSupported, text, rate]);
@@ -66,14 +70,18 @@ export const useSpeechSynthesis = (
     if (!isSupported) return;
     try {
       window.speechSynthesis.pause();
-    } catch (e) {}
+    } catch (e) {
+      console.warn('[useSpeechSynthesis] pause failed', e);
+    }
   }, [isSupported]);
 
   const resume = useCallback(() => {
     if (!isSupported) return;
     try {
       window.speechSynthesis.resume();
-    } catch (e) {}
+    } catch (e) {
+      console.warn('[useSpeechSynthesis] resume failed', e);
+    }
   }, [isSupported]);
 
   // 变更倍速：若正在播报，重启使之生效
@@ -92,7 +100,9 @@ export const useSpeechSynthesis = (
           utterRef.current.onend = null;
           utterRef.current.onerror = null;
           window.speechSynthesis.cancel();
-        } catch (e) {}
+        } catch (e) {
+          console.warn('[useSpeechSynthesis] cleanup cancel failed', e);
+        }
         utterRef.current = null;
       }
       setIsPlaying(false);

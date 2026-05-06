@@ -31,8 +31,7 @@ const EVENT = 'mousedown';
  *
  * @remarks
  * - 自动监听全局 mousedown 事件
- * - 智能判断点击目标是否在指定元素内部
- * - 支持父节点包含检测
+ * - 通过 ref.current.contains 判断点击目标是否在容器内部
  * - 组件卸载时自动清理事件监听
  * - 适用于下拉菜单、弹出层等场景
  */
@@ -47,13 +46,9 @@ export const useClickAway = (
      * @param event - 鼠标点击事件对象
      */
     const listener = (event: { target: any }) => {
-      // 如果ref为null或ref.current为null，或者ref.current包含事件目标元素，则不做任何操作
-      if (
-        !ref ||
-        !ref.current ||
-        ref.current.contains(event.target) ||
-        ref.current.parentNode?.contains(event.target)
-      ) {
+      // 仅当点击目标在 ref 容器内部时跳过；切勿用 parentNode.contains 判断，
+      // 否则点击同级兄弟节点会被误判为内部，导致"点外面关闭"的关闭逻辑失效
+      if (!ref || !ref.current || ref.current.contains(event.target)) {
         return;
       }
       // 执行回调函数，并传递事件对象

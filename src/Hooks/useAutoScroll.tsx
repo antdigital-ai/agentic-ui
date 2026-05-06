@@ -30,7 +30,8 @@ const WHEEL_INTENT_RESET_MS = 120;
  *
  * @template T - 容器元素类型
  * @param props - Hook 配置参数
- * @param props.SCROLL_TOLERANCE - 判定"已贴底"的容差阈值（px），默认 20
+ * @param props.scrollTolerance - 判定"已贴底"的容差阈值（px），默认 20
+ * @param props.SCROLL_TOLERANCE - **已废弃**，请使用 `scrollTolerance`，仅作向后兼容保留
  * @param props.pinThreshold - 判定"已脱离底部"的阈值（px），默认 80。距离底部超过该值才认为用户已离开
  * @param props.onResize - 容器尺寸变化回调
  * @param props.onScrollStateChange - 跟随状态/贴底状态变化回调
@@ -60,6 +61,12 @@ export interface AutoScrollState {
 }
 
 export interface UseAutoScrollProps {
+  /** 判定"已贴底"的容差阈值（px），默认 20 */
+  scrollTolerance?: number;
+  /**
+   * @deprecated 已废弃，请使用 `scrollTolerance`，下个大版本将移除。
+   * 同时传入时优先使用 `scrollTolerance`。
+   */
   SCROLL_TOLERANCE?: number;
   pinThreshold?: number;
   onResize?: (size: { width: number; height: number }) => void;
@@ -91,19 +98,25 @@ export const useAutoScroll = <T extends HTMLDivElement>(
   const mutationObserver = useRef<MutationObserver | null>(null);
   const resizeObserver = useRef<ResizeObserver | null>(null);
 
-  const tolerance = props.SCROLL_TOLERANCE ?? SCROLL_TOLERANCE;
+  // 优先使用新名 scrollTolerance，回退到 deprecated 的 SCROLL_TOLERANCE，最后才是默认值
+  const tolerance =
+    props.scrollTolerance ?? props.SCROLL_TOLERANCE ?? SCROLL_TOLERANCE;
   // pinThreshold 必须 >= tolerance，否则会出现"既算贴底又算脱离"的逻辑空洞
   const pinThreshold = Math.max(props.pinThreshold ?? PIN_THRESHOLD, tolerance);
 
   /**
    * 用 ref 持有最新回调与 scrollBehavior，避免引用变化导致 effect 反复重建监听。
+   * 必须在 effect 中赋值，渲染期写 ref 在 React 18 并发渲染 / StrictMode 下不安全
+   * （被丢弃的渲染版本会污染 ref）。
    */
   const onResizeRef = useRef(props.onResize);
   const onScrollStateChangeRef = useRef(props.onScrollStateChange);
   const scrollBehaviorRef = useRef(props.scrollBehavior);
-  onResizeRef.current = props.onResize;
-  onScrollStateChangeRef.current = props.onScrollStateChange;
-  scrollBehaviorRef.current = props.scrollBehavior;
+  useEffect(() => {
+    onResizeRef.current = props.onResize;
+    onScrollStateChangeRef.current = props.onScrollStateChange;
+    scrollBehaviorRef.current = props.scrollBehavior;
+  });
 
   /**
    * 把 deps 序列化成稳定 key，避免在 useEffect 依赖里展开 deps 数组
