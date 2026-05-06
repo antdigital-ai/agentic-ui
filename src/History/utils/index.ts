@@ -68,10 +68,24 @@ export const getItemTimestamp = (item: {
 };
 
 /**
- * 按指定键对数组进行分组
- * @param list 要分组的数组
- * @param getCategoryKey 分组键的获取函数
- * @returns 分组后的对象
+ * 按指定键对数组进行分组（保持原顺序）。
+ *
+ * 单遍 reduce 实现，对每个元素调用一次 `getCategoryKey` 计算分组键，
+ * 同一键下的元素按原数组中的相对顺序追加到对应分组数组末尾。
+ *
+ * 典型用法是按日期分组历史记录：
+ * ```ts
+ * groupByCategory(historyList, (item) => formatTime(getItemTimestamp(item)));
+ * // => { '今日': [...], '昨日': [...], '一周内': [...], '2024-01-01': [...] }
+ * ```
+ *
+ * 时间复杂度 O(n)，空间复杂度 O(n)。返回的对象未做特殊排序，
+ * 调用方如需按分组键排序请在拿到结果后自行 `Object.keys(...).sort(...)`。
+ *
+ * @template T 数组元素类型
+ * @param list 要分组的数组；为空数组时返回空对象 `{}`
+ * @param getCategoryKey 分组键计算函数；返回相同字符串的元素归入同组
+ * @returns 分组后的对象，键为分组名，值为该分组下的元素数组（按原顺序）
  */
 export const groupByCategory = <T>(
   list: T[],

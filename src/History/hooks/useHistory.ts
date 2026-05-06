@@ -36,8 +36,18 @@ export const useHistory = (props: HistoryProps) => {
     chatList,
   );
 
-  // 仅在挂载时触发 onInit / onShow，故意不把它们放进依赖数组：
-  // 这两个回调表达「组件首次出现」的语义，重复触发会破坏调用方的副作用。
+  // 仅在挂载时触发 onInit / onShow，故意不把它们放进依赖数组（#25）：
+  //
+  // 这两个回调语义虽然相近但不等价，约定如下：
+  // - `onInit`：组件**首次实例化**完成时触发一次，调用方常用来做一次性初始化
+  //   （如埋点上报、首次拉取依赖资源），不应在每次显示时重复触发。
+  // - `onShow`：组件**首次出现在视图**时触发一次，调用方常用来做曝光埋点。
+  //   当前实现把它和 `onInit` 一起在 mount 时触发是有意行为——下拉模式下
+  //   `open` 状态切换并不会重新 mount 本 hook，所以这里只暴露「首次显示」语义；
+  //   如果未来需要「每次展开都触发」，请新建独立 effect 监听 `open` 而非改本处。
+  //
+  // 依赖数组留空也是 #25 的一部分：把 `props.onInit / props.onShow` 放进去会因为
+  // 每次渲染回调引用变化导致重复触发，这正是要避免的副作用风暴。
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     props.onInit?.();
@@ -58,12 +68,26 @@ export const useHistory = (props: HistoryProps) => {
     loadHistory();
   }, [props.sessionId, props.request, loadHistory, setSelectedIds]);
 
-  // 处理加载更多
+  /**
+   * 透传到 `agent.onLoadMore` 的稳定 ref 包装（#30）。
+   *
+   * 之所以不直接把 `props.agent?.onLoadMore` 暴露出去：
+   * - 调用方（HistoryLoadMore 等组件）通常 `React.memo` 包装，需要稳定的引用避免重渲。
+   * - 通过 `useRefFunction` 的稳定 wrapper，每次渲染拿到的引用一致，但内部仍能读到最新的 `props.agent.onLoadMore`。
+   *
+   * 注意：本 wrapper 不做 loading / 防抖 / 错误兜底——这些应由调用方组件按场景决定。
+   */
   const handleLoadMore = useRefFunction(async () => {
     await props.agent?.onLoadMore?.();
   });
 
-  // 处理新对话
+  /**
+   * 透传到 `agent.onNewChat` 的稳定 ref 包装，并在 await 完成后副作用关闭下拉菜单（#30）。
+   *
+   * 关闭 `open` 是有意行为：从用户视角看「点新对话 → 操作完成 → 历史下拉自动收起」是一致的体感。
+   * 如果调用方 reject 或抛错，此处不会关闭菜单——这一点保留给 `useRefFunction` 的默认错误透传，
+   * 调用方可在外层用 try/catch 决定是否回退 UI。
+   */
   const handleNewChat = useRefFunction(async () => {
     await props.agent?.onNewChat?.();
     setOpen(false);

@@ -9,6 +9,7 @@ import React, { useContext } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { getMaskStyle } from '../constants';
+import { useFormatTimeLocale } from '../hooks/useFormatTimeLocale';
 import { useTextOverflow } from '../hooks/useTextOverflow';
 import { useStyle } from '../style';
 import {
@@ -20,10 +21,27 @@ import { formatTime } from '../utils';
 import { HistoryActionsBox } from './HistoryActionsBox';
 import { HistoryRunningIcon } from './HistoryRunningIcon';
 
+// ──────────────────────────────────────────────────────────────────────────
+// 任务状态图标（#26）
+//
+// 这块代码由两个 module-level 常量 + 一个工厂函数协同工作：
+//
+//   TASK_STATUS_ICON       —— 状态枚举到「裸图标」的映射（仅 React Element 本体）
+//   renderTaskStatusIcon() —— 在调用点把图标包到带样式的容器里
+//
+// 设计动机：
+// 1) 之前 `TaskIconMap` 是工厂函数，每次渲染都会重建 3 个 React Element，
+//    破坏 `React.memo` 的引用稳定性，造成下游不必要的 reconcile。
+// 2) 把图标提到 module 级后引用恒定，但容器 className 仍依赖运行时拿到的
+//    `prefixCls + hashId`，无法静态固化——因此用 `renderTaskStatusIcon`
+//    在调用点动态包裹一层 div。
+// 3) 仅 3 个状态有图标 (`success` / `error` / `cancel`)，其它状态走兜底
+//    （HistoryItem 多行模式下回落到 '📄'，单行模式下不展示图标）。
+// ──────────────────────────────────────────────────────────────────────────
+
 /**
  * 任务状态对应的图标（模块级常量，仅创建一次）。
- * 之前 TaskIconMap 是工厂函数，每次渲染都会重建 3 个 React Element，破坏 React.memo 的引用稳定性。
- * 现在仅缓存图标本体，外层 `<div className="-task-icon">` 由调用点按需包裹，避免重复创建。
+ * 仅缓存图标本体，外层 `<div className="-task-icon">` 由调用点按需包裹，避免重复创建。
  */
 const TASK_STATUS_ICON: Partial<Record<TaskStatusEnum, React.ReactNode>> = {
   success: <FileCheckFill />,
@@ -31,7 +49,13 @@ const TASK_STATUS_ICON: Partial<Record<TaskStatusEnum, React.ReactNode>> = {
   cancel: <CloseCircleFill />,
 };
 
-/** 把状态图标包到带样式的容器里，className 由调用点决定 */
+/**
+ * 把状态图标包到带样式的容器里，className 由调用点决定。
+ *
+ * @param status 任务状态；缺失或未在 `TASK_STATUS_ICON` 内的状态返回 `null`
+ *               （由调用点决定是否走 fallback，例如 '📄'）
+ * @param containerClassName 容器 div 的 className，通常为 `taskIconClassName` useMemo 结果
+ */
 const renderTaskStatusIcon = (
   status: TaskStatusEnum | undefined,
   containerClassName: string,
@@ -156,16 +180,7 @@ const HistoryItemSingle = React.memo<HistoryItemProps>(
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('agentic-chat-history-menu');
     const { hashId } = useStyle(prefixCls);
-    const { locale } = React.useContext(I18nContext);
-    // 组装传给 formatTime 的 i18n 文案，优先取 i18n key，缺失时回落到 hard-coded 中文
-    const formatTimeLocale = React.useMemo(
-      () => ({
-        today: locale?.['chat.history.time.today'],
-        yesterday: locale?.['chat.history.time.yesterday'],
-        withinWeek: locale?.['chat.history.time.withinWeek'],
-      }),
-      [locale],
-    );
+    const formatTimeLocale = useFormatTimeLocale();
     // 任务状态图标容器 className：单行模式下也会出现在 isRunning 分支
     const taskIconClassName = React.useMemo(
       () => `${prefixCls}-task-icon ${hashId}`,
@@ -370,16 +385,10 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
     );
     const { textRef, isTextOverflow } = useTextOverflow(displayText);
     const isTask = React.useMemo(() => type === 'task', [type]);
+    const formatTimeLocale = useFormatTimeLocale();
+    // 多行模式下的 description 兜底文案需要读 `task.default` i18n key，
+    // 这里仍需要直接持有 locale；formatTime 相关 i18n 已被 useFormatTimeLocale 收口。
     const { locale } = React.useContext(I18nContext);
-    // 组装传给 formatTime 的 i18n 文案，优先取 i18n key，缺失时回落到 hard-coded 中文
-    const formatTimeLocale = React.useMemo(
-      () => ({
-        today: locale?.['chat.history.time.today'],
-        yesterday: locale?.['chat.history.time.yesterday'],
-        withinWeek: locale?.['chat.history.time.withinWeek'],
-      }),
-      [locale],
-    );
     // 任务状态图标容器 className：在多行模式里被 5 处使用，统一缓存避免重复字符串拼接
     const taskIconClassName = React.useMemo(
       () => `${prefixCls}-task-icon ${hashId}`,

@@ -12,6 +12,7 @@ import {
   HistorySearch,
   generateHistoryItems,
 } from './components';
+import { useFormatTimeLocale } from './hooks/useFormatTimeLocale';
 import { useHistory } from './hooks/useHistory';
 import GroupMenu from './menu';
 import { useStyle } from './style';
@@ -83,15 +84,9 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
   // 聚合 loading 状态：isLoading 是新名字，loading 已废弃但仍兼容；优先取 isLoading
   const mergedLoading = props.isLoading ?? props.loading;
 
-  // generateHistoryItems 是普通函数，无法读 React Context；这里把 i18n 文案打包传入
-  const formatTimeLocale = useMemo(
-    () => ({
-      today: locale?.['chat.history.time.today'],
-      yesterday: locale?.['chat.history.time.yesterday'],
-      withinWeek: locale?.['chat.history.time.withinWeek'],
-    }),
-    [locale],
-  );
+  // generateHistoryItems 是普通函数，无法读 React Context；
+  // 通过 useFormatTimeLocale 拿到稳定的 i18n 文案对象再透传下去
+  const formatTimeLocale = useFormatTimeLocale();
 
   const items = generateHistoryItems({
     filteredList,
