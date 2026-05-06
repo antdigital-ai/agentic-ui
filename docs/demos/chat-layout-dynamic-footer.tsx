@@ -1,6 +1,8 @@
 import { ChatLayout, ChatLayoutRef } from '@ant-design/agentic-ui';
-import { Tag } from 'antd';
+import { Button, Input, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
+
+const { TextArea } = Input;
 
 const MessageList = ({ count }: { count: number }) => (
   <div style={{ padding: 16 }}>
@@ -26,9 +28,6 @@ const DynamicFooterDemo = () => {
   const chatRef = useRef<ChatLayoutRef>(null);
   const [text, setText] = useState('');
 
-  const lineCount = text ? text.split('\n').length : 1;
-  const textareaHeight = Math.min(Math.max(lineCount * 22, 32), 160);
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       {/* 动态高度 footer */}
@@ -53,39 +52,14 @@ const DynamicFooterDemo = () => {
                   background: '#fff',
                 }}
               >
-                <textarea
+                <TextArea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   placeholder="输入多行文本，观察底部高度变化..."
-                  style={{
-                    flex: 1,
-                    resize: 'none',
-                    border: '1px solid #d9d9d9',
-                    borderRadius: 8,
-                    padding: '6px 12px',
-                    fontSize: 14,
-                    lineHeight: '22px',
-                    height: textareaHeight,
-                    outline: 'none',
-                    transition: 'height 0.15s',
-                    fontFamily: 'inherit',
-                  }}
+                  autoSize={{ minRows: 1, maxRows: 6 }}
+                  style={{ flex: 1 }}
                 />
-                <button
-                  style={{
-                    height: 32,
-                    padding: '0 16px',
-                    border: 'none',
-                    borderRadius: 8,
-                    background: '#1677ff',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    fontSize: 14,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  发送
-                </button>
+                <Button type="primary">发送</Button>
               </div>
             }
           >
@@ -127,30 +101,11 @@ const DynamicFooterDemo = () => {
                   提示：footerHeight 仅设置最小高度，实际高度由内容撑开
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <input
+                  <Input
                     placeholder="输入框"
-                    style={{
-                      flex: 1,
-                      border: '1px solid #d9d9d9',
-                      borderRadius: 6,
-                      padding: '4px 12px',
-                      fontSize: 14,
-                      outline: 'none',
-                    }}
+                    style={{ flex: 1 }}
                   />
-                  <button
-                    style={{
-                      padding: '0 16px',
-                      border: 'none',
-                      borderRadius: 6,
-                      background: '#1677ff',
-                      color: '#fff',
-                      cursor: 'pointer',
-                      fontSize: 14,
-                    }}
-                  >
-                    发送
-                  </button>
+                  <Button type="primary">发送</Button>
                 </div>
               </div>
             }

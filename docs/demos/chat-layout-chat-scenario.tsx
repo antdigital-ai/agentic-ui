@@ -1,11 +1,10 @@
 import {
   BubbleList,
   ChatLayout,
-  ChatLayoutRef,
   MessageBubbleData,
 } from '@ant-design/agentic-ui';
 import { Button, Input } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 const assistantAvatar =
   'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original';
@@ -38,7 +37,6 @@ const ChatScenarioDemo = () => {
     useState<MessageBubbleData[]>(INITIAL_MESSAGES);
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
-  const chatRef = useRef<ChatLayoutRef>(null);
 
   const handleSend = () => {
     const text = inputValue.trim();
@@ -55,12 +53,13 @@ const ChatScenarioDemo = () => {
       fileMap: new Map(),
     };
 
+    const nextLength = messages.length + 1;
     setMessages((prev) => [...prev, userMsg]);
     setInputValue('');
     setLoading(true);
 
     setTimeout(() => {
-      const replyIdx = (messages.length / 2) % ASSISTANT_REPLIES.length;
+      const replyIdx = Math.floor(nextLength / 2) % ASSISTANT_REPLIES.length;
       const assistantMsg: MessageBubbleData = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
@@ -79,7 +78,6 @@ const ChatScenarioDemo = () => {
   return (
     <div style={{ height: 560, display: 'flex', flexDirection: 'column' }}>
       <ChatLayout
-        ref={chatRef}
         header={{
           title: 'AI 对话',
           showShare: true,

@@ -1,11 +1,10 @@
 import {
   BubbleList,
   ChatLayout,
-  ChatLayoutRef,
   MessageBubbleData,
 } from '@ant-design/agentic-ui';
 import { Button, Input, Tag } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 const assistantAvatar =
   'https://mdn.alipayobjects.com/huamei_re70wt/afts/img/A*ed7ZTbwtgIQAAAAAQOAAAAgAemuEAQ/original';
@@ -20,10 +19,8 @@ const SUGGESTIONS = [
 ];
 
 const EmptyStateDemo = () => {
-  const chatRef = useRef<ChatLayoutRef>(null);
   const [messages, setMessages] = useState<MessageBubbleData[]>([]);
   const [inputValue, setInputValue] = useState('');
-  const [started, setStarted] = useState(false);
 
   const handleSend = (text?: string) => {
     const content = text || inputValue.trim();
@@ -42,7 +39,6 @@ const EmptyStateDemo = () => {
 
     setMessages((prev) => [...prev, userMsg]);
     setInputValue('');
-    setStarted(true);
 
     setTimeout(() => {
       const assistantMsg: MessageBubbleData = {
@@ -61,7 +57,6 @@ const EmptyStateDemo = () => {
 
   const handleReset = () => {
     setMessages([]);
-    setStarted(false);
     setInputValue('');
   };
 
@@ -74,7 +69,6 @@ const EmptyStateDemo = () => {
         </Tag>
         <div style={{ height: 500, display: 'flex', flexDirection: 'column' }}>
           <ChatLayout
-            ref={chatRef}
             header={{
               title: 'AI 助手',
               showShare: true,
@@ -99,7 +93,7 @@ const EmptyStateDemo = () => {
                 <Button type="primary" onClick={() => handleSend()}>
                   发送
                 </Button>
-                {started && (
+                {messages.length > 0 && (
                   <Button onClick={handleReset}>重置对话</Button>
                 )}
               </div>

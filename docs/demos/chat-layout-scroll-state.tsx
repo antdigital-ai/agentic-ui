@@ -43,10 +43,9 @@ const ScrollStateDemo = () => {
     useState<MessageBubbleData[]>(INITIAL_MESSAGES);
 
   const handleAddMessage = () => {
-    const id = `msg-${Date.now()}`;
     const isAssistant = messages.length % 2 === 0;
     const newMessage: MessageBubbleData = {
-      id,
+      id: `msg-${Date.now()}`,
       role: isAssistant ? 'assistant' : 'user',
       content: isAssistant
         ? '新增的助手消息。如果你停留在底部，内容会自动跟随滚动。'
@@ -64,7 +63,9 @@ const ScrollStateDemo = () => {
   };
 
   return (
-    <div style={{ height: 520, display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{ height: 520, display: 'flex', flexDirection: 'column', position: 'relative' }}
+    >
       <ChatLayout
         ref={chatRef}
         header={{ title: '滚动状态监听' }}
@@ -92,31 +93,26 @@ const ScrollStateDemo = () => {
           onLike={() => {}}
           onDisLike={() => {}}
         />
-
-        {!scrollState.isPinned && (
-          <div
-            style={{
-              position: 'absolute',
-              right: 24,
-              bottom: 80,
-              zIndex: 10,
-            }}
-          >
-            <Button
-              type="primary"
-              shape="circle"
-              size="large"
-              onClick={() => chatRef.current?.scrollToBottom('smooth')}
-              title="回到底部"
-              style={{
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-              }}
-            >
-              ↓
-            </Button>
-          </div>
-        )}
       </ChatLayout>
+
+      {!scrollState.isPinned && (
+        <Button
+          type="primary"
+          shape="circle"
+          size="large"
+          onClick={() => chatRef.current?.scrollToBottom('smooth')}
+          title="回到底部"
+          style={{
+            position: 'absolute',
+            right: 24,
+            bottom: 80,
+            zIndex: 10,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          }}
+        >
+          ↓
+        </Button>
+      )}
 
       <div
         style={{
