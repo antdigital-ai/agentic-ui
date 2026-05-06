@@ -37,9 +37,10 @@ const TitleComponent: React.FC<TitleProps> = ({
   const prefixCls = getPrefixCls('agentic-chatboot-title', customPrefixCls);
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
-  // 使用提前返回优化
+  // wrapSSR 必须在 hooks 之后、early return 之前执行，确保 SSR 场景样式正常注入。
+  // 无内容时返回空片段（仍经过 wrapSSR），避免 SSR 样式丢失。
   if (!title && !subtitle) {
-    return null;
+    return wrapSSR(<></>);
   }
 
   const mainCls = classNames(`${prefixCls}-main`, hashId);

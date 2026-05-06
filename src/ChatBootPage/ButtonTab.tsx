@@ -57,16 +57,8 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
     [disabled, onIconClick],
   );
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (disabled) return;
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        onClick?.();
-      }
-    },
-    [disabled, onClick],
-  );
+  // 注意：原生 <button> 已原生处理 Enter/Space 触发 onClick，
+  // 无需额外 handleKeyDown，避免同一按键触发两次。
 
   const buttonClassName = classNames(
     prefixCls,
@@ -110,7 +102,6 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
       className={buttonClassName}
       data-testid={testId}
       onClick={handleClick}
-      onKeyDown={handleKeyDown}
       disabled={disabled}
       aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : 0}

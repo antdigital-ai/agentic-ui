@@ -7,15 +7,14 @@ import {
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
-      position: 'fixed',
-      bottom: 48,
-      zIndex: 1000,
+      // position:relative，在流内正常占位，由父容器负责整体定位。
+      // 不使用 position:fixed，避免脱离文档流导致隐藏时 presence 高度塌陷。
+      position: 'relative',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       width: 32,
       height: 32,
-      insetInlineEnd: 24,
       color: 'var(--color-gray-text-secondary)',
       fontSize: 16,
       background: 'var(--color-gray-bg-card-white)',
@@ -44,17 +43,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
     },
 
-    // presence wrapper：始终挂载在 DOM（通过 position:fixed 完全脱离文档流），
-    // 只用 opacity + pointer-events 切换显隐，避免挂载/卸载导致文档流重排跳动。
-    // inset:0 配合子元素的 position:fixed 不影响定位；wrapper 本身零尺寸不占空间。
+    // presence wrapper：始终保留在 DOM 中，固定 32×32 尺寸以保持占位空间。
+    // 仅通过 opacity + pointer-events 切换显隐，隐藏时内部按钮不可交互但占位不变。
     [`${token.componentCls}-presence`]: {
-      position: 'fixed',
-      // 零宽高使 wrapper 本身不占视口任何空间，子按钮用独立 fixed 坐标定位
-      width: 0,
-      height: 0,
-      overflow: 'visible',
-      // 优先级足够高，确保在其他 fixed 元素上层
-      zIndex: 1000,
+      width: 32,
+      height: 32,
+      flexShrink: 0,
       transition: 'opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
       '&[data-state="enter"]': {
         opacity: 1,

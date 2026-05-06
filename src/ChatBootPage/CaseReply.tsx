@@ -2,6 +2,7 @@ import { ArrowRight } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useCallback, useContext } from 'react';
+import { useLocale } from '../I18n';
 import { useStyle } from './CaseReplyStyle';
 
 /**
@@ -98,7 +99,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
   quote,
   title,
   description,
-  buttonText = '查看回放',
+  buttonText,
   buttonBar,
   onButtonClick,
   onClick,
@@ -112,6 +113,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
     customPrefixCls,
   );
   const { wrapSSR, hashId } = useStyle(prefixCls);
+  const locale = useLocale();
 
   // P1-1：hover 状态从 React state 改为 CSS :hover 直驱（见 CaseReplyStyle.ts），
   // 这里不再需要 isHovered / mouseEnter / mouseLeave，避免列表场景下的 N 次 rerender。
@@ -146,6 +148,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
     <div
       className={containerCls}
       data-testid={testId}
+      data-clickable={onClick ? 'true' : undefined}
       style={style}
       onClick={onClick}
       onKeyDown={onClick ? handleKeyDown : undefined}
@@ -175,7 +178,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
             放在 <p> 里会触发 React 的 validateDOMNesting 警告（<div> in <p>）。 */}
         {description && <div className={descriptionCls}>{description}</div>}
         {/* buttonBar */}
-        {(buttonBar || buttonText) && (
+        {(buttonBar || buttonText !== undefined || onButtonClick) && (
           <div className={buttonBarCls}>
             {buttonBar || (
               <button
@@ -185,7 +188,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
                   onButtonClick?.(e);
                 }}
               >
-                {buttonText}
+                {buttonText ?? locale['chatBootPage.caseReply.viewReplay']}
                 <span className={arrowIconCls} aria-hidden="true">
                   <ArrowRight />
                 </span>

@@ -102,8 +102,6 @@ const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
           onClick={() => handleTabClick(item.key, item.disabled)}
           onIconClick={item.onIconClick}
           icon={item.icon}
-          // 兼容历史 className：保留 `<group-prefix>-item-disabled` 修饰符以便外部样式钩子
-          className={item.disabled ? `${prefixCls}-item-disabled` : ''}
         >
           {item.label}
         </ButtonTab>

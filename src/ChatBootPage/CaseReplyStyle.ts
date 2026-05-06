@@ -8,22 +8,28 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
       maxWidth: '322px',
-      background: '#fdfdfd',
+      background: token.colorFillQuaternary,
       borderRadius: 'var(--radius-card-base)',
       boxShadow: 'inset 0 0 1px 0 rgba(0, 0, 0, 0.15)',
       position: 'relative',
       overflow: 'hidden',
-      cursor: 'pointer',
+      // cursor 由组件按需注入：有 onClick 时注入 data-clickable="true"
+      cursor: 'default',
       transition: 'all 0.3s ease-in-out',
 
-      '&:hover': {
-        backgroundColor: '#ffffff',
-        boxShadow: '0 2px 12px 0 rgba(0, 0, 0, 0.08)',
-        transform: 'scale(1.02)',
-      },
+      // 可点击态：组件存在 onClick 时注入 data-clickable="true"
+      '&[data-clickable="true"]': {
+        cursor: 'pointer',
 
-      '&:active': {
-        transform: 'scale(0.95)',
+        '&:hover': {
+          backgroundColor: token.colorBgElevated,
+          boxShadow: '0 2px 12px 0 rgba(0, 0, 0, 0.08)',
+          transform: 'scale(1.02)',
+        },
+
+        '&:active': {
+          transform: 'scale(0.95)',
+        },
       },
 
       // cover 区域
@@ -133,8 +139,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
         // buttonBar 内的按钮样式
         '& button': {
-          backgroundColor: '#000000',
-          color: '#ffffff',
+          backgroundColor: token.colorText,
+          color: token.colorBgContainer,
           borderRadius: '36px',
           padding: '8px 16px',
           cursor: 'pointer',

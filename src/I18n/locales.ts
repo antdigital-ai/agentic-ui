@@ -466,6 +466,8 @@ export const cnLabels = {
   shrink: '缩小',
   'skillMode.region': '技能模式',
   'skillMode.close': '关闭技能模式',
+  // ChatBootPage 组件相关
+  'chatBootPage.caseReply.viewReplay': '查看回放',
 };
 
 /**
@@ -948,4 +950,6 @@ export const enLabels: typeof cnLabels = {
   shrink: 'Shrink',
   'skillMode.region': 'Skill mode',
   'skillMode.close': 'Close skill mode',
+  // ChatBootPage component related
+  'chatBootPage.caseReply.viewReplay': 'View Replay',
 };

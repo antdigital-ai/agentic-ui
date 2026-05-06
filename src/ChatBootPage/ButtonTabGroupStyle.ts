@@ -11,12 +11,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       alignItems: 'center',
       gap: '8px',
       padding: '0',
-
-      '&-item-disabled': {
-        opacity: 0.5,
-        cursor: 'not-allowed',
-        pointerEvents: 'none',
-      },
+      // disabled 样式统一由 ButtonTab 自身的 &-disabled 规则负责，此处不重复定义
     },
   };
 };
