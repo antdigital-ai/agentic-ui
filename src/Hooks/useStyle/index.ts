@@ -57,7 +57,10 @@ export function useEditorStyleRegister(
   componentName: string,
   styleFn: (token: ComponentToken) => CSSInterpolation,
 ) {
-  const { token, theme } = antdTheme?.useToken?.() || {};
+  // 直接调用 useToken；用可选链 `antdTheme?.useToken?.()` 会让该 render 跳过 hook 调用，
+  // 下次它存在时又调用，造成 hook 调用顺序变化，违反 Rules of Hooks。
+  // peerDependencies 已约束 antd>=5，useToken 必然存在。
+  const { token, theme } = antdTheme.useToken();
   const chatToken = {
     ...token,
     chatCls: '',
