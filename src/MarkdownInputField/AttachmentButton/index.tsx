@@ -77,24 +77,15 @@ export type AttachmentButtonProps = {
   removeFileOnUploadError?: boolean;
 };
 
-const BUTTON_WITH_TITLE_STYLE: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-};
-
-const BUTTON_TITLE_STYLE: React.CSSProperties = {
-  font: 'var(--font-text-body-base)',
-  letterSpacing: 'var(--letter-spacing-body-base, normal)',
-  color: 'var(--color-gray-text-default)',
-};
-
-const ButtonContent: React.FC<{ title?: React.ReactNode }> = ({ title }) => {
+const ButtonContent: React.FC<{ title?: React.ReactNode; prefixCls: string }> = ({
+  title,
+  prefixCls,
+}) => {
   return (
     <>
       <Paperclip />
       {title !== null && title ? (
-        <div style={BUTTON_TITLE_STYLE}>{title}</div>
+        <span className={`${prefixCls}-title`}>{title}</span>
       ) : null}
     </>
   );
@@ -130,30 +121,33 @@ export const AttachmentButton: React.FC<
 
   const format = supportedFormat || SupportedFileFormats.image;
 
-  const handleClick = () => {
-    if (disabled) return;
-    uploadImage?.();
-  };
-
-  const buttonWithStyle = (
-    <div style={BUTTON_WITH_TITLE_STYLE}>
-      <ButtonContent title={title} />
+  const buttonContent = (
+    <div className={`${prefix}-inner`}>
+      <ButtonContent title={title} prefixCls={prefix} />
     </div>
   );
 
+  const handleWrapperClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (disabled) {
+      // disabled 时拦截所有点击，阻止冒泡至 Popover 内部触发上传
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  };
+
   const wrapper = render ? (
     render({
-      children: buttonWithStyle,
+      children: buttonContent,
       supportedFormat: format,
       locale,
     })
   ) : (
     <AttachmentButtonPopover
       supportedFormat={format}
-      uploadImage={uploadImage}
+      uploadImage={disabled ? undefined : uploadImage}
       locale={locale}
     >
-      {buttonWithStyle}
+      {buttonContent}
     </AttachmentButtonPopover>
   );
 
@@ -162,7 +156,7 @@ export const AttachmentButton: React.FC<
       className={classNames(`${prefix}`, hashId, {
         [`${prefix}-disabled`]: disabled,
       })}
-      onClick={handleClick}
+      onClick={handleWrapperClick}
       data-testid="attachment-button"
     >
       {wrapper}

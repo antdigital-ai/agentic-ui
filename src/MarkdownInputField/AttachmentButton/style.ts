@@ -23,69 +23,19 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&:hover': {
         backgroundColor: 'var(--color-gray-control-fill-hover)',
       },
-      [`${token.componentCls}-file-list`]: {
-        '&-item': {
-          width: '178px',
-          height: '56px',
-          borderRadius: '12px',
-          opacity: 1,
-          background: 'var(--color-gray-bg-card-white)',
-          boxSizing: 'border-box',
-          border: '1px solid var(--color-gray-border-light)',
-          padding: '8px',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          cursor: 'pointer',
-          gap: '8px',
-          position: 'relative',
-          '&-file-icon': {
-            width: '40px',
-            height: '40px',
-          },
-          '&-file-info': {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            '&-file-name': {
-              display: 'flex',
-              width: '112px',
-              '&-text': {
-                maxWidth: '98px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                WebkitLineClamp: 1,
-                height: 22,
-                WebkitBoxOrient: 'vertical',
-              },
-              '&-extension': {
-                color: 'rgba(0, 0, 0, 0.45)',
-              },
-            },
-            '&-file-size': {
-              color: 'var(--color-gray-text-light)',
-              fontSize: '12px',
-            },
-          },
-          '&-close-icon': {
-            width: '16px',
-            height: '16px',
-            opacity: 1,
-            background: 'var(--color-gray-bg-page-dark)',
-            fontSize: 12,
-            position: 'absolute',
-            top: 2,
-            borderRadius: '50%',
-            right: 2,
-            color: 'var(--color-gray-bg-card-white)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            '&:hover': {
-              color: token.colorPrimary,
-            },
-          },
-        },
+      [`${token.componentCls}-inner`]: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: token.marginXXS,
+      },
+      [`${token.componentCls}-title`]: {
+        font: 'var(--font-text-body-base)',
+        letterSpacing: 'var(--letter-spacing-body-base, normal)',
+        color: 'var(--color-gray-text-default)',
+      },
+      [`&${token.componentCls}-disabled`]: {
+        cursor: 'not-allowed',
+        opacity: token.opacityLoading,
       },
     },
   };

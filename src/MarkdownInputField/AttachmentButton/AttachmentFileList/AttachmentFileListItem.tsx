@@ -78,6 +78,29 @@ const FileIcon: React.FC<{
   );
 };
 
+const DoneFileSizeItems: React.FC<{
+  file: AttachmentFile;
+  prefixCls?: string;
+  hashId?: string;
+}> = ({ file, prefixCls, hashId }) => {
+  const fileExtension = getFileExtension(file.name);
+  const fileSize = file.size ? kbToSize(file.size / 1024) : '';
+  const sizeItems = [fileExtension, fileSize].filter(Boolean);
+
+  return (
+    <>
+      {sizeItems.map((item) => (
+        <span
+          key={item}
+          className={classNames(`${prefixCls}-file-size-item`, hashId)}
+        >
+          {item}
+        </span>
+      ))}
+    </>
+  );
+};
+
 const FileSizeInfo: React.FC<{
   file: AttachmentFile;
   prefixCls?: string;
@@ -87,58 +110,37 @@ const FileSizeInfo: React.FC<{
   const status = (file.status || 'done') as FileStatus;
   const baseClassName = classNames(`${prefixCls}-file-size`, hashId);
 
-  const statusContentMap: Record<FileStatus, React.ReactNode> = {
-    uploading: locale?.uploading || '上传中...',
-    pending: locale?.uploading || '上传中...',
-    error: (
-      <div
-        className={classNames(baseClassName, `${prefixCls}-file-size-error`)}
-      >
-        {file.errorMessage || locale?.uploadFailed || '上传失败'}
+  if (status === 'uploading' || status === 'pending') {
+    return <div className={baseClassName}>{locale?.uploading || 'Uploading...'}</div>;
+  }
+
+  if (status === 'error') {
+    return (
+      <div className={classNames(baseClassName, `${prefixCls}-file-size-error`)}>
+        {file.errorMessage || locale?.uploadFailed || 'Upload failed'}
       </div>
-    ),
-    done: (() => {
-      const fileExtension = getFileExtension(file.name);
-      const fileSize = file.size ? kbToSize(file.size / 1024) : '';
-      const sizeItems = [fileExtension, fileSize].filter(Boolean);
+    );
+  }
 
-      return sizeItems.map((item) => (
-        <span
-          key={item}
-          className={classNames(`${prefixCls}-file-size-item`, hashId)}
-        >
-          {item}
-        </span>
-      ));
-    })(),
-  };
-
-  const content = statusContentMap[status];
-
-  return typeof content === 'string' ? (
-    <div className={baseClassName}>{content}</div>
-  ) : (
-    <div className={baseClassName}>{content}</div>
+  return (
+    <div className={baseClassName}>
+      <DoneFileSizeItems file={file} prefixCls={prefixCls} hashId={hashId} />
+    </div>
   );
 };
 
 const DeleteButton: React.FC<{
-  isVisible: boolean;
   onClick: (e: React.MouseEvent) => void;
   prefixCls?: string;
   hashId?: string;
-}> = ({ isVisible, onClick, prefixCls, hashId }) => {
-  if (!isVisible) return null;
-
-  return (
-    <div
-      onClick={onClick}
-      className={classNames(`${prefixCls}-close-icon`, hashId)}
-    >
-      <X role="img" aria-label="X" />
-    </div>
-  );
-};
+}> = ({ onClick, prefixCls, hashId }) => (
+  <div
+    onClick={onClick}
+    className={classNames(`${prefixCls}-close-icon`, hashId)}
+  >
+    <X role="img" aria-label="X" />
+  </div>
+);
 
 export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
   file,
@@ -219,12 +221,13 @@ export const AttachmentFileListItem: React.FC<FileListItemProps> = ({
             locale={locale}
           />
         </div>
-        <DeleteButton
-          isVisible={canDelete}
-          onClick={handleDeleteClick}
-          prefixCls={prefixCls}
-          hashId={hashId}
-        />
+        {canDelete && (
+          <DeleteButton
+            onClick={handleDeleteClick}
+            prefixCls={prefixCls}
+            hashId={hashId}
+          />
+        )}
       </div>
     </Tooltip>
   );

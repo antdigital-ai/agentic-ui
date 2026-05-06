@@ -241,7 +241,6 @@ export const upLoadFileToServer = async (
   // regardless of whether the caller wraps the callback or passes a raw setState directly.
   const notifyChange = (m: Map<string, AttachmentFile>) =>
     props.onFileMapChange?.(new Map(m));
-  const hideLoading = () => {};
 
   const fileList = Array.from(files) as AttachmentFile[];
   fileList.forEach(prepareFile);
@@ -260,7 +259,6 @@ export const upLoadFileToServer = async (
   };
 
   if (isMaxExceeded || isMinNotMet) {
-    hideLoading();
     if (isMaxExceeded) {
       const maxCount = props.maxFileCount!;
       const rawMessage = getLocaleMessage(
@@ -302,7 +300,5 @@ export const upLoadFileToServer = async (
       file.status = 'error';
       updateFileMap(map, file, notifyChange as UploadProps['onFileMapChange']);
     });
-  } finally {
-    hideLoading();
   }
 };

@@ -38,12 +38,12 @@ const CONTENT_STYLE: React.CSSProperties = {
 export const SupportedFileFormats = {
   image: {
     icon: <FileImageOutlined />,
-    type: '图片',
+    type: 'image',
     extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'],
   },
   document: {
     icon: <FileTextFilled />,
-    type: '文档',
+    type: 'document',
     extensions: [
       'pdf',
       'markdown',
@@ -59,17 +59,17 @@ export const SupportedFileFormats = {
   },
   audio: {
     icon: <AudioOutlined />,
-    type: '音频',
+    type: 'audio',
     extensions: ['mp3', 'wav'],
   },
   video: {
     icon: <VideoCameraOutlined />,
-    type: '视频',
+    type: 'video',
     extensions: ['mp4', 'avi', 'mov'],
   },
 };
 
-const DEFAULT_FORMAT_MESSAGE = '支持 ${extensions}等格式。';
+const DEFAULT_FORMAT_MESSAGE = 'Supports ${extensions} formats.';
 
 const buildFormatMessage = (
   format: SupportedFormat,
@@ -180,7 +180,7 @@ export const AttachmentButtonPopover: React.FC<
               icon={<PictureOutlined />}
               onClick={handleOpenGallery}
             >
-              {locale?.['input.openGallery'] || '打开相册'}
+              {locale?.['input.openGallery'] || 'Open Gallery'}
             </Button>
             <Button
               color="default"
@@ -188,7 +188,7 @@ export const AttachmentButtonPopover: React.FC<
               icon={<FolderOpenOutlined />}
               onClick={handleOpenFile}
             >
-              {locale?.['input.openFile'] || '打开文件'}
+              {locale?.['input.openFile'] || 'Open File'}
             </Button>
           </div>
         </Modal>

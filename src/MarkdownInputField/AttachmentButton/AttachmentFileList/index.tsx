@@ -69,15 +69,14 @@ const openFileInNewWindow = (url?: string) => {
 
 const ClearButton: React.FC<{
   visible: boolean;
-  opacity: number;
   onClick?: () => void;
   className: string;
-}> = ({ visible, opacity, onClick, className }) => {
+}> = ({ visible, onClick, className }) => {
   if (!visible) return null;
 
   return (
     <ActionIconBox
-      style={{ transition: CLEAR_BUTTON_TRANSITION, opacity }}
+      style={{ transition: CLEAR_BUTTON_TRANSITION }}
       onClick={onClick}
       className={className}
     >
@@ -105,9 +104,9 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
   const fileCount = fileMap?.size || 0;
   const hasFiles = fileList.length > 0;
   const isAnyUploading = fileList.some((file) => file.status === 'uploading');
-  const canShowClearButton = !isAnyUploading;
+  // 有文件且没有正在上传时才显示清空按钮，避免空列表时透明按钮占用布局空间
+  const canShowClearButton = hasFiles && !isAnyUploading;
   const containerStyle = fileCount ? {} : HIDDEN_STYLE;
-  const clearButtonOpacity = fileCount ? 1 : 0;
 
   // ---- 等价 AnimatePresence：维护"被移除但尚在播放退出动画"的影子项 ----
   // 当外部 fileMap 中的某项被移除时，先在 renderEntries 中标记为 'exit'，
@@ -267,7 +266,6 @@ export const AttachmentFileList: React.FC<AttachmentFileListProps> = ({
       </div>
       <ClearButton
         visible={canShowClearButton}
-        opacity={clearButtonOpacity}
         onClick={onClearFileMap}
         className={classNames(`${prefix}-close-icon`, hashId)}
       />

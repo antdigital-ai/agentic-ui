@@ -40,7 +40,10 @@ const getTooltipProps = (
 };
 
 /**
- * ScrollVisibleButton 组件属性
+ * ScrollVisibleButton 组件公开属性
+ *
+ * `shouldVisible` 是内部实现细节，由 BackTop / BackBottom 负责注入，
+ * 不在公开 API 中暴露。
  */
 export interface ScrollVisibleButtonProps extends Omit<
   React.DOMAttributes<HTMLButtonElement>,
@@ -56,8 +59,6 @@ export interface ScrollVisibleButtonProps extends Omit<
   tooltip?: React.ReactNode | TooltipProps;
   /** 滚动目标元素 */
   target?: () => HTMLElement | Window;
-  /** 按钮显示条件 @default 400 */
-  shouldVisible?: number | UseScrollVisibleProps['shouldVisible'];
   /** 点击回调 */
   onClick?: (
     e: React.MouseEvent<HTMLButtonElement> | undefined,
@@ -69,28 +70,30 @@ export type ScrollVisibleButtonRef = {
   nativeElement: HTMLButtonElement | null;
 };
 
+/** @internal 仅供 BackTop / BackBottom 内部透传 shouldVisible 使用，不对外暴露 */
+type WithShouldVisible = ScrollVisibleButtonProps & {
+  shouldVisible?: number | UseScrollVisibleProps['shouldVisible'];
+};
+
 /**
  * ScrollVisibleButton 组件
  *
- * 根据滚动位置显示/隐藏的按钮，支持平滑动画效果
+ * 根据滚动位置显示/隐藏的按钮，支持平滑动画效果。
+ * 注意：shouldVisible 是内部实现细节，请使用 BackTo.Top / BackTo.Bottom。
  *
  * @example
  * ```tsx
- * <ScrollVisibleButton
- *   tooltip="返回顶部"
- *   shouldVisible={400}
- *   onClick={handleClick}
- * >
- *   <ArrowUpIcon />
- * </ScrollVisibleButton>
+ * <BackTo.Top tooltip="返回顶部" />
+ * <BackTo.Bottom tooltip="去底部" />
  * ```
  */
 export const ScrollVisibleButton = forwardRef<
   ScrollVisibleButtonRef,
   ScrollVisibleButtonProps
 >(
-  (
-    {
+  (props, ref) => {
+    // shouldVisible 是内部 prop，不在公开类型中暴露，通过内部类型读取
+    const {
       className,
       style,
       shouldVisible: propsShouldVisible = DEFAULT_VISIBLE_THRESHOLD,
@@ -100,9 +103,7 @@ export const ScrollVisibleButton = forwardRef<
       children,
       'data-testid': dataTestId,
       ...rest
-    },
-    ref,
-  ) => {
+    } = props as WithShouldVisible;
     const context = useContext(ConfigProvider.ConfigContext);
     const baseCls = context?.getPrefixCls(prefixCls);
     const { wrapSSR, hashId } = useStyle(baseCls);

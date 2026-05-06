@@ -183,13 +183,13 @@ export const useFileUploadManager = ({
     input.multiple = attachment?.allowMultiple ?? true;
     input.style.display = 'none';
 
-    input.onchange = async (e: any) => {
+    input.onchange = async (e: Event) => {
       if (input.dataset.readonly) {
         return;
       }
       input.dataset.readonly = 'true';
       try {
-        const selectedFiles = e.target.files;
+        const selectedFiles = (e.target as HTMLInputElement).files;
         if (!selectedFiles || selectedFiles.length === 0) {
           return;
         }
