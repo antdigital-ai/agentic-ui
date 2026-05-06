@@ -1,107 +1,40 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { HistoryProps } from '../types';
-import { HistoryDataType } from '../types/HistoryData';
+import { useHistoryData } from './useHistoryData';
+import { useHistorySearch } from './useHistorySearch';
+import { useHistorySelection } from './useHistorySelection';
 
 /**
- * 根据关键词从列表中过滤
- */
-function filterListByKeyword(
-  list: HistoryDataType[],
-  keyword: string,
-): HistoryDataType[] {
-  if (!keyword.trim()) return list;
-  const lower = keyword.toLowerCase();
-  return list.filter((item) => {
-    const title =
-      typeof item.sessionTitle === 'string'
-        ? item.sessionTitle
-        : String(item.sessionTitle || '');
-    return title.toLowerCase().includes(lower);
-  });
-}
-
-/**
- * 浅比较两个历史列表是否在「展示语义」上完全一致。
+ * 历史记录状态管理 Hook（顶层组装层）。
  *
- * 用于 loadHistory 后判断是否真的需要 setChatList：
- * 当 actionRef.reload() 拉到的新列表与现有列表内容相同（同 sessionId / gmtCreate / 收藏态）时，
- * 跳过 setState 即可保留 chatList 的引用稳定性，避免下游 useMemo / React.memo 大面积失效，
- * GroupMenu 不必白白重渲一遍。
+ * 内部由 3 个职责单一的 sub-hook 组合而成：
+ * - {@link useHistoryData}：列表数据加载、收藏修改、actionRef 暴露
+ * - {@link useHistorySelection}：多选状态管理
+ * - {@link useHistorySearch}：搜索关键词与过滤后列表
  *
- * 注意：故意只比较少量「会影响渲染」的字段，而不是 deep equal —— 整体 deep equal 在长列表下成本过高，
- * 收益却很小（同一 sessionId 的 displayTitle 等字段更新本来就该触发 re-render）。
- */
-function isHistoryListVisuallyEqual(
-  prev: HistoryDataType[],
-  next: HistoryDataType[],
-): boolean {
-  if (prev === next) return true;
-  if (prev.length !== next.length) return false;
-  for (let i = 0; i < prev.length; i += 1) {
-    const a = prev[i];
-    const b = next[i];
-    if (
-      a.sessionId !== b.sessionId ||
-      a.gmtCreate !== b.gmtCreate ||
-      a.isFavorite !== b.isFavorite ||
-      a.sessionTitle !== b.sessionTitle ||
-      a.status !== b.status
-    ) {
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
- * 历史记录状态管理 Hook
+ * useHistory 自身只做：
+ * 1. 组装上述 sub-hook 的返回值，对外暴露稳定的扁平 API
+ * 2. 持有真正跨 hook 的协调状态（如 `open` 菜单开关）
+ * 3. 处理跨 hook 的副作用（如 sessionId 变化时初始化 selectedIds 并触发 reload）
+ *
+ * **公共签名（返回字段）保持向后兼容**，调用方无需感知内部已拆分。
  */
 export const useHistory = (props: HistoryProps) => {
   const [open, setOpen] = useState(false);
-  // 直接使用 state 管理列表，避免 ref + 哨兵 state 的反模式：
-  // 之前用 chatListRef + listVersion 是为了「绕过 useMemo 依赖检查」，但 ref 改动并不会驱动子组件重渲染，
-  // 实际渲染依赖的依然是 setListVersion。改为真正的 state 后，依赖关系显式且可被 lint 校验。
-  const [chatList, setChatList] = useState<HistoryDataType[]>([]);
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  const filteredList = useMemo(
-    () => filterListByKeyword(chatList, searchKeyword),
-    [chatList, searchKeyword],
+  // ---- 数据层 ----
+  const { chatList, loadHistory, handleFavorite } = useHistoryData(props);
+
+  // ---- 多选层 ----
+  const { selectedIds, setSelectedIds, handleSelectionChange } =
+    useHistorySelection(props);
+
+  // ---- 搜索层（依赖 chatList）----
+  const { searchKeyword, filteredList, handleSearch } = useHistorySearch(
+    props,
+    chatList,
   );
-
-  const loadHistory = useRefFunction(async () => {
-    // 防御 props.request 为 undefined：之前 `props?.request?.(...).then(...)` 在 request 缺失时会
-    // 对 undefined 调用 .then 抛 TypeError，再被 `as HistoryDataType[]` 强行掩盖。
-    if (!props.request) return;
-    try {
-      const list = await props.request({ agentId: props.agentId });
-      const safeList = Array.isArray(list) ? list : [];
-      // referential equality 优化：当新列表在展示语义上与旧列表完全一致时，
-      // 用函数式 setState 返回旧引用，让 React 的 bail-out 跳过下游所有重渲。
-      // 之前每次 reload 都无脑 setChatList(list)，会让 GroupMenu / useMemo 全量失效。
-      setChatList((prev) =>
-        isHistoryListVisuallyEqual(prev, safeList) ? prev : safeList,
-      );
-    } catch (error) {
-      // 失败时回退为空列表，并把错误打到控制台，避免在 React 树中抛出未捕获 Promise。
-      // 不直接 throw，保证 actionRef.reload() 调用方不需要也包 try/catch。
-      // 同样用函数式 setState 走 bail-out，避免空 → 空也触发重渲。
-      // eslint-disable-next-line no-console
-      console.error('[History] loadHistory failed:', error);
-      setChatList((prev) => (prev.length === 0 ? prev : []));
-    }
-  });
-
-  // 暴露 reload 方法给 actionRef
-  useEffect(() => {
-    if (props.actionRef) {
-      props.actionRef.current = {
-        reload: loadHistory,
-      };
-    }
-  }, [props.actionRef, loadHistory]);
 
   // 仅在挂载时触发 onInit / onShow，故意不把它们放进依赖数组：
   // 这两个回调表达「组件首次出现」的语义，重复触发会破坏调用方的副作用。
@@ -111,44 +44,19 @@ export const useHistory = (props: HistoryProps) => {
     props.onShow?.();
   }, []);
 
-  // 当 sessionId 或 request 改变时重新加载数据
+  // 跨 hook 协调：sessionId / request 改变时重新加载数据 + 重置多选。
+  //
+  // 语义说明（#22）：当外部 `sessionId` 改变（例如父组件切换会话），
+  // 此处会把 `selectedIds` **整段覆盖** 为 `[新 sessionId]`，意图是
+  // 「以"当前会话即默认选中"为出发点重置选择面板」。
+  // 因此一旦 sessionId 在多选进行中发生变化，正在进行的多选会被覆盖丢弃 —
+  // 这是有意行为而非 bug。如未来需要保留多选，请显式在新建状态机里处理。
   useEffect(() => {
     if (props.sessionId) {
       setSelectedIds([props.sessionId]);
     }
     loadHistory();
-  }, [props.sessionId, props.request, loadHistory]);
-
-  // 处理收藏
-  const handleFavorite = useRefFunction(
-    async (sessionId: string, isFavorite: boolean) => {
-      await props.agent?.onFavorite?.(sessionId, isFavorite);
-      setChatList((prev) =>
-        prev.map((item) =>
-          item.sessionId === sessionId ? { ...item, isFavorite } : item,
-        ),
-      );
-    },
-  );
-
-  // 处理多选 —— 用函数式 setState 避免闭包陈旧
-  const handleSelectionChange = useRefFunction(
-    (sessionId: string, checked: boolean) => {
-      setSelectedIds((prev) => {
-        const next = checked
-          ? [...prev, sessionId]
-          : prev.filter((id) => id !== sessionId);
-        props.agent?.onSelectionChange?.(next);
-        return next;
-      });
-    },
-  );
-
-  // 处理搜索
-  const handleSearch = useRefFunction((value: string) => {
-    setSearchKeyword(value);
-    props.agent?.onSearch?.(value);
-  });
+  }, [props.sessionId, props.request, loadHistory, setSelectedIds]);
 
   // 处理加载更多
   const handleLoadMore = useRefFunction(async () => {

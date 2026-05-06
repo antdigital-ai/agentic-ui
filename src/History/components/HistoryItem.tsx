@@ -43,19 +43,39 @@ const renderTaskStatusIcon = (
 };
 
 /**
- * 检查自定义操作区域是否有效
- * @param extra - 自定义操作区域内容
- * @returns 是否应该渲染自定义操作区域
+ * 判断单个 ReactNode 是否「足够实质化」，需要渲染。
+ * 仅检查叶子节点，不递归数组。
+ */
+const isLeafNodeValid = (node: React.ReactNode): boolean => {
+  if (!node) return false;
+  if (React.isValidElement(node)) return true;
+  if (typeof node === 'string' && node.trim()) return true;
+  return false;
+};
+
+/**
+ * 检查自定义操作区域是否有效。
+ *
+ * 之前实现用「递归 + Array.some」处理嵌套数组，最坏情况 O(n) 递归调用栈，
+ * 在大型 children 数组下既有性能开销也有可读性问题。
+ * 现在改成显式 stack 迭代平展，规避递归 + 提前 return：
+ * 只要发现一个有效叶子节点即可立即返回 true，不必遍历完整个树。
  */
 const isValidCustomOperation = (extra: React.ReactNode): boolean => {
-  if (!extra) return false;
-  if (React.isValidElement(extra)) return true;
-  if (typeof extra === 'string' && extra.trim()) return true;
-  if (
-    Array.isArray(extra) &&
-    extra.some((item) => isValidCustomOperation(item))
-  )
-    return true;
+  // 单值直接走叶子判断
+  if (!Array.isArray(extra)) return isLeafNodeValid(extra);
+
+  // 数组情况：迭代式深度优先扫描，遇到第一个有效叶子立即返回
+  const stack: React.ReactNode[] = [...extra];
+  while (stack.length > 0) {
+    const cur = stack.pop();
+    if (Array.isArray(cur)) {
+      // 嵌套数组继续展开（在 React.ReactNode 类型里数组可以嵌套）
+      stack.push(...cur);
+      continue;
+    }
+    if (isLeafNodeValid(cur)) return true;
+  }
   return false;
 };
 
@@ -146,6 +166,11 @@ const HistoryItemSingle = React.memo<HistoryItemProps>(
       }),
       [locale],
     );
+    // 任务状态图标容器 className：单行模式下也会出现在 isRunning 分支
+    const taskIconClassName = React.useMemo(
+      () => `${prefixCls}-task-icon ${hashId}`,
+      [prefixCls, hashId],
+    );
     const displayText = React.useMemo(
       () => item.displayTitle || item.sessionTitle,
       [item.displayTitle, item.sessionTitle],
@@ -206,6 +231,7 @@ const HistoryItemSingle = React.memo<HistoryItemProps>(
 
         {isRunning && (
           <div
+            className={taskIconClassName}
             style={{
               flexShrink: 0,
               display: 'flex',
@@ -354,6 +380,11 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
       }),
       [locale],
     );
+    // 任务状态图标容器 className：在多行模式里被 5 处使用，统一缓存避免重复字符串拼接
+    const taskIconClassName = React.useMemo(
+      () => `${prefixCls}-task-icon ${hashId}`,
+      [prefixCls, hashId],
+    );
     const shouldShowIcon = React.useMemo(
       () => isTask && (!!item.icon || TaskStatusData.includes(item.status!)),
       [isTask, item.icon, item.status],
@@ -433,7 +464,7 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
             }}
           >
             {isRunning ? (
-              <div className={`${prefixCls}-task-icon ${hashId}`}>
+              <div className={taskIconClassName}>
                 <HistoryRunningIcon
                   width={16}
                   height={16}
@@ -445,20 +476,14 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
             ) : React.isValidElement(item.icon) ? (
               item.icon
             ) : item.icon ? (
-              <div className={`${prefixCls}-task-icon ${hashId}`}>
+              <div className={taskIconClassName}>
                 {item.icon ||
                   (isTask
-                    ? renderTaskStatusIcon(
-                        item.status,
-                        `${prefixCls}-task-icon ${hashId}`,
-                      )
+                    ? renderTaskStatusIcon(item.status, taskIconClassName)
                     : '📄')}
               </div>
             ) : (
-              renderTaskStatusIcon(
-                item.status,
-                `${prefixCls}-task-icon ${hashId}`,
-              )
+              renderTaskStatusIcon(item.status, taskIconClassName)
             )}
           </div>
         )}

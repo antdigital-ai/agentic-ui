@@ -82,12 +82,23 @@ export const generateHistoryItems = ({
     },
   );
 
-  const groupMaxTimes = Object.fromEntries(
-    Object.entries(groupList).map(([key, list]) => [
-      key,
-      Math.max(...list.map((item) => getItemTimestamp(item))),
-    ]),
-  );
+  // 计算每个分组的最大时间戳，用于跨分组排序。
+  // 之前实现是 `Object.fromEntries(... Math.max(...list.map(...)))`：
+  // 1) `list.map` 拷贝出一份新数组
+  // 2) `Math.max(...spread)` 在 V8 里会把每个元素当独立参数压栈，长 list 下有栈帧消耗
+  // 3) `Object.entries` + `Object.fromEntries` 又转两次 — 总共 O(3n)
+  // 改成一次 reduce + 内部 for 循环，单遍 O(n) 不分配中间数组。
+  const groupMaxTimes: Record<string, number> = {};
+  for (const key in groupList) {
+    if (!Object.prototype.hasOwnProperty.call(groupList, key)) continue;
+    const list = groupList[key];
+    let max = 0;
+    for (let i = 0; i < list.length; i += 1) {
+      const t = getItemTimestamp(list[i]);
+      if (t > max) max = t;
+    }
+    groupMaxTimes[key] = max;
+  }
 
   // 按照时间顺序对分组进行排序：今日 > 昨日 > 一周内 > 其他
   const sortedGroupKeys = Object.keys(groupList).sort(
