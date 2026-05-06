@@ -1,4 +1,3 @@
-import '@testing-library/jest-dom/vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
@@ -75,10 +74,7 @@ describe('AgenticLayout', () => {
   it('applies custom style', () => {
     const customStyle = { backgroundColor: 'blue' };
     const { container } = render(
-      <AgenticLayout
-        center={<div>Center content</div>}
-        style={customStyle}
-      />,
+      <AgenticLayout center={<div>Center content</div>} style={customStyle} />,
     );
 
     expect(container.firstChild).toHaveStyle(
@@ -830,6 +826,104 @@ describe('AgenticLayout', () => {
         'ant-agentic-layout-sidebar-left-collapsed',
       );
       expect(leftSidebar.nextElementSibling).toBe(main);
+    });
+  });
+
+  describe('rightWidth prop', () => {
+    // 这一组用例锚定「外部 rightWidth prop 的下限」与「拖拽手柄下限」的拆分：
+    // - 外部 prop（含初始化与 rerender）应完全尊重用户传入值，仅夹视口最大限制；
+    // - 拖拽 / 键盘交互仍受 MIN_RIGHT_WIDTH=400 约束，避免用户手抖把右栏拖没。
+
+    it('respects rightWidth values smaller than MIN_RIGHT_WIDTH on initial render', () => {
+      // 历史 bug：rightWidth=200 会被 clampRightWidth 夹到 400，导致 prop 不生效。
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 1600,
+      });
+
+      const { container } = render(
+        <AgenticLayout
+          center={<div>Center content</div>}
+          right={<div>Right content</div>}
+          rightWidth={200}
+        />,
+      );
+
+      const rightSidebar = container.querySelector(
+        '.ant-agentic-layout-sidebar-right',
+      ) as HTMLElement;
+      expect(rightSidebar.style.width).toBe('200px');
+    });
+
+    it('respects rightWidth values smaller than MIN_RIGHT_WIDTH after rerender', () => {
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 1600,
+      });
+
+      const { rerender, container } = render(
+        <AgenticLayout
+          center={<div>Center content</div>}
+          right={<div>Right content</div>}
+          rightWidth={500}
+        />,
+      );
+
+      const rightSidebar = container.querySelector(
+        '.ant-agentic-layout-sidebar-right',
+      ) as HTMLElement;
+      expect(rightSidebar.style.width).toBe('500px');
+
+      rerender(
+        <AgenticLayout
+          center={<div>Center content</div>}
+          right={<div>Right content</div>}
+          rightWidth={240}
+        />,
+      );
+
+      // 切到比 MIN_RIGHT_WIDTH 还小的值，外部 prop 同样应被尊重。
+      expect(rightSidebar.style.width).toBe('240px');
+    });
+
+    it('still clamps drag interactions to MIN_RIGHT_WIDTH (400)', () => {
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 1600,
+      });
+
+      const { container } = render(
+        <AgenticLayout
+          center={<div>Center content</div>}
+          right={<div>Right content</div>}
+          rightWidth={500}
+        />,
+      );
+
+      const resizeHandle = container.querySelector(
+        '.ant-agentic-layout-resize-handle-right',
+      ) as HTMLElement;
+      const rightSidebar = container.querySelector(
+        '.ant-agentic-layout-sidebar-right',
+      ) as HTMLElement;
+
+      // 模拟向右拖拽 1000px（即缩小右栏 1000px：500 - 1000 = -500，应被夹到 400）。
+      act(() => {
+        fireEvent.mouseDown(resizeHandle, { clientX: 100 });
+      });
+      act(() => {
+        document.dispatchEvent(
+          new MouseEvent('mousemove', { clientX: 1100, bubbles: true }),
+        );
+      });
+      act(() => {
+        document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+      });
+
+      expect(rightSidebar.style.width).toBe('400px');
     });
   });
 });

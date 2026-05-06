@@ -126,7 +126,7 @@ const WorkspacePanel = () => (
 
 const SidebarDemo = () => {
   const [leftWidth, setLeftWidth] = useState(200);
-  const [rightWidth, setRightWidth] = useState(240);
+  const [rightWidth, setRightWidth] = useState(320);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -158,7 +158,7 @@ const SidebarDemo = () => {
       >
         <Tag color="purple">rightWidth</Tag>
         <Segmented
-          options={[200, 280, 360, 440]}
+          options={[240, 320, 400, 480]}
           value={rightWidth}
           onChange={(v) => setRightWidth(v as number)}
         />

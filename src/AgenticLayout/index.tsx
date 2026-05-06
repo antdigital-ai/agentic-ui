@@ -110,9 +110,22 @@ const computeMaxRightWidth = (): number => {
   return window.innerWidth * MAX_RIGHT_WIDTH_RATIO;
 };
 
-/** 把宽度夹到 [MIN_RIGHT_WIDTH, maxWidth] 区间。 */
+/**
+ * 把宽度夹到 [MIN_RIGHT_WIDTH, maxWidth] 区间。
+ * 仅用于「拖拽 / 键盘交互」：保留下限避免用户手抖把右栏拖没。
+ */
 const clampRightWidth = (next: number, maxWidth: number): number =>
   Math.max(MIN_RIGHT_WIDTH, Math.min(next, maxWidth));
+
+/**
+ * 仅夹上限，不约束下限（仍兜底防止负数）。
+ * 用于「外部 rightWidth prop / 初始化 / props 同步 / 视口 resize」：
+ * 这些场景应完全尊重外部传入值，仅防止超过视口允许的最大宽度。
+ * 若也套用 MIN_RIGHT_WIDTH 会导致 `rightWidth={200}` 这类 prop 被默默夹回 400，
+ * 表现为「rightWidth 不生效」。
+ */
+const clampRightWidthMaxOnly = (next: number, maxWidth: number): number =>
+  Math.max(0, Math.min(next, maxWidth));
 
 const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
   left,
@@ -138,8 +151,9 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
 
   // 右侧边栏宽度状态
   // 使用 lazy initializer 在首屏阶段就执行 clamp，避免「初值超出 maxWidth → 渲染 → 再 clamp」造成的两帧布局抖动。
+  // 这里走 maxOnly 版本：完全尊重外部 rightWidth prop，不强制套用 MIN_RIGHT_WIDTH。
   const [currentRightWidth, setCurrentRightWidth] = useState<number>(() =>
-    clampRightWidth(rightWidth, computeMaxRightWidth()),
+    clampRightWidthMaxOnly(rightWidth, computeMaxRightWidth()),
   );
   const isResizingRef = useRef(false);
   const resizeStartX = useRef<number>(0);
@@ -149,8 +163,11 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
   const getMaxRightWidth = useCallback(() => computeMaxRightWidth(), []);
 
   // 当 rightWidth prop 变化时同步状态，并在同一时刻 clamp 防止越界。
+  // 同样走 maxOnly：尊重外部 prop，不强制套用 MIN_RIGHT_WIDTH。
   useEffect(() => {
-    setCurrentRightWidth(clampRightWidth(rightWidth, computeMaxRightWidth()));
+    setCurrentRightWidth(
+      clampRightWidthMaxOnly(rightWidth, computeMaxRightWidth()),
+    );
   }, [rightWidth]);
 
   // 监听窗口大小变化，确保右侧边栏宽度不超过最大限制

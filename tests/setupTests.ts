@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { MotionGlobalConfig } from 'framer-motion';
 import { JSDOM } from 'jsdom';
 import MockDate from 'mockdate';
