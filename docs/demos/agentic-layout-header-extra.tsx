@@ -2,6 +2,33 @@ import { AgenticLayout, ChatLayout } from '@ant-design/agentic-ui';
 import { Badge, Button, Space, Tag } from 'antd';
 import React from 'react';
 
+const HistoryPanel = () => (
+  <div style={{ padding: '12px 8px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+    {['对话记录 A', '对话记录 B', '对话记录 C', '对话记录 D'].map((text, i) => (
+      <div
+        key={i}
+        style={{
+          padding: '8px 10px',
+          borderRadius: 6,
+          fontSize: 13,
+          cursor: 'pointer',
+          background:
+            i === 0
+              ? 'var(--ant-color-bg-text-hover, rgba(0,0,0,0.04))'
+              : 'transparent',
+          color:
+            i === 0
+              ? 'var(--ant-color-text, rgba(0,0,0,88))'
+              : 'var(--ant-color-text-secondary, rgba(0,0,0,65))',
+          fontWeight: i === 0 ? 500 : 400,
+        }}
+      >
+        {text}
+      </div>
+    ))}
+  </div>
+);
+
 const CenterContent = () => (
   <ChatLayout>
     <div style={{ padding: '16px 24px' }}>
@@ -26,18 +53,36 @@ const CenterContent = () => (
   </ChatLayout>
 );
 
-const SidebarPanel = ({ label }: { label: string }) => (
-  <div
-    style={{
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: 14,
-      color: 'var(--ant-color-text-secondary, #555)',
-    }}
-  >
-    {label}
+const WorkspacePanel = () => (
+  <div style={{ padding: '12px 8px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    {[
+      { label: '实时跟随', status: '运行中' },
+      { label: '任务列表', status: '3/5' },
+      { label: '文件管理', status: '6 个文件' },
+    ].map((item, i) => (
+      <div
+        key={i}
+        style={{
+          padding: '10px 12px',
+          borderRadius: 6,
+          background: 'var(--ant-color-bg-text-hover, rgba(0,0,0,0.04))',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: 13,
+        }}
+      >
+        <span style={{ color: 'var(--ant-color-text, rgba(0,0,0,88))' }}>
+          {item.label}
+        </span>
+        <Tag
+          color={i === 0 ? 'processing' : 'default'}
+          style={{ margin: 0, fontSize: 11 }}
+        >
+          {item.status}
+        </Tag>
+      </div>
+    ))}
   </div>
 );
 
@@ -113,9 +158,9 @@ const HeaderExtraDemo = () => (
       >
         <AgenticLayout
           style={{ height: '100%', minHeight: 0 }}
-          left={<SidebarPanel label="历史记录" />}
+          left={<HistoryPanel />}
           center={<CenterContent />}
-          right={<SidebarPanel label="工作区" />}
+          right={<WorkspacePanel />}
           header={{
             title: '工作台',
             leftCollapsible: true,

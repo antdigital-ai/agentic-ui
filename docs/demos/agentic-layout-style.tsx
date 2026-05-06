@@ -5,18 +5,30 @@ import React, { useState } from 'react';
 // 通过外部 style 控制根容器 minHeight，AgenticLayout 不再内置 minHeight prop。
 // 这里演示如何借助 style.minHeight 实现等价能力。
 
-const SidebarPanel = ({ label }: { label: string }) => (
-  <div
-    style={{
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: 14,
-      color: 'var(--ant-color-text-secondary, #555)',
-    }}
-  >
-    {label}
+const HistoryPanel = () => (
+  <div style={{ padding: '12px 8px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+    {['对话记录 A', '对话记录 B', '对话记录 C', '对话记录 D'].map((text, i) => (
+      <div
+        key={i}
+        style={{
+          padding: '8px 10px',
+          borderRadius: 6,
+          fontSize: 13,
+          cursor: 'pointer',
+          background:
+            i === 0
+              ? 'var(--ant-color-bg-text-hover, rgba(0,0,0,0.04))'
+              : 'transparent',
+          color:
+            i === 0
+              ? 'var(--ant-color-text, rgba(0,0,0,88))'
+              : 'var(--ant-color-text-secondary, rgba(0,0,0,65))',
+          fontWeight: i === 0 ? 500 : 400,
+        }}
+      >
+        {text}
+      </div>
+    ))}
   </div>
 );
 
@@ -42,6 +54,39 @@ const CenterContent = () => (
       ))}
     </div>
   </ChatLayout>
+);
+
+const WorkspacePanel = () => (
+  <div style={{ padding: '12px 8px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    {[
+      { label: '实时跟随', status: '运行中' },
+      { label: '任务列表', status: '3/5' },
+      { label: '文件管理', status: '6 个文件' },
+    ].map((item, i) => (
+      <div
+        key={i}
+        style={{
+          padding: '10px 12px',
+          borderRadius: 6,
+          background: 'var(--ant-color-bg-text-hover, rgba(0,0,0,0.04))',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: 13,
+        }}
+      >
+        <span style={{ color: 'var(--ant-color-text, rgba(0,0,0,88))' }}>
+          {item.label}
+        </span>
+        <Tag
+          color={i === 0 ? 'processing' : 'default'}
+          style={{ margin: 0, fontSize: 11 }}
+        >
+          {item.status}
+        </Tag>
+      </div>
+    ))}
+  </div>
 );
 
 const StyleDemo = () => {
@@ -81,9 +126,9 @@ const StyleDemo = () => {
         >
           <AgenticLayout
             style={{ height: '100%', minHeight }}
-            left={<SidebarPanel label="左侧" />}
+            left={<HistoryPanel />}
             center={<CenterContent />}
-            right={<SidebarPanel label="右侧" />}
+            right={<WorkspacePanel />}
             header={{
               title: 'minHeight 演示',
               leftCollapsible: true,
@@ -139,9 +184,9 @@ const StyleDemo = () => {
           <AgenticLayout
             style={{ height: '100%', minHeight: 0 }}
             rightWidth={280}
-            left={<SidebarPanel label="历史记录" />}
+            left={<HistoryPanel />}
             center={<CenterContent />}
-            right={<SidebarPanel label="工作区（可拖拽调整宽度）" />}
+            right={<WorkspacePanel />}
             header={{
               title: '拖拽调整右侧宽度',
               leftCollapsible: true,
