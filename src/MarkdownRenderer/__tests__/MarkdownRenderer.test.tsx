@@ -258,12 +258,16 @@ describe('MarkdownRenderer', () => {
     expect(container.querySelector('h3')?.textContent).toBe('H3');
   });
 
-  it('应渲染代码块', () => {
+  it('应渲染代码块', async () => {
     const { container } = render(
       <MarkdownRenderer content={'```js\nconst x = 1;\n```'} />,
     );
 
-    // 代码块应使用 CodeContainer（data-be="code"）
+    // 代码块走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
     expect(container.querySelector('[data-be="code"]')).toBeTruthy();
     expect(
       container.querySelector('[data-testid="code-toolbar"]'),
@@ -376,7 +380,7 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('最终回答');
   });
 
-  it('应将 HTML 注释 + 表格组合渲染为图表', () => {
+  it('应将 HTML 注释 + 表格组合渲染为图表', async () => {
     const content = [
       '<!-- [{"chartType":"line","title":"趋势","x":"month","y":"value"}] -->',
       '',
@@ -387,6 +391,11 @@ describe('MarkdownRenderer', () => {
     ].join('\n');
 
     const { container } = render(<MarkdownRenderer content={content} />);
+
+    // ChartBlockRenderer 走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
 
     const chartEl = container.querySelector('[data-be="chart"]');
     expect(chartEl).toBeTruthy();
@@ -440,7 +449,7 @@ describe('MarkdownRenderer', () => {
     expect(img?.getAttribute('alt')).toBe('alt text');
   });
 
-  it('应将 schema 代码块渲染为 SchemaRenderer', () => {
+  it('应将 schema 代码块渲染为 SchemaRenderer', async () => {
     const schemaJson = JSON.stringify({
       type: 'object',
       properties: { name: { type: 'string' } },
@@ -448,6 +457,11 @@ describe('MarkdownRenderer', () => {
     const { container } = render(
       <MarkdownRenderer content={'```schema\n' + schemaJson + '\n```'} />,
     );
+
+    // SchemaBlockRenderer 走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
 
     const schemaEl = container.querySelector('[data-testid="schema-renderer"]');
     expect(schemaEl).toBeTruthy();
@@ -497,7 +511,7 @@ describe('MarkdownRenderer', () => {
     expect(customEl?.textContent).toContain('Custom: form');
   });
 
-  it('应将 agentic-ui-task 代码块渲染为 TaskList', () => {
+  it('应将 agentic-ui-task 代码块渲染为 TaskList', async () => {
     const json = JSON.stringify({
       items: [
         {
@@ -512,6 +526,11 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer content={'```agentic-ui-task\n' + json + '\n```'} />,
     );
 
+    // AgenticUiTaskBlockRenderer 走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
     expect(
       container.querySelector('[data-testid="agentic-ui-task-block"]'),
     ).toBeTruthy();
@@ -520,7 +539,7 @@ describe('MarkdownRenderer', () => {
     ).toBeTruthy();
   });
 
-  it('应将 agentic-ui-toolusebar 代码块渲染为 ToolUseBar', () => {
+  it('应将 agentic-ui-toolusebar 代码块渲染为 ToolUseBar', async () => {
     const json = JSON.stringify({
       tools: [
         {
@@ -536,6 +555,11 @@ describe('MarkdownRenderer', () => {
         content={'```agentic-ui-toolusebar\n' + json + '\n```'}
       />,
     );
+
+    // AgenticUiToolUseBarBlockRenderer 走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
 
     expect(
       container.querySelector('[data-testid="agentic-ui-toolusebar-block"]'),
@@ -559,7 +583,7 @@ describe('MarkdownRenderer', () => {
     expect(container.querySelector('[data-testid="ToolUse"]')).toBeTruthy();
   });
 
-  it('应将 agentic-ui-filemap 代码块渲染为 FileMapView', () => {
+  it('应将 agentic-ui-filemap 代码块渲染为 FileMapView', async () => {
     const json = JSON.stringify({
       fileList: [
         {
@@ -581,6 +605,11 @@ describe('MarkdownRenderer', () => {
     const { container } = render(
       <MarkdownRenderer content={'```agentic-ui-filemap\n' + json + '\n```'} />,
     );
+
+    // AgenticUiFileMapBlockRenderer 走 React.lazy，等 Suspense 解析完成后再断言
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
 
     expect(
       container.querySelector('[data-testid="agentic-ui-filemap-block"]'),

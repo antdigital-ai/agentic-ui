@@ -155,7 +155,7 @@ describe('renderMarkdownBlock', () => {
     expect(result).not.toBeNull();
   });
 
-  it('returns null on parse error', () => {
+  it('falls back to a <pre> error element on parse error', () => {
     const badProcessor = {
       parse: () => {
         throw new Error('parse error');
@@ -163,7 +163,13 @@ describe('renderMarkdownBlock', () => {
       runSync: () => ({}),
     } as any;
     const result = renderMarkdownBlock('test', badProcessor, {});
-    expect(result).toBeNull();
+    // 解析失败时返回兜底 <pre> 元素（带 data-testid），保留原文以避免内容静默丢失
+    expect(React.isValidElement(result)).toBe(true);
+    expect((result as React.ReactElement).type).toBe('pre');
+    expect(
+      (result as React.ReactElement).props['data-testid'],
+    ).toBe('markdown-block-error-fallback');
+    expect((result as React.ReactElement).props.children).toBe('test');
   });
 });
 
