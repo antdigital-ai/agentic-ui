@@ -200,4 +200,8 @@ export const ChatLayout = memo(ChatLayoutComponent);
 // 保持向后兼容，导出 ChatFlowHeader 作为 LayoutHeader 的别名
 export { LayoutHeader as ChatFlowHeader } from '../Components/LayoutHeader';
 export type { LayoutHeaderProps as ChatFlowHeaderProps } from '../Components/LayoutHeader';
-export type { ChatLayoutProps, ChatLayoutRef } from './types';
+export type {
+  ChatLayoutProps,
+  ChatLayoutRef,
+  ChatLayoutScrollState,
+} from './types';

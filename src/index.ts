@@ -140,6 +140,7 @@ export {
   type ChatFlowHeaderProps,
   type ChatLayoutProps,
   type ChatLayoutRef,
+  type ChatLayoutScrollState,
 } from './ChatLayout';
 
 // ─── 思维链 / 工具调用 ──────────────────────────────────────────────────────

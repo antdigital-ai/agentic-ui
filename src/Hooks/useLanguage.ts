@@ -47,7 +47,9 @@ export function useLanguage() {
   const context = useContext(I18nContext);
 
   if (!context) {
-    throw new Error('useLanguage must be used within I18nProvide');
+    throw new Error(
+      '[useLanguage] called outside <I18nProvide /> — wrap your tree with the provider before using this hook',
+    );
   }
 
   const { language, locale, setLanguage } = context;

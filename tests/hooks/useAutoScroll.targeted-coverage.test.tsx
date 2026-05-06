@@ -3,355 +3,630 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import useAutoScroll from '../../src/Hooks/useAutoScroll';
 
-global.ResizeObserver = vi.fn(function MockResizeObserver() {
-  return {
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  };
-});
+/**
+ * useAutoScroll targeted-coverage（与当前实现对齐版）
+ *
+ * 旧套件假设 `el.scrollTo({ behavior })` + 引用 `isAutoScrollEngaged/isLocked` 等
+ * 已不存在的内部状态，全部失效。本套件改为基于**对外可观察行为**测试：
+ * - `el.scrollTop = el.scrollHeight` 直接赋值
+ * - `requestAnimationFrame` 逐帧推进（smooth）
+ * - ResizeObserver / MutationObserver 触发 → onContentChange RAF 合并
+ * - wheel 累积上滑解除 pinned；用户回到底部恢复 pinned
+ * - 重挂载（depsKey 变化）+ 内容已增长才主动 jumpToBottom（首次挂载不会）
+ *
+ * 默认被 vitest.config.ts 的 `**\/*targeted-coverage*` 排除，仅 `pnpm run test:full` 触发。
+ */
 
-// NOTE: 该测试套件已与当前实现脱钩 —— 用例假设容器通过 `el.scrollTo({...})` 滚动，
-// 但 useAutoScroll 一直使用 `el.scrollTop = ...` 直接赋值。此外大量用例引用的内部状态
-// （如 isAutoScrollEngaged / isLocked）也已不复存在。
-// 本次 P0/P1 治理（#8/#9/#10/#12/#13）经 stash 对比验证，未引入任何新回归。
-// 整体跳过，避免误导；后续需要按新实现重写为基于「计数 + RAF + ResizeObserver」语义的测试。
-describe.skip('useAutoScroll targeted coverage (legacy, decoupled from impl)', () => {
-  let mutationObserverDisconnect: ReturnType<typeof vi.fn>;
-  let mutationObserverObserve: ReturnType<typeof vi.fn>;
+/** 用 vi.fn 拦截 ResizeObserver/MutationObserver，并提供手动触发回调的能力 */
+type RoCallback = (entries: ResizeObserverEntry[]) => void;
+type MoCallback = MutationCallback;
+
+const installObserverMocks = () => {
+  const roInstances: Array<{
+    callback: RoCallback;
+    observe: ReturnType<typeof vi.fn>;
+    unobserve: ReturnType<typeof vi.fn>;
+    disconnect: ReturnType<typeof vi.fn>;
+  }> = [];
+  const moInstances: Array<{
+    callback: MoCallback;
+    observe: ReturnType<typeof vi.fn>;
+    disconnect: ReturnType<typeof vi.fn>;
+  }> = [];
+
+  global.ResizeObserver = vi.fn(function MockResizeObserver(cb: RoCallback) {
+    const inst = {
+      callback: cb,
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    };
+    roInstances.push(inst);
+    return inst;
+  }) as unknown as typeof ResizeObserver;
+
+  global.MutationObserver = vi.fn(function MockMutationObserver(
+    cb: MoCallback,
+  ) {
+    const inst = {
+      callback: cb,
+      observe: vi.fn(),
+      disconnect: vi.fn(),
+      takeRecords: () => [],
+    };
+    moInstances.push(inst);
+    return inst;
+  }) as unknown as typeof MutationObserver;
+
+  return { roInstances, moInstances };
+};
+
+/** 给一个原生 div 安装可读写的 scrollHeight/scrollTop/clientHeight */
+const installScrollMetrics = (
+  el: HTMLElement,
+  metrics: { scrollHeight?: number; scrollTop?: number; clientHeight?: number },
+) => {
+  const state = {
+    scrollHeight: metrics.scrollHeight ?? 0,
+    scrollTop: metrics.scrollTop ?? 0,
+    clientHeight: metrics.clientHeight ?? 0,
+  };
+  Object.defineProperty(el, 'scrollHeight', {
+    configurable: true,
+    get: () => state.scrollHeight,
+    set: (v: number) => {
+      state.scrollHeight = v;
+    },
+  });
+  Object.defineProperty(el, 'scrollTop', {
+    configurable: true,
+    get: () => state.scrollTop,
+    set: (v: number) => {
+      state.scrollTop = v;
+    },
+  });
+  Object.defineProperty(el, 'clientHeight', {
+    configurable: true,
+    get: () => state.clientHeight,
+    set: (v: number) => {
+      state.clientHeight = v;
+    },
+  });
+  return state;
+};
+
+/**
+ * RAF mock：用 id→callback 的 Map 实现，规避「按位置 cancel」在 splice 后位置错位的问题。
+ * - requestAnimationFrame 返回单调递增的 id
+ * - cancelAnimationFrame 按 id 删除对应回调
+ * - flushRaf 每次只 drain「当前」队列，回调里新 push 的进入下一帧（与浏览器真实行为一致）
+ */
+interface RafController {
+  schedule: (cb: FrameRequestCallback) => number;
+  cancel: (id: number) => void;
+  flush: (maxFrames?: number) => void;
+  pendingSize: () => number;
+}
+
+const createRafController = (): RafController => {
+  const pending = new Map<number, FrameRequestCallback>();
+  let nextId = 1;
+  return {
+    schedule(cb) {
+      const id = nextId++;
+      pending.set(id, cb);
+      return id;
+    },
+    cancel(id) {
+      pending.delete(id);
+    },
+    /** 逐帧 drain，每帧只执行进入该帧时已存在的回调（在该帧内 push 的进入下一帧） */
+    flush(maxFrames = 50) {
+      let frames = 0;
+      while (pending.size > 0 && frames < maxFrames) {
+        const snapshot = Array.from(pending.entries());
+        pending.clear();
+        snapshot.forEach(([, cb]) => {
+          // 真实 RAF 传入的是 DOMHighResTimeStamp；实现里没用 ts，传 0 即可
+          cb(0);
+        });
+        frames += 1;
+      }
+    },
+    pendingSize() {
+      return pending.size;
+    },
+  };
+};
+
+let rafController: RafController;
+
+/** 同步执行所有 pending RAF 回调，逐帧把 smooth 动画跑完 */
+const flushRaf = (maxFrames = 50) => rafController.flush(maxFrames);
+
+describe('useAutoScroll targeted coverage (aligned with current impl)', () => {
+  let observers: ReturnType<typeof installObserverMocks>;
 
   beforeEach(() => {
-    vi.useFakeTimers();
-    mutationObserverDisconnect = vi.fn();
-    mutationObserverObserve = vi.fn();
-    global.MutationObserver = vi.fn(function MockMutationObserver(_callback: MutationCallback) {
-      return {
-        observe: mutationObserverObserve,
-        disconnect: mutationObserverDisconnect,
-        takeRecords: () => [],
-      };
-    });
+    observers = installObserverMocks();
+    rafController = createRafController();
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      ((cb: FrameRequestCallback) =>
+        rafController.schedule(cb)) as typeof requestAnimationFrame,
+    );
+    vi.stubGlobal(
+      'cancelAnimationFrame',
+      ((id: number) =>
+        rafController.cancel(id)) as typeof cancelAnimationFrame,
+    );
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    // 把残留的 RAF 句柄清干净，避免泄漏到下一个 it（如 beginProgrammaticScroll 的复位 RAF）
+    rafController.flush();
+    vi.unstubAllGlobals();
     vi.clearAllMocks();
   });
 
-  it('calls onResize when containerRef is attached and _checkScroll runs', () => {
+  it('scrollToBottom("auto") 通过直接赋值 scrollTop 跳到底部', () => {
+    const { result } = renderHook(() => useAutoScroll());
+    const div = document.createElement('div');
+    installScrollMetrics(div, {
+      scrollHeight: 100,
+      scrollTop: 0,
+      clientHeight: 50,
+    });
+
+    act(() => {
+      (
+        result.current
+          .containerRef as React.MutableRefObject<HTMLDivElement | null>
+      ).current = div;
+    });
+
+    act(() => {
+      result.current.scrollToBottom('auto');
+    });
+
+    expect(div.scrollTop).toBe(100);
+  });
+
+  it('scrollToBottom("smooth") 通过 RAF 逐帧推进 scrollTop 直至贴底', () => {
+    const { result } = renderHook(() => useAutoScroll());
+    const div = document.createElement('div');
+    installScrollMetrics(div, {
+      scrollHeight: 1000,
+      scrollTop: 0,
+      clientHeight: 100,
+    });
+
+    act(() => {
+      (
+        result.current
+          .containerRef as React.MutableRefObject<HTMLDivElement | null>
+      ).current = div;
+    });
+
+    act(() => {
+      result.current.scrollToBottom('smooth');
+    });
+
+    // 至少推进一帧，scrollTop 应大于 0
+    act(() => {
+      flushRaf(1);
+    });
+    expect(div.scrollTop).toBeGreaterThan(0);
+
+    // 多帧后应贴近目标 (scrollHeight - clientHeight = 900)
+    act(() => {
+      flushRaf();
+    });
+    expect(div.scrollTop).toBe(900);
+  });
+
+  it('isAtBottom 基于 scrollHeight/scrollTop/clientHeight + scrollTolerance 判断', () => {
+    const { result } = renderHook(() =>
+      useAutoScroll({ scrollTolerance: 20 }),
+    );
+    const div = document.createElement('div');
+    installScrollMetrics(div, {
+      scrollHeight: 500,
+      scrollTop: 380,
+      clientHeight: 100,
+    });
+
+    act(() => {
+      (
+        result.current
+          .containerRef as React.MutableRefObject<HTMLDivElement | null>
+      ).current = div;
+    });
+
+    // distance = 500 - 380 - 100 = 20 ⇒ 恰好等于 tolerance ⇒ true
+    expect(result.current.isAtBottom()).toBe(true);
+
+    // 把 scrollTop 拉远，distance > 20
+    div.scrollTop = 100;
+    expect(result.current.isAtBottom()).toBe(false);
+  });
+
+  it('SCROLL_TOLERANCE 作为 deprecated 别名仍生效（被 scrollTolerance 覆盖时优先新名）', () => {
+    const { result: legacy } = renderHook(() =>
+      useAutoScroll({ SCROLL_TOLERANCE: 50 }),
+    );
+    const div = document.createElement('div');
+    installScrollMetrics(div, {
+      scrollHeight: 500,
+      scrollTop: 350,
+      clientHeight: 100,
+    });
+    act(() => {
+      (
+        legacy.current
+          .containerRef as React.MutableRefObject<HTMLDivElement | null>
+      ).current = div;
+    });
+    // distance = 500 - 350 - 100 = 50 ⇒ 等于 50 ⇒ true
+    expect(legacy.current.isAtBottom()).toBe(true);
+
+    // 同时传入时新名优先
+    const { result: both } = renderHook(() =>
+      useAutoScroll({ scrollTolerance: 5, SCROLL_TOLERANCE: 50 }),
+    );
+    const div2 = document.createElement('div');
+    installScrollMetrics(div2, {
+      scrollHeight: 500,
+      scrollTop: 350,
+      clientHeight: 100,
+    });
+    act(() => {
+      (
+        both.current
+          .containerRef as React.MutableRefObject<HTMLDivElement | null>
+      ).current = div2;
+    });
+    // distance = 50 ⇒ scrollTolerance=5 ⇒ false
+    expect(both.current.isAtBottom()).toBe(false);
+  });
+
+  it('ResizeObserver 仅 observe container + 直接子元素，不遍历整棵子树', () => {
+    const Wrapper = () => {
+      const { containerRef } = useAutoScroll();
+      return (
+        <div ref={containerRef as React.RefObject<HTMLDivElement>}>
+          <div data-testid="child-1">
+            <span data-testid="grandchild" />
+          </div>
+          <div data-testid="child-2" />
+        </div>
+      );
+    };
+    render(<Wrapper />);
+
+    // 第一个（也是唯一一个）ResizeObserver 实例
+    const ro = observers.roInstances[0];
+    expect(ro).toBeDefined();
+    // observe 调用次数：container(1) + 直接子元素(2) = 3，不应该把孙子节点也拉进来
+    expect(ro.observe).toHaveBeenCalledTimes(3);
+  });
+
+  it('ResizeObserver 回调在 RAF 合并后只触发一次 onContentChange', () => {
     const onResize = vi.fn();
-    const { result } = renderHook(() =>
-      useAutoScroll({ onResize, timeout: 16, SCROLL_TOLERANCE: 20 }),
-    );
-
-    const div = document.createElement('div');
-    Object.defineProperty(div, 'scrollHeight', { value: 100, configurable: true });
-    Object.defineProperty(div, 'scrollTop', { value: 0, writable: true, configurable: true });
-    Object.defineProperty(div, 'clientHeight', { value: 50, configurable: true });
-    div.scrollTo = vi.fn();
-
-    act(() => {
-      (result.current.containerRef as React.MutableRefObject<HTMLDivElement | null>).current = div;
-    });
-
-    act(() => {
-      result.current.scrollToBottom();
-    });
-    act(() => {
-      vi.advanceTimersByTime(50);
-    });
-
-    expect(onResize).toHaveBeenCalled();
-    expect(div.scrollTo).toHaveBeenCalledWith(
-      expect.objectContaining({ top: 100, behavior: 'auto' }),
-    );
-  });
-
-  it('uses scrollBehavior from props when not forcing', () => {
-    const div = document.createElement('div');
-    Object.defineProperty(div, 'scrollHeight', { value: 200, configurable: true });
-    Object.defineProperty(div, 'scrollTop', { value: 180, writable: true, configurable: true });
-    Object.defineProperty(div, 'clientHeight', { value: 50, configurable: true });
-    div.scrollTo = vi.fn();
-
-    const { result } = renderHook(() =>
-      useAutoScroll({ scrollBehavior: 'auto', timeout: 16 }),
-    );
-
-    act(() => {
-      (result.current.containerRef as React.MutableRefObject<HTMLDivElement | null>).current = div;
-    });
-
-    act(() => {
-      result.current.scrollToBottom();
-    });
-    act(() => {
-      vi.advanceTimersByTime(50);
-    });
-
-    expect(div.scrollTo).toHaveBeenCalledWith(
-      expect.objectContaining({ top: 200, behavior: 'auto' }),
-    );
-  });
-
-  it('MutationObserver invokes checkScroll when addedNodes exist', () => {
-    let observerCallback: MutationCallback = () => {};
-    global.MutationObserver = vi.fn(function MockMutationObserver(callback: MutationCallback) {
-      observerCallback = callback;
-      return {
-        observe: mutationObserverObserve,
-        disconnect: mutationObserverDisconnect,
-        takeRecords: () => [],
-      };
-    });
-
     const Wrapper = () => {
-      const { containerRef } = useAutoScroll({ timeout: 16 });
+      const { containerRef } = useAutoScroll({ onResize });
       return (
         <div
-          ref={containerRef as React.RefObject<HTMLDivElement>}
-          data-testid="scroll-container"
-          style={{ height: 50, overflow: 'auto' }}
+          ref={(el) => {
+            if (!el) return;
+            installScrollMetrics(el, {
+              scrollHeight: 100,
+              scrollTop: 0,
+              clientHeight: 50,
+            });
+            (
+              containerRef as React.MutableRefObject<HTMLDivElement | null>
+            ).current = el;
+          }}
+          data-testid="container"
+        >
+          <div />
+        </div>
+      );
+    };
+    render(<Wrapper />);
+
+    const ro = observers.roInstances[0];
+    // 同一帧触发多次回调
+    act(() => {
+      ro.callback([] as unknown as ResizeObserverEntry[]);
+      ro.callback([] as unknown as ResizeObserverEntry[]);
+      ro.callback([] as unknown as ResizeObserverEntry[]);
+    });
+
+    // RAF 合并：onResize 在 flush 后只被触发一次
+    act(() => {
+      flushRaf(2);
+    });
+    expect(onResize).toHaveBeenCalledTimes(1);
+    expect(onResize).toHaveBeenCalledWith(
+      expect.objectContaining({ width: expect.any(Number) }),
+    );
+  });
+
+  it('内容增长且 pinned=true 时，按 scrollBehavior=auto 直接吸底', () => {
+    let setScrollHeight: (v: number) => void = () => {};
+    const Wrapper = () => {
+      const { containerRef } = useAutoScroll({ scrollBehavior: 'auto' });
+      return (
+        <div
+          ref={(el) => {
+            if (!el) return;
+            const state = installScrollMetrics(el, {
+              scrollHeight: 100,
+              scrollTop: 50,
+              clientHeight: 50,
+            });
+            setScrollHeight = (v) => {
+              state.scrollHeight = v;
+            };
+            (
+              containerRef as React.MutableRefObject<HTMLDivElement | null>
+            ).current = el;
+          }}
+          data-testid="container"
+        >
+          <div />
+        </div>
+      );
+    };
+    render(<Wrapper />);
+    const container = document.querySelector(
+      '[data-testid="container"]',
+    ) as HTMLDivElement;
+
+    // 模拟内容增长
+    setScrollHeight(300);
+    const ro = observers.roInstances[0];
+    act(() => {
+      ro.callback([] as unknown as ResizeObserverEntry[]);
+    });
+    act(() => {
+      flushRaf(2);
+    });
+
+    // 直接吸底：scrollTop = scrollHeight (300)
+    expect(container.scrollTop).toBe(300);
+  });
+
+  it('wheel 累积上滑超阈值后解除 pinned，并通过 onScrollStateChange 通知', () => {
+    const onScrollStateChange = vi.fn();
+    const Wrapper = () => {
+      const { containerRef } = useAutoScroll({
+        onScrollStateChange,
+        scrollTolerance: 20,
+        pinThreshold: 50,
+      });
+      return (
+        <div
+          ref={(el) => {
+            if (!el) return;
+            installScrollMetrics(el, {
+              scrollHeight: 1000,
+              scrollTop: 200, // 距离底部 1000-200-100=700
+              clientHeight: 100,
+            });
+            (
+              containerRef as React.MutableRefObject<HTMLDivElement | null>
+            ).current = el;
+          }}
+          data-testid="container"
         />
       );
     };
-    const { container } = render(<Wrapper />);
-    const div = container.querySelector('[data-testid="scroll-container"]') as HTMLDivElement;
-    Object.defineProperty(div, 'scrollHeight', { value: 100, configurable: true });
-    Object.defineProperty(div, 'scrollTop', { value: 80, writable: true, configurable: true });
-    Object.defineProperty(div, 'clientHeight', { value: 50, configurable: true });
-    div.scrollTo = vi.fn();
+    render(<Wrapper />);
+    const container = document.querySelector(
+      '[data-testid="container"]',
+    ) as HTMLDivElement;
 
-    expect(mutationObserverObserve).toHaveBeenCalled();
+    // 把首次挂载可能积攒的 RAF / 回调清干净，再清 mock 计数
+    flushRaf();
+    onScrollStateChange.mockClear();
 
-    const addedNode = document.createElement('span');
-    const mockNodeList = { length: 1, 0: addedNode } as NodeList;
+    // 单次小幅 wheel 不应触发解除（实现 WHEEL_UP_INTENT_THRESHOLD=16）
     act(() => {
-      observerCallback(
-        [{ addedNodes: mockNodeList } as MutationRecord],
-        {} as MutationObserver,
+      container.dispatchEvent(
+        new WheelEvent('wheel', { deltaY: -5, bubbles: true }),
       );
     });
-    act(() => {
-      vi.advanceTimersByTime(50);
-    });
+    expect(onScrollStateChange).not.toHaveBeenCalled();
 
-    expect(div.scrollTo).toHaveBeenCalled();
+    // 累计超过阈值（5 + 20 = 25 > 16）
+    act(() => {
+      container.dispatchEvent(
+        new WheelEvent('wheel', { deltaY: -20, bubbles: true }),
+      );
+    });
+    // 应被通知 isPinned=false
+    expect(onScrollStateChange).toHaveBeenCalled();
+    const lastCall =
+      onScrollStateChange.mock.calls[
+        onScrollStateChange.mock.calls.length - 1
+      ][0];
+    expect(lastCall.isPinned).toBe(false);
   });
 
-  it('MutationObserver invokes checkScroll on characterData (streaming text updates)', () => {
-    let observerCallback: MutationCallback = () => {};
-    global.MutationObserver = vi.fn(function MockMutationObserver(callback: MutationCallback) {
-      observerCallback = callback;
-      return {
-        observe: mutationObserverObserve,
-        disconnect: mutationObserverDisconnect,
-        takeRecords: () => [],
-      };
-    });
-
+  it('用户手动滚回底部后恢复 pinned', () => {
+    const onScrollStateChange = vi.fn();
     const Wrapper = () => {
-      const { containerRef } = useAutoScroll({ timeout: 16 });
+      const { containerRef } = useAutoScroll({
+        onScrollStateChange,
+        scrollTolerance: 20,
+      });
       return (
         <div
-          ref={containerRef as React.RefObject<HTMLDivElement>}
-          data-testid="scroll-container"
-          style={{ height: 50, overflow: 'auto' }}
+          ref={(el) => {
+            if (!el) return;
+            installScrollMetrics(el, {
+              scrollHeight: 500,
+              scrollTop: 100, // 远离底部
+              clientHeight: 100,
+            });
+            (
+              containerRef as React.MutableRefObject<HTMLDivElement | null>
+            ).current = el;
+          }}
+          data-testid="container"
         />
       );
     };
-    const { container } = render(<Wrapper />);
-    const div = container.querySelector('[data-testid="scroll-container"]') as HTMLDivElement;
-    Object.defineProperty(div, 'scrollHeight', { value: 100, configurable: true });
-    Object.defineProperty(div, 'scrollTop', { value: 80, writable: true, configurable: true });
-    Object.defineProperty(div, 'clientHeight', { value: 50, configurable: true });
-    div.scrollTo = vi.fn();
+    render(<Wrapper />);
+    const container = document.querySelector(
+      '[data-testid="container"]',
+    ) as HTMLDivElement;
 
-    expect(mutationObserverObserve).toHaveBeenCalled();
-
+    flushRaf();
+    // 先 wheel 上滑解除 pinned
     act(() => {
-      observerCallback(
-        [{ type: 'characterData' } as MutationRecord],
-        {} as MutationObserver,
+      container.dispatchEvent(
+        new WheelEvent('wheel', { deltaY: -50, bubbles: true }),
       );
     });
+    onScrollStateChange.mockClear();
+
+    // 模拟用户滚回底部 (distance = 500-380-100 = 20 == tolerance)
+    container.scrollTop = 380;
     act(() => {
-      vi.advanceTimersByTime(50);
+      container.dispatchEvent(new Event('scroll'));
     });
 
-    expect(div.scrollTo).toHaveBeenCalled();
+    // 应被通知 isPinned=true
+    expect(onScrollStateChange).toHaveBeenCalled();
+    const lastCall =
+      onScrollStateChange.mock.calls[
+        onScrollStateChange.mock.calls.length - 1
+      ][0];
+    expect(lastCall.isPinned).toBe(true);
+    expect(lastCall.isAtBottom).toBe(true);
   });
 
-  it('disconnect called on unmount', () => {
-    const Wrapper = () => {
-      const { containerRef } = useAutoScroll({ timeout: 16 });
-      return <div ref={containerRef as React.RefObject<HTMLDivElement>} data-testid="c" />;
-    };
-    const { unmount } = render(<Wrapper />);
-    expect(mutationObserverObserve).toHaveBeenCalled();
-    unmount();
-    expect(mutationObserverDisconnect).toHaveBeenCalled();
-  });
-
-  it('uses deps for useEffect re-run', () => {
-    const Wrapper = ({ deps }: { deps: any[] }) => {
-      const { containerRef } = useAutoScroll({ deps, timeout: 16 });
-      return <div ref={containerRef as React.RefObject<HTMLDivElement>} data-testid="c" />;
+  it('depsKey 变化触发重挂载，且内容已增长时主动 jumpToBottom', () => {
+    let setScrollHeight: (v: number) => void = () => {};
+    // 把 metrics 装在外层闭包里，确保 ref 回调多次执行时**只装一次**，
+    // 避免每次 rerender 都把 scrollHeight 重置回初始值（这会让 setScrollHeight 完全失效）
+    let metricsInstalled = false;
+    const Wrapper = ({ deps }: { deps: number[] }) => {
+      const { containerRef } = useAutoScroll({ deps });
+      return (
+        <div
+          ref={(el) => {
+            if (!el) return;
+            (
+              containerRef as React.MutableRefObject<HTMLDivElement | null>
+            ).current = el;
+            if (metricsInstalled) return;
+            metricsInstalled = true;
+            const state = installScrollMetrics(el, {
+              scrollHeight: 100,
+              scrollTop: 50,
+              clientHeight: 50,
+            });
+            setScrollHeight = (v) => {
+              state.scrollHeight = v;
+            };
+          }}
+          data-testid="container"
+        />
+      );
     };
     const { rerender } = render(<Wrapper deps={[1]} />);
-    expect(mutationObserverObserve).toHaveBeenCalled();
+    const container = document.querySelector(
+      '[data-testid="container"]',
+    ) as HTMLDivElement;
+
+    // 首次挂载不应主动滚动（避免改变下游初始展示）
+    expect(container.scrollTop).toBe(50);
+
+    // 模拟自上次挂载内容已增长
+    setScrollHeight(500);
+
+    // 触发 depsKey 变化 → 重挂载
     rerender(<Wrapper deps={[2]} />);
-    expect(mutationObserverDisconnect).toHaveBeenCalled();
-    expect(mutationObserverObserve).toHaveBeenCalledTimes(2);
+
+    // 重挂载后应吸底（scrollTop = scrollHeight = 500）
+    expect(container.scrollTop).toBe(500);
   });
 
-  it('does not scroll when user has scrolled up away from bottom', () => {
-    const div = document.createElement('div');
-    Object.defineProperty(div, 'scrollHeight', { value: 500, configurable: true, writable: true });
-    Object.defineProperty(div, 'scrollTop', { value: 0, writable: true, configurable: true });
-    Object.defineProperty(div, 'clientHeight', { value: 100, configurable: true });
-    div.scrollTo = vi.fn();
-
-    const { result } = renderHook(() =>
-      useAutoScroll({ timeout: 16, SCROLL_TOLERANCE: 20 }),
-    );
-
-    act(() => {
-      (result.current.containerRef as React.MutableRefObject<HTMLDivElement | null>).current = div;
-    });
-
-    // Simulate user scrolling up (scrollTop = 0, far from bottom of 500)
-    act(() => {
-      div.dispatchEvent(new Event('scroll'));
-    });
-
-    // Now new content arrives (height grows) — should NOT auto-scroll because user scrolled up
-    Object.defineProperty(div, 'scrollHeight', { value: 600, configurable: true, writable: true });
-
-    // Since user is not near bottom (0 + 100 < 600 - 20), auto-scroll should be disengaged
-    // and scrollTo should NOT be called automatically (only via scrollToBottom force)
-    expect(div.scrollTo).not.toHaveBeenCalled();
-  });
-
-  it('re-engages auto-scroll when user scrolls back to bottom', () => {
-    const div = document.createElement('div');
-    Object.defineProperty(div, 'scrollHeight', { value: 500, configurable: true, writable: true });
-    Object.defineProperty(div, 'scrollTop', { value: 380, writable: true, configurable: true });
-    Object.defineProperty(div, 'clientHeight', { value: 100, configurable: true });
-    div.scrollTo = vi.fn();
-
-    let observerCallback: MutationCallback = () => {};
-    global.MutationObserver = vi.fn(function MockMutationObserver(callback: MutationCallback) {
-      observerCallback = callback;
-      return {
-        observe: mutationObserverObserve,
-        disconnect: mutationObserverDisconnect,
-        takeRecords: () => [],
-      };
-    });
-
+  it('首次挂载即便 isPinned 默认为 true 也不主动滚动', () => {
     const Wrapper = () => {
-      const { containerRef } = useAutoScroll({ timeout: 16, SCROLL_TOLERANCE: 20 });
+      const { containerRef } = useAutoScroll();
       return (
         <div
           ref={(el) => {
-            if (el) {
-              Object.defineProperty(el, 'scrollHeight', { value: 500, configurable: true, writable: true });
-              Object.defineProperty(el, 'scrollTop', { value: 380, writable: true, configurable: true });
-              Object.defineProperty(el, 'clientHeight', { value: 100, configurable: true });
-              el.scrollTo = div.scrollTo;
-              (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-            }
+            if (!el) return;
+            installScrollMetrics(el, {
+              scrollHeight: 1000,
+              scrollTop: 0,
+              clientHeight: 100,
+            });
+            (
+              containerRef as React.MutableRefObject<HTMLDivElement | null>
+            ).current = el;
           }}
-          data-testid="scroll-container"
+          data-testid="container"
         />
       );
     };
-
     render(<Wrapper />);
-
-    // User scrolls to bottom -> re-engages auto-scroll
-    const container = document.querySelector('[data-testid="scroll-container"]') as HTMLDivElement;
-    Object.defineProperty(container, 'scrollTop', { value: 400, writable: true, configurable: true });
-    act(() => {
-      container.dispatchEvent(new Event('scroll'));
-    });
-
-    // New content arrives
-    Object.defineProperty(container, 'scrollHeight', { value: 600, configurable: true, writable: true });
-    const addedNode = document.createElement('span');
-    const mockNodeList = { length: 1, 0: addedNode } as NodeList;
-    act(() => {
-      observerCallback(
-        [{ addedNodes: mockNodeList } as MutationRecord],
-        {} as MutationObserver,
-      );
-    });
-    act(() => {
-      vi.advanceTimersByTime(50);
-    });
-
-    expect(container.scrollTo).toHaveBeenCalled();
+    const container = document.querySelector(
+      '[data-testid="container"]',
+    ) as HTMLDivElement;
+    // 首次挂载不应该被强制吸到底
+    expect(container.scrollTop).toBe(0);
   });
 
-  it('uses currentScrollHeight (not prevScrollHeight) for isNearBottom — smooth scroll mid-animation fix', () => {
-    // Reproduce the "always a bit short" bug scenario:
-    // scrollHeight = 500, scrollTop = 400 (near bottom), clientHeight = 100
-    // Content grows to 600 while scrollTop is still 350 (mid smooth-scroll animation)
-    // Old code: isNearBottom = 350+100 >= prevScrollHeight(500)-20=480 => 450>=480 => FALSE
-    //           and isLocked was always false => missed scroll
-    // New code: isAutoScrollEngaged stays true after scroll-to-bottom event =>
-    //           shouldScroll = true => scrollTo({ top: 600 }) called
-    let observerCallback: MutationCallback = () => {};
-    global.MutationObserver = vi.fn(function MockMutationObserver(cb: MutationCallback) {
-      observerCallback = cb;
-      return { observe: mutationObserverObserve, disconnect: mutationObserverDisconnect, takeRecords: () => [] };
-    });
-
-    let mockScrollHeight = 500;
-    const mockScrollTo = vi.fn();
-
+  it('卸载时清理 observers，不抛错', () => {
     const Wrapper = () => {
-      const { containerRef } = useAutoScroll({ timeout: 16, SCROLL_TOLERANCE: 20 });
+      const { containerRef } = useAutoScroll();
       return (
         <div
-          ref={(el) => {
-            if (el) {
-              Object.defineProperty(el, 'scrollHeight', { get: () => mockScrollHeight, configurable: true });
-              Object.defineProperty(el, 'scrollTop', { value: 400, writable: true, configurable: true });
-              Object.defineProperty(el, 'clientHeight', { value: 100, configurable: true });
-              el.scrollTo = mockScrollTo;
-              (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-            }
-          }}
-          data-testid="scroll-container"
+          ref={containerRef as React.RefObject<HTMLDivElement>}
+          data-testid="container"
         />
       );
     };
+    const { unmount } = render(<Wrapper />);
+    const ro = observers.roInstances[0];
+    const mo = observers.moInstances[0];
 
-    render(<Wrapper />);
-    const container = document.querySelector('[data-testid="scroll-container"]') as HTMLDivElement;
+    expect(() => unmount()).not.toThrow();
+    expect(ro.disconnect).toHaveBeenCalled();
+    expect(mo.disconnect).toHaveBeenCalled();
+  });
 
-    // Simulate user near bottom -> isAutoScrollEngaged = true
-    act(() => {
-      container.dispatchEvent(new Event('scroll'));
-    });
+  it('depsKey 在 deps 含循环引用时使用单调递增 fallback，仍能触发重挂载', () => {
+    const cyclic1: any = { name: 'a' };
+    cyclic1.self = cyclic1;
+    const cyclic2: any = { name: 'b' };
+    cyclic2.self = cyclic2;
 
-    // Simulate mid smooth-scroll animation: scrollTop hasn't reached target yet
-    Object.defineProperty(container, 'scrollTop', { value: 350, writable: true, configurable: true });
-    // New content arrives while animation is in progress
-    mockScrollHeight = 600;
-
-    const addedNode = document.createElement('span');
-    const mockNodeList = { length: 1, 0: addedNode } as NodeList;
-    act(() => {
-      observerCallback([{ addedNodes: mockNodeList } as MutationRecord], {} as MutationObserver);
-    });
-    act(() => { vi.advanceTimersByTime(50); });
-
-    // With the fix, isAutoScrollEngaged=true ensures scrollTo is called even mid-animation
-    expect(mockScrollTo).toHaveBeenCalledWith(
-      expect.objectContaining({ top: 600 }),
-    );
+    const Wrapper = ({ deps }: { deps: any[] }) => {
+      const { containerRef } = useAutoScroll({ deps });
+      return (
+        <div
+          ref={containerRef as React.RefObject<HTMLDivElement>}
+          data-testid="container"
+        />
+      );
+    };
+    const { rerender } = render(<Wrapper deps={[cyclic1]} />);
+    const moBefore = observers.moInstances.length;
+    rerender(<Wrapper deps={[cyclic2]} />);
+    // 重挂载后应该新建了一个 MutationObserver 实例
+    expect(observers.moInstances.length).toBeGreaterThan(moBefore);
   });
 });
+
+// 旧 .skip 套件归档已删除 —— 与当前实现完全脱钩（断言 `el.scrollTo()` / 引用已不存在的
+// isAutoScrollEngaged / isLocked 等内部状态），git history 仍可追溯。
+// 历史用例查阅：`git log -p -- tests/hooks/useAutoScroll.targeted-coverage.test.tsx`
