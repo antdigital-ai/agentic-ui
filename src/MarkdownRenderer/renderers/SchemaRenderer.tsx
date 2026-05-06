@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
-import { SchemaRenderer } from '../../Schema';
+import { SchemaRenderer, type LowCodeSchema } from '../../Schema';
 import { debugInfo } from '../../Utils/debugUtils';
 import { extractBlockTextContent } from '../extractBlockTextContent';
 import type { RendererBlockProps } from '../types';
@@ -150,8 +150,8 @@ export const SchemaBlockRenderer: React.FC<
         data-agentar-card="true"
       >
         <SchemaRenderer
-          schema={schemaValue}
-          values={schemaValue?.initialValues || {}}
+          schema={schemaValue as LowCodeSchema}
+          values={extractInitialValues(schemaValue) as Record<string, any>}
           useDefaultValues={false}
           debug={false}
           fallbackContent={null}
@@ -164,8 +164,8 @@ export const SchemaBlockRenderer: React.FC<
   const schemaDom = (
     <div data-testid="schema-renderer" style={{ padding: '0.5em' }}>
       <SchemaRenderer
-        schema={schemaValue}
-        values={schemaValue?.initialValues || {}}
+        schema={schemaValue as LowCodeSchema}
+        values={extractInitialValues(schemaValue) as Record<string, any>}
         useDefaultValues={false}
         debug={false}
         fallbackContent={null}
