@@ -1,24 +1,29 @@
 ---
 name: markdown-syntax-guide
-description: 指导用户使用 Markdown Editor / Markdown 渲染器的扩展语法。图表场景默认使用 HTML 注释（chartType）+ 表格语法；仅在找不到合适图表类型时才使用 Mermaid。Triggers on keywords like 表格, 视频, 图表, 卡片, 提示块, 语法, 怎么写, how to write table chart video card.
+description: 指导用户使用 @ant-design/agentic-ui 的 Markdown Editor / Renderer 扩展语法。图表场景**优先使用内置 chart**（HTML 注释 `chartType` + 表格），**只有当内置 chartType 都不能表达诉求时才回退 Mermaid**。Triggers on keywords like 表格, 视频, 图表, 卡片, 提示块, 流程图, 语法, 怎么写, how to write table chart video card mermaid.
 ---
 
 # Markdown 语法指导 Skill
 
-当用户或 AI 需要生成可被 @ant-design/agentic-ui 的 Markdown 编辑器/渲染器正确解析的内容时，使用本技能提供准确的语法指导。
+当用户或 AI 需要生成可被 `@ant-design/agentic-ui` 的 `MarkdownEditor` / `MarkdownRenderer` 正确解析的内容时，使用本技能提供与代码实现严格对齐的语法指导。
+
+> **核心原则（图表场景）**：先看「图表选型决策表」 → 命中内置 chartType 就用 HTML 注释 + 表格 → **实在没有合适 chartType 才回退 Mermaid 代码块**。
 
 ## Skill 激活场景
 
 | 触发关键词 | 指导内容 |
 |------------|----------|
-| `表格`, `table` | 基础表格 + 高级表格 + 图表化表格 |
-| `视频`, `video` | HTML video 标签 + 图片式视频语法 |
-| `图表`, `chart`, `柱状图`, `饼图`, `折线图` | **仅使用** chartType 注释 + 表格（默认）；找不到合适图表类型时才给 Mermaid |
-| `卡片`, `card`, `link-card` | 链接卡片语法 |
-| `提示块`, `alert`, `info`, `warning` | ::: 语法 |
-| `Mermaid` | 仅当找不到合适图表类型时，才给 Mermaid 代码块 |
-| `附件`, `attachment` | 附件展示语法 |
-| `MDX`, `内嵌组件` | React 组件嵌入 |
+| `表格`, `table` | 基础 Markdown 表格 + `chartType: "table"` 高级表格 + 图表化表格 |
+| `视频`, `video` | HTML `<video>` 标签 + `![video:xxx](url)` 图片式语法 |
+| `图表`, `chart`, `柱状图`, `饼图`, `折线图`, `散点`, `雷达`, `漏斗`, `箱线`, `直方` | **优先**给 `chartType` HTML 注释 + 表格示例（见图表选型决策表）|
+| `流程图`, `时序图`, `甘特图`, `mermaid` | **回退方案**：内置 chartType 无法表达流程关系时，才给 Mermaid 代码块 |
+| `卡片`, `card`, `link-card` | 链接卡片语法（`{"type":"card", ...}` + 链接） |
+| `提示块`, `alert`, `info`, `warning`, `success`, `error` | `:::` 容器语法 |
+| `附件`, `attachment` | `![attachment:xxx](url)` 语法 |
+| `任务列表`, `task list` | GFM `- [x]` / `agentic-ui-task` 代码块 |
+| `工具栏`, `tool use bar` | `agentic-ui-toolusebar` 代码块 |
+| `文件列表`, `filemap` | `agentic-ui-filemap` 代码块 |
+| `MDX`, `内嵌组件` | React 组件嵌入（依赖 MDX 渲染上下文）|
 | `apaasify` | aPaaS Schema 代码块 |
 | `怎么写`, `语法`, `格式` | 综合语法速查 |
 
