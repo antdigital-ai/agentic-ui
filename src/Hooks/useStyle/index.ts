@@ -82,7 +82,18 @@ export function useEditorStyleRegister(
   const result = genStyles(componentName, styleFn);
 
   // 确保总是返回一个有效的对象，且 hashId 保持关闭
-  return result
-    ? { ...result, hashId: '' }
-    : { wrapSSR: (node: any) => node, hashId: '' };
+  // fallback 分支触发场景：createStyleRegister 返回 falsy（如 token 缺失、theme 上下文异常等），
+  // 此时透传 node 不注入样式 —— dev 模式下打 warn 便于定位，prod 不打扰
+  if (!result) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        `[useEditorStyleRegister] genStyles returned falsy for "${componentName}" — styles will not be injected. Check antd ConfigProvider / theme context.`,
+      );
+    }
+    return {
+      wrapSSR: (node: React.ReactElement) => node,
+      hashId: '',
+    };
+  }
+  return { ...result, hashId: '' };
 }
