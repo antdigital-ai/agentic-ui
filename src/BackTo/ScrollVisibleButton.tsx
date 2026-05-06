@@ -16,8 +16,6 @@ import {
 import { prefixCls, useStyle } from './style';
 
 const DEFAULT_VISIBLE_THRESHOLD = 400;
-/** 退出动画时长（毫秒），需与 style.ts 中的 transition 时长保持一致 */
-const PRESENCE_EXIT_DURATION_MS = 180;
 
 const getDefaultTarget = () => window;
 
@@ -123,28 +121,20 @@ export const ScrollVisibleButton = forwardRef<
       shouldVisible,
     });
 
-    // 替代 framer-motion 的 AnimatePresence + exit 动画：
-    // 通过本地 shouldRender + dataState 实现"显示时立即挂载、隐藏时延迟卸载"。
-    const [shouldRender, setShouldRender] = useState<boolean>(visible);
+    // 显隐动画：presence wrapper 始终保留在 DOM 中（fixed 定位，完全脱离文档流），
+    // 只通过 opacity + pointer-events 切换显隐，避免挂载/卸载触发文档流重排导致页面跳动。
     const [dataState, setDataState] = useState<'enter' | 'exit'>(
       visible ? 'enter' : 'exit',
     );
 
     useEffect(() => {
       if (visible) {
-        setShouldRender(true);
-        // 在挂载后下一帧切到 enter，触发 opacity 过渡
+        // 下一帧切到 enter，确保浏览器已完成一次 layout 后再触发 opacity 过渡
         const raf = requestAnimationFrame(() => setDataState('enter'));
         return () => cancelAnimationFrame(raf);
       }
-      // 退出：先切到 exit 触发淡出，过渡结束后卸载
       setDataState('exit');
-      const timer = window.setTimeout(() => {
-        setShouldRender(false);
-      }, PRESENCE_EXIT_DURATION_MS);
-      return () => {
-        window.clearTimeout(timer);
-      };
+      return undefined;
     }, [visible]);
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -171,16 +161,15 @@ export const ScrollVisibleButton = forwardRef<
       button
     );
 
+    // presence wrapper 始终挂载（position:fixed 脱离文档流），不会触发布局重排
     return wrapSSR(
       <>
-        {shouldRender ? (
-          <div
-            className={`${baseCls}-presence ${hashId}`}
-            data-state={dataState}
-          >
-            {buttonWithTooltip}
-          </div>
-        ) : null}
+        <div
+          className={`${baseCls}-presence ${hashId}`}
+          data-state={dataState}
+        >
+          {buttonWithTooltip}
+        </div>
       </>,
     );
   },

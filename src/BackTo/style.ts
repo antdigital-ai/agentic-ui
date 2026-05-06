@@ -44,8 +44,17 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       },
     },
 
-    // 包裹容器的入场/退出淡入淡出（替代 framer-motion 的 AnimatePresence + motion.div exit:opacity:0）
+    // presence wrapper：始终挂载在 DOM（通过 position:fixed 完全脱离文档流），
+    // 只用 opacity + pointer-events 切换显隐，避免挂载/卸载导致文档流重排跳动。
+    // inset:0 配合子元素的 position:fixed 不影响定位；wrapper 本身零尺寸不占空间。
     [`${token.componentCls}-presence`]: {
+      position: 'fixed',
+      // 零宽高使 wrapper 本身不占视口任何空间，子按钮用独立 fixed 坐标定位
+      width: 0,
+      height: 0,
+      overflow: 'visible',
+      // 优先级足够高，确保在其他 fixed 元素上层
+      zIndex: 1000,
       transition: 'opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
       '&[data-state="enter"]': {
         opacity: 1,
