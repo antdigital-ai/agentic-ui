@@ -26,12 +26,24 @@ interface ToolImageProps {
   tool: ToolCall;
   prefixCls: string;
   hashId: string;
+  /**
+   * 是否禁用动画。
+   *
+   * 注：图标旋转动画完全由 CSS 驱动（参见 ToolUseBar/style.ts 中
+   * `&-tool-image-wrapper-loading::after` + `@keyframes -toolImageSpin`），
+   * 此处保留参数仅用于与同级子组件保持 API 形状一致，避免父组件
+   * `BarItem/index.tsx` 在解构传递时编译报错。
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  disableAnimation?: boolean;
 }
 
 const ToolImageComponent: React.FC<ToolImageProps> = ({
   tool,
   prefixCls,
   hashId,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  disableAnimation = false,
 }) => {
   const toolImageWrapperClassName = useMemo(() => {
     return classNames(`${prefixCls}-tool-image-wrapper`, hashId, {
