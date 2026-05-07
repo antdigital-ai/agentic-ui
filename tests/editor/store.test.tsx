@@ -1,4 +1,4 @@
-﻿import '@testing-library/jest-dom';
+import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';

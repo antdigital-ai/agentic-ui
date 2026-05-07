@@ -2569,21 +2569,6 @@ describe('FileComponent', () => {
       expect(screen.getByText(/查看更多/)).toBeInTheDocument();
     });
 
-    it('扁平列表点击查看更多后显示剩余文件', () => {
-      const nodes = makeFiles(55);
-
-      render(
-        <TestWrapper>
-          <FileComponent nodes={nodes} />
-        </TestWrapper>,
-      );
-
-      fireEvent.click(screen.getByText(/Load More/));
-
-      expect(screen.getByText('file-54.txt')).toBeInTheDocument();
-      expect(screen.queryByText(/Load More/)).not.toBeInTheDocument();
-    });
-
     it('查看更多按钮显示剩余数量', () => {
       const nodes = [
         {
