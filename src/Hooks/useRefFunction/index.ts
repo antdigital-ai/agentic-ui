@@ -23,25 +23,20 @@ import { useCallback, useLayoutEffect, useRef } from 'react';
  * ```
  *
  * @remarks
- * - 不可在渲染期间同步调用返回的包装器，effect/事件回调中使用是安全的
+ * - 包装器在渲染期同步调用也是安全的（如 useState 的 lazy initializer），ref
+ *   初始值即为传入的最新实现，后续每次 commit 阶段由 useLayoutEffect 同步刷新
  * - 用 useLayoutEffect 而非渲染期写 ref，避免 R18 并发渲染下被丢弃的渲染版本污染 ref
  */
 const useRefFunction = <T extends (...args: any[]) => any>(reFunction: T) => {
-  // 用 null 初始化但通过 useLayoutEffect 在 commit 阶段同步写入，避免渲染期写 ref。
-  // useLayoutEffect 在 DOM 更新后、浏览器 paint 前同步执行，能保证 effect/事件
-  // 回调里读取的 ref 永远是最新版本。
-  const ref = useRef<T | null>(null);
+  // 初始值即为当前渲染传入的实现，保证渲染期同步调用包装器（如 useState lazy
+  // initializer、useMemo）时也能拿到可用的函数。
+  // useLayoutEffect 在 DOM 更新后、浏览器 paint 前同步执行，后续每次 commit
+  // 阶段刷新 ref，保证 effect/事件回调里读取的 ref 永远是最新版本。
+  const ref = useRef<T>(reFunction);
   useLayoutEffect(() => {
     ref.current = reFunction;
   });
   return useCallback((...rest: Parameters<T>): ReturnType<T> => {
-    // 包装器在 mount 之前被同步调用是反模式（渲染期），此时 ref.current 为 null，
-    // 用类型断言抛出更明确的错误，避免静默返回 undefined 与签名声明的 ReturnType<T> 不符。
-    if (ref.current === null) {
-      throw new Error(
-        '[useRefFunction] called before mount — do not call the wrapper during render',
-      );
-    }
     return ref.current(...rest);
   }, []);
 };
