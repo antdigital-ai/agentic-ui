@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TaskList } from '..';
+import type { TaskItem } from '../types';
 
 // 模拟 Loading 组件
 vi.mock('../../Components/Loading', () => ({
@@ -825,6 +826,122 @@ describe('TaskList', () => {
       render(<TaskList items={allDoneItems} variant="simple" />);
 
       expect(screen.getByText('任务完成')).toBeInTheDocument();
+    });
+
+    describe('taskCompleteText 自定义文案', () => {
+      const allDoneItems = [
+        {
+          key: '1',
+          title: 'Task 1',
+          content: 'Content 1',
+          status: 'success' as const,
+        },
+        {
+          key: '2',
+          title: 'Task 2',
+          content: 'Content 2',
+          status: 'success' as const,
+        },
+      ];
+
+      it('应支持通过 taskCompleteText 传入字符串覆盖完成文案', () => {
+        render(
+          <TaskList
+            items={allDoneItems}
+            variant="simple"
+            taskCompleteText="全部搞定"
+          />,
+        );
+
+        expect(screen.getByText('全部搞定')).toBeInTheDocument();
+        expect(screen.queryByText('任务完成')).not.toBeInTheDocument();
+      });
+
+      it('应支持通过 taskCompleteText 传入 ReactNode 覆盖完成文案', () => {
+        render(
+          <TaskList
+            items={allDoneItems}
+            variant="simple"
+            taskCompleteText={
+              <span data-testid="custom-complete-node">Done!</span>
+            }
+          />,
+        );
+
+        expect(screen.getByTestId('custom-complete-node')).toBeInTheDocument();
+        expect(screen.queryByText('任务完成')).not.toBeInTheDocument();
+      });
+
+      it('应支持通过 taskCompleteText 传入函数，基于 items 动态生成文案', () => {
+        const renderComplete = vi.fn<
+          (params: { items: TaskItem[] }) => React.ReactNode
+        >(({ items }) => `共完成 ${items.length} 个任务`);
+
+        render(
+          <TaskList
+            items={allDoneItems}
+            variant="simple"
+            taskCompleteText={renderComplete}
+          />,
+        );
+
+        expect(renderComplete).toHaveBeenCalledWith({ items: allDoneItems });
+        expect(screen.getByText('共完成 2 个任务')).toBeInTheDocument();
+      });
+
+      it('taskCompleteText 仅影响完成态，不影响进行中文案', () => {
+        const partialItems = [
+          {
+            key: '1',
+            title: 'Task 1',
+            content: 'Content 1',
+            status: 'success' as const,
+          },
+          {
+            key: '2',
+            title: 'Running',
+            content: 'Content 2',
+            status: 'loading' as const,
+          },
+        ];
+
+        render(
+          <TaskList
+            items={partialItems}
+            variant="simple"
+            taskCompleteText="不应展示"
+          />,
+        );
+
+        expect(screen.queryByText('不应展示')).not.toBeInTheDocument();
+        expect(screen.getByText('正在进行Running任务')).toBeInTheDocument();
+      });
+
+      it('未传入 taskCompleteText 时应回退到 i18n 默认文案', () => {
+        render(<TaskList items={allDoneItems} variant="simple" />);
+
+        expect(screen.getByText('任务完成')).toBeInTheDocument();
+      });
+
+      it('default variant 下传入 taskCompleteText 不应抛错且不渲染摘要条', () => {
+        render(
+          <TaskList
+            items={allDoneItems}
+            variant="default"
+            taskCompleteText="不应展示"
+          />,
+        );
+
+        // default 模式不渲染 simple 摘要条
+        expect(
+          screen.queryByTestId('task-list-simple-bar'),
+        ).not.toBeInTheDocument();
+        // 自定义文案也不应被渲染到任务项中
+        expect(screen.queryByText('不应展示')).not.toBeInTheDocument();
+        // 但任务项本身应正常渲染
+        expect(screen.getByText('Task 1')).toBeInTheDocument();
+        expect(screen.getByText('Task 2')).toBeInTheDocument();
+      });
     });
 
     it('有错误任务时应显示取消状态', () => {

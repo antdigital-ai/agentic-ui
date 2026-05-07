@@ -26,6 +26,15 @@ export interface TaskListProps {
   open?: boolean;
   /** simple 模式下摘要条展开状态变化回调 */
   onOpenChange?: (open: boolean) => void;
+  /**
+   * 任务全部完成时摘要条的文案，未配置时回退到 i18n 默认值（如「任务完成」）。
+   * 支持直接传入 `React.ReactNode`，也支持传入函数基于当前任务列表动态生成。
+   *
+   * 注：当前仅在 `variant="simple"` 的摘要条上渲染，`default` 模式不展示摘要条。
+   */
+  taskCompleteText?:
+    | React.ReactNode
+    | ((params: { items: TaskItem[] }) => React.ReactNode);
 }
 
 /**

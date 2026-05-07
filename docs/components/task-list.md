@@ -16,6 +16,8 @@ group:
 
 <code src="../demos/task-list-simple.tsx">Simple 模式 - 紧凑摘要条</code>
 
+<code src="../demos/task-list-task-complete-text.tsx">Simple 模式 - 自定义任务完成文案</code>
+
 ## API
 
 ### TaskList (TaskListProps)
@@ -31,6 +33,7 @@ group:
 | variant              | 组件变体，`simple` 模式将任务列表收起为紧凑的单行摘要条 | `'default' \| 'simple'`            | `'default'` | 2.31.0 |
 | open                 | `simple` 模式下摘要条是否展开（受控）                   | `boolean`                          | -           | 2.31.0 |
 | onOpenChange         | `simple` 模式下摘要条展开状态变化回调                   | `(open: boolean) => void`          | -           | 2.31.0 |
+| taskCompleteText     | 任务全部完成时摘要条的文案，未配置时回退到 i18n 默认值（仅在 `variant="simple"` 时渲染） | `` `React.ReactNode \| ((params: { items: TaskItem[] }) => React.ReactNode)` `` | -           | 2.31.0 |
 
 ### TaskItem
 
@@ -40,6 +43,36 @@ group:
 | title   | 任务标题     | `React.ReactNode`                                | -      | -    |
 | content | 任务内容     | `React.ReactNode \| React.ReactNode[]`           | -      | -    |
 | status  | 任务状态     | `'success' \| 'loading' \| 'pending' \| 'error'` | -      | -    |
+
+### 自定义任务完成文案示例
+
+`taskCompleteText` 仅在 `variant="simple"` 摘要条上生效，未配置时回退到 i18n 默认值（如「任务完成」）。
+支持直接传入 `React.ReactNode`（字符串 / JSX），也支持传入函数 `({ items }) => ReactNode` 基于当前任务列表动态生成。
+
+```tsx
+import { TaskList } from '@ant-design/agentic-ui';
+
+export default () => {
+  const items = [
+    { key: '1', title: '任务 1', status: 'success', content: '内容 1' },
+    { key: '2', title: '任务 2', status: 'success', content: '内容 2' },
+  ];
+
+  return (
+    <>
+      {/* 字符串 */}
+      <TaskList items={items} variant="simple" taskCompleteText="报告已生成" />
+
+      {/* 函数：基于 items 动态生成 */}
+      <TaskList
+        items={items}
+        variant="simple"
+        taskCompleteText={({ items }) => `共完成 ${items.length} 项任务`}
+      />
+    </>
+  );
+};
+```
 
 ### 受控模式示例
 

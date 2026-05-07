@@ -37,6 +37,7 @@ export const TaskList = memo(
     variant = 'default',
     open,
     onOpenChange,
+    taskCompleteText,
   }: TaskListProps) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('task-list');
@@ -98,11 +99,16 @@ export const TaskList = memo(
         const allDone = completedCount === items.length && items.length > 0;
 
         let status: TaskStatus = 'pending';
-        let text = locale?.['taskList.taskList'] || '任务列表';
+        let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
 
         if (allDone) {
           status = 'success';
-          text = locale?.['taskList.taskComplete'] || '任务完成';
+          const customCompleteText =
+            typeof taskCompleteText === 'function'
+              ? taskCompleteText({ items })
+              : taskCompleteText;
+          text =
+            customCompleteText ?? locale?.['taskList.taskComplete'] ?? '任务完成';
         } else if (loadingItem?.title) {
           status = 'loading';
           const tpl =
@@ -125,7 +131,7 @@ export const TaskList = memo(
           hasError: errorExists,
           lastItem: items[items.length - 1] as TaskItem | undefined,
         };
-      }, [items, locale]);
+      }, [items, locale, taskCompleteText]);
 
     const renderItems = useCallback(
       (visibleItems: TaskItem[]) => {
@@ -186,10 +192,7 @@ export const TaskList = memo(
               hashId={hashId}
             />
           </div>
-          <div
-            key={summaryText}
-            className={classNames(`${simpleCls}-text`, hashId)}
-          >
+          <div className={classNames(`${simpleCls}-text`, hashId)}>
             {summaryText}
           </div>
           <div className={classNames(`${simpleCls}-arrow`, hashId)}>
