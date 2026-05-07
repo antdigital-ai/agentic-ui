@@ -91,11 +91,11 @@ export const TASK_STATUS = {
 } as const satisfies Record<string, TaskStatus>;
 
 /**
- * 任务状态常量对象的类型（向后兼容）
+ * 任务状态常量对象的类型别名（向后兼容）
  *
  * @deprecated 请直接使用 {@link TaskStatus} 联合类型
  */
-export type TASK_STATUS = TaskStatus;
+export type TaskStatusEnum = TaskStatus;
 
 /**
  * 任务运行状态常量对象（向后兼容）
@@ -110,11 +110,11 @@ export const TASK_RUNNING_STATUS = {
 } as const satisfies Record<string, TaskRunningStatus>;
 
 /**
- * 任务运行状态常量对象的类型（向后兼容）
+ * 任务运行状态常量对象的类型别名（向后兼容）
  *
  * @deprecated 请直接使用 {@link TaskRunningStatus} 联合类型
  */
-export type TASK_RUNNING_STATUS = TaskRunningStatus;
+export type TaskRunningStatusEnum = TaskRunningStatus;
 
 /**
  * 主题样式变体

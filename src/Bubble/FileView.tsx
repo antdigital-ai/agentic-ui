@@ -59,7 +59,7 @@ const renderMoreAction = (
   cfg: RenderMoreActionConfig | undefined,
   file: AttachmentFile,
 ): React.ReactNode | undefined => {
-  if (cfg == null || cfg === false) return undefined;
+  if (cfg === null || cfg === undefined || cfg === false) return undefined;
   if (typeof cfg !== 'function') {
     // ReactNode 直传
     return cfg as React.ReactNode;

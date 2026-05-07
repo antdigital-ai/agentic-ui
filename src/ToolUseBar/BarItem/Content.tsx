@@ -26,14 +26,12 @@ interface ToolImageProps {
   tool: ToolCall;
   prefixCls: string;
   hashId: string;
-  disableAnimation?: boolean;
 }
 
 const ToolImageComponent: React.FC<ToolImageProps> = ({
   tool,
   prefixCls,
   hashId,
-  disableAnimation = false,
 }) => {
   const toolImageWrapperClassName = useMemo(() => {
     return classNames(`${prefixCls}-tool-image-wrapper`, hashId, {

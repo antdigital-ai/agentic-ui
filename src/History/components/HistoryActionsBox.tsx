@@ -1,5 +1,5 @@
 import { Star, StarFill, Trash2 } from '@sofa-design/icons';
-import { ConfigProvider, Popconfirm, Space } from 'antd';
+import { Popconfirm, Space } from 'antd';
 import React, { useContext, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
@@ -44,8 +44,6 @@ import { HistoryActionsBoxProps } from '../types';
  * - 国际化支持
  */
 export const HistoryActionsBox: React.FC<HistoryActionsBoxProps> = (props) => {
-  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
-  const prefixCls = getPrefixCls();
   const { locale: i18nLocale } = useContext(I18nContext);
   const [isHover, setIsHover] = useState(false);
   const [open, setOpen] = useState(false);
