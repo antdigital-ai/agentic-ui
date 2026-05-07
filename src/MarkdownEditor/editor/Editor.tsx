@@ -633,17 +633,6 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   }, [props.instance, markdownEditorRef.current]);
 
   /**
-   * 处理粘贴事件，会把粘贴的内容转换为对应的节点
-   * @description paste event
-   * @param {React.ClipboardEvent<HTMLDivElement>} e
-   */
-  const onPaste = useRefFunction(
-    async (event: React.ClipboardEvent<HTMLDivElement>) => {
-      await handlePasteEvent(event);
-    },
-  );
-
-  /**
    * 实际的粘贴处理逻辑
    */
   const handlePasteEvent = async (
@@ -816,12 +805,13 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
             text,
             selection,
             plugins,
+            allowedTypes,
           )
         ) {
           return;
         }
       } catch (e) {
-        console.log('insert error', e);
+        console.error('[handlePaste] 处理纯文本粘贴失败:', e);
       }
     }
 
@@ -830,6 +820,13 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       ReactEditor.insertData(markdownEditorRef.current, event.clipboardData);
     }
   };
+
+  /**
+   * 处理粘贴事件，会把粘贴的内容转换为对应的节点
+   * @description paste event
+   * @param {React.ClipboardEvent<HTMLDivElement>} e
+   */
+  const onPaste = useRefFunction(handlePasteEvent);
 
   /**
    * 处理输入法开始事件
@@ -1181,7 +1178,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
       });
       return decorateList.concat(ranges as any[]);
     } catch (error) {
-      console.log('error', error);
+      console.error('[highlight] 高亮计算失败:', error);
       return decorateList;
     }
   };

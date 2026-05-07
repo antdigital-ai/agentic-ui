@@ -85,6 +85,8 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         backdropFilter: LIGHT_MODE_BACKDROP_FILTER,
         WebkitBackdropFilter: LIGHT_MODE_BACKDROP_FILTER,
         '&:hover': {
+          // light 模式 hover 保持一致的浅色背景，避免与 container border-left 颜色不协调
+          background: 'var(--color-gray-bg-card-light)',
           boxShadow: 'none',
           [`${token.componentCls}-header-left-icon-light`]: {
             color: 'var(--color-gray-text-secondary)',

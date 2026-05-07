@@ -65,7 +65,7 @@ export const handleSlateMarkdownFragment = (
     EditorUtils.replaceSelectedNode(editor, fragment);
     return true;
   } catch (error) {
-    console.log('error', error);
+    console.error('[handlePaste] 处理 Slate fragment 粘贴失败:', error);
     return false;
   }
 };
@@ -79,15 +79,16 @@ export const handleHtmlPaste = async (
   editorProps: MarkdownEditorProps,
 ) => {
   try {
-    const html = await clipboardData.getData('text/html');
-    const rtf = await clipboardData.getData('text/rtf');
+    // getData 是同步方法，返回 string，不需要 await
+    const html = clipboardData.getData('text/html');
+    const rtf = clipboardData.getData('text/rtf');
 
     if (html) {
       return await insertParsedHtmlNodes(editor, html, editorProps, rtf);
     }
     return false;
   } catch (error) {
-    console.log('error', error);
+    console.error('[handlePaste] 处理 HTML 粘贴失败:', error);
     return false;
   }
 };
@@ -104,13 +105,14 @@ export const handleFilesPaste = async (
     const fileList = clipboardData.files;
     if (fileList.length > 0 && editorProps.image?.upload) {
       try {
-        const url = [];
-        for await (const file of fileList) {
-          if (editorProps.image?.upload) {
-            const serverUrl = await editorProps.image.upload([file]);
-            url.push(serverUrl);
-          }
-        }
+        // 并行上传所有文件，避免串行阻塞
+        const uploadResults = await Promise.all(
+          Array.from(fileList).map((file) =>
+            editorProps.image!.upload!([file]),
+          ),
+        );
+        const uploadedUrls = uploadResults.flat(1);
+
         const selection = editor?.selection?.focus?.path;
         const node = selection
           ? Node.get(editor, Path.parent(selection)!)
@@ -120,8 +122,8 @@ export const handleFilesPaste = async (
           ? EditorUtils.findNext(editor, selection)!
           : undefined;
 
-        [url].flat(2).forEach((u) => {
-          if (!u) return null;
+        uploadedUrls.forEach((u) => {
+          if (!u) return;
           Transforms.insertNodes(
             editor,
             EditorUtils.createMediaNode(u, 'image'),
@@ -138,13 +140,13 @@ export const handleFilesPaste = async (
         });
         return true;
       } catch (error) {
-        console.log('error', error);
+        console.error('[handlePaste] 文件粘贴上传失败:', error);
         return false;
       }
     }
     return false;
   } catch (error) {
-    console.log('error', error);
+    console.error('[handlePaste] 处理文件粘贴失败:', error);
     return false;
   }
 };
@@ -296,12 +298,17 @@ export const handlePlainTextPaste = async (
   text: string,
   selection: any,
   plugins: any,
+  allowedTypes?: string[],
 ) => {
   if (isMarkdown(text)) {
     await parseMarkdownToNodesAndInsert(editor, text, plugins);
     return true;
   }
-  if (isHtml(text)) {
+  // 仅当 allowedTypes 允许 text/html 时才走 HTML 解析，
+  // 避免绕过调用方对 pasteConfig.allowedTypes 的限制
+  const htmlAllowed =
+    !allowedTypes || allowedTypes.includes('text/html');
+  if (htmlAllowed && isHtml(text)) {
     const success = await insertParsedHtmlNodes(editor, text, plugins, '');
     if (success) return true;
   }

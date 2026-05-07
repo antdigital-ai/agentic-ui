@@ -36,17 +36,19 @@ const findElementByNode = (node: ChildNode) => {
 };
 const fragment = new Set(['body', 'figure', 'div']);
 
+/** 从 HTML 元素中提取文本对齐方式（align 属性 / style.textAlign / data-align） */
+const getElementAlign = (el: HTMLElement): string | null =>
+  (typeof el?.getAttribute === 'function' ? el.getAttribute('align') : null) ||
+  el?.style?.textAlign ||
+  (typeof el?.getAttribute === 'function'
+    ? el.getAttribute('data-align')
+    : null) ||
+  null;
+
 export const ELEMENT_TAGS = {
   BLOCKQUOTE: () => ({ type: 'blockquote' }),
   H1: (el: HTMLElement) => {
-    const align =
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('align')
-        : null) ||
-      el?.style?.textAlign ||
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('data-align')
-        : null);
+    const align = getElementAlign(el);
     return {
       type: 'head',
       level: 1,
@@ -54,14 +56,7 @@ export const ELEMENT_TAGS = {
     };
   },
   H2: (el: HTMLElement) => {
-    const align =
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('align')
-        : null) ||
-      el?.style?.textAlign ||
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('data-align')
-        : null);
+    const align = getElementAlign(el);
     return {
       type: 'head',
       level: 2,
@@ -69,14 +64,7 @@ export const ELEMENT_TAGS = {
     };
   },
   H3: (el: HTMLElement) => {
-    const align =
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('align')
-        : null) ||
-      el?.style?.textAlign ||
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('data-align')
-        : null);
+    const align = getElementAlign(el);
     return {
       type: 'head',
       level: 3,
@@ -84,14 +72,7 @@ export const ELEMENT_TAGS = {
     };
   },
   H4: (el: HTMLElement) => {
-    const align =
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('align')
-        : null) ||
-      el?.style?.textAlign ||
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('data-align')
-        : null);
+    const align = getElementAlign(el);
     return {
       type: 'head',
       level: 4,
@@ -99,14 +80,7 @@ export const ELEMENT_TAGS = {
     };
   },
   H5: (el: HTMLElement) => {
-    const align =
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('align')
-        : null) ||
-      el?.style?.textAlign ||
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('data-align')
-        : null);
+    const align = getElementAlign(el);
     return {
       type: 'head',
       level: 5,
@@ -188,14 +162,7 @@ export const ELEMENT_TAGS = {
   LI: () => ({ type: 'list-item' }),
   OL: () => ({ type: 'list', order: true }),
   P: (el: HTMLElement) => {
-    const align =
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('align')
-        : null) ||
-      el?.style?.textAlign ||
-      (el && typeof el.getAttribute === 'function'
-        ? el.getAttribute('data-align')
-        : null);
+    const align = getElementAlign(el);
     return {
       type: 'paragraph',
       ...(align ? { align } : {}),
@@ -845,7 +812,10 @@ export const insertParsedHtmlNodes = async (
 
     return true;
   } catch (error) {
-    console.error('插入HTML节点失败:', error);
+    // 区分预期的业务失败（return false）与非预期的内部错误：
+    // 走到这里说明是解析/插入过程中的异常，而非"内容为空"等正常跳过情形。
+    console.error('[insertParsedHtmlNodes] 内部错误，HTML 节点插入失败:', error);
+    debugInfo('insertParsedHtmlNodes - 内部错误', { error });
 
     return false;
   }
