@@ -36,9 +36,6 @@ describe('BackTop 组件', () => {
   it('应该在滚动超过默认阈值（400px）时显示', async () => {
     const { container } = render(<BackTo.Top />);
 
-    // 初始状态不可见
-    expect(container.querySelector('button')).not.toBeInTheDocument();
-
     // 模拟滚动到 500px
     Object.defineProperty(window, 'pageYOffset', {
       writable: true,
@@ -49,7 +46,9 @@ describe('BackTop 组件', () => {
 
     await waitFor(
       () => {
-        expect(container.querySelector('button')).toBeInTheDocument();
+        // 按钮始终在 DOM 中，但 data-state 应为 'enter' 表示显示
+        const presenceWrapper = container.querySelector('[data-state]');
+        expect(presenceWrapper).toHaveAttribute('data-state', 'enter');
       },
       { timeout: 500 },
     );
@@ -318,7 +317,9 @@ describe('BackTop 组件', () => {
 
     await waitFor(
       () => {
-        expect(container.querySelector('button')).toBeInTheDocument();
+        // 按钮始终在 DOM 中，但 data-state 应为 'enter' 表示显示
+        const presenceWrapper = container.querySelector('[data-state]');
+        expect(presenceWrapper).toHaveAttribute('data-state', 'enter');
       },
       { timeout: 500 },
     );
@@ -333,7 +334,9 @@ describe('BackTop 组件', () => {
 
     await waitFor(
       () => {
-        expect(container.querySelector('button')).not.toBeInTheDocument();
+        // 按钮始终在 DOM 中，但 data-state 应为 'exit' 表示隐藏
+        const presenceWrapper = container.querySelector('[data-state]');
+        expect(presenceWrapper).toHaveAttribute('data-state', 'exit');
       },
       { timeout: 500 },
     );

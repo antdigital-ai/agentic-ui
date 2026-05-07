@@ -178,7 +178,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
             放在 <p> 里会触发 React 的 validateDOMNesting 警告（<div> in <p>）。 */}
         {description && <div className={descriptionCls}>{description}</div>}
         {/* buttonBar */}
-        {(buttonBar || buttonText !== undefined || onButtonClick) && (
+        {(buttonBar || buttonText || onButtonClick) && (
           <div className={buttonBarCls}>
             {buttonBar || (
               <button

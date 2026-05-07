@@ -1,71 +1,38 @@
-// @ts-nocheck
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Mock slate 相关重量级依赖，避免在 jsdom 环境中加载卡死
+vi.mock('slate', () => ({
+  createEditor: vi.fn(),
+  Editor: {},
+  Transforms: {},
+  Path: {},
+  Node: {},
+  Text: { isText: vi.fn() },
+  Range: { isCollapsed: vi.fn() },
+  Element: { isElement: vi.fn() },
+}));
+vi.mock('slate-react', () => ({
+  Slate: ({ children }: any) => children,
+  Editable: () => null,
+  withReact: vi.fn((e: any) => e),
+  useSlate: vi.fn(),
+  useSlateStatic: vi.fn(),
+  useFocused: vi.fn(),
+  useSelected: vi.fn(),
+  ReactEditor: { findPath: vi.fn(), focus: vi.fn() },
+}));
+vi.mock('slate-history', () => ({
+  withHistory: vi.fn((e: any) => e),
+  HistoryEditor: {},
+}));
+
 import {
   Suggestion,
   SuggestionConnext,
 } from '../src/MarkdownInputField/Suggestion';
-
-// Mock antd Dropdown: support popupRender, menu.items.onClick, onOpenChange
-vi.mock('antd', async () => {
-  const actual = await vi.importActual('antd');
-  return {
-    ...actual,
-    Dropdown: ({
-      children,
-      menu,
-      open,
-      popupRender,
-      onOpenChange,
-    }: any) => {
-      const content =
-        open && popupRender
-          ? popupRender(
-              menu?.items ? (
-                <div data-testid="dropdown-menu">
-                  {menu.items.map((item: any, index: number) => (
-                    <div
-                      key={item.key || index}
-                      data-testid={`item-${item.key || index}`}
-                      onClick={() => {
-                        item.onClick?.();
-                        onOpenChange?.(false);
-                      }}
-                    >
-                      {item.label}
-                    </div>
-                  ))}
-                </div>
-              ) : null,
-            )
-          : open && menu?.items ? (
-              <div data-testid="dropdown-menu">
-                {menu.items.map((item: any, index: number) => (
-                  <div
-                    key={item.key || index}
-                    data-testid={`item-${item.key || index}`}
-                    onClick={() => {
-                      item.onClick?.();
-                      onOpenChange?.(false);
-                    }}
-                  >
-                    {item.label}
-                  </div>
-                ))}
-              </div>
-            ) : null;
-      return (
-        <div>
-          {children}
-          {content}
-        </div>
-      );
-    },
-    Spin: ({ children }: any) => <div data-testid="spin">{children}</div>,
-  };
-});
 
 describe('Suggestion', () => {
   beforeEach(() => {
@@ -324,9 +291,7 @@ describe('Suggestion', () => {
         );
       });
       render(
-        <Suggestion
-          tagInputProps={{ dropdownRender, open: true }}
-        >
+        <Suggestion tagInputProps={{ dropdownRender, open: true }}>
           <CaptureRef />
         </Suggestion>,
       );
@@ -434,10 +399,10 @@ describe('Suggestion', () => {
         }, [context]);
 
         return (
-        <button
-              type="button"
-              onClick={() => context.onSelectRef?.current?.('selected value')}
-            >
+          <button
+            type="button"
+            onClick={() => context.onSelectRef?.current?.('selected value')}
+          >
             Select
           </button>
         );

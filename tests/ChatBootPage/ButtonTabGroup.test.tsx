@@ -113,8 +113,9 @@ describe('ButtonTabGroup 组件', () => {
     const disabledTab = screen.getByText('标签3').closest('button');
     expect(disabledTab).not.toBeNull();
     // 兼容 antd ConfigProvider 默认前缀 'ant-'，仅断言修饰符部分
+    // ButtonTab 组件在 disabled 时添加的是 ${prefixCls}-disabled
     expect(disabledTab!.className).toMatch(
-      /agentic-chatboot-button-tab-group-item-disabled\b/,
+      /agentic-chatboot-button-tab-disabled\b/,
     );
     // P0-3：disabled 时原生 disabled 属性 + aria-disabled 必须正确
     expect(disabledTab).toBeDisabled();

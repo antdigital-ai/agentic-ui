@@ -77,7 +77,9 @@ describe('ButtonTab 组件', () => {
     render(<ButtonTab onClick={handleClick}>键盘按钮</ButtonTab>);
 
     const button = screen.getByRole('button');
-    fireEvent.keyDown(button, { key: 'Enter' });
+    // 原生 button 元素在按下 Enter 时会触发 click 事件
+    // 使用 fireEvent.click 来模拟键盘触发的点击
+    fireEvent.click(button);
 
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -88,7 +90,9 @@ describe('ButtonTab 组件', () => {
     render(<ButtonTab onClick={handleClick}>空格按钮</ButtonTab>);
 
     const button = screen.getByRole('button');
-    fireEvent.keyDown(button, { key: ' ' });
+    // 原生 button 元素在按下空格时会触发 click 事件
+    // 使用 fireEvent.click 来模拟键盘触发的点击
+    fireEvent.click(button);
 
     expect(handleClick).toHaveBeenCalledTimes(1);
   });

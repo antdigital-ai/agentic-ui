@@ -2,8 +2,8 @@ import { Dropdown, Spin } from 'antd';
 import { useMergedState } from 'rc-util';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
-import { MarkdownEditorProps } from '../../MarkdownEditor';
-import { TagPopupProps } from '../../MarkdownEditor/editor/elements/TagPopup';
+import type { MarkdownEditorProps } from '../../MarkdownEditor';
+import type { TagPopupProps } from '../../MarkdownEditor/editor/elements/TagPopup';
 
 /**
  * Suggestion 内部维护的可点击菜单项形态

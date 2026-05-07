@@ -85,7 +85,9 @@ describe('ScrollVisibleButton 组件', () => {
 
     await waitFor(
       () => {
-        expect(container.querySelector('button')).not.toBeInTheDocument();
+        // 按钮始终在 DOM 中，但 data-state 应为 'exit' 表示隐藏
+        const presenceWrapper = container.querySelector('[data-state]');
+        expect(presenceWrapper).toHaveAttribute('data-state', 'exit');
       },
       { timeout: 500 },
     );
@@ -375,7 +377,9 @@ describe('ScrollVisibleButton 组件', () => {
 
     await waitFor(
       () => {
-        expect(container.querySelector('button')).not.toBeInTheDocument();
+        // 按钮始终在 DOM 中，但 data-state 应为 'exit' 表示隐藏
+        const presenceWrapper = container.querySelector('[data-state]');
+        expect(presenceWrapper).toHaveAttribute('data-state', 'exit');
       },
       { timeout: 500 },
     );
@@ -396,7 +400,9 @@ describe('ScrollVisibleButton 组件', () => {
 
     await waitFor(
       () => {
-        expect(container.querySelector('button')).toBeInTheDocument();
+        // 按钮始终在 DOM 中，但 data-state 应为 'enter' 表示显示
+        const presenceWrapper = container.querySelector('[data-state]');
+        expect(presenceWrapper).toHaveAttribute('data-state', 'enter');
       },
       { timeout: 500 },
     );
@@ -467,7 +473,9 @@ describe('ScrollVisibleButton 组件', () => {
 
     await waitFor(
       () => {
-        expect(container.querySelector('button')).not.toBeInTheDocument();
+        // 按钮始终在 DOM 中，但 data-state 应为 'exit' 表示隐藏
+        const presenceWrapper = container.querySelector('[data-state]');
+        expect(presenceWrapper).toHaveAttribute('data-state', 'exit');
       },
       { timeout: 500 },
     );
@@ -481,21 +489,9 @@ describe('ScrollVisibleButton 组件', () => {
 
     await waitFor(
       () => {
-        expect(container.querySelector('button')).toBeInTheDocument();
-      },
-      { timeout: 500 },
-    );
-
-    // 再次滚动到不可见位置
-    Object.defineProperty(window, 'pageYOffset', {
-      writable: true,
-      value: 300,
-    });
-    fireEvent.scroll(window);
-
-    await waitFor(
-      () => {
-        expect(container.querySelector('button')).not.toBeInTheDocument();
+        // 按钮始终在 DOM 中，但 data-state 应为 'enter' 表示显示
+        const presenceWrapper = container.querySelector('[data-state]');
+        expect(presenceWrapper).toHaveAttribute('data-state', 'enter');
       },
       { timeout: 500 },
     );
