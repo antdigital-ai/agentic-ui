@@ -81,7 +81,7 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/支持/)).toBeInTheDocument();
+      expect(screen.getByText(/Supports/)).toBeInTheDocument();
       expect(screen.getByText(/pdf/)).toBeInTheDocument();
     });
 
@@ -108,7 +108,7 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/支持/)).toBeInTheDocument();
+      expect(screen.getByText(/Supports/)).toBeInTheDocument();
       expect(screen.getByText(/pdf/)).toBeInTheDocument();
     });
 
@@ -119,7 +119,7 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/支持/)).toBeInTheDocument();
+      expect(screen.getByText(/Supports/)).toBeInTheDocument();
       expect(screen.getByText(/mp3, wav/)).toBeInTheDocument();
     });
 
@@ -142,8 +142,8 @@ describe('AttachmentButtonPopover', () => {
     it('should use default format when supportedFormat is undefined', () => {
       render(<AttachmentSupportedFormatsContent />);
 
-      // Should show default image format content
-      expect(screen.getByText(/支持/)).toBeInTheDocument();
+      // Should show default image format content (English template: "Supports ... formats.")
+      expect(screen.getByText(/Supports/)).toBeInTheDocument();
       expect(screen.getByText(/jpg, jpeg, png, gif/)).toBeInTheDocument();
     });
   });
@@ -275,7 +275,7 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/支持/)).toBeInTheDocument();
+      expect(screen.getByText(/Supports/)).toBeInTheDocument();
     });
 
     it('should handle format with zero max size', () => {
@@ -291,7 +291,7 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/支持/)).toBeInTheDocument();
+      expect(screen.getByText(/Supports/)).toBeInTheDocument();
     });
 
     it('should handle format with very large max size', () => {
@@ -307,7 +307,7 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/支持/)).toBeInTheDocument();
+      expect(screen.getByText(/Supports/)).toBeInTheDocument();
     });
 
     it('should handle single extension', () => {
