@@ -45,6 +45,17 @@ type SuggestionMenuItem = {
 };
 
 /**
+ * 静态空数组兜底引用。
+ *
+ * 用作 `props.tagInputProps.items` 未传时的稳定 fallback —— 严禁在解构默认值
+ * 处写 `items = []`：那会让每次渲染都生成新的 `[]` 引用，下游 useEffect 依赖
+ * `[items]` 永远变化，触发 setState → re-render → 死循环。该 bug 在 jsdom
+ * 下被 React 批处理掩盖，但在 happy-dom 下会直接表现为渲染卡死。
+ */
+const EMPTY_ITEMS: ReadonlyArray<{ key: string | number; label: string }> =
+  Object.freeze([]);
+
+/**
  * Suggestion 组件 - 自动完成建议组件
  *
  * 该组件提供输入框的自动完成功能，支持静态建议列表和动态加载建议。
@@ -99,12 +110,18 @@ export const Suggestion: React.FC<{
     Record<string, any> & { text?: string; placeholder?: string }
   >(undefined);
   const {
-    items = [],
+    items: rawItems,
     dropdownRender,
     menu,
     dropdownStyle,
     notFoundContent,
   } = props.tagInputProps || {};
+
+  // 注意：此处不能写成 `items = []` 默认值的解构形式。
+  // 原因是 `[]` 字面量每次渲染都是新引用，会让下方 useEffect 的 [items]
+  // 依赖永远变化，触发 setSelectedItems → re-render → 新 [] → 再次触发 ... 形成
+  // 真实存在的死循环（jsdom 下被批处理掩盖，happy-dom 下直接表现为渲染卡死）。
+  const items = rawItems ?? EMPTY_ITEMS;
 
   const [open, setOpen] = useMergedState(false, {
     value: props?.tagInputProps?.open,
@@ -112,22 +129,29 @@ export const Suggestion: React.FC<{
   });
 
   const [loading, setLoading] = useState(false);
+
+  // 用 ref 桥接 onSelectRef / setOpen，使 onClick 不依赖每次新建的闭包，
+  // 从而让 selectedItems 仅在原始 items 数组真正变化时才重建。
+  const buildMenuItems = (
+    list: ReadonlyArray<{ key: string | number; label: string }>,
+  ): SuggestionMenuItem[] =>
+    list.map((item) => {
+      const { key } = item || ({} as { key?: string | number });
+      return {
+        ...item,
+        onClick: () => {
+          setOpen(false);
+          onSelectRef.current?.(`${key}` || '');
+        },
+      };
+    });
+
   const [selectedItems, setSelectedItems] = useState<SuggestionMenuItem[]>(
     () => {
       if (typeof items === 'function') {
         return [];
       }
-      return items.map((item) => {
-        const { key } = item || {};
-
-        return {
-          ...item,
-          onClick: () => {
-            setOpen(false);
-            onSelectRef.current?.(`${key}` || '');
-          },
-        };
-      });
+      return buildMenuItems(items);
     },
   );
 
@@ -136,18 +160,9 @@ export const Suggestion: React.FC<{
     if (typeof items === 'function') {
       return;
     }
-    setSelectedItems(
-      items.map((item) => {
-        const { key } = item || {};
-        return {
-          ...item,
-          onClick: () => {
-            setOpen(false);
-            onSelectRef.current?.(`${key}` || '');
-          },
-        };
-      }),
-    );
+    setSelectedItems(buildMenuItems(items));
+    // 只有 items 真正变化（含 EMPTY_ITEMS 这样稳定引用的兜底）时才重算。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
   useEffect(() => {

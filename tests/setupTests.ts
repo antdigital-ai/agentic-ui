@@ -286,42 +286,17 @@ Object.defineProperty(window, 'matchMedia', {
   value: matchMediaMock,
 });
 
-// Mock window.getSelection / document.getSelection
-// Slate 编辑器在 happy-dom 下会因 selectionchange 事件循环导致测试卡死：
-// Editable 组件监听 selectionchange → 调用 Transforms.select/deselect →
-// 触发 onChange → 重新渲染 → 再次触发 selectionchange。
-// happy-dom 的 Selection API 行为与浏览器不一致，此循环没有自然终止条件。
-// 返回稳定的 stub 对象可以打断这个循环。
-const mockSelection = {
-  anchorNode: null,
-  anchorOffset: 0,
-  focusNode: null,
-  focusOffset: 0,
-  isCollapsed: true,
-  rangeCount: 0,
-  type: 'None',
-  addRange: vi.fn(),
-  collapse: vi.fn(),
-  collapseToEnd: vi.fn(),
-  collapseToStart: vi.fn(),
-  containsNode: vi.fn(() => false),
-  deleteFromDocument: vi.fn(),
-  empty: vi.fn(),
-  extend: vi.fn(),
-  getRangeAt: vi.fn(() => null),
-  modify: vi.fn(),
-  removeAllRanges: vi.fn(),
-  removeRange: vi.fn(),
-  selectAllChildren: vi.fn(),
-  setBaseAndExtent: vi.fn(),
-  setPosition: vi.fn(),
-  toString: vi.fn(() => ''),
-};
-
-vi.stubGlobal('getSelection', vi.fn(() => mockSelection));
-if (typeof document !== 'undefined') {
-  document.getSelection = vi.fn(() => mockSelection) as any;
-}
+// 历史包袱说明：
+// 此处曾经有一段 mockSelection 把 window.getSelection / document.getSelection
+// 全部替换成 noop stub，理由是"Slate 在 happy-dom 下因 selectionchange 死循环
+// 导致测试卡死"。经实测验证（2026-05），该诊断完全错误：
+//   1) 纯 <Editable /> 在 happy-dom 下 11ms 渲染完成，无任何死循环
+//   2) happy-dom 的 selectionchange 事件不会因读/写 selection 重复触发
+// 真正的死循环源在 src/MarkdownInputField/Suggestion/index.tsx：
+// 解构默认值 `items = []` 每次渲染生成新数组引用，触发 useEffect → setState →
+// re-render 的无限循环。该 bug 已被 happy-dom 的快速调度暴露并修复。
+// 移除 mockSelection 的好处：editorUtils.test.ts 等检测真实 Selection 异常的
+// 用例不再失效；Slate selection 相关代码路径恢复真实测试覆盖。
 
 vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
 

@@ -47,10 +47,14 @@ const defaultTestExcludes = [
   '**/tests/Bubble/**',
   '**/tests/Bubble*.tsx',
   '**/tests/schema/**',
+  /**
+   * Suggestion `items = []` 死循环已于 2026-05 修复，理论上 MarkdownInputField
+   * 测试可在默认套件运行；保留 default 排除是为了 `pnpm test` 整体耗时，
+   * 全量回归请使用 `pnpm run test:full`。
+   */
   '**/tests/MarkdownInputField/**',
   '**/tests/History/**',
   '**/src/MarkdownInputField/**',
-  '**/tests/editor/utils/editorUtils.test.ts',
   '**/tests/utils/language.test.ts',
 ];
 
