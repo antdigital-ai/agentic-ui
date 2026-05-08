@@ -9,7 +9,6 @@ import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
 import React, {
   memo,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -137,8 +136,8 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
   );
 
   const [hover, setHover] = useState(false);
-  const onMouseMove = useCallback(() => setHover(true), []);
-  const onMouseLeave = useCallback(() => setHover(false), []);
+  const onMouseMove = useRefFunction(() => setHover(true));
+  const onMouseLeave = useRefFunction(() => setHover(false));
 
   const handleToggleExpand = useRefFunction(() => {
     setExpandedState(!expandedState);
@@ -164,11 +163,11 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
 
   const needOverflowCheck = expandedState && !isLoading && !!thinkContent;
 
-  const checkOverflow = useCallback(() => {
+  const checkOverflow = useRefFunction(() => {
     const el = contentInnerRef.current;
     if (!el) return;
     setIsContentOverflowing(el.scrollHeight > CONTENT_COLLAPSE_THRESHOLD);
-  }, []);
+  });
 
   useEffect(() => {
     if (!needOverflowCheck) return;

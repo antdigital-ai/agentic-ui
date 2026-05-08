@@ -1,12 +1,7 @@
 import { ConfigProvider } from 'antd';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { cnLabels, enLabels } from './locales';
 
 export { cnLabels, enLabels };
@@ -201,20 +196,17 @@ export const I18nProvide: React.FC<{
   }, [antdContext?.locale?.locale, autoDetect, language]);
 
   // 语言切换处理函数
-  const setLanguage = useCallback((newLanguage: 'zh-CN' | 'en-US') => {
+  const setLanguage = useRefFunction((newLanguage: 'zh-CN' | 'en-US') => {
     setLanguageState(newLanguage);
     saveUserLanguage(newLanguage);
-  }, []);
+  });
 
   // 兼容旧的 setLocale 接口
-  const setLocale = useCallback(
-    (newLocale: typeof cnLabels) => {
-      // 根据传入的 locale 对象判断语言
-      const newLanguage = newLocale === cnLabels ? 'zh-CN' : 'en-US';
-      setLanguage(newLanguage);
-    },
-    [setLanguage],
-  );
+  const setLocale = useRefFunction((newLocale: typeof cnLabels) => {
+    // 根据传入的 locale 对象判断语言
+    const newLanguage = newLocale === cnLabels ? 'zh-CN' : 'en-US';
+    setLanguage(newLanguage);
+  });
 
   const contextValue = useMemo(
     () => ({

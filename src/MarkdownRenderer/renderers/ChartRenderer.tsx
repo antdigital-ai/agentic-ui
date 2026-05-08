@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Loading } from '../../Components/Loading';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { ChartRender } from '../../Plugins/chart/ChartRender';
 import { parseChineseCurrencyToNumber } from '../../Plugins/chart/utils';
 import { debugInfo } from '../../Utils/debugUtils';
@@ -81,7 +82,7 @@ const ChartWithRetry: React.FC<{
   } = props;
   const [retryKey, setRetryKey] = useState(0);
 
-  const handleChartError = React.useCallback(
+  const handleChartError = useRefFunction(
     (error: Error, info: React.ErrorInfo) => {
       debugInfo('[MarkdownRenderer ChartBlockRenderer] 渲染失败', {
         chartType,
@@ -96,12 +97,11 @@ const ChartWithRetry: React.FC<{
       });
       setRetryKey((k) => (k === 0 ? 1 : k));
     },
-    [chartType, rest?.title, x, y, chartDataItems.length, columns.length],
   );
 
-  const handleRetry = React.useCallback(() => {
+  const handleRetry = useRefFunction(() => {
     setRetryKey((k) => k + 1);
-  }, []);
+  });
 
   const chartFallback = (
     <div

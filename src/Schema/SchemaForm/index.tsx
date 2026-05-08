@@ -13,9 +13,9 @@ import React, {
   useMemo,
 } from 'react';
 import { I18nContext, compileTemplate } from '../../I18n';
-import { LowCodeSchema, SchemaProperty } from '../types';
+import { ComponentConfig, LowCodeSchema, SchemaProperty } from '../types';
 
-const EMPTY_COMPONENT = { properties: {} };
+const EMPTY_COMPONENT: ComponentConfig = { properties: {} };
 
 export interface SchemaFormProps {
   schema: LowCodeSchema;
@@ -367,7 +367,9 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
 
   // 计算默认值
   const defaultValues = useMemo(() => {
-    return Object.entries(properties).reduce(
+    return (
+      Object.entries(properties) as Array<[string, SchemaProperty]>
+    ).reduce(
       (acc, [key, prop]) => {
         if (prop.default !== undefined) {
           acc[key] = prop.default;
@@ -386,7 +388,9 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
 
   // 生成表单项
   const formItems = useMemo(() => {
-    return Object.entries(properties).map(([key, property]) => {
+    return (
+      Object.entries(properties) as Array<[string, SchemaProperty]>
+    ).map(([key, property]) => {
       const shouldUseFormItemName =
         property.type !== 'object' && property.type !== 'array';
 

@@ -1,7 +1,8 @@
 import { ChevronUp } from '@sofa-design/icons';
 import classNames from 'clsx';
-import React, { memo, useCallback, useContext } from 'react';
+import React, { memo, useContext } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { getArrowRotation, hasTaskContent } from '../constants';
 import type { TaskItem } from '../types';
@@ -22,9 +23,9 @@ export const TaskListItem: React.FC<TaskListItemProps> = memo(
     const isCollapsed = !expandedKeys.includes(item.key);
     const hasContent = hasTaskContent(item.content);
 
-    const handleToggle = useCallback(() => {
+    const handleToggle = useRefFunction(() => {
       onToggle(item.key);
-    }, [item.key, onToggle]);
+    });
 
     const arrowTitle = isCollapsed
       ? locale?.['taskList.expand'] || '展开'

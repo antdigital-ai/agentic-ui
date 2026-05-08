@@ -3,10 +3,11 @@
  * 统一管理代码编辑器的状态逻辑
  */
 
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useGetSetState } from 'react-use';
 import { Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { useSelStatus } from '../../../MarkdownEditor/hooks/editor';
@@ -31,12 +32,9 @@ export function useCodeEditorState(element: CodeNode) {
   });
 
   // 更新代码节点数据
-  const update = useCallback(
-    (data: Partial<CodeNode>) => {
-      Transforms.setNodes(store.editor, data, { at: path });
-    },
-    [path, store.editor],
-  );
+  const update = useRefFunction((data: Partial<CodeNode>) => {
+    Transforms.setNodes(store.editor, data, { at: path });
+  });
 
   // 处理编辑器选中状态的边框显示
   useEffect(() => {
@@ -48,35 +46,29 @@ export function useCodeEditorState(element: CodeNode) {
   }, [selected, path, setState, state, markdownEditorRef]);
 
   // 工具栏事件处理器
-  const handleCloseClick = useCallback(() => {
+  const handleCloseClick = useRefFunction(() => {
     setState({ hide: false });
-  }, [setState]);
+  });
 
-  const handleRunHtml = useCallback(() => {
+  const handleRunHtml = useRefFunction(() => {
     try {
       setState({ htmlStr: element?.value || '' });
     } catch (error) {
       // HTML 执行失败时静默处理
     }
-  }, [element?.value, setState]);
+  });
 
-  const handleHtmlPreviewClose = useCallback(() => {
+  const handleHtmlPreviewClose = useRefFunction(() => {
     setState({ htmlStr: '' });
-  }, [setState]);
+  });
 
-  const handleShowBorderChange = useCallback(
-    (show: boolean) => {
-      setState({ showBorder: show });
-    },
-    [setState],
-  );
+  const handleShowBorderChange = useRefFunction((show: boolean) => {
+    setState({ showBorder: show });
+  });
 
-  const handleHideChange = useCallback(
-    (hide: boolean) => {
-      setState({ hide });
-    },
-    [setState],
-  );
+  const handleHideChange = useRefFunction((hide: boolean) => {
+    setState({ hide });
+  });
 
   return {
     state: state(),

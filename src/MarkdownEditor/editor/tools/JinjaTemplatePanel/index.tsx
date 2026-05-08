@@ -3,16 +3,11 @@ import { Info } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import isHotkey from 'is-hotkey';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Editor, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { useLocale } from '../../../../I18n';
 import type { JinjaTemplateItem } from '../../../types';
 import { useEditorStore } from '../../store';
@@ -92,25 +87,22 @@ export const JinjaTemplatePanel: React.FC = () => {
     JINJA_PANEL_PREFIX_CLS;
   const { wrapSSR, hashId } = useJinjaTemplatePanelStyle(prefixCls);
 
-  const close = useCallback(() => {
+  const close = useRefFunction(() => {
     setOpenJinjaTemplate?.(false);
     setJinjaAnchorPath?.(null);
     setActiveIndex(0);
-  }, [setOpenJinjaTemplate, setJinjaAnchorPath]);
+  });
 
-  const handleClickOutside = useCallback(
-    (e: Event) => {
-      const target = e.target as HTMLElement;
-      if (domRef.current && !domRef.current.contains(target)) {
-        // 忽略弹窗打开后短时间内的点击，避免「点击聚焦编辑器后快速输入 {}」
-        // 触发的陈旧 click 事件立即关闭弹窗
-        const elapsed = Date.now() - openTimeRef.current;
-        if (elapsed < 150) return;
-        close();
-      }
-    },
-    [close],
-  );
+  const handleClickOutside = useRefFunction((e: Event) => {
+    const target = e.target as HTMLElement;
+    if (domRef.current && !domRef.current.contains(target)) {
+      // 忽略弹窗打开后短时间内的点击，避免「点击聚焦编辑器后快速输入 {}」
+      // 触发的陈旧 click 事件立即关闭弹窗
+      const elapsed = Date.now() - openTimeRef.current;
+      if (elapsed < 150) return;
+      close();
+    }
+  });
 
   useEffect(() => {
     if (!openJinjaTemplate) return;
@@ -164,64 +156,45 @@ export const JinjaTemplatePanel: React.FC = () => {
     return () => window.removeEventListener('click', handleClickOutside);
   }, [openJinjaTemplate, handleClickOutside]);
 
-  const insertTemplate = useCallback(
-    (item: JinjaTemplateItem) => {
-      const editor = markdownEditorRef?.current;
-      if (!editor || !jinjaAnchorPath || !setOpenJinjaTemplate) return;
-      try {
-        const end = Editor.end(editor, jinjaAnchorPath);
-        const start =
-          Editor.before(editor, end, { distance: trigger.length }) ?? end;
-        Transforms.delete(editor, { at: { anchor: start, focus: end } });
-        Transforms.insertText(editor, item.template, { at: start });
-        EditorUtils.focus(editor);
-      } finally {
-        close();
-      }
-    },
-    [
-      markdownEditorRef,
-      jinjaAnchorPath,
-      trigger.length,
-      setOpenJinjaTemplate,
-      close,
-    ],
-  );
+  const insertTemplate = useRefFunction((item: JinjaTemplateItem) => {
+    const editor = markdownEditorRef?.current;
+    if (!editor || !jinjaAnchorPath || !setOpenJinjaTemplate) return;
+    try {
+      const end = Editor.end(editor, jinjaAnchorPath);
+      const start =
+        Editor.before(editor, end, { distance: trigger.length }) ?? end;
+      Transforms.delete(editor, { at: { anchor: start, focus: end } });
+      Transforms.insertText(editor, item.template, { at: start });
+      EditorUtils.focus(editor);
+    } finally {
+      close();
+    }
+  });
 
-  const keydown = useCallback(
-    (e: KeyboardEvent) => {
-      if (!openJinjaTemplate) return;
-      if (isHotkey('esc', e)) {
-        e.preventDefault();
-        close();
-        EditorUtils.focus(markdownEditorRef?.current);
-        return;
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setActiveIndex((i) => (i > 0 ? i - 1 : items.length - 1));
-        return;
-      }
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setActiveIndex((i) => (i < items.length - 1 ? i + 1 : 0));
-        return;
-      }
-      if (e.key === 'Enter' && items[activeIndex]) {
-        e.preventDefault();
-        e.stopPropagation();
-        insertTemplate(items[activeIndex]);
-      }
-    },
-    [
-      openJinjaTemplate,
-      close,
-      markdownEditorRef,
-      items,
-      activeIndex,
-      insertTemplate,
-    ],
-  );
+  const keydown = useRefFunction((e: KeyboardEvent) => {
+    if (!openJinjaTemplate) return;
+    if (isHotkey('esc', e)) {
+      e.preventDefault();
+      close();
+      EditorUtils.focus(markdownEditorRef?.current);
+      return;
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex((i) => (i > 0 ? i - 1 : items.length - 1));
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex((i) => (i < items.length - 1 ? i + 1 : 0));
+      return;
+    }
+    if (e.key === 'Enter' && items[activeIndex]) {
+      e.preventDefault();
+      e.stopPropagation();
+      insertTemplate(items[activeIndex]);
+    }
+  });
 
   useEffect(() => {
     if (!openJinjaTemplate) return;

@@ -15,6 +15,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ActionIconBox } from '../Components/ActionIconBox';
 import { useAutoScroll } from '../Hooks/useAutoScroll';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { I18nContext } from '../I18n';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { DotLoading } from './DotAni';
@@ -405,22 +406,19 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
     }, [bubble?.isFinished, finishAutoCollapse]);
 
     // memo 化的回调函数
-    const handleCollapseToggle = React.useCallback(() => {
+    const handleCollapseToggle = useRefFunction(() => {
       setCollapse((prev) => !prev);
-    }, []);
+    });
 
-    const handleDocMetaClose = React.useCallback(() => {
+    const handleDocMetaClose = useRefFunction(() => {
       setDocMeta(null);
       onDocMetaClick?.(null);
-    }, [onDocMetaClick]);
+    });
 
-    const handleDocMetaClick = React.useCallback(
-      (meta: DocMeta) => {
-        setDocMeta(meta);
-        onDocMetaClick?.(meta);
-      },
-      [onDocMetaClick],
-    );
+    const handleDocMetaClick = useRefFunction((meta: DocMeta) => {
+      setDocMeta(meta);
+      onDocMetaClick?.(meta);
+    });
 
     const endStatusDisplay = useMemo(() => {
       const time = ((bubble?.endTime || 0) - (bubble?.createAt || 0)) / 1000;

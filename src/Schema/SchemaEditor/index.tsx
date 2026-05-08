@@ -5,12 +5,12 @@ import copy from 'copy-to-clipboard';
 import React, {
   forwardRef,
   memo,
-  useCallback,
   useContext,
   useImperativeHandle,
   useMemo,
   useState,
 } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { SchemaRenderer } from '../SchemaRenderer';
 import { LowCodeSchema } from '../types';
@@ -120,20 +120,17 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
     }, [schema]);
 
     // 将schema转换为JSON字符串
-    const schemaToJson = useCallback(
-      (schemaData: LowCodeSchema): string => {
-        try {
-          return JSON.stringify(schemaData, null, 2);
-        } catch (error) {
-          console.error(locale['schemaEditor.schemaSerializationError'], error);
-          return '{}';
-        }
-      },
-      [locale],
-    );
+    const schemaToJson = useRefFunction((schemaData: LowCodeSchema): string => {
+      try {
+        return JSON.stringify(schemaData, null, 2);
+      } catch (error) {
+        console.error(locale['schemaEditor.schemaSerializationError'], error);
+        return '{}';
+      }
+    });
 
     // 将JSON字符串转换为schema对象
-    const jsonToSchema = useCallback(
+    const jsonToSchema = useRefFunction(
       (jsonString: string): LowCodeSchema | null => {
         try {
           return JSON.parse(jsonString);
@@ -142,7 +139,6 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
           return null;
         }
       },
-      [locale],
     );
 
     // 从 schema 派生 htmlContent 和 schemaString
@@ -153,7 +149,7 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
     }, [schema, schemaToJson]);
 
     // 验证schema
-    const validateSchema = useCallback(
+    const validateSchema = useRefFunction(
       (schemaData: LowCodeSchema): string => {
         try {
           const result = mdDataSchemaValidator.validate(schemaData);
@@ -170,47 +166,37 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
             : locale['schemaEditor.validationFailed'];
         }
       },
-      [locale],
     );
 
     // 处理schema变更
-    const handleSchemaChange = useCallback(
-      (newSchema: LowCodeSchema) => {
-        setSchema(newSchema);
-        setValidationError(validateSchema(newSchema));
-        onChange?.(newSchema, values);
-      },
-      [values, onChange, validateSchema],
-    );
+    const handleSchemaChange = useRefFunction((newSchema: LowCodeSchema) => {
+      setSchema(newSchema);
+      setValidationError(validateSchema(newSchema));
+      onChange?.(newSchema, values);
+    });
 
     // 处理HTML内容变更
-    const handleHtmlChange = useCallback(
-      (newHtml: string) => {
-        const newSchema = {
-          ...schemaRef.current,
-          component: {
-            ...schemaRef.current.component,
-            schema: newHtml,
-          },
-        };
-        handleSchemaChange(newSchema);
-      },
-      [handleSchemaChange],
-    );
+    const handleHtmlChange = useRefFunction((newHtml: string) => {
+      const newSchema = {
+        ...schemaRef.current,
+        component: {
+          ...schemaRef.current.component,
+          schema: newHtml,
+        },
+      };
+      handleSchemaChange(newSchema);
+    });
 
     // 处理JSON编辑器变更
-    const handleJsonChange = useCallback(
-      (newJsonString: string) => {
-        const newSchema = jsonToSchema(newJsonString);
-        if (newSchema) {
-          handleSchemaChange(newSchema);
-        }
-      },
-      [jsonToSchema, handleSchemaChange],
-    );
+    const handleJsonChange = useRefFunction((newJsonString: string) => {
+      const newSchema = jsonToSchema(newJsonString);
+      if (newSchema) {
+        handleSchemaChange(newSchema);
+      }
+    });
 
     // 处理运行按钮点击
-    const handleRunClick = useCallback(() => {
+    const handleRunClick = useRefFunction(() => {
       const currentSchema = schemaRef.current;
       setRenderedSchema({ ...currentSchema });
 
@@ -219,10 +205,10 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
         setValues(currentSchema.initialValues);
       }
       setIsSchemaRendered(true);
-    }, []);
+    });
 
     // 复制函数
-    const handleCopyContent = useCallback(
+    const handleCopyContent = useRefFunction(
       (content: string, type: 'html' | 'json') => {
         if (!content || !content.trim()) {
           message.warning(locale['schemaEditor.noContentToCopy']);
@@ -243,21 +229,20 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
           console.error(locale['schemaEditor.copyFailed'], error);
         }
       },
-      [locale],
     );
 
     // 处理复制HTML内容
-    const handleCopyHtml = useCallback(() => {
+    const handleCopyHtml = useRefFunction(() => {
       handleCopyContent(htmlContent, 'html');
-    }, [htmlContent, handleCopyContent]);
+    });
 
     // 处理复制JSON内容
-    const handleCopyJson = useCallback(() => {
+    const handleCopyJson = useRefFunction(() => {
       handleCopyContent(schemaString, 'json');
-    }, [schemaString, handleCopyContent]);
+    });
 
     // 统一的设置内容方法，支持 HTML 或 JSON 字符串
-    const setContent = useCallback(
+    const setContent = useRefFunction(
       (content: string, type: 'html' | 'json') => {
         if (type === 'html') {
           handleHtmlChange(content);
@@ -265,7 +250,6 @@ const SchemaEditorComponent = forwardRef<SchemaEditorRef, SchemaEditorProps>(
           handleJsonChange(content);
         }
       },
-      [handleHtmlChange, handleJsonChange],
     );
 
     // 暴露 ref 方法

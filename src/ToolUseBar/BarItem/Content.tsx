@@ -6,14 +6,7 @@ import {
   X,
 } from '@sofa-design/icons';
 import classNames from 'clsx';
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { ToolCall } from '.';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 
@@ -296,12 +289,12 @@ const ToolContentComponent: React.FC<ToolContentProps> = ({
     ) : null;
   }, [tool.content, contentClassName]);
 
-  const checkOverflow = useCallback(() => {
+  const checkOverflow = useRefFunction(() => {
     const el = contentInnerRef.current;
     if (!el) return;
     const { scrollHeight } = el;
     setIsContentOverflowing(scrollHeight > CONTENT_COLLAPSE_THRESHOLD);
-  }, []);
+  });
 
   useEffect(() => {
     if (!showContent || !expanded) return;

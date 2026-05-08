@@ -1,10 +1,5 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { isBrowser, isTest } from '../../Utils/env';
 import {
   ATTACHMENT_EXTRA_HEIGHT_PX,
@@ -103,15 +98,14 @@ export const useInputFieldGeometry = ({
   const [quickRightOffset, setQuickRightOffset] = useState(0);
 
   // 对外只暴露稳定的回调，避免主组件再当胶水把 setter 接到子组件 onResize 上。
-  const onSendActionsResize = useCallback((width: number) => {
+  const onSendActionsResize = useRefFunction((width: number) => {
     setRightPadding(width);
-  }, []);
-  const onQuickActionsResize = useCallback(
+  });
+  const onQuickActionsResize = useRefFunction(
     (width: number, rightOffset: number) => {
       setTopRightPadding(width);
       setQuickRightOffset(rightOffset);
     },
-    [],
   );
 
   const inputRef = useRef<HTMLDivElement>(null);

@@ -34,7 +34,11 @@ interface SuggestionTagInputProps {
   menu?: MenuProps;
   dropdownStyle?: React.CSSProperties;
   notFoundContent?: React.ReactNode;
-  onChange?: (value: string) => void;
+  /**
+   * 标签输入值变更回调。
+   * 第二参数为调用方上下文（如外层 RenderProps），按需透传，未使用时可忽略。
+   */
+  onChange?: (value: string, props?: any) => void;
 }
 
 /**

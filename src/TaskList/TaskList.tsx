@@ -130,6 +130,10 @@ export const TaskList = memo(
       };
     }, [items, locale, taskCompleteText]);
 
+    // 注意：此处必须用 useCallback 而非 useRefFunction。
+    // renderItems 在父组件渲染期被同步调用（`{renderItems(items)}`），
+    // 而 useRefFunction 通过 useLayoutEffect 在 commit 阶段才刷新 ref，
+    // 渲染期调用会拿到上一帧的闭包，导致 internalExpandedKeys 等状态用旧值。
     const renderItems = useCallback(
       (visibleItems: TaskItem[]) => {
         return visibleItems.map((item, index) => (

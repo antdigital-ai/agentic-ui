@@ -1,4 +1,5 @@
-import React, { forwardRef, memo, useCallback } from 'react';
+import React, { forwardRef, memo } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { getScrollRailHeight } from '../Utils/getScroll';
 import scrollTo from '../Utils/scrollTo';
 import { BottomIcon } from './icons/BottomIcon';
@@ -92,36 +93,30 @@ const BackBottomComponent = forwardRef<ScrollVisibleButtonRef, BackBottomProps>(
       ...rest
     } = props;
 
-    const shouldVisible = useCallback<
+    const shouldVisible = useRefFunction<
       (scrollTop: number, container: HTMLElement | Window) => boolean
-    >(
-      (scrollTop, container) => {
-        if (typeof propsShouldVisible === 'function') {
-          return propsShouldVisible(scrollTop, container);
-        }
-        const scrollRailHeight = getScrollRailHeight(container);
-        return (
-          scrollRailHeight - scrollTop >=
-          (propsShouldVisible ?? DEFAULT_VISIBLE_THRESHOLD)
-        );
-      },
-      [propsShouldVisible],
-    );
+    >((scrollTop, container) => {
+      if (typeof propsShouldVisible === 'function') {
+        return propsShouldVisible(scrollTop, container);
+      }
+      const scrollRailHeight = getScrollRailHeight(container);
+      return (
+        scrollRailHeight - scrollTop >=
+        (propsShouldVisible ?? DEFAULT_VISIBLE_THRESHOLD)
+      );
+    });
 
-    // 使用 useCallback 优化滚动到底部处理函数
-    const scrollToBottom = useCallback<
+    // 使用 useRefFunction 优化滚动到底部处理函数，保持引用稳定
+    const scrollToBottom = useRefFunction<
       (
         e: React.MouseEvent<HTMLButtonElement> | undefined,
         container: HTMLElement | Window,
       ) => void
-    >(
-      (e, container) => {
-        const scrollRailHeight = getScrollRailHeight(container);
-        scrollTo(scrollRailHeight, { container, duration });
-        onClick?.(e, container);
-      },
-      [duration, onClick],
-    );
+    >((e, container) => {
+      const scrollRailHeight = getScrollRailHeight(container);
+      scrollTo(scrollRailHeight, { container, duration });
+      onClick?.(e, container);
+    });
 
     // shouldVisible 是 ScrollVisibleButton 的内部 prop，通过类型断言注入
     const scrollVisibleProps = {

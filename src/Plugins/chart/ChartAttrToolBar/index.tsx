@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import React, { useContext, useRef } from 'react';
 import { NodeEntry, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../I18n';
 import { ChartNode, EditorUtils } from '../../../MarkdownEditor';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
@@ -67,7 +68,7 @@ export const ChartAttrToolBar: React.FC<{
 
   const chartNodeRef = useRef<NodeEntry<ChartNode>>();
 
-  const remove = React.useCallback(() => {
+  const remove = useRefFunction(() => {
     const chart = props.node;
     if (!chart) return;
 
@@ -76,7 +77,7 @@ export const ChartAttrToolBar: React.FC<{
     });
     chartNodeRef.current = undefined;
     ReactEditor.focus(markdownEditorRef.current);
-  }, [markdownEditorRef.current]);
+  });
 
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls(`chart-attr-toolbar`);

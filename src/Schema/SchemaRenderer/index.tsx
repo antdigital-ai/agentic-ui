@@ -15,11 +15,11 @@ import {
   DEFAULT_SANDBOX_CONFIG,
   ProxySandbox,
 } from '../../Utils/proxySandbox';
-import { LowCodeSchema } from '../types';
+import { ComponentConfig, LowCodeSchema } from '../types';
 import { mdDataSchemaValidator } from '../validator';
 
 const EMPTY_SCHEMA: LowCodeSchema = {} as LowCodeSchema;
-const EMPTY_COMPONENT = {};
+const EMPTY_COMPONENT: ComponentConfig = {};
 const EMPTY_INITIAL_VALUES = {};
 import { TemplateEngine } from './templateEngine';
 export * from './templateEngine';

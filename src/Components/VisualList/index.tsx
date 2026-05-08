@@ -1,6 +1,6 @@
 import { SquareArrowUpRight } from '@sofa-design/icons';
 import classNames from 'clsx';
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { useStyle } from './style';
 
@@ -20,9 +20,9 @@ const VisualListImage = memo<VisualListImageProps>(
   ({ item, prefixCls, hashId, shape, imageStyle }) => {
     const [imageError, setImageError] = useState(false);
 
-    const handleImageError = useCallback(() => {
+    const handleImageError = useRefFunction(() => {
       setImageError(true);
-    }, []);
+    });
 
     if (imageError || !item.src) {
       return (

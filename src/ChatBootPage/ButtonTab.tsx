@@ -1,6 +1,7 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { memo, useCallback, useContext } from 'react';
+import React, { memo, useContext } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { useStyle } from './ButtonTabStyle';
 
 export interface ButtonTabProps {
@@ -43,19 +44,16 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
   // P0-3：disabled 时统一短路，避免键盘 Enter/Space 仍能触发 onClick
-  const handleClick = useCallback(() => {
+  const handleClick = useRefFunction(() => {
     if (disabled) return;
     onClick?.();
-  }, [disabled, onClick]);
+  });
 
-  const handleIconClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (disabled) return;
-      onIconClick?.();
-    },
-    [disabled, onIconClick],
-  );
+  const handleIconClick = useRefFunction((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (disabled) return;
+    onIconClick?.();
+  });
 
   // 注意：原生 <button> 已原生处理 Enter/Space 触发 onClick，
   // 无需额外 handleKeyDown，避免同一按键触发两次。
@@ -81,17 +79,14 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
   // P1-5：当 icon 区域是独立可点的（onIconClick 存在）时，需要让键盘也能触发它。
   // 用 role="button" + tabIndex + 键盘 handler 让 icon span 成为独立 a11y 元素；
   // 同时阻止键盘事件冒泡到外层主按钮，避免一次按键触发两次 onClick。
-  const handleIconKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (disabled || !onIconClick) return;
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        e.stopPropagation();
-        onIconClick();
-      }
-    },
-    [disabled, onIconClick],
-  );
+  const handleIconKeyDown = useRefFunction((e: React.KeyboardEvent) => {
+    if (disabled || !onIconClick) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      onIconClick();
+    }
+  });
 
   // P1-9：testid 与 prefixCls 解耦
   const testId = 'agentic-chatboot-button-tab';

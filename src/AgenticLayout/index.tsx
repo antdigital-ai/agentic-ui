@@ -3,7 +3,6 @@ import classNames from 'clsx';
 import React, {
   memo,
   ReactNode,
-  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -13,6 +12,7 @@ import {
   LayoutHeader,
   type LayoutHeaderConfig,
 } from '../Components/LayoutHeader';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { useAgenticLayoutStyle } from './style';
 
 export interface AgenticLayoutProps {
@@ -162,7 +162,7 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
   const resizeStartWidth = useRef<number>(rightWidth);
 
   // 计算最大宽度（浏览器窗口的70%）
-  const getMaxRightWidth = useCallback(() => computeMaxRightWidth(), []);
+  const getMaxRightWidth = useRefFunction(() => computeMaxRightWidth());
 
   // 当 rightWidth prop 变化时同步状态，并在同一时刻 clamp 防止越界。
   // 同样走 maxOnly：尊重外部 prop，不强制套用 MIN_RIGHT_WIDTH。
@@ -197,7 +197,7 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
 
   // 处理拖拽开始：捕获本次拖拽的初始状态，并把 mousemove/mouseup 直接绑定到 document。
   // listener 通过 ref 持有，使得卸载/单次拖拽结束都能精确移除。
-  const handleResizeStart = useCallback(
+  const handleResizeStart = useRefFunction(
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
@@ -262,7 +262,6 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
       document.body.style.cursor = 'col-resize';
       document.body.style.userSelect = 'none';
     },
-    [currentRightWidth, getMaxRightWidth, isRTL],
   );
 
   /**
@@ -271,7 +270,7 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
    * - 在 RTL 下方向相反
    * - Shift 切大步长
    */
-  const handleResizeKeyDown = useCallback(
+  const handleResizeKeyDown = useRefFunction(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       const maxWidth = getMaxRightWidth();
       const step = e.shiftKey
@@ -297,7 +296,6 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
       e.preventDefault();
       setCurrentRightWidth(clampRightWidth(next, maxWidth));
     },
-    [currentRightWidth, getMaxRightWidth, isRTL],
   );
 
   // 仅在卸载时执行一次清理：移除可能残留的 document 级 listener、复位 body 样式、取消 rAF。

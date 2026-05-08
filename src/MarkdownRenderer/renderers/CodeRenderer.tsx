@@ -1,5 +1,6 @@
 import copy from 'copy-to-clipboard';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { CodeNode } from '../../MarkdownEditor/el';
 import type { MarkdownEditorProps } from '../../MarkdownEditor/types';
 import { useDetectTheme } from '../../Plugins/chart/hooks';
@@ -66,7 +67,7 @@ export const CodeBlockRenderer: React.FC<
     [language, code],
   );
 
-  const handleCopy = useCallback(() => {
+  const handleCopy = useRefFunction(() => {
     try {
       copy(code);
     } catch (error) {
@@ -74,11 +75,11 @@ export const CodeBlockRenderer: React.FC<
         error: (error as Error)?.message || String(error),
       });
     }
-  }, [code]);
+  });
 
-  const handleToggleExpanded = useCallback(() => {
+  const handleToggleExpanded = useRefFunction(() => {
     setIsExpanded((prev) => !prev);
-  }, []);
+  });
 
   const defaultDom = (
     <CodeContainer

@@ -61,7 +61,7 @@ vi.mock('react-rnd', () => ({
   ),
 }));
 
-vi.mock('@ant-design/pro-components', () => ({
+vi.mock('../../../../Hooks/useDebounceFn', () => ({
   useDebounceFn: (fn: any) => ({ run: fn, cancel: vi.fn() }),
 }));
 

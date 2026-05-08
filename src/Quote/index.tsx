@@ -1,7 +1,8 @@
 import { CloseCircleFill, CornerLeftUp, QuoteBefore } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { useStyle } from './style';
 
 const POPUP_ICON_STYLE: React.CSSProperties = {
@@ -113,11 +114,11 @@ const QuoteComponent: React.FC<QuoteProps> = ({
   const prefixCls = getPrefixCls('agentic-quote');
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
-  const handleFileClick = useCallback(() => {
+  const handleFileClick = useRefFunction(() => {
     if (onFileClick && fileName) {
       onFileClick(fileName, lineRange);
     }
-  }, [onFileClick, fileName, lineRange]);
+  });
 
   const cls = useMemo(
     () => ({

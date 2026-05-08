@@ -1,7 +1,8 @@
 import { ArrowRight } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, { memo, useCallback, useContext } from 'react';
+import React, { memo, useContext } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { useLocale } from '../I18n';
 import { useStyle } from './CaseReplyStyle';
 
@@ -130,7 +131,7 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
 
   // P1-6：仅当 onClick 存在时，才把外层 div 升级为可聚焦的 button 角色，
   // 避免没有点击意图的卡片污染 tab 流。
-  const handleKeyDown = useCallback(
+  const handleKeyDown = useRefFunction(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (!onClick) return;
       if (e.key === 'Enter' || e.key === ' ') {
@@ -138,7 +139,6 @@ const CaseReplyComponent: React.FC<CaseReplyProps> = ({
         onClick();
       }
     },
-    [onClick],
   );
 
   // P1-9：testid 与 prefixCls 解耦，避免外层 ConfigProvider 改 prefix 时测试失效。

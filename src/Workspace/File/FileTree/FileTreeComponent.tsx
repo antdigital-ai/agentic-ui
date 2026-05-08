@@ -5,7 +5,6 @@ import type { AntdTreeNodeAttribute } from 'antd/es/tree/Tree';
 import classNames from 'clsx';
 import React, {
   type FC,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -115,7 +114,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
     [innerTree],
   );
 
-  const handleLoadData = useCallback(
+  const handleLoadData = useRefFunction(
     (treeNode: EventDataNode<DataNode>) => {
       const k = String(treeNode.key);
       const source = nodeMap.get(k);
@@ -147,10 +146,9 @@ const FileTreeComponent: FC<FileTreeProps> = ({
           throw error;
         });
     },
-    [onLoadChildrenRef, nodeMap],
   );
 
-  const handleSelect: NonNullable<TreeProps['onSelect']> = useCallback(
+  const handleSelect: NonNullable<TreeProps['onSelect']> = useRefFunction(
     (_keys, info) => {
       if (!onSelect) return;
       if (!info.selected) return;
@@ -158,10 +156,9 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       const n = nodeMap.get(k);
       if (n) onSelect(n);
     },
-    [nodeMap, onSelect],
   );
 
-  const handleTreeIcon: TreeProps['icon'] = useCallback(
+  const handleTreeIcon: TreeProps['icon'] = useRefFunction(
     (iconProps: AntdTreeNodeAttribute) => {
       const k = String(iconProps.eventKey);
       const n = nodeMap.get(k);
@@ -197,7 +194,6 @@ const FileTreeComponent: FC<FileTreeProps> = ({
         </span>
       );
     },
-    [hashId, nodeMap, prefixCls],
   );
 
   const showEmpty = innerTree.length === 0;

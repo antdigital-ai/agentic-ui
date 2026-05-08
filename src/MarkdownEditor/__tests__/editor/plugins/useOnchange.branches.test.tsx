@@ -16,7 +16,7 @@ const storeState = {
   setDomRect: mockSetDomRect,
 };
 
-vi.mock('@ant-design/pro-components', () => ({
+vi.mock('../../../../Hooks/useDebounceFn', () => ({
   useDebounceFn: (fn: any) => ({
     cancel: mockCancel,
     run: (...args: any[]) => {

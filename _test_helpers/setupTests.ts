@@ -71,6 +71,65 @@ vi.mock('@galacean/effects', () => {
   };
 });
 
+/**
+ * ===== 重子树全局 mock（性能优化，2026-05）=====
+ * 背景：BaseMarkdownEditorSlate 的顶层 import 链冷启动 ~6.7s（实测）。
+ * 主因是 katex / mermaid / react-syntax-highlighter 这些只在渲染态需要的
+ * 重包，被 editor/elements 的桶状导出间接拉进每个测试文件的模块图。
+ * 业务测试不直接断言这些库的内部行为，因此在 setup 阶段提供「足够真实
+ * 的轻量替身」，可显著降低首次加载开销。
+ *
+ * 注意事项：
+ * - katex.renderToString 必须返回包含 `class="katex"` 的字符串，
+ *   否则 markdownToHtml.test.ts 等用例的 `toContain('class="katex"')`
+ *   断言会失败。
+ * - mermaid.render 返回与 sharedMocks.mockMermaid 相同形状的对象。
+ */
+vi.mock('katex', () => {
+  const renderToString = vi.fn((tex: string = '') =>
+    `<span class="katex"><span class="katex-mathml">${tex}</span></span>`,
+  );
+  const render = vi.fn((tex: string, container: HTMLElement | null) => {
+    if (container) container.innerHTML = renderToString(tex);
+  });
+  const katexMock = { renderToString, render };
+  return {
+    default: katexMock,
+    renderToString,
+    render,
+  };
+});
+
+vi.mock('mermaid', () => {
+  const mermaidMock = {
+    initialize: vi.fn(),
+    render: vi.fn().mockResolvedValue({ svg: '<svg>mermaid</svg>' }),
+    parse: vi.fn().mockResolvedValue(true),
+    getConfig: vi.fn().mockReturnValue({}),
+    setConfig: vi.fn(),
+    contentLoaded: vi.fn(),
+    run: vi.fn().mockResolvedValue(undefined),
+  };
+  return {
+    default: mermaidMock,
+    ...mermaidMock,
+  };
+});
+
+vi.mock('react-syntax-highlighter', () => {
+  const Stub = ({ children }: { children?: React.ReactNode }) =>
+    React.createElement('pre', { 'data-testid': 'syntax-highlighter' }, children);
+  return {
+    default: Stub,
+    Prism: Stub,
+    Light: Stub,
+    PrismLight: Stub,
+    LightAsync: Stub,
+    PrismAsync: Stub,
+    PrismAsyncLight: Stub,
+  };
+});
+
 // 设置全局mocks
 setupGlobalMocks();
 setupLottieMock();

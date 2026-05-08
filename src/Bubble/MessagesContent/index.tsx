@@ -1,7 +1,7 @@
 import { ExportOutlined } from '@ant-design/icons';
 import { ConfigProvider, Popover, Tooltip, Typography } from 'antd';
 import classNames from 'clsx';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
@@ -90,11 +90,10 @@ export const BubbleMessageDisplay: React.FC<
     return node;
   });
 
-  const handleFootnoteDefinitionChange = useCallback(
+  const handleFootnoteDefinitionChange = useRefFunction(
     (list: typeof nodeList) => {
       setNodeList(list);
     },
-    [],
   );
 
   const typing = useMemo(() => {
@@ -135,7 +134,7 @@ export const BubbleMessageDisplay: React.FC<
     contentAfterDom,
   ]);
 
-  const mdReferenceRender = useCallback(
+  const mdReferenceRender = useRefFunction(
     (mdProps: { children?: React.ReactNode }, _: React.ReactNode) => {
       const reference_url_info_list =
         props.originData?.extra?.reference_url_info_list || [];
@@ -249,17 +248,6 @@ export const BubbleMessageDisplay: React.FC<
         </Popover>
       );
     },
-    [
-      props.originData?.extra?.reference_url_info_list,
-      funRender,
-      locale,
-      baseChatCls,
-      hashId,
-      props?.customConfig?.PopoverProps?.titleStyle,
-      props?.customConfig?.PopoverProps?.contentStyle,
-      props?.customConfig?.TooltipProps,
-      props.markdownRenderConfig?.fncProps?.onOriginUrlClick,
-    ],
   );
 
   const markdownPreviewFncProps = useMemo(

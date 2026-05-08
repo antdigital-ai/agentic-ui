@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
+import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { TableNode } from '../../types/Table';
 
 export interface TableContextValue {
@@ -25,11 +26,10 @@ export const TablePropsProvider: React.FC<{
     columnIndex?: number;
   } | null>(null);
 
-  const handleSetDeleteIconPosition = useCallback(
+  const handleSetDeleteIconPosition = useRefFunction(
     (position: { rowIndex?: number; columnIndex?: number } | null) => {
       setDeleteIconPosition(position);
     },
-    [],
   );
 
   const contextValue: TableContextValue = {

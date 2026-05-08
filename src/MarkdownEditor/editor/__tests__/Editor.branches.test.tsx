@@ -22,7 +22,7 @@ const mockOnChange = vi.fn();
 /* ========== Module Mocks ========== */
 
 // useDebounceFn：让 handleSelectionChange 同步执行
-vi.mock('@ant-design/pro-components', () => ({
+vi.mock('../../../Hooks/useDebounceFn', () => ({
   useDebounceFn: (fn: any) => ({ run: fn, cancel: vi.fn() }),
 }));
 

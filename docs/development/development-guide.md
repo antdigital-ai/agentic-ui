@@ -174,6 +174,202 @@ git commit -m "test: add unit tests for markdown parser"
 
 ## ⚡ 性能优化
 
+### React Hooks 依赖陷阱
+
+以下模式是项目中实际出现并修复过的 bug，开发时务必注意。
+
+#### 1. 空数组/空对象字面量在依赖中导致死循环
+
+`[]` 和 `{}` 每次渲染都是新引用，放入 `useEffect` / `useMemo` / `useCallback` 的依赖数组会导致无限重执行。
+
+```tsx | pure
+// ❌ 错误：每次渲染 items 都是新的 []，effect 无限触发
+const MyComponent = ({ items = [] }) => {
+  useEffect(() => {
+    setInternalActiveKey(items[0]?.key);
+  }, [items]);
+};
+
+// ✅ 正确：模块级常量提供稳定引用
+const EMPTY_ITEMS: MyComponentProps['items'] = [];
+const MyComponent = ({ items = EMPTY_ITEMS }) => {
+  useEffect(() => {
+    setInternalActiveKey(items[0]?.key);
+  }, [items]);
+};
+```
+
+同样适用于 `|| {}` / `|| []` / `?? {}` 等回退模式：
+
+```tsx | pure
+// ❌ 错误：schema 为 null 时，每次渲染 safeSchema 都是新对象
+const safeSchema = schema || {};
+const result = useMemo(() => validate(safeSchema), [safeSchema]);
+
+// ✅ 正确：模块级常量
+const EMPTY_SCHEMA = {} as SchemaType;
+const safeSchema = schema ?? EMPTY_SCHEMA;
+const result = useMemo(() => validate(safeSchema), [safeSchema]);
+```
+
+> **关键规则**：凡是在 hook 依赖数组中使用的值，绝不能由 `|| []`、`|| {}`、`= []`、`= {}` 等字面量创建。必须使用模块级常量或 `useMemo` 稳定引用。
+
+#### 2. 状态既在依赖中又在 effect 内被设置 — 多余触发
+
+当 `useEffect` 的依赖包含某个 state，而 effect 内部又调用了该 state 的 setter，会导致 effect 重复执行。
+
+```tsx | pure
+// ❌ 错误：currentRightWidth 变化 → effect 重建 → setCurrentRightWidth → 循环
+useEffect(() => {
+  const handleResize = () => {
+    if (currentRightWidth > maxWidth) {
+      setCurrentRightWidth(maxWidth);
+    }
+  };
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, [currentRightWidth, getMaxRightWidth]);
+
+// ✅ 正确：用 ref 持有 state，依赖中移除 state
+const currentRightWidthRef = useRef(currentRightWidth);
+currentRightWidthRef.current = currentRightWidth;
+
+useEffect(() => {
+  const handleResize = () => {
+    if (currentRightWidthRef.current > maxWidth) {
+      setCurrentRightWidth(maxWidth);
+    }
+  };
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, [getMaxRightWidth]);
+```
+
+同样模式适用于：isEditorFocused、isControlled 等布尔状态在 event listener effect 中使用的情况。
+
+#### 3. 对象类型的 hook 依赖应提取为原始值
+
+当 hook 依赖是对象时，每次父组件渲染都会产生新引用，导致 effect 过度触发。
+
+```tsx | pure
+// ❌ 错误：antdContext?.locale 是对象，每次渲染都可能新引用
+useEffect(() => {
+  const antdLocale = antdContext.locale.locale;
+  // ...
+}, [antdContext?.locale, autoDetect, language]);
+
+// ✅ 正确：只依赖需要的原始值（字符串）
+useEffect(() => {
+  const antdLocale = antdContext.locale.locale;
+  // ...
+}, [antdContext?.locale?.locale, autoDetect, language]);
+```
+
+#### 4. props.children 作为依赖 — 过度触发
+
+`props.children` 在父组件每次渲染时都是新引用，不应直接作为 effect 依赖。
+
+```tsx | pure
+// ❌ 错误：每次父渲染都触发 effect
+useEffect(() => {
+  syncOrderedFromChildren(props.children);
+}, [props.children]);
+
+// ✅ 正确：提取稳定的 key 序列作为依赖
+const childrenKeys = useMemo(
+  () => React.Children.toArray(props.children)
+    .filter(React.isValidElement)
+    .map((child) => child.key),
+  [props.children],
+);
+
+useEffect(() => {
+  syncOrderedFromChildren(props.children);
+}, [childrenKeys]);
+```
+
+#### 5. 闭包陈旧 — 缺失依赖
+
+effect 内使用了变量但未列入依赖，导致闭包捕获旧值。
+
+```tsx | pure
+// ❌ 错误：props.plugins 变化不会触发重新解析
+useEffect(() => {
+  editorRef.current?.store?.updateNodeList(
+    parserMdToSchema(formatted, props.plugins).schema,
+  );
+}, [props.initValue]); // 缺少 props.plugins
+
+// ✅ 正确：补全依赖
+useEffect(() => {
+  editorRef.current?.store?.updateNodeList(
+    parserMdToSchema(formatted, props.plugins).schema,
+  );
+}, [props.initValue, props.plugins]);
+```
+
+对于只在初始化时执行的 effect（如 `onInit`），如果回调可能变化，应使用 `useRefFunction` 或 ref 持有：
+
+```tsx | pure
+// ❌ 错误：onChange 闭包捕获初始值，后续变化不会更新
+useEffect(() => {
+  if (!readonly && onChange) {
+    codeEditor.on('change', () => {
+      onChange(newValue); // 永远是初始的 onChange
+    });
+  }
+}, [aceLoaded]); // 缺少 onChange
+
+// ✅ 正确：用 ref 持有最新回调
+const onChangeRef = useRef(onChange);
+onChangeRef.current = onChange;
+
+useEffect(() => {
+  if (!readonly && onChangeRef.current) {
+    codeEditor.on('change', () => {
+      onChangeRef.current?.(newValue);
+    });
+  }
+}, [aceLoaded]);
+```
+
+#### 6. ref.current 不应作为 hook 依赖
+
+React 不会追踪 `ref.current` 的变化，将其放入依赖数组不可靠。
+
+```tsx | pure
+// ❌ 错误：ref.current 变化不会触发 effect
+useEffect(() => {
+  if (nodeRef.current !== props.instance) {
+    initialNote();
+  }
+}, [props.instance, markdownEditorRef.current]); // ref.current 不可靠
+
+// ✅ 正确：移除 ref.current 依赖，加注释说明
+useEffect(() => {
+  if (nodeRef.current !== props.instance) {
+    initialNote();
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- markdownEditorRef.current 是可变 ref
+}, [props.instance]);
+```
+
+#### 7. ref 同步应使用 useLayoutEffect
+
+用无依赖 `useEffect` 同步 ref 值的模式应改为 `useLayoutEffect`，避免在 paint 后再做同步写入。
+
+```tsx | pure
+// ❌ 不推荐：paint 后才同步 ref
+useEffect(() => {
+  callbackRef.current = props.onCallback;
+});
+
+// ✅ 推荐：DOM 更新后、paint 前同步 ref
+useLayoutEffect(() => {
+  callbackRef.current = props.onCallback;
+});
+```
+
 ### 渲染性能优化
 
 #### 1. 组件 Memoization

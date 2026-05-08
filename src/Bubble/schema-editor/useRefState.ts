@@ -1,4 +1,5 @@
-import { MutableRefObject, useCallback, useRef, useState } from 'react';
+import { MutableRefObject, useRef, useState } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 
 /**
  * useRefState - 同时维护 state 和 ref 的 hook
@@ -29,7 +30,7 @@ export function useRefState<T>(
   // 每次渲染也同步（处理外部直接读取 state 后变化的情况）
   ref.current = state;
 
-  const setRefState = useCallback((value: T | ((prev: T) => T)) => {
+  const setRefState = useRefFunction((value: T | ((prev: T) => T)) => {
     const newValue =
       typeof value === 'function'
         ? (value as (prev: T) => T)(ref.current)
@@ -37,7 +38,7 @@ export function useRefState<T>(
 
     ref.current = newValue; // 立即更新 ref
     setState(newValue); // 触发重渲染
-  }, []);
+  });
 
   return [state, setRefState, ref];
 }

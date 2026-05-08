@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/no-children-prop */
-import { useDebounceFn } from '@ant-design/pro-components';
+import { useDebounceFn } from '../../Hooks/useDebounceFn';
 import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -254,7 +254,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   }, [props?.comment?.commentList]);
 
   const handleSelectionChange = useDebounceFn(
-    async (e: React.ReactEventHandler<HTMLDivElement>) => {
+    async (e?: React.SyntheticEvent<HTMLDivElement>) => {
       // 只读且不需要选区（无 onSelectionChange、无 FloatBar）时，跳过选区同步与 DOM 测量，提升性能
       if (
         readonly &&
@@ -1223,7 +1223,9 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
             hashId,
           )}
           style={props.style}
-          onSelect={handleSelectionChange.run}
+          onSelect={(e) => {
+            handleSelectionChange.run(e);
+          }}
           onCut={(event: React.ClipboardEvent<HTMLDivElement>) => {
             const handled = handleClipboardCopy(event, 'cut');
             if (!handled) {

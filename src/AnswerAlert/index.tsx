@@ -3,12 +3,12 @@ import classNames from 'clsx';
 import React, {
   isValidElement,
   memo,
-  useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
 } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { CloseIcon } from './components/CloseIcon';
 import { ErrorIcon } from './components/ErrorIcon';
 import { InfoIcon } from './components/InfoIcon';
@@ -201,7 +201,7 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 使用 useCallback 优化关闭处理函数
-  const handleClose = useCallback(
+  const handleClose = useRefFunction(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       // 已经在退出流程中，忽略后续点击，确保 onClose 只触发一次
       if (closing || closed) return;
@@ -213,7 +213,6 @@ const AnswerAlertComponent: React.FC<AnswerAlertProps> = ({
         setClosed(true);
       }
     },
-    [closing, closed, motion, onClose],
   );
 
   // 监听退出动画结束 → 真正卸载

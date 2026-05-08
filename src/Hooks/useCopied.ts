@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRefFunction } from './useRefFunction';
 
 /**
  * "已复制"状态自动复位的持续时间（ms）
@@ -45,12 +46,12 @@ export const useCopied = () => {
    * 命名上沿用历史 API（`setCopied`），但语义是「trigger」而非通用 setter，
    * 不接受参数；如需主动复位请使用 `reset`。
    */
-  const setCopied = useCallback(() => setCopy(true), []);
+  const setCopied = useRefFunction(() => setCopy(true));
 
   /**
    * 主动立即复位为 false，跳过自动定时器
    */
-  const reset = useCallback(() => setCopy(false), []);
+  const reset = useRefFunction(() => setCopy(false));
 
   return useMemo(
     () => ({ copied, setCopied, reset }),

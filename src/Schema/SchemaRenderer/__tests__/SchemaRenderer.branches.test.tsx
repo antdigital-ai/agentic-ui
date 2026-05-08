@@ -1,10 +1,23 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
-import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SchemaRenderer } from '..';
 import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// 共享的 validator mock：被本文件两段 describe 共用。
+// 由于 vi.mock 是文件级 hoist，无法做到段间相互隔离的 mock。
+// 这里在文件顶部声明一份共享 mockValidate，再分别在各段 beforeEach 中
+// 设置不同的默认实现：
+// - 段 1（Comprehensive Tests）：按入参判断（空/非法 schema -> invalid，符合段 1 既有断言）
+// - 段 2（targeted coverage）：恒返回 valid（符合段 2 既有断言，单测通过 mockImplementationOnce 覆盖异常分支）
+const mockValidate = vi.hoisted(() =>
+  vi.fn(() => ({ valid: true, errors: [] })),
+);
+
+vi.mock('../../validator', () => ({
+  mdDataSchemaValidator: {
+    validate: (...args: any[]) => mockValidate(...args),
+  },
+}));
 
 // Mock the proxySandbox module
 vi.mock('../../../Utils/proxySandbox', () => ({
@@ -75,6 +88,28 @@ describe('SchemaRenderer - Comprehensive Tests', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // 段 1 的默认 validator 行为：保持与"真实 ajv 校验"一致——
+    // 当 schema 缺少 version/name/description/component 任一必填字段时返回 invalid，
+    // 否则返回 valid。这样下面"应该处理 null/undefined/空 schema/空 component"
+    // 等用例可以正常命中 "Schema 验证失败" 分支。
+    mockValidate.mockImplementation((data: any) => {
+      if (
+        !data ||
+        typeof data !== 'object' ||
+        !data.version ||
+        !data.name ||
+        !data.description ||
+        !data.component
+      ) {
+        // 注意：errors[].message 不要包含"Schema 验证失败"字样，
+        // 否则会与外层标题 <h3>Schema 验证失败</h3> 一起被 getByText 命中两次
+        return {
+          valid: false,
+          errors: [{ path: '', message: 'required field missing' }],
+        };
+      }
+      return { valid: true, errors: [] };
+    });
     // 清除所有 console 调用记录
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -86,7 +121,10 @@ describe('SchemaRenderer - Comprehensive Tests', () => {
     originalCreateElement = document.createElement;
     originalQuerySelectorAll = Element.prototype.querySelectorAll;
     originalAttachShadow = Element.prototype.attachShadow;
-    originalInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+    originalInnerHTML = Object.getOwnPropertyDescriptor(
+      Element.prototype,
+      'innerHTML',
+    );
     originalEntries = Object.entries;
   });
 
@@ -1244,9 +1282,8 @@ describe('SchemaRenderer - Comprehensive Tests', () => {
 const mockMerge = vi.hoisted(() =>
   vi.fn((...objs: any[]) => Object.assign({}, ...objs)),
 );
-const mockValidate = vi.hoisted(() =>
-  vi.fn(() => ({ valid: true, errors: [] })),
-);
+// 注意：mockValidate 已在文件顶部统一声明并 mock validator 模块，
+// 段 2 的 beforeEach 会把它重置为恒返回 valid，不要在此重复声明。
 const mockTemplateRender = vi.hoisted(() =>
   vi.fn((template: string) => template),
 );
@@ -1265,9 +1302,7 @@ const mockCreateSandbox = vi.hoisted(() =>
 );
 
 vi.mock('lodash-es', () => ({ merge: (...args: any[]) => mockMerge(...args) }));
-vi.mock('../../validator', () => ({
-  mdDataSchemaValidator: { validate: (...args: any[]) => mockValidate(...args) },
-}));
+// 注意：'../../validator' 已在文件顶部 mock，这里不再重复声明。
 vi.mock('../templateEngine', () => ({
   TemplateEngine: { render: (...args: any[]) => mockTemplateRender(...args) },
 }));
@@ -1303,7 +1338,9 @@ describe('SchemaRenderer targeted coverage', () => {
     vi.clearAllMocks();
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
-    mockMerge.mockImplementation((...objs: any[]) => Object.assign({}, ...objs));
+    mockMerge.mockImplementation((...objs: any[]) =>
+      Object.assign({}, ...objs),
+    );
     mockValidate.mockImplementation(() => ({ valid: true, errors: [] }));
     mockTemplateRender.mockImplementation((template: string) => template);
     mockPartialParse.mockImplementation((input: string) => JSON.parse(input));
@@ -1329,14 +1366,14 @@ describe('SchemaRenderer targeted coverage', () => {
         new Proxy<any>(
           { arr: 'a,b', obj: '{"a":1}', boolLike: undefined },
           {
-          set(target, prop, value) {
-            if (prop === 'obj' && setCount < 2) {
-              setCount += 1;
-              throw new Error('set fail');
-            }
-            target[prop as any] = value;
-            return true;
-          },
+            set(target, prop, value) {
+              if (prop === 'obj' && setCount < 2) {
+                setCount += 1;
+                throw new Error('set fail');
+              }
+              target[prop as any] = value;
+              return true;
+            },
           },
         ),
     );
@@ -1398,11 +1435,7 @@ describe('SchemaRenderer targeted coverage', () => {
       throw new Error('template failed');
     });
     const { container } = render(
-      <SchemaRenderer
-        schema={baseSchema}
-        values={{}}
-        debug
-      />,
+      <SchemaRenderer schema={baseSchema} values={{}} debug />,
     );
     expect(console.error).toHaveBeenCalled();
     // happy-dom 中 useEffect 异步设置 renderError state，需要用 waitFor 等待重新渲染
@@ -1455,7 +1488,10 @@ describe('SchemaRenderer targeted coverage', () => {
   });
 
   it('覆盖 sandbox 执行返回 error（112）', async () => {
-    mockSandboxExecute.mockResolvedValueOnce({ success: false, error: 'sandbox error' });
+    mockSandboxExecute.mockResolvedValueOnce({
+      success: false,
+      error: 'sandbox error',
+    });
     render(
       <SchemaRenderer
         schema={{
@@ -1475,8 +1511,8 @@ describe('SchemaRenderer targeted coverage', () => {
 
   it('覆盖 executeScript 总 catch（155）', async () => {
     const originalCreate = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
+      document,
+    ) as typeof document.createElement;
     const createSpy = vi
       .spyOn(document, 'createElement')
       .mockImplementation((tagName: any) => {
@@ -1516,7 +1552,9 @@ describe('SchemaRenderer targeted coverage', () => {
     HTMLElement.prototype.attachShadow = vi.fn(() => {
       throw new Error('no shadow');
     }) as any;
-    const { container } = render(<SchemaRenderer schema={baseSchema} values={{}} />);
+    const { container } = render(
+      <SchemaRenderer schema={baseSchema} values={{}} />,
+    );
     expect(container.querySelector('.schemaRenderer')).toBeInTheDocument();
     await new Promise((r) => setTimeout(r, 0));
     expect(screen.getByTestId('schema-renderer')).toBeInTheDocument();

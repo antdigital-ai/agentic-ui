@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import { useRefFunction } from '../../../../Hooks/useRefFunction';
 
-import { useDebounceFn } from '@ant-design/pro-components';
+import { useDebounceFn } from '../../../../Hooks/useDebounceFn';
 import { Rnd } from 'react-rnd';
 import { Transforms } from 'slate';
 import { ActionIconBox } from '../../../../Components/ActionIconBox';
@@ -82,8 +82,7 @@ export const ResizeImage = ({
   });
   const imgRef = useRef<HTMLImageElement>(null);
 
-  //@ts-expect-error
-  const resize = useDebounceFn((size) => {
+  const resize = useDebounceFn((size: { width: number; height?: number }) => {
     setSize({
       width: size.width,
       height: size.width / radio.current,

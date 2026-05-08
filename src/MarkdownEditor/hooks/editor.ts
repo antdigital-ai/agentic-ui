@@ -1,7 +1,6 @@
-import { useCallback } from 'react';
-
 import { BaseElement, Path, Transforms } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { selChange$ } from '../editor/plugins/useOnchange';
 import { EditorStore, useEditorStore } from '../editor/store';
 import { useGetSetState } from '../editor/utils';
@@ -34,13 +33,12 @@ import { useSubject } from './subscribe';
 export const useMEditor = (el: BaseElement) => {
   const editor = useSlate();
 
-  const update = useCallback(
+  const update = useRefFunction(
     (props: Record<string, any>, current?: BaseElement) => {
       Transforms.setNodes(editor, props, {
         at: ReactEditor.findPath(editor, current || el),
       });
     },
-    [editor, el],
   );
 
   return [editor, update] as [typeof editor, typeof update];

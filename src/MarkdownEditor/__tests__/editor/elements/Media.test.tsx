@@ -95,7 +95,7 @@ vi.mock('../../../../Components/ContributorAvatar', () => ({
   ),
 }));
 
-vi.mock('@ant-design/pro-components', () => ({
+vi.mock('../../../../Hooks/useDebounceFn', () => ({
   useDebounceFn: vi.fn((fn) => ({
     run: fn,
     cancel: vi.fn(),
@@ -763,7 +763,9 @@ describe('Media', () => {
     });
 
     it('应该处理 resize 函数调用', async () => {
-      const { useDebounceFn } = await import('@ant-design/pro-components');
+      const { useDebounceFn } = await import(
+        '../../../../Hooks/useDebounceFn'
+      );
       const mockResize = vi.fn();
       vi.mocked(useDebounceFn).mockReturnValueOnce({
         run: mockResize,

@@ -9,6 +9,30 @@ group:
 
 # Changelog
 
+## v2.33.0
+
+- 🐞 修复 React Hooks 依赖项导致的死循环与过度渲染问题
+  - SchemaRenderer：`schema || {}` 每次渲染产生新引用导致 `useMemo([safeSchema])` 失效，改用模块级常量 `EMPTY_SCHEMA`
+  - SchemaForm：`schema?.component || {}` 每次渲染产生新引用导致 `useMemo([properties])` 失效，改用模块级常量 `EMPTY_COMPONENT`
+  - ButtonTabGroup：默认参数 `items = []` 导致 `useEffect([items])` 每次渲染触发，改用模块级常量 `EMPTY_ITEMS`
+  - useChartDataFilter：`Array.isArray(data) ? data : []` 导致 `useMemo([safeData])` 失效，改用模块级常量 `EMPTY_DATA`
+  - TagPopup：`props || {}` 解构出的 `items` 引用不稳定，移除多余的 `|| {}` 回退
+  - I18n：`antdContext?.locale`（对象引用）作为依赖导致 effect 过度触发，改为 `antdContext?.locale?.locale`（字符串）
+  - AgenticLayout：`currentRightWidth` 同时作为依赖和 `setCurrentRightWidth` 的目标导致 resize listener 反复重建，改用 ref 持有
+  - BaseMarkdownEditorSlate：`isEditorFocused` 同时作为依赖和 setter 目标导致 mousedown listener 反复重建，改用 ref + `useRefFunction`
+  - Workspace：受控模式下 `setInternalActiveTab` 无条件执行导致 effect 二次触发，增加 `currentKey !== internalActiveTab` 守卫
+  - ActionItemContainer：`props.children` 作为依赖导致 effect 每次父渲染都触发，改用 `useMemo` 提取 `childrenKeys`
+  - keyboard：空依赖 `[]` 但使用了 `props.readonly`/`store`/`keydown`，补全依赖
+  - ThoughtChainList/MarkdownEditor：`useEffect` 缺少 `props.plugins` 和 `props.initValue` 依赖，补全
+  - AceEditorWrapper：`onChange` 闭包捕获初始值导致后续变化不生效，改用 `onChangeRef` 模式
+  - BubbleExtra：`useEffect` 缺少 `props.onRenderExtraNull` 依赖，补全
+  - FileComponent：`useEffect` 缺少 `previewFile` 依赖，补全
+  - Editor：`ref.current` 作为依赖不可靠，移除并加 eslint-disable 注释
+  - useAutoScroll：无依赖 `useEffect` 同步 ref 改为 `useLayoutEffect`
+- 🛠 SchemaRenderer / SchemaForm：`EMPTY_COMPONENT` 补充 `ComponentConfig` 类型标注
+- 🛠 BaseMarkdownEditorSlate：`setEditorFocused` 由 `useCallback` 改为 `useRefFunction`，移除多余的 `isEditorFocused` state
+- 📖 开发指南新增「React Hooks 依赖陷阱」章节，记录 7 类常见模式及修复方案
+
 ## v2.32.0
 
 - MarkdownInputField

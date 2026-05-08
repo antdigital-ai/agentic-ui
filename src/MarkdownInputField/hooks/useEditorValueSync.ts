@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { ReactEditor } from 'slate-react';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 
 interface UseEditorValueSyncParams {
   /** 受控的外部 value */
@@ -43,9 +44,9 @@ export const useEditorValueSync = ({
    */
   const lastEditorValueRef = useRef<string | undefined>(undefined);
 
-  const onEditorChange = useCallback((next: string) => {
+  const onEditorChange = useRefFunction((next: string) => {
     lastEditorValueRef.current = next;
-  }, []);
+  });
 
   useEffect(() => {
     if (!markdownEditorRef.current) return;

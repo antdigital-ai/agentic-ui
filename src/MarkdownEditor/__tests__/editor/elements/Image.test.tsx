@@ -69,7 +69,7 @@ vi.mock('../../../../Components/ActionIconBox', () => ({
   ),
 }));
 
-vi.mock('@ant-design/pro-components', () => ({
+vi.mock('../../../../Hooks/useDebounceFn', () => ({
   useDebounceFn: vi.fn((fn) => ({
     run: fn,
     cancel: vi.fn(),
@@ -296,7 +296,7 @@ describe('Image', () => {
         openInNewTab?: boolean;
       }) => {
         const { useEditorStore } = await import(
-          '../../../../src/MarkdownEditor/editor/store'
+          '../../../editor/store'
         );
         vi.mocked(useEditorStore).mockReturnValue({
           editorProps: {

@@ -1,4 +1,5 @@
-import React, { forwardRef, memo, useCallback } from 'react';
+import React, { forwardRef, memo } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import scrollTo from '../Utils/scrollTo';
 import {
   ScrollVisibleButton,
@@ -95,8 +96,8 @@ const BackTopComponent = forwardRef<ScrollVisibleButtonRef, BackTopProps>(
 
     const shouldVisible = getShouldVisible(propsShouldVisible);
 
-    // 使用 useCallback 优化点击处理函数
-    const handleClick = useCallback(
+    // 使用 useRefFunction 优化点击处理函数，保持引用稳定
+    const handleClick = useRefFunction(
       (
         e: React.MouseEvent<HTMLButtonElement> | undefined,
         container: HTMLElement | Window,
@@ -104,7 +105,6 @@ const BackTopComponent = forwardRef<ScrollVisibleButtonRef, BackTopProps>(
         scrollTo(0, { container, duration });
         onClick?.(e, container);
       },
-      [duration, onClick],
     );
 
     // shouldVisible 是 ScrollVisibleButton 的内部 prop，通过类型断言注入

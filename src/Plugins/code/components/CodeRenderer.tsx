@@ -4,7 +4,8 @@
  */
 
 import { ConfigProvider, Skeleton, theme as antdTheme } from 'antd';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { MarkdownEditor } from '../../../MarkdownEditor';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
 import { CodeNode, ElementProps } from '../../../MarkdownEditor/el';
@@ -157,14 +158,14 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
   };
 
   // 本地预览处理函数
-  const handleLocalPreview = useCallback(() => {
+  const handleLocalPreview = useRefFunction(() => {
     const value = props.element?.value || '';
     if (language === 'markdown') {
       openMarkdownLocalPreview(value);
     } else if (language === 'html') {
       openHtmlLocalPreview(value);
     }
-  }, [language, props.element?.value]);
+  });
 
   // 使用工具栏配置Hook
   const { toolbarProps } = useToolbarConfig({

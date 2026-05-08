@@ -1,12 +1,7 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { memo, useContext, useEffect, useState } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import ButtonTab from './ButtonTab';
 
 const EMPTY_ITEMS: ButtonTabGroupProps['items'] = [];
@@ -75,16 +70,13 @@ const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
 
   const currentActiveKey = isControlled ? activeKey : internalActiveKey;
 
-  const handleTabClick = useCallback(
-    (key: string, disabled?: boolean) => {
-      if (disabled) return;
-      if (!isControlled) {
-        setInternalActiveKey(key);
-      }
-      onChange?.(key);
-    },
-    [isControlled, onChange],
-  );
+  const handleTabClick = useRefFunction((key: string, disabled?: boolean) => {
+    if (disabled) return;
+    if (!isControlled) {
+      setInternalActiveKey(key);
+    }
+    onChange?.(key);
+  });
 
   return wrapSSR(
     // P0-2：用 clsx 拼接 className，避免模板字符串产生连续空格与命名风格不一致

@@ -1,5 +1,6 @@
 import classNames from 'clsx';
 import React, { useMemo } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { DeepThink } from './DeepThink';
 import { RagRetrievalInfo } from './RagRetrievalInfo';
@@ -325,16 +326,13 @@ export const ThoughtChainListItem: React.FC<
     return !!props?.bubble?.isFinished || !!props.isFinished;
   }, [props?.bubble?.isFinished, props.isFinished]);
 
-  const handleMetaClick = React.useCallback(
-    (meta: DocMeta) => {
-      setDocMeta(meta);
-    },
-    [setDocMeta],
-  );
+  const handleMetaClick = useRefFunction((meta: DocMeta) => {
+    setDocMeta(meta);
+  });
 
-  const handleCollapseChange = React.useCallback((change: boolean) => {
+  const handleCollapseChange = useRefFunction((change: boolean) => {
     setCollapse(change);
-  }, []);
+  });
 
   React.useEffect(() => {
     if (!collapse) {

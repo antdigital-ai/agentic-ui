@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useDebounceFn } from '@ant-design/pro-components';
+import { useDebounceFn } from '../../../Hooks/useDebounceFn';
 import React, { useRef } from 'react';
 import { Subject } from 'rxjs';
 import {
@@ -35,10 +35,13 @@ export function useOnchange(
   onChange?: (value: string, schema: Elements[]) => void,
 ) {
   const rangeContent = useRef('');
-  const onChangeDebounce = useDebounceFn(async () => {
-    if (!onChange) return;
-    onChange?.(parserSlateNodeToMarkdown(editor.children), editor.children);
-  }, 16);
+  const onChangeDebounce = useDebounceFn(
+    async (_value?: any, _children?: Elements[]) => {
+      if (!onChange) return;
+      onChange?.(parserSlateNodeToMarkdown(editor.children), editor.children);
+    },
+    16,
+  );
 
   const { setRefreshFloatBar, setDomRect, refreshFloatBar, readonly } =
     useEditorStore();

@@ -9,6 +9,30 @@ group:
 
 # Changelog
 
+## v2.33.0
+
+- 🐞 Fix React Hooks dependency issues causing infinite loops and excessive re-renders
+  - SchemaRenderer: `schema || {}` creates a new reference each render, invalidating `useMemo([safeSchema])`. Fixed with module-level constant `EMPTY_SCHEMA`
+  - SchemaForm: `schema?.component || {}` creates a new reference each render, invalidating `useMemo([properties])`. Fixed with module-level constant `EMPTY_COMPONENT`
+  - ButtonTabGroup: default param `items = []` causes `useEffect([items])` to fire every render. Fixed with module-level constant `EMPTY_ITEMS`
+  - useChartDataFilter: `Array.isArray(data) ? data : []` invalidates `useMemo([safeData])`. Fixed with module-level constant `EMPTY_DATA`
+  - TagPopup: `props || {}` destructured `items` has unstable reference. Removed unnecessary `|| {}` fallback
+  - I18n: `antdContext?.locale` (object reference) as dependency causes excessive effect firing. Changed to `antdContext?.locale?.locale` (string)
+  - AgenticLayout: `currentRightWidth` as both dependency and `setCurrentRightWidth` target causes resize listener to rebuild repeatedly. Fixed with ref
+  - BaseMarkdownEditorSlate: `isEditorFocused` as both dependency and setter target causes mousedown listener to rebuild repeatedly. Fixed with ref + `useRefFunction`
+  - Workspace: uncontrolled `setInternalActiveTab` in else-if branch causes double effect firing. Added `currentKey !== internalActiveTab` guard
+  - ActionItemContainer: `props.children` as dependency causes effect to fire on every parent render. Fixed with `useMemo` extracting `childrenKeys`
+  - keyboard: empty deps `[]` but uses `props.readonly`/`store`/`keydown`. Added missing dependencies
+  - ThoughtChainList/MarkdownEditor: `useEffect` missing `props.plugins` and `props.initValue` dependencies. Added
+  - AceEditorWrapper: `onChange` closure captures initial value, later changes ignored. Fixed with `onChangeRef` pattern
+  - BubbleExtra: `useEffect` missing `props.onRenderExtraNull` dependency. Added
+  - FileComponent: `useEffect` missing `previewFile` dependency. Added
+  - Editor: `ref.current` as dependency is unreliable. Removed and added eslint-disable comment
+  - useAutoScroll: no-deps `useEffect` for ref sync changed to `useLayoutEffect`
+- 🛠 SchemaRenderer / SchemaForm: add `ComponentConfig` type annotation to `EMPTY_COMPONENT`
+- 🛠 BaseMarkdownEditorSlate: change `setEditorFocused` from `useCallback` to `useRefFunction`, remove redundant `isEditorFocused` state
+- 📖 Add "React Hooks Dependency Pitfalls" section to development guide, documenting 7 common patterns and fixes
+
 ## v2.32.0
 
 - MarkdownInputField

@@ -3,13 +3,13 @@ import { ConfigProvider, Tooltip } from 'antd';
 import classNames from 'clsx';
 import React, {
   memo,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { useStyle } from './style';
 
@@ -68,12 +68,12 @@ const OverflowTooltip: React.FC<OverflowTooltipProps> = memo(
     const textRef = useRef<HTMLSpanElement>(null);
     const [isOverflowing, setIsOverflowing] = useState(false);
 
-    const checkOverflow = useCallback(() => {
+    const checkOverflow = useRefFunction(() => {
       const node = textRef.current;
       if (!node) return;
       const overflowing = node.scrollWidth > node.clientWidth;
       setIsOverflowing((prev) => (prev === overflowing ? prev : overflowing));
-    }, []);
+    });
 
     // 仅在 children 内容变化时复检
     useEffect(() => {

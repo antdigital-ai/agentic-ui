@@ -39,13 +39,6 @@ vi.mock('../../../editor/elements/List/style', () => ({
   })),
 }));
 
-vi.mock('@ant-design/pro-components', () => ({
-  useMountMergeState: vi.fn((initialValue) => {
-    const [state, setState] = React.useState(initialValue);
-    return [state, setState];
-  }),
-}));
-
 describe('List Components', () => {
   describe('List', () => {
     const defaultListProps = {

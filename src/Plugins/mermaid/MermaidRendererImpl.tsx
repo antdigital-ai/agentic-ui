@@ -2,9 +2,10 @@ import { CopyOutlined, DownloadOutlined } from '@ant-design/icons';
 import { ConfigProvider, theme } from 'antd';
 import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
-import React, { useCallback, useContext, useMemo, useRef } from 'react';
+import React, { useContext, useMemo, useRef } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { useIntersectionOnce } from '../../Hooks/useIntersectionOnce';
+import { useRefFunction } from '../../Hooks/useRefFunction';
 import { useLocale } from '../../I18n';
 import { CodeNode } from '../../MarkdownEditor/el';
 import { useStyle } from './style';
@@ -101,14 +102,14 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
 
   const code = props.element.value || '';
 
-  const handleCopySource = useCallback(() => {
+  const handleCopySource = useRefFunction(() => {
     if (!code) {
       return;
     }
     copy(code);
-  }, [code]);
+  });
 
-  const handleDownloadSvg = useCallback(() => {
+  const handleDownloadSvg = useRefFunction(() => {
     const root = divRef.current;
     if (!root) {
       return;
@@ -130,7 +131,7 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     anchor.rel = 'noopener';
     anchor.click();
     URL.revokeObjectURL(url);
-  }, []);
+  });
 
   return wrapSSR(
     <div

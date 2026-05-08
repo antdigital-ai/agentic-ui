@@ -3,14 +3,9 @@ import { Copy } from '@sofa-design/icons';
 import { ConfigProvider, Modal } from 'antd';
 import classNames from 'clsx';
 import copy from 'copy-to-clipboard';
-import React, {
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useContext, useMemo, useRef, useState } from 'react';
 import { ActionIconBox } from '../../../../Components/ActionIconBox';
+import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { I18nContext } from '../../../../I18n';
 import { useEditorStore } from '../../store';
 import { TableNode } from '../../types/Table';
@@ -62,7 +57,7 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
     });
 
     // 缓存复制处理函数
-    const handleCopy = useCallback(() => {
+    const handleCopy = useRefFunction(() => {
       try {
         let contentToCopy = '';
 
@@ -91,18 +86,18 @@ export const ReadonlyTableComponent: React.FC<ReadonlyTableComponentProps> =
       } catch (error) {
         console.error('Copy failed:', error);
       }
-    }, [element, actions?.copy]);
+    });
 
     // 缓存全屏处理函数
-    const handleFullScreen = useCallback((e: React.MouseEvent) => {
+    const handleFullScreen = useRefFunction((e: React.MouseEvent) => {
       e.stopPropagation();
       setPreviewOpen(true);
-    }, []);
+    });
 
     // 缓存模态框关闭函数
-    const handleModalClose = useCallback(() => {
+    const handleModalClose = useRefFunction(() => {
       setPreviewOpen(false);
-    }, []);
+    });
 
     // 缓存表格DOM
     const tableDom = useMemo(

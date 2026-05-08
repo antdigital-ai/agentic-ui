@@ -11,16 +11,11 @@ import { Button, ConfigProvider, Input, Menu, Tabs } from 'antd';
 import { ItemType } from 'antd/es/breadcrumb/Breadcrumb';
 import classNames from 'clsx';
 import isHotkey from 'is-hotkey';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Editor, Element, Node, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { I18nContext, LocalKeys } from '../../../I18n';
 import { CardNode } from '../../el';
 import { useSubject } from '../../hooks/subscribe';
@@ -289,14 +284,14 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     text: '',
   });
 
-  const clickClose = useCallback((e: Event) => {
+  const clickClose = useRefFunction((e: Event) => {
     if (!dom.current?.contains(e.target as HTMLElement)) {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       close();
     }
-  }, []);
+  });
 
-  const close = useCallback(() => {
+  const close = useRefFunction(() => {
     setState({
       filterOptions: [],
       options: [],
@@ -308,9 +303,9 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     });
     if (typeof window === 'undefined') return;
     window.removeEventListener('click', clickClose);
-  }, []);
+  });
 
-  const runInsertTask = useCallback(
+  const runInsertTask = useRefFunction(
     async (
       op: InsertOptions['children'][number],
       params?: {
@@ -359,10 +354,9 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
         close();
       }
     },
-    [],
   );
 
-  const insertAttachByLink = useCallback(async () => {
+  const insertAttachByLink = useRefFunction(async () => {
     setState({ loading: true });
     try {
       let url = state.insertUrl;
@@ -411,9 +405,9 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     } finally {
       setState({ loading: false });
     }
-  }, []);
+  });
 
-  const keydown = useCallback((e: KeyboardEvent) => {
+  const keydown = useRefFunction((e: KeyboardEvent) => {
     if (
       state.options.length &&
       (e.key === 'ArrowUp' || e.key === 'ArrowDown')
@@ -464,7 +458,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
       setOpenInsertCompletion?.(false);
       EditorUtils.focus(markdownEditorRef.current);
     }
-  }, []);
+  });
 
   const i18n = useContext(I18nContext);
 
@@ -479,7 +473,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
   /**
    * 插入媒体
    */
-  const insertMedia = useCallback(async () => {
+  const insertMedia = useRefFunction(async () => {
     setState({ loading: true });
     try {
       let url = state.insertUrl;
@@ -520,7 +514,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
     } finally {
       setState({ loading: false });
     }
-  }, []);
+  });
 
   useSubject(insertCompletionText$, (text) => {
     let tempText = text || '';

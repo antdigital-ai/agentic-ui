@@ -8,6 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { Subject } from 'rxjs';
 import { createEditor, Editor, Selection } from 'slate';
 import { withHistory } from 'slate-history';
@@ -79,12 +80,10 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
   const rootStyle = sanitizeEditorChromeStyle(rawStyle);
 
   const [editorMountStatus, setMountedStatus] = useState(false);
-  const [isEditorFocused, setIsEditorFocused] = useState(false);
   const isEditorFocusedRef = useRef(false);
-  const setEditorFocused = useCallback((focused: boolean) => {
+  const setEditorFocused = useRefFunction((focused: boolean) => {
     isEditorFocusedRef.current = focused;
-    setIsEditorFocused(focused);
-  }, []);
+  });
   const keyTask$ = useMemo(
     () =>
       new Subject<{

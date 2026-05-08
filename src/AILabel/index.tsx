@@ -1,6 +1,7 @@
 import { ConfigProvider, Tooltip, TooltipProps } from 'antd';
 import classNames from 'clsx';
-import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
+import React, { memo, useContext, useMemo, useState } from 'react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { AIGraphic } from './AIGraphic';
 import { AIGraphicDisabled } from './AIGraphicDisabled';
 import { prefixCls, useStyle } from './style';
@@ -167,14 +168,10 @@ const AILabelComponent = React.forwardRef<HTMLSpanElement, AILabelProps>(
     const [tooltipOpen, setTooltipOpen] = useState(false);
 
     // 处理 Tooltip 状态变化
-    const tooltipOnOpenChange = tooltip?.onOpenChange;
-    const handleTooltipOpenChange = useCallback(
-      (open: boolean) => {
-        setTooltipOpen(open);
-        tooltipOnOpenChange?.(open);
-      },
-      [tooltipOnOpenChange],
-    );
+    const handleTooltipOpenChange = useRefFunction((open: boolean) => {
+      setTooltipOpen(open);
+      tooltip?.onOpenChange?.(open);
+    });
 
     // 计算类名
     const badgeClassName = classNames(
