@@ -1,11 +1,12 @@
 import '@testing-library/jest-dom/vitest';
 import { MotionGlobalConfig } from 'framer-motion';
-import { JSDOM } from 'jsdom';
 import MockDate from 'mockdate';
 import React from 'react';
 import { vi } from 'vitest';
 import { setupLottieMock } from './_mocks_/lottieMock';
 import { setupGlobalMocks } from './_mocks_/sharedMocks';
+
+// happy-dom 会自动创建完整的 window/document，无需手动覆盖。
 MotionGlobalConfig.skipAnimations = true;
 
 // Mock ace-builds 模块，避免在测试环境中加载真实的 ace 库
@@ -76,21 +77,7 @@ setupLottieMock();
 
 globalThis.React = React;
 
-//@ts-ignore
-globalThis.window = new JSDOM().window;
-
-globalThis.document = window.document;
-
 MockDate.set('2023-12-21 10:30:56');
-// 设置正确的文档类型，修复KaTeX警告
-Object.defineProperty(document, 'doctype', {
-  value: {
-    name: 'html',
-    publicId: '',
-    systemId: '',
-  },
-});
-
 // 修复 canvas 相关的问题：BarChart 等组件会调用 canvas.getContext('2d') 测量文本
 // 同时 patch window.HTMLCanvasElement，确保 document.createElement('canvas') 使用的构造器被 mock
 const installCanvasMock = () => {
@@ -120,7 +107,6 @@ installCanvasMock();
 global.window.scrollTo = vi.fn();
 Element.prototype.scrollTo = vi.fn();
 
-// jsdom 未实现 window.open，调用处会抛「is not a function」
 Object.defineProperty(window, 'open', {
   writable: true,
   configurable: true,
@@ -140,10 +126,7 @@ const idleCallbacks = new Map<number, () => void>();
 
 vi.stubGlobal(
   'requestIdleCallback',
-  vi.fn(function requestIdleCallbackStub(
-    cb: () => void,
-    options?: { timeout?: number },
-  ) {
+  vi.fn(function requestIdleCallbackStub(cb: () => void) {
     const id = ++idleCallbackIdCounter;
     idleCallbacks.set(id, cb);
     // 在测试环境中立即同步执行，避免异步操作阻塞测试

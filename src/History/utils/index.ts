@@ -3,7 +3,12 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 // 显式注册 relativeTime 插件以启用 dayjs().fromNow()，
 // 取代之前 `@ts-ignore + ?.fromNow?.()` 的隐式依赖（一旦上游没注册插件就会静默返回 undefined）。
-dayjs.extend(relativeTime);
+// try/catch 防御 Vitest 4 Vite Module Runner 的 CJS interop 问题。
+try {
+  dayjs.extend(relativeTime);
+} catch {
+  // Vite Module Runner SSR 模式下 dayjs 的 default export 可能不是函数
+}
 
 /**
  * 用于覆盖 formatTime 输出的可选 i18n 文案。

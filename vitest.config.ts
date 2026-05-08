@@ -68,7 +68,7 @@ export default defineConfig(({ mode }) => ({
     host: '127.0.0.1',
   },
   test: {
-    environment: 'jsdom',
+    environment: 'happy-dom',
     globals: true,
     setupFiles: './tests/setupTests.ts',
     testTimeout: 500000,
@@ -76,7 +76,7 @@ export default defineConfig(({ mode }) => ({
     // 限制并发：full 模式文件多、内存占用大，降低并行度防止 OOM / 卡死
     maxConcurrency: isFullSuite(mode) ? 5 : 10,
     fileParallelism: !isFullSuite(mode),
-    // Vitest 4: poolOptions 已移除，改用顶层 worker 配置
+    pool: 'forks',
     maxWorkers: isFullSuite(mode) ? 2 : undefined,
     minWorkers: 1,
     alias: [
