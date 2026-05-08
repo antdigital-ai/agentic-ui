@@ -104,8 +104,8 @@ describe('WelcomeMessage 组件', () => {
     });
 
     const rootElement = container.querySelector('.ant-agentic-welcome');
-    expect(rootElement).toHaveStyle('background-color: rgb(255, 0, 0)');
-    expect(rootElement).toHaveStyle('color: rgb(255, 255, 255)');
+    expect(rootElement).toHaveStyle({ backgroundColor: 'red' });
+    expect(rootElement).toHaveStyle({ color: 'white' });
   });
 
   it('应该支持 React 节点作为标题', () => {
@@ -375,6 +375,6 @@ describe('WelcomeMessage 组件', () => {
     );
 
     const rootElement = container.querySelector('.style-priority');
-    expect(rootElement).toHaveStyle('color: rgb(255, 0, 0)');
+    expect(rootElement).toHaveStyle({ color: 'red' });
   });
 });

@@ -163,7 +163,7 @@ describe('Workspace Component', () => {
 
     const workspace = screen.getByTestId('workspace');
     expect(workspace).toHaveClass('custom-workspace');
-    expect(workspace).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(workspace).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该处理空子组件', () => {

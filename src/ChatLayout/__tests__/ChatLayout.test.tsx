@@ -140,7 +140,7 @@ describe('ChatLayout', () => {
     );
 
     expect(container.firstChild).toHaveStyle(
-      'background-color: rgb(255, 0, 0)',
+      { backgroundColor: 'red' },
     );
   });
 

@@ -128,12 +128,12 @@ describe('IconButton 组件', () => {
     const { container } = render(
       <IconButton
         icon={<TestIcon />}
-        style={{ backgroundColor: 'rgb(255, 0, 0)' }}
+        style={{ backgroundColor: 'red' }}
       />,
     );
 
     const wrapper = container.querySelector('.ant-icon-button');
-    expect(wrapper).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(wrapper).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该在 ConfigProvider 中正确工作', () => {

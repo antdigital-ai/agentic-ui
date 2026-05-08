@@ -294,7 +294,7 @@ describe('TaskRunning Component', () => {
 
     const taskRunningElement = container.firstChild as HTMLElement;
     expect(taskRunningElement).toHaveClass(customClassName);
-    expect(taskRunningElement).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(taskRunningElement).toHaveStyle({ backgroundColor: 'red' });
   });
 
   // 测试机器人状态变化

@@ -72,7 +72,7 @@ describe('ActionItemContainer Component', () => {
     // 查找包含 ant- 前缀的容器类名
     const containerEl = container.querySelector('[class*="ant-"][class*="container"]');
     expect(containerEl).toBeInTheDocument();
-    expect(containerEl).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(containerEl).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该显示溢出菜单按钮', () => {

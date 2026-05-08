@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -108,13 +108,13 @@ describe('ToggleButton 组件', () => {
 
   it('应该支持自定义样式', () => {
     const { container } = render(
-      <ToggleButton style={{ backgroundColor: 'rgb(255, 0, 0)' }}>
+      <ToggleButton style={{ backgroundColor: 'red' }}>
         自定义样式
       </ToggleButton>,
     );
 
     const wrapper = container.querySelector('.ant-toggle-button');
-    expect(wrapper).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(wrapper).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该在 ConfigProvider 中正确工作', () => {

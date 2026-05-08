@@ -225,12 +225,12 @@ describe('SuggestionList 组件', () => {
     const { container } = render(
       <SuggestionList
         items={mockItems}
-        style={{ backgroundColor: 'rgb(255, 0, 0)' }}
+        style={{ backgroundColor: 'red' }}
       />,
     );
 
     const root = container.querySelector('.ant-follow-up');
-    expect(root).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(root).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该在提交时禁用所有项', async () => {

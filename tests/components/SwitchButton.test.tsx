@@ -166,13 +166,13 @@ describe('SwitchButton 组件', () => {
 
   it('应该支持自定义样式', () => {
     const { container } = render(
-      <SwitchButton style={{ backgroundColor: 'rgb(255, 0, 0)' }}>
+      <SwitchButton style={{ backgroundColor: 'red' }}>
         自定义样式
       </SwitchButton>,
     );
 
     const button = container.querySelector('.ant-switch-button-button');
-    expect(button).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(button).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该应用激活状态的样式类', () => {

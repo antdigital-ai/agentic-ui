@@ -208,7 +208,7 @@ describe('BackBottom 组件', () => {
     const { container } = render(
       <BackTo.Bottom
         className="custom-back-bottom"
-        style={{ backgroundColor: 'rgb(0, 0, 255)' }}
+        style={{ backgroundColor: 'blue' }}
       />,
     );
 
@@ -219,7 +219,7 @@ describe('BackBottom 组件', () => {
         const button = container.querySelector('button');
         expect(button).toBeInTheDocument();
         expect(button).toHaveClass('custom-back-bottom');
-        expect(button).toHaveStyle('background-color: rgb(0, 0, 255)');
+        expect(button).toHaveStyle({ backgroundColor: 'blue' });
       },
       { timeout: 500 },
     );

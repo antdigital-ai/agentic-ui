@@ -102,14 +102,14 @@ describe('CaseReply 组件', () => {
   });
 
   it('应该支持自定义样式', () => {
-    const customStyle = { backgroundColor: 'rgb(255, 0, 0)' };
+    const customStyle = { backgroundColor: 'red' };
 
     const { container } = render(
       <CaseReply quote="样式测试" style={customStyle} />,
     );
 
     const mainElement = container.querySelector('.ant-agentic-chatboot-case-reply');
-    expect(mainElement).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(mainElement).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该支持自定义类名', () => {
@@ -286,7 +286,7 @@ describe('CaseReply 组件', () => {
 
   it('应该支持所有属性的组合', () => {
     const handleClick = vi.fn();
-    const customStyle = { backgroundColor: 'rgb(0, 0, 255)' };
+    const customStyle = { backgroundColor: 'blue' };
 
     const { container } = render(
       <CaseReply
@@ -306,7 +306,7 @@ describe('CaseReply 组件', () => {
     const mainElement = container.querySelector('.custom-prefix');
     expect(mainElement).toBeInTheDocument();
     expect(mainElement).toHaveClass('custom-class');
-    expect(mainElement).toHaveStyle('background-color: rgb(0, 0, 255)');
+    expect(mainElement).toHaveStyle({ backgroundColor: 'blue' });
 
     expect(screen.getByText('完整功能测试')).toBeInTheDocument();
     expect(screen.getByText('完整标题')).toBeInTheDocument();

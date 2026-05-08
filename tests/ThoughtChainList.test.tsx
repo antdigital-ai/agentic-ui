@@ -325,9 +325,11 @@ describe('ThoughtChainList', () => {
       );
 
       const thoughtChainElement = container.firstChild as HTMLElement;
-      expect(thoughtChainElement).toHaveStyle(
-        'background-color: rgb(255, 0, 0)',
-      );
+      // happy-dom serializes colors as keyword names, jsdom as rgb()
+      const bgColor =
+        thoughtChainElement.style.backgroundColor ||
+        getComputedStyle(thoughtChainElement).backgroundColor;
+      expect(bgColor === 'red' || bgColor === 'rgb(255, 0, 0)').toBe(true);
       expect(thoughtChainElement).toHaveStyle('padding: 20px');
     });
 

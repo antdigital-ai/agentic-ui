@@ -743,7 +743,7 @@ describe('RealtimeFollow Component', () => {
 
       const element = container.querySelector('.custom-class');
       expect(element).toBeInTheDocument();
-      expect(element).toHaveStyle('background-color: rgb(255, 0, 0)');
+      expect(element).toHaveStyle({ backgroundColor: 'red' });
     });
 
     it('应该为不同类型显示对应图标', () => {

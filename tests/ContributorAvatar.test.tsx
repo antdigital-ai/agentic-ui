@@ -34,7 +34,7 @@ describe('ContributorAvatar Component', () => {
       );
 
       const avatar = screen.getByText('Jo').closest('.ant-avatar');
-      expect(avatar).toHaveStyle('background-color: rgb(245, 106, 0)');
+      expect(avatar).toHaveStyle({ backgroundColor: '#f56a00' });
     });
 
     it('should cycle through color list based on index', () => {
@@ -43,7 +43,7 @@ describe('ContributorAvatar Component', () => {
       );
 
       let avatar = screen.getByText('Jo').closest('.ant-avatar');
-      expect(avatar).toHaveStyle('background-color: rgb(255, 191, 0)'); // index 8 % 6 = 2, third color
+      expect(avatar).toHaveStyle({ backgroundColor: '#ffbf00' }); // index 8 % 6 = 2, third color
 
       rerender(
         <ConfigProvider>
@@ -56,7 +56,7 @@ describe('ContributorAvatar Component', () => {
       );
 
       avatar = screen.getByText('Jo').closest('.ant-avatar');
-      expect(avatar).toHaveStyle('background-color: rgb(0, 162, 174)'); // index 9 % 6 = 3, fourth color
+      expect(avatar).toHaveStyle({ backgroundColor: '#00a2ae' }); // index 9 % 6 = 3, fourth color
     });
 
     it('should render tooltip with user name', () => {
@@ -128,7 +128,7 @@ describe('ContributorAvatar Component', () => {
       );
 
       const avatar = screen.getByText('Jo').closest('.ant-avatar');
-      expect(avatar).toHaveStyle('background-color: rgb(245, 106, 0)'); // First color
+      expect(avatar).toHaveStyle({ backgroundColor: '#f56a00' }); // First color
     });
 
     it('should have cursor pointer style', () => {
@@ -201,11 +201,11 @@ describe('ContributorAvatar Component', () => {
       const avatars = document.querySelectorAll('.ant-avatar');
 
       // First avatar should have the first color
-      expect(avatars[0]).toHaveStyle('background-color: rgb(245, 106, 0)');
+      expect(avatars[0]).toHaveStyle({ backgroundColor: '#f56a00' });
       // Second avatar should have the second color
-      expect(avatars[1]).toHaveStyle('background-color: rgb(114, 101, 230)');
+      expect(avatars[1]).toHaveStyle({ backgroundColor: '#7265e6' });
       // Third avatar should have the third color
-      expect(avatars[2]).toHaveStyle('background-color: rgb(255, 191, 0)');
+      expect(avatars[2]).toHaveStyle({ backgroundColor: '#ffbf00' });
     });
 
     it('should handle duplicate names correctly', () => {

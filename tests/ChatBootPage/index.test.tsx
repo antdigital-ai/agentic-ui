@@ -145,7 +145,7 @@ describe('ChatBoot index 导出', () => {
 
     const caseReplyWithAllProps: CaseReplyProps = {
       coverBackground: 'rgba(255, 0, 0, 0.5)',
-      quoteIconColor: 'rgb(255, 0, 0)',
+      quoteIconColor: 'red',
       quote: '完整引用',
       title: '完整标题',
       description: '完整描述',

@@ -173,7 +173,7 @@ describe('HtmlPreview Component', () => {
 
     const htmlPreview = container.firstChild as HTMLElement;
     expect(htmlPreview).toHaveClass('custom-class');
-    expect(htmlPreview).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(htmlPreview).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该支持自定义 iframe 属性', () => {

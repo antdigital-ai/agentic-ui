@@ -173,12 +173,12 @@ describe('AnswerAlert 组件', () => {
     const { container } = render(
       <AnswerAlert
         message="自定义样式"
-        style={{ backgroundColor: 'rgb(255, 0, 0)' }}
+        style={{ backgroundColor: 'red' }}
       />,
     );
 
     const alert = container.querySelector('.ant-answer-alert');
-    expect(alert).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(alert).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该正确渲染复杂的内容', () => {

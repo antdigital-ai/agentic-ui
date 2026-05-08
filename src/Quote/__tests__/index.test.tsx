@@ -134,7 +134,7 @@ describe('Quote 组件', () => {
     const quoteContainer = container.querySelector(
       '[data-testid="quote-container"]',
     );
-    expect(quoteContainer).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(quoteContainer).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该支持不传文件名', () => {

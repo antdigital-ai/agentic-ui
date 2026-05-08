@@ -29,10 +29,10 @@ describe('TextLoading 组件', () => {
   });
 
   it('应该应用自定义样式', () => {
-    render(<TextLoading style={{ color: 'rgb(255, 0, 0)' }} />);
+    render(<TextLoading style={{ color: 'red' }} />);
 
     expect(screen.getByTestId('text-loading')).toHaveStyle({
-      color: 'rgb(255, 0, 0)',
+      color: 'red',
     });
   });
 

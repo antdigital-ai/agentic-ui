@@ -274,7 +274,7 @@ describe('ScrollVisibleButton 组件', () => {
     });
 
     const { container } = render(
-      <ScrollVisibleButton style={{ backgroundColor: 'rgb(255, 0, 0)' }}>
+      <ScrollVisibleButton style={{ backgroundColor: 'red' }}>
         <span>内容</span>
       </ScrollVisibleButton>,
     );
@@ -285,7 +285,7 @@ describe('ScrollVisibleButton 组件', () => {
       () => {
         const button = container.querySelector('button');
         expect(button).toBeInTheDocument();
-        expect(button).toHaveStyle('background-color: rgb(255, 0, 0)');
+        expect(button).toHaveStyle({ backgroundColor: 'red' });
       },
       { timeout: 500 },
     );

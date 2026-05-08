@@ -114,13 +114,13 @@ describe('VisualList 组件', () => {
     const { container } = render(
       <VisualList
         data={mockData}
-        style={{ backgroundColor: 'rgb(255, 0, 0)' }}
+        style={{ backgroundColor: 'red' }}
       />,
     );
 
     // style 加在外层容器 div 上
     const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(wrapper).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该支持自定义项样式', () => {
@@ -149,12 +149,12 @@ describe('VisualList 组件', () => {
     const { container } = render(
       <VisualList
         data={dataWithLinks}
-        linkStyle={{ color: 'rgb(255, 0, 0)' }}
+        linkStyle={{ color: 'red' }}
       />,
     );
 
     const link = container.querySelector('a');
-    expect(link).toHaveStyle('color: rgb(255, 0, 0)');
+    expect(link).toHaveStyle({ color: 'red' });
   });
 
   it('应该设置默认的图片尺寸', () => {

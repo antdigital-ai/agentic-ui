@@ -31,14 +31,14 @@ describe('Title 组件', () => {
   });
 
   it('应该支持自定义样式', () => {
-    const customStyle = { backgroundColor: 'rgb(255, 0, 0)' };
+    const customStyle = { backgroundColor: 'red' };
 
     const { container } = render(
       <Title title="样式测试" style={customStyle} />,
     );
 
     const titleElement = container.querySelector('.ant-agentic-chatboot-title');
-    expect(titleElement).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(titleElement).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该支持自定义类名', () => {
@@ -170,7 +170,7 @@ describe('Title 组件', () => {
   });
 
   it('应该支持所有属性的组合', () => {
-    const customStyle = { backgroundColor: 'rgb(0, 0, 255)' };
+    const customStyle = { backgroundColor: 'blue' };
     const complexTitle = <div>复杂主标题</div>;
     const complexSubtitle = <div>复杂副标题</div>;
 
@@ -187,7 +187,7 @@ describe('Title 组件', () => {
     const titleElement = container.querySelector('.custom-prefix');
     expect(titleElement).toBeInTheDocument();
     expect(titleElement).toHaveClass('custom-class');
-    expect(titleElement).toHaveStyle('background-color: rgb(0, 0, 255)');
+    expect(titleElement).toHaveStyle({ backgroundColor: 'blue' });
 
     expect(screen.getByText('复杂主标题')).toBeInTheDocument();
     expect(screen.getByText('复杂副标题')).toBeInTheDocument();

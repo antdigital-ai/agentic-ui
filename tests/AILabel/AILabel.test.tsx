@@ -48,7 +48,7 @@ describe('AILabel', () => {
     expect(root).toBeInTheDocument();
     expect(root).toHaveStyle({ margin: '20px' });
     const dot = container.querySelector('sup');
-    expect(dot).toHaveStyle({ color: 'rgb(255, 0, 0)' });
+    expect(dot).toHaveStyle({ color: 'red' });
   });
 
   it('renders with tooltip config', () => {

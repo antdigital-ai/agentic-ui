@@ -78,7 +78,7 @@ describe('AgenticLayout', () => {
     );
 
     expect(container.firstChild).toHaveStyle(
-      'background-color: rgb(0, 0, 255)',
+      { backgroundColor: 'blue' },
     );
   });
 

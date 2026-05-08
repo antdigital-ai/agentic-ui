@@ -229,7 +229,7 @@ describe('BackTop 组件', () => {
     const { container } = render(
       <BackTo.Top
         className="custom-back-top"
-        style={{ backgroundColor: 'rgb(255, 0, 0)' }}
+        style={{ backgroundColor: 'red' }}
       />,
     );
 
@@ -240,7 +240,7 @@ describe('BackTop 组件', () => {
         const button = container.querySelector('button');
         expect(button).toBeInTheDocument();
         expect(button).toHaveClass('custom-back-top');
-        expect(button).toHaveStyle('background-color: rgb(255, 0, 0)');
+        expect(button).toHaveStyle({ backgroundColor: 'red' });
       },
       { timeout: 500 },
     );

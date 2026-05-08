@@ -325,14 +325,14 @@ describe('ActionIconBox 组件', () => {
     render(
       <ActionIconBox
         title="自定义样式"
-        style={{ backgroundColor: 'rgb(255, 0, 0)' }}
+        style={{ backgroundColor: 'red' }}
       >
         <TestIcon />
       </ActionIconBox>,
     );
 
     const button = screen.getByTestId('action-icon-box');
-    expect(button).toHaveStyle('background-color: rgb(255, 0, 0)');
+    expect(button).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('应该支持自定义 data-testid', () => {
