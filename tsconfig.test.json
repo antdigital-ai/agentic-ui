@@ -4,8 +4,8 @@
     "types": ["vitest/globals", "@testing-library/jest-dom/vitest"]
   },
   "include": [
-    "tests/**/*",
     "src/**/__tests__/**/*",
+    "src/__test_helpers__/**/*",
     "src/**/*.test.ts",
     "src/**/*.test.tsx"
   ],

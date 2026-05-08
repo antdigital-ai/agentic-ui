@@ -54,7 +54,7 @@
     "guidelines"
   ],
   "scripts": {
-    "bench:parsemd": "vitest --run tests/editor/parseMd.benchmark.test.ts",
+    "bench:parsemd": "vitest --run src/MarkdownEditor/__tests__/editor/parseMd.benchmark.test.ts",
     "build": "father build",
     "minify:lottie": "node scripts/minify-lottie-json.mjs",
     "build:watch": "father dev",

@@ -6,6 +6,9 @@ import { defineConfig } from 'vitest/config';
  * 全量套件（与 Codecov 任务一致）用以下任一方式：
  * - `pnpm run test:full` / `pnpm run test:coverage:full`（推荐，使用 `--mode full`）
  * - `VITEST_FULL_SUITE=1 pnpm test`（兼容仅设环境变量、无 `--mode` 的场景）
+ *
+ * 备注：所有测试文件已从 `tests/` 迁移到 `src/<Component>/__tests__/`，
+ * 故路径模式从 `**/tests/X/**` 改为 `**/src/X/__tests__/**`。
  */
 const defaultTestExcludes = [
   '**/node_modules/**',
@@ -24,9 +27,7 @@ const defaultTestExcludes = [
   '**/*targeted-coverage*.test.tsx',
   '**/*comprehensive*.test.ts',
   '**/*comprehensive*.test.tsx',
-  /** 分支 / 覆盖率补洞 / 增强断言等重复套件（`src/Plugins/chart` 单测仍保留） */
-  '**/tests/plugins/chart/**',
-  '**/tests/plugins/chart.test.tsx',
+  /** 分支 / 覆盖率补洞 / 增强断言等重复套件 */
   '**/*.branches.test.ts',
   '**/*.branches.test.tsx',
   '**/*.coverage.test.ts',
@@ -39,17 +40,22 @@ const defaultTestExcludes = [
   '**/*.targeted.test.tsx',
   '**/*missing-coverage.test.ts',
   '**/*missing-coverage.test.tsx',
-  /** Workspace 子系统用例体量大，与 E2E 重叠多；改 Workspace 时用 `pnpm test tests/Workspace` 或 `pnpm run test:full` */
-  '**/tests/Workspace/**',
+  /** 迁移产生的冲突保留文件：与原 src/__tests__ 重复，全量再跑 */
+  '**/*.from-tests.test.ts',
+  '**/*.from-tests.test.tsx',
+  /** Workspace 子系统用例体量大，与 E2E 重叠多；改 Workspace 时用 `pnpm test src/Workspace/__tests__` 或 `pnpm run test:full` */
+  '**/src/Workspace/__tests__/**',
   /** 体量大的集成区：默认套件外跑，见 `pnpm run test:full` 或按目录单跑 */
-  '**/tests/plugins/**',
-  '**/tests/MarkdownEditor/editor/**',
-  '**/tests/Bubble/**',
-  '**/tests/Bubble*.tsx',
-  '**/tests/schema/**',
-  '**/tests/History/**',
+  '**/src/Plugins/chart/__tests__/**',
+  '**/src/Plugins/code/__tests__/**',
+  '**/src/Plugins/katex/__tests__/**',
+  '**/src/Plugins/mermaid/__tests__/**',
+  '**/src/MarkdownEditor/__tests__/editor/**',
+  '**/src/Bubble/__tests__/**',
+  '**/src/Schema/**/__tests__/**',
+  '**/src/History/__tests__/**',
   '**/src/MarkdownInputField/**',
-  '**/tests/utils/language.test.ts',
+  '**/src/Utils/__tests__/language.test.ts',
 ];
 
 const fullSuiteTestExcludes = ['**/node_modules/**', '**/dist/**', '**/e2e/**'];
@@ -67,7 +73,7 @@ export default defineConfig(({ mode }) => ({
   test: {
     environment: 'happy-dom',
     globals: true,
-    setupFiles: './tests/setupTests.ts',
+    setupFiles: './src/__test_helpers__/setupTests.ts',
     testTimeout: 30000,
     exclude: isFullSuite(mode) ? fullSuiteTestExcludes : defaultTestExcludes,
     // 限制并发：full 模式文件多、内存占用大，降低并行度防止 OOM / 卡死
@@ -85,21 +91,21 @@ export default defineConfig(({ mode }) => ({
         find: '@schema-element-editor/host-sdk/core',
         replacement: path.resolve(
           __dirname,
-          './tests/_mocks_/schemaEditorHostSdkMock.ts',
+          './src/__test_helpers__/_mocks_/schemaEditorHostSdkMock.ts',
         ),
       },
       {
         find: '@schema-element-editor/host-sdk',
         replacement: path.resolve(
           __dirname,
-          './tests/_mocks_/schemaEditorHostSdkMock.ts',
+          './src/__test_helpers__/_mocks_/schemaEditorHostSdkMock.ts',
         ),
       },
       {
         find: /^ace-builds\/src-noconflict\/(mode|theme)-.+/,
         replacement: path.resolve(
           __dirname,
-          './tests/_mocks_/aceBuildsSideEffectStub.ts',
+          './src/__test_helpers__/_mocks_/aceBuildsSideEffectStub.ts',
         ),
       },
     ],
@@ -109,9 +115,9 @@ export default defineConfig(({ mode }) => ({
       include: ['src/**/*.{ts,tsx,js,jsx}'],
       all: true,
       exclude: [
-        'tests/**',
-        /** 不把源码树内的测试文件计入覆盖率，避免拉低分支等指标 */
+        /** 不把源码树内的测试文件 / 测试支撑文件计入覆盖率，避免拉低分支等指标 */
         '**/src/**/__tests__/**',
+        '**/src/__test_helpers__/**',
         '**/src/**/*.test.ts',
         '**/src/**/*.test.tsx',
         '**/src/**/*.spec.ts',
