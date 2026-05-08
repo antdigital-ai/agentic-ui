@@ -7,7 +7,7 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { RealtimeFollow } from '../../RealtimeFollow';
-import { TestWrapper } from '../../../__test_helpers__/testUtils';
+import { TestWrapper } from '../../../../_test_helpers/testUtils';
 
 vi.mock('../../RealtimeFollow/style', () => ({
   useRealtimeFollowStyle: vi.fn(() => undefined),

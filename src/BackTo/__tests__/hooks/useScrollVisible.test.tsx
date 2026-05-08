@@ -160,7 +160,7 @@ describe('useScrollVisible hook', () => {
 
     // 验证 hook 正常工作
     const throttleByAnimationFrame = await import(
-      '../../../src/Utils/throttleByAnimationFrame'
+      '../../../Utils/throttleByAnimationFrame'
     );
     expect(throttleByAnimationFrame.default).toBeDefined();
   });

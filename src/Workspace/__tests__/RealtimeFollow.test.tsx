@@ -9,7 +9,7 @@ import {
   RealtimeFollowList,
   shouldUpdateEditor,
 } from '../RealtimeFollow';
-import { TestWrapper } from '../../__test_helpers__/testUtils';
+import { TestWrapper } from '../../../_test_helpers/testUtils';
 
 vi.mock('../RealtimeFollow/style', () => ({
   useRealtimeFollowStyle: vi.fn(() => undefined),

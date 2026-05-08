@@ -1,7 +1,7 @@
 import { docxDeserializer } from '@ant-design/agentic-ui';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { html, rtl } from './word';
+import { html, rtl } from '../../../../_test_helpers/demo/word';
 
 describe('word parse', () => {
   afterEach(async () => {

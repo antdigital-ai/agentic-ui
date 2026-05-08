@@ -73,7 +73,7 @@ export default defineConfig(({ mode }) => ({
   test: {
     environment: 'happy-dom',
     globals: true,
-    setupFiles: './src/__test_helpers__/setupTests.ts',
+    setupFiles: './_test_helpers/setupTests.ts',
     testTimeout: 30000,
     exclude: isFullSuite(mode) ? fullSuiteTestExcludes : defaultTestExcludes,
     // 限制并发：full 模式文件多、内存占用大，降低并行度防止 OOM / 卡死
@@ -91,21 +91,21 @@ export default defineConfig(({ mode }) => ({
         find: '@schema-element-editor/host-sdk/core',
         replacement: path.resolve(
           __dirname,
-          './src/__test_helpers__/_mocks_/schemaEditorHostSdkMock.ts',
+          './_test_helpers/_mocks_/schemaEditorHostSdkMock.ts',
         ),
       },
       {
         find: '@schema-element-editor/host-sdk',
         replacement: path.resolve(
           __dirname,
-          './src/__test_helpers__/_mocks_/schemaEditorHostSdkMock.ts',
+          './_test_helpers/_mocks_/schemaEditorHostSdkMock.ts',
         ),
       },
       {
         find: /^ace-builds\/src-noconflict\/(mode|theme)-.+/,
         replacement: path.resolve(
           __dirname,
-          './src/__test_helpers__/_mocks_/aceBuildsSideEffectStub.ts',
+          './_test_helpers/_mocks_/aceBuildsSideEffectStub.ts',
         ),
       },
     ],
@@ -117,7 +117,7 @@ export default defineConfig(({ mode }) => ({
       exclude: [
         /** 不把源码树内的测试文件 / 测试支撑文件计入覆盖率，避免拉低分支等指标 */
         '**/src/**/__tests__/**',
-        '**/src/__test_helpers__/**',
+        '**/_test_helpers/**',
         '**/src/**/*.test.ts',
         '**/src/**/*.test.tsx',
         '**/src/**/*.spec.ts',

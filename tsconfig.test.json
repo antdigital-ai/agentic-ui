@@ -5,7 +5,7 @@
   },
   "include": [
     "src/**/__tests__/**/*",
-    "src/__test_helpers__/**/*",
+    "_test_helpers/**/*",
     "src/**/*.test.ts",
     "src/**/*.test.tsx"
   ],
