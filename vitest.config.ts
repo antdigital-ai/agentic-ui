@@ -49,7 +49,6 @@ const defaultTestExcludes = [
   '**/tests/schema/**',
   '**/tests/MarkdownInputField/**',
   '**/tests/History/**',
-  '**/src/MarkdownRenderer/**',
   '**/src/MarkdownInputField/**',
   '**/tests/editor/utils/editorUtils.test.ts',
   '**/tests/utils/language.test.ts',
