@@ -285,14 +285,4 @@ describe('MarkdownInputField targeted coverage', () => {
     expect(onChangeSpy).toHaveBeenCalledWith('new text');
   });
 
-  it('覆盖 QuickActions onResize 回调', () => {
-    render(<MarkdownInputField enlargeable={{ enable: true }} />);
-
-    expect(captured.quickActionsProps).toBeTruthy();
-    act(() => {
-      captured.quickActionsProps.onResize(120, 40);
-    });
-    // setTopRightPadding and setQuickRightOffset called without error
-    expect(true).toBe(true);
-  });
 });

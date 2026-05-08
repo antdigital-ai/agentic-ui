@@ -17,7 +17,9 @@ vi.mock('antd', async () => {
 });
 
 // Mock upLoadFileToServer
-vi.mock('../../src/MarkdownInputField/AttachmentButton', () => ({
+// 注意：useFileUploadManager 实际从 '../utils/uploadFile' 导入 upLoadFileToServer，
+// 必须 mock 实际 import 路径，否则 mock 不生效。
+vi.mock('../../src/MarkdownInputField/utils/uploadFile', () => ({
   upLoadFileToServer: vi.fn().mockResolvedValue(undefined),
 }));
 
