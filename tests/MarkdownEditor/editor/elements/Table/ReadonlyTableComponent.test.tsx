@@ -186,7 +186,8 @@ describe('ReadonlyTableComponent', () => {
       renderComponent();
       const cols = document.querySelectorAll('col');
       expect(cols.length).toBe(2);
-      expect((cols[0] as HTMLElement).style.width).toBe('50%');
+      // happy-dom 将百分比格式化为 '50.00%'，使用 parseFloat 兼容两种格式
+      expect(parseFloat((cols[0] as HTMLElement).style.width)).toBe(50);
     });
 
     it('应该处理空的 children', () => {
@@ -672,7 +673,8 @@ describe('ReadonlyTableComponent', () => {
           expect(htmlCol.style.minWidth).toBe('40px');
         } else {
           // 无 containerWidth 时走内容比例，5 列等分即为 20%
-          expect(htmlCol.style.width).toBe('20%');
+          // happy-dom 将百分比格式化为 '20.00%'
+          expect(parseFloat(htmlCol.style.width)).toBe(20);
         }
       });
     });

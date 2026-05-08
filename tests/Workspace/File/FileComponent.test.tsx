@@ -508,10 +508,36 @@ describe('FileComponent', () => {
 
       expect(screen.getByText('doc1.txt')).toBeInTheDocument();
 
-      // Click to collapse
-      fireEvent.click(screen.getByText('文档'));
+      // Click to collapse — 使用 onGroupToggle 验证折叠回调被调用
+      const toggleSpy = vi.fn();
+      rerender(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onGroupToggle={toggleSpy} />
+        </TestWrapper>,
+      );
 
-      // File should be hidden after animation completes
+      await act(async () => {
+        fireEvent.click(screen.getByText('文档'));
+      });
+
+      // 验证折叠回调被触发（type='plainText', collapsed=true）
+      expect(toggleSpy).toHaveBeenCalledWith('plainText', true);
+
+      // 使用折叠后的 nodes 重新渲染，验证内容被隐藏
+      const collapsedNodes: GroupNode[] = [
+        { ...nodes[0], collapsed: true },
+      ];
+      rerender(
+        <TestWrapper>
+          <FileComponent nodes={collapsedNodes} />
+        </TestWrapper>,
+      );
+
+      // 折叠后内容在过渡动画结束后（280ms）卸载，需等待 setTimeout 完成
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 300));
+      });
+
       await waitFor(() => {
         expect(screen.queryByText('doc1.txt')).not.toBeInTheDocument();
       });

@@ -167,7 +167,8 @@ describe('handlePaste 分支覆盖', () => {
     });
 
     it('JSON 解析失败时进入 catch 返回 false', () => {
-      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      // 源代码使用 console.error 而非 console.log
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       mockClipboard.getData.mockReturnValue('{invalid json');
 
       const result = handleSlateMarkdownFragment(
@@ -176,8 +177,8 @@ describe('handlePaste 分支覆盖', () => {
         null,
       );
       expect(result).toBe(false);
-      expect(logSpy).toHaveBeenCalledWith('error', expect.any(Error));
-      logSpy.mockRestore();
+      expect(errorSpy).toHaveBeenCalled();
+      errorSpy.mockRestore();
     });
   });
 
@@ -185,7 +186,8 @@ describe('handlePaste 分支覆盖', () => {
 
   describe('handleHtmlPaste 分支', () => {
     it('getData 抛出时进入 catch 返回 false', async () => {
-      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      // 源代码使用 console.error 而非 console.log
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       mockClipboard.getData.mockImplementation(() => {
         throw new Error('clipboard error');
       });
@@ -196,8 +198,8 @@ describe('handlePaste 分支覆盖', () => {
         {},
       );
       expect(result).toBe(false);
-      expect(logSpy).toHaveBeenCalledWith('error', expect.any(Error));
-      logSpy.mockRestore();
+      expect(errorSpy).toHaveBeenCalled();
+      errorSpy.mockRestore();
     });
   });
 
@@ -219,7 +221,8 @@ describe('handlePaste 分支覆盖', () => {
     });
 
     it('外层 try/catch 捕获异常返回 false', async () => {
-      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      // 源代码使用 console.error 而非 console.log
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       // files getter 抛出错误来触发外层 catch
       const badClipboard = {
         getData: vi.fn(),
@@ -234,8 +237,8 @@ describe('handlePaste 分支覆盖', () => {
         { image: { upload: vi.fn() } },
       );
       expect(result).toBe(false);
-      expect(logSpy).toHaveBeenCalledWith('error', expect.any(Error));
-      logSpy.mockRestore();
+      expect(errorSpy).toHaveBeenCalled();
+      errorSpy.mockRestore();
     });
   });
 

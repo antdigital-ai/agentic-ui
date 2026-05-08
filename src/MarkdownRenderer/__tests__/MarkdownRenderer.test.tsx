@@ -192,16 +192,21 @@ describe('MarkdownRenderer', () => {
       />,
     );
 
-    // 一帧后输出 5 个字符
+    // CharacterQueue 使用 RAF 驱动逐字输出。
+    // happy-dom 下 advanceTimersByTime(16) 不一定触发 RAF，
+    // 使用 advanceTimersToNextTimer 多次推进确保 RAF 回调被执行。
     act(() => {
-      vi.advanceTimersByTime(16);
+      vi.advanceTimersToNextTimer();
+      vi.advanceTimersToNextTimer();
     });
 
     expect(container.textContent).toContain('Hello');
 
-    // 再一帧输出剩余
+    // 再推进多帧输出剩余字符
     act(() => {
-      vi.advanceTimersByTime(16);
+      vi.advanceTimersToNextTimer();
+      vi.advanceTimersToNextTimer();
+      vi.advanceTimersToNextTimer();
     });
 
     expect(container.textContent).toContain('Hello Worl');

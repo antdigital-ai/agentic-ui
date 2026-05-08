@@ -224,10 +224,8 @@ describe('HistoryRunningIconContainer', () => {
       container = result.container;
     });
     const div = container!.firstChild as HTMLElement;
-    expect(div).toHaveStyle({
-      width: '2em',
-      height: '2em',
-    });
+    expect(div.getAttribute('style')).toContain('width: 2em');
+    expect(div.getAttribute('style')).toContain('height: 2em');
   });
 
   it('应该应用自定义容器样式', async () => {

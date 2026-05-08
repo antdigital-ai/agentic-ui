@@ -57,12 +57,14 @@ describe('LoadImage Component', () => {
 
       render(<LoadImage {...props} />);
       const img = screen.getByAltText('Test Icon');
-      expect(img).toHaveStyle({
-        width: '2em',
-        height: '2em',
-        color: 'rgb(255, 0, 0)',
-        display: 'none',
-      });
+      // happy-dom 将 em 单位解析为 px（2em → 32px），且不将 'red' 转为 rgb 格式
+      const style = img.getAttribute('style') || '';
+      expect(style).toContain('display: none');
+      // 检查 color 为 red 或 rgb(255, 0, 0)
+      expect(style).toMatch(/color:\s*(red|rgb\(255,\s*0,\s*0\))/);
+      // 检查 width/height 为 2em 或 32px
+      expect(style).toMatch(/width:\s*(2em|32px)/);
+      expect(style).toMatch(/height:\s*(2em|32px)/);
     });
   });
 

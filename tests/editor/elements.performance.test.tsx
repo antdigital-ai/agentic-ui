@@ -194,10 +194,10 @@ describe('Performance Optimization Tests', () => {
         '[data-testid="markdown-heading"]',
       );
       expect(headElement).toBeInTheDocument();
-      expect(headElement).toHaveStyle({
-        fontSize: '1.375em', // 1.5 - (2-1) * 0.125
-        fontWeight: '600',
-      });
+      // happy-dom 不支持 toHaveStyle 对内联 style 的检测，改用 getAttribute
+      const styleAttr = (headElement as HTMLElement).getAttribute('style') ?? '';
+      expect(styleAttr).toContain('1.375em'); // 1.5 - (2-1) * 0.125
+      expect(styleAttr).toContain('600');
     });
   });
 

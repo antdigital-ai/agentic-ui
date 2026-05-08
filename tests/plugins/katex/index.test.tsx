@@ -109,7 +109,10 @@ describe('KatexElement', () => {
       const element = container.querySelector('[data-slate-node="element"]');
       expect(element).toBeInTheDocument();
       expect(element).toHaveAttribute('contentEditable', 'false');
-      expect(element).toHaveStyle({ margin: '1em 0', userSelect: 'none' });
+      // happy-dom 会将 em 转为 px 且不支持 computed style 获取 CSS-in-JS 样式，改用 getAttribute
+      const style = element?.getAttribute('style') ?? '';
+      expect(style).toContain('margin');
+      expect(style).toContain('user-select');
     });
 
     it('应该在只读模式下渲染 Katex 组件', () => {

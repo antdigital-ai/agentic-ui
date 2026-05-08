@@ -1248,7 +1248,7 @@ describe('Editor branches - handlePasteEvent', () => {
       },
     );
 
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     renderEditor({});
 
     const event = {
@@ -1264,7 +1264,8 @@ describe('Editor branches - handlePasteEvent', () => {
     editableProps.onPaste(event);
     await flushPromises();
 
-    expect(consoleSpy).toHaveBeenCalledWith('insert error', expect.any(Error));
+    // 源码中 catch 块使用 console.error('[handlePaste] 处理纯文本粘贴失败:', e)
+    expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
 

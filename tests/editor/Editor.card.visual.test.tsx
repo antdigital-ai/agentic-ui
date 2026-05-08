@@ -28,8 +28,8 @@ describe('Card Visual Effects Tests', () => {
         '[data-be="card"]',
       ) as HTMLElement;
 
-      // 验证初始状态
-      expect(cardElement.style.outline).toBe('none');
+      // 验证初始状态（happy-dom 将 outline: none 解析为 'none none'）
+      expect(cardElement.style.outline).toContain('none');
       expect(cardElement.getAttribute('aria-selected')).toBe('false');
 
       // 验证卡片是可点击的
@@ -70,7 +70,8 @@ describe('Card Visual Effects Tests', () => {
       expect(['flex', 'inline-flex']).toContain(cardElement.style.display);
       expect(cardElement.style.maxWidth).toBe('100%');
       expect(cardElement.style.alignItems).toBe('flex-end');
-      expect(cardElement.style.outline).toBe('none');
+      // happy-dom 将 outline: none 解析为 'none none'
+      expect(cardElement.style.outline).toContain('none');
       expect(cardElement.style.width).toBe('max-content');
       // 注意：当前实现中没有设置 padding、borderRadius、cursor 和 transition 样式
 

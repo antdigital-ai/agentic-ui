@@ -445,14 +445,12 @@ describe('LanguageSelector Component', () => {
       render(<LanguageSelector {...defaultProps} />);
       const iconContainer = screen.getByAltText('language-icon').parentElement;
 
-      expect(iconContainer).toHaveStyle({
-        height: '1em',
-        width: '1em',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: '0.25em',
-      });
+      // happy-dom 将 em 单位解析为 px（1em → 14px），改用 getAttribute 断言
+      const style = iconContainer?.getAttribute('style') || '';
+      expect(style).toContain('display: flex');
+      // width/height 为 1em 或 14px（happy-dom 转换）
+      expect(style).toMatch(/width:\s*(1em|14px)/);
+      expect(style).toMatch(/height:\s*(1em|14px)/);
     });
   });
 

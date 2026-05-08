@@ -152,7 +152,8 @@ describe('AceEditorWrapper', () => {
       );
 
       const editorElement = container.firstChild as HTMLElement;
-      expect(editorElement).toHaveStyle({ height: '50vh' });
+      // happy-dom 会将 vh 等单位转为 px，改用 getAttribute 检查原始 style
+      expect(editorElement.getAttribute('style')).toContain('height: 50vh');
     });
   });
 

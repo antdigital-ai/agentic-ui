@@ -75,8 +75,9 @@ describe('CodeBlockToolbar', () => {
     const collapsedToolbar = container.querySelector(
       '[data-testid="code-toolbar"]',
     ) as HTMLElement;
-    // 折叠态下：jsdom 会把 'none' 归一化为空字符串，断言宽度为空表示无可见边框
-    expect(collapsedToolbar.style.borderBottomWidth).toBe('');
+    // happy-dom 将 borderBottomWidth 归一化为 'initial'，jsdom 则为空字符串；
+    // 两者都表示"无显式可见边框"
+    expect(['', 'initial']).toContain(collapsedToolbar.style.borderBottomWidth);
   });
 
   it('invokes onCopy when copy button is clicked', () => {

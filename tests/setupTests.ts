@@ -286,6 +286,43 @@ Object.defineProperty(window, 'matchMedia', {
   value: matchMediaMock,
 });
 
+// Mock window.getSelection / document.getSelection
+// Slate 编辑器在 happy-dom 下会因 selectionchange 事件循环导致测试卡死：
+// Editable 组件监听 selectionchange → 调用 Transforms.select/deselect →
+// 触发 onChange → 重新渲染 → 再次触发 selectionchange。
+// happy-dom 的 Selection API 行为与浏览器不一致，此循环没有自然终止条件。
+// 返回稳定的 stub 对象可以打断这个循环。
+const mockSelection = {
+  anchorNode: null,
+  anchorOffset: 0,
+  focusNode: null,
+  focusOffset: 0,
+  isCollapsed: true,
+  rangeCount: 0,
+  type: 'None',
+  addRange: vi.fn(),
+  collapse: vi.fn(),
+  collapseToEnd: vi.fn(),
+  collapseToStart: vi.fn(),
+  containsNode: vi.fn(() => false),
+  deleteFromDocument: vi.fn(),
+  empty: vi.fn(),
+  extend: vi.fn(),
+  getRangeAt: vi.fn(() => null),
+  modify: vi.fn(),
+  removeAllRanges: vi.fn(),
+  removeRange: vi.fn(),
+  selectAllChildren: vi.fn(),
+  setBaseAndExtent: vi.fn(),
+  setPosition: vi.fn(),
+  toString: vi.fn(() => ''),
+};
+
+vi.stubGlobal('getSelection', vi.fn(() => mockSelection));
+if (typeof document !== 'undefined') {
+  document.getSelection = vi.fn(() => mockSelection) as any;
+}
+
 vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
 
 const localStorageMock = (() => {

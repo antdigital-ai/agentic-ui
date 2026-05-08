@@ -62,7 +62,8 @@ describe('CreativeSparkLottie Component', () => {
     render(<CreativeSparkLottie size="2em" />);
 
     const lottie = await getLoadedLottie();
-    expect(lottie).toHaveStyle({ width: '2em', height: '2em' });
+    expect(lottie.getAttribute('style')).toContain('width: 2em');
+    expect(lottie.getAttribute('style')).toContain('height: 2em');
   });
 
   it('should merge custom style and size', async () => {

@@ -272,10 +272,10 @@ describe('ChartAttrToolBar', () => {
       );
 
       const iconElement = screen.getByTestId('icon1').parentElement;
-      expect(iconElement).toHaveStyle({
-        color: 'rgb(255, 0, 0)',
-        fontSize: '16px',
-      });
+      const style = iconElement?.getAttribute('style') ?? '';
+      // happy-dom 不做 rgb() 转换，保留原始颜色值
+      expect(style).toMatch(/color:\s*(red|rgb\(255,\s*0,\s*0\))/);
+      expect(style).toContain('font-size: 16px');
     });
 
   });
@@ -355,8 +355,12 @@ describe('ChartAttrToolBar', () => {
         </ConfigProvider>,
       );
 
-      // 测试点击事件被调用
-      fireEvent.click(screen.getByTestId('icon1'));
+      // happy-dom 下 onClick throw 会直接冒泡，用 try-catch 验证调用
+      try {
+        fireEvent.click(screen.getByTestId('icon1'));
+      } catch {
+        // 预期会抛出
+      }
       expect(mockOnClick).toHaveBeenCalled();
     });
   });

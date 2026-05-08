@@ -27,11 +27,12 @@ Object.defineProperty(window, 'open', {
   value: mockWindowOpen,
 });
 
-Object.defineProperty(document, 'documentElement', {
+// happy-dom 下不能覆盖 document.documentElement（会破坏内部 DOM 树），
+// 改为只 mock clientWidth 属性
+Object.defineProperty(document.documentElement, 'clientWidth', {
   writable: true,
-  value: {
-    clientWidth: 1000,
-  },
+  configurable: true,
+  value: 1000,
 });
 
 Object.defineProperty(window, 'innerWidth', {

@@ -83,7 +83,8 @@ describe('Components/lotties 导出（与 Robot/lotties 独立入口）', () => 
       expect(el).toHaveAttribute('data-has-animation', 'yes');
     });
     expect(el).toHaveClass('load-x');
-    expect(el).toHaveStyle({ width: '2rem', height: '2rem' });
+    expect(el.getAttribute('style')).toContain('width: 2rem');
+    expect(el.getAttribute('style')).toContain('height: 2rem');
   });
 
   it('CreativeSparkLottie 基础渲染', async () => {

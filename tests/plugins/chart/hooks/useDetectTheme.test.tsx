@@ -252,17 +252,18 @@ describe('useDetectTheme', () => {
       const mockObserve = vi.fn();
       const mockDisconnect = vi.fn();
 
-      // Mock MutationObserver
+      // Mock MutationObserver - 使用 class 形式以兼容 new 调用
       const OriginalMutationObserver = window.MutationObserver;
-      window.MutationObserver = vi.fn().mockImplementation((callback) => {
-        mutationCallbacks.push(callback);
-        return {
-          observe: mockObserve,
-          disconnect: mockDisconnect,
-        };
-      }) as unknown as typeof MutationObserver;
+      window.MutationObserver = class MockMutationObserver {
+        constructor(callback: MutationCallback) {
+          mutationCallbacks.push(callback);
+        }
+        observe = mockObserve;
+        disconnect = mockDisconnect;
+        takeRecords = () => [] as MutationRecord[];
+      } as unknown as typeof MutationObserver;
 
-      const { result } = renderHook(() => useDetectTheme());
+      const { result, unmount } = renderHook(() => useDetectTheme());
       expect(result.current).toBe('light');
 
       // 模拟 data-theme 变化
@@ -283,6 +284,9 @@ describe('useDetectTheme', () => {
           );
         });
       });
+
+      // 确保 unmount hook 以清理 React 状态
+      unmount();
 
       // 恢复原始 MutationObserver
       window.MutationObserver = OriginalMutationObserver;

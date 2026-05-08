@@ -145,7 +145,9 @@ describe('WarpCard Element', () => {
     const { container } = renderCard();
 
     const cardDiv = container.querySelector('[data-be="card"]') as HTMLElement;
-    expect(cardDiv.style.outline).toBe('none');
+    // happy-dom 将 outline: none 解析为 'none none'（包含 outline-color 和 outline-style），
+    // 使用 toContain 兼容 jsdom 和 happy-dom
+    expect(cardDiv.style.outline).toContain('none');
   });
 
   it('应该有正确的 position 样式', () => {

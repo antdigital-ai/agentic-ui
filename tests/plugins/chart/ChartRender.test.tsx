@@ -228,23 +228,6 @@ describe('ChartRender', () => {
       toJSON: vi.fn(),
     }));
 
-    // Mock ownerDocument for Chart.js DOM operations
-    Object.defineProperty(HTMLElement.prototype, 'ownerDocument', {
-      value: {
-        defaultView: {
-          getComputedStyle: vi.fn(() => ({
-            getPropertyValue: vi.fn(() => ''),
-            width: '400px',
-            height: '300px',
-          })),
-        },
-        documentElement: {
-          style: {},
-        },
-      },
-      writable: true,
-    });
-
     // Mock ResizeObserver
     global.ResizeObserver = vi.fn(function MockResizeObserver() {
       return {

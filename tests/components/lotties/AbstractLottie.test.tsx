@@ -49,7 +49,8 @@ describe('AbstractLottie', () => {
     expect(el).toHaveAttribute('data-loop', 'false');
     expect(el).toHaveAttribute('data-autoplay', 'false');
     expect(el).toHaveAttribute('aria-hidden', 'true');
-    expect(el).toHaveStyle({ width: '1em', height: '1em' });
+    expect(el.getAttribute('style')).toContain('width: 1em');
+    expect(el.getAttribute('style')).toContain('height: 1em');
   });
 
   it('should accept numeric and string size', () => {
@@ -59,7 +60,7 @@ describe('AbstractLottie', () => {
     expect(screen.getByTestId('lottie-animation')).toHaveStyle({ width: '64px' });
 
     rerender(<AbstractLottie animationData={mockAnimationData} size="2em" />);
-    expect(screen.getByTestId('lottie-animation')).toHaveStyle({ width: '2em' });
+    expect(screen.getByTestId('lottie-animation').getAttribute('style')).toContain('width: 2em');
   });
 
   it('should apply className, style, autoplay, loop', () => {

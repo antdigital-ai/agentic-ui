@@ -69,7 +69,7 @@ describe('Loading 组件', () => {
       const lottie = screen.getByTestId('lottie-animation');
       const container = lottie.parentElement as HTMLElement;
       expect(container).toBeTruthy();
-      expect(container).toHaveStyle({ fontSize: '1em' });
+      expect(container.getAttribute('style')).toContain('font-size: 1em');
     });
 
     it('应该应用自定义类名', () => {

@@ -9,7 +9,9 @@ describe('EffectPlayer', () => {
     render(<EffectPlayer sceneUrl="test-scene" data-testid="player" />);
     const el = screen.getByTestId('player');
     expect(el.tagName).toBe('DIV');
-    expect(el).toHaveStyle({ width: '1em', height: '1em', position: 'relative' });
+    expect(el.getAttribute('style')).toContain('width: 1em');
+    expect(el.getAttribute('style')).toContain('height: 1em');
+    expect(el).toHaveStyle({ position: 'relative' });
   });
 
   it('should apply custom numeric/string size', () => {
@@ -21,7 +23,7 @@ describe('EffectPlayer', () => {
     rerender(
       <EffectPlayer sceneUrl="test" data-testid="player" size="3rem" />,
     );
-    expect(screen.getByTestId('player')).toHaveStyle({ width: '3rem' });
+    expect(screen.getByTestId('player').getAttribute('style')).toContain('width: 3rem');
   });
 
   it('should apply className, style and extra HTML attributes', () => {

@@ -1,12 +1,19 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ActionItemContainer } from '../src/MarkdownInputField/BeforeToolContainer/BeforeToolContainer';
+
+// happy-dom 不支持 setPointerCapture/releasePointerCapture，需要 mock
+HTMLElement.prototype.setPointerCapture = vi.fn();
+HTMLElement.prototype.releasePointerCapture = vi.fn();
 
 type KeyedElement = React.ReactElement & { key: React.Key };
 
 describe('ActionItemContainer Component', () => {
+  afterEach(() => {
+    cleanup();
+  });
   const TestWrapper: React.FC<{ children: React.ReactNode }> = ({
     children,
   }) => <ConfigProvider>{children}</ConfigProvider>;
@@ -424,30 +431,6 @@ describe('ActionItemContainer Component', () => {
     expect(containerEl).toBeInTheDocument();
   });
 
-  it('应该在开发环境验证 key 属性', () => {
-    // 这个测试只在开发环境有效
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
-
-    // 创建没有 key 的元素
-    const invalidItems = [
-      React.createElement('div', null, 'Item 1'),
-      React.createElement('div', null, 'Item 2'),
-    ];
-
-    expect(() => {
-      render(
-        <TestWrapper>
-          <ActionItemContainer>{invalidItems as any}</ActionItemContainer>
-        </TestWrapper>,
-      );
-    }).toThrow(
-      'ActionItemContainer: all children must include an explicit `key` prop.',
-    );
-
-    process.env.NODE_ENV = originalEnv;
-  });
-
   it('应该支持 menuDisabled 属性', () => {
     const items = createMockItems();
     const { container } = render(
@@ -545,5 +528,41 @@ describe('ActionItemContainer Component', () => {
     fireEvent.wheel(containerEl, { deltaX: 50, deltaY: 0 });
 
     expect(containerEl).toBeInTheDocument();
+  });
+
+  // 此测试必须放在最后，因为 render 抛出异常后 React 内部工作循环状态会被污染，
+  // 导致后续使用 @testing-library/react 的 render 全部失败
+  it('应该在开发环境验证 key 属性', () => {
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+
+    const invalidItems = [
+      React.createElement('div', null, 'Item 1'),
+      React.createElement('div', null, 'Item 2'),
+    ];
+
+    // 使用独立的 DOM 容器和 ReactDOM.createRoot 来隔离 React 状态
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ReactDOM = require('react-dom/client');
+    const root = ReactDOM.createRoot(container);
+    let caughtError: Error | null = null;
+    try {
+      require('react-dom').flushSync(() => {
+        root.render(
+          <TestWrapper>
+            <ActionItemContainer>{invalidItems as any}</ActionItemContainer>
+          </TestWrapper>,
+        );
+      });
+    } catch (error: any) {
+      caughtError = error;
+    }
+    expect(caughtError).toBeTruthy();
+    expect(caughtError?.message).toContain(
+      'ActionItemContainer: all children must include an explicit `key` prop.',
+    );
+
+    process.env.NODE_ENV = originalEnv;
   });
 });
