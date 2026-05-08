@@ -55,18 +55,7 @@ const defaultTestExcludes = [
   '**/tests/utils/language.test.ts',
 ];
 
-const fullSuiteTestExcludes = [
-  '**/node_modules/**',
-  '**/dist/**',
-  '**/e2e/**',
-  /**
-   * Slate 编辑器在 happy-dom 下初始化会无限重试导致测试卡死。
-   * 以下目录中大量测试文件直接或间接依赖真实 Slate 运行时且未做 mock，
-   * 在全局 mock Slate 之前先排除，避免 test:full 超时。
-   */
-  '**/src/MarkdownInputField/**',
-  '**/tests/MarkdownInputField/**',
-];
+const fullSuiteTestExcludes = ['**/node_modules/**', '**/dist/**', '**/e2e/**'];
 
 const isFullSuite = (mode: string | undefined) =>
   mode === 'full' || process.env.VITEST_FULL_SUITE === '1';
