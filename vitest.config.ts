@@ -125,6 +125,8 @@ export default defineConfig(({ mode }) => ({
         '**/Icons/animated/**',
         'test/**',
         '**/Hooks/useIntersectionOnce.ts',
+        /** ThoughtChainList 已废弃，不再计入覆盖率 */
+        '**/ThoughtChainList/**',
       ],
       // 启用 COVERAGE_ENFORCE=1 时强制覆盖率阈值；src 内 *.test / __tests__ 已排除在覆盖率外
       ...(process.env.COVERAGE_ENFORCE === '1' && {
