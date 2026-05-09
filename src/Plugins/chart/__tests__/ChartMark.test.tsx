@@ -155,40 +155,35 @@ describe('ChartMark Components', () => {
 
   describe('SSR / isWindowDefined 分支覆盖', () => {
     it('Area: isWindowDefined 为 false 时不注册 Chart', async () => {
-      const { isWindowDefined } =
-        await import('../env');
+      const { isWindowDefined } = await import('../env');
       vi.mocked(isWindowDefined).mockReturnValueOnce(false);
       render(<Area {...defaultProps} />);
       expect(screen.getByTestId('line-chart')).toBeInTheDocument();
     });
 
     it('Bar: isWindowDefined 为 false 时不注册 Chart', async () => {
-      const { isWindowDefined } =
-        await import('../env');
+      const { isWindowDefined } = await import('../env');
       vi.mocked(isWindowDefined).mockReturnValueOnce(false);
       render(<Bar {...defaultProps} />);
       expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
     });
 
     it('Column: isWindowDefined 为 false 时不注册 Chart', async () => {
-      const { isWindowDefined } =
-        await import('../env');
+      const { isWindowDefined } = await import('../env');
       vi.mocked(isWindowDefined).mockReturnValueOnce(false);
       render(<Column {...defaultProps} />);
       expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
     });
 
     it('Line: isWindowDefined 为 false 时不注册 Chart', async () => {
-      const { isWindowDefined } =
-        await import('../env');
+      const { isWindowDefined } = await import('../env');
       vi.mocked(isWindowDefined).mockReturnValueOnce(false);
       render(<Line {...defaultProps} />);
       expect(screen.getByTestId('line-chart')).toBeInTheDocument();
     });
 
     it('Pie: isWindowDefined 为 false 时不注册 Chart', async () => {
-      const { isWindowDefined } =
-        await import('../env');
+      const { isWindowDefined } = await import('../env');
       vi.mocked(isWindowDefined).mockReturnValueOnce(false);
       render(<Pie {...defaultProps} />);
       expect(screen.getByTestId('doughnut-chart')).toBeInTheDocument();

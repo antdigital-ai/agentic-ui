@@ -27,11 +27,15 @@ describe('BubbleAvatar', () => {
 
   it('should set cursor:default when no onClick, normal cursor with onClick', () => {
     const { rerender } = render(<BubbleAvatar avatar="AB" />);
-    expect(screen.getByTestId('bubble-avatar')).toHaveStyle({ cursor: 'default' });
+    expect(screen.getByTestId('bubble-avatar')).toHaveStyle({
+      cursor: 'default',
+    });
 
     const onClick = vi.fn();
     rerender(<BubbleAvatar avatar="AB" onClick={onClick} />);
-    expect(screen.getByTestId('bubble-avatar').style.cursor).not.toBe('default');
+    expect(screen.getByTestId('bubble-avatar').style.cursor).not.toBe(
+      'default',
+    );
   });
 
   it('should fire onClick callback', () => {
@@ -43,6 +47,8 @@ describe('BubbleAvatar', () => {
 
   it('should apply className and shape', () => {
     render(<BubbleAvatar avatar="AB" className="my-avatar" shape="square" />);
-    expect(screen.getByTestId('bubble-avatar').className).toContain('my-avatar');
+    expect(screen.getByTestId('bubble-avatar').className).toContain(
+      'my-avatar',
+    );
   });
 });

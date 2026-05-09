@@ -524,9 +524,7 @@ describe('FileComponent', () => {
       expect(toggleSpy).toHaveBeenCalledWith('plainText', true);
 
       // 使用折叠后的 nodes 重新渲染，验证内容被隐藏
-      const collapsedNodes: GroupNode[] = [
-        { ...nodes[0], collapsed: true },
-      ];
+      const collapsedNodes: GroupNode[] = [{ ...nodes[0], collapsed: true }];
       rerender(
         <TestWrapper>
           <FileComponent nodes={collapsedNodes} />

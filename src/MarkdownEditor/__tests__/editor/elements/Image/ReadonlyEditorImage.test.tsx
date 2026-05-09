@@ -2,8 +2,8 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReadonlyEditorImage } from '../../../../editor/elements/Image/ReadonlyEditorImage';
-import * as domUtils from '../../../../editor/utils/dom';
 import * as editorUtils from '../../../../editor/utils';
+import * as domUtils from '../../../../editor/utils/dom';
 
 vi.mock('../../../../editor/utils/dom', () => ({
   getMediaType: vi.fn(() => 'image'),
@@ -45,7 +45,9 @@ describe('ReadonlyEditorImage', () => {
 
   it('应渲染容器并 data-be="image"', () => {
     const { container } = render(<ReadonlyEditorImage {...defaultProps} />);
-    const outer = container.querySelector('[data-be="image"][data-testid="image-container"]');
+    const outer = container.querySelector(
+      '[data-be="image"][data-testid="image-container"]',
+    );
     expect(outer).toBeInTheDocument();
   });
 
@@ -64,7 +66,14 @@ describe('ReadonlyEditorImage', () => {
     render(
       <ReadonlyEditorImage
         {...defaultProps}
-        element={{ ...defaultElement, finished: false, url: 'https://x.com/a.png', alt: '' } as any}
+        element={
+          {
+            ...defaultElement,
+            finished: false,
+            url: 'https://x.com/a.png',
+            alt: '',
+          } as any
+        }
       />,
     );
     vi.advanceTimersByTime(5000);
@@ -79,7 +88,9 @@ describe('ReadonlyEditorImage', () => {
     render(
       <ReadonlyEditorImage
         {...defaultProps}
-        element={{ ...defaultElement, finished: false, url: '', alt: '' } as any}
+        element={
+          { ...defaultElement, finished: false, url: '', alt: '' } as any
+        }
       />,
     );
     vi.advanceTimersByTime(5000);
@@ -92,23 +103,27 @@ describe('ReadonlyEditorImage', () => {
   it('initial() 创建的 img onerror 会调用 setState({ loadSuccess: false })', async () => {
     const capturedImgs: HTMLImageElement[] = [];
     const origCreateElement = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
+      document,
+    ) as typeof document.createElement;
     const mockSetState = vi.fn();
-    vi.mocked(editorUtils.useGetSetState).mockImplementation((initialState: any) => {
-      const stateRef = { current: { ...initialState } };
-      const get = () => stateRef.current;
-      const set = (patch: any) => {
-        mockSetState(patch);
-        Object.assign(stateRef.current, patch);
-      };
-      return [get, set];
-    });
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      const el = origCreateElement(tagName) as HTMLImageElement;
-      if (tagName === 'img') capturedImgs.push(el);
-      return el;
-    });
+    vi.mocked(editorUtils.useGetSetState).mockImplementation(
+      (initialState: any) => {
+        const stateRef = { current: { ...initialState } };
+        const get = () => stateRef.current;
+        const set = (patch: any) => {
+          mockSetState(patch);
+          Object.assign(stateRef.current, patch);
+        };
+        return [get, set];
+      },
+    );
+    vi.spyOn(document, 'createElement').mockImplementation(
+      (tagName: string) => {
+        const el = origCreateElement(tagName) as HTMLImageElement;
+        if (tagName === 'img') capturedImgs.push(el);
+        return el;
+      },
+    );
 
     render(
       <ReadonlyEditorImage
@@ -121,12 +136,16 @@ describe('ReadonlyEditorImage', () => {
       expect(capturedImgs.length).toBeGreaterThanOrEqual(1);
     });
     // initial() 创建的 img 未 append 到 document，ReadonlyImage 的 img 在 DOM 中
-    const initialImg = capturedImgs.find((img) => !document.contains(img)) ?? capturedImgs[capturedImgs.length - 1];
+    const initialImg =
+      capturedImgs.find((img) => !document.contains(img)) ??
+      capturedImgs[capturedImgs.length - 1];
     act(() => {
       initialImg?.onerror?.({} as Event);
     });
     // initial() 内先 setState({ type })、setState({ url })，img onerror 时 setState({ loadSuccess: false })
-    expect(mockSetState).toHaveBeenCalledWith(expect.objectContaining({ loadSuccess: false }));
+    expect(mockSetState).toHaveBeenCalledWith(
+      expect.objectContaining({ loadSuccess: false }),
+    );
     vi.mocked(document.createElement).mockRestore();
   });
 
@@ -134,12 +153,14 @@ describe('ReadonlyEditorImage', () => {
     render(
       <ReadonlyEditorImage
         {...defaultProps}
-        element={{
-          ...defaultElement,
-          finished: true,
-          width: 100,
-          height: 80,
-        } as any}
+        element={
+          {
+            ...defaultElement,
+            finished: true,
+            width: 100,
+            height: 80,
+          } as any
+        }
       />,
     );
     const img = document.querySelector('img');
@@ -150,13 +171,15 @@ describe('ReadonlyEditorImage', () => {
   it('initial 应创建 img 并设置 referrerPolicy、crossOrigin', async () => {
     let capturedImg: HTMLImageElement | null = null;
     const origCreateElement = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      const el = origCreateElement(tagName) as HTMLImageElement;
-      if (tagName === 'img') capturedImg = el;
-      return el;
-    });
+      document,
+    ) as typeof document.createElement;
+    vi.spyOn(document, 'createElement').mockImplementation(
+      (tagName: string) => {
+        const el = origCreateElement(tagName) as HTMLImageElement;
+        if (tagName === 'img') capturedImg = el;
+        return el;
+      },
+    );
 
     render(
       <ReadonlyEditorImage
@@ -171,8 +194,14 @@ describe('ReadonlyEditorImage', () => {
     // happy-dom 中通过 property 赋值的 referrerPolicy/crossOrigin 可能不反映到 getAttribute，
     // 源代码通过 img.referrerPolicy = 'no-referrer' 和 img.crossOrigin = 'anonymous' 赋值，
     // 验证 property 或 attribute 至少有一个被正确设置
-    const referrerValue = capturedImg?.referrerPolicy || capturedImg?.getAttribute?.('referrerpolicy') || '';
-    const crossOriginValue = capturedImg?.crossOrigin || capturedImg?.getAttribute?.('crossorigin') || '';
+    const referrerValue =
+      capturedImg?.referrerPolicy ||
+      capturedImg?.getAttribute?.('referrerpolicy') ||
+      '';
+    const crossOriginValue =
+      capturedImg?.crossOrigin ||
+      capturedImg?.getAttribute?.('crossorigin') ||
+      '';
     // 在 happy-dom 中这些 property 赋值可能不被保留，验证源代码确实执行了 createElement('img')
     expect(capturedImg?.tagName).toBe('IMG');
     // 如果属性可用则验证，否则只验证 img 元素被创建
@@ -189,13 +218,15 @@ describe('ReadonlyEditorImage', () => {
     vi.mocked(domUtils.getMediaType).mockReturnValue(undefined as any);
     let capturedImg: HTMLImageElement | null = null;
     const origCreateElement = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      const el = origCreateElement(tagName) as HTMLImageElement;
-      if (tagName === 'img') capturedImg = el;
-      return el;
-    });
+      document,
+    ) as typeof document.createElement;
+    vi.spyOn(document, 'createElement').mockImplementation(
+      (tagName: string) => {
+        const el = origCreateElement(tagName) as HTMLImageElement;
+        if (tagName === 'img') capturedImg = el;
+        return el;
+      },
+    );
 
     render(
       <ReadonlyEditorImage
@@ -234,13 +265,15 @@ describe('ReadonlyEditorImage', () => {
     vi.mocked(domUtils.getMediaType).mockReturnValue('other');
     let capturedImg: HTMLImageElement | null = null;
     const origCreateElement = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      const el = origCreateElement(tagName) as HTMLImageElement;
-      if (tagName === 'img') capturedImg = el;
-      return el;
-    });
+      document,
+    ) as typeof document.createElement;
+    vi.spyOn(document, 'createElement').mockImplementation(
+      (tagName: string) => {
+        const el = origCreateElement(tagName) as HTMLImageElement;
+        if (tagName === 'img') capturedImg = el;
+        return el;
+      },
+    );
 
     render(
       <ReadonlyEditorImage
@@ -258,13 +291,15 @@ describe('ReadonlyEditorImage', () => {
   it('img onload 应设置 loadSuccess true', async () => {
     let capturedImg: HTMLImageElement | null = null;
     const origCreateElement = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      const el = origCreateElement(tagName) as HTMLImageElement;
-      if (tagName === 'img') capturedImg = el;
-      return el;
-    });
+      document,
+    ) as typeof document.createElement;
+    vi.spyOn(document, 'createElement').mockImplementation(
+      (tagName: string) => {
+        const el = origCreateElement(tagName) as HTMLImageElement;
+        if (tagName === 'img') capturedImg = el;
+        return el;
+      },
+    );
 
     render(
       <ReadonlyEditorImage

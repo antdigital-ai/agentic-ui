@@ -2,21 +2,17 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  MElement,
-  MLeaf,
-} from '../../../editor/elements';
+import { MElement, MLeaf } from '../../../editor/elements';
 import { EditorUtils } from '../../../editor/utils/editorUtils';
 
 const elementStubs = vi.hoisted(() => {
   const box =
     (testId: string) =>
-    ({ children, ...props }: Record<string, unknown>) =>
-      (
-        <div data-testid={testId} {...props}>
-          {children}
-        </div>
-      );
+    ({ children, ...props }: Record<string, unknown>) => (
+      <div data-testid={testId} {...props}>
+        {children}
+      </div>
+    );
   return { box };
 });
 
@@ -72,19 +68,13 @@ vi.mock('../../../editor/elements/Comment', () => ({
   CommentView: elementStubs.box('comment-view'),
 }));
 
-vi.mock(
-  '../../../editor/elements/FootnoteDefinition',
-  () => ({
-    FootnoteDefinition: elementStubs.box('footnote-definition'),
-  }),
-);
+vi.mock('../../../editor/elements/FootnoteDefinition', () => ({
+  FootnoteDefinition: elementStubs.box('footnote-definition'),
+}));
 
-vi.mock(
-  '../../../editor/elements/FootnoteReference',
-  () => ({
-    FootnoteReference: elementStubs.box('footnote-reference'),
-  }),
-);
+vi.mock('../../../editor/elements/FootnoteReference', () => ({
+  FootnoteReference: elementStubs.box('footnote-reference'),
+}));
 
 vi.mock('../../../editor/elements/Image', () => ({
   EditorImage: elementStubs.box('editor-image'),
@@ -266,7 +256,11 @@ describe('Elements Index', () => {
       ] as const)('卡片 %s 在可编辑与只读下的显示', (elementType, dataBe) => {
         const element = { type: elementType, children: [] };
         const { unmount } = render(
-          <MElement {...defaultElementProps} element={element} readonly={false} />,
+          <MElement
+            {...defaultElementProps}
+            element={element}
+            readonly={false}
+          />,
         );
         let el = screen.getByText('Test Content').parentElement;
         expect(el).toHaveAttribute('data-be', dataBe);
@@ -436,9 +430,10 @@ describe('Elements Index', () => {
         );
         expect(screen.getByText('Test Content')).toBeInTheDocument();
         rerender(<MLeaf {...defaultLeafProps} readonly={false} leaf={leaf} />);
-        expect(
-          screen.getByText('Test Content').parentElement,
-        ).toHaveAttribute('data-be', 'text');
+        expect(screen.getByText('Test Content').parentElement).toHaveAttribute(
+          'data-be',
+          'text',
+        );
       });
     });
 
@@ -613,7 +608,10 @@ describe('Elements Index', () => {
           };
           const { unmount: u1 } = render(<MLeaf {...urlProps} />);
           fireEvent.click(screen.getByText('Test Content').parentElement!);
-          expect(openMock).toHaveBeenCalledWith('https://example.com', '_blank');
+          expect(openMock).toHaveBeenCalledWith(
+            'https://example.com',
+            '_blank',
+          );
           u1();
           openMock.mockClear();
 
@@ -652,7 +650,10 @@ describe('Elements Index', () => {
           openMock.mockClear();
           fireEvent.click(c4.querySelector('[data-fnc="fnc"]')!);
           expect(onOrigin2).toHaveBeenCalledWith('test-id');
-          expect(openMock).toHaveBeenCalledWith('https://example.com', '_blank');
+          expect(openMock).toHaveBeenCalledWith(
+            'https://example.com',
+            '_blank',
+          );
           u4();
 
           const { container: c5, unmount: u5 } = render(
@@ -887,9 +888,7 @@ describe('Elements Index', () => {
       expect(screen.getByText('Test Content')).toBeInTheDocument();
 
       rerender(<MLeaf {...leafBase} linkConfig={{}} />);
-      rerender(
-        <MLeaf {...leafBase} linkConfig={{ openInNewTab: false }} />,
-      );
+      rerender(<MLeaf {...leafBase} linkConfig={{ openInNewTab: false }} />);
       expect(screen.getByText('Test Content')).toBeInTheDocument();
     });
   });
@@ -918,7 +917,6 @@ describe('Elements Index', () => {
       rerender(<MElement {...props2} />);
       expect(screen.getByTestId('paragraph')).toBeInTheDocument();
     });
-
   });
 
   describe('areDepsEqual 函数测试', () => {
@@ -930,11 +928,20 @@ describe('Elements Index', () => {
       } as any;
 
       const rerenderCases: Array<[any, any]> = [
-        [{ ...base, deps: ['dep1', 'dep2'] }, { ...base, deps: ['dep1', 'dep2'] }],
+        [
+          { ...base, deps: ['dep1', 'dep2'] },
+          { ...base, deps: ['dep1', 'dep2'] },
+        ],
         [{ ...base }, { ...base }],
-        [{ ...base, deps: ['dep1'] }, { ...base, deps: ['dep1', 'dep2'] }],
+        [
+          { ...base, deps: ['dep1'] },
+          { ...base, deps: ['dep1', 'dep2'] },
+        ],
         [{ ...base }, { ...base, deps: ['only-next'] }],
-        [{ ...base, deps: ['a', 'b'] }, { ...base, deps: ['a', 'c'] }],
+        [
+          { ...base, deps: ['a', 'b'] },
+          { ...base, deps: ['a', 'c'] },
+        ],
       ];
 
       const { rerender } = render(<MElement {...rerenderCases[0][0]} />);
@@ -1141,8 +1148,7 @@ describe('Elements Index', () => {
         focus: vi.fn(),
         withoutNormalizing: (fn: () => void) => fn(),
       };
-      const storeModule =
-        await import('../../../editor/store');
+      const storeModule = await import('../../../editor/store');
       (storeModule.useEditorStore as ReturnType<typeof vi.fn>).mockReturnValue({
         markdownEditorRef: { current: mockEditor as any },
         markdownContainerRef: { current: document.createElement('div') },
@@ -1222,8 +1228,7 @@ describe('Elements Index', () => {
         focus: vi.fn(),
         withoutNormalizing: (fn: () => void) => fn(),
       };
-      const storeModule3 =
-        await import('../../../editor/store');
+      const storeModule3 = await import('../../../editor/store');
       (storeModule3.useEditorStore as ReturnType<typeof vi.fn>).mockReturnValue(
         {
           markdownEditorRef: { current: mockEditor as any },

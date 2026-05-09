@@ -19,30 +19,24 @@ vi.mock('../../../editor/tools/DragHandle', () => ({
   DragHandle: () => <div data-testid="drag-handle">Drag Handle</div>,
 }));
 
-vi.mock(
-  '../../../editor/components/ContributorAvatar',
-  () => ({
-    AvatarList: ({ displayList }: any) => (
-      <div data-testid="avatar-list">
-        {displayList?.map((item: any, index: number) => (
-          <div key={index} data-testid={`avatar-${item.name}`}>
-            {item.name}
-          </div>
-        ))}
-      </div>
-    ),
-  }),
-);
+vi.mock('../../../editor/components/ContributorAvatar', () => ({
+  AvatarList: ({ displayList }: any) => (
+    <div data-testid="avatar-list">
+      {displayList?.map((item: any, index: number) => (
+        <div key={index} data-testid={`avatar-${item.name}`}>
+          {item.name}
+        </div>
+      ))}
+    </div>
+  ),
+}));
 
-vi.mock(
-  '../../../editor/elements/LinkCard/style',
-  () => ({
-    useStyle: vi.fn(() => ({
-      wrapSSR: (component: any) => component,
-      hashId: 'test-hash',
-    })),
-  }),
-);
+vi.mock('../../../editor/elements/LinkCard/style', () => ({
+  useStyle: vi.fn(() => ({
+    wrapSSR: (component: any) => component,
+    hashId: 'test-hash',
+  })),
+}));
 
 // Mock window.open
 const mockWindowOpen = vi.fn();

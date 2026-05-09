@@ -57,4 +57,4 @@ describe('formatTime', () => {
 
     process.env.NODE_ENV = originalEnv;
   });
-}); 
+});

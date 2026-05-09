@@ -16,12 +16,9 @@ vi.mock('../editor/plugins/insertParsedHtmlNodes', () => ({
   insertParsedHtmlNodes: mocks.insertParsedHtmlNodes,
 }));
 
-vi.mock(
-  '../editor/plugins/parseMarkdownToNodesAndInsert',
-  () => ({
-    parseMarkdownToNodesAndInsert: mocks.parseMarkdownToNodesAndInsert,
-  }),
-);
+vi.mock('../editor/plugins/parseMarkdownToNodesAndInsert', () => ({
+  parseMarkdownToNodesAndInsert: mocks.parseMarkdownToNodesAndInsert,
+}));
 
 vi.mock('antd', () => ({
   message: {
@@ -152,7 +149,9 @@ describe('handlePaste 分支覆盖', () => {
       const fragment = [
         {
           type: 'card',
-          children: [{ type: 'paragraph', children: [{ text: 'card content' }] }],
+          children: [
+            { type: 'paragraph', children: [{ text: 'card content' }] },
+          ],
         },
       ];
       mockClipboard.getData.mockReturnValue(JSON.stringify(fragment));

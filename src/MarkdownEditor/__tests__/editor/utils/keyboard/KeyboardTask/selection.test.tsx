@@ -1,9 +1,6 @@
 import { createEditor, Editor, Path, Transforms } from 'slate';
+import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  ReactEditor,
-  withReact,
-} from 'slate-react';
 import { EditorStore } from '../../../../../editor/store';
 import { EditorUtils } from '../../../../../editor/utils/editorUtils';
 import { KeyboardTask } from '../../../../../editor/utils/keyboard';

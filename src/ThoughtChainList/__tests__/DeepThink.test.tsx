@@ -26,9 +26,7 @@ const locale = {
 
 const wrap = (ui: React.ReactElement) =>
   render(
-    <I18nContext.Provider value={{ locale } as any}>
-      {ui}
-    </I18nContext.Provider>,
+    <I18nContext.Provider value={{ locale } as any}>{ui}</I18nContext.Provider>,
   );
 
 describe('DeepThink', () => {
@@ -69,9 +67,7 @@ describe('DeepThink', () => {
   });
 
   it('should pass data-testid prop', () => {
-    wrap(
-      <DeepThink info="q" category="thinking" data-testid="deep-think" />,
-    );
+    wrap(<DeepThink info="q" category="thinking" data-testid="deep-think" />);
     expect(screen.getByTestId('deep-think')).toBeInTheDocument();
   });
 });

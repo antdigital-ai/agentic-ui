@@ -1,8 +1,8 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
+  registerBarChartComponents,
   registerChartComponents,
   registerLineChartComponents,
-  registerBarChartComponents,
 } from '../../utils/registerChart';
 
 describe('registerChartComponents', () => {
@@ -92,4 +92,3 @@ describe('registerBarChartComponents', () => {
     }).not.toThrow();
   });
 });
-

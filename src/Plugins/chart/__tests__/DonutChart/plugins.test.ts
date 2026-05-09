@@ -67,7 +67,15 @@ describe('DonutChart plugins', () => {
       const ctx = createMockCtx();
       const chart = createLeaderLineChartWithCtx(
         ctx,
-        [{ x: 100, y: 100, outerRadius: 80, startAngle: 0, endAngle: Math.PI * 2 }],
+        [
+          {
+            x: 100,
+            y: 100,
+            outerRadius: 80,
+            startAngle: 0,
+            endAngle: Math.PI * 2,
+          },
+        ],
         [100],
       );
 
@@ -83,8 +91,20 @@ describe('DonutChart plugins', () => {
       const chart = createLeaderLineChartWithCtx(
         ctx,
         [
-          { x: 100, y: 100, outerRadius: 80, startAngle: 0, endAngle: Math.PI * 1.96 },
-          { x: 100, y: 100, outerRadius: 80, startAngle: Math.PI * 1.96, endAngle: Math.PI * 2 },
+          {
+            x: 100,
+            y: 100,
+            outerRadius: 80,
+            startAngle: 0,
+            endAngle: Math.PI * 1.96,
+          },
+          {
+            x: 100,
+            y: 100,
+            outerRadius: 80,
+            startAngle: Math.PI * 1.96,
+            endAngle: Math.PI * 2,
+          },
         ],
         [99, 1],
       );
@@ -100,7 +120,13 @@ describe('DonutChart plugins', () => {
       const chart = createLeaderLineChartWithCtx(
         ctx,
         [
-          { x: 100, y: 100, outerRadius: 80, startAngle: 0, endAngle: Math.PI * 2 },
+          {
+            x: 100,
+            y: 100,
+            outerRadius: 80,
+            startAngle: 0,
+            endAngle: Math.PI * 2,
+          },
         ],
         [NaN],
       );
@@ -115,7 +141,15 @@ describe('DonutChart plugins', () => {
       const ctx = createMockCtx();
       const chart = createLeaderLineChartWithCtx(
         ctx,
-        [{ x: 100, y: 100, outerRadius: 80, startAngle: 0, endAngle: Math.PI * 2 }],
+        [
+          {
+            x: 100,
+            y: 100,
+            outerRadius: 80,
+            startAngle: 0,
+            endAngle: Math.PI * 2,
+          },
+        ],
         [100],
       );
 
@@ -129,7 +163,15 @@ describe('DonutChart plugins', () => {
       const ctx = createMockCtx();
       const chart = createLeaderLineChartWithCtx(
         ctx,
-        [{ x: 100, y: 100, outerRadius: 80, startAngle: 0, endAngle: Math.PI * 2 }],
+        [
+          {
+            x: 100,
+            y: 100,
+            outerRadius: 80,
+            startAngle: 0,
+            endAngle: Math.PI * 2,
+          },
+        ],
         [100],
       );
 
@@ -145,7 +187,13 @@ describe('DonutChart plugins', () => {
         ctx,
         [
           { x: 100, y: 100, outerRadius: 80, startAngle: 0, endAngle: Math.PI },
-          { x: 100, y: 100, outerRadius: 80, startAngle: Math.PI, endAngle: Math.PI * 2 },
+          {
+            x: 100,
+            y: 100,
+            outerRadius: 80,
+            startAngle: Math.PI,
+            endAngle: Math.PI * 2,
+          },
         ],
         ['not a number' as any, 50],
       );
@@ -319,8 +367,13 @@ function createMockCtx() {
     fillStyleValues: [] as string[],
   };
   Object.defineProperty(ctx, 'fillStyle', {
-    get() { return ctx._fillStyle; },
-    set(v: string) { ctx._fillStyle = v; ctx.fillStyleValues.push(v); },
+    get() {
+      return ctx._fillStyle;
+    },
+    set(v: string) {
+      ctx._fillStyle = v;
+      ctx.fillStyleValues.push(v);
+    },
   });
   return ctx;
 }

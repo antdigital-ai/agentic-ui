@@ -17,21 +17,20 @@ describe('BubbleTitle', () => {
   });
 
   it('should apply left/right placement flex direction', () => {
-    const { rerender } = render(
-      <BubbleTitle title="Test" placement="left" />,
-    );
-    expect(screen.getByTestId('bubble-title')).toHaveStyle({ flexDirection: 'row' });
+    const { rerender } = render(<BubbleTitle title="Test" placement="left" />);
+    expect(screen.getByTestId('bubble-title')).toHaveStyle({
+      flexDirection: 'row',
+    });
 
     rerender(<BubbleTitle title="Test" placement="right" />);
-    expect(screen.getByTestId('bubble-title')).toHaveStyle({ flexDirection: 'row-reverse' });
+    expect(screen.getByTestId('bubble-title')).toHaveStyle({
+      flexDirection: 'row-reverse',
+    });
   });
 
   it('should render quote content', () => {
     render(
-      <BubbleTitle
-        title="Test"
-        quote={<div data-testid="quote">Quote</div>}
-      />,
+      <BubbleTitle title="Test" quote={<div data-testid="quote">Quote</div>} />,
     );
     expect(screen.getByTestId('quote')).toBeInTheDocument();
   });
@@ -52,9 +51,7 @@ describe('BubbleTitle', () => {
   });
 
   it('should accept ReactNode as title', () => {
-    render(
-      <BubbleTitle title={<strong data-testid="strong">Bold</strong>} />,
-    );
+    render(<BubbleTitle title={<strong data-testid="strong">Bold</strong>} />);
     expect(screen.getByTestId('strong')).toBeInTheDocument();
   });
 });

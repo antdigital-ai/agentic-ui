@@ -1,10 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { ConfigProvider } from 'antd';
 import React, { useContext } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { ConfigProvider } from 'antd';
-import { UserBubble } from '../UserBubble';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { MessagesContext } from '../MessagesContent/BubbleContext';
+import { UserBubble } from '../UserBubble';
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -39,10 +39,7 @@ describe('UserBubble', () => {
   it('returns null when bubbleRenderConfig.render is false', () => {
     render(
       <Wrap>
-        <UserBubble
-          {...defaultProps}
-          bubbleRenderConfig={{ render: false }}
-        />
+        <UserBubble {...defaultProps} bubbleRenderConfig={{ render: false }} />
       </Wrap>,
     );
     expect(screen.queryByText('User message')).not.toBeInTheDocument();
@@ -93,7 +90,9 @@ describe('UserBubble', () => {
     );
 
     fireEvent.click(screen.getByTestId('trigger-set-message'));
-    expect(setMessageItem).toHaveBeenCalledWith('user-1', { content: 'updated' });
+    expect(setMessageItem).toHaveBeenCalledWith('user-1', {
+      content: 'updated',
+    });
   });
 
   it('passes extra as null to render when extraRender is false', () => {

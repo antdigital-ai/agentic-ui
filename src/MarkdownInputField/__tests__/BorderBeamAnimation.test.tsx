@@ -8,20 +8,21 @@ describe('BorderBeamAnimation', () => {
 
   beforeEach(() => {
     disconnectSpy = vi.fn();
-    (global as any).ResizeObserver = vi.fn(
-      function (this: any, callback: (entries: ResizeObserverEntry[]) => void) {
-        this.callback = callback;
-        this.observe = (target: Element) => {
-          callback([
-            {
-              contentRect: { width: 200, height: 100 },
-              target,
-            } as ResizeObserverEntry,
-          ]);
-        };
-        this.disconnect = disconnectSpy;
-      },
-    );
+    (global as any).ResizeObserver = vi.fn(function (
+      this: any,
+      callback: (entries: ResizeObserverEntry[]) => void,
+    ) {
+      this.callback = callback;
+      this.observe = (target: Element) => {
+        callback([
+          {
+            contentRect: { width: 200, height: 100 },
+            target,
+          } as ResizeObserverEntry,
+        ]);
+      };
+      this.disconnect = disconnectSpy;
+    });
   });
 
   afterEach(() => {
@@ -40,7 +41,9 @@ describe('BorderBeamAnimation', () => {
     const { container } = render(
       <BorderBeamAnimation isVisible={true} borderRadius={16} />,
     );
-    expect(container.querySelector('[style*="position: absolute"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('[style*="position: absolute"]'),
+    ).toBeInTheDocument();
   });
 
   it('在非 test 环境下运行 ResizeObserver 并设置 dimensions', () => {

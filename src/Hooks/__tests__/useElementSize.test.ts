@@ -2,7 +2,6 @@
  * useElementSize 覆盖 ResizeObserver 回调（10、11、12 行）
  */
 import { act, renderHook } from '@testing-library/react';
-import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { useElementSize } from '../useElementSize';
 

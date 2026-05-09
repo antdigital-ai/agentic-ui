@@ -34,25 +34,19 @@ describe('EXCEPTION', () => {
     it('应该处理空内容', () => {
       render(<EXCEPTION content="" extra={null} />);
 
-      expect(
-        screen.getByText('生成回答失败，请重试'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('生成回答失败，请重试')).toBeInTheDocument();
     });
 
     it('应该处理undefined内容', () => {
       render(<EXCEPTION content={undefined as any} extra={null} />);
 
-      expect(
-        screen.getByText('生成回答失败，请重试'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('生成回答失败，请重试')).toBeInTheDocument();
     });
 
     it('应该处理null内容', () => {
       render(<EXCEPTION content={null as any} extra={null} />);
 
-      expect(
-        screen.getByText('生成回答失败，请重试'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('生成回答失败，请重试')).toBeInTheDocument();
     });
 
     it('空内容时使用 locale 中 chat.message.generateFailed (67)', () => {
@@ -60,9 +54,7 @@ describe('EXCEPTION', () => {
         'chat.message.generateFailed': '接口异常，请稍后重试',
       } as any);
       render(<EXCEPTION content="   " extra={null} />);
-      expect(
-        screen.getByText('接口异常，请稍后重试'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('接口异常，请稍后重试')).toBeInTheDocument();
     });
   });
 

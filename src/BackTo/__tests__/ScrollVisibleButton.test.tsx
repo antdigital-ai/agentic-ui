@@ -142,10 +142,7 @@ describe('ScrollVisibleButton 组件', () => {
         if (button) {
           fireEvent.click(button);
           expect(handleClick).toHaveBeenCalled();
-          expect(handleClick).toHaveBeenCalledWith(
-            expect.any(Object),
-            window,
-          );
+          expect(handleClick).toHaveBeenCalledWith(expect.any(Object), window);
         }
       },
       { timeout: 500 },
@@ -204,9 +201,7 @@ describe('ScrollVisibleButton 组件', () => {
     });
 
     const { container } = render(
-      <ScrollVisibleButton
-        tooltip={{ title: '提示文本', placement: 'left' }}
-      >
+      <ScrollVisibleButton tooltip={{ title: '提示文本', placement: 'left' }}>
         <span>内容</span>
       </ScrollVisibleButton>,
     );
@@ -339,10 +334,7 @@ describe('ScrollVisibleButton 组件', () => {
     });
 
     const { container } = render(
-      <ScrollVisibleButton
-        data-testid="custom-button"
-        aria-label="自定义按钮"
-      >
+      <ScrollVisibleButton data-testid="custom-button" aria-label="自定义按钮">
         <span>内容</span>
       </ScrollVisibleButton>,
     );
@@ -497,4 +489,3 @@ describe('ScrollVisibleButton 组件', () => {
     );
   });
 });
-

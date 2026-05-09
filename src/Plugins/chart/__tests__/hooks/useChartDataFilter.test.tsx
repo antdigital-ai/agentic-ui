@@ -124,9 +124,7 @@ describe('useChartDataFilter', () => {
   });
 
   it('应该处理非数组数据', () => {
-    const { result } = renderHook(() =>
-      useChartDataFilter(null as any),
-    );
+    const { result } = renderHook(() => useChartDataFilter(null as any));
 
     expect(result.current.categories).toEqual([]);
     expect(result.current.filteredData).toEqual([]);
@@ -195,12 +193,9 @@ describe('useChartDataFilter', () => {
       { x: 2, y: 200, category: 'A' },
     ];
 
-    const { result } = renderHook(() =>
-      useChartDataFilter(dataWithNumericX),
-    );
+    const { result } = renderHook(() => useChartDataFilter(dataWithNumericX));
 
     expect(result.current.filteredData).toHaveLength(2);
     expect(result.current.filteredData[0].x).toBe(1);
   });
 });
-

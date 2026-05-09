@@ -95,7 +95,7 @@ describe('MatchKey', () => {
           type: 'code',
           value: '',
         }),
-        expect.anything()
+        expect.anything(),
       );
       expect(mockEvent.preventDefault).toHaveBeenCalled();
     });
@@ -109,13 +109,13 @@ describe('MatchKey', () => {
 
       // 模拟编辑器状态：文本为 ```javascript
       mockEditor.children[0].children[0].text = '```javascript';
-      
+
       // 更新 mock Node.string 和 leaf
       // @ts-ignore
       const slate = require('slate');
       vi.spyOn(slate.Node, 'string').mockReturnValue('```javascript');
       vi.spyOn(slate.Node, 'leaf').mockReturnValue({ text: '```javascript' });
-      
+
       // 更新 selection offset
       mockEditor.selection.anchor.offset = 13;
 
@@ -130,7 +130,7 @@ describe('MatchKey', () => {
           // language: 'javascript', // 测试失败显示 language 是 undefined，可能正则匹配有问题或者传参问题，暂时注释掉严格检查
           value: '',
         }),
-        expect.anything()
+        expect.anything(),
       );
     });
   });

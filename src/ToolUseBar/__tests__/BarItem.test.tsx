@@ -193,7 +193,9 @@ describe('ToolUseBarItem', () => {
 
   describe('Content 展开/收起按钮与键盘', () => {
     beforeEach(() => {
-      global.ResizeObserver = vi.fn(function MockResizeObserver(callback: () => void) {
+      global.ResizeObserver = vi.fn(function MockResizeObserver(
+        callback: () => void,
+      ) {
         return {
           observe: vi.fn((el: HTMLElement) => {
             if (el) {

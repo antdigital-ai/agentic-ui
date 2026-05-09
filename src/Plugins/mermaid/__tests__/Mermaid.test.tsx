@@ -92,7 +92,9 @@ describe('Mermaid Component', () => {
 
     vi.clearAllMocks();
     rerender(
-      <Mermaid element={{ ...defaultElement, value: 'invalid mermaid code' }} />,
+      <Mermaid
+        element={{ ...defaultElement, value: 'invalid mermaid code' }}
+      />,
     );
     await waitFor(() => expect(mermaid.default.render).toHaveBeenCalled());
 

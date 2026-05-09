@@ -68,7 +68,12 @@ describe('Components/lotties 导出（与 Robot/lotties 独立入口）', () => 
     });
 
     rerender(
-      <ThinkingLottie autoplay={false} loop={false} size={24} className="think-x" />,
+      <ThinkingLottie
+        autoplay={false}
+        loop={false}
+        size={24}
+        className="think-x"
+      />,
     );
     el = screen.getByTestId('lottie-mock');
     expect(el).toHaveAttribute('data-autoplay', 'false');

@@ -1,18 +1,23 @@
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
-import { BaseEditor, createEditor } from 'slate';
+import { BaseEditor, createEditor, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
-import { ReactEditor, Slate, withReact } from 'slate-react';
+import {
+  ReactEditor,
+  Slate,
+  ReactEditor as SlateReactEditor,
+  withReact,
+} from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useMEditor, useSelStatus } from '../../hooks/editor';
-import { EditorStore, EditorStoreContext } from '../../editor/store';
 import { selChange$ } from '../../editor/plugins/useOnchange';
-import { Transforms } from 'slate';
-import { ReactEditor as SlateReactEditor } from 'slate-react';
+import { EditorStore, EditorStoreContext } from '../../editor/store';
+import { useMEditor, useSelStatus } from '../../hooks/editor';
 
 describe('MarkdownEditor hooks/editor', () => {
   let editor: BaseEditor & ReactEditor & HistoryEditor;
-  let editorRef: React.MutableRefObject<BaseEditor & ReactEditor & HistoryEditor>;
+  let editorRef: React.MutableRefObject<
+    BaseEditor & ReactEditor & HistoryEditor
+  >;
   let store: EditorStore;
 
   beforeEach(() => {
@@ -34,14 +39,21 @@ describe('MarkdownEditor hooks/editor', () => {
   describe('useMEditor', () => {
     it('update(props, current) 应使用 current 的 path', () => {
       const setNodesSpy = vi.spyOn(Transforms, 'setNodes');
-      const findPathSpy = vi.spyOn(SlateReactEditor, 'findPath').mockImplementation((ed, node) => {
-        // 传入 current 时返回 [1]，否则返回 [0]（el 的 path）
-        if (node && (node as any).currentPath) return (node as any).currentPath;
-        return [0];
-      });
+      const findPathSpy = vi
+        .spyOn(SlateReactEditor, 'findPath')
+        .mockImplementation((ed, node) => {
+          // 传入 current 时返回 [1]，否则返回 [0]（el 的 path）
+          if (node && (node as any).currentPath)
+            return (node as any).currentPath;
+          return [0];
+        });
 
       const el0 = editor.children[0];
-      const currentEl = { type: 'paragraph', children: [{ text: 'b' }], currentPath: [1] };
+      const currentEl = {
+        type: 'paragraph',
+        children: [{ text: 'b' }],
+        currentPath: [1],
+      };
 
       const TestComp = () => {
         const [, update] = useMEditor(el0 as any);
@@ -64,7 +76,11 @@ describe('MarkdownEditor hooks/editor', () => {
 
       const { getByTestId } = render(
         <EditorStoreContext.Provider value={contextValue as any}>
-          <Slate editor={editor} initialValue={editor.children} onChange={() => {}}>
+          <Slate
+            editor={editor}
+            initialValue={editor.children}
+            onChange={() => {}}
+          >
             <TestComp />
           </Slate>
         </EditorStoreContext.Provider>,
@@ -90,7 +106,9 @@ describe('MarkdownEditor hooks/editor', () => {
 
       const TestComp = () => {
         const [sel] = useSelStatus(element as any);
-        return <div data-testid="status">{sel ? 'selected' : 'not-selected'}</div>;
+        return (
+          <div data-testid="status">{sel ? 'selected' : 'not-selected'}</div>
+        );
       };
 
       const contextValue = {
@@ -101,7 +119,11 @@ describe('MarkdownEditor hooks/editor', () => {
 
       const { getByTestId } = render(
         <EditorStoreContext.Provider value={contextValue as any}>
-          <Slate editor={editor} initialValue={editor.children} onChange={() => {}}>
+          <Slate
+            editor={editor}
+            initialValue={editor.children}
+            onChange={() => {}}
+          >
             <TestComp />
           </Slate>
         </EditorStoreContext.Provider>,

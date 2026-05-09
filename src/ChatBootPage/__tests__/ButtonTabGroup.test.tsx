@@ -2,9 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import ButtonTabGroup, {
-  ButtonTabItem,
-} from '../ButtonTabGroup';
+import ButtonTabGroup, { ButtonTabItem } from '../ButtonTabGroup';
 
 describe('ButtonTabGroup 组件', () => {
   const TestIcon = () => <span data-testid="test-icon">📌</span>;

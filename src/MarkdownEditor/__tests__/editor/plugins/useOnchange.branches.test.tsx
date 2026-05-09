@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Editor } from 'slate';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useOnchange } from '../../../editor/plugins/useOnchange';
 
 const mockCancel = vi.fn();
@@ -189,4 +189,3 @@ describe('useOnchange targeted coverage', () => {
     expect(mockSetDomRect).toHaveBeenCalledWith(null);
   });
 });
-

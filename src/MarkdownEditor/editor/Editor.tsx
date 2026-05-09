@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/no-children-prop */
-import { useDebounceFn } from '../../Hooks/useDebounceFn';
 import classNames from 'clsx';
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -19,6 +18,7 @@ import {
   RenderLeafProps,
   Slate,
 } from 'slate-react';
+import { useDebounceFn } from '../../Hooks/useDebounceFn';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { parserMdToSchema } from '../BaseMarkdownEditor';
 import { Elements } from '../el';

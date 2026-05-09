@@ -1,9 +1,14 @@
-import { createEditor, Editor, Element, Node, Path, Range, Transforms } from 'slate';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  ReactEditor,
-  withReact,
-} from 'slate-react';
+  createEditor,
+  Editor,
+  Element,
+  Node,
+  Path,
+  Range,
+  Transforms,
+} from 'slate';
+import { ReactEditor, withReact } from 'slate-react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorStore } from '../../../editor/store';
 import { KeyboardTask } from '../../../editor/utils/keyboard';
 
@@ -108,13 +113,18 @@ describe('KeyboardTask', () => {
       vi.spyOn(Path, 'equals').mockReturnValue(true);
       vi.spyOn(Path, 'parent').mockReturnValue([0]);
       // Node.get should return a node with valid children (text node)
-      vi.spyOn(Node, 'get').mockReturnValue({ type: 'paragraph', children: [{ text: 'Test' }] });
+      vi.spyOn(Node, 'get').mockReturnValue({
+        type: 'paragraph',
+        children: [{ text: 'Test' }],
+      });
       vi.spyOn(Node, 'string').mockReturnValue('Test');
       vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
       vi.spyOn(Element, 'isElement').mockReturnValue(true);
 
       // Mock wrapNodes to prevent actual execution which requires valid editor structure
-      const wrapNodesSpy = vi.spyOn(Transforms, 'wrapNodes').mockImplementation(() => {});
+      const wrapNodesSpy = vi
+        .spyOn(Transforms, 'wrapNodes')
+        .mockImplementation(() => {});
 
       keyboardTask.list('ordered');
 
@@ -143,13 +153,18 @@ describe('KeyboardTask', () => {
       vi.spyOn(Path, 'equals').mockReturnValue(true);
       vi.spyOn(Path, 'parent').mockReturnValue([0]);
       // Node.get should return a node with valid children (text node)
-      vi.spyOn(Node, 'get').mockReturnValue({ type: 'paragraph', children: [{ text: 'Test' }] });
+      vi.spyOn(Node, 'get').mockReturnValue({
+        type: 'paragraph',
+        children: [{ text: 'Test' }],
+      });
       vi.spyOn(Node, 'string').mockReturnValue('Test');
       vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
       vi.spyOn(Element, 'isElement').mockReturnValue(true);
 
       // Mock wrapNodes to prevent actual execution which requires valid editor structure
-      const wrapNodesSpy = vi.spyOn(Transforms, 'wrapNodes').mockImplementation(() => {});
+      const wrapNodesSpy = vi
+        .spyOn(Transforms, 'wrapNodes')
+        .mockImplementation(() => {});
 
       keyboardTask.list('unordered');
 
@@ -177,13 +192,18 @@ describe('KeyboardTask', () => {
       vi.spyOn(Path, 'equals').mockReturnValue(true);
       vi.spyOn(Path, 'parent').mockReturnValue([0]);
       // Node.get should return a node with valid children (text node)
-      vi.spyOn(Node, 'get').mockReturnValue({ type: 'paragraph', children: [{ text: 'Test' }] });
+      vi.spyOn(Node, 'get').mockReturnValue({
+        type: 'paragraph',
+        children: [{ text: 'Test' }],
+      });
       vi.spyOn(Node, 'string').mockReturnValue('Test');
       vi.spyOn(Range, 'isCollapsed').mockReturnValue(true);
       vi.spyOn(Element, 'isElement').mockReturnValue(true);
 
       // Mock wrapNodes to prevent actual execution which requires valid editor structure
-      const wrapNodesSpy = vi.spyOn(Transforms, 'wrapNodes').mockImplementation(() => {});
+      const wrapNodesSpy = vi
+        .spyOn(Transforms, 'wrapNodes')
+        .mockImplementation(() => {});
 
       keyboardTask.list('task');
 
@@ -215,7 +235,9 @@ describe('KeyboardTask', () => {
       vi.spyOn(Element, 'isElement').mockReturnValue(true);
 
       // Mock setNodes to prevent actual execution
-      const setNodesSpy = vi.spyOn(Transforms, 'setNodes').mockImplementation(() => {});
+      const setNodesSpy = vi
+        .spyOn(Transforms, 'setNodes')
+        .mockImplementation(() => {});
 
       keyboardTask.list('ordered');
 

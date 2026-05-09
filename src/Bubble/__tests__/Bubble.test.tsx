@@ -13,7 +13,7 @@ const BubbleConfigProvide: React.FC<{
 }> = ({ children, compact, standalone }) => {
   return (
     <BubbleConfigContext.Provider
-      value={{ standalone: standalone || false, compact,}}
+      value={{ standalone: standalone || false, compact }}
     >
       {children}
     </BubbleConfigContext.Provider>
@@ -165,10 +165,7 @@ describe('Bubble', () => {
     };
     render(
       <BubbleConfigProvide>
-        <Bubble
-          {...userProps}
-          bubbleRenderConfig={{ render: false }}
-        />
+        <Bubble {...userProps} bubbleRenderConfig={{ render: false }} />
       </BubbleConfigProvide>,
     );
     expect(screen.queryByText('Test message content')).not.toBeInTheDocument();
@@ -1045,7 +1042,9 @@ describe('agentic-ui-filemap 提取与渲染', () => {
       expect(fileViewList).toBeInTheDocument();
       // chat-message 是 bubble 内容列（bubble-container-ai）的容器，
       // ContentFilemapView 应是其兄弟节点，而不是后代
-      const chatMessage = container.querySelector('[data-testid="chat-message"]');
+      const chatMessage = container.querySelector(
+        '[data-testid="chat-message"]',
+      );
       expect(chatMessage?.contains(contentFilemapView)).toBe(false);
     });
   });
@@ -1097,7 +1096,9 @@ describe('agentic-ui-filemap 提取与渲染', () => {
         '[data-testid="content-filemap-view"]',
       );
       expect(contentFilemapView).toBeInTheDocument();
-      const chatMessage = container.querySelector('[data-testid="chat-message"]');
+      const chatMessage = container.querySelector(
+        '[data-testid="chat-message"]',
+      );
       expect(chatMessage?.contains(contentFilemapView)).toBe(false);
     });
 

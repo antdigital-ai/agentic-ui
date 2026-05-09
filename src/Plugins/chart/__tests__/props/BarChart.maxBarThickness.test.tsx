@@ -4,7 +4,9 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 // Mock canvas.getContext so BarChart calculateLabelWidth 不抛错（与 BarChart.coverage 一致）
-HTMLCanvasElement.prototype.getContext = vi.fn(function (this: HTMLCanvasElement) {
+HTMLCanvasElement.prototype.getContext = vi.fn(function (
+  this: HTMLCanvasElement,
+) {
   return {
     measureText: vi.fn(() => ({ width: 50 })),
     fillText: vi.fn(),
@@ -66,9 +68,7 @@ vi.mock('../utils', () => ({
 }));
 
 // Import BarChart after mocking
-import BarChart, {
-  BarChartDataItem,
-} from '../BarChart';
+import BarChart, { BarChartDataItem } from '../BarChart';
 
 describe('BarChart maxBarThickness 功能测试', () => {
   const basicData: BarChartDataItem[] = [
@@ -413,7 +413,9 @@ describe('BarChart maxBarThickness 功能测试', () => {
           dataLabelFormatter={dataLabelFormatter}
         />,
       );
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
       expect(dataLabelFormatter).toHaveBeenCalled();
     });
 
@@ -421,15 +423,21 @@ describe('BarChart maxBarThickness 功能测试', () => {
       const { container } = render(
         <BarChart data={mockData} indexAxis="y" showDataLabels={true} />,
       );
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
     });
 
     it('当无法获取 canvas context 时应使用备用宽度计算', () => {
       const originalGetContext = HTMLCanvasElement.prototype.getContext;
       HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue(null);
 
-      const { container } = render(<BarChart data={mockData} showDataLabels={true} />);
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      const { container } = render(
+        <BarChart data={mockData} showDataLabels={true} />,
+      );
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
 
       HTMLCanvasElement.prototype.getContext = originalGetContext;
     });

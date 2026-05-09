@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { TestWrapper } from '../../../_test_helpers/testUtils';
 import { I18nContext } from '../../I18n';
 import {
   getContentForEditor,
@@ -9,7 +10,6 @@ import {
   RealtimeFollowList,
   shouldUpdateEditor,
 } from '../RealtimeFollow';
-import { TestWrapper } from '../../../_test_helpers/testUtils';
 
 vi.mock('../RealtimeFollow/style', () => ({
   useRealtimeFollowStyle: vi.fn(() => undefined),
@@ -361,7 +361,9 @@ describe('RealtimeFollow Component', () => {
       );
       expect(overlay).toBeInTheDocument();
       expect(
-        overlay?.classList.contains('ant-agentic-workspace-realtime-overlay--loading'),
+        overlay?.classList.contains(
+          'ant-agentic-workspace-realtime-overlay--loading',
+        ),
       ).toBe(true);
       expect(container.querySelector('.ant-agentic-spin')).toBeInTheDocument();
     });
@@ -404,7 +406,9 @@ describe('RealtimeFollow Component', () => {
       );
       expect(overlay).toBeInTheDocument();
       expect(
-        overlay?.classList.contains('ant-agentic-workspace-realtime-overlay--error'),
+        overlay?.classList.contains(
+          'ant-agentic-workspace-realtime-overlay--error',
+        ),
       ).toBe(true);
       expect(screen.getByText('页面渲染失败')).toBeInTheDocument();
     });
@@ -480,7 +484,9 @@ describe('RealtimeFollow Component', () => {
         </TestWrapper>,
       );
       expect(screen.getByTestId('custom-fn')).toHaveTextContent('来自函数');
-      expect(container.querySelector('.ant-agentic-agentic-md-editor')).toBeNull();
+      expect(
+        container.querySelector('.ant-agentic-agentic-md-editor'),
+      ).toBeNull();
     });
   });
 
@@ -1799,7 +1805,9 @@ describe('RealtimeFollow Component', () => {
       // 在测试环境中，编辑器可能不会立即更新，但组件应该能正常渲染
       await waitFor(
         () => {
-          const editor = container.querySelector('.ant-agentic-agentic-md-editor');
+          const editor = container.querySelector(
+            '.ant-agentic-agentic-md-editor',
+          );
           const iframe = container.querySelector('iframe');
           // 应该至少渲染其中一个
           expect(editor || iframe || container.firstChild).toBeTruthy();

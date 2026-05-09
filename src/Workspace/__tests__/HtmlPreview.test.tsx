@@ -107,7 +107,9 @@ describe('HtmlPreview Component', () => {
 
     await waitFor(() => {
       // 应该显示代码编辑器
-      expect(document.querySelector('.ant-agentic-md-editor')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-md-editor'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -126,7 +128,9 @@ describe('HtmlPreview Component', () => {
     );
 
     // 应该显示代码模式
-    expect(document.querySelector('.ant-agentic-md-editor')).toBeInTheDocument();
+    expect(
+      document.querySelector('.ant-agentic-md-editor'),
+    ).toBeInTheDocument();
   });
 
   it('应该清理 HTML 内容（XSS 防护）', () => {
@@ -214,7 +218,9 @@ describe('HtmlPreview Component', () => {
     );
 
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-md-editor')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-md-editor'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -334,7 +340,9 @@ describe('HtmlPreview Component', () => {
     fireEvent.click(codeButton);
 
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-md-editor')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-md-editor'),
+      ).toBeInTheDocument();
     });
 
     // 再次切换回预览模式
@@ -390,7 +398,9 @@ describe('HtmlPreview Component', () => {
     );
 
     await waitFor(() => {
-      expect(document.querySelector('.ant-agentic-md-editor')).toBeInTheDocument();
+      expect(
+        document.querySelector('.ant-agentic-md-editor'),
+      ).toBeInTheDocument();
     });
   });
 

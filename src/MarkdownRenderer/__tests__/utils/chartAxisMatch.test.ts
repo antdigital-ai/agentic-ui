@@ -27,18 +27,18 @@ describe('columnKeyMatchesConfiguredField', () => {
   });
 
   it('matches column with Chinese parenthesis unit suffix', () => {
-    expect(columnKeyMatchesConfiguredField('GDP总量（万亿元）', 'GDP总量')).toBe(
-      true,
-    );
+    expect(
+      columnKeyMatchesConfiguredField('GDP总量（万亿元）', 'GDP总量'),
+    ).toBe(true);
     expect(columnKeyMatchesConfiguredField('客单价（元）', '客单价')).toBe(
       true,
     );
   });
 
   it('matches column with multiple parenthesis suffixes', () => {
-    expect(
-      columnKeyMatchesConfiguredField('销量(万台)(同比)', '销量'),
-    ).toBe(true);
+    expect(columnKeyMatchesConfiguredField('销量(万台)(同比)', '销量')).toBe(
+      true,
+    );
     expect(
       columnKeyMatchesConfiguredField('GDP（万亿元）（季调）', 'GDP'),
     ).toBe(true);
@@ -74,7 +74,9 @@ describe('resolveChartAxisFieldToColumnKey', () => {
   const columns = ['时段', '客单价(元)', '销量（万台）'];
 
   it('returns the field as-is when undefined / null', () => {
-    expect(resolveChartAxisFieldToColumnKey(undefined, columns)).toBeUndefined();
+    expect(
+      resolveChartAxisFieldToColumnKey(undefined, columns),
+    ).toBeUndefined();
     expect(
       resolveChartAxisFieldToColumnKey(null as unknown as string, columns),
     ).toBeNull();
@@ -96,7 +98,9 @@ describe('resolveChartAxisFieldToColumnKey', () => {
     expect(resolveChartAxisFieldToColumnKey('客单价', columns)).toBe(
       '客单价(元)',
     );
-    expect(resolveChartAxisFieldToColumnKey('销量', columns)).toBe('销量（万台）');
+    expect(resolveChartAxisFieldToColumnKey('销量', columns)).toBe(
+      '销量（万台）',
+    );
   });
 
   it('returns the original configuredField when no column matches', () => {

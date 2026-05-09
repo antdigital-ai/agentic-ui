@@ -83,7 +83,9 @@ describe('Katex', () => {
     it('应该应用正确的样式', () => {
       const { container } = render(<Katex el={mockElement} />);
 
-      const mainDiv = container.querySelector('div[contenteditable="false"]') as HTMLElement;
+      const mainDiv = container.querySelector(
+        'div[contenteditable="false"]',
+      ) as HTMLElement;
       // happy-dom 不支持通过 computed style 获取 CSS-in-JS 注入的样式，改用 getAttribute
       const style = mainDiv?.getAttribute('style') ?? '';
       expect(style).toContain('cursor: default');
@@ -121,7 +123,9 @@ describe('Katex', () => {
         vi.advanceTimersByTime(100);
       });
 
-      const mainContainer = container.querySelector('div[contenteditable="false"]');
+      const mainContainer = container.querySelector(
+        'div[contenteditable="false"]',
+      );
       expect(mainContainer).toBeInTheDocument();
     });
 
@@ -145,7 +149,9 @@ describe('Katex', () => {
     it('应该处理 katex 加载失败的情况', async () => {
       const originalEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
       mockLoadKatex.mockRejectedValueOnce(new Error('Load failed'));
 
@@ -194,7 +200,7 @@ describe('Katex', () => {
     it('应该在 katex 未加载时不渲染公式', async () => {
       const originalEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
-      
+
       // 创建一个永远不会 resolve 的 promise，模拟 katex 未加载
       mockLoadKatex.mockImplementation(() => new Promise(() => {}));
 
@@ -276,7 +282,9 @@ describe('Katex', () => {
         vi.advanceTimersByTime(100);
       });
 
-      const mainContainer = container.querySelector('div[contenteditable="false"]');
+      const mainContainer = container.querySelector(
+        'div[contenteditable="false"]',
+      );
       expect(mainContainer).toBeInTheDocument();
       expect(mainContainer).toHaveStyle({
         textAlign: 'center',
@@ -437,7 +445,9 @@ describe('Katex', () => {
 
   describe('类名和样式测试', () => {
     it('应该应用 hidden 类名当内容为空时', async () => {
-      const { container } = render(<Katex el={{ ...mockElement, value: '' }} />);
+      const { container } = render(
+        <Katex el={{ ...mockElement, value: '' }} />,
+      );
 
       await act(async () => {
         vi.advanceTimersByTime(100);

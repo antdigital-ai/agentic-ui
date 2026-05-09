@@ -7,46 +7,40 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  CommentCreate,
-  CommentView,
-} from '../../../editor/elements/Comment';
+import { CommentCreate, CommentView } from '../../../editor/elements/Comment';
 import { TestSlateWrapper } from './TestSlateWrapper';
 
 // Mock dependencies：同一 setShowComment 引用以便覆盖 onClick 内 setShowComment 分支
 const commentMockRef = vi.hoisted(() => ({ setShowComment: vi.fn() }));
 
-vi.mock(
-  '../../../editor/store',
-  async (importOriginal) => {
-    const actual = (await importOriginal()) as any;
-    return {
-      ...actual,
-      EditorStoreContext: React.createContext({
-        store: {},
-        typewriter: false,
-        setShowComment: commentMockRef.setShowComment,
-        readonly: false,
-        keyTask$: { next: vi.fn() },
-        insertCompletionText$: { next: vi.fn() },
-        openInsertLink$: { next: vi.fn() },
-        domRect: null,
-        setDomRect: vi.fn(),
-        editorProps: {},
-        markdownEditorRef: { current: null },
-        markdownContainerRef: { current: null },
-      }),
-      useEditorStore: vi.fn(() => ({
-        store: {},
-        readonly: false,
-        typewriter: false,
-        editorProps: {},
-        markdownEditorRef: { current: null },
-        setShowComment: commentMockRef.setShowComment,
-      })),
-    };
-  },
-);
+vi.mock('../../../editor/store', async (importOriginal) => {
+  const actual = (await importOriginal()) as any;
+  return {
+    ...actual,
+    EditorStoreContext: React.createContext({
+      store: {},
+      typewriter: false,
+      setShowComment: commentMockRef.setShowComment,
+      readonly: false,
+      keyTask$: { next: vi.fn() },
+      insertCompletionText$: { next: vi.fn() },
+      openInsertLink$: { next: vi.fn() },
+      domRect: null,
+      setDomRect: vi.fn(),
+      editorProps: {},
+      markdownEditorRef: { current: null },
+      markdownContainerRef: { current: null },
+    }),
+    useEditorStore: vi.fn(() => ({
+      store: {},
+      readonly: false,
+      typewriter: false,
+      editorProps: {},
+      markdownEditorRef: { current: null },
+      setShowComment: commentMockRef.setShowComment,
+    })),
+  };
+});
 
 describe('Comment', () => {
   const renderWithProvider = (component: React.ReactElement) => {
@@ -86,11 +80,7 @@ describe('Comment', () => {
 
     it('应该正确渲染有评论的内容', () => {
       renderWithProvider(
-        <CommentView
-          comment={{}}
-          commentItem={mockCommentItem}
-          id="test-id"
-        >
+        <CommentView comment={{}} commentItem={mockCommentItem} id="test-id">
           <span>Test content</span>
         </CommentView>,
       );
@@ -128,11 +118,7 @@ describe('Comment', () => {
       const mockStopPropagation = vi.fn();
 
       renderWithProvider(
-        <CommentView
-          comment={{}}
-          commentItem={mockCommentItem}
-          id="test-id"
-        >
+        <CommentView comment={{}} commentItem={mockCommentItem} id="test-id">
           <span>Test content</span>
         </CommentView>,
       );
@@ -151,11 +137,7 @@ describe('Comment', () => {
 
     it('应该在没有评论时直接渲染子元素', () => {
       renderWithProvider(
-        <CommentView
-          comment={{}}
-          commentItem={[]}
-          id="test-id"
-        >
+        <CommentView comment={{}} commentItem={[]} id="test-id">
           <span>Test content</span>
         </CommentView>,
       );
@@ -168,11 +150,7 @@ describe('Comment', () => {
 
     it('应该在没有评论项时直接渲染子元素', () => {
       renderWithProvider(
-        <CommentView
-          comment={{}}
-          commentItem={undefined as any}
-          id="test-id"
-        >
+        <CommentView comment={{}} commentItem={undefined as any} id="test-id">
           <span>Test content</span>
         </CommentView>,
       );
@@ -185,11 +163,7 @@ describe('Comment', () => {
 
     it('应该处理空的评论项数组', () => {
       renderWithProvider(
-        <CommentView
-          comment={{}}
-          commentItem={[]}
-          id="test-id"
-        >
+        <CommentView comment={{}} commentItem={[]} id="test-id">
           <span>Test content</span>
         </CommentView>,
       );
@@ -201,11 +175,7 @@ describe('Comment', () => {
 
     it('应该处理复杂的子元素', () => {
       renderWithProvider(
-        <CommentView
-          comment={{}}
-          commentItem={mockCommentItem}
-          id="test-id"
-        >
+        <CommentView comment={{}} commentItem={mockCommentItem} id="test-id">
           <div>
             <span>Complex content</span>
             <p>With multiple elements</p>
@@ -387,11 +357,7 @@ describe('Comment', () => {
   describe('边界情况测试', () => {
     it('应该处理空的子元素', () => {
       renderWithProvider(
-        <CommentView
-          comment={{}}
-          commentItem={[]}
-          id="test-id"
-        >
+        <CommentView comment={{}} commentItem={[]} id="test-id">
           {null}
         </CommentView>,
       );
@@ -401,11 +367,7 @@ describe('Comment', () => {
 
     it('应该处理空的字符串子元素', () => {
       renderWithProvider(
-        <CommentView
-          comment={{}}
-          commentItem={[]}
-          id="test-id"
-        >
+        <CommentView comment={{}} commentItem={[]} id="test-id">
           {''}
         </CommentView>,
       );
@@ -415,11 +377,7 @@ describe('Comment', () => {
 
     it('应该处理数字子元素', () => {
       renderWithProvider(
-        <CommentView
-          comment={{}}
-          commentItem={[]}
-          id="test-id"
-        >
+        <CommentView comment={{}} commentItem={[]} id="test-id">
           {123}
         </CommentView>,
       );
@@ -429,11 +387,7 @@ describe('Comment', () => {
 
     it('应该处理布尔子元素', () => {
       renderWithProvider(
-        <CommentView
-          comment={{}}
-          commentItem={[]}
-          id="test-id"
-        >
+        <CommentView comment={{}} commentItem={[]} id="test-id">
           {true}
         </CommentView>,
       );

@@ -2,8 +2,8 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React, { useEffect } from 'react';
 import { describe, expect, it } from 'vitest';
-import { useMarkdownToReact } from '..';
 import type { RendererBlockProps } from '..';
+import { useMarkdownToReact } from '..';
 
 interface Counters {
   mounts: number;
@@ -53,7 +53,9 @@ describe('useMarkdownToReact streaming stability', () => {
       />,
     );
 
-    expect(screen.getByTestId('streaming-code-block-probe')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('streaming-code-block-probe'),
+    ).toBeInTheDocument();
     expect(counters.mounts).toBe(1);
     expect(counters.unmounts).toBe(0);
 
@@ -94,7 +96,9 @@ describe('useMarkdownToReact streaming stability', () => {
       />,
     );
 
-    expect(screen.getByTestId('streaming-code-block-probe')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('streaming-code-block-probe'),
+    ).toBeInTheDocument();
     expect(counters.mounts).toBe(1);
     expect(counters.unmounts).toBe(0);
 

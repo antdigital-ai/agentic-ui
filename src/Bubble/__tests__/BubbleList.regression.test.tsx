@@ -86,7 +86,9 @@ describe('BubbleList regression', () => {
         </BubbleConfigProvide>,
       );
 
-      expect(screen.getByTestId(`mock-bubble-${LOADING_FLAT}`)).toBeInTheDocument();
+      expect(
+        screen.getByTestId(`mock-bubble-${LOADING_FLAT}`),
+      ).toBeInTheDocument();
       expect(mockState.mountCount).toBe(1);
       expect(mockState.unmountCount).toBe(0);
 

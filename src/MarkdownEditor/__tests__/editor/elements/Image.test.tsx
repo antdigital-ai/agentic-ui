@@ -295,9 +295,7 @@ describe('Image', () => {
         onClick?: (url: string) => boolean | void;
         openInNewTab?: boolean;
       }) => {
-        const { useEditorStore } = await import(
-          '../../../editor/store'
-        );
+        const { useEditorStore } = await import('../../../editor/store');
         vi.mocked(useEditorStore).mockReturnValue({
           editorProps: {
             linkConfig,

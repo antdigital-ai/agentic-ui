@@ -2,9 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import FunnelChart, {
-  FunnelChartDataItem,
-} from '../FunnelChart';
+import FunnelChart, { FunnelChartDataItem } from '../FunnelChart';
 
 // Mock Chart.js
 vi.mock('chart.js', () => ({
@@ -93,7 +91,14 @@ vi.mock('../components', () => ({
       ))}
     </div>
   ),
-  ChartToolBar: ({ title, onDownload, dataTime, extra, loading, filter }: any) => (
+  ChartToolBar: ({
+    title,
+    onDownload,
+    dataTime,
+    extra,
+    loading,
+    filter,
+  }: any) => (
     <div data-testid="chart-toolbar">
       {title && <span data-testid="chart-title">{title}</span>}
       {dataTime && <span data-testid="chart-datatime">{dataTime}</span>}
@@ -332,9 +337,7 @@ describe('FunnelChart', () => {
 
   describe('交互功能测试', () => {
     it('应该支持下载功能', async () => {
-      const { downloadChart } = vi.mocked(
-        await import('../components'),
-      );
+      const { downloadChart } = vi.mocked(await import('../components'));
 
       render(<FunnelChart data={sampleData} title="可下载漏斗" />);
 
@@ -893,7 +896,15 @@ describe('FunnelChart', () => {
       expect(options?.plugins?.legend?.labels?.generateLabels).toBeDefined();
       const mockChart = {
         data: {
-          datasets: [{ data: [[0, 1000], [0, 600], [0, 200]] }],
+          datasets: [
+            {
+              data: [
+                [0, 1000],
+                [0, 600],
+                [0, 200],
+              ],
+            },
+          ],
           labels: ['阶段A', '阶段B', '阶段C'],
         },
       };
@@ -963,8 +974,12 @@ describe('FunnelChart', () => {
       render(<FunnelChart data={dataWithRatio} />);
       const plugins = (globalThis as any).__funnelChartLastPlugins as any[];
       expect(Array.isArray(plugins)).toBe(true);
-      const trapezoid = plugins?.find((p: any) => p.id === 'funnelTrapezoidLabels');
-      const rightLabel = plugins?.find((p: any) => p.id === 'funnelRightLabels');
+      const trapezoid = plugins?.find(
+        (p: any) => p.id === 'funnelTrapezoidLabels',
+      );
+      const rightLabel = plugins?.find(
+        (p: any) => p.id === 'funnelRightLabels',
+      );
       expect(trapezoid?.afterDatasetsDraw).toBeDefined();
       expect(rightLabel?.afterDatasetsDraw).toBeDefined();
 
@@ -980,7 +995,15 @@ describe('FunnelChart', () => {
       const mockChart = {
         ctx,
         data: {
-          datasets: [{ data: [[0, 1000], [0, 600], [0, 200]] }],
+          datasets: [
+            {
+              data: [
+                [0, 1000],
+                [0, 600],
+                [0, 200],
+              ],
+            },
+          ],
           labels: ['阶段A', '阶段B', '阶段C'],
         },
         scales: { x: xScale },
@@ -996,7 +1019,9 @@ describe('FunnelChart', () => {
     it('trapezoid 插件在 showTrapezoid 为 true 时应绘制', () => {
       render(<FunnelChart data={dataWithRatio} />);
       const plugins = (globalThis as any).__funnelChartLastPlugins as any[];
-      const trapezoid = plugins?.find((p: any) => p.id === 'funnelTrapezoidLabels');
+      const trapezoid = plugins?.find(
+        (p: any) => p.id === 'funnelTrapezoidLabels',
+      );
       const ctx = createMockCtx();
       const xScale = {
         getPixelForValue: vi.fn((v: number) => 100 + v * 2),
@@ -1009,7 +1034,15 @@ describe('FunnelChart', () => {
       const mockChart = {
         ctx,
         data: {
-          datasets: [{ data: [[0, 1000], [0, 600], [0, 200]] }],
+          datasets: [
+            {
+              data: [
+                [0, 1000],
+                [0, 600],
+                [0, 200],
+              ],
+            },
+          ],
           labels: ['阶段A', '阶段B', '阶段C'],
         },
         scales: { x: xScale },
@@ -1040,9 +1073,7 @@ describe('FunnelChart', () => {
         { category: 'A', filterLabel: 'L2', x: '步骤1', y: 200 },
         { category: 'B', filterLabel: 'L1', x: '步骤1', y: 150 },
       ];
-      render(
-        <FunnelChart data={multiCategory} renderFilterInToolbar />,
-      );
+      render(<FunnelChart data={multiCategory} renderFilterInToolbar />);
       expect(screen.getByTestId('chart-toolbar')).toBeInTheDocument();
       expect(screen.getByTestId('chart-filter')).toBeInTheDocument();
     });

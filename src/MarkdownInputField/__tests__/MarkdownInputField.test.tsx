@@ -1,12 +1,10 @@
+import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownInputField } from '../MarkdownInputField';
 import { CreateRecognizer } from '../VoiceInput';
-import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../BorderBeamAnimation', () => ({
   BorderBeamAnimation: () => null,

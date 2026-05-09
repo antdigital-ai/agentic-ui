@@ -53,10 +53,7 @@ describe('rehypeFootnoteRef', () => {
   it('converts multiple references in one text node', () => {
     const tree = runOnText('a [^x] then [^y] end');
     const spans = collectFncSpans(tree);
-    expect(spans.map((s) => s.properties['data-fnc-name'])).toEqual([
-      'x',
-      'y',
-    ]);
+    expect(spans.map((s) => s.properties['data-fnc-name'])).toEqual(['x', 'y']);
   });
 
   it('preserves leading and trailing text fragments around references', () => {

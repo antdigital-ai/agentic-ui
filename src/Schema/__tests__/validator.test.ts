@@ -1,8 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  SchemaValidator,
-  mdDataSchemaValidator,
-} from '../validator';
+import { SchemaValidator, mdDataSchemaValidator } from '../validator';
 
 // Mock Ajv
 const { mockValidate, mockCompile } = vi.hoisted(() => {

@@ -57,10 +57,14 @@ describe('AbstractLottie', () => {
     const { rerender } = render(
       <AbstractLottie animationData={mockAnimationData} size={64} />,
     );
-    expect(screen.getByTestId('lottie-animation')).toHaveStyle({ width: '64px' });
+    expect(screen.getByTestId('lottie-animation')).toHaveStyle({
+      width: '64px',
+    });
 
     rerender(<AbstractLottie animationData={mockAnimationData} size="2em" />);
-    expect(screen.getByTestId('lottie-animation').getAttribute('style')).toContain('width: 2em');
+    expect(
+      screen.getByTestId('lottie-animation').getAttribute('style'),
+    ).toContain('width: 2em');
   });
 
   it('should apply className, style, autoplay, loop', () => {

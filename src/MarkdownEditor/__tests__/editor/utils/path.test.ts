@@ -92,12 +92,16 @@ describe('Path Utils', () => {
   describe('toUnixPath', () => {
     it('应该将 Windows 路径转换为 Unix 路径', () => {
       expect(toUnixPath('C:\\path\\to\\file')).toBe('C:/path/to/file');
-      expect(toUnixPath('D:\\folder\\subfolder\\file.txt')).toBe('D:/folder/subfolder/file.txt');
+      expect(toUnixPath('D:\\folder\\subfolder\\file.txt')).toBe(
+        'D:/folder/subfolder/file.txt',
+      );
     });
 
     it('应该保持 Unix 路径不变', () => {
       expect(toUnixPath('/path/to/file')).toBe('/path/to/file');
-      expect(toUnixPath('/folder/subfolder/file.txt')).toBe('/folder/subfolder/file.txt');
+      expect(toUnixPath('/folder/subfolder/file.txt')).toBe(
+        '/folder/subfolder/file.txt',
+      );
     });
 
     it('应该处理相对路径', () => {
@@ -118,12 +122,18 @@ describe('Path Utils', () => {
     });
 
     it('应该处理混合路径', () => {
-      expect(toUnixPath('C:\\path/to\\mixed/file')).toBe('C:/path/to/mixed/file');
+      expect(toUnixPath('C:\\path/to\\mixed/file')).toBe(
+        'C:/path/to/mixed/file',
+      );
     });
 
     it('应该处理包含特殊字符的路径', () => {
-      expect(toUnixPath('C:\\path with spaces\\file.txt')).toBe('C:/path with spaces/file.txt');
-      expect(toUnixPath('C:\\path-with-dashes\\file.txt')).toBe('C:/path-with-dashes/file.txt');
+      expect(toUnixPath('C:\\path with spaces\\file.txt')).toBe(
+        'C:/path with spaces/file.txt',
+      );
+      expect(toUnixPath('C:\\path-with-dashes\\file.txt')).toBe(
+        'C:/path-with-dashes/file.txt',
+      );
     });
   });
 
@@ -149,23 +159,29 @@ describe('Path Utils', () => {
 
   describe('性能测试', () => {
     it('应该能够快速处理大量路径', () => {
-      const paths = Array.from({ length: 1000 }, (_, i) => `/path${i}/file#section${i}`);
-      
+      const paths = Array.from(
+        { length: 1000 },
+        (_, i) => `/path${i}/file#section${i}`,
+      );
+
       const startTime = performance.now();
-      paths.forEach(path => parsePath(path));
+      paths.forEach((path) => parsePath(path));
       const endTime = performance.now();
 
       expect(endTime - startTime).toBeLessThan(100); // 应该在100ms内完成
     });
 
     it('应该能够快速处理大量 URL', () => {
-      const urls = Array.from({ length: 1000 }, (_, i) => `https://example${i}.com`);
-      
+      const urls = Array.from(
+        { length: 1000 },
+        (_, i) => `https://example${i}.com`,
+      );
+
       const startTime = performance.now();
-      urls.forEach(url => isLink(url));
+      urls.forEach((url) => isLink(url));
       const endTime = performance.now();
 
       expect(endTime - startTime).toBeLessThan(100); // 应该在100ms内完成
     });
   });
-}); 
+});

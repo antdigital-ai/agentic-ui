@@ -297,9 +297,7 @@ describe('Mermaid Plugin', () => {
       const copyButton = screen.getByTestId('copy-button');
       fireEvent.click(copyButton);
 
-      expect(mockCopy).toHaveBeenCalledWith(
-        'graph TD\nA --> B\nB --> C',
-      );
+      expect(mockCopy).toHaveBeenCalledWith('graph TD\nA --> B\nB --> C');
     });
   });
 

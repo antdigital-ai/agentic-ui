@@ -14,19 +14,19 @@ import {
 
 vi.mock('../../../editor/utils', () => ({
   EditorUtils: {
-    createMediaNode: vi.fn(
-      (url: string, type: string, opts?: any) => ({
-        type: 'media',
-        src: url,
-        mediaType: type,
-        ...opts,
-      }),
-    ),
+    createMediaNode: vi.fn((url: string, type: string, opts?: any) => ({
+      type: 'media',
+      src: url,
+      mediaType: type,
+      ...opts,
+    })),
   },
 }));
 
 vi.mock('../../../editor/plugins/insertParsedHtmlNodes', () => ({
-  htmlToFragmentList: vi.fn((_html: string) => [{ type: 'paragraph', children: [{ text: '' }] }]),
+  htmlToFragmentList: vi.fn((_html: string) => [
+    { type: 'paragraph', children: [{ text: '' }] },
+  ]),
 }));
 
 describe('parseHtml', () => {
@@ -60,8 +60,7 @@ describe('parseHtml', () => {
     });
 
     it('应解析 video 内 source 的 src', () => {
-      const html =
-        '<video><source src="https://a.com/v.mp4"/></video>';
+      const html = '<video><source src="https://a.com/v.mp4"/></video>';
       const r = findImageElement(html);
       expect(r).not.toBeNull();
       expect(r?.url).toBe('https://a.com/v.mp4');
@@ -163,7 +162,10 @@ describe('parseHtml', () => {
     it('块级：<br/> 应转为空段落', () => {
       const el = { value: '<br/>' };
       const r = handleHtml(el, null, [], undefined);
-      expect(r.el).toMatchObject({ type: 'paragraph', children: [{ text: '' }] });
+      expect(r.el).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: '' }],
+      });
     });
 
     it('块级：</img> 应返回 null', () => {
@@ -213,7 +215,9 @@ describe('parseHtml', () => {
     it('块级：<p align> 内 parseMarkdownFn 返回非 paragraph 首节点时用 first.children', () => {
       const el = { value: '<!-- <p align="right">**bold**</p> -->' };
       const parseMarkdownFn = () => ({
-        schema: [{ type: 'paragraph', children: [{ text: 'bold', bold: true }] }],
+        schema: [
+          { type: 'paragraph', children: [{ text: 'bold', bold: true }] },
+        ],
       });
       const r = handleHtml(el, null, [], parseMarkdownFn);
       expect(r.el.align).toBe('right');
@@ -302,9 +306,19 @@ describe('parseHtml', () => {
 
     it('内联闭合标签与栈顶匹配时应弹出栈', () => {
       const parent = { type: 'paragraph' };
-      const open = handleHtml({ value: '<span style="color:red">' }, parent, [], undefined);
+      const open = handleHtml(
+        { value: '<span style="color:red">' },
+        parent,
+        [],
+        undefined,
+      );
       expect(open.htmlTag).toHaveLength(1);
-      const close = handleHtml({ value: '</span>' }, parent, open.htmlTag, undefined);
+      const close = handleHtml(
+        { value: '</span>' },
+        parent,
+        open.htmlTag,
+        undefined,
+      );
       expect(close.htmlTag).toHaveLength(0);
     });
 
@@ -360,7 +374,8 @@ describe('parseHtml', () => {
     });
 
     it('应解析 data-size', () => {
-      const html = '<a download href="https://a.com/f.pdf" data-size="1024">link</a>';
+      const html =
+        '<a download href="https://a.com/f.pdf" data-size="1024">link</a>';
       const r = findAttachment(html);
       expect(r?.size).toBe(1024);
     });
@@ -402,7 +417,9 @@ describe('parseHtml', () => {
 
   describe('preprocessNonStandardHtmlTags', () => {
     it('应保留标准标签，只剥非标准标签内容', () => {
-      expect(preprocessNonStandardHtmlTags('<div>a</div>')).toBe('<div>a</div>');
+      expect(preprocessNonStandardHtmlTags('<div>a</div>')).toBe(
+        '<div>a</div>',
+      );
       const custom = '<custom>inner</custom>';
       expect(preprocessNonStandardHtmlTags(custom)).toBe('inner');
     });

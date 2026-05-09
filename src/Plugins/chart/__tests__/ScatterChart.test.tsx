@@ -2,9 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import ScatterChart, {
-  ScatterChartDataItem,
-} from '../ScatterChart';
+import ScatterChart, { ScatterChartDataItem } from '../ScatterChart';
 import { useStyle as useScatterStyle } from '../ScatterChart/style';
 
 const lastScatterOptionsRef = vi.hoisted(() => ({ current: null as any }));
@@ -399,9 +397,8 @@ describe('ScatterChart', () => {
 
   describe('交互功能测试', () => {
     it('应该支持下载功能', async () => {
-      const { downloadChart } = await import(
-        '../../../src/Plugins/chart/components'
-      );
+      const { downloadChart } =
+        await import('../../../src/Plugins/chart/components');
 
       render(<ScatterChart data={sampleData} title="可下载散点图" />);
 
@@ -671,9 +668,7 @@ describe('ScatterChart', () => {
     });
 
     it('loading=true 时工具栏显示加载状态', () => {
-      render(
-        <ScatterChart data={sampleData} loading title="加载中" />,
-      );
+      render(<ScatterChart data={sampleData} loading title="加载中" />);
       expect(screen.getByTestId('chart-loading')).toHaveTextContent('loading');
     });
 
@@ -747,11 +742,14 @@ describe('ScatterChart', () => {
           title="Tooltip"
         />,
       );
-      const external = lastScatterOptionsRef.current?.plugins?.tooltip?.external;
+      const external =
+        lastScatterOptionsRef.current?.plugins?.tooltip?.external;
       expect(external).toBeDefined();
 
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: { opacity: 0, dataPoints: [], caretX: 0, caretY: 0 },
       });
       expect(el.style.opacity).toBe('0');
@@ -767,7 +765,8 @@ describe('ScatterChart', () => {
           title="Tooltip"
         />,
       );
-      const external = lastScatterOptionsRef.current?.plugins?.tooltip?.external;
+      const external =
+        lastScatterOptionsRef.current?.plugins?.tooltip?.external;
       expect(external).toBeDefined();
 
       const mockChart = {
@@ -802,7 +801,8 @@ describe('ScatterChart', () => {
 
     it('tooltip external 无 dataPoints 时提前 return', () => {
       render(<ScatterChart data={sampleData} title="Tooltip" />);
-      const external = lastScatterOptionsRef.current?.plugins?.tooltip?.external;
+      const external =
+        lastScatterOptionsRef.current?.plugins?.tooltip?.external;
       external({
         chart: { canvas: {} },
         tooltip: { opacity: 1, dataPoints: [], caretX: 0, caretY: 0 },
@@ -813,7 +813,8 @@ describe('ScatterChart', () => {
 
     it('tooltip external 解析异常时使用 0', () => {
       render(<ScatterChart data={sampleData} xUnit="月" title="Tooltip" />);
-      const external = lastScatterOptionsRef.current?.plugins?.tooltip?.external;
+      const external =
+        lastScatterOptionsRef.current?.plugins?.tooltip?.external;
       external({
         chart: {
           canvas: {
@@ -843,11 +844,7 @@ describe('ScatterChart', () => {
   describe('覆盖率：legend generateLabels 截断', () => {
     it('generateLabels 长文本时截断并加省略号', () => {
       render(
-        <ScatterChart
-          data={sampleData}
-          textMaxWidth={10}
-          title="图例截断"
-        />,
+        <ScatterChart data={sampleData} textMaxWidth={10} title="图例截断" />,
       );
       const generateLabels =
         lastScatterOptionsRef.current?.plugins?.legend?.labels?.generateLabels;
@@ -872,9 +869,8 @@ describe('ScatterChart', () => {
 
   describe('覆盖率：handleDownload 与错误边界', () => {
     it('handleDownload 通过 ToolBar 调用 downloadChart', async () => {
-      const { downloadChart } = await import(
-        '../../../src/Plugins/chart/components'
-      );
+      const { downloadChart } =
+        await import('../../../src/Plugins/chart/components');
       render(<ScatterChart data={sampleData} title="下载" />);
       screen.getByTestId('download-button').click();
       await waitFor(() => {
@@ -897,7 +893,9 @@ describe('ScatterChart', () => {
         };
       });
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       render(<ScatterChart data={sampleData} title="错误" />);
       expect(
         screen.getByText('图表渲染失败，请检查数据格式'),

@@ -13,7 +13,6 @@ vi.mock('katex', () => ({
   },
 }));
 
-
 describe('Katex Plugin', () => {
   beforeEach(() => {
     vi.clearAllMocks();

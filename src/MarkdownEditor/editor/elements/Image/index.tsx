@@ -14,10 +14,10 @@ import React, {
 } from 'react';
 import { useRefFunction } from '../../../../Hooks/useRefFunction';
 
-import { useDebounceFn } from '../../../../Hooks/useDebounceFn';
 import { Rnd } from 'react-rnd';
 import { Path, Transforms } from 'slate';
 import { ActionIconBox } from '../../../../Components/ActionIconBox';
+import { useDebounceFn } from '../../../../Hooks/useDebounceFn';
 import { I18nContext } from '../../../../I18n';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, MediaNode } from '../../../el';

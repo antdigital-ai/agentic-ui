@@ -3,8 +3,8 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { ReactEditor } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { TagPopup } from '../../../editor/elements/TagPopup';
 import { SuggestionConnext } from '../../../../MarkdownInputField/Suggestion';
+import { TagPopup } from '../../../editor/elements/TagPopup';
 
 // Mock SuggestionContext
 const createMockSuggestionContext = () => ({
@@ -393,12 +393,7 @@ describe('TagPopup 组件测试', () => {
       const { container, rerender } = render(
         <ConfigProvider>
           <SuggestionConnext.Provider value={mockSuggestionContext}>
-            <TagPopup
-              text=" "
-              items={items}
-              onSelect={onSelect}
-              type="panel"
-            >
+            <TagPopup text=" " items={items} onSelect={onSelect} type="panel">
               <span data-testid="tag-content"> </span>
             </TagPopup>
           </SuggestionConnext.Provider>

@@ -203,10 +203,14 @@ describe('Markdown HTML Demo 测试', () => {
       <MarkdownEditor initValue={complexHtml} readonly reportMode />,
     );
 
-    expect(container.querySelector('.ant-agentic-md-editor')).toBeInTheDocument();
+    expect(
+      container.querySelector('.ant-agentic-md-editor'),
+    ).toBeInTheDocument();
     const textContent = container.textContent || '';
     expect(
-      textContent.includes('标题文字') || textContent.includes('副标题文字') || container.innerHTML.length > 0,
+      textContent.includes('标题文字') ||
+        textContent.includes('副标题文字') ||
+        container.innerHTML.length > 0,
     ).toBe(true);
   });
 

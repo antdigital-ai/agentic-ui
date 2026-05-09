@@ -15,7 +15,13 @@ describe('Break Component', () => {
   const mockChildren = (<span>Test content</span>) as any;
 
   it('应该正确渲染Break组件', () => {
-    render(<Break attributes={mockAttributes} children={mockChildren} element={{ type: 'break', children: [] } as any} />);
+    render(
+      <Break
+        attributes={mockAttributes}
+        children={mockChildren}
+        element={{ type: 'break', children: [] } as any}
+      />,
+    );
 
     const breakElement = screen.getByText('Test content').parentElement;
     expect(breakElement).toBeInTheDocument();
@@ -24,7 +30,13 @@ describe('Break Component', () => {
   });
 
   it('应该包含br标签', () => {
-    render(<Break attributes={mockAttributes} children={mockChildren} element={{ type: 'break', children: [] } as any} />);
+    render(
+      <Break
+        attributes={mockAttributes}
+        children={mockChildren}
+        element={{ type: 'break', children: [] } as any}
+      />,
+    );
 
     const brElement = screen
       .getByText('Test content')
@@ -39,7 +51,13 @@ describe('Break Component', () => {
       className: 'custom-class',
     };
 
-    render(<Break attributes={customAttributes} children={mockChildren} element={{ type: 'break', children: [] } as any} />);
+    render(
+      <Break
+        attributes={customAttributes}
+        children={mockChildren}
+        element={{ type: 'break', children: [] } as any}
+      />,
+    );
 
     const breakElement = screen.getByText('Test content').parentElement;
     expect(breakElement).toHaveAttribute('data-testid', 'break-element');
@@ -49,14 +67,26 @@ describe('Break Component', () => {
   it('应该渲染children内容', () => {
     const customChildren = <div data-testid="child-content">Child content</div>;
 
-    render(<Break attributes={mockAttributes} children={customChildren} element={{ type: 'break', children: [] } as any} />);
+    render(
+      <Break
+        attributes={mockAttributes}
+        children={customChildren}
+        element={{ type: 'break', children: [] } as any}
+      />,
+    );
 
     expect(screen.getByTestId('child-content')).toBeInTheDocument();
     expect(screen.getByText('Child content')).toBeInTheDocument();
   });
 
   it('应该处理空的children', () => {
-    render(<Break attributes={mockAttributes} children={null} element={{ type: 'break', children: [] } as any} />);
+    render(
+      <Break
+        attributes={mockAttributes}
+        children={null}
+        element={{ type: 'break', children: [] } as any}
+      />,
+    );
 
     const breakElement = document.querySelector(
       'span[contenteditable="false"]',
@@ -73,6 +103,8 @@ describe('Break Component', () => {
         element={{ type: 'break', children: [] } as any}
       />,
     );
-    expect(screen.getByText('ro').parentElement?.querySelector('br')).toBeInTheDocument();
+    expect(
+      screen.getByText('ro').parentElement?.querySelector('br'),
+    ).toBeInTheDocument();
   });
 });

@@ -95,7 +95,9 @@ describe('ActionItemBox 组件', () => {
         />
       </ConfigProvider>,
     );
-    const iconWrap = container.querySelector('.ant-agentic-chat-action-item-box-icon');
+    const iconWrap = container.querySelector(
+      '.ant-agentic-chat-action-item-box-icon',
+    );
     expect(iconWrap).toHaveStyle({ width: '32px', height: '32px' });
   });
 
@@ -105,18 +107,16 @@ describe('ActionItemBox 组件', () => {
         <ActionItemBox title="紧凑" onClick={() => {}} icon="i" compact />
       </ConfigProvider>,
     );
-    const iconWrap = container.querySelector('.ant-agentic-chat-action-item-box-icon');
+    const iconWrap = container.querySelector(
+      '.ant-agentic-chat-action-item-box-icon',
+    );
     expect(iconWrap).not.toBeInTheDocument();
   });
 
   it('有 description 时渲染描述且不 compact 时显示', () => {
     render(
       <ConfigProvider>
-        <ActionItemBox
-          title="标题"
-          description="描述文案"
-          onClick={() => {}}
-        />
+        <ActionItemBox title="标题" description="描述文案" onClick={() => {}} />
       </ConfigProvider>,
     );
     expect(screen.getByText('标题')).toBeInTheDocument();
@@ -156,7 +156,9 @@ describe('ActionItemBox 组件', () => {
       </ConfigProvider>,
     );
     expect(
-      container.querySelector('.ant-agentic-chat-action-item-box-container-hover-bg'),
+      container.querySelector(
+        '.ant-agentic-chat-action-item-box-container-hover-bg',
+      ),
     ).not.toBeInTheDocument();
   });
 

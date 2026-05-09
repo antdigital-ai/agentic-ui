@@ -11,11 +11,7 @@ describe('ToolBarItem', () => {
   it('应渲染并响应 onClick', () => {
     const onClick = vi.fn();
     render(
-      <ToolBarItem
-        title="Bold"
-        icon={<span>B</span>}
-        onClick={onClick}
-      />,
+      <ToolBarItem title="Bold" icon={<span>B</span>} onClick={onClick} />,
     );
     fireEvent.click(screen.getByRole('button'));
     expect(onClick).toHaveBeenCalledTimes(1);

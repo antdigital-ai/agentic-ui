@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
 import { Root } from 'mdast';
-import { unified } from 'unified';
-import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import remarkParse from 'remark-parse';
+import { unified } from 'unified';
+import { describe, expect, it } from 'vitest';
 import markdownParser, {
   convertParagraphToImage,
   fixStrongWithSpecialChars,
@@ -16,9 +16,7 @@ import markdownParser, {
 
 describe('remarkParse.ts', () => {
   describe('convertParagraphToImage 插件测试', () => {
-    const processor = unified()
-      .use(remarkParse)
-      .use(convertParagraphToImage);
+    const processor = unified().use(remarkParse).use(convertParagraphToImage);
 
     it('应该将 ! 开头的段落转换为图片节点', () => {
       // 根据源码，转换需要 index 和 parent 且无 nextNode；首段 index=0 会跳过，故用两段使第二段 index=1
@@ -35,7 +33,7 @@ describe('remarkParse.ts', () => {
     it('应该处理空的 ! 开头段落', () => {
       const markdown = '!';
       const result = processor.runSync(processor.parse(markdown)) as Root;
-      
+
       expect(result.children).toHaveLength(1);
       const node: any = result.children[0];
       expect(node.type).toBe('paragraph');
@@ -44,7 +42,7 @@ describe('remarkParse.ts', () => {
     it('应该处理普通的段落（不以 ! 开头）', () => {
       const markdown = '这是一个普通段落';
       const result = processor.runSync(processor.parse(markdown)) as Root;
-      
+
       expect(result.children).toHaveLength(1);
       const node: any = result.children[0];
       expect(node.type).toBe('paragraph');
@@ -70,7 +68,9 @@ describe('remarkParse.ts', () => {
           { type: 'paragraph', children: [{ type: 'text', value: '前一段' }] },
           {
             type: 'paragraph',
-            children: [{ type: 'text', value: '[链接文本](https://example.com)' }],
+            children: [
+              { type: 'text', value: '[链接文本](https://example.com)' },
+            ],
           },
         ],
       };
@@ -83,7 +83,7 @@ describe('remarkParse.ts', () => {
     it('应该处理不完整的链接格式', () => {
       const markdown = '[链接文本]';
       const result = processor.runSync(processor.parse(markdown)) as Root;
-      
+
       expect(result.children).toHaveLength(1);
       const node: any = result.children[0];
       expect(node.type).toBe('paragraph');
@@ -117,73 +117,83 @@ describe('remarkParse.ts', () => {
   });
 
   describe('fixStrongWithSpecialChars 插件测试', () => {
-    const processor = unified()
-      .use(remarkParse)
-      .use(fixStrongWithSpecialChars);
+    const processor = unified().use(remarkParse).use(fixStrongWithSpecialChars);
 
     it('应该修复包含特殊字符的加粗文本', () => {
       const markdown = '**$9.698M**';
       const result = processor.runSync(processor.parse(markdown)) as Root;
-      
+
       expect(result.children).toHaveLength(1);
       const paragraph: any = result.children[0];
       expect(paragraph.type).toBe('paragraph');
-      
+
       // 检查是否包含加粗节点
-      const hasStrong = paragraph.children && paragraph.children.some((child: any) => child.type === 'strong');
+      const hasStrong =
+        paragraph.children &&
+        paragraph.children.some((child: any) => child.type === 'strong');
       expect(hasStrong).toBe(true);
     });
 
     it('应该修复包含百分比的加粗文本', () => {
       const markdown = '**57%**';
       const result = processor.runSync(processor.parse(markdown)) as Root;
-      
+
       expect(result.children).toHaveLength(1);
       const paragraph: any = result.children[0];
       expect(paragraph.type).toBe('paragraph');
-      
+
       // 检查是否包含加粗节点
-      const hasStrong = paragraph.children && paragraph.children.some((child: any) => child.type === 'strong');
+      const hasStrong =
+        paragraph.children &&
+        paragraph.children.some((child: any) => child.type === 'strong');
       expect(hasStrong).toBe(true);
     });
 
     it('应该修复包含符号的加粗文本', () => {
       const markdown = '**#tag**';
       const result = processor.runSync(processor.parse(markdown)) as Root;
-      
+
       expect(result.children).toHaveLength(1);
       const paragraph: any = result.children[0];
       expect(paragraph.type).toBe('paragraph');
-      
+
       // 检查是否包含加粗节点
-      const hasStrong = paragraph.children && paragraph.children.some((child: any) => child.type === 'strong');
+      const hasStrong =
+        paragraph.children &&
+        paragraph.children.some((child: any) => child.type === 'strong');
       expect(hasStrong).toBe(true);
     });
 
     it('应该处理不完整的加粗文本', () => {
       const markdown = '**未闭合的加粗文本';
       const result = processor.runSync(processor.parse(markdown)) as Root;
-      
+
       expect(result.children).toHaveLength(1);
       const paragraph: any = result.children[0];
       expect(paragraph.type).toBe('paragraph');
-      
+
       // 检查是否包含加粗节点
-      const hasStrong = paragraph.children && paragraph.children.some((child: any) => child.type === 'strong');
+      const hasStrong =
+        paragraph.children &&
+        paragraph.children.some((child: any) => child.type === 'strong');
       expect(hasStrong).toBe(true);
     });
 
     it('应该处理混合文本', () => {
       const markdown = '普通文本 **加粗文本** 更多普通文本';
       const result = processor.runSync(processor.parse(markdown)) as Root;
-      
+
       expect(result.children).toHaveLength(1);
       const paragraph: any = result.children[0];
       expect(paragraph.type).toBe('paragraph');
-      
+
       // 检查是否包含多种类型的节点
-      const hasText = paragraph.children && paragraph.children.some((child: any) => child.type === 'text');
-      const hasStrong = paragraph.children && paragraph.children.some((child: any) => child.type === 'strong');
+      const hasText =
+        paragraph.children &&
+        paragraph.children.some((child: any) => child.type === 'text');
+      const hasStrong =
+        paragraph.children &&
+        paragraph.children.some((child: any) => child.type === 'strong');
       expect(hasText).toBe(true);
       expect(hasStrong).toBe(true);
     });
@@ -197,7 +207,8 @@ describe('remarkParse.ts', () => {
       expect(paragraph.type).toBe('paragraph');
 
       const strongCount = paragraph.children
-        ? paragraph.children.filter((child: any) => child.type === 'strong').length
+        ? paragraph.children.filter((child: any) => child.type === 'strong')
+            .length
         : 0;
       expect(strongCount).toBeGreaterThanOrEqual(1);
     });
@@ -232,8 +243,10 @@ describe('remarkParse.ts', () => {
       expect(result.children).toHaveLength(1);
       const heading: any = result.children[0];
       expect(heading.type).toBe('heading');
-      const texts = heading.children?.filter((c: any) => c.type === 'text') ?? [];
-      const strongs = heading.children?.filter((c: any) => c.type === 'strong') ?? [];
+      const texts =
+        heading.children?.filter((c: any) => c.type === 'text') ?? [];
+      const strongs =
+        heading.children?.filter((c: any) => c.type === 'strong') ?? [];
       expect(strongs.length).toBeGreaterThanOrEqual(1);
       expect(texts.some((t: any) => t.value?.includes('剩余'))).toBe(true);
     });
@@ -299,7 +312,9 @@ describe('remarkParse.ts', () => {
       };
       fixStrongWithSpecialChars()(tree);
       const ch = tree.children[0].children;
-      const suffix = ch?.find((c: any) => c.type === 'text' && c.value?.includes('后缀'));
+      const suffix = ch?.find(
+        (c: any) => c.type === 'text' && c.value?.includes('后缀'),
+      );
       expect(suffix).toBeDefined();
       expect(suffix?.value).toBe(' 后缀');
     });
@@ -316,8 +331,14 @@ describe('remarkParse.ts', () => {
       };
       fixStrongWithSpecialChars()(tree);
       const ch = tree.children[0].children;
-      expect(ch.some((c: any) => c.type === 'strong' && c.finished === false)).toBe(true);
-      expect(ch.some((c: any) => c.type === 'strong' && c.children?.[0]?.value === 'b')).toBe(true);
+      expect(
+        ch.some((c: any) => c.type === 'strong' && c.finished === false),
+      ).toBe(true);
+      expect(
+        ch.some(
+          (c: any) => c.type === 'strong' && c.children?.[0]?.value === 'b',
+        ),
+      ).toBe(true);
     });
 
     it('visit(paragraph) 分支：beforeText + 完整加粗 + afterText 应正确拆分', () => {
@@ -352,16 +373,16 @@ describe('remarkParse.ts', () => {
       };
       fixStrongWithSpecialChars()(tree);
       const p = tree.children[0];
-      const incomplete = p.children?.find((c: any) => c.type === 'strong' && c.finished === false);
+      const incomplete = p.children?.find(
+        (c: any) => c.type === 'strong' && c.finished === false,
+      );
       expect(incomplete).toBeDefined();
     });
   });
 
   describe('extractParagraphText 函数测试', () => {
     it('应该正确提取段落文本', () => {
-      const processor = unified()
-        .use(remarkParse)
-        .use(convertParagraphToImage);
+      const processor = unified().use(remarkParse).use(convertParagraphToImage);
 
       const markdown = '测试段落文本';
       const result = processor.runSync(processor.parse(markdown)) as Root;
@@ -402,11 +423,11 @@ describe('remarkParse.ts', () => {
 $$数学公式$$
 `;
       const result = processor.runSync(processor.parse(markdown)) as Root;
-      
+
       expect(result.children.length).toBeGreaterThanOrEqual(3); // 至少包含标题、段落等
-      
+
       // 检查是否包含不同类型的节点
-      const nodeTypes = result.children.map(child => child.type);
+      const nodeTypes = result.children.map((child) => child.type);
       expect(nodeTypes).toContain('heading');
       expect(nodeTypes).toContain('paragraph');
     });
@@ -416,9 +437,11 @@ $$数学公式$$
       const emptyResult = processor.runSync(processor.parse('')) as Root;
       // 空内容可能产生0个或1个子节点
       expect(emptyResult.children.length).toBeGreaterThanOrEqual(0);
-      
+
       // 测试只有空白字符
-      const whitespaceResult = processor.runSync(processor.parse('   ')) as Root;
+      const whitespaceResult = processor.runSync(
+        processor.parse('   '),
+      ) as Root;
       expect(whitespaceResult.children.length).toBeGreaterThanOrEqual(0);
     });
   });

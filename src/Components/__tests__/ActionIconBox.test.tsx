@@ -323,10 +323,7 @@ describe('ActionIconBox 组件', () => {
 
   it('应该支持自定义样式', () => {
     render(
-      <ActionIconBox
-        title="自定义样式"
-        style={{ backgroundColor: 'red' }}
-      >
+      <ActionIconBox title="自定义样式" style={{ backgroundColor: 'red' }}>
         <TestIcon />
       </ActionIconBox>,
     );

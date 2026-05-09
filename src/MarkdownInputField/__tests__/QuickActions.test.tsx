@@ -425,10 +425,7 @@ describe('QuickActions', () => {
 
     it('应该在 enable 为 true 但 onRefine 缺失时不执行优化（111）', async () => {
       render(
-        <QuickActions
-          {...defaultProps}
-          refinePrompt={{ enable: true }}
-        />,
+        <QuickActions {...defaultProps} refinePrompt={{ enable: true }} />,
       );
 
       const refineButton = screen.getByTestId('refine-prompt-button');
@@ -612,10 +609,12 @@ describe('QuickActions', () => {
   describe('Resize 观察', () => {
     it('应该在尺寸变化时调用 onResize 回调', async () => {
       const mockOnResize = vi.fn();
-      const getComputedStyleSpy = vi.spyOn(window, 'getComputedStyle').mockReturnValue({
-        right: '12px',
-        getPropertyValue: vi.fn(),
-      } as any);
+      const getComputedStyleSpy = vi
+        .spyOn(window, 'getComputedStyle')
+        .mockReturnValue({
+          right: '12px',
+          getPropertyValue: vi.fn(),
+        } as any);
 
       const ref = React.createRef<HTMLDivElement>();
       render(
@@ -644,12 +643,7 @@ describe('QuickActions', () => {
 
     it('应该在 window 为 undefined 时调用 onResize(width, 0)', async () => {
       const mockOnResize = vi.fn();
-      render(
-        <QuickActions
-          {...defaultProps}
-          onResize={mockOnResize}
-        />,
-      );
+      render(<QuickActions {...defaultProps} onResize={mockOnResize} />);
 
       await waitFor(() => {
         expect(capturedOnResize).not.toBeNull();
@@ -671,12 +665,7 @@ describe('QuickActions', () => {
         throw new Error('getComputedStyle error');
       });
 
-      render(
-        <QuickActions
-          {...defaultProps}
-          onResize={mockOnResize}
-        />,
-      );
+      render(<QuickActions {...defaultProps} onResize={mockOnResize} />);
 
       expect(mockOnResize).toHaveBeenCalledWith(100, 0);
       vi.restoreAllMocks();
@@ -686,10 +675,15 @@ describe('QuickActions', () => {
   describe('div 事件：onBlur / onFocus / onKeyDown（148, 151, 159, 160）', () => {
     it('应该触发 blur/focus/keyDown 处理器', () => {
       const { container } = render(
-        <QuickActions {...defaultProps} refinePrompt={{ enable: true, onRefine: vi.fn() }} />,
+        <QuickActions
+          {...defaultProps}
+          refinePrompt={{ enable: true, onRefine: vi.fn() }}
+        />,
       );
 
-      const quickActionsDiv = container.querySelector('.test-prefix-quick-actions');
+      const quickActionsDiv = container.querySelector(
+        '.test-prefix-quick-actions',
+      );
       expect(quickActionsDiv).toBeInTheDocument();
 
       fireEvent.blur(quickActionsDiv!);

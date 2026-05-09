@@ -6,20 +6,13 @@ import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
-import { ReadonlyMedia } from '../../../../editor/elements/Media/ReadonlyMedia';
-import { MediaNode } from '../../../../el';
-import * as domUtils from '../../../../editor/utils/dom';
-import * as editorUtils from '../../../../editor/utils';
-import { TestSlateWrapper } from '../TestSlateWrapper';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as useRefFunctionModule from '../../../../../Hooks/useRefFunction';
+import { ReadonlyMedia } from '../../../../editor/elements/Media/ReadonlyMedia';
+import * as editorUtils from '../../../../editor/utils';
+import * as domUtils from '../../../../editor/utils/dom';
+import { MediaNode } from '../../../../el';
+import { TestSlateWrapper } from '../TestSlateWrapper';
 
 vi.mock('../../../../editor/store', () => ({
   useEditorStore: vi.fn(() => ({ editorProps: {} })),
@@ -58,7 +51,10 @@ const baseElement: MediaNode = {
   children: [{ text: '' }],
 };
 
-const renderWithProvider = (element: MediaNode, props?: { children?: React.ReactNode }) => {
+const renderWithProvider = (
+  element: MediaNode,
+  props?: { children?: React.ReactNode },
+) => {
   return render(
     <ConfigProvider>
       <TestSlateWrapper>
@@ -107,12 +103,15 @@ describe('ReadonlyMedia', () => {
     it('initial 中 img onerror 时设置 loadSuccess false', async () => {
       vi.mocked(domUtils.getMediaType).mockReturnValue('image');
       const orig = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
+        document,
+      ) as typeof document.createElement;
       document.createElement = ((tagName: string) => {
         const el = orig(tagName);
         if (tagName.toLowerCase() === 'img') {
-          setTimeout(() => (el as HTMLImageElement).onerror?.(new Event('error')), 0);
+          setTimeout(
+            () => (el as HTMLImageElement).onerror?.(new Event('error')),
+            0,
+          );
         }
         return el;
       }) as typeof document.createElement;
@@ -127,8 +126,8 @@ describe('ReadonlyMedia', () => {
     it('initial 中 video onerror/onloadedmetadata', async () => {
       vi.mocked(domUtils.getMediaType).mockReturnValue('video');
       const orig = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
+        document,
+      ) as typeof document.createElement;
       document.createElement = ((tagName: string) => {
         const el = orig(tagName);
         if (tagName.toLowerCase() === 'video') {
@@ -149,12 +148,15 @@ describe('ReadonlyMedia', () => {
     it('initial 中 video onerror 时设置 loadSuccess false', async () => {
       vi.mocked(domUtils.getMediaType).mockReturnValue('video');
       const orig = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
+        document,
+      ) as typeof document.createElement;
       document.createElement = ((tagName: string) => {
         const el = orig(tagName);
         if (tagName.toLowerCase() === 'video') {
-          setTimeout(() => (el as HTMLVideoElement).onerror?.(new Event('error')), 0);
+          setTimeout(
+            () => (el as HTMLVideoElement).onerror?.(new Event('error')),
+            0,
+          );
         }
         return el;
       }) as typeof document.createElement;
@@ -169,8 +171,8 @@ describe('ReadonlyMedia', () => {
     it('initial 中 img onload 时设置 loadSuccess true', async () => {
       vi.mocked(domUtils.getMediaType).mockReturnValue('image');
       const orig = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
+        document,
+      ) as typeof document.createElement;
       document.createElement = ((tagName: string) => {
         const el = orig(tagName);
         if (tagName.toLowerCase() === 'img') {
@@ -252,7 +254,9 @@ describe('ReadonlyMedia', () => {
       await act(async () => {
         vi.advanceTimersByTime(5000);
       });
-      expect(screen.getByText(/图片链接|test alt|example\.com/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/图片链接|test alt|example\.com/),
+      ).toBeInTheDocument();
       vi.useRealTimers();
     });
   });
@@ -301,7 +305,9 @@ describe('ReadonlyMedia', () => {
       await act(async () => {
         vi.advanceTimersByTime(5000);
       });
-      expect(screen.getByText(/视频链接|example\.com|test alt/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/视频链接|example\.com|test alt/),
+      ).toBeInTheDocument();
       vi.useRealTimers();
     });
 
@@ -317,7 +323,9 @@ describe('ReadonlyMedia', () => {
       ]);
       vi.mocked(domUtils.getMediaType).mockReturnValue('video');
       renderWithProvider({ ...baseElement, url: 'https://example.com/v.mp4' });
-      expect(screen.getByText(/视频链接|test alt|example\.com/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/视频链接|test alt|example\.com/),
+      ).toBeInTheDocument();
     });
 
     it('video 元素 onError 时设置 loadSuccess false', async () => {
@@ -328,7 +336,10 @@ describe('ReadonlyMedia', () => {
         type: 'video' as const,
       };
       const setState = vi.fn((patch: any) => Object.assign(stateData, patch));
-      vi.mocked(editorUtils.useGetSetState).mockReturnValue([() => stateData, setState]);
+      vi.mocked(editorUtils.useGetSetState).mockReturnValue([
+        () => stateData,
+        setState,
+      ]);
       renderWithProvider({
         ...baseElement,
         url: 'https://example.com/v.mp4',
@@ -353,7 +364,9 @@ describe('ReadonlyMedia', () => {
 
   describe('mediaElement audio', () => {
     beforeEach(() => {
-      vi.mocked(useRefFunctionModule.useRefFunction).mockImplementation((fn: any) => () => {});
+      vi.mocked(useRefFunctionModule.useRefFunction).mockImplementation(
+        (fn: any) => () => {},
+      );
     });
 
     it('audio 分支需 type 为 audio：通过 useGetSetState 提供', async () => {
@@ -390,7 +403,9 @@ describe('ReadonlyMedia', () => {
       ]);
       vi.mocked(domUtils.getMediaType).mockReturnValue('other');
       renderWithProvider({ ...baseElement, url: 'https://example.com/a.mp3' });
-      expect(screen.getByText(/音频链接|test alt|example\.com/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/音频链接|test alt|example\.com/),
+      ).toBeInTheDocument();
     });
 
     it('audio finished false 未超时显示 loading 占位', async () => {
@@ -448,7 +463,10 @@ describe('ReadonlyMedia', () => {
         type: 'audio' as const,
       };
       const setState = vi.fn((patch: any) => Object.assign(stateData, patch));
-      vi.mocked(editorUtils.useGetSetState).mockReturnValue([() => stateData, setState]);
+      vi.mocked(editorUtils.useGetSetState).mockReturnValue([
+        () => stateData,
+        setState,
+      ]);
       vi.mocked(domUtils.getMediaType).mockReturnValue('other');
       renderWithProvider({ ...baseElement, url: 'https://example.com/a.mp3' });
       await act(async () => {

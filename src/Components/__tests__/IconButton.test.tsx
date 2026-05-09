@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -126,10 +126,7 @@ describe('IconButton 组件', () => {
 
   it('应该支持自定义样式', () => {
     const { container } = render(
-      <IconButton
-        icon={<TestIcon />}
-        style={{ backgroundColor: 'red' }}
-      />,
+      <IconButton icon={<TestIcon />} style={{ backgroundColor: 'red' }} />,
     );
 
     const wrapper = container.querySelector('.ant-icon-button');

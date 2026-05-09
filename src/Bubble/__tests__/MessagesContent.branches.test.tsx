@@ -13,11 +13,7 @@ import { BubbleMessageDisplay } from '../MessagesContent';
 
 /* ---------- 关键 mock：MarkdownPreview 会调用 fncProps.render ---------- */
 vi.mock('../MessagesContent/MarkdownPreview', () => ({
-  MarkdownPreview: ({
-    content,
-    extra,
-    fncProps,
-  }: any) => {
+  MarkdownPreview: ({ content, extra, fncProps }: any) => {
     // 将 fncProps.render 的结果渲染出来以触发回调
     let renderedFnc: React.ReactNode = null;
     if (fncProps?.render) {
@@ -123,8 +119,13 @@ vi.mock('antd', async (importOriginal) => {
       </div>
     ),
     Tooltip: ({ children, title }: any) => (
-      <div data-testid="tooltip" title={typeof title === 'string' ? title : undefined}>
-        {typeof title !== 'string' && <div data-testid="tooltip-title">{title}</div>}
+      <div
+        data-testid="tooltip"
+        title={typeof title === 'string' ? title : undefined}
+      >
+        {typeof title !== 'string' && (
+          <div data-testid="tooltip-title">{title}</div>
+        )}
         {children}
       </div>
     ),
@@ -267,13 +268,13 @@ describe('BubbleMessageDisplay fncProps.render 分支覆盖', () => {
 
     // [1] 有 origin_url → 应有 ActionIconBox
     const result1 = screen.getByTestId('fnc-result-1');
-    expect(result1.querySelector('[data-testid="action-icon-box"]')).toBeTruthy();
+    expect(
+      result1.querySelector('[data-testid="action-icon-box"]'),
+    ).toBeTruthy();
 
     // [^2] 无 origin_url → 不应有 ActionIconBox
     const result2 = screen.getByTestId('fnc-result-2');
-    expect(
-      result2.querySelector('[data-testid="action-icon-box"]'),
-    ).toBeNull();
+    expect(result2.querySelector('[data-testid="action-icon-box"]')).toBeNull();
   });
 
   it('点击 ActionIconBox 调用 onOriginUrlClick 时走自定义回调', () => {

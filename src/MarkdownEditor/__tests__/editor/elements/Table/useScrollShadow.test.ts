@@ -21,13 +21,17 @@ describe('useScrollShadow Hook', () => {
     }) as any;
 
     // Mock requestAnimationFrame
-    vi.spyOn(global, 'requestAnimationFrame').mockImplementation(function rafStub(cb: any) {
-      cb();
-      return 0;
-    });
+    vi.spyOn(global, 'requestAnimationFrame').mockImplementation(
+      function rafStub(cb: any) {
+        cb();
+        return 0;
+      },
+    );
 
     // Mock cancelAnimationFrame
-    vi.spyOn(global, 'cancelAnimationFrame').mockImplementation(function cafStub() {});
+    vi.spyOn(global, 'cancelAnimationFrame').mockImplementation(
+      function cafStub() {},
+    );
   });
 
   afterEach(() => {

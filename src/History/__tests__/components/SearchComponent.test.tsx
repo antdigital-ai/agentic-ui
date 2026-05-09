@@ -1,9 +1,15 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { HistorySearch } from '../../components/SearchComponent';
 import { I18nContext } from '../../../I18n';
+import { HistorySearch } from '../../components/SearchComponent';
 
 const mockI18nLocale = {
   'chat.history.search': '搜索',
@@ -419,9 +425,9 @@ describe('HistorySearch', () => {
       fireEvent.change(input, { target: { value: '测试搜索' } });
 
       // 等待真实的 debounce 延迟完成
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 360));
-    });
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 360));
+      });
 
       await waitFor(
         () => {
@@ -451,9 +457,9 @@ describe('HistorySearch', () => {
       fireEvent.change(input, { target: { value: '测试搜索' } });
 
       // 等待真实的 debounce 延迟完成
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 360));
-    });
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 360));
+      });
 
       // 验证没有调用搜索
       expect(onSearch).not.toHaveBeenCalled();
@@ -534,9 +540,9 @@ describe('HistorySearch', () => {
       fireEvent.keyDown(input, { key: 'Tab', code: 'Tab' });
 
       // 等待真实的 debounce 延迟完成
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 360));
-    });
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 360));
+      });
 
       // 验证没有调用搜索
       expect(onSearch).not.toHaveBeenCalled();
@@ -557,9 +563,9 @@ describe('HistorySearch', () => {
       fireEvent.change(input, { target: { value: '测试' } });
 
       // 等待真实的 debounce 延迟完成
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 360));
-    });
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 360));
+      });
 
       await waitFor(
         () => {

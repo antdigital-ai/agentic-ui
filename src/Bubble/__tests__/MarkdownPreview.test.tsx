@@ -90,7 +90,11 @@ describe('MarkdownPreview', () => {
 
     it('extra 为 undefined 时不使用 Popover', () => {
       render(
-        <MarkdownPreview {...defaultProps} placement="right" extra={undefined} />,
+        <MarkdownPreview
+          {...defaultProps}
+          placement="right"
+          extra={undefined}
+        />,
       );
 
       expect(
@@ -125,7 +129,9 @@ describe('MarkdownPreview', () => {
       expect(
         screen.queryByTestId('markdown-preview-popover-wrapper'),
       ).not.toBeInTheDocument();
-      expect(screen.getByTestId('extra-right')).toHaveTextContent('Extra Right');
+      expect(screen.getByTestId('extra-right')).toHaveTextContent(
+        'Extra Right',
+      );
     });
   });
 
@@ -235,9 +241,9 @@ describe('MarkdownPreview', () => {
         />,
       );
 
-      expect(screen.getByTestId('markdown-renderer-streaming')).toHaveTextContent(
-        'false',
-      );
+      expect(
+        screen.getByTestId('markdown-renderer-streaming'),
+      ).toHaveTextContent('false');
     });
 
     it('markdown 渲染模式下，最后一条消息启用 streaming 动画', () => {
@@ -255,9 +261,9 @@ describe('MarkdownPreview', () => {
         />,
       );
 
-      expect(screen.getByTestId('markdown-renderer-streaming')).toHaveTextContent(
-        'true',
-      );
+      expect(
+        screen.getByTestId('markdown-renderer-streaming'),
+      ).toHaveTextContent('true');
     });
 
     it('slate 渲染模式下，非最后一条消息不启用 typewriter', () => {
@@ -274,9 +280,9 @@ describe('MarkdownPreview', () => {
         />,
       );
 
-      expect(screen.getByTestId('markdown-editor-typewriter')).toHaveTextContent(
-        'false',
-      );
+      expect(
+        screen.getByTestId('markdown-editor-typewriter'),
+      ).toHaveTextContent('false');
     });
   });
 });

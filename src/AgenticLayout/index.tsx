@@ -197,72 +197,67 @@ const AgenticLayoutComponent: React.FC<AgenticLayoutProps> = ({
 
   // 处理拖拽开始：捕获本次拖拽的初始状态，并把 mousemove/mouseup 直接绑定到 document。
   // listener 通过 ref 持有，使得卸载/单次拖拽结束都能精确移除。
-  const handleResizeStart = useRefFunction(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      isResizingRef.current = true;
-      resizeStartX.current = e.clientX;
-      resizeStartWidth.current = currentRightWidth;
+  const handleResizeStart = useRefFunction((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isResizingRef.current = true;
+    resizeStartX.current = e.clientX;
+    resizeStartWidth.current = currentRightWidth;
 
-      const onMove = (event: MouseEvent) => {
-        if (!isResizingRef.current) return;
-        // 向左拖拽（扩大右侧边栏）时 deltaX 为正，向右拖拽（缩小）时 deltaX 为负。
-        // RTL 下方向相反：向右拖拽即扩大右侧栏。
-        const rawDeltaX = resizeStartX.current - event.clientX;
-        const deltaX = isRTL ? -rawDeltaX : rawDeltaX;
-        const newWidth = resizeStartWidth.current + deltaX;
-        const maxWidth = getMaxRightWidth();
-        const clampedWidth = clampRightWidth(newWidth, maxWidth);
+    const onMove = (event: MouseEvent) => {
+      if (!isResizingRef.current) return;
+      // 向左拖拽（扩大右侧边栏）时 deltaX 为正，向右拖拽（缩小）时 deltaX 为负。
+      // RTL 下方向相反：向右拖拽即扩大右侧栏。
+      const rawDeltaX = resizeStartX.current - event.clientX;
+      const deltaX = isRTL ? -rawDeltaX : rawDeltaX;
+      const newWidth = resizeStartWidth.current + deltaX;
+      const maxWidth = getMaxRightWidth();
+      const clampedWidth = clampRightWidth(newWidth, maxWidth);
 
-        // rAF 节流：同一帧的多次 mousemove 合并为最后一次的 setState。
-        pendingWidthRef.current = clampedWidth;
-        if (rafIdRef.current === null) {
-          rafIdRef.current = requestAnimationFrame(() => {
-            rafIdRef.current = null;
-            const nextWidth = pendingWidthRef.current;
-            pendingWidthRef.current = null;
-            if (nextWidth !== null) {
-              setCurrentRightWidth(nextWidth);
-            }
-          });
-        }
-      };
-
-      const onUp = () => {
-        isResizingRef.current = false;
-        // 拖拽结束前 flush 掉最后一帧未提交的宽度，避免最后一次微调丢失。
-        if (rafIdRef.current !== null) {
-          cancelAnimationFrame(rafIdRef.current);
+      // rAF 节流：同一帧的多次 mousemove 合并为最后一次的 setState。
+      pendingWidthRef.current = clampedWidth;
+      if (rafIdRef.current === null) {
+        rafIdRef.current = requestAnimationFrame(() => {
           rafIdRef.current = null;
-        }
-        if (pendingWidthRef.current !== null) {
-          setCurrentRightWidth(pendingWidthRef.current);
+          const nextWidth = pendingWidthRef.current;
           pendingWidthRef.current = null;
-        }
-        if (boundMoveHandlerRef.current) {
-          document.removeEventListener(
-            'mousemove',
-            boundMoveHandlerRef.current,
-          );
-          boundMoveHandlerRef.current = null;
-        }
-        if (boundUpHandlerRef.current) {
-          document.removeEventListener('mouseup', boundUpHandlerRef.current);
-          boundUpHandlerRef.current = null;
-        }
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-      };
+          if (nextWidth !== null) {
+            setCurrentRightWidth(nextWidth);
+          }
+        });
+      }
+    };
 
-      boundMoveHandlerRef.current = onMove;
-      boundUpHandlerRef.current = onUp;
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup', onUp);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-    },
-  );
+    const onUp = () => {
+      isResizingRef.current = false;
+      // 拖拽结束前 flush 掉最后一帧未提交的宽度，避免最后一次微调丢失。
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+      if (pendingWidthRef.current !== null) {
+        setCurrentRightWidth(pendingWidthRef.current);
+        pendingWidthRef.current = null;
+      }
+      if (boundMoveHandlerRef.current) {
+        document.removeEventListener('mousemove', boundMoveHandlerRef.current);
+        boundMoveHandlerRef.current = null;
+      }
+      if (boundUpHandlerRef.current) {
+        document.removeEventListener('mouseup', boundUpHandlerRef.current);
+        boundUpHandlerRef.current = null;
+      }
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    boundMoveHandlerRef.current = onMove;
+    boundUpHandlerRef.current = onUp;
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  });
 
   /**
    * 键盘交互：方向键调宽，Home/End 跳到极值。

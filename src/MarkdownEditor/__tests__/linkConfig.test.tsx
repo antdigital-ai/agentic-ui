@@ -2,10 +2,7 @@ import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  BaseMarkdownEditor,
-  MarkdownEditorProps,
-} from '../BaseMarkdownEditor';
+import { BaseMarkdownEditor, MarkdownEditorProps } from '../BaseMarkdownEditor';
 
 // 测试工具函数 - 模拟 MLeaf 的链接点击逻辑
 const simulateLinkClick = (

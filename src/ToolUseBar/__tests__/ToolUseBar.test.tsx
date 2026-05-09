@@ -157,10 +157,14 @@ describe('ToolUseBar', () => {
     const toolItems = container.querySelectorAll(
       '[data-testid="ToolUserItem"]',
     );
-      expect(toolItems[0]).toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool1 应该激活
-      expect(toolItems[1]).not.toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool2 不应该激活
-      expect(toolItems[2]).toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool3 应该激活
-    expect(toolItems[3]).not.toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool4 不应该激活
+    expect(toolItems[0]).toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool1 应该激活
+    expect(toolItems[1]).not.toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool2 不应该激活
+    expect(toolItems[2]).toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool3 应该激活
+    expect(toolItems[3]).not.toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool4 不应该激活
 
     // 重新渲染，改变 activeKeys 属性
     rerender(
@@ -175,10 +179,18 @@ describe('ToolUseBar', () => {
     const updatedToolItems = container.querySelectorAll(
       '[data-testid="ToolUserItem"]',
     );
-    expect(updatedToolItems[0]).not.toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool1 不再激活
-    expect(updatedToolItems[1]).toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool2 现在激活
-    expect(updatedToolItems[2]).not.toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool3 不再激活
-    expect(updatedToolItems[3]).not.toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool4 不激活
+    expect(updatedToolItems[0]).not.toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool1 不再激活
+    expect(updatedToolItems[1]).toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool2 现在激活
+    expect(updatedToolItems[2]).not.toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool3 不再激活
+    expect(updatedToolItems[3]).not.toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool4 不激活
   });
 
   it('should use defaultActiveKeys in uncontrolled mode', () => {
@@ -191,9 +203,13 @@ describe('ToolUseBar', () => {
     const toolItems = container.querySelectorAll(
       '[data-testid="ToolUserItem"]',
     );
-    expect(toolItems[0]).not.toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool1 不激活
+    expect(toolItems[0]).not.toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool1 不激活
     expect(toolItems[1]).toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool2 默认激活
-    expect(toolItems[2]).not.toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool3 不激活
+    expect(toolItems[2]).not.toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool3 不激活
     expect(toolItems[3]).toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool4 默认激活
   });
 
@@ -215,9 +231,15 @@ describe('ToolUseBar', () => {
       '[data-testid="ToolUserItem"]',
     );
     expect(toolItems[0]).toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool1 激活（来自activeKeys）
-    expect(toolItems[1]).not.toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool2 不激活（忽略defaultActiveKeys）
-    expect(toolItems[2]).not.toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool3 不激活（忽略defaultActiveKeys）
-    expect(toolItems[3]).not.toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool4 不激活
+    expect(toolItems[1]).not.toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool2 不激活（忽略defaultActiveKeys）
+    expect(toolItems[2]).not.toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool3 不激活（忽略defaultActiveKeys）
+    expect(toolItems[3]).not.toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool4 不激活
   });
 
   it('should handle activeKeys change when tool items are clicked', () => {
@@ -260,8 +282,12 @@ describe('ToolUseBar', () => {
     const updatedToolItems = container.querySelectorAll(
       '[data-testid="ToolUserItem"]',
     );
-    expect(updatedToolItems[0]).toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool1 仍然激活
-    expect(updatedToolItems[1]).toHaveClass('ant-agentic-tool-use-bar-tool-active'); // tool2 现在也激活
+    expect(updatedToolItems[0]).toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool1 仍然激活
+    expect(updatedToolItems[1]).toHaveClass(
+      'ant-agentic-tool-use-bar-tool-active',
+    ); // tool2 现在也激活
 
     // 清除之前的调用记录
     mockOnActiveKeysChange.mockClear();
@@ -326,7 +352,9 @@ describe('ToolUseBar', () => {
     );
 
     const rootElement = container.firstChild as HTMLElement;
-    expect(rootElement).not.toHaveClass('ant-agentic-tool-use-bar-no-animation');
+    expect(rootElement).not.toHaveClass(
+      'ant-agentic-tool-use-bar-no-animation',
+    );
   });
 
   it('should expand and collapse content correctly when disableAnimation is true', () => {

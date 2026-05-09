@@ -78,8 +78,7 @@ describe('ThinkBlock 国际化', () => {
       <I18nContext.Provider value={{ locale: enLabels, language: 'en-US' }}>
         <ThinkBlock
           element={mockLoadingElement}
-          attributes={
-            { 'data-slate-node': 'element' as const, ref: null }}
+          attributes={{ 'data-slate-node': 'element' as const, ref: null }}
           // eslint-disable-next-line react/no-children-prop
           children={<span>children</span>}
         />

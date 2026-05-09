@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { 
-  imagePastingListener, 
-  extractTagsFromHtml
+import {
+  extractTagsFromHtml,
+  imagePastingListener,
 } from '../../../../editor/utils/docx/utils';
 
 // Mock blob-util
@@ -28,11 +28,12 @@ describe('docx utils', () => {
 
   describe('extractTagsFromHtml', () => {
     it('should extract src attributes from img tags', () => {
-      const html = '<img src="http://example.com/image1.jpg"><img src="http://example.com/image2.png">';
+      const html =
+        '<img src="http://example.com/image1.jpg"><img src="http://example.com/image2.png">';
       const result = extractTagsFromHtml(html);
       expect(result).toEqual([
         'http://example.com/image1.jpg',
-        'http://example.com/image2.png'
+        'http://example.com/image2.png',
       ]);
     });
 
@@ -113,7 +114,8 @@ Some text without images
     it('should handle mismatched image counts', () => {
       // 图片数量不匹配时，函数返回空对象（因为 imgTags.length !== newSrcValues.length）
       const rtf = `{\\rtf1\\ansi{\\pict\\pngblip\\bliptag999 89504e470d0a1a0a0000000d4948445200000001000000010802000000907753de0000000a49444154789c6300010000000500010d0a2db40000000467414d41000186a031e8965f000000097048597300000ec400000ec401952b0e1b0000000c74455874536f667477617265004d6963726f736f6674204f66666963650000000049454e44ae426082}}`;
-      const html = '<img src="file:///C:/temp/image1.png"><img src="file:///C:/temp/image2.png">';
+      const html =
+        '<img src="file:///C:/temp/image1.png"><img src="file:///C:/temp/image2.png">';
       const result = imagePastingListener(rtf, html);
       // 图片数量不匹配时应该返回空对象（因为条件 imgTags.length === newSrcValues.length 不满足）
       expect(result).toBeDefined();
@@ -133,7 +135,7 @@ Some text without images
       const rtf = `{\\rtf1\\ansi{\\pict\\pngblip\\bliptag111 89504e470d0a1a0a0000000d4948445200000001000000010802000000907753de0000000a49444154789c6300010000000500010d0a2db40000000467414d41000186a031e8965f000000097048597300000ec400000ec401952b0e1b0000000c74455874536f667477617265004d6963726f736f6674204f66666963650000000049454e44ae426082}}`;
       const html = '<img src="file:///C:/temp/image.png">';
       const result = imagePastingListener(rtf, html);
-      
+
       expect(result).toBeDefined();
       if (result) {
         expect(Object.keys(result).length).toBeGreaterThan(0);

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // 由于 loadedCSS 是模块私有的，我们需要重新导入模块来进行测试
 let loadCSSModule: typeof import('../loadCSS');
@@ -15,7 +15,7 @@ describe('loadCSS.ts', () => {
     loadCSSModule = await import('../loadCSS');
     loadCSS = loadCSSModule.loadCSS;
     preloadCSS = loadCSSModule.preloadCSS;
-    
+
     // 清除所有模拟
     vi.clearAllMocks();
   });
@@ -47,7 +47,7 @@ describe('loadCSS.ts', () => {
 
       const mockImport = vi.fn().mockResolvedValue({});
       const result = await loadCSS(mockImport);
-      
+
       expect(mockImport).toHaveBeenCalled();
       expect(result).toBeUndefined();
     }, 10000);
@@ -64,7 +64,7 @@ describe('loadCSS.ts', () => {
       await loadCSS(mockImport);
       // 第二次加载同样的函数
       const result = await loadCSS(mockImport);
-      
+
       // 函数应该只被调用一次
       expect(mockImport).toHaveBeenCalledTimes(1);
       expect(result).toBeUndefined();
@@ -79,13 +79,16 @@ describe('loadCSS.ts', () => {
 
       const mockImport = vi.fn().mockRejectedValue(new Error('Import failed'));
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      
+
       const result = await loadCSS(mockImport);
-      
+
       expect(mockImport).toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith('Failed to load CSS:', expect.any(Error));
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to load CSS:',
+        expect.any(Error),
+      );
       expect(result).toBeUndefined();
-      
+
       // 清理
       consoleSpy.mockRestore();
     }, 10000);
@@ -106,14 +109,14 @@ describe('loadCSS.ts', () => {
             href: '',
             onload: null,
             onerror: null,
-            setAttribute: function(key: string, value: string) {
+            setAttribute: function (key: string, value: string) {
               (this as any)[key] = value;
-            }
+            },
           };
         }
         return {};
       });
-      
+
       const mockAppendChild = vi.fn().mockImplementation((element) => {
         // 模拟触发 onload 事件
         setTimeout(() => {
@@ -139,7 +142,7 @@ describe('loadCSS.ts', () => {
       await loadCSS(cssPath);
       // 第二次加载同样的 CSS (应该直接返回，因为已加载)
       const result = await loadCSS(cssPath);
-      
+
       expect(result).toBeUndefined();
     }, 10000);
 
@@ -167,8 +170,10 @@ describe('loadCSS.ts', () => {
 
       const cssPath = 'https://example.com/test.css';
       const result = await loadCSS(cssPath);
-      
-      expect(mockQuerySelector).toHaveBeenCalledWith(`link[href*="${cssPath}"]`);
+
+      expect(mockQuerySelector).toHaveBeenCalledWith(
+        `link[href*="${cssPath}"]`,
+      );
       expect(result).toBeUndefined();
     }, 10000);
 
@@ -178,11 +183,13 @@ describe('loadCSS.ts', () => {
         writable: true,
       });
 
-      const mockAppendChild = vi.fn().mockImplementation((element: HTMLLinkElement) => {
-        setImmediate(() => {
-          if (element.onerror) element.onerror(new Event('error') as any);
+      const mockAppendChild = vi
+        .fn()
+        .mockImplementation((element: HTMLLinkElement) => {
+          setImmediate(() => {
+            if (element.onerror) element.onerror(new Event('error') as any);
+          });
         });
-      });
 
       Object.defineProperty(global, 'document', {
         value: {
@@ -241,10 +248,10 @@ describe('loadCSS.ts', () => {
       });
 
       const cssPath = 'https://example.com/test.css';
-      
+
       // 先加载 CSS
       await loadCSS(cssPath);
-      
+
       // 预加载已加载的 CSS
       const result = preloadCSS(cssPath);
       expect(result).toBeUndefined();

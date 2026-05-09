@@ -3,10 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import classNames from 'clsx';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  BaseMarkdownEditor,
-  MarkdownEditorProps,
-} from '../BaseMarkdownEditor';
+import { BaseMarkdownEditor, MarkdownEditorProps } from '../BaseMarkdownEditor';
 
 // Mock 依赖
 vi.mock('../editor/Editor', () => ({

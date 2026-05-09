@@ -2,8 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { message } from 'antd';
 import React, { createRef } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { I18nProvide } from '../../../I18n';
 import { SchemaEditor, SchemaEditorRef } from '..';
+import { I18nProvide } from '../../../I18n';
 import { LowCodeSchema } from '../../types';
 import { mdDataSchemaValidator } from '../../validator';
 

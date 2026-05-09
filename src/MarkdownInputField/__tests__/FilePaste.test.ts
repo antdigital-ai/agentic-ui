@@ -10,7 +10,9 @@ describe('FilePaste', () => {
         },
       } as unknown as React.ClipboardEvent<HTMLDivElement>;
 
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toEqual([]);
     });
 
@@ -20,7 +22,9 @@ describe('FilePaste', () => {
       } as any;
 
       // 现在代码已经处理了 undefined 的情况，应该返回空数组
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toEqual([]);
     });
 
@@ -38,7 +42,9 @@ describe('FilePaste', () => {
         },
       } as unknown as React.ClipboardEvent<HTMLDivElement>;
 
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toHaveLength(1);
       expect(result[0]).toBe(mockFile);
       expect(mockItem.getAsFile).toHaveBeenCalled();
@@ -66,7 +72,9 @@ describe('FilePaste', () => {
         },
       } as unknown as React.ClipboardEvent<HTMLDivElement>;
 
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toHaveLength(2);
       expect(result[0]).toBe(mockFile1);
       expect(result[1]).toBe(mockFile2);
@@ -85,7 +93,9 @@ describe('FilePaste', () => {
         },
       } as unknown as React.ClipboardEvent<HTMLDivElement>;
 
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toEqual([]);
       expect(mockItem.getAsFile).not.toHaveBeenCalled();
     });
@@ -113,7 +123,9 @@ describe('FilePaste', () => {
         },
       } as unknown as React.ClipboardEvent<HTMLDivElement>;
 
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toHaveLength(1);
       expect(mockItem.getAsFile).toHaveBeenCalled();
       expect(mockItem.webkitGetAsEntry).toHaveBeenCalled();
@@ -168,7 +180,9 @@ describe('FilePaste', () => {
         },
       } as unknown as React.ClipboardEvent<HTMLDivElement>;
 
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toHaveLength(2);
       expect(result[0]).toBe(mockFile1);
       expect(result[1]).toBe(mockFile2);
@@ -240,7 +254,9 @@ describe('FilePaste', () => {
         },
       } as unknown as React.ClipboardEvent<HTMLDivElement>;
 
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toHaveLength(2);
       expect(result[0]).toBe(mockFile1);
       expect(result[1]).toBe(mockFile2);
@@ -264,7 +280,9 @@ describe('FilePaste', () => {
         },
       } as unknown as React.ClipboardEvent<HTMLDivElement>;
 
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toEqual([]);
     });
 
@@ -281,7 +299,9 @@ describe('FilePaste', () => {
         },
       } as unknown as React.ClipboardEvent<HTMLDivElement>;
 
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toEqual([]);
       expect(mockItem.getAsFile).toHaveBeenCalled();
       expect(mockItem.webkitGetAsEntry).toHaveBeenCalled();
@@ -312,7 +332,9 @@ describe('FilePaste', () => {
         },
       } as unknown as React.ClipboardEvent<HTMLDivElement>;
 
-      const result = await getFileListFromDataTransferItems(mockEvent.clipboardData);
+      const result = await getFileListFromDataTransferItems(
+        mockEvent.clipboardData,
+      );
       expect(result).toEqual([]);
     });
   });

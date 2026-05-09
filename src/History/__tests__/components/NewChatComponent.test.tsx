@@ -2,8 +2,8 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { HistoryNewChat } from '../../components/NewChatComponent';
 import { I18nContext } from '../../../I18n';
+import { HistoryNewChat } from '../../components/NewChatComponent';
 
 const mockI18nLocale = {
   'chat.history.newChat': '新对话',

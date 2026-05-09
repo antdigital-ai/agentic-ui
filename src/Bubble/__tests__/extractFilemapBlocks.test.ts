@@ -39,7 +39,8 @@ describe('extractFilemapBlocks', () => {
   });
 
   it('does not extract other code fence types', () => {
-    const content = '```json\n{"foo":1}\n```\n\n```typescript\nconst x = 1;\n```';
+    const content =
+      '```json\n{"foo":1}\n```\n\n```typescript\nconst x = 1;\n```';
     const { blocks, stripped } = extractFilemapBlocks(content);
     expect(blocks).toHaveLength(0);
     expect(stripped).toBe(content.trim());

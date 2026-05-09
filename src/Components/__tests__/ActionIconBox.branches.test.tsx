@@ -177,7 +177,9 @@ describe('ActionIconBox targeted coverage', () => {
       </ActionIconBox>,
     );
     await act(async () => {
-      fireEvent.keyDown(screen.getByTestId('kbd-loading-btn'), { key: 'Enter' });
+      fireEvent.keyDown(screen.getByTestId('kbd-loading-btn'), {
+        key: 'Enter',
+      });
       await Promise.resolve();
     });
 
@@ -185,4 +187,3 @@ describe('ActionIconBox targeted coverage', () => {
     expect(console.error).toHaveBeenCalled();
   });
 });
-

@@ -143,7 +143,7 @@ describe('findMatchingClose', () => {
       // 从第一个 ``` 之后开始搜索
       // 转义的字符应该被跳过，找到最后的 ```
       const closeIdx = findMatchingClose(code, 3, '```', '```');
-      // 应该找到最后的 ``` 
+      // 应该找到最后的 ```
       expect(closeIdx).toBeGreaterThan(-1);
       expect(code.substring(closeIdx, closeIdx + 3)).toBe('```');
     });
@@ -164,7 +164,12 @@ describe('findMatchingClose', () => {
       const firstClose = findMatchingClose(code, 3, '```', '```');
       expect(firstClose).toBeGreaterThan(-1);
       // 从第一个闭合标记之后开始搜索
-      const secondClose = findMatchingClose(code, firstClose! + 3, '```', '```');
+      const secondClose = findMatchingClose(
+        code,
+        firstClose! + 3,
+        '```',
+        '```',
+      );
       expect(secondClose).toBeGreaterThan(firstClose!);
     });
   });
@@ -261,12 +266,14 @@ describe('isCodeBlockLikelyComplete', () => {
     });
 
     it('完整的 timeline 应该返回 true', () => {
-      const code = 'timeline\n  title History\n  2020 : Event A\n  2021 : Event B';
+      const code =
+        'timeline\n  title History\n  2020 : Event A\n  2021 : Event B';
       expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
     });
 
     it('完整的 quadrantChart 应该返回 true', () => {
-      const code = 'quadrantChart\n  title Features\n  x-axis Low to High\n  y-axis Low to High';
+      const code =
+        'quadrantChart\n  title Features\n  x-axis Low to High\n  y-axis Low to High';
       expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
     });
 
@@ -276,7 +283,8 @@ describe('isCodeBlockLikelyComplete', () => {
     });
 
     it('完整的 C4Context 应该返回 true', () => {
-      const code = 'C4Context\n  title System Context\n  Enterprise_Boundary e1, "Boundary"';
+      const code =
+        'C4Context\n  title System Context\n  Enterprise_Boundary e1, "Boundary"';
       expect(isCodeBlockLikelyComplete(code, 'mermaid')).toBe(true);
     });
 
@@ -330,4 +338,3 @@ describe('isCodeBlockLikelyComplete', () => {
     });
   });
 });
-

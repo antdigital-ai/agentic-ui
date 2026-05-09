@@ -54,4 +54,3 @@ describe('SchemaEditor style', () => {
     });
   });
 });
-

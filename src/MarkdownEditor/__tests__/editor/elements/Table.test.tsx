@@ -2,11 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  tableRenderElement,
-  Td,
-  Th,
-} from '../../../editor/elements/Table';
+import { tableRenderElement, Td, Th } from '../../../editor/elements/Table';
 
 // Mock dependencies
 vi.mock('../../../editor/store', () => ({
@@ -42,26 +38,20 @@ vi.mock('../../../utils/slate-table', () => ({
   },
 }));
 
-vi.mock(
-  '../../../editor/elements/Table/SimpleTable',
-  () => ({
-    SimpleTable: ({ children, ...props }: any) => (
-      <table data-testid="simple-table" {...props}>
-        {children}
-      </table>
-    ),
-  }),
-);
+vi.mock('../../../editor/elements/Table/SimpleTable', () => ({
+  SimpleTable: ({ children, ...props }: any) => (
+    <table data-testid="simple-table" {...props}>
+      {children}
+    </table>
+  ),
+}));
 
-vi.mock(
-  '../../../editor/elements/Table/Td/style',
-  () => ({
-    useStyle: vi.fn(() => ({
-      wrapSSR: (component: any) => component,
-      hashId: 'test-hash',
-    })),
-  }),
-);
+vi.mock('../../../editor/elements/Table/Td/style', () => ({
+  useStyle: vi.fn(() => ({
+    wrapSSR: (component: any) => component,
+    hashId: 'test-hash',
+  })),
+}));
 
 describe('Table Components', () => {
   describe('Th (表头单元格)', () => {
@@ -845,7 +835,9 @@ describe('Table Components', () => {
       const types = ['table-head', 'table-footer', 'table-row'];
 
       types.forEach((type, index) => {
-        const children = [<div key={`${type}-${index}`}>Test Content {index}</div>];
+        const children = [
+          <div key={`${type}-${index}`}>Test Content {index}</div>,
+        ];
         const props = {
           element: { type: type as any, children: [] },
           attributes: defaultAttributes,

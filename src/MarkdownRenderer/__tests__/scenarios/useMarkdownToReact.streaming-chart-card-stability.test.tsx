@@ -2,12 +2,12 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React, { useEffect } from 'react';
 import { describe, expect, it } from 'vitest';
+import type { RendererBlockProps } from '..';
 import {
   ChartBlockRenderer,
   SchemaBlockRenderer,
   useMarkdownToReact,
 } from '..';
-import type { RendererBlockProps } from '..';
 
 interface Counters {
   mounts: number;
@@ -94,7 +94,10 @@ const HookHarness: React.FC<{
 
 describe('useMarkdownToReact streaming — 图表 / 卡片重组件稳定性', () => {
   it('流式追加 chart 块 JSON 时，ChartBlockRenderer 不应重复挂载', () => {
-    const chart = { chart: { mounts: 0, unmounts: 0 }, card: { mounts: 0, unmounts: 0 } };
+    const chart = {
+      chart: { mounts: 0, unmounts: 0 },
+      card: { mounts: 0, unmounts: 0 },
+    };
     const CodeBlock = createInstrumentedCodeBlock(chart);
 
     const { rerender, unmount } = render(
@@ -127,7 +130,10 @@ describe('useMarkdownToReact streaming — 图表 / 卡片重组件稳定性', (
   });
 
   it('chart 块封版后追加新块时，图表不应重复挂载', () => {
-    const chart = { chart: { mounts: 0, unmounts: 0 }, card: { mounts: 0, unmounts: 0 } };
+    const chart = {
+      chart: { mounts: 0, unmounts: 0 },
+      card: { mounts: 0, unmounts: 0 },
+    };
     const CodeBlock = createInstrumentedCodeBlock(chart);
 
     const chartFence =
@@ -158,7 +164,10 @@ describe('useMarkdownToReact streaming — 图表 / 卡片重组件稳定性', (
   });
 
   it('流式追加 agentar-card 块 JSON 时，SchemaBlockRenderer 不应重复挂载', () => {
-    const chart = { chart: { mounts: 0, unmounts: 0 }, card: { mounts: 0, unmounts: 0 } };
+    const chart = {
+      chart: { mounts: 0, unmounts: 0 },
+      card: { mounts: 0, unmounts: 0 },
+    };
     const CodeBlock = createInstrumentedCodeBlock(chart);
 
     const { rerender, unmount } = render(
@@ -193,7 +202,10 @@ describe('useMarkdownToReact streaming — 图表 / 卡片重组件稳定性', (
   });
 
   it('agentar-card 块封版后追加新块时，卡片不应重复挂载', () => {
-    const chart = { chart: { mounts: 0, unmounts: 0 }, card: { mounts: 0, unmounts: 0 } };
+    const chart = {
+      chart: { mounts: 0, unmounts: 0 },
+      card: { mounts: 0, unmounts: 0 },
+    };
     const CodeBlock = createInstrumentedCodeBlock(chart);
 
     const cardFence =

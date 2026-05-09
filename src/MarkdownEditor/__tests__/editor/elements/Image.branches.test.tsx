@@ -25,7 +25,9 @@ vi.mock('antd', () => {
         <div data-testid="mock-popover-content">{content}</div>
       </div>
     ),
-    Space: ({ children }: any) => <div data-testid="mock-space">{children}</div>,
+    Space: ({ children }: any) => (
+      <div data-testid="mock-space">{children}</div>
+    ),
     Modal: { confirm },
   };
 });
@@ -67,7 +69,12 @@ vi.mock('../../../../Hooks/useDebounceFn', () => ({
 
 vi.mock('../../../../Components/ActionIconBox', () => ({
   ActionIconBox: ({ children, onClick, title }: any) => (
-    <button type="button" onClick={onClick} title={title} data-testid={`action-${title}`}>
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      data-testid={`action-${title}`}
+    >
       {children}
     </button>
   ),
@@ -121,7 +128,9 @@ vi.mock('../../../../Utils/debugUtils', () => ({
 }));
 
 vi.mock('../../../editor/elements/components/MediaErrorLink', () => ({
-  MediaErrorLink: ({ displayText }: any) => <span data-testid="media-error-link">{displayText}</span>,
+  MediaErrorLink: ({ displayText }: any) => (
+    <span data-testid="media-error-link">{displayText}</span>
+  ),
 }));
 
 const baseElement: any = {
@@ -154,10 +163,22 @@ describe('Image targeted coverage', () => {
       configurable: true,
       value: 1000,
     });
-    render(<ResizeImage src="https://example.com/a.jpg" alt="A" defaultSize={{ width: 580 }} />);
+    render(
+      <ResizeImage
+        src="https://example.com/a.jpg"
+        alt="A"
+        defaultSize={{ width: 580 }}
+      />,
+    );
     const img = screen.getByAltText('A') as HTMLImageElement;
-    Object.defineProperty(img, 'naturalWidth', { configurable: true, value: 800 });
-    Object.defineProperty(img, 'naturalHeight', { configurable: true, value: 400 });
+    Object.defineProperty(img, 'naturalWidth', {
+      configurable: true,
+      value: 800,
+    });
+    Object.defineProperty(img, 'naturalHeight', {
+      configurable: true,
+      value: 400,
+    });
     fireEvent.load(img);
     expect(screen.queryByTestId('icon-loading')).not.toBeInTheDocument();
   });
@@ -165,17 +186,17 @@ describe('Image targeted coverage', () => {
   it('覆盖 EditorImage 的图片探测 onerror/onload 分支', () => {
     const createdImgs: HTMLImageElement[] = [];
     const originalCreate = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-    const createSpy = vi
-      .spyOn(document, 'createElement')
-      .mockImplementation(((tagName: string) => {
-        const el = originalCreate(tagName) as any;
-        if (tagName === 'img') {
-          createdImgs.push(el);
-        }
-        return el;
-      }) as any);
+      document,
+    ) as typeof document.createElement;
+    const createSpy = vi.spyOn(document, 'createElement').mockImplementation(((
+      tagName: string,
+    ) => {
+      const el = originalCreate(tagName) as any;
+      if (tagName === 'img') {
+        createdImgs.push(el);
+      }
+      return el;
+    }) as any);
 
     render(
       <EditorImage element={baseElement} attributes={attrs}>
@@ -192,7 +213,10 @@ describe('Image targeted coverage', () => {
 
   it('覆盖 unfinished 图片 5 秒后文本回退分支', () => {
     render(
-      <EditorImage element={{ ...baseElement, finished: false, alt: 'Pending Alt' }} attributes={attrs}>
+      <EditorImage
+        element={{ ...baseElement, finished: false, alt: 'Pending Alt' }}
+        attributes={attrs}
+      >
         {null}
       </EditorImage>,
     );
@@ -237,7 +261,6 @@ describe('Image targeted coverage', () => {
     const payload = confirmMock.mock.calls[0][0];
     payload.onOk();
     expect(Transforms.removeNodes).toHaveBeenCalled();
-
   });
 
   it('覆盖删除按钮 onOk 在 editorRef 为空时直接 return', () => {
@@ -251,24 +274,33 @@ describe('Image targeted coverage', () => {
     const deletes = screen.getAllByTestId('action-删除');
     fireEvent.click(deletes[deletes.length - 1]);
     const confirmMock = (Modal as any).confirm as ReturnType<typeof vi.fn>;
-    const payload = confirmMock.mock.calls[confirmMock.mock.calls.length - 1][0];
+    const payload =
+      confirmMock.mock.calls[confirmMock.mock.calls.length - 1][0];
     payload.onOk();
     expect(Transforms.removeNodes).not.toHaveBeenCalled();
   });
 
   it('覆盖 block/inline 切换分支（含 editorRef guard）', () => {
     render(
-      <EditorImage element={{ ...baseElement, block: false }} attributes={attrs}>
+      <EditorImage
+        element={{ ...baseElement, block: false }}
+        attributes={attrs}
+      >
         {null}
       </EditorImage>,
     );
     fireEvent.click(screen.getByTestId('action-行内图片'));
-    expect((Transforms.setNodes as any).mock.calls.length).toBeGreaterThanOrEqual(2);
+    expect(
+      (Transforms.setNodes as any).mock.calls.length,
+    ).toBeGreaterThanOrEqual(2);
 
     (Transforms.setNodes as any).mockClear();
     storeState.markdownEditorRef = { current: null };
     render(
-      <EditorImage element={{ ...baseElement, block: false }} attributes={attrs}>
+      <EditorImage
+        element={{ ...baseElement, block: false }}
+        attributes={attrs}
+      >
         {null}
       </EditorImage>,
     );
@@ -283,12 +315,11 @@ describe('Image targeted coverage', () => {
         {null}
       </EditorImage>,
     );
-    const mediaContainer = screen.getByTestId('image-container').querySelector(
-      '[data-be="media-container"]',
-    ) as HTMLElement;
+    const mediaContainer = screen
+      .getByTestId('image-container')
+      .querySelector('[data-be="media-container"]') as HTMLElement;
     fireEvent.click(mediaContainer);
     vi.advanceTimersByTime(16);
     expect(screen.getByTestId('image-container')).toBeInTheDocument();
   });
 });
-

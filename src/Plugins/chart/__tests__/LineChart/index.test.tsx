@@ -18,19 +18,16 @@ let LineChart: React.FC<any>;
 // 在测试套件开始前导入组件，避免在每个测试前重复导入
 beforeAll(async () => {
   try {
-    const LineChartModule =
-      await import('../../LineChart/index');
+    const LineChartModule = await import('../../LineChart/index');
     LineChart = LineChartModule.default;
   } catch (error) {
     // 如果上面的导入失败，尝试不带扩展名的导入
     try {
-      const LineChartModule =
-        await import('../../LineChart');
+      const LineChartModule = await import('../../LineChart');
       LineChart = LineChartModule.default;
     } catch (secondError) {
       // 如果都失败了，尝试从 Plugins 目录导入
-      const LineChartModule =
-        await import('../../LineChart/index');
+      const LineChartModule = await import('../../LineChart/index');
       LineChart = LineChartModule.default;
     }
   }
@@ -252,18 +249,16 @@ describe('LineChart', () => {
 
       // 通过 spy 临时替换 useChartDataFilter 的返回值，
       // 避免在 it() 内部调用 vi.mock（会被提升到顶层并触发 vitest 警告）
-      const filterSpy = vi
-        .spyOn(hooks, 'useChartDataFilter')
-        .mockReturnValue({
-          filteredData: mockFilteredData,
-          filterOptions: ['All', 'Series 1'],
-          filterLabels: [],
-          selectedFilter: 'All',
-          setSelectedFilter: vi.fn(),
-          selectedFilterLabel: '',
-          setSelectedFilterLabel: vi.fn(),
-          filteredDataByFilterLabel: [],
-        } as any);
+      const filterSpy = vi.spyOn(hooks, 'useChartDataFilter').mockReturnValue({
+        filteredData: mockFilteredData,
+        filterOptions: ['All', 'Series 1'],
+        filterLabels: [],
+        selectedFilter: 'All',
+        setSelectedFilter: vi.fn(),
+        selectedFilterLabel: '',
+        setSelectedFilterLabel: vi.fn(),
+        filteredDataByFilterLabel: [],
+      } as any);
 
       render(<LineChart data={mockData} />);
 
@@ -605,8 +600,7 @@ describe('LineChart', () => {
       const downloadButton = screen.getByTestId('download-button');
       fireEvent.click(downloadButton);
 
-      const components =
-        await import('../../components');
+      const components = await import('../../components');
       expect(components.downloadChart).toHaveBeenCalled();
     });
   });
@@ -814,9 +808,7 @@ describe('LineChart', () => {
 
       // 重新mock hooks 以返回过滤选项
       vi.doMock('../../../../src/Plugins/chart/hooks', async () => {
-        const actual: any = await vi.importActual(
-          '../../hooks',
-        );
+        const actual: any = await vi.importActual('../../hooks');
         return {
           ...actual,
           useChartDataFilter: () => ({
@@ -835,12 +827,10 @@ describe('LineChart', () => {
       // 重新导入组件以应用新的mock
       let ReRenderedLineChart: React.FC<any>;
       try {
-        const LineChartModule =
-          await import('../../LineChart/index');
+        const LineChartModule = await import('../../LineChart/index');
         ReRenderedLineChart = LineChartModule.default;
       } catch (error) {
-        const LineChartModule =
-          await import('../../LineChart');
+        const LineChartModule = await import('../../LineChart');
         ReRenderedLineChart = LineChartModule.default;
       }
       render(

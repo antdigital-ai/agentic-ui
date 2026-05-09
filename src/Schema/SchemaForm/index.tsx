@@ -388,23 +388,23 @@ const SchemaFormComponent: React.FC<SchemaFormProps> = ({
 
   // 生成表单项
   const formItems = useMemo(() => {
-    return (
-      Object.entries(properties) as Array<[string, SchemaProperty]>
-    ).map(([key, property]) => {
-      const shouldUseFormItemName =
-        property.type !== 'object' && property.type !== 'array';
+    return (Object.entries(properties) as Array<[string, SchemaProperty]>).map(
+      ([key, property]) => {
+        const shouldUseFormItemName =
+          property.type !== 'object' && property.type !== 'array';
 
-      return (
-        <Form.Item
-          key={key}
-          label={getPropertyTitle(property, key)}
-          name={shouldUseFormItemName ? key : undefined}
-          rules={generateRules(property)}
-        >
-          {renderFormItem(key, property)}
-        </Form.Item>
-      );
-    });
+        return (
+          <Form.Item
+            key={key}
+            label={getPropertyTitle(property, key)}
+            name={shouldUseFormItemName ? key : undefined}
+            rules={generateRules(property)}
+          >
+            {renderFormItem(key, property)}
+          </Form.Item>
+        );
+      },
+    );
   }, [properties, getPropertyTitle, generateRules, renderFormItem]);
 
   return (

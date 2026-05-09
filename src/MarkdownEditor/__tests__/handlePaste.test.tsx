@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import { createEditor, Editor, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -822,101 +821,101 @@ describe('handlePaste utilities', () => {
       });
 
       const expectedChildren = [
+        {
+          type: 'heading-one',
+          children: [{ text: 'Complex Document' }],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            { text: 'This is a ' },
+            { text: 'bold', bold: true },
+            { text: ' paragraph with ' },
+            { text: 'italic', italic: true },
+            { text: ' text.' },
+          ],
+        },
+        {
+          type: 'bulleted-list',
+          children: [
             {
-              type: 'heading-one',
-              children: [{ text: 'Complex Document' }],
-            },
-            {
-              type: 'paragraph',
-              children: [
-                { text: 'This is a ' },
-                { text: 'bold', bold: true },
-                { text: ' paragraph with ' },
-                { text: 'italic', italic: true },
-                { text: ' text.' },
-              ],
-            },
-            {
-              type: 'bulleted-list',
+              type: 'list-item',
               children: [
                 {
-                  type: 'list-item',
+                  type: 'paragraph',
+                  children: [{ text: 'First level item' }],
+                },
+                {
+                  type: 'bulleted-list',
                   children: [
                     {
-                      type: 'paragraph',
-                      children: [{ text: 'First level item' }],
-                    },
-                    {
-                      type: 'bulleted-list',
+                      type: 'list-item',
                       children: [
                         {
-                          type: 'list-item',
-                          children: [
-                            {
-                              type: 'paragraph',
-                              children: [{ text: 'Nested item 1' }],
-                            },
-                          ],
-                        },
-                        {
-                          type: 'list-item',
-                          children: [
-                            {
-                              type: 'paragraph',
-                              children: [
-                                { text: 'Nested item 2 with ' },
-                                { text: 'bold', bold: true },
-                              ],
-                            },
-                          ],
+                          type: 'paragraph',
+                          children: [{ text: 'Nested item 1' }],
                         },
                       ],
                     },
-                  ],
-                },
-                {
-                  type: 'list-item',
-                  children: [
                     {
-                      type: 'paragraph',
-                      children: [{ text: 'Another first level item' }],
+                      type: 'list-item',
+                      children: [
+                        {
+                          type: 'paragraph',
+                          children: [
+                            { text: 'Nested item 2 with ' },
+                            { text: 'bold', bold: true },
+                          ],
+                        },
+                      ],
                     },
                   ],
                 },
               ],
             },
             {
-              type: 'table',
+              type: 'list-item',
               children: [
                 {
-                  type: 'table-row',
+                  type: 'paragraph',
+                  children: [{ text: 'Another first level item' }],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'table',
+          children: [
+            {
+              type: 'table-row',
+              children: [
+                { type: 'table-cell', children: [{ text: 'Header 1' }] },
+                { type: 'table-cell', children: [{ text: 'Header 2' }] },
+              ],
+            },
+            {
+              type: 'table-row',
+              children: [
+                {
+                  type: 'table-cell',
                   children: [
-                    { type: 'table-cell', children: [{ text: 'Header 1' }] },
-                    { type: 'table-cell', children: [{ text: 'Header 2' }] },
+                    { text: 'Cell with ' },
+                    { text: 'italic', italic: true },
                   ],
                 },
                 {
-                  type: 'table-row',
+                  type: 'table-cell',
                   children: [
-                    {
-                      type: 'table-cell',
-                      children: [
-                        { text: 'Cell with ' },
-                        { text: 'italic', italic: true },
-                      ],
-                    },
-                    {
-                      type: 'table-cell',
-                      children: [
-                        { text: 'Cell with ' },
-                        { text: 'code', code: true },
-                      ],
-                    },
+                    { text: 'Cell with ' },
+                    { text: 'code', code: true },
                   ],
                 },
               ],
             },
-          ];
+          ],
+        },
+      ];
 
       // Mock the parsed result for lists and tables
       (insertParsedHtmlNodes as any).mockImplementation(
@@ -955,24 +954,24 @@ describe('handlePaste utilities', () => {
       });
 
       const expectedChildren = [
+        {
+          type: 'code',
+          language: 'javascript',
+          children: [
             {
-              type: 'code',
-              language: 'javascript',
-              children: [
-                {
-                  text: 'function example() {\n  const x = 1;\n  return x + 2;\n}',
-                },
-              ],
+              text: 'function example() {\n  const x = 1;\n  return x + 2;\n}',
             },
-            {
-              type: 'paragraph',
-              children: [{ text: 'Special characters: & < > " \'' }],
-            },
-            {
-              type: 'paragraph',
-              children: [{ text: 'Emoji: 👋 🎉 🚀' }],
-            },
-          ];
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [{ text: 'Special characters: & < > " \'' }],
+        },
+        {
+          type: 'paragraph',
+          children: [{ text: 'Emoji: 👋 🎉 🚀' }],
+        },
+      ];
 
       // Mock the parsed result for code blocks
       (insertParsedHtmlNodes as any).mockImplementation(
@@ -1019,67 +1018,67 @@ describe('handlePaste utilities', () => {
       });
 
       const expectedChildren = [
-            {
-              type: 'heading-two',
-              children: [{ text: 'Mixed Content' }],
-            },
-            {
-              type: 'block-quote',
-              children: [
-                {
-                  type: 'paragraph',
-                  children: [
-                    { text: 'This is a quote with ' },
-                    {
-                      type: 'link',
-                      url: 'https://example.com',
-                      children: [{ text: 'a link' }],
-                    },
-                  ],
-                },
-              ],
-            },
+        {
+          type: 'heading-two',
+          children: [{ text: 'Mixed Content' }],
+        },
+        {
+          type: 'block-quote',
+          children: [
             {
               type: 'paragraph',
               children: [
-                { text: 'Styled text with ' },
-                { text: 'highlighted', highlight: true },
-                { text: ' content' },
+                { text: 'This is a quote with ' },
+                {
+                  type: 'link',
+                  url: 'https://example.com',
+                  children: [{ text: 'a link' }],
+                },
               ],
             },
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            { text: 'Styled text with ' },
+            { text: 'highlighted', highlight: true },
+            { text: ' content' },
+          ],
+        },
+        {
+          type: 'thematic-break',
+          children: [{ text: '' }],
+        },
+        {
+          type: 'details',
+          children: [
             {
-              type: 'thematic-break',
+              type: 'summary',
+              children: [{ text: 'Expandable section' }],
+            },
+            {
+              type: 'paragraph',
+              children: [{ text: 'Hidden content' }],
+            },
+          ],
+        },
+        {
+          type: 'figure',
+          children: [
+            {
+              type: 'image',
+              url: 'example.jpg',
+              alt: 'Example image',
               children: [{ text: '' }],
             },
             {
-              type: 'details',
-              children: [
-                {
-                  type: 'summary',
-                  children: [{ text: 'Expandable section' }],
-                },
-                {
-                  type: 'paragraph',
-                  children: [{ text: 'Hidden content' }],
-                },
-              ],
+              type: 'figcaption',
+              children: [{ text: 'Image caption' }],
             },
-            {
-              type: 'figure',
-              children: [
-                {
-                  type: 'image',
-                  url: 'example.jpg',
-                  alt: 'Example image',
-                  children: [{ text: '' }],
-                },
-                {
-                  type: 'figcaption',
-                  children: [{ text: 'Image caption' }],
-                },
-              ],
-            },
-          ];
+          ],
+        },
+      ];
 
       // Mock the parsed result for mixed content
       (insertParsedHtmlNodes as any).mockImplementation(
@@ -1124,60 +1123,60 @@ describe('handlePaste utilities', () => {
       });
 
       const expectedChildren = [
+        {
+          type: 'heading-three',
+          children: [{ text: 'Mathematical Content' }],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            { text: 'The quadratic formula: ' },
             {
-              type: 'heading-three',
-              children: [{ text: 'Mathematical Content' }],
+              type: 'math',
+              children: [{ text: 'x = (-b ± √(b² - 4ac)) / (2a)' }],
             },
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [
+            { text: 'Chemical equation: ' },
             {
-              type: 'paragraph',
+              type: 'chemistry',
+              children: [{ text: '2H₂ + O₂ → 2H₂O' }],
+            },
+          ],
+        },
+        {
+          type: 'table',
+          children: [
+            {
+              type: 'table-row',
               children: [
-                { text: 'The quadratic formula: ' },
                 {
-                  type: 'math',
-                  children: [{ text: 'x = (-b ± √(b² - 4ac)) / (2a)' }],
+                  type: 'table-cell',
+                  children: [{ text: 'Temperature (°C)' }],
+                },
+                {
+                  type: 'table-cell',
+                  children: [{ text: 'Pressure (kPa)' }],
                 },
               ],
             },
             {
-              type: 'paragraph',
+              type: 'table-row',
               children: [
-                { text: 'Chemical equation: ' },
-                {
-                  type: 'chemistry',
-                  children: [{ text: '2H₂ + O₂ → 2H₂O' }],
-                },
+                { type: 'table-cell', children: [{ text: '25.5' }] },
+                { type: 'table-cell', children: [{ text: '101.3' }] },
               ],
             },
-            {
-              type: 'table',
-              children: [
-                {
-                  type: 'table-row',
-                  children: [
-                    {
-                      type: 'table-cell',
-                      children: [{ text: 'Temperature (°C)' }],
-                    },
-                    {
-                      type: 'table-cell',
-                      children: [{ text: 'Pressure (kPa)' }],
-                    },
-                  ],
-                },
-                {
-                  type: 'table-row',
-                  children: [
-                    { type: 'table-cell', children: [{ text: '25.5' }] },
-                    { type: 'table-cell', children: [{ text: '101.3' }] },
-                  ],
-                },
-              ],
-            },
-            {
-              type: 'paragraph',
-              children: [{ text: 'Greek symbols: α β γ δ' }],
-            },
-          ];
+          ],
+        },
+        {
+          type: 'paragraph',
+          children: [{ text: 'Greek symbols: α β γ δ' }],
+        },
+      ];
 
       // Mock the parsed result for mathematical content
       (insertParsedHtmlNodes as any).mockImplementation(
@@ -1222,61 +1221,61 @@ describe('handlePaste utilities', () => {
       });
 
       const expectedChildren = [
+        {
+          type: 'form',
+          children: [
             {
-              type: 'form',
+              type: 'paragraph',
+              children: [{ text: 'Name: ' }],
+            },
+            {
+              type: 'input',
+              inputType: 'text',
+              value: 'John Doe',
+              children: [{ text: '' }],
+            },
+            {
+              type: 'select',
               children: [
                 {
-                  type: 'paragraph',
-                  children: [{ text: 'Name: ' }],
+                  type: 'option',
+                  children: [{ text: 'Option 1' }],
                 },
                 {
-                  type: 'input',
-                  inputType: 'text',
-                  value: 'John Doe',
-                  children: [{ text: '' }],
-                },
-                {
-                  type: 'select',
-                  children: [
-                    {
-                      type: 'option',
-                      children: [{ text: 'Option 1' }],
-                    },
-                    {
-                      type: 'option',
-                      selected: true,
-                      children: [{ text: 'Option 2' }],
-                    },
-                  ],
-                },
-                {
-                  type: 'textarea',
-                  children: [{ text: 'Some text here' }],
+                  type: 'option',
+                  selected: true,
+                  children: [{ text: 'Option 2' }],
                 },
               ],
             },
             {
-              type: 'div',
-              className: 'interactive',
-              children: [
-                {
-                  type: 'button',
-                  children: [{ text: 'Click me' }],
-                },
-                {
-                  type: 'progress',
-                  value: 70,
-                  max: 100,
-                  children: [{ text: '70%' }],
-                },
-                {
-                  type: 'meter',
-                  value: 0.6,
-                  children: [{ text: '60%' }],
-                },
-              ],
+              type: 'textarea',
+              children: [{ text: 'Some text here' }],
             },
-          ];
+          ],
+        },
+        {
+          type: 'div',
+          className: 'interactive',
+          children: [
+            {
+              type: 'button',
+              children: [{ text: 'Click me' }],
+            },
+            {
+              type: 'progress',
+              value: 70,
+              max: 100,
+              children: [{ text: '70%' }],
+            },
+            {
+              type: 'meter',
+              value: 0.6,
+              children: [{ text: '60%' }],
+            },
+          ],
+        },
+      ];
 
       // Mock the parsed result for form elements
       (insertParsedHtmlNodes as any).mockImplementation(
@@ -1350,167 +1349,167 @@ describe('handlePaste utilities', () => {
       });
 
       const expectedChildren = [
+        {
+          type: 'heading-one',
+          children: [{ text: 'Combined Complex Content' }],
+        },
+        {
+          type: 'nav',
+          children: [
             {
-              type: 'heading-one',
-              children: [{ text: 'Combined Complex Content' }],
-            },
-            {
-              type: 'nav',
+              type: 'bulleted-list',
               children: [
                 {
-                  type: 'bulleted-list',
+                  type: 'list-item',
                   children: [
                     {
-                      type: 'list-item',
-                      children: [
-                        {
-                          type: 'link',
-                          url: '#section1',
-                          children: [{ text: 'Section 1' }],
-                        },
-                      ],
+                      type: 'link',
+                      url: '#section1',
+                      children: [{ text: 'Section 1' }],
                     },
+                  ],
+                },
+                {
+                  type: 'list-item',
+                  children: [
                     {
-                      type: 'list-item',
-                      children: [
-                        {
-                          type: 'link',
-                          url: '#section2',
-                          children: [{ text: 'Section 2' }],
-                        },
-                      ],
+                      type: 'link',
+                      url: '#section2',
+                      children: [{ text: 'Section 2' }],
                     },
                   ],
                 },
               ],
             },
+          ],
+        },
+        {
+          type: 'section',
+          id: 'section1',
+          children: [
             {
-              type: 'section',
-              id: 'section1',
+              type: 'heading-two',
+              children: [{ text: 'Section 1: Code and Math' }],
+            },
+            {
+              type: 'code',
+              language: 'typescript',
               children: [
                 {
-                  type: 'heading-two',
-                  children: [{ text: 'Section 1: Code and Math' }],
+                  text: 'interface Example {\n  name: string;\n  value: number;\n}',
                 },
+              ],
+            },
+            {
+              type: 'paragraph',
+              children: [
+                { text: 'Math equation: ' },
                 {
-                  type: 'code',
-                  language: 'typescript',
+                  type: 'math',
+                  children: [{ text: 'E = mc²' }],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'section',
+          id: 'section2',
+          children: [
+            {
+              type: 'heading-two',
+              children: [{ text: 'Section 2: Tables and Lists' }],
+            },
+            {
+              type: 'table',
+              children: [
+                {
+                  type: 'table-row',
                   children: [
                     {
-                      text: 'interface Example {\n  name: string;\n  value: number;\n}',
+                      type: 'table-cell',
+                      header: true,
+                      children: [{ text: 'Column 1' }],
+                    },
+                    {
+                      type: 'table-cell',
+                      header: true,
+                      children: [{ text: 'Column 2' }],
                     },
                   ],
                 },
                 {
-                  type: 'paragraph',
+                  type: 'table-row',
                   children: [
-                    { text: 'Math equation: ' },
-                    {
-                      type: 'math',
-                      children: [{ text: 'E = mc²' }],
-                    },
+                    { type: 'table-cell', children: [{ text: 'Data 1' }] },
+                    { type: 'table-cell', children: [{ text: 'Data 2' }] },
                   ],
                 },
               ],
             },
             {
-              type: 'section',
-              id: 'section2',
+              type: 'bulleted-list',
               children: [
                 {
-                  type: 'heading-two',
-                  children: [{ text: 'Section 2: Tables and Lists' }],
-                },
-                {
-                  type: 'table',
+                  type: 'list-item',
                   children: [
+                    { type: 'paragraph', children: [{ text: 'Item 1' }] },
                     {
-                      type: 'table-row',
+                      type: 'numbered-list',
                       children: [
                         {
-                          type: 'table-cell',
-                          header: true,
-                          children: [{ text: 'Column 1' }],
-                        },
-                        {
-                          type: 'table-cell',
-                          header: true,
-                          children: [{ text: 'Column 2' }],
-                        },
-                      ],
-                    },
-                    {
-                      type: 'table-row',
-                      children: [
-                        { type: 'table-cell', children: [{ text: 'Data 1' }] },
-                        { type: 'table-cell', children: [{ text: 'Data 2' }] },
-                      ],
-                    },
-                  ],
-                },
-                {
-                  type: 'bulleted-list',
-                  children: [
-                    {
-                      type: 'list-item',
-                      children: [
-                        { type: 'paragraph', children: [{ text: 'Item 1' }] },
-                        {
-                          type: 'numbered-list',
+                          type: 'list-item',
                           children: [
                             {
-                              type: 'list-item',
-                              children: [
-                                {
-                                  type: 'paragraph',
-                                  children: [{ text: 'Sub-item A' }],
-                                },
-                              ],
+                              type: 'paragraph',
+                              children: [{ text: 'Sub-item A' }],
                             },
+                          ],
+                        },
+                        {
+                          type: 'list-item',
+                          children: [
                             {
-                              type: 'list-item',
-                              children: [
-                                {
-                                  type: 'paragraph',
-                                  children: [{ text: 'Sub-item B' }],
-                                },
-                              ],
+                              type: 'paragraph',
+                              children: [{ text: 'Sub-item B' }],
                             },
                           ],
                         },
                       ],
                     },
-                    {
-                      type: 'list-item',
-                      children: [
-                        { type: 'paragraph', children: [{ text: 'Item 2' }] },
-                      ],
-                    },
                   ],
+                },
+                {
+                  type: 'list-item',
+                  children: [
+                    { type: 'paragraph', children: [{ text: 'Item 2' }] },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'footer',
+          children: [
+            {
+              type: 'paragraph',
+              children: [
+                { text: 'Created by ' },
+                {
+                  type: 'link',
+                  url: 'mailto:test@example.com',
+                  children: [{ text: 'Author' }],
                 },
               ],
             },
             {
-              type: 'footer',
-              children: [
-                {
-                  type: 'paragraph',
-                  children: [
-                    { text: 'Created by ' },
-                    {
-                      type: 'link',
-                      url: 'mailto:test@example.com',
-                      children: [{ text: 'Author' }],
-                    },
-                  ],
-                },
-                {
-                  type: 'small',
-                  children: [{ text: 'Copyright © 2024' }],
-                },
-              ],
+              type: 'small',
+              children: [{ text: 'Copyright © 2024' }],
             },
-          ];
+          ],
+        },
+      ];
 
       // Mock the parsed result for combined content
       (insertParsedHtmlNodes as any).mockImplementation(

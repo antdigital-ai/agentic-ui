@@ -7,7 +7,10 @@ import { LoadingEffect } from '../LoadingEffect';
 
 const effectComponents = [
   { name: 'LoadingEffect', Component: LoadingEffect },
-  { name: 'CreativeRecommendationEffect', Component: CreativeRecommendationEffect },
+  {
+    name: 'CreativeRecommendationEffect',
+    Component: CreativeRecommendationEffect,
+  },
 ];
 
 describe.each(effectComponents)('$name', ({ Component }) => {

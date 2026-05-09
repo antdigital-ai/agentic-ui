@@ -7,21 +7,27 @@ import {
 describe('rehypeSanitizeUserHtml', () => {
   describe('危险元素过滤', () => {
     it('应移除 script 元素', async () => {
-      const result = await markdownToHtml('<script>alert("xss")</script>\n\nSafe content');
+      const result = await markdownToHtml(
+        '<script>alert("xss")</script>\n\nSafe content',
+      );
       expect(result).not.toContain('<script>');
       expect(result).not.toContain('alert');
       expect(result).toContain('Safe content');
     });
 
     it('应移除 style 元素', async () => {
-      const result = await markdownToHtml('<style>body{color:red}</style>\n\nSafe content');
+      const result = await markdownToHtml(
+        '<style>body{color:red}</style>\n\nSafe content',
+      );
       expect(result).not.toContain('<style>');
       expect(result).not.toContain('body{color:red}');
       expect(result).toContain('Safe content');
     });
 
     it('应移除 noscript 元素', async () => {
-      const result = await markdownToHtml('<noscript>fallback</noscript>\n\nSafe content');
+      const result = await markdownToHtml(
+        '<noscript>fallback</noscript>\n\nSafe content',
+      );
       expect(result).not.toContain('<noscript>');
       expect(result).toContain('Safe content');
     });
@@ -29,7 +35,8 @@ describe('rehypeSanitizeUserHtml', () => {
 
   describe('结构性元素解包', () => {
     it('应解包 html/head/body 元素，保留安全子节点', async () => {
-      const html = '<!DOCTYPE html><html><head><title>Test</title></head><body><p>Content</p></body></html>';
+      const html =
+        '<!DOCTYPE html><html><head><title>Test</title></head><body><p>Content</p></body></html>';
       const result = await markdownToHtml(html);
       expect(result).not.toContain('<html>');
       expect(result).not.toContain('<head>');
@@ -39,7 +46,9 @@ describe('rehypeSanitizeUserHtml', () => {
     });
 
     it('应移除 meta/link/base 元素', async () => {
-      const result = await markdownToHtml('<meta charset="utf-8">\n\n<link rel="stylesheet" href="x.css">\n\nSafe');
+      const result = await markdownToHtml(
+        '<meta charset="utf-8">\n\n<link rel="stylesheet" href="x.css">\n\nSafe',
+      );
       expect(result).not.toContain('<meta');
       expect(result).not.toContain('<link');
       expect(result).toContain('Safe');
@@ -53,20 +62,26 @@ describe('rehypeSanitizeUserHtml', () => {
     });
 
     it('应移除非 checkbox 的 input 元素', async () => {
-      const result = await markdownToHtml('<input type="text" value="hack">\n\nSafe');
+      const result = await markdownToHtml(
+        '<input type="text" value="hack">\n\nSafe',
+      );
       expect(result).not.toContain('<input');
       expect(result).toContain('Safe');
     });
 
     it('应解包 button 元素，保留文本', async () => {
-      const result = await markdownToHtml('<button onclick="alert(1)">Click me</button>\n\nSafe');
+      const result = await markdownToHtml(
+        '<button onclick="alert(1)">Click me</button>\n\nSafe',
+      );
       expect(result).not.toContain('<button');
       expect(result).not.toContain('onclick');
       expect(result).toContain('Click me');
     });
 
     it('应解包 form 元素，保留子节点文本', async () => {
-      const result = await markdownToHtml('<form action="/submit"><button>Submit</button></form>\n\nSafe');
+      const result = await markdownToHtml(
+        '<form action="/submit"><button>Submit</button></form>\n\nSafe',
+      );
       expect(result).not.toContain('<form');
       expect(result).toContain('Submit');
     });
@@ -74,7 +89,9 @@ describe('rehypeSanitizeUserHtml', () => {
 
   describe('危险属性清理', () => {
     it('应移除 on* 事件属性', async () => {
-      const result = await markdownToHtml('<div onclick="alert(1)" onmouseover="alert(2)">Safe</div>');
+      const result = await markdownToHtml(
+        '<div onclick="alert(1)" onmouseover="alert(2)">Safe</div>',
+      );
       expect(result).not.toContain('onclick');
       expect(result).not.toContain('onmouseover');
       expect(result).toContain('Safe');
@@ -87,7 +104,9 @@ describe('rehypeSanitizeUserHtml', () => {
     });
 
     it('应移除 javascript: URL', async () => {
-      const result = await markdownToHtml('<a href="javascript:alert(1)">link</a>');
+      const result = await markdownToHtml(
+        '<a href="javascript:alert(1)">link</a>',
+      );
       expect(result).not.toContain('javascript:');
       expect(result).toContain('link');
     });
@@ -95,18 +114,24 @@ describe('rehypeSanitizeUserHtml', () => {
 
   describe('安全元素保留', () => {
     it('应保留安全的 HTML 元素', async () => {
-      const result = await markdownToHtml('<div><h1>Title</h1><p>Paragraph</p></div>');
+      const result = await markdownToHtml(
+        '<div><h1>Title</h1><p>Paragraph</p></div>',
+      );
       expect(result).toContain('<h1>Title</h1>');
       expect(result).toContain('<p>Paragraph</p>');
     });
 
     it('应保留安全的链接', async () => {
-      const result = await markdownToHtml('<a href="https://example.com">link</a>');
+      const result = await markdownToHtml(
+        '<a href="https://example.com">link</a>',
+      );
       expect(result).toContain('href="https://example.com"');
     });
 
     it('应保留安全的图片', async () => {
-      const result = await markdownToHtml('<img src="https://example.com/img.png" alt="test">');
+      const result = await markdownToHtml(
+        '<img src="https://example.com/img.png" alt="test">',
+      );
       expect(result).toContain('src="https://example.com/img.png"');
     });
   });

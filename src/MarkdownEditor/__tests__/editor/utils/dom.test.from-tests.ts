@@ -233,9 +233,9 @@ describe('DOM Utils', () => {
       expect(getMediaType('blob:http://example.com/123', 'image')).toBe(
         'image',
       );
-      expect(getMediaType('blob:http://example.com/123', 'data:image/png')).toBe(
-        'image',
-      );
+      expect(
+        getMediaType('blob:http://example.com/123', 'data:image/png'),
+      ).toBe('image');
     });
 
     it('应根据 alt 参数处理非 blob 文件名', () => {

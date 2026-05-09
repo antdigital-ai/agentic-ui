@@ -3,11 +3,11 @@ import { fireEvent, render } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { createEditor, Editor, Transforms } from 'slate';
-import { ReactEditor, Slate, useSlate, withReact } from 'slate-react';
+import { ReactEditor, Slate, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { TableCellIndexSpacer } from '../../../../editor/elements/Table/TableCellIndexSpacer';
 import { TablePropsContext } from '../../../../editor/elements/Table/TableContext';
-import { useClickAway } from '../../../../../Hooks/useClickAway';
 import { NativeTableEditor } from '../../../../utils/native-table';
 // Mock dependencies
 vi.mock('../../../../editor/store');
@@ -27,15 +27,12 @@ vi.mock('../../../../utils/native-table', () => ({
   },
 }));
 
-vi.mock(
-  '../../../../editor/elements/Table/TableCellIndexSpacer/style',
-  () => ({
-    useStyle: vi.fn(() => ({
-      wrapSSR: (component: any) => component,
-      hashId: 'test-hash',
-    })),
-  }),
-);
+vi.mock('../../../../editor/elements/Table/TableCellIndexSpacer/style', () => ({
+  useStyle: vi.fn(() => ({
+    wrapSSR: (component: any) => component,
+    hashId: 'test-hash',
+  })),
+}));
 
 // 创建一个全局的 editor 引用，用于 useSlate mock
 let testEditorInstance: any = null;
@@ -736,10 +733,10 @@ describe('TableCellIndexSpacer 组件测试', () => {
   describe('handleClick 函数 - 选中所有单元格', () => {
     it('应该处理 columnIndex 为 -1 时选中所有单元格', () => {
       const mockSetAttribute = vi.fn();
-      
+
       // 重置 mock
       vi.mocked(ReactEditor.toDOMNode).mockClear();
-      
+
       // Mock ReactEditor.toDOMNode 返回带有 mock setAttribute 的元素
       // 需要在每次调用时返回新的元素，因为 handleClick 会遍历所有单元格
       vi.mocked(ReactEditor.toDOMNode).mockImplementation((editor, node) => {
@@ -758,11 +755,15 @@ describe('TableCellIndexSpacer 组件测试', () => {
               children: [
                 {
                   type: 'table-cell',
-                  children: [{ type: 'paragraph', children: [{ text: 'Cell 1' }] }],
+                  children: [
+                    { type: 'paragraph', children: [{ text: 'Cell 1' }] },
+                  ],
                 },
                 {
                   type: 'table-cell',
-                  children: [{ type: 'paragraph', children: [{ text: 'Cell 2' }] }],
+                  children: [
+                    { type: 'paragraph', children: [{ text: 'Cell 2' }] },
+                  ],
                 },
               ],
             },
@@ -771,11 +772,15 @@ describe('TableCellIndexSpacer 组件测试', () => {
               children: [
                 {
                   type: 'table-cell',
-                  children: [{ type: 'paragraph', children: [{ text: 'Cell 3' }] }],
+                  children: [
+                    { type: 'paragraph', children: [{ text: 'Cell 3' }] },
+                  ],
                 },
                 {
                   type: 'table-cell',
-                  children: [{ type: 'paragraph', children: [{ text: 'Cell 4' }] }],
+                  children: [
+                    { type: 'paragraph', children: [{ text: 'Cell 4' }] },
+                  ],
                 },
               ],
             },
@@ -783,7 +788,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
         },
       ];
       editor.children = tableChildren as any;
-      
+
       // 设置 testEditorInstance，使 useSlate 返回正确的 editor
       testEditorInstance = editor;
 
@@ -804,20 +809,21 @@ describe('TableCellIndexSpacer 组件测试', () => {
 
       // 查找 TableCellIndexSpacer 渲染的 td 元素
       // 组件渲染的 td 有 title="点击选中整个表格" (当 columnIndex === -1 时)
-      const spacerTd = document.querySelector('td[title="点击选中整个表格"]') || 
-                       document.querySelector('td.config-td');
+      const spacerTd =
+        document.querySelector('td[title="点击选中整个表格"]') ||
+        document.querySelector('td.config-td');
       if (spacerTd) {
         fireEvent.click(spacerTd);
       }
-      
+
       // handleClick 会遍历所有单元格并调用 setAttribute
       // 但需要确保 ReactEditor.toDOMNode 被正确调用
       // 注意：Editor.hasPath 和 Editor.node 是真实的 Slate API，它们应该能正常工作
       // 因为我们已经设置了正确的 editor.children 和 testEditorInstance
-      
+
       // 验证组件已渲染
       expect(spacerTd).toBeInTheDocument();
-      
+
       // handleClick 会遍历所有单元格
       // Editor.hasPath 和 Editor.node 是真实的 Slate API，它们应该能正常工作
       // 因为我们已经设置了正确的 editor.children 和 testEditorInstance
@@ -986,7 +992,9 @@ describe('TableCellIndexSpacer 组件测试', () => {
     });
 
     it('应该处理删除列时只有一列的情况', () => {
-      const removeTableSpy = vi.spyOn(NativeTableEditor, 'removeTable').mockImplementation(() => {});
+      const removeTableSpy = vi
+        .spyOn(NativeTableEditor, 'removeTable')
+        .mockImplementation(() => {});
 
       const editor = createTestEditor();
       const tableChildren = [
@@ -1008,7 +1016,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
         },
       ];
       editor.children = tableChildren as any;
-      
+
       // 设置 testEditorInstance，使 useSlate 返回正确的 editor
       testEditorInstance = editor;
 
@@ -1037,15 +1045,15 @@ describe('TableCellIndexSpacer 组件测试', () => {
       const deleteButton = document.querySelector(
         '.ant-agentic-md-editor-table-cell-index-spacer-delete-icon',
       );
-      
+
       // 确保删除按钮存在（删除按钮总是渲染的）
       expect(deleteButton).toBeInTheDocument();
-      
+
       if (deleteButton) {
         // 点击删除按钮
         fireEvent.click(deleteButton);
       }
-      
+
       // 验证 removeTable 被调用（当只有一列时应该删除整个表格）
       // 注意：handleDeleteClick 需要 Editor.node 能够正确工作
       // 由于我们已经设置了 testEditorInstance，Editor.node 应该能正常工作
@@ -1178,7 +1186,7 @@ describe('TableCellIndexSpacer 组件测试', () => {
         },
       ];
       editor.children = tableChildren as any;
-      
+
       // 设置 testEditorInstance，使 useSlate 返回正确的 editor
       testEditorInstance = editor;
 

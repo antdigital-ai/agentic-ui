@@ -101,7 +101,9 @@ describe('TitleInfo', () => {
       };
 
       render(
-        <I18nContext.Provider value={{ locale: locale as any, language: 'zh-CN' }}>
+        <I18nContext.Provider
+          value={{ locale: locale as any, language: 'zh-CN' }}
+        >
           <TitleInfo
             {...defaultProps}
             title="查询 ${knowledge} 数据"
@@ -137,7 +139,9 @@ describe('TitleInfo', () => {
       };
 
       render(
-        <I18nContext.Provider value={{ locale: locale as any, language: 'zh-CN' }}>
+        <I18nContext.Provider
+          value={{ locale: locale as any, language: 'zh-CN' }}
+        >
           <TitleInfo
             {...defaultProps}
             title="查询 ${table} 数据"
@@ -173,7 +177,9 @@ describe('TitleInfo', () => {
       };
 
       render(
-        <I18nContext.Provider value={{ locale: locale as any, language: 'zh-CN' }}>
+        <I18nContext.Provider
+          value={{ locale: locale as any, language: 'zh-CN' }}
+        >
           <TitleInfo
             {...defaultProps}
             title="调用 ${tool} 工具"
@@ -209,7 +215,9 @@ describe('TitleInfo', () => {
       };
 
       render(
-        <I18nContext.Provider value={{ locale: locale as any, language: 'zh-CN' }}>
+        <I18nContext.Provider
+          value={{ locale: locale as any, language: 'zh-CN' }}
+        >
           <TitleInfo
             {...defaultProps}
             title="处理 ${data} 数据"

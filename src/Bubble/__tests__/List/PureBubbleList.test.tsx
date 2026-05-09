@@ -1,11 +1,11 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ConfigProvider } from 'antd';
 import { BubbleConfigContext } from '../../BubbleConfigProvide';
-import { LOADING_FLAT } from '../../MessagesContent';
 import { PureBubbleList } from '../../List/PureBubbleList';
+import { LOADING_FLAT } from '../../MessagesContent';
 import type { MessageBubbleData } from '../../type';
 
 vi.mock('framer-motion', () => ({
@@ -145,7 +145,9 @@ describe('PureBubbleList', () => {
         </BubbleConfigProvide>,
       );
 
-      expect(container.querySelector('[class*="-readonly"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[class*="-readonly"]'),
+      ).toBeInTheDocument();
     });
 
     it('BubbleConfigContext compact 时应添加 compact 类名', () => {
@@ -159,7 +161,9 @@ describe('PureBubbleList', () => {
         </BubbleConfigProvide>,
       );
 
-      expect(container.querySelector('[class*="-compact"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[class*="-compact"]'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -238,10 +242,7 @@ describe('PureBubbleList', () => {
 
       render(
         <BubbleConfigProvide>
-          <PureBubbleList
-            bubbleList={bubbleList}
-            onDisLike={vi.fn()}
-          />
+          <PureBubbleList bubbleList={bubbleList} onDisLike={vi.fn()} />
         </BubbleConfigProvide>,
       );
 
@@ -255,10 +256,7 @@ describe('PureBubbleList', () => {
 
       render(
         <BubbleConfigProvide>
-          <PureBubbleList
-            bubbleList={bubbleList}
-            onCancelLike={vi.fn()}
-          />
+          <PureBubbleList bubbleList={bubbleList} onCancelLike={vi.fn()} />
         </BubbleConfigProvide>,
       );
 
@@ -379,7 +377,10 @@ describe('PureBubbleList', () => {
       );
 
       expect(renderPlaceholder).toHaveBeenCalled();
-      const lastCall = renderPlaceholder.mock.calls[renderPlaceholder.mock.calls.length - 1][0];
+      const lastCall =
+        renderPlaceholder.mock.calls[
+          renderPlaceholder.mock.calls.length - 1
+        ][0];
       expect(lastCall.elementInfo).toEqual(
         expect.objectContaining({ type: 'bubble', index: 0, total: 1 }),
       );

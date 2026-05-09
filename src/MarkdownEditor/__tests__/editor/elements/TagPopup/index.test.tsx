@@ -1,8 +1,8 @@
-import React from 'react';
 import { render } from '@testing-library/react';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import React from 'react';
 import { BaseEditor } from 'slate';
 import { ReactEditor, useSlate } from 'slate-react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TagPopup } from '../../../../editor/elements/TagPopup/index';
 
 // Mock Slate hooks
@@ -18,13 +18,12 @@ vi.mock('slate-react', () => ({
 vi.mock('antd', () => ({
   ConfigProvider: {
     ConfigContext: {
-      Consumer: ({ children }: any) => children({ getPrefixCls: () => 'ant-agentic-tag-popup' }),
+      Consumer: ({ children }: any) =>
+        children({ getPrefixCls: () => 'ant-agentic-tag-popup' }),
     },
   },
   Dropdown: ({ children }: any) => (
-    <div data-testid="dropdown-container">
-      {children}
-    </div>
+    <div data-testid="dropdown-container">{children}</div>
   ),
 }));
 
@@ -71,15 +70,15 @@ describe('TagPopup 组件', () => {
       triggerNodeContext: { current: null },
       onSelectRef: { current: null },
     };
-    
+
     const MockContext = React.createContext(mockSuggestionContextValue);
-    
+
     const { container } = render(
       <MockContext.Provider value={mockSuggestionContextValue}>
         <TagPopup {...defaultProps} />
-      </MockContext.Provider>
+      </MockContext.Provider>,
     );
-    
+
     // 检查组件是否渲染
     expect(container).toBeInTheDocument();
   });
@@ -92,15 +91,15 @@ describe('TagPopup 组件', () => {
       triggerNodeContext: { current: null },
       onSelectRef: { current: null },
     };
-    
+
     const MockContext = React.createContext(mockSuggestionContextValue);
-    
+
     const { container } = render(
       <MockContext.Provider value={mockSuggestionContextValue}>
         <TagPopup {...defaultProps} type="dropdown" />
-      </MockContext.Provider>
+      </MockContext.Provider>,
     );
-    
+
     // 检查组件是否渲染
     expect(container).toBeInTheDocument();
   });
@@ -113,15 +112,15 @@ describe('TagPopup 组件', () => {
       triggerNodeContext: { current: null },
       onSelectRef: { current: null },
     };
-    
+
     const MockContext = React.createContext(mockSuggestionContextValue);
-    
+
     const { container } = render(
       <MockContext.Provider value={mockSuggestionContextValue}>
         <TagPopup {...defaultProps} items={[]} />
-      </MockContext.Provider>
+      </MockContext.Provider>,
     );
-    
+
     // 检查组件是否渲染
     expect(container).toBeInTheDocument();
   });
@@ -134,15 +133,15 @@ describe('TagPopup 组件', () => {
       triggerNodeContext: { current: null },
       onSelectRef: { current: null },
     };
-    
+
     const MockContext = React.createContext(mockSuggestionContextValue);
-    
+
     const { container } = render(
       <MockContext.Provider value={mockSuggestionContextValue}>
         <TagPopup {...defaultProps} items={undefined} />
-      </MockContext.Provider>
+      </MockContext.Provider>,
     );
-    
+
     // 检查组件是否渲染
     expect(container).toBeInTheDocument();
   });
@@ -155,15 +154,15 @@ describe('TagPopup 组件', () => {
       triggerNodeContext: { current: null },
       onSelectRef: { current: null },
     };
-    
+
     const MockContext = React.createContext(mockSuggestionContextValue);
-    
+
     const { container } = render(
       <MockContext.Provider value={mockSuggestionContextValue}>
         <TagPopup {...defaultProps} className="custom-class" />
-      </MockContext.Provider>
+      </MockContext.Provider>,
     );
-    
+
     // 检查组件是否渲染
     expect(container).toBeInTheDocument();
   });
@@ -176,15 +175,15 @@ describe('TagPopup 组件', () => {
       triggerNodeContext: { current: null },
       onSelectRef: { current: null },
     };
-    
+
     const MockContext = React.createContext(mockSuggestionContextValue);
-    
+
     const { container } = render(
       <MockContext.Provider value={mockSuggestionContextValue}>
         <TagPopup {...defaultProps} text="" />
-      </MockContext.Provider>
+      </MockContext.Provider>,
     );
-    
+
     // 检查组件是否渲染
     expect(container).toBeInTheDocument();
   });
@@ -197,15 +196,15 @@ describe('TagPopup 组件', () => {
       triggerNodeContext: { current: null },
       onSelectRef: { current: null },
     };
-    
+
     const MockContext = React.createContext(mockSuggestionContextValue);
-    
+
     const { container } = render(
       <MockContext.Provider value={mockSuggestionContextValue}>
         <TagPopup {...defaultProps} text="   " />
-      </MockContext.Provider>
+      </MockContext.Provider>,
     );
-    
+
     // 检查组件是否渲染
     expect(container).toBeInTheDocument();
   });
@@ -218,20 +217,20 @@ describe('TagPopup 组件', () => {
       triggerNodeContext: { current: null },
       onSelectRef: { current: null },
     };
-    
+
     const MockContext = React.createContext(mockSuggestionContextValue);
-    
+
     const asyncItems = vi.fn().mockResolvedValue([
       { label: '异步选项1', key: 'async1' },
       { label: '异步选项2', key: 'async2' },
     ]);
-    
+
     const { container } = render(
       <MockContext.Provider value={mockSuggestionContextValue}>
         <TagPopup {...defaultProps} items={asyncItems} />
-      </MockContext.Provider>
+      </MockContext.Provider>,
     );
-    
+
     // 检查组件是否渲染
     expect(container).toBeInTheDocument();
   });
@@ -244,21 +243,21 @@ describe('TagPopup 组件', () => {
       triggerNodeContext: { current: null },
       onSelectRef: { current: null },
     };
-    
+
     const MockContext = React.createContext(mockSuggestionContextValue);
-    
+
     const beforeOpenChange = vi.fn().mockReturnValue(false);
-    
+
     const { container } = render(
       <MockContext.Provider value={mockSuggestionContextValue}>
-        <TagPopup 
-          {...defaultProps} 
+        <TagPopup
+          {...defaultProps}
           type="panel"
           beforeOpenChange={beforeOpenChange}
         />
-      </MockContext.Provider>
+      </MockContext.Provider>,
     );
-    
+
     // 检查组件是否渲染
     expect(container).toBeInTheDocument();
   });
@@ -271,15 +270,15 @@ describe('TagPopup 组件', () => {
       triggerNodeContext: { current: null },
       onSelectRef: { current: null },
     };
-    
+
     const MockContext = React.createContext(mockSuggestionContextValue);
-    
+
     const { container } = render(
       <MockContext.Provider value={mockSuggestionContextValue}>
         <TagPopup {...defaultProps} type="dropdown" open={true} />
-      </MockContext.Provider>
+      </MockContext.Provider>,
     );
-    
+
     // 检查组件是否渲染
     expect(container).toBeInTheDocument();
   });

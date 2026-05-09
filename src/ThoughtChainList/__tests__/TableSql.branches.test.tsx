@@ -34,9 +34,7 @@ vi.mock('../../MarkdownEditor', () => ({
       </div>
     );
   },
-  parserSlateNodeToMarkdown: vi.fn(
-    () => '```sql\nSELECT 1\n```\n<!--{}-->\n',
-  ),
+  parserSlateNodeToMarkdown: vi.fn(() => '```sql\nSELECT 1\n```\n<!--{}-->\n'),
 }));
 
 // Mock ActionIconBox 为可点击的简单按钮（直接 mock 组件路径）
@@ -248,9 +246,7 @@ describe('TableSql 分支覆盖', () => {
     it('点击查询结果区域复制按钮调用 copy + JSON.stringify', () => {
       // 该用例下游代码若复制失败会通过 console.error 输出"复制失败:"，
       // 这里属于预期行为，静默以避免污染测试输出
-      const errorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       render(
         <Wrapper>
@@ -307,9 +303,7 @@ describe('TableSql 分支覆盖', () => {
     it('错误状态下点击复制按钮复制 errorMsg', () => {
       // 该用例下游代码若复制失败会通过 console.error 输出"复制失败:"，
       // 这里属于预期行为，静默以避免污染测试输出
-      const errorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       render(
         <Wrapper>

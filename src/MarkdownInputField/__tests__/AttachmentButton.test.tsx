@@ -1,13 +1,9 @@
 import { AttachmentFile, isImageFile } from '@ant-design/agentic-ui';
 import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
-import { message } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  AttachmentButton,
-  upLoadFileToServer,
-} from '../AttachmentButton';
+import { AttachmentButton, upLoadFileToServer } from '../AttachmentButton';
 
 // Mock antd message
 vi.mock('antd', async () => {
@@ -177,7 +173,9 @@ describe('AttachmentButton', () => {
 
     it('上传失败时 handleUploadError 应设置文件状态为 error', async () => {
       const mockFiles = [
-        new File(['test'], 'test.txt', { type: 'text/plain' }) as AttachmentFile,
+        new File(['test'], 'test.txt', {
+          type: 'text/plain',
+        }) as AttachmentFile,
       ];
       const customErrorMsg = 'Custom upload error message';
       mockUpload.mockRejectedValue(new Error(customErrorMsg));
@@ -197,11 +195,13 @@ describe('AttachmentButton', () => {
         }) as AttachmentFile,
       ];
       mockUpload.mockRejectedValue(new Error('Upload failed'));
-      const throwingOnFileMapChange = vi.fn().mockImplementation((_map?: Map<string, AttachmentFile>) => {
-        if (throwingOnFileMapChange.mock.calls.length === 2) {
-          throw new Error('onFileMapChange throw');
-        }
-      });
+      const throwingOnFileMapChange = vi
+        .fn()
+        .mockImplementation((_map?: Map<string, AttachmentFile>) => {
+          if (throwingOnFileMapChange.mock.calls.length === 2) {
+            throw new Error('onFileMapChange throw');
+          }
+        });
 
       await upLoadFileToServer(mockFiles, {
         upload: mockUpload,
@@ -238,16 +238,24 @@ describe('AttachmentButton', () => {
       });
       // 文件应以 error 状态进入 fileMap
       expect(mockOnFileMapChange).toHaveBeenCalled();
-      const lastMap = mockOnFileMapChange.mock.calls[mockOnFileMapChange.mock.calls.length - 1][0] as Map<string, AttachmentFile>;
+      const lastMap = mockOnFileMapChange.mock.calls[
+        mockOnFileMapChange.mock.calls.length - 1
+      ][0] as Map<string, AttachmentFile>;
       const files = Array.from(lastMap.values());
       expect(files.every((f) => f.status === 'error')).toBe(true);
-      expect(files.every((f) => f.errorCode === 'FILE_COUNT_EXCEEDED')).toBe(true);
+      expect(files.every((f) => f.errorCode === 'FILE_COUNT_EXCEEDED')).toBe(
+        true,
+      );
     });
 
     it('should call onExceedMaxCount without callback (backward compatible)', async () => {
       const mockFiles = [
-        new File(['test1'], 'test1.txt', { type: 'text/plain' }) as AttachmentFile,
-        new File(['test2'], 'test2.txt', { type: 'text/plain' }) as AttachmentFile,
+        new File(['test1'], 'test1.txt', {
+          type: 'text/plain',
+        }) as AttachmentFile,
+        new File(['test2'], 'test2.txt', {
+          type: 'text/plain',
+        }) as AttachmentFile,
       ];
 
       // 不传 onExceedMaxCount，不应抛错，文件仍以 error 入 map
@@ -300,10 +308,16 @@ describe('AttachmentButton', () => {
       });
       // 新文件应以 error 状态进入 fileMap
       expect(mockOnFileMapChange).toHaveBeenCalled();
-      const lastMap = mockOnFileMapChange.mock.calls[mockOnFileMapChange.mock.calls.length - 1][0] as Map<string, AttachmentFile>;
-      const newFiles = Array.from(lastMap.values()).filter((f) => f.name !== 'existing.txt');
+      const lastMap = mockOnFileMapChange.mock.calls[
+        mockOnFileMapChange.mock.calls.length - 1
+      ][0] as Map<string, AttachmentFile>;
+      const newFiles = Array.from(lastMap.values()).filter(
+        (f) => f.name !== 'existing.txt',
+      );
       expect(newFiles.every((f) => f.status === 'error')).toBe(true);
-      expect(newFiles.every((f) => f.errorCode === 'FILE_COUNT_EXCEEDED')).toBe(true);
+      expect(newFiles.every((f) => f.errorCode === 'FILE_COUNT_EXCEEDED')).toBe(
+        true,
+      );
     });
 
     it('should allow upload when total file count is within limit', async () => {
@@ -476,13 +490,15 @@ describe('AttachmentButton', () => {
       );
 
       // 查找 AttachmentButtonPopover 内部的触发元素
-      const popoverTrigger = container.querySelector('[data-testid="attachment-button"]');
+      const popoverTrigger = container.querySelector(
+        '[data-testid="attachment-button"]',
+      );
       expect(popoverTrigger).toBeInTheDocument();
-      
+
       // 点击触发元素应该打开 Popover，但 uploadImage 是在文件选择后调用的
       // 这里我们验证按钮可以被点击而不被禁用
       fireEvent.click(popoverTrigger!);
-      
+
       // 由于 uploadImage 是通过文件选择器触发的，而不是直接点击按钮
       // 这个测试主要验证按钮在非禁用状态下可以响应点击
       expect(popoverTrigger).toBeInTheDocument();
@@ -696,11 +712,11 @@ describe('AttachmentButton', () => {
       );
 
       const attachmentButton = getByTestId('attachment-button');
-      
+
       // 点击触发元素应该打开 Popover，但 uploadImage 是在文件选择后调用的
       // 这里我们验证按钮可以被点击而不被禁用
       fireEvent.click(attachmentButton);
-      
+
       // 由于 uploadImage 是通过文件选择器触发的，而不是直接点击按钮
       // 这个测试主要验证自定义渲染下的按钮可以响应点击
       expect(attachmentButton).toBeInTheDocument();

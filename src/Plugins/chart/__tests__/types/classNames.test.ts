@@ -37,9 +37,9 @@ describe('ChartClassNames 类型', () => {
   it('应该支持对象格式的类名（条件类名）', () => {
     const classNames: ChartClassNames = {
       root: {
-        'active': true,
-        'disabled': false,
-        'highlight': true,
+        active: true,
+        disabled: false,
+        highlight: true,
       },
       toolbar: {
         'toolbar-active': true,
@@ -48,9 +48,9 @@ describe('ChartClassNames 类型', () => {
     };
 
     expect(classNames.root).toEqual({
-      'active': true,
-      'disabled': false,
-      'highlight': true,
+      active: true,
+      disabled: false,
+      highlight: true,
     });
     expect(classNames.toolbar).toEqual({
       'toolbar-active': true,
@@ -132,15 +132,14 @@ describe('ClassNameType 类型', () => {
 
   it('应该支持对象格式（条件类名）', () => {
     const className: ClassNameType = {
-      'active': true,
-      'disabled': false,
-      'highlight': true,
+      active: true,
+      disabled: false,
+      highlight: true,
     };
     expect(className).toEqual({
-      'active': true,
-      'disabled': false,
-      'highlight': true,
+      active: true,
+      disabled: false,
+      highlight: true,
     });
   });
 });
-

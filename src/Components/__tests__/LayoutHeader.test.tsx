@@ -39,12 +39,7 @@ describe('LayoutHeader', () => {
 
   it('toggles left collapsed when left collapse clicked', () => {
     const onLeftCollapse = vi.fn();
-    wrap(
-      <LayoutHeader
-        leftCollapsible
-        onLeftCollapse={onLeftCollapse}
-      />,
-    );
+    wrap(<LayoutHeader leftCollapsible onLeftCollapse={onLeftCollapse} />);
     fireEvent.click(screen.getByRole('button', { name: /折叠左侧边栏/ }));
     expect(onLeftCollapse).toHaveBeenCalled();
     expect(onLeftCollapse.mock.calls[0][0]).toBe(true);
@@ -59,12 +54,7 @@ describe('LayoutHeader', () => {
 
   it('toggles right collapsed when right collapse clicked', () => {
     const onRightCollapse = vi.fn();
-    wrap(
-      <LayoutHeader
-        rightCollapsible
-        onRightCollapse={onRightCollapse}
-      />,
-    );
+    wrap(<LayoutHeader rightCollapsible onRightCollapse={onRightCollapse} />);
     fireEvent.click(screen.getByRole('button', { name: /折叠右侧边栏/ }));
     expect(onRightCollapse).toHaveBeenCalled();
     expect(onRightCollapse.mock.calls[0][0]).toBe(true);
@@ -97,7 +87,11 @@ describe('LayoutHeader', () => {
         rightDefaultCollapsed={false}
       />,
     );
-    expect(screen.getByRole('button', { name: /折叠左侧边栏/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /折叠右侧边栏/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /折叠左侧边栏/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /折叠右侧边栏/ }),
+    ).toBeInTheDocument();
   });
 });

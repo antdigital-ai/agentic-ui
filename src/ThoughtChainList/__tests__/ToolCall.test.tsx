@@ -544,9 +544,7 @@ describe('ToolCall Component', () => {
       // 当组件渲染抛错时 React 会通过 console.error 打印
       // "The above error occurred in the <ToolCall> component"，
       // 此处刻意构造循环引用触发异常，静默该日志避免污染测试输出
-      const errorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const circularProps = {
         ...mockProps,

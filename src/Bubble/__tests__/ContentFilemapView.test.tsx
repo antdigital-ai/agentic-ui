@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { ContentFilemapView } from '../ContentFilemapView';
-import { extractFilemapBlocks } from '../extractFilemapBlocks';
-import type { FilemapBlock } from '../extractFilemapBlocks';
 import type { AttachmentFile } from '../../MarkdownInputField/AttachmentButton/types';
+import { ContentFilemapView } from '../ContentFilemapView';
+import type { FilemapBlock } from '../extractFilemapBlocks';
+import { extractFilemapBlocks } from '../extractFilemapBlocks';
 
 vi.mock('framer-motion', () => ({
   motion: {

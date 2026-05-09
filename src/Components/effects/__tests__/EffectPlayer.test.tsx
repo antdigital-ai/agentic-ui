@@ -20,10 +20,10 @@ describe('EffectPlayer', () => {
     );
     expect(screen.getByTestId('player')).toHaveStyle({ width: '64px' });
 
-    rerender(
-      <EffectPlayer sceneUrl="test" data-testid="player" size="3rem" />,
+    rerender(<EffectPlayer sceneUrl="test" data-testid="player" size="3rem" />);
+    expect(screen.getByTestId('player').getAttribute('style')).toContain(
+      'width: 3rem',
     );
-    expect(screen.getByTestId('player').getAttribute('style')).toContain('width: 3rem');
   });
 
   it('should apply className, style and extra HTML attributes', () => {

@@ -1,8 +1,8 @@
 import { act, renderHook } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
-import { useLanguage } from '../useLanguage';
+import { describe, expect, it } from 'vitest';
 import { I18nProvide } from '../../I18n';
+import { useLanguage } from '../useLanguage';
 
 describe('useLanguage Hook', () => {
   it('应该在没有 I18nProvide 时使用 context 默认值', () => {

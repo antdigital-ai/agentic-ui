@@ -16,15 +16,12 @@ const capturedProps = vi.hoisted(() => ({
   attachmentListProps: undefined as any,
 }));
 
-vi.mock(
-  '../../AttachmentButton/AttachmentFileList',
-  () => ({
-    AttachmentFileList: (props: any) => {
-      capturedProps.attachmentListProps = props;
-      return <div data-testid="attachment-file-list-mock" />;
-    },
-  }),
-);
+vi.mock('../../AttachmentButton/AttachmentFileList', () => ({
+  AttachmentFileList: (props: any) => {
+    capturedProps.attachmentListProps = props;
+    return <div data-testid="attachment-file-list-mock" />;
+  },
+}));
 
 describe('renderHelpers', () => {
   beforeEach(() => {
@@ -46,7 +43,9 @@ describe('renderHelpers', () => {
       fileMap?: Map<string, AttachmentFile>;
       handleFileRemoval?: (file: AttachmentFile) => Promise<void>;
       handleFileRetry?: (file: AttachmentFile) => Promise<void>;
-      updateAttachmentFiles?: (nextFileMap?: Map<string, AttachmentFile>) => void;
+      updateAttachmentFiles?: (
+        nextFileMap?: Map<string, AttachmentFile>,
+      ) => void;
     }) {
       const node = useAttachmentList({
         attachment: attachment as any,
@@ -79,10 +78,16 @@ describe('renderHelpers', () => {
         />,
       );
 
-      expect(screen.getByTestId('attachment-file-list-mock')).toBeInTheDocument();
-      expect(typeof capturedProps.attachmentListProps?.onPreview).toBe('function');
+      expect(
+        screen.getByTestId('attachment-file-list-mock'),
+      ).toBeInTheDocument();
+      expect(typeof capturedProps.attachmentListProps?.onPreview).toBe(
+        'function',
+      );
 
-      expect(() => capturedProps.attachmentListProps.onPreview(file)).not.toThrow();
+      expect(() =>
+        capturedProps.attachmentListProps.onPreview(file),
+      ).not.toThrow();
       await Promise.resolve();
 
       expect(onPreview).toHaveBeenCalledWith(file);

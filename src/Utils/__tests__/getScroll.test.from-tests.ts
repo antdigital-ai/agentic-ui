@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import getScroll, {
   getScrollRailHeight,
   isWindow,
@@ -131,7 +131,6 @@ describe('getScroll', () => {
       (win as any).window = win;
       expect(getScrollRailHeight(win as any)).toBe(1200);
     });
-
 
     it('returns documentElement scrollHeight - clientHeight for Document', () => {
       const doc = document;

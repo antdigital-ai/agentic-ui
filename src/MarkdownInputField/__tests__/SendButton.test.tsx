@@ -229,7 +229,6 @@ describe('SendButton', () => {
       expect(onClick).toHaveBeenCalled();
     });
 
-
     it('应应用 style 和 className', () => {
       const { container } = render(
         <SendButton

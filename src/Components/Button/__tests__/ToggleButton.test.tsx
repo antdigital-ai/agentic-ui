@@ -28,14 +28,18 @@ describe('ToggleButton', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
 
     rerender(
-      <ToggleButton disabled onClick={onClick}>Test</ToggleButton>,
+      <ToggleButton disabled onClick={onClick}>
+        Test
+      </ToggleButton>,
     );
     expect(screen.getByRole('button')).toBeDisabled();
   });
 
   it('should apply active and disabled classes', () => {
     const { container } = render(
-      <ToggleButton active disabled>Test</ToggleButton>,
+      <ToggleButton active disabled>
+        Test
+      </ToggleButton>,
     );
     expect(container.querySelector('[class*="active"]')).toBeTruthy();
     expect(container.querySelector('[class*="disabled"]')).toBeTruthy();
@@ -43,10 +47,7 @@ describe('ToggleButton', () => {
 
   it('should apply custom className and style', () => {
     const { container } = render(
-      <ToggleButton
-        className="my-toggle"
-        style={{ backgroundColor: 'blue' }}
-      >
+      <ToggleButton className="my-toggle" style={{ backgroundColor: 'blue' }}>
         Test
       </ToggleButton>,
     );

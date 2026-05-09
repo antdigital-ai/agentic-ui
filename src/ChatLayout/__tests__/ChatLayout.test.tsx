@@ -139,9 +139,7 @@ describe('ChatLayout', () => {
       </ChatLayout>,
     );
 
-    expect(container.firstChild).toHaveStyle(
-      { backgroundColor: 'red' },
-    );
+    expect(container.firstChild).toHaveStyle({ backgroundColor: 'red' });
   });
 
   it('applies custom footerHeight to footer', () => {

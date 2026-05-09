@@ -2,8 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { I18nContext } from '../../I18n';
 import { TaskList } from '..';
+import { I18nContext } from '../../I18n';
 
 // Mock Loading 组件
 vi.mock('../../Components/Loading', () => ({
@@ -112,9 +112,7 @@ describe('TaskList Component', () => {
 
     expect(screen.getByTestId('task-list-status-success')).toBeInTheDocument();
     expect(screen.getByTestId('task-list-status-loading')).toBeInTheDocument();
-    expect(
-      screen.getAllByTestId('task-list-status-pending'),
-    ).toHaveLength(2);
+    expect(screen.getAllByTestId('task-list-status-pending')).toHaveLength(2);
   });
 
   it('应该显示错误状态的任务', () => {

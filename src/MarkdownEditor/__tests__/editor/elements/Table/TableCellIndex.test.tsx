@@ -29,15 +29,12 @@ vi.mock('../../../../utils/native-table', () => ({
   },
 }));
 
-vi.mock(
-  '../../../../editor/elements/Table/TableCellIndex/style',
-  () => ({
-    useStyle: vi.fn(() => ({
-      wrapSSR: (component: any) => component,
-      hashId: 'test-hash',
-    })),
-  }),
-);
+vi.mock('../../../../editor/elements/Table/TableCellIndex/style', () => ({
+  useStyle: vi.fn(() => ({
+    wrapSSR: (component: any) => component,
+    hashId: 'test-hash',
+  })),
+}));
 
 vi.mock('slate-react', async () => {
   const actual: any = await vi.importActual('slate-react');
@@ -68,25 +65,18 @@ describe('TableCellIndex 组件测试', () => {
     mockSetDeleteIconPosition.mockClear();
   });
 
-  const renderTableCellIndex = (
-    props: any = {},
-    contextValue: any = {},
-  ) => {
+  const renderTableCellIndex = (props: any = {}, contextValue: any = {}) => {
     const editor = createTestEditor();
     const testRow = {
       type: 'table-row',
       children: [
         {
           type: 'table-cell',
-          children: [
-            { type: 'paragraph', children: [{ text: 'Cell 1' }] },
-          ],
+          children: [{ type: 'paragraph', children: [{ text: 'Cell 1' }] }],
         },
         {
           type: 'table-cell',
-          children: [
-            { type: 'paragraph', children: [{ text: 'Cell 2' }] },
-          ],
+          children: [{ type: 'paragraph', children: [{ text: 'Cell 2' }] }],
         },
       ],
     };
@@ -379,9 +369,7 @@ describe('TableCellIndex 组件测试', () => {
       children: [
         {
           type: 'table-cell',
-          children: [
-            { type: 'paragraph', children: [{ text: 'Cell 1' }] },
-          ],
+          children: [{ type: 'paragraph', children: [{ text: 'Cell 1' }] }],
         },
       ],
     };
@@ -429,15 +417,11 @@ describe('TableCellIndex 组件测试', () => {
       children: [
         {
           type: 'table-cell',
-          children: [
-            { type: 'paragraph', children: [{ text: 'Cell 1' }] },
-          ],
+          children: [{ type: 'paragraph', children: [{ text: 'Cell 1' }] }],
         },
         {
           type: 'table-cell',
-          children: [
-            { type: 'paragraph', children: [{ text: 'Cell 2' }] },
-          ],
+          children: [{ type: 'paragraph', children: [{ text: 'Cell 2' }] }],
         },
       ],
     };
@@ -445,9 +429,7 @@ describe('TableCellIndex 组件测试', () => {
     editor.children = [
       {
         type: 'table',
-        children: [
-          testRow,
-        ],
+        children: [testRow],
       },
     ];
 
@@ -463,7 +445,11 @@ describe('TableCellIndex 组件测试', () => {
             <table>
               <tbody>
                 <tr>
-                  <TableCellIndex targetRow={testRow} rowIndex={0} tablePath={[0]} />
+                  <TableCellIndex
+                    targetRow={testRow}
+                    rowIndex={0}
+                    tablePath={[0]}
+                  />
                 </tr>
               </tbody>
             </table>
@@ -480,9 +466,8 @@ describe('TableCellIndex 组件测试', () => {
       fireEvent.click(deleteButton);
     }
 
-    const { NativeTableEditor } = await import(
-      '../../../../../src/MarkdownEditor/utils/native-table'
-    );
+    const { NativeTableEditor } =
+      await import('../../../../../src/MarkdownEditor/utils/native-table');
     expect(NativeTableEditor.removeTable).toHaveBeenCalledWith(editor, [0]);
   });
 
@@ -499,9 +484,8 @@ describe('TableCellIndex 组件测试', () => {
     };
     editor.children = [{ type: 'table', children: [testRow] }];
 
-    const { NativeTableEditor } = await import(
-      '../../../../../src/MarkdownEditor/utils/native-table'
-    );
+    const { NativeTableEditor } =
+      await import('../../../../../src/MarkdownEditor/utils/native-table');
 
     render(
       <ConfigProvider>
@@ -515,7 +499,11 @@ describe('TableCellIndex 组件测试', () => {
             <table>
               <tbody>
                 <tr>
-                  <TableCellIndex targetRow={testRow} rowIndex={0} tablePath={[0]} />
+                  <TableCellIndex
+                    targetRow={testRow}
+                    rowIndex={0}
+                    tablePath={[0]}
+                  />
                 </tr>
               </tbody>
             </table>
@@ -533,7 +521,9 @@ describe('TableCellIndex 组件测试', () => {
   });
 
   it('应该在多行时删除指定行并调用 clearSelect', () => {
-    const mockRemoveNodes = vi.spyOn(Transforms, 'removeNodes').mockImplementation(() => {});
+    const mockRemoveNodes = vi
+      .spyOn(Transforms, 'removeNodes')
+      .mockImplementation(() => {});
 
     renderTableCellIndex(
       { rowIndex: 0, tablePath: [0] },
@@ -714,8 +704,11 @@ describe('TableCellIndex 组件测试', () => {
   describe('clearSelect 函数测试', () => {
     it('应该在 clearIcon 为 false 时不调用 setDeleteIconPosition', () => {
       mockSetDeleteIconPosition.mockClear();
-      const { container } = renderTableCellIndex({ tablePath: [0], rowIndex: 0 });
-      
+      const { container } = renderTableCellIndex({
+        tablePath: [0],
+        rowIndex: 0,
+      });
+
       // 通过点击外部区域来触发 clearSelect（clearIcon=false）
       // 由于 useClickAway 的复杂性，我们直接验证组件渲染
       expect(container).toBeInTheDocument();
@@ -819,7 +812,11 @@ describe('TableCellIndex 组件测试', () => {
               <table>
                 <tbody>
                   <tr>
-                    <TableCellIndex targetRow={{}} tablePath={[0]} rowIndex={0} />
+                    <TableCellIndex
+                      targetRow={{}}
+                      tablePath={[0]}
+                      rowIndex={0}
+                    />
                   </tr>
                 </tbody>
               </table>
@@ -856,7 +853,11 @@ describe('TableCellIndex 组件测试', () => {
               <table>
                 <tbody>
                   <tr>
-                    <TableCellIndex targetRow={{}} tablePath={[0]} rowIndex={0} />
+                    <TableCellIndex
+                      targetRow={{}}
+                      tablePath={[0]}
+                      rowIndex={0}
+                    />
                   </tr>
                 </tbody>
               </table>
@@ -895,7 +896,11 @@ describe('TableCellIndex 组件测试', () => {
               <table>
                 <tbody>
                   <tr>
-                    <TableCellIndex targetRow={{}} tablePath={[0]} rowIndex={0} />
+                    <TableCellIndex
+                      targetRow={{}}
+                      tablePath={[0]}
+                      rowIndex={0}
+                    />
                   </tr>
                 </tbody>
               </table>
@@ -920,9 +925,7 @@ describe('TableCellIndex 组件测试', () => {
         children: [
           {
             type: 'table-cell',
-            children: [
-              { type: 'paragraph', children: [{ text: 'Cell' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'Cell' }] }],
           },
         ],
       };
@@ -934,7 +937,8 @@ describe('TableCellIndex 组件测试', () => {
         },
       ];
 
-      const { NativeTableEditor } = await import('../../../../utils/native-table');
+      const { NativeTableEditor } =
+        await import('../../../../utils/native-table');
       const mockRemoveTable = vi.fn();
       vi.mocked(NativeTableEditor).removeTable = mockRemoveTable;
 
@@ -950,7 +954,11 @@ describe('TableCellIndex 组件测试', () => {
               <table>
                 <tbody>
                   <tr>
-                    <TableCellIndex targetRow={testRow} tablePath={[0]} rowIndex={0} />
+                    <TableCellIndex
+                      targetRow={testRow}
+                      tablePath={[0]}
+                      rowIndex={0}
+                    />
                   </tr>
                 </tbody>
               </table>
@@ -975,15 +983,11 @@ describe('TableCellIndex 组件测试', () => {
         children: [
           {
             type: 'table-cell',
-            children: [
-              { type: 'paragraph', children: [{ text: 'Cell 1' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'Cell 1' }] }],
           },
           {
             type: 'table-cell',
-            children: [
-              { type: 'paragraph', children: [{ text: 'Cell 2' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'Cell 2' }] }],
           },
         ],
       };
@@ -995,7 +999,8 @@ describe('TableCellIndex 组件测试', () => {
         },
       ];
 
-      const { NativeTableEditor } = await import('../../../../utils/native-table');
+      const { NativeTableEditor } =
+        await import('../../../../utils/native-table');
       const mockRemoveTable = vi.fn();
       vi.mocked(NativeTableEditor).removeTable = mockRemoveTable;
 
@@ -1011,7 +1016,11 @@ describe('TableCellIndex 组件测试', () => {
               <table>
                 <tbody>
                   <tr>
-                    <TableCellIndex targetRow={testRow} tablePath={[0]} rowIndex={0} />
+                    <TableCellIndex
+                      targetRow={testRow}
+                      tablePath={[0]}
+                      rowIndex={0}
+                    />
                   </tr>
                 </tbody>
               </table>
@@ -1054,9 +1063,7 @@ describe('TableCellIndex 组件测试', () => {
         children: [
           {
             type: 'table-cell',
-            children: [
-              { type: 'paragraph', children: [{ text: 'Cell 1' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'Cell 1' }] }],
           },
         ],
       };
@@ -1084,7 +1091,11 @@ describe('TableCellIndex 组件测试', () => {
               <table>
                 <tbody>
                   <tr>
-                    <TableCellIndex targetRow={testRow} tablePath={[0]} rowIndex={0} />
+                    <TableCellIndex
+                      targetRow={testRow}
+                      tablePath={[0]}
+                      rowIndex={0}
+                    />
                   </tr>
                 </tbody>
               </table>
@@ -1127,7 +1138,11 @@ describe('TableCellIndex 组件测试', () => {
               <table>
                 <tbody>
                   <tr>
-                    <TableCellIndex targetRow={{}} tablePath={[0]} rowIndex={0} />
+                    <TableCellIndex
+                      targetRow={{}}
+                      tablePath={[0]}
+                      rowIndex={0}
+                    />
                   </tr>
                 </tbody>
               </table>
@@ -1192,7 +1207,11 @@ describe('TableCellIndex 组件测试', () => {
               <table>
                 <tbody>
                   <tr>
-                    <TableCellIndex targetRow={{}} tablePath={[0]} rowIndex={0} />
+                    <TableCellIndex
+                      targetRow={{}}
+                      tablePath={[0]}
+                      rowIndex={0}
+                    />
                   </tr>
                 </tbody>
               </table>
@@ -1221,9 +1240,7 @@ describe('TableCellIndex 组件测试', () => {
         children: [
           {
             type: 'table-cell',
-            children: [
-              { type: 'paragraph', children: [{ text: 'Cell 1' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: 'Cell 1' }] }],
           },
         ],
       };
@@ -1247,7 +1264,11 @@ describe('TableCellIndex 组件测试', () => {
               <table>
                 <tbody>
                   <tr>
-                    <TableCellIndex targetRow={testRow} tablePath={[0]} rowIndex={0} />
+                    <TableCellIndex
+                      targetRow={testRow}
+                      tablePath={[0]}
+                      rowIndex={0}
+                    />
                   </tr>
                 </tbody>
               </table>

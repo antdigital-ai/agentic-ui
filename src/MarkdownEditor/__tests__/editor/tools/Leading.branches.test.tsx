@@ -16,10 +16,17 @@ vi.mock('nanoid', () => ({
 
 vi.mock('antd', () => {
   const flatten = (items: any[] = []) =>
-    items.flatMap((item) => [item, ...(item.children ? flatten(item.children) : [])]);
+    items.flatMap((item) => [
+      item,
+      ...(item.children ? flatten(item.children) : []),
+    ]);
 
   return {
-    ConfigProvider: ({ children, getPopupContainer, getTargetContainer }: any) => {
+    ConfigProvider: ({
+      children,
+      getPopupContainer,
+      getTargetContainer,
+    }: any) => {
       const popup = getPopupContainer?.();
       const target = getTargetContainer?.();
       if (popup) configTargets.push(popup);
@@ -34,7 +41,9 @@ vi.mock('antd', () => {
             <a
               key={item.href}
               href={item.href}
-              onClick={(e) => onClick?.(e, { title: item.title, href: item.href })}
+              onClick={(e) =>
+                onClick?.(e, { title: item.title, href: item.href })
+              }
             >
               {item.title}
             </a>
@@ -143,7 +152,9 @@ describe('Leading targeted coverage', () => {
     outTarget.getBoundingClientRect = vi.fn(() => ({ top: 20 }) as any);
     document.body.appendChild(outTarget);
 
-    const scrollBySpy = vi.spyOn(window, 'scrollBy').mockImplementation(() => {});
+    const scrollBySpy = vi
+      .spyOn(window, 'scrollBy')
+      .mockImplementation(() => {});
     Object.defineProperty(window, 'pageYOffset', {
       configurable: true,
       value: 150,
@@ -171,4 +182,3 @@ describe('Leading targeted coverage', () => {
     fireEvent.scroll(window);
   });
 });
-

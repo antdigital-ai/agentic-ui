@@ -39,6 +39,8 @@ describe('ReadonlyBlockquote', () => {
         element={{ type: 'blockquote', children: [] } as any}
       />,
     );
-    expect(document.querySelector('blockquote[data-be="blockquote"]')).toBeInTheDocument();
+    expect(
+      document.querySelector('blockquote[data-be="blockquote"]'),
+    ).toBeInTheDocument();
   });
 });

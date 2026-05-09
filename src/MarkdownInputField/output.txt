@@ -1,0 +1,292 @@
+
+> @ant-design/agentic-ui@2.31.5 test:full /Users/qixianqixian/Documents/github/agentic-ui
+> NODE_OPTIONS=--max-old-space-size=8192 vitest --run --mode full
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.5 [39m[90m/Users/qixianqixian/Documents/github/agentic-ui[39m
+
+ [31m❯[39m src/MarkdownInputField/__tests__/MarkdownInputField.test.tsx [2m([22m[2m49 tests[22m[2m | [22m[31m8 failed[39m[2m)[22m[33m 2819[2mms[22m[39m
+     [32m✓[39m should render custom tools when toolsRender is provided[32m 20[2mms[22m[39m
+     [32m✓[39m should pass correct props to toolsRender function[32m 5[2mms[22m[39m
+     [32m✓[39m should update tools when component state changes[32m 5[2mms[22m[39m
+     [32m✓[39m should handle tool click events[32m 3[2mms[22m[39m
+     [32m✓[39m should render tools with correct styles[32m 3[2mms[22m[39m
+[31m     [31m×[31m should not interfere with send button functionality[39m[32m 5[2mms[22m[39m
+     [32m✓[39m should handle disabled state correctly[32m 3[2mms[22m[39m
+     [32m✓[39m should render voice input button when enabled[32m 3[2mms[22m[39m
+     [32m✓[39m should start recording on first click and stop on second click[32m 54[2mms[22m[39m
+     [32m✓[39m should not respond when disabled[32m 3[2mms[22m[39m
+[31m     [31m×[31m should handle sentence-level callbacks: begin -> partial -> end[39m[33m 1216[2mms[22m[39m
+[31m     [31m×[31m should stop recording before sending when clicking send during recording[39m[33m 1117[2mms[22m[39m
+     [32m✓[39m should handle recognizer error and reset recording state[32m 161[2mms[22m[39m
+     [32m✓[39m should recover when recognizer creation fails (catch branch)[32m 64[2mms[22m[39m
+     [32m✓[39m should have onClick handler on the container[32m 8[2mms[22m[39m
+     [32m✓[39m should not focus editor when disabled[32m 7[2mms[22m[39m
+[31m     [31m×[31m should set editor readonly and typing class when typing[39m[32m 12[2mms[22m[39m
+     [32m✓[39m should allow clicking on the editor area[32m 4[2mms[22m[39m
+     [32m✓[39m should not interfere with button clicks inside container[32m 3[2mms[22m[39m
+     [32m✓[39m should not call onSend when empty by default[32m 3[2mms[22m[39m
+     [32m✓[39m should call onSend with empty string when allowEmptySubmit enabled[32m 3[2mms[22m[39m
+     [32m✓[39m should treat whitespace-only as empty unless allowEmptySubmit provided[32m 3[2mms[22m[39m
+       [32m✓[39m 应该正确处理 value 属性[32m 2[2mms[22m[39m
+       [32m✓[39m 应该正确处理 placeholder 属性[32m 2[2mms[22m[39m
+       [32m✓[39m 应该正确处理 disabled 属性[32m 2[2mms[22m[39m
+       [32m✓[39m 应该正确应用 className[32m 2[2mms[22m[39m
+       [32m✓[39m 应该正确应用 style 属性[32m 2[2mms[22m[39m
+       [32m✓[39m 应该渲染所有核心组件[32m 2[2mms[22m[39m
+[31m       [31m×[31m 应该在启用附件时显示附件按钮[39m[32m 14[2mms[22m[39m
+       [32m✓[39m 应该在禁用附件时不显示附件按钮[32m 3[2mms[22m[39m
+       [32m✓[39m 应该正确处理按钮点击[32m 37[2mms[22m[39m
+[31m       [31m×[31m 应该正确处理附件上传[39m[32m 7[2mms[22m[39m
+       [32m✓[39m 应该正确处理 typing 状态[32m 3[2mms[22m[39m
+       [32m✓[39m 应该正确处理空内容状态[32m 2[2mms[22m[39m
+       [32m✓[39m 应该正确处理有内容状态[32m 2[2mms[22m[39m
+       [32m✓[39m 应该处理 undefined value[32m 2[2mms[22m[39m
+       [32m✓[39m 应该处理空字符串 value[32m 2[2mms[22m[39m
+       [32m✓[39m 应该处理长文本内容[32m 2[2mms[22m[39m
+       [32m✓[39m 应该处理特殊字符[32m 2[2mms[22m[39m
+       [32m✓[39m 应该接受所有必需的 props[32m 2[2mms[22m[39m
+[31m       [31m×[31m 应该正确处理可选的 attachment props[39m[32m 5[2mms[22m[39m
+       [32m✓[39m 应该同时渲染编辑器、发送按钮和建议组件[32m 2[2mms[22m[39m
+[31m       [31m×[31m 应该在启用附件时渲染所有组件[39m[32m 5[2mms[22m[39m
+       [32m✓[39m 应该支持 triggerSendKey 选项[32m 2[2mms[22m[39m
+       [32m✓[39m 应该正确处理组件更新[32m 2[2mms[22m[39m
+       [32m✓[39m 应该支持自定义操作按钮渲染[32m 2[2mms[22m[39m
+       [32m✓[39m 应该在没有 props 的情况下正常渲染[32m 2[2mms[22m[39m
+       [32m✓[39m 应该处理无效的 attachment 配置[32m 2[2mms[22m[39m
+       [32m✓[39m 应该处理异常的回调函数[32m 2[2mms[22m[39m
+ [31m❯[39m src/Plugins/code/__tests__/components/scenarios/AceEditor.theme.test.tsx [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 10[2mms[22m[39m
+[31m     [31m×[31m 应该在只读模式下正确渲染[39m[32m 6[2mms[22m[39m
+[31m     [31m×[31m 应该接受 codeProps.theme 配置[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m 应该使用默认主题 chrome[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m 应该支持多种主题[39m[32m 0[2mms[22m[39m
+[31m     [31m×[31m 应该与其他 codeProps 配置共存[39m[32m 0[2mms[22m[39m
+ [31m❯[39m src/Bubble/__tests__/scenarios/BubbleExtra.shouldShowCopy-onCancelLike.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Bubble/__tests__/scenarios/BubbleExtra.voice.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Bubble/__tests__/props/MessagesContent.extraRender.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Hooks/__tests__/scenarios/useStyle.fallback.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/props/BaseMarkdownEditor.contentStyle.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/props/BaseMarkdownEditor.renderMode.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/scenarios/BaseMarkdownEditor.apaasify.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/scenarios/markdownToHtml.safe.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownRenderer/__tests__/scenarios/useMarkdownToReact.streaming-chart-card-stability.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownRenderer/__tests__/scenarios/useMarkdownToReact.streaming-stability.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownRenderer/__tests__/scenarios/useStreamingMarkdown.revision.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownRenderer/__tests__/scenarios/useStreamingMarkdownReact.cache.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Plugins/chart/__tests__/BarChart.branches.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Plugins/chart/__tests__/RadarChart.branches.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Plugins/chart/__tests__/RadarChart.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Plugins/chart/__tests__/ScatterChart.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Plugins/katex/__tests__/loadKatex.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/ToolUseBar/__tests__/props/ToolUseBar.expandedKeys.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Bubble/__tests__/List/props/PureBubbleList.originDataFlags.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Components/VisualList/__tests__/props/VisualList.defaultIcon.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/events/debug.deleteBackward.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/events/withMarkdown.deleteBackward.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/scenarios/Editor.align.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/scenarios/Editor.card.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/scenarios/Editor.card.visual.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/scenarios/withMarkdown.console.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/editor/__tests__/scenarios/Editor.error-boundary.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/editor/__tests__/scenarios/Editor.handlers.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Plugins/chart/__tests__/DonutChart/index.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Plugins/chart/__tests__/ScatterChart/index.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Plugins/chart/__tests__/props/BarChart.maxBarThickness.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Plugins/code/__tests__/components/AceEditor.branches.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/elements/Table/TableCellIndex.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/elements/scenarios/Schema.bubble.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/elements/scenarios/Schema.bubblecontext.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/utils/scenarios/keyboard.list.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/editor/plugins/__tests__/scenarios/useHighlight.jinja.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/editor/parser/__tests__/scenarios/parserSlateNodeToMarkdown.table.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/Plugins/chart/__tests__/utils/scenarios/resolveCssVariable.dom.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/__tests__/editor/tools/ToolBar/config/toolsConfig.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/editor/plugins/hotKeyCommands/__tests__/scenarios/backspace.markdown.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m src/MarkdownEditor/editor/plugins/hotKeyCommands/__tests__/scenarios/enter.markdown.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [32m✓[39m src/Schema/SchemaForm/__tests__/SchemaForm.test.tsx [2m([22m[2m31 tests[22m[2m)[22m[33m 28744[2mms[22m[39m
+     [33m[2m✓[22m[39m handles form value changes [33m 503[2mms[22m[39m
+     [33m[2m✓[22m[39m validates required fields [33m 531[2mms[22m[39m
+     [33m[2m✓[22m[39m handles number input with min/max validation [33m 512[2mms[22m[39m
+     [33m[2m✓[22m[39m handles select dropdown [33m 958[2mms[22m[39m
+     [33m[2m✓[22m[39m handles array operations [33m 3874[2mms[22m[39m
+     [33m[2m✓[22m[39m handles complex array with object items [33m 676[2mms[22m[39m
+     [33m[2m✓[22m[39m handles array with initial values [33m 696[2mms[22m[39m
+     [33m[2m✓[22m[39m handles form submission and validation [33m 1419[2mms[22m[39m
+       [33m[2m✓[22m[39m handles array without items definition [33m 710[2mms[22m[39m
+       [33m[2m✓[22m[39m validates string pattern correctly [33m 2930[2mms[22m[39m
+       [33m[2m✓[22m[39m handles number with decimal step [33m 525[2mms[22m[39m
+       [33m[2m✓[22m[39m validates array min/max items [33m 1514[2mms[22m[39m
+       [33m[2m✓[22m[39m handles deeply nested structures [33m 2951[2mms[22m[39m
+       [33m[2m✓[22m[39m handles nested object in nested structure [33m 1548[2mms[22m[39m
+       [33m[2m✓[22m[39m handles remove operations in arrays [33m 8795[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/editor/tools/__tests__/InsertAutocomplete.test.tsx [2m([22m[2m65 tests[22m[2m)[22m[33m 11994[2mms[22m[39m
+     [33m[2m✓[22m[39m runInsertTask with isCustom calls Transforms.delete and runInsertTask prop [33m 513[2mms[22m[39m
+     [33m[2m✓[22m[39m calls runInsertTask with isCustom when custom image option is clicked [33m 517[2mms[22m[39m
+     [33m[2m✓[22m[39m shows insertLink UI when clicking default embedMedia option and calls insertMedia on Embed [33m 516[2mms[22m[39m
+     [33m[2m✓[22m[39m insertMedia with youtube replaceUrl [33m 522[2mms[22m[39m
+     [33m[2m✓[22m[39m insertMedia with youtube replaceUrl and optional ?si= preserves query [33m 519[2mms[22m[39m
+     [33m[2m✓[22m[39m insertMedia invalid URL throws and sets loading false [33m 517[2mms[22m[39m
+     [33m[2m✓[22m[39m insertMedia with bilibili replaceUrl [33m 523[2mms[22m[39m
+     [33m[2m✓[22m[39m insertMedia with src= replaceUrl [33m 519[2mms[22m[39m
+     [33m[2m✓[22m[39m insertMedia invalid protocol throws [33m 517[2mms[22m[39m
+     [33m[2m✓[22m[39m insertMedia with plain https URL (no replaceUrl match) succeeds [33m 517[2mms[22m[39m
+     [33m[2m✓[22m[39m insertMedia when getRemoteMediaType returns null sets loading false in finally [33m 515[2mms[22m[39m
+     [33m[2m✓[22m[39m shows insertAttachment UI when clicking default attachLink option [33m 819[2mms[22m[39m
+     [33m[2m✓[22m[39m insertAttachByLink with http URL calls fetch and setNodes [33m 518[2mms[22m[39m
+     [33m[2m✓[22m[39m insertAttachByLink via Local tab Choose a file button [33m 517[2mms[22m[39m
+     [33m[2m✓[22m[39m insertAttachByLink when fetch returns not ok keeps loading false in finally [33m 521[2mms[22m[39m
+     [33m[2m✓[22m[39m insertAttachByLink with http URL extracts filename from path [33m 519[2mms[22m[39m
+     [33m[2m✓[22m[39m insertAttachByLink when next node is not empty paragraph does not delete [33m 519[2mms[22m[39m
+     [33m[2m✓[22m[39m insertAttachByLink when next node is empty paragraph calls Transforms.delete [33m 520[2mms[22m[39m
+     [33m[2m✓[22m[39m insertAttachByLink with non-http URL does not call fetch [33m 524[2mms[22m[39m
+     [33m[2m✓[22m[39m insertLink Input onMouseDown stopPropagation [33m 509[2mms[22m[39m
+     [33m[2m✓[22m[39m insertLink Input Enter key triggers insertMedia [33m 520[2mms[22m[39m
+     [33m[2m✓[22m[39m insertAttachment Embed tab Enter triggers insertAttachByLink [33m 513[2mms[22m[39m
+ [32m✓[39m src/Plugins/code/__tests__/components/LanguageSelector.test.tsx [2m([22m[2m32 tests[22m[2m)[22m[33m 8930[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该在弹层关闭时清空搜索关键字 [33m 1543[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该过滤语言选项 [33m 869[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该处理大小写不敏感的搜索 [33m 869[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该处理部分匹配 [33m 954[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该在选择语言时调用 setLanguage [33m 319[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该在选择语言后关闭弹层 [33m 315[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该处理 Enter 键事件 [33m 924[2mms[22m[39m
+       [33m[2m✓[22m[39m 弹层关闭时应清空 keyword 并标记用户已关闭 [33m 1394[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/elements/Media.test.tsx [2m([22m[2m45 tests[22m[2m)[22m[33m 5986[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该处理 finished 为 false 的情况（5秒后显示文本） [33m 5107[2mms[22m[39m
+ [32m✓[39m src/Plugins/chart/__tests__/ChartRender.test.tsx [2m([22m[2m44 tests[22m[2m)[22m[33m 5136[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该在数据变化时使用防抖更新 [33m 917[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该通过点击 Dropdown 触发 getPopupContainer 与图表类型菜单（761, 766） [33m 2030[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该打开配置 Popover、触发表单 X/Y 的 stopPropagation 并提交（833, 847, 851, 871, 888） [33m 1422[2mms[22m[39m
+ [32m✓[39m src/History/__tests__/components/SearchComponent.test.tsx [2m([22m[2m24 tests[22m[2m)[22m[33m 4527[2mms[22m[39m
+     [33m[2m✓[22m[39m 展开且有输入内容时点击外部不收起 [33m 374[2mms[22m[39m
+     [33m[2m✓[22m[39m 点击清空按钮应触发 onClear [33m 391[2mms[22m[39m
+     [33m[2m✓[22m[39m 应该支持清空输入 [33m 745[2mms[22m[39m
+     [33m[2m✓[22m[39m 应该在输入搜索词后触发搜索 [33m 373[2mms[22m[39m
+     [33m[2m✓[22m[39m 应该在加载时显示 Spin [33m 404[2mms[22m[39m
+     [33m[2m✓[22m[39m 应该处理搜索错误 [33m 391[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该在 trigger=change 时实时触发搜索(默认行为) [33m 373[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该在 trigger=enter 时只在按回车时触发搜索 [33m 391[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该在 trigger=enter 时按其他键不触发搜索 [33m 371[2mms[22m[39m
+       [33m[2m✓[22m[39m 默认应该使用 change 触发方式 [33m 389[2mms[22m[39m
+ [32m✓[39m src/Workspace/__tests__/File/FileComponent.test.tsx [2m([22m[2m97 tests[22m[2m)[22m[33m 4091[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该折叠和展开分组 [33m 319[2mms[22m[39m
+       [33m[2m✓[22m[39m 查看更多按钮显示剩余数量 [33m 1344[2mms[22m[39m
+ [32m✓[39m src/ThoughtChainList/__tests__/ToolCall.test.tsx [2m([22m[2m44 tests[22m[2m)[22m[33m 2294[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该完整的工作流程测试 [33m 344[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/utils/media.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 2012[2mms[22m[39m
+       [33m[2m✓[22m[39m 应该处理超时 [33m 2002[2mms[22m[39m
+ [32m✓[39m src/Schema/SchemaEditor/__tests__/AceEditorWrapper.test.tsx [2m([22m[2m40 tests[22m[2m)[22m[33m 1930[2mms[22m[39m
+ [32m✓[39m src/ThoughtChainList/__tests__/TableSql.branches.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 1774[2mms[22m[39m
+       [33m[2m✓[22m[39m 点击取消按钮退出编辑模式并重置内容 [33m 333[2mms[22m[39m
+       [33m[2m✓[22m[39m 点击重试按钮，调用 onItemChange 回调 [33m 313[2mms[22m[39m
+       [33m[2m✓[22m[39m 无 onItemChange 时回退调用 onChangeItem [33m 343[2mms[22m[39m
+ [32m✓[39m src/Plugins/chart/loadChartRuntime.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1870[2mms[22m[39m
+     [33m[2m✓[22m[39m 成功加载时返回包含各图表组件的运行时 [33m 1867[2mms[22m[39m
+ [32m✓[39m src/History/__tests__/components/HistoryActionsBox.test.tsx [2m([22m[2m13 tests[22m[2m)[22m[33m 1383[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/tools/InsertLink.test.tsx [2m([22m[2m21 tests[22m[2m)[22m[33m 1259[2mms[22m[39m
+ [32m✓[39m src/Plugins/mermaid/__tests__/Mermaid.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 1003[2mms[22m[39m
+     [33m[2m✓[22m[39m 复杂代码与非法代码仍会走 mermaid.render [33m 339[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/store.test.tsx [2m([22m[2m176 tests[22m[2m)[22m[33m 902[2mms[22m[39m
+ [32m✓[39m src/Workspace/__tests__/File/PreviewComponent.test.tsx [2m([22m[2m65 tests[22m[2m)[22m[33m 862[2mms[22m[39m
+ [32m✓[39m src/ThoughtChainList/__tests__/TableSql.test.tsx [2m([22m[2m14 tests[22m[2m)[22m[33m 961[2mms[22m[39m
+ [32m✓[39m src/Workspace/__tests__/Browser.test.tsx [2m([22m[2m14 tests[22m[2m)[22m[33m 880[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/readonly.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 895[2mms[22m[39m
+     [33m[2m✓[22m[39m should hide toolbar when text is not selected [33m 454[2mms[22m[39m
+ [32m✓[39m src/Plugins/chart/__tests__/LineChart/index.test.tsx [2m([22m[2m62 tests[22m[2m)[22m[33m 867[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/editor/tools/__tests__/InsertAutocomplete.branches.test.tsx [2m([22m[2m64 tests[22m[2m)[22m[33m 802[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/CommentList.test.tsx [2m([22m[2m22 tests[22m[2m)[22m[33m 750[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/VoiceInputManager.test.tsx [2m([22m[2m16 tests[22m[2m)[22m[33m 750[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/props/MarkdownInputField.leafRender.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 726[2mms[22m[39m
+ [32m✓[39m src/Workspace/__tests__/Workspace.test.tsx [2m([22m[2m52 tests[22m[2m)[22m[33m 699[2mms[22m[39m
+ [32m✓[39m src/Workspace/__tests__/RealtimeFollow.test.tsx [2m([22m[2m104 tests[22m[2m)[22m[33m 619[2mms[22m[39m
+ [32m✓[39m src/History/__tests__/History.test.tsx [2m([22m[2m19 tests[22m[2m)[22m[33m 619[2mms[22m[39m
+ [32m✓[39m src/Components/__tests__/SwitchButton.test.tsx [2m([22m[2m21 tests[22m[2m)[22m[33m 636[2mms[22m[39m
+ [32m✓[39m src/Plugins/chart/__tests__/FunnelChart/index.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 598[2mms[22m[39m
+     [33m[2m✓[22m[39m 应该渲染并触发样式与图表渲染逻辑 [33m 597[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/props/MarkdownInputField.actionsRender.test.tsx [2m([22m[2m12 tests[22m[2m)[22m[33m 583[2mms[22m[39m
+ [32m✓[39m src/Bubble/__tests__/BubbleList.test.tsx [2m([22m[2m59 tests[22m[2m)[22m[33m 525[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/FileMapView.test.tsx [2m([22m[2m53 tests[22m[2m)[22m[33m 541[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/elements/Media/ReadonlyMedia.test.tsx [2m([22m[2m26 tests[22m[2m)[22m[33m 574[2mms[22m[39m
+ [32m✓[39m src/Components/__tests__/LayoutHeader.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 529[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/QuickActions.test.tsx [2m([22m[2m26 tests[22m[2m)[22m[33m 487[2mms[22m[39m
+ [32m✓[39m src/TaskList/__tests__/index.test.tsx [2m([22m[2m60 tests[22m[2m)[22m[33m 575[2mms[22m[39m
+ [32m✓[39m src/MarkdownRenderer/__tests__/MarkdownRenderer.test.tsx [2m([22m[2m49 tests[22m[2m)[22m[33m 478[2mms[22m[39m
+ [32m✓[39m src/Components/__tests__/ToggleButton.test.tsx [2m([22m[2m20 tests[22m[2m)[22m[33m 490[2mms[22m[39m
+ [32m✓[39m src/AgentRunBar/__tests__/index.test.tsx [2m([22m[2m27 tests[22m[2m)[22m[33m 462[2mms[22m[39m
+ [32m✓[39m src/Components/__tests__/IconButton.test.tsx [2m([22m[2m20 tests[22m[2m)[22m[33m 470[2mms[22m[39m
+ [32m✓[39m src/Schema/SchemaEditor/__tests__/index.test.tsx [2m([22m[2m40 tests[22m[2m)[22m[33m 478[2mms[22m[39m
+ [32m✓[39m src/Bubble/__tests__/Bubble.test.tsx [2m([22m[2m45 tests[22m[2m)[22m[33m 453[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/editor/__tests__/Editor.test.tsx [2m([22m[2m54 tests[22m[2m)[22m[33m 445[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/scenarios/MarkdownInputField.keyboard.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 439[2mms[22m[39m
+ [32m✓[39m src/Components/__tests__/ActionIconBox.test.tsx [2m([22m[2m27 tests[22m[2m)[22m[33m 391[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/editor/tools/ToolBar/__tests__/BaseBar.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 403[2mms[22m[39m
+ [32m✓[39m src/Bubble/__tests__/DocInfo.test.tsx [2m([22m[2m22 tests[22m[2m)[22m[33m 391[2mms[22m[39m
+ [32m✓[39m src/Workspace/__tests__/HtmlPreview.test.tsx [2m([22m[2m27 tests[22m[2m)[22m[32m 270[2mms[22m[39m
+ [32m✓[39m src/Schema/SchemaEditor/__tests__/SchemaEditor.test.tsx [2m([22m[2m40 tests[22m[2m)[22m[33m 401[2mms[22m[39m
+ [32m✓[39m src/Components/__tests__/SuggestionList.test.tsx [2m([22m[2m33 tests[22m[2m)[22m[33m 361[2mms[22m[39m
+ [32m✓[39m src/Bubble/__tests__/PureBubble.test.tsx [2m([22m[2m38 tests[22m[2m)[22m[33m 334[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/render-failure-regression.test.tsx [2m([22m[2m25 tests[22m[2m)[22m[33m 364[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/elements.benchmark.test.tsx [2m([22m[2m14 tests[22m[2m)[22m[32m 299[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/AttachmentButton.test.tsx [2m([22m[2m37 tests[22m[2m)[22m[33m 301[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/MarkdownInputField.branches.test.tsx [2m([22m[2m54 tests[22m[2m)[22m[33m 319[2mms[22m[39m
+ [32m✓[39m src/ChatLayout/__tests__/ChatLayout.test.tsx [2m([22m[2m28 tests[22m[2m)[22m[33m 322[2mms[22m[39m
+ [32m✓[39m src/Components/Button/__tests__/IconButton.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 291[2mms[22m[39m
+ [32m✓[39m src/Bubble/__tests__/List/PureBubbleList.test.tsx [2m([22m[2m18 tests[22m[2m)[22m[33m 307[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/markdown-html-demo.test.tsx [2m([22m[2m13 tests[22m[2m)[22m[32m 223[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/insertParsedHtmlNodes.test.tsx [2m([22m[2m82 tests[22m[2m)[22m[32m 274[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/AttachmentButtonPopover.branches.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 267[2mms[22m[39m
+ [32m✓[39m src/Plugins/chart/__tests__/ChartMark.test.tsx [2m([22m[2m51 tests[22m[2m)[22m[32m 268[2mms[22m[39m
+ [32m✓[39m src/Bubble/__tests__/AIBubble.test.tsx [2m([22m[2m19 tests[22m[2m)[22m[32m 287[2mms[22m[39m
+[90mstdout[2m | src/Utils/__tests__/sandbox/ProxySandbox.test.ts[2m > [22m[2mProxySandbox[2m > [22m[2m控制台访问测试[2m > [22m[2m应该允许使用 console 对象（如果启用）
+[22m[39m[Sandbox] test
+
+[90mstdout[2m | src/Utils/__tests__/sandbox/ProxySandbox.test.ts[2m > [22m[2m边界情况测试[2m > [22m[2m覆盖率补充：console 与定时器[2m > [22m[2m应调用 console.info 和 console.debug
+[22m[39m[Sandbox] info
+[Sandbox] debug
+
+[90mstdout[2m | src/Utils/__tests__/sandbox/ProxySandbox.test.ts[2m > [22m[2m边界情况测试[2m > [22m[2m覆盖率补充：私有分支直测[2m > [22m[2mcreateWorkerInstance 与 setup handlers/timeout/cleanup 分支
+[22m[39m[Sandbox] m
+
+ [32m✓[39m src/Utils/__tests__/sandbox/ProxySandbox.test.ts [2m([22m[2m133 tests[22m[2m)[22m[32m 249[2mms[22m[39m
+[90mstdout[2m | src/Schema/SchemaRenderer/__tests__/SchemaRenderer.branches.test.tsx[2m > [22m[2mSchemaRenderer - Comprehensive Tests[2m > [22m[2m沙箱功能测试[2m > [22m[2m应该在沙箱禁用时执行不安全脚本
+[22m[39mtest
+
+ [32m✓[39m src/Schema/SchemaRenderer/__tests__/SchemaRenderer.branches.test.tsx [2m([22m[2m69 tests[22m[2m)[22m[32m 229[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/BeforeToolContainer.test.tsx [2m([22m[2m24 tests[22m[2m)[22m[32m 230[2mms[22m[39m
+ [32m✓[39m src/BackTo/__tests__/ScrollVisibleButton.test.tsx [2m([22m[2m18 tests[22m[2m)[22m[32m 205[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/elements/Image.test.tsx [2m([22m[2m53 tests[22m[2m)[22m[32m 231[2mms[22m[39m
+ [32m✓[39m src/BackTo/__tests__/BackTop.test.tsx [2m([22m[2m14 tests[22m[2m)[22m[32m 205[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/elements/Image/index.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[32m 222[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/BaseMarkdownEditor.advanced.test.tsx [2m([22m[2m29 tests[22m[2m)[22m[32m 173[2mms[22m[39m
+ [32m✓[39m src/Bubble/__tests__/BubbleExtra.test.tsx [2m([22m[2m28 tests[22m[2m)[22m[32m 205[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/FileUploadManager.test.tsx [2m([22m[2m31 tests[22m[2m)[22m[32m 215[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/AttachmentButton/__tests__/upLoadFileToServer.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 195[2mms[22m[39m
+ [32m✓[39m src/Components/Robot/__tests__/RobotLotties.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[32m 218[2mms[22m[39m
+ [32m✓[39m src/History/__tests__/components/LoadMoreComponent.test.tsx [2m([22m[2m15 tests[22m[2m)[22m[32m 187[2mms[22m[39m
+ [32m✓[39m src/Components/Button/__tests__/ToggleButton.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 210[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/ContributorAvatar.test.tsx [2m([22m[2m21 tests[22m[2m)[22m[32m 197[2mms[22m[39m
+ [32m✓[39m src/Schema/__tests__/validator.branches.test.ts [2m([22m[2m46 tests[22m[2m)[22m[32m 199[2mms[22m[39m
+ [32m✓[39m src/BackTo/__tests__/BackBottom.test.tsx [2m([22m[2m15 tests[22m[2m)[22m[32m 174[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/elements/Table/ReadonlyTableComponent.test.tsx [2m([22m[2m35 tests[22m[2m)[22m[32m 176[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/elements/TagPopup.test.tsx [2m([22m[2m24 tests[22m[2m)[22m[32m 174[2mms[22m[39m
+ [32m✓[39m src/Plugins/chart/HistogramChart/__tests__/index.test.tsx [2m([22m[2m21 tests[22m[2m)[22m[32m 147[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/elements/Table/TableCellIndexSpacer.test.tsx [2m([22m[2m55 tests[22m[2m)[22m[32m 138[2mms[22m[39m
+ [32m✓[39m src/MarkdownInputField/__tests__/AttachmentFileList.test.tsx [2m([22m[2m22 tests[22m[2m)[22m[32m 202[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/utils/__tests__/exportHtml.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 158[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/BaseMarkdownEditor.lazy.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 169[2mms[22m[39m
+ [32m✓[39m src/AgenticLayout/__tests__/AgenticLayout.test.tsx [2m([22m[2m31 tests[22m[2m)[22m[32m 161[2mms[22m[39m
+ [32m✓[39m src/Plugins/mermaid/__tests__/MermaidRendererImpl.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 157[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/BaseMarkdownEditor.test.tsx [2m([22m[2m34 tests[22m[2m)[22m[32m 179[2mms[22m[39m
+ [32m✓[39m src/Components/lotties/__tests__/ExportedLotties.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 170[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/editor/tools/Leading.test.tsx [2m([22m[2m21 tests[22m[2m)[22m[32m 168[2mms[22m[39m
+ [32m✓[39m src/Plugins/chart/__tests__/ChartAttrToolBar.test.tsx [2m([22m[2m19 tests[22m[2m)[22m[32m 173[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/BoldListItems.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 168[2mms[22m[39m
+ [32m✓[39m src/Plugins/chart/__tests__/components/ChartContainer/ChartErrorBoundary.test.tsx [2m([22m[2m13 tests[22m[2m)[22m[32m 156[2mms[22m[39m
+ [32m✓[39m src/Schema/__tests__/SchemaRenderer.test.tsx [2m([22m[2m15 tests[22m[2m)[22m[32m 155[2mms[22m[39m
+ [32m✓[39m src/ThoughtChainList/__tests__/TitleInfo.test.tsx [2m([22m[2m20 tests[22m[2m)[22m[32m 208[2mms[22m[39m
+ [32m✓[39m src/Workspace/__tests__/Task/Task.test.tsx [2m([22m[2m38 tests[22m[2m)[22m[32m 166[2mms[22m[39m
+ [32m✓[39m src/AgentRunBar/__tests__/Robot.test.tsx [2m([22m[2m20 tests[22m[2m)[22m[32m 189[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/editor/__tests__/EditorStore.test.ts [2m([22m[2m27 tests[22m[2m)[22m[32m 157[2mms[22m[39m
+ [32m✓[39m src/Bubble/__tests__/beforeMessage-afterMessage.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 234[2mms[22m[39m
+ [32m✓[39m src/MarkdownEditor/__tests__/boldTextIntegration.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 141[2mms[22m[39m
+ [32m✓[39m src/Bubble/__tests__/afterContent-beforeContent.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 130[2mms[22m[39m

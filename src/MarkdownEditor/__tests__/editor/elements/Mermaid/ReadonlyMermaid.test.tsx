@@ -15,10 +15,7 @@ describe('ReadonlyMermaid', () => {
   const renderWithConfig = (element = defaultProps.element) =>
     render(
       <ConfigProvider>
-        <ReadonlyMermaid
-          {...defaultProps}
-          element={element as any}
-        />
+        <ReadonlyMermaid {...defaultProps} element={element as any} />
       </ConfigProvider>,
     );
 

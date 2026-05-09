@@ -83,11 +83,7 @@ Logs: openclaw logs --follow
 
       expect(() => {
         render(
-          <MarkdownEditor
-            readonly
-            initValue={twoColonMarkdown}
-            reportMode
-          />,
+          <MarkdownEditor readonly initValue={twoColonMarkdown} reportMode />,
         );
       }).not.toThrow();
     });
@@ -144,9 +140,7 @@ Logs: openclaw logs --follow
     it('应正确渲染含时间格式的文本（避免 02:20:31 被误解析为 directive）', () => {
       const timeMarkdown = `会议时间：2026-03-18 02:20:31 至 04:53:36`;
       expect(() => {
-        render(
-          <MarkdownEditor readonly initValue={timeMarkdown} reportMode />,
-        );
+        render(<MarkdownEditor readonly initValue={timeMarkdown} reportMode />);
       }).not.toThrow();
     });
 
@@ -349,9 +343,7 @@ Logs: openclaw logs --follow
   describe('markdownToHtml - 行内文本/语雀内容转换不应抛错', () => {
     it('行内 :icon[check] 转 HTML 时应保留原文', () => {
       expect(() => {
-        const html = markdownToHtmlSync(
-          '文本中有 :icon[check] 这样的行内指令',
-        );
+        const html = markdownToHtmlSync('文本中有 :icon[check] 这样的行内指令');
         expect(html).toContain(':icon[check]');
       }).not.toThrow();
     });

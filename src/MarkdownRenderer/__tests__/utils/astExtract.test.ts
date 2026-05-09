@@ -482,9 +482,9 @@ describe('astExtract / extractLanguageFromClassName', () => {
   });
 
   it('handles className arrays', () => {
-    expect(
-      extractLanguageFromClassName(['hljs', 'language-json']),
-    ).toBe('json');
+    expect(extractLanguageFromClassName(['hljs', 'language-json'])).toBe(
+      'json',
+    );
   });
 
   it('returns undefined when no language- class is present', () => {

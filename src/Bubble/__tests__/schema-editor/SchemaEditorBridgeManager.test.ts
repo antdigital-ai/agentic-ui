@@ -1,9 +1,9 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import {
-  SchemaEditorBridgeManager,
-  BubbleHandler,
-} from '../../schema-editor/SchemaEditorBridgeManager';
 import { createSchemaElementEditorBridge } from '@schema-element-editor/host-sdk/core';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  BubbleHandler,
+  SchemaEditorBridgeManager,
+} from '../../schema-editor/SchemaEditorBridgeManager';
 
 describe('SchemaEditorBridgeManager', () => {
   beforeEach(() => {
@@ -197,9 +197,8 @@ describe('SchemaEditorBridgeManager', () => {
 
   describe('Bridge 启动/停止逻辑', () => {
     it('启用且有注册时应该启动 bridge', async () => {
-      const { createSchemaElementEditorBridge } = await import(
-        '@schema-element-editor/host-sdk/core'
-      );
+      const { createSchemaElementEditorBridge } =
+        await import('@schema-element-editor/host-sdk/core');
       const manager = SchemaEditorBridgeManager.getInstance();
 
       manager.setEnabled(true);
@@ -212,9 +211,8 @@ describe('SchemaEditorBridgeManager', () => {
     });
 
     it('禁用时不应该启动 bridge', async () => {
-      const { createSchemaElementEditorBridge } = await import(
-        '@schema-element-editor/host-sdk/core'
-      );
+      const { createSchemaElementEditorBridge } =
+        await import('@schema-element-editor/host-sdk/core');
       vi.mocked(createSchemaElementEditorBridge).mockClear();
 
       const manager = SchemaEditorBridgeManager.getInstance();
@@ -229,9 +227,8 @@ describe('SchemaEditorBridgeManager', () => {
     });
 
     it('先注册再 setEnabled(true) 时应启动 bridge', async () => {
-      const { createSchemaElementEditorBridge } = await import(
-        '@schema-element-editor/host-sdk/core'
-      );
+      const { createSchemaElementEditorBridge } =
+        await import('@schema-element-editor/host-sdk/core');
       vi.mocked(createSchemaElementEditorBridge).mockClear();
       const manager = SchemaEditorBridgeManager.getInstance();
 
@@ -246,9 +243,8 @@ describe('SchemaEditorBridgeManager', () => {
 
     it('setEnabled(false) 时应调用 bridge.cleanup 并清空 bridge', async () => {
       const mockCleanup = vi.fn();
-      const { createSchemaElementEditorBridge } = await import(
-        '@schema-element-editor/host-sdk/core'
-      );
+      const { createSchemaElementEditorBridge } =
+        await import('@schema-element-editor/host-sdk/core');
       vi.mocked(createSchemaElementEditorBridge).mockReturnValue({
         cleanup: mockCleanup,
         recording: { push: vi.fn() },
@@ -267,9 +263,8 @@ describe('SchemaEditorBridgeManager', () => {
 
     it('所有 handler 注销后应该停止 bridge', async () => {
       const mockCleanup = vi.fn();
-      const { createSchemaElementEditorBridge } = await import(
-        '@schema-element-editor/host-sdk/core'
-      );
+      const { createSchemaElementEditorBridge } =
+        await import('@schema-element-editor/host-sdk/core');
       vi.mocked(createSchemaElementEditorBridge).mockReturnValue({
         cleanup: mockCleanup,
         recording: { push: vi.fn() },
@@ -290,9 +285,8 @@ describe('SchemaEditorBridgeManager', () => {
 
     it('stopBridge 时 cleanup 抛出应捕获并 console.warn', async () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const { createSchemaElementEditorBridge } = await import(
-        '@schema-element-editor/host-sdk/core'
-      );
+      const { createSchemaElementEditorBridge } =
+        await import('@schema-element-editor/host-sdk/core');
       vi.mocked(createSchemaElementEditorBridge).mockReturnValue({
         cleanup: () => {
           throw new Error('cleanup fail');
@@ -341,7 +335,10 @@ describe('SchemaEditorBridgeManager', () => {
       return mockCalls[mockCalls.length - 1][0] as {
         getSchema?: (params: string) => any;
         updateSchema?: (schema: any, params: string) => boolean;
-        renderPreview?: (schema: any, containerId: string) => (() => void) | void;
+        renderPreview?: (
+          schema: any,
+          containerId: string,
+        ) => (() => void) | void;
       };
     };
 
@@ -421,10 +418,7 @@ describe('SchemaEditorBridgeManager', () => {
 
         const config = getBridgeConfig();
         expect(config).not.toBeNull();
-        const result = config?.updateSchema?.(
-          'new content',
-          'non-existent-id',
-        );
+        const result = config?.updateSchema?.('new content', 'non-existent-id');
         expect(result).toBe(false);
       });
 
@@ -560,9 +554,8 @@ describe('SchemaEditorBridgeManager', () => {
   describe('setEnabled 边界情况', () => {
     it('从启用切换到禁用应该停止 bridge', async () => {
       const mockCleanup = vi.fn();
-      const { createSchemaElementEditorBridge } = await import(
-        '@schema-element-editor/host-sdk/core'
-      );
+      const { createSchemaElementEditorBridge } =
+        await import('@schema-element-editor/host-sdk/core');
       vi.mocked(createSchemaElementEditorBridge).mockReturnValue({
         cleanup: mockCleanup,
         recording: { push: vi.fn() },
@@ -583,9 +576,8 @@ describe('SchemaEditorBridgeManager', () => {
     });
 
     it('重复启用不应该重复创建 bridge', async () => {
-      const { createSchemaElementEditorBridge } = await import(
-        '@schema-element-editor/host-sdk/core'
-      );
+      const { createSchemaElementEditorBridge } =
+        await import('@schema-element-editor/host-sdk/core');
       vi.mocked(createSchemaElementEditorBridge).mockClear();
 
       const manager = SchemaEditorBridgeManager.getInstance();
@@ -596,8 +588,8 @@ describe('SchemaEditorBridgeManager', () => {
         setContent: vi.fn(),
       });
 
-      const callCountAfterFirst = vi.mocked(createSchemaElementEditorBridge).mock.calls
-        .length;
+      const callCountAfterFirst = vi.mocked(createSchemaElementEditorBridge)
+        .mock.calls.length;
 
       /** 再次启用 */
       manager.setEnabled(true);
@@ -609,9 +601,8 @@ describe('SchemaEditorBridgeManager', () => {
     });
 
     it('启用时如果没有注册的 handler 不应该启动 bridge', async () => {
-      const { createSchemaElementEditorBridge } = await import(
-        '@schema-element-editor/host-sdk/core'
-      );
+      const { createSchemaElementEditorBridge } =
+        await import('@schema-element-editor/host-sdk/core');
       vi.mocked(createSchemaElementEditorBridge).mockClear();
 
       const manager = SchemaEditorBridgeManager.getInstance();
@@ -633,7 +624,10 @@ describe('SchemaEditorBridgeManager', () => {
       return mockCalls[mockCalls.length - 1][0] as {
         getSchema?: (params: string) => any;
         updateSchema?: (schema: any, params: string) => boolean;
-        renderPreview?: (schema: any, containerId: string) => (() => void) | void;
+        renderPreview?: (
+          schema: any,
+          containerId: string,
+        ) => (() => void) | void;
       };
     };
 
@@ -730,4 +724,3 @@ describe('SchemaEditorBridgeManager', () => {
     });
   });
 });
-

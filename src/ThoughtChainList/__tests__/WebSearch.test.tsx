@@ -30,9 +30,7 @@ const locale = {
 
 const wrap = (ui: React.ReactElement) =>
   render(
-    <I18nContext.Provider value={{ locale } as any}>
-      {ui}
-    </I18nContext.Provider>,
+    <I18nContext.Provider value={{ locale } as any}>{ui}</I18nContext.Provider>,
   );
 
 describe('WebSearch', () => {
@@ -55,9 +53,7 @@ describe('WebSearch', () => {
   });
 
   it('should show no-results when output has no data', () => {
-    wrap(
-      <WebSearch info="q" category="web_search" output={{}} isFinished />,
-    );
+    wrap(<WebSearch info="q" category="web_search" output={{}} isFinished />);
     expect(screen.getByText('无搜索结果')).toBeInTheDocument();
   });
 

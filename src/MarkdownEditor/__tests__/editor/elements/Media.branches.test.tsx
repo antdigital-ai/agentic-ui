@@ -33,12 +33,9 @@ vi.mock('antd', () => ({
       <div data-testid="popover-content">{content}</div>
     </div>
   ),
-  Skeleton: Object.assign(
-    () => <div data-testid="skeleton" />,
-    {
-      Image: () => <div data-testid="skeleton-image" />,
-    },
-  ),
+  Skeleton: Object.assign(() => <div data-testid="skeleton" />, {
+    Image: () => <div data-testid="skeleton-image" />,
+  }),
 }));
 
 vi.mock('react-rnd', () => ({
@@ -117,7 +114,9 @@ vi.mock('../../../editor/components/MediaErrorLink', () => ({
 }));
 
 vi.mock('../../../editor/elements/Image', () => ({
-  ReadonlyImage: (props: any) => <img data-testid="readonly-image" {...props} />,
+  ReadonlyImage: (props: any) => (
+    <img data-testid="readonly-image" {...props} />
+  ),
 }));
 
 vi.mock('slate', () => ({
@@ -174,7 +173,10 @@ describe('Media targeted coverage', () => {
       readonly: false,
     };
     render(
-      <Media element={{ ...baseElement, mediaType: undefined }} attributes={{} as any}>
+      <Media
+        element={{ ...baseElement, mediaType: undefined }}
+        attributes={{} as any}
+      >
         {null}
       </Media>,
     );
@@ -184,9 +186,11 @@ describe('Media targeted coverage', () => {
   it('覆盖 initial 的 image 探测回调（269/271）', () => {
     const created: any[] = [];
     const origin = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-    vi.spyOn(document, 'createElement').mockImplementation(((tagName: string) => {
+      document,
+    ) as typeof document.createElement;
+    vi.spyOn(document, 'createElement').mockImplementation(((
+      tagName: string,
+    ) => {
       const el = origin(tagName);
       if (String(tagName).toLowerCase() === 'img') created.push(el);
       return el;
@@ -194,7 +198,10 @@ describe('Media targeted coverage', () => {
 
     mocks.getMediaTypeMock.mockReturnValue('image');
     render(
-      <Media element={{ ...baseElement, url: 'https://example.com/a.png' }} attributes={{} as any}>
+      <Media
+        element={{ ...baseElement, url: 'https://example.com/a.png' }}
+        attributes={{} as any}
+      >
         {null}
       </Media>,
     );
@@ -210,9 +217,11 @@ describe('Media targeted coverage', () => {
   it('覆盖 initial 的 video 探测回调（278/281）', () => {
     const created: any[] = [];
     const origin = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-    vi.spyOn(document, 'createElement').mockImplementation(((tagName: string) => {
+      document,
+    ) as typeof document.createElement;
+    vi.spyOn(document, 'createElement').mockImplementation(((
+      tagName: string,
+    ) => {
       const el = origin(tagName);
       if (String(tagName).toLowerCase() === 'video') created.push(el);
       return el;
@@ -220,7 +229,10 @@ describe('Media targeted coverage', () => {
 
     mocks.getMediaTypeMock.mockReturnValue('video');
     render(
-      <Media element={{ ...baseElement, url: 'https://example.com/a.mp4' }} attributes={{} as any}>
+      <Media
+        element={{ ...baseElement, url: 'https://example.com/a.mp4' }}
+        attributes={{} as any}
+      >
         {null}
       </Media>,
     );
@@ -240,9 +252,11 @@ describe('Media targeted coverage', () => {
   it('覆盖 initial 的 audio 探测回调（285-292）', () => {
     const created: any[] = [];
     const origin = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-    vi.spyOn(document, 'createElement').mockImplementation(((tagName: string) => {
+      document,
+    ) as typeof document.createElement;
+    vi.spyOn(document, 'createElement').mockImplementation(((
+      tagName: string,
+    ) => {
       const el = origin(tagName);
       if (String(tagName).toLowerCase() === 'audio') created.push(el);
       return el;
@@ -263,7 +277,10 @@ describe('Media targeted coverage', () => {
 
     mocks.getMediaTypeMock.mockReturnValue('audio');
     render(
-      <Media element={{ ...baseElement, url: 'https://example.com/a.mp3' }} attributes={{} as any}>
+      <Media
+        element={{ ...baseElement, url: 'https://example.com/a.mp3' }}
+        attributes={{} as any}
+      >
         {null}
       </Media>,
     );
@@ -285,7 +302,11 @@ describe('Media targeted coverage', () => {
     mocks.getMediaTypeMock.mockReturnValue('video');
     const { rerender } = render(
       <Media
-        element={{ ...baseElement, url: 'https://example.com/v.mp4', finished: false }}
+        element={{
+          ...baseElement,
+          url: 'https://example.com/v.mp4',
+          finished: false,
+        }}
         attributes={{} as any}
       >
         {null}
@@ -294,7 +315,9 @@ describe('Media targeted coverage', () => {
     act(() => {
       vi.advanceTimersByTime(5001);
     });
-    expect(screen.getByText(/视频链接|test alt|example.com/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/视频链接|test alt|example.com/),
+    ).toBeInTheDocument();
 
     const includesSpy = vi
       .spyOn(Array.prototype, 'includes')
@@ -312,7 +335,11 @@ describe('Media targeted coverage', () => {
     mocks.getMediaTypeMock.mockReturnValue('audio');
     rerender(
       <Media
-        element={{ ...baseElement, url: 'https://example.com/a.mp3', finished: false }}
+        element={{
+          ...baseElement,
+          url: 'https://example.com/a.mp3',
+          finished: false,
+        }}
         attributes={{} as any}
       >
         {null}
@@ -321,7 +348,9 @@ describe('Media targeted coverage', () => {
     act(() => {
       vi.advanceTimersByTime(5001);
     });
-    expect(screen.getByText(/音频链接|test alt|example.com/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/音频链接|test alt|example.com/),
+    ).toBeInTheDocument();
     includesSpy.mockRestore();
   });
 
@@ -329,7 +358,11 @@ describe('Media targeted coverage', () => {
     mocks.getMediaTypeMock.mockReturnValue('attachment');
     render(
       <Media
-        element={{ ...baseElement, url: 'https://example.com/file.pdf', alt: 'attachment:file.pdf' }}
+        element={{
+          ...baseElement,
+          url: 'https://example.com/file.pdf',
+          alt: 'attachment:file.pdf',
+        }}
         attributes={{} as any}
       >
         {null}
@@ -341,7 +374,10 @@ describe('Media targeted coverage', () => {
 
   it('覆盖删除弹窗 onClick/onOk（678/679/683）', () => {
     render(
-      <Media element={{ ...baseElement, mediaType: 'image' }} attributes={{} as any}>
+      <Media
+        element={{ ...baseElement, mediaType: 'image' }}
+        attributes={{} as any}
+      >
         {null}
       </Media>,
     );
@@ -357,4 +393,3 @@ describe('Media targeted coverage', () => {
     expect(mocks.removeNodesSpy).toHaveBeenCalled();
   });
 });
-

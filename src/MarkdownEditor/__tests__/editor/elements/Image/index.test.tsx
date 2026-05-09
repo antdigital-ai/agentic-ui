@@ -5,13 +5,13 @@
 
 import { render } from '@testing-library/react';
 import React from 'react';
+import * as slate from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorImage } from '../../../../editor/elements/Image';
-import * as slate from 'slate';
 import * as editorStore from '../../../../editor/store';
+import * as utils from '../../../../editor/utils';
 import * as domUtils from '../../../../editor/utils/dom';
 import * as editorHooks from '../../../../hooks/editor';
-import * as utils from '../../../../editor/utils';
 
 // Mock 依赖
 vi.mock('slate');
@@ -69,17 +69,21 @@ describe('EditorImage Component', () => {
   beforeEach(() => {
     // 重置所有 mocks
     vi.resetAllMocks();
-    
+
     // Mock useEditorStore
     vi.mocked(editorStore.useEditorStore).mockReturnValue({
       markdownEditorRef: mockEditor,
       readonly: false,
       editorProps: {},
     } as any);
-    
+
     // Mock useSelStatus
-    vi.mocked(editorHooks.useSelStatus).mockReturnValue([false, [0], {}] as any);
-    
+    vi.mocked(editorHooks.useSelStatus).mockReturnValue([
+      false,
+      [0],
+      {},
+    ] as any);
+
     // Mock useGetSetState
     const stateData = {
       height: 300,
@@ -89,16 +93,16 @@ describe('EditorImage Component', () => {
       selected: false,
       type: 'image',
     };
-    
+
     vi.mocked(utils.useGetSetState).mockReturnValue([
       () => stateData,
       vi.fn((updates) => Object.assign(stateData, updates)),
     ]);
-    
+
     // Mock Transforms.setNodes
     vi.mocked(slate.Transforms.setNodes).mockImplementation(() => {});
     vi.mocked(slate.Transforms.removeNodes).mockImplementation(() => {});
-    
+
     // Mock getMediaType
     vi.mocked(domUtils.getMediaType).mockReturnValue('image');
   });
@@ -117,7 +121,7 @@ describe('EditorImage Component', () => {
         readonly: true,
         editorProps: {},
       } as any);
-      
+
       render(<EditorImage {...defaultProps} />);
       expect(true).toBe(true);
     });
@@ -132,7 +136,7 @@ describe('EditorImage Component', () => {
           finished: true,
         },
       };
-      
+
       render(<EditorImage {...props} />);
       expect(true).toBe(true);
     });
@@ -143,7 +147,7 @@ describe('EditorImage Component', () => {
         readonly: true,
         editorProps: {},
       } as any);
-      
+
       const props = {
         ...defaultProps,
         element: {
@@ -151,7 +155,7 @@ describe('EditorImage Component', () => {
           url: 'invalid-url.jpg',
         },
       };
-      
+
       render(<EditorImage {...props} />);
       expect(true).toBe(true);
     });
@@ -166,7 +170,7 @@ describe('EditorImage Component', () => {
           finished: false,
         },
       };
-      
+
       render(<EditorImage {...props} />);
       expect(true).toBe(true);
     });
@@ -175,7 +179,7 @@ describe('EditorImage Component', () => {
   describe('媒体类型处理', () => {
     it('应该正确处理 image 类型', () => {
       vi.mocked(domUtils.getMediaType).mockReturnValue('image');
-      
+
       const props = {
         ...defaultProps,
         element: {
@@ -183,14 +187,14 @@ describe('EditorImage Component', () => {
           url: 'https://example.com/test.jpg',
         },
       };
-      
+
       render(<EditorImage {...props} />);
       expect(true).toBe(true);
     });
 
     it('应该正确处理 unknown 类型', () => {
       vi.mocked(domUtils.getMediaType).mockReturnValue('other');
-      
+
       const props = {
         ...defaultProps,
         element: {
@@ -198,7 +202,7 @@ describe('EditorImage Component', () => {
           url: 'https://example.com/unknown.file',
         },
       };
-      
+
       render(<EditorImage {...props} />);
       expect(true).toBe(true);
     });
@@ -214,7 +218,7 @@ describe('EditorImage Component', () => {
           alt: 'Empty URL Image',
         },
       };
-      
+
       render(<EditorImage {...props} />);
       expect(true).toBe(true);
     });
@@ -228,7 +232,7 @@ describe('EditorImage Component', () => {
           height: undefined,
         },
       };
-      
+
       render(<EditorImage {...props} />);
       expect(true).toBe(true);
     });
@@ -241,7 +245,7 @@ describe('EditorImage Component', () => {
           mediaType: undefined,
         },
       };
-      
+
       render(<EditorImage {...props} />);
       expect(true).toBe(true);
     });
@@ -252,7 +256,7 @@ describe('EditorImage Component', () => {
         readonly: true,
         editorProps: {},
       } as any);
-      
+
       const props = {
         ...defaultProps,
         element: {
@@ -260,7 +264,7 @@ describe('EditorImage Component', () => {
           url: 'not-a-valid-url',
         },
       };
-      
+
       render(<EditorImage {...props} />);
       expect(true).toBe(true);
     });

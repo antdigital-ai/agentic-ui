@@ -3,10 +3,10 @@
  * 测试 CodeElement 组件
  */
 
-import { describe, it, expect, vi, beforeAll } from 'vitest';
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 // Mock CodeElement 组件及相关依赖
 const mockEditorStore = {
@@ -136,7 +136,7 @@ describe('code plugin index', () => {
           value: csvData,
         },
       };
-      
+
       render(<CodeElement {...props} />);
       expect(screen.getByTestId('base-markdown-editor')).toBeInTheDocument();
     });

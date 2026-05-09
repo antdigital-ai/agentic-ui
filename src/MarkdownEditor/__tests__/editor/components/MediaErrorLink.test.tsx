@@ -150,10 +150,13 @@ describe('MediaErrorLink Component', () => {
           />,
         );
         // 等待 React 重新渲染完成
-        await waitFor(() => {
-          const element = containerElement?.querySelector('span');
-          expect(element).toBeInTheDocument();
-        }, { timeout: 1000 });
+        await waitFor(
+          () => {
+            const element = containerElement?.querySelector('span');
+            expect(element).toBeInTheDocument();
+          },
+          { timeout: 1000 },
+        );
       }
     };
 
@@ -184,4 +187,3 @@ describe('MediaErrorLink Component', () => {
     });
   });
 });
-

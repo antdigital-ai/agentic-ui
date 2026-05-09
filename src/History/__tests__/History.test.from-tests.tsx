@@ -209,7 +209,9 @@ describe('History 组件', () => {
 
       await waitFor(
         () => {
-          expect(document.querySelector('.ant-popover-open')).toBeInTheDocument();
+          expect(
+            document.querySelector('.ant-popover-open'),
+          ).toBeInTheDocument();
         },
         { timeout: 1000 },
       );
@@ -218,7 +220,9 @@ describe('History 组件', () => {
 
       await waitFor(
         () => {
-          expect(document.querySelector('.ant-popover-open')).not.toBeInTheDocument();
+          expect(
+            document.querySelector('.ant-popover-open'),
+          ).not.toBeInTheDocument();
         },
         { timeout: 500 },
       );
@@ -227,9 +231,8 @@ describe('History 组件', () => {
     it('onDeleteItem 执行后调用 loadHistory', async () => {
       const request = vi.fn().mockResolvedValue(mockHistoryData);
       const onDeleteItem = vi.fn().mockResolvedValue(undefined);
-      const { generateHistoryItems } = await import(
-        '../../src/History/components'
-      );
+      const { generateHistoryItems } =
+        await import('../../src/History/components');
 
       let deleteCallbackFired = false;
       vi.mocked(generateHistoryItems).mockImplementation((config: any) => {
@@ -346,9 +349,8 @@ describe('History 组件', () => {
   describe('emptyRender 空状态渲染', () => {
     it('应该在历史记录为空时显示自定义空状态', async () => {
       const emptyRequest = vi.fn().mockResolvedValue([]);
-      const { generateHistoryItems } = await import(
-        '../../src/History/components'
-      );
+      const { generateHistoryItems } =
+        await import('../../src/History/components');
       (generateHistoryItems as any).mockReturnValue([]);
 
       const emptyRender = vi.fn(() => (
@@ -378,9 +380,8 @@ describe('History 组件', () => {
     });
 
     it('应该在有数据时不显示空状态', async () => {
-      const { generateHistoryItems } = await import(
-        '../../src/History/components'
-      );
+      const { generateHistoryItems } =
+        await import('../../src/History/components');
       (generateHistoryItems as any).mockReturnValue([
         {
           key: 'group1',
@@ -412,9 +413,8 @@ describe('History 组件', () => {
 
     it('应该在下拉菜单模式下也支持空状态渲染', async () => {
       const emptyRequest = vi.fn().mockResolvedValue([]);
-      const { generateHistoryItems } = await import(
-        '../../src/History/components'
-      );
+      const { generateHistoryItems } =
+        await import('../../src/History/components');
       (generateHistoryItems as any).mockReturnValue([]);
 
       const emptyRender = vi.fn(() => (
@@ -462,9 +462,8 @@ describe('History 组件', () => {
 
     it('空列表且有搜索关键词时显示 HistoryEmpty', async () => {
       const emptyRequest = vi.fn().mockResolvedValue([]);
-      const { generateHistoryItems } = await import(
-        '../../src/History/components'
-      );
+      const { generateHistoryItems } =
+        await import('../../src/History/components');
       vi.mocked(generateHistoryItems).mockReturnValue([]);
 
       render(
@@ -518,9 +517,8 @@ describe('History 组件', () => {
 
     it('空列表且无搜索关键词时使用 emptyRender', async () => {
       const emptyRequest = vi.fn().mockResolvedValue([]);
-      const { generateHistoryItems } = await import(
-        '../../src/History/components'
-      );
+      const { generateHistoryItems } =
+        await import('../../src/History/components');
       vi.mocked(generateHistoryItems).mockReturnValue([]);
 
       const emptyRender = vi.fn(() => (
@@ -574,9 +572,8 @@ describe('History 组件', () => {
 
     it('应该支持复杂的自定义空状态组件', async () => {
       const emptyRequest = vi.fn().mockResolvedValue([]);
-      const { generateHistoryItems } = await import(
-        '../../src/History/components'
-      );
+      const { generateHistoryItems } =
+        await import('../../src/History/components');
       (generateHistoryItems as any).mockReturnValue([]);
 
       const emptyRender = () => (
@@ -629,9 +626,8 @@ describe('History 组件', () => {
     });
 
     it('应该在 loading 为 false 时显示正常内容', async () => {
-      const { generateHistoryItems } = await import(
-        '../../src/History/components'
-      );
+      const { generateHistoryItems } =
+        await import('../../src/History/components');
       (generateHistoryItems as any).mockReturnValue([
         {
           key: 'group1',

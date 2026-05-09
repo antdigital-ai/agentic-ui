@@ -4,7 +4,6 @@
  */
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { RefObject } from 'react';
-import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   useIntersectionOnce,
@@ -52,8 +51,14 @@ describe('useIntersectionOnce', () => {
   });
 
   it('元素已在视口内时 useLayoutEffect 将 isIntersecting 设为 true', async () => {
-    Object.defineProperty(window, 'innerWidth', { value: 800, configurable: true });
-    Object.defineProperty(window, 'innerHeight', { value: 600, configurable: true });
+    Object.defineProperty(window, 'innerWidth', {
+      value: 800,
+      configurable: true,
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      value: 600,
+      configurable: true,
+    });
     targetEl.getBoundingClientRect = vi.fn(() => ({
       top: 10,
       bottom: 50,
@@ -350,8 +355,14 @@ describe('useIntersectionOnce', () => {
 
   describe('无 root 时的 viewport 边界', () => {
     it('rect 超出视口右侧时 shouldSetIntersecting 为 false', () => {
-      Object.defineProperty(window, 'innerWidth', { value: 800, configurable: true });
-      Object.defineProperty(window, 'innerHeight', { value: 600, configurable: true });
+      Object.defineProperty(window, 'innerWidth', {
+        value: 800,
+        configurable: true,
+      });
+      Object.defineProperty(window, 'innerHeight', {
+        value: 600,
+        configurable: true,
+      });
       targetEl.getBoundingClientRect = vi.fn(() => ({
         top: 10,
         bottom: 50,
@@ -372,8 +383,14 @@ describe('useIntersectionOnce', () => {
     });
 
     it('rect 在视口内时 shouldSetIntersecting 为 true', async () => {
-      Object.defineProperty(window, 'innerWidth', { value: 800, configurable: true });
-      Object.defineProperty(window, 'innerHeight', { value: 600, configurable: true });
+      Object.defineProperty(window, 'innerWidth', {
+        value: 800,
+        configurable: true,
+      });
+      Object.defineProperty(window, 'innerHeight', {
+        value: 600,
+        configurable: true,
+      });
       targetEl.getBoundingClientRect = vi.fn(() => ({
         top: 10,
         bottom: 50,

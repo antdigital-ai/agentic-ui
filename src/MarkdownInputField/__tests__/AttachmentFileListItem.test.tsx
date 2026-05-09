@@ -21,14 +21,11 @@ vi.mock('../../icons/LoadingIcon', () => ({
 }));
 
 // Mock AttachmentFileIcon
-vi.mock(
-  '../AttachmentButton/AttachmentFileList/AttachmentFileIcon',
-  () => ({
-    AttachmentFileIcon: ({ file }: { file: any }) => (
-      <div data-testid="file-icon">{file.name}</div>
-    ),
-  }),
-);
+vi.mock('../AttachmentButton/AttachmentFileList/AttachmentFileIcon', () => ({
+  AttachmentFileIcon: ({ file }: { file: any }) => (
+    <div data-testid="file-icon">{file.name}</div>
+  ),
+}));
 
 describe('AttachmentFileListItem', () => {
   const mockOnDelete = vi.fn();

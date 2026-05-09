@@ -277,7 +277,6 @@ describe('ChartAttrToolBar', () => {
       expect(style).toMatch(/color:\s*(red|rgb\(255,\s*0,\s*0\))/);
       expect(style).toContain('font-size: 16px');
     });
-
   });
 
   describe('边界情况', () => {

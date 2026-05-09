@@ -229,7 +229,9 @@ describe('DocInfoList', () => {
       // happy-dom 下 framer-motion mock 的 data-testid 可能未被渲染到 DOM，
       // 改为通过 container 查询所有带 data-testid="motion-div" 的元素，
       // 若找不到则回退到检查文档项数量
-      const motionDivs = container.querySelectorAll('[data-testid="motion-div"]');
+      const motionDivs = container.querySelectorAll(
+        '[data-testid="motion-div"]',
+      );
       if (motionDivs.length > 0) {
         expect(motionDivs).toHaveLength(3);
       } else {
@@ -249,7 +251,9 @@ describe('DocInfoList', () => {
       const { container } = render(
         <DocInfoList
           {...defaultProps}
-          options={[{ content: 'Only one', docMeta: { doc_name: 'O' }, originUrl: '#' }]}
+          options={[
+            { content: 'Only one', docMeta: { doc_name: 'O' }, originUrl: '#' },
+          ]}
           reference_url_info_list={[]}
         />,
       );
@@ -294,7 +298,9 @@ describe('DocInfoList', () => {
           ]}
         />,
       );
-      const item = screen.getByText('Test document 1').closest('[class*="list-item"]');
+      const item = screen
+        .getByText('Test document 1')
+        .closest('[class*="list-item"]');
       await user.click(item!);
       expect(onOriginUrlClick).toHaveBeenCalledWith('https://example.com/doc1');
     });
@@ -315,7 +321,9 @@ describe('DocInfoList', () => {
           ]}
         />,
       );
-      const item = screen.getByText('No url doc').closest('[class*="list-item"]');
+      const item = screen
+        .getByText('No url doc')
+        .closest('[class*="list-item"]');
       await user.click(item!);
       expect(openSpy).toHaveBeenCalledWith(undefined);
       openSpy.mockRestore();
@@ -389,25 +397,35 @@ describe('DocInfoList', () => {
           options={[
             {
               content: longContent,
-              docMeta: { doc_name: docName, doc_url: 'https://example.com/long' },
+              docMeta: {
+                doc_name: docName,
+                doc_url: 'https://example.com/long',
+              },
               originUrl: 'https://example.com/long',
             },
           ]}
         />,
       );
       expect(screen.getByText(longContent)).toBeInTheDocument();
-      const listItem = screen.getByText(longContent).closest('[class*="list-item"]');
+      const listItem = screen
+        .getByText(longContent)
+        .closest('[class*="list-item"]');
       await user.hover(listItem as HTMLElement);
-      const popoverContent = document.body.querySelector('[class*="popover"] [class*="content"]') || document.body.querySelector('.ant-popover-content');
+      const popoverContent =
+        document.body.querySelector('[class*="popover"] [class*="content"]') ||
+        document.body.querySelector('.ant-popover-content');
       if (popoverContent) {
-        const docMetaInPopover = within(popoverContent as HTMLElement).getByText(docName);
+        const docMetaInPopover = within(
+          popoverContent as HTMLElement,
+        ).getByText(docName);
         await user.click(docMetaInPopover);
       }
       expect(screen.getByText(docName)).toBeInTheDocument();
     });
 
     it('传入 render 时使用自定义渲染 (396)', () => {
-      const longContent = 'Custom content that is long enough to trigger Popover';
+      const longContent =
+        'Custom content that is long enough to trigger Popover';
       const renderItem = vi.fn((item: any, dom: React.ReactNode) => (
         <div data-testid="custom-render">{item?.content}</div>
       ));
@@ -428,6 +446,5 @@ describe('DocInfoList', () => {
       expect(screen.getByText(longContent)).toBeInTheDocument();
       expect(renderItem).toHaveBeenCalled();
     });
-
   });
 });

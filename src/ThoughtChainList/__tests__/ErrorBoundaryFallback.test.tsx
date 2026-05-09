@@ -23,9 +23,7 @@ const mockItem: WhiteBoxProcessInterface = {
 
 describe('ThoughtChainList ErrorBoundary fallback', () => {
   it('应在子组件抛出时显示 fallback 并渲染 thoughtChainList.at(index)', () => {
-    render(
-      <ThoughtChainList thoughtChainList={[mockItem]} />,
-    );
+    render(<ThoughtChainList thoughtChainList={[mockItem]} />);
 
     expect(screen.getByText(/"runId":\s*"r1"/)).toBeInTheDocument();
   });

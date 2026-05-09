@@ -1,7 +1,13 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ActionItemContainer } from '../BeforeToolContainer/BeforeToolContainer';
 
 // happy-dom 不支持 setPointerCapture/releasePointerCapture，需要 mock
@@ -52,7 +58,9 @@ describe('ActionItemContainer Component', () => {
     );
 
     // 查找包含 ant- 前缀和 small 尺寸的容器类名
-    const smallContainer = container.querySelector('[class*="ant-"][class*="container"][class*="small"]');
+    const smallContainer = container.querySelector(
+      '[class*="ant-"][class*="container"][class*="small"]',
+    );
     expect(smallContainer).toBeInTheDocument();
 
     rerender(
@@ -62,7 +70,9 @@ describe('ActionItemContainer Component', () => {
     );
 
     // 查找包含 ant- 前缀和 large 尺寸的容器类名
-    const largeContainer = container.querySelector('[class*="ant-"][class*="container"][class*="large"]');
+    const largeContainer = container.querySelector(
+      '[class*="ant-"][class*="container"][class*="large"]',
+    );
     expect(largeContainer).toBeInTheDocument();
   });
 
@@ -77,7 +87,9 @@ describe('ActionItemContainer Component', () => {
     );
 
     // 查找包含 ant- 前缀的容器类名
-    const containerEl = container.querySelector('[class*="ant-"][class*="container"]');
+    const containerEl = container.querySelector(
+      '[class*="ant-"][class*="container"]',
+    );
     expect(containerEl).toBeInTheDocument();
     expect(containerEl).toHaveStyle({ backgroundColor: 'red' });
   });
@@ -91,7 +103,9 @@ describe('ActionItemContainer Component', () => {
     );
 
     // 查找包含 ant- 前缀和 overflow-container-menu 的类名
-    const menuButton = container.querySelector('[class*="ant-"][class*="overflow-container-menu"]');
+    const menuButton = container.querySelector(
+      '[class*="ant-"][class*="overflow-container-menu"]',
+    );
     expect(menuButton).toBeInTheDocument();
   });
 
@@ -104,9 +118,7 @@ describe('ActionItemContainer Component', () => {
     );
 
     expect(
-      container.querySelector(
-        '[class*="ant-"][class*="overflow-container"]',
-      ),
+      container.querySelector('[class*="ant-"][class*="overflow-container"]'),
     ).not.toBeInTheDocument();
   });
 
@@ -166,7 +178,9 @@ describe('ActionItemContainer Component', () => {
     );
 
     // 查找包含 ant- 前缀的容器类名
-    const containerDiv = container.querySelector('[class*="ant-"][class*="container"]');
+    const containerDiv = container.querySelector(
+      '[class*="ant-"][class*="container"]',
+    );
     expect(containerDiv).toBeInTheDocument();
   });
 
@@ -445,7 +459,9 @@ describe('ActionItemContainer Component', () => {
     ) as HTMLElement;
 
     // 检查类名是否包含预期的模式
-    expect(menuButton?.className).toMatch(/ant-.*-overflow-container-menu-disabled/);
+    expect(menuButton?.className).toMatch(
+      /ant-.*-overflow-container-menu-disabled/,
+    );
 
     // 点击不应该打开弹窗
     fireEvent.click(menuButton);

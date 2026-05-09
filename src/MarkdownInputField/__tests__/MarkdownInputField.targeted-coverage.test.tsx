@@ -7,14 +7,7 @@
 import '@testing-library/jest-dom';
 import { act, render } from '@testing-library/react';
 import React from 'react';
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // === merged from MarkdownInputField.targeted-coverage.test.tsx ===
 // ===========================================================================
@@ -113,28 +106,22 @@ vi.mock('../hooks/useKeyboardHandler', () => ({
   useKeyboardHandler: () => ({ handleKeyDown: vi.fn() }),
 }));
 
-vi.mock(
-  '../hooks/useEnlargeAndContainerHandler',
-  () => ({
-    useEnlargeAndContainerHandler: () => ({
-      handleEnlargeClick: vi.fn(),
-      handleContainerClick: vi.fn(),
-      activeInput: vi.fn(),
-    }),
+vi.mock('../hooks/useEnlargeAndContainerHandler', () => ({
+  useEnlargeAndContainerHandler: () => ({
+    handleEnlargeClick: vi.fn(),
+    handleContainerClick: vi.fn(),
+    activeInput: vi.fn(),
   }),
-);
+}));
 
-vi.mock(
-  '../hooks/useInputFieldRefContainer',
-  () => ({
-    useInputFieldRefContainer: () => ({
-      markdownEditorRef: { current: { store: { setMDContent: vi.fn() } } },
-      quickActionsRef: { current: null },
-      actionsRef: { current: null },
-      isSendingRef: { current: false },
-    }),
+vi.mock('../hooks/useInputFieldRefContainer', () => ({
+  useInputFieldRefContainer: () => ({
+    markdownEditorRef: { current: { store: { setMDContent: vi.fn() } } },
+    quickActionsRef: { current: null },
+    actionsRef: { current: null },
+    isSendingRef: { current: false },
   }),
-);
+}));
 
 vi.mock('../hooks/useEditorValueSync', () => ({
   useEditorValueSync: () => ({
@@ -162,23 +149,20 @@ vi.mock('../hooks/useInputFieldGeometry', () => ({
   }),
 }));
 
-vi.mock(
-  '../hooks/useMarkdownInputFieldState',
-  () => ({
-    useMarkdownInputFieldState: () => ({
-      isHover: false,
-      setHover: vi.fn(),
-      isLoading: false,
-      setIsLoading: vi.fn(),
-      isEnlarged: false,
-      setIsEnlarged: vi.fn(),
-      value: '',
-      setValue: vi.fn(),
-      fileMap: {},
-      setFileMap: vi.fn(),
-    }),
+vi.mock('../hooks/useMarkdownInputFieldState', () => ({
+  useMarkdownInputFieldState: () => ({
+    isHover: false,
+    setHover: vi.fn(),
+    isLoading: false,
+    setIsLoading: vi.fn(),
+    isEnlarged: false,
+    setIsEnlarged: vi.fn(),
+    value: '',
+    setValue: vi.fn(),
+    fileMap: {},
+    setFileMap: vi.fn(),
   }),
-);
+}));
 
 import { MarkdownInputField } from '../MarkdownInputField';
 
@@ -286,7 +270,10 @@ describe('MarkdownInputField targeted coverage', () => {
   it('覆盖 QuickActions onValueChange 回调', () => {
     const onChangeSpy = vi.fn();
     render(
-      <MarkdownInputField onChange={onChangeSpy} enlargeable={{ enable: true }} />,
+      <MarkdownInputField
+        onChange={onChangeSpy}
+        enlargeable={{ enable: true }}
+      />,
     );
 
     expect(captured.quickActionsProps).toBeTruthy();
@@ -296,5 +283,4 @@ describe('MarkdownInputField targeted coverage', () => {
 
     expect(onChangeSpy).toHaveBeenCalledWith('new text');
   });
-
 });

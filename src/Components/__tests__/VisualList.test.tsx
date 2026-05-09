@@ -112,10 +112,7 @@ describe('VisualList 组件', () => {
 
   it('应该支持自定义样式', () => {
     const { container } = render(
-      <VisualList
-        data={mockData}
-        style={{ backgroundColor: 'red' }}
-      />,
+      <VisualList data={mockData} style={{ backgroundColor: 'red' }} />,
     );
 
     // style 加在外层容器 div 上
@@ -147,10 +144,7 @@ describe('VisualList 组件', () => {
     ];
 
     const { container } = render(
-      <VisualList
-        data={dataWithLinks}
-        linkStyle={{ color: 'red' }}
-      />,
+      <VisualList data={dataWithLinks} linkStyle={{ color: 'red' }} />,
     );
 
     const link = container.querySelector('a');

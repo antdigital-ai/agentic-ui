@@ -114,39 +114,37 @@ const FileTreeComponent: FC<FileTreeProps> = ({
     [innerTree],
   );
 
-  const handleLoadData = useRefFunction(
-    (treeNode: EventDataNode<DataNode>) => {
-      const k = String(treeNode.key);
-      const source = nodeMap.get(k);
-      if (!source) {
-        return Promise.resolve();
-      }
-      if (source.isLeaf === true) {
-        return Promise.resolve();
-      }
-      if (
-        source.isLeaf === undefined &&
-        (!source.children || source.children.length === 0)
-      ) {
-        return Promise.resolve();
-      }
-      if (source.children && source.children.length > 0) {
-        return Promise.resolve();
-      }
+  const handleLoadData = useRefFunction((treeNode: EventDataNode<DataNode>) => {
+    const k = String(treeNode.key);
+    const source = nodeMap.get(k);
+    if (!source) {
+      return Promise.resolve();
+    }
+    if (source.isLeaf === true) {
+      return Promise.resolve();
+    }
+    if (
+      source.isLeaf === undefined &&
+      (!source.children || source.children.length === 0)
+    ) {
+      return Promise.resolve();
+    }
+    if (source.children && source.children.length > 0) {
+      return Promise.resolve();
+    }
 
-      // 须让 `Promise` 在失败时 reject，以便 rc-tree 不将 key 记为已加载，从而可再次展开重试
-      return Promise.resolve(onLoadChildrenRef(source))
-        .then((loaded) => {
-          const children = loaded ?? [];
-          setInnerTree((prev) => replaceNodeChildren(prev, k, children));
-        })
-        .catch((error) => {
-          console.error('Failed to load tree children:', error);
-          // 返回 reject 以便 rc-tree 不将 key 记为已加载，允许重试
-          throw error;
-        });
-    },
-  );
+    // 须让 `Promise` 在失败时 reject，以便 rc-tree 不将 key 记为已加载，从而可再次展开重试
+    return Promise.resolve(onLoadChildrenRef(source))
+      .then((loaded) => {
+        const children = loaded ?? [];
+        setInnerTree((prev) => replaceNodeChildren(prev, k, children));
+      })
+      .catch((error) => {
+        console.error('Failed to load tree children:', error);
+        // 返回 reject 以便 rc-tree 不将 key 记为已加载，允许重试
+        throw error;
+      });
+  });
 
   const handleSelect: NonNullable<TreeProps['onSelect']> = useRefFunction(
     (_keys, info) => {

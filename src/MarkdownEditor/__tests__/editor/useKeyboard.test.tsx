@@ -27,10 +27,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownEditorProps } from '../../BaseMarkdownEditor';
 import { useKeyboard } from '../../editor/plugins/useKeyboard';
 import { withMarkdown } from '../../editor/plugins/withMarkdown';
-import {
-  EditorStore,
-  useEditorStore,
-} from '../../editor/store';
+import { EditorStore, useEditorStore } from '../../editor/store';
 
 // Mock is-hotkey 库
 vi.mock('is-hotkey', () => ({

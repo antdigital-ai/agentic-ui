@@ -1,7 +1,7 @@
 /**
  * useSkillModeState Hook 测试
  */
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useSkillModeState } from '../../../SkillModeBar/hooks/useSkillModeState';
 
@@ -10,10 +10,7 @@ describe('useSkillModeState', () => {
     const onSkillModeOpenChange = vi.fn();
     const { result, rerender } = renderHook(
       (props: { open?: boolean }) =>
-        useSkillModeState(
-          { open: props.open },
-          onSkillModeOpenChange,
-        ),
+        useSkillModeState({ open: props.open }, onSkillModeOpenChange),
       { initialProps: { open: false } },
     );
 

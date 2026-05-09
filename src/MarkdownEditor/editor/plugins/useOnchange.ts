@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useDebounceFn } from '../../../Hooks/useDebounceFn';
 import React, { useRef } from 'react';
 import { Subject } from 'rxjs';
 import {
@@ -11,6 +10,7 @@ import {
   Path,
   Range,
 } from 'slate';
+import { useDebounceFn } from '../../../Hooks/useDebounceFn';
 import { Elements } from '../../el';
 import { useEditorStore } from '../store';
 import { parserSlateNodeToMarkdown } from '../utils';

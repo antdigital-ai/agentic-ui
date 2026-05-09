@@ -2,8 +2,8 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BubbleFileView } from '../FileView';
 import { AttachmentFile } from '../../MarkdownInputField/AttachmentButton/types';
+import { BubbleFileView } from '../FileView';
 
 // Mock FileMapView 组件
 vi.mock('../../MarkdownInputField/FileMapView', () => ({

@@ -4,7 +4,7 @@
 
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
-import React, { createContext } from 'react';
+import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CodeRenderer } from '../../components/CodeRenderer';
 
@@ -541,7 +541,8 @@ describe('CodeRenderer Component', () => {
         element: {
           ...defaultProps.element,
           language: 'html',
-          value: '<style>.test { color: red; }</style><div class="test">Content</div>',
+          value:
+            '<style>.test { color: red; }</style><div class="test">Content</div>',
         },
       };
       render(<CodeRenderer {...props} />);

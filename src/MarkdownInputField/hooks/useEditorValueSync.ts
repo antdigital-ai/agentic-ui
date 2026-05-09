@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { ReactEditor } from 'slate-react';
-import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 import { useRefFunction } from '../../Hooks/useRefFunction';
+import type { MarkdownEditorInstance } from '../../MarkdownEditor';
 
 interface UseEditorValueSyncParams {
   /** 受控的外部 value */

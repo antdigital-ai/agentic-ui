@@ -62,8 +62,12 @@ describe('Title 组件', () => {
   it('应该为标题添加正确的样式类', () => {
     const { container } = render(<Title title="主标题" subtitle="副标题" />);
 
-    const mainTitle = container.querySelector('.ant-agentic-chatboot-title-main');
-    const subtitle = container.querySelector('.ant-agentic-chatboot-title-subtitle');
+    const mainTitle = container.querySelector(
+      '.ant-agentic-chatboot-title-main',
+    );
+    const subtitle = container.querySelector(
+      '.ant-agentic-chatboot-title-subtitle',
+    );
 
     expect(mainTitle).toBeInTheDocument();
     expect(subtitle).toBeInTheDocument();
@@ -100,14 +104,18 @@ describe('Title 组件', () => {
   it('应该只渲染有内容的标题', () => {
     const { container } = render(<Title subtitle="只有副标题" />);
 
-    const mainTitle = container.querySelector('.ant-agentic-chatboot-title-main');
+    const mainTitle = container.querySelector(
+      '.ant-agentic-chatboot-title-main',
+    );
     expect(mainTitle).not.toBeInTheDocument();
   });
 
   it('应该只渲染有内容的副标题', () => {
     const { container } = render(<Title title="只有主标题" />);
 
-    const subtitle = container.querySelector('.ant-agentic-chatboot-title-subtitle');
+    const subtitle = container.querySelector(
+      '.ant-agentic-chatboot-title-subtitle',
+    );
     expect(subtitle).not.toBeInTheDocument();
   });
 

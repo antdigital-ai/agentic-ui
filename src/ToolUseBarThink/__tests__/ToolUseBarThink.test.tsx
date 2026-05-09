@@ -19,10 +19,7 @@ describe('ToolUseBarThink', () => {
   it('should render with time and show time element', () => {
     render(
       <Wrapper>
-        <ToolUseBarThink
-          toolName="Test"
-          time="10:00"
-        />
+        <ToolUseBarThink toolName="Test" time="10:00" />
       </Wrapper>,
     );
     expect(screen.getByText('10:00')).toBeInTheDocument();
@@ -167,7 +164,10 @@ describe('ToolUseBarThink', () => {
         this.callback = callback;
       }
       observe(el: HTMLElement) {
-        Object.defineProperty(el, 'scrollHeight', { value: 250, configurable: true });
+        Object.defineProperty(el, 'scrollHeight', {
+          value: 250,
+          configurable: true,
+        });
         this.callback();
       }
       disconnect() {}
@@ -201,7 +201,10 @@ describe('ToolUseBarThink', () => {
         this.callback = callback;
       }
       observe(el: HTMLElement) {
-        Object.defineProperty(el, 'scrollHeight', { value: 250, configurable: true });
+        Object.defineProperty(el, 'scrollHeight', {
+          value: 250,
+          configurable: true,
+        });
         this.callback();
       }
       disconnect() {}

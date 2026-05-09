@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ThreeThinkingLottie } from '../ThreeThinkingLottie';
 
 // Mock lottie-react
@@ -38,7 +38,11 @@ describe('ThreeThinkingLottie', () => {
   });
 
   it('支持自定义 fallback', () => {
-    render(<ThreeThinkingLottie fallback={<div data-testid="custom-fallback">Loading...</div>} />);
+    render(
+      <ThreeThinkingLottie
+        fallback={<div data-testid="custom-fallback">Loading...</div>}
+      />,
+    );
     expect(screen.getByTestId('custom-fallback')).toBeInTheDocument();
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });

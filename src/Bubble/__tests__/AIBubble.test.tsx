@@ -1,13 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React, { useContext } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  AIBubble,
-  shouldRenderBeforeContent,
-} from '../AIBubble';
+import { RoleType } from '../../Types/common';
+import { AIBubble, shouldRenderBeforeContent } from '../AIBubble';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
 import { MessagesContext } from '../MessagesContent/BubbleContext';
-import { RoleType } from '../../Types/common';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -184,7 +181,9 @@ describe('AIBubble', () => {
 
     fireEvent.click(screen.getByTestId('trigger-set-message'));
 
-    expect(setMessageItem).toHaveBeenCalledWith('test-id', { content: 'updated' });
+    expect(setMessageItem).toHaveBeenCalledWith('test-id', {
+      content: 'updated',
+    });
   });
 
   it('should call setMessageItem with thumbsDown when onDisLike succeeds', async () => {
@@ -447,7 +446,9 @@ describe('AIBubble', () => {
         </BubbleConfigProvide>,
       );
 
-      expect(screen.queryByTestId('bubble-avatar-title')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('bubble-avatar-title'),
+      ).not.toBeInTheDocument();
     });
 
     it('avatarRender 和 titleRender 均返回 null 时不渲染 avatar-title 包装器', () => {
@@ -470,7 +471,9 @@ describe('AIBubble', () => {
         </BubbleConfigProvide>,
       );
 
-      expect(screen.queryByTestId('bubble-avatar-title')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('bubble-avatar-title'),
+      ).not.toBeInTheDocument();
     });
 
     it('avatarDom 或 titleDom 至少有一个存在时渲染 avatar-title 包装器', () => {

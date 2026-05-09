@@ -1,9 +1,4 @@
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-} from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -101,9 +96,7 @@ describe('SuggestionList 组件', () => {
   it('MutationObserver 不存在时 useEffect 提前 return', () => {
     const origMO = global.MutationObserver;
     (global as any).MutationObserver = undefined;
-    render(
-      <SuggestionList items={[{ key: '1', text: 'text' }]} />,
-    );
+    render(<SuggestionList items={[{ key: '1', text: 'text' }]} />);
     expect(screen.getByText('text')).toBeInTheDocument();
     (global as any).MutationObserver = origMO;
   });
@@ -223,10 +216,7 @@ describe('SuggestionList 组件', () => {
 
   it('应该支持自定义样式', () => {
     const { container } = render(
-      <SuggestionList
-        items={mockItems}
-        style={{ backgroundColor: 'red' }}
-      />,
+      <SuggestionList items={mockItems} style={{ backgroundColor: 'red' }} />,
     );
 
     const root = container.querySelector('.ant-follow-up');

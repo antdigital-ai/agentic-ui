@@ -75,9 +75,8 @@ describe('Mermaid utils', () => {
     it('应该在加载失败时重置 loader 并抛出', async () => {
       (globalThis as any).__MERMAID_LOAD_FAIL__ = true;
       try {
-        const { loadMermaid } = await import(
-          '../../../src/Plugins/mermaid/utils'
-        );
+        const { loadMermaid } =
+          await import('../../../src/Plugins/mermaid/utils');
         await expect(loadMermaid()).rejects.toThrow('load failed');
       } finally {
         (globalThis as any).__MERMAID_LOAD_FAIL__ = false;

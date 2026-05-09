@@ -3,10 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  CommentDataType,
-  MarkdownEditorProps,
-} from '../BaseMarkdownEditor';
+import { CommentDataType, MarkdownEditorProps } from '../BaseMarkdownEditor';
 import { CommentList } from '../editor/components/CommentList';
 
 const { setShowCommentMock, mockMarkdownEditorRef } = vi.hoisted(() => ({
@@ -222,7 +219,9 @@ describe('CommentList Component', () => {
   });
 
   it('onDelete 抛出时静默捕获', () => {
-    const onDeleteReject = vi.fn().mockRejectedValue(new Error('delete failed'));
+    const onDeleteReject = vi
+      .fn()
+      .mockRejectedValue(new Error('delete failed'));
     renderWithProvider(
       <CommentList
         commentList={[mockCommentData[0]]}
@@ -351,7 +350,9 @@ describe('CommentList Component', () => {
       document.querySelector('.ant-agentic-md-editor-comment-view-item-header'),
     ).toBeInTheDocument();
     expect(
-      document.querySelector('.ant-agentic-md-editor-comment-view-item-content'),
+      document.querySelector(
+        '.ant-agentic-md-editor-comment-view-item-content',
+      ),
     ).toBeInTheDocument();
   });
 
@@ -436,7 +437,9 @@ describe('CommentList Component', () => {
     const getElementByIdSpy = vi
       .spyOn(document, 'getElementById')
       .mockReturnValue(mockEl as any);
-    const scrollBySpy = vi.spyOn(window, 'scrollBy').mockImplementation(scrollByMock);
+    const scrollBySpy = vi
+      .spyOn(window, 'scrollBy')
+      .mockImplementation(scrollByMock);
 
     renderWithProvider(
       <CommentList

@@ -7,12 +7,9 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React, { useContext } from 'react';
 import { describe, expect, it } from 'vitest';
-import {
-  BubbleConfigContext,
-  ChatConfigType,
-} from '../BubbleConfigProvide';
-import { BubbleProps } from '../type';
 import { cnLabels, enLabels } from '../../I18n/locales';
+import { BubbleConfigContext, ChatConfigType } from '../BubbleConfigProvide';
+import { BubbleProps } from '../type';
 
 // 测试组件，用于获取 context 值
 const TestComponent = () => {

@@ -108,7 +108,9 @@ describe('List Component', () => {
     const { container } = renderList(list);
 
     const listContainer = container.querySelector('[data-be="list"]');
-    expect(listContainer?.className).toContain('ant-agentic-md-editor-list-container');
+    expect(listContainer?.className).toContain(
+      'ant-agentic-md-editor-list-container',
+    );
   });
 
   it('应该为有序列表应用 ol 类名', () => {
@@ -159,7 +161,9 @@ describe('List Component', () => {
 
     const { container } = renderList(list);
 
-    const listContainer = container.querySelector('[data-be="list"]') as HTMLElement;
+    const listContainer = container.querySelector(
+      '[data-be="list"]',
+    ) as HTMLElement;
     // 源码通过 onDragStart 绑定事件（非 draggable 属性），验证 dragstart 事件可正常触发
     expect(listContainer).toBeDefined();
     expect(() => {

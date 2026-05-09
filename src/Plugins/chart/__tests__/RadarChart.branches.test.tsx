@@ -148,18 +148,22 @@ describe('RadarChart 分支逻辑', () => {
   describe('generateLabels 文本截断逻辑', () => {
     it('短文本不截断，长文本截断加省略号', () => {
       // 直接 mock createElement 让 canvas.getContext 返回可用的 ctx
-      const origCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
-      vi.spyOn(document, 'createElement').mockImplementation((tag: string, options?: any) => {
-        if (tag === 'canvas') {
-          return {
-            getContext: () => ({
-              measureText: (text: string) => ({ width: text.length * 8 }),
-              font: '',
-            }),
-          } as any;
-        }
-        return origCreateElement(tag, options);
-      });
+      const origCreateElement = Document.prototype.createElement.bind(
+        document,
+      ) as typeof document.createElement;
+      vi.spyOn(document, 'createElement').mockImplementation(
+        (tag: string, options?: any) => {
+          if (tag === 'canvas') {
+            return {
+              getContext: () => ({
+                measureText: (text: string) => ({ width: text.length * 8 }),
+                font: '',
+              }),
+            } as any;
+          }
+          return origCreateElement(tag, options);
+        },
+      );
 
       render(<RadarChart data={validData} textMaxWidth={80} />);
       expect(capturedRadarProps).toBeTruthy();
@@ -178,13 +182,17 @@ describe('RadarChart 分支逻辑', () => {
     });
 
     it('canvas context 为 null 时返回原始标签', () => {
-      const origCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
-      vi.spyOn(document, 'createElement').mockImplementation((tag: string, options?: any) => {
-        if (tag === 'canvas') {
-          return { getContext: () => null } as any;
-        }
-        return origCreateElement(tag, options);
-      });
+      const origCreateElement = Document.prototype.createElement.bind(
+        document,
+      ) as typeof document.createElement;
+      vi.spyOn(document, 'createElement').mockImplementation(
+        (tag: string, options?: any) => {
+          if (tag === 'canvas') {
+            return { getContext: () => null } as any;
+          }
+          return origCreateElement(tag, options);
+        },
+      );
 
       render(<RadarChart data={validData} />);
       const generateLabels =
@@ -192,9 +200,7 @@ describe('RadarChart 分支逻辑', () => {
       const result = generateLabels({});
       // ctx 为 null，直接返回 original
       expect(result).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ text: 'Short' }),
-        ]),
+        expect.arrayContaining([expect.objectContaining({ text: 'Short' })]),
       );
     });
   });
@@ -215,7 +221,9 @@ describe('RadarChart 分支逻辑', () => {
       document.body.appendChild(el);
 
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: { opacity: 0 },
       });
 
@@ -231,7 +239,9 @@ describe('RadarChart 分支逻辑', () => {
 
       expect(() => {
         external({
-          chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+          chart: {
+            canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+          },
           tooltip: { opacity: 0 },
         });
       }).not.toThrow();
@@ -241,7 +251,9 @@ describe('RadarChart 分支逻辑', () => {
       const external = getTooltipExternal();
       expect(() => {
         external({
-          chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+          chart: {
+            canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+          },
           tooltip: { opacity: 1, dataPoints: [] },
         });
       }).not.toThrow();
@@ -251,7 +263,9 @@ describe('RadarChart 分支逻辑', () => {
       const external = getTooltipExternal();
       expect(() => {
         external({
-          chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+          chart: {
+            canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+          },
           tooltip: { opacity: 1, dataPoints: [undefined] },
         });
       }).not.toThrow();
@@ -261,7 +275,9 @@ describe('RadarChart 分支逻辑', () => {
       const external = getTooltipExternal();
       expect(() => {
         external({
-          chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+          chart: {
+            canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+          },
           tooltip: { opacity: 1, dataPoints: undefined },
         });
       }).not.toThrow();
@@ -277,7 +293,9 @@ describe('RadarChart 分支逻辑', () => {
     it('rawValue 为有限数字时格式化为定点数', () => {
       const external = getTooltipExternal();
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: {
           opacity: 1,
           caretX: 10,
@@ -300,7 +318,9 @@ describe('RadarChart 分支逻辑', () => {
     it('rawValue 为非有限数字时使用 String 转换', () => {
       const external = getTooltipExternal();
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: {
           opacity: 1,
           caretX: 0,
@@ -334,7 +354,9 @@ describe('RadarChart 分支逻辑', () => {
       };
 
       external({
-        chart: { canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) } },
+        chart: {
+          canvas: { getBoundingClientRect: () => ({ left: 0, top: 0 }) },
+        },
         tooltip: {
           opacity: 1,
           caretX: 0,
@@ -352,17 +374,15 @@ describe('RadarChart 分支逻辑', () => {
   describe('ticks callback 和 download 错误', () => {
     it('ticks callback 直接返回 value', () => {
       render(<RadarChart data={validData} />);
-      const ticksCallback =
-        capturedRadarProps.options.scales.r.ticks.callback;
+      const ticksCallback = capturedRadarProps.options.scales.r.ticks.callback;
       expect(ticksCallback(20)).toBe(20);
       expect(ticksCallback(0)).toBe(0);
       expect(ticksCallback(100)).toBe(100);
     });
 
     it('下载时 downloadChart 抛错触发 console.warn', async () => {
-      const { downloadChart } = await import(
-        '../../../src/Plugins/chart/components'
-      );
+      const { downloadChart } =
+        await import('../../../src/Plugins/chart/components');
       (downloadChart as any).mockImplementation(() => {
         throw new Error('download fail');
       });
@@ -372,10 +392,7 @@ describe('RadarChart 分支逻辑', () => {
       const downloadBtn = screen.getByTestId('download-button');
       downloadBtn.click();
 
-      expect(warnSpy).toHaveBeenCalledWith(
-        '图表下载失败:',
-        expect.any(Error),
-      );
+      expect(warnSpy).toHaveBeenCalledWith('图表下载失败:', expect.any(Error));
       warnSpy.mockRestore();
     });
   });
@@ -402,7 +419,9 @@ describe('RadarChart 分支逻辑', () => {
         'RadarChart 渲染错误:',
         expect.any(Error),
       );
-      expect(screen.getByText('图表渲染失败，请检查数据格式')).toBeInTheDocument();
+      expect(
+        screen.getByText('图表渲染失败，请检查数据格式'),
+      ).toBeInTheDocument();
 
       errorSpy.mockRestore();
     });

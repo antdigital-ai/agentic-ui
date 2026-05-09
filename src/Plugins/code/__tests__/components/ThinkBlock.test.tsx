@@ -8,10 +8,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MessagesContext } from '../../../../Bubble/MessagesContent/BubbleContext';
 import { CodeNode } from '../../../../MarkdownEditor/el';
-import {
-  ThinkBlock,
-  ThinkBlockProvider,
-} from '../../components/ThinkBlock';
+import { ThinkBlock, ThinkBlockProvider } from '../../components/ThinkBlock';
 
 const mockFindPath = vi.fn();
 const mockCheckSelEnd = vi.fn();

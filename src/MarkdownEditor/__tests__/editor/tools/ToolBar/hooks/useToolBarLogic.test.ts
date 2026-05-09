@@ -3,7 +3,6 @@
  */
 
 import { act, renderHook } from '@testing-library/react';
-import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   useToolBarLogic,
@@ -46,7 +45,12 @@ vi.mock('../../../../../editor/utils/editorUtils', () => ({
   },
 }));
 
-const mockGetSelRect = vi.fn(() => ({ top: 0, left: 0, width: 100, height: 20 }));
+const mockGetSelRect = vi.fn(() => ({
+  top: 0,
+  left: 0,
+  width: 100,
+  height: 20,
+}));
 vi.mock('../../../../../editor/utils/dom', () => ({
   getSelRect: (...args: any[]) => mockGetSelRect(...args),
 }));
@@ -82,14 +86,17 @@ vi.mock('slate', async (importOriginal) => {
   };
 });
 
-const EditorUtils = await import('../../../../../editor/utils/editorUtils').then(
-  (m) => m.EditorUtils,
-);
+const EditorUtils =
+  await import('../../../../../editor/utils/editorUtils').then(
+    (m) => m.EditorUtils,
+  );
 
 describe('useToolBarLogic', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockEditorNodes.mockReturnValue([[{ type: 'paragraph', children: [{ text: 'hi' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'paragraph', children: [{ text: 'hi' }] }, [0, 0]],
+    ]);
     vi.mocked(EditorUtils.isFormatActive).mockReturnValue(false);
     Object.defineProperty(window, 'matchMedia', {
       value: vi.fn(() => ({ matches: true })),
@@ -129,7 +136,10 @@ describe('useToolBarLogic', () => {
   });
 
   it('markdownEditorRef.current 存在时 currentNode 来自 Editor.nodes', () => {
-    const nodeEntry = [{ type: 'paragraph', children: [{ text: '' }] }, [0, 0] as any];
+    const nodeEntry = [
+      { type: 'paragraph', children: [{ text: '' }] },
+      [0, 0] as any,
+    ];
     mockEditorNodes.mockReturnValue([nodeEntry]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     expect(result.current.currentNode).toEqual(nodeEntry);
@@ -137,13 +147,17 @@ describe('useToolBarLogic', () => {
   });
 
   it('isCodeNode 在节点为 code 时返回 true', () => {
-    mockEditorNodes.mockReturnValue([[{ type: 'code', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'code', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     expect(result.current.isCodeNode()).toBe(true);
   });
 
   it('isCodeNode 在节点非 code 时返回 false', () => {
-    mockEditorNodes.mockReturnValue([[{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     expect(result.current.isCodeNode()).toBe(false);
   });
@@ -178,7 +192,9 @@ describe('useToolBarLogic', () => {
   });
 
   it('handleClearFormat 在非 code 节点时调用 clearMarks 和 highColor', () => {
-    mockEditorNodes.mockReturnValue([[{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
       result.current.handleClearFormat();
@@ -188,7 +204,9 @@ describe('useToolBarLogic', () => {
   });
 
   it('handleClearFormat 在 code 节点时不执行', () => {
-    mockEditorNodes.mockReturnValue([[{ type: 'code', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'code', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
       result.current.handleClearFormat();
@@ -206,7 +224,10 @@ describe('useToolBarLogic', () => {
   });
 
   it('handleFormat 有 editor 但无文本节点时不进入 if(node)', () => {
-    const elemEntry = [{ type: 'paragraph', children: [{ text: '' }] }, [0, 0] as any];
+    const elemEntry = [
+      { type: 'paragraph', children: [{ text: '' }] },
+      [0, 0] as any,
+    ];
     let callCount = 0;
     mockEditorNodes.mockImplementation(() => {
       callCount += 1;
@@ -247,7 +268,10 @@ describe('useToolBarLogic', () => {
 
   it('handleFormat 有文本节点非空但无 selection 时不 Transforms', () => {
     const editorNoSel = { ...mockEditor, selection: null };
-    const props = { ...defaultProps, markdownEditorRef: { current: editorNoSel as any } };
+    const props = {
+      ...defaultProps,
+      markdownEditorRef: { current: editorNoSel as any },
+    };
     const textNodeEntry = [{ text: 'x' }, [0, 0] as any];
     mockEditorNodes.mockReturnValue([textNodeEntry]);
     mockNodeString.mockReturnValue('x');
@@ -258,9 +282,9 @@ describe('useToolBarLogic', () => {
     expect(mockTransformsInsertText).not.toHaveBeenCalled();
   });
 
-    it('handleFormat 有节点但 content 空且 store.getMDContent 空时不调用 setMDContent', () => {
-      const textNodeEntry = [{ text: '' }, [0, 0] as any];
-      mockEditorNodes.mockReturnValue([textNodeEntry]);
+  it('handleFormat 有节点但 content 空且 store.getMDContent 空时不调用 setMDContent', () => {
+    const textNodeEntry = [{ text: '' }, [0, 0] as any];
+    mockEditorNodes.mockReturnValue([textNodeEntry]);
     mockNodeString.mockReturnValue('');
     mockGetMDContent.mockReturnValue(null);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
@@ -279,7 +303,9 @@ describe('useToolBarLogic', () => {
   });
 
   it('handleColorChange 在非 code 节点时设置 highColor 并刷新', () => {
-    mockEditorNodes.mockReturnValue([[{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
       result.current.handleColorChange('#ff0000');
@@ -289,7 +315,9 @@ describe('useToolBarLogic', () => {
   });
 
   it('handleColorChange 在 code 节点时不执行', () => {
-    mockEditorNodes.mockReturnValue([[{ type: 'code', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'code', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
       result.current.handleColorChange('#ff0000');
@@ -299,18 +327,25 @@ describe('useToolBarLogic', () => {
 
   it('handleToggleHighColor 当 highColor 已激活时只调 highColor()', () => {
     vi.mocked(EditorUtils.isFormatActive).mockReturnValue(true);
-    mockEditorNodes.mockReturnValue([[{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
       result.current.handleToggleHighColor();
     });
     expect(EditorUtils.highColor).toHaveBeenCalledWith(mockEditor);
-    expect(EditorUtils.highColor).not.toHaveBeenCalledWith(mockEditor, expect.any(String));
+    expect(EditorUtils.highColor).not.toHaveBeenCalledWith(
+      mockEditor,
+      expect.any(String),
+    );
   });
 
   it('handleToggleHighColor 当 highColor 未激活时传默认色或当前 highColor', () => {
     vi.mocked(EditorUtils.isFormatActive).mockReturnValue(false);
-    mockEditorNodes.mockReturnValue([[{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
       result.current.handleToggleHighColor();
@@ -320,7 +355,9 @@ describe('useToolBarLogic', () => {
 
   it('handleToggleHighColor 使用已有 highColor 状态', () => {
     vi.mocked(EditorUtils.isFormatActive).mockReturnValue(false);
-    mockEditorNodes.mockReturnValue([[{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
       result.current.handleColorChange('#abc');
@@ -333,7 +370,9 @@ describe('useToolBarLogic', () => {
 
   it('handleToolClick 有 tool.onClick 时调用 onClick', () => {
     const onClick = vi.fn();
-    mockEditorNodes.mockReturnValue([[{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
       result.current.handleToolClick({ type: 'custom', onClick });
@@ -342,7 +381,9 @@ describe('useToolBarLogic', () => {
   });
 
   it('handleToolClick 无 onClick 时调用 EditorUtils.toggleFormat', () => {
-    mockEditorNodes.mockReturnValue([[{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'paragraph', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
       result.current.handleToolClick({ type: 'bold' });
@@ -351,7 +392,9 @@ describe('useToolBarLogic', () => {
   });
 
   it('handleToolClick 在 code 节点时不执行', () => {
-    mockEditorNodes.mockReturnValue([[{ type: 'code', children: [{ text: '' }] }, [0, 0]]]);
+    mockEditorNodes.mockReturnValue([
+      [{ type: 'code', children: [{ text: '' }] }, [0, 0]],
+    ]);
     const onClick = vi.fn();
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
@@ -362,7 +405,10 @@ describe('useToolBarLogic', () => {
 
   it('handleInsertLink 无 selection 时不执行', () => {
     const editorWithoutSel = { ...mockEditor, selection: null };
-    const props = { ...defaultProps, markdownEditorRef: { current: editorWithoutSel as any } };
+    const props = {
+      ...defaultProps,
+      markdownEditorRef: { current: editorWithoutSel as any },
+    };
     const { result } = renderHook(() => useToolBarLogic(props));
     act(() => {
       result.current.handleInsertLink();
@@ -371,34 +417,43 @@ describe('useToolBarLogic', () => {
     expect(mockOpenInsertLinkNext).not.toHaveBeenCalled();
   });
 
-    it('handleInsertLink 有 selection 时 setDomRect 并 openInsertLink$.next', () => {
-      const { result } = renderHook(() => useToolBarLogic(defaultProps));
-      act(() => {
-        result.current.handleInsertLink();
-      });
-      expect(mockSetDomRect).toHaveBeenCalled();
-      expect(mockGetSelRect).toHaveBeenCalled();
-      expect(mockOpenInsertLinkNext).toHaveBeenCalledWith(mockEditor.selection);
+  it('handleInsertLink 有 selection 时 setDomRect 并 openInsertLink$.next', () => {
+    const { result } = renderHook(() => useToolBarLogic(defaultProps));
+    act(() => {
+      result.current.handleInsertLink();
     });
+    expect(mockSetDomRect).toHaveBeenCalled();
+    expect(mockGetSelRect).toHaveBeenCalled();
+    expect(mockOpenInsertLinkNext).toHaveBeenCalledWith(mockEditor.selection);
+  });
 
-    it('handleInsertLink 在 window.matchMedia 未定义时不调用 openInsertLink$.next', () => {
-      const originalMatchMedia = window.matchMedia;
-      Object.defineProperty(window, 'matchMedia', { value: undefined, configurable: true });
-      const { result } = renderHook(() => useToolBarLogic(defaultProps));
-      act(() => {
-        result.current.handleInsertLink();
-      });
-      expect(mockSetDomRect).toHaveBeenCalled();
-      expect(mockOpenInsertLinkNext).not.toHaveBeenCalled();
-      Object.defineProperty(window, 'matchMedia', { value: originalMatchMedia, configurable: true });
+  it('handleInsertLink 在 window.matchMedia 未定义时不调用 openInsertLink$.next', () => {
+    const originalMatchMedia = window.matchMedia;
+    Object.defineProperty(window, 'matchMedia', {
+      value: undefined,
+      configurable: true,
     });
+    const { result } = renderHook(() => useToolBarLogic(defaultProps));
+    act(() => {
+      result.current.handleInsertLink();
+    });
+    expect(mockSetDomRect).toHaveBeenCalled();
+    expect(mockOpenInsertLinkNext).not.toHaveBeenCalled();
+    Object.defineProperty(window, 'matchMedia', {
+      value: originalMatchMedia,
+      configurable: true,
+    });
+  });
 
   it('handleInsert 有 op 时调用 keyTask$.next', () => {
     const { result } = renderHook(() => useToolBarLogic(defaultProps));
     act(() => {
       result.current.handleInsert({ task: 'image', args: ['url'] });
     });
-    expect(mockKeyTaskNext).toHaveBeenCalledWith({ key: 'image', args: ['url'] });
+    expect(mockKeyTaskNext).toHaveBeenCalledWith({
+      key: 'image',
+      args: ['url'],
+    });
   });
 
   it('handleInsert op 为空时不调用', () => {

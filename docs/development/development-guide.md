@@ -277,9 +277,10 @@ useEffect(() => {
 
 // ✅ 正确：提取稳定的 key 序列作为依赖
 const childrenKeys = useMemo(
-  () => React.Children.toArray(props.children)
-    .filter(React.isValidElement)
-    .map((child) => child.key),
+  () =>
+    React.Children.toArray(props.children)
+      .filter(React.isValidElement)
+      .map((child) => child.key),
   [props.children],
 );
 

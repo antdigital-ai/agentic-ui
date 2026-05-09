@@ -977,8 +977,9 @@ describe('BubbleMessageDisplay', () => {
 
       const definedAfterMount = markdownPreviewFncPropsHistory.filter(Boolean);
       expect(definedAfterMount.length).toBeGreaterThan(0);
-      const fncPropsAfterMount =
-        definedAfterMount[definedAfterMount.length - 1] as object;
+      const fncPropsAfterMount = definedAfterMount[
+        definedAfterMount.length - 1
+      ] as object;
 
       rerender(
         <BubbleConfigContext.Provider value={defaultContext as any}>
@@ -990,14 +991,14 @@ describe('BubbleMessageDisplay', () => {
         </BubbleConfigContext.Provider>,
       );
 
-      const definedAfterRerender = markdownPreviewFncPropsHistory.filter(
-        Boolean,
-      );
+      const definedAfterRerender =
+        markdownPreviewFncPropsHistory.filter(Boolean);
       expect(definedAfterRerender.length).toBeGreaterThan(
         definedAfterMount.length,
       );
-      const fncPropsAfterStream =
-        definedAfterRerender[definedAfterRerender.length - 1] as object;
+      const fncPropsAfterStream = definedAfterRerender[
+        definedAfterRerender.length - 1
+      ] as object;
       expect(fncPropsAfterStream).toBe(fncPropsAfterMount);
     });
 
@@ -1025,9 +1026,7 @@ describe('BubbleMessageDisplay', () => {
         </BubbleConfigContext.Provider>,
       );
 
-      const first = markdownPreviewFncPropsHistory.filter(
-        Boolean,
-      ) as object[];
+      const first = markdownPreviewFncPropsHistory.filter(Boolean) as object[];
       expect(first.length).toBeGreaterThan(0);
       const refV1 = first[first.length - 1];
 
@@ -1043,9 +1042,7 @@ describe('BubbleMessageDisplay', () => {
         </BubbleConfigContext.Provider>,
       );
 
-      const second = markdownPreviewFncPropsHistory.filter(
-        Boolean,
-      ) as object[];
+      const second = markdownPreviewFncPropsHistory.filter(Boolean) as object[];
       const refV2 = second[second.length - 1];
       expect(refV2).not.toBe(refV1);
       expect((refV2 as { custom?: string }).custom).toBe('v2');

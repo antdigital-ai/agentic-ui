@@ -2,8 +2,8 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React, { useEffect } from 'react';
 import { describe, expect, it } from 'vitest';
-import { useMarkdownToReact } from '..';
 import type { RendererBlockProps } from '..';
+import { useMarkdownToReact } from '..';
 
 interface Counters {
   mounts: number;
@@ -30,12 +30,7 @@ const RevisionHarness: React.FC<{
   streaming: boolean;
   codeBlockComponent: React.ComponentType<RendererBlockProps>;
   contentRevisionSource?: string;
-}> = ({
-  content,
-  streaming,
-  codeBlockComponent,
-  contentRevisionSource,
-}) => {
+}> = ({ content, streaming, codeBlockComponent, contentRevisionSource }) => {
   const reactNode = useMarkdownToReact(content, {
     streaming,
     contentRevisionSource,

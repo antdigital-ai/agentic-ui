@@ -24,7 +24,9 @@ describe('AgenticUiTaskBlock / AgenticUiToolUseBarBlock', () => {
           {
             type: 'agentic-ui-task',
             value: {
-              items: [{ key: '1', title: 'T', content: 'c', status: 'pending' }],
+              items: [
+                { key: '1', title: 'T', content: 'c', status: 'pending' },
+              ],
             },
           } as any
         }
@@ -33,7 +35,9 @@ describe('AgenticUiTaskBlock / AgenticUiToolUseBarBlock', () => {
     );
     expect(screen.getByTestId('agentic-ui-task-block')).toBeInTheDocument();
     expect(screen.getByTestId('task-list-mock')).toBeInTheDocument();
-    expect(screen.getByTestId('agentic-ui-task-hidden-children')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('agentic-ui-task-hidden-children'),
+    ).toBeInTheDocument();
   });
 
   it('AgenticUiToolUseBarBlock 渲染 ToolUseBar 与隐藏 children', () => {
@@ -58,7 +62,9 @@ describe('AgenticUiTaskBlock / AgenticUiToolUseBarBlock', () => {
         children={<span>hc</span>}
       />,
     );
-    expect(screen.getByTestId('agentic-ui-toolusebar-block')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('agentic-ui-toolusebar-block'),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('tooluse-bar-mock')).toBeInTheDocument();
     expect(
       screen.getByTestId('agentic-ui-toolusebar-hidden-children'),

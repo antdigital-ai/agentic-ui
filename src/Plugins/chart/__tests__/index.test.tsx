@@ -461,9 +461,8 @@ describe('ChartElement', () => {
       expect(chartLayer).toHaveStyle('position: relative');
       expect(chartLayer).toHaveStyle('z-index: 1');
 
-      const placeholderLayer = chartLayer?.previousElementSibling as
-        | HTMLDivElement
-        | null;
+      const placeholderLayer =
+        chartLayer?.previousElementSibling as HTMLDivElement | null;
       expect(placeholderLayer).toBeInTheDocument();
       expect(placeholderLayer).toHaveStyle('position: absolute');
       expect(placeholderLayer).toHaveStyle('z-index: 0');
@@ -530,9 +529,7 @@ describe('ChartElement', () => {
           type: 'chart',
           children: [{ text: '' }],
           otherProps: {
-            dataSource: [
-              { region: 'North', name: 'A', value: 10 },
-            ],
+            dataSource: [{ region: 'North', name: 'A', value: 10 }],
             config: {
               chartType: 'bar',
               x: 'name',

@@ -1,12 +1,12 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { FileCategory, FileType } from '../../types';
 import {
   generateUniqueId,
   getFileTypeIcon,
   getGroupIcon,
 } from '../../File/utils';
+import { FileType } from '../../types';
 
 describe('Workspace File utils', () => {
   describe('getFileTypeIcon', () => {
@@ -304,7 +304,9 @@ describe('Workspace File utils', () => {
         id: 'g1',
         name: 'Group',
         type: 'plainText' as FileType,
-        children: [{ id: 'f1', name: 'file.txt', type: 'plainText' as FileType }],
+        children: [
+          { id: 'f1', name: 'file.txt', type: 'plainText' as FileType },
+        ],
       };
       const icon = getGroupIcon(group, 'plainText');
       const { container } = render(<div>{icon}</div>);

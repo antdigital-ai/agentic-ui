@@ -150,16 +150,10 @@ describe('useAutoScroll targeted coverage (aligned with current impl)', () => {
   beforeEach(() => {
     observers = installObserverMocks();
     rafController = createRafController();
-    vi.stubGlobal(
-      'requestAnimationFrame',
-      ((cb: FrameRequestCallback) =>
-        rafController.schedule(cb)) as typeof requestAnimationFrame,
-    );
-    vi.stubGlobal(
-      'cancelAnimationFrame',
-      ((id: number) =>
-        rafController.cancel(id)) as typeof cancelAnimationFrame,
-    );
+    vi.stubGlobal('requestAnimationFrame', ((cb: FrameRequestCallback) =>
+      rafController.schedule(cb)) as typeof requestAnimationFrame);
+    vi.stubGlobal('cancelAnimationFrame', ((id: number) =>
+      rafController.cancel(id)) as typeof cancelAnimationFrame);
   });
 
   afterEach(() => {
@@ -226,9 +220,7 @@ describe('useAutoScroll targeted coverage (aligned with current impl)', () => {
   });
 
   it('isAtBottom 基于 scrollHeight/scrollTop/clientHeight + scrollTolerance 判断', () => {
-    const { result } = renderHook(() =>
-      useAutoScroll({ scrollTolerance: 20 }),
-    );
+    const { result } = renderHook(() => useAutoScroll({ scrollTolerance: 20 }));
     const div = document.createElement('div');
     installScrollMetrics(div, {
       scrollHeight: 500,

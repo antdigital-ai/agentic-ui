@@ -2,8 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { HistoryActionsBox } from '../../components/HistoryActionsBox';
 import { I18nContext } from '../../../I18n';
+import { HistoryActionsBox } from '../../components/HistoryActionsBox';
 
 const mockI18nLocale = {
   'chat.history.favorite': '收藏',

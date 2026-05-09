@@ -32,9 +32,7 @@ describe('useVoiceInputManager', () => {
 
   describe('基本功能', () => {
     it('应该返回正确的初始状态', () => {
-      const { result } = renderHook(() =>
-        useVoiceInputManager(defaultProps),
-      );
+      const { result } = renderHook(() => useVoiceInputManager(defaultProps));
 
       expect(result.current.recording).toBe(false);
       expect(typeof result.current.startRecording).toBe('function');
@@ -221,9 +219,7 @@ describe('useVoiceInputManager', () => {
     });
 
     it('应该在未录音时不执行停止', async () => {
-      const { result } = renderHook(() =>
-        useVoiceInputManager(defaultProps),
-      );
+      const { result } = renderHook(() => useVoiceInputManager(defaultProps));
 
       await result.current.stopRecording();
 
@@ -420,7 +416,9 @@ describe('useVoiceInputManager', () => {
       partialCallback('first sentence');
 
       // 第二个句子
-      mockEditorRef.current.store.getMDContent.mockReturnValue('first sentence');
+      mockEditorRef.current.store.getMDContent.mockReturnValue(
+        'first sentence',
+      );
       sentenceBeginCallback();
       partialCallback(' second sentence');
 
@@ -430,4 +428,3 @@ describe('useVoiceInputManager', () => {
     });
   });
 });
-

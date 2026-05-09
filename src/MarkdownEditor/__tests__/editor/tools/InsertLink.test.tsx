@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { InsertLink } from '../../../editor/tools/InsertLink';
@@ -100,10 +100,7 @@ vi.mock('@ant-design/agentic-ui/MarkdownEditor/hooks/subscribe', () => ({
 
 vi.mock('@ant-design/agentic-ui/MarkdownEditor/editor/utils', () => ({
   useGetSetState: () => {
-    return [
-      () => mockState,
-      mockSetState,
-    ];
+    return [() => mockState, mockSetState];
   },
   useRefFunction: (fn: any) => fn,
 }));
@@ -149,14 +146,14 @@ describe('InsertLink Component', () => {
   it('应该处理链接输入（http链接）', () => {
     mockState.open = true;
     mockState.inputKeyword = 'https://example.com';
-    
+
     vi.mocked(pathUtils.isLink).mockReturnValue(true);
 
     render(<InsertLink />);
-    
+
     const textarea = screen.getByRole('textbox');
     fireEvent.change(textarea, { target: { value: 'https://example.com' } });
-    
+
     const okButton = document.querySelector('.ant-modal .ant-btn-primary');
     if (okButton) {
       fireEvent.click(okButton);
@@ -182,16 +179,14 @@ describe('InsertLink Component', () => {
   it('应该处理锚点输入', () => {
     mockState.open = true;
     mockState.inputKeyword = 'path#anchor';
-    mockState.anchors = [
-      { item: { path: 'path/to/doc' }, value: 'anchor' },
-    ];
+    mockState.anchors = [{ item: { path: 'path/to/doc' }, value: 'anchor' }];
     mockState.filterAnchors = [
       { item: { path: 'path/to/doc' }, value: 'anchor' },
     ];
     mockState.index = 0;
 
     render(<InsertLink />);
-    
+
     const okButton = document.querySelector('.ant-modal .ant-btn-primary');
     if (okButton) {
       fireEvent.click(okButton);
@@ -202,10 +197,13 @@ describe('InsertLink Component', () => {
     mockState.open = true;
     mockState.inputKeyword = '#anchor';
 
-    vi.mocked(pathUtils.parsePath).mockReturnValue({ path: '', hash: 'anchor' });
+    vi.mocked(pathUtils.parsePath).mockReturnValue({
+      path: '',
+      hash: 'anchor',
+    });
 
     render(<InsertLink />);
-    
+
     const okButton = document.querySelector('.ant-modal .ant-btn-primary');
     if (okButton) {
       fireEvent.click(okButton);
@@ -217,8 +215,9 @@ describe('InsertLink Component', () => {
     mockState.oldUrl = 'https://example.com';
 
     render(<InsertLink />);
-    
-    const deleteButton = document.querySelector('.anticon-delete')?.parentElement;
+
+    const deleteButton =
+      document.querySelector('.anticon-delete')?.parentElement;
     if (deleteButton) {
       fireEvent.click(deleteButton);
     }
@@ -229,7 +228,7 @@ describe('InsertLink Component', () => {
     mockState.oldUrl = 'https://example.com';
 
     render(<InsertLink />);
-    
+
     const cancelButton = document.querySelector('.ant-modal .ant-btn-default');
     if (cancelButton) {
       fireEvent.click(cancelButton);
@@ -238,17 +237,14 @@ describe('InsertLink Component', () => {
 
   it('应该处理输入框变化（文档过滤）', () => {
     mockState.open = true;
-    mockState.docs = [
-      { path: 'path/to/doc1' },
-      { path: 'path/to/doc2' },
-    ];
+    mockState.docs = [{ path: 'path/to/doc1' }, { path: 'path/to/doc2' }];
     mockState.anchors = [];
 
     render(<InsertLink />);
-    
+
     const textarea = screen.getByRole('textbox');
     fireEvent.change(textarea, { target: { value: 'doc1' } });
-    
+
     expect(mockSetState).toHaveBeenCalled();
   });
 
@@ -260,54 +256,47 @@ describe('InsertLink Component', () => {
     ];
 
     render(<InsertLink />);
-    
+
     const textarea = screen.getByRole('textbox');
     fireEvent.change(textarea, { target: { value: 'path#anchor1' } });
-    
+
     expect(mockSetState).toHaveBeenCalled();
   });
 
   it('应该处理 Backspace 键清除锚点', () => {
     mockState.open = true;
     mockState.inputKeyword = 'path#';
-    mockState.anchors = [
-      { item: { path: 'path/to/doc' }, value: 'anchor' },
-    ];
+    mockState.anchors = [{ item: { path: 'path/to/doc' }, value: 'anchor' }];
 
     render(<InsertLink />);
-    
+
     const textarea = screen.getByRole('textbox');
     fireEvent.keyDown(textarea, {
       key: 'Backspace',
       metaKey: true,
     });
-    
+
     expect(mockSetState).toHaveBeenCalled();
   });
 
   it('应该处理 Backspace 键（当输入以 # 结尾时）', () => {
     mockState.open = true;
     mockState.inputKeyword = 'path#';
-    mockState.anchors = [
-      { item: { path: 'path/to/doc' }, value: 'anchor' },
-    ];
+    mockState.anchors = [{ item: { path: 'path/to/doc' }, value: 'anchor' }];
 
     render(<InsertLink />);
-    
+
     const textarea = screen.getByRole('textbox');
     fireEvent.keyDown(textarea, {
       key: 'Backspace',
     });
-    
+
     expect(mockSetState).toHaveBeenCalled();
   });
 
   it('应该处理 openInsertLink 事件（有 URL）', () => {
     vi.mocked(EditorUtils.getUrl).mockReturnValue('https://example.com');
-    const addEventListenerSpy = vi.spyOn(
-      mockParentElement,
-      'addEventListener',
-    );
+    const addEventListenerSpy = vi.spyOn(mockParentElement, 'addEventListener');
 
     render(<InsertLink />);
 
@@ -329,31 +318,31 @@ describe('InsertLink Component', () => {
 
   it('应该处理 openInsertLink 事件（有 hash）', () => {
     vi.mocked(EditorUtils.getUrl).mockReturnValue('path#anchor');
-    
+
     render(<InsertLink />);
-    
+
     if (mockOpenInsertLink$.callback) {
       mockOpenInsertLink$.callback({
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 5 },
       });
     }
-    
+
     expect(mockSetState).toHaveBeenCalled();
   });
 
   it('应该处理 openInsertLink 事件（无 hash）', () => {
     vi.mocked(EditorUtils.getUrl).mockReturnValue('path/to/doc');
-    
+
     render(<InsertLink />);
-    
+
     if (mockOpenInsertLink$.callback) {
       mockOpenInsertLink$.callback({
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 5 },
       });
     }
-    
+
     expect(mockSetState).toHaveBeenCalled();
   });
 
@@ -376,8 +365,9 @@ describe('InsertLink Component', () => {
 
     mockState.open = true;
     render(<InsertLink />);
-    
-    const deleteButton = document.querySelector('.anticon-delete')?.parentElement;
+
+    const deleteButton =
+      document.querySelector('.anticon-delete')?.parentElement;
     if (deleteButton) {
       fireEvent.click(deleteButton);
     }
@@ -392,7 +382,7 @@ describe('InsertLink Component', () => {
     mockState.anchors = [];
 
     render(<InsertLink />);
-    
+
     const okButton = document.querySelector('.ant-modal .ant-btn-primary');
     if (okButton) {
       fireEvent.click(okButton);
@@ -406,7 +396,7 @@ describe('InsertLink Component', () => {
     mockState.filterAnchors = [];
 
     render(<InsertLink />);
-    
+
     const okButton = document.querySelector('.ant-modal .ant-btn-primary');
     if (okButton) {
       fireEvent.click(okButton);
@@ -446,6 +436,8 @@ describe('InsertLink Component', () => {
     if (okButton) {
       fireEvent.click(okButton);
     }
-    expect(mockSetState).toHaveBeenCalledWith(expect.objectContaining({ open: false }));
+    expect(mockSetState).toHaveBeenCalledWith(
+      expect.objectContaining({ open: false }),
+    );
   });
 });

@@ -4,10 +4,7 @@ import copy from 'copy-to-clipboard';
 import React, { createContext } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CodeNode } from '../../../../MarkdownEditor/el';
-import {
-  CodeToolbar,
-  CodeToolbarProps,
-} from '../../components/CodeToolbar';
+import { CodeToolbar, CodeToolbarProps } from '../../components/CodeToolbar';
 
 // 使用 vi.hoisted() 定义变量，使其与 vi.mock 一起被提升
 const { mockEditorStore } = vi.hoisted(() => {

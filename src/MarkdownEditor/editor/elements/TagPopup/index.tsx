@@ -391,7 +391,7 @@ export const TagPopup = (props: RenderProps) => {
   }, [props.text]);
 
   const [selectedItems, setSelectedItems] = useState(() => {
-    return typeof items === 'function' ? [] : items ?? [];
+    return typeof items === 'function' ? [] : (items ?? []);
   });
 
   useEffect(() => {

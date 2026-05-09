@@ -28,16 +28,16 @@ describe('useSpeechSynthesis Hook', () => {
     });
 
     // Mock SpeechSynthesisUtterance（Vitest 4：`new SpeechSynthesisUtterance()` 需 function mock）
-    global.SpeechSynthesisUtterance = vi.fn(function SpeechSynthesisUtteranceMock(
-      text: string,
-    ) {
-      return {
-        text,
-        rate: 1,
-        onend: null,
-        onerror: null,
-      };
-    }) as any;
+    global.SpeechSynthesisUtterance = vi.fn(
+      function SpeechSynthesisUtteranceMock(text: string) {
+        return {
+          text,
+          rate: 1,
+          onend: null,
+          onerror: null,
+        };
+      },
+    ) as any;
   });
 
   it('应该正确检测浏览器支持', () => {
@@ -239,11 +239,13 @@ describe('useSpeechSynthesis Hook', () => {
     });
 
     const callCountBeforeUnmount = mockCancel.mock.calls.length;
-    
+
     unmount();
 
     // 卸载后应该再次调用 cancel
-    expect(mockCancel.mock.calls.length).toBeGreaterThan(callCountBeforeUnmount);
+    expect(mockCancel.mock.calls.length).toBeGreaterThan(
+      callCountBeforeUnmount,
+    );
   });
 
   it('start 时 speak 抛错应进入 catch 并设置 isPlaying 为 false', () => {
@@ -284,4 +286,3 @@ describe('useSpeechSynthesis Hook', () => {
     });
   });
 });
-

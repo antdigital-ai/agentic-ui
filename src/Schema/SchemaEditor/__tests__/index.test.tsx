@@ -3,9 +3,9 @@ import { message } from 'antd';
 import copy from 'copy-to-clipboard';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { I18nProvide } from '../../../I18n';
-import { SchemaEditor } from '..';
 import type { SchemaEditorRef } from '..';
+import { SchemaEditor } from '..';
+import { I18nProvide } from '../../../I18n';
 import { LowCodeSchema } from '../../types';
 
 // Mock AceEditorWrapper
@@ -371,7 +371,9 @@ describe('SchemaEditor', () => {
 
       editorRef.current?.copyJson();
 
-      expect(copy).toHaveBeenCalledWith(expect.stringContaining('"name": "Test Schema"'));
+      expect(copy).toHaveBeenCalledWith(
+        expect.stringContaining('"name": "Test Schema"'),
+      );
       expect(message.success).toHaveBeenCalledWith('JSON内容已复制到剪贴板');
       expect(message.error).not.toHaveBeenCalled();
       expect(message.warning).not.toHaveBeenCalled();

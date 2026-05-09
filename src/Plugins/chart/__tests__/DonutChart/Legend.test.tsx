@@ -143,7 +143,9 @@ describe('DonutChart Legend', () => {
 
   describe('移动端适配', () => {
     it('应该在移动端使用不同的样式', () => {
-      const { container } = render(<Legend {...defaultProps} isMobile={true} />);
+      const { container } = render(
+        <Legend {...defaultProps} isMobile={true} />,
+      );
 
       const legendContainer = screen
         .getByText('A')

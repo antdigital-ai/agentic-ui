@@ -72,11 +72,7 @@ describe('AgenticUiTaskBlockRenderer', () => {
   it('应从多种子节点提取代码文本', () => {
     render(
       <AgenticUiTaskBlockRenderer
-        children={[
-          '{"items":[{"key":"a","title":"',
-          'nested',
-          '"}]}',
-        ]}
+        children={['{"items":[{"key":"a","title":"', 'nested', '"}]}']}
       />,
     );
 

@@ -67,7 +67,9 @@ vi.mock('../../../../MarkdownEditor/editor/utils/ace', () => ({
     ['js', 'javascript'],
   ]),
   getAceLangs: vi.fn(() =>
-    Promise.resolve(new Set(['javascript', 'typescript', 'python', 'java', 'text'])),
+    Promise.resolve(
+      new Set(['javascript', 'typescript', 'python', 'java', 'text']),
+    ),
   ),
 }));
 
@@ -76,7 +78,9 @@ const mockTransforms = vi.hoisted(() => ({
   insertNodes: vi.fn(),
   select: vi.fn(),
 }));
-const mockEditorStart = vi.hoisted(() => vi.fn(() => ({ path: [0, 0], offset: 0 })));
+const mockEditorStart = vi.hoisted(() =>
+  vi.fn(() => ({ path: [0, 0], offset: 0 })),
+);
 
 vi.mock('slate', () => ({
   Editor: {
@@ -164,18 +168,21 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     mockEditor.setValue.mockClear();
     mockEditor.setTheme.mockClear();
     mockEditor.session.setMode.mockClear();
-    mockEditor.on.mockImplementation((event: string, handler: (...args: any[]) => void) => {
-      pushHandler(event, handler);
-    });
-    mockEditor.selection.on.mockImplementation((event: string, handler: (...args: any[]) => void) => {
-      pushHandler(`selection.${event}`, handler);
-    });
+    mockEditor.on.mockImplementation(
+      (event: string, handler: (...args: any[]) => void) => {
+        pushHandler(event, handler);
+      },
+    );
+    mockEditor.selection.on.mockImplementation(
+      (event: string, handler: (...args: any[]) => void) => {
+        pushHandler(`selection.${event}`, handler);
+      },
+    );
   });
 
   it('完整加载与初始化：加载 Ace、创建编辑器、设置主题与 mode', async () => {
-    const { loadAceEditor, loadAceTheme } = await import(
-      '../../../../src/Plugins/code/loadAceEditor'
-    );
+    const { loadAceEditor, loadAceTheme } =
+      await import('../../../../src/Plugins/code/loadAceEditor');
 
     function Wrapper() {
       const result = AceEditor(defaultProps);
@@ -201,7 +208,9 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     expect(loadAceTheme).toHaveBeenCalled();
 
     expect(mockEditor.setTheme).toHaveBeenCalledWith('ace/theme/github');
-    expect(mockEditor.session.setMode).toHaveBeenCalledWith('ace/mode/javascript');
+    expect(mockEditor.session.setMode).toHaveBeenCalledWith(
+      'ace/mode/javascript',
+    );
     expect(mockEditor.commands.addCommand).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'disableFind' }),
     );
@@ -373,7 +382,9 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
   });
 
   it('handleKeyDown: mod+enter 插入新段落', async () => {
-    const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+    const isMac =
+      typeof navigator !== 'undefined' &&
+      /Mac|iPod|iPhone|iPad/.test(navigator.platform);
     function Wrapper() {
       const result = AceEditor(defaultProps);
       return (
@@ -406,7 +417,8 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
     });
     textarea!.dispatchEvent(keydownEvent);
 
-    const { EditorUtils } = await import('../../../../MarkdownEditor/editor/utils/editorUtils');
+    const { EditorUtils } =
+      await import('../../../../MarkdownEditor/editor/utils/editorUtils');
     expect(EditorUtils.focus).toHaveBeenCalled();
     expect(mockTransforms.insertNodes).toHaveBeenCalled();
   });
@@ -466,7 +478,10 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
       await Promise.resolve();
     });
 
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to load Ace Editor:', expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Failed to load Ace Editor:',
+      expect.any(Error),
+    );
     consoleSpy.mockRestore();
     vi.mocked(loadAceEditor).mockResolvedValue({
       default: { edit: appendTextareaAndReturnEditor },

@@ -182,9 +182,7 @@ describe('Chart Utils', () => {
     it('应该在解析出错时安全返回原值', () => {
       // resolveCssVariable 解析失败时会通过 console.warn 输出
       // "Failed to resolve CSS variable"，本用例正是构造该异常路径，需要静默
-      const warnSpy = vi
-        .spyOn(console, 'warn')
-        .mockImplementation(() => {});
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       const originalCreateElement = document.createElement;
       document.createElement = vi.fn().mockImplementation(() => {

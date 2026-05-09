@@ -15,10 +15,9 @@ vi.mock('react-chartjs-2', () => ({
     React.useEffect(() => {
       if (ref) {
         // 创建模拟的 Chart.js 实例；测试可设 __donutChartMockNoCanvas 使 canvas 为 null
-        const canvas =
-          (globalThis as any).__donutChartMockNoCanvas
-            ? null
-            : document.createElement('canvas');
+        const canvas = (globalThis as any).__donutChartMockNoCanvas
+          ? null
+          : document.createElement('canvas');
         const mockInstance = {
           canvas,
           toBase64Image: vi.fn(() => 'data:image/png;base64,test'),
@@ -234,9 +233,8 @@ describe('DonutChart', () => {
 
   describe('SSR / 非浏览器环境', () => {
     it('isWindowDefined 为 false 时不注册 Chart', async () => {
-      const { isWindowDefined } = await import(
-        '../../../../src/Plugins/chart/env'
-      );
+      const { isWindowDefined } =
+        await import('../../../../src/Plugins/chart/env');
       vi.mocked(isWindowDefined).mockReturnValueOnce(false);
 
       const { container } = render(
@@ -903,10 +901,7 @@ describe('DonutChart', () => {
     it('应该处理图例项点击 - 隐藏数据项', () => {
       render(
         <TestWrapper>
-          <DonutChart
-            data={mockData}
-            configs={[{ showLegend: true }]}
-          />
+          <DonutChart data={mockData} configs={[{ showLegend: true }]} />
         </TestWrapper>,
       );
 
@@ -937,10 +932,7 @@ describe('DonutChart', () => {
         <TestWrapper>
           <DonutChart
             data={multiData}
-            configs={[
-              { showLegend: true },
-              { showLegend: true },
-            ]}
+            configs={[{ showLegend: true }, { showLegend: true }]}
           />
         </TestWrapper>,
       );
@@ -956,10 +948,7 @@ describe('DonutChart', () => {
     it('应该处理图例点击 - 添加和删除隐藏索引', () => {
       render(
         <TestWrapper>
-          <DonutChart
-            data={mockData}
-            configs={[{ showLegend: true }]}
-          />
+          <DonutChart data={mockData} configs={[{ showLegend: true }]} />
         </TestWrapper>,
       );
 
@@ -979,28 +968,33 @@ describe('DonutChart', () => {
     beforeEach(() => {
       // Mock Chart.js 实例的 canvas
       const originalCreateElement = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-      vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-        if (tagName === 'canvas') {
-          const canvas = originalCreateElement('canvas') as HTMLCanvasElement;
-          canvas.width = 200;
-          canvas.height = 200;
-          canvas.getContext = vi.fn(() => ({
-            fillStyle: '',
-            fillRect: vi.fn(),
-            drawImage: vi.fn(),
-          } as any));
-          canvas.toDataURL = vi.fn(() => 'data:image/png;base64,test');
-          return canvas;
-        }
-        if (tagName === 'a') {
-          const link = originalCreateElement('a') as HTMLAnchorElement;
-          link.click = vi.fn();
-          return link;
-        }
-        return originalCreateElement(tagName);
-      });
+        document,
+      ) as typeof document.createElement;
+      vi.spyOn(document, 'createElement').mockImplementation(
+        (tagName: string) => {
+          if (tagName === 'canvas') {
+            const canvas = originalCreateElement('canvas') as HTMLCanvasElement;
+            canvas.width = 200;
+            canvas.height = 200;
+            canvas.getContext = vi.fn(
+              () =>
+                ({
+                  fillStyle: '',
+                  fillRect: vi.fn(),
+                  drawImage: vi.fn(),
+                }) as any,
+            );
+            canvas.toDataURL = vi.fn(() => 'data:image/png;base64,test');
+            return canvas;
+          }
+          if (tagName === 'a') {
+            const link = originalCreateElement('a') as HTMLAnchorElement;
+            link.click = vi.fn();
+            return link;
+          }
+          return originalCreateElement(tagName);
+        },
+      );
     });
 
     afterEach(() => {
@@ -1023,16 +1017,15 @@ describe('DonutChart', () => {
       // ChartToolBar mock 会渲染一个带有 "Download" 文本的按钮
       const downloadButton = screen.getByText('Download');
       expect(downloadButton).toBeInTheDocument();
-      
+
       fireEvent.click(downloadButton);
       expect(onDownload).toHaveBeenCalled();
     });
 
     it('应该下载单个图表', async () => {
       // 直接导入 mock 的模块
-      const componentsModule = await import(
-        '../../../../src/Plugins/chart/components'
-      );
+      const componentsModule =
+        await import('../../../../src/Plugins/chart/components');
       const downloadSpy = vi.spyOn(componentsModule, 'downloadChart');
 
       render(
@@ -1072,37 +1065,38 @@ describe('DonutChart', () => {
     });
 
     it('应该处理下载异常并回退到单图下载', async () => {
-      const chartComponents = await import(
-        '../../../../src/Plugins/chart/components'
-      );
+      const chartComponents =
+        await import('../../../../src/Plugins/chart/components');
       const downloadSpy = vi.spyOn(chartComponents, 'downloadChart');
 
       const originalCreateElement = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-      vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-        if (tagName === 'canvas') {
-          const canvas = originalCreateElement('canvas') as HTMLCanvasElement;
-          canvas.width = 200;
-          canvas.height = 200;
-          const mockCtx = {
-            fillStyle: '',
-            fillRect: vi.fn(),
-            drawImage: vi.fn(),
-          };
-          canvas.getContext = vi.fn(() => mockCtx as any);
-          canvas.toDataURL = vi.fn(() => 'data:image/png;base64,test');
-          return canvas;
-        }
-        if (tagName === 'a') {
-          const link = originalCreateElement('a') as HTMLAnchorElement;
-          link.click = vi.fn(() => {
-            throw new Error('click failed');
-          });
-          return link;
-        }
-        return originalCreateElement(tagName);
-      });
+        document,
+      ) as typeof document.createElement;
+      vi.spyOn(document, 'createElement').mockImplementation(
+        (tagName: string) => {
+          if (tagName === 'canvas') {
+            const canvas = originalCreateElement('canvas') as HTMLCanvasElement;
+            canvas.width = 200;
+            canvas.height = 200;
+            const mockCtx = {
+              fillStyle: '',
+              fillRect: vi.fn(),
+              drawImage: vi.fn(),
+            };
+            canvas.getContext = vi.fn(() => mockCtx as any);
+            canvas.toDataURL = vi.fn(() => 'data:image/png;base64,test');
+            return canvas;
+          }
+          if (tagName === 'a') {
+            const link = originalCreateElement('a') as HTMLAnchorElement;
+            link.click = vi.fn(() => {
+              throw new Error('click failed');
+            });
+            return link;
+          }
+          return originalCreateElement(tagName);
+        },
+      );
 
       const multiData = [
         { label: 'A1', value: 30 },
@@ -1168,7 +1162,7 @@ describe('DonutChart', () => {
       // singleMode 下每个数据项会创建一个图表
       const charts = screen.getAllByTestId('doughnut-chart');
       expect(charts.length).toBe(mockData.length);
-      
+
       unmount();
     });
 
@@ -1190,17 +1184,14 @@ describe('DonutChart', () => {
       // singleMode 下每个数据项会创建一个图表
       const charts = screen.getAllByTestId('doughnut-chart');
       expect(charts.length).toBe(mockData.length);
-      
+
       unmount();
     });
 
     it('应该支持 singleMode 下的 hoverOffset 回调', () => {
       render(
         <TestWrapper>
-          <DonutChart
-            data={[{ label: 'Test', value: 75 }]}
-            singleMode={true}
-          />
+          <DonutChart data={[{ label: 'Test', value: 75 }]} singleMode={true} />
         </TestWrapper>,
       );
 
@@ -1226,10 +1217,7 @@ describe('DonutChart', () => {
     it('应该支持 singleMode 下的剩余值计算', () => {
       render(
         <TestWrapper>
-          <DonutChart
-            data={[{ label: 'Test', value: 75 }]}
-            singleMode={true}
-          />
+          <DonutChart data={[{ label: 'Test', value: 75 }]} singleMode={true} />
         </TestWrapper>,
       );
 
@@ -1270,10 +1258,7 @@ describe('DonutChart', () => {
     it('应该正确格式化 tooltip label（数字值）', () => {
       render(
         <TestWrapper>
-          <DonutChart
-            data={mockData}
-            configs={[{ showTooltip: true }]}
-          />
+          <DonutChart data={mockData} configs={[{ showTooltip: true }]} />
         </TestWrapper>,
       );
 
@@ -1333,10 +1318,7 @@ describe('DonutChart', () => {
     it('应该正确设置图表实例引用（singleMode）', () => {
       render(
         <TestWrapper>
-          <DonutChart
-            data={[{ label: 'Test', value: 75 }]}
-            singleMode={true}
-          />
+          <DonutChart data={[{ label: 'Test', value: 75 }]} singleMode={true} />
         </TestWrapper>,
       );
 
@@ -1370,10 +1352,7 @@ describe('DonutChart', () => {
     it('应该支持 pie 样式（cutout 为 0）', () => {
       render(
         <TestWrapper>
-          <DonutChart
-            data={mockData}
-            configs={[{ chartStyle: 'pie' }]}
-          />
+          <DonutChart data={mockData} configs={[{ chartStyle: 'pie' }]} />
         </TestWrapper>,
       );
 
@@ -1383,10 +1362,7 @@ describe('DonutChart', () => {
     it('应该支持 pie 样式下的 borderWidth 和 spacing', () => {
       render(
         <TestWrapper>
-          <DonutChart
-            data={mockData}
-            configs={[{ chartStyle: 'pie' }]}
-          />
+          <DonutChart data={mockData} configs={[{ chartStyle: 'pie' }]} />
         </TestWrapper>,
       );
 
@@ -1406,10 +1382,7 @@ describe('DonutChart', () => {
 
       render(
         <TestWrapper>
-          <DonutChart
-            data={mockData}
-            configs={[{ cutout: '70%' }]}
-          />
+          <DonutChart data={mockData} configs={[{ cutout: '70%' }]} />
         </TestWrapper>,
       );
 
@@ -1421,10 +1394,7 @@ describe('DonutChart', () => {
 
       render(
         <TestWrapper>
-          <DonutChart
-            data={mockData}
-            configs={[{ cutout: 50 }]}
-          />
+          <DonutChart data={mockData} configs={[{ cutout: 50 }]} />
         </TestWrapper>,
       );
 
@@ -1498,10 +1468,7 @@ describe('DonutChart', () => {
 
       render(
         <TestWrapper>
-          <DonutChart
-            data={dataWithCategory}
-            enableAutoCategory={true}
-          />
+          <DonutChart data={dataWithCategory} enableAutoCategory={true} />
         </TestWrapper>,
       );
 
@@ -1590,7 +1557,7 @@ describe('DonutChart', () => {
       // 两次渲染会创建两个图表元素
       const charts = screen.getAllByTestId('doughnut-chart');
       expect(charts.length).toBeGreaterThanOrEqual(1);
-      
+
       unmount1();
       unmount2();
     });

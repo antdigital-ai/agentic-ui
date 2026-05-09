@@ -6,24 +6,24 @@
 
 import { describe, expect, it } from 'vitest';
 import {
-  SandboxErrorType,
-  SandboxError,
+  CodeExecutionContext,
   ExecutionStatus,
-  PermissionLevel,
-  MonitoringEventType,
+  ExtendedSandboxConfig,
+  GlobalSandboxSettings,
   MonitoringEvent,
   MonitoringEventListener,
-  CodeExecutionContext,
-  ResourceUsageStats,
-  SecurityPolicy,
+  MonitoringEventType,
   PerformanceConfig,
-  ExtendedSandboxConfig,
-  SandboxInstanceState,
+  PermissionLevel,
+  ResourceUsageStats,
   // ISandboxManager,
   // ICodeValidator,
   SandboxConfigType,
+  SandboxError,
+  SandboxErrorType,
   SandboxFactoryOptions,
-  GlobalSandboxSettings
+  SandboxInstanceState,
+  SecurityPolicy,
 } from '../types';
 
 describe('proxySandbox/types.ts', () => {
@@ -41,8 +41,12 @@ describe('proxySandbox/types.ts', () => {
 
   describe('SandboxError 类测试', () => {
     it('应该正确创建 SandboxError 实例', () => {
-      const error = new SandboxError('测试错误', SandboxErrorType.RUNTIME_ERROR, { test: 'data' });
-      
+      const error = new SandboxError(
+        '测试错误',
+        SandboxErrorType.RUNTIME_ERROR,
+        { test: 'data' },
+      );
+
       expect(error).toBeInstanceOf(Error);
       expect(error).toBeInstanceOf(SandboxError);
       expect(error.message).toBe('测试错误');
@@ -54,7 +58,7 @@ describe('proxySandbox/types.ts', () => {
 
     it('应该在没有上下文时正确创建 SandboxError 实例', () => {
       const error = new SandboxError('测试错误', SandboxErrorType.SYNTAX_ERROR);
-      
+
       expect(error.message).toBe('测试错误');
       expect(error.type).toBe(SandboxErrorType.SYNTAX_ERROR);
       expect(error.context).toBeUndefined();
@@ -87,7 +91,9 @@ describe('proxySandbox/types.ts', () => {
       expect(MonitoringEventType.EXECUTION_START).toBe('EXECUTION_START');
       expect(MonitoringEventType.EXECUTION_END).toBe('EXECUTION_END');
       expect(MonitoringEventType.MEMORY_USAGE).toBe('MEMORY_USAGE');
-      expect(MonitoringEventType.PERFORMANCE_WARNING).toBe('PERFORMANCE_WARNING');
+      expect(MonitoringEventType.PERFORMANCE_WARNING).toBe(
+        'PERFORMANCE_WARNING',
+      );
       expect(MonitoringEventType.SECURITY_EVENT).toBe('SECURITY_EVENT');
       expect(MonitoringEventType.ERROR_EVENT).toBe('ERROR_EVENT');
     });
@@ -100,9 +106,9 @@ describe('proxySandbox/types.ts', () => {
         timestamp: Date.now(),
         contextId: 'test-context',
         data: { test: 'data' },
-        message: '测试事件'
+        message: '测试事件',
       };
-      
+
       expect(event.type).toBe(MonitoringEventType.EXECUTION_START);
       expect(typeof event.timestamp).toBe('number');
       expect(event.contextId).toBe('test-context');
@@ -114,7 +120,7 @@ describe('proxySandbox/types.ts', () => {
       const listener: MonitoringEventListener = () => {
         // 空实现，仅用于测试类型
       };
-      
+
       expect(typeof listener).toBe('function');
     });
 
@@ -127,9 +133,9 @@ describe('proxySandbox/types.ts', () => {
         result: 'test result',
         error: new SandboxError('测试错误', SandboxErrorType.RUNTIME_ERROR),
         memoryUsage: 1024,
-        metadata: { test: 'metadata' }
+        metadata: { test: 'metadata' },
       };
-      
+
       expect(context.executionId).toBe('test-execution');
       expect(context.code).toBe('console.log("test");');
       expect(typeof context.startTime).toBe('number');
@@ -147,9 +153,9 @@ describe('proxySandbox/types.ts', () => {
         cpuUsage: 75,
         callStackDepth: 3,
         loopIterations: 100,
-        functionCalls: 20
+        functionCalls: 20,
       };
-      
+
       expect(stats.memoryUsage).toBe(1024);
       expect(stats.executionTime).toBe(50);
       expect(stats.cpuUsage).toBe(75);
@@ -169,11 +175,11 @@ describe('proxySandbox/types.ts', () => {
           {
             name: 'test-rule',
             pattern: 'test-pattern',
-            action: 'deny'
-          }
-        ]
+            action: 'deny',
+          },
+        ],
       };
-      
+
       expect(policy.network).toBe(PermissionLevel.LIMITED);
       expect(policy.fileSystem).toBe(PermissionLevel.NONE);
       expect(policy.dom).toBe(PermissionLevel.READ_ONLY);
@@ -189,9 +195,9 @@ describe('proxySandbox/types.ts', () => {
         samplingRate: 0.5,
         memoryWarningThreshold: 1024 * 1024,
         executionTimeWarningThreshold: 1000,
-        enableDetailedLogging: false
+        enableDetailedLogging: false,
       };
-      
+
       expect(config.enableMonitoring).toBe(true);
       expect(config.samplingRate).toBe(0.5);
       expect(config.memoryWarningThreshold).toBe(1024 * 1024);
@@ -210,37 +216,37 @@ describe('proxySandbox/types.ts', () => {
           strictMode: false,
           customGlobals: {},
           allowDOM: false,
-          maxMemoryUsage: 1024 * 1024
+          maxMemoryUsage: 1024 * 1024,
         },
         security: {
           network: PermissionLevel.LIMITED,
           fileSystem: PermissionLevel.NONE,
           dom: PermissionLevel.READ_ONLY,
           systemApi: PermissionLevel.NONE,
-          thirdPartyLibs: PermissionLevel.LIMITED
+          thirdPartyLibs: PermissionLevel.LIMITED,
         },
         performance: {
           enableMonitoring: true,
           samplingRate: 0.5,
           memoryWarningThreshold: 1024 * 1024,
           executionTimeWarningThreshold: 1000,
-          enableDetailedLogging: false
+          enableDetailedLogging: false,
         },
         monitoring: {
           enablePerformanceMonitoring: true,
           enableErrorTracking: true,
           enableResourceMonitoring: true,
           enableSecurityAuditing: true,
-          eventListeners: []
+          eventListeners: [],
         },
         debug: {
           enableDebugMode: false,
           logLevel: 'info',
           enableSourceMaps: true,
-          enableStackTrace: true
-        }
+          enableStackTrace: true,
+        },
       };
-      
+
       expect(Array.isArray(config.basic.allowedGlobals)).toBe(true);
       expect(config.security.network).toBe(PermissionLevel.LIMITED);
       expect(config.performance.enableMonitoring).toBe(true);
@@ -259,7 +265,7 @@ describe('proxySandbox/types.ts', () => {
           memoryUsage: 1024,
           executionTime: 50,
           callStackDepth: 3,
-          loopIterations: 100
+          loopIterations: 100,
         },
         errorCount: 2,
         config: {
@@ -272,38 +278,38 @@ describe('proxySandbox/types.ts', () => {
             strictMode: false,
             customGlobals: {},
             allowDOM: false,
-            maxMemoryUsage: 1024 * 1024
+            maxMemoryUsage: 1024 * 1024,
           },
           security: {
             network: PermissionLevel.LIMITED,
             fileSystem: PermissionLevel.NONE,
             dom: PermissionLevel.READ_ONLY,
             systemApi: PermissionLevel.NONE,
-            thirdPartyLibs: PermissionLevel.LIMITED
+            thirdPartyLibs: PermissionLevel.LIMITED,
           },
           performance: {
             enableMonitoring: true,
             samplingRate: 0.5,
             memoryWarningThreshold: 1024 * 1024,
             executionTimeWarningThreshold: 1000,
-            enableDetailedLogging: false
+            enableDetailedLogging: false,
           },
           monitoring: {
             enablePerformanceMonitoring: true,
             enableErrorTracking: true,
             enableResourceMonitoring: true,
             enableSecurityAuditing: true,
-            eventListeners: []
+            eventListeners: [],
           },
           debug: {
             enableDebugMode: false,
             logLevel: 'info',
             enableSourceMaps: true,
-            enableStackTrace: true
-          }
-        }
+            enableStackTrace: true,
+          },
+        },
       };
-      
+
       expect(state.instanceId).toBe('test-instance');
       expect(typeof state.createdAt).toBe('number');
       expect(typeof state.lastActiveAt).toBe('number');
@@ -320,9 +326,9 @@ describe('proxySandbox/types.ts', () => {
         'restricted',
         'development',
         'production',
-        'custom'
+        'custom',
       ];
-      
+
       expect(types).toHaveLength(6);
       expect(types.includes('basic')).toBe(true);
       expect(types.includes('secure')).toBe(true);
@@ -345,40 +351,40 @@ describe('proxySandbox/types.ts', () => {
             strictMode: true,
             customGlobals: {},
             allowDOM: false,
-            maxMemoryUsage: 1024 * 1024
+            maxMemoryUsage: 1024 * 1024,
           },
           security: {
             network: PermissionLevel.NONE,
             fileSystem: PermissionLevel.NONE,
             dom: PermissionLevel.NONE,
             systemApi: PermissionLevel.NONE,
-            thirdPartyLibs: PermissionLevel.NONE
+            thirdPartyLibs: PermissionLevel.NONE,
           },
           performance: {
             enableMonitoring: true,
             samplingRate: 0.5,
             memoryWarningThreshold: 1024 * 1024,
             executionTimeWarningThreshold: 1000,
-            enableDetailedLogging: false
+            enableDetailedLogging: false,
           },
           monitoring: {
             enablePerformanceMonitoring: true,
             enableErrorTracking: true,
             enableResourceMonitoring: true,
             enableSecurityAuditing: true,
-            eventListeners: []
+            eventListeners: [],
           },
           debug: {
             enableDebugMode: false,
             logLevel: 'info',
             enableSourceMaps: true,
-            enableStackTrace: true
-          }
+            enableStackTrace: true,
+          },
         },
         enableCaching: true,
-        poolSize: 5
+        poolSize: 5,
       };
-      
+
       expect(options.type).toBe('secure');
       expect(options.enableCaching).toBe(true);
       expect(options.poolSize).toBe(5);
@@ -392,9 +398,9 @@ describe('proxySandbox/types.ts', () => {
           // 空实现，仅用于测试类型
         },
         globalPerformanceMonitoring: true,
-        cleanupInterval: 60000
+        cleanupInterval: 60000,
       };
-      
+
       expect(settings.defaultTimeout).toBe(3000);
       expect(settings.defaultMemoryLimit).toBe(1024 * 1024);
       expect(typeof settings.globalErrorHandler).toBe('function');

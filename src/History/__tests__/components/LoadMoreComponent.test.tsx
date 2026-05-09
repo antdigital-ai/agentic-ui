@@ -8,8 +8,8 @@ import {
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { HistoryLoadMore } from '../../components/LoadMoreComponent';
 import { I18nContext } from '../../../I18n';
+import { HistoryLoadMore } from '../../components/LoadMoreComponent';
 
 const mockI18nLocale = {
   'task.history.loadMore': '查看更多历史',
@@ -329,6 +329,8 @@ describe('HistoryLoadMore', () => {
       { timeout: 1000 },
     );
 
-    expect(container.querySelector('.anticon-ellipsis')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('.anticon-ellipsis'),
+    ).not.toBeInTheDocument();
   });
 });

@@ -2,11 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  ANSWER_ALERT_TYPES,
-  AnswerAlert,
-  type AnswerAlertType,
-} from '..';
+import { ANSWER_ALERT_TYPES, AnswerAlert, type AnswerAlertType } from '..';
 
 describe('AnswerAlert 组件', () => {
   it('应该渲染基本的提示信息', () => {
@@ -171,10 +167,7 @@ describe('AnswerAlert 组件', () => {
 
   it('应该支持自定义样式', () => {
     const { container } = render(
-      <AnswerAlert
-        message="自定义样式"
-        style={{ backgroundColor: 'red' }}
-      />,
+      <AnswerAlert message="自定义样式" style={{ backgroundColor: 'red' }} />,
     );
 
     const alert = container.querySelector('.ant-answer-alert');
@@ -237,9 +230,7 @@ describe('AnswerAlert 组件', () => {
   });
 
   it('当没有类型时不应显示默认图标', () => {
-    const { container } = render(
-      <AnswerAlert message="无类型提示" showIcon />,
-    );
+    const { container } = render(<AnswerAlert message="无类型提示" showIcon />);
 
     const icon = container.querySelector('.ant-answer-alert-icon');
     expect(icon).not.toBeInTheDocument();
@@ -404,20 +395,18 @@ describe('AnswerAlert 组件', () => {
 
     // 模拟动画结束 → 节点卸载
     act(() => {
-      alertEl!.dispatchEvent(
-        new Event('animationend', { bubbles: true }),
-      );
+      alertEl!.dispatchEvent(new Event('animationend', { bubbles: true }));
     });
 
-    expect(container.querySelector('.ant-answer-alert')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('.ant-answer-alert'),
+    ).not.toBeInTheDocument();
   });
 
   it('motion=true：动画 fallback 超时也应保证卸载', () => {
     vi.useFakeTimers();
     try {
-      const { container } = render(
-        <AnswerAlert message="兜底卸载" closable />,
-      );
+      const { container } = render(<AnswerAlert message="兜底卸载" closable />);
       const closeButton = container.querySelector(
         '.ant-answer-alert-close-icon',
       ) as HTMLElement;
@@ -451,4 +440,3 @@ describe('AnswerAlert 组件', () => {
     expect(ANSWER_ALERT_TYPES).toContain(t);
   });
 });
-

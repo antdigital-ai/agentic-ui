@@ -77,9 +77,7 @@ describe('AgenticLayout', () => {
       <AgenticLayout center={<div>Center content</div>} style={customStyle} />,
     );
 
-    expect(container.firstChild).toHaveStyle(
-      { backgroundColor: 'blue' },
-    );
+    expect(container.firstChild).toHaveStyle({ backgroundColor: 'blue' });
   });
 
   it('handles left sidebar collapse state', () => {

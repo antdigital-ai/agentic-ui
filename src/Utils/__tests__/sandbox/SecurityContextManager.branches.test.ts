@@ -93,9 +93,7 @@ describe('SecurityContextManager 分支覆盖', () => {
       const tracker = (manager as any).globalMonitors.get('errorTracker');
       expect(tracker).toBeDefined();
 
-      const errorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       tracker.captureError(new Error('test error'), 'testContext');
       expect(errorSpy).toHaveBeenCalledWith(
         '[Sandbox Error] testContext:',

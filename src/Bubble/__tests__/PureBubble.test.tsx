@@ -1,14 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { ConfigProvider } from 'antd';
 import React, { useContext, useEffect } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { BubbleConfigContext } from '../BubbleConfigProvide';
-import {
-  PureAIBubble,
-  PureBubble,
-  PureUserBubble,
-} from '../PureBubble';
 import { MessagesContext } from '../MessagesContent/BubbleContext';
-import { ConfigProvider } from 'antd';
+import { PureAIBubble, PureBubble, PureUserBubble } from '../PureBubble';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -386,10 +382,7 @@ describe('PureBubble', () => {
 
     render(
       <BubbleConfigProvide>
-        <PureBubble
-          {...feedbackEnabledProps}
-          onDislike={onDislike}
-        />
+        <PureBubble {...feedbackEnabledProps} onDislike={onDislike} />
       </BubbleConfigProvide>,
     );
 

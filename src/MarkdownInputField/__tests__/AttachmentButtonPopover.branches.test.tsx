@@ -4,7 +4,7 @@
  * 覆盖 vivo/oppo 设备分支、移动设备分支、点击/取消/打开相册/打开文件等交互
  */
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, act } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -15,10 +15,7 @@ const mocks = vi.hoisted(() => ({
   kbToSize: vi.fn((kb: number) => `${kb} KB`),
 }));
 
-vi.mock(
-  '../AttachmentButton/utils',
-  () => mocks,
-);
+vi.mock('../AttachmentButton/utils', () => mocks);
 
 // Mock useRefFunction 透传
 vi.mock('../../Hooks/useRefFunction', () => ({
@@ -118,9 +115,7 @@ describe('AttachmentButtonPopover 分支覆盖', () => {
 
       // Modal body 内的 div 有 stopPropagation
       const galleryBtn = screen.getByText('打开相册');
-      const modalBody = galleryBtn.closest(
-        'div[style]',
-      ) as HTMLElement;
+      const modalBody = galleryBtn.closest('div[style]') as HTMLElement;
       if (modalBody) {
         const event = new MouseEvent('click', { bubbles: true });
         const stopSpy = vi.spyOn(event, 'stopPropagation');

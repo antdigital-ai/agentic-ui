@@ -5,23 +5,11 @@
  */
 
 import '@testing-library/jest-dom';
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import classNames from 'clsx';
 import React from 'react';
-import {
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownInputField } from '../MarkdownInputField';
 import { addGlowBorderOffset } from '../style';
 
@@ -150,47 +138,41 @@ vi.mock('../SendButton', () => ({
   },
 }));
 
-vi.mock(
-  '../AttachmentButton/AttachmentButtonPopover',
-  () => ({
-    SupportedFileFormats: {
-      image: { name: 'Image', extensions: ['.jpg', '.png', '.gif'] },
-      document: { name: 'Document', extensions: ['.pdf', '.doc', '.docx'] },
-    },
-  }),
-);
+vi.mock('../AttachmentButton/AttachmentButtonPopover', () => ({
+  SupportedFileFormats: {
+    image: { name: 'Image', extensions: ['.jpg', '.png', '.gif'] },
+    document: { name: 'Document', extensions: ['.pdf', '.doc', '.docx'] },
+  },
+}));
 
-vi.mock(
-  '../AttachmentButton/AttachmentFileList',
-  () => ({
-    AttachmentFileList: ({ fileMap, onDelete, onClearFileMap }: any) => (
-      <div data-testid="attachment-file-list">
-        {fileMap && fileMap.size > 0 && (
-          <div>
-            Files: {fileMap.size}
-            <button
-              type="button"
-              data-testid="clear-files"
-              onClick={() => onClearFileMap()}
-            >
-              Clear
-            </button>
-            <button
-              type="button"
-              data-testid="delete-file"
-              onClick={() => {
-                const firstFile = Array.from(fileMap.values())[0];
-                if (firstFile) onDelete(firstFile);
-              }}
-            >
-              Delete First
-            </button>
-          </div>
-        )}
-      </div>
-    ),
-  }),
-);
+vi.mock('../AttachmentButton/AttachmentFileList', () => ({
+  AttachmentFileList: ({ fileMap, onDelete, onClearFileMap }: any) => (
+    <div data-testid="attachment-file-list">
+      {fileMap && fileMap.size > 0 && (
+        <div>
+          Files: {fileMap.size}
+          <button
+            type="button"
+            data-testid="clear-files"
+            onClick={() => onClearFileMap()}
+          >
+            Clear
+          </button>
+          <button
+            type="button"
+            data-testid="delete-file"
+            onClick={() => {
+              const firstFile = Array.from(fileMap.values())[0];
+              if (firstFile) onDelete(firstFile);
+            }}
+          >
+            Delete First
+          </button>
+        </div>
+      )}
+    </div>
+  ),
+}));
 
 vi.mock('../SkillModeBar', () => ({
   SkillModeBar: () => <div data-testid="skill-mode-bar">Skill Mode</div>,
@@ -642,10 +624,7 @@ describe('MarkdownInputField Enhanced Tests', () => {
         ));
 
         render(
-          <MarkdownInputField
-            value=""
-            beforeToolsRender={beforeToolsRender}
-          />,
+          <MarkdownInputField value="" beforeToolsRender={beforeToolsRender} />,
         );
 
         expect(beforeToolsRender).toHaveBeenCalled();
@@ -657,10 +636,7 @@ describe('MarkdownInputField Enhanced Tests', () => {
         const upload = vi.fn().mockResolvedValue(undefined);
 
         render(
-          <MarkdownInputField
-            value=""
-            attachment={{ enable: true, upload }}
-          />,
+          <MarkdownInputField value="" attachment={{ enable: true, upload }} />,
         );
 
         expect(screen.getByTestId('base-markdown-editor')).toBeInTheDocument();
@@ -668,4 +644,3 @@ describe('MarkdownInputField Enhanced Tests', () => {
     });
   });
 });
-

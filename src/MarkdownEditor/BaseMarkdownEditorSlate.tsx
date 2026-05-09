@@ -8,11 +8,11 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useRefFunction } from '../Hooks/useRefFunction';
 import { Subject } from 'rxjs';
 import { createEditor, Editor, Selection } from 'slate';
 import { withHistory } from 'slate-history';
 import { withReact } from 'slate-react';
+import { useRefFunction } from '../Hooks/useRefFunction';
 import { CommentList } from './editor/components/CommentList';
 import { SlateMarkdownEditor } from './editor/Editor';
 import { parserMdToSchema } from './editor/parser/parserMdToSchema';

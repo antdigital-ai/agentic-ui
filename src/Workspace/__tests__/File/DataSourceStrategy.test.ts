@@ -533,9 +533,8 @@ describe('DataSourceStrategy', () => {
 
   describe('全局实例', () => {
     it('应该导出全局dataSourceManager实例', async () => {
-      const { dataSourceManager } = await import(
-        '../../File/DataSourceStrategy'
-      );
+      const { dataSourceManager } =
+        await import('../../File/DataSourceStrategy');
       expect(dataSourceManager).toBeInstanceOf(DataSourceManager);
     });
   });

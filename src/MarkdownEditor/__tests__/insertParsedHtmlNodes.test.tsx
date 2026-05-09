@@ -1,12 +1,11 @@
-import { message } from 'antd';
 import { createEditor, Editor, Node, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  ELEMENT_TAGS,
-  TEXT_TAGS,
   deserialize,
+  ELEMENT_TAGS,
   htmlToFragmentList,
   insertParsedHtmlNodes,
+  TEXT_TAGS,
 } from '../editor/plugins/insertParsedHtmlNodes';
 import * as docxDeserializerModule from '../editor/utils/docx/docxDeserializer';
 
@@ -324,9 +323,7 @@ describe('insertParsedHtmlNodes', () => {
 
   // 新增测试用例：粘贴到标题（需 mock 返回带 text 的 fragment 才能插入到 head）
   it('should handle paste into heading', async () => {
-    editor.children = [
-      { type: 'head', level: 1, children: [{ text: '' }] },
-    ];
+    editor.children = [{ type: 'head', level: 1, children: [{ text: '' }] }];
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
       focus: { path: [0, 0], offset: 0 },
@@ -352,9 +349,7 @@ describe('insertParsedHtmlNodes', () => {
         children: [
           {
             type: 'list-item',
-            children: [
-              { type: 'paragraph', children: [{ text: '' }] },
-            ],
+            children: [{ type: 'paragraph', children: [{ text: '' }] }],
           },
         ],
       },
@@ -481,9 +476,7 @@ describe('insertParsedHtmlNodes', () => {
   // 测试用例：未配置 upload 时，粘贴包含嵌套媒体文件的 HTML 应该过滤掉所有媒体片段
   it('should filter out nested media fragments when upload is not configured', async () => {
     const path = [0, 0];
-    editor.children = [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ];
+    editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
     editor.selection = {
       anchor: { path, offset: 0 },
       focus: { path, offset: 0 },
@@ -560,7 +553,10 @@ describe('insertParsedHtmlNodes', () => {
       vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce(
         tableFragment as any,
       );
-      const result = htmlToFragmentList('<table><tr><td>x</td></tr></table>', '');
+      const result = htmlToFragmentList(
+        '<table><tr><td>x</td></tr></table>',
+        '',
+      );
       expect(result.length).toBe(1);
       expect(result[0].type).toBe('card');
     });
@@ -608,7 +604,10 @@ describe('insertParsedHtmlNodes', () => {
       (el as any).src = 'https://example.com/page';
       (el as any).alt = 'link';
       const out: { type: string; children: Array<{ text: string }> } =
-        ELEMENT_TAGS.IMG(el as any) as { type: string; children: Array<{ text: string }> };
+        ELEMENT_TAGS.IMG(el as any) as {
+          type: string;
+          children: Array<{ text: string }>;
+        };
       expect(out.type).toBe('paragraph');
       expect(out.children[0].text).toBe('https://example.com/page');
     });
@@ -624,7 +623,10 @@ describe('insertParsedHtmlNodes', () => {
     it('IMG 空 src 或非 http(s) 地址应回退 paragraph', () => {
       const out1 = ELEMENT_TAGS.IMG({ src: '', alt: 'a' } as any) as any;
       expect(out1.type).toBe('paragraph');
-      const out2 = ELEMENT_TAGS.IMG({ src: 'ftp://x/a.png', alt: 'a' } as any) as any;
+      const out2 = ELEMENT_TAGS.IMG({
+        src: 'ftp://x/a.png',
+        alt: 'a',
+      } as any) as any;
       expect(out2.type).toBe('paragraph');
     });
 
@@ -671,7 +673,15 @@ describe('insertParsedHtmlNodes', () => {
 
   describe('deserialize', () => {
     it('script/style/meta/link/head/colgroup/noscript 应返回 []', () => {
-      const tags = ['script', 'style', 'meta', 'link', 'head', 'colgroup', 'noscript'];
+      const tags = [
+        'script',
+        'style',
+        'meta',
+        'link',
+        'head',
+        'colgroup',
+        'noscript',
+      ];
       tags.forEach((tag) => {
         const el = document.createElement(tag);
         expect(deserialize(el as any, '')).toEqual([]);
@@ -698,7 +708,9 @@ describe('insertParsedHtmlNodes', () => {
       div.appendChild(document.createTextNode('x'));
       const result = deserialize(div as any, '');
       expect(result).toBeDefined();
-      expect(Array.isArray(result) || (result && typeof result === 'object')).toBe(true);
+      expect(
+        Array.isArray(result) || (result && typeof result === 'object'),
+      ).toBe(true);
     });
 
     it('BLOCKQUOTE 标签应走 ELEMENT_TAGS.BLOCKQUOTE', () => {
@@ -723,7 +735,10 @@ describe('insertParsedHtmlNodes', () => {
       wrap.innerHTML = '<pre><code>a<br>b</code></pre>';
       const pre = wrap.firstElementChild as HTMLElement;
       const code = pre.firstElementChild as HTMLElement;
-      Object.defineProperty(code, 'innerText', { value: 'a\nb', configurable: true });
+      Object.defineProperty(code, 'innerText', {
+        value: 'a\nb',
+        configurable: true,
+      });
       const result = deserialize(pre as any, '') as any;
       expect(result?.type).toBe('code');
       expect(result?.value).toBe('a\nb');
@@ -734,7 +749,10 @@ describe('insertParsedHtmlNodes', () => {
       wrap.innerHTML = '<pre><code></code></pre>';
       const pre = wrap.firstElementChild as HTMLElement;
       const code = pre.firstElementChild as HTMLElement;
-      Object.defineProperty(code, 'innerText', { value: '', configurable: true });
+      Object.defineProperty(code, 'innerText', {
+        value: '',
+        configurable: true,
+      });
       const result = deserialize(pre as any, '') as any;
       expect(result).toBeNull();
     });
@@ -774,7 +792,9 @@ describe('insertParsedHtmlNodes', () => {
     it('空元素 children 回退为 text 节点', () => {
       const p = document.createElement('p');
       const result = deserialize(p as any, '') as any;
-      const textNode = Array.isArray(result) ? result[0] : result?.children?.[0];
+      const textNode = Array.isArray(result)
+        ? result[0]
+        : result?.children?.[0];
       expect(textNode?.text).toBe('');
     });
 
@@ -929,7 +949,12 @@ describe('insertParsedHtmlNodes', () => {
         },
       ] as any);
       const moveSpy = vi.spyOn(Transforms, 'moveNodes');
-      const result = await insertParsedHtmlNodes(editor, '<ul><li>a</li></ul>', {}, '');
+      const result = await insertParsedHtmlNodes(
+        editor,
+        '<ul><li>a</li></ul>',
+        {},
+        '',
+      );
       expect(result).toBe(true);
       expect(moveSpy).toHaveBeenCalled();
       moveSpy.mockRestore();
@@ -983,12 +1008,7 @@ describe('insertParsedHtmlNodes', () => {
         },
       ] as any);
       const upload = vi.fn();
-      await insertParsedHtmlNodes(
-        editor,
-        'media',
-        { image: { upload } },
-        '',
-      );
+      await insertParsedHtmlNodes(editor, 'media', { image: { upload } }, '');
       expect(upload).not.toHaveBeenCalled();
     });
 
@@ -1019,7 +1039,10 @@ describe('insertParsedHtmlNodes', () => {
       vi.mocked(docxDeserializerModule.docxDeserializer).mockImplementationOnce(
         () => [{ type: 'paragraph', children: [{ text: 'long' }] }] as any,
       );
-      editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
       editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
       vi.useFakeTimers();
       const resultPromise = insertParsedHtmlNodes(editor, longHtml, {}, '');
@@ -1054,9 +1077,11 @@ describe('insertParsedHtmlNodes', () => {
 
     it('大内容异步解析抛错时返回 false', async () => {
       const longHtml = '<p>' + 'x'.repeat(1200) + '</p>';
-      vi.mocked(docxDeserializerModule.docxDeserializer).mockImplementationOnce(() => {
-        throw new Error('idle parse failed');
-      });
+      vi.mocked(docxDeserializerModule.docxDeserializer).mockImplementationOnce(
+        () => {
+          throw new Error('idle parse failed');
+        },
+      );
       const result = await insertParsedHtmlNodes(editor, longHtml, {}, '');
       expect(result).toBe(false);
     });
@@ -1073,12 +1098,7 @@ describe('insertParsedHtmlNodes', () => {
       vi.mocked(docxDeserializerModule.docxDeserializer).mockImplementationOnce(
         () => manyNodes as any,
       );
-      const result = await insertParsedHtmlNodes(
-        editor,
-        '<p>p0</p>',
-        {},
-        '',
-      );
+      const result = await insertParsedHtmlNodes(editor, '<p>p0</p>', {}, '');
       expect(result).toBe(true);
       expect(editor.children.length).toBeGreaterThanOrEqual(15);
     });
@@ -1087,7 +1107,10 @@ describe('insertParsedHtmlNodes', () => {
       vi.mocked(docxDeserializerModule.docxDeserializer).mockRejectedValueOnce(
         new Error('parse error'),
       );
-      editor.selection = { anchor: { path: [0, 0], offset: 0 }, focus: { path: [0, 0], offset: 0 } };
+      editor.selection = {
+        anchor: { path: [0, 0], offset: 0 },
+        focus: { path: [0, 0], offset: 0 },
+      };
       const result = await insertParsedHtmlNodes(editor, '<p>x</p>', {}, '');
       expect(result).toBe(false);
     });
@@ -1101,12 +1124,7 @@ describe('insertParsedHtmlNodes', () => {
       vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce([
         { type: 'paragraph', children: [{ text: '' }] },
       ] as any);
-      const result = await insertParsedHtmlNodes(
-        editor,
-        '<p></p>',
-        {},
-        '',
-      );
+      const result = await insertParsedHtmlNodes(editor, '<p></p>', {}, '');
       expect(result).toBe(false);
     });
 
@@ -1121,7 +1139,12 @@ describe('insertParsedHtmlNodes', () => {
         { type: 'code', children: [{ text: 'const n=1;' }] },
         { type: 'paragraph', children: [{ text: 'p' }] },
       ] as any);
-      const result = await insertParsedHtmlNodes(editor, '<div>mixed</div>', {}, '');
+      const result = await insertParsedHtmlNodes(
+        editor,
+        '<div>mixed</div>',
+        {},
+        '',
+      );
       expect(result).toBe(true);
     });
 
@@ -1189,7 +1212,12 @@ describe('insertParsedHtmlNodes', () => {
       ] as any);
       const upload = vi.fn().mockImplementation(async (arr: any[]) => arr[0]);
       vi.useFakeTimers();
-      const p = insertParsedHtmlNodes(editor, '<p>bulk</p>', { image: { upload } }, '');
+      const p = insertParsedHtmlNodes(
+        editor,
+        '<p>bulk</p>',
+        { image: { upload } },
+        '',
+      );
       await vi.runAllTimersAsync();
       const result = await p;
       vi.useRealTimers();
@@ -1239,7 +1267,12 @@ describe('insertParsedHtmlNodes', () => {
       vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce([
         { children: [{ foo: 'bar' }] },
       ] as any);
-      const result = await insertParsedHtmlNodes(editor, '<div>x</div>', {}, '');
+      const result = await insertParsedHtmlNodes(
+        editor,
+        '<div>x</div>',
+        {},
+        '',
+      );
       expect(result).toBe(false);
     });
   });
@@ -1329,9 +1362,7 @@ describe('insertParsedHtmlNodes', () => {
     });
 
     it('单段落无文本时不应使用 insertText', async () => {
-      editor.children = [
-        { type: 'paragraph', children: [{ text: '' }] },
-      ];
+      editor.children = [{ type: 'paragraph', children: [{ text: '' }] }];
       editor.selection = {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 0 },
@@ -1339,12 +1370,7 @@ describe('insertParsedHtmlNodes', () => {
       vi.mocked(docxDeserializerModule.docxDeserializer).mockReturnValueOnce([
         { type: 'paragraph', children: [{ text: '' }] },
       ] as any);
-      const result = await insertParsedHtmlNodes(
-        editor,
-        '<p></p>',
-        {},
-        '',
-      );
+      const result = await insertParsedHtmlNodes(editor, '<p></p>', {}, '');
       expect(typeof result).toBe('boolean');
     });
 

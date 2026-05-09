@@ -6,9 +6,6 @@
  * calculateLabelWidth 异常等分支。
  */
 import '@testing-library/jest-dom';
-import { act, render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   act,
   fireEvent,
@@ -16,6 +13,8 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /* ---------- 全局 canvas mock ---------- */
 if (typeof HTMLCanvasElement !== 'undefined') {
@@ -298,8 +297,8 @@ describe('BarChart 分支覆盖', () => {
   it('getContext 抛异常时 calculateLabelWidth 走 catch 分支', () => {
     // 通过 document.createElement 抛异常来确保进入 catch
     const origCreate = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
+      document,
+    ) as typeof document.createElement;
     const createSpy = vi
       .spyOn(document, 'createElement')
       .mockImplementation((tag: string, ...args: any[]) => {
@@ -467,7 +466,9 @@ const mockDownloadChart = vi.fn();
 
 // Mock canvas context 必须在 BarChart 任何逻辑前生效（含 useMemo 中的 calculateLabelWidth）
 if (typeof HTMLCanvasElement !== 'undefined') {
-  HTMLCanvasElement.prototype.getContext = vi.fn(function (this: HTMLCanvasElement) {
+  HTMLCanvasElement.prototype.getContext = vi.fn(function (
+    this: HTMLCanvasElement,
+  ) {
     return {
       measureText: vi.fn(() => ({ width: 50 })),
       fillText: vi.fn(),
@@ -566,7 +567,11 @@ vi.mock('../components', () => ({
   ChartStatistic: () => <div data-testid="chart-statistic" />,
   ChartToolBar: ({ onDownload, filter }: any) => (
     <div data-testid="chart-toolbar">
-      <button type="button" data-testid="download-btn" onClick={() => onDownload?.()}>
+      <button
+        type="button"
+        data-testid="download-btn"
+        onClick={() => onDownload?.()}
+      >
         download
       </button>
       {filter}
@@ -605,8 +610,6 @@ vi.mock('../utils', () => ({
   hexToRgba: vi.fn((color, alpha) => `rgba(${color},${alpha})`),
   resolveCssVariable: vi.fn((color) => color),
 }));
-
-import BarChart from '../BarChart';
 
 describe('BarChart 额外用例', () => {
   beforeEach(() => {
@@ -815,7 +818,11 @@ describe('BarChart 额外用例', () => {
     const data = [{ category: 'A', type: 't1', x: 'X1', y: 99 }];
     const customFormatter = vi.fn(({ value }: any) => `$${value}`);
     render(
-      <BarChart data={data} showDataLabels dataLabelFormatter={customFormatter} />,
+      <BarChart
+        data={data}
+        showDataLabels
+        dataLabelFormatter={customFormatter}
+      />,
     );
     const options = (globalThis as any).__barChartLastOptions as any;
     const formatter = options?.plugins?.datalabels?.formatter;
@@ -834,7 +841,14 @@ describe('BarChart 额外用例', () => {
     render(<BarChart data={data} showDataLabels />);
     const options = (globalThis as any).__barChartLastOptions as any;
     const formatter = options?.plugins?.datalabels?.formatter;
-    expect(formatter(null, { chart: {}, dataIndex: 0, datasetIndex: 0, dataset: {} })).toBe('');
+    expect(
+      formatter(null, {
+        chart: {},
+        dataIndex: 0,
+        datasetIndex: 0,
+        dataset: {},
+      }),
+    ).toBe('');
   });
 
   it('renderFilterInToolbar 为 false 且多分类时应渲染 ChartFilter', () => {
@@ -864,7 +878,9 @@ describe('BarChart 额外用例', () => {
     }) as any;
     const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
     const { container } = render(<BarChart data={data} showDataLabels />);
-    expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-testid="bar-chart"]'),
+    ).toBeInTheDocument();
     HTMLCanvasElement.prototype.getContext = orig;
   });
 
@@ -875,7 +891,12 @@ describe('BarChart 额外用例', () => {
     ];
     const customFormatter = vi.fn(({ value }: any) => `合计: ${value}`);
     render(
-      <BarChart data={data} stacked showDataLabels dataLabelFormatter={customFormatter} />,
+      <BarChart
+        data={data}
+        stacked
+        showDataLabels
+        dataLabelFormatter={customFormatter}
+      />,
     );
     const options = (globalThis as any).__barChartLastOptions as any;
     const formatter = options?.plugins?.datalabels?.formatter;
@@ -977,7 +998,12 @@ describe('BarChart 额外用例', () => {
       render(<BarChart data={data} />);
       const lastData = (globalThis as any).__barChartLastData as any;
       const borderRadius = lastData?.datasets?.[0]?.borderRadius;
-      const result = borderRadius({ raw: -2, chart: null, datasetIndex: 0, dataIndex: 0 } as any);
+      const result = borderRadius({
+        raw: -2,
+        chart: null,
+        datasetIndex: 0,
+        dataIndex: 0,
+      } as any);
       expect(result).toMatchObject({
         bottomLeft: 6,
         bottomRight: 6,
@@ -1028,8 +1054,12 @@ describe('BarChart 额外用例', () => {
       };
       const borderRadius0 = lastData?.datasets?.[0]?.borderRadius;
       const borderRadius1 = lastData?.datasets?.[1]?.borderRadius;
-      expect(borderRadius0({ raw: 10, chart, datasetIndex: 0, dataIndex: 0 } as any)).toBe(0);
-      expect(borderRadius1({ raw: 20, chart, datasetIndex: 1, dataIndex: 0 } as any)).toMatchObject({
+      expect(
+        borderRadius0({ raw: 10, chart, datasetIndex: 0, dataIndex: 0 } as any),
+      ).toBe(0);
+      expect(
+        borderRadius1({ raw: 20, chart, datasetIndex: 1, dataIndex: 0 } as any),
+      ).toMatchObject({
         topLeft: 6,
         topRight: 6,
       });
@@ -1071,13 +1101,17 @@ describe('BarChart 额外用例', () => {
         scales: {},
         ctx: {},
       };
-      expect(backgroundColor({ chart: noScale, parsed: { y: 10 } } as any)).toBeDefined();
+      expect(
+        backgroundColor({ chart: noScale, parsed: { y: 10 } } as any),
+      ).toBeDefined();
       const scaleNoMethod = {
         chartArea: { left: 0, right: 100, top: 0, bottom: 50 },
         scales: { x: {}, y: {} },
         ctx: {},
       };
-      expect(backgroundColor({ chart: scaleNoMethod, parsed: { y: 10 } } as any)).toBeDefined();
+      expect(
+        backgroundColor({ chart: scaleNoMethod, parsed: { y: 10 } } as any),
+      ).toBeDefined();
     });
 
     it('backgroundColor 水平柱 indexAxis y 非零值走渐变且正负图用自定义 color', () => {
@@ -1097,8 +1131,14 @@ describe('BarChart 额外用例', () => {
           y: { getPixelForValue: (v: number) => v },
         },
       };
-      const r1 = backgroundColor({ chart: mockChart as any, parsed: { x: 10 } } as any);
-      const r2 = backgroundColor({ chart: mockChart as any, parsed: { x: -5 } } as any);
+      const r1 = backgroundColor({
+        chart: mockChart as any,
+        parsed: { x: 10 },
+      } as any);
+      const r2 = backgroundColor({
+        chart: mockChart as any,
+        parsed: { x: -5 },
+      } as any);
       expect(r1).toBe(gradient);
       expect(r2).toBe(gradient);
     });
@@ -1119,7 +1159,10 @@ describe('BarChart 额外用例', () => {
           y: { getPixelForValue: () => 0 },
         },
       };
-      const result = backgroundColor({ chart: mockChart as any, parsed: { x: 1 } } as any);
+      const result = backgroundColor({
+        chart: mockChart as any,
+        parsed: { x: 1 },
+      } as any);
       expect(result).toBeDefined();
     });
 
@@ -1136,7 +1179,10 @@ describe('BarChart 额外用例', () => {
           y: { getPixelForValue: () => 0 },
         },
       };
-      const result = backgroundColor({ chart: mockChart as any, parsed: { y: 0 } } as any);
+      const result = backgroundColor({
+        chart: mockChart as any,
+        parsed: { y: 0 },
+      } as any);
       expect(result).toBeDefined();
     });
 
@@ -1156,7 +1202,10 @@ describe('BarChart 额外用例', () => {
           y: { getPixelForValue: () => Number.NaN },
         },
       };
-      const result = backgroundColor({ chart: mockChart as any, parsed: { y: 10 } } as any);
+      const result = backgroundColor({
+        chart: mockChart as any,
+        parsed: { y: 10 },
+      } as any);
       expect(result).toBeDefined();
     });
 
@@ -1177,8 +1226,14 @@ describe('BarChart 额外用例', () => {
           y: { getPixelForValue: (v: number) => v },
         },
       };
-      const r1 = backgroundColor({ chart: mockChart as any, parsed: { y: 10 } } as any);
-      const r2 = backgroundColor({ chart: mockChart as any, parsed: { y: -5 } } as any);
+      const r1 = backgroundColor({
+        chart: mockChart as any,
+        parsed: { y: 10 },
+      } as any);
+      const r2 = backgroundColor({
+        chart: mockChart as any,
+        parsed: { y: -5 },
+      } as any);
       expect(r1).toBe(gradient);
       expect(r2).toBe(gradient);
     });
@@ -1214,13 +1269,17 @@ describe('BarChart 额外用例', () => {
       HTMLCanvasElement.prototype.getContext = vi.fn(() => null) as any;
       const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
       const { container } = render(<BarChart data={data} showDataLabels />);
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
       HTMLCanvasElement.prototype.getContext = origGetContext;
     });
 
     it('measureText 不可用时走 catch 使用备用估算', () => {
       const origGetContext = HTMLCanvasElement.prototype.getContext;
-      HTMLCanvasElement.prototype.getContext = vi.fn(function (this: HTMLCanvasElement) {
+      HTMLCanvasElement.prototype.getContext = vi.fn(function (
+        this: HTMLCanvasElement,
+      ) {
         return {
           measureText: vi.fn(() => {
             throw new Error('measureText failed');
@@ -1232,7 +1291,9 @@ describe('BarChart 额外用例', () => {
       }) as any;
       const data = [{ category: 'A', type: 't1', x: 'X1', y: 10 }];
       const { container } = render(<BarChart data={data} showDataLabels />);
-      expect(container.querySelector('[data-testid="bar-chart"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="bar-chart"]'),
+      ).toBeInTheDocument();
       HTMLCanvasElement.prototype.getContext = origGetContext;
     });
   });
@@ -1282,5 +1343,4 @@ describe('BarChart 额外用例', () => {
       expect(labels).toEqual(['M', 'N']);
     });
   });
-
 });

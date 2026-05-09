@@ -86,12 +86,7 @@ describe('BubbleList', () => {
         </BubbleConfigProvide>,
       );
 
-      expectBubbleListItemIsLast(container, [
-        false,
-        false,
-        false,
-        true,
-      ]);
+      expectBubbleListItemIsLast(container, [false, false, false, true]);
     });
 
     it('should set isLast to true for single bubble in the list', () => {
@@ -182,13 +177,7 @@ describe('BubbleList', () => {
         </BubbleConfigProvide>,
       );
 
-      expectBubbleListItemIsLast(container, [
-        false,
-        false,
-        false,
-        false,
-        true,
-      ]);
+      expectBubbleListItemIsLast(container, [false, false, false, false, true]);
     });
   });
 
@@ -207,12 +196,7 @@ describe('BubbleList', () => {
         </BubbleConfigProvide>,
       );
 
-      expectBubbleListItemIsLast(container, [
-        false,
-        false,
-        false,
-        true,
-      ]);
+      expectBubbleListItemIsLast(container, [false, false, false, true]);
     });
 
     it('should set isLatest to true for single bubble in the list', () => {
@@ -286,13 +270,7 @@ describe('BubbleList', () => {
         </BubbleConfigProvide>,
       );
 
-      expectBubbleListItemIsLast(container, [
-        false,
-        false,
-        false,
-        false,
-        true,
-      ]);
+      expectBubbleListItemIsLast(container, [false, false, false, false, true]);
     });
   });
 
@@ -392,7 +370,9 @@ describe('BubbleList', () => {
         </BubbleConfigProvide>,
       );
 
-      expect(screen.queryByTestId('chat-item-copy-button')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('chat-item-copy-button'),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -666,7 +646,9 @@ describe('BubbleList', () => {
         </BubbleConfigProvide>,
       );
 
-      expect(screen.queryByTestId('chat-item-copy-button')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('chat-item-copy-button'),
+      ).not.toBeInTheDocument();
     });
   });
 

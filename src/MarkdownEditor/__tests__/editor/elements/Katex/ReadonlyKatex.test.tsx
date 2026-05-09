@@ -10,7 +10,11 @@ vi.mock('../../../../../Utils/debugUtils', () => ({
 
 describe('ReadonlyKatex', () => {
   it('应渲染只读公式块并应用样式', () => {
-    const element = { type: 'code', value: 'E = mc^2', children: [{ text: '' }] };
+    const element = {
+      type: 'code',
+      value: 'E = mc^2',
+      children: [{ text: '' }],
+    };
     const attributes = { 'data-slate-node': 'element', ref: React.createRef() };
     const { container } = render(
       <ReadonlyKatex element={element} attributes={attributes}>

@@ -16,10 +16,7 @@ import {
   it,
   vi,
 } from 'vitest';
-import {
-  Media,
-  ResizeImage,
-} from '../../../editor/elements/Media';
+import { Media, ResizeImage } from '../../../editor/elements/Media';
 import { useEditorStore } from '../../../editor/store';
 import * as utils from '../../../editor/utils';
 import { MediaNode } from '../../../el';
@@ -492,8 +489,7 @@ describe('Media', () => {
 
     it('视频加载失败时应该显示链接并支持 linkConfig', async () => {
       const onClick = vi.fn();
-      const { useEditorStore } =
-        await import('../../../editor/store');
+      const { useEditorStore } = await import('../../../editor/store');
       vi.mocked(useEditorStore).mockReturnValue({
         markdownEditorRef: {
           current: {
@@ -553,8 +549,7 @@ describe('Media', () => {
 
     it('音频加载失败时应该显示链接并支持 linkConfig', async () => {
       const onClick = vi.fn();
-      const { useEditorStore } =
-        await import('../../../editor/store');
+      const { useEditorStore } = await import('../../../editor/store');
       vi.mocked(useEditorStore).mockReturnValue({
         markdownEditorRef: {
           current: {
@@ -614,8 +609,7 @@ describe('Media', () => {
 
     it('当 linkConfig.onClick 返回 false 时应该阻止视频链接的默认行为', async () => {
       const onClick = vi.fn().mockReturnValue(false);
-      const { useEditorStore } =
-        await import('../../../editor/store');
+      const { useEditorStore } = await import('../../../editor/store');
       vi.mocked(useEditorStore).mockReturnValue({
         markdownEditorRef: {
           current: {
@@ -763,9 +757,7 @@ describe('Media', () => {
     });
 
     it('应该处理 resize 函数调用', async () => {
-      const { useDebounceFn } = await import(
-        '../../../../Hooks/useDebounceFn'
-      );
+      const { useDebounceFn } = await import('../../../../Hooks/useDebounceFn');
       const mockResize = vi.fn();
       vi.mocked(useDebounceFn).mockReturnValueOnce({
         run: mockResize,

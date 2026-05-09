@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { message, Modal } from 'antd';
+import { Modal } from 'antd';
 import copy from 'copy-to-clipboard';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Transforms } from 'slate';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useEditorStore } from '../../../../MarkdownEditor/editor/store';
 import { ReadonlyBaseBar } from '../../../../MarkdownEditor/editor/tools/ToolBar/ReadonlyBaseBar';
 
@@ -22,7 +22,12 @@ vi.mock('antd', () => ({
   },
 }));
 
-const storeRef: { current: { editorProps: { comment: { onSubmit: ReturnType<typeof vi.fn> } }; markdownEditorRef: any } | null } = { current: null };
+const storeRef: {
+  current: {
+    editorProps: { comment: { onSubmit: ReturnType<typeof vi.fn> } };
+    markdownEditorRef: any;
+  } | null;
+} = { current: null };
 
 vi.mock('../../../../MarkdownEditor/editor/store', () => ({
   useEditorStore: vi.fn(() => {
@@ -187,9 +192,18 @@ describe('ReadonlyBaseBar', () => {
         markdownEditorRef: {
           current: {
             selection: null,
-            children: [{ type: 'paragraph', children: [{ text: 'Test content' }] }],
-            nodes: vi.fn(() => [[{ type: 'paragraph', children: [{ text: 'Test content' }] }, [0]]]),
-            fragment: vi.fn(() => [{ type: 'paragraph', children: [{ text: 'Test content' }] }]),
+            children: [
+              { type: 'paragraph', children: [{ text: 'Test content' }] },
+            ],
+            nodes: vi.fn(() => [
+              [
+                { type: 'paragraph', children: [{ text: 'Test content' }] },
+                [0],
+              ],
+            ]),
+            fragment: vi.fn(() => [
+              { type: 'paragraph', children: [{ text: 'Test content' }] },
+            ]),
             string: vi.fn(() => 'Test content'),
           },
         },
@@ -199,7 +213,9 @@ describe('ReadonlyBaseBar', () => {
       } as any;
 
       const prevImpl = vi.mocked(useEditorStore).getMockImplementation();
-      vi.mocked(useEditorStore).mockImplementation(() => storeWithNullSelection);
+      vi.mocked(useEditorStore).mockImplementation(
+        () => storeWithNullSelection,
+      );
 
       try {
         render(<ReadonlyBaseBar {...defaultProps} />);
@@ -263,7 +279,9 @@ describe('ReadonlyBaseBar', () => {
       (storeRef.current!.editorProps.comment.onSubmit as any).mockClear();
       await confirmConfig.onOk();
 
-      expect(storeRef.current?.editorProps.comment.onSubmit).not.toHaveBeenCalled();
+      expect(
+        storeRef.current?.editorProps.comment.onSubmit,
+      ).not.toHaveBeenCalled();
     });
   });
 
@@ -276,7 +294,9 @@ describe('ReadonlyBaseBar', () => {
       fireEvent.click(highlightButton);
 
       await waitFor(() => {
-        expect(storeRef.current?.editorProps.comment.onSubmit).toHaveBeenCalledWith(
+        expect(
+          storeRef.current?.editorProps.comment.onSubmit,
+        ).toHaveBeenCalledWith(
           expect.any(String),
           expect.objectContaining({
             commentType: 'highlight',

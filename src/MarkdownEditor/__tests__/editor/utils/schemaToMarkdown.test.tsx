@@ -353,15 +353,18 @@ mindmap
 `;
 
 describe('schema ↔ markdown per paragraph chunk', () => {
-  input?.split('\n\n').filter(Boolean).forEach((char) => {
-    it(`should parse and serialize ${char.slice(0, 10)} chunk`, () => {
-      const padded = ` ${char}`;
-      const schema = parserMdToSchema(padded).schema;
-      expect(Array.isArray(schema)).toBe(true);
-      const markdown = parserSlateNodeToMarkdown(schema);
-      expect(typeof markdown).toBe('string');
+  input
+    ?.split('\n\n')
+    .filter(Boolean)
+    .forEach((char) => {
+      it(`should parse and serialize ${char.slice(0, 10)} chunk`, () => {
+        const padded = ` ${char}`;
+        const schema = parserMdToSchema(padded).schema;
+        expect(Array.isArray(schema)).toBe(true);
+        const markdown = parserSlateNodeToMarkdown(schema);
+        expect(typeof markdown).toBe('string');
+      });
     });
-  });
 });
 
 it(`忽略card，并且只生成一次`, () => {

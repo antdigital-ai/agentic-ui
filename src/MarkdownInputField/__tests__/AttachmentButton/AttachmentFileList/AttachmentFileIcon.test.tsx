@@ -9,7 +9,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { AttachmentFileIcon } from '../../../AttachmentButton/AttachmentFileList/AttachmentFileIcon';
 
 vi.mock('antd', async (importOriginal) => {
-  const mod = await importOriginal() as Record<string, unknown>;
+  const mod = (await importOriginal()) as Record<string, unknown>;
   return {
     ...mod,
     Image: ({ alt, src }: any) => (
@@ -58,9 +58,7 @@ describe('AttachmentFileIcon', () => {
       uuid: '1',
       url: 'https://example.com/photo.png',
     };
-    render(
-      <AttachmentFileIcon file={file as any} className="test-class" />,
-    );
+    render(<AttachmentFileIcon file={file as any} className="test-class" />);
     const img = screen.getByTestId('image-preview');
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute('src', 'https://example.com/photo.png');
@@ -118,9 +116,7 @@ describe('AttachmentFileIcon', () => {
       uuid: '1',
       url: 'https://example.com/doc.pdf',
     };
-    render(
-      <AttachmentFileIcon file={file as any} className="test-class" />,
-    );
+    render(<AttachmentFileIcon file={file as any} className="test-class" />);
     expect(mockGetFileTypeIcon).toHaveBeenCalled();
     expect(screen.getByTestId('file-type-icon')).toBeInTheDocument();
   });

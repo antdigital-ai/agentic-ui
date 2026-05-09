@@ -83,7 +83,9 @@ describe('BrowserList Component', () => {
       // jsdom 中不需要真正打开窗口
       .mockImplementation(() => null as any);
 
-    renderWithProvider(<BrowserList items={mockItems} activeLabel="搜索站点" />);
+    renderWithProvider(
+      <BrowserList items={mockItems} activeLabel="搜索站点" />,
+    );
 
     await user.click(screen.getByText('example.com'));
 
@@ -101,7 +103,11 @@ describe('BrowserList Component', () => {
     const onLocate = vi.fn();
 
     renderWithProvider(
-      <BrowserList items={mockItems} activeLabel="搜索定位" onLocate={onLocate} />,
+      <BrowserList
+        items={mockItems}
+        activeLabel="搜索定位"
+        onLocate={onLocate}
+      />,
     );
 
     // 只有第一条可定位

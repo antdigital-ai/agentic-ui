@@ -2,10 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  BaseMarkdownEditor,
-  MarkdownEditorProps,
-} from '../BaseMarkdownEditor';
+import { BaseMarkdownEditor, MarkdownEditorProps } from '../BaseMarkdownEditor';
 
 let capturedInitSchemaValue: any[] = [];
 vi.mock('../editor/Editor', () => ({
@@ -96,7 +93,10 @@ describe('BaseMarkdownEditor', () => {
     });
 
     it.each([
-      { label: '空字符串', props: { initValue: '' as const, onChange: vi.fn() } },
+      {
+        label: '空字符串',
+        props: { initValue: '' as const, onChange: vi.fn() },
+      },
       {
         label: 'undefined',
         props: { initValue: undefined, onChange: vi.fn() },

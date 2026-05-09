@@ -1,5 +1,11 @@
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../I18n';
@@ -89,7 +95,6 @@ vi.mock('../ChartMark', () => ({
   )),
 }));
 
-
 // Mock ChartAttrToolBar
 vi.mock('../ChartAttrToolBar', () => ({
   ChartAttrToolBar: vi.fn().mockImplementation((props) => (
@@ -102,9 +107,9 @@ vi.mock('../ChartAttrToolBar', () => ({
   )),
 }));
 
-
 const createRuntimeComponent =
-  (testId: string) => (props: { title?: string; toolbarExtra?: React.ReactNode }) => (
+  (testId: string) =>
+  (props: { title?: string; toolbarExtra?: React.ReactNode }) => (
     <div data-testid={testId}>
       {props.title ?? `mock-${testId}`}
       {props.toolbarExtra}
@@ -359,8 +364,12 @@ describe('ChartRender', () => {
       expect(screen.getByText('C')).toBeInTheDocument();
 
       // 检查 BEM 类名
-      expect(container.querySelector('.ant-agentic-plugin-chart')).toBeInTheDocument();
-      expect(container.querySelector('.ant-agentic-plugin-chart__table')).toBeInTheDocument();
+      expect(
+        container.querySelector('.ant-agentic-plugin-chart'),
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('.ant-agentic-plugin-chart__table'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -379,8 +388,12 @@ describe('ChartRender', () => {
       expect(screen.getByText('C')).toBeInTheDocument();
 
       // 检查 BEM 类名
-      expect(container.querySelector('.ant-agentic-plugin-chart')).toBeInTheDocument();
-      expect(container.querySelector('.ant-agentic-plugin-chart__descriptions')).toBeInTheDocument();
+      expect(
+        container.querySelector('.ant-agentic-plugin-chart'),
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('.ant-agentic-plugin-chart__descriptions'),
+      ).toBeInTheDocument();
     });
 
     it('应该在数据少于2条且列数大于8时渲染定义列表', () => {
@@ -707,8 +720,20 @@ describe('ChartRender', () => {
         ...defaultProps,
         chartType: 'funnel' as const,
         chartData: [
-          { name: 'Step1', value: 100, ratio: 1.0, category: 'Cat1', type: 'Type1' },
-          { name: 'Step2', value: 80, ratio: 0.8, category: 'Cat2', type: 'Type2' },
+          {
+            name: 'Step1',
+            value: 100,
+            ratio: 1.0,
+            category: 'Cat1',
+            type: 'Type1',
+          },
+          {
+            name: 'Step2',
+            value: 80,
+            ratio: 0.8,
+            category: 'Cat2',
+            type: 'Type2',
+          },
         ],
         filterBy: 'filter',
         groupBy: 'category',
@@ -761,8 +786,8 @@ describe('ChartRender', () => {
       const props = {
         ...defaultProps,
         chartData: [
-          { 'index\\_value': 10, 'normal_field': 20 },
-          { 'index\\_value': 15, 'normal_field': 25 },
+          { 'index\\_value': 10, normal_field: 20 },
+          { 'index\\_value': 15, normal_field: 25 },
         ],
         config: {
           ...defaultProps.config,
@@ -936,7 +961,9 @@ describe('ChartRender', () => {
         fireEvent.click(dropdownTrigger);
       });
 
-      const menuItem = await screen.findByRole('menuitem', {}, { timeout: 2000 }).catch(() => null);
+      const menuItem = await screen
+        .findByRole('menuitem', {}, { timeout: 2000 })
+        .catch(() => null);
       if (menuItem) {
         await act(async () => {
           fireEvent.click(menuItem);
@@ -983,15 +1010,19 @@ describe('ChartRender', () => {
         </I18nContext.Provider>,
       );
 
-      const columnTriggers = screen.getAllByText((content, el) =>
-        el?.textContent?.includes('3') === true && el?.textContent?.includes('列') === true,
+      const columnTriggers = screen.getAllByText(
+        (content, el) =>
+          el?.textContent?.includes('3') === true &&
+          el?.textContent?.includes('列') === true,
       );
       const columnTrigger = columnTriggers[columnTriggers.length - 1];
       await act(async () => {
         fireEvent.click(columnTrigger);
       });
 
-      const menuItems = document.body.querySelectorAll('.ant-dropdown-menu-item');
+      const menuItems = document.body.querySelectorAll(
+        '.ant-dropdown-menu-item',
+      );
       if (menuItems.length > 0) {
         await act(async () => {
           fireEvent.click(menuItems[1]);

@@ -1,6 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { message } from 'antd';
-import { makeDeserializer, TEXT_TAGS } from '../../../../editor/utils/docx/module';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  makeDeserializer,
+  TEXT_TAGS,
+} from '../../../../editor/utils/docx/module';
 
 vi.mock('antd', () => ({
   message: {
@@ -59,8 +61,8 @@ describe('docx module', () => {
         nodeType: 3,
         textContent: 'Hello World',
         parentNode: {
-          nodeName: 'P'
-        }
+          nodeName: 'P',
+        },
       };
 
       const result = deserialize(textNode, {});
@@ -72,8 +74,8 @@ describe('docx module', () => {
         nodeType: 3,
         textContent: '   \n  \t  ',
         parentNode: {
-          nodeName: 'P'
-        }
+          nodeName: 'P',
+        },
       };
 
       const result = deserialize(textNode, {});
@@ -85,8 +87,8 @@ describe('docx module', () => {
         nodeType: 3,
         textContent: 'Line 1\nLine 2\nLine 3',
         parentNode: {
-          nodeName: 'P'
-        }
+          nodeName: 'P',
+        },
       };
 
       const result = deserialize(textNode, {});
@@ -100,9 +102,9 @@ describe('docx module', () => {
         parentNode: {
           nodeName: 'O:P',
           parentNode: {
-            nodeName: 'P'
-          }
-        }
+            nodeName: 'P',
+          },
+        },
       };
 
       const result = deserialize(textNode, {});
@@ -121,7 +123,7 @@ describe('docx module', () => {
     it('应该处理BR标签', () => {
       const brNode = {
         nodeType: 1,
-        nodeName: 'BR'
+        nodeName: 'BR',
       };
 
       const result = deserialize(brNode, {});
@@ -132,7 +134,7 @@ describe('docx module', () => {
       const bodyNode = {
         nodeType: 1,
         nodeName: 'BODY',
-        childNodes: []
+        childNodes: [],
       };
 
       const result = deserialize(bodyNode, {});
@@ -141,7 +143,7 @@ describe('docx module', () => {
       expect(result[0]).toEqual({
         type: 'paragraph',
         className: 'P',
-        children: [{ text: ' ' }]
+        children: [{ text: ' ' }],
       });
     });
   });
@@ -156,15 +158,18 @@ describe('docx module', () => {
           return null;
         }),
         setAttribute: vi.fn(),
-        childNodes: [] // 添加childNodes属性
+        childNodes: [], // 添加childNodes属性
       };
 
       const imageTags = {
-        'http://example.com/image.jpg': 'http://replaced.com/image.jpg'
+        'http://example.com/image.jpg': 'http://replaced.com/image.jpg',
       };
 
       const result = deserialize(imgNode, imageTags);
-      expect(imgNode.setAttribute).toHaveBeenCalledWith('src', 'http://replaced.com/image.jpg');
+      expect(imgNode.setAttribute).toHaveBeenCalledWith(
+        'src',
+        'http://replaced.com/image.jpg',
+      );
       // 由于ELEMENT_TAGS需要被mock，我们暂时跳过这部分测试
       expect(result).toBeDefined();
     });
@@ -173,13 +178,15 @@ describe('docx module', () => {
       const h1Node = {
         nodeType: 1,
         nodeName: 'H1',
-        childNodes: [{
-          nodeType: 3,
-          textContent: 'Heading 1',
-          parentNode: {
-            nodeName: 'H1'
-          }
-        }]
+        childNodes: [
+          {
+            nodeType: 3,
+            textContent: 'Heading 1',
+            parentNode: {
+              nodeName: 'H1',
+            },
+          },
+        ],
       };
 
       const result = deserialize(h1Node, {});
@@ -187,7 +194,7 @@ describe('docx module', () => {
         type: 'head',
         className: 'H1',
         level: 1,
-        children: ['Heading 1']
+        children: ['Heading 1'],
       });
     });
 
@@ -195,39 +202,45 @@ describe('docx module', () => {
       const bNode = {
         nodeType: 1,
         nodeName: 'B',
-        childNodes: [{
-          nodeType: 3,
-          textContent: 'Bold Text',
-          parentNode: {
-            nodeName: 'B'
-          }
-        }]
+        childNodes: [
+          {
+            nodeType: 3,
+            textContent: 'Bold Text',
+            parentNode: {
+              nodeName: 'B',
+            },
+          },
+        ],
       };
 
       const result = deserialize(bNode, {});
-      expect(result).toEqual([{
-        bold: true,
-        text: 'Bold Text'
-      }]);
+      expect(result).toEqual([
+        {
+          bold: true,
+          text: 'Bold Text',
+        },
+      ]);
     });
 
     it('应该处理嵌套元素', () => {
       const pNode = {
         nodeType: 1,
         nodeName: 'P',
-        childNodes: [{
-          nodeType: 3,
-          textContent: 'Paragraph text',
-          parentNode: {
-            nodeName: 'P'
-          }
-        }]
+        childNodes: [
+          {
+            nodeType: 3,
+            textContent: 'Paragraph text',
+            parentNode: {
+              nodeName: 'P',
+            },
+          },
+        ],
       };
 
       const result = deserialize(pNode, {});
       expect(result).toEqual({
         type: 'paragraph',
-        children: ['Paragraph text']
+        children: ['Paragraph text'],
       });
     });
 
@@ -239,13 +252,15 @@ describe('docx module', () => {
           {
             nodeType: 1,
             nodeName: 'CODE',
-            childNodes: [{
-              nodeType: 3,
-              textContent: 'code content',
-              parentNode: { nodeName: 'CODE' }
-            }]
-          }
-        ]
+            childNodes: [
+              {
+                nodeType: 3,
+                textContent: 'code content',
+                parentNode: { nodeName: 'CODE' },
+              },
+            ],
+          },
+        ],
       };
       const result = deserialize(preNode, {});
       expect(result).toBeDefined();
@@ -256,11 +271,13 @@ describe('docx module', () => {
       const emNode = {
         nodeType: 1,
         nodeName: 'EM',
-        childNodes: [{
-          nodeType: 3,
-          textContent: 'italic',
-          parentNode: { nodeName: 'EM' }
-        }]
+        childNodes: [
+          {
+            nodeType: 3,
+            textContent: 'italic',
+            parentNode: { nodeName: 'EM' },
+          },
+        ],
       };
       const result = deserialize(emNode, {});
       expect(result).toEqual([{ italic: true, text: 'italic' }]);
@@ -274,13 +291,15 @@ describe('docx module', () => {
           {
             nodeType: 1,
             nodeName: 'I',
-            childNodes: [{
-              nodeType: 3,
-              textContent: 'nested',
-              parentNode: { nodeName: 'I' }
-            }]
-          }
-        ]
+            childNodes: [
+              {
+                nodeType: 3,
+                textContent: 'nested',
+                parentNode: { nodeName: 'I' },
+              },
+            ],
+          },
+        ],
       };
       const result = deserialize(bNode, {});
       expect(result).toBeDefined();
@@ -297,11 +316,13 @@ describe('docx module', () => {
       const bNode = {
         nodeType: 1,
         nodeName: 'B',
-        childNodes: [{
-          nodeType: 3,
-          textContent: 'x',
-          parentNode: { nodeName: 'B' }
-        }]
+        childNodes: [
+          {
+            nodeType: 3,
+            textContent: 'x',
+            parentNode: { nodeName: 'B' },
+          },
+        ],
       };
       const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const result = deserializeWithError(bNode, {});
@@ -321,7 +342,11 @@ describe('docx module', () => {
       container.appendChild(p);
 
       const result = deserialize(p, {});
-      expect(mockJsx).toHaveBeenCalledWith('element', expect.any(Object), expect.any(Array));
+      expect(mockJsx).toHaveBeenCalledWith(
+        'element',
+        expect.any(Object),
+        expect.any(Array),
+      );
       expect(result).toBeDefined();
       expect(result?.type).toBe('bulleted-list');
     });
@@ -332,12 +357,12 @@ describe('docx module', () => {
           getNamedItem: vi.fn((name) => {
             if (name === 'class') {
               return {
-                value: 'some-other-class'
+                value: 'some-other-class',
               };
             }
             return null;
-          })
-        }
+          }),
+        },
       };
 
       const result = deserialize(nonListNode, {});
@@ -385,7 +410,9 @@ describe('docx module', () => {
 
   describe('deserializeListItem', () => {
     it('deserializeElement 抛错时应走 catch 并输出 console.error', () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       const container = document.createElement('div');
       const p = document.createElement('p');
       p.setAttribute('class', 'MsoListParagraph');
@@ -412,20 +439,24 @@ describe('docx module', () => {
       const bNode = {
         nodeType: 1,
         nodeName: 'B',
-        childNodes: [{
-          nodeType: 3,
-          textContent: 'Bold Text',
-          parentNode: {
-            nodeName: 'B'
-          }
-        }]
+        childNodes: [
+          {
+            nodeType: 3,
+            textContent: 'Bold Text',
+            parentNode: {
+              nodeName: 'B',
+            },
+          },
+        ],
       };
 
       const result = deserialize(bNode, {});
-      expect(result).toEqual([{
-        bold: true,
-        text: 'Bold Text'
-      }]);
+      expect(result).toEqual([
+        {
+          bold: true,
+          text: 'Bold Text',
+        },
+      ]);
     });
   });
 
@@ -434,7 +465,7 @@ describe('docx module', () => {
       const emptyNode = {
         nodeType: 1,
         nodeName: 'DIV',
-        childNodes: []
+        childNodes: [],
       };
 
       const result = deserialize(emptyNode, {});
@@ -451,13 +482,15 @@ describe('docx module', () => {
       const errorNode = {
         nodeType: 1,
         nodeName: 'B',
-        childNodes: [{
-          nodeType: 3,
-          textContent: 'Error test',
-          parentNode: {
-            nodeName: 'B'
-          }
-        }]
+        childNodes: [
+          {
+            nodeType: 3,
+            textContent: 'Error test',
+            parentNode: {
+              nodeName: 'B',
+            },
+          },
+        ],
       };
 
       // 模拟jsx函数抛出异常
@@ -466,7 +499,7 @@ describe('docx module', () => {
       });
 
       const errorDeserialize = makeDeserializer(errorJsx);
-      
+
       // 这里应该不会抛出异常，因为错误被catch了
       expect(() => {
         errorDeserialize(errorNode, {});

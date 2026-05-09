@@ -108,7 +108,9 @@ describe('CaseReply 组件', () => {
       <CaseReply quote="样式测试" style={customStyle} />,
     );
 
-    const mainElement = container.querySelector('.ant-agentic-chatboot-case-reply');
+    const mainElement = container.querySelector(
+      '.ant-agentic-chatboot-case-reply',
+    );
     expect(mainElement).toHaveStyle({ backgroundColor: 'red' });
   });
 
@@ -117,7 +119,9 @@ describe('CaseReply 组件', () => {
       <CaseReply quote="类名测试" className="custom-class" />,
     );
 
-    const mainElement = container.querySelector('.ant-agentic-chatboot-case-reply');
+    const mainElement = container.querySelector(
+      '.ant-agentic-chatboot-case-reply',
+    );
     expect(mainElement).toHaveClass('custom-class');
   });
 
@@ -317,7 +321,9 @@ describe('CaseReply 组件', () => {
   it('应该正确处理默认值', () => {
     const { container } = render(<CaseReply />);
 
-    const mainElement = container.querySelector('.ant-agentic-chatboot-case-reply');
+    const mainElement = container.querySelector(
+      '.ant-agentic-chatboot-case-reply',
+    );
     expect(mainElement).toBeInTheDocument();
   });
 });

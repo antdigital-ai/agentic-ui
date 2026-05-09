@@ -2,8 +2,8 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { HistoryEmpty } from '../../components/HistoryEmpty';
 import { I18nContext } from '../../../I18n';
+import { HistoryEmpty } from '../../components/HistoryEmpty';
 
 describe('HistoryEmpty', () => {
   it('应渲染默认标题和描述', () => {
@@ -19,12 +19,14 @@ describe('HistoryEmpty', () => {
   it('应使用 locale 中的标题和描述', () => {
     render(
       <I18nContext.Provider
-        value={{
-          locale: {
-            'chat.history.empty.chat.title': '空状态标题',
-            'chat.history.empty.chat.description': '空状态描述',
-          },
-        } as any}
+        value={
+          {
+            locale: {
+              'chat.history.empty.chat.title': '空状态标题',
+              'chat.history.empty.chat.description': '空状态描述',
+            },
+          } as any
+        }
       >
         <HistoryEmpty />
       </I18nContext.Provider>,

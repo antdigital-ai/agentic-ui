@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { Editor } from 'slate';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
+import { Editor } from 'slate';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ElementProps, InlineKatexNode } from '../../../MarkdownEditor/el';
 import { InlineKatex } from '../InlineKatex';
@@ -176,7 +176,9 @@ describe('InlineKatex', () => {
 
       process.env.NODE_ENV = previousEnv;
 
-      const hiddenSpan = container.querySelector('span[style*="display: none"]');
+      const hiddenSpan = container.querySelector(
+        'span[style*="display: none"]',
+      );
       expect(hiddenSpan).toBeInTheDocument();
     });
   });
@@ -201,7 +203,9 @@ describe('InlineKatex', () => {
     it('应该处理 katex 加载失败的情况', async () => {
       const originalEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
       mockLoadKatex.mockRejectedValueOnce(new Error('Load failed'));
 
@@ -306,7 +310,9 @@ describe('InlineKatex', () => {
       // 这个测试主要验证条件检查 `if (renderEl.current && katexRef.current)` 的逻辑存在
       // 在实际场景中，如果 renderEl.current 为 null（例如组件卸载后），不会调用 render
       // 这里我们验证组件正常渲染且 render 被调用了（说明条件检查通过）
-      expect(mockKatexRender.mock.calls.length).toBeGreaterThanOrEqual(initialCallCount);
+      expect(mockKatexRender.mock.calls.length).toBeGreaterThanOrEqual(
+        initialCallCount,
+      );
 
       process.env.NODE_ENV = originalEnv;
     });
@@ -369,7 +375,9 @@ describe('InlineKatex', () => {
         await Promise.resolve();
       });
 
-      const inputSpan = container.querySelector('span[style*="visibility: hidden"]');
+      const inputSpan = container.querySelector(
+        'span[style*="visibility: hidden"]',
+      );
       expect(inputSpan).toBeInTheDocument();
 
       // 未选中且 katex 已加载时，应该调用 render
@@ -378,7 +386,7 @@ describe('InlineKatex', () => {
 
     it('应该处理点击事件', () => {
       process.env.NODE_ENV = 'development';
-      
+
       mockUseEditorStore.mockReturnValue({
         markdownEditorRef: mockMarkdownEditorRef,
         readonly: false,
@@ -387,7 +395,9 @@ describe('InlineKatex', () => {
 
       const { container } = render(<InlineKatex {...defaultProps} />);
 
-      const katexSpan = container.querySelector('span.katex[contenteditable="false"]');
+      const katexSpan = container.querySelector(
+        'span.katex[contenteditable="false"]',
+      );
       expect(katexSpan).toBeInTheDocument();
 
       // 点击不应该抛出错误
@@ -404,7 +414,9 @@ describe('InlineKatex', () => {
 
       const { container } = render(<InlineKatex {...defaultProps} />);
 
-      const katexSpan = container.querySelector('span.katex[contenteditable="false"]');
+      const katexSpan = container.querySelector(
+        'span.katex[contenteditable="false"]',
+      );
       expect(katexSpan).toBeInTheDocument();
       expect(katexSpan).toHaveStyle({
         visibility: 'hidden',
@@ -431,7 +443,9 @@ describe('InlineKatex', () => {
       process.env.NODE_ENV = previousEnv;
 
       // 验证组件渲染了（通过查找 data-be 属性）
-      const katexElement = container.querySelector('span[data-be="inline-katex"]');
+      const katexElement = container.querySelector(
+        'span[data-be="inline-katex"]',
+      );
       expect(katexElement).toBeInTheDocument();
     });
   });

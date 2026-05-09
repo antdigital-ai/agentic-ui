@@ -2,10 +2,7 @@ import '@testing-library/jest-dom';
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  BaseMarkdownEditor,
-  MarkdownEditorProps,
-} from '../BaseMarkdownEditor';
+import { BaseMarkdownEditor, MarkdownEditorProps } from '../BaseMarkdownEditor';
 
 // Mock 依赖
 vi.mock('../editor/Editor', () => ({
@@ -177,9 +174,7 @@ describe('BaseMarkdownEditor - contentStyle 测试', () => {
       );
 
       await waitFor(() => {
-        const root = container.querySelector(
-          '.markdown-editor',
-        ) as HTMLElement;
+        const root = container.querySelector('.markdown-editor') as HTMLElement;
         expect(root).toBeInTheDocument();
         const attr = root.getAttribute('style') || '';
         expect(attr).not.toMatch(/padding-top:\s*;/);

@@ -21,6 +21,8 @@ describe('LineChart style', () => {
 
   it('wrapSSR 应能包装节点', () => {
     const { result } = renderHook(() => useStyle('line-chart'));
-    expect(result.current.wrapSSR(React.createElement('div', null, 'test'))).toBeDefined();
+    expect(
+      result.current.wrapSSR(React.createElement('div', null, 'test')),
+    ).toBeDefined();
   });
 });

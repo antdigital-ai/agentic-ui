@@ -2,11 +2,11 @@ import '@testing-library/jest-dom';
 import isHotkey from 'is-hotkey';
 import { Editor, Range, Transforms } from 'slate';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { KeyboardTask } from '../../../editor/utils/keyboard';
 import { EditorUtils } from '../../../editor/utils/editorUtils';
+import { KeyboardTask } from '../../../editor/utils/keyboard';
 
 vi.mock('slate', async () => {
-  const actual = await vi.importActual('slate') as any;
+  const actual = (await vi.importActual('slate')) as any;
   return {
     ...actual,
     Transforms: {
@@ -532,7 +532,10 @@ describe('keyboard utils', () => {
           focus: { path: [0, 0], offset: 2 },
         };
         vi.mocked(Range.isCollapsed).mockReturnValue(true);
-        vi.mocked(Editor.leaf).mockReturnValue([{ text: 'hello world' }, [0, 0]] as any);
+        vi.mocked(Editor.leaf).mockReturnValue([
+          { text: 'hello world' },
+          [0, 0],
+        ] as any);
 
         const task = new KeyboardTask(store, {});
         task.selectWord();
@@ -547,7 +550,10 @@ describe('keyboard utils', () => {
           focus: { path: [0, 0], offset: 1 },
         };
         vi.mocked(Range.isCollapsed).mockReturnValue(true);
-        vi.mocked(Editor.leaf).mockReturnValue([{ text: '你好世界test' }, [0, 0]] as any);
+        vi.mocked(Editor.leaf).mockReturnValue([
+          { text: '你好世界test' },
+          [0, 0],
+        ] as any);
 
         const task = new KeyboardTask(store, {});
         task.selectWord();
@@ -562,7 +568,10 @@ describe('keyboard utils', () => {
           focus: { path: [0, 0], offset: 6 },
         };
         vi.mocked(Range.isCollapsed).mockReturnValue(true);
-        vi.mocked(Editor.leaf).mockReturnValue([{ text: 'hello ' }, [0, 0]] as any);
+        vi.mocked(Editor.leaf).mockReturnValue([
+          { text: 'hello ' },
+          [0, 0],
+        ] as any);
 
         const task = new KeyboardTask(store, {});
         task.selectWord();
@@ -577,7 +586,10 @@ describe('keyboard utils', () => {
           focus: { path: [0, 0], offset: 3 },
         };
         vi.mocked(Range.isCollapsed).mockReturnValue(true);
-        vi.mocked(Editor.leaf).mockReturnValue([{ text: '你好 ' }, [0, 0]] as any);
+        vi.mocked(Editor.leaf).mockReturnValue([
+          { text: '你好 ' },
+          [0, 0],
+        ] as any);
 
         const task = new KeyboardTask(store, {});
         task.selectWord();
@@ -592,7 +604,10 @@ describe('keyboard utils', () => {
           focus: { path: [0, 0], offset: 0 },
         };
         vi.mocked(Range.isCollapsed).mockReturnValue(true);
-        vi.mocked(Editor.leaf).mockReturnValue([{ text: '.,!' }, [0, 0]] as any);
+        vi.mocked(Editor.leaf).mockReturnValue([
+          { text: '.,!' },
+          [0, 0],
+        ] as any);
 
         const task = new KeyboardTask(store, {});
         task.selectWord();
@@ -715,14 +730,18 @@ describe('keyboard utils', () => {
 
       it('undo catches errors', () => {
         const { store, editor } = createMockStore();
-        editor.undo.mockImplementation(() => { throw new Error('fail'); });
+        editor.undo.mockImplementation(() => {
+          throw new Error('fail');
+        });
         const task = new KeyboardTask(store, {});
         expect(() => task.undo()).not.toThrow();
       });
 
       it('redo catches errors', () => {
         const { store, editor } = createMockStore();
-        editor.redo.mockImplementation(() => { throw new Error('fail'); });
+        editor.redo.mockImplementation(() => {
+          throw new Error('fail');
+        });
         const task = new KeyboardTask(store, {});
         expect(() => task.redo()).not.toThrow();
       });
@@ -733,7 +752,10 @@ describe('keyboard utils', () => {
         const { store } = createMockStore();
         const task = new KeyboardTask(store, {});
         task.format('bold');
-        expect(EditorUtils.toggleFormat).toHaveBeenCalledWith(expect.anything(), 'bold');
+        expect(EditorUtils.toggleFormat).toHaveBeenCalledWith(
+          expect.anything(),
+          'bold',
+        );
       });
     });
   });

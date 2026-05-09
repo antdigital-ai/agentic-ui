@@ -2,12 +2,9 @@ import '@testing-library/jest-dom';
 import { cleanup, waitFor } from '@testing-library/react';
 import { BaseEditor, createEditor, Node, Transforms } from 'slate';
 import { HistoryEditor, withHistory } from 'slate-history';
+import { ReactEditor, withReact } from 'slate-react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { withMarkdown } from '../../editor/plugins/withMarkdown';
-import {
-  ReactEditor,
-  withReact,
-} from 'slate-react';
 import { EditorUtils } from '../../editor/utils/editorUtils';
 
 describe('Editor Card Tests', () => {

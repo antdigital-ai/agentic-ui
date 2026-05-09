@@ -2,9 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import RadarChart, {
-  RadarChartDataItem,
-} from '../RadarChart';
+import RadarChart, { RadarChartDataItem } from '../RadarChart';
 
 // Mock Chart.js
 vi.mock('chart.js', () => ({
@@ -416,9 +414,8 @@ describe('RadarChart', () => {
 
   describe('交互功能测试', () => {
     it('应该支持下载功能', async () => {
-      const { downloadChart } = await import(
-        '../../../src/Plugins/chart/components'
-      );
+      const { downloadChart } =
+        await import('../../../src/Plugins/chart/components');
 
       render(<RadarChart data={sampleData} title="可下载雷达图" />);
 

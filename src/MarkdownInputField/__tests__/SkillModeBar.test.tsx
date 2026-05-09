@@ -192,7 +192,9 @@ describe('SkillModeBar', () => {
         />,
       );
 
-      const bar = container.querySelector('.ant-agentic-skill-mode') as HTMLElement;
+      const bar = container.querySelector(
+        '.ant-agentic-skill-mode',
+      ) as HTMLElement;
       expect(bar.style.backgroundColor).toBe('red');
       expect(bar.style.padding).toBe('20px');
     });

@@ -2,16 +2,10 @@ import { render, renderHook } from '@testing-library/react';
 import React from 'react';
 import { Subject } from 'rxjs';
 import { createEditor, Editor, Transforms } from 'slate';
+import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  ReactEditor,
-  withReact,
-} from 'slate-react';
 import { EditorStore } from '../../../../editor/store';
-import {
-  Methods,
-  useSystemKeyboard,
-} from '../../../../editor/utils/keyboard';
+import { Methods, useSystemKeyboard } from '../../../../editor/utils/keyboard';
 
 // Mock dependencies
 vi.mock('antd', () => ({
@@ -35,7 +29,13 @@ vi.mock('is-hotkey', () => ({
     if (hotkey === 'arrowUp' && event.key === 'ArrowUp') return true;
     if (hotkey === 'arrowDown' && event.key === 'ArrowDown') return true;
     if (hotkey === 'mod+a' && event.ctrlKey && event.key === 'a') return true;
-    if (hotkey === 'mod+shift+l' && event.ctrlKey && event.shiftKey && event.key === 'l') return true;
+    if (
+      hotkey === 'mod+shift+l' &&
+      event.ctrlKey &&
+      event.shiftKey &&
+      event.key === 'l'
+    )
+      return true;
     return false;
   }),
 }));
@@ -213,7 +213,10 @@ describe('useSystemKeyboard', () => {
     } as any;
     const mockRef = { current: mockElement };
 
-    const mediaNode = [{ type: 'media', url: 'https://x.com/a.jpg', height: 100 }, [0, 0] as any];
+    const mediaNode = [
+      { type: 'media', url: 'https://x.com/a.jpg', height: 100 },
+      [0, 0] as any,
+    ];
     vi.spyOn(Editor, 'nodes').mockReturnValue([mediaNode] as any);
 
     renderHook(() => {
@@ -277,7 +280,10 @@ describe('useSystemKeyboard', () => {
     } as any;
     const mockRef = { current: mockElement };
 
-    const mediaNode = [{ type: 'media', url: 'https://x.com/a.jpg' }, [0, 0] as any];
+    const mediaNode = [
+      { type: 'media', url: 'https://x.com/a.jpg' },
+      [0, 0] as any,
+    ];
     vi.spyOn(Editor, 'nodes').mockReturnValue([mediaNode] as any);
     const deleteSpy = vi.spyOn(Transforms, 'delete');
 

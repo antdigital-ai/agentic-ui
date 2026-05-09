@@ -5,10 +5,7 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
-import {
-  createConfiguredSandbox,
-  quickExecute,
-} from '../../proxySandbox';
+import { createConfiguredSandbox, quickExecute } from '../../proxySandbox';
 
 describe('沙箱系统集成测试', () => {
   describe('预配置沙箱测试', () => {

@@ -1,15 +1,12 @@
 import '@testing-library/jest-dom';
-import { ConfigProvider } from 'antd';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  List,
-  ListItem,
-} from '../../../editor/elements/List';
+import { List, ListItem } from '../../../editor/elements/List';
 import { ReadonlyListItem } from '../../../editor/elements/List/ReadonlyListItem';
-import * as editorHooks from '../../../hooks/editor';
 import * as editorStore from '../../../editor/store';
+import * as editorHooks from '../../../hooks/editor';
 
 // Mock dependencies
 vi.mock('../../../editor/store', () => ({
@@ -206,7 +203,10 @@ describe('List Components', () => {
     describe('ReadonlyListItem', () => {
       const readonlyProps = (element: any) => ({
         element,
-        attributes: { 'data-slate-node': 'element' as const, ref: { current: null } },
+        attributes: {
+          'data-slate-node': 'element' as const,
+          ref: { current: null },
+        },
         children: [<div key="1">Content</div>],
       });
 
@@ -239,7 +239,9 @@ describe('List Components', () => {
             />
           </ConfigProvider>,
         );
-        expect(container.querySelector('[data-be="list-item"]')).toBeInTheDocument();
+        expect(
+          container.querySelector('[data-be="list-item"]'),
+        ).toBeInTheDocument();
         expect(screen.getByText('Alice')).toBeInTheDocument();
       });
     });
@@ -266,9 +268,11 @@ describe('List Components', () => {
       });
 
       it('点击提及下拉区域应阻止冒泡和默认行为', async () => {
-        const loadMentions = vi.fn().mockResolvedValue([
-          { id: '1', name: 'Alice', avatar: 'http://example.com/a.png' },
-        ]);
+        const loadMentions = vi
+          .fn()
+          .mockResolvedValue([
+            { id: '1', name: 'Alice', avatar: 'http://example.com/a.png' },
+          ]);
         vi.mocked(editorStore.useEditorStore).mockReturnValue({
           store: { dragStart: vi.fn() },
           markdownContainerRef: { current: document.createElement('div') },
@@ -291,7 +295,9 @@ describe('List Components', () => {
           expect(loadMentions).toHaveBeenCalled();
         });
         const trigger = container.querySelector('.ant-dropdown-trigger');
-        const wrapperDiv = trigger?.parentElement ?? container.querySelector('[data-be="list-item"]');
+        const wrapperDiv =
+          trigger?.parentElement ??
+          container.querySelector('[data-be="list-item"]');
         const e = new MouseEvent('click', { bubbles: true });
         const stopSpy = vi.spyOn(e, 'stopPropagation');
         const preventSpy = vi.spyOn(e, 'preventDefault');
@@ -381,7 +387,10 @@ describe('List Components', () => {
         const { container } = render(<ListItem {...props} />);
         expect(listItemRender).toHaveBeenCalledWith(
           expect.objectContaining({ children: expect.anything() }),
-          expect.objectContaining({ element: props.element, attributes: props.attributes }),
+          expect.objectContaining({
+            element: props.element,
+            attributes: props.attributes,
+          }),
         );
         expect(screen.getByText('Custom')).toBeInTheDocument();
         const li = container.querySelector('[data-be="list-item"]');

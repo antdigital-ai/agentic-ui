@@ -4,12 +4,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock markdownToHtml 以避免引入 unified 重量级依赖
-vi.mock(
-  '../../../../MarkdownEditor/editor/utils/markdownToHtml',
-  () => ({
-    markdownToHtml: vi.fn(async (md: string) => `<p>${md}</p>`),
-  }),
-);
+vi.mock('../../../../MarkdownEditor/editor/utils/markdownToHtml', () => ({
+  markdownToHtml: vi.fn(async (md: string) => `<p>${md}</p>`),
+}));
 
 import {
   openHtmlLocalPreview,

@@ -1,7 +1,7 @@
-import { renderHook, act } from '@testing-library/react';
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { useSchemaEditorBridge } from '../../schema-editor/useSchemaEditorBridge';
+import { act, renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SchemaEditorBridgeManager } from '../../schema-editor/SchemaEditorBridgeManager';
+import { useSchemaEditorBridge } from '../../schema-editor/useSchemaEditorBridge';
 
 describe('useSchemaEditorBridge', () => {
   /** 保存原始 NODE_ENV */

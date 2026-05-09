@@ -1,6 +1,6 @@
 import { Transforms } from 'slate';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReactEditor } from 'slate-react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EditorStore } from '../../../editor/store';
 import {
   convertRemoteImages,
@@ -53,9 +53,7 @@ describe('Media Utils', () => {
     });
 
     it('应该处理 data URL 音频', async () => {
-      const result = await getRemoteMediaType(
-        'data:audio/mpeg;base64,//uQx',
-      );
+      const result = await getRemoteMediaType('data:audio/mpeg;base64,//uQx');
       expect(result).toBe('audio');
     });
 

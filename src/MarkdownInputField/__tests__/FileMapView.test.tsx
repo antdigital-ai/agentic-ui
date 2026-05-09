@@ -64,7 +64,9 @@ describe('FileMapView', () => {
       const fileMap = new Map();
       fileMap.set('file-1', createMockFile('test.pdf', 'application/pdf'));
       const customStyle = { backgroundColor: 'red' };
-      const { container } = render(<FileMapView style={customStyle} fileMap={fileMap} />);
+      const { container } = render(
+        <FileMapView style={customStyle} fileMap={fileMap} />,
+      );
       const element = container.querySelector(
         '.ant-agentic-md-editor-file-view-list',
       ) as HTMLElement;
@@ -214,7 +216,9 @@ describe('FileMapView', () => {
       fireEvent.click(viewAllButton);
 
       await waitFor(() => {
-        const fileItems = container.querySelectorAll('[data-testid="file-item"]');
+        const fileItems = container.querySelectorAll(
+          '[data-testid="file-item"]',
+        );
         expect(fileItems.length).toBe(5);
       });
     });
@@ -236,7 +240,9 @@ describe('FileMapView', () => {
       fireEvent.click(viewAllButton);
 
       await waitFor(() => {
-        const fileItems = container.querySelectorAll('[data-testid="file-item"]');
+        const fileItems = container.querySelectorAll(
+          '[data-testid="file-item"]',
+        );
         expect(fileItems.length).toBe(5);
       });
     });
@@ -383,7 +389,9 @@ describe('FileMapView', () => {
     it('should render with right placement', () => {
       const fileMap = new Map();
       fileMap.set('file-1', createMockFile('test.pdf', 'application/pdf'));
-      const { container } = render(<FileMapView placement="right" fileMap={fileMap} />);
+      const { container } = render(
+        <FileMapView placement="right" fileMap={fileMap} />,
+      );
       expect(
         container.querySelector('.ant-agentic-md-editor-file-view-list'),
       ).toBeInTheDocument();
@@ -410,7 +418,9 @@ describe('FileMapView', () => {
       const { container } = render(<FileMapView fileMap={fileMap} />);
 
       // Single video: 330x188
-      const videoThumb = container.querySelector('.ant-agentic-md-editor-file-view-list-video-thumb');
+      const videoThumb = container.querySelector(
+        '.ant-agentic-md-editor-file-view-list-video-thumb',
+      );
       expect(videoThumb).toBeInTheDocument();
       expect((videoThumb as HTMLElement).style.width).toBe('330px');
       expect((videoThumb as HTMLElement).style.height).toBe('188px');
@@ -426,7 +436,9 @@ describe('FileMapView', () => {
 
       const { container } = render(<FileMapView fileMap={fileMap} />);
 
-      const videoThumbs = container.querySelectorAll('.ant-agentic-md-editor-file-view-list-video-thumb');
+      const videoThumbs = container.querySelectorAll(
+        '.ant-agentic-md-editor-file-view-list-video-thumb',
+      );
       expect(videoThumbs.length).toBe(2);
       expect((videoThumbs[0] as HTMLElement).style.width).toBe('124px');
       expect((videoThumbs[0] as HTMLElement).style.height).toBe('124px');
@@ -492,7 +504,9 @@ describe('FileMapView', () => {
       });
 
       const { container } = render(<FileMapView fileMap={fileMap} />);
-      const sizeNode = container.querySelector('[data-testid="file-item-size"]');
+      const sizeNode = container.querySelector(
+        '[data-testid="file-item-size"]',
+      );
 
       expect(sizeNode).toBeInTheDocument();
       expect(sizeNode).toHaveTextContent('1 KB');
@@ -510,9 +524,9 @@ describe('FileMapView', () => {
       expect(
         container.querySelector('[data-testid="file-item-size"]'),
       ).not.toBeInTheDocument();
-      expect(container.querySelector('[data-testid="file-item-extension"]')).toHaveTextContent(
-        'pdf',
-      );
+      expect(
+        container.querySelector('[data-testid="file-item-extension"]'),
+      ).toHaveTextContent('pdf');
     });
 
     it('缺失 size 时不应展示文件大小', () => {
@@ -524,9 +538,9 @@ describe('FileMapView', () => {
       expect(
         container.querySelector('[data-testid="file-item-size"]'),
       ).not.toBeInTheDocument();
-      expect(container.querySelector('[data-testid="file-item-extension"]')).toHaveTextContent(
-        'pdf',
-      );
+      expect(
+        container.querySelector('[data-testid="file-item-extension"]'),
+      ).toHaveTextContent('pdf');
     });
 
     it('无扩展名文件名应正确显示 displayName (65)', () => {
@@ -539,7 +553,9 @@ describe('FileMapView', () => {
 
       const { container } = render(<FileMapView fileMap={fileMap} />);
       expect(container.textContent).toContain('README');
-      expect(container.querySelector('[data-testid="file-item"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-testid="file-item"]'),
+      ).toBeInTheDocument();
     });
 
     it('status 为 error 时点击项不触发预览或 window.open (84)', () => {
@@ -597,7 +613,9 @@ describe('FileMapView', () => {
       const { container } = render(
         <FileMapView fileMap={fileMap} onDownload={onDownload} />,
       );
-      fireEvent.mouseEnter(container.querySelector('[data-testid="file-item"]')!);
+      fireEvent.mouseEnter(
+        container.querySelector('[data-testid="file-item"]')!,
+      );
       const downloadBtn = screen.getByRole('button', { name: '下载' });
       fireEvent.click(downloadBtn);
       expect(onDownload).toHaveBeenCalledWith(file);
@@ -613,7 +631,9 @@ describe('FileMapView', () => {
       const { container } = render(
         <FileMapView fileMap={fileMap} renderMoreAction={renderMoreAction} />,
       );
-      fireEvent.mouseEnter(container.querySelector('[data-testid="file-item"]')!);
+      fireEvent.mouseEnter(
+        container.querySelector('[data-testid="file-item"]')!,
+      );
       expect(screen.getByTestId('more-x.pdf')).toHaveTextContent('More: x.pdf');
     });
 
@@ -626,7 +646,9 @@ describe('FileMapView', () => {
       const { container } = render(
         <FileMapView fileMap={fileMap} onPreview={onPreview} />,
       );
-      fireEvent.mouseEnter(container.querySelector('[data-testid="file-item"]')!);
+      fireEvent.mouseEnter(
+        container.querySelector('[data-testid="file-item"]')!,
+      );
       const previewBtn = screen.getByRole('button', { name: '预览' });
       fireEvent.click(previewBtn);
       expect(onPreview).toHaveBeenCalledWith(file);
@@ -640,7 +662,9 @@ describe('FileMapView', () => {
       const { container } = render(
         <FileMapView fileMap={fileMap} customSlot={customSlot} />,
       );
-      fireEvent.mouseEnter(container.querySelector('[data-testid="file-item"]')!);
+      fireEvent.mouseEnter(
+        container.querySelector('[data-testid="file-item"]')!,
+      );
       const moreBtn = screen.getByRole('button', { name: '更多' });
       fireEvent.click(moreBtn);
       expect(moreBtn).toBeInTheDocument();
@@ -656,7 +680,9 @@ describe('FileMapView', () => {
       const { container } = render(
         <FileMapView fileMap={fileMap} renderMoreAction={renderMoreAction} />,
       );
-      fireEvent.mouseEnter(container.querySelector('[data-testid="file-item"]')!);
+      fireEvent.mouseEnter(
+        container.querySelector('[data-testid="file-item"]')!,
+      );
       const moreActionBtn = screen.getByRole('button', { name: '更多操作' });
       fireEvent.click(moreActionBtn);
       expect(moreActionBtn).toBeInTheDocument();
@@ -725,7 +751,9 @@ describe('FileMapView', () => {
         <FileMapView fileMap={fileMap} onPreview={onPreview} />,
       );
 
-      const img = container.querySelector('img[src="https://example.com/photo.jpg"]');
+      const img = container.querySelector(
+        'img[src="https://example.com/photo.jpg"]',
+      );
       expect(img).toBeInTheDocument();
     });
 
@@ -743,11 +771,9 @@ describe('FileMapView', () => {
 
   describe('itemRender prop', () => {
     it('should use itemRender to wrap image items', () => {
-      const itemRender = vi.fn(
-        (file: any, defaultDom: React.ReactNode) => (
-          <div data-testid={`custom-item-${file.name}`}>{defaultDom}</div>
-        ),
-      );
+      const itemRender = vi.fn((file: any, defaultDom: React.ReactNode) => (
+        <div data-testid={`custom-item-${file.name}`}>{defaultDom}</div>
+      ));
       const fileMap = new Map();
       fileMap.set('img-1', createMockFile('wrap.jpg', 'image/jpeg'));
 
@@ -774,11 +800,9 @@ describe('FileMapView', () => {
     });
 
     it('should use itemRender for video items', () => {
-      const itemRender = vi.fn(
-        (file: any, defaultDom: React.ReactNode) => (
-          <div data-testid={`custom-video-${file.name}`}>{defaultDom}</div>
-        ),
-      );
+      const itemRender = vi.fn((file: any, defaultDom: React.ReactNode) => (
+        <div data-testid={`custom-video-${file.name}`}>{defaultDom}</div>
+      ));
       const fileMap = new Map();
       fileMap.set('vid-1', createMockFile('clip.mp4', 'video/mp4'));
 
@@ -797,16 +821,16 @@ describe('FileMapView', () => {
 
       const { container } = render(<FileMapView fileMap={fileMap} />);
 
-      const img = container.querySelector('img[src="https://example.com/default.jpg"]');
+      const img = container.querySelector(
+        'img[src="https://example.com/default.jpg"]',
+      );
       expect(img).toBeInTheDocument();
     });
 
     it('should use itemRender for placeholder items when status is set but no url', () => {
-      const itemRender = vi.fn(
-        (file: any, defaultDom: React.ReactNode) => (
-          <div data-testid={`placeholder-wrap-${file.name}`}>{defaultDom}</div>
-        ),
-      );
+      const itemRender = vi.fn((file: any, defaultDom: React.ReactNode) => (
+        <div data-testid={`placeholder-wrap-${file.name}`}>{defaultDom}</div>
+      ));
       const fileMap = new Map();
       fileMap.set('img-1', {
         uuid: 'uuid-placeholder',
@@ -819,7 +843,9 @@ describe('FileMapView', () => {
 
       render(<FileMapView fileMap={fileMap} itemRender={itemRender} />);
 
-      expect(screen.getByTestId('placeholder-wrap-loading.jpg')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('placeholder-wrap-loading.jpg'),
+      ).toBeInTheDocument();
     });
   });
 

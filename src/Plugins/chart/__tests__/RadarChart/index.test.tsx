@@ -164,7 +164,9 @@ vi.mock('../../utils', () => ({
   resolveCssVariable: vi.fn((color) =>
     typeof color === 'string' && color.startsWith('var(') ? '#1677ff' : color,
   ),
-  hexToRgba: vi.fn((color, alpha) => `${color}${Math.round(alpha * 255).toString(16)}`),
+  hexToRgba: vi.fn(
+    (color, alpha) => `${color}${Math.round(alpha * 255).toString(16)}`,
+  ),
 }));
 
 const mockData = [
@@ -268,7 +270,9 @@ describe('RadarChart', () => {
       throw new Error('Download failed');
     });
 
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleWarnSpy = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => {});
 
     render(
       <ConfigProvider>
@@ -408,10 +412,7 @@ describe('RadarChart', () => {
   it('应该支持统计信息', () => {
     render(
       <ConfigProvider>
-        <RadarChart
-          data={mockData}
-          statistic={{ title: '总计', value: 100 }}
-        />
+        <RadarChart data={mockData} statistic={{ title: '总计', value: 100 }} />
       </ConfigProvider>,
     );
 
@@ -539,10 +540,7 @@ describe('RadarChart', () => {
   it('应该支持自定义 classNames', () => {
     render(
       <ConfigProvider>
-        <RadarChart
-          data={mockData}
-          classNames={{ root: 'custom-root' }}
-        />
+        <RadarChart data={mockData} classNames={{ root: 'custom-root' }} />
       </ConfigProvider>,
     );
 
@@ -552,10 +550,7 @@ describe('RadarChart', () => {
   it('应该支持自定义 styles', () => {
     render(
       <ConfigProvider>
-        <RadarChart
-          data={mockData}
-          styles={{ root: { padding: '10px' } }}
-        />
+        <RadarChart data={mockData} styles={{ root: { padding: '10px' } }} />
       </ConfigProvider>,
     );
 
@@ -662,16 +657,18 @@ describe('RadarChart', () => {
   it('应该处理 generateLabels 中 ctx 为 null 的情况', () => {
     // Mock getContext 返回 null
     const originalCreateElement = Document.prototype.createElement.bind(
-  document,
-) as typeof document.createElement;
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      if (tagName === 'canvas') {
-        const canvas = originalCreateElement('canvas') as HTMLCanvasElement;
-        canvas.getContext = vi.fn(() => null);
-        return canvas;
-      }
-      return originalCreateElement(tagName);
-    });
+      document,
+    ) as typeof document.createElement;
+    vi.spyOn(document, 'createElement').mockImplementation(
+      (tagName: string) => {
+        if (tagName === 'canvas') {
+          const canvas = originalCreateElement('canvas') as HTMLCanvasElement;
+          canvas.getContext = vi.fn(() => null);
+          return canvas;
+        }
+        return originalCreateElement(tagName);
+      },
+    );
 
     render(
       <ConfigProvider>

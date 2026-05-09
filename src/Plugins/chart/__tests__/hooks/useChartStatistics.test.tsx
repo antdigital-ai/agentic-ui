@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { useChartStatistics } from '../../hooks/useChartStatistics';
 import type { StatisticConfigType } from '../../hooks/useChartStatistic';
+import { useChartStatistics } from '../../hooks/useChartStatistics';
 
 describe('useChartStatistics', () => {
   const mockStatisticConfig: StatisticConfigType = {
@@ -88,11 +88,8 @@ describe('useChartStatistics', () => {
       { title: 'Third', value: 300 },
     ];
 
-    const { result } = renderHook(() =>
-      useChartStatistics(complexConfigArray),
-    );
+    const { result } = renderHook(() => useChartStatistics(complexConfigArray));
 
     expect(result.current).toEqual(complexConfigArray);
   });
 });
-

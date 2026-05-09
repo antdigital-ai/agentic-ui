@@ -863,8 +863,7 @@ describe('ProxySandbox', () => {
 describe('工厂函数测试', () => {
   describe('createSandbox', () => {
     it('应该创建带有默认配置的沙箱', async () => {
-      const { createSandbox } =
-        await import('../../proxySandbox/ProxySandbox');
+      const { createSandbox } = await import('../../proxySandbox/ProxySandbox');
       const sandbox = createSandbox();
 
       expect(sandbox).toBeInstanceOf(ProxySandbox);
@@ -874,8 +873,7 @@ describe('工厂函数测试', () => {
     });
 
     it('应该创建带有自定义配置的沙箱', async () => {
-      const { createSandbox } =
-        await import('../../proxySandbox/ProxySandbox');
+      const { createSandbox } = await import('../../proxySandbox/ProxySandbox');
       const config = {
         allowConsole: false,
         timeout: 1000,
@@ -895,8 +893,7 @@ describe('工厂函数测试', () => {
 
   describe('runInSandbox', () => {
     it('应该能够一次性执行代码', async () => {
-      const { runInSandbox } =
-        await import('../../proxySandbox/ProxySandbox');
+      const { runInSandbox } = await import('../../proxySandbox/ProxySandbox');
       const result = await runInSandbox('return 2 * 3');
 
       expect(result.success).toBe(true);
@@ -904,8 +901,7 @@ describe('工厂函数测试', () => {
     });
 
     it('应该在执行后自动清理资源', async () => {
-      const { runInSandbox } =
-        await import('../../proxySandbox/ProxySandbox');
+      const { runInSandbox } = await import('../../proxySandbox/ProxySandbox');
       // 这个测试验证不会造成内存泄漏
       const promises = Array.from({ length: 10 }, (_, i) =>
         runInSandbox(`return ${i} * 2`),
@@ -920,8 +916,7 @@ describe('工厂函数测试', () => {
     });
 
     it('应该使用自定义配置执行代码', async () => {
-      const { runInSandbox } =
-        await import('../../proxySandbox/ProxySandbox');
+      const { runInSandbox } = await import('../../proxySandbox/ProxySandbox');
       const result = await runInSandbox('return customVar', {
         customGlobals: { customVar: 'test' },
       });
@@ -931,8 +926,7 @@ describe('工厂函数测试', () => {
     });
 
     it('应该支持注入参数', async () => {
-      const { runInSandbox } =
-        await import('../../proxySandbox/ProxySandbox');
+      const { runInSandbox } = await import('../../proxySandbox/ProxySandbox');
       const result = await runInSandbox(
         'return injectedValue',
         {},
@@ -944,8 +938,7 @@ describe('工厂函数测试', () => {
     });
 
     it('执行失败时应在 finally 中 destroy 且后续调用正常', async () => {
-      const { runInSandbox } =
-        await import('../../proxySandbox/ProxySandbox');
+      const { runInSandbox } = await import('../../proxySandbox/ProxySandbox');
 
       const failResult = await runInSandbox('throw new Error("fail");');
       expect(failResult.success).toBe(false);
@@ -959,8 +952,7 @@ describe('工厂函数测试', () => {
 
 describe('边界情况测试', () => {
   it('应该处理空代码', async () => {
-    const { runInSandbox } =
-      await import('../../proxySandbox/ProxySandbox');
+    const { runInSandbox } = await import('../../proxySandbox/ProxySandbox');
     const result = await runInSandbox('');
 
     expect(result.success).toBe(true);
@@ -968,16 +960,14 @@ describe('边界情况测试', () => {
   });
 
   it('应该处理只有注释的代码', async () => {
-    const { runInSandbox } =
-      await import('../../proxySandbox/ProxySandbox');
+    const { runInSandbox } = await import('../../proxySandbox/ProxySandbox');
     const result = await runInSandbox('// 这是注释\n/* 这也是注释 */');
 
     expect(result.success).toBe(true);
   });
 
   it('应该处理复杂的嵌套结构', async () => {
-    const { runInSandbox } =
-      await import('../../proxySandbox/ProxySandbox');
+    const { runInSandbox } = await import('../../proxySandbox/ProxySandbox');
     const code = `
       const obj = {
         nested: {
@@ -995,8 +985,7 @@ describe('边界情况测试', () => {
   });
 
   it('应该处理异步代码（Promise）', async () => {
-    const { runInSandbox } =
-      await import('../../proxySandbox/ProxySandbox');
+    const { runInSandbox } = await import('../../proxySandbox/ProxySandbox');
     const code = `
       return Promise.resolve(42);
     `;
@@ -1986,7 +1975,12 @@ describe('边界情况测试', () => {
       const sandbox = new ProxySandbox({ allowConsole: true } as any);
       const postMessage = vi.fn();
       const terminate = vi.fn();
-      const fakeWorker: any = { postMessage, terminate, onmessage: null, onerror: null };
+      const fakeWorker: any = {
+        postMessage,
+        terminate,
+        onmessage: null,
+        onerror: null,
+      };
       const OldWorker = (globalThis as any).Worker;
       const OldURL = globalThis.URL;
       const revokeSpy = vi.fn();

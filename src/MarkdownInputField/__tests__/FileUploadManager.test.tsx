@@ -178,7 +178,9 @@ describe('useFileUploadManager', () => {
       fileMap.set('file2', createMockFile('file2', 'done'));
 
       const clickSpy = vi.fn();
-      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
+      const originalCreateElement = Document.prototype.createElement.bind(
+        document,
+      ) as typeof document.createElement;
       const createElementSpy = vi
         .spyOn(document, 'createElement')
         .mockImplementation((tagName: string) => {
@@ -230,7 +232,9 @@ describe('useFileUploadManager', () => {
 
       // 模拟 DOM 操作
       const clickSpy = vi.fn();
-      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
+      const originalCreateElement = Document.prototype.createElement.bind(
+        document,
+      ) as typeof document.createElement;
       const createElementSpy = vi
         .spyOn(document, 'createElement')
         .mockImplementation((tagName: string) => {
@@ -248,8 +252,7 @@ describe('useFileUploadManager', () => {
     });
 
     it('应该达到 maxFileCount 时阻止选择并触发 onExceedMaxCount 回调', async () => {
-      const { upLoadFileToServer } =
-        await import('../AttachmentButton');
+      const { upLoadFileToServer } = await import('../AttachmentButton');
 
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
@@ -263,7 +266,9 @@ describe('useFileUploadManager', () => {
         .spyOn(document, 'createElement')
         .mockReturnValue(mockInput);
       vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
-      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(vi.fn());
+      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(
+        vi.fn(),
+      );
 
       const onFileMapChange = vi.fn();
       const { result } = renderHook(
@@ -311,7 +316,9 @@ describe('useFileUploadManager', () => {
       const clickSpy = vi.fn();
       const appendChildSpy = vi.fn();
       const removeSpy = vi.fn();
-      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
+      const originalCreateElement = Document.prototype.createElement.bind(
+        document,
+      ) as typeof document.createElement;
 
       let createdInput: HTMLInputElement | null = null;
 
@@ -354,7 +361,9 @@ describe('useFileUploadManager', () => {
       });
 
       const clickSpy = vi.fn();
-      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
+      const originalCreateElement = Document.prototype.createElement.bind(
+        document,
+      ) as typeof document.createElement;
 
       let createdInput: HTMLInputElement | null = null;
 
@@ -393,7 +402,9 @@ describe('useFileUploadManager', () => {
       });
 
       const clickSpy = vi.fn();
-      const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
+      const originalCreateElement = Document.prototype.createElement.bind(
+        document,
+      ) as typeof document.createElement;
 
       let createdInput: HTMLInputElement | null = null;
 
@@ -711,8 +722,7 @@ describe('useFileUploadManager', () => {
       mockInput.onchange?.(changeEvent);
 
       // 不应该调用上传函数
-      const { upLoadFileToServer } =
-        await import('../AttachmentButton');
+      const { upLoadFileToServer } = await import('../AttachmentButton');
       expect(upLoadFileToServer).not.toHaveBeenCalled();
 
       createElementSpy.mockRestore();
@@ -720,8 +730,7 @@ describe('useFileUploadManager', () => {
     });
 
     it('应该处理文件数量超过限制的情况（onExceedMaxCount 被透传给 upLoadFileToServer）', async () => {
-      const { upLoadFileToServer } =
-        await import('../AttachmentButton');
+      const { upLoadFileToServer } = await import('../AttachmentButton');
 
       const onExceedMaxCount = vi.fn();
       const onFileMapChange = vi.fn();
@@ -736,7 +745,9 @@ describe('useFileUploadManager', () => {
         .spyOn(document, 'createElement')
         .mockReturnValue(mockInput);
       vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
-      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(vi.fn());
+      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(
+        vi.fn(),
+      );
 
       const { result: resultWithLimit } = renderHook(
         () =>
@@ -771,8 +782,7 @@ describe('useFileUploadManager', () => {
     });
 
     it('应该处理文件总数超过限制的情况（onExceedMaxCount 被透传给 upLoadFileToServer）', async () => {
-      const { upLoadFileToServer } =
-        await import('../AttachmentButton');
+      const { upLoadFileToServer } = await import('../AttachmentButton');
 
       const fileMap = new Map();
       fileMap.set('file1', createMockFile('file1', 'done'));
@@ -789,7 +799,9 @@ describe('useFileUploadManager', () => {
         .spyOn(document, 'createElement')
         .mockReturnValue(mockInput);
       vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node);
-      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(vi.fn());
+      vi.spyOn(HTMLInputElement.prototype, 'remove').mockImplementation(
+        vi.fn(),
+      );
 
       const { result } = renderHook(
         () =>
@@ -851,8 +863,7 @@ describe('useFileUploadManager', () => {
       mockInput.onchange?.(changeEvent);
 
       // readonly 状态下不应该处理
-      const { upLoadFileToServer } =
-        await import('../AttachmentButton');
+      const { upLoadFileToServer } = await import('../AttachmentButton');
       expect(upLoadFileToServer).not.toHaveBeenCalled();
 
       createElementSpy.mockRestore();
@@ -860,8 +871,7 @@ describe('useFileUploadManager', () => {
     });
 
     it('应在 upLoadFileToServer 成功时调用 onFileMapChange', async () => {
-      const { upLoadFileToServer } =
-        await import('../AttachmentButton');
+      const { upLoadFileToServer } = await import('../AttachmentButton');
       vi.mocked(upLoadFileToServer).mockImplementation(
         async (_files: File[], options: any) => {
           options?.onFileMapChange?.(new Map());
@@ -900,8 +910,7 @@ describe('useFileUploadManager', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
-      const { upLoadFileToServer } =
-        await import('../AttachmentButton');
+      const { upLoadFileToServer } = await import('../AttachmentButton');
       vi.mocked(upLoadFileToServer).mockRejectedValue(
         new Error('Upload error'),
       );
@@ -980,7 +989,9 @@ describe('useFileUploadManager', () => {
   });
 
   describe('getAcceptValue 设备类型处理', () => {
-    const originalCreateElement = Document.prototype.createElement.bind(document) as typeof document.createElement;
+    const originalCreateElement = Document.prototype.createElement.bind(
+      document,
+    ) as typeof document.createElement;
 
     it.each([
       [

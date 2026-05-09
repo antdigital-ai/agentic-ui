@@ -2,9 +2,7 @@ import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import FunnelChart, {
-  FunnelChartDataItem,
-} from '../FunnelChart';
+import FunnelChart, { FunnelChartDataItem } from '../FunnelChart';
 
 vi.mock('chart.js', () => ({
   Chart: {
@@ -57,17 +55,34 @@ vi.mock('../utils', async () => {
 
 vi.mock('../components', () => ({
   ChartContainer: ({ children, ...p }: any) => (
-    <div data-testid="chart-container" {...p}>{children}</div>
+    <div data-testid="chart-container" {...p}>
+      {children}
+    </div>
   ),
-  ChartFilter: ({ filterOptions, onFilterChange, customOptions, onSelectionChange }: any) => (
+  ChartFilter: ({
+    filterOptions,
+    onFilterChange,
+    customOptions,
+    onSelectionChange,
+  }: any) => (
     <div data-testid="chart-filter">
       {filterOptions?.map((o: any) => (
-        <button type="button" key={o.value} onClick={() => onFilterChange?.(o.value)} data-testid={`filter-${o.value}`}>
+        <button
+          type="button"
+          key={o.value}
+          onClick={() => onFilterChange?.(o.value)}
+          data-testid={`filter-${o.value}`}
+        >
           {o.label}
         </button>
       ))}
       {customOptions?.map((o: any) => (
-        <button type="button" key={o.key} onClick={() => onSelectionChange?.(o.key)} data-testid={`custom-${o.key}`}>
+        <button
+          type="button"
+          key={o.key}
+          onClick={() => onSelectionChange?.(o.key)}
+          data-testid={`custom-${o.key}`}
+        >
           {o.label}
         </button>
       ))}
@@ -77,7 +92,9 @@ vi.mock('../components', () => ({
     <div data-testid="chart-toolbar">
       {title && <span>{title}</span>}
       {loading && <span data-testid="loading">loading</span>}
-      <button type="button" onClick={onDownload} data-testid="download-btn">下载</button>
+      <button type="button" onClick={onDownload} data-testid="download-btn">
+        下载
+      </button>
       {filter}
     </div>
   ),
@@ -86,7 +103,9 @@ vi.mock('../components', () => ({
 
 vi.mock('../ChartStatistic', () => ({
   default: ({ title, value }: any) => (
-    <div data-testid="chart-statistic">{title}: {value}</div>
+    <div data-testid="chart-statistic">
+      {title}: {value}
+    </div>
   ),
 }));
 
@@ -108,7 +127,10 @@ const createMockCtx = () => ({
 describe('FunnelChart 分支逻辑', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    Object.defineProperty(window, 'innerWidth', { writable: true, value: 1024 });
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      value: 1024,
+    });
   });
 
   describe('高度计算回退', () => {
@@ -133,8 +155,8 @@ describe('FunnelChart 分支逻辑', () => {
       const chartData = JSON.parse(
         screen.getByTestId('bar-chart').getAttribute('data-chart-data')!,
       );
-      const widths = chartData.datasets[0].data.map(
-        (p: [number, number]) => Math.abs(p[1] - p[0]),
+      const widths = chartData.datasets[0].data.map((p: [number, number]) =>
+        Math.abs(p[1] - p[0]),
       );
       widths.forEach((w: number) => expect(w).toBe(500));
     });
@@ -169,7 +191,17 @@ describe('FunnelChart 分支逻辑', () => {
       render(<FunnelChart data={data} />);
       const opts = (globalThis as any).__lastFunnelOptions;
       const labels = opts.plugins.legend.labels.generateLabels({
-        data: { datasets: [{ data: [[0, 1000], [0, 600]] }], labels: ['阶段A', '阶段B'] },
+        data: {
+          datasets: [
+            {
+              data: [
+                [0, 1000],
+                [0, 600],
+              ],
+            },
+          ],
+          labels: ['阶段A', '阶段B'],
+        },
       });
       expect(labels.find((l: any) => l.text === '转化率')).toBeUndefined();
     });
@@ -182,7 +214,17 @@ describe('FunnelChart 分支逻辑', () => {
       render(<FunnelChart data={data} />);
       const opts = (globalThis as any).__lastFunnelOptions;
       const labels = opts.plugins.legend.labels.generateLabels({
-        data: { datasets: [{ data: [[0, 1000], [0, 600]] }], labels: ['阶段A', '阶段B'] },
+        data: {
+          datasets: [
+            {
+              data: [
+                [0, 1000],
+                [0, 600],
+              ],
+            },
+          ],
+          labels: ['阶段A', '阶段B'],
+        },
       });
       expect(labels.find((l: any) => l.text === '转化率')).toBeDefined();
     });
@@ -195,7 +237,17 @@ describe('FunnelChart 分支逻辑', () => {
       render(<FunnelChart data={data} />);
       const opts = (globalThis as any).__lastFunnelOptions;
       const labels = opts.plugins.legend.labels.generateLabels({
-        data: { datasets: [{ data: [[0, 1000], [0, 600]] }], labels: ['阶段A', '阶段B'] },
+        data: {
+          datasets: [
+            {
+              data: [
+                [0, 1000],
+                [0, 600],
+              ],
+            },
+          ],
+          labels: ['阶段A', '阶段B'],
+        },
       });
       expect(labels.find((l: any) => l.text === '转化率')).toBeUndefined();
     });
@@ -222,7 +274,8 @@ describe('FunnelChart 分支逻辑', () => {
         { x: '阶段B', y: 600 },
       ];
       render(<FunnelChart data={data} showPercent={false} />);
-      const callbacks = (globalThis as any).__lastFunnelOptions.plugins.tooltip.callbacks;
+      const callbacks = (globalThis as any).__lastFunnelOptions.plugins.tooltip
+        .callbacks;
       const result = callbacks.label({ dataIndex: 0, datasetIndex: 0 });
       expect(result).toBe('1000');
     });
@@ -233,7 +286,8 @@ describe('FunnelChart 分支逻辑', () => {
         { x: '阶段B', y: 600 },
       ];
       render(<FunnelChart data={data} showPercent />);
-      const callbacks = (globalThis as any).__lastFunnelOptions.plugins.tooltip.callbacks;
+      const callbacks = (globalThis as any).__lastFunnelOptions.plugins.tooltip
+        .callbacks;
       expect(callbacks.label({ dataIndex: 1 })).toBe('600');
     });
   });
@@ -248,17 +302,28 @@ describe('FunnelChart 分支逻辑', () => {
     const buildMockChart = (ds?: any[], meta?: any) => ({
       ctx: createMockCtx(),
       data: {
-        datasets: [{ data: ds || [[-500, 500], [-300, 300], [-100, 100]] }],
+        datasets: [
+          {
+            data: ds || [
+              [-500, 500],
+              [-300, 300],
+              [-100, 100],
+            ],
+          },
+        ],
         labels: ['阶段A', '阶段B', '阶段C'],
       },
       scales: { x: { getPixelForValue: (v: number) => 300 + v * 0.3 } },
-      getDatasetMeta: vi.fn(() => meta || {
-        data: [
-          { x: 300, y: 30, height: 30, width: 300 },
-          { x: 300, y: 70, height: 30, width: 180 },
-          { x: 300, y: 110, height: 30, width: 60 },
-        ],
-      }),
+      getDatasetMeta: vi.fn(
+        () =>
+          meta || {
+            data: [
+              { x: 300, y: 30, height: 30, width: 300 },
+              { x: 300, y: 70, height: 30, width: 180 },
+              { x: 300, y: 110, height: 30, width: 60 },
+            ],
+          },
+      ),
     });
 
     it('showTrapezoid 初始为 true 时绘制梯形', () => {
@@ -304,7 +369,10 @@ describe('FunnelChart 分支逻辑', () => {
         (p: any) => p.id === 'funnelTrapezoidLabels',
       );
       const chart = buildMockChart(
-        [[-500, 500], [-300, 300]],
+        [
+          [-500, 500],
+          [-300, 300],
+        ],
         {
           data: [
             { x: 300, y: 30, height: 30, width: 300 },
@@ -389,7 +457,10 @@ describe('FunnelChart 分支逻辑', () => {
     });
 
     it('isMobile 时容器使用 w-full', () => {
-      Object.defineProperty(window, 'innerWidth', { writable: true, value: 500 });
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        value: 500,
+      });
       render(<FunnelChart data={[{ x: 'A', y: 100 }]} width={800} />);
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
     });

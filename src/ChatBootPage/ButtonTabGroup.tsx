@@ -3,9 +3,9 @@ import classNames from 'clsx';
 import React, { memo, useContext, useEffect, useState } from 'react';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import ButtonTab from './ButtonTab';
+import { useStyle } from './ButtonTabGroupStyle';
 
 const EMPTY_ITEMS: ButtonTabGroupProps['items'] = [];
-import { useStyle } from './ButtonTabGroupStyle';
 
 export interface ButtonTabItem {
   /** Tab 的唯一标识 */

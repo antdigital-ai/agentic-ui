@@ -116,7 +116,9 @@ describe('ChartFilter', () => {
 
   it('点击地区下拉项应调用 onSelectionChange', () => {
     const onSelectionChange = vi.fn();
-    render(<ChartFilter {...defaultProps} onSelectionChange={onSelectionChange} />);
+    render(
+      <ChartFilter {...defaultProps} onSelectionChange={onSelectionChange} />,
+    );
     screen.getByTestId('dropdown-item-region2').click();
     expect(onSelectionChange).toHaveBeenCalledWith('region2');
   });
@@ -240,8 +242,6 @@ describe('ChartFilter', () => {
     expect(filterButton.textContent).toContain('全部');
   });
 
-
-
   it('应该防抖处理地区选择变化', async () => {
     vi.useFakeTimers();
     const onSelectionChange = vi.fn();
@@ -359,8 +359,7 @@ describe('ChartFilter', () => {
     // 重新模拟 I18nContext 以测试默认文本
     vi.doMock('../../../../src/I18n', () => ({
       I18nContext: {
-        Consumer: ({ children }: any) =>
-          children({}),
+        Consumer: ({ children }: any) => children({}),
       },
     }));
 
@@ -398,7 +397,6 @@ describe('ChartFilter', () => {
     const filterContainer = container.firstChild as HTMLElement;
     expect(filterContainer.className).toContain('dark');
   });
-
 
   it('应该正确处理地区选项禁用状态', () => {
     render(<ChartFilter {...defaultProps} />);

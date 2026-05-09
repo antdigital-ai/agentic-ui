@@ -497,7 +497,9 @@ describe('BubbleExtra', () => {
       };
       render(<BubbleExtra {...props} />);
       expect(screen.queryByTestId('like-button')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('chat-item-copy-button')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('chat-item-copy-button'),
+      ).not.toBeInTheDocument();
     });
 
     it('isAborted 且未完成时展示中止提示 (350)', () => {
@@ -519,9 +521,7 @@ describe('BubbleExtra', () => {
 
     it('点击重新生成应调用 onReply (362)', async () => {
       const onReply = vi.fn();
-      render(
-        <BubbleExtra {...defaultProps} onReply={onReply} />,
-      );
+      render(<BubbleExtra {...defaultProps} onReply={onReply} />);
       const retry = screen.getByTestId('reply-button');
       fireEvent.click(retry);
       await waitFor(() => {

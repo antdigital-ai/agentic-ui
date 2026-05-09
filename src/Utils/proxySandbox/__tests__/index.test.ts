@@ -399,8 +399,7 @@ describe('proxySandbox/index.ts', () => {
       });
 
       it('全局隔离与超时走 catch 时正确设置 results', async () => {
-        const ProxySandboxModule =
-          await import('../ProxySandbox');
+        const ProxySandboxModule = await import('../ProxySandbox');
         let callCount = 0;
         vi.spyOn(ProxySandboxModule, 'runInSandbox').mockImplementation(
           (code: string, opts?: any) => {
@@ -432,8 +431,7 @@ describe('proxySandbox/index.ts', () => {
       });
 
       it('全局隔离 try 成功时 results.globalIsolation 为 false', async () => {
-        const ProxySandboxModule =
-          await import('../ProxySandbox');
+        const ProxySandboxModule = await import('../ProxySandbox');
         vi.spyOn(ProxySandboxModule, 'runInSandbox').mockImplementation(
           (code: string) => {
             if (code.includes('return 1 + 1'))
@@ -460,8 +458,7 @@ describe('proxySandbox/index.ts', () => {
       });
 
       it('全局隔离 catch 时 results.globalIsolation 为 true', async () => {
-        const ProxySandboxModule =
-          await import('../ProxySandbox');
+        const ProxySandboxModule = await import('../ProxySandbox');
         vi.spyOn(ProxySandboxModule, 'runInSandbox').mockImplementation(
           (code: string) => {
             if (code.includes('return 1 + 1'))

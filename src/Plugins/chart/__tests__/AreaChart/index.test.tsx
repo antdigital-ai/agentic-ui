@@ -28,9 +28,7 @@ vi.mock('react-chartjs-2', () => ({
 
 // Mock components
 vi.mock('../../components', async () => {
-  const actual = await vi.importActual(
-    '../../components',
-  );
+  const actual = await vi.importActual('../../components');
   return {
     ...actual,
     downloadChart: vi.fn(),

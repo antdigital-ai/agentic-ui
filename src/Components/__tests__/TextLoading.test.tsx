@@ -55,7 +55,9 @@ describe('TextLoading 组件', () => {
   it('应该应用自定义字体大小', () => {
     render(<TextLoading fontSize="24px" />);
 
-    expect(screen.getByTestId('text-loading')).toHaveStyle({ fontSize: '24px' });
+    expect(screen.getByTestId('text-loading')).toHaveStyle({
+      fontSize: '24px',
+    });
   });
 
   it('默认应该使用亮色主题', () => {
@@ -79,4 +81,3 @@ describe('TextLoading 组件', () => {
     expect(element.className).toContain('light');
   });
 });
-

@@ -219,9 +219,7 @@ describe('PreviewComponent', () => {
     it('应该处理URL加载失败', async () => {
       // usePreviewContent 在加载失败时会通过 console.error 输出"加载文本内容失败"，
       // 这里属于预期行为，静默以避免污染测试输出
-      const errorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       (global.fetch as any).mockResolvedValue({
         ok: false,
@@ -251,9 +249,7 @@ describe('PreviewComponent', () => {
 
     it('应该处理网络错误', async () => {
       // usePreviewContent 在加载失败时会通过 console.error 输出"加载文本内容失败"
-      const errorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       (global.fetch as any).mockRejectedValue(new Error('Network error'));
 

@@ -13,7 +13,7 @@ import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { MarkdownEditor } from '../../../..';
+import { MarkdownEditor } from '../../../../..';
 
 // Mock ace-builds
 vi.mock('ace-builds', () => {
@@ -68,9 +68,7 @@ vi.mock('../../../../MarkdownEditor/editor/utils/ace', () => ({
     ['js', 'javascript'],
   ]),
   getAceLangs: vi.fn(() =>
-    Promise.resolve(
-      new Set(['javascript', 'typescript', 'python', 'java']),
-    ),
+    Promise.resolve(new Set(['javascript', 'typescript', 'python', 'java'])),
   ),
 }));
 

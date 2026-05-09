@@ -159,9 +159,8 @@ describe('useScrollVisible hook', () => {
     renderHook(() => useScrollVisible({ target, shouldVisible }));
 
     // 验证 hook 正常工作
-    const throttleByAnimationFrame = await import(
-      '../../../Utils/throttleByAnimationFrame'
-    );
+    const throttleByAnimationFrame =
+      await import('../../../Utils/throttleByAnimationFrame');
     expect(throttleByAnimationFrame.default).toBeDefined();
   });
 
@@ -193,10 +192,7 @@ describe('useScrollVisible hook', () => {
     const container2 = document.createElement('div');
 
     const addEventListenerSpy1 = vi.spyOn(container1, 'addEventListener');
-    const removeEventListenerSpy1 = vi.spyOn(
-      container1,
-      'removeEventListener',
-    );
+    const removeEventListenerSpy1 = vi.spyOn(container1, 'removeEventListener');
     const addEventListenerSpy2 = vi.spyOn(container2, 'addEventListener');
 
     const { rerender } = renderHook(
@@ -236,4 +232,3 @@ describe('useScrollVisible hook', () => {
     expect(shouldVisible).toHaveBeenCalled();
   });
 });
-

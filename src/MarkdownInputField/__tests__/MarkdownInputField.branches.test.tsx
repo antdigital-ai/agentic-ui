@@ -3,26 +3,11 @@
  */
 
 import '@testing-library/jest-dom';
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import classNames from 'clsx';
 import React from 'react';
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownInputField } from '../MarkdownInputField';
-import { addGlowBorderOffset } from '../style';
 
 // Mock dependencies
 vi.mock('../../MarkdownEditor', () => ({
@@ -852,4 +837,3 @@ describe('MarkdownInputField Comprehensive Tests', () => {
     });
   });
 });
-

@@ -352,7 +352,10 @@ describe('useHistory Hook', () => {
 
     it('sessionId 为空时不写入 selectedIds', async () => {
       const { result } = renderHook(() =>
-        useHistory({ ...defaultProps, sessionId: undefined as unknown as string }),
+        useHistory({
+          ...defaultProps,
+          sessionId: undefined as unknown as string,
+        }),
       );
 
       await act(async () => {
@@ -434,7 +437,9 @@ describe('useHistory Hook', () => {
         stableData.map((item) => ({ ...item })),
       );
 
-      const { result } = renderHook(() => useHistory({ ...defaultProps, request }));
+      const { result } = renderHook(() =>
+        useHistory({ ...defaultProps, request }),
+      );
 
       await act(async () => {
         await result.current.loadHistory();
@@ -449,7 +454,10 @@ describe('useHistory Hook', () => {
       expect(result.current.filteredList).toBe(firstRef);
 
       // 关键展示字段变化（sessionTitle）→ 应触发新引用
-      const changed = stableData.map((item) => ({ ...item, sessionTitle: '新标题' }));
+      const changed = stableData.map((item) => ({
+        ...item,
+        sessionTitle: '新标题',
+      }));
       request.mockResolvedValueOnce(changed);
       await act(async () => {
         await result.current.loadHistory();

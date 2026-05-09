@@ -1,9 +1,6 @@
 import { createEditor, Editor, Transforms } from 'slate';
+import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  ReactEditor,
-  withReact,
-} from 'slate-react';
 import { EditorStore } from '../../../../../editor/store';
 import { KeyboardTask } from '../../../../../editor/utils/keyboard';
 
@@ -269,7 +266,9 @@ describe('KeyboardTask - Paste and Upload Methods', () => {
       });
       keyboardTask.uploadImage();
       mockInputElement.dataset.readonly = 'true';
-      const mockEvent = { target: { files: [new File([''], 'x.jpg', { type: 'image/jpeg' })] } };
+      const mockEvent = {
+        target: { files: [new File([''], 'x.jpg', { type: 'image/jpeg' })] },
+      };
       await mockInputElement.onchange(mockEvent);
       expect(mockProps.image.upload).not.toHaveBeenCalled();
     });
@@ -277,7 +276,10 @@ describe('KeyboardTask - Paste and Upload Methods', () => {
     it('column-cell 节点时 insertMedia 应使用 at [...node[1], 0]', async () => {
       const mockFiles = [new File([''], 'test.jpg', { type: 'image/jpeg' })];
       mockProps.image.upload.mockResolvedValue('https://example.com/test.jpg');
-      const columnCellNode = [{ type: 'column-cell', children: [{ text: '' }] }, [0, 0] as any];
+      const columnCellNode = [
+        { type: 'column-cell', children: [{ text: '' }] },
+        [0, 0] as any,
+      ];
       Object.defineProperty(keyboardTask, 'curNodes', {
         get: vi.fn().mockReturnValue([columnCellNode]),
         configurable: true,

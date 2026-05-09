@@ -17,11 +17,11 @@ import {
 } from '../../Utils/proxySandbox';
 import { ComponentConfig, LowCodeSchema } from '../types';
 import { mdDataSchemaValidator } from '../validator';
+import { TemplateEngine } from './templateEngine';
 
 const EMPTY_SCHEMA: LowCodeSchema = {} as LowCodeSchema;
 const EMPTY_COMPONENT: ComponentConfig = {};
 const EMPTY_INITIAL_VALUES = {};
-import { TemplateEngine } from './templateEngine';
 export * from './templateEngine';
 
 // 错误 UI 公共样式常量

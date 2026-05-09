@@ -1,10 +1,10 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cnLabels, enLabels, I18nContext } from '..';
 import { HistoryLoadMore } from '../../History/components/LoadMoreComponent';
 import { HistoryNewChat } from '../../History/components/NewChatComponent';
 import { HistorySearch } from '../../History/components/SearchComponent';
-import { cnLabels, enLabels, I18nContext } from '..';
 import { TaskList } from '../../TaskList';
 
 // Mock components that might not be available in test environment

@@ -3,18 +3,15 @@ import { NativeTableEditor } from '../../../utils/native-table/native-table-edit
 import { NativeTableKeyboard } from '../../../utils/native-table/native-table-keyboard';
 
 // Mock NativeTableEditor
-vi.mock(
-  '../../../utils/native-table/native-table-editor',
-  () => ({
-    NativeTableEditor: {
-      isInTableCell: vi.fn(),
-      moveToNextCell: vi.fn(),
-      moveToPreviousCell: vi.fn(),
-      findTableCell: vi.fn(),
-      findTable: vi.fn(),
-    },
-  }),
-);
+vi.mock('../../../utils/native-table/native-table-editor', () => ({
+  NativeTableEditor: {
+    isInTableCell: vi.fn(),
+    moveToNextCell: vi.fn(),
+    moveToPreviousCell: vi.fn(),
+    findTableCell: vi.fn(),
+    findTable: vi.fn(),
+  },
+}));
 
 describe('NativeTableKeyboard', () => {
   let mockEditor: any;

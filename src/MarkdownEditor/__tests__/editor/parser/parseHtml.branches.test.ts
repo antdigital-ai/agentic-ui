@@ -4,37 +4,28 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /* ---------- mock ---------- */
-vi.mock(
-  '../../../editor/utils',
-  () => ({
-    EditorUtils: {
-      createMediaNode: vi.fn((url: string, type: string, opts?: any) => ({
-        type: 'media',
-        src: url,
-        mediaType: type,
-        ...opts,
-      })),
-    },
-  }),
-);
+vi.mock('../../../editor/utils', () => ({
+  EditorUtils: {
+    createMediaNode: vi.fn((url: string, type: string, opts?: any) => ({
+      type: 'media',
+      src: url,
+      mediaType: type,
+      ...opts,
+    })),
+  },
+}));
 
-vi.mock(
-  '../../../editor/plugins/insertParsedHtmlNodes',
-  () => ({
-    htmlToFragmentList: vi.fn(() => [
-      { type: 'paragraph', children: [{ text: '' }] },
-    ]),
-  }),
-);
+vi.mock('../../../editor/plugins/insertParsedHtmlNodes', () => ({
+  htmlToFragmentList: vi.fn(() => [
+    { type: 'paragraph', children: [{ text: '' }] },
+  ]),
+}));
 
 // mock partialJsonParse 使其抛出，触发 parseCommentContextProps 双重失败
 const mockPartialJsonParse = vi.fn();
-vi.mock(
-  '../../../editor/parser/json-parse',
-  () => ({
-    default: (...args: any[]) => mockPartialJsonParse(...args),
-  }),
-);
+vi.mock('../../../editor/parser/json-parse', () => ({
+  default: (...args: any[]) => mockPartialJsonParse(...args),
+}));
 
 import {
   findImageElement,

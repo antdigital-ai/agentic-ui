@@ -122,7 +122,10 @@ describe('ReadonlySchema', () => {
     };
 
     renderWithProvider(
-      <ReadonlySchema element={elementWithAgentarCard} attributes={mockAttributes}>
+      <ReadonlySchema
+        element={elementWithAgentarCard}
+        attributes={mockAttributes}
+      >
         {null}
       </ReadonlySchema>,
     );
@@ -143,7 +146,10 @@ describe('ReadonlySchema', () => {
     };
 
     renderWithProvider(
-      <ReadonlySchema element={elementWithAgentarCard} attributes={mockAttributes}>
+      <ReadonlySchema
+        element={elementWithAgentarCard}
+        attributes={mockAttributes}
+      >
         {null}
       </ReadonlySchema>,
     );
@@ -168,4 +174,3 @@ describe('ReadonlySchema', () => {
     expect(screen.getByTestId('apaasify-render')).toBeInTheDocument();
   });
 });
-

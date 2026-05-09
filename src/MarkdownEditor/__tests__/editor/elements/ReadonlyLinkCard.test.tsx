@@ -5,20 +5,17 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReadonlyLinkCard } from '../../../editor/elements/LinkCard/ReadonlyLinkCard';
 
-vi.mock(
-  '../../../editor/components/ContributorAvatar',
-  () => ({
-    AvatarList: ({ displayList }: any) => (
-      <div data-testid="avatar-list">
-        {(displayList || []).map((item: any) => (
-          <span key={item.name} data-testid={`avatar-${item.name}`}>
-            {item.name}:{item.collaboratorNumber}
-          </span>
-        ))}
-      </div>
-    ),
-  }),
-);
+vi.mock('../../../editor/components/ContributorAvatar', () => ({
+  AvatarList: ({ displayList }: any) => (
+    <div data-testid="avatar-list">
+      {(displayList || []).map((item: any) => (
+        <span key={item.name} data-testid={`avatar-${item.name}`}>
+          {item.name}:{item.collaboratorNumber}
+        </span>
+      ))}
+    </div>
+  ),
+}));
 
 describe('ReadonlyLinkCard', () => {
   const openSpy = vi.fn();
@@ -122,4 +119,3 @@ describe('ReadonlyLinkCard', () => {
     expect(openSpy).toHaveBeenCalledWith('https://example.com');
   });
 });
-

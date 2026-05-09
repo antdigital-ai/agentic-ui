@@ -53,7 +53,9 @@ describe('AttachmentButtonPopover', () => {
         />,
       );
 
-      expect(screen.getByText(/Supports jpg, jpeg, png, gif/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Supports jpg, jpeg, png, gif/),
+      ).toBeInTheDocument();
       expect(screen.getByText(/webp, svg/)).toBeInTheDocument();
     });
 
@@ -62,8 +64,7 @@ describe('AttachmentButtonPopover', () => {
         <AttachmentSupportedFormatsContent
           supportedFormat={SupportedFileFormats.image}
           locale={{
-            'input.supportedFormatMessage':
-              'Formats: ${extensions}.',
+            'input.supportedFormatMessage': 'Formats: ${extensions}.',
           }}
         />,
       );
@@ -209,8 +210,7 @@ describe('AttachmentButtonPopover', () => {
             locale={{
               'input.openGallery': 'Open Gallery',
               'input.openFile': 'Open File',
-              'input.supportedFormatMessage':
-                'Custom formats: ${extensions}',
+              'input.supportedFormatMessage': 'Custom formats: ${extensions}',
             }}
           >
             <button type="button">Attach</button>

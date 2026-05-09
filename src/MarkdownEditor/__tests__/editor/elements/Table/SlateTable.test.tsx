@@ -20,34 +20,25 @@ vi.mock('../../../../editor/store', () => ({
   useEditorStore: () => mocks.storeState,
 }));
 
-vi.mock(
-  '../../../../editor/elements/Table/useScrollShadow',
-  () => ({
-    default: () => [mocks.scrollRef, mocks.scrollState],
-  }),
-);
+vi.mock('../../../../editor/elements/Table/useScrollShadow', () => ({
+  default: () => [mocks.scrollRef, mocks.scrollState],
+}));
 
-vi.mock(
-  '../../../../editor/elements/Table/ReadonlyTableComponent',
-  () => ({
-    ReadonlyTableComponent: ({ children, element, baseCls }: any) => (
-      <div data-testid="readonly-table" data-basecls={baseCls}>
-        {children}
-      </div>
-    ),
-  }),
-);
+vi.mock('../../../../editor/elements/Table/ReadonlyTableComponent', () => ({
+  ReadonlyTableComponent: ({ children, element, baseCls }: any) => (
+    <div data-testid="readonly-table" data-basecls={baseCls}>
+      {children}
+    </div>
+  ),
+}));
 
-vi.mock(
-  '../../../../editor/elements/Table/TableRowIndex',
-  () => ({
-    TableRowIndex: () => (
-      <tr data-testid="table-row-index">
-        <td>index</td>
-      </tr>
-    ),
-  }),
-);
+vi.mock('../../../../editor/elements/Table/TableRowIndex', () => ({
+  TableRowIndex: () => (
+    <tr data-testid="table-row-index">
+      <td>index</td>
+    </tr>
+  ),
+}));
 
 vi.mock('string-width', () => ({
   default: (s: string) => s.length,

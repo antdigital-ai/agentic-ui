@@ -97,10 +97,7 @@ describe('CodeContainer Component', () => {
 
       render(
         <div onClick={onContainerClick}>
-          <CodeContainer
-            {...defaultProps}
-            onEditorClick={onEditorClick}
-          />
+          <CodeContainer {...defaultProps} onEditorClick={onEditorClick} />
         </div>,
       );
 

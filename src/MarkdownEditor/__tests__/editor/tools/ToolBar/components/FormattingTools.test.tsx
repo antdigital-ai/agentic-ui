@@ -11,7 +11,12 @@ import { FormattingTools } from '../../../../../editor/tools/ToolBar/components/
 const defaultTools = [
   { key: 'bold', type: 'bold', title: 'Bold', icon: <span>B</span> },
   { key: 'italic', type: 'italic', title: 'Italic', icon: <span>I</span> },
-  { key: 'alignLeft', type: 'alignLeft', title: 'Align Left', icon: <span>L</span> },
+  {
+    key: 'alignLeft',
+    type: 'alignLeft',
+    title: 'Align Left',
+    icon: <span>L</span>,
+  },
 ];
 
 describe('FormattingTools', () => {

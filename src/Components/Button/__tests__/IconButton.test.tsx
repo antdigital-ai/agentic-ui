@@ -48,7 +48,9 @@ describe('IconButton', () => {
       />,
     );
     expect(container.querySelector('.my-btn')).toBeTruthy();
-    expect(container.firstChild as HTMLElement).toHaveStyle({ marginTop: '10px' });
+    expect(container.firstChild as HTMLElement).toHaveStyle({
+      marginTop: '10px',
+    });
   });
 
   it('should prefer isLoading over legacy loading prop', () => {

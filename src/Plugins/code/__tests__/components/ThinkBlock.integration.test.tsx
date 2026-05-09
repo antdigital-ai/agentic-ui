@@ -48,7 +48,9 @@ describe('ThinkBlock alwaysExpandedDeepThink 集成测试', () => {
       children: [{ text: '深度思考中...' }],
     };
 
-    const { container } = render(<ThinkBlock {...mockProps} element={loadingCodeNode} />);
+    const { container } = render(
+      <ThinkBlock {...mockProps} element={loadingCodeNode} />,
+    );
 
     // 验证组件正常渲染（这间接验证了加载状态的判断逻辑）
     expect(container.firstChild).toBeTruthy();
@@ -63,7 +65,9 @@ describe('ThinkBlock alwaysExpandedDeepThink 集成测试', () => {
       children: [{ text: '' }],
     };
 
-    const { container } = render(<ThinkBlock {...mockProps} element={emptyCodeNode} />);
+    const { container } = render(
+      <ThinkBlock {...mockProps} element={emptyCodeNode} />,
+    );
 
     // 验证组件正常渲染
     expect(container.firstChild).toBeTruthy();
@@ -78,7 +82,9 @@ describe('ThinkBlock alwaysExpandedDeepThink 集成测试', () => {
       children: [{ text: '' }],
     };
 
-    const { container } = render(<ThinkBlock {...mockProps} element={nullCodeNode} />);
+    const { container } = render(
+      <ThinkBlock {...mockProps} element={nullCodeNode} />,
+    );
 
     // 验证组件正常渲染
     expect(container.firstChild).toBeTruthy();
@@ -93,7 +99,9 @@ describe('ThinkBlock alwaysExpandedDeepThink 集成测试', () => {
       children: [{ text: '' }],
     };
 
-    const { container } = render(<ThinkBlock {...mockProps} element={undefinedCodeNode} />);
+    const { container } = render(
+      <ThinkBlock {...mockProps} element={undefinedCodeNode} />,
+    );
 
     // 验证组件正常渲染
     expect(container.firstChild).toBeTruthy();
@@ -108,7 +116,9 @@ describe('ThinkBlock alwaysExpandedDeepThink 集成测试', () => {
       children: [{ text: '123' }],
     };
 
-    const { container } = render(<ThinkBlock {...mockProps} element={numberCodeNode} />);
+    const { container } = render(
+      <ThinkBlock {...mockProps} element={numberCodeNode} />,
+    );
 
     // 验证组件正常渲染
     expect(container.firstChild).toBeTruthy();
