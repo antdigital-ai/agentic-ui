@@ -1,7 +1,7 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { ToolUseBar } from '..';
+import { ToolUseBar } from '../..';
 
 const mockToolsWithContent = [
   {

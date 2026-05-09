@@ -16,109 +16,11 @@ import {
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-/* ---------- 全局 canvas mock ---------- */
-if (typeof HTMLCanvasElement !== 'undefined') {
-  HTMLCanvasElement.prototype.getContext = vi.fn(function (
-    this: HTMLCanvasElement,
-  ) {
-    return {
-      measureText: vi.fn(() => ({ width: 50 })),
-      fillText: vi.fn(),
-      font: '',
-      canvas: this,
-    };
-  }) as any;
-}
-
-/* ---------- module mocks ---------- */
-const mockDownloadChart = vi.fn();
-
-vi.mock('chart.js', () => ({
-  Chart: { register: vi.fn() },
-  CategoryScale: vi.fn(),
-  LinearScale: vi.fn(),
-  BarElement: vi.fn(),
-  Tooltip: vi.fn(),
-  Legend: vi.fn(),
-}));
-
-vi.mock('chartjs-plugin-datalabels', () => ({ default: {} }));
-
-vi.mock('react-chartjs-2', () => ({
-  Bar: ({ data, options }: any) => {
-    (globalThis as any).__barBranchOptions = options;
-    (globalThis as any).__barBranchData = data;
-    return (
-      <div data-testid="bar-chart" data-labels={JSON.stringify(data?.labels)} />
-    );
-  },
-}));
-
-vi.mock('rc-resize-observer', () => ({
-  default: ({ children }: any) => <div>{children}</div>,
-}));
-
-vi.mock('../components', () => ({
-  ChartContainer: ({ children }: any) => (
-    <div data-testid="chart-container">{children}</div>
-  ),
-  ChartFilter: ({ filterOptions, onFilterChange }: any) => (
-    <button
-      type="button"
-      data-testid="chart-filter"
-      onClick={() => {
-        if (filterOptions?.length > 1 && onFilterChange) {
-          onFilterChange(filterOptions[1]?.value ?? '');
-        }
-      }}
-    >
-      filter
-    </button>
-  ),
-  ChartStatistic: () => <div data-testid="chart-statistic" />,
-  ChartToolBar: ({ onDownload, filter }: any) => (
-    <div data-testid="chart-toolbar">
-      <button
-        type="button"
-        data-testid="download-btn"
-        onClick={() => onDownload?.()}
-      >
-        download
-      </button>
-      {filter}
-    </div>
-  ),
-  downloadChart: (...args: any[]) => mockDownloadChart(...args),
-}));
-
-vi.mock('../BarChart/style', () => ({
-  useStyle: () => ({ wrapSSR: (node: any) => node }),
-}));
-
-vi.mock('../const', () => ({
-  defaultColorList: ['#123456', '#654321'],
-}));
-
-vi.mock('../utils', () => ({
-  extractAndSortXValues: vi.fn((data) => [
-    ...new Set(
-      data
-        .map((item: any) => item.x)
-        .filter(
-          (v: any) =>
-            v !== null &&
-            v !== undefined &&
-            v !== '' &&
-            String(v).trim() !== '',
-        ),
-    ),
-  ]),
-  findDataPointByXValue: vi.fn((data, x, type) =>
-    data.find((item: any) => item.x === x && item.type === type),
-  ),
-  hexToRgba: vi.fn((color, alpha) => `rgba(${color},${alpha})`),
-  resolveCssVariable: vi.fn((color) => color),
-}));
+// 注：本文件由 BarChart.branches.test.tsx 与 BarChart.coverage.test.tsx 合并而来。
+// vitest 不允许对同一模块声明多次 vi.mock（hoist 后只保留最后一次），
+// 因此 mock 集中在文件下半部分（行 ~465 起）一次性声明，并且 react-chartjs-2 的
+// Bar mock 同时输出第一段 describe 依赖的 `__barBranchOptions/__barBranchData`
+// 与第二段 describe 依赖的 `__barChartLastOptions/__barChartLastData` 两套全局变量。
 
 import BarChart from '../BarChart';
 
@@ -493,6 +395,9 @@ vi.mock('chartjs-plugin-datalabels', () => ({
 
 vi.mock('react-chartjs-2', () => ({
   Bar: ({ data, options }: any) => {
+    // 同时输出两套全局变量，分别给两段 describe 使用
+    (globalThis as any).__barBranchOptions = options;
+    (globalThis as any).__barBranchData = data;
     (globalThis as any).__barChartLastOptions = options;
     (globalThis as any).__barChartLastData = data;
     return (

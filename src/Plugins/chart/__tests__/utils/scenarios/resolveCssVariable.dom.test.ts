@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { resolveCssVariable } from '../../utils';
+import { resolveCssVariable } from '../../../utils';
 
 describe('resolveCssVariable DOM 解析', () => {
   it('应解析 CSS 变量并写入缓存', () => {
