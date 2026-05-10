@@ -14,6 +14,7 @@ import React, { lazy, Suspense, useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
 import { I18nContext } from '../../I18n';
+import { DocCards } from './DocCards';
 import { loadChartRuntime, type ChartRuntime } from './loadChartRuntime';
 import {
   debounce,
@@ -111,11 +112,16 @@ const getChartMap = (i18n: any) => ({
       'funnel',
       'boxplot',
       'histogram',
+      'docCards',
     ],
   },
   descriptions: {
     title: i18n?.locale?.descriptions || '定义列表',
     changeData: ['column', 'line', 'area', 'pie', 'donut', 'table'],
+  },
+  docCards: {
+    title: i18n?.locale?.docCards || '卡片列表',
+    changeData: ['table'],
   },
 });
 
@@ -629,7 +635,8 @@ export const ChartRender: React.FC<{
     | 'boxplot'
     | 'histogram'
     | 'descriptions'
-    | 'table';
+    | 'table'
+    | 'docCards';
   chartData: Record<string, any>[];
   config: {
     height: any;
@@ -665,6 +672,7 @@ export const ChartRender: React.FC<{
     | 'funnel'
     | 'boxplot'
     | 'histogram'
+    | 'docCards'
   >(() => props.chartType);
   const {
     chartData,
@@ -726,6 +734,7 @@ export const ChartRender: React.FC<{
   const shouldLoadRuntime =
     chartType !== 'table' &&
     chartType !== 'descriptions' &&
+    chartType !== 'docCards' &&
     !renderDescriptionsFallback;
 
   // 获取国际化的图表类型映射
@@ -1267,6 +1276,41 @@ export const ChartRender: React.FC<{
               }
             />
           ))}
+        </div>
+      );
+    }
+
+    if (chartType === 'docCards') {
+      const restCfg = (config?.rest ?? {}) as {
+        cardColumns?: number;
+        fieldMap?: Record<string, string>;
+      };
+      return (
+        <div
+          key={config?.index}
+          className={`${prefixCls}__doc-cards`}
+          style={{ margin: 12 }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 0',
+              flexShrink: 0,
+            }}
+          >
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+              {toolBar}
+            </div>
+          </div>
+          <DocCards
+            title={title}
+            columns={config?.columns || []}
+            data={chartData}
+            cardColumns={restCfg?.cardColumns}
+            fieldMap={restCfg?.fieldMap}
+          />
         </div>
       );
     }

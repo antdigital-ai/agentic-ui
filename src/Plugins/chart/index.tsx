@@ -33,6 +33,21 @@ export * from './ChartMark';
 // 图表渲染组件
 export { ChartRender } from './ChartRender';
 
+// 文档卡片栅格
+export {
+  DEFAULT_FIELD_ALIASES as DocCardsDefaultFieldAliases,
+  DocCards,
+  isSafeHref as isDocCardsSafeHref,
+  resolveDocCardsFields,
+  splitTags as splitDocCardsTags,
+} from './DocCards';
+export type {
+  DocCardsField,
+  DocCardsFieldMap,
+  DocCardsProps,
+  ResolvedDocCardsFields,
+} from './DocCards';
+
 // 图表组件导出
 export { default as AreaChart } from './AreaChart';
 export { default as BarChart } from './BarChart';
