@@ -152,6 +152,32 @@ export const resolveChartAxisFieldToColumnKey = (
   return hit ?? configuredField;
 };
 
+/**
+ * docCards 主标题列的别名表（与 `Plugins/chart/DocCards/utils.ts` 保持一致）。
+ *
+ * 此处内联是为了在 parseTable 解析阶段做「降级判定」时避免对插件层的循环依赖；
+ * 渲染层的完整字段映射由 {@link DocCards} 完成。
+ */
+const DOC_CARDS_TITLE_ALIASES = ['名称', '标题', 'name', 'title', 'Name', 'Title'];
+
+/**
+ * 在解析阶段判断 docCards 是否能锁定主标题列；不能则整表降级为普通表格。
+ * 仅做「主标题」最少必需列校验，与渲染层的 `resolveDocCardsFields` 行为对齐。
+ */
+const resolveDocCardsTitleColumn = (
+  columnKeys: string[],
+  override?: string,
+): boolean => {
+  const candidates = [override, ...DOC_CARDS_TITLE_ALIASES].filter(
+    Boolean,
+  ) as string[];
+  return candidates.some((alias) =>
+    columnKeys.some(
+      (key) => key === alias || columnKeyMatchesConfiguredField(key, alias),
+    ),
+  );
+};
+
 const normalizeChartConfigAxisFields = (
   cfg: ChartTypeConfig,
   columnKeys: string[],
@@ -365,14 +391,21 @@ export const parseTableOrChart = (
   let isChart = chartType && chartType !== 'table';
 
   // 图表的 x、y 必须在表格列中存在，否则降级为表格渲染
+  // docCards 不需要 x/y，但要求至少能解析出主标题列（名称/标题/name/title）
   if (isChart && chartConfig) {
     const columnKeys = new Set(columns.map((c) => c.dataIndex));
+    const columnKeyList = columns.map((c) => c.dataIndex);
     const configsToValidate = Array.isArray(chartConfig)
       ? chartConfig
       : [chartConfig];
 
     const isChartConfigValid = (cfg: ChartTypeConfig): boolean => {
       if (!cfg || cfg.chartType === 'table') return true;
+      if (cfg.chartType === 'docCards') {
+        const fieldMap = (cfg as { fieldMap?: Record<string, string> })
+          ?.fieldMap;
+        return resolveDocCardsTitleColumn(columnKeyList, fieldMap?.title);
+      }
       if (cfg.x && !columnKeys.has(cfg.x)) return false;
       if (cfg.y && !columnKeys.has(cfg.y)) return false;
       return true;
