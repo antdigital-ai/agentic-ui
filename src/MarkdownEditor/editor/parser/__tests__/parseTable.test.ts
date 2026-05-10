@@ -324,6 +324,51 @@ describe('parseTableOrChart 通过 parserMarkdownToSlateNode', () => {
     expect(config[1].chartType).toBe('bar');
   });
 
+  it('docCards 命中默认主标题别名时产出 chart 节点（保持 chartType 与列契约）', () => {
+    const md = `<!-- {"chartType": "docCards", "title": "优秀文档站"} -->
+| 名称 | 地址 | 简介 | 亮点 |
+| --- | --- | --- | --- |
+| Tailwind | https://tailwindcss.com | 文档结构清晰 | 交互式, 暗色模式 |
+| MDN | https://developer.mozilla.org | Web 权威参考 | 多语言, 可折叠 |`;
+    const result = parserMarkdownToSlateNode(md);
+    const card = result.schema.find((n: any) => n.type === 'card');
+    expect(card).toBeDefined();
+    const chart = (card as any).children?.[1];
+    expect(chart.type).toBe('chart');
+    const config = chart?.otherProps?.config;
+    expect(config?.chartType).toBe('docCards');
+    expect(chart?.otherProps?.dataSource).toHaveLength(2);
+    const columnIndices = (chart?.otherProps?.columns || []).map(
+      (c: any) => c.dataIndex,
+    );
+    expect(columnIndices).toEqual(['名称', '地址', '简介', '亮点']);
+  });
+
+  it('docCards 无可识别主标题列时整表降级为普通表格', () => {
+    const md = `<!-- {"chartType": "docCards"} -->
+| col1 | col2 |
+| --- | --- |
+| a | b |`;
+    const result = parserMarkdownToSlateNode(md);
+    const card = result.schema.find((n: any) => n.type === 'card');
+    expect(card).toBeDefined();
+    const inner = (card as any).children?.[1];
+    expect(inner.type).toBe('table');
+  });
+
+  it('docCards 通过 fieldMap.title 显式覆盖时即便表头无默认别名也能识别', () => {
+    const md = `<!-- {"chartType": "docCards", "fieldMap": {"title": "Foo"}} -->
+| Foo | Bar |
+| --- | --- |
+| x | y |`;
+    const result = parserMarkdownToSlateNode(md);
+    const card = result.schema.find((n: any) => n.type === 'card');
+    expect(card).toBeDefined();
+    const chart = (card as any).children?.[1];
+    expect(chart.type).toBe('chart');
+    expect(chart?.otherProps?.config?.chartType).toBe('docCards');
+  });
+
   it('mergeCells + 空单元格通过注释传入', () => {
     const md = `<!-- {"mergeCells": [{"row": 0, "col": 0, "rowSpan": 2, "colSpan": 2}]} -->
 | A | B |
