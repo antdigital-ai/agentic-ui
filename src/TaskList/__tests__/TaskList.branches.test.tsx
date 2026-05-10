@@ -146,7 +146,7 @@ describe('TaskList Component', () => {
     expect(loadingComponent).toHaveAttribute('data-size', '16');
   });
 
-  it('应该支持点击展开/折叠', () => {
+  it('应该支持点击展开/折叠并同步刷新内容可见性', () => {
     render(
       <TestWrapper>
         <TaskList items={mockItems} />
@@ -155,9 +155,13 @@ describe('TaskList Component', () => {
 
     const arrowContainer = screen.getAllByTestId('task-list-arrowContainer')[0];
     expect(arrowContainer).toBeInTheDocument();
+    expect(screen.getByText('任务1内容')).toBeInTheDocument();
 
     fireEvent.click(arrowContainer);
-    // 这里可以添加更多关于展开/折叠状态的断言
+    expect(screen.queryByText('任务1内容')).not.toBeInTheDocument();
+
+    fireEvent.click(arrowContainer);
+    expect(screen.getByText('任务1内容')).toBeInTheDocument();
   });
 
   it('应该显示任务内容', () => {

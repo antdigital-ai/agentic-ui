@@ -119,6 +119,31 @@ describe('useCodeEditorState', () => {
     expect(result.current.state.htmlStr).toBe('const x = 1;');
   });
 
+  it('稳定的 handleRunHtml 在重渲染后读取最新 element.value', () => {
+    const { result, rerender } = renderHook(
+      ({ element }) => useCodeEditorState(element),
+      {
+        initialProps: {
+          element: defaultElement,
+        },
+      },
+    );
+    const initialHandleRunHtml = result.current.handleRunHtml;
+
+    rerender({
+      element: {
+        ...defaultElement,
+        value: '<strong>latest html</strong>',
+      },
+    });
+
+    expect(result.current.handleRunHtml).toBe(initialHandleRunHtml);
+    act(() => {
+      result.current.handleRunHtml();
+    });
+    expect(result.current.state.htmlStr).toBe('<strong>latest html</strong>');
+  });
+
   it('handleRunHtml 在 element.value 为空时设置空字符串', () => {
     const el = { ...defaultElement, value: undefined };
     const { result } = renderHook(() => useCodeEditorState(el));
