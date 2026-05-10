@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import * as adaptiveTooltip from '../../Utils/adaptiveTooltip';
 import { ActionIconBox } from '../ActionIconBox';
 
 describe('ActionIconBox 组件', () => {
@@ -21,45 +22,51 @@ describe('ActionIconBox 组件', () => {
     expect(screen.getByTestId('test-icon')).toBeInTheDocument();
   });
 
-  it('触摸能力下 Tooltip 包裹时仍保留原生 title 兜底', async () => {
-    vi.stubGlobal('navigator', {
-      ...navigator,
-      maxTouchPoints: 5,
-    });
+  it('触摸策略为真时 Tooltip 包裹仍保留原生 title 兜底', async () => {
+    const spy = vi
+      .spyOn(adaptiveTooltip, 'shouldUseInformationalTooltipClickTrigger')
+      .mockReturnValue(true);
 
-    render(
-      <ActionIconBox title="保存">
-        <TestIcon />
-      </ActionIconBox>,
-    );
+    try {
+      render(
+        <ActionIconBox title="保存">
+          <TestIcon />
+        </ActionIconBox>,
+      );
 
-    await act(async () => {
-      await Promise.resolve();
-    });
+      await act(async () => {
+        await Promise.resolve();
+      });
 
-    expect(screen.getByTestId('action-icon-box')).toHaveAttribute(
-      'title',
-      '保存',
-    );
+      expect(screen.getByTestId('action-icon-box')).toHaveAttribute(
+        'title',
+        '保存',
+      );
+    } finally {
+      spy.mockRestore();
+    }
   });
 
-  it('无触摸能力且存在 Tooltip 时不设置原生 title 避免双重提示', async () => {
-    vi.stubGlobal('navigator', {
-      ...navigator,
-      maxTouchPoints: 0,
-    });
+  it('触摸策略为假且存在 Tooltip 时不设置原生 title', async () => {
+    const spy = vi
+      .spyOn(adaptiveTooltip, 'shouldUseInformationalTooltipClickTrigger')
+      .mockReturnValue(false);
 
-    render(
-      <ActionIconBox title="保存">
-        <TestIcon />
-      </ActionIconBox>,
-    );
+    try {
+      render(
+        <ActionIconBox title="保存">
+          <TestIcon />
+        </ActionIconBox>,
+      );
 
-    await act(async () => {
-      await Promise.resolve();
-    });
+      await act(async () => {
+        await Promise.resolve();
+      });
 
-    expect(screen.getByTestId('action-icon-box')).not.toHaveAttribute('title');
+      expect(screen.getByTestId('action-icon-box')).not.toHaveAttribute('title');
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   it('应该显示标题文本', () => {

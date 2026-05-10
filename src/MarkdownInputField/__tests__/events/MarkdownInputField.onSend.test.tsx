@@ -13,6 +13,8 @@ vi.mock('../../../Hooks/useRefFunction', () => ({
 
 describe('useSendHandler - onSend 防重复触发', () => {
   const createMockParams = (overrides: Record<string, any> = {}) => {
+    const { props: propsOverride, ...restOverrides } = overrides;
+
     const markdownEditorRef = {
       current: {
         store: {
@@ -30,7 +32,7 @@ describe('useSendHandler - onSend 防重复触发', () => {
       onChange: vi.fn(),
       onSend: vi.fn().mockResolvedValue(undefined),
       allowEmptySubmit: false,
-      ...(overrides.props || {}),
+      ...(propsOverride || {}),
     };
 
     return {
@@ -45,8 +47,7 @@ describe('useSendHandler - onSend 防重复触发', () => {
       setFileMap: vi.fn(),
       recording: false,
       stopRecording: vi.fn().mockResolvedValue(undefined),
-      ...overrides,
-      props,
+      ...restOverrides,
     };
   };
 
