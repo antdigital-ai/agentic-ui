@@ -1,10 +1,13 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ActionIconBox } from '../ActionIconBox';
 
 describe('ActionIconBox 组件', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
   const TestIcon = () => <span data-testid="test-icon">Icon</span>;
 
   it('应该渲染基本的图标盒子', () => {
@@ -16,6 +19,47 @@ describe('ActionIconBox 组件', () => {
 
     expect(screen.getByTestId('action-icon-box')).toBeInTheDocument();
     expect(screen.getByTestId('test-icon')).toBeInTheDocument();
+  });
+
+  it('触摸能力下 Tooltip 包裹时仍保留原生 title 兜底', async () => {
+    vi.stubGlobal('navigator', {
+      ...navigator,
+      maxTouchPoints: 5,
+    });
+
+    render(
+      <ActionIconBox title="保存">
+        <TestIcon />
+      </ActionIconBox>,
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId('action-icon-box')).toHaveAttribute(
+      'title',
+      '保存',
+    );
+  });
+
+  it('无触摸能力且存在 Tooltip 时不设置原生 title 避免双重提示', async () => {
+    vi.stubGlobal('navigator', {
+      ...navigator,
+      maxTouchPoints: 0,
+    });
+
+    render(
+      <ActionIconBox title="保存">
+        <TestIcon />
+      </ActionIconBox>,
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId('action-icon-box')).not.toHaveAttribute('title');
   });
 
   it('应该显示标题文本', () => {

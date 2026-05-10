@@ -691,6 +691,7 @@ export {
 export { useAdaptiveTooltipProps } from './Hooks/useAdaptiveTooltipProps';
 export { useAutoScroll } from './Hooks/useAutoScroll';
 export { useLanguage } from './Hooks/useLanguage';
+export { useNativeTitleTooltipFallback } from './Hooks/useNativeTitleTooltipFallback';
 export { useRefFunction } from './Hooks/useRefFunction';
 export {
   resetComponent,

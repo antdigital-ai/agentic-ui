@@ -4,6 +4,7 @@ import classNames from 'clsx';
 import { isFunction } from 'lodash-es';
 import { useMergedState } from 'rc-util';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { useNativeTitleTooltipFallback } from '../../Hooks/useNativeTitleTooltipFallback';
 import { useStyle } from './style';
 
 export interface ActionIconBoxProps {
@@ -151,6 +152,7 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
     onChange: onLoadingChange,
   });
   const [isHovered, setIsHovered] = useState(false);
+  const keepNativeTitleFallback = useNativeTitleTooltipFallback();
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-md-editor-action-icon-box');
   const { wrapSSR, hashId } = useStyle(prefixCls);
@@ -220,7 +222,13 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
       role="button"
       tabIndex={0}
       aria-label={titleText}
-      title={extraProps ? undefined : titleText}
+      title={
+        titleText === undefined
+          ? undefined
+          : extraProps && !keepNativeTitleFallback
+            ? undefined
+            : titleText
+      }
       className={rootClassName}
       onClick={handleClick}
       onKeyDown={handleKeyDown}

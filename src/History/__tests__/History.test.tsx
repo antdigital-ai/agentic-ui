@@ -107,7 +107,7 @@ describe('History Component', () => {
         </TestWrapper>,
       );
 
-      // ActionIconBox 使用 aria-label 和 data-title 属性，而不是 HTML title 属性
+      // ActionIconBox：aria-label / data-title 必有；触摸环境下可额外保留 HTML title 作兜底
       const button = screen.getByLabelText('聊天历史');
       expect(button).toBeInTheDocument();
       expect(button).toHaveAttribute('data-title', '聊天历史');
