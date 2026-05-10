@@ -1285,27 +1285,18 @@ export const ChartRender: React.FC<{
         cardColumns?: number;
         fieldMap?: Record<string, string>;
       };
+      // toolbar 直接交给 DocCards 头部排布，避免内外两层 header 错位
       return (
         <div
           key={config?.index}
           className={`${prefixCls}__doc-cards`}
-          style={{ margin: 12 }}
+          style={{ margin: 12, width: 'calc(100% - 24px)' }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '8px 0',
-              flexShrink: 0,
-            }}
-          >
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-              {toolBar}
-            </div>
-          </div>
           <DocCards
             title={title}
+            toolbar={
+              toolBar.length > 0 ? <>{toolBar}</> : undefined
+            }
             columns={config?.columns || []}
             data={chartData}
             cardColumns={restCfg?.cardColumns}

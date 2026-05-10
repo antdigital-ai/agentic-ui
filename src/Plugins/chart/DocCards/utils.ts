@@ -136,3 +136,34 @@ export const isSafeHref = (raw: unknown): boolean => {
   if (trimmed.startsWith('/') || trimmed.startsWith('#')) return true;
   return /^(https?:|mailto:|tel:)/i.test(trimmed);
 };
+
+/**
+ * 将原始 URL 简写为「hostname + path」便于在卡片中展示，长链截断到指定字符数。
+ *
+ * - `http(s)` 链接：返回 `host + pathname + search`，去掉 protocol 与末尾 `/`；
+ * - `mailto:` / `tel:`：返回去 scheme 后的纯地址；
+ * - 站内相对路径 / 解析失败：原样返回；
+ * - 任何超过 `maxLength` 的结果会按尾部省略，确保最终长度 ≤ `maxLength + 1`。
+ */
+export const formatDisplayUrl = (raw: unknown, maxLength = 64): string => {
+  if (typeof raw !== 'string') return '';
+  const trimmed = raw.trim();
+  if (!trimmed) return '';
+  let display = trimmed;
+  if (/^https?:/i.test(trimmed)) {
+    try {
+      const parsed = new URL(trimmed);
+      const path = parsed.pathname === '/' ? '' : parsed.pathname;
+      display = `${parsed.host}${path}${parsed.search}`;
+    } catch {
+      display = trimmed.replace(/^https?:\/\//i, '');
+    }
+  } else if (/^mailto:/i.test(trimmed)) {
+    display = trimmed.slice('mailto:'.length);
+  } else if (/^tel:/i.test(trimmed)) {
+    display = trimmed.slice('tel:'.length);
+  }
+  return display.length > maxLength
+    ? `${display.slice(0, maxLength)}…`
+    : display;
+};

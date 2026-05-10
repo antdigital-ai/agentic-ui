@@ -37,6 +37,7 @@ export { ChartRender } from './ChartRender';
 export {
   DEFAULT_FIELD_ALIASES as DocCardsDefaultFieldAliases,
   DocCards,
+  formatDisplayUrl as formatDocCardsDisplayUrl,
   isSafeHref as isDocCardsSafeHref,
   resolveDocCardsFields,
   splitTags as splitDocCardsTags,
