@@ -13,6 +13,7 @@ import {
 import classNames from 'clsx';
 import React, { useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
+import { useAdaptiveTooltipProps } from '../../Hooks/useAdaptiveTooltipProps';
 import { I18nContext, compileTemplate } from '../../I18n';
 import { useBrowserStyle } from './style';
 
@@ -200,6 +201,7 @@ export const BrowserHeader: React.FC<BrowserHeaderProps> = ({
   onBack,
 }) => {
   const { prefixCls, wrapSSR, hashId } = useBrowserContext();
+  const headerTooltipProps = useAdaptiveTooltipProps('informational');
 
   return wrapSSR(
     <div className={classNames(`${prefixCls}-header-left`, hashId)}>
@@ -217,7 +219,11 @@ export const BrowserHeader: React.FC<BrowserHeaderProps> = ({
           onClick={onBack}
         />
       )}
-      <Tooltip title={activeLabel} mouseEnterDelay={0.5}>
+      <Tooltip
+        title={activeLabel}
+        mouseEnterDelay={0.5}
+        {...headerTooltipProps}
+      >
         <div className={classNames(`${prefixCls}-header-title`, hashId)}>
           {activeLabel}
         </div>
@@ -369,6 +375,7 @@ const Browser: React.FC<BrowserProps> = ({
   const { locale } = useContext(I18nContext);
 
   const { prefixCls, wrapSSR, hashId } = useBrowserContext();
+  const suggestionLabelTooltipProps = useAdaptiveTooltipProps('informational');
 
   const { items: results, loading } = useMemo(() => {
     if (!activeSuggestion) {
@@ -430,7 +437,11 @@ const Browser: React.FC<BrowserProps> = ({
                   >
                     {suggestionIcon || <Search />}
                   </div>
-                  <Tooltip title={item.label} mouseEnterDelay={0.5}>
+                  <Tooltip
+                    title={item.label}
+                    mouseEnterDelay={0.5}
+                    {...suggestionLabelTooltipProps}
+                  >
                     <div
                       className={classNames(
                         `${prefixCls}-suggestion-text`,

@@ -6,6 +6,7 @@ import {
 import { Checkbox, ConfigProvider, Divider, Tooltip } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import React, { useContext } from 'react';
+import { useAdaptiveTooltipProps } from '../../Hooks/useAdaptiveTooltipProps';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { getMaskStyle } from '../constants';
@@ -199,6 +200,7 @@ const HistoryItemSingle = React.memo<HistoryItemProps>(
       () => selectedIds.includes(item.sessionId!),
       [selectedIds, item.sessionId],
     );
+    const adaptiveTitleTooltip = useAdaptiveTooltipProps('informational');
 
     const handleClick = useRefFunction((e: React.MouseEvent) => {
       e.stopPropagation();
@@ -292,6 +294,7 @@ const HistoryItemSingle = React.memo<HistoryItemProps>(
                 title={isTextOverflow ? displayText : null}
                 mouseEnterDelay={0.3}
                 open={isTextOverflow ? undefined : false}
+                {...adaptiveTitleTooltip}
               >
                 <div
                   style={{
@@ -410,6 +413,7 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
       () => selectedIds.includes(item.sessionId!),
       [selectedIds, item.sessionId],
     );
+    const adaptiveTitleTooltip = useAdaptiveTooltipProps('informational');
 
     /**
      * 处理点击事件
@@ -528,6 +532,7 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
                 title={isTextOverflow ? displayText : null}
                 mouseEnterDelay={0.3}
                 open={isTextOverflow ? undefined : false}
+                {...adaptiveTitleTooltip}
               >
                 <div
                   style={{
@@ -556,6 +561,7 @@ const HistoryItemMulti = React.memo<HistoryItemProps>(
                   item.description ||
                   (isTask ? locale?.['task.default'] || '任务' : '')
                 }
+                {...adaptiveTitleTooltip}
               >
                 <div
                   style={{

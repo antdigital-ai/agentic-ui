@@ -178,19 +178,19 @@ describe('AttachmentButtonPopover 分支覆盖', () => {
 
   /* ====== 移动设备分支 ====== */
 
-  describe('移动设备下渲染纯 span', () => {
-    it('isMobile 时渲染纯 span 包裹 children', () => {
+  describe('移动设备下使用 Popover 展示格式说明', () => {
+    it('isMobile 时点击展开 Popover 展示支持格式', async () => {
       mocks.isMobileDevice.mockReturnValue(true);
 
-      const { container } = render(
+      render(
         <AttachmentButtonPopover>
           <button type="button">Upload</button>
         </AttachmentButtonPopover>,
       );
 
       expect(screen.getByText('Upload')).toBeInTheDocument();
-      // 不应有 Tooltip 或 Modal
-      expect(container.querySelector('.ant-tooltip')).toBeNull();
+      fireEvent.click(screen.getByText('Upload'));
+      expect(await screen.findByText(/jpg/i)).toBeInTheDocument();
     });
   });
 

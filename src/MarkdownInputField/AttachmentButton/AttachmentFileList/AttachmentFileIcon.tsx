@@ -1,6 +1,7 @@
 import { Eye, FileFailed, FileUploadingSpin, Play } from '@sofa-design/icons';
 import { Image, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { useAdaptiveTooltipProps } from '../../../Hooks/useAdaptiveTooltipProps';
 import { getFileTypeIcon } from '../../../Workspace/File/utils';
 import { FileType } from '../../../Workspace/types';
 import { AttachmentFile } from '../types';
@@ -125,8 +126,9 @@ export const FileMetaPlaceholder: React.FC<{
     ? (rawFormat.split('/').pop() ?? '').toUpperCase()
     : rawFormat.toUpperCase();
   const formatText = formatSuffix || '-';
+  const adaptiveTooltip = useAdaptiveTooltipProps('informational');
   return (
-    <Tooltip title={file.name}>
+    <Tooltip title={file.name} {...adaptiveTooltip}>
       <div
         data-testid="file-meta-placeholder"
         className={className}

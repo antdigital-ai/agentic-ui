@@ -9,6 +9,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useAdaptiveTooltipProps } from '../../Hooks/useAdaptiveTooltipProps';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { useStyle } from './style';
@@ -67,6 +68,7 @@ const OverflowTooltip: React.FC<OverflowTooltipProps> = memo(
   ({ children, title, prefixCls, hashId, forceShow = false }) => {
     const textRef = useRef<HTMLSpanElement>(null);
     const [isOverflowing, setIsOverflowing] = useState(false);
+    const adaptiveTooltip = useAdaptiveTooltipProps('informational');
 
     const checkOverflow = useRefFunction(() => {
       const node = textRef.current;
@@ -118,7 +120,12 @@ const OverflowTooltip: React.FC<OverflowTooltipProps> = memo(
     }
 
     return (
-      <Tooltip mouseEnterDelay={0.3} title={title} placement="top">
+      <Tooltip
+        mouseEnterDelay={0.3}
+        title={title}
+        placement="top"
+        {...adaptiveTooltip}
+      >
         <span
           ref={textRef}
           className={classNames(`${prefixCls}-label`, hashId)}

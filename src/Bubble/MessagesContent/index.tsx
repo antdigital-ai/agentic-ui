@@ -3,6 +3,7 @@ import { ConfigProvider, Popover, Tooltip, Typography } from 'antd';
 import classNames from 'clsx';
 import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
+import { useAdaptiveTooltipProps } from '../../Hooks/useAdaptiveTooltipProps';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import { MarkdownEditor } from '../../MarkdownEditor';
@@ -84,6 +85,8 @@ export const BubbleMessageDisplay: React.FC<
   const chatCls = getPrefixCls('agentic-ui');
   const baseChatCls = `${chatCls}-display`;
   const { hashId, wrapSSR } = useMessagesContentStyle(baseChatCls);
+
+  const docTagTooltipProps = useAdaptiveTooltipProps('informational');
 
   const funRender = useRefFunction((props: { identifier?: any }) => {
     const node = nodeList.find((item) => item.placeholder === props.identifier);
@@ -214,6 +217,7 @@ export const BubbleMessageDisplay: React.FC<
                       {item.docId}
                     </Typography.Text>
                   }
+                  {...docTagTooltipProps}
                 >
                   <div
                     className={classNames(

@@ -6,7 +6,7 @@ import {
   PictureOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { Button, Modal, Tooltip } from 'antd';
+import { Button, Modal, Popover, Tooltip } from 'antd';
 import React, { useContext, useMemo, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { LocalKeys } from '../../I18n';
@@ -196,9 +196,23 @@ export const AttachmentButtonPopover: React.FC<
     );
   }
 
-  // 如果是移动设备，不显示 Tooltip
+  // 移动设备无稳定 hover：用点击 Popover 展示支持格式说明（vivo/oppo 仍走上方 Modal）
   if (isMobile) {
-    return <span>{children}</span>;
+    return (
+      <Popover
+        trigger="click"
+        placement="top"
+        arrow={false}
+        content={
+          <AttachmentSupportedFormatsContent
+            supportedFormat={supportedFormat}
+            locale={locale}
+          />
+        }
+      >
+        <span style={{ display: 'inline-flex' }}>{children}</span>
+      </Popover>
+    );
   }
 
   return (
