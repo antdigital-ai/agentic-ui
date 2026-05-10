@@ -1,6 +1,6 @@
 import { LoadingOutlined } from '@ant-design/icons';
 import { TextOptimize } from '@sofa-design/icons';
-import { ConfigProvider, Tooltip } from 'antd';
+import { ConfigProvider } from 'antd';
 import React, { useContext } from 'react';
 
 import { ErrorBoundary } from 'react-error-boundary';
@@ -37,25 +37,22 @@ export const RefinePromptButton: React.FC<RefinePromptButtonProps> = (
     return <TextOptimize />;
   };
 
+  const actionTitle =
+    status === 'loading'
+      ? locale['refine.loading']
+      : locale['refine.oneClickOptimize'];
+
   if (!isBrowserEnv()) {
     return null;
   }
 
   return wrapSSR(
-    <Tooltip
-      title={
-        status === 'loading'
-          ? locale['refine.loading']
-          : locale['refine.oneClickOptimize']
-      }
+    <ActionIconBox
+      title={actionTitle}
+      onClick={handleClick}
+      data-testid="refine-prompt-button"
     >
-      <ActionIconBox
-        title={locale['refine.optimizePrompt']}
-        onClick={handleClick}
-        data-testid="refine-prompt-button"
-      >
-        <ErrorBoundary fallback={<div />}>{renderIcon()}</ErrorBoundary>
-      </ActionIconBox>
-    </Tooltip>,
+      <ErrorBoundary fallback={<div />}>{renderIcon()}</ErrorBoundary>
+    </ActionIconBox>,
   );
 };

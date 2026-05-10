@@ -190,17 +190,31 @@ describe('RefinePromptButton', () => {
 
       const button = screen.getByTestId('refine-prompt-button');
       expect(button).toHaveAttribute('role', 'button');
-      expect(button).toHaveAttribute('aria-label', '优化提示词');
+      expect(button).toHaveAttribute('aria-label', '一键优化提示词');
       expect(button).toHaveAttribute('tabIndex', '0');
     });
 
-    it('should show correct tooltip for idle state', () => {
+    it('should show correct tooltip title for idle state', () => {
       render(
         <RefinePromptButton isHover={false} status="idle" onRefine={vi.fn()} />,
       );
 
       const button = screen.getByTestId('refine-prompt-button');
-      expect(button).toHaveAttribute('data-title', '优化提示词');
+      expect(button).toHaveAttribute('data-title', '一键优化提示词');
+    });
+
+    it('should use loading copy for aria and tooltip title when loading', () => {
+      render(
+        <RefinePromptButton
+          isHover={false}
+          status="loading"
+          onRefine={vi.fn()}
+        />,
+      );
+
+      const button = screen.getByTestId('refine-prompt-button');
+      expect(button).toHaveAttribute('aria-label', '优化中');
+      expect(button).toHaveAttribute('data-title', '优化中');
     });
   });
 
