@@ -36,7 +36,7 @@ vi.mock('react-chartjs-2', () => {
   return {
     Line: R.forwardRef(({ data, options }: any, ref: any) => {
       R.useEffect(() => {
-        if (ref) ref.current = {};
+        if (ref) ref.current = { resize: vi.fn() };
       }, [ref]);
       // 覆盖 Line.tsx 148,149,160：调用 scales ticks callback
       R.useEffect(() => {
@@ -59,7 +59,7 @@ vi.mock('react-chartjs-2', () => {
     }),
     Bar: R.forwardRef(({ data, options }: any, ref: any) => {
       R.useEffect(() => {
-        if (ref) ref.current = {};
+        if (ref) ref.current = { resize: vi.fn() };
       }, [ref]);
       // 覆盖 Column.tsx 154,155,166,177 与 Bar.tsx 155,166,167,177：调用 scales ticks callback 并设置 ref
       R.useEffect(() => {
@@ -90,7 +90,7 @@ vi.mock('react-chartjs-2', () => {
     }),
     Doughnut: R.forwardRef(({ data }: any, ref: any) => {
       R.useEffect(() => {
-        if (ref) ref.current = {};
+        if (ref) ref.current = { resize: vi.fn() };
       }, [ref]);
       return R.createElement('div', {
         'data-testid': 'doughnut-chart',

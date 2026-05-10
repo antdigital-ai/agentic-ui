@@ -39,7 +39,7 @@ export const Container: React.FC<{
         Math.abs(preSize.width - newSize.width) > 30 || // 从 20 增加到 30
         Math.abs(preSize.height - newSize.height) > 30 // 从 20 增加到 30
       ) {
-        chart.resize(newSize.width, newSize.height);
+        chart.resize?.(newSize.width, newSize.height);
         sizeRef.current = newSize;
         return;
       }
