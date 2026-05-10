@@ -9,6 +9,14 @@ group:
 
 # Changelog
 
+## 未发布
+
+- 📖 文档
+  - 📖 新增 `MarkdownRenderer` 组件文档（流式 Markdown 渲染、`CharacterQueueOptions`、内置代码块渲染器路由表、`MarkdownRendererRef` 命令式接口）。
+  - 📖 新增 `ToolUseBarThink` 独立组件文档；同步修正 `ToolUseBar` 中 `ToolUseBarThink` 的 API 表（移除已废弃 / 不存在的 `id` / `isThinkLoading` / `isActive` / `onActiveChange` 等字段，对齐实际 props）。
+  - 📖 新增 `GradientText`、`TextAnimate`、`TypingAnimation` 组件文档与对应 demo。
+  - 🛠 `task-running.md` 改写为 `AgentRunBar 任务运行状态`，标注 `TaskRunning` / `TaskRunningProps` / `TaskRunningVariant` / `TaskRunningActionsRender` 为已废弃别名；同步将 `docs/demos/task-running.tsx` 中的 `TaskRunning` 替换为 `AgentRunBar`。
+
 ## v2.33.0
 
 - 🐞 修复 React Hooks 依赖项导致的死循环与过度渲染问题

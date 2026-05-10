@@ -9,6 +9,14 @@ group:
 
 # Changelog
 
+## Unreleased
+
+- 📖 Docs
+  - 📖 Added `MarkdownRenderer` component documentation (streaming Markdown rendering, `CharacterQueueOptions`, built-in code-block renderer routing, `MarkdownRendererRef` imperative API).
+  - 📖 Added a dedicated `ToolUseBarThink` doc; corrected the `ToolUseBarThink` API table inside `tool-use-bar.md` (removed deprecated/non-existent props such as `id`, `isThinkLoading`, `isActive`, `onActiveChange`, etc., aligned with actual props).
+  - 📖 Added `GradientText`, `TextAnimate`, and `TypingAnimation` component docs with demos.
+  - 🛠 Rewrote `task-running.md` as `AgentRunBar 任务运行状态`, marking `TaskRunning` / `TaskRunningProps` / `TaskRunningVariant` / `TaskRunningActionsRender` as deprecated aliases; updated `docs/demos/task-running.tsx` to use `AgentRunBar` instead of `TaskRunning`.
+
 ## v2.33.0
 
 - 🐞 Fix React Hooks dependency issues causing infinite loops and excessive re-renders
