@@ -105,37 +105,23 @@ export default () => {
 
 ## ToolUseBarThink 独立组件
 
-ToolUseBarThink 是一个专门为 Think 功能设计的独立组件，拥有独特的样式和功能。
+`ToolUseBarThink` 是一个独立的「深度思考」展示组件，与 `ToolUseBar` 同属工具调用展示族但拥有独立的样式与交互（默认展开收起、Loading 浮动展开按钮、二级展开收起、`light` 轻量模式等）。
 
-### ToolUseBarThinkProps
+完整 API、行为说明与示例请参阅 [ToolUseBarThink 深度思考](./tool-use-bar-think)。下方仅列出与 `ToolUseBar` 共同出现时的常用属性快速参考：
 
-| 属性             | 说明                    | 类型                                        | 默认值 | 版本 |
-| ---------------- | ----------------------- | ------------------------------------------- | ------ | ---- |
-| id               | 组件唯一标识            | string                                      | -      | -    |
-| toolName         | 工具名称                | React.ReactNode                             | -      | -    |
-| toolTarget       | 工具目标                | React.ReactNode                             | -      | -    |
-| time             | 工具执行时间            | React.ReactNode                             | -      | -    |
-| icon             | 自定义图标              | React.ReactNode                             | -      | -    |
-| thinkContent     | Think 模块完整内容      | React.ReactNode                             | -      | -    |
-| isThinkLoading   | Think 模块 loading 状态 | boolean                                     | false  | -    |
-| status           | 组件状态                | 'idle' \| 'loading' \| 'success' \| 'error' | 'idle' | -    |
-| onClick          | 点击回调                | (id: string) => void                        | -      | -    |
-| isActive         | 是否激活                | boolean                                     | false  | -    |
-| onActiveChange   | 激活状态变化回调        | (id: string, active: boolean) => void       | -      | -    |
-| isExpanded       | 是否展开                | boolean                                     | -      | -    |
-| onExpandedChange | 展开状态变化回调        | (id: string, expanded: boolean) => void     | -      | -    |
-| defaultExpanded  | 默认展开状态            | boolean                                     | false  | -    |
-| testId           | 测试 ID                 | string                                      | -      | -    |
-| light            | 启用亮色/轻量模式       | boolean                                     | false  | -    |
-
-### ToolUseBarThink 特性
-
-- **独立组件**: 专门为 Think 功能设计的独立组件
-- **专用样式**: 拥有独特的蓝色主题样式
-- **Loading 状态**: 显示 8 行占位符，支持展开收起
-- **完整内容**: 支持显示 thinkContent 完整内容
-- **状态管理**: 支持激活状态和展开状态管理
-- **自定义图标**: 默认使用 ThinkIcon，支持自定义
+| 属性                                       | 说明                                  | 类型                                  | 默认值  |
+| ------------------------------------------ | ------------------------------------- | ------------------------------------- | ------- |
+| toolName                                   | 工具/思考名称                         | `React.ReactNode`                     | -       |
+| toolTarget                                 | 工具目标 / 主题                       | `React.ReactNode`                     | -       |
+| time                                       | 时间信息                              | `React.ReactNode`                     | -       |
+| icon                                       | 自定义图标                            | `React.ReactNode`                     | -       |
+| thinkContent                               | 思考内容（支持流式追加）              | `React.ReactNode`                     | -       |
+| status                                     | 组件状态                              | `'loading' \| 'success' \| 'error'`   | -       |
+| light                                      | 轻量 / 行内模式                       | `boolean`                             | `false` |
+| expanded / defaultExpanded                 | 展开状态（受控 / 非受控）             | `boolean`                             | `false` |
+| onExpandedChange                           | 展开状态变化回调                      | `(expanded: boolean) => void`         | -       |
+| floatingExpanded / defaultFloatingExpanded | Loading 浮动展开按钮（受控 / 非受控） | `boolean`                             | `false` |
+| onFloatingExpandedChange                   | 浮动展开状态变化回调                  | `(floatingExpanded: boolean) => void` | -       |
 
 ## 注意事项
 
