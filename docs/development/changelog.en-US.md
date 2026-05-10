@@ -11,6 +11,11 @@ group:
 
 ## v2.33.0
 
+- MarkdownEditor / Plugins.chart
+  - 🆕 New `chartType: "docCards"` renders a Markdown table as a card grid (one row → one card), reusing the existing `<!-- {chartType: ...} --> + GFM table` data contract. Header columns are matched by aliases (`名称`/`标题`/`name`/`title`, `地址`/`链接`/`URL`, `简介`/`描述`/`description`, `亮点`/`标签`/`tags`) with the same `logical name + (unit)` loose matching used by chart `x`/`y`. `cardColumns` controls the per-row card count (default `2`); `fieldMap` overrides the alias resolution.
+  - 🆕 The `@ant-design/agentic-ui` entry now exports the `DocCards` component along with `resolveDocCardsFields` / `splitDocCardsTags` / `isDocCardsSafeHref` / `DocCardsDefaultFieldAliases` for downstream reuse.
+  - 🛠 `parseTable`: `docCards` now validates that a primary title column is resolvable; if not, the whole table downgrades to a plain Markdown table to avoid rendering an empty card grid. Behavior of other `chartType`s is unchanged.
+
 - 🐞 Fix React Hooks dependency issues causing infinite loops and excessive re-renders
   - SchemaRenderer: `schema || {}` creates a new reference each render, invalidating `useMemo([safeSchema])`. Fixed with module-level constant `EMPTY_SCHEMA`
   - SchemaForm: `schema?.component || {}` creates a new reference each render, invalidating `useMemo([properties])`. Fixed with module-level constant `EMPTY_COMPONENT`

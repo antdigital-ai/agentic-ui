@@ -11,6 +11,11 @@ group:
 
 ## v2.33.0
 
+- MarkdownEditor / Plugins.chart
+  - 🆕 新增 `chartType: "docCards"` 支持「Markdown 表格 → 卡片栅格」展示，与现有图表共用同一套「HTML 注释 + GFM 表格」数据契约。表头按 `名称`/`标题`、`地址`/`链接`/`URL`、`简介`/`描述`、`亮点`/`标签` 别名解析为 `title` / `url` / `description` / `tags`，支持「逻辑名 + 中英文括号单位」的宽松匹配；`cardColumns` 控制每行卡片数（默认 `2`），`fieldMap` 可显式覆盖字段映射。
+  - 🆕 `@ant-design/agentic-ui` 主入口同步导出 `DocCards` 组件与 `resolveDocCardsFields` / `splitDocCardsTags` / `isDocCardsSafeHref` / `DocCardsDefaultFieldAliases` 等工具，方便消费侧复用。
+  - 🛠 `parseTable`：`docCards` 在解析阶段做主标题列校验，命中失败整表降级为普通 Markdown 表格，避免输出空白卡片栅格；不影响其它 `chartType` 行为。
+
 - 🐞 修复 React Hooks 依赖项导致的死循环与过度渲染问题
   - SchemaRenderer：`schema || {}` 每次渲染产生新引用导致 `useMemo([safeSchema])` 失效，改用模块级常量 `EMPTY_SCHEMA`
   - SchemaForm：`schema?.component || {}` 每次渲染产生新引用导致 `useMemo([properties])` 失效，改用模块级常量 `EMPTY_COMPONENT`

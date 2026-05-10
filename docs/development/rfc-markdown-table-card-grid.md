@@ -104,4 +104,12 @@
 
 ## 状态
 
-- **Draft**：未实现；经评审后可进入开发并在本文件底部更新为 **Implemented** 与 PR 链接。
+- **Implemented**：v2.33.0 起以 `chartType: "docCards"` 落地。实现细节：
+  - 渲染：`src/Plugins/chart/DocCards/`（`DocCards.tsx` + `style.ts` + `utils.ts`）。
+  - 解析降级：`src/MarkdownEditor/editor/parser/parse/parseTable.ts` 在 `chartType === 'docCards'`
+    时仅校验「主标题」最少必需列；命中失败整表降级为普通 Markdown 表格。
+  - 公共契约：`columns`/`dataSource`/`title` 与现有 chart 节点一致；`cardColumns`、`fieldMap`
+    放在 chart config 的 `rest` 中（与 `groupBy`、`colorLegend` 等附加配置同位）。
+  - i18n：新增 `docCards` 标签（中文「卡片列表」/英文「Card List」）。
+  - 单元测试：`src/Plugins/chart/__tests__/DocCards.test.tsx`、`src/MarkdownEditor/editor/parser/__tests__/parseTable.test.ts`。
+  - 演示与文档：`docs/demos/markdown-doc-cards.tsx`、`docs/demos-pages/chart.md` 与 `docs/utils/chart-config.md`。

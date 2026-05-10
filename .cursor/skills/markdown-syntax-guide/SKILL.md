@@ -122,6 +122,7 @@ description: 指导用户使用 @ant-design/agentic-ui 的 Markdown Editor / Ren
 | 频数分布 | `histogram` | ❌ |
 | 仅展示原始表格（不画图）| `table` | ❌ |
 | 键值对定义列表 | `descriptions` | ❌ |
+| 文档/网站/工具的卡片栅格（标题 + URL + 简介 + 标签）| `docCards` | ❌ |
 | **流程图 / 决策树** | — | ✅ Mermaid `flowchart` |
 | **时序图 / 调用链** | — | ✅ Mermaid `sequenceDiagram` |
 | **甘特图 / 时间安排** | — | ✅ Mermaid `gantt` |
@@ -170,6 +171,27 @@ description: 指导用户使用 @ant-design/agentic-ui 的 Markdown Editor / Ren
 ```
 
 > 🔸 当数组里**所有** `chartType` 都为 `"table"` 时，插件会跳过转换，保留原始表格渲染。
+
+#### 3.3.1 卡片栅格（`docCards`）
+
+当用户希望以「双列 / 单列卡片」呈现一组带 **标题、URL、简介、标签** 的条目时，使用
+`chartType: "docCards"`。一行 Markdown 表格 = 一张卡片，与现有 chart 共用同一套契约。
+
+```markdown
+<!-- {"chartType": "docCards", "title": "推荐文档站", "cardColumns": 2} -->
+
+| 名称              | 地址                          | 简介                       | 亮点                       |
+| :---------------- | :---------------------------- | :------------------------- | :------------------------- |
+| Tailwind CSS Docs | https://tailwindcss.com/docs  | 结构清晰、搜索与导航强     | 交互式示例, 深链, 暗色模式 |
+| MDN               | https://developer.mozilla.org | 权威 Web 平台参考          | 多语言, 可折叠, 示例可编辑 |
+```
+
+- **表头别名（默认匹配）**：`名称` / `标题` / `name` / `title` → `title`；
+  `地址` / `链接` / `URL` → `url`；`简介` / `描述` → `description`；
+  `亮点` / `标签` → `tags`。同样支持「列名 = 逻辑名 + 中英文括号单位」的宽松匹配。
+- **标签拆分**：`tags` 列允许半角逗号 `,`、分号 `;`、竖线 `|`、斜杠 `/` 与全角 `，` `；` `、` 分隔。
+- **可选配置**：`cardColumns`（默认 `2`，传 `1` 即全宽列表）、`fieldMap`（显式覆盖列名映射）。
+- **降级策略**：注释中无法定位主标题列时，整表会降级为普通 Markdown 表格，避免空白卡片栅格。
 
 #### 3.4 内置 chart 的智能识别能力
 

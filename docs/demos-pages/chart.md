@@ -102,6 +102,18 @@ group:
 
 <code src="../demos/charts/chartWithStatic.tsx" background="var(--main-bg-color)" iframe=1000></code>
 
+## 卡片列表 (docCards)
+
+将一行 Markdown 表格映射为一张卡片，默认按桌面 2 列、窄屏 1 列栅格布局。
+与现有图表共用同一套「HTML 注释（含 `chartType`）+ GFM 表格」数据契约，
+表头按「`名称`/`标题`、`地址`/`链接`/`URL`、`简介`/`描述`、`亮点`/`标签`」别名解析为
+`title` / `url` / `description` / `tags`，可通过 `fieldMap` 覆盖。
+
+`cardColumns` 控制每行卡片数（默认 `2`，传入 `1` 即全宽列表）。
+若注释中无法定位主标题列，整表会降级为普通 Markdown 表格渲染。
+
+<code src="../demos/markdown-doc-cards.tsx" background="var(--main-bg-color)" title="卡片列表" iframe=720></code>
+
 ## Mermaid 图表
 
 <code src="../demos/charts/mermaid.tsx" background="var(--main-bg-color)" iframe=540></code>
