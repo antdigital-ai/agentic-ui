@@ -104,15 +104,50 @@ group:
 
 ## 卡片列表 (docCards)
 
-将一行 Markdown 表格映射为一张卡片，默认按桌面 2 列、窄屏 1 列栅格布局。
+将一行 Markdown 表格映射为一张卡片，默认桌面 2 列、`< 480px` viewport 强制单列。
 与现有图表共用同一套「HTML 注释（含 `chartType`）+ GFM 表格」数据契约，
 表头按「`名称`/`标题`、`地址`/`链接`/`URL`、`简介`/`描述`、`亮点`/`标签`」别名解析为
 `title` / `url` / `description` / `tags`，可通过 `fieldMap` 覆盖。
 
-`cardColumns` 控制每行卡片数（默认 `2`，传入 `1` 即全宽列表）。
+`cardColumns` 控制每行卡片数（取值 `1`~`4`，默认 `2`，超出 clamp 到 `4`）。
 若注释中无法定位主标题列，整表会降级为普通 Markdown 表格渲染。
 
-<code src="../demos/markdown-doc-cards.tsx" background="var(--main-bg-color)" title="卡片列表" iframe=720></code>
+### Markdown 注释驱动（首选用法）
+
+写一行 HTML 注释 + 一张 GFM 表格即可输出卡片栅格，与现有 chart 完全一致。
+适合从 LLM 输出 / 文档站直接产出。
+
+<code src="../demos/markdown-doc-cards.tsx" background="var(--main-bg-color)" title="Markdown 注释驱动" iframe=720></code>
+
+### DocCards 组件直接使用
+
+当上游已是结构化数据、想绕过 Markdown 直接复用 UI 时，可直接 `import { DocCards }`。
+
+<code src="../demos/charts/doc-cards/doc-cards-basic.tsx" background="var(--main-bg-color)" title="组件基础用法" iframe=520></code>
+
+### 列数控制 (cardColumns)
+
+桌面端按 `cardColumns` 精确控制最多 N 列；`< 480px` viewport 强制单列。
+
+<code src="../demos/charts/doc-cards/doc-cards-columns.tsx" background="var(--main-bg-color)" title="cardColumns 切换" iframe=720></code>
+
+### fieldMap 覆盖 + toolbar 槽位
+
+表头不在默认别名表时，用 `fieldMap` 显式映射；`toolbar` 槽位用于放右上角操作。
+
+<code src="../demos/charts/doc-cards/doc-cards-field-map.tsx" background="var(--main-bg-color)" title="fieldMap + toolbar" iframe=520></code>
+
+### 流式追加（模拟 LLM 边产边渲染）
+
+数据增量到达时按行追加；与 chart 一样基于 dataSource 走，无额外接入。
+
+<code src="../demos/charts/doc-cards/doc-cards-streaming.tsx" background="var(--main-bg-color)" title="流式追加" iframe=620></code>
+
+### 容错与降级
+
+仅缺 `亮点` / `简介` 时仍正常出卡片；解析阶段无主标题列则整表降级为普通 Markdown 表格。
+
+<code src="../demos/charts/doc-cards/doc-cards-fallback.tsx" background="var(--main-bg-color)" title="容错与降级" iframe=560></code>
 
 ## Mermaid 图表
 
