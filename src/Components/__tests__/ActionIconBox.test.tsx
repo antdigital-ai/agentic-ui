@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import * as adaptiveTooltip from '../../Utils/adaptiveTooltip';
+import { adaptiveTooltipEnvironment } from '../../Utils/adaptiveTooltip';
 import { ActionIconBox } from '../ActionIconBox';
 
 describe('ActionIconBox 组件', () => {
@@ -24,7 +24,7 @@ describe('ActionIconBox 组件', () => {
 
   it('触摸策略为真时 Tooltip 包裹仍保留原生 title 兜底', async () => {
     const spy = vi
-      .spyOn(adaptiveTooltip, 'shouldUseInformationalTooltipClickTrigger')
+      .spyOn(adaptiveTooltipEnvironment, 'isInformationalClickContext')
       .mockReturnValue(true);
 
     try {
@@ -49,7 +49,7 @@ describe('ActionIconBox 组件', () => {
 
   it('触摸策略为假且存在 Tooltip 时不设置原生 title', async () => {
     const spy = vi
-      .spyOn(adaptiveTooltip, 'shouldUseInformationalTooltipClickTrigger')
+      .spyOn(adaptiveTooltipEnvironment, 'isInformationalClickContext')
       .mockReturnValue(false);
 
     try {
@@ -63,7 +63,9 @@ describe('ActionIconBox 组件', () => {
         await Promise.resolve();
       });
 
-      expect(screen.getByTestId('action-icon-box')).not.toHaveAttribute('title');
+      expect(screen.getByTestId('action-icon-box')).not.toHaveAttribute(
+        'title',
+      );
     } finally {
       spy.mockRestore();
     }

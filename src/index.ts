@@ -703,6 +703,7 @@ export {
 export { useThrottleFn } from './Hooks/useThrottleFn';
 
 export {
+  adaptiveTooltipEnvironment,
   getAdaptiveTooltipProps,
   shouldUseInformationalTooltipClickTrigger,
   type AdaptiveTooltipKind,
