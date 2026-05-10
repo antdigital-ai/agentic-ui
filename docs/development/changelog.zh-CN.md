@@ -12,8 +12,11 @@ group:
 ## v2.33.0
 
 - MarkdownEditor / Plugins.chart
-  - 🆕 新增 `chartType: "docCards"` 支持「Markdown 表格 → 卡片栅格」展示，与现有图表共用同一套「HTML 注释 + GFM 表格」数据契约。表头按 `名称`/`标题`、`地址`/`链接`/`URL`、`简介`/`描述`、`亮点`/`标签` 别名解析为 `title` / `url` / `description` / `tags`，支持「逻辑名 + 中英文括号单位」的宽松匹配；`cardColumns` 控制每行卡片数（默认 `2`），`fieldMap` 可显式覆盖字段映射。
-  - 🆕 `@ant-design/agentic-ui` 主入口同步导出 `DocCards` 组件与 `resolveDocCardsFields` / `splitDocCardsTags` / `isDocCardsSafeHref` / `DocCardsDefaultFieldAliases` 等工具，方便消费侧复用。
+  - 🆕 新增 `chartType: "docCards"` 支持「Markdown 表格 → 卡片栅格」展示，与现有图表共用同一套「HTML 注释 + GFM 表格」数据契约。表头按 `名称`/`标题`、`地址`/`链接`/`URL`、`简介`/`描述`、`亮点`/`标签` 别名解析为 `title` / `url` / `description` / `tags`，支持「逻辑名 + 中英文括号单位」的宽松匹配；`cardColumns` 控制每行卡片数（取值 `1`~`4`，默认 `2`，超出自动 clamp），`fieldMap` 可显式覆盖字段映射。
+  - 🆕 `@ant-design/agentic-ui` 主入口同步导出 `DocCards` 组件与 `resolveDocCardsFields` / `splitDocCardsTags` / `isDocCardsSafeHref` / `formatDocCardsDisplayUrl` / `DocCardsDefaultFieldAliases` 等工具，方便消费侧复用。
+  - 💄 卡片链接展示 hostname + path（`https://tailwindcss.com/docs` → `tailwindcss.com/docs`），`href` 与 `title` attribute 仍是原始 URL；超长 URL 单行省略。
+  - 💄 移动端适配：`< 480px` viewport 强制单列；卡片 `:hover` 用 `@media (hover: hover)` 包裹避免 first-tap 残留；链接最小触摸高度 24px（WCAG 2.5.5 AA）；标签胶囊用 padding 而非固定 height，避免在手机端被压扁。
+  - ⚡️ `gridTemplateColumns` 用 `useMemo` 缓存；header 节点抽到 `useMemo`；`cardColumns` 走 `repeat(N, minmax(0, 1fr))` 精确控制最多 N 列，避免 `auto-fit` 在宽容器塞超过用户期望的列数。
   - 🛠 `parseTable`：`docCards` 在解析阶段做主标题列校验，命中失败整表降级为普通 Markdown 表格，避免输出空白卡片栅格；不影响其它 `chartType` 行为。
 
 - 🐞 修复 React Hooks 依赖项导致的死循环与过度渲染问题

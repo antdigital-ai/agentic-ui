@@ -12,8 +12,11 @@ group:
 ## v2.33.0
 
 - MarkdownEditor / Plugins.chart
-  - 🆕 New `chartType: "docCards"` renders a Markdown table as a card grid (one row → one card), reusing the existing `<!-- {chartType: ...} --> + GFM table` data contract. Header columns are matched by aliases (`名称`/`标题`/`name`/`title`, `地址`/`链接`/`URL`, `简介`/`描述`/`description`, `亮点`/`标签`/`tags`) with the same `logical name + (unit)` loose matching used by chart `x`/`y`. `cardColumns` controls the per-row card count (default `2`); `fieldMap` overrides the alias resolution.
-  - 🆕 The `@ant-design/agentic-ui` entry now exports the `DocCards` component along with `resolveDocCardsFields` / `splitDocCardsTags` / `isDocCardsSafeHref` / `DocCardsDefaultFieldAliases` for downstream reuse.
+  - 🆕 New `chartType: "docCards"` renders a Markdown table as a card grid (one row → one card), reusing the existing `<!-- {chartType: ...} --> + GFM table` data contract. Header columns are matched by aliases (`名称`/`标题`/`name`/`title`, `地址`/`链接`/`URL`, `简介`/`描述`/`description`, `亮点`/`标签`/`tags`) with the same `logical name + (unit)` loose matching used by chart `x`/`y`. `cardColumns` controls the per-row card count (`1`–`4`, default `2`, values out of range are clamped); `fieldMap` overrides the alias resolution.
+  - 🆕 The `@ant-design/agentic-ui` entry now exports the `DocCards` component along with `resolveDocCardsFields` / `splitDocCardsTags` / `isDocCardsSafeHref` / `formatDocCardsDisplayUrl` / `DocCardsDefaultFieldAliases` for downstream reuse.
+  - 💄 Card links render as `host + path` (e.g. `https://tailwindcss.com/docs` → `tailwindcss.com/docs`); `href` and the `title` tooltip keep the original URL. Overlong URLs are truncated to a single line with ellipsis.
+  - 💄 Mobile / touch readiness: viewport `< 480px` is forced to a single column; card `:hover` is wrapped in `@media (hover: hover)` so it no longer "sticks" after first tap on touch devices; link min touch height is 24px (WCAG 2.5.5 AA); tag pills use `padding` instead of a fixed height so they don't get squashed.
+  - ⚡️ `gridTemplateColumns` and the header node are memoized; `cardColumns` uses `repeat(N, minmax(0, 1fr))` so the column count strictly matches user intent (instead of `auto-fit` over-packing a wide container).
   - 🛠 `parseTable`: `docCards` now validates that a primary title column is resolvable; if not, the whole table downgrades to a plain Markdown table to avoid rendering an empty card grid. Behavior of other `chartType`s is unchanged.
 
 - 🐞 Fix React Hooks dependency issues causing infinite loops and excessive re-renders

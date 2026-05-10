@@ -4,6 +4,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { DocCards } from '../DocCards';
 import {
+  formatDisplayUrl,
   isSafeHref,
   resolveDocCardsFields,
   splitTags,
@@ -59,6 +60,39 @@ describe('DocCards utils', () => {
       expect(isSafeHref('')).toBe(false);
       expect(isSafeHref(undefined)).toBe(false);
       expect(isSafeHref(123 as any)).toBe(false);
+    });
+  });
+
+  describe('formatDisplayUrl', () => {
+    it('http(s) 链接展示 host + path 并去掉根路径', () => {
+      expect(formatDisplayUrl('https://tailwindcss.com/docs')).toBe(
+        'tailwindcss.com/docs',
+      );
+      expect(formatDisplayUrl('https://example.com/')).toBe('example.com');
+      expect(formatDisplayUrl('http://a.com/b?c=1')).toBe('a.com/b?c=1');
+    });
+
+    it('mailto / tel 去 scheme 后展示纯地址', () => {
+      expect(formatDisplayUrl('mailto:a@b.com')).toBe('a@b.com');
+      expect(formatDisplayUrl('tel:+861234567')).toBe('+861234567');
+    });
+
+    it('相对路径与解析失败时原样返回', () => {
+      expect(formatDisplayUrl('/foo/bar')).toBe('/foo/bar');
+      expect(formatDisplayUrl('not a url')).toBe('not a url');
+    });
+
+    it('超过 maxLength 时按尾部省略', () => {
+      const long = `https://example.com/${'a'.repeat(100)}`;
+      const out = formatDisplayUrl(long, 32);
+      expect(out.endsWith('…')).toBe(true);
+      expect(out.length).toBeLessThanOrEqual(33);
+    });
+
+    it('空值与非字符串退化为空字符串', () => {
+      expect(formatDisplayUrl('')).toBe('');
+      expect(formatDisplayUrl(undefined)).toBe('');
+      expect(formatDisplayUrl(123 as any)).toBe('');
     });
   });
 
@@ -135,8 +169,9 @@ describe('DocCards 组件渲染', () => {
     expect(screen.getByText('Tailwind CSS Docs')).toBeInTheDocument();
     expect(screen.getByText('MDN')).toBeInTheDocument();
 
+    // 链接展示 hostname + path，但 href / title attribute 仍是原始 URL
     const tailwindLink = screen.getByRole('link', {
-      name: 'https://tailwindcss.com/docs',
+      name: 'tailwindcss.com/docs',
     });
     expect(tailwindLink).toHaveAttribute('href', 'https://tailwindcss.com/docs');
     expect(tailwindLink).toHaveAttribute('target', '_blank');
@@ -179,5 +214,45 @@ describe('DocCards 组件渲染', () => {
       screen.queryByRole('link', { name: /javascript/ }),
     ).not.toBeInTheDocument();
     expect(screen.getByText('javascript:alert(1)')).toBeInTheDocument();
+  });
+
+  it('cardColumns 控制 grid-template-columns，超过 4 时 clamp 到 4', () => {
+    const cols = buildColumns(['名称']);
+    const data = [{ 名称: 'a' }];
+    const { container, rerender } = render(
+      <DocCards columns={cols} data={data} cardColumns={3} />,
+    );
+    const grid = container.querySelector('[class*="-grid"]') as HTMLElement;
+    expect(grid?.style.gridTemplateColumns).toBe(
+      'repeat(3, minmax(0, 1fr))',
+    );
+
+    rerender(<DocCards columns={cols} data={data} cardColumns={9} />);
+    const grid2 = container.querySelector('[class*="-grid"]') as HTMLElement;
+    expect(grid2?.style.gridTemplateColumns).toBe(
+      'repeat(4, minmax(0, 1fr))',
+    );
+  });
+
+  it('toolbar 与 title 在同一 header 行渲染', () => {
+    const cols = buildColumns(['名称']);
+    const data = [{ 名称: 'a' }];
+    render(
+      <DocCards
+        title="标题"
+        toolbar={<button type="button">tool</button>}
+        columns={cols}
+        data={data}
+      />,
+    );
+    expect(screen.getByText('标题')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'tool' })).toBeInTheDocument();
+  });
+
+  it('描述列纯空白时不渲染段落', () => {
+    const cols = buildColumns(['名称', '简介']);
+    const data = [{ 名称: 'a', 简介: '   ' }];
+    const { container } = render(<DocCards columns={cols} data={data} />);
+    expect(container.querySelectorAll('[class*="-item-desc"]')).toHaveLength(0);
   });
 });
