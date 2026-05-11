@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'WelcomeMessage'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'inline-flex',
@@ -32,12 +28,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('WelcomeMessage', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('welcome', (token) => {
-    const welcomeToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(welcomeToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'welcome');
+  return { wrapSSR, hashId };
 }

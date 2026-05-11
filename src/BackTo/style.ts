@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'BackTo'> = (token) => {
   return {
     [token.componentCls]: {
       // position:relative，在流内正常占位，由父容器负责整体定位。
@@ -63,12 +59,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
 export const prefixCls = 'back-to';
 
+const useGenStyle = genStyleHooks('BackTo', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('back-to', (token) => {
-    const backToToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(backToToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'back-to');
+  return { wrapSSR, hashId };
 }

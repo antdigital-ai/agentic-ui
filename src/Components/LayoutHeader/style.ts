@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'LayoutHeader'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -49,13 +45,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export const useLayoutHeaderStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('layout-header', (token) => {
-    const layoutHeaderToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('LayoutHeader', genStyle);
 
-    return [genStyle(layoutHeaderToken)];
-  });
+export const useLayoutHeaderStyle = (prefixCls: string) => {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls);
+  return { wrapSSR, hashId };
 };

@@ -1,9 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const beforeAnimation = new Keyframes('beforeAnimation', {
   '0%, 100%': { transform: 'translate(0, 0)' },
@@ -19,7 +15,7 @@ const afterAnimation = new Keyframes('afterAnimation', {
   '75%': { transform: 'translate(-15%, -10%)' },
 });
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'Loading'> = (token) => {
   return {
     [token.componentCls]: {
       position: 'relative',
@@ -128,12 +124,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
 export const prefixCls = 'loading';
 
+const useGenStyle = genStyleHooks('Loading', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('loading', (token) => {
-    const badgeToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(badgeToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'loading');
+  return { wrapSSR, hashId };
 }

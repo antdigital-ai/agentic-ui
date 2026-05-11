@@ -1,10 +1,6 @@
-﻿import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+﻿import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'TaskList'> = (token) => {
   const { componentCls } = token;
 
   return {
@@ -199,12 +195,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('TaskList', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('task-list', (token) => {
-    const taskListToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(taskListToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'task-list');
+  return { wrapSSR, hashId };
 }

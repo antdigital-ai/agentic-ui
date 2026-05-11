@@ -2,15 +2,11 @@
   CARD_RESIZE_DURATION_MS,
   CARD_RESIZE_EASING,
 } from '../Constants/cardResizeMotion';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
 const LIGHT_MODE_BACKDROP_FILTER = 'blur(12px)';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ToolUseBarThink'> = (token) => {
   return {
     [token.componentCls]: {
       '--resize-dur': `${CARD_RESIZE_DURATION_MS}ms`,
@@ -400,12 +396,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('ToolUseBarThink', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('tool-use-bar-think', (token) => {
-    const toolBarToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(toolBarToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'tool-use-bar-think');
+  return { wrapSSR, hashId };
 }

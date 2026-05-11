@@ -1,9 +1,7 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'DotAni'> = (token) => {
   return {
-    // 加载器样式
     [`${token.componentCls}`]: {
       width: '20px',
       display: 'inline-flex',
@@ -25,18 +23,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('DotAni', genStyle);
+
 /**
  * DotAni 样式 Hook
  * @param prefixCls 样式前缀
  * @returns 样式对象
  */
 export function useDotAniStyle(prefixCls?: string) {
-  return useEditorStyleRegister('DotAni', (token) => {
-    const dotAniToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-
-    return [genStyle(dotAniToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'DotAni');
+  return { wrapSSR, hashId };
 }

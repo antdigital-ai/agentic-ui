@@ -1,8 +1,4 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
 /**
  * 动画曲线常量集中维护：
@@ -15,7 +11,7 @@ const LEAVE_EASING = 'cubic-bezier(0.4, 0, 1, 1)';
 const ENTER_DURATION = '240ms';
 const LEAVE_DURATION = '200ms';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'AnswerAlert'> = (token) => {
   return {
     // ================== Keyframes ==================
     // 命名带 `${prefixCls}` 前缀防止全局冲突；为了兼容 cssinjs，
@@ -233,12 +229,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('AnswerAlert', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('answer-alert', (token) => {
-    const answerAlertToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(answerAlertToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'answer-alert');
+  return { wrapSSR, hashId };
 }

@@ -1,11 +1,10 @@
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ThoughtChainList'> = (token) => {
   return {
     '@keyframes thoughtChainSpin': {
       '0%': { transform: 'rotate(0deg)' },
@@ -247,7 +246,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * 通过 CSS keyframes + inline `animation-delay` 实现按 index 的 stagger 入场，
  * 在测试环境（process.env.NODE_ENV === 'test'）下由组件层禁用动画。
  */
-const genMotionStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genMotionStyle: GenStyleFn<'ThoughtChainList'> = (token) => {
   return {
     [`${token.componentCls}-content-list-item-motion`]: {
       animationName: `${token.componentCls}-thoughtChainItemFadeInUp`,
@@ -267,17 +266,13 @@ const genMotionStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ThoughtChainList', (token) => {
-    const proChatToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ThoughtChainList', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+  genMotionStyle(token, info),
+]);
 
-    return [
-      resetComponent(proChatToken),
-      genStyle(proChatToken),
-      genMotionStyle(proChatToken),
-    ];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ThoughtChainList');
+  return { wrapSSR, hashId };
 }

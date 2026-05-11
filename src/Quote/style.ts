@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genQuoteStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genQuoteStyle: GenStyleFn<'Quote'> = (token) => {
   return {
     [token.componentCls]: {
       '&-container': {
@@ -139,12 +135,9 @@ const genQuoteStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('Quote', genQuoteStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('quote', (token) => {
-    const quoteToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genQuoteStyle(quoteToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'quote');
+  return { wrapSSR, hashId };
 }

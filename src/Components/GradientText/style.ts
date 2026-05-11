@@ -1,9 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const animateGradientText = new Keyframes('animateGradientText', {
   '0%': {
@@ -14,7 +10,7 @@ const animateGradientText = new Keyframes('animateGradientText', {
   },
 });
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'GradientText'> = (token) => {
   return {
     [token.componentCls]: {
       position: 'relative',
@@ -43,13 +39,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export const useGradientTextStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('gradient-text', (token) => {
-    const gradientTextToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('GradientText', genStyle);
 
-    return [genStyle(gradientTextToken)];
-  });
+export const useGradientTextStyle = (prefixCls: string) => {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls);
+  return { wrapSSR, hashId };
 };
