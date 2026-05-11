@@ -14,7 +14,7 @@ import React, { lazy, Suspense, useContext, useMemo, useState } from 'react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
 import { I18nContext } from '../../I18n';
-import { DocCards } from './DocCards';
+import { DocCards, type DocCardsFieldMap } from './DocCards';
 import { loadChartRuntime, type ChartRuntime } from './loadChartRuntime';
 import {
   debounce,
@@ -1283,7 +1283,7 @@ export const ChartRender: React.FC<{
     if (chartType === 'docCards') {
       const restCfg = (config?.rest ?? {}) as {
         cardColumns?: number;
-        fieldMap?: Record<string, string>;
+        fieldMap?: DocCardsFieldMap;
       };
       // toolbar 直接交给 DocCards 头部排布，避免内外两层 header 错位
       return (

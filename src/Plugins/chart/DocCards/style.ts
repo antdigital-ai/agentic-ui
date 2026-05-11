@@ -79,7 +79,7 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       '&-item-link': {
         color: token.colorLink,
         textDecoration: 'none',
-        // 触摸目标至少 24px 高，符合 WCAG 2.5.5 AA
+        // 触摸目标至少 24px 高，达到 WCAG 2.2 AA Target Size (Minimum) 2.5.8 (24×24 px)
         display: 'inline-block',
         minHeight: 24,
         lineHeight: '24px',

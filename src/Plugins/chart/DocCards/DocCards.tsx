@@ -5,6 +5,7 @@ import { I18nContext } from '../../../I18n';
 import { useStyle } from './style';
 import {
   formatDisplayUrl,
+  isExternalLink,
   isSafeHref,
   resolveDocCardsFields,
   splitTags,
@@ -20,7 +21,9 @@ import {
  * - 表头列名按约定语义解析为 `title`/`url`/`description`/`tags`，可通过 `fieldMap` 覆盖；
  * - `cardColumns` 控制每行卡片数（1~4，默认 2）；窄屏（< 480px）强制单列。
  *
- * 解析无法定位 `title` 列时仅渲染空容器，由上层 `parseTable` 已经做过整表降级。
+ * 解析无法定位 `title` 列时渲染带本地化文案的空态占位（i18n 键 `docCards`）；
+ * 在 Markdown 路径下，上层 `parseTable` 已做过整表降级，此分支主要服务于
+ * 直接消费 `DocCards` 组件且数据列名不规范的场景。
  */
 export interface DocCardsProps {
   /** 标题，对应注释中的 `title` 字段；为空时不渲染 header */
@@ -170,14 +173,20 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
                   title={rawUrl}
                 >
                   {safeLink ? (
+                    // 仅外部链接（http(s)/mailto/tel）开新 tab；站内绝对路径、相对路径、
+                    // 锚点 (#section) 走原 tab，避免破坏浏览器原生锚点滚动等行为
                     <a
                       className={classNames(
                         `${prefixCls}-item-link`,
                         hashId,
                       )}
                       href={rawUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      {...(isExternalLink(rawUrl)
+                        ? {
+                            target: '_blank',
+                            rel: 'noopener noreferrer',
+                          }
+                        : {})}
                     >
                       {urlDisplay}
                     </a>
@@ -195,7 +204,7 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
                 <div
                   className={classNames(`${prefixCls}-item-tags`, hashId)}
                   role="list"
-                  aria-label={i18n?.locale?.docCards || '卡片列表'}
+                  aria-label={i18n?.locale?.docCardsTags || '标签列表'}
                 >
                   {tags.map((tag) => (
                     <span
