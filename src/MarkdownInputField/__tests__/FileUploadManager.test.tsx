@@ -986,6 +986,58 @@ describe('useFileUploadManager', () => {
       removeSpy.mockRestore();
       vi.restoreAllMocks();
     });
+
+    it('应该复用隐藏 input 并只在卸载时移除', async () => {
+      const { result, unmount } = renderHook(
+        () =>
+          useFileUploadManager({
+            ...defaultProps,
+            attachment: {
+              ...defaultProps.attachment,
+              allowMultiple: false,
+            },
+          }),
+        { wrapper },
+      );
+
+      const clickSpy = vi.fn();
+      const createdInputs: HTMLInputElement[] = [];
+      const originalCreateElement = Document.prototype.createElement.bind(
+        document,
+      ) as typeof document.createElement;
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const element = originalCreateElement(tagName);
+          if (tagName === 'input') {
+            createdInputs.push(element as HTMLInputElement);
+            element.click = clickSpy;
+          }
+          return element;
+        });
+      const appendChildSpy = vi.spyOn(document.body, 'appendChild');
+      const removeChildSpy = vi.spyOn(document.body, 'removeChild');
+
+      await result.current.uploadImage(false);
+      await result.current.uploadImage(true);
+
+      expect(createdInputs).toHaveLength(1);
+      expect(appendChildSpy).toHaveBeenCalledTimes(1);
+      expect(clickSpy).toHaveBeenCalledTimes(2);
+      expect(createdInputs[0].multiple).toBe(false);
+      expect(createdInputs[0].accept).toBe('image/*');
+      expect(document.body.contains(createdInputs[0])).toBe(true);
+      expect(removeChildSpy).not.toHaveBeenCalled();
+
+      unmount();
+
+      expect(removeChildSpy).toHaveBeenCalledWith(createdInputs[0]);
+      expect(document.body.contains(createdInputs[0])).toBe(false);
+
+      createElementSpy.mockRestore();
+      appendChildSpy.mockRestore();
+      removeChildSpy.mockRestore();
+    });
   });
 
   describe('getAcceptValue 设备类型处理', () => {
