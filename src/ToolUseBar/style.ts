@@ -1,3 +1,7 @@
+﻿import {
+  CARD_RESIZE_DURATION_MS,
+  CARD_RESIZE_EASING,
+} from '../Constants/cardResizeMotion';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -7,6 +11,8 @@ import {
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
+      '--resize-dur': `${CARD_RESIZE_DURATION_MS}ms`,
+      '--resize-ease': CARD_RESIZE_EASING,
       maxWidth: '100%',
       '&-no-animation': {
         '& *': {
@@ -284,8 +290,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         overflow: 'hidden',
         opacity: 0,
         pointerEvents: 'none',
-        transition:
-          'max-height 0.16s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.12s linear',
+        transition: [
+          `max-height var(--resize-dur) var(--resize-ease)`,
+          `width var(--resize-dur) var(--resize-ease)`,
+          `opacity var(--resize-dur) var(--resize-ease)`,
+        ].join(','),
+        willChange: 'max-height, width',
         position: 'relative',
         paddingInline: 4,
         paddingBottom: 0,
@@ -388,6 +398,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         animationDuration: '1s',
         animationTimingFunction: 'linear',
         animationIterationCount: 'infinite',
+      },
+
+      '@media (prefers-reduced-motion: reduce)': {
+        '&-tool-container': {
+          transition: 'none !important',
+          willChange: 'auto',
+        },
       },
     },
   } as any;

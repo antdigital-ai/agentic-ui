@@ -3,7 +3,6 @@ import type { Processor } from 'unified';
 
 import { renderMarkdownBlock } from '../markdownReactShared';
 import { StreamingAnimationContext } from '../StreamingAnimationContext';
-import { StreamingCursor } from '../StreamingCursor';
 import { shouldReparseLastBlock } from './lastBlockThrottle';
 
 export interface MarkdownBlockPieceProps {
@@ -15,7 +14,7 @@ export interface MarkdownBlockPieceProps {
 }
 
 /**
- * 块级渲染单元：sealed 块缓存不动，tail 块节流重解析 + 闪烁光标。
+ * 块级渲染单元：sealed 块缓存不动，tail 块节流重解析。
  */
 export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
   variant,
@@ -77,7 +76,6 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
   return (
     <StreamingAnimationContext.Provider value={{ animateBlock }}>
       {node}
-      {animateBlock && <StreamingCursor />}
     </StreamingAnimationContext.Provider>
   );
 });

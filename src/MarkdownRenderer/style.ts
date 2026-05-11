@@ -1,4 +1,4 @@
-﻿/**
+/**
  * MarkdownRenderer 复用 MarkdownEditor 的样式体系。
  * 两者使用相同的 CSS 前缀（agentic-md-editor），确保渲染结果视觉一致。
  *
@@ -23,16 +23,6 @@ export const useRendererVarStyle = (prefixCls: string) => {
       },
 
       ...textSwapEnterKeyframes,
-
-      '@keyframes markdownStreamingCursorBlink': {
-        '0%, 100%': { opacity: 0.9, boxShadow: '0 0 4px currentColor' },
-        '50%': { opacity: 0, boxShadow: '0 0 0 currentColor' },
-      },
-
-      '@keyframes markdownStreamingCursorFadeIn': {
-        from: { opacity: 0, transform: 'scaleY(0.3)' },
-        to: { opacity: 0.9, transform: 'scaleY(1)' },
-      },
     };
   });
 };

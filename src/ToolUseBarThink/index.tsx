@@ -1,4 +1,4 @@
-import {
+﻿import {
   Brain,
   ChevronDown,
   ChevronsDownUp,
@@ -16,6 +16,10 @@ import React, {
   useState,
 } from 'react';
 
+import {
+  CARD_RESIZE_DURATION_MS,
+  CARD_RESIZE_EASING,
+} from '../Constants/cardResizeMotion';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { useLocale } from '../I18n';
 import { useStyle } from './style';
@@ -42,11 +46,11 @@ const CONTENT_COLLAPSE_THRESHOLD = 200;
 
 const CHEVRON_EXPANDED: React.CSSProperties = {
   transform: 'rotate(0deg)',
-  transition: 'transform 0.2s',
+  transition: `transform ${CARD_RESIZE_DURATION_MS}ms ${CARD_RESIZE_EASING}`,
 };
 const CHEVRON_COLLAPSED: React.CSSProperties = {
   transform: 'rotate(-90deg)',
-  transition: 'transform 0.2s',
+  transition: `transform ${CARD_RESIZE_DURATION_MS}ms ${CARD_RESIZE_EASING}`,
 };
 
 const CONTENT_CLAMPED_STYLE: React.CSSProperties = {
@@ -359,51 +363,63 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
         )}
       </div>
 
-      {/* Container */}
-      {thinkContent && expandedState && (
+      {/* Container：grid 折叠 + Card resize 时长，与工具条一致 */}
+      {thinkContent && (
         <div
-          className={cls.container}
-          data-testid="tool-use-bar-think-container"
-          style={CONTAINER_STYLE}
+          className={classNames(
+            `${prefixCls}-think-collapse`,
+            hashId,
+            {
+              [`${prefixCls}-think-collapse-open`]: expandedState,
+            },
+          )}
         >
-          <div ref={contentInnerRef} style={contentInnerStyle}>
-            <div className={cls.content} style={styles?.content}>
-              {thinkContent}
+          <div className={classNames(`${prefixCls}-think-collapse-inner`, hashId)}>
+            <div
+              className={cls.container}
+              data-testid="tool-use-bar-think-container"
+              style={CONTAINER_STYLE}
+            >
+              <div ref={contentInnerRef} style={contentInnerStyle}>
+                <div className={cls.content} style={styles?.content}>
+                  {thinkContent}
+                </div>
+              </div>
+              {showContentExpand && (
+                <div
+                  className={cls.contentExpand}
+                  onClick={handleContentExpandToggle}
+                  data-testid="tool-use-bar-think-content-expand"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleContentExpandToggle();
+                    }
+                  }}
+                >
+                  {contentExpanded ? <ChevronsDownUp /> : <ChevronsUpDown />}
+                  {contentExpanded ? locale.collapse : locale.expand}
+                </div>
+              )}
+              {showFloatingExpand && (
+                <div
+                  className={cls.floatingExpand}
+                  onClick={handleToggleFloatingExpand}
+                  data-testid="tool-use-bar-think-floating-expand"
+                  style={styles?.floatingExpand}
+                >
+                  {floatingExpandedState ? (
+                    <ChevronsDownUp style={FLOATING_ICON_STYLE} />
+                  ) : (
+                    <ChevronsUpDown style={FLOATING_ICON_STYLE} />
+                  )}
+                  {floatingExpandedState ? locale.collapse : locale.expand}
+                </div>
+              )}
             </div>
           </div>
-          {showContentExpand && (
-            <div
-              className={cls.contentExpand}
-              onClick={handleContentExpandToggle}
-              data-testid="tool-use-bar-think-content-expand"
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleContentExpandToggle();
-                }
-              }}
-            >
-              {contentExpanded ? <ChevronsDownUp /> : <ChevronsUpDown />}
-              {contentExpanded ? locale.collapse : locale.expand}
-            </div>
-          )}
-          {showFloatingExpand && (
-            <div
-              className={cls.floatingExpand}
-              onClick={handleToggleFloatingExpand}
-              data-testid="tool-use-bar-think-floating-expand"
-              style={styles?.floatingExpand}
-            >
-              {floatingExpandedState ? (
-                <ChevronsDownUp style={FLOATING_ICON_STYLE} />
-              ) : (
-                <ChevronsUpDown style={FLOATING_ICON_STYLE} />
-              )}
-              {floatingExpandedState ? locale.collapse : locale.expand}
-            </div>
-          )}
         </div>
       )}
 

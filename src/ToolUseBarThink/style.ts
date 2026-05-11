@@ -1,3 +1,7 @@
+﻿import {
+  CARD_RESIZE_DURATION_MS,
+  CARD_RESIZE_EASING,
+} from '../Constants/cardResizeMotion';
 import {
   ChatTokenType,
   GenerateStyle,
@@ -9,6 +13,8 @@ const LIGHT_MODE_BACKDROP_FILTER = 'blur(12px)';
 const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   return {
     [token.componentCls]: {
+      '--resize-dur': `${CARD_RESIZE_DURATION_MS}ms`,
+      '--resize-ease': CARD_RESIZE_EASING,
       '@keyframes thinkSpin': {
         from: { '--think-rotate': '0deg' },
         to: { '--think-rotate': '360deg' },
@@ -213,6 +219,22 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         letterSpacing: '0.04em',
         color: 'var(--color-gray-text-disabled)',
       },
+      '&-think-collapse': {
+        display: 'grid',
+        gridTemplateRows: '0fr',
+        transition: `grid-template-rows var(--resize-dur) var(--resize-ease)`,
+        overflow: 'hidden',
+        width: '100%',
+        willChange: 'grid-template-rows',
+      },
+      '&-think-collapse-open': {
+        gridTemplateRows: '1fr',
+      },
+      '&-think-collapse-inner': {
+        minHeight: 0,
+        overflow: 'hidden',
+      },
+
       '&-container': {
         width: '100%',
         padding: 8,
@@ -352,6 +374,13 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         '&-hover-visible': {
           opacity: 1,
           transform: 'translateY(0)',
+        },
+      },
+
+      '@media (prefers-reduced-motion: reduce)': {
+        '&-think-collapse': {
+          transition: 'none !important',
+          willChange: 'auto',
         },
       },
     },

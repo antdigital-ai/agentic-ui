@@ -1,4 +1,4 @@
-import {
+﻿import {
   Api,
   ChevronUp,
   ChevronsDownUp,
@@ -8,12 +8,16 @@ import {
 import classNames from 'clsx';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { ToolCall } from '.';
+import {
+  CARD_RESIZE_DURATION_MS,
+  CARD_RESIZE_EASING,
+} from '../../Constants/cardResizeMotion';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 
 /** 内容超出此高度时自动收起 */
 const CONTENT_COLLAPSE_THRESHOLD = 200;
-/** 工具详情收起动画时长（毫秒） */
-const TOOL_CONTENT_COLLAPSE_DURATION_MS = 160;
+/** 与 `--resize-dur` 对齐，收起后再卸载 DOM */
+const TOOL_CONTENT_COLLAPSE_DURATION_MS = CARD_RESIZE_DURATION_MS;
 
 interface ToolImageProps {
   tool: ToolCall;
@@ -189,7 +193,11 @@ const ToolExpandComponent: React.FC<ToolExpandProps> = ({
   // 缓存样式对象，避免重复创建
   const chevronStyle = useMemo(() => {
     return {
-      ...(disableAnimation ? {} : { transition: 'transform 0.3s ease-in-out' }),
+      ...(disableAnimation
+        ? {}
+        : {
+            transition: `transform ${CARD_RESIZE_DURATION_MS}ms ${CARD_RESIZE_EASING}`,
+          }),
       transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
     };
   }, [expanded, disableAnimation]);
