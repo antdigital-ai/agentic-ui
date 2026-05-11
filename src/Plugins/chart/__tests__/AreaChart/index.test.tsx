@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -108,6 +108,10 @@ vi.mock('../../hooks', () => ({
   })),
   useChartStatistics: vi.fn(() => null),
   useDetectTheme: vi.fn(() => 'light'),
+  useResolvedChartTheme: vi.fn((theme?: 'light' | 'dark') => ({
+    resolvedTheme: (theme ?? 'light') as 'light' | 'dark',
+    autoDetectTheme: theme === undefined,
+  })),
 }));
 
 // Mock utils
@@ -225,6 +229,18 @@ describe('AreaChart', () => {
 
       // 检查默认标题是否显示
       expect(screen.getByText('面积图')).toBeInTheDocument();
+    });
+
+    it('未传 theme 时使用检测结果驱动 useChartTheme', () => {
+      render(<AreaChart data={sampleData} title="t" />);
+      expect(hooks.useResolvedChartTheme).toHaveBeenCalled();
+      expect(hooks.useChartTheme).toHaveBeenCalledWith('light');
+    });
+
+    it('传入 theme=dark 时 props 覆盖检测结果', () => {
+      render(<AreaChart data={sampleData} title="t" theme="dark" />);
+      expect(hooks.useResolvedChartTheme).toHaveBeenCalledWith('dark');
+      expect(hooks.useChartTheme).toHaveBeenCalledWith('dark');
     });
   });
 

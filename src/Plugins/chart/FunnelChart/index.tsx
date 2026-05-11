@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import type { LegendItem, PointStyle } from 'chart.js';
 import {
   BarElement,
@@ -22,7 +22,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { useChartTheme, useDetectTheme } from '../hooks';
+import { useChartTheme, useResolvedChartTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
@@ -428,9 +428,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
     return filterLabels?.map((l) => ({ key: l, label: l }));
   }, [filterLabels]);
 
-  // 使用 useChartTheme hook 获取主题相关颜色
-  const detectedTheme = useDetectTheme();
-  const resolvedTheme = theme ?? detectedTheme;
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
   const { axisTextColor, isLight } = useChartTheme(resolvedTheme);
 
   const options: ChartOptions<'bar'> = {
@@ -754,6 +752,7 @@ const FunnelChart: React.FC<FunnelChartProps> = ({
       baseClassName={baseClassName}
       className={classNames(classNamesObj?.root, className, containerClassName)}
       theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       isMobile={isMobile}
       variant={props.variant}
       style={{

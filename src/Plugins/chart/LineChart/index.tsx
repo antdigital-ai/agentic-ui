@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import { ChartData, Chart as ChartJS, ChartOptions } from 'chart.js';
 import classNames from 'clsx';
 import React, { useContext, useLayoutEffect, useMemo, useRef } from 'react';
@@ -16,7 +16,7 @@ import {
   useChartDataFilter,
   useChartStatistics,
   useChartTheme,
-  useDetectTheme,
+  useResolvedChartTheme,
   useResponsiveSize,
 } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
@@ -154,9 +154,7 @@ const LineChart: React.FC<LineChartProps> = ({
     filteredDataByFilterLabel,
   } = useChartDataFilter(data);
 
-  // 主题颜色
-  const detectedTheme = useDetectTheme();
-  const resolvedTheme = theme ?? detectedTheme;
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
   const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
 
   // 从数据中提取唯一的类型
@@ -354,6 +352,7 @@ const LineChart: React.FC<LineChartProps> = ({
       baseClassName={baseClassName}
       className={rootClassName}
       theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       isMobile={isMobile}
       variant={props.variant}
       style={rootStyle}

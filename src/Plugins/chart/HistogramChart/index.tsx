@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import {
   BarElement,
   CategoryScale,
@@ -21,7 +21,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { StatisticConfigType, useDetectTheme } from '../hooks';
+import { StatisticConfigType, useResolvedChartTheme } from '../hooks';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
@@ -454,8 +454,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     };
   }, [histogramData, types, binning, color, stacked]);
 
-  const detectedTheme = useDetectTheme();
-  const resolvedTheme = theme ?? detectedTheme;
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
   const isLight = resolvedTheme === 'light';
   const axisTextColor = isLight
     ? 'rgba(0, 25, 61, 0.3255)'
@@ -567,6 +566,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`, hashId)}
         theme={resolvedTheme}
+        autoDetectTheme={autoDetectTheme}
         className={classNames(classNamesProp?.root, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -605,6 +605,7 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     <ChartContainer
       baseClassName={classNames(`${prefixCls}-container`, hashId)}
       theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       className={classNames(classNamesProp?.root, className)}
       isMobile={isMobile}
       variant={props.variant}

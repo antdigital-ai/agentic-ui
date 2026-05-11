@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+﻿import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import {
   afterEach,
@@ -160,6 +160,10 @@ vi.mock('../../hooks', () => ({
   }),
   useChartStatistics: () => null,
   useDetectTheme: () => 'light',
+  useResolvedChartTheme: (theme?: 'light' | 'dark') => ({
+    resolvedTheme: (theme ?? 'light') as 'light' | 'dark',
+    autoDetectTheme: theme === undefined,
+  }),
 }));
 
 // Mock chart utils

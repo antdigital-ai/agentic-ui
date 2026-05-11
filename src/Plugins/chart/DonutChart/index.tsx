@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import {
   ArcElement,
   Chart as ChartJS,
@@ -21,7 +21,7 @@ import {
 } from '../components';
 import { defaultColorList } from '../const';
 import { isWindowDefined } from '../env';
-import { useChartTheme, useDetectTheme } from '../hooks';
+import { useChartTheme, useResolvedChartTheme } from '../hooks';
 import { resolveCssVariable } from '../utils';
 import {
   SINGLE_MODE_DESKTOP_CUTOUT,
@@ -129,9 +129,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   const { isMobile, windowWidth } = useMobile();
   const locale = useLocale();
 
-  // 使用 useChartTheme hook 获取主题相关颜色
-  const detectedTheme = useDetectTheme();
-  const resolvedTheme = theme ?? detectedTheme;
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
   const { isLight } = useChartTheme(resolvedTheme);
 
   // 默认配置：当 configs 不传时，使用默认配置，showLegend 默认为 true
@@ -317,6 +315,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
       className={classNames(classNamesProp?.root, className)}
       variant={props.variant}
       theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       isMobile={isMobile}
       style={{
         ['--donut-item-min-width' as any]: `${dimensions.width}px`,
@@ -329,6 +328,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
           baseClassName={`${baseClassName}-toolbar-wrapper`}
           variant="borderless"
           theme={resolvedTheme}
+          autoDetectTheme={autoDetectTheme}
           isMobile={isMobile}
         >
           {title && (
@@ -401,6 +401,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
         baseClassName={`${baseClassName}-content`}
         variant="borderless"
         theme={resolvedTheme}
+        autoDetectTheme={autoDetectTheme}
         isMobile={isMobile}
       >
         {renderConfigs.map((cfg, idx) => {
@@ -676,6 +677,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
               baseClassName={`${baseClassName}-chart-wrapper`}
               variant="borderless"
               theme={resolvedTheme}
+              autoDetectTheme={autoDetectTheme}
               isMobile={isMobile}
             >
               {isSingleValueMode ? (
@@ -683,6 +685,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                   baseClassName={`${baseClassName}-single`}
                   variant="borderless"
                   theme={resolvedTheme}
+                  autoDetectTheme={autoDetectTheme}
                   isMobile={isMobile}
                   style={{
                     ['--donut-chart-height' as any]: `${dimensions.height}px`,
@@ -729,6 +732,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                   baseClassName={`${baseClassName}-row`}
                   variant="borderless"
                   theme={resolvedTheme}
+                  autoDetectTheme={autoDetectTheme}
                   isMobile={isMobile}
                   style={{
                     ...(isMobile
@@ -740,6 +744,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
                     baseClassName={`${baseClassName}-chart`}
                     variant="borderless"
                     theme={resolvedTheme}
+                    autoDetectTheme={autoDetectTheme}
                     isMobile={isMobile}
                     style={{
                       ['--donut-chart-width' as any]: `${dimensions.chartWidth}px`,

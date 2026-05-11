@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import {
   BarElement,
   CategoryScale,
@@ -23,7 +23,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { useChartTheme, useDetectTheme } from '../hooks';
+import { useChartTheme, useResolvedChartTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import {
@@ -631,8 +631,7 @@ const BarChart: React.FC<BarChartProps> = ({
     }));
   }, [filterLabels]);
 
-  const detectedTheme = useDetectTheme();
-  const resolvedTheme = theme ?? detectedTheme;
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
 
   // 使用 useChartTheme hook 获取主题相关颜色
   const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
@@ -1015,6 +1014,7 @@ const BarChart: React.FC<BarChartProps> = ({
       baseClassName={baseClassName}
       className={rootClassName}
       theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       isMobile={isMobile}
       variant={variant}
       style={rootStyle}

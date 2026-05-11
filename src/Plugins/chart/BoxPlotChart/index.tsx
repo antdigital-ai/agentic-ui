@@ -1,4 +1,4 @@
-import {
+﻿import {
   BoxAndWiskers,
   BoxPlotController,
 } from '@sgratzl/chartjs-chart-boxplot';
@@ -23,7 +23,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { StatisticConfigType, useDetectTheme } from '../hooks';
+import { StatisticConfigType, useResolvedChartTheme } from '../hooks';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
 import { useStyle } from './style';
@@ -382,8 +382,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
     return { labels, datasets };
   }, [filteredData, types, labels, color, showOutliers]);
 
-  const detectedTheme = useDetectTheme();
-  const resolvedTheme = theme ?? detectedTheme;
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
   const isLight = resolvedTheme === 'light';
   const axisTextColor = isLight
     ? 'rgba(0, 25, 61, 0.3255)'
@@ -503,6 +502,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`, hashId)}
         theme={resolvedTheme}
+        autoDetectTheme={autoDetectTheme}
         className={classNames(classNamesProp?.root, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -541,6 +541,7 @@ const BoxPlotChart: React.FC<BoxPlotChartProps> = ({
     <ChartContainer
       baseClassName={classNames(`${prefixCls}-container`, hashId)}
       theme={resolvedTheme}
+      autoDetectTheme={autoDetectTheme}
       className={classNames(classNamesProp?.root, className)}
       isMobile={isMobile}
       variant={props.variant}

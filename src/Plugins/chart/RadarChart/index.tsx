@@ -22,7 +22,7 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { useChartTheme, useDetectTheme } from '../hooks';
+import { useChartTheme, useResolvedChartTheme } from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
 import { hexToRgba, resolveCssVariable } from '../utils';
@@ -124,9 +124,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
   const prefixCls = getPrefixCls('radar-chart');
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
-  // 主题颜色 - 必须在所有条件返回之前调用
-  const detectedTheme = useDetectTheme();
-  const resolvedTheme = theme ?? detectedTheme;
+  const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
   const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
 
   // 处理 ChartStatistic 组件配置
@@ -253,6 +251,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={resolvedTheme}
+        autoDetectTheme={autoDetectTheme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -652,6 +651,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={resolvedTheme}
+        autoDetectTheme={autoDetectTheme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
@@ -723,6 +723,7 @@ const RadarChart: React.FC<RadarChartProps> = ({
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={resolvedTheme}
+        autoDetectTheme={autoDetectTheme}
         className={classNames(classNamesObj?.root, hashId, className)}
         isMobile={isMobile}
         variant={props.variant}
