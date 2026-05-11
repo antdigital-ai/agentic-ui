@@ -15,6 +15,7 @@ group:
   - 📖 Added `MarkdownRenderer` component documentation (streaming Markdown rendering, `CharacterQueueOptions`, built-in code-block renderer routing, `MarkdownRendererRef` imperative API).
   - 📖 Added a dedicated `ToolUseBarThink` doc; corrected the `ToolUseBarThink` API table inside `tool-use-bar.md` (removed deprecated/non-existent props such as `id`, `isThinkLoading`, `isActive`, `onActiveChange`, etc., aligned with actual props).
   - 📖 Added `GradientText`, `TextAnimate`, and `TypingAnimation` component docs with demos.
+  - 📖 Added an "API Playground" comprehensive demo for `MarkdownRenderer` / `GradientText` / `TextAnimate` / `TypingAnimation` / `ToolUseBarThink`, showcasing each component's core props and behavior in a single interactive demo.
   - 🛠 Rewrote `task-running.md` as `AgentRunBar 任务运行状态`, marking `TaskRunning` / `TaskRunningProps` / `TaskRunningVariant` / `TaskRunningActionsRender` as deprecated aliases; updated `docs/demos/task-running.tsx` to use `AgentRunBar` instead of `TaskRunning`.
 
 ## v2.33.0
