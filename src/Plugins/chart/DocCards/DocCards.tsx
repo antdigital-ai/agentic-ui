@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+﻿import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { memo, useContext, useMemo } from 'react';
 import { I18nContext } from '../../../I18n';
@@ -100,14 +100,23 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
   const headerNode = useMemo(() => {
     if (!title && !toolbar) return null;
     return (
-      <div className={classNames(`${prefixCls}-header`, hashId)}>
+      <div
+        className={classNames(`${prefixCls}-header`, hashId)}
+        data-testid="doc-cards-header"
+      >
         {title ? (
-          <div className={classNames(`${prefixCls}-title`, hashId)}>
+          <div
+            className={classNames(`${prefixCls}-title`, hashId)}
+            data-testid="doc-cards-title"
+          >
             {title}
           </div>
         ) : null}
         {toolbar ? (
-          <div className={classNames(`${prefixCls}-toolbar`, hashId)}>
+          <div
+            className={classNames(`${prefixCls}-toolbar`, hashId)}
+            data-testid="doc-cards-toolbar"
+          >
             {toolbar}
           </div>
         ) : null}
@@ -121,9 +130,13 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
         className={classNames(prefixCls, hashId, className)}
         style={style}
         contentEditable={false}
+        data-testid="doc-cards"
       >
         {headerNode}
-        <div className={classNames(`${prefixCls}-empty`, hashId)}>
+        <div
+          className={classNames(`${prefixCls}-empty`, hashId)}
+          data-testid="doc-cards-empty"
+        >
           {i18n?.locale?.docCards || '卡片列表'}
         </div>
       </div>,
@@ -135,12 +148,14 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
       className={classNames(prefixCls, hashId, className)}
       style={style}
       contentEditable={false}
+      data-testid="doc-cards"
     >
       {headerNode}
       <div
         className={classNames(`${prefixCls}-grid`, hashId)}
         style={gridStyle}
         role="list"
+        data-testid="doc-cards-grid"
       >
         {data.map((row, rowIndex) => {
           const titleText = toDisplayText(row[fields.title]).trim();
@@ -161,9 +176,13 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
               key={cardKey}
               className={classNames(`${prefixCls}-item`, hashId)}
               role="listitem"
+              data-testid={`doc-cards-item-${rowIndex}`}
             >
               {titleText ? (
-                <h3 className={classNames(`${prefixCls}-item-title`, hashId)}>
+                <h3
+                  className={classNames(`${prefixCls}-item-title`, hashId)}
+                  data-testid={`doc-cards-item-${rowIndex}-title`}
+                >
                   {titleText}
                 </h3>
               ) : null}
@@ -171,6 +190,7 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
                 <div
                   className={classNames(`${prefixCls}-item-url`, hashId)}
                   title={rawUrl}
+                  data-testid={`doc-cards-item-${rowIndex}-url`}
                 >
                   {safeLink ? (
                     // 仅外部链接（http(s)/mailto/tel）开新 tab；站内绝对路径、相对路径、
@@ -180,6 +200,7 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
                         `${prefixCls}-item-link`,
                         hashId,
                       )}
+                      data-testid={`doc-cards-item-${rowIndex}-link`}
                       href={rawUrl}
                       {...(isExternalLink(rawUrl)
                         ? {
@@ -196,7 +217,10 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
                 </div>
               ) : null}
               {descText ? (
-                <p className={classNames(`${prefixCls}-item-desc`, hashId)}>
+                <p
+                  className={classNames(`${prefixCls}-item-desc`, hashId)}
+                  data-testid={`doc-cards-item-${rowIndex}-desc`}
+                >
                   {descText}
                 </p>
               ) : null}
@@ -205,13 +229,15 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
                   className={classNames(`${prefixCls}-item-tags`, hashId)}
                   role="list"
                   aria-label={i18n?.locale?.docCardsTags || '标签列表'}
+                  data-testid={`doc-cards-item-${rowIndex}-tags`}
                 >
-                  {tags.map((tag) => (
+                  {tags.map((tag, tagIndex) => (
                     <span
                       key={tag}
                       className={classNames(`${prefixCls}-tag`, hashId)}
                       role="listitem"
                       title={tag}
+                      data-testid={`doc-cards-item-${rowIndex}-tag-${tagIndex}`}
                     >
                       {tag}
                     </span>

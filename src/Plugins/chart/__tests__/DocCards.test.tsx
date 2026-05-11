@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
@@ -215,24 +215,41 @@ describe('DocCards 组件渲染', () => {
     expect(screen.getByText('交互式示例')).toBeInTheDocument();
     expect(screen.getByText('深链')).toBeInTheDocument();
     expect(screen.getByText('暗色模式')).toBeInTheDocument();
+
+    expect(screen.getByTestId('doc-cards')).toBeInTheDocument();
+    expect(screen.getByTestId('doc-cards-grid')).toBeInTheDocument();
+    expect(screen.getByTestId('doc-cards-header')).toBeInTheDocument();
+    expect(screen.getByTestId('doc-cards-title')).toHaveTextContent(
+      '优秀开发者文档站',
+    );
+    expect(screen.getByTestId('doc-cards-item-0')).toBeInTheDocument();
+    expect(screen.getByTestId('doc-cards-item-0-title')).toHaveTextContent(
+      'Tailwind CSS Docs',
+    );
+    expect(screen.getByTestId('doc-cards-item-0-link')).toHaveAttribute(
+      'href',
+      'https://tailwindcss.com/docs',
+    );
+    expect(screen.getByTestId('doc-cards-item-0-tags')).toBeInTheDocument();
+    expect(screen.getByTestId('doc-cards-item-0-tag-0')).toHaveTextContent(
+      '交互式示例',
+    );
   });
 
   it('缺少「亮点」列时不渲染标签区且不报错', () => {
     const cols = buildColumns(['名称', '简介']);
     const data = [{ 名称: 'A', 简介: 'description' }];
-    const { container } = render(<DocCards columns={cols} data={data} />);
+    render(<DocCards columns={cols} data={data} />);
     expect(screen.getByText('A')).toBeInTheDocument();
     expect(screen.getByText('description')).toBeInTheDocument();
-    expect(
-      container.querySelectorAll('[class*="-item-tags"]'),
-    ).toHaveLength(0);
+    expect(screen.queryByTestId('doc-cards-item-0-tags')).not.toBeInTheDocument();
   });
 
   it('无法解析主标题列时仅渲染空状态而不抛错', () => {
     const cols = buildColumns(['col1', 'col2']);
     const data = [{ col1: '1', col2: '2' }];
     render(<DocCards title="x" columns={cols} data={data} />);
-    expect(screen.getByText('卡片列表')).toBeInTheDocument();
+    expect(screen.getByTestId('doc-cards-empty')).toHaveTextContent('卡片列表');
   });
 
   it('不安全 URL 走纯文本，不渲染为可点击链接', () => {
@@ -254,17 +271,15 @@ describe('DocCards 组件渲染', () => {
   it('cardColumns 控制 grid-template-columns，超过 4 时 clamp 到 4', () => {
     const cols = buildColumns(['名称']);
     const data = [{ 名称: 'a' }];
-    const { container, rerender } = render(
+    const { rerender } = render(
       <DocCards columns={cols} data={data} cardColumns={3} />,
     );
-    const grid = container.querySelector('[class*="-grid"]') as HTMLElement;
-    expect(grid?.style.gridTemplateColumns).toBe(
-      'repeat(3, minmax(0, 1fr))',
-    );
+    const grid = screen.getByTestId('doc-cards-grid');
+    expect(grid.style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))');
 
     rerender(<DocCards columns={cols} data={data} cardColumns={9} />);
-    const grid2 = container.querySelector('[class*="-grid"]') as HTMLElement;
-    expect(grid2?.style.gridTemplateColumns).toBe(
+    const grid2 = screen.getByTestId('doc-cards-grid');
+    expect(grid2.style.gridTemplateColumns).toBe(
       'repeat(4, minmax(0, 1fr))',
     );
   });
@@ -282,13 +297,16 @@ describe('DocCards 组件渲染', () => {
     );
     expect(screen.getByText('标题')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'tool' })).toBeInTheDocument();
+    expect(screen.getByTestId('doc-cards-toolbar')).toContainElement(
+      screen.getByRole('button', { name: 'tool' }),
+    );
   });
 
   it('描述列纯空白时不渲染段落', () => {
     const cols = buildColumns(['名称', '简介']);
     const data = [{ 名称: 'a', 简介: '   ' }];
-    const { container } = render(<DocCards columns={cols} data={data} />);
-    expect(container.querySelectorAll('[class*="-item-desc"]')).toHaveLength(0);
+    render(<DocCards columns={cols} data={data} />);
+    expect(screen.queryByTestId('doc-cards-item-0-desc')).not.toBeInTheDocument();
   });
 
   it('外部链接打新 tab，站内路径/锚点保持原 tab', () => {
@@ -323,12 +341,10 @@ describe('DocCards 组件渲染', () => {
 
   it('标签容器 aria-label 使用「标签列表」文案而非容器名', () => {
     const data = [{ 名称: 'a', 亮点: 'tag1, tag2' }];
-    const { container } = render(
+    render(
       <DocCards columns={buildColumns(['名称', '亮点'])} data={data} />,
     );
-    const tagsContainer = container.querySelector(
-      '[class*="-item-tags"]',
-    ) as HTMLElement;
-    expect(tagsContainer?.getAttribute('aria-label')).toBe('标签列表');
+    const tagsContainer = screen.getByTestId('doc-cards-item-0-tags');
+    expect(tagsContainer.getAttribute('aria-label')).toBe('标签列表');
   });
 });
