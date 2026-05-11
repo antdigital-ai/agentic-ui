@@ -1,17 +1,14 @@
-import {
+﻿import {
   AudioOutlined,
   FileImageOutlined,
   FileTextFilled,
-  FolderOpenOutlined,
-  PictureOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { Button, Modal, Popover, Tooltip } from 'antd';
-import React, { useContext, useMemo, useState } from 'react';
-import { useRefFunction } from '../../Hooks/useRefFunction';
+import { Popover, Tooltip } from 'antd';
+import React, { useContext, useMemo } from 'react';
 import type { LocalKeys } from '../../I18n';
 import { compileTemplate, I18nContext } from '../../I18n';
-import { isMobileDevice, isVivoOrOppoDevice } from './utils';
+import { isMobileDevice } from './utils';
 
 export type SupportedFormat = {
   type: string;
@@ -23,9 +20,12 @@ export type SupportedFormat = {
 export type AttachmentButtonPopoverProps = {
   children?: React.ReactNode;
   supportedFormat?: SupportedFormat;
-  /** 上传图片的处理函数 */
+  /**
+   * @deprecated 上传动作由 AttachmentButton 外层点击统一触发；
+   * 该组件仅展示支持格式提示。
+   */
   uploadImage?: (forGallery?: boolean) => Promise<void>;
-  /** 国际化文案，可覆盖 I18n 上下文中的配置。支持 `input.openGallery`、`input.openFile`、`input.supportedFormatMessage`（模板变量：${extensions}）等 */
+  /** 国际化文案，可覆盖 I18n 上下文中的配置。支持 `input.supportedFormatMessage`（模板变量：${extensions}） */
   locale?: Partial<LocalKeys>;
 };
 
@@ -99,104 +99,15 @@ export const AttachmentSupportedFormatsContent: React.FC<
 
 export const AttachmentButtonPopover: React.FC<
   AttachmentButtonPopoverProps
-> = ({ children, supportedFormat, uploadImage, locale: localeProp }) => {
-  const [modalOpen, setModalOpen] = useState(false);
+> = ({ children, supportedFormat, locale: localeProp }) => {
   const { locale: contextLocale } = useContext(I18nContext);
   const locale =
     localeProp !== undefined
       ? { ...contextLocale, ...localeProp }
       : contextLocale;
-  const isVivoOrOppo = useMemo(() => isVivoOrOppoDevice(), []);
   const isMobile = useMemo(() => isMobileDevice(), []);
-  const trigger = useMemo(
-    () =>
-      isVivoOrOppo
-        ? ['click' as const]
-        : (['hover', 'click'] as ('hover' | 'click')[]),
-    [isVivoOrOppo],
-  );
 
-  const handleClick = useRefFunction((e: React.MouseEvent) => {
-    if (isVivoOrOppo) {
-      e.stopPropagation();
-      e.preventDefault();
-      setModalOpen(true);
-    }
-  });
-
-  const handleOpenGallery = useRefFunction(() => {
-    uploadImage?.(true);
-    setModalOpen(false);
-  });
-
-  const handleOpenFile = useRefFunction(() => {
-    uploadImage?.(false);
-    setModalOpen(false);
-  });
-
-  if (isVivoOrOppo) {
-    return (
-      <div
-        onClick={(e) => {
-          if (isVivoOrOppo) {
-            e.stopPropagation();
-            e.preventDefault();
-          }
-        }}
-      >
-        <span onClick={handleClick}>{children}</span>
-        <Modal
-          open={modalOpen}
-          onCancel={() => setModalOpen(false)}
-          footer={null}
-          closable={false}
-          maskClosable={true}
-          centered
-          styles={{
-            content: {
-              padding: 0,
-            },
-            body: {
-              padding: 0,
-            },
-          }}
-          width={120}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-              padding: '12px 0',
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-          >
-            <Button
-              color="default"
-              variant="text"
-              icon={<PictureOutlined />}
-              onClick={handleOpenGallery}
-            >
-              {locale?.['input.openGallery'] || 'Open Gallery'}
-            </Button>
-            <Button
-              color="default"
-              variant="text"
-              icon={<FolderOpenOutlined />}
-              onClick={handleOpenFile}
-            >
-              {locale?.['input.openFile'] || 'Open File'}
-            </Button>
-          </div>
-        </Modal>
-      </div>
-    );
-  }
-
-  // 移动设备无稳定 hover：用点击 Popover 展示支持格式说明（vivo/oppo 仍走上方 Modal）
+  // 移动设备无稳定 hover：点击时展示支持格式说明；上传仍由外层 click 统一触发。
   if (isMobile) {
     return (
       <Popover
@@ -219,7 +130,7 @@ export const AttachmentButtonPopover: React.FC<
     <Tooltip
       arrow={false}
       mouseEnterDelay={1}
-      trigger={trigger}
+      trigger="hover"
       title={
         <AttachmentSupportedFormatsContent
           supportedFormat={supportedFormat}
@@ -227,16 +138,7 @@ export const AttachmentButtonPopover: React.FC<
         />
       }
     >
-      <span
-        onClick={(e) => {
-          if (isVivoOrOppo) {
-            e.stopPropagation();
-            e.preventDefault();
-          }
-        }}
-      >
-        {children}
-      </span>
+      <span>{children}</span>
     </Tooltip>
   );
 };

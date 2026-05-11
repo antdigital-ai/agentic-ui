@@ -1,4 +1,4 @@
-import { Paperclip } from '@sofa-design/icons';
+﻿import { Paperclip } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { useContext } from 'react';
@@ -38,7 +38,7 @@ export type AttachmentButtonProps = {
   supportedFormat?: AttachmentButtonPopoverProps['supportedFormat'];
   /** 是否禁用按钮 */
   disabled?: boolean;
-  /** 国际化文案，会传递给 AttachmentButtonPopover。支持 `input.openGallery`、`input.openFile`、`input.supportedFormatMessage` 等 */
+  /** 国际化文案，会传递给 AttachmentButtonPopover。支持 `input.supportedFormatMessage` 等 */
   locale?: Partial<LocalKeys>;
   /** 自定义渲染函数，用于替换默认的 Popover */
   render?: (props: {
@@ -145,11 +145,7 @@ export const AttachmentButton: React.FC<
       locale,
     })
   ) : (
-    <AttachmentButtonPopover
-      supportedFormat={format}
-      uploadImage={disabled ? undefined : uploadImage}
-      locale={locale}
-    >
+    <AttachmentButtonPopover supportedFormat={format} locale={locale}>
       {buttonContent}
     </AttachmentButtonPopover>
   );

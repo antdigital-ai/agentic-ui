@@ -495,13 +495,9 @@ describe('AttachmentButton', () => {
       );
       expect(popoverTrigger).toBeInTheDocument();
 
-      // 点击触发元素应该打开 Popover，但 uploadImage 是在文件选择后调用的
-      // 这里我们验证按钮可以被点击而不被禁用
       fireEvent.click(popoverTrigger!);
 
-      // 由于 uploadImage 是通过文件选择器触发的，而不是直接点击按钮
-      // 这个测试主要验证按钮在非禁用状态下可以响应点击
-      expect(popoverTrigger).toBeInTheDocument();
+      expect(mockUploadImage).toHaveBeenCalledTimes(1);
     });
 
     it('should not handle click when disabled', () => {
@@ -713,13 +709,9 @@ describe('AttachmentButton', () => {
 
       const attachmentButton = getByTestId('attachment-button');
 
-      // 点击触发元素应该打开 Popover，但 uploadImage 是在文件选择后调用的
-      // 这里我们验证按钮可以被点击而不被禁用
       fireEvent.click(attachmentButton);
 
-      // 由于 uploadImage 是通过文件选择器触发的，而不是直接点击按钮
-      // 这个测试主要验证自定义渲染下的按钮可以响应点击
-      expect(attachmentButton).toBeInTheDocument();
+      expect(mockUploadImage).toHaveBeenCalledTimes(1);
     });
 
     it('should not call uploadImage when disabled with custom render', () => {
