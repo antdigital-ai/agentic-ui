@@ -12,6 +12,14 @@ group:
 
 ## 代码演示
 
+### API Playground
+
+通过控制面板调试 `title` / `showShare` / `leftCollapsible` / `rightCollapsible` / 受控折叠与 `leftExtra` / `rightExtra` 自定义内容。
+
+<code src="../demos/layout-header-playground.tsx">API Playground - 全部核心 props</code>
+
+### 最小用法
+
 ```tsx
 import { LayoutHeader } from '@ant-design/agentic-ui';
 
