@@ -1,9 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
 // 定义闪光动画
 const shine = new Keyframes('shine', {
@@ -15,7 +11,7 @@ const shine = new Keyframes('shine', {
   },
 });
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'TextLoading'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'inline-block',
@@ -57,13 +53,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useStyle(prefixCls: string) {
-  return useEditorStyleRegister('TextLoading', (token) => {
-    const textLoadingToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('TextLoading', genStyle);
 
-    return [genStyle(textLoadingToken)];
-  });
+export function useStyle(prefixCls: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls);
+  return { wrapSSR, hashId };
 }

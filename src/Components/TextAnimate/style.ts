@@ -1,8 +1,4 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 /**
  * TextAnimate 的 10 种 animation preset 等价 CSS 定义。
@@ -76,7 +72,7 @@ const itemKeyframes = {
   },
 };
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'TextAnimate'> = (token) => {
   return {
     ...itemKeyframes,
     [token.componentCls]: {
@@ -156,13 +152,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export const useTextAnimateStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('text-animate', (token) => {
-    const textAnimateToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('TextAnimate', genStyle);
 
-    return [genStyle(textAnimateToken)];
-  });
+export const useTextAnimateStyle = (prefixCls: string) => {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls);
+  return { wrapSSR, hashId };
 };

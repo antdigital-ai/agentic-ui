@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'VisualList'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -118,12 +114,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('VisualList', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('visual-list', (token) => {
-    const visualListToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(visualListToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'visual-list');
+  return { wrapSSR, hashId };
 }

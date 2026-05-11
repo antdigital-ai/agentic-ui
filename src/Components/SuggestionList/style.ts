@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'SuggestionList'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -180,12 +176,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('SuggestionList', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('follow-up', (token) => {
-    const followToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    } as ChatTokenType;
-    return [genStyle(followToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'follow-up');
+  return { wrapSSR, hashId };
 }

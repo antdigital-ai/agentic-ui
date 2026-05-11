@@ -1,8 +1,4 @@
-﻿import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+﻿import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 import {
   DEFAULT_TEXT_SWAP_DURATION_MS,
@@ -11,7 +7,7 @@ import {
   TEXT_SWAP_TRANSLATE_Y_PX,
 } from './constants';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'TextSwap'> = (token) => {
   const { componentCls } = token;
 
   return {
@@ -57,12 +53,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('TextSwap', genStyle);
+
 export function useTextSwapStyle(prefixCls?: string) {
-  return useEditorStyleRegister('text-swap', (token) => {
-    const textSwapToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(textSwapToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'text-swap');
+  return { wrapSSR, hashId };
 }

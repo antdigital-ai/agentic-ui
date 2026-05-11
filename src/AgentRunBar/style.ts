@@ -1,9 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
 // 定义旋转动画
 const stopIconRotate = new Keyframes('stopIconRotate', {
@@ -30,7 +26,7 @@ const borderSpin = new Keyframes('borderSpin', {
  * @param token - 主题令牌，包含全局样式变量
  * @returns CSS-in-JS 样式对象
  */
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'AgentRunBar'> = (token) => {
   const { componentCls } = token;
 
   // 优先使用 antd token，回退到原有的 CSS 变量（兼容尚未注入 antd token 的旧主题）
@@ -305,12 +301,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * const { wrapSSR, hashId } = useStyle('my-prefix');
  * ```
  */
+const useGenStyle = genStyleHooks('AgentRunBar', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('agent-run-bar', (token) => {
-    const agentRunBarToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(agentRunBarToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'agent-run-bar');
+  return { wrapSSR, hashId };
 }

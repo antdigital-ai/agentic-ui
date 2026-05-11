@@ -1,15 +1,11 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 import { sharedButtonVariants } from '../sharedStyle';
 
 const ICON_SIZE = 16;
 const ICON_SIZE_SM = 14;
 const ICON_SIZE_XS = 14;
 
-const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
+const genStyle: GenStyleFn<'IconButton'> = (token) => {
   return {
     [token.componentCls]: {
       // 基础按钮样式
@@ -200,12 +196,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
   };
 };
 
+const useGenStyle = genStyleHooks('IconButton', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('icon-button', (token: any) => {
-    const buttonToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    } as ChatTokenType;
-    return [genStyle(buttonToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'icon-button');
+  return { wrapSSR, hashId };
 }

@@ -1,11 +1,7 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 import { sharedButtonVariants } from '../sharedStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
+const genStyle: GenStyleFn<'ToggleButton'> = (token) => {
   return {
     [token.componentCls]: {
       // 基础按钮样式
@@ -109,12 +105,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
   };
 };
 
+const useGenStyle = genStyleHooks('ToggleButton', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('toggle-button', (token: any) => {
-    const buttonToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    } as ChatTokenType;
-    return [genStyle(buttonToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'toggle-button');
+  return { wrapSSR, hashId };
 }

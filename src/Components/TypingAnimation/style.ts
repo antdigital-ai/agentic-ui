@@ -1,9 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const animation = new Keyframes('animation', {
   '0%': {
@@ -14,7 +10,7 @@ const animation = new Keyframes('animation', {
   },
 });
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'TypingAnimation'> = (token) => {
   return {
     [token.componentCls]: {
       ['&-cursor']: {
@@ -31,13 +27,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export const useTypingAnimationStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('typing-animation', (token) => {
-    const typingAnimationToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('TypingAnimation', genStyle);
 
-    return [genStyle(typingAnimationToken)];
-  });
+export const useTypingAnimationStyle = (prefixCls: string) => {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls);
+  return { wrapSSR, hashId };
 };

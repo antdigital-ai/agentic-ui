@@ -81,7 +81,7 @@ for (const arg of args) {
 
   // 3. 定位 useStyle / useEditorStyleRegister 调用
   const useStyleMatch = original.match(
-    /export\s+function\s+useStyle\s*\(\s*(?:customP|p)refixCls\?:\s*string\s*\)\s*\{[\s\S]*?return\s+useEditorStyleRegister\(\s*['"]([^'"]+)['"]/,
+    /export\s+function\s+useStyle\s*\(\s*(?:customP|p)refixCls\??:\s*string\s*\)\s*\{[\s\S]*?return\s+useEditorStyleRegister\(\s*['"]([^'"]+)['"]/,
   );
   if (!useStyleMatch) {
     failures.push({ filePath, reason: 'no useStyle/useEditorStyleRegister pattern' });
@@ -108,22 +108,24 @@ for (const arg of args) {
 
   // 重写 useStyle：匹配整段函数（含 `customPrefixCls` 或 `prefixCls` 参数名）
   const useStyleFnRegex =
-    /export\s+function\s+useStyle\s*\(\s*((?:customP|p)refixCls)\?:\s*string\s*\)\s*\{[\s\S]*?\n\}\n?/;
+    /export\s+function\s+useStyle\s*\(\s*((?:customP|p)refixCls)(\??):\s*string\s*\)\s*\{[\s\S]*?\n\}\n?/;
   const useStyleSegmentMatch = next.match(useStyleFnRegex);
   if (!useStyleSegmentMatch) {
     failures.push({ filePath, reason: 'cannot locate full useStyle function body' });
     continue;
   }
   const paramName = useStyleSegmentMatch[1];
+  const paramOpt = useStyleSegmentMatch[2]; // '?' 或 ''
 
   // 探测函数体里是否使用 `resetComponent`（决定迁移后是否保留）
   const bodyUsesResetComponent =
     hasResetComponent &&
     /\bresetComponent\(/.test(useStyleSegmentMatch[0]);
 
+  const callArg = paramOpt === '?' ? `${paramName} ?? '${registryKey}'` : paramName;
   const replacementUseStyle = bodyUsesResetComponent
-    ? `const useGenStyle = genStyleHooks('${componentName}', (token, info) => [\n  resetComponent(token),\n  ${genStyleName}(token, info),\n]);\n\nexport function useStyle(${paramName}?: string) {\n  const [wrapSSR, hashId] = useGenStyle(${paramName} ?? '${registryKey}');\n  return { wrapSSR, hashId };\n}\n`
-    : `const useGenStyle = genStyleHooks('${componentName}', ${genStyleName});\n\nexport function useStyle(${paramName}?: string) {\n  const [wrapSSR, hashId] = useGenStyle(${paramName} ?? '${registryKey}');\n  return { wrapSSR, hashId };\n}\n`;
+    ? `const useGenStyle = genStyleHooks('${componentName}', (token, info) => [\n  resetComponent(token),\n  ${genStyleName}(token, info),\n]);\n\nexport function useStyle(${paramName}${paramOpt}: string) {\n  const [wrapSSR, hashId] = useGenStyle(${callArg});\n  return { wrapSSR, hashId };\n}\n`
+    : `const useGenStyle = genStyleHooks('${componentName}', ${genStyleName});\n\nexport function useStyle(${paramName}${paramOpt}: string) {\n  const [wrapSSR, hashId] = useGenStyle(${callArg});\n  return { wrapSSR, hashId };\n}\n`;
 
   next = next.replace(useStyleFnRegex, replacementUseStyle);
 

@@ -1,4 +1,4 @@
-import { resetComponent, useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, resetComponent } from '../../Hooks/useStyle';
 import { genStyle } from '../ActionItemBox/style';
 
 /**
@@ -8,13 +8,12 @@ import { genStyle } from '../ActionItemBox/style';
  * 因此复用同一份 `genStyle`。这里独立成一个 `useStyle`，避免 ActionItemContainer
  * 直接跨组件目录从 `../ActionItemBox` 导入实现细节。
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ActionItemContainer', (token) => {
-    const componentToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ActionItemContainer', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(componentToken), genStyle(componentToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ActionItemContainer');
+  return { wrapSSR, hashId };
 }

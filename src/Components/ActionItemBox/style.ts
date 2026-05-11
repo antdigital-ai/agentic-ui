@@ -1,9 +1,4 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, resetComponent, type GenStyleFn } from '../../Hooks/useStyle';
 
 /**
  * ActionItemBox 与 ActionItemContainer 共享的样式生成函数。
@@ -13,7 +8,7 @@ import {
  * `useStyle` 入口（`ActionItemContainer/style.ts`）以独立的 styleKey
  * 注册同一份 genStyle，避免直接跨组件导入 ActionItemBox 的 useStyle。
  */
-export const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+export const genStyle: GenStyleFn<'ActionItemBox'> = (token) => {
   return {
     [token.componentCls]: {
       borderRadius: '11px',
@@ -352,7 +347,7 @@ export const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * 替代 framer-motion 的 `initial={x:-10, opacity:0}` → `animate={x:0, opacity:1}`，
  * 通过 CSS keyframes 实现，无需 JS 动画运行时。
  */
-const genMotionStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genMotionStyle: GenStyleFn<'ActionItemBox'> = (token) => {
   return {
     [`${token.componentCls}-motion-slide-in-left`]: {
       animationName: `${token.componentCls}-slideInLeft`,
@@ -372,18 +367,13 @@ const genMotionStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ActionItemBox', (token) => {
-    const proChatToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ActionItemBox', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+  genMotionStyle(token, info),
+]);
 
-    // Apply reset first, then component styles to allow overrides like padding
-    return [
-      resetComponent(proChatToken),
-      genStyle(proChatToken),
-      genMotionStyle(proChatToken),
-    ];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ActionItemBox');
+  return { wrapSSR, hashId };
 }

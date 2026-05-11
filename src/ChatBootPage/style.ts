@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChatBootTitle'> = (token) => {
   return {
     [token.componentCls]: {
       textAlign: 'center',
@@ -27,18 +23,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('ChatBootTitle', genStyle);
+
 /**
  * Title 组件样式
  * @param prefixCls
  * @returns
  */
 export const useStyle = (prefixCls?: string) => {
-  return useEditorStyleRegister('ChatBootTitle', (token) => {
-    const titleToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-
-    return [genStyle(titleToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ChatBootTitle');
+  return { wrapSSR, hashId };
 };

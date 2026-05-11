@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChatBootButtonTabGroup'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'inline-flex',
@@ -16,16 +12,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('ChatBootButtonTabGroup', genStyle);
+
 /**
  * ButtonTabGroup 组件样式
  */
 export const useStyle = (prefixCls?: string) => {
-  return useEditorStyleRegister('ChatBootButtonTabGroup', (token) => {
-    const buttonTabGroupToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-
-    return [genStyle(buttonTabGroupToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ChatBootButtonTabGroup');
+  return { wrapSSR, hashId };
 };

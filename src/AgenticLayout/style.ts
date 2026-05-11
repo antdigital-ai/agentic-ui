@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'AgenticLayout'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -148,13 +144,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export const useAgenticLayoutStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('agentic-layout', (token) => {
-    const agenticLayoutToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('AgenticLayout', genStyle);
 
-    return [genStyle(agenticLayoutToken)];
-  });
+export const useAgenticLayoutStyle = (prefixCls: string) => {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls);
+  return { wrapSSR, hashId };
 };

@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
+const genStyle: GenStyleFn<'SwitchButton'> = (token) => {
   return {
     [token.componentCls]: {
       padding: '5px 12px',
@@ -138,12 +134,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token: ChatTokenType) => {
   };
 };
 
+const useGenStyle = genStyleHooks('SwitchButton', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('switch-button', (token: any) => {
-    const buttonToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    } as ChatTokenType;
-    return [genStyle(buttonToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'switch-button');
+  return { wrapSSR, hashId };
 }

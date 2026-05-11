@@ -1,10 +1,5 @@
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, resetComponent, type GenStyleFn } from '../Hooks/useStyle';
 
 const RADIUS_XL =
   'var(--radius-xl, var(--radius-chat-layout-footer, var(--radius-card-lg, 16px)))';
@@ -13,7 +8,7 @@ const COLOR_GRAY_BG_ACTIVE =
 const COLOR_GRAY_BORDER_DEFAULT =
   'var(--color-gray-border-default, var(--color-gray-border-light, rgba(20, 22, 28, 0.12)))';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChatLayout'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -222,13 +217,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls 组件类名前缀
  * @returns 样式对象
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ChatLayout', (token) => {
-    const chatLayoutToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ChatLayout', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(chatLayoutToken), genStyle(chatLayoutToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ChatLayout');
+  return { wrapSSR, hashId };
 }

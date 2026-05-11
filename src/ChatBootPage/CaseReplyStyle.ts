@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChatBootCaseReply'> = (token) => {
   return {
     [token.componentCls]: {
       maxWidth: '322px',
@@ -202,16 +198,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('ChatBootCaseReply', genStyle);
+
 /**
  * CaseReply 组件样式
  */
 export const useStyle = (prefixCls?: string) => {
-  return useEditorStyleRegister('ChatBootCaseReply', (token) => {
-    const caseReplyToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-
-    return [genStyle(caseReplyToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ChatBootCaseReply');
+  return { wrapSSR, hashId };
 };
