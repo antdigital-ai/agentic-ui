@@ -12,6 +12,12 @@ group:
 
 ## 代码演示
 
+### API Playground
+
+通过控制面板串联调试三栏开关、宽度、折叠（受控 / 非受控）、`header.showShare` 与典型布局组合。
+
+<code src="../demos/agentic-layout-playground.tsx" iframe=720>API Playground - 全部核心 props</code>
+
 ### 基础用法
 
 最简用法：只传 `center`，即可获得一个带圆角阴影的内容容器。
