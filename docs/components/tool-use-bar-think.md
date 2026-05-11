@@ -22,6 +22,8 @@ group:
 
 ## 代码演示
 
+<code src="../demos/tool-use-bar-think-playground.tsx">API Playground - 状态 / 受控 / 流式 / 自定义样式</code>
+
 <code src="../demos/tool-use-bar-think-standalone.tsx">深度思考 - 流式与多状态对比</code>
 
 <code src="../demos/tool-use-bar-think-simple.tsx">深度思考 - 简化用法</code>
