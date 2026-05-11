@@ -707,10 +707,16 @@ export { useLanguage } from './Hooks/useLanguage';
 export { useNativeTitleTooltipFallback } from './Hooks/useNativeTitleTooltipFallback';
 export { useRefFunction } from './Hooks/useRefFunction';
 export {
+  genComponentStyleHook,
+  genStyleHooks,
+  genSubStyleComponent,
   resetComponent,
   useEditorStyleRegister,
+  type AgenticComponentTokenMap,
   type CSSInterpolation,
   type ChatTokenType,
+  type FullToken,
+  type GenStyleFn,
   type GenerateStyle,
 } from './Hooks/useStyle';
 export { useThrottleFn } from './Hooks/useThrottleFn';
