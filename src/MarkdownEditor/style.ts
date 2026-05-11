@@ -9,10 +9,10 @@ import {
 } from '../Components/TextSwap/textSwapMotion';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type FullToken,
+  type GenStyleFn,
 } from '../Hooks/useStyle';
 
 // ── Table ──────────────────────────────────────────────────────────────────
@@ -37,7 +37,7 @@ const TABLE_CELL = {
 };
 
 const genTableStyle = (
-  token: ChatTokenType,
+  token: FullToken<'MarkdownEditor'>,
   mobileBreakpoint: string,
   mobilePadding: string,
 ): Record<string, CSSInterpolation> => {
@@ -312,7 +312,7 @@ const genTableStyle = (
   };
 };
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'MarkdownEditor'> = (token) => {
   return {
     [token.componentCls]: {
       '--agentic-ui-table-cell-padding':
@@ -682,13 +682,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('MarkdownEditor', (token) => {
-    const editorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('MarkdownEditor', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(editorToken), genStyle(editorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'MarkdownEditor');
+  return { wrapSSR, hashId };
 }

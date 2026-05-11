@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'BoxPlotChart'> = (token) => {
   return {
     [token.componentCls]: {
       // 统计数据容器样式
@@ -70,13 +66,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('BoxPlotChart', (token) => {
-    const boxPlotToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('BoxPlotChart', genStyle);
 
-    return [genStyle(boxPlotToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'BoxPlotChart');
+  return { wrapSSR, hashId };
 }

@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ChartContainer'> = (token) => {
   return {
     [token.componentCls]: {
       // 图表容器基础样式
@@ -81,13 +77,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param baseClassName 基础类名
  * @returns 样式相关对象
  */
-export const useStyle = (baseClassName: string) => {
-  return useEditorStyleRegister('Chart-Container' + baseClassName, (token) => {
-    const containerToken = {
-      ...token,
-      componentCls: `.${baseClassName}`,
-    };
+const useGenStyle = genStyleHooks('ChartContainer', genStyle);
 
-    return [genStyle(containerToken)];
-  });
+export const useStyle = (baseClassName: string) => {
+  const [wrapSSR, hashId] = useGenStyle(baseClassName);
+  return { wrapSSR, hashId };
 };
+

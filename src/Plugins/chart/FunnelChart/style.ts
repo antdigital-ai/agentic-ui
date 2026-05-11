@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'FunnelChart'> = (token) => {
   return {
     [token.componentCls]: {
       '.chart-wrapper': {
@@ -48,12 +44,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('FunnelChart', genStyle);
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('FunnelChart', (token) => {
-    const areaToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(areaToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'FunnelChart');
+  return { wrapSSR, hashId };
 }

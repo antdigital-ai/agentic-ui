@@ -1,11 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../../../Hooks/useStyle';
+import { genStyleHooks, resetComponent, type GenStyleFn } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ScatterChart'> = (token) => {
   return {
     [`${token.componentCls}-container`]: {
       // 散点图容器样式
@@ -79,13 +74,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ScatterChart', (token) => {
-    const scatterChartToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ScatterChart', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(scatterChartToken), genStyle(scatterChartToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ScatterChart');
+  return { wrapSSR, hashId };
 }

@@ -1,7 +1,6 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'WorkspaceTask'> = (token) => {
   return {
     [`${token.componentCls}`]: {
       padding: '0',
@@ -55,13 +54,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useTaskStyle(prefixCls?: string) {
-  return useEditorStyleRegister('WorkspaceTask', (token) => {
-    const taskToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('WorkspaceTask', genStyle);
 
-    return [genStyle(taskToken)];
-  });
+export function useTaskStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'WorkspaceTask');
+  return { wrapSSR, hashId };
 }

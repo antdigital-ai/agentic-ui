@@ -1,11 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, resetComponent, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'BubbleDocInfo'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -92,13 +87,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('DocInfo', (token) => {
-    const proChatToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('BubbleDocInfo', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(proChatToken), genStyle(proChatToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'DocInfo');
+  return { wrapSSR, hashId };
 }

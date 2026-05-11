@@ -1,11 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
+import { genStyleHooks, resetComponent, type GenStyleFn } from '../../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ToolBar'> = (token) => {
   return {
     [token.componentCls]: {
       borderTopLeftRadius: '0.5em',
@@ -46,13 +41,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ToolBar-' + prefixCls, (token) => {
-    const editorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ToolBar', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(editorToken), genStyle(editorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'ToolBar-');
+  return { wrapSSR, hashId };
 }

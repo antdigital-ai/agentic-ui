@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'History'> = (token) => {
   return {
     [`${token.componentCls}-load-more`]: {
       height: '48px',
@@ -291,13 +287,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 /** @internal 供单测调用 genStyle 覆盖 token 回退分支 */
 export { genStyle };
 
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('history-group-menu', (token) => {
-    const groupMenuToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('History', genStyle);
 
-    return [genStyle(groupMenuToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'history-group-menu');
+  return { wrapSSR, hashId };
 }

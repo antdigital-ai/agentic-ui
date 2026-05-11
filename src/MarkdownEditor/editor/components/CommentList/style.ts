@@ -1,9 +1,5 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+import { genStyleHooks, type GenStyleFn } from '../../../../Hooks/useStyle';
+const genStyle: GenStyleFn<'CommentList'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -98,13 +94,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('editor-content-column', (token) => {
-    const editorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('CommentList', genStyle);
 
-    return [genStyle(editorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'editor-content-column');
+  return { wrapSSR, hashId };
 }

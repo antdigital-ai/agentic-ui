@@ -1,5 +1,4 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const SUBTLE_BORDER = '1px solid var(--color-gray-border-light)';
 
@@ -52,7 +51,7 @@ const genEditorPanelStyle = (cls: string) => ({
   },
 });
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'SchemaEditor'> = (token) => {
   const componentCls = token.componentCls;
 
   return {
@@ -244,13 +243,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('SchemaEditor', (token) => {
-    const schemaEditorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('SchemaEditor', genStyle);
 
-    return [genStyle(schemaEditorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'SchemaEditor');
+  return { wrapSSR, hashId };
 }

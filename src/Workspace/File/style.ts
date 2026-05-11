@@ -1,7 +1,6 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
   return {
     // 定位高亮动画关键帧
     '@keyframes flash-shadow': {
@@ -568,13 +567,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useFileStyle(prefixCls?: string) {
-  return useEditorStyleRegister('WorkspaceFile', (token) => {
-    const fileToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('WorkspaceFile', genStyle);
 
-    return [genStyle(fileToken)];
-  });
+export function useFileStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'WorkspaceFile');
+  return { wrapSSR, hashId };
 }

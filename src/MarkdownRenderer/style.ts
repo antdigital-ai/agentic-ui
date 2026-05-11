@@ -8,21 +8,22 @@
 export { useStyle } from '../MarkdownEditor/style';
 
 import { textSwapEnterKeyframes } from '../Components/TextSwap/textSwapMotion';
-import { useEditorStyleRegister } from '../Hooks/useStyle';
+import { genStyleHooks } from '../Hooks/useStyle';
+
+const useGenVarStyle = genStyleHooks('MarkdownRendererVars', (token) => ({
+  [`:where(${token.componentCls})`]: {
+    '--margin-2x': '8px',
+    '--margin-4x': '16px',
+    '--margin-8x': '20px',
+    '--padding-2x': '8px',
+    '--padding-4x': '16px',
+    '--padding-5x': '20px',
+  },
+
+  ...textSwapEnterKeyframes,
+}));
 
 export const useRendererVarStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('MarkdownRendererVars', (_token) => {
-    return {
-      [`:where(.${prefixCls})`]: {
-        '--margin-2x': '8px',
-        '--margin-4x': '16px',
-        '--margin-8x': '20px',
-        '--padding-2x': '8px',
-        '--padding-4x': '16px',
-        '--padding-5x': '20px',
-      },
-
-      ...textSwapEnterKeyframes,
-    };
-  });
+  const [wrapSSR, hashId] = useGenVarStyle(prefixCls);
+  return { wrapSSR, hashId };
 };

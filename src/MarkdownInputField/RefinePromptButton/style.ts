@@ -1,10 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, resetComponent, type GenStyleFn } from '../../Hooks/useStyle';
 
 const spinnerRotate = new Keyframes('refineSpinnerRotate', {
   '0%': {
@@ -15,7 +10,7 @@ const spinnerRotate = new Keyframes('refineSpinnerRotate', {
   },
 });
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'RefinePromptButton'> = (token) => {
   return {
     [token.componentCls]: {
       width: 20,
@@ -50,13 +45,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('RefinePromptButton', (token) => {
-    const proChatToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('RefinePromptButton', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(proChatToken), genStyle(proChatToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'RefinePromptButton');
+  return { wrapSSR, hashId };
 }

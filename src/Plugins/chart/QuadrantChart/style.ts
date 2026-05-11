@@ -1,9 +1,8 @@
-import type { ChatTokenType, GenerateStyle } from '../../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
 const SINGLE_COLUMN_BREAKPOINT = 480;
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'QuadrantChart'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -139,12 +138,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('QuadrantChart', genStyle);
+
 export const useStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('QuadrantChart', (token) => {
-    const componentToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    } as ChatTokenType;
-    return [genStyle(componentToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls);
+  return { wrapSSR, hashId };
 };
+

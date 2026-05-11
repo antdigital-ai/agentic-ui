@@ -1,5 +1,4 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const THINKING_DOT_SIZE = 4;
 const THINKING_DOT_GAP = 4;
@@ -13,7 +12,7 @@ const THINKING_LOADING_PADDING = {
   paddingBottom: 'var(--padding-2x)',
 };
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'BubbleMessages'> = (token) => {
   return {
     // 加载状态容器（compact模式）
     [`${token.componentCls}-messages-content-loading`]: {
@@ -153,12 +152,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('BubbleMessages', genStyle);
+
 export function useMessagesContentStyle(componentCls: string) {
-  return useEditorStyleRegister('BubbleMessageDisplay', (token) => {
-    const chatToken: ChatTokenType = {
-      ...token,
-      componentCls: `.${componentCls}`,
-    };
-    return genStyle(chatToken);
-  });
+  const [wrapSSR, hashId] = useGenStyle(componentCls);
+  return { wrapSSR, hashId };
 }

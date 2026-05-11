@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'ContributorAvatar'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -32,13 +28,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('editor-content-contributorAvatar', (token) => {
-    const editorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('ContributorAvatar', genStyle);
 
-    return [genStyle(editorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'editor-content-contributorAvatar');
+  return { wrapSSR, hashId };
 }

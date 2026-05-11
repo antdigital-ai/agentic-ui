@@ -3,10 +3,9 @@ import classNames from 'clsx';
 import React from 'react';
 
 import {
-  ChatTokenType,
-  GenerateStyle,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../Hooks/useStyle';
 import { formatTime } from '../Utils/formatTime';
 import { BubbleProps, MessageBubbleData } from './type';
@@ -41,7 +40,7 @@ export interface TitleProps {
   quote?: React.ReactNode;
 }
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'BubbleTitle'> = (token) => {
   return {
     [token.componentCls]: {
       font: 'var(--font-text-h6-base)',
@@ -63,14 +62,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('BubbleTitle', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
+
 const useStyle = (prefixCls?: string) => {
-  return useEditorStyleRegister('Title', (token) => {
-    const titleToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [resetComponent(titleToken), genStyle(titleToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'BubbleTitle');
+  return { wrapSSR, hashId };
 };
 
 /**

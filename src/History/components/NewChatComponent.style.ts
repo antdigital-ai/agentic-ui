@@ -1,10 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genNewChatStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genNewChatStyle: GenStyleFn<'NewChatComponent'> = (token) => {
   return {
     [`${token.componentCls}-new-chat`]: {
       display: 'flex',
@@ -28,14 +24,10 @@ const genNewChatStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export const useNewChatStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('HistoryNewChat', (token) => {
-    const componentCls = `.${prefixCls}`;
-    const chatToken: ChatTokenType = {
-      ...token,
-      componentCls,
-    };
+const useGenStyle = genStyleHooks('NewChatComponent', genNewChatStyle);
 
-    return [genNewChatStyle(chatToken)];
-  });
+export const useNewChatStyle = (prefixCls: string) => {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls);
+  return { wrapSSR, hashId };
 };
+

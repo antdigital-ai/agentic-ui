@@ -1,7 +1,6 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'WorkspaceHtmlPreview'> = (token) => {
   return {
     [`${token.componentCls}`]: {
       display: 'flex',
@@ -60,13 +59,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useHtmlPreviewStyle(prefixCls?: string) {
-  return useEditorStyleRegister('WorkspaceHtmlPreview', (token) => {
-    const htmlPreviewToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('WorkspaceHtmlPreview', genStyle);
 
-    return [genStyle(htmlPreviewToken)];
-  });
+export function useHtmlPreviewStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'WorkspaceHtmlPreview');
+  return { wrapSSR, hashId };
 }

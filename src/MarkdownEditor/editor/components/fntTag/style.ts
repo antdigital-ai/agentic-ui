@@ -1,11 +1,7 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../../Hooks/useStyle';
 import { FNC_TAG_STYLES } from '../../tagStyles';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'FntTag'> = (token) => {
   return {
     [token.componentCls]: {
       ...FNC_TAG_STYLES,
@@ -18,13 +14,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('editor-content-TextStyleTag', (token) => {
-    const editorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('FntTag', genStyle);
 
-    return [genStyle(editorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'editor-content-TextStyleTag');
+  return { wrapSSR, hashId };
 }

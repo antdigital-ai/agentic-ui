@@ -1,7 +1,6 @@
-import type { ChatTokenType, GenerateStyle } from '../../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
   const { componentCls } = token;
 
   return {
@@ -24,12 +23,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('WorkspaceFileTree', genStyle);
+
 export function useFileTreeStyle(prefixCls?: string) {
-  return useEditorStyleRegister('WorkspaceFileTree', (token) => {
-    const fileTreeToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(fileTreeToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'WorkspaceFileTree');
+  return { wrapSSR, hashId };
 }

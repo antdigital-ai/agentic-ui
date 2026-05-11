@@ -1,13 +1,8 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
+import { genStyleHooks, resetComponent, type GenStyleFn } from '../../../../Hooks/useStyle';
 
 export const JINJA_PANEL_PREFIX_CLS = 'agentic-md-editor-jinja-panel';
 
-const genJinjaPanelStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genJinjaPanelStyle: GenStyleFn<'JinjaTemplatePanel'> = (token) => {
   return {
     [token.componentCls]: {
       boxSizing: 'border-box',
@@ -108,16 +103,12 @@ const genJinjaPanelStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('JinjaTemplatePanel', (token, info) => [
+  resetComponent(token),
+  genJinjaPanelStyle(token, info),
+]);
+
 export function useJinjaTemplatePanelStyle(prefixCls?: string) {
-  const componentCls = '.' + (prefixCls || JINJA_PANEL_PREFIX_CLS);
-  return useEditorStyleRegister(
-    'JinjaTemplatePanel-' + (prefixCls || JINJA_PANEL_PREFIX_CLS),
-    (token) => {
-      const editorToken: ChatTokenType = {
-        ...token,
-        componentCls,
-      };
-      return [resetComponent(editorToken), genJinjaPanelStyle(editorToken)];
-    },
-  );
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'JinjaTemplatePanel-');
+  return { wrapSSR, hashId };
 }

@@ -1,8 +1,4 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 /** 根容器内边距（与 ant-agentic-plugin-mermaid 设计一致） */
 const MERMAID_ROOT_PADDING_PX = 8;
@@ -10,7 +6,7 @@ const MERMAID_ROOT_PADDING_PX = 8;
 /** 左上角工具栏占位，避免与流程图节点重叠 */
 const MERMAID_TOOLBAR_RESERVE_INLINE = 72;
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'Mermaid'> = (token) => {
   return {
     [token.componentCls]: {
       marginBottom: '0.75em',
@@ -179,13 +175,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('agentic-plugin-mermaid', (token) => {
-    const editorToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('Mermaid', genStyle);
 
-    return [genStyle(editorToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'agentic-plugin-mermaid');
+  return { wrapSSR, hashId };
 }

@@ -1,7 +1,6 @@
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'WorkspaceRealtimeFollow'> = (token) => {
   return {
     [`${token.componentCls}`]: {
       [`&-container`]: {
@@ -353,13 +352,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useRealtimeFollowStyle(prefixCls?: string) {
-  return useEditorStyleRegister('WorkspaceRealtimeFollow', (token) => {
-    const realtimeToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('WorkspaceRealtimeFollow', genStyle);
 
-    return [genStyle(realtimeToken)];
-  });
+export function useRealtimeFollowStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'WorkspaceRealtimeFollow');
+  return { wrapSSR, hashId };
 }

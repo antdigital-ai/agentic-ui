@@ -1,14 +1,9 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../../../../Hooks/useStyle';
+import { genStyleHooks, resetComponent, type GenStyleFn } from '../../../../Hooks/useStyle';
 
 /**
  * LazyElement 样式生成器
  */
-const genLazyElementStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genLazyElementStyle: GenStyleFn<'LazyElement'> = (token) => {
   return {
     [`${token.componentCls}`]: {
       position: 'relative',
@@ -20,15 +15,13 @@ const genLazyElementStyle: GenerateStyle<ChatTokenType> = (token) => {
 /**
  * LazyElement 组件样式 Hook
  */
+const useGenStyle = genStyleHooks('LazyElement', (token, info) => [
+  resetComponent(token),
+  genLazyElementStyle(token, info),
+]);
+
 export const useStyle = (prefixCls?: string) => {
-  return useEditorStyleRegister('LazyElement', (token) => {
-    const componentToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [
-      resetComponent(componentToken),
-      genLazyElementStyle(componentToken),
-    ];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'LazyElement');
+  return { wrapSSR, hashId };
 };
+

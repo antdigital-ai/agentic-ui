@@ -1,13 +1,9 @@
-import {
-  useEditorStyleRegister,
-  type ChatTokenType,
-  type GenerateStyle,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 export const prefixCls = 'top-operating-area';
 
 // 样式生成函数
-const genTopOperatingAreaStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genTopOperatingAreaStyle: GenStyleFn<'TopOperatingArea'> = (token) => {
   return {
     [token.componentCls]: {
       position: 'relative' as const,
@@ -68,12 +64,12 @@ const genTopOperatingAreaStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export const useStyle = (prefixCls: string) => {
-  return useEditorStyleRegister(prefixCls, (token) => {
-    const topOperatingAreaToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genTopOperatingAreaStyle(topOperatingAreaToken)];
-  });
+const useGenStyle = genStyleHooks(
+  'TopOperatingArea',
+  genTopOperatingAreaStyle,
+);
+
+export const useStyle = (customPrefixCls: string) => {
+  const [wrapSSR, hashId] = useGenStyle(customPrefixCls);
+  return { wrapSSR, hashId };
 };

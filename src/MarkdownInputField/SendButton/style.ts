@@ -1,10 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, resetComponent, type GenStyleFn } from '../../Hooks/useStyle';
 
 // 定义旋转动画
 const pauseIconRotate = new Keyframes('pauseIconRotate', {
@@ -16,7 +11,7 @@ const pauseIconRotate = new Keyframes('pauseIconRotate', {
   },
 });
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'SendButton'> = (token) => {
   return {
     [token.componentCls]: {
       fontSize: '32px',
@@ -51,13 +46,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls
  * @returns
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('SendButton', (token) => {
-    const proChatToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('SendButton', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(proChatToken), genStyle(proChatToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'SendButton');
+  return { wrapSSR, hashId };
 }

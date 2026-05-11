@@ -1,10 +1,9 @@
-import type { ChatTokenType, GenerateStyle } from '../../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
 /** 强制单列布局的 viewport 阈值（手机竖屏 / 窄侧栏） */
 const SINGLE_COLUMN_BREAKPOINT = 480;
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'DocCards'> = (token) => {
   return {
     [token.componentCls]: {
       display: 'flex',
@@ -159,12 +158,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('DocCards', genStyle);
+
 export const useStyle = (prefixCls: string) => {
-  return useEditorStyleRegister('DocCards', (token) => {
-    const componentToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    } as ChatTokenType;
-    return [genStyle(componentToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls);
+  return { wrapSSR, hashId };
 };
+

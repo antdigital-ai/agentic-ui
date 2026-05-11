@@ -1,7 +1,6 @@
-import type { ChatTokenType, GenerateStyle } from '../Hooks/useStyle';
-import { useEditorStyleRegister } from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'Workspace'> = (token) => {
   return {
     [token.componentCls]: {
       height: '100%',
@@ -139,13 +138,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
-export function useWorkspaceStyle(prefixCls?: string) {
-  return useEditorStyleRegister('Workspace', (token) => {
-    const workspaceToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('Workspace', genStyle);
 
-    return [genStyle(workspaceToken)];
-  });
+export function useWorkspaceStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'Workspace');
+  return { wrapSSR, hashId };
 }

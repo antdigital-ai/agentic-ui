@@ -1,11 +1,6 @@
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../../Hooks/useStyle';
+import { genStyleHooks, resetComponent, type GenStyleFn } from '../../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'SkillModeBar'> = (token) => {
   return {
     [`${token.componentCls}-container`]: {
       // overflow: 'hidden', // 会把Quote的弹框遮挡
@@ -114,13 +109,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
  * @param prefixCls 类名前缀
  * @returns 样式相关函数和变量
  */
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('SkillModeBar', (token) => {
-    const skillModeToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
+const useGenStyle = genStyleHooks('SkillModeBar', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
 
-    return [resetComponent(skillModeToken), genStyle(skillModeToken)];
-  });
+export function useStyle(prefixCls?: string) {
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'SkillModeBar');
+  return { wrapSSR, hashId };
 }

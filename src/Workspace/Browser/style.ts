@@ -1,6 +1,5 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import type { ChatTokenType, GenerateStyle } from '../../Hooks/useStyle';
-import { useEditorStyleRegister } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const fadeInUp = new Keyframes('fadeInUp', {
   from: {
@@ -13,7 +12,7 @@ const fadeInUp = new Keyframes('fadeInUp', {
   },
 });
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
+const genStyle: GenStyleFn<'WorkspaceBrowser'> = (token) => {
   const { componentCls } = token;
 
   return {
@@ -139,12 +138,9 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
   };
 };
 
+const useGenStyle = genStyleHooks('WorkspaceBrowser', genStyle);
+
 export function useBrowserStyle(prefixCls?: string) {
-  return useEditorStyleRegister('WorkspaceBrowser', (token) => {
-    const browserToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(browserToken)];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'WorkspaceBrowser');
+  return { wrapSSR, hashId };
 }
