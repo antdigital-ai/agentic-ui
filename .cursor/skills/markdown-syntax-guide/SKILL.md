@@ -63,7 +63,7 @@ description: 指导用户使用 @ant-design/agentic-ui 的 Markdown Editor / Ren
 | C    | 80   |
 ```
 
-支持的 `chartType`：`bar`（条形）、`column`（柱状）、`line`（折线）、`area`（面积）、`pie`（饼图）、`donut`（环形）、`radar`（雷达）、`scatter`（散点）、`funnel`（漏斗）、`table`（表格）、`descriptions`（定义列表）。
+支持的 `chartType`：`bar`（条形）、`column`（柱状）、`line`（折线）、`area`（面积）、`pie`（饼图）、`donut`（环形）、`radar`（雷达）、`scatter`（散点）、`funnel`（漏斗）、`table`（表格）、`descriptions`（定义列表）、`docCards`（卡片列表）、`quadrant`（四象限图）。
 
 ---
 
@@ -123,6 +123,7 @@ description: 指导用户使用 @ant-design/agentic-ui 的 Markdown Editor / Ren
 | 仅展示原始表格（不画图）| `table` | ❌ |
 | 键值对定义列表 | `descriptions` | ❌ |
 | 文档/网站/工具的卡片栅格（标题 + URL + 简介 + 标签）| `docCards` | ❌ |
+| 优先级矩阵 / 二维分类（四象限）| `quadrant` | ❌ |
 | **流程图 / 决策树** | — | ✅ Mermaid `flowchart` |
 | **时序图 / 调用链** | — | ✅ Mermaid `sequenceDiagram` |
 | **甘特图 / 时间安排** | — | ✅ Mermaid `gantt` |

@@ -49,6 +49,20 @@ export type {
   ResolvedDocCardsFields,
 } from './DocCards';
 
+// 四象限图
+export {
+  DEFAULT_QUADRANT_FIELD_ALIASES as QuadrantDefaultFieldAliases,
+  DEFAULT_QUADRANT_LABELS as QuadrantDefaultLabels,
+  QuadrantChart,
+  resolveQuadrantFields,
+} from './QuadrantChart';
+export type {
+  QuadrantChartProps,
+  QuadrantField,
+  QuadrantFieldMap,
+  ResolvedQuadrantFields,
+} from './QuadrantChart';
+
 // 图表组件导出
 export { default as AreaChart } from './AreaChart';
 export { default as BarChart } from './BarChart';
