@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { DocCards } from '../DocCards';
 import {
   formatDisplayUrl,
+  isExternalLink,
   isSafeHref,
   resolveDocCardsFields,
   splitTags,
@@ -45,21 +46,55 @@ describe('DocCards utils', () => {
   });
 
   describe('isSafeHref', () => {
-    it('仅放行 http(s)/mailto/tel 与站内链接', () => {
+    it('放行 http(s)/mailto/tel 与站内绝对/相对路径与锚点', () => {
       expect(isSafeHref('https://a.com')).toBe(true);
       expect(isSafeHref('http://a.com')).toBe(true);
       expect(isSafeHref('mailto:a@b.com')).toBe(true);
       expect(isSafeHref('tel:+861234567')).toBe(true);
       expect(isSafeHref('/foo/bar')).toBe(true);
+      expect(isSafeHref('./foo')).toBe(true);
+      expect(isSafeHref('../foo')).toBe(true);
       expect(isSafeHref('#anchor')).toBe(true);
+    });
+
+    it('拒绝 protocol-relative URL 避免绕过协议白名单', () => {
+      // //evil.com 在 https 页会跳到 https://evil.com，等价于外部链接但不在白名单内
+      expect(isSafeHref('//evil.com')).toBe(false);
+      expect(isSafeHref('  //evil.com  ')).toBe(false);
+      expect(isSafeHref('//evil.com/path?x=1')).toBe(false);
     });
 
     it('拒绝危险协议与非字符串值', () => {
       expect(isSafeHref('javascript:alert(1)')).toBe(false);
+      expect(isSafeHref('JavaScript:alert(1)')).toBe(false);
       expect(isSafeHref('data:text/html,<script>')).toBe(false);
+      expect(isSafeHref('vbscript:msgbox(1)')).toBe(false);
       expect(isSafeHref('')).toBe(false);
+      expect(isSafeHref('   ')).toBe(false);
       expect(isSafeHref(undefined)).toBe(false);
       expect(isSafeHref(123 as any)).toBe(false);
+    });
+  });
+
+  describe('isExternalLink', () => {
+    it('http(s)/mailto/tel 视为外部', () => {
+      expect(isExternalLink('https://a.com')).toBe(true);
+      expect(isExternalLink('http://a.com')).toBe(true);
+      expect(isExternalLink('mailto:a@b.com')).toBe(true);
+      expect(isExternalLink('tel:+861234567')).toBe(true);
+    });
+
+    it('站内路径与锚点视为内部', () => {
+      expect(isExternalLink('/foo')).toBe(false);
+      expect(isExternalLink('./foo')).toBe(false);
+      expect(isExternalLink('../foo')).toBe(false);
+      expect(isExternalLink('#anchor')).toBe(false);
+    });
+
+    it('空值/非字符串视为内部以避免误开新 tab', () => {
+      expect(isExternalLink('')).toBe(false);
+      expect(isExternalLink(null)).toBe(false);
+      expect(isExternalLink(undefined)).toBe(false);
     });
   });
 
@@ -254,5 +289,46 @@ describe('DocCards 组件渲染', () => {
     const data = [{ 名称: 'a', 简介: '   ' }];
     const { container } = render(<DocCards columns={cols} data={data} />);
     expect(container.querySelectorAll('[class*="-item-desc"]')).toHaveLength(0);
+  });
+
+  it('外部链接打新 tab，站内路径/锚点保持原 tab', () => {
+    const data = [
+      { 名称: 'External', 地址: 'https://a.com/x' },
+      { 名称: 'Anchor', 地址: '#section' },
+      { 名称: 'Internal', 地址: '/foo/bar' },
+    ];
+    render(<DocCards columns={buildColumns(['名称', '地址'])} data={data} />);
+    const external = screen.getByRole('link', { name: 'a.com/x' });
+    expect(external).toHaveAttribute('target', '_blank');
+    expect(external).toHaveAttribute('rel', 'noopener noreferrer');
+
+    const anchor = screen.getByRole('link', { name: '#section' });
+    expect(anchor).not.toHaveAttribute('target');
+    expect(anchor).not.toHaveAttribute('rel');
+
+    const internal = screen.getByRole('link', { name: '/foo/bar' });
+    expect(internal).not.toHaveAttribute('target');
+    expect(internal).not.toHaveAttribute('rel');
+  });
+
+  it('protocol-relative URL 不渲染为可点击链接', () => {
+    const data = [{ 名称: 'X', 地址: '//evil.com/path' }];
+    render(<DocCards columns={buildColumns(['名称', '地址'])} data={data} />);
+    expect(
+      screen.queryByRole('link', { name: /evil/ }),
+    ).not.toBeInTheDocument();
+    // 仍以纯文本展示
+    expect(screen.getByText('//evil.com/path')).toBeInTheDocument();
+  });
+
+  it('标签容器 aria-label 使用「标签列表」文案而非容器名', () => {
+    const data = [{ 名称: 'a', 亮点: 'tag1, tag2' }];
+    const { container } = render(
+      <DocCards columns={buildColumns(['名称', '亮点'])} data={data} />,
+    );
+    const tagsContainer = container.querySelector(
+      '[class*="-item-tags"]',
+    ) as HTMLElement;
+    expect(tagsContainer?.getAttribute('aria-label')).toBe('标签列表');
   });
 });

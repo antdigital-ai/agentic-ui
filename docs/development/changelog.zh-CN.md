@@ -13,6 +13,10 @@ group:
 
 - MarkdownEditor / Plugins.chart
   - 🆕 新增 `chartType: "docCards"` 支持「Markdown 表格 → 卡片栅格」展示，与现有图表共用同一套「HTML 注释 + GFM 表格」数据契约。表头按 `名称`/`标题`、`地址`/`链接`/`URL`、`简介`/`描述`、`亮点`/`标签` 别名解析为 `title` / `url` / `description` / `tags`，支持「逻辑名 + 中英文括号单位」的宽松匹配；`cardColumns` 控制每行卡片数（取值 `1`~`4`，默认 `2`，超出自动 clamp），`fieldMap` 可显式覆盖字段映射。
+  - 🐞 **安全**：`isSafeHref` 显式拒绝 protocol-relative URL（`//evil.com`）。原实现以 `startsWith('/')` 放行站内绝对路径时会同时放行 `//host`，等价于绕过协议白名单。
+  - 🛠 **包体积**：抽出 `src/Utils/columnMatching.ts` 零依赖共享模块，承载 `columnKeyMatchesConfiguredField` / `resolveChartAxisFieldToColumnKey` / `DOC_CARDS_FIELD_ALIASES` / `resolveDocCardsFields` 等纯字符串工具。`DocCards/utils.ts` 不再 import `parseTable`，消费侧 `import { DocCards }` 不再被传递性带入完整 markdown 解析栈（remark / rehype / sanitize / katex 等）。`parseTable.ts` 与 `DocCards/utils.ts` 仍 re-export 原符号保持向后兼容。
+  - 💄 站内链接（`/foo`、`./foo`、`../foo`、`#anchor`）不再强制 `target="_blank"`，避免锚点跳转开新 tab；外部链接（http(s)/mailto/tel）仍开新 tab 并带 `rel="noopener noreferrer"`。
+  - 🌐 标签胶囊容器 `aria-label` 改为 `docCardsTags`（中文「标签列表」/英文「Tags」）专用 i18n 键，原先用 `docCards` 会被屏幕阅读器误读为「卡片列表」。
   - 🆕 `@ant-design/agentic-ui` 主入口同步导出 `DocCards` 组件与 `resolveDocCardsFields` / `splitDocCardsTags` / `isDocCardsSafeHref` / `formatDocCardsDisplayUrl` / `DocCardsDefaultFieldAliases` 等工具，方便消费侧复用。
   - 💄 卡片链接展示 hostname + path（`https://tailwindcss.com/docs` → `tailwindcss.com/docs`），`href` 与 `title` attribute 仍是原始 URL；超长 URL 单行省略。
   - 💄 移动端适配：`< 480px` viewport 强制单列；卡片 `:hover` 用 `@media (hover: hover)` 包裹避免 first-tap 残留；链接最小触摸高度 24px（WCAG 2.5.5 AA）；标签胶囊用 padding 而非固定 height，避免在手机端被压扁。
