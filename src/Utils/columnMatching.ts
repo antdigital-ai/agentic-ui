@@ -156,3 +156,21 @@ export const canResolveDocCardsTitleColumn = (
   columnKeys: string[],
   override?: string,
 ): boolean => findFieldKey('title', columnKeys, override) !== undefined;
+
+// ---------------------------------------------------------------------------
+// Quadrant Chart（四象限图）
+// ---------------------------------------------------------------------------
+
+/**
+ * 四象限图按行顺序渲染，不需要字段解析。
+ *
+ * 表格前 4 行 = 4 个象限：
+ * - 第 1 列的值 = 象限标签；
+ * - 第 2 列的值 = 象限内容（逗号分隔的条目列表）。
+ *
+ * 校验仅需：至少 1 列、至少 1 行数据。
+ */
+export const canRenderQuadrantChart = (
+  columnKeys: string[],
+  dataLength: number,
+): boolean => columnKeys.length >= 1 && dataLength >= 1;

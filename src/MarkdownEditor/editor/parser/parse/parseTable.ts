@@ -6,6 +6,7 @@ import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import {
+  canRenderQuadrantChart,
   canResolveDocCardsTitleColumn,
   columnKeyMatchesConfiguredField as sharedColumnKeyMatchesConfiguredField,
   resolveChartAxisFieldToColumnKey as sharedResolveChartAxisFieldToColumnKey,
@@ -358,6 +359,9 @@ export const parseTableOrChart = (
       if (cfg.chartType === 'docCards') {
         const fieldMap = (cfg as { fieldMap?: DocCardsFieldMap })?.fieldMap;
         return canResolveDocCardsTitleColumn(columnKeyList, fieldMap?.title);
+      }
+      if (cfg.chartType === 'quadrant') {
+        return canRenderQuadrantChart(columnKeyList, dataSource.length);
       }
       if (cfg.x && !columnKeys.has(cfg.x)) return false;
       if (cfg.y && !columnKeys.has(cfg.y)) return false;

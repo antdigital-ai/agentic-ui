@@ -698,6 +698,108 @@ describe('useFileUploadManager', () => {
   });
 
   describe('uploadImage 文件选择处理', () => {
+    it('应该在点击文件选择器后保留隐藏 input 直到组件卸载', async () => {
+      const clickSpy = vi.fn();
+      const removeSpy = vi.spyOn(HTMLInputElement.prototype, 'remove');
+      const originalCreateElement = Document.prototype.createElement.bind(
+        document,
+      ) as typeof document.createElement;
+      let createdInput: HTMLInputElement | null = null;
+
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const element = originalCreateElement(tagName);
+          if (tagName === 'input') {
+            createdInput = element as HTMLInputElement;
+            createdInput.click = clickSpy;
+          }
+          return element;
+        });
+
+      const { result, unmount } = renderHook(
+        () => useFileUploadManager(defaultProps),
+        {
+          wrapper,
+        },
+      );
+
+      await result.current.uploadImage();
+
+      expect(clickSpy).toHaveBeenCalledTimes(1);
+      expect(removeSpy).not.toHaveBeenCalled();
+      expect(createdInput).not.toBeNull();
+      expect(document.body.contains(createdInput)).toBe(true);
+
+      unmount();
+
+      expect(document.body.contains(createdInput)).toBe(false);
+
+      createElementSpy.mockRestore();
+      removeSpy.mockRestore();
+    });
+
+    it('应该复用同一个隐藏 input 并在每次打开前重置配置', async () => {
+      const clickSpy = vi.fn();
+      const originalCreateElement = Document.prototype.createElement.bind(
+        document,
+      ) as typeof document.createElement;
+      const createdInputs: HTMLInputElement[] = [];
+
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation((tagName: string) => {
+          const element = originalCreateElement(tagName);
+          if (tagName === 'input') {
+            const inputElement = element as HTMLInputElement;
+            inputElement.click = clickSpy;
+            createdInputs.push(inputElement);
+          }
+          return element;
+        });
+
+      const { result, rerender, unmount } = renderHook(
+        ({ allowMultiple, supportedFormat }) =>
+          useFileUploadManager({
+            ...defaultProps,
+            attachment: {
+              ...defaultProps.attachment,
+              allowMultiple,
+              supportedFormat,
+            } as any,
+          }),
+        {
+          initialProps: {
+            allowMultiple: false,
+            supportedFormat: { extensions: ['pdf'] },
+          },
+          wrapper,
+        },
+      );
+
+      await result.current.uploadImage(false);
+      expect(createdInputs).toHaveLength(1);
+      expect(createdInputs[0].multiple).toBe(false);
+      expect(createdInputs[0].accept).toBe('.pdf');
+
+      rerender({
+        allowMultiple: true,
+        supportedFormat: { extensions: ['png'] },
+      });
+
+      await result.current.uploadImage(false);
+
+      expect(createdInputs).toHaveLength(1);
+      expect(clickSpy).toHaveBeenCalledTimes(2);
+      expect(createdInputs[0].multiple).toBe(true);
+      expect(createdInputs[0].accept).toBe('.png');
+      expect(document.body.contains(createdInputs[0])).toBe(true);
+
+      unmount();
+
+      createElementSpy.mockRestore();
+    });
+
     it('应该处理文件选择为空的情况', async () => {
       const { result } = renderHook(() => useFileUploadManager(defaultProps), {
         wrapper,

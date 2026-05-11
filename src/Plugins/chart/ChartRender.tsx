@@ -15,6 +15,7 @@ import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
 import { I18nContext } from '../../I18n';
 import { DocCards, type DocCardsFieldMap } from './DocCards';
+import { QuadrantChart } from './QuadrantChart';
 import { loadChartRuntime, type ChartRuntime } from './loadChartRuntime';
 import {
   debounce,
@@ -113,6 +114,7 @@ const getChartMap = (i18n: any) => ({
       'boxplot',
       'histogram',
       'docCards',
+      'quadrant',
     ],
   },
   descriptions: {
@@ -121,6 +123,10 @@ const getChartMap = (i18n: any) => ({
   },
   docCards: {
     title: i18n?.locale?.docCards || '卡片列表',
+    changeData: ['table'],
+  },
+  quadrant: {
+    title: i18n?.locale?.quadrantChart || '四象限图',
     changeData: ['table'],
   },
 });
@@ -636,7 +642,8 @@ export const ChartRender: React.FC<{
     | 'histogram'
     | 'descriptions'
     | 'table'
-    | 'docCards';
+    | 'docCards'
+    | 'quadrant';
   chartData: Record<string, any>[];
   config: {
     height: any;
@@ -673,6 +680,7 @@ export const ChartRender: React.FC<{
     | 'boxplot'
     | 'histogram'
     | 'docCards'
+    | 'quadrant'
   >(() => props.chartType);
   const {
     chartData,
@@ -735,6 +743,7 @@ export const ChartRender: React.FC<{
     chartType !== 'table' &&
     chartType !== 'descriptions' &&
     chartType !== 'docCards' &&
+    chartType !== 'quadrant' &&
     !renderDescriptionsFallback;
 
   // 获取国际化的图表类型映射
@@ -1301,6 +1310,25 @@ export const ChartRender: React.FC<{
             data={chartData}
             cardColumns={restCfg?.cardColumns}
             fieldMap={restCfg?.fieldMap}
+          />
+        </div>
+      );
+    }
+
+    if (chartType === 'quadrant') {
+      return (
+        <div
+          key={config?.index}
+          className={`${prefixCls}__quadrant-chart`}
+          style={{ margin: 12, width: 'calc(100% - 24px)' }}
+        >
+          <QuadrantChart
+            title={title}
+            toolbar={
+              toolBar.length > 0 ? <>{toolBar}</> : undefined
+            }
+            columns={config?.columns || []}
+            data={chartData}
           />
         </div>
       );

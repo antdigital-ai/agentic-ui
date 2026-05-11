@@ -49,6 +49,10 @@ export type {
   ResolvedDocCardsFields,
 } from './DocCards';
 
+// 四象限图
+export { QuadrantChart } from './QuadrantChart';
+export type { QuadrantChartProps } from './QuadrantChart';
+
 // 图表组件导出
 export { default as AreaChart } from './AreaChart';
 export { default as BarChart } from './BarChart';
