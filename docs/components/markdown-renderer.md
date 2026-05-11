@@ -23,6 +23,8 @@ group:
 
 ## 代码演示
 
+<code src="../demos/markdown-renderer-playground.tsx">API Playground - 串联调试核心 API</code>
+
 <code src="../demos/markdown-renderer-streaming.tsx">流式 Markdown - 末段淡入</code>
 
 ### 静态 Markdown
