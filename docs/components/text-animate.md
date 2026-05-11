@@ -20,6 +20,8 @@ group:
 
 ## 代码演示
 
+<code src="../demos/text-animate-playground.tsx">API Playground - 全部 animation × by × duration</code>
+
 <code src="../demos/text-animate.tsx">不同入场动画与拆分模式</code>
 
 ## API
