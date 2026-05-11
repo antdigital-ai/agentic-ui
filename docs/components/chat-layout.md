@@ -12,6 +12,12 @@ group:
 
 ## 代码演示
 
+### API Playground
+
+通过控制面板调试 `header` / `footer` / `footerHeight` / `showFooterBackground` / `scrollBehavior` / 命令式 ref（`scrollToBottom` / `isAtBottom`）/ `onScrollStateChange` 等核心 API。
+
+<code src="../demos/chat-layout-playground.tsx" iframe=820>API Playground - 全部核心 props</code>
+
 ### 基础用法
 
 最简单的用法：配置 `header`、`children`（消息列表）和 `footer`（输入区域），通过 `ref` 调用 `scrollToBottom`。
