@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+﻿import { useContext } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext } from '../../I18n';
 import type { AttachmentButtonProps } from '../AttachmentButton';
@@ -183,6 +183,27 @@ export const useFileUploadManager = ({
     input.multiple = attachment?.allowMultiple ?? true;
     input.style.display = 'none';
 
+    let detached = false;
+    const focusHandlerRef: { current: (() => void) | null } = {
+      current: null,
+    };
+    const detachInput = () => {
+      if (detached) {
+        return;
+      }
+      detached = true;
+      if (focusHandlerRef.current) {
+        window.removeEventListener('focus', focusHandlerRef.current);
+      }
+      if (input.parentNode) {
+        input.parentNode.removeChild(input);
+      }
+    };
+    focusHandlerRef.current = () => {
+      // 晚一拍再卸载，避免个别环境下 focus 早于 change 导致选中的文件丢失
+      window.setTimeout(detachInput, 300);
+    };
+
     input.onchange = async (e: Event) => {
       if (input.dataset.readonly) {
         return;
@@ -209,6 +230,7 @@ export const useFileUploadManager = ({
       } finally {
         input.value = '';
         delete input.dataset.readonly;
+        detachInput();
       }
     };
 
@@ -216,8 +238,12 @@ export const useFileUploadManager = ({
       return;
     }
     document.body.appendChild(input);
+    if (focusHandlerRef.current) {
+      window.addEventListener('focus', focusHandlerRef.current);
+    }
     input.click();
-    input.remove();
+    // 禁止在 click() 之后同步 remove：同一任务内移除会导致部分浏览器无法弹出选择器或无法触发 change。
+    // 选择在 onchange 的 finally 与窗口 focus（用户取消选择）时 detachInput。
   });
 
   /**
