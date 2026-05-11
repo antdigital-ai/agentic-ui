@@ -94,36 +94,57 @@ describe('QuadrantChart 组件渲染', () => {
     { 象限: '不重要不紧急', 内容: '整理桌面' },
   ];
 
-  it('渲染标题和四个象限', () => {
+  it('根节点有 data-testid="quadrant-chart"', () => {
+    render(<QuadrantChart columns={cols} data={sampleData} />);
+    expect(screen.getByTestId('quadrant-chart')).toBeInTheDocument();
+  });
+
+  it('渲染标题并带 testid', () => {
     render(
       <QuadrantChart title="优先级矩阵" columns={cols} data={sampleData} />,
     );
-    expect(screen.getByText('优先级矩阵')).toBeInTheDocument();
-    expect(screen.getByText('重要且紧急')).toBeInTheDocument();
-    expect(screen.getByText('重要不紧急')).toBeInTheDocument();
-    expect(screen.getByText('不重要但紧急')).toBeInTheDocument();
-    expect(screen.getByText('不重要不紧急')).toBeInTheDocument();
+    const titleEl = screen.getByTestId('quadrant-chart-title');
+    expect(titleEl).toHaveTextContent('优先级矩阵');
   });
 
-  it('条目正确拆分和渲染', () => {
+  it('四个象限各有独立 testid', () => {
     render(<QuadrantChart columns={cols} data={sampleData} />);
+    expect(screen.getByTestId('quadrant-chart-q0')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-q1')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-q2')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-q3')).toBeInTheDocument();
+  });
+
+  it('象限标签有独立 testid 且文本正确', () => {
+    render(<QuadrantChart columns={cols} data={sampleData} />);
+    expect(screen.getByTestId('quadrant-chart-q0-label')).toHaveTextContent('重要且紧急');
+    expect(screen.getByTestId('quadrant-chart-q1-label')).toHaveTextContent('重要不紧急');
+    expect(screen.getByTestId('quadrant-chart-q2-label')).toHaveTextContent('不重要但紧急');
+    expect(screen.getByTestId('quadrant-chart-q3-label')).toHaveTextContent('不重要不紧急');
+  });
+
+  it('条目容器有 testid，条目正确拆分', () => {
+    render(<QuadrantChart columns={cols} data={sampleData} />);
+    const q0Items = screen.getByTestId('quadrant-chart-q0-items');
+    expect(q0Items).toBeInTheDocument();
     expect(screen.getByText('修复bug')).toBeInTheDocument();
     expect(screen.getByText('处理投诉')).toBeInTheDocument();
     expect(screen.getByText('技术改进')).toBeInTheDocument();
     expect(screen.getByText('学习新技术')).toBeInTheDocument();
   });
 
-  it('空数据时渲染空状态', () => {
+  it('空数据时渲染空状态并带 testid', () => {
     render(<QuadrantChart title="测试" columns={cols} data={[]} />);
-    expect(screen.getByText('四象限图')).toBeInTheDocument();
+    const empty = screen.getByTestId('quadrant-chart-empty');
+    expect(empty).toHaveTextContent('四象限图');
   });
 
   it('空列时渲染空状态', () => {
     render(<QuadrantChart title="测试" columns={[]} data={sampleData} />);
-    expect(screen.getByText('四象限图')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-empty')).toBeInTheDocument();
   });
 
-  it('toolbar 与 title 在同一 header 行', () => {
+  it('toolbar 带 testid', () => {
     render(
       <QuadrantChart
         title="标题"
@@ -132,8 +153,14 @@ describe('QuadrantChart 组件渲染', () => {
         data={sampleData}
       />,
     );
-    expect(screen.getByText('标题')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-header')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-toolbar')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'tool' })).toBeInTheDocument();
+  });
+
+  it('grid 容器带 testid', () => {
+    render(<QuadrantChart columns={cols} data={sampleData} />);
+    expect(screen.getByTestId('quadrant-chart-grid')).toBeInTheDocument();
   });
 
   it('gridcell 有正确的 aria-label', () => {
@@ -144,11 +171,13 @@ describe('QuadrantChart 组件渲染', () => {
     expect(cells[1].getAttribute('aria-label')).toBe('重要不紧急');
   });
 
-  it('不足 4 行时补空占位', () => {
+  it('不足 4 行时补空象限且 testid 齐全', () => {
     const data = [{ 象限: '唯一组', 内容: 'A' }];
     render(<QuadrantChart columns={cols} data={data} />);
-    const cells = screen.getAllByRole('gridcell');
-    expect(cells).toHaveLength(4);
-    expect(screen.getByText('唯一组')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-q0')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-q1')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-q2')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-q3')).toBeInTheDocument();
+    expect(screen.getByTestId('quadrant-chart-q0-label')).toHaveTextContent('唯一组');
   });
 });

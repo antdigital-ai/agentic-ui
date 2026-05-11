@@ -52,14 +52,23 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
   const headerNode = useMemo(() => {
     if (!title && !toolbar) return null;
     return (
-      <div className={classNames(`${prefixCls}-header`, hashId)}>
+      <div
+        className={classNames(`${prefixCls}-header`, hashId)}
+        data-testid="quadrant-chart-header"
+      >
         {title ? (
-          <div className={classNames(`${prefixCls}-title`, hashId)}>
+          <div
+            className={classNames(`${prefixCls}-title`, hashId)}
+            data-testid="quadrant-chart-title"
+          >
             {title}
           </div>
         ) : null}
         {toolbar ? (
-          <div className={classNames(`${prefixCls}-toolbar`, hashId)}>
+          <div
+            className={classNames(`${prefixCls}-toolbar`, hashId)}
+            data-testid="quadrant-chart-toolbar"
+          >
             {toolbar}
           </div>
         ) : null}
@@ -73,9 +82,13 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
         className={classNames(prefixCls, hashId, className)}
         style={style}
         contentEditable={false}
+        data-testid="quadrant-chart"
       >
         {headerNode}
-        <div className={classNames(`${prefixCls}-empty`, hashId)}>
+        <div
+          className={classNames(`${prefixCls}-empty`, hashId)}
+          data-testid="quadrant-chart-empty"
+        >
           {i18n?.locale?.quadrantChart || '四象限图'}
         </div>
       </div>,
@@ -87,12 +100,14 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
       className={classNames(prefixCls, hashId, className)}
       style={style}
       contentEditable={false}
+      data-testid="quadrant-chart"
     >
       {headerNode}
       <div
         className={classNames(`${prefixCls}-grid`, hashId)}
         role="grid"
         aria-label={i18n?.locale?.quadrantChart || '四象限图'}
+        data-testid="quadrant-chart-grid"
       >
         {quadrants.map((group, qi) => (
           <div
@@ -104,14 +119,19 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
             )}
             role="gridcell"
             aria-label={group.label}
+            data-testid={`quadrant-chart-${QUADRANT_MODIFIERS[qi]}`}
           >
-            <div className={classNames(`${prefixCls}-quadrant-label`, hashId)}>
+            <div
+              className={classNames(`${prefixCls}-quadrant-label`, hashId)}
+              data-testid={`quadrant-chart-${QUADRANT_MODIFIERS[qi]}-label`}
+            >
               {group.label}
             </div>
             {group.items.length > 0 ? (
               <div
                 className={classNames(`${prefixCls}-quadrant-items`, hashId)}
                 role="list"
+                data-testid={`quadrant-chart-${QUADRANT_MODIFIERS[qi]}-items`}
               >
                 {group.items.map((item, idx) => (
                   <span
