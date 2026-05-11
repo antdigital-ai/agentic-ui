@@ -1,34 +1,31 @@
-import { columnKeyMatchesConfiguredField } from '../../../MarkdownEditor/editor/parser/parse/parseTable';
+/**
+ * DocCards 渲染层工具函数集合。
+ *
+ * 本模块刻意保持「零外部依赖」（仅原生字符串/正则与 `src/Utils/columnMatching.ts`
+ * 中的纯字符串工具）。请勿在此引入 React / antd / remark / rehype 等运行时依赖，
+ * 以免被消费方按需引用时把整套 markdown 解析栈带进 bundle。
+ */
+import {
+  DOC_CARDS_FIELD_ALIASES,
+  resolveDocCardsFields as sharedResolveDocCardsFields,
+  type DocCardsField,
+  type DocCardsFieldMap,
+  type ResolvedDocCardsFields,
+} from '../../../Utils/columnMatching';
 
 /**
- * docCards 的 4 个语义字段。
+ * 重新导出共享类型与解析函数，保持原有 import 路径向后兼容。
  *
- * - `title`：主标题，必填；用于卡片头部的大字粗体。
- * - `url`：副标题/链接，可选；非空时渲染为 `a[href]`，否则不显示。
- * - `description`：正文段落，可选。
- * - `tags`：标签列表，可选；按 {@link splitTags} 拆分后渲染为胶囊。
+ * 真实实现位于 `src/Utils/columnMatching.ts`，与 `parseTable` 共用同一份别名表，
+ * 避免「同一份契约多处定义」漂移。
  */
-export type DocCardsField = 'title' | 'url' | 'description' | 'tags';
+export type { DocCardsField, DocCardsFieldMap, ResolvedDocCardsFields };
+export const resolveDocCardsFields = sharedResolveDocCardsFields;
 
 /**
- * 字段映射：将语义字段名映射到表头 dataIndex。
- *
- * 缺省值为 `undefined` 时由 {@link DEFAULT_FIELD_ALIASES} 推断。
+ * 字段别名表。保持向后兼容的导出名。
  */
-export type DocCardsFieldMap = Partial<Record<DocCardsField, string>>;
-
-/**
- * 字段别名表（按语义字段聚合）。
- *
- * 列名匹配遵循「精确相等」或「逻辑名 + 中英文括号单位/补充」的宽松规则
- * （复用 {@link columnKeyMatchesConfiguredField}），与 x/y 字段匹配一致。
- */
-export const DEFAULT_FIELD_ALIASES: Record<DocCardsField, string[]> = {
-  title: ['名称', '标题', 'name', 'title', 'Name', 'Title'],
-  url: ['地址', '链接', 'URL', 'url', 'Link', 'link', '网址'],
-  description: ['简介', '描述', '说明', 'description', 'desc', 'summary'],
-  tags: ['亮点', '标签', 'tags', 'tag', '关键词'],
-};
+export const DEFAULT_FIELD_ALIASES = DOC_CARDS_FIELD_ALIASES;
 
 /**
  * 标签拆分分隔符。
@@ -63,77 +60,50 @@ export const splitTags = (raw: unknown): string[] => {
 };
 
 /**
- * 在表头列名集合中按别名顺序查找首个命中列。
- */
-const findFieldKey = (
-  field: DocCardsField,
-  columnKeys: string[],
-  override?: string,
-): string | undefined => {
-  if (override) {
-    if (columnKeys.includes(override)) return override;
-    const matched = columnKeys.find((key) =>
-      columnKeyMatchesConfiguredField(key, override),
-    );
-    if (matched) return matched;
-  }
-  for (const alias of DEFAULT_FIELD_ALIASES[field]) {
-    if (columnKeys.includes(alias)) return alias;
-    const matched = columnKeys.find((key) =>
-      columnKeyMatchesConfiguredField(key, alias),
-    );
-    if (matched) return matched;
-  }
-  return undefined;
-};
-
-/**
- * 解析后的 docCards 字段映射。
+ * 校验给定 url 是否可以安全渲染为 `a[href]`。
  *
- * `title` 必为命中列名；其余字段未命中时为 `undefined`。
- */
-export type ResolvedDocCardsFields = {
-  title: string;
-} & Partial<Record<Exclude<DocCardsField, 'title'>, string>>;
-
-/**
- * 根据表头列与可选覆盖映射，解析出 docCards 各语义字段对应的 dataIndex。
+ * 放行：
+ * - `http://` / `https://` 绝对链接；
+ * - `mailto:` / `tel:` 协议链接；
+ * - 站内**单斜杠**绝对路径 `/foo`、相对路径 `./foo` / `../foo`；
+ * - 站内锚点 `#section`。
  *
- * 当 `title` 列无法解析时返回 `null`，调用方应据此降级（解析阶段降为普通表格、
- * 渲染阶段返回空容器）。
- */
-export const resolveDocCardsFields = (
-  columnKeys: string[],
-  override?: DocCardsFieldMap,
-): ResolvedDocCardsFields | null => {
-  const title = findFieldKey('title', columnKeys, override?.title);
-  if (!title) return null;
-  const url = findFieldKey('url', columnKeys, override?.url);
-  const description = findFieldKey(
-    'description',
-    columnKeys,
-    override?.description,
-  );
-  const tags = findFieldKey('tags', columnKeys, override?.tags);
-  return {
-    title,
-    ...(url ? { url } : {}),
-    ...(description ? { description } : {}),
-    ...(tags ? { tags } : {}),
-  };
-};
-
-/**
- * 校验给定 url 是否为可安全渲染为 `a[href]` 的链接。
- *
- * 仅放行 `http://`、`https://`、`mailto:`、`tel:`，以及站内相对路径 `/...` 与 `#...`；
- * 其它形式（含 `javascript:`）一律视为纯文本以避免 XSS。
+ * 拒绝：
+ * - **protocol-relative URL** `//evil.com`（会沿用当前页协议跳到外部域，绕过协议白名单）；
+ * - `javascript:` / `data:` / `vbscript:` 等可执行/数据 URI；
+ * - 任何空值、空白字符串与非字符串输入。
  */
 export const isSafeHref = (raw: unknown): boolean => {
   if (typeof raw !== 'string') return false;
   const trimmed = raw.trim();
   if (!trimmed) return false;
-  if (trimmed.startsWith('/') || trimmed.startsWith('#')) return true;
+  // protocol-relative URL（//host/...）会在 https 页面跳到 https://host，等价于绝对外链，
+  // 但不会出现在协议白名单里；显式拒绝以避免被当作「站内绝对路径」混过去。
+  if (trimmed.startsWith('//')) return false;
+  // 站内绝对/相对路径 + 锚点
+  if (
+    trimmed.startsWith('/') ||
+    trimmed.startsWith('./') ||
+    trimmed.startsWith('../') ||
+    trimmed.startsWith('#')
+  ) {
+    return true;
+  }
+  return /^(https?:|mailto:|tel:)/i.test(trimmed);
+};
+
+/**
+ * 判断给定链接是否「外部」需要在新 tab 中打开。
+ *
+ * `http(s)` / `mailto:` / `tel:` 视为外部；站内绝对路径、相对路径与锚点视为内部
+ * （内部链接在原 tab 中跳转，避免破坏锚点滚动等浏览器原生行为）。
+ *
+ * 对未通过 {@link isSafeHref} 的 URL 直接返回 `false`，调用方应已先做安全校验。
+ */
+export const isExternalLink = (raw: unknown): boolean => {
+  if (typeof raw !== 'string') return false;
+  const trimmed = raw.trim();
+  if (!trimmed) return false;
   return /^(https?:|mailto:|tel:)/i.test(trimmed);
 };
 

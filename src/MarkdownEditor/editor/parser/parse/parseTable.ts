@@ -5,6 +5,12 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
+import {
+  canResolveDocCardsTitleColumn,
+  columnKeyMatchesConfiguredField as sharedColumnKeyMatchesConfiguredField,
+  resolveChartAxisFieldToColumnKey as sharedResolveChartAxisFieldToColumnKey,
+  type DocCardsFieldMap,
+} from '../../../../Utils/columnMatching';
 import { rehypeSanitizeUserHtml } from '../../../../Utils/rehypeSanitizeUserHtml';
 import { ChartTypeConfig } from '../../../el';
 import {
@@ -114,69 +120,17 @@ export const normalizeFieldName = (fieldName: string): string => {
     .trim();
 };
 
-/** 表头列名在「逻辑名」后仅跟括号单位说明时的后缀，如 GDP总量（万亿元）、销量(万台) */
-const TRAILING_UNIT_SUFFIX_PATTERN = /^(\s*[（(][^）)]+[）)])+\s*$/;
-
 /**
- * 判断表头列名 columnKey 是否对应注释里配置的轴字段 configuredField
- *（精确相等，或列名为「配置名 + 中英文括号内的单位/补充说明」）
- */
-export const columnKeyMatchesConfiguredField = (
-  columnKey: string,
-  configuredField: string,
-): boolean => {
-  const ck = (columnKey || '').trim();
-  const f = (configuredField || '').trim();
-  if (!ck || !f) return false;
-  if (ck === f) return true;
-  if (!ck.startsWith(f)) return false;
-  const rest = ck.slice(f.length);
-  return rest === '' || TRAILING_UNIT_SUFFIX_PATTERN.test(rest);
-};
-
-/**
- * 将注释中的 x/y 字段名解析为表格列的 dataIndex（表头可带单位括号而注释写短名）
- */
-export const resolveChartAxisFieldToColumnKey = (
-  configuredField: string | undefined,
-  columnKeys: string[],
-): string | undefined => {
-  if (configuredField === undefined || configuredField === null) {
-    return configuredField;
-  }
-  const f = configuredField.trim();
-  if (!f) return configuredField;
-  const keySet = new Set(columnKeys);
-  if (keySet.has(f)) return f;
-  const hit = columnKeys.find((k) => columnKeyMatchesConfiguredField(k, f));
-  return hit ?? configuredField;
-};
-
-/**
- * docCards 主标题列的别名表（与 `Plugins/chart/DocCards/utils.ts` 保持一致）。
+ * 列名宽松匹配工具：转发自 `src/Utils/columnMatching.ts` 的零依赖实现。
  *
- * 此处内联是为了在 parseTable 解析阶段做「降级判定」时避免对插件层的循环依赖；
- * 渲染层的完整字段映射由 {@link DocCards} 完成。
+ * 历史上这两个工具内联在本文件并被外部直接 import；为了避免给 `Plugins/chart/DocCards`
+ * 等渲染层带去整套 markdown 解析栈（remark/rehype/sanitize/katex 等），核心算法已下沉到
+ * `Utils/columnMatching.ts`，本处仅做 re-export 以保持 import 路径向后兼容。
  */
-const DOC_CARDS_TITLE_ALIASES = ['名称', '标题', 'name', 'title', 'Name', 'Title'];
-
-/**
- * 在解析阶段判断 docCards 是否能锁定主标题列；不能则整表降级为普通表格。
- * 仅做「主标题」最少必需列校验，与渲染层的 `resolveDocCardsFields` 行为对齐。
- */
-const resolveDocCardsTitleColumn = (
-  columnKeys: string[],
-  override?: string,
-): boolean => {
-  const candidates = [override, ...DOC_CARDS_TITLE_ALIASES].filter(
-    Boolean,
-  ) as string[];
-  return candidates.some((alias) =>
-    columnKeys.some(
-      (key) => key === alias || columnKeyMatchesConfiguredField(key, alias),
-    ),
-  );
-};
+export const columnKeyMatchesConfiguredField =
+  sharedColumnKeyMatchesConfiguredField;
+export const resolveChartAxisFieldToColumnKey =
+  sharedResolveChartAxisFieldToColumnKey;
 
 const normalizeChartConfigAxisFields = (
   cfg: ChartTypeConfig,
@@ -402,9 +356,8 @@ export const parseTableOrChart = (
     const isChartConfigValid = (cfg: ChartTypeConfig): boolean => {
       if (!cfg || cfg.chartType === 'table') return true;
       if (cfg.chartType === 'docCards') {
-        const fieldMap = (cfg as { fieldMap?: Record<string, string> })
-          ?.fieldMap;
-        return resolveDocCardsTitleColumn(columnKeyList, fieldMap?.title);
+        const fieldMap = (cfg as { fieldMap?: DocCardsFieldMap })?.fieldMap;
+        return canResolveDocCardsTitleColumn(columnKeyList, fieldMap?.title);
       }
       if (cfg.x && !columnKeys.has(cfg.x)) return false;
       if (cfg.y && !columnKeys.has(cfg.y)) return false;
