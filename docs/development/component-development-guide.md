@@ -109,102 +109,97 @@ export const useStyles = createStyles(({ token }) => ({
 }));
 ```
 
-### 使用项目自定义样式
+### 推荐：使用 `genStyleHooks` + 组件级 ComponentToken
+
+与 antd 上游一致：每个组件在模块顶层调用一次 `genStyleHooks('ComponentName', genStyle)`
+得到一个 `useStyle(prefixCls)` hook，避免在每次渲染里重新构造样式注册器。
 
 ```tsx | pure
-import { useEditorStyleRegister, ChatTokenType } from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
-const genStyle: GenerateStyle<ChatTokenType> = (token) => ({
+// 可选：通过模块声明扩展 AgenticComponentTokenMap，为组件加上专属 token
+declare module '../Hooks/useStyle' {
+  interface AgenticComponentTokenMap {
+    ComponentName?: ComponentNameToken;
+  }
+}
+
+export interface ComponentNameToken {
+  /** 头部背景色（示例） */
+  componentNameHeaderBg: string;
+}
+
+const genStyle: GenStyleFn<'ComponentName'> = (token) => ({
   [token.componentCls]: {
     width: '100%',
-    '&-item': {
-      display: 'flex',
-      padding: token.paddingSM,
+    padding: token.paddingSM,
+
+    [`${token.componentCls}-header`]: {
+      fontSize: token.fontSizeLG,
+      fontWeight: token.fontWeightStrong,
+      background: token.componentNameHeaderBg,
+      marginBottom: token.marginSM,
+    },
+
+    [`${token.componentCls}-content`]: {
+      padding: token.paddingXS,
+      borderRadius: token.borderRadius,
     },
   },
 });
 
+const useGenStyle = genStyleHooks('ComponentName', genStyle, () => ({
+  componentNameHeaderBg: 'transparent',
+}));
+
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ComponentName', (token: ChatTokenType) => {
-    const componentToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [genStyle(componentToken)];
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'component-name');
+  return { wrapSSR, hashId };
+}
+```
+
+> `genStyleHooks` 内部走的是 `@ant-design/cssinjs-utils` 的 `genStyleUtils`，
+> 与 antd 自身 `theme/util/genStyleUtils` 同源；区别仅在于：
+>
+> 1. 使用 agentic-ui 自有的 `AgenticComponentTokenMap`（组件可自由扩展）
+> 2. `hashId` 始终为 `''`，避免组件库选择器随宿主 antd 主题哈希变化
+
+#### 何时使用 `resetComponent`
+
+需要重置 box-sizing / margin / padding 等基础盒模型时，把 `resetComponent` 与
+自己的 `genStyle` 一起放进 styleFn：
+
+```tsx | pure
+import {
+  genStyleHooks,
+  resetComponent,
+  type GenStyleFn,
+} from '../Hooks/useStyle';
+
+const useGenStyle = genStyleHooks('ComponentName', (token, info) => [
+  resetComponent(token),
+  genStyle(token, info),
+]);
+```
+
+#### 兼容入口：`useEditorStyleRegister`
+
+少数场景（如气泡按 `bubbleNameClassName` 动态切换 cache、Editor 接受
+`propsToken` 运行时覆盖）无法在模块顶层一次性确定 styleFn，仍可使用旧接口：
+
+```tsx | pure
+import { useEditorStyleRegister } from '../Hooks/useStyle';
+
+export function useStyle(prefixCls?: string, extra?: Partial<ChatTokenType>) {
+  return useEditorStyleRegister('ComponentName', (token) => {
+    return [genStyle({ ...token, ...extra, componentCls: `.${prefixCls}` })];
   });
 }
 ```
 
-### 使用项目自定义样式系统
-
-项目使用自定义的样式系统，基于 `useEditorStyleRegister` 和 Token 设计理念。
-
-#### 样式文件结构
-
-```tsx | pure
-import {
-  ChatTokenType,
-  GenerateStyle,
-  resetComponent,
-  useEditorStyleRegister,
-} from '../Hooks/useStyle';
-
-const genStyle: GenerateStyle<ChatTokenType> = (token) => {
-  return {
-    [token.componentCls]: {
-      // 根容器样式
-      display: 'flex',
-      flexDirection: 'column',
-      padding: token.paddingSM,
-
-      // 子元素样式
-      [`${token.componentCls}-header`]: {
-        fontSize: '15px',
-        fontWeight: 600,
-        color: '#343a45',
-        marginBottom: token.marginSM,
-      },
-
-      [`${token.componentCls}-content`]: {
-        padding: token.paddingXS,
-        borderRadius: token.borderRadius,
-      },
-
-      // 主题变体样式
-      '&-dark': {
-        [`${token.componentCls}-header`]: {
-          color: '#fff',
-        },
-        [`${token.componentCls}-content`]: {
-          backgroundColor: '#1a1a1a',
-        },
-      },
-
-      // 状态样式
-      '&-loading': {
-        opacity: 0.6,
-        pointerEvents: 'none',
-      },
-
-      // 响应式样式
-      '@media (max-width: 768px)': {
-        [`${token.componentCls}-header`]: {
-          fontSize: '14px',
-        },
-      },
-    },
-  };
-};
-
-export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ComponentName', (token) => {
-    const componentToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-    return [resetComponent(componentToken), genStyle(componentToken)];
-  });
-}
+`useEditorStyleRegister` 现在直接走 `@ant-design/cssinjs` 的
+`useStyleRegister`，与 `genStyleHooks` 共享同一套底层注入路径。新增样式时
+**优先使用 `genStyleHooks`**，仅在签名特殊时退回 `useEditorStyleRegister`。
 ```
 
 #### 组件中使用样式
@@ -529,10 +524,10 @@ docs/demos/
 
 ### ✅ 样式开发检查
 
-- [ ] 使用 `@ant-design/theme-token` 或项目自定义样式
-- [ ] 样式函数使用 `GenerateStyle` 类型
-- [ ] 使用 `useEditorStyleRegister` 注册样式
-- [ ] 样式变量使用 token 系统
+- [ ] 使用 `genStyleHooks` + 组件级 `ComponentToken`（与 antd 上游一致）
+- [ ] 样式函数使用 `GenStyleFn<'ComponentName'>` 类型
+- [ ] 仅在动态 token / classNames 等特殊场景退回 `useEditorStyleRegister`
+- [ ] 样式变量使用 token 系统（AliasToken + 组件级 ComponentToken）
 - [ ] 支持主题切换和响应式设计
 
 #### ✅ .less 到 style.ts 迁移检查

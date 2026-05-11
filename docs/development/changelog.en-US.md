@@ -11,6 +11,11 @@ group:
 
 ## Unreleased
 
+- 🛠 Styling
+  - 🛠 Rewrote `Hooks/useStyle` on top of `@ant-design/cssinjs-utils`'s `genStyleUtils`, mirroring antd's own `theme/util/genStyleUtils`. Exposes `genStyleHooks` / `genComponentStyleHook` / `genSubStyleComponent` plus `AgenticComponentTokenMap` / `FullToken` / `GenStyleFn` types; components can declare their own `ComponentToken` via module augmentation.
+  - 🛠 Migrated 70+ `style.ts` files to the `genStyleHooks('ComponentName', genStyle)` pattern (`AILabel` / `TaskList` / `ToolUseBar` / `Workspace` / `Plugins/chart/*` / `MarkdownEditor` root, etc.). `useEditorStyleRegister` remains as a thin compatibility entry for cases that need a dynamic token / dynamic classNames (`Bubble`, `MarkdownInputField`, `MarkdownEditor/editor` content), and is now backed directly by `@ant-design/cssinjs`'s `useStyleRegister`.
+  - 🛠 Dropped runtime dependency on `@ant-design/theme-token`'s `createStyleRegister`. The component library keeps `hashId=''` to prevent host antd theme hash from breaking selectors.
+
 - 📖 Docs
   - 📖 Added `MarkdownRenderer` component documentation (streaming Markdown rendering, `CharacterQueueOptions`, built-in code-block renderer routing, `MarkdownRendererRef` imperative API).
   - 📖 Added a dedicated `ToolUseBarThink` doc; corrected the `ToolUseBarThink` API table inside `tool-use-bar.md` (removed deprecated/non-existent props such as `id`, `isThinkLoading`, `isActive`, `onActiveChange`, etc., aligned with actual props).

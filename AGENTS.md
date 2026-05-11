@@ -335,52 +335,64 @@ enum ButtonType {
 
 ### 样式定义示例
 
-项目使用自定义的 `useStyle` hook 来注册样式，基于 `@ant-design/cssinjs` 实现：
+项目通过 `genStyleHooks` + 组件级 `ComponentToken` 注册样式，与 antd 上游
+`theme/util/genStyleUtils` 同源（仅 `hashId` 固定为空，避免与宿主 antd
+主题哈希叠加）：
 
 ```tsx
 import {
-  ChatTokenType,
-  CSSInterpolation,
+  genStyleHooks,
   resetComponent,
-  useEditorStyleRegister,
+  type GenStyleFn,
 } from '../Hooks/useStyle';
 
-const genStyle = (token: ChatTokenType) => {
-  return {
-    [token.componentCls]: {
-      '&-container': {
-        padding: token.paddingSM,
-        backgroundColor: token.colorBgContainer,
-        borderRadius: token.borderRadius,
-        border: `1px solid ${token.colorBorder}`,
-      },
-      // 子元素
-      '&-title': {
-        fontSize: token.fontSizeLG,
-        fontWeight: token.fontWeightStrong,
-      },
-      // 状态样式
-      '&:hover': {
-        borderColor: token.colorPrimary,
-      },
+// 可选：声明组件级 ComponentToken，扩展进 AgenticComponentTokenMap
+declare module '../Hooks/useStyle' {
+  interface AgenticComponentTokenMap {
+    ComponentName?: ComponentNameToken;
+  }
+}
+
+export interface ComponentNameToken {
+  /** 容器边框色（示例） */
+  componentNameBorder: string;
+}
+
+const genStyle: GenStyleFn<'ComponentName'> = (token) => ({
+  [token.componentCls]: {
+    '&-container': {
+      padding: token.paddingSM,
+      backgroundColor: token.colorBgContainer,
+      borderRadius: token.borderRadius,
+      border: `1px solid ${token.componentNameBorder}`,
     },
-  };
-};
+    '&-title': {
+      fontSize: token.fontSizeLG,
+      fontWeight: token.fontWeightStrong,
+    },
+    '&:hover': {
+      borderColor: token.colorPrimary,
+    },
+  },
+});
+
+const useGenStyle = genStyleHooks(
+  'ComponentName',
+  (token, info) => [resetComponent(token), genStyle(token, info)],
+  () => ({
+    componentNameBorder: 'var(--color-gray-border-light)',
+  }),
+);
 
 export function useStyle(prefixCls?: string) {
-  return useEditorStyleRegister('ComponentName', (token) => {
-    const componentToken = {
-      ...token,
-      componentCls: `.${prefixCls}`,
-    };
-
-    return [
-      resetComponent(componentToken),
-      genStyle(componentToken),
-    ] as CSSInterpolation[];
-  });
+  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'component-name');
+  return { wrapSSR, hashId };
 }
 ```
+
+> 极少数动态 styleFn 场景（如气泡按 `bubbleNameClassName` 动态切 cache）可继续
+> 使用 `useEditorStyleRegister` 兼容入口，其底层同样接入 `@ant-design/cssinjs`
+> 的 `useStyleRegister`。
 
 在组件中使用：
 
