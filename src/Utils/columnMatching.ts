@@ -162,14 +162,13 @@ export const canResolveDocCardsTitleColumn = (
 // ---------------------------------------------------------------------------
 
 /**
- * quadrant 的语义字段。
+ * quadrant 的 3 个语义字段。
  *
  * - `name`：项目名称，必填；
+ * - `quadrant`：所属象限名称，必填（前 4 个不重复值构成四个象限）；
  * - `description`：描述信息，可选。
- *
- * X/Y 数值列由 chart config 的 `x`/`y` 指定，不走别名解析。
  */
-export type QuadrantField = 'name' | 'description';
+export type QuadrantField = 'name' | 'quadrant' | 'description';
 
 /**
  * quadrant 字段映射：将语义字段名映射到表头 dataIndex。
@@ -178,11 +177,10 @@ export type QuadrantFieldMap = Partial<Record<QuadrantField, string>>;
 
 /**
  * quadrant 字段别名表。
- *
- * 与 docCards 共用 {@link columnKeyMatchesConfiguredField} 宽松匹配规则。
  */
 export const QUADRANT_FIELD_ALIASES: Record<QuadrantField, string[]> = {
   name: ['名称', '标题', '项目', 'name', 'title', 'item', 'Name', 'Title', 'Item'],
+  quadrant: ['象限', '分类', '类别', 'quadrant', 'category', 'group', 'Quadrant', 'Category'],
   description: ['描述', '简介', '说明', 'description', 'desc', 'summary'],
 };
 
@@ -208,16 +206,17 @@ const findQuadrantFieldKey = (
 /**
  * 解析后的 quadrant 字段映射。
  *
- * `name` 必为命中列名；`description` 未命中时为 `undefined`。
+ * `name` 和 `quadrant` 必为命中列名；`description` 未命中时为 `undefined`。
  */
 export type ResolvedQuadrantFields = {
   name: string;
-} & Partial<Record<Exclude<QuadrantField, 'name'>, string>>;
+  quadrant: string;
+} & Partial<Record<Exclude<QuadrantField, 'name' | 'quadrant'>, string>>;
 
 /**
  * 根据表头列与可选覆盖映射，解析出 quadrant 各语义字段对应的 dataIndex。
  *
- * 当 `name` 列无法解析时返回 `null`，调用方应据此降级。
+ * 当 `name` 或 `quadrant` 列无法解析时返回 `null`，调用方应据此降级。
  */
 export const resolveQuadrantFields = (
   columnKeys: string[],
@@ -225,6 +224,8 @@ export const resolveQuadrantFields = (
 ): ResolvedQuadrantFields | null => {
   const name = findQuadrantFieldKey('name', columnKeys, override?.name);
   if (!name) return null;
+  const quadrant = findQuadrantFieldKey('quadrant', columnKeys, override?.quadrant);
+  if (!quadrant) return null;
   const description = findQuadrantFieldKey(
     'description',
     columnKeys,
@@ -232,14 +233,15 @@ export const resolveQuadrantFields = (
   );
   return {
     name,
+    quadrant,
     ...(description ? { description } : {}),
   };
 };
 
 /**
- * 解析阶段的快速判定：能否在给定表头中锁定 quadrant 名称列。
+ * 解析阶段的快速判定：能否同时锁定 quadrant 名称列和象限列。
  */
-export const canResolveQuadrantNameColumn = (
+export const canResolveQuadrantColumns = (
   columnKeys: string[],
-  override?: string,
-): boolean => findQuadrantFieldKey('name', columnKeys, override) !== undefined;
+  override?: QuadrantFieldMap,
+): boolean => resolveQuadrantFields(columnKeys, override) !== null;

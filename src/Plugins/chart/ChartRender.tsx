@@ -1317,11 +1317,6 @@ export const ChartRender: React.FC<{
 
     if (chartType === 'quadrant') {
       const restCfg = (config?.rest ?? {}) as {
-        xAxisLabel?: string;
-        yAxisLabel?: string;
-        quadrantLabels?: string[];
-        xThreshold?: number;
-        yThreshold?: number;
         fieldMap?: QuadrantFieldMap;
       };
       return (
@@ -1337,13 +1332,6 @@ export const ChartRender: React.FC<{
             }
             columns={config?.columns || []}
             data={chartData}
-            x={config?.x}
-            y={config?.y}
-            xAxisLabel={restCfg?.xAxisLabel}
-            yAxisLabel={restCfg?.yAxisLabel}
-            quadrantLabels={restCfg?.quadrantLabels}
-            xThreshold={restCfg?.xThreshold}
-            yThreshold={restCfg?.yThreshold}
             fieldMap={restCfg?.fieldMap}
           />
         </div>

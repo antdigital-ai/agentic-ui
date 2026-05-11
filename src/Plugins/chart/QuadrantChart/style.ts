@@ -35,76 +35,38 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         flexWrap: 'wrap',
       },
 
-      '&-body': {
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        border: `1px solid ${token.colorBorderSecondary}`,
-        borderRadius: token.borderRadiusLG,
-        overflow: 'hidden',
-      },
-
-      '&-axis-label': {
-        fontSize: token.fontSizeSM,
-        color: token.colorTextDescription,
-        textAlign: 'center',
-        padding: `${token.paddingXXS}px ${token.paddingXS}px`,
-        lineHeight: token.lineHeightSM,
-        fontWeight: token.fontWeightStrong,
-      },
-
-      '&-x-axis': {
-        display: 'flex',
-        justifyContent: 'center',
-        padding: `${token.paddingXXS}px 0`,
-      },
-
-      '&-y-axis': {
-        writingMode: 'vertical-rl',
-        textOrientation: 'mixed',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: `0 ${token.paddingXXS}px`,
-        minWidth: 24,
-      },
-
-      '&-content': {
-        display: 'flex',
-        flex: 1,
-      },
-
       '&-grid': {
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
         gridTemplateRows: '1fr 1fr',
-        flex: 1,
-        minHeight: 280,
+        border: `1px solid ${token.colorBorderSecondary}`,
+        borderRadius: token.borderRadiusLG,
+        overflow: 'hidden',
+        minHeight: 240,
       },
 
       '&-quadrant': {
         display: 'flex',
         flexDirection: 'column',
         padding: token.paddingSM,
-        minHeight: 120,
-        position: 'relative',
+        minHeight: 100,
         overflow: 'hidden',
 
         '&--q0': {
-          borderInlineStart: `1px dashed ${token.colorBorderSecondary}`,
-          borderBlockEnd: `1px dashed ${token.colorBorderSecondary}`,
           backgroundColor: `${token.colorSuccessBg}`,
+          borderInlineEnd: `1px dashed ${token.colorBorderSecondary}`,
+          borderBlockEnd: `1px dashed ${token.colorBorderSecondary}`,
         },
         '&--q1': {
-          borderBlockEnd: `1px dashed ${token.colorBorderSecondary}`,
           backgroundColor: `${token.colorInfoBg}`,
+          borderBlockEnd: `1px dashed ${token.colorBorderSecondary}`,
         },
         '&--q2': {
-          backgroundColor: `${token.colorFillQuaternary}`,
+          backgroundColor: `${token.colorWarningBg}`,
+          borderInlineEnd: `1px dashed ${token.colorBorderSecondary}`,
         },
         '&--q3': {
-          borderInlineStart: `1px dashed ${token.colorBorderSecondary}`,
-          backgroundColor: `${token.colorWarningBg}`,
+          backgroundColor: `${token.colorFillQuaternary}`,
         },
       },
 
@@ -172,18 +134,20 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
       [`@media (max-width: ${SINGLE_COLUMN_BREAKPOINT}px)`]: {
         '&-grid': {
           gridTemplateColumns: '1fr',
-          gridTemplateRows: 'repeat(4, 1fr)',
+          gridTemplateRows: 'repeat(4, auto)',
         },
         '&-quadrant': {
           '&--q0': {
-            borderInlineStart: 'none',
+            borderInlineEnd: 'none',
+            borderBlockEnd: `1px dashed ${token.colorBorderSecondary}`,
           },
-          '&--q3': {
-            borderInlineStart: 'none',
+          '&--q1': {
+            borderBlockEnd: `1px dashed ${token.colorBorderSecondary}`,
           },
-        },
-        '&-y-axis': {
-          display: 'none',
+          '&--q2': {
+            borderInlineEnd: 'none',
+            borderBlockEnd: `1px dashed ${token.colorBorderSecondary}`,
+          },
         },
       },
     },

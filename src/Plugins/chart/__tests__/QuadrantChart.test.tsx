@@ -4,10 +4,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { resolveQuadrantFields } from '../../../Utils/columnMatching';
 import { QuadrantChart } from '../QuadrantChart';
-import {
-  classifyIntoQuadrants,
-  computeMedian,
-} from '../QuadrantChart/utils';
+import { groupByQuadrant } from '../QuadrantChart/utils';
 
 const buildColumns = (titles: string[]) =>
   titles.map((t) => ({ title: t, dataIndex: t, key: t }));
@@ -15,119 +12,117 @@ const buildColumns = (titles: string[]) =>
 describe('QuadrantChart utils', () => {
   describe('resolveQuadrantFields', () => {
     it('按默认别名命中中文表头', () => {
-      const fields = resolveQuadrantFields(['名称', '紧急度', '重要度', '描述']);
-      expect(fields).toEqual({ name: '名称', description: '描述' });
+      const fields = resolveQuadrantFields(['名称', '象限', '描述']);
+      expect(fields).toEqual({ name: '名称', quadrant: '象限', description: '描述' });
     });
 
     it('命中英文表头', () => {
-      const fields = resolveQuadrantFields(['name', 'x', 'y', 'description']);
-      expect(fields).toEqual({ name: 'name', description: 'description' });
+      const fields = resolveQuadrantFields(['name', 'quadrant', 'description']);
+      expect(fields).toEqual({ name: 'name', quadrant: 'quadrant', description: 'description' });
     });
 
-    it('支持「逻辑名 + 括号单位」的宽松匹配', () => {
-      const fields = resolveQuadrantFields(['名称（项目）', '描述（中文）']);
-      expect(fields?.name).toBe('名称（项目）');
-      expect(fields?.description).toBe('描述（中文）');
+    it('支持 category/分类 等别名', () => {
+      const fields = resolveQuadrantFields(['标题', '分类']);
+      expect(fields?.name).toBe('标题');
+      expect(fields?.quadrant).toBe('分类');
     });
 
     it('fieldMap 覆盖优先级高于默认别名', () => {
       const fields = resolveQuadrantFields(
-        ['Foo', '名称', '简介'],
-        { name: 'Foo' },
+        ['Foo', 'Bar', '名称'],
+        { name: 'Foo', quadrant: 'Bar' },
       );
       expect(fields?.name).toBe('Foo');
+      expect(fields?.quadrant).toBe('Bar');
     });
 
     it('无法解析名称列时返回 null', () => {
-      expect(resolveQuadrantFields(['col1', 'col2'])).toBeNull();
+      expect(resolveQuadrantFields(['col1', '象限'])).toBeNull();
     });
 
-    it('无描述列时仅返回 name', () => {
-      const fields = resolveQuadrantFields(['名称', '数值A', '数值B']);
-      expect(fields).toEqual({ name: '名称' });
+    it('无法解析象限列时返回 null', () => {
+      expect(resolveQuadrantFields(['名称', 'col2'])).toBeNull();
+    });
+
+    it('无描述列时仅返回 name 和 quadrant', () => {
+      const fields = resolveQuadrantFields(['名称', '象限']);
+      expect(fields).toEqual({ name: '名称', quadrant: '象限' });
     });
   });
 
-  describe('classifyIntoQuadrants', () => {
+  describe('groupByQuadrant', () => {
     const data = [
-      { name: 'A', x: 80, y: 90 },
-      { name: 'B', x: 20, y: 85 },
-      { name: 'C', x: 75, y: 30 },
-      { name: 'D', x: 15, y: 20 },
+      { name: 'A', q: '重要且紧急' },
+      { name: 'B', q: '重要不紧急' },
+      { name: 'C', q: '重要且紧急' },
+      { name: 'D', q: '不重要但紧急' },
+      { name: 'E', q: '不重要不紧急' },
     ];
 
-    it('按阈值 50 正确分配到四个象限', () => {
-      const result = classifyIntoQuadrants(data, 'x', 'y', 'name', undefined, 50, 50);
-      expect(result[0].map((i) => i.name)).toEqual(['A']);
-      expect(result[1].map((i) => i.name)).toEqual(['B']);
-      expect(result[2].map((i) => i.name)).toEqual(['D']);
-      expect(result[3].map((i) => i.name)).toEqual(['C']);
+    it('按象限列分组，保持首次出现顺序', () => {
+      const result = groupByQuadrant(data, 'name', 'q', undefined);
+      expect(result).toHaveLength(4);
+      expect(result[0].label).toBe('重要且紧急');
+      expect(result[0].items.map((i) => i.name)).toEqual(['A', 'C']);
+      expect(result[1].label).toBe('重要不紧急');
+      expect(result[1].items.map((i) => i.name)).toEqual(['B']);
+      expect(result[2].label).toBe('不重要但紧急');
+      expect(result[3].label).toBe('不重要不紧急');
     });
 
-    it('边界值（等于阈值）归入高侧象限', () => {
-      const borderData = [{ name: 'E', x: 50, y: 50 }];
-      const result = classifyIntoQuadrants(borderData, 'x', 'y', 'name', undefined, 50, 50);
-      expect(result[0].map((i) => i.name)).toEqual(['E']);
-    });
-
-    it('跳过非数值的行', () => {
-      const mixedData = [
-        { name: 'A', x: 80, y: 90 },
-        { name: 'B', x: 'invalid', y: 85 },
-        { name: 'C', x: 75, y: null },
+    it('不足 4 个象限时补空占位', () => {
+      const twoGroups = [
+        { name: 'A', q: '组1' },
+        { name: 'B', q: '组2' },
       ];
-      const result = classifyIntoQuadrants(mixedData, 'x', 'y', 'name', undefined, 50, 50);
-      const total = result.reduce((sum, q) => sum + q.length, 0);
-      expect(total).toBe(1);
+      const result = groupByQuadrant(twoGroups, 'name', 'q', undefined);
+      expect(result).toHaveLength(4);
+      expect(result[2].label).toBe('Q3');
+      expect(result[2].items).toHaveLength(0);
+      expect(result[3].label).toBe('Q4');
     });
 
-    it('跳过空名称的行', () => {
-      const emptyNameData = [
-        { name: '', x: 80, y: 90 },
-        { name: '  ', x: 20, y: 85 },
-        { name: 'C', x: 75, y: 30 },
+    it('超过 4 个象限值时忽略多余的', () => {
+      const manyGroups = [
+        { name: 'A', q: 'G1' },
+        { name: 'B', q: 'G2' },
+        { name: 'C', q: 'G3' },
+        { name: 'D', q: 'G4' },
+        { name: 'E', q: 'G5' },
       ];
-      const result = classifyIntoQuadrants(emptyNameData, 'x', 'y', 'name', undefined, 50, 50);
-      const total = result.reduce((sum, q) => sum + q.length, 0);
-      expect(total).toBe(1);
+      const result = groupByQuadrant(manyGroups, 'name', 'q', undefined);
+      expect(result).toHaveLength(4);
+      const allNames = result.flatMap((g) => g.items.map((i) => i.name));
+      expect(allNames).not.toContain('E');
+    });
+
+    it('跳过空名称和空象限', () => {
+      const messyData = [
+        { name: '', q: '组1' },
+        { name: 'B', q: '' },
+        { name: 'C', q: '组1' },
+      ];
+      const result = groupByQuadrant(messyData, 'name', 'q', undefined);
+      expect(result[0].items).toHaveLength(1);
+      expect(result[0].items[0].name).toBe('C');
     });
 
     it('含描述列时正确解析', () => {
-      const withDesc = [{ name: 'A', x: 80, y: 90, desc: '高优先级' }];
-      const result = classifyIntoQuadrants(withDesc, 'x', 'y', 'name', 'desc', 50, 50);
-      expect(result[0][0].description).toBe('高优先级');
-    });
-  });
-
-  describe('computeMedian', () => {
-    it('奇数个值返回中间值', () => {
-      const data = [{ v: 10 }, { v: 20 }, { v: 30 }];
-      expect(computeMedian(data, 'v')).toBe(20);
-    });
-
-    it('偶数个值返回中间两数平均值', () => {
-      const data = [{ v: 10 }, { v: 20 }, { v: 30 }, { v: 40 }];
-      expect(computeMedian(data, 'v')).toBe(25);
-    });
-
-    it('空数据返回 50 作为默认值', () => {
-      expect(computeMedian([], 'v')).toBe(50);
-    });
-
-    it('忽略非数值', () => {
-      const data = [{ v: 10 }, { v: 'abc' }, { v: 30 }];
-      expect(computeMedian(data, 'v')).toBe(20);
+      const withDesc = [{ name: 'A', q: '组1', desc: '说明文字' }];
+      const result = groupByQuadrant(withDesc, 'name', 'q', 'desc');
+      expect(result[0].items[0].description).toBe('说明文字');
     });
   });
 });
 
 describe('QuadrantChart 组件渲染', () => {
-  const sampleColumns = buildColumns(['名称', '紧急度', '重要度', '描述']);
+  const sampleColumns = buildColumns(['名称', '象限', '描述']);
   const sampleData = [
-    { 名称: '优化数据库', 紧急度: 80, 重要度: 90, 描述: '紧急且重要' },
-    { 名称: '学习新技术', 紧急度: 20, 重要度: 85, 描述: '不紧急但重要' },
-    { 名称: '回复邮件', 紧急度: 75, 重要度: 30, 描述: '紧急不重要' },
-    { 名称: '整理桌面', 紧急度: 15, 重要度: 20, 描述: '不紧急不重要' },
+    { 名称: '修复线上bug', 象限: '重要且紧急', 描述: '影响用户' },
+    { 名称: '技术改进', 象限: '重要不紧急', 描述: '长期价值' },
+    { 名称: '回复邮件', 象限: '不重要但紧急', 描述: '日常事务' },
+    { 名称: '整理桌面', 象限: '不重要不紧急', 描述: '可以延后' },
+    { 名称: '处理客户投诉', 象限: '重要且紧急', 描述: '优先处理' },
   ];
 
   it('渲染标题和四个象限区域', () => {
@@ -136,144 +131,102 @@ describe('QuadrantChart 组件渲染', () => {
         title="优先级矩阵"
         columns={sampleColumns}
         data={sampleData}
-        x="紧急度"
-        y="重要度"
       />,
     );
 
     expect(screen.getByText('优先级矩阵')).toBeInTheDocument();
-    expect(screen.getByText('优化数据库')).toBeInTheDocument();
-    expect(screen.getByText('学习新技术')).toBeInTheDocument();
+    expect(screen.getByText('重要且紧急')).toBeInTheDocument();
+    expect(screen.getByText('重要不紧急')).toBeInTheDocument();
+    expect(screen.getByText('不重要但紧急')).toBeInTheDocument();
+    expect(screen.getByText('不重要不紧急')).toBeInTheDocument();
+  });
+
+  it('条目正确分布到象限中', () => {
+    render(
+      <QuadrantChart
+        columns={sampleColumns}
+        data={sampleData}
+      />,
+    );
+
+    expect(screen.getByText('修复线上bug')).toBeInTheDocument();
+    expect(screen.getByText('处理客户投诉')).toBeInTheDocument();
+    expect(screen.getByText('技术改进')).toBeInTheDocument();
     expect(screen.getByText('回复邮件')).toBeInTheDocument();
     expect(screen.getByText('整理桌面')).toBeInTheDocument();
   });
 
-  it('自定义象限标签正确渲染', () => {
-    const labels = ['重要且紧急', '重要不紧急', '不重要不紧急', '不重要但紧急'];
+  it('描述文字正确渲染', () => {
     render(
-      <QuadrantChart
-        title="测试"
-        columns={sampleColumns}
-        data={sampleData}
-        x="紧急度"
-        y="重要度"
-        quadrantLabels={labels}
-      />,
+      <QuadrantChart columns={sampleColumns} data={sampleData} />,
     );
 
-    expect(screen.getByText('重要且紧急')).toBeInTheDocument();
-    expect(screen.getByText('重要不紧急')).toBeInTheDocument();
-    expect(screen.getByText('不重要不紧急')).toBeInTheDocument();
-    expect(screen.getByText('不重要但紧急')).toBeInTheDocument();
+    expect(screen.getByText('影响用户')).toBeInTheDocument();
+    expect(screen.getByText('长期价值')).toBeInTheDocument();
   });
 
-  it('显示轴标签', () => {
-    render(
-      <QuadrantChart
-        columns={sampleColumns}
-        data={sampleData}
-        x="紧急度"
-        y="重要度"
-        xAxisLabel="紧急程度 →"
-        yAxisLabel="重要程度 →"
-      />,
-    );
-
-    expect(screen.getByText('紧急程度 →')).toBeInTheDocument();
-    expect(screen.getByText('重要程度 →')).toBeInTheDocument();
-  });
-
-  it('无法解析名称列时仅渲染空状态', () => {
+  it('无法解析字段时仅渲染空状态', () => {
     const cols = buildColumns(['col1', 'col2']);
-    const data = [{ col1: 80, col2: 90 }];
+    const data = [{ col1: 'a', col2: 'b' }];
     render(
-      <QuadrantChart
-        title="测试"
-        columns={cols}
-        data={data}
-        x="col1"
-        y="col2"
-      />,
-    );
-    expect(screen.getByText('四象限图')).toBeInTheDocument();
-  });
-
-  it('缺少 x/y 时渲染空状态', () => {
-    render(
-      <QuadrantChart
-        title="测试"
-        columns={sampleColumns}
-        data={sampleData}
-      />,
+      <QuadrantChart title="测试" columns={cols} data={data} />,
     );
     expect(screen.getByText('四象限图')).toBeInTheDocument();
   });
 
   it('描述列缺失时不渲染描述且不报错', () => {
-    const cols = buildColumns(['名称', '紧急度', '重要度']);
-    const data = [{ 名称: 'A', 紧急度: 80, 重要度: 90 }];
+    const cols = buildColumns(['名称', '象限']);
+    const data = [{ 名称: 'A', 象限: '组1' }];
     const { container } = render(
-      <QuadrantChart columns={cols} data={data} x="紧急度" y="重要度" />,
+      <QuadrantChart columns={cols} data={data} />,
     );
     expect(screen.getByText('A')).toBeInTheDocument();
     expect(container.querySelectorAll('[class*="-item-desc"]')).toHaveLength(0);
   });
 
   it('toolbar 与 title 在同一 header 行渲染', () => {
-    const cols = buildColumns(['名称', '紧急度', '重要度']);
-    const data = [{ 名称: 'a', 紧急度: 80, 重要度: 90 }];
+    const cols = buildColumns(['名称', '象限']);
+    const data = [{ 名称: 'a', 象限: '组1' }];
     render(
       <QuadrantChart
         title="标题"
         toolbar={<button type="button">tool</button>}
         columns={cols}
         data={data}
-        x="紧急度"
-        y="重要度"
       />,
     );
     expect(screen.getByText('标题')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'tool' })).toBeInTheDocument();
   });
 
-  it('自定义阈值正确分组', () => {
-    const cols = buildColumns(['名称', '紧急度', '重要度']);
+  it('gridcell 有正确的 aria-label', () => {
+    const cols = buildColumns(['名称', '象限']);
     const data = [
-      { 名称: 'A', 紧急度: 30, 重要度: 70 },
-      { 名称: 'B', 紧急度: 70, 重要度: 70 },
+      { 名称: 'A', 象限: '高高' },
+      { 名称: 'B', 象限: '低高' },
+      { 名称: 'C', 象限: '高低' },
+      { 名称: 'D', 象限: '低低' },
     ];
     render(
-      <QuadrantChart
-        columns={cols}
-        data={data}
-        x="紧急度"
-        y="重要度"
-        xThreshold={50}
-        yThreshold={50}
-      />,
-    );
-    expect(screen.getByText('A')).toBeInTheDocument();
-    expect(screen.getByText('B')).toBeInTheDocument();
-  });
-
-  it('gridcell 有正确的 aria-label', () => {
-    const cols = buildColumns(['名称', '紧急度', '重要度']);
-    const data = [{ 名称: 'A', 紧急度: 80, 重要度: 90 }];
-    render(
-      <QuadrantChart
-        columns={cols}
-        data={data}
-        x="紧急度"
-        y="重要度"
-        quadrantLabels={['高高', '低高', '低低', '高低']}
-      />,
+      <QuadrantChart columns={cols} data={data} />,
     );
     const cells = screen.getAllByRole('gridcell');
     expect(cells).toHaveLength(4);
     const labels = cells.map((c) => c.getAttribute('aria-label'));
     expect(labels).toContain('高高');
     expect(labels).toContain('低高');
-    expect(labels).toContain('低低');
     expect(labels).toContain('高低');
+    expect(labels).toContain('低低');
+  });
+
+  it('不足 4 个象限时补空占位', () => {
+    const cols = buildColumns(['名称', '象限']);
+    const data = [{ 名称: 'A', 象限: '唯一组' }];
+    render(
+      <QuadrantChart columns={cols} data={data} />,
+    );
+    const cells = screen.getAllByRole('gridcell');
+    expect(cells).toHaveLength(4);
+    expect(screen.getByText('唯一组')).toBeInTheDocument();
   });
 });

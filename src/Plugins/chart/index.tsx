@@ -52,7 +52,6 @@ export type {
 // 四象限图
 export {
   DEFAULT_QUADRANT_FIELD_ALIASES as QuadrantDefaultFieldAliases,
-  DEFAULT_QUADRANT_LABELS as QuadrantDefaultLabels,
   QuadrantChart,
   resolveQuadrantFields,
 } from './QuadrantChart';
