@@ -50,17 +50,8 @@ export type {
 } from './DocCards';
 
 // 四象限图
-export {
-  DEFAULT_QUADRANT_FIELD_ALIASES as QuadrantDefaultFieldAliases,
-  QuadrantChart,
-  resolveQuadrantFields,
-} from './QuadrantChart';
-export type {
-  QuadrantChartProps,
-  QuadrantField,
-  QuadrantFieldMap,
-  ResolvedQuadrantFields,
-} from './QuadrantChart';
+export { QuadrantChart } from './QuadrantChart';
+export type { QuadrantChartProps } from './QuadrantChart';
 
 // 图表组件导出
 export { default as AreaChart } from './AreaChart';

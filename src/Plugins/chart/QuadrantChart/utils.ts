@@ -1,76 +1,62 @@
 /**
- * QuadrantChart 渲染层工具函数集合。
+ * QuadrantChart 渲染层工具函数。
  *
- * 保持「零外部依赖」，仅依赖 `src/Utils/columnMatching.ts` 中的纯字符串工具。
+ * 四象限图采用最简模式：按行顺序渲染，前 4 行 = 4 个象限。
+ * 第 1 列 = 象限标签，第 2 列 = 逗号分隔的条目列表。
  */
-import {
-  QUADRANT_FIELD_ALIASES,
-  resolveQuadrantFields as sharedResolveQuadrantFields,
-  type QuadrantField,
-  type QuadrantFieldMap,
-  type ResolvedQuadrantFields,
-} from '../../../Utils/columnMatching';
-
-export type { QuadrantField, QuadrantFieldMap, ResolvedQuadrantFields };
-export const resolveQuadrantFields = sharedResolveQuadrantFields;
-export const DEFAULT_QUADRANT_FIELD_ALIASES = QUADRANT_FIELD_ALIASES;
 
 /** 四象限固定 4 格 */
 const MAX_QUADRANTS = 4;
 
+/** 条目拆分分隔符（与 docCards 的 splitTags 一致） */
+const ITEM_SPLIT_PATTERN = /[,;|/，；、]+/;
+
 export interface QuadrantGroup {
   label: string;
-  items: QuadrantItem[];
-}
-
-export interface QuadrantItem {
-  name: string;
-  description?: string;
+  items: string[];
 }
 
 /**
- * 按「象限」列的值将数据行分组到最多 4 个象限。
- *
- * 取前 4 个不重复的象限值作为象限标签，按首次出现顺序排列。
- * 超出 4 个的象限值会被忽略。
+ * 将原始单元格内容拆分为条目列表。
  */
-export const groupByQuadrant = (
+export const splitItems = (raw: unknown): string[] => {
+  if (raw === undefined || raw === null) return [];
+  const text = String(raw).trim();
+  if (!text) return [];
+  return text
+    .split(ITEM_SPLIT_PATTERN)
+    .map((s) => s.trim())
+    .filter(Boolean);
+};
+
+/**
+ * 按行顺序解析表格数据为四象限。
+ *
+ * - 前 4 行依次对应 4 个象限；
+ * - 第 1 列值作为象限标签；
+ * - 第 2 列值按分隔符拆分为条目列表；
+ * - 不足 4 行时补空占位。
+ */
+export const parseQuadrantsFromRows = (
   data: Record<string, any>[],
-  nameField: string,
-  quadrantField: string,
-  descField: string | undefined,
+  columns: { dataIndex: string }[],
 ): QuadrantGroup[] => {
-  const labelOrder: string[] = [];
-  const groupMap = new Map<string, QuadrantItem[]>();
+  const labelKey = columns[0]?.dataIndex;
+  const itemsKey = columns[1]?.dataIndex;
 
-  for (const row of data) {
-    const label = String(row[quadrantField] ?? '').trim();
-    if (!label) continue;
+  const groups: QuadrantGroup[] = [];
 
-    const name = String(row[nameField] ?? '').trim();
-    if (!name) continue;
-
-    if (!groupMap.has(label)) {
-      if (labelOrder.length >= MAX_QUADRANTS) continue;
-      labelOrder.push(label);
-      groupMap.set(label, []);
-    }
-
-    groupMap.get(label)!.push({
-      name,
-      description: descField ? String(row[descField] ?? '').trim() || undefined : undefined,
-    });
+  const rowCount = Math.min(data.length, MAX_QUADRANTS);
+  for (let i = 0; i < rowCount; i++) {
+    const row = data[i];
+    const label = labelKey ? String(row[labelKey] ?? '').trim() : `Q${i + 1}`;
+    const items = itemsKey ? splitItems(row[itemsKey]) : [];
+    groups.push({ label: label || `Q${i + 1}`, items });
   }
 
-  // 不足 4 组时补空象限
-  while (labelOrder.length < MAX_QUADRANTS) {
-    const placeholder = `Q${labelOrder.length + 1}`;
-    labelOrder.push(placeholder);
-    groupMap.set(placeholder, []);
+  while (groups.length < MAX_QUADRANTS) {
+    groups.push({ label: `Q${groups.length + 1}`, items: [] });
   }
 
-  return labelOrder.map((label) => ({
-    label,
-    items: groupMap.get(label) || [],
-  }));
+  return groups;
 };

@@ -42,14 +42,14 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         border: `1px solid ${token.colorBorderSecondary}`,
         borderRadius: token.borderRadiusLG,
         overflow: 'hidden',
-        minHeight: 240,
+        minHeight: 200,
       },
 
       '&-quadrant': {
         display: 'flex',
         flexDirection: 'column',
         padding: token.paddingSM,
-        minHeight: 100,
+        minHeight: 80,
         overflow: 'hidden',
 
         '&--q0': {
@@ -88,34 +88,19 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
 
       '&-item': {
         display: 'inline-flex',
-        flexDirection: 'column',
-        gap: 2,
+        alignItems: 'center',
         padding: `${token.paddingXXS}px ${token.paddingXS}px`,
         borderRadius: token.borderRadiusSM,
         backgroundColor: token.colorBgContainer,
         border: `1px solid ${token.colorBorderSecondary}`,
-        maxWidth: '100%',
-        transition: `border-color ${token.motionDurationMid} ${token.motionEaseOut}, box-shadow ${token.motionDurationMid} ${token.motionEaseOut}`,
-      },
-
-      '&-item-name': {
         fontSize: token.fontSizeSM,
-        fontWeight: token.fontWeightStrong,
         color: token.colorText,
         lineHeight: token.lineHeightSM,
+        maxWidth: '100%',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
-      },
-
-      '&-item-desc': {
-        fontSize: token.fontSizeSM - 1,
-        color: token.colorTextDescription,
-        lineHeight: token.lineHeightSM,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        maxWidth: 200,
+        transition: `border-color ${token.motionDurationMid} ${token.motionEaseOut}, box-shadow ${token.motionDurationMid} ${token.motionEaseOut}`,
       },
 
       '@media (hover: hover)': {

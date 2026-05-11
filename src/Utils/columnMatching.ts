@@ -158,90 +158,19 @@ export const canResolveDocCardsTitleColumn = (
 ): boolean => findFieldKey('title', columnKeys, override) !== undefined;
 
 // ---------------------------------------------------------------------------
-// Quadrant Chart（四象限图）字段解析
+// Quadrant Chart（四象限图）
 // ---------------------------------------------------------------------------
 
 /**
- * quadrant 的 3 个语义字段。
+ * 四象限图按行顺序渲染，不需要字段解析。
  *
- * - `name`：项目名称，必填；
- * - `quadrant`：所属象限名称，必填（前 4 个不重复值构成四个象限）；
- * - `description`：描述信息，可选。
- */
-export type QuadrantField = 'name' | 'quadrant' | 'description';
-
-/**
- * quadrant 字段映射：将语义字段名映射到表头 dataIndex。
- */
-export type QuadrantFieldMap = Partial<Record<QuadrantField, string>>;
-
-/**
- * quadrant 字段别名表。
- */
-export const QUADRANT_FIELD_ALIASES: Record<QuadrantField, string[]> = {
-  name: ['名称', '标题', '项目', 'name', 'title', 'item', 'Name', 'Title', 'Item'],
-  quadrant: ['象限', '分类', '类别', 'quadrant', 'category', 'group', 'Quadrant', 'Category'],
-  description: ['描述', '简介', '说明', 'description', 'desc', 'summary'],
-};
-
-const findQuadrantFieldKey = (
-  field: QuadrantField,
-  columnKeys: string[],
-  override?: string,
-): string | undefined => {
-  const candidates = override
-    ? [override, ...QUADRANT_FIELD_ALIASES[field]]
-    : QUADRANT_FIELD_ALIASES[field];
-  for (const alias of candidates) {
-    if (!alias) continue;
-    if (columnKeys.includes(alias)) return alias;
-    const matched = columnKeys.find((key) =>
-      columnKeyMatchesConfiguredField(key, alias),
-    );
-    if (matched) return matched;
-  }
-  return undefined;
-};
-
-/**
- * 解析后的 quadrant 字段映射。
+ * 表格前 4 行 = 4 个象限：
+ * - 第 1 列的值 = 象限标签；
+ * - 第 2 列的值 = 象限内容（逗号分隔的条目列表）。
  *
- * `name` 和 `quadrant` 必为命中列名；`description` 未命中时为 `undefined`。
+ * 校验仅需：至少 1 列、至少 1 行数据。
  */
-export type ResolvedQuadrantFields = {
-  name: string;
-  quadrant: string;
-} & Partial<Record<Exclude<QuadrantField, 'name' | 'quadrant'>, string>>;
-
-/**
- * 根据表头列与可选覆盖映射，解析出 quadrant 各语义字段对应的 dataIndex。
- *
- * 当 `name` 或 `quadrant` 列无法解析时返回 `null`，调用方应据此降级。
- */
-export const resolveQuadrantFields = (
+export const canRenderQuadrantChart = (
   columnKeys: string[],
-  override?: QuadrantFieldMap,
-): ResolvedQuadrantFields | null => {
-  const name = findQuadrantFieldKey('name', columnKeys, override?.name);
-  if (!name) return null;
-  const quadrant = findQuadrantFieldKey('quadrant', columnKeys, override?.quadrant);
-  if (!quadrant) return null;
-  const description = findQuadrantFieldKey(
-    'description',
-    columnKeys,
-    override?.description,
-  );
-  return {
-    name,
-    quadrant,
-    ...(description ? { description } : {}),
-  };
-};
-
-/**
- * 解析阶段的快速判定：能否同时锁定 quadrant 名称列和象限列。
- */
-export const canResolveQuadrantColumns = (
-  columnKeys: string[],
-  override?: QuadrantFieldMap,
-): boolean => resolveQuadrantFields(columnKeys, override) !== null;
+  dataLength: number,
+): boolean => columnKeys.length >= 1 && dataLength >= 1;

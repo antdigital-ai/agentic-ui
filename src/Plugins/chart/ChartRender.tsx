@@ -15,7 +15,7 @@ import { ActionIconBox } from '../../Components/ActionIconBox';
 import { Loading } from '../../Components/Loading';
 import { I18nContext } from '../../I18n';
 import { DocCards, type DocCardsFieldMap } from './DocCards';
-import { QuadrantChart, type QuadrantFieldMap } from './QuadrantChart';
+import { QuadrantChart } from './QuadrantChart';
 import { loadChartRuntime, type ChartRuntime } from './loadChartRuntime';
 import {
   debounce,
@@ -1316,9 +1316,6 @@ export const ChartRender: React.FC<{
     }
 
     if (chartType === 'quadrant') {
-      const restCfg = (config?.rest ?? {}) as {
-        fieldMap?: QuadrantFieldMap;
-      };
       return (
         <div
           key={config?.index}
@@ -1332,7 +1329,6 @@ export const ChartRender: React.FC<{
             }
             columns={config?.columns || []}
             data={chartData}
-            fieldMap={restCfg?.fieldMap}
           />
         </div>
       );

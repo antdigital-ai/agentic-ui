@@ -3,30 +3,16 @@ import classNames from 'clsx';
 import React, { memo, useContext, useMemo } from 'react';
 import { I18nContext } from '../../../I18n';
 import { useStyle } from './style';
-import {
-  groupByQuadrant,
-  resolveQuadrantFields,
-  type QuadrantFieldMap,
-  type QuadrantGroup,
-} from './utils';
+import { parseQuadrantsFromRows } from './utils';
 
 /**
  * QuadrantChart 组件 — 四象限图
  *
- * 与 docCards 共用同一套「HTML 注释 + GFM 表格」数据契约：
+ * 与 docCards 共用同一套「HTML 注释 + GFM 表格」数据契约，按行顺序渲染：
  *
- * - 每行表格 = 一个条目；
- * - 通过「象限」列（别名：象限/分类/类别/quadrant/category/group）将条目分组；
- * - 前 4 个不重复的象限值构成 2×2 网格的四个区域。
- *
- * 布局（2×2 grid，按数据中象限值的出现顺序）：
- * ```
- *   ┌──────────┬──────────┐
- *   │  第1个值  │  第2个值  │
- *   ├──────────┼──────────┤
- *   │  第3个值  │  第4个值  │
- *   └──────────┴──────────┘
- * ```
+ * - 前 4 行 = 4 个象限（按顺序排列为 2×2 网格）；
+ * - 第 1 列 = 象限标签；
+ * - 第 2 列 = 逗号分隔的条目列表。
  */
 export interface QuadrantChartProps {
   /** 标题 */
@@ -35,8 +21,6 @@ export interface QuadrantChartProps {
   columns: { title?: string; dataIndex: string; key?: string }[];
   /** 数据行 */
   data: Record<string, any>[];
-  /** 自定义字段名映射 */
-  fieldMap?: QuadrantFieldMap;
   /** 工具栏 */
   toolbar?: React.ReactNode;
   /** 容器自定义类名 */
@@ -51,7 +35,6 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
   title,
   columns,
   data,
-  fieldMap,
   toolbar,
   className,
   style,
@@ -61,20 +44,10 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
   const prefixCls = getPrefixCls('agentic-quadrant-chart');
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
-  const columnKeys = useMemo(
-    () => columns.map((col) => col.dataIndex).filter(Boolean),
-    [columns],
+  const quadrants = useMemo(
+    () => parseQuadrantsFromRows(data, columns),
+    [data, columns],
   );
-
-  const fields = useMemo(
-    () => resolveQuadrantFields(columnKeys, fieldMap),
-    [columnKeys, fieldMap],
-  );
-
-  const quadrants: QuadrantGroup[] | null = useMemo(() => {
-    if (!fields) return null;
-    return groupByQuadrant(data, fields.name, fields.quadrant, fields.description);
-  }, [data, fields]);
 
   const headerNode = useMemo(() => {
     if (!title && !toolbar) return null;
@@ -94,7 +67,7 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
     );
   }, [title, toolbar, prefixCls, hashId]);
 
-  if (!fields || !quadrants) {
+  if (!data.length || !columns.length) {
     return wrapSSR(
       <div
         className={classNames(prefixCls, hashId, className)}
@@ -123,7 +96,7 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
       >
         {quadrants.map((group, qi) => (
           <div
-            key={group.label}
+            key={qi}
             className={classNames(
               `${prefixCls}-quadrant`,
               `${prefixCls}-quadrant--${QUADRANT_MODIFIERS[qi]}`,
@@ -141,21 +114,14 @@ const QuadrantChartComponent: React.FC<QuadrantChartProps> = ({
                 role="list"
               >
                 {group.items.map((item, idx) => (
-                  <div
-                    key={`${idx}-${item.name}`}
+                  <span
+                    key={`${idx}-${item}`}
                     className={classNames(`${prefixCls}-item`, hashId)}
                     role="listitem"
-                    title={item.description || item.name}
+                    title={item}
                   >
-                    <span className={classNames(`${prefixCls}-item-name`, hashId)}>
-                      {item.name}
-                    </span>
-                    {item.description ? (
-                      <span className={classNames(`${prefixCls}-item-desc`, hashId)}>
-                        {item.description}
-                      </span>
-                    ) : null}
-                  </div>
+                    {item}
+                  </span>
                 ))}
               </div>
             ) : null}
