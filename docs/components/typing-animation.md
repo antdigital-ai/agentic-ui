@@ -20,8 +20,6 @@ group:
 
 ## 代码演示
 
-<code src="../demos/typing-animation-playground.tsx">API Playground - 速度 / words / 光标 / loop</code>
-
 <code src="../demos/typing-animation.tsx">基础打字机、词语轮播与光标样式</code>
 
 ## API
