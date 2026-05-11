@@ -15,7 +15,8 @@ group:
   - 📖 新增 `MarkdownRenderer` 组件文档（流式 Markdown 渲染、`CharacterQueueOptions`、内置代码块渲染器路由表、`MarkdownRendererRef` 命令式接口）。
   - 📖 新增 `ToolUseBarThink` 独立组件文档；同步修正 `ToolUseBar` 中 `ToolUseBarThink` 的 API 表（移除已废弃 / 不存在的 `id` / `isThinkLoading` / `isActive` / `onActiveChange` 等字段，对齐实际 props）。
   - 📖 新增 `GradientText`、`TextAnimate`、`TypingAnimation` 组件文档与对应 demo。
-  - 📖 为 `MarkdownRenderer` / `GradientText` / `TextAnimate` / `TypingAnimation` / `ToolUseBarThink` 各补充一份「API Playground」综合 demo，单一演示串联调试各组件的核心 props 与行为。
+  - 📖 为 `MarkdownRenderer` / `GradientText` / `TextAnimate` / `ToolUseBarThink` 各补充一份「API Playground」综合 demo，单一演示串联调试各组件的核心 props 与行为。
+  - 📖 为布局组件 `AgenticLayout` / `ChatLayout` / `LayoutHeader` 各补充一份「API Playground」综合 demo，覆盖三栏开关、宽度、受控/非受控折叠、`scrollBehavior`、命令式 ref（`scrollToBottom` / `isAtBottom`）、`onScrollStateChange`、`leftExtra` / `rightExtra` 等核心 props。
   - 🛠 `task-running.md` 改写为 `AgentRunBar 任务运行状态`，标注 `TaskRunning` / `TaskRunningProps` / `TaskRunningVariant` / `TaskRunningActionsRender` 为已废弃别名；同步将 `docs/demos/task-running.tsx` 中的 `TaskRunning` 替换为 `AgentRunBar`。
 
 ## v2.33.0
