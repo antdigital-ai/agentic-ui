@@ -17,6 +17,8 @@ group:
 
 ## 代码演示
 
+<code src="../demos/gradient-text-playground.tsx">API Playground - 预设、速度与字号</code>
+
 <code src="../demos/gradient-text.tsx">渐变文字基础用法</code>
 
 ## API
