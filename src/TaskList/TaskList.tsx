@@ -112,7 +112,7 @@ export const TaskList = memo(
           text =
             customCompleteText ?? locale?.['taskList.taskComplete'] ?? '任务完成';
           swapKey = `done:${items.map((i) => i.key).join(',')}`;
-        } else if (loadingItem?.title) {
+        } else if (loadingItem) {
           status = 'loading';
           const tpl =
             locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';

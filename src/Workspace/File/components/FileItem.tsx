@@ -1,4 +1,4 @@
-import {
+﻿import {
   Download as DownloadIcon,
   Eye as EyeIcon,
   Locate,
@@ -305,4 +305,4 @@ const FileItemComponent: FC<FileItemProps> = ({
 
 FileItemComponent.displayName = 'FileItem';
 
-export const FileItem = React.memo(FileItemComponent);
+export const FileItem = FileItemComponent;

@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChevronDown as DownIcon,
   Download as DownloadIcon,
   ChevronRight as RightIcon,
@@ -112,4 +112,4 @@ const GroupHeaderComponent: FC<GroupHeaderProps> = ({
 
 GroupHeaderComponent.displayName = 'GroupHeader';
 
-export const GroupHeader = React.memo(GroupHeaderComponent);
+export const GroupHeader = GroupHeaderComponent;

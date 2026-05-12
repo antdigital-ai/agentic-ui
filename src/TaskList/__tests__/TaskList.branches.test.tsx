@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+﻿import { fireEvent, render, screen } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -132,6 +132,33 @@ describe('TaskList Component', () => {
     );
 
     expect(screen.getByTestId('task-list-status-error')).toBeInTheDocument();
+  });
+
+  it('运行中时不应显示错误状态', () => {
+    const loadingWithErrorItems = [
+      {
+        key: 'task1',
+        title: '任务1',
+        content: '任务1内容',
+        status: 'error' as const,
+      },
+      {
+        key: 'task2',
+        // 注意：此 loading 任务没有 title
+        content: '任务2内容',
+        status: 'loading' as const,
+      },
+    ];
+
+    render(
+      <TestWrapper>
+        <TaskList items={loadingWithErrorItems} variant="simple" />
+      </TestWrapper>,
+    );
+
+    // 即使有错误存在，但只要有任务在运行中，就应该显示 loading 状态
+    expect(screen.getByTestId('task-list-status-loading')).toBeInTheDocument();
+    expect(screen.queryByTestId('task-list-status-error')).not.toBeInTheDocument();
   });
 
   it('应该显示加载动画', () => {

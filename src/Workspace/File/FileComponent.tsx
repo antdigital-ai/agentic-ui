@@ -1,4 +1,4 @@
-import { ConfigProvider, Empty, Image, Spin, Typography } from 'antd';
+﻿import { ConfigProvider, Empty, Image, Spin, Typography } from 'antd';
 import classNames from 'clsx';
 import React, { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
@@ -53,7 +53,11 @@ export const FileComponent: FC<{
   >;
   customActions?: React.ReactNode | ((file: FileNode) => React.ReactNode);
   actionRef?: FileProps['actionRef'];
+  /**
+   * @deprecated @since 2.29.0 请使用 isLoading 代替
+   */
   loading?: FileProps['loading'];
+  isLoading?: FileProps['isLoading'];
   loadingRender?: FileProps['loadingRender'];
   emptyRender?: FileProps['emptyRender'];
   /** 搜索关键字（受控） */
@@ -78,7 +82,8 @@ export const FileComponent: FC<{
   markdownEditorProps,
   customActions,
   actionRef,
-  loading,
+  loading: loadingProp,
+  isLoading,
   loadingRender,
   emptyRender,
   keyword,
@@ -118,6 +123,8 @@ export const FileComponent: FC<{
   );
 
   const safeNodes = nodes || [];
+  // 优先使用 isLoading，向后兼容 loading
+  const loading = isLoading ?? loadingProp;
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);

@@ -1,4 +1,4 @@
-import { Search } from '@sofa-design/icons';
+﻿import { Search } from '@sofa-design/icons';
 import { Input, type InputRef } from 'antd';
 import classNames from 'clsx';
 import React, { type FC, useRef } from 'react';
@@ -46,4 +46,4 @@ const SearchInputComponent: FC<SearchInputProps> = ({
 
 SearchInputComponent.displayName = 'SearchInput';
 
-export const SearchInput = React.memo(SearchInputComponent);
+export const SearchInput = SearchInputComponent;

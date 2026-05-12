@@ -1,4 +1,4 @@
-import {
+﻿import {
   act,
   fireEvent,
   render,
@@ -2613,6 +2613,55 @@ describe('FileComponent', () => {
       const showMoreBtn = screen.getByRole('button', { name: /查看更多/ });
       expect(showMoreBtn).toBeInTheDocument();
       expect(showMoreBtn.textContent).toMatch(/20/);
+    });
+  });
+
+  describe('加载状态', () => {
+    it('isLoading=true 时应显示加载状态', () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'test.txt', url: 'https://example.com/test.txt' },
+      ];
+
+      const { container } = render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} isLoading />
+        </TestWrapper>,
+      );
+
+      // 检查 Spin 组件的 loading 状态
+      expect(container.querySelector('.ant-spin')).toBeInTheDocument();
+      expect(container.querySelector('.ant-spin-spinning')).toBeInTheDocument();
+    });
+
+    it('isLoading 应优先于 loading 属性', () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'test.txt', url: 'https://example.com/test.txt' },
+      ];
+
+      const { container } = render(
+        <TestWrapper>
+          {/* isLoading=false, loading=true，最终应不显示 loading */}
+          <FileComponent nodes={nodes} isLoading={false} loading />
+        </TestWrapper>,
+      );
+
+      // isLoading 优先级更高，设为 false 时不应显示 loading
+      expect(container.querySelector('.ant-spin-spinning')).not.toBeInTheDocument();
+    });
+
+    it('未传 isLoading 时应回退到 loading 属性', () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'test.txt', url: 'https://example.com/test.txt' },
+      ];
+
+      const { container } = render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} loading />
+        </TestWrapper>,
+      );
+
+      // 回退到 loading 属性
+      expect(container.querySelector('.ant-spin-spinning')).toBeInTheDocument();
     });
   });
 });
