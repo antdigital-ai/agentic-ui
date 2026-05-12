@@ -247,7 +247,9 @@ export function useEditorStyleRegister(
       token: chatToken,
       hashId: '',
       path: [componentName],
-      nonce: () => csp?.nonce ?? '',
+      // 缺省 nonce 时透传 undefined，避免在 <style> 上 emit nonce=""
+      // —— 严格 CSP 策略下空 nonce 会被解读为「无值」并被拒绝
+      nonce: csp?.nonce ? () => csp.nonce! : undefined,
     },
     () => styleFn(chatToken),
   );
