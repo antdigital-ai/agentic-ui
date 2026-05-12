@@ -801,11 +801,13 @@ describe('TaskList', () => {
 
       render(<TaskList items={nodeTitleItems} variant="simple" />);
 
+      const summaryBar = screen.getByTestId('task-list-simple-bar');
+
       expect(
-        screen.getByTestId('task-list-status-loading'),
+        summaryBar.querySelector('[data-testid="task-list-status-loading"]'),
       ).toBeInTheDocument();
       expect(
-        screen.queryByTestId('task-list-status-error'),
+        summaryBar.querySelector('[data-testid="task-list-status-error"]'),
       ).not.toBeInTheDocument();
       expect(screen.getByText('正在进行任务')).toBeInTheDocument();
     });
