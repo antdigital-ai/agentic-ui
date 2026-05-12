@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 /**
  * 基础样式属性
@@ -48,7 +48,14 @@ export type WithFalse<T> = T | false;
  * 角色类型
  * @description 消息发送者的角色类型
  */
-export type RoleType = 'user' | 'system' | 'assistant' | 'agent' | 'bot';
+export type RoleType =
+  | 'user'
+  | 'system'
+  | 'assistant'
+  | 'agent'
+  | 'bot'
+  /** 会话内居中时间轴提示等非对话气泡（由宿主列表与 bubbleRender 约定展示） */
+  | 'sessionNotice';
 
 /**
  * 反馈类型

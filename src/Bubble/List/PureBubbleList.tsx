@@ -1,4 +1,4 @@
-import SkeletonList from './SkeletonList';
+﻿import SkeletonList from './SkeletonList';
 
 import { MutableRefObject, useContext, useMemo, useRef } from 'react';
 
@@ -8,6 +8,7 @@ import type {
   BubbleProps,
   MessageBubbleData,
 } from '../type';
+import type { RoleType } from '../../Types/common';
 
 import { ConfigProvider } from 'antd';
 import clsx from 'clsx';
@@ -90,7 +91,7 @@ export interface PureBubbleListProps {
         type: string;
         index: number;
         total: number;
-        role?: 'user' | 'assistant';
+        role?: RoleType;
       };
     }) => React.ReactNode;
     /**
@@ -250,7 +251,7 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
                 elementInfo: lazyProps.elementInfo
                   ? {
                       ...lazyProps.elementInfo,
-                      role: item.role as 'user' | 'assistant',
+                      role: item.role as RoleType,
                     }
                   : undefined,
               });
