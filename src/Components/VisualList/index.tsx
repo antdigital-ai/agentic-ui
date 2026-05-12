@@ -205,35 +205,25 @@ const VisualListComponent: React.FC<VisualListProps> = ({
   }, [prefixCls, hashId, variant, className]);
 
   /**
-   * 默认列表项渲染函数 - 使用 useRefFunction 优化
+   * 默认列表项渲染函数
    */
-  const defaultRenderItem = useRefFunction(
-    (item: VisualListItem, index: number) => {
-      const itemClassNames = [
-        `${prefixCls}-item`,
-        shape === 'circle' ? `${prefixCls}-item-circle` : '',
-        hashId,
-      ]
-        .filter(Boolean)
-        .join(' ');
+  const defaultRenderItem = (item: VisualListItem, index: number) => {
+    const itemClassNames = [
+      `${prefixCls}-item`,
+      shape === 'circle' ? `${prefixCls}-item-circle` : '',
+      hashId,
+    ]
+      .filter(Boolean)
+      .join(' ');
 
-      return (
-        <li key={item.id || index} className={itemClassNames} style={itemStyle}>
-          {item.href ? (
-            <a
-              href={item.href}
-              className={classNames(`${prefixCls}-link`, hashId)}
-              style={linkStyle}
-            >
-              <VisualListImage
-                item={item}
-                prefixCls={prefixCls}
-                hashId={hashId}
-                shape={shape}
-                imageStyle={imageStyle}
-              />
-            </a>
-          ) : (
+    return (
+      <li key={item.id || index} className={itemClassNames} style={itemStyle}>
+        {item.href ? (
+          <a
+            href={item.href}
+            className={classNames(`${prefixCls}-link`, hashId)}
+            style={linkStyle}
+          >
             <VisualListImage
               item={item}
               prefixCls={prefixCls}
@@ -241,11 +231,19 @@ const VisualListComponent: React.FC<VisualListProps> = ({
               shape={shape}
               imageStyle={imageStyle}
             />
-          )}
-        </li>
-      );
-    },
-  );
+          </a>
+        ) : (
+          <VisualListImage
+            item={item}
+            prefixCls={prefixCls}
+            hashId={hashId}
+            shape={shape}
+            imageStyle={imageStyle}
+          />
+        )}
+      </li>
+    );
+  };
 
   // 使用 useMemo 优化列表渲染
   const listItems = useMemo(() => {
@@ -255,7 +253,7 @@ const VisualListComponent: React.FC<VisualListProps> = ({
       }
       return defaultRenderItem(item, index);
     });
-  }, [displayList, renderItem, defaultRenderItem]);
+  }, [displayList, renderItem]);
 
   // 加载状态渲染
   if (loading) {

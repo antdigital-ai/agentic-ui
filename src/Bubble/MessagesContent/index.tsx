@@ -88,10 +88,10 @@ export const BubbleMessageDisplay: React.FC<
 
   const docTagTooltipProps = useAdaptiveTooltipProps('informational');
 
-  const funRender = useRefFunction((props: { identifier?: any }) => {
+  const funRender = (props: { identifier?: any }) => {
     const node = nodeList.find((item) => item.placeholder === props.identifier);
     return node;
-  });
+  };
 
   const handleFootnoteDefinitionChange = useRefFunction(
     (list: typeof nodeList) => {

@@ -337,7 +337,7 @@ export const FileComponent: FC<{
     );
   };
 
-  const renderEmptyContent = useRefFunction(() => {
+  const renderEmptyContent = () => {
     if (hasKeyword) {
       return (
         <Typography.Text type="secondary">
@@ -359,7 +359,7 @@ export const FileComponent: FC<{
         <Empty description={locale?.['workspace.empty'] || 'No data'} />
       )
     );
-  });
+  };
 
   const handleFlatShowMore = useRefFunction(() => {
     setFlatVisibleCount((prev) => prev + GROUP_PAGE_SIZE_INCREMENT);
