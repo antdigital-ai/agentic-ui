@@ -129,6 +129,34 @@ describe('VisualList 组件', () => {
     expect(firstItem).toHaveStyle('padding: 10px');
   });
 
+  it('相同 data 引用重新渲染时应刷新默认项属性', () => {
+    const stableData = [
+      { id: '1', src: '/img1.jpg', alt: '图片1', title: '标题1' },
+    ];
+
+    const { container, rerender } = render(
+      <VisualList data={stableData} itemStyle={{ padding: '4px' }} />,
+    );
+
+    expect(container.querySelector('li')).not.toHaveClass(
+      'visual-list-item-circle',
+    );
+    expect(container.querySelector('li')).toHaveStyle('padding: 4px');
+
+    rerender(
+      <VisualList
+        data={stableData}
+        shape="circle"
+        itemStyle={{ padding: '12px' }}
+      />,
+    );
+
+    expect(container.querySelector('li')).toHaveClass(
+      'visual-list-item-circle',
+    );
+    expect(container.querySelector('li')).toHaveStyle('padding: 12px');
+  });
+
   it('应该支持自定义图片样式', () => {
     const { container } = render(
       <VisualList data={mockData} imageStyle={{ borderRadius: '50%' }} />,

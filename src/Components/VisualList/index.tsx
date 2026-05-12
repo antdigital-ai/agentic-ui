@@ -1,6 +1,6 @@
 import { SquareArrowUpRight } from '@sofa-design/icons';
 import classNames from 'clsx';
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { useStyle } from './style';
 
@@ -207,23 +207,33 @@ const VisualListComponent: React.FC<VisualListProps> = ({
   /**
    * 默认列表项渲染函数
    */
-  const defaultRenderItem = (item: VisualListItem, index: number) => {
-    const itemClassNames = [
-      `${prefixCls}-item`,
-      shape === 'circle' ? `${prefixCls}-item-circle` : '',
-      hashId,
-    ]
-      .filter(Boolean)
-      .join(' ');
+  const defaultRenderItem = useCallback(
+    (item: VisualListItem, index: number) => {
+      const itemClassNames = [
+        `${prefixCls}-item`,
+        shape === 'circle' ? `${prefixCls}-item-circle` : '',
+        hashId,
+      ]
+        .filter(Boolean)
+        .join(' ');
 
-    return (
-      <li key={item.id || index} className={itemClassNames} style={itemStyle}>
-        {item.href ? (
-          <a
-            href={item.href}
-            className={classNames(`${prefixCls}-link`, hashId)}
-            style={linkStyle}
-          >
+      return (
+        <li key={item.id || index} className={itemClassNames} style={itemStyle}>
+          {item.href ? (
+            <a
+              href={item.href}
+              className={classNames(`${prefixCls}-link`, hashId)}
+              style={linkStyle}
+            >
+              <VisualListImage
+                item={item}
+                prefixCls={prefixCls}
+                hashId={hashId}
+                shape={shape}
+                imageStyle={imageStyle}
+              />
+            </a>
+          ) : (
             <VisualListImage
               item={item}
               prefixCls={prefixCls}
@@ -231,19 +241,12 @@ const VisualListComponent: React.FC<VisualListProps> = ({
               shape={shape}
               imageStyle={imageStyle}
             />
-          </a>
-        ) : (
-          <VisualListImage
-            item={item}
-            prefixCls={prefixCls}
-            hashId={hashId}
-            shape={shape}
-            imageStyle={imageStyle}
-          />
-        )}
-      </li>
-    );
-  };
+          )}
+        </li>
+      );
+    },
+    [hashId, imageStyle, itemStyle, linkStyle, prefixCls, shape],
+  );
 
   // 使用 useMemo 优化列表渲染
   const listItems = useMemo(() => {
@@ -253,7 +256,7 @@ const VisualListComponent: React.FC<VisualListProps> = ({
       }
       return defaultRenderItem(item, index);
     });
-  }, [displayList, renderItem]);
+  }, [defaultRenderItem, displayList, renderItem]);
 
   // 加载状态渲染
   if (loading) {

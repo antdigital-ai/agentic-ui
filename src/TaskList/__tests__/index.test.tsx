@@ -777,6 +777,39 @@ describe('TaskList', () => {
       expect(screen.getByText('正在进行Running Task任务')).toBeInTheDocument();
     });
 
+    it('loading 任务标题为 ReactNode 时仍应显示 loading 摘要', () => {
+      const nodeTitleItems = [
+        {
+          key: '1',
+          title: 'Completed Task',
+          content: 'Completed content',
+          status: 'success' as const,
+        },
+        {
+          key: '2',
+          title: <span data-testid="running-node-title">Running Node</span>,
+          content: 'Running content',
+          status: 'loading' as const,
+        },
+        {
+          key: '3',
+          title: 'Error Task',
+          content: 'Error content',
+          status: 'error' as const,
+        },
+      ];
+
+      render(<TaskList items={nodeTitleItems} variant="simple" />);
+
+      expect(
+        screen.getByTestId('task-list-status-loading'),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByTestId('task-list-status-error'),
+      ).not.toBeInTheDocument();
+      expect(screen.getByText('正在进行任务')).toBeInTheDocument();
+    });
+
     it('点击摘要条应展开任务列表', async () => {
       render(<TaskList items={simpleItems} variant="simple" />);
 

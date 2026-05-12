@@ -1271,6 +1271,39 @@ describe('FileComponent', () => {
       expect(screen.getByText(/未找到与/)).toBeInTheDocument();
     });
 
+    it('更新 keyword 时应立即刷新空状态文案', () => {
+      const emptyRender = <div data-testid="custom-empty">暂无数据</div>;
+
+      const { rerender } = render(
+        <TestWrapper>
+          <FileComponent
+            nodes={[]}
+            showSearch
+            keyword=""
+            emptyRender={emptyRender}
+          />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByTestId('custom-empty')).toBeInTheDocument();
+
+      rerender(
+        <TestWrapper>
+          <FileComponent
+            nodes={[]}
+            showSearch
+            keyword="missing"
+            emptyRender={emptyRender}
+          />
+        </TestWrapper>,
+      );
+
+      expect(
+        screen.getByText('未找到与「missing」匹配的结果'),
+      ).toBeInTheDocument();
+      expect(screen.queryByTestId('custom-empty')).not.toBeInTheDocument();
+    });
+
     it('应该清空搜索', () => {
       const handleChange = vi.fn();
 
@@ -2646,7 +2679,9 @@ describe('FileComponent', () => {
       );
 
       // isLoading 优先级更高，设为 false 时不应显示 loading
-      expect(container.querySelector('.ant-spin-spinning')).not.toBeInTheDocument();
+      expect(
+        container.querySelector('.ant-spin-spinning'),
+      ).not.toBeInTheDocument();
     });
 
     it('未传 isLoading 时应回退到 loading 属性', () => {
