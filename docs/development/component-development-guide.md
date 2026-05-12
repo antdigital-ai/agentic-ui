@@ -205,7 +205,6 @@ export function useStyle(prefixCls?: string, extra?: Partial<ChatTokenType>) {
 `useEditorStyleRegister` 现在直接走 `@ant-design/cssinjs` 的
 `useStyleRegister`，与 `genStyleHooks` 共享同一套底层注入路径。新增样式时
 **优先使用 `genStyleHooks`**，仅在签名特殊时退回 `useEditorStyleRegister`。
-```
 
 #### 组件中使用样式
 
