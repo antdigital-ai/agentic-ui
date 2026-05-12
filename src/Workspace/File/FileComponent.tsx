@@ -372,7 +372,7 @@ export const FileComponent: FC<{
     }
   });
 
-  const renderFileContent = useRefFunction(() => {
+  const renderFileContent = () => {
     if (safeNodes.length === 0 && !loading) {
       return (
         <div className={classNames(`${prefixCls}-empty`, hashId)}>
@@ -456,7 +456,7 @@ export const FileComponent: FC<{
         </div>
       </>
     );
-  });
+  };
 
   // 隐藏的 antd Image，用于触发图片预览
   const ImagePreviewComponent = (
