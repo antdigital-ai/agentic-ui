@@ -965,6 +965,40 @@ describe('TaskList', () => {
       expect(screen.getByText('正在进行任务')).toBeInTheDocument();
     });
 
+    it('loading 任务无标题时应优先显示进行中状态', () => {
+      const itemsWithUntitledLoading = [
+        {
+          key: '1',
+          title: 'Task 1',
+          content: 'Content 1',
+          status: 'success' as const,
+        },
+        {
+          key: '2',
+          content: 'Loading content',
+          status: 'loading' as const,
+        },
+        {
+          key: '3',
+          title: 'Error Task',
+          content: 'Error content',
+          status: 'error' as const,
+        },
+      ];
+
+      render(<TaskList items={itemsWithUntitledLoading} variant="simple" />);
+
+      const bar = screen.getByTestId('task-list-simple-bar');
+      expect(bar).toHaveAttribute('aria-label', '展开');
+      expect(screen.getByText('正在进行任务')).toBeInTheDocument();
+      expect(
+        bar.querySelector('[data-testid="task-list-status-loading"]'),
+      ).toBeInTheDocument();
+      expect(
+        bar.querySelector('[data-testid="task-list-status-error"]'),
+      ).not.toBeInTheDocument();
+    });
+
     it('展开后取消状态只显示最后一条任务', async () => {
       const errorItems = [
         {

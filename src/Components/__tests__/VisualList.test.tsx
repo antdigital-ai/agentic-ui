@@ -273,6 +273,33 @@ describe('VisualList 组件', () => {
       expect(defaultIcon).toBeTruthy();
     });
   });
+
+  it('相同 data 引用下更新图片样式时应刷新默认渲染项', () => {
+    const dataWithOneImg = [{ id: '1', src: '/valid.jpg', alt: '图' }];
+    const { container, rerender } = render(
+      <VisualListFull
+        data={dataWithOneImg}
+        imageStyle={{ width: 24, height: 24 }}
+      />,
+    );
+
+    expect(container.querySelector('img')).toHaveStyle({
+      width: '24px',
+      height: '24px',
+    });
+
+    rerender(
+      <VisualListFull
+        data={dataWithOneImg}
+        imageStyle={{ width: 48, height: 48 }}
+      />,
+    );
+
+    expect(container.querySelector('img')).toHaveStyle({
+      width: '48px',
+      height: '48px',
+    });
+  });
 });
 
 describe('VisualList（Components/VisualList）', () => {

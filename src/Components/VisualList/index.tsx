@@ -253,7 +253,16 @@ const VisualListComponent: React.FC<VisualListProps> = ({
       }
       return defaultRenderItem(item, index);
     });
-  }, [displayList, renderItem]);
+  }, [
+    displayList,
+    renderItem,
+    prefixCls,
+    shape,
+    hashId,
+    itemStyle,
+    linkStyle,
+    imageStyle,
+  ]);
 
   // 加载状态渲染
   if (loading) {

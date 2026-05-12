@@ -413,15 +413,23 @@ describe('BubbleMessageDisplay', () => {
     it('应该处理bot角色消息', () => {
       const props = {
         ...defaultProps,
+        content: 'Unfinished bot content',
         originData: {
           ...defaultProps.originData,
+          content: 'Unfinished bot content',
           role: 'bot',
+          isFinished: false,
         },
       };
 
       renderWithContext(props);
 
       expect(screen.getByTestId('markdown-preview')).toBeInTheDocument();
+      expect(screen.getByTestId('content')).toHaveTextContent(
+        'Unfinished bot content',
+      );
+      expect(screen.getByTestId('is-finished')).toHaveTextContent('true');
+      expect(screen.getByTestId('typing')).toHaveTextContent('false');
     });
 
     it('应该处理REJECT_TO_ANSWER标签', () => {
