@@ -181,13 +181,11 @@ export const FileComponent: FC<{
     setHeaderFileOverride(null);
   });
 
-  // resetKey 变化 → 重置预览
+  // resetKey 变化 → 重置预览（仅依赖 resetKey；勿依赖 previewFile，否则 onPreview 将 previewFile 从 null 置为有值时会再跑一遍 effect，在 resetKey 已为 0 等合法值时误触发返回列表）
   useEffect(() => {
-    if (resetKey !== undefined && previewFile) {
-      handleBackToList();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey, previewFile]);
+    if (resetKey === undefined) return;
+    handleBackToList();
+  }, [resetKey, handleBackToList]);
 
   useEffect(() => {
     if (panelView === 'tree') {

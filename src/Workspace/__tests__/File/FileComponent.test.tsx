@@ -1109,6 +1109,33 @@ describe('FileComponent', () => {
         expect(screen.queryByLabelText('返回文件列表')).not.toBeInTheDocument();
       });
     });
+
+    it('resetKey 已传入（含 0）时 onPreview 返回自定义 React 节点打开预览不应闪回列表', async () => {
+      const CustomPreview = () => (
+        <div data-testid="custom-preview-flash-guard">custom body</div>
+      );
+      const handlePreview = vi
+        .fn()
+        .mockResolvedValue((<CustomPreview />) as any);
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'guard.txt', content: 'Hello' },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} onPreview={handlePreview} resetKey={0} />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByLabelText('预览'));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId('custom-preview-flash-guard'),
+        ).toBeInTheDocument();
+      });
+      expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+    });
   });
 
   describe('actionRef功能', () => {
