@@ -81,4 +81,39 @@ describe('genStyleHooks 基础设施', () => {
     );
     expect(typeof SubStyle).toBe('function');
   });
+
+  it('wrapSSR 应为 identity 函数：不包 Fragment、不动节点', () => {
+    const useStyle = genStyleHooks(
+      'TestIdentityWrap' as any,
+      (token) => ({ [token.componentCls]: { color: token.colorText } }),
+    );
+
+    const { result } = renderHook(() => useStyle('agentic-identity'), {
+      wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
+    });
+
+    const [wrapSSR] = result.current;
+    const node = <div data-testid="payload" />;
+    // 严格相等：identity 不应创建新的 React 元素
+    expect(wrapSSR(node)).toBe(node);
+  });
+
+  it('useStyle 调用本身已注入样式到 document.head，无需 wrapSSR 触发', () => {
+    const styleId = 'agentic-side-effect-injection';
+    const useStyle = genStyleHooks('TestSideEffect' as any, (token) => ({
+      [token.componentCls]: {
+        // 通过该字段在 document.head 里搜索注入痕迹
+        '--agentic-side-effect-marker': `"${styleId}"`,
+      },
+    }));
+
+    renderHook(() => useStyle(styleId), {
+      wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
+    });
+
+    const injected = Array.from(document.head.querySelectorAll('style')).some(
+      (el) => el.textContent?.includes(styleId),
+    );
+    expect(injected).toBe(true);
+  });
 });

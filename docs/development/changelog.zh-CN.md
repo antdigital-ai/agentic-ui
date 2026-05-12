@@ -15,6 +15,7 @@ group:
   - 🛠 `Hooks/useStyle` 重写为基于 `@ant-design/cssinjs-utils` 的 `genStyleUtils`，与 antd 上游 `theme/util/genStyleUtils` 同源；新增导出 `genStyleHooks` / `genComponentStyleHook` / `genSubStyleComponent` 及类型 `AgenticComponentTokenMap` / `FullToken` / `GenStyleFn`，组件可通过模块声明扩展自己的 `ComponentToken`。
   - 🛠 全量迁移 70+ 组件的 `style.ts` 至 `genStyleHooks('ComponentName', genStyle)` 模式（`AILabel` / `TaskList` / `ToolUseBar` / `Workspace` / `Plugins/chart/*` / `MarkdownEditor` 主样式 等）；`useEditorStyleRegister` 作为兼容入口保留，少数动态 token / 动态 classNames 场景（`Bubble` 主样式、`MarkdownInputField` 主样式、`MarkdownEditor/editor` content 样式）继续走该入口，其内部已改由 `@ant-design/cssinjs` 的 `useStyleRegister` 直接驱动。
   - 🛠 移除对 `@ant-design/theme-token` `createStyleRegister` 的依赖；组件库统一保持 `hashId=''`，避免与宿主 antd 主题哈希叠加导致选择器失效。
+  - ⚡️ `useStyle` 返回的 `wrapSSR` 改为 identity 函数：样式注入由 cssinjs `useGlobalCache` → `updateCSS` 副作用完成，与 `wrapSSR` 无关；浏览器 CSR 下 `wrapSSR(node)` 此前一直等于 `<><Empty/>{node}</>`，组件库也未使用 `<StyleProvider ssrInline>`，因此该层 Fragment + `<Empty/>` 元素纯属无用开销。改造后每个组件每次渲染少一层 React 元素分配；组件文件继续 `return wrapSSR(<jsx/>)` 仍兼容（identity 透传），新组件可以直接 `return <jsx/>`。
 
 - 📖 文档
   - 📖 新增 `MarkdownRenderer` 组件文档（流式 Markdown 渲染、`CharacterQueueOptions`、内置代码块渲染器路由表、`MarkdownRendererRef` 命令式接口）。
