@@ -368,9 +368,18 @@ describe('Workspace Component', () => {
       </TestWrapper>,
     );
 
-    const digitGroups = screen.getAllByTestId('workspace-tab-count-digits');
-    expect(digitGroups.some((el) => el.textContent === '5')).toBe(true);
-    expect(digitGroups.some((el) => el.textContent === '10')).toBe(true);
+    expect(
+      screen.getByTestId('workspace-tab-count-digits--realtime'),
+    ).toHaveTextContent('5');
+    expect(
+      screen.getByTestId('workspace-tab-count-digits--browser'),
+    ).toHaveTextContent('10');
+    expect(
+      screen.getByTestId('workspace-tab-count-digit--browser--0'),
+    ).toHaveTextContent('1');
+    expect(
+      screen.getByTestId('workspace-tab-count-digit--browser--1'),
+    ).toHaveTextContent('0');
   });
 
   it('应该支持自定义标签页配置', () => {

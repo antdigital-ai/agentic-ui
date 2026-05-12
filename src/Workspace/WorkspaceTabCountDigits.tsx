@@ -5,6 +5,8 @@ import React, { useEffect, useRef, useState } from 'react';
 const TAB_COUNT_DIGIT_STAGGER_MS = 70;
 
 export interface WorkspaceTabCountDigitsProps {
+  /** 与 Workspace 标签 `key` 一致，用于拼接稳定的 data-testid */
+  tabKey: string;
   value: number;
   prefixCls: string;
   hashId?: string;
@@ -12,7 +14,7 @@ export interface WorkspaceTabCountDigitsProps {
 
 export const WorkspaceTabCountDigits: React.FC<
   WorkspaceTabCountDigitsProps
-> = ({ value, prefixCls, hashId }) => {
+> = ({ tabKey, value, prefixCls, hashId }) => {
   const [isAnimating, setIsAnimating] = useState(true);
   const lastSerializedRef = useRef<string | null>(null);
   const digits = String(value).split('');
@@ -52,12 +54,13 @@ export const WorkspaceTabCountDigits: React.FC<
         hashId,
         isAnimating && `${prefixCls}-tab-count-digits--animating`,
       )}
-      data-testid="workspace-tab-count-digits"
+      data-testid={`workspace-tab-count-digits--${tabKey}`}
     >
       {digits.map((ch, index) => (
         <span
           key={`${index}-${ch}`}
           className={classNames(`${prefixCls}-tab-count-digit`, hashId)}
+          data-testid={`workspace-tab-count-digit--${tabKey}--${index}`}
           style={
             index > 0
               ? {
