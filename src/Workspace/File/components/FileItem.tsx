@@ -1,4 +1,4 @@
-﻿import {
+import {
   Download as DownloadIcon,
   Eye as EyeIcon,
   Locate,

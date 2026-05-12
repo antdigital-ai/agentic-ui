@@ -1,4 +1,4 @@
-﻿import { ConfigProvider, Empty, Image, Spin, Typography } from 'antd';
+import { ConfigProvider, Empty, Image, Spin, Typography } from 'antd';
 import classNames from 'clsx';
 import React, { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
@@ -323,7 +323,7 @@ export const FileComponent: FC<{
 
   const hasKeyword = Boolean((keyword ?? '').trim());
 
-  const renderSearchInput = useRefFunction(() => {
+  const renderSearchInput = () => {
     if (!showSearch) return null;
     return (
       <SearchInput
@@ -335,7 +335,7 @@ export const FileComponent: FC<{
         locale={locale}
       />
     );
-  });
+  };
 
   const renderEmptyContent = useRefFunction(() => {
     if (hasKeyword) {

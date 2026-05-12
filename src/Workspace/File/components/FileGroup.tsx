@@ -1,4 +1,4 @@
-﻿import classNames from 'clsx';
+import classNames from 'clsx';
 import React, { type FC, useEffect, useRef, useState } from 'react';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { compileTemplate } from '../../../I18n';
