@@ -198,6 +198,94 @@ describe('FileComponent', () => {
     });
   });
 
+  describe('fileTreeSwitch 列表与文件树切换', () => {
+    const treeProps = {
+      treeData: [{ key: 'leaf-1', name: 'only.txt', isLeaf: true }],
+      onLoadChildren: vi.fn().mockResolvedValue([]),
+    };
+
+    it('展示段选择器并切换到内嵌文件树', async () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
+      ];
+      render(
+        <TestWrapper>
+          <FileComponent nodes={nodes} fileTreeSwitch={{ treeProps }} />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('file-panel-view-switch')).toBeInTheDocument();
+      expect(screen.getByText('list.txt')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('文件树'));
+      await waitFor(() => {
+        expect(screen.getByTestId('workspace-file-tree')).toBeInTheDocument();
+      });
+      expect(screen.getByText('only.txt')).toBeInTheDocument();
+      expect(screen.queryByText('list.txt')).not.toBeInTheDocument();
+    });
+
+    it('树视图下隐藏搜索框，切回列表恢复', () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
+      ];
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={nodes}
+            showSearch
+            keyword=""
+            onChange={vi.fn()}
+            fileTreeSwitch={{
+              treeProps,
+              listLabel: 'List',
+              treeLabel: 'Tree',
+            }}
+          />
+        </TestWrapper>,
+      );
+      expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('Tree'));
+      expect(screen.queryByTestId('file-search-input')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByText('List'));
+      expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
+    });
+
+    it('受控 view 时由外部驱动展示', async () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
+      ];
+      const onViewChange = vi.fn();
+      const { rerender } = render(
+        <TestWrapper>
+          <FileComponent
+            nodes={nodes}
+            fileTreeSwitch={{
+              treeProps,
+              view: 'list',
+              onViewChange,
+            }}
+          />
+        </TestWrapper>,
+      );
+      fireEvent.click(screen.getByText('文件树'));
+      expect(onViewChange).toHaveBeenCalledWith('tree');
+      rerender(
+        <TestWrapper>
+          <FileComponent
+            nodes={nodes}
+            fileTreeSwitch={{
+              treeProps,
+              view: 'tree',
+              onViewChange,
+            }}
+          />
+        </TestWrapper>,
+      );
+      await waitFor(() => {
+        expect(screen.getByTestId('workspace-file-tree')).toBeInTheDocument();
+      });
+    });
+  });
+
   describe('文件交互', () => {
     it('应该触发文件点击事件', () => {
       const handleClick = vi.fn();
@@ -2646,7 +2734,9 @@ describe('FileComponent', () => {
       );
 
       // isLoading 优先级更高，设为 false 时不应显示 loading
-      expect(container.querySelector('.ant-spin-spinning')).not.toBeInTheDocument();
+      expect(
+        container.querySelector('.ant-spin-spinning'),
+      ).not.toBeInTheDocument();
     });
 
     it('未传 isLoading 时应回退到 loading 属性', () => {

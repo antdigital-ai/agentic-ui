@@ -1,10 +1,23 @@
-import { ConfigProvider, Empty, Image, Spin, Typography } from 'antd';
+import {
+  ConfigProvider,
+  Empty,
+  Image,
+  Segmented,
+  Spin,
+  Typography,
+} from 'antd';
 import classNames from 'clsx';
 import React, { type FC, useContext, useEffect, useRef, useState } from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext, compileTemplate } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor';
-import type { FileNode, FileProps, FileType, GroupNode } from '../types';
+import type {
+  FileNode,
+  FilePanelViewMode,
+  FileProps,
+  FileType,
+  GroupNode,
+} from '../types';
 import {
   FileGroup,
   GROUP_INITIAL_PAGE_SIZE,
@@ -12,6 +25,7 @@ import {
 } from './components/FileGroup';
 import { FileItem } from './components/FileItem';
 import { SearchInput } from './components/SearchInput';
+import { FileTree } from './FileTree';
 import { isImageFile } from './FileTypeProcessor';
 import {
   getPreviewSource,
@@ -67,6 +81,7 @@ export const FileComponent: FC<{
   showSearch?: boolean;
   searchPlaceholder?: string;
   bindDomId?: FileProps['bindDomId'];
+  fileTreeSwitch?: FileProps['fileTreeSwitch'];
 }> = ({
   nodes,
   onGroupDownload,
@@ -91,6 +106,7 @@ export const FileComponent: FC<{
   showSearch = false,
   searchPlaceholder,
   bindDomId = false,
+  fileTreeSwitch,
 }) => {
   const [previewFile, setPreviewFile] = useState<FileNode | null>(null);
   const [customPreviewContent, setCustomPreviewContent] =
@@ -109,6 +125,16 @@ export const FileComponent: FC<{
   const [flatVisibleCount, setFlatVisibleCount] = useState(
     GROUP_INITIAL_PAGE_SIZE,
   );
+  const [innerPanelView, setInnerPanelView] = useState<FilePanelViewMode>(
+    () => fileTreeSwitch?.defaultView ?? 'list',
+  );
+
+  const isControlledPanelView = fileTreeSwitch?.view !== undefined;
+  const panelView: FilePanelViewMode = fileTreeSwitch
+    ? isControlledPanelView
+      ? (fileTreeSwitch.view as FilePanelViewMode)
+      : innerPanelView
+    : 'list';
 
   // nodes / keyword 变化时重置扁平列表分页
   useEffect(() => {
@@ -162,6 +188,12 @@ export const FileComponent: FC<{
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetKey, previewFile]);
+
+  useEffect(() => {
+    if (panelView === 'tree') {
+      handleBackToList();
+    }
+  }, [panelView, handleBackToList]);
 
   // nodes 变化 → 同步更新 previewFile（保持预览内容跟随外部数据）
   useEffect(() => {
@@ -323,17 +355,61 @@ export const FileComponent: FC<{
 
   const hasKeyword = Boolean((keyword ?? '').trim());
 
-  const renderSearchInput = () => {
-    if (!showSearch) return null;
+  const handlePanelViewChange = useRefFunction((next: FilePanelViewMode) => {
+    if (!isControlledPanelView) {
+      setInnerPanelView(next);
+    }
+    fileTreeSwitch?.onViewChange?.(next);
+  });
+
+  const renderToolbarRow = () => {
+    const showSwitcher = Boolean(fileTreeSwitch);
+    const showSearchInToolbar =
+      showSearch && (!fileTreeSwitch || panelView === 'list');
+    if (!showSwitcher && !showSearchInToolbar) {
+      return null;
+    }
+    const listLabel =
+      fileTreeSwitch?.listLabel ?? locale?.['workspace.file'] ?? 'File';
+    const treeLabel =
+      fileTreeSwitch?.treeLabel ??
+      locale?.['workspace.fileTree'] ??
+      'File tree';
+    const switchTrailing = showSwitcher && !showSearchInToolbar;
+
     return (
-      <SearchInput
-        keyword={keyword}
-        onChange={onChange}
-        searchPlaceholder={searchPlaceholder}
-        prefixCls={prefixCls}
-        hashId={hashId}
-        locale={locale}
-      />
+      <div
+        className={classNames(`${prefixCls}-toolbar`, hashId)}
+        data-testid="file-toolbar"
+      >
+        {showSearchInToolbar ? (
+          <div className={classNames(`${prefixCls}-toolbar-search`, hashId)}>
+            <SearchInput
+              keyword={keyword}
+              onChange={onChange}
+              searchPlaceholder={searchPlaceholder}
+              prefixCls={prefixCls}
+              hashId={hashId}
+              locale={locale}
+            />
+          </div>
+        ) : null}
+        {showSwitcher ? (
+          <Segmented<FilePanelViewMode>
+            size="small"
+            className={classNames(`${prefixCls}-toolbar-switch`, hashId, {
+              [`${prefixCls}-toolbar-switch--trailing`]: switchTrailing,
+            })}
+            value={panelView}
+            onChange={handlePanelViewChange}
+            options={[
+              { label: listLabel, value: 'list' },
+              { label: treeLabel, value: 'tree' },
+            ]}
+            data-testid="file-panel-view-switch"
+          />
+        ) : null}
+      </div>
     );
   };
 
@@ -514,7 +590,7 @@ export const FileComponent: FC<{
           className={classNames(`${prefixCls}-container`, hashId)}
           data-testid="file-component"
         >
-          {renderSearchInput()}
+          {renderToolbarRow()}
           {loadingRender()}
         </div>
       ) : (
@@ -523,8 +599,17 @@ export const FileComponent: FC<{
             className={classNames(`${prefixCls}-container`, hashId)}
             data-testid="file-component"
           >
-            {renderSearchInput()}
-            {renderFileContent()}
+            {renderToolbarRow()}
+            {panelView === 'tree' && fileTreeSwitch ? (
+              <div
+                className={classNames(`${prefixCls}-tree-panel`, hashId)}
+                data-testid="file-tree-embed"
+              >
+                <FileTree {...fileTreeSwitch.treeProps} resetKey={resetKey} />
+              </div>
+            ) : (
+              renderFileContent()
+            )}
           </div>
         </Spin>
       )}

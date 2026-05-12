@@ -41,10 +41,12 @@ export {
   type FileActionRef,
   type FileBuiltinActions,
   type FileNode,
+  type FilePanelViewMode,
   type FileProps,
   type FileRenderContext,
   type FileTreeNode,
   type FileTreeProps,
+  type FileTreeSwitchConfig,
   type FileType,
   type GroupNode,
   type HtmlPreviewProps,
@@ -560,7 +562,6 @@ export {
   type DocCardsField,
   type DocCardsFieldMap,
   type DocCardsProps,
-  type ResolvedDocCardsFields,
   type DonutChartConfig,
   type DonutChartData,
   type DonutChartProps,
@@ -575,6 +576,7 @@ export {
   type QuadrantChartProps,
   type RadarChartDataItem,
   type RegionOption,
+  type ResolvedDocCardsFields,
   type ScatterChartDataItem,
   type ScatterChartProps,
 } from './Plugins/chart';
@@ -627,7 +629,6 @@ export {
   GradientText,
   type GradientTextProps,
 } from './Components/GradientText';
-export { TextSwap, type TextSwapProps } from './Components/TextSwap';
 export {
   LayoutHeader,
   type LayoutHeaderConfig,
@@ -690,6 +691,7 @@ export {
   resolveSegments,
   type TextAnimateProps,
 } from './Components/TextAnimate';
+export { TextSwap, type TextSwapProps } from './Components/TextSwap';
 export {
   TypingAnimation,
   type TypingAnimationProps,

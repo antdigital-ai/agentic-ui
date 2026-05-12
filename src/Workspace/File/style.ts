@@ -490,6 +490,38 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
       },
     },
 
+    [`${token.componentCls}-toolbar`]: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: token.marginXS ?? 8,
+      flexShrink: 0,
+      marginBottom: 8,
+    },
+
+    [`${token.componentCls}-toolbar-search`]: {
+      flex: 1,
+      minWidth: 0,
+      [`${token.componentCls}-search ${token.antCls}-input-outlined`]: {
+        marginBottom: 0,
+      },
+    },
+
+    [`${token.componentCls}-toolbar-switch`]: {
+      flexShrink: 0,
+    },
+
+    [`${token.componentCls}-toolbar-switch--trailing`]: {
+      marginInlineStart: 'auto',
+    },
+
+    [`${token.componentCls}-tree-panel`]: {
+      flex: 1,
+      minHeight: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+    },
+
     // 搜索框样式
     [`${token.componentCls}-search`]: {
       [`${token.antCls}-input-outlined`]: {

@@ -394,9 +394,11 @@ export type { HtmlPreviewProps } from './HtmlPreview';
 export type {
   BrowserProps,
   CustomProps,
+  FilePanelViewMode,
   FileProps,
   FileTreeNode,
   FileTreeProps,
+  FileTreeSwitchConfig,
   RealtimeProps,
   TabConfiguration,
   TabItem,

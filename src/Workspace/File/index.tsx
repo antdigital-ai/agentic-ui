@@ -9,10 +9,12 @@ export type {
   FileActionRef,
   FileBuiltinActions,
   FileNode,
+  FilePanelViewMode,
   FileProps,
   FileRenderContext,
   FileTreeNode,
   FileTreeProps,
+  FileTreeSwitchConfig,
   FileType,
   GroupNode,
 } from '../types';

@@ -535,6 +535,11 @@ export interface FileProps extends BaseChildProps {
   /** 搜索框占位符 */
   searchPlaceholder?: string;
   /**
+   * 列表与文件树视图切换：传入后在搜索框旁展示段选择器；未传入时不展示
+   * @description 切到「文件树」时隐藏搜索框（树数据无内置过滤）；切回「列表」时恢复
+   */
+  fileTreeSwitch?: FileTreeSwitchConfig;
+  /**
    * 是否在文件项根元素上绑定 DOM id
    * @default false
    * @description 置为 false 时，不会向元素写入 id 属性（不影响 React key）
@@ -604,6 +609,26 @@ export interface FileTreeProps extends BaseChildProps {
    * 是否整行可点选（antd Tree `blockNode`），默认 `true`
    */
   blockNode?: boolean;
+}
+
+/** 文件面板在「列表」与「文件树」之间的视图模式 */
+export type FilePanelViewMode = 'list' | 'tree';
+
+/**
+ * 在 {@link FileProps} 上启用「列表 / 文件树」段选择器时的配置
+ * @description 配置后搜索行右侧展示切换；`treeProps` 与独立使用 `Workspace.FileTree` 时一致（`tab`、`resetKey` 由 `Workspace.File` 注入）
+ */
+export interface FileTreeSwitchConfig {
+  treeProps: Omit<FileTreeProps, 'tab' | 'resetKey'>;
+  /** 非受控时的初始视图，默认 `list` */
+  defaultView?: FilePanelViewMode;
+  /** 受控当前视图 */
+  view?: FilePanelViewMode;
+  onViewChange?: (view: FilePanelViewMode) => void;
+  /** 列表选项文案，默认取 `locale['workspace.file']` */
+  listLabel?: React.ReactNode;
+  /** 文件树选项文案，默认取 `locale['workspace.fileTree']` */
+  treeLabel?: React.ReactNode;
 }
 
 export interface CustomProps extends BaseChildProps {
