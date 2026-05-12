@@ -1,4 +1,4 @@
-import classNames from 'clsx';
+﻿import classNames from 'clsx';
 import React, { type FC, useEffect, useRef, useState } from 'react';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { compileTemplate } from '../../../I18n';
@@ -166,4 +166,4 @@ const FileGroupComponent: FC<FileGroupProps> = ({
 
 FileGroupComponent.displayName = 'FileGroup';
 
-export const FileGroup = React.memo(FileGroupComponent);
+export const FileGroup = FileGroupComponent;
