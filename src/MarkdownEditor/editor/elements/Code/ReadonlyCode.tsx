@@ -2,6 +2,8 @@ import DOMPurify from 'dompurify';
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
 import { debugInfo } from '../../../../Utils/debugUtils';
+import { getCodeBlockPlainText } from '../../../editor/utils/codeBlockPlainText';
+import type { CodeNode } from '../../../el';
 
 /**
  * ReadonlyCode 组件 - 只读代码块预览组件
@@ -30,81 +32,90 @@ import { debugInfo } from '../../../../Utils/debugUtils';
  *
  * @remarks
  * - 简化渲染逻辑，移除编辑相关功能
- * - 使用 React.memo 优化性能
+ * - 代码正文优先取自 Slate 子节点，避免流式更新仅改 text 时 `value` 滞后
  * - 保持预览模式的视觉效果
  */
-export const ReadonlyCode: React.FC<RenderElementProps> = React.memo(
-  ({ attributes, children, element }) => {
-    debugInfo('ReadonlyCode - 渲染只读代码块', {
-      language: element?.language,
-      valueLength: element?.value?.length,
+export const ReadonlyCode: React.FC<RenderElementProps> = ({
+  attributes,
+  children,
+  element,
+}) => {
+  debugInfo('ReadonlyCode - 渲染只读代码块', {
+    language: element?.language,
+    valueLength: element?.value?.length,
+    isConfig: element?.otherProps?.isConfig,
+    finished: element?.otherProps?.finished,
+  });
+
+  // HTML 代码块处理
+  if (element?.language === 'html') {
+    debugInfo('ReadonlyCode - HTML 代码块', {
       isConfig: element?.otherProps?.isConfig,
-      finished: element?.otherProps?.finished,
     });
-
-    // HTML 代码块处理
-    if (element?.language === 'html') {
-      debugInfo('ReadonlyCode - HTML 代码块', {
-        isConfig: element?.otherProps?.isConfig,
-      });
-      return (
-        <div
-          {...attributes}
-          style={{
-            display: element?.otherProps?.isConfig ? 'none' : 'block',
-          }}
-        >
-          {element?.otherProps?.isConfig
-            ? ''
-            : DOMPurify.sanitize(element?.value?.trim())}
-        </div>
-      );
-    }
-
-    // 检查代码块是否未闭合
-    const isUnclosed = element?.otherProps?.finished === false;
-
     return (
       <div
         {...attributes}
-        data-is-unclosed={isUnclosed || undefined}
-        data-language={element?.language}
-        style={
-          element?.language === 'html'
-            ? {
-                display: element?.otherProps?.isConfig ? 'none' : 'block',
-              }
-            : {
-                height: '240px',
-                minWidth: '398px',
-                maxWidth: '800px',
-                minHeight: '240px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                alignSelf: 'stretch',
-                zIndex: 5,
-                color: 'rgb(27, 27, 27)',
-                padding: '1em',
-                margin: '1em 0',
-                fontSize: '0.8em',
-                lineHeight: '1.5',
-                overflowX: 'auto',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-all',
-                fontFamily: `'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace`,
-                wordWrap: 'break-word',
-                borderRadius: '12px',
-                background: '#FFFFFF',
-                boxShadow: 'var(--shadow-control-base)',
-                position: 'relative',
-              }
-        }
+        style={{
+          display: element?.otherProps?.isConfig ? 'none' : 'block',
+        }}
       >
-        {element?.value?.trim() || children}
+        {element?.otherProps?.isConfig
+          ? ''
+          : DOMPurify.sanitize(element?.value?.trim())}
       </div>
     );
-  },
-);
+  }
+
+  // 检查代码块是否未闭合
+  const isUnclosed = element?.otherProps?.finished === false;
+
+  const codeNode = element as CodeNode;
+  const plainBody = getCodeBlockPlainText(codeNode);
+  const legacyValue =
+    typeof codeNode?.value === 'string' ? codeNode.value.trim() : '';
+  const displayBody =
+    plainBody !== '' ? plainBody : legacyValue !== '' ? legacyValue : children;
+
+  return (
+    <div
+      {...attributes}
+      data-is-unclosed={isUnclosed || undefined}
+      data-language={codeNode?.language}
+      style={
+        codeNode?.language === 'html'
+          ? {
+              display: codeNode?.otherProps?.isConfig ? 'none' : 'block',
+            }
+          : {
+              height: '240px',
+              minWidth: '398px',
+              maxWidth: '800px',
+              minHeight: '240px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              alignSelf: 'stretch',
+              zIndex: 5,
+              color: 'rgb(27, 27, 27)',
+              padding: '1em',
+              margin: '1em 0',
+              fontSize: '0.8em',
+              lineHeight: '1.5',
+              overflowX: 'auto',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-all',
+              fontFamily: `'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace`,
+              wordWrap: 'break-word',
+              borderRadius: '12px',
+              background: '#FFFFFF',
+              boxShadow: 'var(--shadow-control-base)',
+              position: 'relative',
+            }
+      }
+    >
+      {displayBody}
+    </div>
+  );
+};
 
 ReadonlyCode.displayName = 'ReadonlyCode';

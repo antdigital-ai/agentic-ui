@@ -7,6 +7,7 @@
 import React from 'react';
 import { BaseMarkdownEditor } from '../../MarkdownEditor';
 import { useEditorStore } from '../../MarkdownEditor/editor/store';
+import { getCodeBlockPlainText } from '../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode, ElementProps } from '../../MarkdownEditor/el';
 import { CodeRenderer } from './components';
 
@@ -75,7 +76,7 @@ export function CodeElement(props: ElementProps<CodeNode>) {
     return null;
   }
   // readonly 模式下，空代码块不展示
-  if (readonly && !props.element.value) {
+  if (readonly && !getCodeBlockPlainText(props.element)) {
     return null;
   }
   if (readonly && props.element.language === 'csv') {
@@ -88,7 +89,7 @@ export function CodeElement(props: ElementProps<CodeNode>) {
         style={{
           padding: 0,
         }}
-        initValue={csvToMarkdownTable(props.element?.value)}
+        initValue={csvToMarkdownTable(getCodeBlockPlainText(props.element))}
         readonly
       />
     );

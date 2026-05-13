@@ -8,6 +8,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { MarkdownEditor } from '../../../MarkdownEditor';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
+import { getCodeBlockPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode, ElementProps } from '../../../MarkdownEditor/el';
 import { useDetectTheme } from '../../chart/hooks';
 import {
@@ -112,10 +113,11 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
   // 但如果禁用了 HTML 预览，则强制使用代码模式
   const disableHtmlPreview = editorProps.codeProps?.disableHtmlPreview ?? false;
   const language = props.element?.language?.toLowerCase();
-  const htmlValue = props.element?.value || '';
+  const codePlainText = getCodeBlockPlainText(props.element);
 
   // 检测 HTML 代码中是否包含 JavaScript
-  const hasJavaScript = language === 'html' && containsJavaScript(htmlValue);
+  const hasJavaScript =
+    language === 'html' && containsJavaScript(codePlainText);
 
   // 如果禁用了 HTML 预览或包含 JavaScript，强制使用代码模式
   const shouldDisablePreview = disableHtmlPreview || hasJavaScript;
@@ -159,7 +161,7 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
 
   // 本地预览处理函数
   const handleLocalPreview = useRefFunction(() => {
-    const value = props.element?.value || '';
+    const value = codePlainText;
     if (language === 'markdown') {
       openMarkdownLocalPreview(value);
     } else if (language === 'html') {
@@ -215,7 +217,7 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
     // 配置型 HTML 代码块：如果未完成且内容较长，显示 skeleton
     if (shouldHideConfigHtml) {
       const isUnclosed = props.element?.otherProps?.finished === false;
-      const contentLength = props.element?.value?.length || 0;
+      const contentLength = codePlainText.length;
       const isLongContent = contentLength > 100; // 内容超过 100 字符视为较长
 
       // 如果未完成且内容较长，显示 skeleton
@@ -275,12 +277,12 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
                 {viewMode === 'preview' &&
                   props.element.language === 'html' &&
                   !shouldDisablePreview && (
-                    <HtmlPreview htmlStr={props.element?.value} />
+                    <HtmlPreview htmlStr={codePlainText} />
                   )}
                 {viewMode === 'preview' &&
                   props.element.language &&
                   props.element.language === 'markdown' && (
-                    <MarkdownEditor initValue={props.element?.value} />
+                    <MarkdownEditor initValue={codePlainText} />
                   )}
                 <div
                   style={{
@@ -317,7 +319,7 @@ export function CodeRenderer(props: ElementProps<CodeNode>) {
     editorProps.codeProps?.disableHtmlPreview,
     shouldDisablePreview,
     hasJavaScript,
-    htmlValue,
+    codePlainText,
     toolbarProps,
     handleHtmlPreviewClose,
     viewMode,

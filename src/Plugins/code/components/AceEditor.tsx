@@ -20,6 +20,7 @@ import { useRefFunction } from '../../../Hooks/useRefFunction';
 import partialParse from '../../../MarkdownEditor/editor/parser/json-parse';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
 import { getAceLangs, modeMap } from '../../../MarkdownEditor/editor/utils/ace';
+import { getCodeBlockPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { EditorUtils } from '../../../MarkdownEditor/editor/utils/editorUtils';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { loadAceEditor, loadAceTheme } from '../loadAceEditor';
@@ -84,9 +85,10 @@ export function AceEditor({
   ...props
 }: AceEditorProps) {
   const { store, editorProps, readonly } = useEditorStore();
+  const codePlainSource = getCodeBlockPlainText(element);
 
   // 各种引用
-  const codeRef = useRef(element.value || '');
+  const codeRef = useRef(codePlainSource || '');
   const pathRef = useRef<Path>(path);
   const posRef = useRef({ row: 0, column: 0 });
   const pasted = useRef(false);
@@ -251,7 +253,7 @@ export function AceEditor({
 
     const codeProps = editorProps.codeProps || {};
 
-    let value = element.value || '';
+    let value = codePlainSource || '';
     const shouldFormatJsonInAce =
       element.language === 'json' && element.otherProps?.finished !== false;
     if (shouldFormatJsonInAce) {
@@ -333,7 +335,7 @@ export function AceEditor({
 
   // 监听外部值变化
   useEffect(() => {
-    let value = element.value || '';
+    let value = codePlainSource || '';
 
     // 流式 JSON：partialParse + JSON.stringify 会随不完整结构变化而整块改写，
     // 与 Slate 原文的 startsWith 关系断裂，反复 setValue 造成闪动；闭合后再格式化。
@@ -366,7 +368,7 @@ export function AceEditor({
       editor.setValue(value);
       editor.clearSelection();
     }
-  }, [element.value, element.language, element.otherProps?.finished]);
+  }, [codePlainSource, element.language, element.otherProps?.finished]);
 
   // 监听主题变化
   useEffect(() => {
