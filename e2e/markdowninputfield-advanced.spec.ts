@@ -1,5 +1,5 @@
-import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
-import { expect, test } from '../tests/fixtures/page-fixture';
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../_test_helpers/constants/playwrightDemoRoutes';
+import { expect, test } from '../_test_helpers/fixtures/page-fixture';
 
 test.describe('MarkdownInputField 高级功能', () => {
   test('应该支持多行输入', async ({ markdownInputFieldPage }) => {

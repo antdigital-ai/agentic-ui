@@ -14,7 +14,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const captured = vi.hoisted(() => ({
   editorProps: null as any,
-  animationProps: null as any,
   quickActionsProps: null as any,
 }));
 
@@ -23,14 +22,6 @@ vi.mock('../../MarkdownEditor', () => ({
   BaseMarkdownEditor: (props: any) => {
     captured.editorProps = props;
     return <div data-testid="mock-editor">{props.children}</div>;
-  },
-}));
-
-/* ---- Mock BorderBeamAnimation：捕获 onAnimationComplete ---- */
-vi.mock('../BorderBeamAnimation', () => ({
-  BorderBeamAnimation: (props: any) => {
-    captured.animationProps = props;
-    return <div data-testid="mock-border-beam" />;
   },
 }));
 
@@ -169,7 +160,6 @@ import { MarkdownInputField } from '../MarkdownInputField';
 describe('MarkdownInputField targeted coverage', () => {
   beforeEach(() => {
     captured.editorProps = null;
-    captured.animationProps = null;
     captured.quickActionsProps = null;
   });
 
@@ -253,17 +243,6 @@ describe('MarkdownInputField targeted coverage', () => {
       captured.editorProps.onPaste(fakeEvent);
     });
     // handlePaste should have been called without error
-    expect(true).toBe(true);
-  });
-
-  it('覆盖 onAnimationComplete 回调', () => {
-    render(<MarkdownInputField />);
-
-    expect(captured.animationProps).toBeTruthy();
-    act(() => {
-      captured.animationProps.onAnimationComplete?.();
-    });
-    // setAnimationComplete(true) called without error
     expect(true).toBe(true);
   });
 

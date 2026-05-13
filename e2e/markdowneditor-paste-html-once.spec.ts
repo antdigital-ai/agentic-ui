@@ -1,4 +1,4 @@
-import { expect, test } from '../tests/fixtures/page-fixture';
+import { expect, test } from '../_test_helpers/fixtures/page-fixture';
 
 /**
  * 粘贴 HTML 时 handlePasteEvent 应只插入一次文本（避免与浏览器默认粘贴行为重复插入）

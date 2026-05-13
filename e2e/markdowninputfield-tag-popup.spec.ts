@@ -1,5 +1,5 @@
-import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
-import { expect, test } from '../tests/fixtures/page-fixture';
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../_test_helpers/constants/playwrightDemoRoutes';
+import { expect, test } from '../_test_helpers/fixtures/page-fixture';
 
 test.describe('MarkdownInputField Tag Popup', () => {
   test('应该能够通过 tag popup 选择更新输入内容', async ({

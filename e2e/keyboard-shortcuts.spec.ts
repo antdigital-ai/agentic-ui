@@ -1,5 +1,5 @@
-import { PLAYWRIGHT_FIXTURE_DEMOS } from '../tests/constants/playwrightDemoRoutes';
-import { expect, test } from '../tests/fixtures/page-fixture';
+import { PLAYWRIGHT_FIXTURE_DEMOS } from '../_test_helpers/constants/playwrightDemoRoutes';
+import { expect, test } from '../_test_helpers/fixtures/page-fixture';
 
 /**
  * KeyboardTask 快捷键功能 E2E 测试

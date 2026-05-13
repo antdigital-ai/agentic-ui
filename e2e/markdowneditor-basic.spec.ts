@@ -1,4 +1,4 @@
-import { expect, test } from '../tests/fixtures/page-fixture';
+import { expect, test } from '../_test_helpers/fixtures/page-fixture';
 
 test.describe('MarkdownEditor 基础功能', () => {
   test.beforeEach(async ({ markdownEditorPage }) => {
