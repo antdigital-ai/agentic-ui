@@ -8,6 +8,24 @@ import { useCodeEditorState } from '../../hooks/useCodeEditorState';
 
 const mockSetNodes = vi.fn();
 vi.mock('slate', () => ({
+  Node: {
+    string: (node: unknown): string => {
+      const slateNode = node as {
+        children?: unknown;
+        text?: unknown;
+      };
+      if (Array.isArray(slateNode.children)) {
+        return slateNode.children
+          .map((child) =>
+            typeof (child as { text?: unknown })?.text === 'string'
+              ? String((child as { text: string }).text)
+              : '',
+          )
+          .join('');
+      }
+      return typeof slateNode.text === 'string' ? slateNode.text : '';
+    },
+  },
   Transforms: {
     setNodes: (...args: unknown[]) => mockSetNodes(...args),
   },
