@@ -9,12 +9,18 @@ interface StatusIconProps {
   status: TaskStatus;
   prefixCls: string;
   hashId: string;
+  /**
+   * 覆盖根节点 `data-testid`（默认 `task-list-status-${status}`）
+   * @description simple 汇总条与列表项都会渲染状态图标，需区分时可传入独立 testid
+   */
+  statusTestId?: string;
 }
 
 const StatusIconComponent: React.FC<StatusIconProps> = ({
   status,
   prefixCls,
   hashId,
+  statusTestId,
 }) => {
   const statusContent = useMemo(() => {
     const contentMap: Record<TaskStatus, React.ReactNode> = {
@@ -37,7 +43,7 @@ const StatusIconComponent: React.FC<StatusIconProps> = ({
         `${prefixCls}-status-${status}`,
         hashId,
       )}
-      data-testid={`task-list-status-${status}`}
+      data-testid={statusTestId ?? `task-list-status-${status}`}
     >
       {statusContent}
     </div>

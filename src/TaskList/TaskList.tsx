@@ -200,6 +200,7 @@ export const TaskList = memo(
               status={summaryStatus}
               prefixCls={prefixCls}
               hashId={hashId}
+              statusTestId={`task-list-simple-summary-status-${summaryStatus}`}
             />
           </div>
           <div className={classNames(`${simpleCls}-text`, hashId)}>
