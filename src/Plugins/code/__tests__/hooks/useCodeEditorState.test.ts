@@ -144,7 +144,20 @@ describe('useCodeEditorState', () => {
     expect(result.current.state.htmlStr).toBe('<strong>latest html</strong>');
   });
 
-  it('handleRunHtml 在 element.value 为空时设置空字符串', () => {
+  it('handleRunHtml 在仅子节点有正文、value 为空时应用 Slate 文本', () => {
+    const el = {
+      ...defaultElement,
+      value: '',
+      children: [{ text: '<p>from slate</p>' }],
+    };
+    const { result } = renderHook(() => useCodeEditorState(el));
+    act(() => {
+      result.current.handleRunHtml();
+    });
+    expect(result.current.state.htmlStr).toBe('<p>from slate</p>');
+  });
+
+  it('handleRunHtml 在 element.value 为空且子节点也无文本时设置空字符串', () => {
     const el = { ...defaultElement, value: undefined };
     const { result } = renderHook(() => useCodeEditorState(el));
     act(() => {

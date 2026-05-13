@@ -1,5 +1,6 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
+import { getSlateElementPlainText } from '../../utils/codeBlockPlainText';
 
 /**
  * ReadonlyInlineKatex 组件 - 只读行内数学公式预览组件
@@ -44,7 +45,7 @@ export const ReadonlyInlineKatex: React.FC<RenderElementProps> = React.memo(
           fontFamily: 'monospace',
         }}
       >
-        {element.value}
+        {getSlateElementPlainText(element)}
         {children}
       </code>
     );

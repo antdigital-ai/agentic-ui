@@ -12,6 +12,7 @@ import React, { useContext, useMemo } from 'react';
 import { ActionIconBox } from '../../../Components/ActionIconBox';
 import { I18nContext } from '../../../I18n';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
+import { getSlateElementPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { langIconMap } from '../langIconMap';
 import { LanguageSelector, LanguageSelectorProps } from './LanguageSelector';
@@ -296,7 +297,7 @@ export const CodeToolbar = (props: CodeToolbarProps) => {
           onClick={(e) => {
             e.stopPropagation();
             try {
-              const code = element.value || '';
+              const code = getSlateElementPlainText(element);
               copy(code);
             } catch (error) {
               // 复制失败时静默处理

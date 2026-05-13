@@ -1,6 +1,7 @@
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
 import { debugInfo } from '../../../../Utils/debugUtils';
+import { getSlateElementPlainText } from '../../utils/codeBlockPlainText';
 
 export const InlineKatex = ({
   attributes,
@@ -17,7 +18,7 @@ export const InlineKatex = ({
         display: 'inline-block',
       }}
     >
-      {element.value}
+      {getSlateElementPlainText(element)}
       <div
         style={{
           display: 'none',

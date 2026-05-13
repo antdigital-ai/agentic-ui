@@ -7,6 +7,7 @@ import { ActionIconBox } from '../../Components/ActionIconBox';
 import { useIntersectionOnce } from '../../Hooks/useIntersectionOnce';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { useLocale } from '../../I18n';
+import { getSlateElementPlainText } from '../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode } from '../../MarkdownEditor/el';
 import { useStyle } from './style';
 import { useMermaidRender } from './useMermaidRender';
@@ -64,8 +65,9 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     ],
   );
   const isVisible = useIntersectionOnce(containerRef);
+  const mermaidSource = getSlateElementPlainText(props.element);
   const { error, renderedCode } = useMermaidRender(
-    props.element.value || '',
+    mermaidSource,
     divRef,
     id,
     isVisible,
@@ -100,7 +102,7 @@ export const MermaidRendererImpl = (props: { element: CodeNode }) => {
     [isRendered],
   );
 
-  const code = props.element.value || '';
+  const code = mermaidSource;
 
   const handleCopySource = useRefFunction(() => {
     if (!code) {

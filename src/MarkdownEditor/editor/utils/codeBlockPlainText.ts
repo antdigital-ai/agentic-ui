@@ -1,19 +1,38 @@
 import { Node, Element as SlateElement } from 'slate';
 import type { CodeNode } from '../../el';
 
+/** 可从 Slate 子节点或 `value` 取正文的元素（code / mermaid / katex / think 等） */
+export type SlatePlainTextSource =
+  | {
+      children?: unknown;
+      value?: unknown;
+    }
+  | null
+  | undefined;
+
 /**
- * 代码块在 Slate 中的正文：以子节点文本为准（与 parser 初始写入的 `value` 可能不同步，
- * 尤其在 Realtime / 流式 updateNodeList 只更新 text leaf 时）。
+ * 从 Slate 元素读取正文：优先 `Node.string`（与子节点同步），再回退到 string `value`。
+ * 用于流式 updateNodeList 只更新 text leaf、未同步 `value` 的场景。
  */
-export function getCodeBlockPlainText(
-  element: CodeNode | undefined | null,
+export function getSlateElementPlainText(
+  element: SlatePlainTextSource,
 ): string {
   if (!element) return '';
-  if (SlateElement.isElement(element) && element.type === 'code') {
+  if (SlateElement.isElement(element)) {
     const fromSlate = Node.string(element);
     if (fromSlate !== '') {
       return fromSlate;
     }
   }
-  return typeof element.value === 'string' ? element.value : '';
+  const v = (element as { value?: unknown }).value;
+  return typeof v === 'string' ? v : '';
+}
+
+/**
+ * 从 `CodeNode` 取正文，与 {@link getSlateElementPlainText} 行为一致。
+ */
+export function getCodeBlockPlainText(
+  element: CodeNode | undefined | null,
+): string {
+  return getSlateElementPlainText(element);
 }

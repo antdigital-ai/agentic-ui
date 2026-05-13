@@ -9,6 +9,7 @@ import { Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { useEditorStore } from '../../../MarkdownEditor/editor/store';
+import { getSlateElementPlainText } from '../../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode } from '../../../MarkdownEditor/el';
 import { useSelStatus } from '../../../MarkdownEditor/hooks/editor';
 
@@ -52,7 +53,7 @@ export function useCodeEditorState(element: CodeNode) {
 
   const handleRunHtml = useRefFunction(() => {
     try {
-      setState({ htmlStr: element?.value || '' });
+      setState({ htmlStr: getSlateElementPlainText(element) });
     } catch (error) {
       // HTML 执行失败时静默处理
     }

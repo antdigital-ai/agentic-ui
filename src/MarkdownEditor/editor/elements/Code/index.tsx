@@ -2,6 +2,7 @@ import DOMPurify from 'dompurify';
 import React from 'react';
 import { RenderElementProps } from 'slate-react';
 import { debugInfo } from '../../../../Utils/debugUtils';
+import { getSlateElementPlainText } from '../../utils/codeBlockPlainText';
 
 export const Code = ({ attributes, children, element }: RenderElementProps) => {
   debugInfo('Code - 渲染代码块', {
@@ -26,7 +27,9 @@ export const Code = ({ attributes, children, element }: RenderElementProps) => {
           <div
             contentEditable={false}
             dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(element?.value?.trim() || ''),
+              __html: DOMPurify.sanitize(
+                getSlateElementPlainText(element).trim() || '',
+              ),
             }}
           />
         )}

@@ -7,6 +7,7 @@
 import React, { useMemo } from 'react';
 import { useEditorStore } from '../../MarkdownEditor/editor/store';
 import { DragHandle } from '../../MarkdownEditor/editor/tools/DragHandle';
+import { getSlateElementPlainText } from '../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode, ElementProps } from '../../MarkdownEditor/el';
 import { Katex } from './Katex';
 
@@ -52,6 +53,7 @@ import { Katex } from './Katex';
  */
 export function KatexElement(props: ElementProps<CodeNode>) {
   const { readonly } = useEditorStore();
+  const katexSource = getSlateElementPlainText(props.element);
 
   // 渲染组件
   return useMemo(() => {
@@ -80,7 +82,7 @@ export function KatexElement(props: ElementProps<CodeNode>) {
               pointerEvents: 'none',
             }}
           >
-            {props.element?.value}
+            {katexSource}
             {props.children}
           </div>
         </div>
@@ -130,13 +132,20 @@ export function KatexElement(props: ElementProps<CodeNode>) {
               pointerEvents: 'none',
             }}
           >
-            {props.element?.value}
+            {katexSource}
             {props.children}
           </div>
         </div>
       </div>
     );
-  }, [props.element, props.element.value, props.element.katex, readonly]);
+  }, [
+    katexSource,
+    props.element,
+    props.element.katex,
+    props.attributes,
+    props.children,
+    readonly,
+  ]);
 }
 
 // 导出内联 KaTeX 组件

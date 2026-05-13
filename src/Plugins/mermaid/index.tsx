@@ -10,6 +10,7 @@ import { ReactEditor } from 'slate-react';
 import { ActionIconBox } from '../../Components/ActionIconBox';
 import { I18nContext } from '../../I18n';
 import { useEditorStore } from '../../MarkdownEditor/editor/store';
+import { getSlateElementPlainText } from '../../MarkdownEditor/editor/utils/codeBlockPlainText';
 import { CodeNode, ElementProps } from '../../MarkdownEditor/el';
 import { useSelStatus } from '../../MarkdownEditor/hooks/editor';
 import { Mermaid } from './Mermaid';
@@ -162,7 +163,7 @@ export function MermaidElement(props: ElementProps<CodeNode>) {
                 onClick={(e) => {
                   e.stopPropagation();
                   try {
-                    const code = props.element.value || '';
+                    const code = getSlateElementPlainText(props.element);
                     copy(code);
                   } catch (error) {}
                 }}
