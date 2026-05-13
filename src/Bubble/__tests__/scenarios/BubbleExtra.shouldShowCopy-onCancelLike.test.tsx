@@ -77,7 +77,7 @@ vi.mock('@ant-design/agentic-ui', async () => {
 
 // Mock ActionIconBox and CopyButton
 vi.mock('../../../index', async () => {
-  const actual = await vi.importActual('../../index');
+  const actual = await vi.importActual('../../../index');
   return {
     ...actual,
     ActionIconBox: ({

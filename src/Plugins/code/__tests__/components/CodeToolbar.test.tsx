@@ -250,7 +250,11 @@ describe('CodeToolbar', () => {
 
   describe('边界情况测试', () => {
     it('应该处理空的代码值', () => {
-      const emptyElement = { ...defaultElement, value: '' };
+      const emptyElement = {
+        ...defaultElement,
+        value: '',
+        children: [{ text: '' }],
+      };
       const mockCopy = copy as any;
       mockCopy.mockReturnValue(true);
 
@@ -269,7 +273,11 @@ describe('CodeToolbar', () => {
     });
 
     it('应该处理未定义的代码值', () => {
-      const undefinedElement = { ...defaultElement, value: undefined as any };
+      const undefinedElement = {
+        ...defaultElement,
+        value: undefined as any,
+        children: [{ text: '' }],
+      };
       const mockCopy = copy as any;
       mockCopy.mockReturnValue(true);
 
