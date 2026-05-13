@@ -574,6 +574,23 @@ describe('CodeRenderer Component', () => {
       // 应该显示代码编辑器
       expect(screen.getByTestId('code-container')).toBeInTheDocument();
     });
+
+    it('当危险 HTML 仅存在于 Slate 子节点时，应该自动禁用预览', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'html',
+          value: '<div>stale safe html</div>',
+          children: [{ text: '<img src="x" onerror="alert(1)">' }],
+        },
+      };
+
+      render(<CodeRenderer {...props} />);
+
+      expect(screen.queryByTestId('html-preview')).not.toBeInTheDocument();
+      expect(screen.getByTestId('ace-editor-container')).toBeInTheDocument();
+    });
   });
 
   describe('handleViewModeToggle 与 useEffect', () => {

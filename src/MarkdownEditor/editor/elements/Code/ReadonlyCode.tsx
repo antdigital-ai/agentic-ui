@@ -40,6 +40,9 @@ export const ReadonlyCode: React.FC<RenderElementProps> = ({
   children,
   element,
 }) => {
+  const codeNode = element as CodeNode;
+  const plainBody = getCodeBlockPlainText(codeNode);
+
   debugInfo('ReadonlyCode - 渲染只读代码块', {
     language: element?.language,
     valueLength: element?.value?.length,
@@ -61,7 +64,7 @@ export const ReadonlyCode: React.FC<RenderElementProps> = ({
       >
         {element?.otherProps?.isConfig
           ? ''
-          : DOMPurify.sanitize(element?.value?.trim())}
+          : DOMPurify.sanitize(plainBody.trim())}
       </div>
     );
   }
@@ -69,8 +72,6 @@ export const ReadonlyCode: React.FC<RenderElementProps> = ({
   // 检查代码块是否未闭合
   const isUnclosed = element?.otherProps?.finished === false;
 
-  const codeNode = element as CodeNode;
-  const plainBody = getCodeBlockPlainText(codeNode);
   const legacyValue =
     typeof codeNode?.value === 'string' ? codeNode.value.trim() : '';
   const displayBody =
