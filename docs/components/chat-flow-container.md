@@ -12,24 +12,57 @@ group:
 
 ## 基础用法
 
+含左侧 `History`、头部、消息区与底部任务条，贴近完整产品布局。
+
 <code src="../demos/ChatFlowContainer/index.tsx" iframe=620>对话流容器 - 头部 + 内容 + 底部</code>
+
+## 无主栏 · 固定高度
+
+无会话侧栏，父级给定高度即可；适合嵌入设置抽屉、弹层或分栏右侧等场景。
+
+<code src="../demos/ChatFlowContainer/no-sidebar.tsx" iframe=640>无主栏 · 固定高度嵌入</code>
+
+## 带 Markdown 输入框
+
+底部使用 `MarkdownInputField`，`scrollBehavior` 为 `auto`。
+
+<code src="../demos/ChatFlowContainer/with-input.tsx" iframe=620>带输入框</code>
+
+## 底部最小高度
+
+通过 `footerHeight` 为多行输入等较高的 `footer` 预留最小高度，避免内容被遮挡。
+
+<code src="../demos/ChatFlowContainer/footer-height.tsx" iframe=640>footerHeight 与多行底部</code>
+
+## 滚动状态监听
+
+使用 `onScrollStateChange` 的 `isPinned` 控制「回到底部」浮动按钮；与流式追加消息配合时常用。
+
+<code src="../demos/ChatFlowContainer/scroll-state.tsx" iframe=680>滚动状态与回到底部</code>
+
+## 关闭底部背景动效
+
+`showFooterBackground={false}`，仅保留底部操作区。
+
+<code src="../demos/ChatFlowContainer/withOut-footer.tsx" iframe=620>关闭底部背景动效</code>
 
 ## API 参考
 
 ### ChatLayoutProps
 
-| 属性                 | 说明                                             | 类型                   | 默认值     | 版本 |
-| -------------------- | ------------------------------------------------ | ---------------------- | ---------- | ---- |
-| header               | 头部配置对象，详见下方 LayoutHeaderConfig        | `LayoutHeaderConfig`   | -          | -    |
-| children             | 内容区域的自定义内容                             | `ReactNode`            | -          | -    |
-| footer               | 底部区域的自定义内容                             | `ReactNode`            | -          | -    |
-| footerHeight         | 底部区域的最小高度（单位：px）                   | `number`               | `48`       | -    |
-| scrollBehavior       | 滚动行为，`smooth` 为平滑滚动，`auto` 为立即滚动 | `'smooth' \| 'auto'`   | `'smooth'` | -    |
-| showFooterBackground | 是否显示底部背景动效                             | `boolean`              | `true`     | -    |
-| className            | 自定义类名                                       | `string`               | -          | -    |
-| style                | 自定义样式                                       | `React.CSSProperties`  | -          | -    |
-| classNames           | 自定义各部分类名，详见下方 ChatLayoutClassNames  | `ChatLayoutClassNames` | -          | -    |
-| styles               | 自定义各部分样式，详见下方 ChatLayoutStyles      | `ChatLayoutStyles`     | -          | -    |
+| 属性                 | 说明                                             | 类型                                     | 默认值     | 版本 |
+| -------------------- | ------------------------------------------------ | ---------------------------------------- | ---------- | ---- |
+| header               | 头部配置对象，详见下方 LayoutHeaderConfig        | `LayoutHeaderConfig`                     | -          | -    |
+| children             | 内容区域的自定义内容                             | `ReactNode`                              | -          | -    |
+| footer               | 底部区域的自定义内容                             | `ReactNode`                              | -          | -    |
+| footerHeight         | 底部区域的最小高度（单位：px）                   | `number`                                 | `48`       | -    |
+| onScrollStateChange  | 滚动状态变化回调，便于「回到底部」等交互         | `(state: ChatLayoutScrollState) => void` | -          | -    |
+| scrollBehavior       | 滚动行为，`smooth` 为平滑滚动，`auto` 为立即滚动 | `'smooth' \| 'auto'`                     | `'smooth'` | -    |
+| showFooterBackground | 是否显示底部背景动效                             | `boolean`                                | `true`     | -    |
+| className            | 自定义类名                                       | `string`                                 | -          | -    |
+| style                | 自定义样式                                       | `React.CSSProperties`                    | -          | -    |
+| classNames           | 自定义各部分类名，详见下方 ChatLayoutClassNames  | `ChatLayoutClassNames`                   | -          | -    |
+| styles               | 自定义各部分样式，详见下方 ChatLayoutStyles      | `ChatLayoutStyles`                       | -          | -    |
 
 ### ChatLayoutClassNames
 
