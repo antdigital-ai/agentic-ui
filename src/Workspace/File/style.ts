@@ -1,4 +1,4 @@
-import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
+﻿import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
   return {
@@ -17,6 +17,8 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
     // 文件组件样式
     [`${token.componentCls}-container`]: {
       height: '100%',
+      minWidth: 0,
+      overflowX: 'hidden',
       display: 'flex',
       flexDirection: 'column',
 
@@ -267,6 +269,8 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
+      minWidth: 0,
+      overflowX: 'hidden',
       marginLeft: '-12px',
       marginRight: '-12px',
       background: token.colorBgContainer,
@@ -277,6 +281,7 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
         display: 'flex',
         alignItems: 'center',
         gap: '4px',
+        minWidth: 0,
         padding: '8px 12px',
         borderBottom: `1px solid ${token.colorBorderSecondary || token.colorBorder}`,
         background: token.colorBgContainer,
@@ -370,7 +375,9 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'auto',
+        minWidth: 0,
+        overflowX: 'hidden',
+        overflowY: 'auto',
         minHeight: 0, // 确保 flex 子项可以收缩
         padding: '16px',
       },
@@ -495,6 +502,8 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
       alignItems: 'center',
       gap: token.marginXS ?? 8,
       flexShrink: 0,
+      minWidth: 0,
+      maxWidth: '100%',
       marginBottom: 8,
     },
 
@@ -508,6 +517,25 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
 
     [`${token.componentCls}-toolbar-switch`]: {
       flexShrink: 0,
+      [`${token.antCls}-segmented-item-label`]: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 28,
+        minHeight: 24,
+      },
+    },
+
+    [`${token.componentCls}-toolbar-switch-icon`]: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: token.colorText,
+      lineHeight: 0,
+      '& svg': {
+        width: 16,
+        height: 16,
+      },
     },
 
     [`${token.componentCls}-toolbar-switch--trailing`]: {
@@ -517,6 +545,7 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
     [`${token.componentCls}-tree-panel`]: {
       flex: 1,
       minHeight: 0,
+      minWidth: 0,
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden',
@@ -524,6 +553,14 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
 
     // 搜索框样式
     [`${token.componentCls}-search`]: {
+      width: '100%',
+      minWidth: 0,
+      boxSizing: 'border-box',
+      [`${token.antCls}-input-affix-wrapper`]: {
+        width: '100%',
+        maxWidth: '100%',
+        minWidth: 0,
+      },
       [`${token.antCls}-input-outlined`]: {
         borderRadius: 'var(--radius-control-base)',
         borderColor: 'transparent',

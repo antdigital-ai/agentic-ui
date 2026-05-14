@@ -561,6 +561,11 @@ export interface FileTreeNode {
   /** 展示名称 */
   name: string;
   /**
+   * 叶子节点对应的文件数据（可选）
+   * @description 传入后可在树行展示预览/下载等操作，并与 {@link FileTreeProps} 的 `onPreview` / `onDownload` 等配合；未传时行为与仅展示名称的叶子一致
+   */
+  file?: FileNode;
+  /**
    * 是否叶子（文件）节点
    * @description
    * - 懒加载**目录**必须 `isLeaf: false`；若未传 `isLeaf` 且也无 `children` 时视为**文件**（`isLeaf: true`），与「仅省略 `isLeaf` 表示普通文件」一致
@@ -598,6 +603,19 @@ export interface FileTreeProps extends BaseChildProps {
   ) => FileTreeNode[] | Promise<FileTreeNode[]>;
   /** 选中节点（点击标题区域）时触发 */
   onSelect?: (node: FileTreeNode) => void;
+  /**
+   * 叶子节点带 `file` 时，点击行（选中）优先触发；未传且存在 `onPreview` 时选中叶子会打开预览
+   * @description 与平铺 {@link FileProps.onFileClick} 一致
+   */
+  onFileClick?: (file: FileNode) => void;
+  /** 下载；未传时对有下载源的叶子仍可使用内置 `handleFileDownload` */
+  onDownload?: (file: FileNode) => void;
+  /** 预览；语义同 {@link FileProps.onPreview} */
+  onPreview?: FileProps['onPreview'];
+  /** 分享 */
+  onShare?: FileProps['onShare'];
+  /** 定位 */
+  onLocate?: (file: FileNode) => void;
   /** 是否显示连接线，透传 antd Tree */
   showLine?: boolean;
   /**
@@ -626,18 +644,34 @@ export type FilePanelViewMode = 'list' | 'tree';
 
 /**
  * 在 {@link FileProps} 上启用「列表 / 文件树」段选择器时的配置
- * @description 配置后搜索行右侧展示切换；开启 `showSearch` 时树模式仍显示搜索框，筛选仅作用于已展开分支（`filterKeyword` 由 `Workspace.File` 注入）。`treeProps` 与独立使用 `Workspace.FileTree` 时一致（`tab`、`resetKey`、`filterKeyword` 由 `Workspace.File` 注入）
+ * @description 配置后搜索行右侧展示切换；开启 `showSearch` 时树模式仍显示搜索框，筛选仅作用于已展开分支（`filterKeyword` 由 `Workspace.File` 注入）。`treeProps` 与独立使用 `Workspace.FileTree` 时一致（`tab`、`resetKey`、`filterKeyword` 由 `Workspace.File` 注入；`onDownload`、`onPreview`、`onShare`、`onLocate`、`onFileClick` 由 `Workspace.File` 与列表共用，勿在 `treeProps` 中重复传入）
  */
 export interface FileTreeSwitchConfig {
-  treeProps: Omit<FileTreeProps, 'tab' | 'resetKey' | 'filterKeyword'>;
+  treeProps: Omit<
+    FileTreeProps,
+    | 'tab'
+    | 'resetKey'
+    | 'filterKeyword'
+    | 'onDownload'
+    | 'onPreview'
+    | 'onShare'
+    | 'onLocate'
+    | 'onFileClick'
+  >;
   /** 非受控时的初始视图，默认 `list` */
   defaultView?: FilePanelViewMode;
   /** 受控当前视图 */
   view?: FilePanelViewMode;
   onViewChange?: (view: FilePanelViewMode) => void;
-  /** 列表选项文案，默认取 `locale['workspace.file']` */
+  /**
+   * 平铺视图的无障碍名称与浏览器 `title`（段控件为图标时使用）
+   * @default 取 `locale['workspace.file']`
+   */
   listLabel?: React.ReactNode;
-  /** 文件树选项文案，默认取 `locale['workspace.fileTree']` */
+  /**
+   * 文件树视图的无障碍名称与浏览器 `title`（段控件为图标时使用）
+   * @default 取 `locale['workspace.fileTree']`
+   */
   treeLabel?: React.ReactNode;
 }
 

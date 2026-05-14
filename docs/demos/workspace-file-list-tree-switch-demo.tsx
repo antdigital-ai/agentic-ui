@@ -16,25 +16,6 @@ const TREE_ROOT: FileTreeNode[] = [
   },
 ];
 
-const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
-  'demo-root': [
-    { key: 'demo-root/src', name: 'src', isLeaf: false },
-    { key: 'demo-root/README.md', name: 'README.md', isLeaf: true },
-  ],
-  'demo-root/src': [
-    {
-      key: 'demo-root/src/api.ts',
-      name: 'api.ts',
-      isLeaf: true,
-    },
-    {
-      key: 'demo-root/src/app.tsx',
-      name: 'app.tsx',
-      isLeaf: true,
-    },
-  ],
-};
-
 const ALL_FILES: FileNode[] = [
   {
     id: 'flat-readme',
@@ -64,6 +45,32 @@ const ALL_FILES: FileNode[] = [
     canPreview: true,
   },
 ];
+
+const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
+  'demo-root': [
+    { key: 'demo-root/src', name: 'src', isLeaf: false },
+    {
+      key: 'demo-root/README.md',
+      name: 'README.md',
+      isLeaf: true,
+      file: ALL_FILES[0],
+    },
+  ],
+  'demo-root/src': [
+    {
+      key: 'demo-root/src/api.ts',
+      name: 'api.ts',
+      isLeaf: true,
+      file: ALL_FILES[1],
+    },
+    {
+      key: 'demo-root/src/app.tsx',
+      name: 'app.tsx',
+      isLeaf: true,
+      file: ALL_FILES[2],
+    },
+  ],
+};
 
 const LOAD_DELAY_MS = 200;
 
@@ -103,7 +110,7 @@ const WorkspaceFileListTreeSwitchDemo: React.FC = () => {
             description={
               panelView === 'list'
                 ? '列表按文件名过滤当前全部文件条目'
-                : '树内搜索仅匹配已展开目录下已加载的文件名；无匹配时根级与「已展开仍无结果」会显示不同提示'
+                : '树内搜索仅匹配已展开目录下已加载的文件名；叶子可挂 `file` 与列表一致支持预览/下载；无匹配时根级与「已展开仍无结果」会显示不同提示；工具栏为图标切换（悬停可看名称）'
             }
           />
 

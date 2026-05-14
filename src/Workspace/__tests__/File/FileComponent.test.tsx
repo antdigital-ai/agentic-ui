@@ -215,7 +215,7 @@ describe('FileComponent', () => {
       );
       expect(screen.getByTestId('file-panel-view-switch')).toBeInTheDocument();
       expect(screen.getByText('list.txt')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('文件树'));
+      fireEvent.click(screen.getByLabelText('文件树'));
       await waitFor(() => {
         expect(screen.getByTestId('workspace-file-tree')).toBeInTheDocument();
       });
@@ -243,9 +243,9 @@ describe('FileComponent', () => {
         </TestWrapper>,
       );
       expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('Tree'));
+      fireEvent.click(screen.getByLabelText('Tree'));
       expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('List'));
+      fireEvent.click(screen.getByLabelText('List'));
       expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
     });
 
@@ -266,7 +266,7 @@ describe('FileComponent', () => {
           />
         </TestWrapper>,
       );
-      fireEvent.click(screen.getByText('文件树'));
+      fireEvent.click(screen.getByLabelText('文件树'));
       expect(onViewChange).toHaveBeenCalledWith('tree');
       rerender(
         <TestWrapper>

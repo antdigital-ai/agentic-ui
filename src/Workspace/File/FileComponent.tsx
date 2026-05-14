@@ -1,4 +1,5 @@
-﻿import {
+﻿import { FileStack, TreeDownArrow } from '@sofa-design/icons';
+import {
   ConfigProvider,
   Empty,
   Image,
@@ -7,7 +8,14 @@
   Typography,
 } from 'antd';
 import classNames from 'clsx';
-import React, { type FC, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  type FC,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import { I18nContext, compileTemplate } from '../../I18n';
 import type { MarkdownEditorProps } from '../../MarkdownEditor';
@@ -43,6 +51,16 @@ const isFileNodeReturn = (value: unknown): value is FileNode => {
   if (!value || typeof value !== 'object') return false;
   if (React.isValidElement(value as object)) return false;
   return typeof (value as { name?: unknown }).name === 'string';
+};
+
+const toSegmentAccessibleName = (
+  raw: ReactNode | undefined,
+  fallback: string,
+): string => {
+  if (typeof raw === 'string' || typeof raw === 'number') {
+    return String(raw);
+  }
+  return fallback;
 };
 
 /**
@@ -188,12 +206,6 @@ export const FileComponent: FC<{
     if (resetKey === undefined) return;
     handleBackToList();
   }, [resetKey, handleBackToList]);
-
-  useEffect(() => {
-    if (panelView === 'tree') {
-      handleBackToList();
-    }
-  }, [panelView, handleBackToList]);
 
   // nodes 变化 → 同步更新 previewFile（保持预览内容跟随外部数据）
   useEffect(() => {
@@ -368,12 +380,12 @@ export const FileComponent: FC<{
     if (!showSwitcher && !showSearchInToolbar) {
       return null;
     }
-    const listLabel =
-      fileTreeSwitch?.listLabel ?? locale?.['workspace.file'] ?? 'File';
-    const treeLabel =
-      fileTreeSwitch?.treeLabel ??
-      locale?.['workspace.fileTree'] ??
-      'File tree';
+    const listFallback = locale?.['workspace.file'] ?? 'File';
+    const treeFallback = locale?.['workspace.fileTree'] ?? 'File tree';
+    const rawListLabel = fileTreeSwitch?.listLabel ?? listFallback;
+    const rawTreeLabel = fileTreeSwitch?.treeLabel ?? treeFallback;
+    const listAccessible = toSegmentAccessibleName(rawListLabel, listFallback);
+    const treeAccessible = toSegmentAccessibleName(rawTreeLabel, treeFallback);
     const switchTrailing = showSwitcher && !showSearchInToolbar;
 
     const resolvedSearchPlaceholder =
@@ -413,8 +425,36 @@ export const FileComponent: FC<{
             value={panelView}
             onChange={handlePanelViewChange}
             options={[
-              { label: listLabel, value: 'list' },
-              { label: treeLabel, value: 'tree' },
+              {
+                value: 'list',
+                label: (
+                  <span
+                    className={classNames(
+                      `${prefixCls}-toolbar-switch-icon`,
+                      hashId,
+                    )}
+                    title={listAccessible}
+                    aria-label={listAccessible}
+                  >
+                    <FileStack />
+                  </span>
+                ),
+              },
+              {
+                value: 'tree',
+                label: (
+                  <span
+                    className={classNames(
+                      `${prefixCls}-toolbar-switch-icon`,
+                      hashId,
+                    )}
+                    title={treeAccessible}
+                    aria-label={treeAccessible}
+                  >
+                    <TreeDownArrow />
+                  </span>
+                ),
+              },
             ]}
             data-testid="file-panel-view-switch"
           />
@@ -621,6 +661,11 @@ export const FileComponent: FC<{
                   filterKeyword={
                     hasKeyword ? String(keyword ?? '').trim() : undefined
                   }
+                  onDownload={onDownload}
+                  onPreview={handlePreview}
+                  onShare={onShare}
+                  onLocate={onLocate}
+                  onFileClick={onFileClick}
                 />
               </div>
             ) : (

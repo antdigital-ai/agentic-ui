@@ -1,4 +1,4 @@
-import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
+﻿import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
   const { componentCls } = token;
@@ -16,8 +16,54 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
       [`${componentCls}-tree`]: {
         flex: 1,
         minHeight: 0,
-        overflow: 'auto',
+        minWidth: 0,
+        overflowX: 'hidden',
+        overflowY: 'auto',
         background: 'transparent',
+
+        [`${componentCls}-leaf-title`]: {
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: token.marginXXS ?? 4,
+          width: '100%',
+          minWidth: 0,
+        },
+        [`${componentCls}-leaf-title-text`]: {
+          flex: 1,
+          minWidth: 0,
+          whiteSpace: 'normal',
+          wordBreak: 'break-word',
+          overflowWrap: 'anywhere',
+        },
+        [`.ant-tree-treenode`]: {
+          alignItems: 'flex-start',
+        },
+        [`.ant-tree-node-content-wrapper`]: {
+          whiteSpace: 'normal',
+          wordBreak: 'break-word',
+          overflowWrap: 'anywhere',
+        },
+        [`.ant-tree-title`]: {
+          whiteSpace: 'normal',
+          wordBreak: 'break-word',
+          overflowWrap: 'anywhere',
+        },
+        [`${componentCls}-leaf-actions`]: {
+          display: 'flex',
+          alignItems: 'center',
+          alignSelf: 'flex-start',
+          gap: '4px',
+          flexShrink: 0,
+          paddingTop: 2,
+        },
+        [`${componentCls}-leaf-action-btn`]: {
+          [`.anticon`]: {
+            color: 'var(--color-gray-text-light)',
+          },
+          ['&:hover .anticon, &:focus .anticon, &:active .anticon']: {
+            color: 'var(--color-gray-text-light)',
+          },
+        },
       },
     },
   };

@@ -14,9 +14,11 @@ import React, {
 
 import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { I18nContext, compileTemplate } from '../../../I18n';
-import type { FileTreeNode, FileTreeProps } from '../../types';
+import type { FileNode, FileTreeNode, FileTreeProps } from '../../types';
 import { getFileType } from '../../types';
+import { ensureNodeWithId } from '../handlers';
 import { getFileTypeIcon } from '../utils';
+import { FileTreeLeafTitle } from './FileTreeLeafTitle';
 import { useFileTreeStyle } from './style';
 
 const walkAndIndex = (
@@ -31,29 +33,68 @@ const walkAndIndex = (
   }
 };
 
-const toDataNode = (node: FileTreeNode): DataNode => {
-  const { key, name, isLeaf, disabled, children } = node;
-  const hasChildren = Boolean(children && children.length > 0);
-  // `isLeaf: false` = 目录；未传时：有子节点 = 目录，无子节点 = 视为文件（与懒加载目录需显式 `isLeaf: false` 一致）
-  const resolvedIsLeaf = isLeaf ?? !hasChildren;
-
-  if (resolvedIsLeaf) {
-    return {
-      key,
-      title: name,
-      isLeaf: true,
-      disabled,
-    } as DataNode;
-  }
-
-  return {
-    key,
-    title: name,
-    isLeaf: false,
-    disabled,
-    children: hasChildren ? (children as FileTreeNode[]).map(toDataNode) : [],
-  } as DataNode;
+const resolveTreeLeafFile = (node: FileTreeNode): FileNode | null => {
+  const hasChildren = Boolean(node.children && node.children.length > 0);
+  const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
+  if (!resolvedIsLeaf || !node.file) return null;
+  return ensureNodeWithId({
+    ...node.file,
+    name: node.file.name ?? node.name,
+    id: node.file.id ?? node.id ?? node.key,
+  });
 };
+
+const mapTreeToDataNodes = (
+  nodes: FileTreeNode[],
+  ctx: {
+    prefixCls: string;
+    hashId: string;
+    locale?: Record<string, any>;
+    onDownload?: (file: FileNode) => void;
+    onPreview?: FileTreeProps['onPreview'];
+    onShare?: FileTreeProps['onShare'];
+    onLocate?: (file: FileNode) => void;
+  },
+): DataNode[] =>
+  nodes.map((node) => {
+    const hasChildren = Boolean(node.children && node.children.length > 0);
+    const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
+
+    if (resolvedIsLeaf) {
+      const title =
+        node.file != null ? (
+          <FileTreeLeafTitle
+            node={node as FileTreeNode & { file: FileNode }}
+            prefixCls={ctx.prefixCls}
+            hashId={ctx.hashId}
+            locale={ctx.locale}
+            onDownload={ctx.onDownload}
+            onPreview={ctx.onPreview}
+            onShare={ctx.onShare}
+            onLocate={ctx.onLocate}
+          />
+        ) : (
+          node.name
+        );
+
+      return {
+        key: node.key,
+        title,
+        isLeaf: true,
+        disabled: node.disabled,
+      } as DataNode;
+    }
+
+    return {
+      key: node.key,
+      title: node.name,
+      isLeaf: false,
+      disabled: node.disabled,
+      children: hasChildren
+        ? mapTreeToDataNodes(node.children as FileTreeNode[], ctx)
+        : [],
+    } as DataNode;
+  });
 
 const replaceNodeChildren = (
   nodes: FileTreeNode[],
@@ -144,6 +185,11 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   treeData,
   onLoadChildren,
   onSelect,
+  onFileClick,
+  onDownload,
+  onPreview,
+  onShare,
+  onLocate,
   showLine = true,
   resetKey: _resetKey,
   emptyRender,
@@ -196,8 +242,26 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   );
 
   const dataNodes = useMemo(
-    () => displayTree.map(toDataNode) as NonNullable<TreeProps['treeData']>,
-    [displayTree],
+    () =>
+      mapTreeToDataNodes(displayTree, {
+        prefixCls,
+        hashId,
+        locale,
+        onDownload,
+        onPreview,
+        onShare,
+        onLocate,
+      }) as NonNullable<TreeProps['treeData']>,
+    [
+      displayTree,
+      prefixCls,
+      hashId,
+      locale,
+      onDownload,
+      onPreview,
+      onShare,
+      onLocate,
+    ],
   );
 
   const handleLoadData = useRefFunction((treeNode: EventDataNode<DataNode>) => {
@@ -234,11 +298,18 @@ const FileTreeComponent: FC<FileTreeProps> = ({
 
   const handleSelect: NonNullable<TreeProps['onSelect']> = useRefFunction(
     (_keys, info) => {
-      if (!onSelect) return;
       if (!info.selected) return;
       const k = String(info.node.key);
       const n = nodeMap.get(k);
-      if (n) onSelect(n);
+      if (!n) return;
+      onSelect?.(n);
+      const file = resolveTreeLeafFile(n);
+      if (!file || n.disabled === true) return;
+      if (onFileClick) {
+        onFileClick(file);
+      } else if (onPreview) {
+        void onPreview(file);
+      }
     },
   );
 

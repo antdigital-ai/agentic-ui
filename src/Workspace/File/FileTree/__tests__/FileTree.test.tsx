@@ -9,11 +9,14 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../../I18n';
+import type { FileNode } from '../../../types';
 import Workspace from '../../../index';
 
 describe('Workspace.FileTree', () => {
   const mockLocale = {
     'workspace.empty': '暂无数据',
+    'workspace.file.preview': '预览',
+    'workspace.file.download': '下载',
   } as any;
 
   const TestWrapper: React.FC<{ children: React.ReactNode }> = ({
@@ -243,5 +246,155 @@ describe('Workspace.FileTree', () => {
         expect.objectContaining({ key: 'x', name: 'b.md' }),
       );
     });
+  });
+
+  it('shows preview/download for leaf with file and invokes onDownload', async () => {
+    const onDownload = vi.fn();
+    const file: FileNode = {
+      id: 'tree-f1',
+      name: 'demo.md',
+      type: 'markdown',
+      url: 'https://example.com/demo.md',
+      canPreview: true,
+    };
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-1',
+                name: 'demo.md',
+                isLeaf: true,
+                file,
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            onDownload={onDownload}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: '下载' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '预览' }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '下载' }));
+    expect(onDownload).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'tree-f1', name: 'demo.md' }),
+    );
+  });
+
+  it('invokes onPreview when preview icon clicked', async () => {
+    const onPreview = vi.fn();
+    const file: FileNode = {
+      id: 'tree-f2',
+      name: 'note.md',
+      type: 'markdown',
+      url: 'https://example.com/note.md',
+      canPreview: true,
+    };
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-md',
+                name: 'note.md',
+                isLeaf: true,
+                file,
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            onPreview={onPreview}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '预览' }));
+    expect(onPreview).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'tree-f2', name: 'note.md' }),
+    );
+  });
+
+  it('invokes onPreview on leaf select when file is set and onFileClick omitted', async () => {
+    const onPreview = vi.fn();
+    const file: FileNode = {
+      id: 'tree-f3',
+      name: 'x.ts',
+      url: 'https://example.com/x.ts',
+      canPreview: true,
+    };
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-ts',
+                name: 'x.ts',
+                isLeaf: true,
+                file,
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            onPreview={onPreview}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByText('x.ts'));
+    await waitFor(() => {
+      expect(onPreview).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'tree-f3', name: 'x.ts' }),
+      );
+    });
+  });
+
+  it('invokes onFileClick instead of onPreview when both are set', async () => {
+    const onPreview = vi.fn();
+    const onFileClick = vi.fn();
+    const file: FileNode = {
+      id: 'tree-f4',
+      name: 'y.ts',
+      url: 'https://example.com/y.ts',
+      canPreview: true,
+    };
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-y',
+                name: 'y.ts',
+                isLeaf: true,
+                file,
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            onFileClick={onFileClick}
+            onPreview={onPreview}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByText('y.ts'));
+    await waitFor(() => {
+      expect(onFileClick).toHaveBeenCalled();
+    });
+    expect(onPreview).not.toHaveBeenCalled();
   });
 });
