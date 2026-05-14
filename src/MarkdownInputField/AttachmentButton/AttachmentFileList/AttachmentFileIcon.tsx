@@ -242,7 +242,7 @@ export const AttachmentFileIcon: React.FC<{
         />
       );
     }
-    if (file.size) {
+    if (file.size && file instanceof File) {
       return (
         <VideoThumbnailFromBlob
           key={`${file.name}-${file.size}-${file.lastModified || 0}`}
