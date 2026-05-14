@@ -223,7 +223,7 @@ describe('FileComponent', () => {
       expect(screen.queryByText('list.txt')).not.toBeInTheDocument();
     });
 
-    it('树视图下隐藏搜索框，切回列表恢复', () => {
+    it('树视图下仍显示搜索框，筛选仅作用于已展开分支', () => {
       const nodes: FileNode[] = [
         { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
       ];
@@ -244,7 +244,7 @@ describe('FileComponent', () => {
       );
       expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
       fireEvent.click(screen.getByText('Tree'));
-      expect(screen.queryByTestId('file-search-input')).not.toBeInTheDocument();
+      expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
       fireEvent.click(screen.getByText('List'));
       expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
     });

@@ -1,4 +1,4 @@
-import {
+﻿import {
   ConfigProvider,
   Empty,
   Image,
@@ -80,6 +80,7 @@ export const FileComponent: FC<{
   /** 是否显示搜索框，默认不显示 */
   showSearch?: boolean;
   searchPlaceholder?: string;
+  searchPlaceholderTree?: string;
   bindDomId?: FileProps['bindDomId'];
   fileTreeSwitch?: FileProps['fileTreeSwitch'];
 }> = ({
@@ -105,6 +106,7 @@ export const FileComponent: FC<{
   onChange,
   showSearch = false,
   searchPlaceholder,
+  searchPlaceholderTree,
   bindDomId = false,
   fileTreeSwitch,
 }) => {
@@ -362,8 +364,7 @@ export const FileComponent: FC<{
 
   const renderToolbarRow = () => {
     const showSwitcher = Boolean(fileTreeSwitch);
-    const showSearchInToolbar =
-      showSearch && (!fileTreeSwitch || panelView === 'list');
+    const showSearchInToolbar = showSearch;
     if (!showSwitcher && !showSearchInToolbar) {
       return null;
     }
@@ -375,6 +376,17 @@ export const FileComponent: FC<{
       'File tree';
     const switchTrailing = showSwitcher && !showSearchInToolbar;
 
+    const resolvedSearchPlaceholder =
+      fileTreeSwitch && panelView === 'tree'
+        ? (searchPlaceholderTree ??
+          locale?.['workspace.fileTreeSearchPlaceholder'] ??
+          searchPlaceholder ??
+          locale?.['workspace.searchPlaceholder'] ??
+          '搜索已展开目录内的文件名')
+        : (searchPlaceholder ??
+          locale?.['workspace.searchPlaceholder'] ??
+          '搜索文件名');
+
     return (
       <div
         className={classNames(`${prefixCls}-toolbar`, hashId)}
@@ -385,7 +397,7 @@ export const FileComponent: FC<{
             <SearchInput
               keyword={keyword}
               onChange={onChange}
-              searchPlaceholder={searchPlaceholder}
+              searchPlaceholder={resolvedSearchPlaceholder}
               prefixCls={prefixCls}
               hashId={hashId}
               locale={locale}
@@ -603,7 +615,13 @@ export const FileComponent: FC<{
                 className={classNames(`${prefixCls}-tree-panel`, hashId)}
                 data-testid="file-tree-embed"
               >
-                <FileTree {...fileTreeSwitch.treeProps} resetKey={resetKey} />
+                <FileTree
+                  {...fileTreeSwitch.treeProps}
+                  resetKey={resetKey}
+                  filterKeyword={
+                    hasKeyword ? String(keyword ?? '').trim() : undefined
+                  }
+                />
               </div>
             ) : (
               renderFileContent()

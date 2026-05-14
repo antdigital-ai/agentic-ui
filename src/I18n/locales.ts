@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 中文标签映射对象
  *
  * 包含所有界面文本的中文翻译，用于国际化
@@ -294,7 +294,12 @@ export const cnLabels = {
   // 新增：Workspace 标题与搜索相关
   'workspace.title': '工作空间',
   'workspace.searchPlaceholder': '搜索文件名',
+  'workspace.fileTreeSearchPlaceholder': '搜索已展开目录下的文件名',
   'workspace.noResultsFor': '未找到与「${keyword}」匹配的结果',
+  'workspace.treeFilterNoMatchVisibleRoots':
+    '当前可见列表中未找到与「${keyword}」匹配的文件',
+  'workspace.treeFilterNoMatchInExpanded':
+    '已在展开目录的已加载内容中查找，未找到与「${keyword}」匹配的结果',
   // 新增：文件预览相关
   'workspace.file.generating': '正在生成',
   'workspace.file.processing': '正在处理文件...',
@@ -774,7 +779,13 @@ export const enLabels: typeof cnLabels = {
   // New: Workspace title & search
   'workspace.title': 'Workspace',
   'workspace.searchPlaceholder': 'Search file name',
+  'workspace.fileTreeSearchPlaceholder':
+    'Search loaded files under expanded folders',
   'workspace.noResultsFor': 'No results for "${keyword}"',
+  'workspace.treeFilterNoMatchVisibleRoots':
+    'No matching files in the current visible list for "${keyword}"',
+  'workspace.treeFilterNoMatchInExpanded':
+    'Searched loaded content under expanded folders; no match for "${keyword}"',
   // New: File preview related
   'workspace.file.generating': 'Generating',
   'workspace.file.processing': 'Processing file...',

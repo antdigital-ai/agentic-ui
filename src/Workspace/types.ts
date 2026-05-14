@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+﻿import React, { type ReactNode } from 'react';
 import type { MarkdownEditorProps } from '../MarkdownEditor';
 import type { BrowserProps as InternalBrowserProps } from './Browser';
 import type { RealtimeFollowData } from './RealtimeFollow';
@@ -532,11 +532,16 @@ export interface FileProps extends BaseChildProps {
   onChange?: (keyword: string) => void;
   /** 是否显示搜索框（默认不显示） */
   showSearch?: boolean;
-  /** 搜索框占位符 */
+  /** 搜索框占位符（平铺列表模式；未配置 `fileTreeSwitch` 时两种模式均用此项） */
   searchPlaceholder?: string;
   /**
+   * 文件树模式下的搜索框占位符
+   * @description 仅在与 `fileTreeSwitch` 并存且当前为树视图时生效；未传时依次回退 `workspace.fileTreeSearchPlaceholder`、`searchPlaceholder`、`workspace.searchPlaceholder`
+   */
+  searchPlaceholderTree?: string;
+  /**
    * 列表与文件树视图切换：传入后在搜索框旁展示段选择器；未传入时不展示
-   * @description 切到「文件树」时隐藏搜索框（树数据无内置过滤）；切回「列表」时恢复
+   * @description 与 `showSearch` 并存时，树模式仍显示搜索框；树内筛选仅匹配已展开目录下的已加载子节点（由 `Workspace.File` 注入 `filterKeyword`）
    */
   fileTreeSwitch?: FileTreeSwitchConfig;
   /**
@@ -606,6 +611,11 @@ export interface FileTreeProps extends BaseChildProps {
    */
   emptyRender?: ReactNode | (() => ReactNode);
   /**
+   * 名称筛选关键字（`Workspace.File` 内嵌树时注入）
+   * @description 仅匹配已展开目录下的已加载子节点；未传或空不筛选。无匹配时：未展开任何目录为 `workspace.treeFilterNoMatchVisibleRoots`，已展开过为 `workspace.treeFilterNoMatchInExpanded`
+   */
+  filterKeyword?: string;
+  /**
    * 是否整行可点选（antd Tree `blockNode`），默认 `true`
    */
   blockNode?: boolean;
@@ -616,10 +626,10 @@ export type FilePanelViewMode = 'list' | 'tree';
 
 /**
  * 在 {@link FileProps} 上启用「列表 / 文件树」段选择器时的配置
- * @description 配置后搜索行右侧展示切换；`treeProps` 与独立使用 `Workspace.FileTree` 时一致（`tab`、`resetKey` 由 `Workspace.File` 注入）
+ * @description 配置后搜索行右侧展示切换；开启 `showSearch` 时树模式仍显示搜索框，筛选仅作用于已展开分支（`filterKeyword` 由 `Workspace.File` 注入）。`treeProps` 与独立使用 `Workspace.FileTree` 时一致（`tab`、`resetKey`、`filterKeyword` 由 `Workspace.File` 注入）
  */
 export interface FileTreeSwitchConfig {
-  treeProps: Omit<FileTreeProps, 'tab' | 'resetKey'>;
+  treeProps: Omit<FileTreeProps, 'tab' | 'resetKey' | 'filterKeyword'>;
   /** 非受控时的初始视图，默认 `list` */
   defaultView?: FilePanelViewMode;
   /** 受控当前视图 */

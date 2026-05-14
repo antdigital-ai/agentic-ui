@@ -99,11 +99,11 @@ const WorkspaceFileListTreeSwitchDemo: React.FC = () => {
           <Alert
             type="info"
             showIcon
-            message="当前视图"
+            message={panelView === 'list' ? '平铺模式' : '文件树模式'}
             description={
               panelView === 'list'
-                ? '平铺列表（支持搜索过滤）'
-                : '文件树（搜索框隐藏，展开目录懒加载）'
+                ? '列表按文件名过滤当前全部文件条目'
+                : '树内搜索仅匹配已展开目录下已加载的文件名；无匹配时根级与「已展开仍无结果」会显示不同提示'
             }
           />
 
@@ -129,7 +129,8 @@ const WorkspaceFileListTreeSwitchDemo: React.FC = () => {
               showSearch
               keyword={keyword}
               onChange={setKeyword}
-              searchPlaceholder="按文件名过滤（仅平铺模式）"
+              searchPlaceholder="搜索全部文件名"
+              searchPlaceholderTree="仅搜索已展开目录内已加载的文件"
               fileTreeSwitch={{
                 view: panelView,
                 onViewChange: setPanelView,

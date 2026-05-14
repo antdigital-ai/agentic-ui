@@ -1,10 +1,11 @@
-import { FileFolders } from '@sofa-design/icons';
-import { ConfigProvider, Empty, Tree } from 'antd';
+﻿import { FileFolders } from '@sofa-design/icons';
+import { ConfigProvider, Empty, Tree, Typography } from 'antd';
 import type { DataNode, EventDataNode, TreeProps } from 'antd/es/tree';
 import type { AntdTreeNodeAttribute } from 'antd/es/tree/Tree';
 import classNames from 'clsx';
 import React, {
   type FC,
+  type Key,
   useContext,
   useEffect,
   useMemo,
@@ -12,7 +13,7 @@ import React, {
 } from 'react';
 
 import { useRefFunction } from '../../../Hooks/useRefFunction';
-import { I18nContext } from '../../../I18n';
+import { I18nContext, compileTemplate } from '../../../I18n';
 import type { FileTreeNode, FileTreeProps } from '../../types';
 import { getFileType } from '../../types';
 import { getFileTypeIcon } from '../utils';
@@ -82,6 +83,60 @@ const buildMap = (nodes: FileTreeNode[]) => {
   return m;
 };
 
+/**
+ * 仅对已展开目录下的已加载子树做名称匹配；未展开目录内的节点不参与匹配
+ */
+const filterFileTreeByExpandedKeyword = (
+  nodes: FileTreeNode[],
+  expandedSet: Set<string>,
+  rawKeyword: string,
+): FileTreeNode[] => {
+  const q = rawKeyword.trim().toLowerCase();
+  if (!q) return nodes;
+
+  const visit = (node: FileTreeNode): FileTreeNode | null => {
+    const selfMatch = node.name.toLowerCase().includes(q);
+    const hasChildren = Boolean(node.children && node.children.length > 0);
+    const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
+
+    if (resolvedIsLeaf) {
+      return selfMatch ? node : null;
+    }
+
+    if (!expandedSet.has(node.key)) {
+      return { ...node, children: node.children ?? [] };
+    }
+
+    const rawChildren = node.children ?? [];
+    if (rawChildren.length === 0 && node.isLeaf === false) {
+      return { ...node, children: [] };
+    }
+
+    const filteredChildren = rawChildren
+      .map(visit)
+      .filter((n): n is FileTreeNode => Boolean(n));
+
+    if (selfMatch || filteredChildren.length > 0) {
+      return { ...node, children: filteredChildren };
+    }
+    return null;
+  };
+
+  return nodes.map(visit).filter((n): n is FileTreeNode => Boolean(n));
+};
+
+const collectSubtreeKeys = (nodes: FileTreeNode[]): Set<string> => {
+  const keys = new Set<string>();
+  const walk = (ns: FileTreeNode[]) => {
+    for (const n of ns) {
+      keys.add(n.key);
+      if (n.children?.length) walk(n.children);
+    }
+  };
+  walk(nodes);
+  return keys;
+};
+
 const FileTreeComponent: FC<FileTreeProps> = ({
   tab: _tab,
   className,
@@ -93,6 +148,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   resetKey: _resetKey,
   emptyRender,
   blockNode = true,
+  filterKeyword,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
@@ -100,6 +156,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   const { wrapSSR, hashId } = useFileTreeStyle(prefixCls);
 
   const [innerTree, setInnerTree] = useState<FileTreeNode[]>(treeData);
+  const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
 
   const nodeMap = useMemo(() => buildMap(innerTree), [innerTree]);
 
@@ -109,9 +166,38 @@ const FileTreeComponent: FC<FileTreeProps> = ({
     setInnerTree(treeData);
   }, [treeData]);
 
+  useEffect(() => {
+    if (_resetKey === undefined) return;
+    setExpandedKeys([]);
+  }, [_resetKey]);
+
+  const expandedSet = useMemo(
+    () => new Set(expandedKeys.map((k) => String(k))),
+    [expandedKeys],
+  );
+
+  const displayTree = useMemo(() => {
+    if (!filterKeyword?.trim()) return innerTree;
+    return filterFileTreeByExpandedKeyword(
+      innerTree,
+      expandedSet,
+      filterKeyword,
+    );
+  }, [innerTree, expandedSet, filterKeyword]);
+
+  const keysInDisplayTree = useMemo(
+    () => collectSubtreeKeys(displayTree),
+    [displayTree],
+  );
+
+  const safeExpandedKeys = useMemo(
+    () => expandedKeys.filter((k) => keysInDisplayTree.has(String(k))),
+    [expandedKeys, keysInDisplayTree],
+  );
+
   const dataNodes = useMemo(
-    () => innerTree.map(toDataNode) as NonNullable<TreeProps['treeData']>,
-    [innerTree],
+    () => displayTree.map(toDataNode) as NonNullable<TreeProps['treeData']>,
+    [displayTree],
   );
 
   const handleLoadData = useRefFunction((treeNode: EventDataNode<DataNode>) => {
@@ -156,6 +242,12 @@ const FileTreeComponent: FC<FileTreeProps> = ({
     },
   );
 
+  const handleExpand: NonNullable<TreeProps['onExpand']> = useRefFunction(
+    (keys) => {
+      setExpandedKeys(keys);
+    },
+  );
+
   const handleTreeIcon: TreeProps['icon'] = useRefFunction(
     (iconProps: AntdTreeNodeAttribute) => {
       const k = String(iconProps.eventKey);
@@ -194,7 +286,6 @@ const FileTreeComponent: FC<FileTreeProps> = ({
     },
   );
 
-  const showEmpty = innerTree.length === 0;
   const emptyNode =
     typeof emptyRender === 'function'
       ? (emptyRender as () => React.ReactNode)()
@@ -206,6 +297,37 @@ const FileTreeComponent: FC<FileTreeProps> = ({
     />
   );
 
+  const showEmpty = innerTree.length === 0;
+  const showFilterNoMatch =
+    innerTree.length > 0 &&
+    Boolean(filterKeyword?.trim()) &&
+    displayTree.length === 0;
+
+  const filterEmptyState: 'rootsNoMatch' | 'expandedNoMatch' | null =
+    showFilterNoMatch
+      ? expandedSet.size > 0
+        ? 'expandedNoMatch'
+        : 'rootsNoMatch'
+      : null;
+
+  const filterNoMatchNode =
+    filterEmptyState === null ? null : (
+      <Typography.Text
+        type="secondary"
+        data-testid="file-tree-filter-empty"
+        data-state={filterEmptyState}
+      >
+        {compileTemplate(
+          filterEmptyState === 'expandedNoMatch'
+            ? (locale?.['workspace.treeFilterNoMatchInExpanded'] ??
+                '已在展开目录的已加载内容中查找，未找到与「${keyword}」匹配的结果')
+            : (locale?.['workspace.treeFilterNoMatchVisibleRoots'] ??
+                '当前可见列表中未找到与「${keyword}」匹配的文件'),
+          { keyword: String(filterKeyword ?? '').trim() },
+        )}
+      </Typography.Text>
+    );
+
   return wrapSSR(
     <div
       className={classNames(prefixCls, hashId, className)}
@@ -214,12 +336,16 @@ const FileTreeComponent: FC<FileTreeProps> = ({
     >
       {showEmpty ? (
         (emptyNode ?? defaultEmpty)
+      ) : showFilterNoMatch ? (
+        filterNoMatchNode
       ) : (
         <Tree
           className={classNames(`${prefixCls}-tree`, hashId)}
           showLine={showLine}
           showIcon
           blockNode={blockNode}
+          expandedKeys={safeExpandedKeys}
+          onExpand={handleExpand}
           loadData={handleLoadData}
           onSelect={handleSelect}
           treeData={dataNodes}

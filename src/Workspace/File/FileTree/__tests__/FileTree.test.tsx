@@ -1,4 +1,4 @@
-import {
+﻿import {
   act,
   fireEvent,
   render,
@@ -131,6 +131,87 @@ describe('Workspace.FileTree', () => {
       expect(onLoadChildren.mock.calls.length).toBeGreaterThanOrEqual(2);
     });
     await waitFor(() => expect(screen.getByText('f.txt')).toBeInTheDocument());
+  });
+
+  it('filterKeyword shows empty hint when no root matches', () => {
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[{ key: 'x', name: 'readme.md', isLeaf: true }]}
+            onLoadChildren={vi.fn()}
+            filterKeyword="gamma"
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByTestId('file-tree-filter-empty')).toHaveAttribute(
+      'data-state',
+      'rootsNoMatch',
+    );
+  });
+
+  it('filter empty uses expanded hint when folders were expanded', async () => {
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'r',
+                name: 'rootdir',
+                isLeaf: false,
+                children: [{ key: 'a', name: 'foo.txt', isLeaf: true }],
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            filterKeyword="zzz"
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(document.querySelector('.ant-tree-switcher')!);
+
+    const empty = await screen.findByTestId('file-tree-filter-empty');
+    expect(empty).toHaveAttribute('data-state', 'expandedNoMatch');
+  });
+
+  it('filterKeyword only matches loaded children under expanded folders', async () => {
+    const onLoadChildren = vi
+      .fn()
+      .mockResolvedValue([{ key: 'b1', name: 'gamma.txt', isLeaf: true }]);
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'b',
+                name: 'beta-dir',
+                isLeaf: false,
+                children: [] as any,
+              },
+            ]}
+            onLoadChildren={onLoadChildren}
+            filterKeyword="gamma"
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(
+      screen.queryByTestId('file-tree-filter-empty'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('beta-dir')).toBeInTheDocument();
+
+    fireEvent.click(document.querySelector('.ant-tree-switcher')!);
+    await waitFor(() => expect(onLoadChildren).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(screen.getByText('gamma.txt')).toBeInTheDocument(),
+    );
   });
 
   it('invokes onSelect with node', async () => {
