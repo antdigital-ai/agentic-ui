@@ -248,6 +248,66 @@ describe('Workspace.FileTree', () => {
     });
   });
 
+  it('renders leaves without file data as plain tree items', async () => {
+    const onSelect = vi.fn();
+    const onPreview = vi.fn();
+    const onFileClick = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={
+              [
+                {
+                  key: 'null-file',
+                  name: 'null-file.txt',
+                  isLeaf: true,
+                  file: null,
+                },
+                {
+                  key: 'missing-file',
+                  name: 'missing-file.txt',
+                  isLeaf: true,
+                },
+              ] as any
+            }
+            onLoadChildren={vi.fn()}
+            onSelect={onSelect}
+            onPreview={onPreview}
+            onFileClick={onFileClick}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText('null-file.txt')).toBeInTheDocument();
+    expect(screen.getByText('missing-file.txt')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '预览' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '下载' }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('null-file.txt'));
+    fireEvent.click(screen.getByText('missing-file.txt'));
+
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalledTimes(2);
+    });
+    expect(onSelect).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ key: 'null-file', file: null }),
+    );
+    expect(onSelect).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ key: 'missing-file' }),
+    );
+    expect(onPreview).not.toHaveBeenCalled();
+    expect(onFileClick).not.toHaveBeenCalled();
+  });
+
   it('shows preview/download for leaf with file and invokes onDownload', async () => {
     const onDownload = vi.fn();
     const file: FileNode = {
