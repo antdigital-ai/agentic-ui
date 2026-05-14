@@ -80,8 +80,7 @@ const genStyle: GenerateStyle<
     ? {}
     : {
         '&:hover': {
-          boxShadow:
-            '0px 0px 1px 0px rgba(10, 48, 104, 0.25), 0px 2px 7px 0px rgba(10, 48, 104, 0.05), 0px 2px 5px -2px rgba(10, 48, 104, 0.06)',
+          boxShadow: 'var(--shadow-control-lg)',
         },
       };
 
@@ -103,12 +102,10 @@ const genStyle: GenerateStyle<
       '> * ': {
         boxSizing: 'border-box',
       },
-      boxShadow:
-        '0px 0px 1px 0px rgba(10, 48, 104, 0.15), 0px 1.5px 4px -1px rgba(10, 48, 104, 0.04)',
+      boxShadow: 'var(--shadow-control-base)',
       ...hoverStyle,
       '&-focused': {
-        boxShadow:
-          '0px 0px 1px 0px rgba(10, 48, 104, 0.25), 0px 2px 7px 0px rgba(10, 48, 104, 0.05), 0px 2px 5px -2px rgba(10, 48, 104, 0.06)',
+        boxShadow: 'var(--shadow-control-lg)',
       },
 
       '&-enlarged': {

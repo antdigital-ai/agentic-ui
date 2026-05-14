@@ -62,6 +62,25 @@ describe('ReadonlyCode', () => {
     expect(div.textContent).toContain('Safe');
   });
 
+  it('language 为 html 且 value 滞后时应展示 Slate 子节点文本', () => {
+    const element = {
+      type: 'code',
+      language: 'html',
+      value: '<div>Old</div>',
+      otherProps: { isConfig: false },
+      children: [{ text: '<section>Streamed</section>' }],
+    };
+    const { container } = render(
+      <ReadonlyCode attributes={mockAttributes} element={element}>
+        <span />
+      </ReadonlyCode>,
+    );
+
+    const div = container.firstChild as HTMLElement;
+    expect(div.textContent).toContain('Streamed');
+    expect(div.textContent).not.toContain('Old');
+  });
+
   it('finished 为 false 时应设置 data-is-unclosed', () => {
     const element = {
       type: 'code',

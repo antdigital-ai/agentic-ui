@@ -559,6 +559,24 @@ describe('CodeRenderer Component', () => {
       expect(screen.getByTestId('ace-editor-container')).toBeInTheDocument();
     });
 
+    it('流式更新仅同步子节点时，应使用 Slate 文本检测 HTML 中的 JavaScript', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'html',
+          value: '<div>Safe stale value</div>',
+          children: [
+            { text: '<script>alert("from slate")</script><div>Content</div>' },
+          ] as [{ text: string }],
+        },
+      };
+      render(<CodeRenderer {...props} />);
+
+      expect(screen.queryByTestId('html-preview')).not.toBeInTheDocument();
+      expect(screen.getByTestId('ace-editor-container')).toBeInTheDocument();
+    });
+
     it('当 HTML 代码包含 setTimeout 字符串代码时，应该自动禁用预览', () => {
       const props = {
         ...defaultProps,
@@ -573,6 +591,61 @@ describe('CodeRenderer Component', () => {
       expect(screen.queryByTestId('html-preview')).not.toBeInTheDocument();
       // 应该显示代码编辑器
       expect(screen.getByTestId('code-container')).toBeInTheDocument();
+    });
+
+    it('当危险 HTML 仅存在于 Slate 子节点时，应该自动禁用预览', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'html',
+          value: '<div>stale safe html</div>',
+          children: [{ text: '<img src="x" onerror="alert(1)">' }],
+        },
+      };
+
+      render(<CodeRenderer {...props} />);
+
+      expect(screen.queryByTestId('html-preview')).not.toBeInTheDocument();
+      expect(screen.getByTestId('ace-editor-container')).toBeInTheDocument();
+    });
+  });
+
+  describe('流式 Slate 文本同步', () => {
+    it('HTML 预览应使用 Slate 子节点文本而不是滞后的 value', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'html',
+          value: '<div>stale</div>',
+          children: [{ text: '<section>from slate</section>' }] as [
+            { text: string },
+          ],
+        },
+      };
+      render(<CodeRenderer {...props} />);
+
+      expect(screen.getByTestId('html-content')).toHaveTextContent(
+        '<section>from slate</section>',
+      );
+    });
+
+    it('Markdown 预览应使用 Slate 子节点文本而不是滞后的 value', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          language: 'markdown',
+          value: '# stale',
+          children: [{ text: '## from slate' }] as [{ text: string }],
+        },
+      };
+      render(<CodeRenderer {...props} />);
+
+      expect(screen.getByTestId('markdown-content')).toHaveTextContent(
+        '## from slate',
+      );
     });
   });
 
@@ -650,6 +723,24 @@ describe('CodeRenderer Component', () => {
         },
       };
       const { container } = render(<CodeRenderer {...props} />);
+      expect(container.querySelector('.ant-skeleton')).toBeInTheDocument();
+    });
+
+    it('流式更新仅同步子节点时，配置型 HTML 应按 Slate 文本长度显示 Skeleton', () => {
+      const props = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          type: 'code' as const,
+          language: 'html',
+          isConfig: true,
+          otherProps: { finished: false },
+          value: 'x',
+          children: [{ text: 'x'.repeat(101) }] as [{ text: string }],
+        },
+      };
+      const { container } = render(<CodeRenderer {...props} />);
+
       expect(container.querySelector('.ant-skeleton')).toBeInTheDocument();
     });
   });
