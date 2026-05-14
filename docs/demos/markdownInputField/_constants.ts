@@ -28,3 +28,25 @@ export const pageStyle: CSSProperties = {
 };
 
 export const inputMinStyle: CSSProperties = { minHeight: 66 };
+
+/** 通用模拟上传：返回一个临时 blob URL，并附加可控延时 */
+export const mockUpload = async (file: File, delay = 800): Promise<string> => {
+  await new Promise((resolve) => setTimeout(resolve, delay));
+  return URL.createObjectURL(file);
+};
+
+/** 通用模拟删除：清理 blob URL，避免内存泄漏 */
+export const mockDelete = async (file: {
+  url?: string;
+  previewUrl?: string;
+}): Promise<void> => {
+  const fileUrl = typeof file.url === 'string' ? file.url : undefined;
+  const previewUrl =
+    typeof file.previewUrl === 'string' ? file.previewUrl : undefined;
+  if (fileUrl?.startsWith('blob:')) {
+    URL.revokeObjectURL(fileUrl);
+  }
+  if (previewUrl?.startsWith('blob:') && previewUrl !== fileUrl) {
+    URL.revokeObjectURL(previewUrl);
+  }
+};

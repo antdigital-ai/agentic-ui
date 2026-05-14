@@ -1,1 +1,1 @@
-export { default } from '../markdownInputField';
+export { default } from '../markdownInputField/basic';
