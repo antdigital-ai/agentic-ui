@@ -7,7 +7,7 @@ import { useDemoSend } from './useDemoSend';
 const { Text, Title } = Typography;
 
 export default () => {
-  const [borderRadius, setBorderRadius] = useState(0);
+  const [borderRadius, setBorderRadius] = useState(12);
   const { handleSend, handleStop } = useDemoSend();
 
   const asyncTagItems = useCallback(

@@ -7,7 +7,7 @@ import { useDemoSend } from './useDemoSend';
 const { Text, Title } = Typography;
 
 export default () => {
-  const { sentList, handleSend, handleStop } = useDemoSend();
+  const { handleSend, handleStop } = useDemoSend();
 
   const asyncTagItems = useCallback(
     async (props: { placeholder?: string } | undefined) =>
@@ -26,11 +26,6 @@ export default () => {
       <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
         `tagInputProps.items` 异步返回候选；`value` 展示模板占位语法。
       </Text>
-      {sentList.length > 0 ? (
-        <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
-          已发送 {sentList.length} 条（模拟 1s 延迟；停止可中断）
-        </Text>
-      ) : null}
       <MarkdownInputField
         style={inputMinStyle}
         value={TEMPLATE_VALUE}

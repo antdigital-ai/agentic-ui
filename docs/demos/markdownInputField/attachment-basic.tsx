@@ -1,7 +1,13 @@
 import { MarkdownInputField } from '@ant-design/agentic-ui';
 import { Typography } from 'antd';
 import React, { useMemo } from 'react';
-import { TAG_ITEMS, TEMPLATE_VALUE, pageStyle } from './_constants';
+import {
+  TAG_ITEMS,
+  TEMPLATE_VALUE,
+  mockDelete,
+  mockUpload,
+  pageStyle,
+} from './_constants';
 import { useDemoSend } from './useDemoSend';
 
 const { Text, Title } = Typography;
@@ -12,21 +18,8 @@ export default () => {
   const attachmentConfig = useMemo(
     () => ({
       enable: true as const,
-      upload: async (file: File) =>
-        new Promise<string>((resolve) => {
-          setTimeout(() => resolve(URL.createObjectURL(file)), 1000);
-        }),
-      onDelete: async (file: { url?: string; previewUrl?: string }) => {
-        const fileUrl = typeof file.url === 'string' ? file.url : undefined;
-        const previewUrl =
-          typeof file.previewUrl === 'string' ? file.previewUrl : undefined;
-        if (fileUrl?.startsWith('blob:')) {
-          URL.revokeObjectURL(fileUrl);
-        }
-        if (previewUrl?.startsWith('blob:') && previewUrl !== fileUrl) {
-          URL.revokeObjectURL(previewUrl);
-        }
-      },
+      upload: (file: File) => mockUpload(file, 1000),
+      onDelete: mockDelete,
     }),
     [],
   );
