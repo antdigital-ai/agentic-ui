@@ -62,7 +62,7 @@ const mapTreeToDataNodes = (
 
     if (resolvedIsLeaf) {
       const title =
-        node.file != null ? (
+        node.file !== null && node.file !== undefined ? (
           <FileTreeLeafTitle
             node={node as FileTreeNode & { file: FileNode }}
             prefixCls={ctx.prefixCls}
