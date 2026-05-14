@@ -286,6 +286,54 @@ describe('Workspace.FileTree', () => {
     );
   });
 
+  it('renders leaf nodes with null file metadata as plain selectable leaves', async () => {
+    const onSelect = vi.fn();
+    const onFileClick = vi.fn();
+    const onPreview = vi.fn();
+    const onDownload = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-null-file',
+                name: 'orphan.txt',
+                isLeaf: true,
+                file: null,
+              } as any,
+            ]}
+            onLoadChildren={vi.fn()}
+            onSelect={onSelect}
+            onFileClick={onFileClick}
+            onPreview={onPreview}
+            onDownload={onDownload}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText('orphan.txt')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '下载' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '预览' })).toBeNull();
+
+    fireEvent.click(screen.getByText('orphan.txt'));
+
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          key: 'leaf-null-file',
+          name: 'orphan.txt',
+          file: null,
+        }),
+      );
+    });
+    expect(onFileClick).not.toHaveBeenCalled();
+    expect(onPreview).not.toHaveBeenCalled();
+    expect(onDownload).not.toHaveBeenCalled();
+  });
+
   it('invokes onPreview when preview icon clicked', async () => {
     const onPreview = vi.fn();
     const file: FileNode = {
