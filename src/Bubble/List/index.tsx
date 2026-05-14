@@ -59,6 +59,11 @@ export type BubbleListProps = {
   bubbleRenderConfig?: BubbleProps['bubbleRenderConfig'];
 
   /**
+   * 文件视图配置，透传给每条气泡内的 FileMapView。
+   */
+  fileViewConfig?: BubbleProps['fileViewConfig'];
+
+  /**
    * 组件的样式
    */
   style?: React.CSSProperties;
@@ -552,6 +557,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
             bubbleRef={props.bubbleRef}
             markdownRenderConfig={markdownRenderConfig}
             docListProps={props.docListProps}
+            fileViewConfig={props.fileViewConfig}
             styles={mergedStyles}
             readonly={props.readonly}
             onReply={props.onReply}

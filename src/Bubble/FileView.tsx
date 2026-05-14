@@ -79,13 +79,12 @@ const renderMoreAction = (
 };
 
 const createViewAllHandler = (
-  handler: ((files: AttachmentFile[]) => void) | undefined,
+  handler: ((files: AttachmentFile[]) => boolean | void) | undefined,
 ) => {
   if (!handler) return undefined;
 
   return (files: AttachmentFile[]) => {
-    handler(files);
-    return false;
+    return handler(files);
   };
 };
 
@@ -125,6 +124,8 @@ export const BubbleFileView: React.FC<BubbleFileViewProps> = ({
       maxDisplayCount={fileViewConfig.maxDisplayCount}
       showMoreButton={fileViewConfig.showMoreButton}
       onPreview={events.onPreview}
+      onFileClick={fileViewConfig.onFileClick}
+      disableDefaultFileClick={fileViewConfig.disableDefaultFileClick}
       onDownload={events.onDownload}
       onViewAll={createViewAllHandler(events.onViewAll)}
       renderMoreAction={

@@ -3,8 +3,8 @@ import { FileMapView } from '@ant-design/agentic-ui';
 import React from 'react';
 
 /**
- * 创建仅有元数据、无 url/previewUrl 的附件（用于展示「文件内容未拿到」时的占位块）
- * AttachmentFileIcon 会渲染文件大小 + 格式的小块
+ * 创建仅有元数据、无 url/previewUrl 的附件。
+ * 有 type/name 时会降级为普通文件卡片，避免空图片或空视频缩略图。
  */
 const createStatusOnlyFile = (
   name: string,
@@ -60,10 +60,10 @@ export default () => (
       }}
     >
       <h3 style={{ margin: '0 0 8px 0', fontSize: 16 }}>
-        仅有 status、无 url/previewUrl 时的占位展示
+        无 url/previewUrl 时的文件卡片展示
       </h3>
       <p style={{ margin: 0, color: '#666', fontSize: 14 }}>
-        文件内容未拿到时，展示「文件大小 + 文件格式」的小块，而非空白或错误图标
+        文件有 type/name 但没有可预览 URL 时，展示文件图标和文件名，而非空白缩略图
       </p>
     </div>
     <div

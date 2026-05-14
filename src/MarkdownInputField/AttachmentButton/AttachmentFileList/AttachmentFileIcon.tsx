@@ -216,15 +216,18 @@ export const AttachmentFileIcon: React.FC<{
 
   // 图片文件预览
   if (isImageFile(file)) {
-    return (
-      <Image
-        src={file.url}
-        style={IMAGE_STYLE}
-        rootClassName={className}
-        preview={IMAGE_PREVIEW_CONFIG}
-        alt={file.name}
-      />
-    );
+    const imageUrl = file.previewUrl || file.url;
+    if (imageUrl) {
+      return (
+        <Image
+          src={imageUrl}
+          style={IMAGE_STYLE}
+          rootClassName={className}
+          preview={IMAGE_PREVIEW_CONFIG}
+          alt={file.name}
+        />
+      );
+    }
   }
 
   // 视频文件缩略图预览（与图片类似，带播放按钮）

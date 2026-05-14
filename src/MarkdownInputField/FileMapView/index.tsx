@@ -21,6 +21,15 @@ const getMediaPlaceholderStyle = (size: { width: number; height: number }) => ({
   minWidth: size.width,
 });
 
+const getFilePreviewUrl = (file: AttachmentFile): string | undefined =>
+  file.previewUrl || file.url;
+
+const isPreviewableImageFile = (file: AttachmentFile): boolean =>
+  Boolean(getFilePreviewUrl(file)) && isImageFile(file);
+
+const isPreviewableVideoFile = (file: AttachmentFile): boolean =>
+  Boolean(getFilePreviewUrl(file)) && isVideoFile(file);
+
 export type FileMapViewProps = {
   /** 是否显示"查看更多"按钮 */
   showMoreButton?: boolean;
@@ -33,10 +42,16 @@ export type FileMapViewProps = {
    * - 对于视频文件：点击缩略图时触发，传入时阻止内置弹窗播放。
    */
   onPreview?: (file: AttachmentFile) => void;
+  /** 自定义普通文件卡片点击回调，传入后优先于默认预览行为 */
+  onFileClick?: (file: AttachmentFile) => void;
+  /** 禁用普通文件卡片点击触发的默认预览行为 */
+  disableDefaultFileClick?: boolean;
   /** 下载文件回调 */
   onDownload?: (file: AttachmentFile) => void;
   /** 点击"查看所有文件"回调，携带当前所有文件列表。返回 true 时组件内部展开所有文件，返回 false 时由外部处理 */
-  onViewAll?: (files: AttachmentFile[]) => boolean | Promise<boolean>;
+  onViewAll?: (
+    files: AttachmentFile[],
+  ) => boolean | void | Promise<boolean | void>;
   /** 自定义更多操作 DOM（优先于 onMore，传入则展示该 DOM，不传则不展示更多按钮） */
   renderMoreAction?: (file: AttachmentFile) => React.ReactNode;
   /** 自定义悬浮动作区 slot（传入则覆盖默认『预览/下载/更多』动作区） */
@@ -115,17 +130,20 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
 
   // 图片列表不受 maxDisplayCount 限制，显示所有图片
   const imgList = useMemo(() => {
-    return fileList.filter((file) => isImageFile(file));
+    return fileList.filter((file) => isPreviewableImageFile(file));
   }, [fileList]);
 
   // 视频列表，与图片一样以缩略图形式展示
   const videoList = useMemo(() => {
-    return fileList.filter((file) => isVideoFile(file));
+    return fileList.filter((file) => isPreviewableVideoFile(file));
   }, [fileList]);
 
   // 所有非图片、非视频文件列表
   const allNoMediaFiles = useMemo(() => {
-    return fileList.filter((file) => !isImageFile(file) && !isVideoFile(file));
+    return fileList.filter(
+      (file) =>
+        !isPreviewableImageFile(file) && !isPreviewableVideoFile(file),
+    );
   }, [fileList]);
 
   // 根据 maxDisplayCount 限制显示的非媒体文件列表
@@ -159,13 +177,12 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
   const handleViewAllClick = async () => {
     if (props.onViewAll) {
       const shouldExpand = await props.onViewAll(fileList);
-      if (shouldExpand) {
-        setShowAllFiles(true);
+      if (shouldExpand === false) {
+        return;
       }
-    } else {
-      // 如果没有提供 onViewAll 回调，默认展开所有文件
-      setShowAllFiles(true);
     }
+    // 默认展开所有文件；仅当 onViewAll 明确返回 false 时交给外部处理。
+    setShowAllFiles(true);
   };
 
   const imagePlaceholderStyle = getMediaPlaceholderStyle({
@@ -370,7 +387,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
           style={props.style}
         >
           {noMediaFileList.map((file, index) => {
-            return (
+            const defaultFileItemDom = (
               <FileMapViewItem
                 style={{ width: props.style?.width }}
                 onPreview={
@@ -389,6 +406,8 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
                 }
                 renderMoreAction={props.renderMoreAction}
                 customSlot={props.customSlot}
+                onFileClick={props.onFileClick}
+                disableDefaultFileClick={props.disableDefaultFileClick}
                 key={file?.uuid || file?.name || index}
                 prefixCls={`${prefix}-item`}
                 hashId={hashId}
@@ -396,15 +415,27 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
                 file={file}
               />
             );
+
+            return props.itemRender && (isImageFile(file) || isVideoFile(file))
+              ? props.itemRender(file, defaultFileItemDom)
+              : defaultFileItemDom;
           })}
           {props.maxDisplayCount !== undefined &&
           allNoMediaFiles.length > props.maxDisplayCount &&
           !showAllFiles ? (
             <div
+              role="button"
+              tabIndex={0}
               data-testid="file-view-view-all"
               style={{ width: props.style?.width }}
               className={classNames(hashId, `${prefix}-more-file-container`)}
               onClick={handleViewAllClick}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  void handleViewAllClick();
+                }
+              }}
             >
               <FileSearch color="var(--color-gray-text-secondary)" />
               <div className={classNames(hashId, `${prefix}-more-file-name`)}>

@@ -71,6 +71,30 @@ describe('BubbleList', () => {
     });
   });
 
+  describe('fileViewConfig', () => {
+    it('should pass fileViewConfig to bubble file view', () => {
+      const bubbleList: MessageBubbleData[] = [
+        createMockBubbleData('1', 'assistant', '已生成文件'),
+      ];
+      const contentRender = vi.fn((bubbleProps, defaultDom) => {
+        expect(bubbleProps.fileViewConfig?.maxDisplayCount).toBe(2);
+        return defaultDom;
+      });
+
+      render(
+        <BubbleConfigProvide>
+          <BubbleList
+            bubbleList={bubbleList}
+            fileViewConfig={{ maxDisplayCount: 2 }}
+            bubbleRenderConfig={{ contentRender }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      expect(contentRender).toHaveBeenCalled();
+    });
+  });
+
   describe('isLast property', () => {
     it('should set isLast to true only for the last bubble in the list', () => {
       const bubbleList: MessageBubbleData[] = [

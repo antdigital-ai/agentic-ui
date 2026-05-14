@@ -54,6 +54,8 @@ import {
 export const FileMapViewItem: React.FC<{
   file: AttachmentFile;
   onPreview?: () => void;
+  onFileClick?: (file: AttachmentFile) => void;
+  disableDefaultFileClick?: boolean;
   onDownload?: () => void;
   renderMoreAction?: (file: AttachmentFile) => React.ReactNode;
   customSlot?: React.ReactNode | ((file: AttachmentFile) => React.ReactNode);
@@ -82,6 +84,29 @@ export const FileMapViewItem: React.FC<{
   const lastModifiedTime = file?.lastModified
     ? dayjs(file.lastModified).format('HH:mm')
     : '';
+  const shouldShowMetaPlaceholder =
+    isFileMetaPlaceholderState(file) && !(file.name && file.type);
+
+  const handlePreview = () => {
+    if (props.onPreview) {
+      props.onPreview?.();
+      return;
+    }
+    // 默认行为：在新窗口打开文件
+    if (typeof window === 'undefined') return;
+    window.open(file.previewUrl || file.url, '_blank');
+  };
+
+  const handleFileClick = () => {
+    if (file.status === 'error') return;
+    if (props.onFileClick) {
+      props.onFileClick(file);
+      return;
+    }
+    if (props.disableDefaultFileClick) return;
+    handlePreview();
+  };
+  const showDefaultActionBar = !props.disableDefaultFileClick;
 
   const renderExtensionContainer = () => {
     if (file.status === 'error' && file.errorMessage) {
@@ -171,7 +196,7 @@ export const FileMapViewItem: React.FC<{
   };
 
   // 有 status 但无 url/previewUrl：文件内容未拿到，展示大小与格式占位块（loading 状态除外）
-  if (isFileMetaPlaceholderState(file)) {
+  if (shouldShowMetaPlaceholder) {
     return (
       <FileMetaPlaceholder
         file={file}
@@ -203,16 +228,7 @@ export const FileMapViewItem: React.FC<{
       <div
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onClick={() => {
-          if (file.status === 'error') return;
-          if (props.onPreview) {
-            props.onPreview?.();
-          } else {
-            // 默认行为：在新窗口打开文件
-            if (typeof window === 'undefined') return;
-            window.open(file.previewUrl || file.url, '_blank');
-          }
-        }}
+        onClick={handleFileClick}
         className={classNames(
           props.className,
           // 注意：这里 prefixCls 是 `${parentPrefix}-item`，而 keyframes/类名定义在
@@ -220,10 +236,10 @@ export const FileMapViewItem: React.FC<{
           // 因此完整类名需用 props.prefixCls 直接拼装：`${prefix-item}-motion-slide-in`
           `${props.prefixCls}-motion-slide-in`,
           {
-            [`${props.prefixCls}-meta-placeholder`]:
-              isFileMetaPlaceholderState(file),
+            [`${props.prefixCls}-meta-placeholder`]: shouldShowMetaPlaceholder,
           },
         )}
+        aria-label={file.name ? `文件：${file.name}` : undefined}
         data-testid="file-item"
       >
         <div
@@ -259,7 +275,8 @@ export const FileMapViewItem: React.FC<{
           {renderExtensionContainer()}
         </div>
 
-        {hovered ? (
+        {hovered &&
+        (props.customSlot || props.renderMoreAction || showDefaultActionBar) ? (
           <div
             data-testid="file-item-action-bar"
             className={classNames(
@@ -284,26 +301,22 @@ export const FileMapViewItem: React.FC<{
               </ActionIconBox>
             ) : (
               <>
-                <ActionIconBox
-                  title={locale?.preview || '预览'}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (props.onPreview) {
-                      props.onPreview?.();
-                    } else {
-                      // 默认行为：在新窗口打开文件
-                      if (typeof window === 'undefined') return;
-                      window.open(file.previewUrl || file.url, '_blank');
-                    }
-                  }}
-                  className={classNames(
-                    `${props.prefixCls}-action-btn`,
-                    props.hashId,
-                  )}
-                >
-                  <Eye color="var(--color-gray-text-secondary)" />
-                </ActionIconBox>
-                {props.onDownload && (
+                {showDefaultActionBar ? (
+                  <ActionIconBox
+                    title={locale?.preview || '预览'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePreview();
+                    }}
+                    className={classNames(
+                      `${props.prefixCls}-action-btn`,
+                      props.hashId,
+                    )}
+                  >
+                    <Eye color="var(--color-gray-text-secondary)" />
+                  </ActionIconBox>
+                ) : null}
+                {showDefaultActionBar && props.onDownload && (
                   <ActionIconBox
                     title={locale?.download || '下载'}
                     onClick={(e) => {

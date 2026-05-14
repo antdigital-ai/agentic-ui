@@ -147,6 +147,63 @@ describe('FileMapView', () => {
       }
     });
 
+    it('should let onFileClick take over file item click before onPreview', () => {
+      const onFileClick = vi.fn();
+      const onPreview = vi.fn();
+      const fileMap = new Map();
+      const file = createMockFile('custom.pdf', 'application/pdf');
+      fileMap.set('file-1', file);
+
+      const { container } = render(
+        <FileMapView
+          fileMap={fileMap}
+          onFileClick={onFileClick}
+          onPreview={onPreview}
+        />,
+      );
+
+      fireEvent.click(container.querySelector('[data-testid="file-item"]')!);
+
+      expect(onFileClick).toHaveBeenCalledWith(file);
+      expect(onPreview).not.toHaveBeenCalled();
+      expect(mockWindowOpen).not.toHaveBeenCalled();
+    });
+
+    it('should disable default file item click without onFileClick', () => {
+      const fileMap = new Map();
+      const file = createMockFile('disabled.pdf', 'application/pdf');
+      fileMap.set('file-1', file);
+
+      const { container } = render(
+        <FileMapView fileMap={fileMap} disableDefaultFileClick />,
+      );
+
+      fireEvent.click(container.querySelector('[data-testid="file-item"]')!);
+
+      expect(mockWindowOpen).not.toHaveBeenCalled();
+    });
+
+    it('should hide default preview and download actions when default file click is disabled', () => {
+      const onDownload = vi.fn();
+      const fileMap = new Map();
+      const file = createMockFile('locate-only.pdf', 'application/pdf');
+      fileMap.set('file-1', file);
+
+      const { container } = render(
+        <FileMapView
+          fileMap={fileMap}
+          disableDefaultFileClick
+          onDownload={onDownload}
+        />,
+      );
+
+      fireEvent.mouseEnter(container.querySelector('[data-testid="file-item"]')!);
+
+      expect(screen.queryByRole('button', { name: '预览' })).toBeNull();
+      expect(screen.queryByRole('button', { name: '下载' })).toBeNull();
+      expect(screen.queryByTestId('file-item-action-bar')).toBeNull();
+    });
+
     it('should call onDownload when download is clicked', () => {
       const onDownload = vi.fn();
       const fileMap = new Map();
@@ -429,6 +486,38 @@ describe('FileMapView', () => {
       expect(video).toBeInTheDocument();
     });
 
+    it('should render media files without url as normal file cards when type and name exist', () => {
+      const fileMap = new Map();
+      fileMap.set('img-1', {
+        uuid: 'uuid-image-no-url',
+        name: '商品主图色差对比.png',
+        type: 'image/png',
+        status: 'done',
+      });
+      fileMap.set('video-1', {
+        uuid: 'uuid-video-no-url',
+        name: '演示视频.mp4',
+        type: 'video/mp4',
+        status: 'done',
+      });
+
+      const { container } = render(<FileMapView fileMap={fileMap} />);
+
+      expect(
+        screen.queryByTestId('file-view-image-list'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('file-view-video-list'),
+      ).not.toBeInTheDocument();
+      expect(container.querySelectorAll('[data-testid="file-item"]')).toHaveLength(
+        2,
+      );
+      expect(screen.getByText('商品主图色差对比')).toBeInTheDocument();
+      expect(screen.getByText('演示视频')).toBeInTheDocument();
+      expect(container.querySelectorAll('img')).toHaveLength(0);
+      expect(container.querySelectorAll('video')).toHaveLength(0);
+    });
+
     it('should display multiple videos with 124x124 size', () => {
       const fileMap = new Map();
       fileMap.set('video-1', createMockFile('demo1.mp4', 'video/mp4'));
@@ -555,6 +644,21 @@ describe('FileMapView', () => {
       expect(container.textContent).toContain('README');
       expect(
         container.querySelector('[data-testid="file-item"]'),
+      ).toBeInTheDocument();
+    });
+
+    it('文件卡片应使用文件名作为 aria-label', () => {
+      const fileMap = new Map();
+      fileMap.set('file-1', {
+        uuid: 'uuid-a11y-image-no-url',
+        name: '商品主图色差对比.png',
+        type: 'image/png',
+        status: 'done',
+      });
+
+      const { container } = render(<FileMapView fileMap={fileMap} />);
+      expect(
+        container.querySelector('[aria-label="文件：商品主图色差对比.png"]'),
       ).toBeInTheDocument();
     });
 

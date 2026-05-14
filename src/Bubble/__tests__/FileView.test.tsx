@@ -17,10 +17,27 @@ vi.mock('../../MarkdownInputField/FileMapView', () => ({
       <div data-testid="file-map-showMoreButton">
         {String(props.showMoreButton ?? '')}
       </div>
+      <div data-testid="file-map-disableDefaultFileClick">
+        {String(props.disableDefaultFileClick ?? '')}
+      </div>
       <div data-testid="file-map-style">
         {props.style ? JSON.stringify(props.style) : 'none'}
       </div>
       <div data-testid="file-map-fileCount">{props.fileMap?.size || 0}</div>
+      {props.onFileClick && (
+        <button
+          type="button"
+          data-testid="file-click-button"
+          onClick={() => {
+            const file = new File([], 'test.pdf') as AttachmentFile;
+            file.uuid = 'file-1';
+            file.url = 'http://example.com/test.pdf';
+            props.onFileClick(file);
+          }}
+        >
+          File Click
+        </button>
+      )}
       {props.onPreview && (
         <button
           type="button"
@@ -322,6 +339,30 @@ describe('BubbleFileView', () => {
       render(<BubbleFileView {...props} />);
       expect(screen.getByTestId('file-map-style')).toHaveTextContent(
         JSON.stringify(customStyle),
+      );
+    });
+
+    it('应该传递 onFileClick 和 disableDefaultFileClick', () => {
+      const onFileClick = vi.fn();
+      const props = {
+        ...defaultProps,
+        bubble: {
+          ...defaultProps.bubble,
+          fileViewConfig: {
+            onFileClick,
+            disableDefaultFileClick: true,
+          },
+        },
+      };
+
+      render(<BubbleFileView {...props} />);
+      expect(
+        screen.getByTestId('file-map-disableDefaultFileClick'),
+      ).toHaveTextContent('true');
+
+      fireEvent.click(screen.getByTestId('file-click-button'));
+      expect(onFileClick).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'test.pdf' }),
       );
     });
   });
