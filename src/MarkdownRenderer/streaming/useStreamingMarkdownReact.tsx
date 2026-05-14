@@ -93,7 +93,8 @@ export const useStreamingMarkdownReact = (
       const elements = blocks.map((blockSource, index) => {
         const isLast = index === blocks.length - 1;
         // 注意：key 必须与 variant 解耦——末块由 tail 晋升 sealed 时不能卸载重挂，
-        // 否则 chart / agentar-card 等重组件会重复初始化（见 streaming-chart-card-stability 回归测试）。
+        // 否则 chart / agentar-card 等重组件会重复初始化（见
+        // src/MarkdownRenderer/__tests__/scenarios/useMarkdownToReact.streaming-chart-card-stability.test.tsx）。
         const key = `b-${gen}-${index}`;
         return jsx(
           MarkdownBlockPiece,

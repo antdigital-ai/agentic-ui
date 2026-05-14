@@ -75,7 +75,9 @@ describe('BackTop 组件', () => {
 
   it('应该支持函数形式的可见判断', async () => {
     const shouldVisible = vi.fn((scrollTop) => scrollTop > 300);
-    const { container: _container } = render(<BackTo.Top shouldVisible={shouldVisible} />);
+    const { container: _container } = render(
+      <BackTo.Top shouldVisible={shouldVisible} />,
+    );
 
     // 滚动到 350px
     Object.defineProperty(window, 'pageYOffset', {

@@ -69,8 +69,9 @@ export default () => {
           自定义文件点击与无 URL 文件卡片
         </h3>
         <p style={{ margin: 0, color: '#666', fontSize: 14 }}>
-          无 url/previewUrl 但有 type/name 的图片、视频、文档会按普通文件卡片展示；
-          也可以通过 onFileClick 接管普通文件点击。
+          无 url/previewUrl 但有 type/name
+          的图片、视频、文档会按普通文件卡片展示； 也可以通过 onFileClick
+          接管普通文件点击。
         </p>
       </div>
 

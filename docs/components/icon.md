@@ -30,7 +30,8 @@ export default () => <Plus />;
 import { Plus } from '@sofa-design/icons';
 
 export default () => (
-  <Plus style={{ fontSize: 24, color: 'var(--color-primary-control-fill-primary)' }} />
+  <Plus
+    style={{ fontSize: 24, color: 'var(--color-primary-control-fill-primary)' }}
+  />
 );
 ```
-

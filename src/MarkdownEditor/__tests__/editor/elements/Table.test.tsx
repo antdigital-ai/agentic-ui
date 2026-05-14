@@ -843,7 +843,9 @@ describe('Table Components', () => {
           attributes: defaultAttributes,
           children,
         };
-        const { container: _container } = render(tableRenderElement(props) as any);
+        const { container: _container } = render(
+          tableRenderElement(props) as any,
+        );
         expect(screen.getByText(`Test Content ${index}`)).toBeInTheDocument();
       });
     });

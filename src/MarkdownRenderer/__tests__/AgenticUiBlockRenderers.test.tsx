@@ -116,7 +116,9 @@ describe('AgenticUiToolUseBarBlockRenderer', () => {
       tools: [{ id: 'a', toolName: 'n', toolTarget: '' }],
     });
     render(
-      <AgenticUiToolUseBarBlockRenderer>{json}</AgenticUiToolUseBarBlockRenderer>,
+      <AgenticUiToolUseBarBlockRenderer>
+        {json}
+      </AgenticUiToolUseBarBlockRenderer>,
     );
 
     expect(

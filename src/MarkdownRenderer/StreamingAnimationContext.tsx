@@ -5,5 +5,6 @@ export interface StreamingAnimationContextValue {
   animateBlock: boolean;
 }
 
+/** 默认 animateBlock=true：无 Provider 包裹时（如静态渲染）不阻断子树自身的入场动画 */
 export const StreamingAnimationContext =
-  React.createContext<StreamingAnimationContextValue | null>(null);
+  React.createContext<StreamingAnimationContextValue>({ animateBlock: true });

@@ -453,7 +453,7 @@ import { BubbleList } from '@ant-design/agentic-ui';
     streamingParagraphAnimation: false,
   }}
   // ...
-/>
+/>;
 ```
 
 <code src="../demos/bubble/rerender-bubble-demo.tsx"></code> 演示中亦包含该配置说明。

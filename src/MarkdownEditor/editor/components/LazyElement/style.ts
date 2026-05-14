@@ -1,4 +1,8 @@
-import { genStyleHooks, resetComponent, type GenStyleFn } from '../../../../Hooks/useStyle';
+import {
+  genStyleHooks,
+  resetComponent,
+  type GenStyleFn,
+} from '../../../../Hooks/useStyle';
 
 /**
  * LazyElement 样式生成器
@@ -24,4 +28,3 @@ export const useStyle = (prefixCls?: string) => {
   const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'LazyElement');
   return { wrapSSR, hashId };
 };
-

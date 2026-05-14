@@ -1,5 +1,9 @@
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
-import { genStyleHooks, resetComponent, type GenStyleFn } from '../Hooks/useStyle';
+import {
+  genStyleHooks,
+  resetComponent,
+  type GenStyleFn,
+} from '../Hooks/useStyle';
 
 const RADIUS_XL =
   'var(--radius-xl, var(--radius-chat-layout-footer, var(--radius-card-lg, 16px)))';

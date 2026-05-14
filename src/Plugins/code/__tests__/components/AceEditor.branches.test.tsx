@@ -181,9 +181,7 @@ describe('AceEditor 覆盖率 (NODE_ENV=development)', () => {
   });
 
   it('完整加载与初始化：加载 Ace、创建编辑器、设置主题与 mode', async () => {
-    const { loadAceEditor, loadAceTheme } = await import(
-      '../../loadAceEditor'
-    );
+    const { loadAceEditor, loadAceTheme } = await import('../../loadAceEditor');
 
     function Wrapper() {
       const result = AceEditor(defaultProps);

@@ -139,8 +139,9 @@ export default () => {
         },
         commentList: comments,
         loadMentions: async (keyword) => {
-          return [{ name: 'Alice' }, { name: 'Bob' }]
-            .filter((u) => u.name.toLowerCase().includes(keyword.toLowerCase()));
+          return [{ name: 'Alice' }, { name: 'Bob' }].filter((u) =>
+            u.name.toLowerCase().includes(keyword.toLowerCase()),
+          );
         },
       }}
       height="500px"
@@ -275,20 +276,20 @@ export default () => {
 
 #### 评论 (comment)
 
-| 属性                | 说明                                                       | 类型                                                                                                                                                                                     | 默认值 | 版本 |
-| ------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---- |
-| enable              | 是否启用评论功能                                           | `boolean`                                                                                                                                                                                | -      | -    |
-| onSubmit            | 评论提交回调                                               | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
-| onDelete            | 删除评论回调                                               | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
-| onEdit              | 编辑评论回调                                               | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
-| onClick             | 点击评论回调                                               | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
-| commentList         | 评论列表数据                                               | `CommentDataType[]`                                                                                                                                                                      | -      | -    |
-| deleteConfirmText   | 删除评论确认文本                                           | `string`                                                                                                                                                                                 | -      | -    |
-| loadMentions        | 加载 @提及用户列表                                         | `(text: string) => Promise<{ name: string }[]>`                                                                                                                                          | -      | -    |
-| mentionsPlaceholder | @提及输入框占位符                                          | `string`                                                                                                                                                                                 | -      | -    |
+| 属性                | 说明                                                                            | 类型                                                                                                                                                                                     | 默认值 | 版本 |
+| ------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---- |
+| enable              | 是否启用评论功能                                                                | `boolean`                                                                                                                                                                                | -      | -    |
+| onSubmit            | 评论提交回调                                                                    | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
+| onDelete            | 删除评论回调                                                                    | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
+| onEdit              | 编辑评论回调                                                                    | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
+| onClick             | 点击评论回调                                                                    | `(id: string \| number, comment: CommentDataType) => void`                                                                                                                               | -      | -    |
+| commentList         | 评论列表数据                                                                    | `CommentDataType[]`                                                                                                                                                                      | -      | -    |
+| deleteConfirmText   | 删除评论确认文本                                                                | `string`                                                                                                                                                                                 | -      | -    |
+| loadMentions        | 加载 @提及用户列表                                                              | `(text: string) => Promise<{ name: string }[]>`                                                                                                                                          | -      | -    |
+| mentionsPlaceholder | @提及输入框占位符                                                               | `string`                                                                                                                                                                                 | -      | -    |
 | placeholder         | 评论输入框占位符，未提供时回退到顶层的 [`titlePlaceholderContent`](#引用与其他) | `string`                                                                                                                                                                                 | -      | -    |
-| editorRender        | 自定义评论编辑器渲染                                       | `(dom: React.ReactNode) => React.ReactNode`                                                                                                                                              | -      | -    |
-| listItemRender      | 自定义评论列表项渲染                                       | `(defaultDom: { checkbox: ReactNode \| null; mentionsUser: ReactNode \| null; children: any }, comment: { element: Elements; children: ReactNode; attributes: any }) => React.ReactNode` | -      | -    |
+| editorRender        | 自定义评论编辑器渲染                                                            | `(dom: React.ReactNode) => React.ReactNode`                                                                                                                                              | -      | -    |
+| listItemRender      | 自定义评论列表项渲染                                                            | `(defaultDom: { checkbox: ReactNode \| null; mentionsUser: ReactNode \| null; children: any }, comment: { element: Elements; children: ReactNode; attributes: any }) => React.ReactNode` | -      | -    |
 
 #### CommentDataType
 
@@ -357,11 +358,11 @@ export default () => {
 
 **JinjaTemplateItem**
 
-| 属性        | 说明              | 类型     |
-| ----------- | ----------------- | -------- |
-| title       | 模板标题          | `string` |
-| description | 模板描述（可选）  | `string` |
-| template    | 模板内容          | `string` |
+| 属性        | 说明             | 类型     |
+| ----------- | ---------------- | -------- |
+| title       | 模板标题         | `string` |
+| description | 模板描述（可选） | `string` |
+| template    | 模板内容         | `string` |
 
 #### 粘贴配置 (pasteConfig)
 
@@ -416,29 +417,29 @@ export default () => {
 
 #### 引用与其他
 
-| 属性                    | 说明                                            | 类型                                                                                                                                  | 默认值 | 版本 |
-| ----------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---- |
-| editorRef               | 编辑器实例引用                                  | `React.Ref<MarkdownEditorInstance \| undefined>`                                                                                      | -      | -    |
-| rootContainer           | 根容器引用                                      | `React.MutableRefObject<HTMLDivElement \| undefined>`                                                                                 | -      | -    |
-| plugins                 | 编辑器插件配置                                  | `any[]`                                                                                                                               | -      | -    |
+| 属性                    | 说明                                                                                                                                  | 类型                                                                                                                                  | 默认值 | 版本 |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---- |
+| editorRef               | 编辑器实例引用                                                                                                                        | `React.Ref<MarkdownEditorInstance \| undefined>`                                                                                      | -      | -    |
+| rootContainer           | 根容器引用                                                                                                                            | `React.MutableRefObject<HTMLDivElement \| undefined>`                                                                                 | -      | -    |
+| plugins                 | 编辑器插件配置                                                                                                                        | `any[]`                                                                                                                               | -      | -    |
 | markdownToHtmlOptions   | 自定义 unified 插件数组，每项为 `Plugin` 或 `[Plugin, ...options]`，例如 `[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]` | `MarkdownToHtmlOptions`                                                                                                               | -      | -    |
-| fncProps                | 脚注配置                                        | `{ render: (...) => React.ReactNode; onOriginUrlClick?: (url?: string) => void; onFootnoteDefinitionChange?: (data: [...]) => void }` | -      | -    |
-| anchorProps             | 锚点链接配置                                    | `AnchorProps`                                                                                                                         | -      | -    |
-| titlePlaceholderContent | 标题占位符内容；同时作为 `comment.placeholder` 未指定时的回退值 | `string`                                                                                                                              | -      | -    |
-| attachment              | 附件配置                                        | `Record<string, unknown>`                                                                                                             | -      | -    |
-| toolbarConfig           | 工具栏配置（另一种方式）                        | `{ show?: boolean; items?: string[] }`                                                                                                | -      | -    |
-| fileMapConfig           | FileMapView 配置（仅 `renderMode: 'markdown'`） | `FileMapConfig`                                                                                                                       | -      | -    |
-| apaasify                | 低代码渲染配置                                  | `{ enable?: boolean; render?: (props: RenderElementProps, originData?: MessageBubbleData) => React.ReactNode }`                       | -      | -    |
-| apassify                | `apaasify` 的旧拼写，已废弃，请使用 `apaasify`  | `{ enable?: boolean; render?: (...) => React.ReactNode }`                                                                             | -      | -    |
+| fncProps                | 脚注配置                                                                                                                              | `{ render: (...) => React.ReactNode; onOriginUrlClick?: (url?: string) => void; onFootnoteDefinitionChange?: (data: [...]) => void }` | -      | -    |
+| anchorProps             | 锚点链接配置                                                                                                                          | `AnchorProps`                                                                                                                         | -      | -    |
+| titlePlaceholderContent | 标题占位符内容；同时作为 `comment.placeholder` 未指定时的回退值                                                                       | `string`                                                                                                                              | -      | -    |
+| attachment              | 附件配置                                                                                                                              | `Record<string, unknown>`                                                                                                             | -      | -    |
+| toolbarConfig           | 工具栏配置（另一种方式）                                                                                                              | `{ show?: boolean; items?: string[] }`                                                                                                | -      | -    |
+| fileMapConfig           | FileMapView 配置（仅 `renderMode: 'markdown'`）                                                                                       | `FileMapConfig`                                                                                                                       | -      | -    |
+| apaasify                | 低代码渲染配置                                                                                                                        | `{ enable?: boolean; render?: (props: RenderElementProps, originData?: MessageBubbleData) => React.ReactNode }`                       | -      | -    |
+| apassify                | `apaasify` 的旧拼写，已废弃，请使用 `apaasify`                                                                                        | `{ enable?: boolean; render?: (...) => React.ReactNode }`                                                                             | -      | -    |
 
 ### MarkdownEditorInstance
 
 通过 `editorRef` 获取编辑器实例，支持以下属性和方法：
 
-| 属性/方法            | 说明                                | 类型                                                               |
-| -------------------- | ----------------------------------- | ------------------------------------------------------------------ |
+| 属性/方法            | 说明                                                                | 类型                                                               |
+| -------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | store                | 编辑器内部状态管理（含 `getMDContent` / `setMDContent` 等常用方法） | `EditorStore`                                                      |
-| markdownContainerRef | Markdown 容器 DOM 引用              | `React.MutableRefObject<HTMLDivElement \| null>`                   |
-| markdownEditorRef    | Slate 编辑器实例引用                | `React.MutableRefObject<BaseEditor & ReactEditor & HistoryEditor>` |
-| exportHtml           | 导出为 HTML 文件                    | `(filename?: string) => void`                                      |
-| range                | 内部使用的选区缓存                  | `any`                                                              |
+| markdownContainerRef | Markdown 容器 DOM 引用                                              | `React.MutableRefObject<HTMLDivElement \| null>`                   |
+| markdownEditorRef    | Slate 编辑器实例引用                                                | `React.MutableRefObject<BaseEditor & ReactEditor & HistoryEditor>` |
+| exportHtml           | 导出为 HTML 文件                                                    | `(filename?: string) => void`                                      |
+| range                | 内部使用的选区缓存                                                  | `any`                                                              |

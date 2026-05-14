@@ -1,4 +1,7 @@
-import { genStyleHooks, type GenStyleFn } from '@ant-design/agentic-ui/Hooks/useStyle';
+import {
+  genStyleHooks,
+  type GenStyleFn,
+} from '@ant-design/agentic-ui/Hooks/useStyle';
 
 const genAbstractLottieStyle: GenStyleFn<'Abstract'> = (token) => {
   return {

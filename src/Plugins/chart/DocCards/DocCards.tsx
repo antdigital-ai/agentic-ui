@@ -159,7 +159,9 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
       >
         {data.map((row, rowIndex) => {
           const titleText = toDisplayText(row[fields.title]).trim();
-          const rawUrl = fields.url ? toDisplayText(row[fields.url]).trim() : '';
+          const rawUrl = fields.url
+            ? toDisplayText(row[fields.url]).trim()
+            : '';
           const descText = fields.description
             ? toDisplayText(row[fields.description]).trim()
             : '';
@@ -196,10 +198,7 @@ const DocCardsComponent: React.FC<DocCardsProps> = ({
                     // 仅外部链接（http(s)/mailto/tel）开新 tab；站内绝对路径、相对路径、
                     // 锚点 (#section) 走原 tab，避免破坏浏览器原生锚点滚动等行为
                     <a
-                      className={classNames(
-                        `${prefixCls}-item-link`,
-                        hashId,
-                      )}
+                      className={classNames(`${prefixCls}-item-link`, hashId)}
                       data-testid={`doc-cards-item-${rowIndex}-link`}
                       href={rawUrl}
                       {...(isExternalLink(rawUrl)

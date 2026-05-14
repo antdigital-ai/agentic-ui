@@ -197,7 +197,9 @@ describe('FileMapView', () => {
         />,
       );
 
-      fireEvent.mouseEnter(container.querySelector('[data-testid="file-item"]')!);
+      fireEvent.mouseEnter(
+        container.querySelector('[data-testid="file-item"]')!,
+      );
 
       expect(screen.queryByRole('button', { name: '预览' })).toBeNull();
       expect(screen.queryByRole('button', { name: '下载' })).toBeNull();
@@ -509,9 +511,9 @@ describe('FileMapView', () => {
       expect(
         screen.queryByTestId('file-view-video-list'),
       ).not.toBeInTheDocument();
-      expect(container.querySelectorAll('[data-testid="file-item"]')).toHaveLength(
-        2,
-      );
+      expect(
+        container.querySelectorAll('[data-testid="file-item"]'),
+      ).toHaveLength(2);
       expect(screen.getByText('商品主图色差对比')).toBeInTheDocument();
       expect(screen.getByText('演示视频')).toBeInTheDocument();
       expect(container.querySelectorAll('img')).toHaveLength(0);
@@ -571,7 +573,9 @@ describe('FileMapView', () => {
       const fileMap = new Map();
       fileMap.set('video-1', createMockFile('space.mp4', 'video/mp4'));
 
-      const { container: _container } = render(<FileMapView fileMap={fileMap} />);
+      const { container: _container } = render(
+        <FileMapView fileMap={fileMap} />,
+      );
 
       const videoThumb = screen.getByRole('button', {
         name: '播放视频：space.mp4',

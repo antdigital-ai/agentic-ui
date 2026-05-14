@@ -335,7 +335,11 @@ describe('WelcomeMessage 组件', () => {
 
     const { container: _container } = renderWelcomeMessage({
       title: (
-        <button type="button" onClick={handleClick} data-testid="clickable-title">
+        <button
+          type="button"
+          onClick={handleClick}
+          data-testid="clickable-title"
+        >
           可点击标题
         </button>
       ),

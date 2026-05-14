@@ -11,72 +11,77 @@ import DonutChart from '../../DonutChart';
 // Mock react-chartjs-2 - 支持 ref 回调
 const mockChartInstances: any[] = [];
 vi.mock('react-chartjs-2', () => ({
-  Doughnut: React.forwardRef(({ data, options, plugins: _plugins }: any, ref: any) => {
-    React.useEffect(() => {
-      if (ref) {
-        // 创建模拟的 Chart.js 实例；测试可设 __donutChartMockNoCanvas 使 canvas 为 null
-        const canvas = (globalThis as any).__donutChartMockNoCanvas
-          ? null
-          : document.createElement('canvas');
-        const mockInstance = {
-          canvas,
-          toBase64Image: vi.fn(() => 'data:image/png;base64,test'),
-          getDatasetMeta: vi.fn(() => ({ data: [] })),
-          width: 200,
-          height: 200,
-        };
-        mockChartInstances.push(mockInstance);
-        if (typeof ref === 'function') {
-          ref(mockInstance);
-        } else if (ref && typeof ref === 'object') {
-          ref.current = mockInstance;
+  Doughnut: React.forwardRef(
+    ({ data, options, plugins: _plugins }: any, ref: any) => {
+      React.useEffect(() => {
+        if (ref) {
+          // 创建模拟的 Chart.js 实例；测试可设 __donutChartMockNoCanvas 使 canvas 为 null
+          const canvas = (globalThis as any).__donutChartMockNoCanvas
+            ? null
+            : document.createElement('canvas');
+          const mockInstance = {
+            canvas,
+            toBase64Image: vi.fn(() => 'data:image/png;base64,test'),
+            getDatasetMeta: vi.fn(() => ({ data: [] })),
+            width: 200,
+            height: 200,
+          };
+          mockChartInstances.push(mockInstance);
+          if (typeof ref === 'function') {
+            ref(mockInstance);
+          } else if (ref && typeof ref === 'object') {
+            ref.current = mockInstance;
+          }
         }
-      }
-    }, [ref]);
+      }, [ref]);
 
-    // 测试 tooltip 回调
-    if (options?.plugins?.tooltip?.callbacks?.label) {
-      const labelCallback = options.plugins.tooltip.callbacks.label;
-      // 模拟调用 label 回调
-      try {
-        labelCallback({ label: 'Test', raw: 30 });
-        labelCallback({ label: 'Test', raw: 'invalid' });
-        labelCallback({ label: 'Test', raw: Infinity });
-      } catch (e) {
-        // 忽略测试中的错误
-      }
-    }
-
-    // 测试 tooltip filter
-    if (options?.plugins?.tooltip?.filter) {
-      const filterCallback = options.plugins.tooltip.filter;
-      try {
-        filterCallback({ dataIndex: 0 } as any);
-        filterCallback({ dataIndex: 1 } as any);
-      } catch (e) {
-        // 忽略测试中的错误
-      }
-    }
-
-    // 测试 hoverOffset
-    if (data?.datasets?.[0]?.hoverOffset) {
-      const hoverOffset = data.datasets[0].hoverOffset;
-      if (typeof hoverOffset === 'function') {
+      // 测试 tooltip 回调
+      if (options?.plugins?.tooltip?.callbacks?.label) {
+        const labelCallback = options.plugins.tooltip.callbacks.label;
+        // 模拟调用 label 回调
         try {
-          hoverOffset({ dataIndex: 0 } as any);
-          hoverOffset({ dataIndex: 1 } as any);
+          labelCallback({ label: 'Test', raw: 30 });
+          labelCallback({ label: 'Test', raw: 'invalid' });
+          labelCallback({ label: 'Test', raw: Infinity });
         } catch (e) {
           // 忽略测试中的错误
         }
       }
-    }
 
-    return (
-      <div data-testid="doughnut-chart" data-chart-data={JSON.stringify(data)}>
-        Chart
-      </div>
-    );
-  }),
+      // 测试 tooltip filter
+      if (options?.plugins?.tooltip?.filter) {
+        const filterCallback = options.plugins.tooltip.filter;
+        try {
+          filterCallback({ dataIndex: 0 } as any);
+          filterCallback({ dataIndex: 1 } as any);
+        } catch (e) {
+          // 忽略测试中的错误
+        }
+      }
+
+      // 测试 hoverOffset
+      if (data?.datasets?.[0]?.hoverOffset) {
+        const hoverOffset = data.datasets[0].hoverOffset;
+        if (typeof hoverOffset === 'function') {
+          try {
+            hoverOffset({ dataIndex: 0 } as any);
+            hoverOffset({ dataIndex: 1 } as any);
+          } catch (e) {
+            // 忽略测试中的错误
+          }
+        }
+      }
+
+      return (
+        <div
+          data-testid="doughnut-chart"
+          data-chart-data={JSON.stringify(data)}
+        >
+          Chart
+        </div>
+      );
+    },
+  ),
 }));
 
 // Mock utils

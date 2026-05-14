@@ -56,7 +56,9 @@ describe('columnMatching', () => {
     });
 
     it('undefined / null / 空白透传', () => {
-      expect(resolveChartAxisFieldToColumnKey(undefined, ['a'])).toBeUndefined();
+      expect(
+        resolveChartAxisFieldToColumnKey(undefined, ['a']),
+      ).toBeUndefined();
       expect(resolveChartAxisFieldToColumnKey('   ', ['a'])).toBe('   ');
     });
   });
@@ -80,9 +82,7 @@ describe('columnMatching', () => {
 
   describe('resolveDocCardsFields', () => {
     it('全字段命中默认别名', () => {
-      expect(
-        resolveDocCardsFields(['名称', '地址', '简介', '亮点']),
-      ).toEqual({
+      expect(resolveDocCardsFields(['名称', '地址', '简介', '亮点'])).toEqual({
         title: '名称',
         url: '地址',
         description: '简介',
@@ -97,9 +97,9 @@ describe('columnMatching', () => {
     });
 
     it('命中带括号单位的列', () => {
-      expect(
-        resolveDocCardsFields(['名称（站点）', 'URL'])?.title,
-      ).toBe('名称（站点）');
+      expect(resolveDocCardsFields(['名称（站点）', 'URL'])?.title).toBe(
+        '名称（站点）',
+      );
     });
 
     it('无主标题列时返回 null', () => {

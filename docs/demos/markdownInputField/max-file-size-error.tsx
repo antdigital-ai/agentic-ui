@@ -19,7 +19,8 @@ export default () => {
         文件超过最大值报错
       </Title>
       <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
-        单文件最大 <Text strong>100KB</Text>。选择超过大小的文件时，会在附件列表中显示「超过 xxx KB」报错。
+        单文件最大 <Text strong>100KB</Text>
+        。选择超过大小的文件时，会在附件列表中显示「超过 xxx KB」报错。
       </Text>
       <MarkdownInputField
         value={value}

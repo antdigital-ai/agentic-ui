@@ -133,12 +133,7 @@ describe('DocCards utils', () => {
 
   describe('resolveDocCardsFields', () => {
     it('按默认别名命中中英文表头', () => {
-      const fields = resolveDocCardsFields([
-        '名称',
-        '地址',
-        '简介',
-        '亮点',
-      ]);
+      const fields = resolveDocCardsFields(['名称', '地址', '简介', '亮点']);
       expect(fields).toEqual({
         title: '名称',
         url: '地址',
@@ -160,10 +155,9 @@ describe('DocCards utils', () => {
     });
 
     it('fieldMap 覆盖优先级高于默认别名', () => {
-      const fields = resolveDocCardsFields(
-        ['Foo', '名称', '简介'],
-        { title: 'Foo' },
-      );
+      const fields = resolveDocCardsFields(['Foo', '名称', '简介'], {
+        title: 'Foo',
+      });
       expect(fields?.title).toBe('Foo');
       expect(fields?.description).toBe('简介');
     });
@@ -208,7 +202,10 @@ describe('DocCards 组件渲染', () => {
     const tailwindLink = screen.getByRole('link', {
       name: 'tailwindcss.com/docs',
     });
-    expect(tailwindLink).toHaveAttribute('href', 'https://tailwindcss.com/docs');
+    expect(tailwindLink).toHaveAttribute(
+      'href',
+      'https://tailwindcss.com/docs',
+    );
     expect(tailwindLink).toHaveAttribute('target', '_blank');
     expect(tailwindLink).toHaveAttribute('rel', 'noopener noreferrer');
 
@@ -242,7 +239,9 @@ describe('DocCards 组件渲染', () => {
     render(<DocCards columns={cols} data={data} />);
     expect(screen.getByText('A')).toBeInTheDocument();
     expect(screen.getByText('description')).toBeInTheDocument();
-    expect(screen.queryByTestId('doc-cards-item-0-tags')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('doc-cards-item-0-tags'),
+    ).not.toBeInTheDocument();
   });
 
   it('无法解析主标题列时仅渲染空状态而不抛错', () => {
@@ -259,9 +258,7 @@ describe('DocCards 组件渲染', () => {
         地址: 'javascript:alert(1)',
       },
     ];
-    render(
-      <DocCards columns={buildColumns(['名称', '地址'])} data={data} />,
-    );
+    render(<DocCards columns={buildColumns(['名称', '地址'])} data={data} />);
     expect(
       screen.queryByRole('link', { name: /javascript/ }),
     ).not.toBeInTheDocument();
@@ -279,9 +276,7 @@ describe('DocCards 组件渲染', () => {
 
     rerender(<DocCards columns={cols} data={data} cardColumns={9} />);
     const grid2 = screen.getByTestId('doc-cards-grid');
-    expect(grid2.style.gridTemplateColumns).toBe(
-      'repeat(4, minmax(0, 1fr))',
-    );
+    expect(grid2.style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))');
   });
 
   it('toolbar 与 title 在同一 header 行渲染', () => {
@@ -306,7 +301,9 @@ describe('DocCards 组件渲染', () => {
     const cols = buildColumns(['名称', '简介']);
     const data = [{ 名称: 'a', 简介: '   ' }];
     render(<DocCards columns={cols} data={data} />);
-    expect(screen.queryByTestId('doc-cards-item-0-desc')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('doc-cards-item-0-desc'),
+    ).not.toBeInTheDocument();
   });
 
   it('外部链接打新 tab，站内路径/锚点保持原 tab', () => {
@@ -341,9 +338,7 @@ describe('DocCards 组件渲染', () => {
 
   it('标签容器 aria-label 使用「标签列表」文案而非容器名', () => {
     const data = [{ 名称: 'a', 亮点: 'tag1, tag2' }];
-    render(
-      <DocCards columns={buildColumns(['名称', '亮点'])} data={data} />,
-    );
+    render(<DocCards columns={buildColumns(['名称', '亮点'])} data={data} />);
     const tagsContainer = screen.getByTestId('doc-cards-item-0-tags');
     expect(tagsContainer.getAttribute('aria-label')).toBe('标签列表');
   });

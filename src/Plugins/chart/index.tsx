@@ -35,8 +35,8 @@ export { ChartRender } from './ChartRender';
 
 // 文档卡片栅格
 export {
-  DEFAULT_FIELD_ALIASES as DocCardsDefaultFieldAliases,
   DocCards,
+  DEFAULT_FIELD_ALIASES as DocCardsDefaultFieldAliases,
   formatDisplayUrl as formatDocCardsDisplayUrl,
   isSafeHref as isDocCardsSafeHref,
   resolveDocCardsFields,

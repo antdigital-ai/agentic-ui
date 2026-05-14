@@ -1,5 +1,9 @@
 import { Keyframes } from '@ant-design/cssinjs';
-import { genStyleHooks, resetComponent, type GenStyleFn } from '../../Hooks/useStyle';
+import {
+  genStyleHooks,
+  resetComponent,
+  type GenStyleFn,
+} from '../../Hooks/useStyle';
 
 const spinnerRotate = new Keyframes('refineSpinnerRotate', {
   '0%': {

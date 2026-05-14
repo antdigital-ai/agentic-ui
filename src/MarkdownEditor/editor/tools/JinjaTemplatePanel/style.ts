@@ -1,4 +1,8 @@
-import { genStyleHooks, resetComponent, type GenStyleFn } from '../../../../Hooks/useStyle';
+import {
+  genStyleHooks,
+  resetComponent,
+  type GenStyleFn,
+} from '../../../../Hooks/useStyle';
 
 export const JINJA_PANEL_PREFIX_CLS = 'agentic-md-editor-jinja-panel';
 

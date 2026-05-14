@@ -141,8 +141,7 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
   // 所有非图片、非视频文件列表
   const allNoMediaFiles = useMemo(() => {
     return fileList.filter(
-      (file) =>
-        !isPreviewableImageFile(file) && !isPreviewableVideoFile(file),
+      (file) => !isPreviewableImageFile(file) && !isPreviewableVideoFile(file),
     );
   }, [fileList]);
 

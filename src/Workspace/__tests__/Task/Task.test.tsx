@@ -263,7 +263,9 @@ describe('TaskList Component', () => {
       items: [],
     };
 
-    const { container: _container } = renderWithProvider(<TaskList data={data} />);
+    const { container: _container } = renderWithProvider(
+      <TaskList data={data} />,
+    );
 
     const taskList = screen.getByTestId('task-list');
     expect(taskList).toBeInTheDocument();

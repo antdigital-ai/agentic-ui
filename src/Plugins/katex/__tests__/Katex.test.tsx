@@ -204,7 +204,9 @@ describe('Katex', () => {
       // 创建一个永远不会 resolve 的 promise，模拟 katex 未加载
       mockLoadKatex.mockImplementation(() => new Promise(() => {}));
 
-      const { container: _pendingContainer } = render(<Katex el={mockElement} />);
+      const { container: _pendingContainer } = render(
+        <Katex el={mockElement} />,
+      );
 
       await act(async () => {
         await Promise.resolve();

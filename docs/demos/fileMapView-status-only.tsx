@@ -63,7 +63,8 @@ export default () => (
         无 url/previewUrl 时的文件卡片展示
       </h3>
       <p style={{ margin: 0, color: '#666', fontSize: 14 }}>
-        文件有 type/name 但没有可预览 URL 时，展示文件图标和文件名，而非空白缩略图
+        文件有 type/name 但没有可预览 URL
+        时，展示文件图标和文件名，而非空白缩略图
       </p>
     </div>
     <div

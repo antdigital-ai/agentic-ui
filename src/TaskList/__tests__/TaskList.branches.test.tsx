@@ -158,7 +158,9 @@ describe('TaskList Component', () => {
 
     // 即使有错误存在，但只要有任务在运行中，就应该显示 loading 状态
     expect(screen.getByTestId('task-list-status-loading')).toBeInTheDocument();
-    expect(screen.queryByTestId('task-list-status-error')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('task-list-status-error'),
+    ).not.toBeInTheDocument();
   });
 
   it('应该显示加载动画', () => {

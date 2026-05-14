@@ -83,4 +83,3 @@ export const useStyle = (baseClassName: string) => {
   const [wrapSSR, hashId] = useGenStyle(baseClassName);
   return { wrapSSR, hashId };
 };
-

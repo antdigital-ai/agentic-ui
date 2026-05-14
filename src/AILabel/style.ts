@@ -52,8 +52,7 @@ const genStyle: GenStyleFn<'AILabel'> = (token) => ({
       border: `1px solid ${token.aiLabelDotBorderColor}`,
       borderRadius: token.borderRadiusSM ?? 4,
       // 状态切换时统一过渡，避免在 emphasis / tooltip-visible 切换时跳变
-      transition:
-        'background 0.2s ease-in-out, border-color 0.2s ease-in-out',
+      transition: 'background 0.2s ease-in-out, border-color 0.2s ease-in-out',
     },
 
     [`&${token.componentCls}-status-watermark`]: {

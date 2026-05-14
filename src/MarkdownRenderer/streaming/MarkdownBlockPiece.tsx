@@ -49,6 +49,15 @@ export const MarkdownBlockPiece = memo(function MarkdownBlockPiece({
     if (variant === 'sealed') {
       const cached = cacheRef.current.get(blockSource);
       if (cached) return cached;
+      // 末块刚晋升为 sealed 时 cacheRef 通常未命中（tail 路径只写 lastParsedRef）。
+      // 直接复用 lastParsedRef 上一次 parse 的结果，避免再走一次 renderMarkdownBlock
+      // 触发不必要的子树替换（chart / agentar-card 等重组件依赖 React 同位置同
+      // 类型 reconciliation 来保留实例）。
+      if (lastParsedRef.current?.source === blockSource) {
+        const el = lastParsedRef.current.node;
+        cacheRef.current.set(blockSource, el);
+        return el;
+      }
       const el = renderMarkdownBlock(blockSource, processor, comps);
       cacheRef.current.set(blockSource, el);
       return el;

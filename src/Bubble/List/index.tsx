@@ -3,13 +3,13 @@ export { PureBubbleList } from './PureBubbleList';
 
 import { MutableRefObject, useContext, useMemo, useRef } from 'react';
 
+import type { RoleType } from '../../Types/common';
 import type {
   BubbleImperativeHandle,
   BubbleMetaData,
   BubbleProps,
   MessageBubbleData,
 } from '../type';
-import type { RoleType } from '../../Types/common';
 
 import { ConfigProvider } from 'antd';
 import clsx from 'clsx';

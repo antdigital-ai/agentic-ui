@@ -13,5 +13,5 @@ export { useChartStatistics } from './useChartStatistics';
 export { useChartTheme } from './useChartTheme';
 export { useDetectTheme } from './useDetectTheme';
 export type { DetectThemeOptions } from './useDetectTheme';
-export { useResponsiveSize } from './useResponsiveSize';
 export { useResolvedChartTheme } from './useResolvedChartTheme';
+export { useResponsiveSize } from './useResponsiveSize';

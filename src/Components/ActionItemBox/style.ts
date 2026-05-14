@@ -1,4 +1,8 @@
-import { genStyleHooks, resetComponent, type GenStyleFn } from '../../Hooks/useStyle';
+import {
+  genStyleHooks,
+  resetComponent,
+  type GenStyleFn,
+} from '../../Hooks/useStyle';
 
 /**
  * ActionItemBox 与 ActionItemContainer 共享的样式生成函数。

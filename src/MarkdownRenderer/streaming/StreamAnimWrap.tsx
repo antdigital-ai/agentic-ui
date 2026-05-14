@@ -21,8 +21,7 @@ const StreamAnimWrapComponent: React.FC<StreamAnimWrapProps> = ({
   streamingParagraphAnimation,
   children,
 }) => {
-  const ctx = useContext(StreamingAnimationContext);
-  const animateBlock = ctx?.animateBlock ?? true;
+  const { animateBlock } = useContext(StreamingAnimationContext);
   const allow =
     !!streaming && animateBlock && streamingParagraphAnimation !== false;
   if (!allow) return <>{children}</>;

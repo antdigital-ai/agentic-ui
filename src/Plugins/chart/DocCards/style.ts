@@ -164,4 +164,3 @@ export const useStyle = (prefixCls: string) => {
   const [wrapSSR, hashId] = useGenStyle(prefixCls);
   return { wrapSSR, hashId };
 };
-

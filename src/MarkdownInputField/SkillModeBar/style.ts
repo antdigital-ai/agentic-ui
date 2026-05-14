@@ -1,4 +1,8 @@
-import { genStyleHooks, resetComponent, type GenStyleFn } from '../../Hooks/useStyle';
+import {
+  genStyleHooks,
+  resetComponent,
+  type GenStyleFn,
+} from '../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'SkillModeBar'> = (token) => {
   return {

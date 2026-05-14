@@ -30,4 +30,3 @@ export const useNewChatStyle = (prefixCls: string) => {
   const [wrapSSR, hashId] = useGenStyle(prefixCls);
   return { wrapSSR, hashId };
 };
-

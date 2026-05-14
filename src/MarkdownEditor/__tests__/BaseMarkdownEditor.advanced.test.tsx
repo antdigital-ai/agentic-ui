@@ -50,7 +50,11 @@ vi.mock('../editor/tools/ToolBar/FloatBar', () => ({
 }));
 
 vi.mock('../editor/tools/Leading', () => ({
-  TocHeading: ({ schema, anchorProps: _anchorProps, useCustomContainer: _useCustomContainer }: any) => (
+  TocHeading: ({
+    schema,
+    anchorProps: _anchorProps,
+    useCustomContainer: _useCustomContainer,
+  }: any) => (
     <div data-testid="toc-heading" data-schema-length={schema?.length}>
       Table of Contents
     </div>
@@ -359,7 +363,9 @@ describe('BaseMarkdownEditor - 高级功能测试', () => {
 
   describe('键盘事件测试', () => {
     it('应该处理键盘事件', async () => {
-      const { container: _container } = render(<BaseMarkdownEditor {...defaultProps} />);
+      const { container: _container } = render(
+        <BaseMarkdownEditor {...defaultProps} />,
+      );
 
       const editorContent = screen.getByTestId('editor-content');
 

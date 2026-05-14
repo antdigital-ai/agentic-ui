@@ -369,15 +369,13 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
       {/* Container：grid 折叠 + Card resize 时长，与工具条一致 */}
       {thinkContent && (
         <div
-          className={classNames(
-            `${prefixCls}-think-collapse`,
-            hashId,
-            {
-              [`${prefixCls}-think-collapse-open`]: expandedState,
-            },
-          )}
+          className={classNames(`${prefixCls}-think-collapse`, hashId, {
+            [`${prefixCls}-think-collapse-open`]: expandedState,
+          })}
         >
-          <div className={classNames(`${prefixCls}-think-collapse-inner`, hashId)}>
+          <div
+            className={classNames(`${prefixCls}-think-collapse-inner`, hashId)}
+          >
             <div
               className={cls.container}
               data-testid="tool-use-bar-think-container"

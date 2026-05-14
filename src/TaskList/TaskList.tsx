@@ -110,7 +110,9 @@ export const TaskList = memo(
               ? taskCompleteText({ items })
               : taskCompleteText;
           text =
-            customCompleteText ?? locale?.['taskList.taskComplete'] ?? '任务完成';
+            customCompleteText ??
+            locale?.['taskList.taskComplete'] ??
+            '任务完成';
           swapKey = `done:${items.map((i) => i.key).join(',')}`;
         } else if (loadingItem) {
           status = 'loading';

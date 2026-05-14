@@ -1,11 +1,11 @@
 import type { CSSInterpolation } from '@ant-design/cssinjs';
 import { useStyleRegister } from '@ant-design/cssinjs';
-import { genStyleUtils } from '@ant-design/cssinjs-utils';
 import type {
   FullToken as CssUtilsFullToken,
   GenStyleFn as CssUtilsGenStyleFn,
   TokenMap,
 } from '@ant-design/cssinjs-utils';
+import { genStyleUtils } from '@ant-design/cssinjs-utils';
 import { ConfigProvider as AntdConfigProvider, theme as antdTheme } from 'antd';
 import type { AliasToken, GlobalToken } from 'antd/es/theme/interface';
 import { useContext } from 'react';

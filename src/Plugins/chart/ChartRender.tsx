@@ -1303,9 +1303,7 @@ export const ChartRender: React.FC<{
         >
           <DocCards
             title={title}
-            toolbar={
-              toolBar.length > 0 ? <>{toolBar}</> : undefined
-            }
+            toolbar={toolBar.length > 0 ? <>{toolBar}</> : undefined}
             columns={config?.columns || []}
             data={chartData}
             cardColumns={restCfg?.cardColumns}
@@ -1324,9 +1322,7 @@ export const ChartRender: React.FC<{
         >
           <QuadrantChart
             title={title}
-            toolbar={
-              toolBar.length > 0 ? <>{toolBar}</> : undefined
-            }
+            toolbar={toolBar.length > 0 ? <>{toolBar}</> : undefined}
             columns={config?.columns || []}
             data={chartData}
           />

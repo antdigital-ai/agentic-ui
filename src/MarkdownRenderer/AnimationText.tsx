@@ -32,8 +32,8 @@ const extractText = (children: React.ReactNode): string => {
   return '';
 };
 
-/** 流式同一段内：前后文案仅「前缀关系」变化（增长或尾部截断修正） */
-const isStreamingCompatible = (prev: string, next: string) =>
+/** 两串互为前缀关系（任一是另一方的前缀）：流式同一段内的增长或尾部截断修正 */
+const arePrefixRelated = (prev: string, next: string) =>
   prev.startsWith(next) || next.startsWith(prev);
 
 function prefersReducedMotion(): boolean {
@@ -72,7 +72,7 @@ const AnimationText = React.memo<AnimationTextProps>(
         return;
       }
 
-      if (isStreamingCompatible(prev, text)) {
+      if (arePrefixRelated(prev, text)) {
         prevTextRef.current = text;
         return;
       }

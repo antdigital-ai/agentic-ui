@@ -1,4 +1,8 @@
-import { genStyleHooks, resetComponent, type GenStyleFn } from '../../../Hooks/useStyle';
+import {
+  genStyleHooks,
+  resetComponent,
+  type GenStyleFn,
+} from '../../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'AttachmentFileList'> = (token) => {
   return {
@@ -293,6 +297,8 @@ const useGenStyle = genStyleHooks('AttachmentFileList', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [wrapSSR, hashId] = useGenStyle(prefixCls ?? 'md-editor-attachment-file-list');
+  const [wrapSSR, hashId] = useGenStyle(
+    prefixCls ?? 'md-editor-attachment-file-list',
+  );
   return { wrapSSR, hashId };
 }

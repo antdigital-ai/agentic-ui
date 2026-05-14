@@ -18,8 +18,9 @@ export default () => {
         文件数量超限回调
       </Title>
       <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
-        最多 <Text strong>{MAX_FILE_COUNT}</Text> 个文件。选择文件数量超限时会触发{' '}
-        <Text code>onExceedMaxCount</Text> 回调，由消费者展示提示，避免静默失败。
+        最多 <Text strong>{MAX_FILE_COUNT}</Text>{' '}
+        个文件。选择文件数量超限时会触发 <Text code>onExceedMaxCount</Text>{' '}
+        回调，由消费者展示提示，避免静默失败。
       </Text>
       <MarkdownInputField
         value={value}

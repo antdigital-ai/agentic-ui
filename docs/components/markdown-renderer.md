@@ -82,7 +82,7 @@ export default () => {
 
 通过 `plugins[].renderer.rendererComponents` 注册渲染器，键名对应代码块的 `language`。内置语言（`mermaid`、`chart`、`schema` 等）在这里注册的同名键会**优先**被使用，覆盖默认渲染。
 
-```tsx
+````tsx
 import { MarkdownRenderer } from '@ant-design/agentic-ui';
 import React from 'react';
 
@@ -103,7 +103,7 @@ export default () => (
     ]}
   />
 );
-```
+````
 
 > 注意：`MarkdownEditorPlugin.elements` 用于 Slate 编辑器侧的元素渲染；`MarkdownRenderer` 不会读取它，只读 `plugin.renderer.rendererComponents`。
 
@@ -111,25 +111,25 @@ export default () => (
 
 ### MarkdownRendererProps
 
-| 属性                        | 说明                                                    | 类型                                                                                | 默认值                   | 版本 |
-| --------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------ | ---- |
-| content                     | Markdown 文本内容                                       | `string`                                                                            | -                        | -    |
-| streaming                   | 是否处于流式输出过程中                                  | `boolean`                                                                           | `false`                  | -    |
-| isFinished                  | 流式输出是否已结束（触发 CharacterQueue 立即 flush 收尾）；仅在 `streaming={true}` 时生效 | `boolean`                                                                           | `false`                  | -    |
-| streamingParagraphAnimation | 末段淡入动画开关；未传时默认开启，仅 `false` 关闭       | `boolean`                                                                           | `true`                   | -    |
-| queueOptions                | 流式打字机字符队列配置                                  | `CharacterQueueOptions`                                                             | -                        | -    |
-| plugins                     | 编辑器/渲染器插件，用于扩展元素渲染                     | `MarkdownEditorPlugin[]`                                                            | -                        | -    |
-| remarkPlugins               | 自定义 remark/rehype 插件，每项为 `Plugin` 或 `[Plugin, ...options]`，例如 `[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]` | `MarkdownRemarkPlugin[]`                                                            | -                        | -    |
-| htmlConfig                  | Markdown → HTML 配置，详见下方 [MarkdownToHtmlConfig](#markdowntohtmlconfig) | `MarkdownToHtmlConfig`                                                              | -                        | -    |
-| codeProps                   | 代码块配置（透传给 MarkdownEditor 的同名属性）          | `MarkdownEditorProps['codeProps']`                                                  | -                        | -    |
-| fncProps                    | 脚注配置（透传给 MarkdownEditor 的同名属性）            | `MarkdownEditorProps['fncProps']`                                                   | -                        | -    |
-| linkConfig                  | 链接行为配置；`openInNewTab` 仅在显式传 `false` 时同标签页打开（不传 `linkConfig` 或不传 `openInNewTab` 都视为新标签页） | `{ openInNewTab?: boolean; onClick?: (url?: string) => boolean \| void }`           | `{ openInNewTab: true }` | -    |
+| 属性                        | 说明                                                                                                                                                                                                      | 类型                                                                                | 默认值                   | 版本 |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------ | ---- |
+| content                     | Markdown 文本内容                                                                                                                                                                                         | `string`                                                                            | -                        | -    |
+| streaming                   | 是否处于流式输出过程中                                                                                                                                                                                    | `boolean`                                                                           | `false`                  | -    |
+| isFinished                  | 流式输出是否已结束（触发 CharacterQueue 立即 flush 收尾）；仅在 `streaming={true}` 时生效                                                                                                                 | `boolean`                                                                           | `false`                  | -    |
+| streamingParagraphAnimation | 末段淡入动画开关；未传时默认开启，仅 `false` 关闭                                                                                                                                                         | `boolean`                                                                           | `true`                   | -    |
+| queueOptions                | 流式打字机字符队列配置                                                                                                                                                                                    | `CharacterQueueOptions`                                                             | -                        | -    |
+| plugins                     | 编辑器/渲染器插件，用于扩展元素渲染                                                                                                                                                                       | `MarkdownEditorPlugin[]`                                                            | -                        | -    |
+| remarkPlugins               | 自定义 remark/rehype 插件，每项为 `Plugin` 或 `[Plugin, ...options]`，例如 `[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]`                                                                   | `MarkdownRemarkPlugin[]`                                                            | -                        | -    |
+| htmlConfig                  | Markdown → HTML 配置，详见下方 [MarkdownToHtmlConfig](#markdowntohtmlconfig)                                                                                                                              | `MarkdownToHtmlConfig`                                                              | -                        | -    |
+| codeProps                   | 代码块配置（透传给 MarkdownEditor 的同名属性）                                                                                                                                                            | `MarkdownEditorProps['codeProps']`                                                  | -                        | -    |
+| fncProps                    | 脚注配置（透传给 MarkdownEditor 的同名属性）                                                                                                                                                              | `MarkdownEditorProps['fncProps']`                                                   | -                        | -    |
+| linkConfig                  | 链接行为配置；`openInNewTab` 仅在显式传 `false` 时同标签页打开（不传 `linkConfig` 或不传 `openInNewTab` 都视为新标签页）                                                                                  | `{ openInNewTab?: boolean; onClick?: (url?: string) => boolean \| void }`           | `{ openInNewTab: true }` | -    |
 | apaasify                    | Apaas 数据双向绑定配置（注意：`render` 签名与 [`MarkdownEditor.apaasify`](./api) 不同——此处入参为已解析后的 value，而 `MarkdownEditor` 收到的是 `(props: RenderElementProps, originData?) => ReactNode`） | `{ enable?: boolean; render?: (value: any) => React.ReactNode }`                    | -                        | -    |
-| fileMapConfig               | 文件地图（`agentic-ui-filemap`）代码块渲染配置          | `FileMapConfig`                                                                     | -                        | -    |
-| eleRender                   | 自定义节点渲染回退函数；返回 `undefined` 时回退默认渲染 | `(props: MarkdownRendererEleProps, defaultDom: React.ReactNode) => React.ReactNode` | -                        | -    |
-| className                   | 自定义类名                                              | `string`                                                                            | -                        | -    |
-| style                       | 自定义样式                                              | `React.CSSProperties`                                                               | -                        | -    |
-| prefixCls                   | 类名前缀（透传给 antd `getPrefixCls`）                  | `string`                                                                            | `'agentic-md-editor'`    | -    |
+| fileMapConfig               | 文件地图（`agentic-ui-filemap`）代码块渲染配置                                                                                                                                                            | `FileMapConfig`                                                                     | -                        | -    |
+| eleRender                   | 自定义节点渲染回退函数；返回 `undefined` 时回退默认渲染                                                                                                                                                   | `(props: MarkdownRendererEleProps, defaultDom: React.ReactNode) => React.ReactNode` | -                        | -    |
+| className                   | 自定义类名                                                                                                                                                                                                | `string`                                                                            | -                        | -    |
+| style                       | 自定义样式                                                                                                                                                                                                | `React.CSSProperties`                                                               | -                        | -    |
+| prefixCls                   | 类名前缀（透传给 antd `getPrefixCls`）                                                                                                                                                                    | `string`                                                                            | `'agentic-md-editor'`    | -    |
 
 ### MarkdownRendererRef
 
@@ -144,25 +144,25 @@ export default () => (
 
 控制流式打字机字符队列的节奏与节流。
 
-| 属性                      | 说明                                         | 类型      | 默认值  |
-| ------------------------- | -------------------------------------------- | --------- | ------- |
-| charsPerFrame             | 每帧推进的字符数                             | `number`  | `3`     |
+| 属性                      | 说明                                                                                                                                                   | 类型      | 默认值  |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------- |
+| charsPerFrame             | 每帧推进的字符数                                                                                                                                       | `number`  | `3`     |
 | animate                   | 是否启用打字机推进；`streaming={true}` 时默认 `false`（避免 RAF 每帧全量重解析），需显式传 `true` 开启；`streaming={false}` 时不创建队列，本字段无意义 | `boolean` | `false` |
-| animateTailChars          | 仅对末尾 N 字做动画，前面内容立即展示        | `number`  | -       |
-| speed                     | 速度因子                                     | `number`  | `1.0`   |
-| flushOnComplete           | 完成时是否立即 flush 全部内容                | `boolean` | -       |
-| backgroundInterval        | 后台批处理间隔（毫秒）                       | `number`  | `100`   |
-| backgroundBatchMultiplier | 后台批处理乘数                               | `number`  | `10`    |
+| animateTailChars          | 仅对末尾 N 字做动画，前面内容立即展示                                                                                                                  | `number`  | -       |
+| speed                     | 速度因子                                                                                                                                               | `number`  | `1.0`   |
+| flushOnComplete           | 完成时是否立即 flush 全部内容                                                                                                                          | `boolean` | -       |
+| backgroundInterval        | 后台批处理间隔（毫秒）                                                                                                                                 | `number`  | `100`   |
+| backgroundBatchMultiplier | 后台批处理乘数                                                                                                                                         | `number`  | `10`    |
 
 ### MarkdownToHtmlConfig
 
 控制 Markdown → HTML 转换流水线。
 
-| 属性             | 说明                                                         | 类型                       | 默认值 |
-| ---------------- | ------------------------------------------------------------ | -------------------------- | ------ |
-| openLinksInNewTab | 是否在新标签页打开链接（与外层 `linkConfig.openInNewTab` 二选一即可） | `boolean`                  | -      |
-| paragraphTag     | 自定义段落标签                                               | `string`                   | `'p'`  |
-| markedConfig     | 用户自定义 unified 插件数组，每项为 `Plugin` 或 `[Plugin, ...options]` | `MarkdownRemarkPlugin[]`   | -      |
+| 属性              | 说明                                                                   | 类型                     | 默认值 |
+| ----------------- | ---------------------------------------------------------------------- | ------------------------ | ------ |
+| openLinksInNewTab | 是否在新标签页打开链接（与外层 `linkConfig.openInNewTab` 二选一即可）  | `boolean`                | -      |
+| paragraphTag      | 自定义段落标签                                                         | `string`                 | `'p'`  |
+| markedConfig      | 用户自定义 unified 插件数组，每项为 `Plugin` 或 `[Plugin, ...options]` | `MarkdownRemarkPlugin[]` | -      |
 
 ### FileMapConfig
 
@@ -178,28 +178,28 @@ export default () => (
 
 `MarkdownRenderer` 默认根据代码块的 `language` 路由到不同渲染器，业务可直接通过书写带语言标记的代码块触发：
 
-| Language                                                        | 对应渲染器                         | 用途                                                  |
-| --------------------------------------------------------------- | ---------------------------------- | ----------------------------------------------------- |
-| `mermaid`                                                       | `MermaidBlockRenderer`             | Mermaid 流程图 / 时序图                               |
-| `chart` / `json-chart`                                          | `ChartBlockRenderer`               | 内置图表（line/bar/pie/area/scatter/radar/funnel 等） |
-| `agentic-ui-filemap`                                            | `AgenticUiFileMapBlockRenderer`    | 文件地图 / 附件列表预览                               |
-| `agentic-ui-task`                                               | `AgenticUiTaskBlockRenderer`       | TaskList 任务步骤                                     |
-| `agentic-ui-toolusebar` / `agentic-ui-usertoolbar`              | `AgenticUiToolUseBarBlockRenderer` | ToolUseBar 工具调用                                   |
-| `schema` / `apaasify` / `apassify` / `agentar-card`             | `SchemaBlockRenderer`              | Schema 渲染 / 编辑（多语言别名等价触发）              |
+| Language                                                            | 对应渲染器                         | 用途                                                  |
+| ------------------------------------------------------------------- | ---------------------------------- | ----------------------------------------------------- |
+| `mermaid`                                                           | `MermaidBlockRenderer`             | Mermaid 流程图 / 时序图                               |
+| `chart` / `json-chart`                                              | `ChartBlockRenderer`               | 内置图表（line/bar/pie/area/scatter/radar/funnel 等） |
+| `agentic-ui-filemap`                                                | `AgenticUiFileMapBlockRenderer`    | 文件地图 / 附件列表预览                               |
+| `agentic-ui-task`                                                   | `AgenticUiTaskBlockRenderer`       | TaskList 任务步骤                                     |
+| `agentic-ui-toolusebar` / `agentic-ui-usertoolbar`                  | `AgenticUiToolUseBarBlockRenderer` | ToolUseBar 工具调用                                   |
+| `schema` / `apaasify` / `apassify` / `agentar-card`                 | `SchemaBlockRenderer`              | Schema 渲染 / 编辑（多语言别名等价触发）              |
 | 其它（不匹配任何上述键时回退；含 `katex`、`ts`、`bash` 等普通代码） | `CodeBlockRenderer`                | 代码高亮、KaTeX 公式                                  |
 
 > 这些渲染器均通过 `MarkdownRenderer` 顶层导出，可在自定义 Markdown 流水线中独立复用。
 
 ## 相关 Hook 与工具
 
-| 名称                        | 说明                                                             |
-| --------------------------- | ---------------------------------------------------------------- |
-| `useMarkdownToReact`        | 将 Markdown 字符串同步转换为 React 节点（非流式场景）            |
-| `markdownToReactSync`       | `useMarkdownToReact` 的非 Hook 版本                              |
-| `useStreaming`              | 流式 Markdown 推进核心 Hook，按 `CharacterQueueOptions` 控制节奏 |
-| `useStreamingMarkdownReact` | 组合 `useStreaming` + `useMarkdownToReact` 的高阶 Hook           |
-| `CharacterQueue`            | 字符级队列实现，可单独用于受控的字符推进                         |
-| `AnimationText`             | 末段淡入动画包装组件，用于自定义渲染器                           |
+| 名称                        | 说明                                                                                                                             |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `useMarkdownToReact`        | 将 Markdown 字符串同步转换为 React 节点（非流式场景）                                                                            |
+| `markdownToReactSync`       | `useMarkdownToReact` 的非 Hook 版本                                                                                              |
+| `useStreaming`              | 流式 Markdown 推进核心 Hook，按 `CharacterQueueOptions` 控制节奏                                                                 |
+| `useStreamingMarkdownReact` | 与 `useMarkdownToReact` 是**同一函数**（互为别名）；真正"组合 token 缓存 + Markdown→React"发生在 `MarkdownRenderer` 顶层组件内部 |
+| `CharacterQueue`            | 字符级队列实现，可单独用于受控的字符推进                                                                                         |
+| `AnimationText`             | 末段淡入动画包装组件，用于自定义渲染器                                                                                           |
 
 ## 注意事项
 

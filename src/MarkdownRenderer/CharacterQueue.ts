@@ -24,6 +24,10 @@ interface ResolvedOptions {
  * - 标签页可见时以 RAF 驱动逐字输出（60fps 动画）
  * - 标签页不可见时降级为 setTimeout，保证后台仍能消费
  * - 切回前台时自动恢复 RAF
+ *
+ * 默认值差异：本类独立使用时 `animate` 默认 `true`（打字机开启）；被
+ * `MarkdownRenderer` 包装且 `streaming === true` 时，上层会显式覆盖为
+ * `animate: false`，需要打字机效果时由调用方传 `queueOptions.animate: true`。
  */
 export class CharacterQueue {
   private displayedLength = 0;
@@ -40,7 +44,21 @@ export class CharacterQueue {
     options?: CharacterQueueOptions,
   ) {
     this.onFlush = onFlush;
-    this.options = {
+    this.options = CharacterQueue.resolveOptions(options);
+
+    this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
+    if (typeof document !== 'undefined') {
+      document.addEventListener(
+        'visibilitychange',
+        this.handleVisibilityChange,
+      );
+    }
+  }
+
+  private static resolveOptions(
+    options?: CharacterQueueOptions,
+  ): ResolvedOptions {
+    return {
       charsPerFrame: options?.charsPerFrame ?? DEFAULT_CHARS_PER_FRAME,
       animate: options?.animate ?? true,
       speed: options?.speed ?? DEFAULT_SPEED,
@@ -52,19 +70,38 @@ export class CharacterQueue {
         DEFAULT_BACKGROUND_BATCH_MULTIPLIER,
       animateTailChars: options?.animateTailChars,
     };
+  }
 
-    this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
-    if (typeof document !== 'undefined') {
-      document.addEventListener(
-        'visibilitychange',
-        this.handleVisibilityChange,
-      );
+  /**
+   * 在不重置 `displayedLength` 的前提下更新调度参数。
+   * 流式过程中调速 / 切换 animate 时使用，避免重建队列导致已展示文本回退。
+   */
+  setOptions(options?: CharacterQueueOptions): void {
+    const next = CharacterQueue.resolveOptions(options);
+    const wasAnimating = this.options.animate;
+    this.options = next;
+    if (wasAnimating && !next.animate) {
+      // 关闭动画：立即把剩余内容 flush 出去
+      this.cancelAllTicks();
+      this.displayedLength = this.fullContent.length;
+      this.onFlush(this.fullContent);
+      return;
+    }
+    if (!wasAnimating && next.animate) {
+      // 重新开启动画：从当前 displayedLength 继续推进
+      if (this.displayedLength < this.fullContent.length) {
+        this.ensureTicking();
+      }
     }
   }
 
   /** SSE token 到达时调用——接收完整的 content 字符串 */
   push(content: string): void {
-    if (content.length < this.displayedLength) {
+    // 已展示部分必须仍是新 content 的前缀，否则视为整段重置（避免接着旧
+    // displayedLength 推进出乱码）。仅靠长度比较不严谨：新 content 长度可能大于
+    // displayedLength 但前缀已分叉。
+    const consumedSlice = this.fullContent.slice(0, this.displayedLength);
+    if (!content.startsWith(consumedSlice)) {
       this.displayedLength = 0;
     }
     this.fullContent = content;
@@ -117,9 +154,11 @@ export class CharacterQueue {
   private ensureTicking(): void {
     if (this.disposed || this.isTickActive()) return;
 
+    const hasRaf = typeof requestAnimationFrame !== 'undefined';
     const isVisible =
       typeof document !== 'undefined' && document.visibilityState === 'visible';
-    this.tickMode = isVisible ? 'raf' : 'timeout';
+    // SSR 或 Node 测试环境 rAF 不可用时强制走 setTimeout 路径
+    this.tickMode = isVisible && hasRaf ? 'raf' : 'timeout';
 
     if (this.tickMode === 'raf') {
       this.rafId = requestAnimationFrame(this.tick);
@@ -159,7 +198,8 @@ export class CharacterQueue {
   };
 
   private scheduleNext(isVisible: boolean): void {
-    if (isVisible) {
+    const hasRaf = typeof requestAnimationFrame !== 'undefined';
+    if (isVisible && hasRaf) {
       this.tickMode = 'raf';
       this.rafId = requestAnimationFrame(this.tick);
     } else {
@@ -181,7 +221,9 @@ export class CharacterQueue {
 
   private cancelAllTicks(): void {
     if (this.rafId !== null) {
-      cancelAnimationFrame(this.rafId);
+      if (typeof cancelAnimationFrame !== 'undefined') {
+        cancelAnimationFrame(this.rafId);
+      }
       this.rafId = null;
     }
     if (this.timerId !== null) {

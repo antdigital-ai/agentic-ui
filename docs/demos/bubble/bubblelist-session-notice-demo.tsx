@@ -158,24 +158,24 @@ export default () => {
 
       <div data-testid="bubblelist-session-notice-demo-list-wrap">
         <BubbleList
-        markdownRenderConfig={{
-          tableConfig: {
-            pure: true,
-          },
-        }}
-        pure
-        bubbleList={bubbleList}
-        bubbleListRef={bubbleListRef}
-        bubbleRef={bubbleRef}
-        bubbleRenderConfig={bubbleRenderConfig}
-        assistantMeta={assistantMeta}
-        userMeta={userMeta}
-        style={{
-          height: 400,
-          overflow: 'auto',
-          borderRadius: '20px',
-        }}
-      />
+          markdownRenderConfig={{
+            tableConfig: {
+              pure: true,
+            },
+          }}
+          pure
+          bubbleList={bubbleList}
+          bubbleListRef={bubbleListRef}
+          bubbleRef={bubbleRef}
+          bubbleRenderConfig={bubbleRenderConfig}
+          assistantMeta={assistantMeta}
+          userMeta={userMeta}
+          style={{
+            height: 400,
+            overflow: 'auto',
+            borderRadius: '20px',
+          }}
+        />
       </div>
 
       <div
@@ -189,11 +189,12 @@ export default () => {
         <strong>说明：</strong>
         <ul style={{ margin: '8px 0 0 0', paddingLeft: 20 }}>
           <li>
-            <code>sessionNotice</code> 为{' '}
-            <code>MessageBubbleData.role</code> 的合法取值，用于时间轴类说明
+            <code>sessionNotice</code> 为 <code>MessageBubbleData.role</code>{' '}
+            的合法取值，用于时间轴类说明
           </li>
           <li>
-            典型宿主可在此基础上加 <code>@</code> 高亮等；本 demo 用虚线边框 + 圆角居中展示
+            典型宿主可在此基础上加 <code>@</code> 高亮等；本 demo 用虚线边框 +
+            圆角居中展示
           </li>
         </ul>
       </div>

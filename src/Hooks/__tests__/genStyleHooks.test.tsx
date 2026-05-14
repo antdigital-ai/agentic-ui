@@ -59,12 +59,9 @@ describe('genStyleHooks 基础设施', () => {
   });
 
   it('genComponentStyleHook 返回 [wrapSSR, hashId]', () => {
-    const useStyle = genComponentStyleHook(
-      'TestSubComp' as any,
-      (token) => ({
-        [token.componentCls]: { color: token.colorText },
-      }),
-    );
+    const useStyle = genComponentStyleHook('TestSubComp' as any, (token) => ({
+      [token.componentCls]: { color: token.colorText },
+    }));
 
     const { result } = renderHook(() => useStyle('agentic-sub'), {
       wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
@@ -75,18 +72,16 @@ describe('genStyleHooks 基础设施', () => {
   });
 
   it('genSubStyleComponent 返回 SubStyle React 组件', () => {
-    const SubStyle = genSubStyleComponent(
-      'TestSubStyle' as any,
-      (token) => ({ [token.componentCls]: {} }),
-    );
+    const SubStyle = genSubStyleComponent('TestSubStyle' as any, (token) => ({
+      [token.componentCls]: {},
+    }));
     expect(typeof SubStyle).toBe('function');
   });
 
   it('wrapSSR 应为 identity 函数：不包 Fragment、不动节点', () => {
-    const useStyle = genStyleHooks(
-      'TestIdentityWrap' as any,
-      (token) => ({ [token.componentCls]: { color: token.colorText } }),
-    );
+    const useStyle = genStyleHooks('TestIdentityWrap' as any, (token) => ({
+      [token.componentCls]: { color: token.colorText },
+    }));
 
     const { result } = renderHook(() => useStyle('agentic-identity'), {
       wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,

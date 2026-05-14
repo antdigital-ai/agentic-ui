@@ -9,8 +9,8 @@ import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../../I18n';
-import type { FileNode } from '../../../types';
 import Workspace from '../../../index';
+import type { FileNode } from '../../../types';
 
 describe('Workspace.FileTree', () => {
   const mockLocale = {
@@ -277,12 +277,8 @@ describe('Workspace.FileTree', () => {
       </TestWrapper>,
     );
 
-    expect(
-      screen.getByRole('button', { name: '下载' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: '预览' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '下载' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '预览' })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: '下载' }));
     expect(onDownload).toHaveBeenCalledWith(

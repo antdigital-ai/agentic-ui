@@ -1,12 +1,6 @@
 ﻿import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
-import React, {
-  memo,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { memo, useContext, useEffect, useRef, useState } from 'react';
 import { DEFAULT_TEXT_SWAP_DURATION_MS } from './constants';
 import { useTextSwapStyle } from './style';
 
@@ -21,8 +15,10 @@ function prefersReducedMotion(): boolean {
   }
 }
 
-export interface TextSwapProps
-  extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> {
+export interface TextSwapProps extends Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  'children'
+> {
   /**
    * When this value changes, the old content plays exit, then new `children` enter.
    */

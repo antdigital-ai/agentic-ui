@@ -116,12 +116,15 @@ const InternalMarkdownRenderer = forwardRef<
     }
 
     const sig = JSON.stringify(resolvedQueueOptions ?? {});
-    if (!queueRef.current || sig !== queueOptsSigRef.current) {
-      queueRef.current?.dispose();
+    if (!queueRef.current) {
       queueRef.current = new CharacterQueue(
         (displayed) => setDisplayedContent(displayed),
         resolvedQueueOptions,
       );
+      queueOptsSigRef.current = sig;
+    } else if (sig !== queueOptsSigRef.current) {
+      // 仅更新调度参数，保留 displayedLength / fullContent，避免已展示文本回退
+      queueRef.current.setOptions(resolvedQueueOptions);
       queueOptsSigRef.current = sig;
     }
     queueRef.current.push(content || '');
@@ -139,10 +142,22 @@ const InternalMarkdownRenderer = forwardRef<
     };
   }, []);
 
+  // 流式 60fps 模式下 displayedContent 每帧都变；用一个廉价正则前置判断
+  // 是否可能含有 footnote 定义（行首形如 `[^id]:`），避免逐帧走 unified parse
+  const lastFootnoteEmptyRef = useRef(false);
   useEffect(() => {
     const notify = fncProps?.onFootnoteDefinitionChange;
     if (!notify) return;
-    notify(extractFootnoteDefinitionsFromMarkdown(displayedContent || ''));
+    const text = displayedContent || '';
+    if (!/^\[\^[^\]]+\]:/m.test(text)) {
+      if (!lastFootnoteEmptyRef.current) {
+        notify([]);
+        lastFootnoteEmptyRef.current = true;
+      }
+      return;
+    }
+    lastFootnoteEmptyRef.current = false;
+    notify(extractFootnoteDefinitionsFromMarkdown(text));
   }, [displayedContent, fncProps?.onFootnoteDefinitionChange]);
 
   // 构建组件映射
