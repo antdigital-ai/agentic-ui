@@ -249,6 +249,37 @@ describe('FileComponent', () => {
       expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
     });
 
+    it('树视图下优先使用文件树搜索占位符', () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={nodes}
+            showSearch
+            keyword=""
+            onChange={vi.fn()}
+            searchPlaceholder="搜索列表文件"
+            searchPlaceholderTree="搜索已展开目录"
+            fileTreeSwitch={{
+              treeProps,
+              listLabel: 'List',
+              treeLabel: 'Tree',
+            }}
+          />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByPlaceholderText('搜索列表文件')).toBeInTheDocument();
+      fireEvent.click(screen.getByLabelText('Tree'));
+      expect(screen.getByPlaceholderText('搜索已展开目录')).toBeInTheDocument();
+      expect(
+        screen.queryByPlaceholderText('搜索列表文件'),
+      ).not.toBeInTheDocument();
+    });
+
     it('受控 view 时由外部驱动展示', async () => {
       const nodes: FileNode[] = [
         { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
