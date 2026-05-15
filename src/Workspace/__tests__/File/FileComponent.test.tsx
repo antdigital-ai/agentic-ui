@@ -249,6 +249,38 @@ describe('FileComponent', () => {
       expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
     });
 
+    it('树视图将搜索关键字透传给文件树筛选', async () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={nodes}
+            showSearch
+            keyword="  gamma  "
+            onChange={vi.fn()}
+            fileTreeSwitch={{
+              treeProps: {
+                treeData: [
+                  { key: 'readme', name: 'readme.md', isLeaf: true },
+                ],
+                onLoadChildren: vi.fn().mockResolvedValue([]),
+              },
+            }}
+          />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByLabelText('文件树'));
+
+      const empty = await screen.findByTestId('file-tree-filter-empty');
+      expect(empty).toHaveAttribute('data-state', 'rootsNoMatch');
+      expect(empty).toHaveTextContent('gamma');
+      expect(screen.queryByText('readme.md')).not.toBeInTheDocument();
+    });
+
     it('受控 view 时由外部驱动展示', async () => {
       const nodes: FileNode[] = [
         { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },

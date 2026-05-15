@@ -253,6 +253,42 @@ describe('FileMapView', () => {
       );
     });
 
+    it('should activate view all with Enter and expand files', async () => {
+      const onViewAll = vi.fn().mockResolvedValue(undefined);
+      const fileMap = new Map();
+      for (let i = 1; i <= 5; i++) {
+        fileMap.set(
+          `file-${i}`,
+          createMockFile(`file${i}.pdf`, 'application/pdf'),
+        );
+      }
+
+      const { container } = render(
+        <FileMapView
+          fileMap={fileMap}
+          maxDisplayCount={3}
+          onViewAll={onViewAll}
+        />,
+      );
+
+      const viewAllButton = screen.getByTestId('file-view-view-all');
+      fireEvent.keyDown(viewAllButton, { key: 'Enter' });
+
+      await waitFor(() => {
+        expect(onViewAll).toHaveBeenCalledWith(
+          expect.arrayContaining([
+            expect.objectContaining({ name: 'file1.pdf' }),
+            expect.objectContaining({ name: 'file5.pdf' }),
+          ]),
+        );
+      });
+      await waitFor(() => {
+        expect(
+          container.querySelectorAll('[data-testid="file-item"]'),
+        ).toHaveLength(5);
+      });
+    });
+
     it('should expand all files when onViewAll returns true', async () => {
       const fileMap = new Map();
       for (let i = 1; i <= 5; i++) {

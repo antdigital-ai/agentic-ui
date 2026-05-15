@@ -217,6 +217,46 @@ describe('Workspace.FileTree', () => {
     );
   });
 
+  it('treats leaves without file payload as name-only selectable items', () => {
+    const onSelect = vi.fn();
+    const onFileClick = vi.fn();
+    const onPreview = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              { key: 'missing-file', name: 'missing-file.txt', isLeaf: true },
+              {
+                key: 'runtime-null-file',
+                name: 'runtime-null-file.txt',
+                isLeaf: true,
+                file: null as any,
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            onSelect={onSelect}
+            onFileClick={onFileClick}
+            onPreview={onPreview}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByText('missing-file.txt'));
+    fireEvent.click(screen.getByText('runtime-null-file.txt'));
+
+    expect(onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ key: 'missing-file' }),
+    );
+    expect(onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ key: 'runtime-null-file' }),
+    );
+    expect(onFileClick).not.toHaveBeenCalled();
+    expect(onPreview).not.toHaveBeenCalled();
+  });
+
   it('invokes onSelect with node', async () => {
     const onSelect = vi.fn();
     const onLoadChildren = vi
