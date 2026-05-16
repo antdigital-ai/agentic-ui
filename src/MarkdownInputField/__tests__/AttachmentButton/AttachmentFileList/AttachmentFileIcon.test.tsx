@@ -107,6 +107,40 @@ describe('AttachmentFileIcon', () => {
     vi.unstubAllGlobals();
   });
 
+  it('服务端视频元数据不是 File 实例时不应创建 object URL', () => {
+    const createObjectURL = vi.fn(() => 'blob:metadata-url');
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal('URL', {
+      createObjectURL,
+      revokeObjectURL,
+    });
+    mockGetFileTypeIcon.mockClear();
+
+    const file = {
+      name: 'server-video.mp4',
+      type: 'video/mp4',
+      status: 'done' as const,
+      uuid: 'metadata-video',
+      size: 1024,
+      url: '',
+      previewUrl: '',
+    };
+
+    const { container } = render(
+      <AttachmentFileIcon file={file as any} className="test-class" />,
+    );
+
+    expect(createObjectURL).not.toHaveBeenCalled();
+    expect(container.querySelector('video')).not.toBeInTheDocument();
+    expect(mockGetFileTypeIcon).toHaveBeenCalledWith(
+      'mp4',
+      '',
+      'server-video.mp4',
+    );
+    expect(screen.getByTestId('file-type-icon')).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
   it('应调用 getFileTypeIcon 当非图片非视频文件', () => {
     mockGetFileTypeIcon.mockClear();
     const file = {

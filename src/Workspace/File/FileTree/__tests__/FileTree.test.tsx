@@ -286,6 +286,48 @@ describe('Workspace.FileTree', () => {
     );
   });
 
+  it('renders nullish-file leaves as inert plain labels', () => {
+    const onFileClick = vi.fn();
+    const onPreview = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'null-file',
+                name: 'null-file.md',
+                isLeaf: true,
+                file: null as any,
+              },
+              {
+                key: 'undefined-file',
+                name: 'undefined-file.md',
+                isLeaf: true,
+                file: undefined as any,
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            onFileClick={onFileClick}
+            onPreview={onPreview}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText('null-file.md')).toBeInTheDocument();
+    expect(screen.getByText('undefined-file.md')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '预览' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '下载' })).toBeNull();
+
+    fireEvent.click(screen.getByText('null-file.md'));
+    fireEvent.click(screen.getByText('undefined-file.md'));
+
+    expect(onFileClick).not.toHaveBeenCalled();
+    expect(onPreview).not.toHaveBeenCalled();
+  });
+
   it('invokes onPreview when preview icon clicked', async () => {
     const onPreview = vi.fn();
     const file: FileNode = {
