@@ -8,7 +8,7 @@
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { I18nProvide } from '../../../I18n';
+import { cnLabels, I18nProvide } from '../../../I18n';
 import { FileComponent } from '../../File/FileComponent';
 import type { FileNode, GroupNode } from '../../types';
 
@@ -247,6 +247,62 @@ describe('FileComponent', () => {
       expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
       fireEvent.click(screen.getByLabelText('List'));
       expect(screen.getByTestId('file-search-input')).toBeInTheDocument();
+    });
+
+    it('树视图优先使用 searchPlaceholderTree', () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={nodes}
+            showSearch
+            keyword=""
+            searchPlaceholder="搜索列表文件"
+            searchPlaceholderTree="搜索已展开目录"
+            fileTreeSwitch={{
+              treeProps,
+              view: 'tree',
+            }}
+          />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByPlaceholderText('搜索已展开目录')).toBeInTheDocument();
+      expect(screen.queryByPlaceholderText('搜索列表文件')).toBeNull();
+    });
+
+    it('树视图未传 searchPlaceholderTree 时使用文件树 locale 文案', () => {
+      const nodes: FileNode[] = [
+        { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
+      ];
+
+      render(
+        <ConfigProvider>
+          <I18nProvide
+            locale={{
+              ...cnLabels,
+              'workspace.fileTreeSearchPlaceholder': '仅搜索已展开目录',
+            }}
+          >
+            <FileComponent
+              nodes={nodes}
+              showSearch
+              keyword=""
+              searchPlaceholder="搜索列表文件"
+              fileTreeSwitch={{
+                treeProps,
+                view: 'tree',
+              }}
+            />
+          </I18nProvide>
+        </ConfigProvider>,
+      );
+
+      expect(screen.getByPlaceholderText('仅搜索已展开目录')).toBeInTheDocument();
+      expect(screen.queryByPlaceholderText('搜索列表文件')).toBeNull();
     });
 
     it('受控 view 时由外部驱动展示', async () => {

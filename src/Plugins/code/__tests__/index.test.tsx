@@ -141,6 +141,27 @@ describe('code plugin index', () => {
       expect(screen.getByTestId('base-markdown-editor')).toBeInTheDocument();
     });
 
+    it('只读 csv 优先使用 Slate children 中的最新正文', async () => {
+      mockEditorStore.readonly = true;
+      const props = {
+        ...baseProps,
+        element: {
+          ...baseProps.element,
+          language: 'csv',
+          value: 'Name,Age\nStale,1',
+          children: [{ text: 'Name,Age\nFresh,2' }],
+        },
+      };
+
+      render(<CodeElement {...props} />);
+      expect(screen.getByTestId('base-markdown-editor')).toHaveTextContent(
+        'Fresh',
+      );
+      expect(screen.getByTestId('base-markdown-editor')).not.toHaveTextContent(
+        'Stale',
+      );
+    });
+
     it('在非只读模式下应该渲染CodeRenderer', async () => {
       mockEditorStore.readonly = false;
       render(<CodeElement {...baseProps} />);

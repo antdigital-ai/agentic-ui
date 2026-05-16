@@ -10,7 +10,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../../I18n';
 import Workspace from '../../../index';
-import type { FileNode } from '../../../types';
+import type { FileNode, FileTreeNode } from '../../../types';
 
 describe('Workspace.FileTree', () => {
   const mockLocale = {
@@ -246,6 +246,58 @@ describe('Workspace.FileTree', () => {
         expect.objectContaining({ key: 'x', name: 'b.md' }),
       );
     });
+  });
+
+  it('treats leaf nodes with null or missing file as plain selectable nodes', () => {
+    const onSelect = vi.fn();
+    const onPreview = vi.fn();
+    const treeData: FileTreeNode[] = [
+      {
+        key: 'leaf-null',
+        name: 'metadata-null.txt',
+        isLeaf: true,
+        file: null as unknown as FileNode,
+      },
+      {
+        key: 'leaf-missing',
+        name: 'metadata-missing.txt',
+        isLeaf: true,
+      },
+    ];
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={treeData}
+            onLoadChildren={vi.fn()}
+            onSelect={onSelect}
+            onPreview={onPreview}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText('metadata-null.txt')).toBeInTheDocument();
+    expect(screen.getByText('metadata-missing.txt')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '下载' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '预览' })).toBeNull();
+
+    fireEvent.click(screen.getByText('metadata-null.txt'));
+    fireEvent.click(screen.getByText('metadata-missing.txt'));
+
+    expect(onSelect).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ key: 'leaf-null', name: 'metadata-null.txt' }),
+    );
+    expect(onSelect).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        key: 'leaf-missing',
+        name: 'metadata-missing.txt',
+      }),
+    );
+    expect(onPreview).not.toHaveBeenCalled();
   });
 
   it('shows preview/download for leaf with file and invokes onDownload', async () => {
