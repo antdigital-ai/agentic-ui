@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { AttachmentFile } from '../../MarkdownInputField/AttachmentButton/types';
 import { ContentFilemapView } from '../ContentFilemapView';
 import type { FilemapBlock } from '../extractFilemapBlocks';
@@ -11,6 +11,10 @@ vi.mock('framer-motion', () => ({
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
 }));
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 const makeBlock = (body: string): FilemapBlock => ({
   raw: `\`\`\`agentic-ui-filemap\n${body}\n\`\`\``,
@@ -132,14 +136,22 @@ describe('ContentFilemapView', () => {
 
   it('fileViewEvents 返回的 onPreview 会替换默认行为', () => {
     const onPreview = vi.fn();
+    const windowOpen = vi.spyOn(window, 'open').mockImplementation(() => null);
+
     render(
       <ContentFilemapView
-        blocks={[makeBlock(IMG_BODY)]}
+        blocks={[makeBlock(PDF_BODY)]}
         placement="left"
         fileViewEvents={() => ({ onPreview })}
       />,
     );
-    expect(screen.getByTestId('file-view-list')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('file-item'));
+
+    expect(onPreview).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'report.pdf', uuid: 'uuid-pdf' }),
+    );
+    expect(windowOpen).not.toHaveBeenCalled();
   });
 
   it('fileViewEvents 抛出异常时不影响渲染', () => {
@@ -160,14 +172,22 @@ describe('ContentFilemapView', () => {
 
   it('fileMapConfig.onPreview 在没有 fileViewEvents 时作为默认预览处理器', () => {
     const onPreview = vi.fn();
+    const windowOpen = vi.spyOn(window, 'open').mockImplementation(() => null);
+
     render(
       <ContentFilemapView
-        blocks={[makeBlock(IMG_BODY)]}
+        blocks={[makeBlock(PDF_BODY)]}
         placement="left"
         fileMapConfig={{ onPreview }}
       />,
     );
-    expect(screen.getByTestId('file-view-list')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('file-item'));
+
+    expect(onPreview).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'report.pdf', uuid: 'uuid-pdf' }),
+    );
+    expect(windowOpen).not.toHaveBeenCalled();
   });
 
   it('fileViewEvents 提供 onPreview 时优先于 fileMapConfig.onPreview', () => {
@@ -175,13 +195,19 @@ describe('ContentFilemapView', () => {
     const eventsPreview = vi.fn();
     render(
       <ContentFilemapView
-        blocks={[makeBlock(IMG_BODY)]}
+        blocks={[makeBlock(PDF_BODY)]}
         placement="left"
         fileMapConfig={{ onPreview: configPreview }}
         fileViewEvents={() => ({ onPreview: eventsPreview })}
       />,
     );
-    expect(screen.getByTestId('file-view-list')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('file-item'));
+
+    expect(eventsPreview).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'report.pdf', uuid: 'uuid-pdf' }),
+    );
+    expect(configPreview).not.toHaveBeenCalled();
   });
 
   // ─── fileMapConfig.itemRender ──────────────────────────────────────────────

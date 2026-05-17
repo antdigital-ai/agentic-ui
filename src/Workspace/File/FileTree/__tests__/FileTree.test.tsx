@@ -17,6 +17,8 @@ describe('Workspace.FileTree', () => {
     'workspace.empty': '暂无数据',
     'workspace.file.preview': '预览',
     'workspace.file.download': '下载',
+    'workspace.file.location': '定位',
+    'workspace.file.share': '分享',
   } as any;
 
   const TestWrapper: React.FC<{ children: React.ReactNode }> = ({
@@ -319,6 +321,54 @@ describe('Workspace.FileTree', () => {
     expect(onPreview).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'tree-f2', name: 'note.md' }),
     );
+  });
+
+  it('invokes share and locate actions without selecting the leaf', async () => {
+    const onLocate = vi.fn();
+    const onSelect = vi.fn();
+    const onShare = vi.fn();
+    const file: FileNode = {
+      id: 'tree-f-share',
+      name: 'share.md',
+      canLocate: true,
+      canShare: true,
+    };
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-share',
+                name: 'share.md',
+                isLeaf: true,
+                file,
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            onLocate={onLocate}
+            onSelect={onSelect}
+            onShare={onShare}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '分享' }));
+    expect(onShare).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'tree-f-share', name: 'share.md' }),
+      expect.objectContaining({
+        anchorEl: expect.any(HTMLElement),
+        origin: 'list',
+      }),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '定位' }));
+    expect(onLocate).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'tree-f-share', name: 'share.md' }),
+    );
+    expect(onSelect).not.toHaveBeenCalled();
   });
 
   it('invokes onPreview on leaf select when file is set and onFileClick omitted', async () => {
