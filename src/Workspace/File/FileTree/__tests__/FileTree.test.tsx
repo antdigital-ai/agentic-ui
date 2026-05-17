@@ -357,6 +357,41 @@ describe('Workspace.FileTree', () => {
     });
   });
 
+  it('renders leaf with null file as plain title without file actions', () => {
+    const onPreview = vi.fn();
+    const onDownload = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={
+              [
+                {
+                  key: 'legacy-null-file',
+                  name: 'legacy.txt',
+                  isLeaf: true,
+                  file: null,
+                },
+              ] as any
+            }
+            onLoadChildren={vi.fn()}
+            onPreview={onPreview}
+            onDownload={onDownload}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByText('legacy.txt'));
+
+    expect(screen.getByText('legacy.txt')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '预览' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '下载' })).toBeNull();
+    expect(onPreview).not.toHaveBeenCalled();
+    expect(onDownload).not.toHaveBeenCalled();
+  });
+
   it('invokes onFileClick instead of onPreview when both are set', async () => {
     const onPreview = vi.fn();
     const onFileClick = vi.fn();
