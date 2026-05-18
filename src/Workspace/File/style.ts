@@ -232,10 +232,10 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
         transition: 'opacity 0.2s ease, visibility 0.2s ease',
 
         // 保持图标按钮颜色一致
-        [`${token.antCls}-btn, ${token.antCls}-btn .anticon`]: {
+        [`${token.antCls}-btn, ${token.antCls}-btn ${token.iconCls}`]: {
           color: 'var(--color-gray-text-light)',
         },
-        [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover .anticon, ${token.antCls}-btn:focus .anticon, ${token.antCls}-btn:active .anticon`]:
+        [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover ${token.iconCls}, ${token.antCls}-btn:focus ${token.iconCls}, ${token.antCls}-btn:active ${token.iconCls}`]:
           {
             color: 'var(--color-gray-text-light)',
           },
@@ -243,12 +243,13 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
 
       // 文件项动作按钮（预览/下载等）图标颜色保持一致
       [`&-action-btn`]: {
-        [`.anticon`]: {
+        [token.iconCls]: {
           color: 'var(--color-gray-text-light)',
         },
-        ['&:hover .anticon, &:focus .anticon, &:active .anticon']: {
-          color: 'var(--color-gray-text-light)',
-        },
+        [`&:hover ${token.iconCls}, &:focus ${token.iconCls}, &:active ${token.iconCls}`]:
+          {
+            color: 'var(--color-gray-text-light)',
+          },
       },
     },
 
@@ -361,10 +362,10 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
         gap: '8px',
 
         // 保持预览头部操作按钮的图标颜色一致
-        [`${token.antCls}-btn, ${token.antCls}-btn .anticon`]: {
+        [`${token.antCls}-btn, ${token.antCls}-btn ${token.iconCls}`]: {
           color: token.colorTextTertiary || token.colorTextSecondary,
         },
-        [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover .anticon, ${token.antCls}-btn:focus .anticon, ${token.antCls}-btn:active .anticon`]:
+        [`${token.antCls}-btn:hover, ${token.antCls}-btn:focus, ${token.antCls}-btn:active, ${token.antCls}-btn:hover ${token.iconCls}, ${token.antCls}-btn:focus ${token.iconCls}, ${token.antCls}-btn:active ${token.iconCls}`]:
           {
             color: token.colorTextTertiary || token.colorTextSecondary,
           },
@@ -532,10 +533,6 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
       justifyContent: 'center',
       color: token.colorText,
       lineHeight: 0,
-      '& svg': {
-        width: 16,
-        height: 16,
-      },
     },
 
     [`${token.componentCls}-toolbar-switch--trailing`]: {
@@ -581,7 +578,7 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
       },
 
       // 搜索图标样式
-      '.anticon': {
+      [token.iconCls]: {
         color: 'var(--color-gray-text-secondary)',
         fontSize: 16,
       },

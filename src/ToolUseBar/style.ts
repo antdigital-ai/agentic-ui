@@ -356,7 +356,7 @@ const genStyle: GenStyleFn<'ToolUseBar'> = (token) => {
       },
       '&-tool-error': {
         '&-tool-image-wrapper': {
-          '& .anticon': {
+          [`& ${token.iconCls}`]: {
             color: 'var(--color-red-text-default)',
           },
         },

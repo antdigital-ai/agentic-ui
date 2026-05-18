@@ -1,7 +1,7 @@
 ﻿import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
-  const { componentCls } = token;
+  const { componentCls, antCls, iconCls } = token;
 
   return {
     [componentCls]: {
@@ -43,10 +43,10 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
           height: 32,
           lineHeight: '32px',
         },
-        [`.ant-tree-treenode`]: {
+        [`${antCls}-tree-treenode`]: {
           alignItems: 'center',
         },
-        [`.ant-tree-switcher`]: {
+        [`${antCls}-tree-switcher`]: {
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -54,12 +54,12 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
           height: 32,
           lineHeight: '32px',
         },
-        [`.ant-tree-node-content-wrapper`]: {
+        [`${antCls}-tree-node-content-wrapper`]: {
           flex: 1,
           minWidth: 0,
           overflow: 'hidden',
         },
-        [`.ant-tree-title`]: {
+        [`${antCls}-tree-title`]: {
           minWidth: 0,
           height: 32,
           lineHeight: '32px',
@@ -77,10 +77,10 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
           flexShrink: 0,
         },
         [`${componentCls}-leaf-action-btn`]: {
-          [`.anticon`]: {
+          [iconCls]: {
             color: 'var(--color-gray-text-light)',
           },
-          ['&:hover .anticon, &:focus .anticon, &:active .anticon']: {
+          [`&:hover ${iconCls}, &:focus ${iconCls}, &:active ${iconCls}`]: {
             color: 'var(--color-gray-text-light)',
           },
         },

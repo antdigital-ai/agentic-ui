@@ -5,6 +5,8 @@ import {
 } from '../../../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'ChartFilter'> = (token) => {
+  const { antCls } = token;
+
   return {
     [token.componentCls]: {
       padding: '12px 0',
@@ -58,11 +60,11 @@ const genStyle: GenStyleFn<'ChartFilter'> = (token) => {
         borderRadius: '8px',
 
         '&.custom-segmented': {
-          '.ant-segmented-item': {
+          [`${antCls}-segmented-item`]: {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            '.ant-segmented-item-label': {
+            [`${antCls}-segmented-item-label`]: {
               fontFamily: 'PingFang SC',
               fontSize: '13px',
               fontWeight: 'normal',
@@ -70,16 +72,16 @@ const genStyle: GenStyleFn<'ChartFilter'> = (token) => {
               letterSpacing: '0em',
             },
           },
-          '.ant-segmented-group': {
+          [`${antCls}-segmented-group`]: {
             height: '30px',
           },
-          '.ant-segmented-item-selected': {
+          [`${antCls}-segmented-item-selected`]: {
             borderRadius: '8px',
             backgroundColor: 'var(--color-gray-bg-card-white) !important',
             border: '1px solid var(--color-gray-border-light) !important',
             boxShadow:
               '0px 0px 1px 0px rgba(0, 19, 41, 0.2), 0px 1.5px 4px -1px rgba(0, 19, 41, 0.04)',
-            '.ant-segmented-item-label': {
+            [`${antCls}-segmented-item-label`]: {
               fontFamily: 'PingFang SC',
               fontSize: '13px',
               fontWeight: 600,
@@ -122,20 +124,20 @@ const genStyle: GenStyleFn<'ChartFilter'> = (token) => {
           backgroundColor: 'var(--color-gray-bg-page-dark)',
 
           '&.custom-segmented': {
-            '.ant-segmented-item': {
-              '.ant-segmented-item-label': {
+            [`${antCls}-segmented-item`]: {
+              [`${antCls}-segmented-item-label`]: {
                 color: 'rgba(255, 255, 255, 0.65)',
               },
             },
-            '.ant-segmented-item-selected': {
+            [`${antCls}-segmented-item-selected`]: {
               backgroundColor: 'var(--color-gray-bg-card-white) !important',
               border: '1px solid var(--color-gray-border-dark) !important',
 
-              '.ant-segmented-item-label': {
+              [`${antCls}-segmented-item-label`]: {
                 color: 'var(--color-gray-text-default) !important',
               },
             },
-            '.ant-segmented-thumb': {
+            [`${antCls}-segmented-thumb`]: {
               backgroundColor: 'var(--color-gray-bg-page-dark) !important',
             },
           },

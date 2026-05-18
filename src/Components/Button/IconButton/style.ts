@@ -6,6 +6,13 @@ const ICON_SIZE_SM = 14;
 const ICON_SIZE_XS = 14;
 
 const genStyle: GenStyleFn<'IconButton'> = (token) => {
+  const { antCls } = token;
+  const btn = `${antCls}-btn`;
+  const btnIcon = `${antCls}-btn-icon`;
+  const btnIconOnly = `${antCls}-btn-icon-only`;
+  const btnVariantOutlined = `${antCls}-btn-variant-outlined`;
+  const btnDisabled = `${antCls}-btn-disabled`;
+
   return {
     [token.componentCls]: {
       // 基础按钮样式
@@ -31,11 +38,11 @@ const genStyle: GenStyleFn<'IconButton'> = (token) => {
       overflow: 'hidden',
 
       // 统一 icon 尺寸（适配 antd Button 图标容器）- base
-      '&-button .ant-btn-icon': {
+      [`&-button ${btnIcon}`]: {
         fontSize: ICON_SIZE,
         lineHeight: 1,
       },
-      '&-button .ant-btn-icon > *': {
+      [`&-button ${btnIcon} > *`]: {
         width: ICON_SIZE,
         height: ICON_SIZE,
       },
@@ -47,32 +54,31 @@ const genStyle: GenStyleFn<'IconButton'> = (token) => {
         lineHeight: 'var(--height-control-sm)',
         borderRadius: 'var(--radius-control-sm)',
       },
-      '&-button-sm .ant-btn-icon': {
+      [`&-button-sm ${btnIcon}`]: {
         fontSize: ICON_SIZE_SM,
       },
-      '&-button-sm .ant-btn-icon > *': {
+      [`&-button-sm ${btnIcon} > *`]: {
         width: ICON_SIZE_SM,
         height: ICON_SIZE_SM,
       },
 
       // 提升优先级以覆盖 antd 的 icon-only 尺寸（包括 outlined 变体）
-      '&-button&-button-sm.ant-btn.ant-btn-icon-only': {
+      [`&-button&-button-sm${btn}${btnIconOnly}`]: {
         width: 'var(--height-control-sm)',
         height: 'var(--height-control-sm)',
         lineHeight: 'var(--height-control-sm)',
         borderRadius: 'var(--radius-control-sm)',
       },
-      '&-button&-button-sm.ant-btn.ant-btn-variant-outlined.ant-btn-icon-only':
-        {
-          width: 'var(--height-control-sm)',
-          height: 'var(--height-control-sm)',
-          lineHeight: 'var(--height-control-sm)',
-          borderRadius: 'var(--radius-control-sm)',
-        },
-      '&-button&-button-sm.ant-btn.ant-btn-icon-only .ant-btn-icon': {
+      [`&-button&-button-sm${btn}${btnVariantOutlined}${btnIconOnly}`]: {
+        width: 'var(--height-control-sm)',
+        height: 'var(--height-control-sm)',
+        lineHeight: 'var(--height-control-sm)',
+        borderRadius: 'var(--radius-control-sm)',
+      },
+      [`&-button&-button-sm${btn}${btnIconOnly} ${btnIcon}`]: {
         fontSize: ICON_SIZE_SM,
       },
-      '&-button&-button-sm.ant-btn.ant-btn-icon-only .ant-btn-icon > *': {
+      [`&-button&-button-sm${btn}${btnIconOnly} ${btnIcon} > *`]: {
         width: ICON_SIZE_SM,
         height: ICON_SIZE_SM,
       },
@@ -83,30 +89,29 @@ const genStyle: GenStyleFn<'IconButton'> = (token) => {
         lineHeight: 'var(--height-control-xs)',
         borderRadius: 'var(--radius-control-xs)',
       },
-      '&-button-xs .ant-btn-icon': {
+      [`&-button-xs ${btnIcon}`]: {
         fontSize: ICON_SIZE_XS,
       },
-      '&-button-xs .ant-btn-icon > *': {
+      [`&-button-xs ${btnIcon} > *`]: {
         width: ICON_SIZE_XS,
         height: ICON_SIZE_XS,
       },
-      '&-button&-button-xs.ant-btn.ant-btn-icon-only': {
+      [`&-button&-button-xs${btn}${btnIconOnly}`]: {
         width: 'var(--height-control-xs)',
         height: 'var(--height-control-xs)',
         lineHeight: 'var(--height-control-xs)',
         borderRadius: 'var(--radius-control-xs)',
       },
-      '&-button&-button-xs.ant-btn.ant-btn-variant-outlined.ant-btn-icon-only':
-        {
-          width: 'var(--height-control-xs)',
-          height: 'var(--height-control-xs)',
-          lineHeight: 'var(--height-control-xs)',
-          borderRadius: 'var(--radius-control-xs)',
-        },
-      '&-button&-button-xs.ant-btn.ant-btn-icon-only .ant-btn-icon': {
+      [`&-button&-button-xs${btn}${btnVariantOutlined}${btnIconOnly}`]: {
+        width: 'var(--height-control-xs)',
+        height: 'var(--height-control-xs)',
+        lineHeight: 'var(--height-control-xs)',
+        borderRadius: 'var(--radius-control-xs)',
+      },
+      [`&-button&-button-xs${btn}${btnIconOnly} ${btnIcon}`]: {
         fontSize: ICON_SIZE_XS,
       },
-      '&-button&-button-xs.ant-btn.ant-btn-icon-only .ant-btn-icon > *': {
+      [`&-button&-button-xs${btn}${btnIconOnly} ${btnIcon} > *`]: {
         width: ICON_SIZE_XS,
         height: ICON_SIZE_XS,
       },
@@ -133,12 +138,12 @@ const genStyle: GenStyleFn<'IconButton'> = (token) => {
       },
 
       // 提升 hover/active 选择器优先级以覆盖 antd 的 icon-only 悬浮样式
-      '&-button&-button-elevated.ant-btn.ant-btn-icon-only:not(.ant-btn-disabled):not([disabled]):hover':
+      [`&-button&-button-elevated${btn}${btnIconOnly}:not(${btnDisabled}):not([disabled]):hover`]:
         {
           background: 'var(--color-gray-bg-card-white)',
           boxShadow: 'var(--shadow-control-lg)',
         },
-      '&-button&-button-elevated.ant-btn.ant-btn-icon-only:not(.ant-btn-disabled):not([disabled]):active':
+      [`&-button&-button-elevated${btn}${btnIconOnly}:not(${btnDisabled}):not([disabled]):active`]:
         {
           background: 'var(--color-primary-control-fill-secondary)',
           boxShadow: 'var(--shadow-border-base)',
