@@ -15,20 +15,6 @@ export const WORKSPACE_SEGMENTED_DIVIDER_KEY = '__divider__';
 
 const MAX_PANEL_TYPE_WALK_DEPTH = 32;
 
-export function markWorkspacePanel<P extends WorkspacePanelType, C>(
-  component: C,
-  panelType: P,
-): C {
-  if (component == null) {
-    return component;
-  }
-  if (!isWorkspacePanelType(panelType)) {
-    return component;
-  }
-  (component as WorkspacePanelComponent)[WORKSPACE_PANEL_TYPE] = panelType;
-  return component;
-}
-
 export const isWorkspacePanelType = (
   value: unknown,
 ): value is WorkspacePanelType =>
@@ -39,16 +25,30 @@ export const isWorkspacePanelType = (
   value === 'fileTree' ||
   value === 'custom';
 
-export const isWorkspaceSegmentedDividerKey = (key: unknown): boolean =>
-  normalizeTabKey(key) === WORKSPACE_SEGMENTED_DIVIDER_KEY;
-
 /** 归一化标签 key，避免 `null` / 空白字符串参与比较 */
 export const normalizeTabKey = (key: unknown): string => {
-  if (key == null) {
+  if (key === null || key === undefined) {
     return '';
   }
   return String(key).trim();
 };
+
+export const isWorkspaceSegmentedDividerKey = (key: unknown): boolean =>
+  normalizeTabKey(key) === WORKSPACE_SEGMENTED_DIVIDER_KEY;
+
+export function markWorkspacePanel<P extends WorkspacePanelType, C>(
+  component: C,
+  panelType: P,
+): C {
+  if (component === null || component === undefined) {
+    return component;
+  }
+  if (!isWorkspacePanelType(panelType)) {
+    return component;
+  }
+  (component as WorkspacePanelComponent)[WORKSPACE_PANEL_TYPE] = panelType;
+  return component;
+}
 
 /**
  * 从 React 元素 type 链（含 memo / forwardRef 外层）解析内置子面板类型

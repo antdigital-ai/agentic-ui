@@ -173,7 +173,7 @@ const resolveChildPanelType = (
   child: React.ReactElement<BaseChildProps>,
 ): PanelType | undefined => {
   const fromProps = child.props.panelType;
-  if (fromProps != null) {
+  if (fromProps !== null && fromProps !== undefined) {
     return isWorkspacePanelType(fromProps)
       ? fromProps
       : resolveWorkspacePanelType(child.type);
