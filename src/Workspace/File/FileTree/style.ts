@@ -22,10 +22,10 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
         background: 'transparent',
 
         [`${componentCls}-leaf-title`]: {
-          display: 'flex',
+          display: 'inline-flex',
           alignItems: 'flex-start',
           gap: token.marginXXS ?? 4,
-          width: '100%',
+          width: 'fit-content',
           minWidth: 0,
         },
         [`${componentCls}-leaf-title-text`]: {
