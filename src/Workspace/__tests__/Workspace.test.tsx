@@ -664,6 +664,69 @@ describe('Workspace Component', () => {
     expect(container.querySelector('.ant-workspace')).not.toBeInTheDocument();
   });
 
+  it('无有效子面板时应渲染 emptyContent', () => {
+    render(
+      <TestWrapper>
+        <Workspace emptyContent={<div data-testid="workspace-empty" />} />
+      </TestWrapper>,
+    );
+
+    expect(screen.getByTestId('workspace-empty')).toBeInTheDocument();
+  });
+
+  it('非受控 defaultActiveTabKey 应激活对应标签', () => {
+    render(
+      <TestWrapper>
+        <Workspace defaultActiveTabKey="browser">
+          <Workspace.Realtime data={{ type: 'shell', content: '' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByTestId('browser-list')).toBeInTheDocument();
+  });
+
+  it('React.memo(Workspace.File) 应被识别为文件面板', () => {
+    const MemoFile = React.memo(Workspace.File);
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <MemoFile nodes={[{ name: 'a.txt', content: 'hi' }]} />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText('a.txt')).toBeInTheDocument();
+  });
+
+  it('notifyOnInvalidActiveTabKey=false 时非法 activeTabKey 不触发 onTabChange', () => {
+    const onTabChange = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace
+          activeTabKey="nonexistent-key"
+          notifyOnInvalidActiveTabKey={false}
+          onTabChange={onTabChange}
+        >
+          <Workspace.Realtime data={{ type: 'shell', content: 'ok' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(onTabChange).not.toHaveBeenCalled();
+    expect(screen.getByText('ok')).toBeInTheDocument();
+  });
+
   it('应该支持嵌套的复杂结构', () => {
     render(
       <TestWrapper>

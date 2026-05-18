@@ -38,13 +38,39 @@ export interface TabItem {
 
 // 工作空间主组件属性
 export interface WorkspaceProps {
+  /**
+   * 当前激活的标签页 key（受控）
+   * @description 未传则为非受控。非法 key 时界面回退到有效项；`notifyOnInvalidActiveTabKey` 为 true 时会 `onTabChange` 建议值
+   */
   activeTabKey?: string;
+  /**
+   * 非受控模式下的初始激活标签 key
+   * @description 须与某个子面板的 `tab.key` 或默认 key 一致；未传则取第一个有效标签
+   */
+  defaultActiveTabKey?: string;
+  /**
+   * 切换标签页回调（用户点击 Segmented 或受控非法 key 回退时）
+   * @description 受控模式下应同步更新 `activeTabKey`
+   */
   onTabChange?: (tabKey: string) => void;
+  /**
+   * 受控模式下 `activeTabKey` 不在当前标签列表时，是否通过 `onTabChange` 通知父组件回退到有效 key
+   * @default true
+   */
+  notifyOnInvalidActiveTabKey?: boolean;
+  /**
+   * 切换标签时是否保留 File / FileTree 的预览态（离开文件类标签再返回时不重置）
+   * @default false
+   */
+  preserveFilePreviewOnTabChange?: boolean;
   style?: React.CSSProperties;
   className?: string;
   title?: ReactNode;
   onClose?: () => void;
+  /** 子面板：`Workspace.Realtime` 等内置子组件；支持 memo 包裹（需保留面板标记）或通过 `panelType` 显式声明 */
   children?: React.ReactNode;
+  /** 无有效子面板时的占位内容；未传则渲染 `null` */
+  emptyContent?: ReactNode;
   /** 纯净模式，关闭阴影和边框 */
   pure?: boolean;
   /** 自定义 header 右侧区域内容 */
@@ -54,6 +80,11 @@ export interface WorkspaceProps {
 // 子组件基础属性
 export interface BaseChildProps {
   tab?: TabConfiguration;
+  /**
+   * 显式声明子面板类型
+   * @description 使用 HOC 包裹且无法自动识别时传入；一般无需设置
+   */
+  panelType?: WorkspacePanelType;
 }
 
 // 具体子组件属性

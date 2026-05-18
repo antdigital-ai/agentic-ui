@@ -18,6 +18,8 @@ group:
   - ⚡️ `useStyle` now returns an identity `wrapSSR`. Style injection happens through cssinjs's `useGlobalCache` → `updateCSS` side effect during the hook call and never depended on `wrapSSR`. In our CSR-only config `wrapSSR(node)` was always `<><Empty/>{node}</>`, so we drop that Fragment + `<Empty/>` allocation. Existing `return wrapSSR(<jsx/>)` callers continue to work (identity passthrough); new code can simply `return <jsx/>`.
 
 - 📖 Docs
+  - 🆕 `Workspace`: add `defaultActiveTabKey`, `notifyOnInvalidActiveTabKey`, `preserveFilePreviewOnTabChange`, `emptyContent`; panel recognition via `panelType` / `markWorkspacePanel` (incl. `React.memo`); reset file preview only when leaving file panels by default.
+  - 📖 `Workspace`: update API docs for the new props and behaviors.
   - 📖 Added `MarkdownRenderer` component documentation (streaming Markdown rendering, `CharacterQueueOptions`, built-in code-block renderer routing, `MarkdownRendererRef` imperative API).
   - 📖 Added a dedicated `ToolUseBarThink` doc; corrected the `ToolUseBarThink` API table inside `tool-use-bar.md` (removed deprecated/non-existent props such as `id`, `isThinkLoading`, `isActive`, `onActiveChange`, etc., aligned with actual props).
   - 📖 Added `GradientText`, `TextAnimate`, and `TypingAnimation` component docs with demos.

@@ -1,4 +1,4 @@
-﻿import { FileStack, TreeDownArrow } from '@sofa-design/icons';
+﻿import { ApartmentOutlined, BarsOutlined } from '@ant-design/icons';
 import {
   ConfigProvider,
   Empty,
@@ -436,7 +436,7 @@ export const FileComponent: FC<{
                     title={listAccessible}
                     aria-label={listAccessible}
                   >
-                    <FileStack />
+                    <BarsOutlined />
                   </span>
                 ),
               },
@@ -451,7 +451,7 @@ export const FileComponent: FC<{
                     title={treeAccessible}
                     aria-label={treeAccessible}
                   >
-                    <TreeDownArrow />
+                    <ApartmentOutlined />
                   </span>
                 ),
               },

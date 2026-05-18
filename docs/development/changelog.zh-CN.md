@@ -18,6 +18,8 @@ group:
   - ⚡️ `useStyle` 返回的 `wrapSSR` 改为 identity 函数：样式注入由 cssinjs `useGlobalCache` → `updateCSS` 副作用完成，与 `wrapSSR` 无关；浏览器 CSR 下 `wrapSSR(node)` 此前一直等于 `<><Empty/>{node}</>`，组件库也未使用 `<StyleProvider ssrInline>`，因此该层 Fragment + `<Empty/>` 元素纯属无用开销。改造后每个组件每次渲染少一层 React 元素分配；组件文件继续 `return wrapSSR(<jsx/>)` 仍兼容（identity 透传），新组件可以直接 `return <jsx/>`。
 
 - 📖 文档
+  - 🆕 `Workspace` 新增 `defaultActiveTabKey`、`notifyOnInvalidActiveTabKey`、`preserveFilePreviewOnTabChange`、`emptyContent`；子面板支持 `panelType` 与 `markWorkspacePanel` 识别（含 `React.memo`）；离开文件类标签时才默认重置预览。
+  - 📖 `Workspace`：更新 API 文档与上述行为说明。
   - 📖 新增 `MarkdownRenderer` 组件文档（流式 Markdown 渲染、`CharacterQueueOptions`、内置代码块渲染器路由表、`MarkdownRendererRef` 命令式接口）。
   - 📖 新增 `ToolUseBarThink` 独立组件文档；同步修正 `ToolUseBar` 中 `ToolUseBarThink` 的 API 表（移除已废弃 / 不存在的 `id` / `isThinkLoading` / `isActive` / `onActiveChange` 等字段，对齐实际 props）。
   - 📖 新增 `GradientText`、`TextAnimate`、`TypingAnimation` 组件文档与对应 demo。
