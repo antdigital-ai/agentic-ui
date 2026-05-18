@@ -427,11 +427,6 @@ const buildEditorAlignedComponents = (
       const defaultDom = jsx('mark' as any, {
         ...rest,
         'data-testid': 'markdown-mark',
-        style: {
-          background: 'var(--ant-color-warning-bg, #f59e0b)',
-          padding: '0.1em 0.2em',
-          borderRadius: 4,
-        },
         children,
       });
       return applyEleRender('mark', { node, children, ...rest }, defaultDom);

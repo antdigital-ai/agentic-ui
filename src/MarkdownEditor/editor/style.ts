@@ -13,6 +13,10 @@ import { TAG_STYLES } from './tagStyles';
 const COMMENT_HIGHLIGHT_COLOR =
   'var(--agentic-ui-comment-highlight-color, rgba(21, 0, 255, 0.15))';
 
+/** 行内 `<mark>` 搜索/强调高亮（编辑器与 MarkdownRenderer 共用） */
+const MARK_HIGHLIGHT_BG = 'var(--agentic-ui-mark-bg, #4d3c1a)';
+const MARK_HIGHLIGHT_COLOR = 'var(--agentic-ui-mark-color, #e8b339)';
+
 /** Jinja 语法高亮 CSS 变量名，在 .ant-agentic-md-editor-content 上覆盖即可定制 */
 const JINJA_CSS_VAR = {
   variable: '--agentic-ui-md-editor-color-jinja-variable',
@@ -573,6 +577,12 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         zIndex: 1,
         borderRadius: '6px',
         background: 'var(--color-gray-bg-tip)',
+      },
+      '& mark, & [data-testid="markdown-mark"]': {
+        color: MARK_HIGHLIGHT_COLOR,
+        backgroundColor: MARK_HIGHLIGHT_BG,
+        padding: '2px 4px',
+        borderRadius: 4,
       },
       '& &-comment-comment': {
         display: 'inline-block',
