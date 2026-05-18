@@ -31,6 +31,8 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
         [`${componentCls}-leaf-title-text`]: {
           flex: 1,
           minWidth: 0,
+          height: 32,
+          lineHeight: '32px',
           whiteSpace: 'normal',
           wordBreak: 'break-word',
           overflowWrap: 'anywhere',
