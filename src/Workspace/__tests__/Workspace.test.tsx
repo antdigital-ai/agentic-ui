@@ -690,6 +690,29 @@ describe('Workspace Component', () => {
     expect(screen.getByTestId('browser-list')).toBeInTheDocument();
   });
 
+  it('非受控 defaultActiveTabKey 非法时应回退到首个标签并通知建议值', () => {
+    const onTabChange = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace
+          defaultActiveTabKey="missing-tab"
+          onTabChange={onTabChange}
+        >
+          <Workspace.Realtime data={{ type: 'shell', content: 'fallback' }} />
+          <Workspace.Browser
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByTestId('realtime-follow')).toBeInTheDocument();
+    expect(screen.getByText('fallback')).toBeInTheDocument();
+    expect(onTabChange).toHaveBeenCalledWith('realtime');
+  });
+
   it('React.memo(Workspace.File) 应被识别为文件面板', () => {
     const MemoFile = React.memo(Workspace.File);
 

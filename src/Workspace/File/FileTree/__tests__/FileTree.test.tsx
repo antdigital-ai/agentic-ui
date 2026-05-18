@@ -155,6 +155,41 @@ describe('Workspace.FileTree', () => {
     );
   });
 
+  it('renders leaf titles without file metadata and still selects them', () => {
+    const onSelect = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              { key: 'pending', name: 'pending.txt', isLeaf: true },
+              {
+                key: 'null-file',
+                name: 'null-file.txt',
+                isLeaf: true,
+                file: null,
+              } as any,
+            ]}
+            onLoadChildren={vi.fn()}
+            onSelect={onSelect}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText('pending.txt')).toBeInTheDocument();
+    expect(screen.getByText('null-file.txt')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '预览' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '下载' })).toBeNull();
+
+    fireEvent.click(screen.getByText('null-file.txt'));
+
+    expect(onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ key: 'null-file', name: 'null-file.txt' }),
+    );
+  });
+
   it('filter empty uses expanded hint when folders were expanded', async () => {
     render(
       <TestWrapper>
