@@ -430,7 +430,7 @@ const buildEditorAlignedComponents = (
         style: {
           background: 'var(--ant-color-warning-bg, #f59e0b)',
           padding: '0.1em 0.2em',
-          borderRadius: 2,
+          borderRadius: 4,
         },
         children,
       });
