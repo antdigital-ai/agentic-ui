@@ -170,6 +170,11 @@ describe('parseText', () => {
       const result = applyHtmlTagsToElement({ text: 'x' }, [{ tag: 'strong' }]);
       expect(result.bold).toBe(true);
     });
+
+    it('tag 为 mark 时设置 mark', () => {
+      const result = applyHtmlTagsToElement({ text: 'hi' }, [{ tag: 'mark' }]);
+      expect(result).toEqual({ text: 'hi', mark: true });
+    });
   });
 
   describe('handleTextAndInlineElementsPure', () => {

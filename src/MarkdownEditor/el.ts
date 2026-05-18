@@ -270,6 +270,8 @@ export type CustomLeaf<T = Record<string, any>> = {
   tag?: boolean | null;
   italic?: boolean | null;
   strikethrough?: boolean | null;
+  /** 行内 `<mark>` 高亮（与 MarkdownRenderer 语义一致） */
+  mark?: boolean | null;
   color?: string;
   highColor?: string;
   url?: string;

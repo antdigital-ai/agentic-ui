@@ -5,7 +5,7 @@
 import { Node, Text } from 'slate';
 import stringWidth from 'string-width';
 import { debugInfo } from '../../../Utils/debugUtils';
-import { ChartNode } from '../../el';
+import type { ChartNode, CustomLeaf } from '../../el';
 import type { MarkdownEditorPlugin } from '../../plugin';
 import { getMediaType } from '../utils/dom';
 import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
@@ -726,7 +726,7 @@ export const parserSlateNodeToMarkdown = (
 export const isMix = (t: Text) => {
   return (
     Object.keys(t).filter((key) =>
-      ['bold', 'code', 'italic', 'strikethrough'].includes(key),
+      ['bold', 'code', 'italic', 'strikethrough', 'mark'].includes(key),
     ).length > 1
   );
 };
@@ -754,6 +754,7 @@ const textHtml = (t: Text) => {
   if (t.strikethrough) str = `<del>${str}</del>`;
   if (t?.url) str = `<a href="${t?.url}">${str}</a>`;
   if (t?.identifier || t?.fnc) str = `[^${str}]`;
+  if ((t as CustomLeaf).mark) str = `<mark>${str}</mark>`;
   return str;
 };
 
@@ -866,6 +867,7 @@ const composeText = (t: Text, parent: any[]) => {
   if (!t.text && !t.tag) return '';
   if (
     t.highColor ||
+    (t as CustomLeaf).mark ||
     t.identifier ||
     t.fnc ||
     (t.strikethrough && (t.bold || t.italic || t.code))

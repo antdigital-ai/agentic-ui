@@ -31,6 +31,7 @@ const hasFormattingProps = (leaf: CustomLeaf): boolean => {
     leaf.bold ||
     leaf.italic ||
     leaf.strikethrough ||
+    leaf.mark ||
     leaf.url ||
     leaf.code ||
     leaf.otherProps?.finished === false
@@ -170,6 +171,9 @@ export const applyHtmlTagsToElement = (el: any, htmlTag: any[]): any => {
     }
     if (t.tag === 'a' && t?.url) {
       result.url = t?.url;
+    }
+    if (t.tag === 'mark') {
+      result.mark = true;
     }
   }
 

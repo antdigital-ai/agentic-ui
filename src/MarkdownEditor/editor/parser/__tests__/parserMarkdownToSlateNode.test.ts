@@ -147,6 +147,31 @@ describe('parserMarkdownToSlateNode', () => {
       });
     });
 
+    it('should parse inline <mark> as highlighted leaf (not html code block)', () => {
+      const markdown =
+        'prefix <mark>/alipay-aipay-product-intro </mark> suffix';
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        children: [
+          { text: 'prefix ' },
+          { text: '/alipay-aipay-product-intro ', mark: true },
+          { text: ' suffix' },
+        ],
+      });
+    });
+
+    it('should parse block-only <mark>...</mark> as paragraph with mark', () => {
+      const markdown = '<mark>/alipay-aipay-product-intro </mark>';
+      const result = parserMarkdownToSlateNode(markdown);
+      expect(result.schema).toHaveLength(1);
+      expect(result.schema[0]).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: '/alipay-aipay-product-intro ', mark: true }],
+      });
+    });
+
     it('should handle paragraph with inline code', () => {
       const markdown = 'Some `inline code` here';
       const result = parserMarkdownToSlateNode(markdown);

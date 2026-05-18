@@ -528,6 +528,20 @@ const MLeafComponent = (
   if (leaf.italic) {
     style.fontStyle = 'italic';
   }
+  if (leaf.mark) {
+    children = (
+      <mark
+        data-testid="markdown-mark"
+        style={{
+          background: 'var(--ant-color-warning-bg, #f59e0b)',
+          padding: '0.1em 0.2em',
+          borderRadius: 2,
+        }}
+      >
+        {children}
+      </mark>
+    );
+  }
   if (leaf.html) {
     prefixClassName = classNames(mdEditorBaseClass + '-m-html');
   }

@@ -123,6 +123,7 @@ export class EditorUtils {
       leaf.code ||
       leaf.italic ||
       leaf.strikethrough ||
+      leaf.mark ||
       !!leaf?.url ||
       leaf.fnd ||
       leaf.fnc ||
@@ -222,6 +223,7 @@ export class EditorUtils {
     'italic',
     'code',
     'bold',
+    'mark',
     'color',
     'textColor',
     'highColor',

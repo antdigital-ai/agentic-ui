@@ -463,6 +463,37 @@ const handleBlockHtml = (
     return createMediaNodeFromElement(mediaElement);
   }
 
+  const blockOnlyMarkMatch =
+    typeof currentElement?.value === 'string' &&
+    currentElement.value.match(
+      /^\s*<mark(?:\s[^>]*)?>([\s\S]*?)<\/mark>\s*$/i,
+    );
+  if (blockOnlyMarkMatch) {
+    const innerMd = blockOnlyMarkMatch[1];
+    const applyMarkRecursive = (node: any): any => {
+      if (node && typeof node.text === 'string') {
+        return { ...node, mark: true };
+      }
+      if (node?.children && Array.isArray(node.children)) {
+        return {
+          ...node,
+          children: node.children.map(applyMarkRecursive),
+        };
+      }
+      return node;
+    };
+    if (parseMarkdownFn) {
+      const { schema: markSchema } = parseMarkdownFn(innerMd);
+      if (markSchema?.length) {
+        return markSchema.map(applyMarkRecursive);
+      }
+    }
+    return {
+      type: 'paragraph',
+      children: [{ text: innerMd, mark: true }],
+    };
+  }
+
   if (currentElement.value === '<br/>') {
     return { type: 'paragraph', children: [{ text: '' }] };
   }
@@ -718,7 +749,7 @@ const processInlineHtml = (
   }
 
   const htmlMatch = value.match(
-    /<\/?(b|i|del|font|code|span|sup|sub|strong|a)[^\n>]*?>/,
+    /<\/?(b|i|del|font|code|span|sup|sub|strong|a|mark)[^\n>]*?>/,
   );
   if (htmlMatch) {
     const [str, tag] = htmlMatch;
