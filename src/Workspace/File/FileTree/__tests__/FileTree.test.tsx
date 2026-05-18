@@ -321,6 +321,47 @@ describe('Workspace.FileTree', () => {
     );
   });
 
+  it('leaf without explicit file shares download and row preview behavior with flat list', async () => {
+    const onDownload = vi.fn();
+    const onPreview = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-1',
+                name: 'orphan.md',
+                isLeaf: true,
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            onDownload={onDownload}
+            onPreview={onPreview}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByRole('button', { name: '下载' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '预览' }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '下载' }));
+    expect(onDownload).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'leaf-1', name: 'orphan.md' }),
+    );
+
+    fireEvent.click(screen.getByText('orphan.md'));
+    await waitFor(() => {
+      expect(onPreview).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'leaf-1', name: 'orphan.md' }),
+      );
+    });
+  });
+
   it('invokes onPreview on leaf select when file is set and onFileClick omitted', async () => {
     const onPreview = vi.fn();
     const file: FileNode = {

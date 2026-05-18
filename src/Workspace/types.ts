@@ -593,7 +593,7 @@ export interface FileTreeNode {
   name: string;
   /**
    * 叶子节点对应的文件数据（可选）
-   * @description 传入后可在树行展示预览/下载等操作，并与 {@link FileTreeProps} 的 `onPreview` / `onDownload` 等配合；未传时行为与仅展示名称的叶子一致
+   * @description 未传时由 `name` 与 `id`/`key` 合成与平铺列表一致的 {@link FileNode}，预览/下载按钮与选中行为与 {@link FileItem} 对齐；传入后与 {@link FileTreeProps} 的 `onPreview` / `onDownload` 等配合
    */
   file?: FileNode;
   /**

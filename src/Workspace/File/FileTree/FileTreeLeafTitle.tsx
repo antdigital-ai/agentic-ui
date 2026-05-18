@@ -10,7 +10,10 @@ import React, { memo, type FC } from 'react';
 
 import { ActionIconBox } from '../../../Components/ActionIconBox';
 import type { FileNode, FileProps, FileTreeNode } from '../../types';
-import { fileTypeProcessor, isImageFile } from '../FileTypeProcessor';
+import {
+  shouldShowFileDownloadAction,
+  shouldShowFilePreviewAction,
+} from '../fileListRowActions';
 import {
   ensureNodeWithId,
   handleDefaultShare,
@@ -45,12 +48,10 @@ const FileTreeLeafTitleComponent: FC<FileTreeLeafTitleProps> = ({
   });
   const isDisabled = node.disabled === true;
 
-  const showDownloadButton = (() => {
-    if (fileWithId.canDownload !== undefined) return fileWithId.canDownload;
-    return Boolean(
-      onDownload || fileWithId.url || fileWithId.content || fileWithId.file,
-    );
-  })();
+  const showDownloadButton = shouldShowFileDownloadAction(
+    fileWithId,
+    onDownload,
+  );
 
   const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -78,15 +79,7 @@ const FileTreeLeafTitleComponent: FC<FileTreeLeafTitleProps> = ({
     handleDefaultShare(fileWithId);
   };
 
-  const showPreviewButton = (() => {
-    if (fileWithId.canPreview !== undefined) return fileWithId.canPreview;
-    return (
-      !!onPreview &&
-      (isImageFile(fileWithId)
-        ? !!(fileWithId.url || fileWithId.previewUrl)
-        : fileTypeProcessor.processFile(fileWithId).canPreview)
-    );
-  })();
+  const showPreviewButton = shouldShowFilePreviewAction(fileWithId, onPreview);
 
   const showShareButton = fileWithId.canShare === true;
   const showLocationButton = fileWithId.canLocate === true;

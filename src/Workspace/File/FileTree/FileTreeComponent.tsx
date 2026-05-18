@@ -36,11 +36,21 @@ const walkAndIndex = (
 const resolveTreeLeafFile = (node: FileTreeNode): FileNode | null => {
   const hasChildren = Boolean(node.children && node.children.length > 0);
   const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
-  if (!resolvedIsLeaf || !node.file) return null;
+  if (!resolvedIsLeaf) {
+    return null;
+  }
+
+  if (node.file !== undefined && node.file !== null) {
+    return ensureNodeWithId({
+      ...node.file,
+      name: node.file.name ?? node.name,
+      id: node.file.id ?? node.id ?? node.key,
+    });
+  }
+
   return ensureNodeWithId({
-    ...node.file,
-    name: node.file.name ?? node.name,
-    id: node.file.id ?? node.id ?? node.key,
+    name: node.name,
+    id: node.id ?? node.key,
   });
 };
 
@@ -61,10 +71,15 @@ const mapTreeToDataNodes = (
     const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
 
     if (resolvedIsLeaf) {
+      const leafFile = resolveTreeLeafFile(node);
       const title =
-        node.file !== null && node.file !== undefined ? (
+        leafFile !== null ? (
           <FileTreeLeafTitle
-            node={node as FileTreeNode & { file: FileNode }}
+            node={
+              { ...node, file: leafFile } as FileTreeNode & {
+                file: FileNode;
+              }
+            }
             prefixCls={ctx.prefixCls}
             hashId={ctx.hashId}
             locale={ctx.locale}
