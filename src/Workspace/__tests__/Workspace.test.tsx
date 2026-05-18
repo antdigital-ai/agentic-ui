@@ -704,6 +704,56 @@ describe('Workspace Component', () => {
     expect(screen.getByText('a.txt')).toBeInTheDocument();
   });
 
+  it('应展开 Fragment 内的子面板', () => {
+    render(
+      <TestWrapper>
+        <Workspace>
+          <React.Fragment>
+            <Workspace.Realtime data={{ type: 'shell', content: 'fragment' }} />
+          </React.Fragment>
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText('fragment')).toBeInTheDocument();
+  });
+
+  it('重复 tab.key 应自动去重避免 Segmented 冲突', () => {
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.Realtime
+            tab={{ key: 'dup', title: '实时 A' }}
+            data={{ type: 'shell', content: 'a' }}
+          />
+          <Workspace.Browser
+            tab={{ key: 'dup', title: '浏览器 B' }}
+            suggestions={browserSuggestions}
+            request={requestBrowserResults}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText('实时 A')).toBeInTheDocument();
+    expect(screen.getByText('浏览器 B')).toBeInTheDocument();
+  });
+
+  it('非法 panelType 应回退为 type 链识别', () => {
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.File
+            panelType={'invalid' as 'file'}
+            nodes={[{ name: 'safe.txt', content: 'ok' }]}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText('safe.txt')).toBeInTheDocument();
+  });
+
   it('notifyOnInvalidActiveTabKey=false 时非法 activeTabKey 不触发 onTabChange', () => {
     const onTabChange = vi.fn();
 

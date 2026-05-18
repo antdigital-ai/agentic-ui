@@ -34,11 +34,19 @@ import type {
 import { WorkspaceTabCountDigits } from './WorkspaceTabCountDigits';
 import {
   isFileWorkspacePanel,
+  isWorkspacePanelType,
+  isWorkspaceSegmentedDividerKey,
   markWorkspacePanel,
+  normalizeTabKey,
   resolveWorkspacePanelType,
+  WORKSPACE_SEGMENTED_DIVIDER_KEY,
 } from './workspacePanel';
 
-export { markWorkspacePanel, WORKSPACE_PANEL_TYPE } from './workspacePanel';
+export {
+  markWorkspacePanel,
+  WORKSPACE_PANEL_TYPE,
+  WORKSPACE_SEGMENTED_DIVIDER_KEY,
+} from './workspacePanel';
 
 export type { FileActionRef } from './types';
 
@@ -96,12 +104,59 @@ const resolveTabConfig = (
   tab: TabConfiguration | undefined,
   defaultConfig: TabItem,
   index?: number,
-) => ({
-  key: tab?.key || defaultConfig.key + (index !== undefined ? `-${index}` : ''),
-  icon: tab?.icon ?? defaultConfig.icon,
-  title: tab?.title || defaultConfig.label,
-  count: tab?.count,
-});
+) => {
+  const customKey = normalizeTabKey(tab?.key);
+  const baseKey =
+    customKey && !isWorkspaceSegmentedDividerKey(customKey)
+      ? customKey
+      : defaultConfig.key + (index !== undefined ? `-${index}` : '');
+  return {
+    key: baseKey,
+    icon: tab?.icon ?? defaultConfig.icon,
+    title: tab?.title || defaultConfig.label,
+    count: typeof tab?.count === 'number' && Number.isFinite(tab.count)
+      ? tab.count
+      : undefined,
+  };
+};
+
+const flattenWorkspaceChildren = (
+  nodes: React.ReactNode,
+): React.ReactElement<BaseChildProps>[] => {
+  const result: React.ReactElement<BaseChildProps>[] = [];
+  React.Children.forEach(nodes, (child) => {
+    if (!React.isValidElement(child)) {
+      return;
+    }
+    if (child.type === React.Fragment) {
+      flattenWorkspaceChildren(
+        (child.props as { children?: React.ReactNode }).children,
+      ).forEach((nested) => result.push(nested));
+      return;
+    }
+    result.push(child as React.ReactElement<BaseChildProps>);
+  });
+  return result;
+};
+
+const ensureUniqueTabKey = (
+  key: string,
+  usedKeys: Set<string>,
+  fallbackSeed: string,
+): string => {
+  if (!usedKeys.has(key)) {
+    usedKeys.add(key);
+    return key;
+  }
+  let candidate = `${key}-${fallbackSeed}`;
+  let suffix = 1;
+  while (usedKeys.has(candidate)) {
+    candidate = `${key}-${fallbackSeed}-${suffix}`;
+    suffix += 1;
+  }
+  usedKeys.add(candidate);
+  return candidate;
+};
 
 const RealtimeComponent: FC<RealtimeProps> = ({ data }) =>
   data ? <RealtimeFollowList data={data} /> : null;
@@ -118,18 +173,27 @@ const resolveChildPanelType = (
   child: React.ReactElement<BaseChildProps>,
 ): PanelType | undefined => {
   const fromProps = child.props.panelType;
-  if (fromProps) {
-    return fromProps;
+  if (fromProps != null) {
+    return isWorkspacePanelType(fromProps)
+      ? fromProps
+      : resolveWorkspacePanelType(child.type);
   }
   return resolveWorkspacePanelType(child.type);
 };
+
+const isValidReactPanelType = (type: unknown): boolean =>
+  typeof type === 'function' || typeof type === 'object';
 
 const pickFallbackTabKey = (
   tabs: TabItem[],
   preferredKey?: string,
 ): string => {
-  if (preferredKey && tabs.some((tab) => tab.key === preferredKey)) {
-    return preferredKey;
+  const normalizedPreferred = normalizeTabKey(preferredKey);
+  if (
+    normalizedPreferred &&
+    tabs.some((tab) => tab.key === normalizedPreferred)
+  ) {
+    return normalizedPreferred;
   }
   return tabs[0]?.key ?? '';
 };
@@ -205,32 +269,41 @@ const Workspace: FC<WorkspaceProps> & {
     };
 
     const panelEntries: PanelEntry[] = [];
-    React.Children.forEach(children, (child, index) => {
-      if (!React.isValidElement(child)) return;
-      const wType = resolveChildPanelType(child as React.ReactElement<BaseChildProps>);
-      if (!wType) return;
+    const usedTabKeys = new Set<string>();
+    flattenWorkspaceChildren(children).forEach((child, index) => {
+      if (!isValidReactPanelType(child.type)) {
+        return;
+      }
+      const wType = resolveChildPanelType(child);
+      if (!wType || !defaultConfig[wType]) {
+        return;
+      }
       const tabConfig = resolveTabConfig(
         child.props.tab,
         defaultConfig[wType],
         wType === PANEL_TYPES.CUSTOM ? index : undefined,
       );
+      const uniqueKey = ensureUniqueTabKey(
+        tabConfig.key,
+        usedTabKeys,
+        String(index),
+      );
       panelEntries.push({
         wType,
-        child: child as React.ReactElement<BaseChildProps>,
-        tabConfig,
+        child,
+        tabConfig: { ...tabConfig, key: uniqueKey },
       });
     });
 
     const keys = panelEntries.map((e) => e.tabConfig.key);
+    const normalizedActiveTabKey = normalizeTabKey(activeTabKey);
+    const normalizedInternalTab = normalizeTabKey(internalActiveTab);
     const isControlled = activeTabKey !== undefined;
     const effectiveKeyForReset =
-      isControlled &&
-      activeTabKey !== undefined &&
-      activeTabKey !== null &&
-      keys.includes(String(activeTabKey))
-        ? String(activeTabKey)
-        : internalActiveTab && keys.includes(internalActiveTab)
-          ? internalActiveTab
+      isControlled && keys.includes(normalizedActiveTabKey)
+        ? normalizedActiveTabKey
+        : normalizedInternalTab && keys.includes(normalizedInternalTab)
+          ? normalizedInternalTab
           : (keys[0] ?? '');
 
     const firstRealtimeIndex = panelEntries.findIndex(
@@ -267,10 +340,12 @@ const Workspace: FC<WorkspaceProps> & {
             )}
           </div>
         ),
-        content: React.createElement(child.type, {
-          ...child.props,
-          ...(shouldPassResetKey ? { resetKey } : {}),
-        }),
+        content: isValidReactPanelType(child.type)
+          ? React.createElement(child.type, {
+              ...child.props,
+              ...(shouldPassResetKey ? { resetKey } : {}),
+            })
+          : null,
       };
     });
 
@@ -288,7 +363,7 @@ const Workspace: FC<WorkspaceProps> & {
       if (isFirstRealtime && tabs.length > 1) {
         options.push({
           label: '',
-          value: '__divider__',
+          value: WORKSPACE_SEGMENTED_DIVIDER_KEY,
           disabled: true,
         });
       }
@@ -308,21 +383,27 @@ const Workspace: FC<WorkspaceProps> & {
   useEffect(() => {
     if (!availableTabs.length) return;
     const isControlled = activeTabKey !== undefined;
-    const currentKey = isControlled ? activeTabKey : internalActiveTab;
+    const currentKey = normalizeTabKey(
+      isControlled ? activeTabKey : internalActiveTab,
+    );
     const fallbackKey = pickFallbackTabKey(
       availableTabs,
       isControlled ? undefined : defaultActiveTabKey,
     );
 
-    if (!availableTabs.some((tab) => tab.key === currentKey)) {
-      if (!isControlled) {
+    if (!currentKey || !availableTabs.some((tab) => tab.key === currentKey)) {
+      if (!isControlled && fallbackKey) {
         setInternalActiveTab(fallbackKey);
       }
-      if (notifyOnInvalidActiveTabKey) {
+      if (
+        notifyOnInvalidActiveTabKey &&
+        fallbackKey &&
+        fallbackKey !== currentKey
+      ) {
         onTabChange?.(fallbackKey);
       }
-    } else if (isControlled && currentKey !== internalActiveTab) {
-      setInternalActiveTab(currentKey!);
+    } else if (isControlled && currentKey !== normalizeTabKey(internalActiveTab)) {
+      setInternalActiveTab(currentKey);
     }
   }, [
     availableTabs,
@@ -353,15 +434,23 @@ const Workspace: FC<WorkspaceProps> & {
     return () => observer.disconnect();
   }, []);
 
+  const resolvedActiveKey = normalizeTabKey(activeTabKey ?? internalActiveTab);
   const currentActiveTab =
-    availableTabs.find((tab) => tab.key === (activeTabKey ?? internalActiveTab))
-      ?.key ??
-    availableTabs[0]?.key ??
-    '';
+    availableTabs.find((tab) => tab.key === resolvedActiveKey)?.key ??
+    pickFallbackTabKey(availableTabs, defaultActiveTabKey);
 
   const handleTabChange = (key: string | number) => {
-    const tabKey = String(key);
-    const previousKey = activeTabKey ?? internalActiveTab ?? currentActiveTab;
+    const tabKey = normalizeTabKey(key);
+    if (!tabKey || isWorkspaceSegmentedDividerKey(tabKey)) {
+      return;
+    }
+    if (!availableTabs.some((tab) => tab.key === tabKey)) {
+      return;
+    }
+    if (tabKey === currentActiveTab) {
+      return;
+    }
+    const previousKey = currentActiveTab;
     if (activeTabKey === undefined) {
       setInternalActiveTab(tabKey);
     }

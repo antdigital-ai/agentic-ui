@@ -17,9 +17,19 @@ group:
   - 🛠 移除对 `@ant-design/theme-token` `createStyleRegister` 的依赖；组件库统一保持 `hashId=''`，避免与宿主 antd 主题哈希叠加导致选择器失效。
   - ⚡️ `useStyle` 返回的 `wrapSSR` 改为 identity 函数：样式注入由 cssinjs `useGlobalCache` → `updateCSS` 副作用完成，与 `wrapSSR` 无关；浏览器 CSR 下 `wrapSSR(node)` 此前一直等于 `<><Empty/>{node}</>`，组件库也未使用 `<StyleProvider ssrInline>`，因此该层 Fragment + `<Empty/>` 元素纯属无用开销。改造后每个组件每次渲染少一层 React 元素分配；组件文件继续 `return wrapSSR(<jsx/>)` 仍兼容（identity 透传），新组件可以直接 `return <jsx/>`。
 
+- Workspace
+  - 🆕 新增 `defaultActiveTabKey`：非受控模式下指定初始激活的标签 key。
+  - 🆕 新增 `notifyOnInvalidActiveTabKey`（默认 `true`）：受控且 `activeTabKey` 不在当前标签列表时，是否通过 `onTabChange` 回传有效 key；设为 `false` 时仅界面回退、不触发回调。
+  - 🆕 新增 `preserveFilePreviewOnTabChange`（默认 `false`）：为 `true` 时离开文件类标签再返回可保留 `Workspace.File` / `Workspace.FileTree` 的预览态。
+  - 🆕 新增 `emptyContent`：无任何有效子面板时的占位内容（未传仍渲染 `null`）。
+  - 🆕 子组件 `BaseChildProps.panelType` 可显式声明面板类型；包入口导出 `markWorkspacePanel`、`WORKSPACE_PANEL_TYPE`，内置 `Workspace.*` 子组件带面板标记，支持识别 `React.memo(Workspace.File)` 及沿 `type` 链解析的 `forwardRef` / `memo` 包裹。
+  - 🛠 切换标签时仅在**离开** `file` / `fileTree` 面板，或在两个文件类 Tab 之间切换时递增 `resetKey` 重置预览；切换到非文件类 Tab 不再对隐藏中的文件面板无意义递增。
+  - 💄 `Workspace.File` 的 `fileTreeSwitch` 分段控件：平铺 `BarsOutlined`、文件树 `ApartmentOutlined`；`Workspace` 默认「文件」「文件树」Tab 图标与上述语义对齐（`@ant-design/icons`）。
+  - 📖 `workspace.md` 补充 `Workspace` 新属性表、子面板识别（`panelType` / `markWorkspacePanel`）、受控标签与预览行为、最佳实践。
+  - ✅ 补充 `Workspace` 与 `workspacePanel` 单测（`defaultActiveTabKey`、`emptyContent`、`memo` 识别、`notifyOnInvalidActiveTabKey` 等）。
+  - 🛠 防御性处理：展开 `Fragment` 子节点、去重 `tab.key`、忽略 Segmented 分隔项与非法切换 key、校验 `panelType` / `tab.count`、`normalizeTabKey`、限制 `type` 链遍历深度。
+
 - 📖 文档
-  - 🆕 `Workspace` 新增 `defaultActiveTabKey`、`notifyOnInvalidActiveTabKey`、`preserveFilePreviewOnTabChange`、`emptyContent`；子面板支持 `panelType` 与 `markWorkspacePanel` 识别（含 `React.memo`）；离开文件类标签时才默认重置预览。
-  - 📖 `Workspace`：更新 API 文档与上述行为说明。
   - 📖 新增 `MarkdownRenderer` 组件文档（流式 Markdown 渲染、`CharacterQueueOptions`、内置代码块渲染器路由表、`MarkdownRendererRef` 命令式接口）。
   - 📖 新增 `ToolUseBarThink` 独立组件文档；同步修正 `ToolUseBar` 中 `ToolUseBarThink` 的 API 表（移除已废弃 / 不存在的 `id` / `isThinkLoading` / `isActive` / `onActiveChange` 等字段，对齐实际 props）。
   - 📖 新增 `GradientText`、`TextAnimate`、`TypingAnimation` 组件文档与对应 demo。

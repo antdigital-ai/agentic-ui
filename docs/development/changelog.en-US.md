@@ -17,9 +17,19 @@ group:
   - 🛠 Dropped runtime dependency on `@ant-design/theme-token`'s `createStyleRegister`. The component library keeps `hashId=''` to prevent host antd theme hash from breaking selectors.
   - ⚡️ `useStyle` now returns an identity `wrapSSR`. Style injection happens through cssinjs's `useGlobalCache` → `updateCSS` side effect during the hook call and never depended on `wrapSSR`. In our CSR-only config `wrapSSR(node)` was always `<><Empty/>{node}</>`, so we drop that Fragment + `<Empty/>` allocation. Existing `return wrapSSR(<jsx/>)` callers continue to work (identity passthrough); new code can simply `return <jsx/>`.
 
+- Workspace
+  - 🆕 Added `defaultActiveTabKey` to set the initial active tab in uncontrolled mode.
+  - 🆕 Added `notifyOnInvalidActiveTabKey` (default `true`): when controlled `activeTabKey` is not in the tab list, whether to call `onTabChange` with a valid key; `false` falls back in the UI only.
+  - 🆕 Added `preserveFilePreviewOnTabChange` (default `false`): when `true`, leaving and returning to a file panel keeps `Workspace.File` / `Workspace.FileTree` preview state.
+  - 🆕 Added `emptyContent` placeholder when there are no valid child panels (otherwise still `null`).
+  - 🆕 Child `BaseChildProps.panelType` for explicit panel typing; package exports `markWorkspacePanel` and `WORKSPACE_PANEL_TYPE`. Built-in `Workspace.*` children are marked; `React.memo(Workspace.File)` and `memo` / `forwardRef` chains are resolved via the `type` walk.
+  - 🛠 `resetKey` now increments only when **leaving** a `file` / `fileTree` panel or switching between two file panels, instead of on every tab change (avoids pointless bumps for hidden file panes).
+  - 💄 `Workspace.File` `fileTreeSwitch` icons: list `BarsOutlined`, tree `ApartmentOutlined`; default Workspace File / FileTree tab icons aligned (`@ant-design/icons`).
+  - 📖 Updated `workspace.md` with new props, panel recognition, controlled tabs, preview behavior, and best practices.
+  - ✅ Added `Workspace` and `workspacePanel` unit tests (`defaultActiveTabKey`, `emptyContent`, `memo` recognition, `notifyOnInvalidActiveTabKey`, etc.).
+  - 🛠 Defensive guards: flatten `Fragment` children, dedupe `tab.key`, ignore segmented divider / invalid tab keys, validate `panelType` / `tab.count`, `normalizeTabKey`, cap `type`-chain walk depth.
+
 - 📖 Docs
-  - 🆕 `Workspace`: add `defaultActiveTabKey`, `notifyOnInvalidActiveTabKey`, `preserveFilePreviewOnTabChange`, `emptyContent`; panel recognition via `panelType` / `markWorkspacePanel` (incl. `React.memo`); reset file preview only when leaving file panels by default.
-  - 📖 `Workspace`: update API docs for the new props and behaviors.
   - 📖 Added `MarkdownRenderer` component documentation (streaming Markdown rendering, `CharacterQueueOptions`, built-in code-block renderer routing, `MarkdownRendererRef` imperative API).
   - 📖 Added a dedicated `ToolUseBarThink` doc; corrected the `ToolUseBarThink` API table inside `tool-use-bar.md` (removed deprecated/non-existent props such as `id`, `isThinkLoading`, `isActive`, `onActiveChange`, etc., aligned with actual props).
   - 📖 Added `GradientText`, `TextAnimate`, and `TypingAnimation` component docs with demos.
