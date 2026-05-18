@@ -476,6 +476,52 @@ describe('AIBubble', () => {
       ).not.toBeInTheDocument();
     });
 
+    it('avatarRender 为 false 时不渲染默认头像', () => {
+      render(
+        <BubbleConfigProvide>
+          <AIBubble
+            {...defaultProps}
+            preMessage={{
+              content: 'User message',
+              createAt: 1716537500000,
+              id: '122',
+              role: 'user' as RoleType,
+              updateAt: 1716537500000,
+            }}
+            bubbleRenderConfig={{ avatarRender: false }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      expect(screen.queryByTestId('bubble-avatar')).not.toBeInTheDocument();
+      expect(screen.getByTestId('bubble-avatar-title')).toBeInTheDocument();
+    });
+
+    it('avatarRender 与 titleRender 均为 false 时不渲染 avatar-title 包装器', () => {
+      render(
+        <BubbleConfigProvide>
+          <AIBubble
+            {...defaultProps}
+            preMessage={{
+              content: 'User message',
+              createAt: 1716537500000,
+              id: '122',
+              role: 'user' as RoleType,
+              updateAt: 1716537500000,
+            }}
+            bubbleRenderConfig={{
+              avatarRender: false,
+              titleRender: false,
+            }}
+          />
+        </BubbleConfigProvide>,
+      );
+
+      expect(
+        screen.queryByTestId('bubble-avatar-title'),
+      ).not.toBeInTheDocument();
+    });
+
     it('avatarDom 或 titleDom 至少有一个存在时渲染 avatar-title 包装器', () => {
       render(
         <BubbleConfigProvide>

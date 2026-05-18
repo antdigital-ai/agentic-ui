@@ -26,7 +26,14 @@ export const runRender = (
   defaultDom: React.ReactNode,
   ...rest: undefined[]
 ) => {
-  return render ? render(props, defaultDom, ...rest) : defaultDom;
+  // WithFalse：显式 false 表示关闭该插槽，不得回退到 defaultDom
+  if (render === false) {
+    return null;
+  }
+  if (typeof render === 'function') {
+    return render(props, defaultDom, ...rest);
+  }
+  return defaultDom;
 };
 
 const isSameRoleAsPrevious = (preMessage: any, originData: any) => {
