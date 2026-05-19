@@ -55,6 +55,10 @@ import {
   isEventHandled,
   isPath,
 } from './utils/editorUtils';
+import {
+  markImeEnterCommitGuard,
+  scheduleClearInputComposition,
+} from './utils/isImeComposing';
 
 // 默认允许的类型
 const defaultAllowedTypes = [
@@ -198,6 +202,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
   const value = useRef<any[]>([EditorUtils.p]);
   const nodeRef = useRef<MarkdownEditorInstance>();
   const first = useRef(true);
+  const cancelClearInputCompositionRef = useRef<(() => void) | null>(null);
 
   const plugins = useContext(PluginContext);
 
@@ -834,10 +839,14 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
    * 处理输入法开始事件
    */
   const onCompositionStart = () => {
+    cancelClearInputCompositionRef.current?.();
+    cancelClearInputCompositionRef.current = null;
+
     if (markdownContainerRef.current) {
       markdownContainerRef.current.setAttribute('data-composition', '');
     }
     store.inputComposition = true;
+    props.onCompositionActiveChange?.(true);
 
     const focusPath = markdownEditorRef.current.selection?.focus.path || [];
     if (focusPath.length > 0) {
@@ -877,6 +886,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     ) {
       markdownContainerRef.current.setAttribute('data-composition', '');
       store.inputComposition = true;
+      props.onCompositionActiveChange?.(true);
     }
   };
 
@@ -884,7 +894,16 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
    * 处理输入法结束事件
    */
   const onCompositionEnd = () => {
-    store.inputComposition = false;
+    markImeEnterCommitGuard();
+
+    cancelClearInputCompositionRef.current?.();
+    cancelClearInputCompositionRef.current = scheduleClearInputComposition(
+      () => {
+        store.inputComposition = false;
+        props.onCompositionActiveChange?.(false);
+        cancelClearInputCompositionRef.current = null;
+      },
+    );
 
     const focusPath = markdownEditorRef.current.selection?.focus.path || [];
     if (focusPath.length > 0) {

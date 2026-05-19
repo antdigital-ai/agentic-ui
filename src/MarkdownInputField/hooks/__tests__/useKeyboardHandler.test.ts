@@ -69,6 +69,25 @@ describe('useKeyboardHandler', () => {
     expect(params.sendMessage).not.toHaveBeenCalled();
   });
 
+  it('keyCode 229（IME）时直接 return', () => {
+    const params = createDefaultParams();
+    params.props.onSend = vi.fn();
+    const { result } = renderHook(() => useKeyboardHandler(params));
+    const e = {
+      key: 'Enter',
+      keyCode: 229,
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      nativeEvent: { isComposing: false },
+    } as any;
+    result.current.handleKeyDown(e);
+    expect(e.preventDefault).not.toHaveBeenCalled();
+    expect(params.sendMessage).not.toHaveBeenCalled();
+  });
+
   it('isComposing 为 true 时直接 return', () => {
     const params = createDefaultParams();
     const { result } = renderHook(() => useKeyboardHandler(params));

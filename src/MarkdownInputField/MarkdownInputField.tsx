@@ -92,8 +92,11 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
   testId,
   ...props
 }) => {
-  const { contentStyle: markdownContentStyle, ...markdownPropsRest } =
-    markdownProps ?? {};
+  const {
+    contentStyle: markdownContentStyle,
+    markdown: markdownConfig,
+    ...markdownPropsRest
+  } = markdownProps ?? {};
 
   // 默认关闭文件上传，需显式传入 attachment.enable: true 开启
   const attachment = { ...DEFAULT_ATTACHMENT, ...props.attachment };
@@ -488,6 +491,10 @@ const MarkdownInputFieldComponent: React.FC<MarkdownInputFieldProps> = ({
                   allowedTypes: ['text/plain'],
                   plainTextOnly: true,
                   ...props.pasteConfig,
+                }}
+                markdown={{
+                  enableInsertCompletion: false,
+                  ...markdownConfig,
                 }}
                 {...markdownPropsRest}
               >

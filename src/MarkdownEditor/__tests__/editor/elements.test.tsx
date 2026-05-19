@@ -74,52 +74,8 @@ describe('elements.ts', () => {
 
   describe('MdElements', () => {
     describe('table', () => {
-      it('should convert table markdown to table element', () => {
-        const match = ['|col1|col2|', 'col1|col2'];
-        const path = [0];
-        const sel: Range = {
-          anchor: { path: [0, 0], offset: 0 },
-          focus: { path: [0, 0], offset: 0 },
-        };
-
-        const ctx: CheckMdParams = {
-          sel,
-          editor,
-          path,
-          match: match as RegExpMatchArray,
-          el: editor.children[0] as Element,
-          startText: '|col1|col2|',
-        };
-
-        MdElements.table.run(ctx);
-
-        expect(editor.children[0]).toMatchObject({
-          type: 'table',
-          children: [
-            {
-              type: 'table-row',
-              children: [
-                {
-                  type: 'table-cell',
-                  title: true,
-                  children: [{ text: 'col1' }],
-                },
-                {
-                  type: 'table-cell',
-                  title: true,
-                  children: [{ text: 'col2' }],
-                },
-              ],
-            },
-            {
-              type: 'table-row',
-              children: [
-                { type: 'table-cell', children: [{ text: '' }] },
-                { type: 'table-cell', children: [{ text: '' }] },
-              ],
-            },
-          ],
-        });
+      it('不再支持 |col1|col2| 回车转表格短语法', () => {
+        expect(MdElements.table).toBeUndefined();
       });
     });
 
@@ -392,12 +348,9 @@ describe('elements.ts', () => {
 
   describe('BlockMathNodes and TextMatchNodes', () => {
     it('should filter block nodes correctly', () => {
-      expect(BlockMathNodes).toContainEqual(
-        expect.objectContaining({
-          type: 'table',
-          reg: expect.any(RegExp),
-        }),
-      );
+      expect(
+        BlockMathNodes.some((node) => node.type === 'table'),
+      ).toBe(false);
 
       expect(BlockMathNodes).toContainEqual(
         expect.objectContaining({

@@ -68,9 +68,7 @@ export class EditorUtils {
     const doReplace = () => {
       const normalized = EditorUtils.coalesceRootAllEmptyParagraphs(nodes);
       Editor.withoutNormalizing(editor, () => {
-        if (editor.selection) {
-          Transforms.deselect(editor);
-        }
+        EditorUtils.safeDeselect(editor);
         const totalChildren = editor.children.length;
         for (let i = totalChildren - 1; i >= 0; i--) {
           Transforms.removeNodes(editor, { at: [i] });
@@ -83,6 +81,23 @@ export class EditorUtils {
       HistoryEditor.withoutSaving(editor, doReplace);
     } else {
       doReplace();
+    }
+  }
+
+  /**
+   * 安全取消 Slate 选区，避免 IME 过渡态下 DOM Selection 为空时
+   * slate-react 同步触发 collapseToEnd 的 InvalidStateError。
+   */
+  static safeDeselect(editor: Editor) {
+    if (!editor.selection) return;
+    try {
+      Transforms.deselect(editor);
+    } catch {
+      try {
+        editor.selection = null;
+      } catch {
+        // 编辑器销毁或只读态下忽略
+      }
     }
   }
 

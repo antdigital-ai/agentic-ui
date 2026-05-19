@@ -12,7 +12,6 @@ describe('elements.ts', () => {
   describe('MdElements', () => {
     it('应该定义所有必要的元素类型', () => {
       expect(MdElements).toBeDefined();
-      expect(MdElements.table).toBeDefined();
       expect(MdElements.code).toBeDefined();
       expect(MdElements.head).toBeDefined();
       expect(MdElements.link).toBeDefined();
@@ -30,10 +29,6 @@ describe('elements.ts', () => {
     });
 
     it('应该为每个元素定义正则表达式', () => {
-      // 检查表格元素
-      expect(MdElements.table.reg).toBeDefined();
-      expect(MdElements.table.reg instanceof RegExp).toBe(true);
-
       // 检查代码块元素
       expect(MdElements.code.reg).toBeDefined();
       expect(MdElements.code.reg instanceof RegExp).toBe(true);
@@ -108,7 +103,6 @@ describe('elements.ts', () => {
       expect(MdElements.hr.matchKey).toBe(' ');
 
       // 检查没有 matchKey 的元素
-      expect(MdElements.table.matchKey).toBeUndefined();
       expect(MdElements.frontmatter.matchKey).toBeUndefined();
     });
 
@@ -127,14 +121,15 @@ describe('elements.ts', () => {
       expect(BlockMathNodes.length).toBeGreaterThan(0);
 
       // 检查是否包含没有 matchKey 的元素
-      const tableNode = BlockMathNodes.find((node) => node.type === 'table');
       const codeNode = BlockMathNodes.find((node) => node.type === 'code');
       const hrNode = BlockMathNodes.find((node) => node.type === 'hr');
       const frontmatterNode = BlockMathNodes.find(
         (node) => node.type === 'frontmatter',
       );
 
-      expect(tableNode).toBeDefined();
+      expect(
+        BlockMathNodes.find((node) => node.type === 'table'),
+      ).toBeUndefined();
       expect(codeNode).toBeDefined();
       expect(hrNode).toBeDefined();
       expect(frontmatterNode).toBeDefined();
@@ -194,20 +189,6 @@ describe('elements.ts', () => {
         anchor: { path: [0, 0], offset: 0 },
         focus: { path: [0, 0], offset: 7 },
       };
-    });
-
-    it('table.run 应删除原节点并插入表格', () => {
-      const path = [0];
-      const match = ['|a|b|', 'a|b'] as RegExpMatchArray;
-      MdElements.table.run!({
-        editor,
-        path,
-        match,
-        sel: editor.selection!,
-        startText: '',
-        el: editor.children[0] as any,
-      });
-      expect(editor.children[0]).toHaveProperty('type', 'card');
     });
 
     it('code.run 应插入代码块', () => {

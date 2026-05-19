@@ -1685,7 +1685,7 @@ describe('Editor branches - onCompositionStart/End', () => {
     }).not.toThrow();
   });
 
-  it('compositionEnd removes data-composition and sets inputComposition false', () => {
+  it('compositionEnd 推迟清除 inputComposition，避免 IME Enter 确认选字误触', async () => {
     const { editor } = setupStore({ readonly: false });
     editor.selection = {
       anchor: { path: [0, 0], offset: 0 },
@@ -1694,12 +1694,17 @@ describe('Editor branches - onCompositionStart/End', () => {
 
     renderEditor({});
 
-    // First start
     editableProps.onCompositionStart({ preventDefault: vi.fn() });
     expect(mockStoreConfig.store.inputComposition).toBe(true);
 
-    // Then end
     editableProps.onCompositionEnd();
+    expect(mockStoreConfig.store.inputComposition).toBe(true);
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
     expect(mockStoreConfig.store.inputComposition).toBe(false);
   });
 

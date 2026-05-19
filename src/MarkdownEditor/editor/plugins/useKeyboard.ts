@@ -14,6 +14,7 @@ import { ReactEditor } from 'slate-react';
 import { MarkdownEditorProps } from '../../BaseMarkdownEditor';
 import { EditorStore } from '../store';
 import { EditorUtils } from '../utils/editorUtils';
+import { isImeComposing } from '../utils/isImeComposing';
 import { BackspaceKey } from './hotKeyCommands/backspace';
 import { EnterKey } from './hotKeyCommands/enter';
 import { MatchKey } from './hotKeyCommands/match';
@@ -102,6 +103,8 @@ export const useKeyboard = (
     '{}';
   const matchInputToNodeRef = useRef(false);
   matchInputToNodeRef.current = props?.markdown?.matchInputToNode === true;
+  const enableInsertCompletion =
+    props?.markdown?.enableInsertCompletion !== false;
 
   const matchKeyRef = useRef<MatchKey | null>(null);
   if (matchKeyRef.current === null) {
@@ -117,6 +120,8 @@ export const useKeyboard = (
     return (e: React.KeyboardEvent) => {
       // 只读模式下跳过所有键盘处理，提升性能
       if (props.readonly) return;
+
+      const imeActive = isImeComposing(e, store.inputComposition);
 
       // 处理表格键盘事件
       if (NativeTableKeyboard.shouldHandle(markdownEditorRef.current)) {
@@ -178,7 +183,7 @@ export const useKeyboard = (
 
       // Markdown 短语法转节点（``` / --- / 列表等）由 MatchKey 处理
       // IME 组合期间不触发，避免选字时误转
-      if (!e.nativeEvent?.isComposing && matchKeyRef.current!.run(e)) {
+      if (!imeActive && matchKeyRef.current!.run(e)) {
         return;
       }
 
@@ -223,14 +228,24 @@ export const useKeyboard = (
       if (e.key === 'Tab') tab.run(e);
 
       // Enter 发送，Shift+Enter 换行
-      if (e.key === 'Enter' && e.shiftKey && !(e.ctrlKey || e.metaKey)) {
+      if (
+        e.key === 'Enter' &&
+        e.shiftKey &&
+        !(e.ctrlKey || e.metaKey) &&
+        !imeActive
+      ) {
         e.stopPropagation();
         e.preventDefault();
         enter.run(e);
         return;
       }
       // Enter 键（无 Shift）处理：如果在特殊块类型中（列表项、代码块等），让 EnterKey 处理；否则由 MarkdownInputField 处理发送
-      if (e.key === 'Enter' && !(e.ctrlKey || e.metaKey) && !e.shiftKey) {
+      if (
+        e.key === 'Enter' &&
+        !(e.ctrlKey || e.metaKey) &&
+        !e.shiftKey &&
+        !imeActive
+      ) {
         const selection = markdownEditorRef.current.selection;
         if (selection && Range.isCollapsed(selection)) {
           const [node] = Editor.nodes(markdownEditorRef.current, {
@@ -274,7 +289,7 @@ export const useKeyboard = (
       if (
         jinjaTemplatePanelEnabled &&
         e.key.length === 1 &&
-        !e.nativeEvent?.isComposing &&
+        !imeActive &&
         Path.isAncestor(node[1], sel.anchor.path) &&
         setOpenJinjaTemplate &&
         setJinjaAnchorPath
@@ -306,6 +321,7 @@ export const useKeyboard = (
         if (!codeMatch) {
           const insertMatch = str.match(/^\/([^\n]+)?$/i);
           if (
+            enableInsertCompletion &&
             insertMatch &&
             !(
               !Path.hasPrevious(node[1]) &&
@@ -332,5 +348,6 @@ export const useKeyboard = (
     setJinjaAnchorPath,
     jinjaTemplatePanelEnabled,
     jinjaTrigger,
+    enableInsertCompletion,
   ]);
 };

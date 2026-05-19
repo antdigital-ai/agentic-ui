@@ -9,7 +9,6 @@ import {
   Transforms,
 } from 'slate';
 import { Elements, ListNode } from '../../el';
-import { TrNode } from '../elements/Table';
 import { decodeURIComponentUrl } from '../parser/parse/parseHtml';
 import { EditorUtils } from '../utils/editorUtils';
 
@@ -75,39 +74,6 @@ const matchText = (
 };
 
 export const MdElements: Record<string, MdNode> = {
-  table: {
-    reg: /^\s*\|((?:[^|\n]+\|?)+)\|\s*$/,
-    run: ({ editor, path, match }) => {
-      const columns = match[1].split('|');
-      Transforms.delete(editor, { at: path });
-      Transforms.insertNodes(
-        editor,
-        EditorUtils.wrapperCardNode({
-          type: 'table',
-          children: [
-            {
-              type: 'table-row',
-              children: columns.map((c) => ({
-                type: 'table-cell',
-                title: true,
-                children: [{ text: c }],
-              })),
-            },
-            {
-              type: 'table-row',
-              children: columns.map(() => ({
-                type: 'table-cell',
-                children: [{ text: '' }],
-              })),
-            },
-          ] as TrNode[],
-        }),
-
-        { at: path },
-      );
-      Transforms.select(editor, [...path, 1, 0, 0]);
-    },
-  },
   code: {
     matchKey: ' ',
     reg: /^\s*(```|···)([\w#\-+*]{1,30})?\s*$/,

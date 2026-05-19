@@ -308,7 +308,19 @@ export type MarkdownEditorProps = {
   floatBar?: { enable?: boolean };
   textAreaProps?: { enable?: boolean; placeholder?: string };
   titlePlaceholderContent?: string;
-  markdown?: { matchLeaf?: boolean; matchInputToNode?: boolean };
+  /** IME 组合开始/结束时回调，用于关闭与 `/`、`@` 冲突的浮动面板 */
+  onCompositionActiveChange?: (active: boolean) => void;
+
+  markdown?: {
+    matchLeaf?: boolean;
+    matchInputToNode?: boolean;
+    /**
+     * 输入 `/` 时是否打开「插入元素」菜单（含表格等）。
+     * 聊天输入框等场景应设为 `false`，避免与 `/` 快捷命令冲突。
+     * @default true
+     */
+    enableInsertCompletion?: boolean;
+  };
   drag?: { enable?: boolean };
   compact?: boolean;
   attachment?: Record<string, unknown>;

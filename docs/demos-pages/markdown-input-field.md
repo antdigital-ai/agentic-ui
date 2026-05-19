@@ -13,6 +13,10 @@ group:
 
 <code src="../demos/markdownInputField/basic.tsx" background="var(--main-bg-color)" iframe=540></code>
 
+## 中文输入法（IME Enter）{#ime-compose-enter}
+
+<code src="../demos/markdownInputField/ime-compose-enter.tsx" background="var(--main-bg-color)" iframe=640></code>
+
 ## 圆角
 
 <code src="../demos/markdownInputField/border-radius.tsx" background="var(--main-bg-color)" iframe=540></code>

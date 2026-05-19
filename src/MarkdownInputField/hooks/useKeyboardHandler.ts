@@ -2,6 +2,7 @@ import React from 'react';
 import { Editor, Transforms } from 'slate';
 import { useRefFunction } from '../../Hooks/useRefFunction';
 import type { MarkdownEditorInstance } from '../../MarkdownEditor';
+import { isImeComposing } from '../../MarkdownEditor/editor/utils/isImeComposing';
 import { isMobileDevice } from '../AttachmentButton/utils';
 import type { MarkdownInputFieldProps } from '../types/MarkdownInputFieldProps';
 
@@ -29,10 +30,17 @@ export const useKeyboardHandler = ({
   const handleKeyDown = useRefFunction(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (
-        markdownEditorRef?.current?.store.inputComposition ||
-        e.nativeEvent.isComposing
-      )
+        isImeComposing(
+          e,
+          markdownEditorRef?.current?.store.inputComposition,
+        )
+      ) {
+        // 阻止冒泡到外层，避免 IME 确认 Enter 误触发发送；勿 preventDefault，留给输入法提交
+        if (e.key === 'Enter') {
+          e.stopPropagation();
+        }
         return;
+      }
 
       const editor = markdownEditorRef?.current?.markdownEditorRef?.current;
       const isEnter = e.key === 'Enter';

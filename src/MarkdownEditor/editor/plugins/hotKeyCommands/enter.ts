@@ -15,6 +15,7 @@ import { HeadNode, ParagraphNode, TableNode } from '../../../el';
 import { EditorStore } from '../../store';
 import { isMod } from '../../utils';
 import { EditorUtils } from '../../utils/editorUtils';
+import { isImeComposing } from '../../utils/isImeComposing';
 import { BlockMathNodes } from '../elements';
 import { BackspaceKey } from './backspace';
 export class EnterKey {
@@ -31,7 +32,7 @@ export class EnterKey {
   }
   run(e: React.KeyboardEvent) {
     let sel = this.editor.selection;
-    if (!sel || this.store.inputComposition) return;
+    if (!sel || isImeComposing(e, this.store.inputComposition)) return;
     if (!Range.isCollapsed(sel)) {
       e.preventDefault();
       this.backspace.range();
@@ -321,6 +322,9 @@ export class EnterKey {
     node: NodeEntry<ParagraphNode>,
     sel: Range,
   ) {
+    if (isImeComposing(e, this.store.inputComposition)) {
+      return false;
+    }
     const parent = Editor.parent(this.editor, node[1]);
     const end = Editor.end(this.editor, node[1]);
     if (Point.equals(end, sel.focus)) {
@@ -332,7 +336,7 @@ export class EnterKey {
             continue;
           const m = str?.match(n.reg);
           if (m) {
-            n.run({
+            const handled = n.run({
               editor: this.editor,
               path: node[1],
               match: m,
@@ -340,6 +344,7 @@ export class EnterKey {
               sel,
               startText: m[0],
             });
+            if (handled === false) continue;
             e.preventDefault();
             return true;
           }
