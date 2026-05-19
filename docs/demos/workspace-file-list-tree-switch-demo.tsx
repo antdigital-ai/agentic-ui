@@ -16,6 +16,18 @@ const TREE_ROOT: FileTreeNode[] = [
   },
 ];
 
+const LONG_NAME_README =
+  'README-agentic-ui-workspace-file-tree-lazy-load-and-list-switch-integration-notes.md';
+
+const LONG_NAME_COMPONENT =
+  'WorkspaceFilePanelWithTreeSwitchLazyLoadingAndSearchFilterBehavior.regression.test.tsx';
+
+const LONG_NAME_ASSET =
+  'screenshot-2024-q4-release-notes-banner-ultra-wide-3840x2160-final-v3.png';
+
+const LONG_NAME_DOCS =
+  'architecture-and-design-decisions-for-agentic-ui-file-panel-tree-mode-guide.md';
+
 const ALL_FILES: FileNode[] = [
   {
     id: 'flat-readme',
@@ -24,6 +36,24 @@ const ALL_FILES: FileNode[] = [
     size: '12KB',
     lastModified: '09:30',
     url: 'https://example.com/README.md',
+    canPreview: true,
+  },
+  {
+    id: 'flat-readme-long',
+    name: LONG_NAME_README,
+    type: 'markdown',
+    size: '28KB',
+    lastModified: '09:32',
+    url: `https://example.com/${LONG_NAME_README}`,
+    canPreview: true,
+  },
+  {
+    id: 'flat-package',
+    name: 'package.json',
+    type: 'code',
+    size: '2KB',
+    lastModified: '08:00',
+    url: 'https://example.com/package.json',
     canPreview: true,
   },
   {
@@ -44,30 +74,213 @@ const ALL_FILES: FileNode[] = [
     url: 'https://example.com/app.tsx',
     canPreview: true,
   },
+  {
+    id: 'flat-file-item',
+    name: 'FileItem.tsx',
+    type: 'code',
+    size: '6KB',
+    lastModified: '11:18',
+    url: 'https://example.com/FileItem.tsx',
+    canPreview: true,
+  },
+  {
+    id: 'flat-hook',
+    name: 'useFileTreeLazyLoad.ts',
+    type: 'code',
+    size: '3KB',
+    lastModified: '11:22',
+    url: 'https://example.com/useFileTreeLazyLoad.ts',
+    canPreview: true,
+  },
+  {
+    id: 'flat-variables',
+    name: 'variables.css',
+    type: 'code',
+    size: '1KB',
+    lastModified: '11:25',
+    url: 'https://example.com/variables.css',
+    canPreview: true,
+  },
+  {
+    id: 'flat-getting-started',
+    name: 'getting-started.md',
+    type: 'markdown',
+    size: '16KB',
+    lastModified: '10:40',
+    url: 'https://example.com/getting-started.md',
+    canPreview: true,
+  },
+  {
+    id: 'flat-docs-long',
+    name: LONG_NAME_DOCS,
+    type: 'markdown',
+    size: '42KB',
+    lastModified: '10:45',
+    url: `https://example.com/${LONG_NAME_DOCS}`,
+    canPreview: true,
+  },
+  {
+    id: 'flat-component-long',
+    name: LONG_NAME_COMPONENT,
+    type: 'code',
+    size: '18KB',
+    lastModified: '14:02',
+    url: `https://example.com/${LONG_NAME_COMPONENT}`,
+    canPreview: true,
+  },
+  {
+    id: 'flat-logo',
+    name: 'logo.png',
+    type: 'image',
+    size: '120KB',
+    lastModified: '昨天',
+    url: 'https://example.com/logo.png',
+    canPreview: true,
+  },
+  {
+    id: 'flat-asset-long',
+    name: LONG_NAME_ASSET,
+    type: 'image',
+    size: '2.4MB',
+    lastModified: '昨天',
+    url: `https://example.com/${LONG_NAME_ASSET}`,
+    canPreview: true,
+  },
+  {
+    id: 'flat-ci',
+    name: 'ci.yml',
+    type: 'code',
+    size: '3KB',
+    lastModified: '周一',
+    url: 'https://example.com/ci.yml',
+    canPreview: true,
+  },
+  {
+    id: 'flat-changelog',
+    name: 'changelog.zh-CN.md',
+    type: 'markdown',
+    size: '56KB',
+    lastModified: '周一',
+    url: 'https://example.com/changelog.zh-CN.md',
+    canPreview: true,
+  },
 ];
 
 const MOCK_CHILDREN: Record<string, FileTreeNode[]> = {
   'demo-root': [
     { key: 'demo-root/src', name: 'src', isLeaf: false },
+    { key: 'demo-root/docs', name: 'docs', isLeaf: false },
+    { key: 'demo-root/assets', name: 'assets', isLeaf: false },
+    { key: 'demo-root/.github', name: '.github', isLeaf: false },
     {
       key: 'demo-root/README.md',
       name: 'README.md',
       isLeaf: true,
       file: ALL_FILES[0],
     },
+    {
+      key: `demo-root/${LONG_NAME_README}`,
+      name: LONG_NAME_README,
+      isLeaf: true,
+      file: ALL_FILES[1],
+    },
+    {
+      key: 'demo-root/package.json',
+      name: 'package.json',
+      isLeaf: true,
+      file: ALL_FILES[2],
+    },
+    {
+      key: 'demo-root/changelog.zh-CN.md',
+      name: 'changelog.zh-CN.md',
+      isLeaf: true,
+      file: ALL_FILES[14],
+    },
   ],
   'demo-root/src': [
+    { key: 'demo-root/src/components', name: 'components', isLeaf: false },
+    { key: 'demo-root/src/hooks', name: 'hooks', isLeaf: false },
+    { key: 'demo-root/src/styles', name: 'styles', isLeaf: false },
     {
       key: 'demo-root/src/api.ts',
       name: 'api.ts',
       isLeaf: true,
-      file: ALL_FILES[1],
+      file: ALL_FILES[3],
     },
     {
       key: 'demo-root/src/app.tsx',
       name: 'app.tsx',
       isLeaf: true,
-      file: ALL_FILES[2],
+      file: ALL_FILES[4],
+    },
+  ],
+  'demo-root/src/components': [
+    {
+      key: 'demo-root/src/components/FileItem.tsx',
+      name: 'FileItem.tsx',
+      isLeaf: true,
+      file: ALL_FILES[5],
+    },
+    {
+      key: `demo-root/src/components/${LONG_NAME_COMPONENT}`,
+      name: LONG_NAME_COMPONENT,
+      isLeaf: true,
+      file: ALL_FILES[10],
+    },
+  ],
+  'demo-root/src/hooks': [
+    {
+      key: 'demo-root/src/hooks/useFileTreeLazyLoad.ts',
+      name: 'useFileTreeLazyLoad.ts',
+      isLeaf: true,
+      file: ALL_FILES[6],
+    },
+  ],
+  'demo-root/src/styles': [
+    {
+      key: 'demo-root/src/styles/variables.css',
+      name: 'variables.css',
+      isLeaf: true,
+      file: ALL_FILES[7],
+    },
+  ],
+  'demo-root/docs': [
+    {
+      key: 'demo-root/docs/getting-started.md',
+      name: 'getting-started.md',
+      isLeaf: true,
+      file: ALL_FILES[8],
+    },
+    {
+      key: `demo-root/docs/${LONG_NAME_DOCS}`,
+      name: LONG_NAME_DOCS,
+      isLeaf: true,
+      file: ALL_FILES[9],
+    },
+  ],
+  'demo-root/assets': [
+    {
+      key: 'demo-root/assets/logo.png',
+      name: 'logo.png',
+      isLeaf: true,
+      file: ALL_FILES[11],
+    },
+    {
+      key: `demo-root/assets/${LONG_NAME_ASSET}`,
+      name: LONG_NAME_ASSET,
+      isLeaf: true,
+      file: ALL_FILES[12],
+    },
+  ],
+  'demo-root/.github': [
+    { key: 'demo-root/.github/workflows', name: 'workflows', isLeaf: false },
+  ],
+  'demo-root/.github/workflows': [
+    {
+      key: 'demo-root/.github/workflows/ci.yml',
+      name: 'ci.yml',
+      isLeaf: true,
+      file: ALL_FILES[13],
     },
   ],
 };
@@ -97,10 +310,11 @@ const WorkspaceFileListTreeSwitchDemo: React.FC = () => {
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
             通过 <Typography.Text code>fileTreeSwitch</Typography.Text>{' '}
-            开启工具栏 上的分段切换；下方按钮演示<strong>受控</strong>的{' '}
+            开启工具栏上的分段切换；下方按钮演示<strong>受控</strong>的{' '}
             <Typography.Text code>view</Typography.Text> /{' '}
             <Typography.Text code>onViewChange</Typography.Text>，与面板内
-            Segmented 同步
+            Segmented 同步。列表含多级目录与<strong>超长文件名</strong>
+            ，便于验证省略与操作区叠层
           </Typography.Paragraph>
 
           <Alert
@@ -109,8 +323,8 @@ const WorkspaceFileListTreeSwitchDemo: React.FC = () => {
             message={panelView === 'list' ? '平铺模式' : '文件树模式'}
             description={
               panelView === 'list'
-                ? '列表按文件名过滤当前全部文件条目'
-                : '树内搜索仅匹配已展开目录下已加载的文件名；叶子可挂 `file` 与列表一致支持预览/下载；无匹配时根级与「已展开仍无结果」会显示不同提示；工具栏为图标切换（悬停可看名称）'
+                ? '列表按文件名过滤当前全部 15 个文件条目（含 4 个超长文件名）'
+                : '树内搜索仅匹配已展开目录下已加载的文件名；展开 workspace → src / docs / assets 可浏览更多叶子；叶子可挂 `file` 与列表一致支持预览/下载'
             }
           />
 

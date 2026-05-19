@@ -193,9 +193,18 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
       },
 
       [`&-actions`]: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+        zIndex: 1,
         display: 'flex',
         alignItems: 'center',
         gap: '4px',
+        padding: 0,
+        borderStartEndRadius: 'var(--radius-control-base)',
+        borderEndEndRadius: 'var(--radius-control-base)',
+        background: 'var(--color-gray-bg-card-white)',
         // 默认隐藏，仅在 hover/focus 时显示
         opacity: 0,
         visibility: 'hidden',
@@ -226,6 +235,7 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
 
     // 平铺列表行
     [`${token.componentCls}-item--list`]: {
+      position: 'relative',
       display: 'flex',
       width: '100%',
       alignItems: 'center',
@@ -252,6 +262,7 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
           opacity: 1,
           visibility: 'visible',
           pointerEvents: 'auto',
+          background: 'var(--color-gray-control-fill-hover)',
         },
       },
 
@@ -260,14 +271,16 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
           opacity: 1,
           visibility: 'visible',
           pointerEvents: 'auto',
+          background: 'var(--color-gray-control-fill-hover)',
         },
       },
     },
 
     // 文件树叶子行
     [`${token.componentCls}-item--tree`]: {
+      position: 'relative',
       display: 'inline-flex',
-      width: 'auto',
+      width: '100%',
       maxWidth: 'none',
       alignItems: 'center',
       gap: '4px',

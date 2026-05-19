@@ -23,6 +23,9 @@ import { useFileStyle } from '../style';
 import { getFileTypeIcon } from '../utils';
 import { useFileTreeStyle } from './style';
 
+/** antd Tree 每级缩进（px），默认 24 */
+const FILE_TREE_INDENT_SIZE = 12;
+
 const walkAndIndex = (
   nodes: FileTreeNode[],
   map: Map<string, FileTreeNode>,
@@ -432,6 +435,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       ) : (
         <Tree
           className={classNames(`${prefixCls}-tree`, hashId)}
+          indentSize={FILE_TREE_INDENT_SIZE}
           showLine={showLine}
           showIcon
           blockNode={blockNode}

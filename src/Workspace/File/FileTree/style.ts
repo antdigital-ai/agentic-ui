@@ -36,11 +36,13 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
           height: 32,
           lineHeight: '32px',
         },
-        [`${antCls}-tree-node-content-wrapper`]: {
-          flex: 1,
-          minWidth: 0,
-          overflow: 'hidden',
-        },
+        [`&${antCls}-tree-block-node ${antCls}-tree-list-holder-inner ${antCls}-tree-node-content-wrapper`]:
+          {
+            display: 'flex',
+            flex: 1,
+            minWidth: 0,
+            overflow: 'hidden',
+          },
         [`${antCls}-tree-title`]: {
           display: 'inline-flex',
           alignItems: 'center',
