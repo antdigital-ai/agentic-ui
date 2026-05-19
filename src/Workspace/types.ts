@@ -668,6 +668,16 @@ export interface FileTreeProps extends BaseChildProps {
    * 是否整行可点选（antd Tree `blockNode`），默认 `true`
    */
   blockNode?: boolean;
+  /**
+   * 与平铺列表共用的 {@link FileItem} 样式前缀（由 `Workspace.File` 注入）
+   * @internal
+   */
+  fileItemPrefixCls?: string;
+  /**
+   * 与平铺列表共用的 {@link FileItem} hashId（由 `Workspace.File` 注入）
+   * @internal
+   */
+  fileItemHashId?: string;
 }
 
 /** 文件面板在「列表」与「文件树」之间的视图模式 */

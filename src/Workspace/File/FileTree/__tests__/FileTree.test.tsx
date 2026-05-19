@@ -10,7 +10,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { I18nContext } from '../../../../I18n';
 import Workspace from '../../../index';
-import type { FileNode } from '../../../types';
+import type { FileNode, FileTreeNode } from '../../../types';
 
 describe('Workspace.FileTree', () => {
   const mockLocale = {
@@ -319,6 +319,84 @@ describe('Workspace.FileTree', () => {
     expect(onPreview).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'tree-f2', name: 'note.md' }),
     );
+  });
+
+  it('shows preview button when url is on tree node without canPreview', () => {
+    const onPreview = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-md',
+                name: 'readme.md',
+                isLeaf: true,
+                url: 'https://example.com/readme.md',
+              } satisfies FileTreeNode & Pick<FileNode, 'url'>,
+            ]}
+            onLoadChildren={vi.fn()}
+            onPreview={onPreview}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(screen.getByRole('button', { name: '预览' })).toBeInTheDocument();
+  });
+
+  it('renders FileItem tree layout for leaf nodes', () => {
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-layout',
+                name: 'layout.txt',
+                isLeaf: true,
+                url: 'https://example.com/layout.txt',
+              } satisfies FileTreeNode & Pick<FileNode, 'url'>,
+            ]}
+            onLoadChildren={vi.fn()}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(
+      document.querySelector('.ant-workspace-file-item--tree'),
+    ).toBeInTheDocument();
+  });
+
+  it('downloads when url is on tree node without nested file', async () => {
+    const appendSpy = vi.spyOn(document.body, 'appendChild');
+    const removeSpy = vi.spyOn(document.body, 'removeChild');
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-url',
+                name: 'report.pdf',
+                isLeaf: true,
+                url: 'https://example.com/report.pdf',
+              } satisfies FileTreeNode & Pick<FileNode, 'url'>,
+            ]}
+            onLoadChildren={vi.fn()}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '下载' }));
+    expect(appendSpy).toHaveBeenCalled();
+
+    appendSpy.mockRestore();
+    removeSpy.mockRestore();
   });
 
   it('leaf without explicit file shares download and row preview behavior with flat list', async () => {

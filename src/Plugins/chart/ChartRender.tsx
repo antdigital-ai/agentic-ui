@@ -304,8 +304,11 @@ const ChartRuntimeRendererImpl: React.FC<{
       const xValue = getFieldValue(row, config?.x);
       const yValue = getFieldValue(row, config?.y);
       return {
-        label: xValue ? String(xValue) : String(i + 1),
-        score: yValue ? Number(yValue) : undefined,
+        x: xValue ? String(xValue) : String(i + 1),
+        y:
+          yValue !== null && yValue !== undefined && yValue !== ''
+            ? Number(yValue)
+            : 0,
         ...(category ? { category } : {}),
         ...(type ? { type } : {}),
         ...(filterLabel ? { filterLabel } : {}),

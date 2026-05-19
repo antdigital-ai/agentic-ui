@@ -284,6 +284,112 @@ describe('FileComponent', () => {
         expect(screen.getByTestId('workspace-file-tree')).toBeInTheDocument();
       });
     });
+
+    it('树模式叶子使用 FileItem 且点击预览打开与列表一致的预览页', async () => {
+      const treeProps = {
+        treeData: [
+          {
+            key: 'leaf-preview',
+            name: 'readme.md',
+            isLeaf: true,
+            url: 'https://example.com/readme.md',
+          },
+        ],
+        onLoadChildren: vi.fn().mockResolvedValue([]),
+      };
+
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={[]}
+            onPreview={vi.fn()}
+            fileTreeSwitch={{ treeProps, view: 'tree' }}
+          />
+        </TestWrapper>,
+      );
+
+      expect(
+        document.querySelector('.ant-workspace-file-item--tree'),
+      ).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: '预览' }));
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('返回文件列表')).toBeInTheDocument();
+      });
+    });
+
+    it('树模式点击下载应触发 onDownload 并传入合并后的 FileNode', async () => {
+      const handleDownload = vi.fn();
+      const treeProps = {
+        treeData: [
+          {
+            key: 'leaf-dl',
+            name: 'data.csv',
+            isLeaf: true,
+            url: 'https://example.com/data.csv',
+          },
+        ],
+        onLoadChildren: vi.fn().mockResolvedValue([]),
+      };
+
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={[]}
+            onDownload={handleDownload}
+            fileTreeSwitch={{ treeProps, view: 'tree' }}
+          />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: '下载' }));
+
+      expect(handleDownload).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'leaf-dl',
+          name: 'data.csv',
+          url: 'https://example.com/data.csv',
+        }),
+      );
+    });
+
+    it('树模式选中叶子行应走 handlePreview（无 onFileClick 时）', async () => {
+      const handlePreview = vi.fn();
+      const treeProps = {
+        treeData: [
+          {
+            key: 'leaf-select',
+            name: 'select.md',
+            isLeaf: true,
+            content: '# title',
+          },
+        ],
+        onLoadChildren: vi.fn().mockResolvedValue([]),
+      };
+
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={[]}
+            onPreview={handlePreview}
+            fileTreeSwitch={{ treeProps, view: 'tree' }}
+          />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByText('select.md'));
+
+      await waitFor(() => {
+        expect(handlePreview).toHaveBeenCalledWith(
+          expect.objectContaining({
+            id: 'leaf-select',
+            name: 'select.md',
+            content: '# title',
+          }),
+        );
+      });
+    });
   });
 
   describe('文件交互', () => {

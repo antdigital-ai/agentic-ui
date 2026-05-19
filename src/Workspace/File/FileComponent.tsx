@@ -661,6 +661,8 @@ export const FileComponent: FC<{
                   filterKeyword={
                     hasKeyword ? String(keyword ?? '').trim() : undefined
                   }
+                  fileItemPrefixCls={prefixCls}
+                  fileItemHashId={hashId}
                   onDownload={onDownload}
                   onPreview={handlePreview}
                   onShare={onShare}

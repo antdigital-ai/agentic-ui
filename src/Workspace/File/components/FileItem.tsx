@@ -42,6 +42,11 @@ export interface FileItemProps {
   locale?: Record<string, any>;
   /** 是否在元素上绑定 DOM id（默认 false） */
   bindDomId?: boolean;
+  /**
+   * 列表平铺（默认）或文件树叶子行
+   * @description 树模式由 antd Tree 负责行选中，本组件仅渲染文件名与操作区
+   */
+  layout?: 'list' | 'tree';
 }
 
 /**
@@ -66,6 +71,7 @@ const FileItemComponent: FC<FileItemProps> = ({
   hashId,
   locale,
   bindDomId = false,
+  layout = 'list',
 }) => {
   const fileWithId = ensureNodeWithId(file);
   const fileTypeInfo = fileTypeProcessor.inferFileType(fileWithId);
@@ -181,6 +187,56 @@ const FileItemComponent: FC<FileItemProps> = ({
   };
 
   const ariaLabel = `${locale?.['workspace.file'] || '文件'}：${fileWithId.name}`;
+
+  if (layout === 'tree') {
+    if (isDisabled) {
+      return (
+        <span
+          className={classNames(`${prefixCls}-item-name-text`, hashId)}
+          title={fileWithId.name}
+        >
+          {fileWithId.name}
+        </span>
+      );
+    }
+
+    return (
+      <div
+        className={classNames(
+          `${prefixCls}-item`,
+          `${prefixCls}-item--tree`,
+          hashId,
+        )}
+      >
+        <div className={classNames(`${prefixCls}-item-info`, hashId)}>
+          <div className={classNames(`${prefixCls}-item-name`, hashId)}>
+            {fileWithId.renderName ? (
+              fileWithId.renderName(renderContext)
+            ) : (
+              <Typography.Text ellipsis={{ tooltip: fileWithId.name }}>
+                {fileWithId.name}
+              </Typography.Text>
+            )}
+          </div>
+        </div>
+        <div
+          className={classNames(`${prefixCls}-item-actions`, hashId)}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {fileWithId.renderActions ? (
+            fileWithId.renderActions(renderContext)
+          ) : (
+            <>
+              {builtinActions.preview}
+              {builtinActions.locate}
+              {builtinActions.share}
+              {builtinActions.download}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AccessibleButton

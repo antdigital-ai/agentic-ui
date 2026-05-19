@@ -163,6 +163,38 @@ const genStyle: GenStyleFn<'WorkspaceFile'> = (token) => {
         },
       },
 
+      // 文件树叶子行：与平铺列表共用 FileItem，仅保留文件名与操作区
+      '&--tree': {
+        width: '100%',
+        marginBottom: 0,
+        padding: 0,
+        cursor: 'default',
+        background: 'transparent',
+
+        '&:hover': {
+          background: 'transparent',
+        },
+
+        [`${token.componentCls}-item-icon`]: {
+          display: 'none',
+        },
+
+        [`${token.componentCls}-item-details`]: {
+          display: 'none',
+        },
+
+        [`${token.componentCls}-item-info`]: {
+          flex: 1,
+          minWidth: 0,
+        },
+
+        [`${token.componentCls}-item-actions`]: {
+          opacity: 1,
+          visibility: 'visible',
+          pointerEvents: 'auto',
+        },
+      },
+
       // 文件图标
       [`&-icon`]: {
         display: 'flex',

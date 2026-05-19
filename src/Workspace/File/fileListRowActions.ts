@@ -24,10 +24,17 @@ export const shouldShowFilePreviewAction = (
   if (file.canPreview !== undefined) {
     return file.canPreview;
   }
+  // 与下载一致：存在 onPreview 时，有 url/content/file 等源即可展示（不仅依赖类型推断）
   return Boolean(
     onPreview &&
     (isImageFile(file)
       ? !!(file.url || file.previewUrl)
-      : fileTypeProcessor.processFile(file).canPreview),
+      : Boolean(
+          file.url ||
+            file.previewUrl ||
+            file.content ||
+            file.file ||
+            fileTypeProcessor.processFile(file).canPreview,
+        )),
   );
 };

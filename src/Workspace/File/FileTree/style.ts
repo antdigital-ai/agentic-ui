@@ -1,7 +1,7 @@
 ﻿import { genStyleHooks, type GenStyleFn } from '../../../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
-  const { componentCls, antCls, iconCls } = token;
+  const { componentCls, antCls } = token;
 
   return {
     [componentCls]: {
@@ -21,24 +21,6 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
         overflowY: 'auto',
         background: 'transparent',
 
-        [`${componentCls}-leaf-title`]: {
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: token.marginXXS ?? 4,
-          width: 'fit-content',
-          maxWidth: '100%',
-          minWidth: 0,
-          overflow: 'hidden',
-        },
-        [`${componentCls}-leaf-title-text`]: {
-          flex: 1,
-          minWidth: 0,
-          height: 32,
-          lineHeight: '32px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        },
         [`${componentCls}-icon`]: {
           height: 32,
           lineHeight: '32px',
@@ -60,6 +42,8 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
           overflow: 'hidden',
         },
         [`${antCls}-tree-title`]: {
+          flex: 1,
+          width: '100%',
           minWidth: 0,
           height: 32,
           lineHeight: '32px',
@@ -67,21 +51,6 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
           [`&:not(:has(.${componentCls}-leaf-title))`]: {
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-          },
-        },
-        [`${componentCls}-leaf-actions`]: {
-          display: 'flex',
-          alignItems: 'center',
-          alignSelf: 'center',
-          gap: '4px',
-          flexShrink: 0,
-        },
-        [`${componentCls}-leaf-action-btn`]: {
-          [iconCls]: {
-            color: 'var(--color-gray-text-light)',
-          },
-          [`&:hover ${iconCls}, &:focus ${iconCls}, &:active ${iconCls}`]: {
-            color: 'var(--color-gray-text-light)',
           },
         },
       },

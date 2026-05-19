@@ -16,9 +16,10 @@ import { useRefFunction } from '../../../Hooks/useRefFunction';
 import { I18nContext, compileTemplate } from '../../../I18n';
 import type { FileNode, FileTreeNode, FileTreeProps } from '../../types';
 import { getFileType } from '../../types';
-import { ensureNodeWithId } from '../handlers';
+import { FileItem } from '../components/FileItem';
+import { resolveTreeLeafFile } from '../resolveTreeLeafFile';
+import { useFileStyle } from '../style';
 import { getFileTypeIcon } from '../utils';
-import { FileTreeLeafTitle } from './FileTreeLeafTitle';
 import { useFileTreeStyle } from './style';
 
 const walkAndIndex = (
@@ -33,32 +34,13 @@ const walkAndIndex = (
   }
 };
 
-const resolveTreeLeafFile = (node: FileTreeNode): FileNode | null => {
-  const hasChildren = Boolean(node.children && node.children.length > 0);
-  const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
-  if (!resolvedIsLeaf) {
-    return null;
-  }
-
-  if (node.file !== undefined && node.file !== null) {
-    return ensureNodeWithId({
-      ...node.file,
-      name: node.file.name ?? node.name,
-      id: node.file.id ?? node.id ?? node.key,
-    });
-  }
-
-  return ensureNodeWithId({
-    name: node.name,
-    id: node.id ?? node.key,
-  });
-};
-
 const mapTreeToDataNodes = (
   nodes: FileTreeNode[],
   ctx: {
     prefixCls: string;
     hashId: string;
+    fileItemPrefixCls: string;
+    fileItemHashId: string;
     locale?: Record<string, any>;
     onDownload?: (file: FileNode) => void;
     onPreview?: FileTreeProps['onPreview'];
@@ -74,14 +56,15 @@ const mapTreeToDataNodes = (
       const leafFile = resolveTreeLeafFile(node);
       const title =
         leafFile !== null ? (
-          <FileTreeLeafTitle
-            node={
-              { ...node, file: leafFile } as FileTreeNode & {
-                file: FileNode;
-              }
+          <FileItem
+            layout="tree"
+            file={
+              node.disabled === true
+                ? { ...leafFile, disabled: true }
+                : leafFile
             }
-            prefixCls={ctx.prefixCls}
-            hashId={ctx.hashId}
+            prefixCls={ctx.fileItemPrefixCls}
+            hashId={ctx.fileItemHashId}
             locale={ctx.locale}
             onDownload={ctx.onDownload}
             onPreview={ctx.onPreview}
@@ -210,11 +193,19 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   emptyRender,
   blockNode = true,
   filterKeyword,
+  fileItemPrefixCls: fileItemPrefixClsProp,
+  fileItemHashId: fileItemHashIdProp,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
   const prefixCls = getPrefixCls('workspace-file-tree');
+  const fileItemPrefixCls =
+    fileItemPrefixClsProp ?? getPrefixCls('workspace-file');
   const { wrapSSR, hashId } = useFileTreeStyle(prefixCls);
+  const { wrapSSR: wrapFileItemSSR, hashId: fileItemStyleHashId } =
+    useFileStyle(fileItemPrefixCls);
+  const fileItemHashId = fileItemHashIdProp ?? fileItemStyleHashId;
+  const injectFileItemStyles = fileItemHashIdProp === undefined;
 
   const [innerTree, setInnerTree] = useState<FileTreeNode[]>(treeData);
   const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
@@ -261,6 +252,8 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       mapTreeToDataNodes(displayTree, {
         prefixCls,
         hashId,
+        fileItemPrefixCls,
+        fileItemHashId,
         locale,
         onDownload,
         onPreview,
@@ -271,6 +264,8 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       displayTree,
       prefixCls,
       hashId,
+      fileItemPrefixCls,
+      fileItemHashId,
       locale,
       onDownload,
       onPreview,
@@ -414,7 +409,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       </Typography.Text>
     );
 
-  return wrapSSR(
+  const panel = (
     <div
       className={classNames(prefixCls, hashId, className)}
       style={style}
@@ -438,8 +433,10 @@ const FileTreeComponent: FC<FileTreeProps> = ({
           icon={handleTreeIcon}
         />
       )}
-    </div>,
+    </div>
   );
+
+  return wrapSSR(injectFileItemStyles ? wrapFileItemSSR(panel) : panel);
 };
 
 FileTreeComponent.displayName = 'FileTree';
