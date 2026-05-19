@@ -1,4 +1,5 @@
 import { renderHook } from '@testing-library/react';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { useRefFunction } from '../useRefFunction';
 
@@ -13,6 +14,21 @@ describe('useRefFunction', () => {
 
     expect(mockFn).toHaveBeenCalledWith('arg1', 'arg2');
     expect(resultValue).toBe('test result');
+  });
+
+  it('should allow calling the stable wrapper during initial render', () => {
+    const mockFn = vi.fn().mockReturnValue('initial result');
+
+    const { result } = renderHook(() => {
+      const stableFn = useRefFunction(mockFn);
+      const [value] = useState(() => stableFn('initial'));
+
+      return { stableFn, value };
+    });
+
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn).toHaveBeenCalledWith('initial');
+    expect(result.current.value).toBe('initial result');
   });
 
   it('should always call the latest function even when function reference changes', () => {

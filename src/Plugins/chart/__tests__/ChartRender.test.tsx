@@ -109,9 +109,16 @@ vi.mock('../ChartAttrToolBar', () => ({
 
 const createRuntimeComponent =
   (testId: string) =>
-  (props: { title?: string; toolbarExtra?: React.ReactNode }) => (
+  (props: {
+    data?: Array<Record<string, unknown>>;
+    title?: string;
+    toolbarExtra?: React.ReactNode;
+  }) => (
     <div data-testid={testId}>
       {props.title ?? `mock-${testId}`}
+      <pre data-testid={`${testId}-data`}>
+        {JSON.stringify(props.data ?? [])}
+      </pre>
       {props.toolbarExtra}
     </div>
   );
@@ -457,6 +464,50 @@ describe('ChartRender', () => {
 
       // 检查组件是否渲染了基本结构
       expect(container.firstChild).toBeInTheDocument();
+    });
+
+    it('应该将显式 sortBy 字段传给运行时平铺图表数据', async () => {
+      const props = {
+        ...defaultProps,
+        chartData: [
+          { stage: '节前冲刺', value: 265159.89, order: 3, index: 1 },
+          { stage: '春节情人节', value: 265090.85, order: 2, index: 2 },
+          { stage: '节前平淡', value: 150960.55, order: 1, index: 3 },
+        ],
+        config: {
+          ...defaultProps.config,
+          x: 'stage',
+          y: 'value',
+          sortBy: 'order',
+          columns: [
+            { title: 'Stage', dataIndex: 'stage' },
+            { title: 'Value', dataIndex: 'value' },
+            { title: 'Order', dataIndex: 'order' },
+            { title: 'Index', dataIndex: 'index' },
+          ],
+        },
+      };
+
+      render(
+        <I18nContext.Provider value={mockI18n}>
+          <ChartRender {...props} />
+        </I18nContext.Provider>,
+      );
+
+      const runtimeData = JSON.parse(
+        (await screen.findByTestId('bar-chart-data')).textContent ?? '[]',
+      ) as Array<{ sortBy?: number; x: string; y: number }>;
+
+      expect(
+        runtimeData.map(({ sortBy, x }) => ({
+          sortBy,
+          x,
+        })),
+      ).toEqual([
+        { sortBy: 3, x: '节前冲刺' },
+        { sortBy: 2, x: '春节情人节' },
+        { sortBy: 1, x: '节前平淡' },
+      ]);
     });
 
     it('应该处理没有配置的情况', () => {
