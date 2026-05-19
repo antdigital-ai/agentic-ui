@@ -161,14 +161,18 @@ vi.mock('../../ChartStatistic', () => ({
   ),
 }));
 
-vi.mock('../../utils', () => ({
-  resolveCssVariable: vi.fn((color) =>
-    typeof color === 'string' && color.startsWith('var(') ? '#1677ff' : color,
-  ),
-  hexToRgba: vi.fn(
-    (color, alpha) => `${color}${Math.round(alpha * 255).toString(16)}`,
-  ),
-}));
+vi.mock('../../utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../utils')>();
+  return {
+    ...actual,
+    resolveCssVariable: vi.fn((color) =>
+      typeof color === 'string' && color.startsWith('var(') ? '#1677ff' : color,
+    ),
+    hexToRgba: vi.fn(
+      (color, alpha) => `${color}${Math.round(alpha * 255).toString(16)}`,
+    ),
+  };
+});
 
 const mockData = [
   { label: '技术', type: '团队A', score: 80, category: 'cat1' },
@@ -607,7 +611,7 @@ describe('RadarChart', () => {
     expect(screen.getByTestId('radar-chart')).toBeInTheDocument();
   });
 
-  it('应该处理没有 type 的数据项', () => {
+  it('应该处理没有 type 的数据项（使用默认序列名）', () => {
     const dataWithoutType = [
       { label: '技术', score: 80 },
       { label: '沟通', score: 90 },
@@ -619,8 +623,7 @@ describe('RadarChart', () => {
       </ConfigProvider>,
     );
 
-    // 没有 type 时，datasetTypes 为空，应该显示"暂无有效数据"
-    expect(screen.getByText('暂无有效数据')).toBeInTheDocument();
+    expect(screen.getByTestId('radar-chart')).toBeInTheDocument();
   });
 
   it('应该处理空 labels 数组', () => {
@@ -639,19 +642,15 @@ describe('RadarChart', () => {
     expect(screen.getByText('暂无有效数据')).toBeInTheDocument();
   });
 
-  it('应该处理空 datasetTypes 数组', () => {
-    const dataWithoutTypes = [
-      { label: '技术', score: 80 },
-      { label: '沟通', score: 90 },
-    ];
+  it('缺少 x/label 时应显示空状态', () => {
+    const dataWithoutAxis = [{ type: '团队A', score: 80 }];
 
     render(
       <ConfigProvider>
-        <RadarChart data={dataWithoutTypes} />
+        <RadarChart data={dataWithoutAxis} />
       </ConfigProvider>,
     );
 
-    // 应该显示空状态
     expect(screen.getByText('暂无有效数据')).toBeInTheDocument();
   });
 

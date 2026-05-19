@@ -35,13 +35,17 @@ vi.mock('react-chartjs-2', () => ({
   )),
 }));
 
-// Mock utils
-vi.mock('../utils', () => ({
-  hexToRgba: vi.fn((color, alpha) => `rgba(0,0,0,${alpha})`),
-  resolveCssVariable: vi.fn((color) =>
-    typeof color === 'string' && color.startsWith('var(') ? '#1d7afc' : color,
-  ),
-}));
+// Mock utils（保留 normalizeRadarChartData 等真实实现）
+vi.mock('../utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../utils')>();
+  return {
+    ...actual,
+    hexToRgba: vi.fn((color, alpha) => `rgba(0,0,0,${alpha})`),
+    resolveCssVariable: vi.fn((color) =>
+      typeof color === 'string' && color.startsWith('var(') ? '#1d7afc' : color,
+    ),
+  };
+});
 
 // Mock components
 vi.mock('../components', () => ({
@@ -95,16 +99,16 @@ vi.mock('../RadarChart/style', () => ({
 
 describe('RadarChart', () => {
   const sampleData: RadarChartDataItem[] = [
-    { category: 'A组', label: '技术', type: '团队A', score: 80 },
-    { category: 'A组', label: '沟通', type: '团队A', score: 70 },
-    { category: 'A组', label: '创新', type: '团队A', score: 90 },
-    { category: 'A组', label: '领导力', type: '团队A', score: 75 },
-    { category: 'A组', label: '执行力', type: '团队A', score: 85 },
-    { category: 'A组', label: '技术', type: '团队B', score: 70 },
-    { category: 'A组', label: '沟通', type: '团队B', score: 80 },
-    { category: 'A组', label: '创新', type: '团队B', score: 75 },
-    { category: 'A组', label: '领导力', type: '团队B', score: 85 },
-    { category: 'A组', label: '执行力', type: '团队B', score: 70 },
+    { category: 'A组', x: '技术', type: '团队A', y: 80 },
+    { category: 'A组', x: '沟通', type: '团队A', y: 70 },
+    { category: 'A组', x: '创新', type: '团队A', y: 90 },
+    { category: 'A组', x: '领导力', type: '团队A', y: 75 },
+    { category: 'A组', x: '执行力', type: '团队A', y: 85 },
+    { category: 'A组', x: '技术', type: '团队B', y: 70 },
+    { category: 'A组', x: '沟通', type: '团队B', y: 80 },
+    { category: 'A组', x: '创新', type: '团队B', y: 75 },
+    { category: 'A组', x: '领导力', type: '团队B', y: 85 },
+    { category: 'A组', x: '执行力', type: '团队B', y: 70 },
   ];
 
   beforeEach(() => {
@@ -185,14 +189,34 @@ describe('RadarChart', () => {
       expect(screen.getByTestId('chart-container')).toBeInTheDocument();
     });
 
-    it('应该处理没有 type 的数据', () => {
+    it('应该处理没有 type 的数据（使用默认序列名）', () => {
       const noTypeData: RadarChartDataItem[] = [
         { category: 'A组', label: '技术', score: 80 },
+        { category: 'A组', label: '沟通', score: 70 },
       ];
 
       render(<RadarChart data={noTypeData} title="无 type 数据" />);
 
-      expect(screen.getByText('暂无有效数据')).toBeInTheDocument();
+      expect(screen.getByTestId('radar-chart')).toBeInTheDocument();
+    });
+
+    it('应该支持 x/y 扁平字段（与 label/score 等价）', () => {
+      const xyData: RadarChartDataItem[] = [
+        { category: '团队A', x: '产品', y: 85 },
+        { category: '团队A', x: '技术', y: 90 },
+        { category: '团队B', x: '产品', y: 75 },
+        { category: '团队B', x: '技术', y: 85 },
+      ];
+
+      render(
+        <RadarChart
+          data={xyData}
+          title="x/y 数据"
+          renderFilterInToolbar
+        />,
+      );
+
+      expect(screen.getByTestId('radar-chart')).toBeInTheDocument();
     });
 
     it('应该处理没有 label 的数据', () => {

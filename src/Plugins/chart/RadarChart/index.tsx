@@ -22,26 +22,27 @@ import {
   downloadChart,
 } from '../components';
 import { defaultColorList } from '../const';
-import { useChartTheme, useResolvedChartTheme } from '../hooks';
+import {
+  useChartDataFilter,
+  useChartTheme,
+  useResolvedChartTheme,
+} from '../hooks';
 import { StatisticConfigType } from '../hooks/useChartStatistic';
 import type { ChartClassNames, ChartStyles } from '../types/classNames';
-import { hexToRgba, resolveCssVariable } from '../utils';
+import {
+  type RadarChartDataItem,
+  extractAndSortXValues,
+  findDataPointByXValue,
+  hexToRgba,
+  normalizeRadarChartData,
+  parseChartDataYValue,
+  resolveCssVariable,
+} from '../utils';
 import { useStyle } from './style';
 
-let radarChartComponentsRegistered = false;
+export type { RadarChartDataItem };
 
-// 雷达图数据项接口 - 扁平化数据格式
-export interface RadarChartDataItem {
-  category?: string;
-  label?: string;
-  type?: string;
-  score?: number | string;
-  filterLabel?: string;
-  // 兼容不同的数据格式
-  x?: string;
-  y?: number;
-  [key: string]: any;
-}
+let radarChartComponentsRegistered = false;
 
 interface RadarChartProps extends ChartContainerProps {
   /** 扁平化数据数组 */
@@ -167,86 +168,40 @@ const RadarChart: React.FC<RadarChartProps> = ({
   }, []);
   const chartRef = useRef<ChartJS<'radar'>>(null);
 
-  // 数据安全检查和处理 - 直接处理，不用 useMemo
-  const safeData =
-    !data || !Array.isArray(data)
-      ? []
-      : data.filter(
-          (item): item is RadarChartDataItem =>
-            item !== null &&
-            item !== undefined &&
-            typeof item === 'object' &&
-            'label' in item,
-        );
+  const safeData = useMemo(() => normalizeRadarChartData(data), [data]);
 
-  // 从扁平化数据中提取分类，添加安全检查
-  const categories = Array.from(
-    new Set(
-      safeData
-        .map((item) => item?.category)
-        .filter((category): category is string => Boolean(category)),
-    ),
+  const {
+    filteredData,
+    filterOptions,
+    filterLabels,
+    selectedFilter,
+    setSelectedFilter,
+    selectedFilterLabel,
+    setSelectedFilterLabel,
+    filteredDataByFilterLabel,
+  } = useChartDataFilter(safeData);
+
+  const xValues = useMemo(
+    () => extractAndSortXValues(filteredData),
+    [filteredData],
   );
 
-  // 从数据中提取 filterLabel，过滤掉 undefined 值，添加安全检查
-  const validFilterLabels = safeData
-    .map((item) => item?.filterLabel)
-    .filter(
-      (category): category is string =>
-        category !== undefined && category !== null && Boolean(category),
-    );
-
-  const filterLabels: string[] | undefined =
-    validFilterLabels.length > 0
-      ? Array.from(new Set(validFilterLabels))
-      : undefined;
-
-  // 状态管理，添加安全检查
-  const [selectedFilter, setSelectedFilter] = useState(
-    () => categories.find((cat): cat is string => Boolean(cat)) || '',
-  );
-  const [selectedFilterLabel, setSelectedFilterLabel] = useState(() =>
-    filterLabels && filterLabels.length > 0 ? filterLabels[0] : undefined,
-  );
-
-  // 根据选定的分类筛选数据，添加安全检查
-  const filteredData = safeData.filter((item) => {
-    if (!item) return false; // 额外的安全检查
-    if (!selectedFilter) return true;
-    const categoryMatch = item?.category === selectedFilter;
-    // 如果没有 filterLabels 或 selectedFilterLabel，只按 category 筛选
-    if (!filterLabels || !selectedFilterLabel) {
-      return categoryMatch;
-    }
-    // 如果有 filterLabel 筛选，需要同时匹配 category 和 filterLabel
-    return categoryMatch && item?.filterLabel === selectedFilterLabel;
-  });
-
-  // 提取标签和数据集，添加安全检查
-  const labels = Array.from(
-    new Set(
-      filteredData
-        .map((item) => item?.label)
-        .filter((label): label is string => Boolean(label)),
-    ),
-  );
-
-  const datasetTypes = Array.from(
-    new Set(
-      filteredData
-        .map((item) => item?.type)
-        .filter((type): type is string => Boolean(type)),
-    ),
+  const datasetTypes = useMemo(
+    () =>
+      [
+        ...new Set(
+          filteredData
+            .map((item) => item.type)
+            .filter((type): type is string => Boolean(type)),
+        ),
+      ],
+    [filteredData],
   );
 
   const classNamesObj = classNamesProp;
 
   // 如果没有有效数据，返回空状态
-  if (
-    safeData.length === 0 ||
-    labels.length === 0 ||
-    datasetTypes.length === 0
-  ) {
+  if (safeData.length === 0 || xValues.length === 0 || datasetTypes.length === 0) {
     return wrapSSR(
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
@@ -287,29 +242,11 @@ const RadarChart: React.FC<RadarChartProps> = ({
     );
   }
 
-  // 构建数据集，添加更强的安全检查
+  // 构建数据集（与 LineChart / AreaChart 相同：x 为轴维度，y 为分值，type 为序列）
   const datasets = datasetTypes.map((type, index) => {
-    const typeData = filteredData.filter((item) => item?.type === type);
-    const scores = labels.map((label) => {
-      const item = typeData.find((d) => d?.label === label);
-      if (!item || item.score === null || item.score === undefined) {
-        return 0;
-      }
-
-      // 增强的 score 处理
-      const score = item.score;
-      if (typeof score === 'number') {
-        return Number.isFinite(score) && score >= 0 ? score : 0;
-      }
-      if (typeof score === 'string') {
-        const trimmed = score.trim();
-        if (trimmed === '' || trimmed === 'null' || trimmed === 'undefined') {
-          return 0;
-        }
-        const parsed = Number(trimmed);
-        return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
-      }
-      return 0;
+    const scores = xValues.map((x) => {
+      const item = findDataPointByXValue(filteredData, x, type);
+      return parseChartDataYValue(item?.y);
     });
 
     // 根据 color prop 选择颜色
@@ -343,26 +280,9 @@ const RadarChart: React.FC<RadarChartProps> = ({
     };
   });
 
-  // 筛选器的枚举，添加安全检查
-  const filterEnum =
-    categories.length > 0
-      ? categories
-          .filter((category): category is string => Boolean(category))
-          .map((category) => ({
-            label: category,
-            value: category,
-          }))
-      : [];
-
-  // 根据 filterLabel 筛选数据 - 只有当 filterLabels 存在时才生成
-  const filteredDataByFilterLabel = filterLabels?.map((item) => ({
-    key: item,
-    label: item,
-  }));
-
   // 处理数据，应用默认颜色和样式，添加最终安全检查
   const processedData: ChartData<'radar'> = {
-    labels: labels.length > 0 ? labels : ['默认'],
+    labels: xValues.length > 0 ? xValues.map((x) => x.toString()) : ['默认'],
     datasets:
       datasets.length > 0
         ? datasets
@@ -670,9 +590,9 @@ const RadarChart: React.FC<RadarChartProps> = ({
           dataTime={dataTime}
           loading={loading}
           filter={
-            renderFilterInToolbar && filterEnum.length > 0 ? (
+            renderFilterInToolbar && filterOptions.length > 0 ? (
               <ChartFilter
-                filterOptions={filterEnum}
+                filterOptions={filterOptions}
                 selectedFilter={selectedFilter}
                 onFilterChange={setSelectedFilter}
                 {...(filterLabels && {
@@ -687,9 +607,9 @@ const RadarChart: React.FC<RadarChartProps> = ({
           }
         />
 
-        {!renderFilterInToolbar && filterEnum.length > 0 && (
+        {!renderFilterInToolbar && filterOptions.length > 0 && (
           <ChartFilter
-            filterOptions={filterEnum}
+            filterOptions={filterOptions}
             selectedFilter={selectedFilter}
             onFilterChange={setSelectedFilter}
             {...(filterLabels && {

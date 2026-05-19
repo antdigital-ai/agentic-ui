@@ -48,10 +48,14 @@ vi.mock('react-chartjs-2', () => ({
   }),
 }));
 
-vi.mock('../utils', () => ({
-  hexToRgba: vi.fn((color, alpha) => `rgba(0,0,0,${alpha})`),
-  resolveCssVariable: vi.fn((color) => color),
-}));
+vi.mock('../utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../utils')>();
+  return {
+    ...actual,
+    hexToRgba: vi.fn((color, alpha) => `rgba(0,0,0,${alpha})`),
+    resolveCssVariable: vi.fn((color) => color),
+  };
+});
 
 const mockWrapSSR = vi.fn((node: any) => node);
 

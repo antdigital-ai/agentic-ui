@@ -42,6 +42,7 @@ import {
   MarkdownEditorProps,
 } from './types';
 import { exportHtml } from './utils/exportHtml';
+import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { sanitizeEditorChromeStyle } from './utils/sanitizeChromeStyle';
 
 // 组合器函数
@@ -76,7 +77,9 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     ...rest
   } = props;
 
-  const contentStyle = sanitizeEditorChromeStyle(rawContentStyle);
+  const contentStyle = resolveContainerContentStyle(
+    sanitizeEditorChromeStyle(rawContentStyle),
+  );
   const rootStyle = sanitizeEditorChromeStyle(rawStyle);
 
   const [editorMountStatus, setMountedStatus] = useState(false);
@@ -362,16 +365,6 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
               style={{
                 height:
                   !readonly && toolBar?.enable ? `calc(100% - 56px)` : '100%',
-                ...(contentStyle?.padding !== undefined
-                  ? {
-                      '--agentic-ui-content-padding': `${
-                        typeof contentStyle.padding === 'number'
-                          ? `${contentStyle.padding}px`
-                          : contentStyle.padding
-                      }`,
-                      padding: contentStyle.padding,
-                    }
-                  : {}),
                 ...contentStyle,
               }}
               ref={(dom) => {

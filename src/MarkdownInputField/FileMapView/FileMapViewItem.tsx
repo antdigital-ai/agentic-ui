@@ -84,8 +84,7 @@ export const FileMapViewItem: React.FC<{
   const lastModifiedTime = file?.lastModified
     ? dayjs(file.lastModified).format('HH:mm')
     : '';
-  const shouldShowMetaPlaceholder =
-    isFileMetaPlaceholderState(file) && !(file.name && file.type);
+  const shouldShowMetaPlaceholder = isFileMetaPlaceholderState(file);
 
   const handlePreview = () => {
     if (props.onPreview) {

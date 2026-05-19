@@ -1,4 +1,8 @@
 ﻿import { Keyframes } from '@ant-design/cssinjs';
+import {
+  INPUT_FIELD_EDITOR_CONTENT_PADDING_MOBILE_CSS_VAR,
+  MOBILE_INPUT_FIELD_EDITOR_CONTENT_PADDING_DEFAULT,
+} from '../Constants/contentPaddingVars';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   ChatTokenType,
@@ -189,7 +193,9 @@ const genStyle: GenerateStyle<
         overflow: 'hidden',
         position: 'relative',
         [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
-          padding: `${MOBILE_PADDING} !important`,
+          [INPUT_FIELD_EDITOR_CONTENT_PADDING_MOBILE_CSS_VAR]:
+            MOBILE_INPUT_FIELD_EDITOR_CONTENT_PADDING_DEFAULT,
+          padding: `var(${INPUT_FIELD_EDITOR_CONTENT_PADDING_MOBILE_CSS_VAR}, ${MOBILE_PADDING})`,
         },
       },
       '&-has-tools-wrapper': {

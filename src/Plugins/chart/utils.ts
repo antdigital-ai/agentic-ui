@@ -142,6 +142,103 @@ export interface ChartDataItem {
   filterLabel?: string;
 }
 
+/** 未提供 type 时的默认数据序列名（与折线/柱状等图表一致） */
+export const DEFAULT_CHART_DATASET_TYPE = '默认';
+
+/**
+ * 雷达图数据项：与 {@link ChartDataItem} 同形。
+ * - `x`：雷达轴维度（如「产品」「技术」）
+ * - `y`：分值
+ * - `type`：图例序列名
+ * - `category`：工具栏筛选项
+ *
+ * 兼容历史字段 `label` / `score`（分别映射为 x / y）。
+ */
+export type RadarChartDataItem = ChartDataItem & {
+  /** @deprecated 请使用 x */
+  label?: string;
+  /** @deprecated 请使用 y */
+  score?: number | string;
+};
+
+export type RadarChartDataInput = Partial<ChartDataItem> & {
+  label?: string;
+  score?: number | string;
+};
+
+/**
+ * 解析图表 Y 轴数值（雷达图分值、柱状图高度等）
+ */
+export const parseChartDataYValue = (
+  value: number | string | null | undefined,
+): number => {
+  if (value === null || value === undefined) {
+    return 0;
+  }
+  if (typeof value === 'number') {
+    return Number.isFinite(value) && value >= 0 ? value : 0;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed === '' || trimmed === 'null' || trimmed === 'undefined') {
+      return 0;
+    }
+    const parsed = Number(trimmed);
+    if (Number.isFinite(parsed) && parsed >= 0) {
+      return parsed;
+    }
+    return 0;
+  }
+  return 0;
+};
+
+/**
+ * 将雷达图入参归一化为 {@link ChartDataItem}（与 LineChart / BarChart 等一致）
+ */
+export const normalizeRadarChartData = (
+  data: RadarChartDataInput[] | null | undefined,
+): ChartDataItem[] => {
+  if (!data || !Array.isArray(data)) {
+    return [];
+  }
+
+  const result: ChartDataItem[] = [];
+
+  for (const raw of data) {
+    if (
+      raw === null ||
+      raw === undefined ||
+      typeof raw !== 'object'
+    ) {
+      continue;
+    }
+
+    const x = raw.x ?? raw.label;
+    const y = raw.y ?? raw.score;
+
+    if (x === null || x === undefined || String(x).trim() === '') {
+      continue;
+    }
+    if (y === null || y === undefined || y === '') {
+      continue;
+    }
+
+    const type = raw.type?.trim() ? raw.type : DEFAULT_CHART_DATASET_TYPE;
+
+    result.push({
+      category: raw.category,
+      type,
+      x,
+      y,
+      xtitle: raw.xtitle,
+      ytitle: raw.ytitle,
+      filterLabel: raw.filterLabel,
+    });
+  }
+
+  return result;
+};
+
 /** 1 亿（人民币口语单位）对应的「元」数量 */
 const CHINESE_YI_TO_YUAN = 1e8;
 /** 1 万对应的「元」数量 */

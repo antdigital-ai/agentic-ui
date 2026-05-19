@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { CONTENT_PADDING_CSS_VAR } from '../../../Constants/contentPaddingVars';
 import {
   BaseMarkdownEditor,
   MarkdownEditorProps,
@@ -82,7 +83,8 @@ describe('BaseMarkdownEditor - contentStyle 测试', () => {
           '.ant-agentic-md-editor-container',
         ) as HTMLElement;
         expect(contentElement).toBeInTheDocument();
-        expect(contentElement.style.padding).toBe('0px');
+        const inlineStyle = contentElement.getAttribute('style') || '';
+        expect(inlineStyle).toContain(`${CONTENT_PADDING_CSS_VAR}: 0px`);
         expect(contentElement.style.height).toBe('100%');
         expect(contentElement.style.overflow).toBe('auto');
         expect(contentElement.style.display).toBe('flex');
@@ -105,7 +107,8 @@ describe('BaseMarkdownEditor - contentStyle 测试', () => {
           '.ant-agentic-md-editor-container',
         ) as HTMLElement;
         expect(contentElement).toBeInTheDocument();
-        expect(contentElement.style.padding).toBe('0px');
+        const inlineStyle = contentElement.getAttribute('style') || '';
+        expect(inlineStyle).toContain(`${CONTENT_PADDING_CSS_VAR}: 0px`);
         expect(contentElement.style.height).toBe('200px');
       });
     });

@@ -2,22 +2,22 @@ import { RadarChart, RadarChartDataItem } from '@ant-design/agentic-ui';
 import React from 'react';
 
 const data: RadarChartDataItem[] = [
-  { category: '研发', label: '技术', type: '当前', score: 75 },
-  { category: '研发', label: '设计', type: '当前', score: 60 },
-  { category: '研发', label: '产品', type: '当前', score: 80 },
-  { category: '研发', label: '运营', type: '当前', score: 65 },
-  { category: '研发', label: '技术', type: '目标', score: 90 },
-  { category: '研发', label: '设计', type: '目标', score: 85 },
-  { category: '研发', label: '产品', type: '目标', score: 95 },
-  { category: '研发', label: '运营', type: '目标', score: 80 },
-  { category: '市场', label: '技术', type: '当前', score: 55 },
-  { category: '市场', label: '设计', type: '当前', score: 70 },
-  { category: '市场', label: '产品', type: '当前', score: 62 },
-  { category: '市场', label: '运营', type: '当前', score: 78 },
-  { category: '市场', label: '技术', type: '目标', score: 80 },
-  { category: '市场', label: '设计', type: '目标', score: 88 },
-  { category: '市场', label: '产品', type: '目标', score: 85 },
-  { category: '市场', label: '运营', type: '目标', score: 92 },
+  { category: '研发', x: '技术', type: '当前', y: 75 },
+  { category: '研发', x: '设计', type: '当前', y: 60 },
+  { category: '研发', x: '产品', type: '当前', y: 80 },
+  { category: '研发', x: '运营', type: '当前', y: 65 },
+  { category: '研发', x: '技术', type: '目标', y: 90 },
+  { category: '研发', x: '设计', type: '目标', y: 85 },
+  { category: '研发', x: '产品', type: '目标', y: 95 },
+  { category: '研发', x: '运营', type: '目标', y: 80 },
+  { category: '市场', x: '技术', type: '当前', y: 55 },
+  { category: '市场', x: '设计', type: '当前', y: 70 },
+  { category: '市场', x: '产品', type: '当前', y: 62 },
+  { category: '市场', x: '运营', type: '当前', y: 78 },
+  { category: '市场', x: '技术', type: '目标', y: 80 },
+  { category: '市场', x: '设计', type: '目标', y: 88 },
+  { category: '市场', x: '产品', type: '目标', y: 85 },
+  { category: '市场', x: '运营', type: '目标', y: 92 },
 ];
 
 const RadarChartDarkDemo: React.FC = () => (

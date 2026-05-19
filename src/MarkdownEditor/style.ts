@@ -7,6 +7,12 @@ import {
   textSwapEnterAnimationBoth,
   textSwapEnterKeyframes,
 } from '../Components/TextSwap/textSwapMotion';
+import {
+  CONTENT_PADDING_CSS_VAR,
+  CONTENT_PADDING_MOBILE_CSS_VAR,
+  DESKTOP_CONTENT_PADDING_FALLBACK,
+  MOBILE_CONTENT_PADDING_DEFAULT,
+} from '../Constants/contentPaddingVars';
 import { MOBILE_BREAKPOINT, MOBILE_PADDING } from '../Constants/mobile';
 import {
   genStyleHooks,
@@ -364,14 +370,15 @@ const genStyle: GenStyleFn<'MarkdownEditor'> = (token) => {
       '&-container': {
         // 默认 padding，可以通过 contentStyle 覆盖
         // 使用 CSS 变量，允许通过内联样式覆盖
-        padding: 'var(--agentic-ui-content-padding, 4px 20px)',
+        padding: `var(${CONTENT_PADDING_CSS_VAR}, ${DESKTOP_CONTENT_PADDING_FALLBACK})`,
         overflow: 'auto',
         display: 'flex',
         position: 'relative',
         gap: 24,
         outline: 'none',
         [`@media (max-width: ${MOBILE_BREAKPOINT})`]: {
-          padding: 'var(--agentic-ui-content-padding, 4px 4px)',
+          [CONTENT_PADDING_MOBILE_CSS_VAR]: MOBILE_CONTENT_PADDING_DEFAULT,
+          padding: `var(${CONTENT_PADDING_MOBILE_CSS_VAR}, var(${CONTENT_PADDING_CSS_VAR}, var(--padding-1x, 4px)))`,
         },
       },
       '&-focus': {

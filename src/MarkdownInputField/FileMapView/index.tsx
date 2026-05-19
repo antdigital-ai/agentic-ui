@@ -128,20 +128,28 @@ export const FileMapView: React.FC<FileMapViewProps> = (props) => {
     return Array.from(props.fileMap?.values() || []);
   }, [props.fileMap]);
 
-  // 图片列表不受 maxDisplayCount 限制，显示所有图片
+  const isImageListEntry = (file: AttachmentFile) =>
+    isImageFile(file) &&
+    (isPreviewableImageFile(file) || isFileMetaPlaceholderState(file));
+
+  const isVideoListEntry = (file: AttachmentFile) =>
+    isVideoFile(file) &&
+    (isPreviewableVideoFile(file) || isFileMetaPlaceholderState(file));
+
+  // 图片列表不受 maxDisplayCount 限制，显示所有图片（含无 url 的占位态）
   const imgList = useMemo(() => {
-    return fileList.filter((file) => isPreviewableImageFile(file));
+    return fileList.filter(isImageListEntry);
   }, [fileList]);
 
-  // 视频列表，与图片一样以缩略图形式展示
+  // 视频列表，与图片一样以缩略图形式展示（含无 url 的占位态）
   const videoList = useMemo(() => {
-    return fileList.filter((file) => isPreviewableVideoFile(file));
+    return fileList.filter(isVideoListEntry);
   }, [fileList]);
 
   // 所有非图片、非视频文件列表
   const allNoMediaFiles = useMemo(() => {
     return fileList.filter(
-      (file) => !isPreviewableImageFile(file) && !isPreviewableVideoFile(file),
+      (file) => !isImageListEntry(file) && !isVideoListEntry(file),
     );
   }, [fileList]);
 

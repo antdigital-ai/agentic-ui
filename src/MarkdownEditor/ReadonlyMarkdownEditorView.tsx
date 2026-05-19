@@ -6,6 +6,7 @@ import I18nBoundary from './I18nBoundary';
 import { PluginContext } from './plugin';
 import { useStyle } from './style';
 import { MarkdownEditorProps } from './types';
+import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { sanitizeEditorChromeStyle } from './utils/sanitizeChromeStyle';
 
 /**
@@ -26,7 +27,9 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
     children,
   } = props;
 
-  const contentStyle = sanitizeEditorChromeStyle(rawContentStyle);
+  const contentStyle = resolveContainerContentStyle(
+    sanitizeEditorChromeStyle(rawContentStyle),
+  );
   const rootStyle = sanitizeEditorChromeStyle(rawStyle);
   const markdownContainerRef = useRef<HTMLDivElement | null>(null);
 

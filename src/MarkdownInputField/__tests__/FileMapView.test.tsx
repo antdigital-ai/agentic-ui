@@ -488,7 +488,7 @@ describe('FileMapView', () => {
       expect(video).toBeInTheDocument();
     });
 
-    it('should render media files without url as normal file cards when type and name exist', () => {
+    it('should render media files without url as sized placeholders in media lists', () => {
       const fileMap = new Map();
       fileMap.set('img-1', {
         uuid: 'uuid-image-no-url',
@@ -505,17 +505,14 @@ describe('FileMapView', () => {
 
       const { container } = render(<FileMapView fileMap={fileMap} />);
 
-      expect(
-        screen.queryByTestId('file-view-image-list'),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId('file-view-video-list'),
-      ).not.toBeInTheDocument();
-      expect(
-        container.querySelectorAll('[data-testid="file-item"]'),
-      ).toHaveLength(2);
-      expect(screen.getByText('商品主图色差对比')).toBeInTheDocument();
-      expect(screen.getByText('演示视频')).toBeInTheDocument();
+      expect(screen.getByTestId('file-view-image-list')).toBeInTheDocument();
+      expect(screen.getByTestId('file-view-video-list')).toBeInTheDocument();
+      const placeholders = container.querySelectorAll(
+        '[data-testid="file-meta-placeholder"]',
+      );
+      expect(placeholders).toHaveLength(2);
+      expect(placeholders[0]).toHaveStyle({ width: '124px', height: '124px' });
+      expect(placeholders[1]).toHaveStyle({ width: '330px', height: '188px' });
       expect(container.querySelectorAll('img')).toHaveLength(0);
       expect(container.querySelectorAll('video')).toHaveLength(0);
     });
@@ -653,16 +650,14 @@ describe('FileMapView', () => {
 
     it('文件卡片应使用文件名作为 aria-label', () => {
       const fileMap = new Map();
-      fileMap.set('file-1', {
-        uuid: 'uuid-a11y-image-no-url',
-        name: '商品主图色差对比.png',
-        type: 'image/png',
-        status: 'done',
-      });
+      fileMap.set(
+        'file-1',
+        createMockFile('商品主图色差对比.pdf', 'application/pdf'),
+      );
 
       const { container } = render(<FileMapView fileMap={fileMap} />);
       expect(
-        container.querySelector('[aria-label="文件：商品主图色差对比.png"]'),
+        container.querySelector('[aria-label="文件：商品主图色差对比.pdf"]'),
       ).toBeInTheDocument();
     });
 
