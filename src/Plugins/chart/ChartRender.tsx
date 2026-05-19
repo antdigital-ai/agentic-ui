@@ -22,6 +22,8 @@ import {
   getDataHash,
   isConfigEqual,
   isNotEmpty,
+  parseSortByValue,
+  resolveChartSortByField,
   toNumber,
 } from './utils';
 
@@ -828,6 +830,11 @@ export const ChartRender: React.FC<{
   const convertFlatData = useMemo(() => {
     const { xTitle, yTitle } = getAxisTitles();
     const xIndexer = buildXIndexer();
+    const sortByField = resolveChartSortByField(
+      chartData,
+      config?.sortBy ?? config?.rest?.sortBy,
+      getFieldValueSafely,
+    );
 
     return (chartData || []).map((row: any, i: number) => {
       const rawX = getFieldValueSafely(row, config?.x);
@@ -835,6 +842,11 @@ export const ChartRender: React.FC<{
       const category = getFieldValue(row, groupBy);
       const type = getFieldValue(row, colorLegend);
       const filterLabel = getFieldValue(row, filterBy);
+      const rawSortBy = getFieldValueSafely(row, sortByField);
+      const sortBy =
+        sortByField && isNotEmpty(rawSortBy)
+          ? parseSortByValue(rawSortBy)
+          : null;
       const x =
         typeof rawX === 'number'
           ? rawX
@@ -853,6 +865,7 @@ export const ChartRender: React.FC<{
         ...(type ? { type } : {}),
         ...(category ? { category } : {}),
         ...(filterLabel ? { filterLabel } : {}),
+        ...(sortBy !== null ? { sortBy } : {}),
       };
     });
   }, [
@@ -866,6 +879,8 @@ export const ChartRender: React.FC<{
     config?.rest?.stacked,
     config?.rest?.showLegend,
     config?.rest?.showGrid,
+    config?.sortBy,
+    config?.rest?.sortBy,
     title,
     groupBy,
     colorLegend,

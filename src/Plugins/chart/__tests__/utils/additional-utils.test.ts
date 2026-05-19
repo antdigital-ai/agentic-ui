@@ -86,27 +86,27 @@ describe('Chart Utils - Additional Functions', () => {
   });
 
   describe('extractAndSortXValues', () => {
-    it('应该提取并排序数字值', () => {
+    it('非日期数字 x 保持数据顺序', () => {
       const data = [
         { x: 3, y: 10 },
         { x: 1, y: 20 },
         { x: 2, y: 30 },
       ];
 
-      expect(extractAndSortXValues(data)).toEqual([1, 2, 3]);
+      expect(extractAndSortXValues(data)).toEqual([3, 1, 2]);
     });
 
-    it('应该提取并排序字符串值', () => {
+    it('非日期字符串 x 保持数据顺序', () => {
       const data = [
         { x: 'c', y: 10 },
         { x: 'a', y: 20 },
         { x: 'b', y: 30 },
       ];
 
-      expect(extractAndSortXValues(data)).toEqual(['a', 'b', 'c']);
+      expect(extractAndSortXValues(data)).toEqual(['c', 'a', 'b']);
     });
 
-    it('应该处理混合类型的值', () => {
+    it('混合非日期类型保持数据顺序', () => {
       const data = [
         { x: 'c', y: 10 },
         { x: 1, y: 20 },
@@ -114,7 +114,7 @@ describe('Chart Utils - Additional Functions', () => {
         { x: 2, y: 40 },
       ];
 
-      expect(extractAndSortXValues(data)).toEqual([1, 2, 'b', 'c']);
+      expect(extractAndSortXValues(data)).toEqual(['c', 1, 'b', 2]);
     });
 
     it('应该去除重复值', () => {

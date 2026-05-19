@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
+  compareChartXValues,
+  extractAndSortXValues,
   getDataHash,
+  isChartXDateOrRange,
   isConfigEqual,
   isNotEmpty,
+  parseChartXDateSortKey,
   parseChineseCurrencyToNumber,
+  resolveChartSortByField,
+  sortChartDataRowsByXField,
   stringFormatNumber,
   toNumber,
 } from '../utils';
@@ -167,6 +173,120 @@ describe('isConfigEqual', () => {
     const a = { x: 'a', y: 'b' };
     const b = { x: 'a', y: 'c' };
     expect(isConfigEqual(a, b)).toBe(false);
+  });
+});
+
+describe('resolveChartSortByField', () => {
+  it('uses explicit sortBy when provided', () => {
+    const rows = [{ index: 1, order: 2 }];
+    expect(resolveChartSortByField(rows, 'order')).toBe('order');
+  });
+
+  it('auto-detects index column when sortBy is omitted', () => {
+    const rows = [
+      { 阶段: 'A', index: 2 },
+      { 阶段: 'B', index: 1 },
+    ];
+    expect(resolveChartSortByField(rows)).toBe('index');
+  });
+
+  it('returns undefined when no index column', () => {
+    expect(resolveChartSortByField([{ x: 'a', y: 1 }])).toBeUndefined();
+  });
+});
+
+describe('parseChartXDateSortKey', () => {
+  it('parses M.D-M.D date ranges', () => {
+    expect(isChartXDateOrRange('2.1-2.6(节前平淡)')).toBe(true);
+    expect(parseChartXDateSortKey('2.7-2.13(节前冲刺)')).not.toBeNull();
+  });
+
+  it('parses ISO dates', () => {
+    expect(isChartXDateOrRange('2024-01')).toBe(true);
+    expect(parseChartXDateSortKey('2024-03-15')).not.toBeNull();
+  });
+
+  it('returns null for non-date categories', () => {
+    expect(parseChartXDateSortKey('产品A')).toBeNull();
+    expect(parseChartXDateSortKey(3)).toBeNull();
+  });
+});
+
+describe('compareChartXValues', () => {
+  it('sorts date ranges chronologically', () => {
+    expect(
+      compareChartXValues('2.7-2.13', '2.1-2.6'),
+    ).toBeGreaterThan(0);
+  });
+});
+
+describe('extractAndSortXValues with sortBy', () => {
+  it('orders categories by index column values', () => {
+    const data = [
+      { x: '2.7-2.13(节前冲刺)', y: 265159.89, sortBy: 3 },
+      { x: '2.14-2.20(春节+情人节)', y: 265090.85, sortBy: 2 },
+      { x: '2.1-2.6(节前平淡)', y: 150960.55, sortBy: 1 },
+      { x: '2.21-2.28(节后回落)', y: 139049.37, sortBy: 4 },
+    ];
+    expect(extractAndSortXValues(data)).toEqual([
+      '2.1-2.6(节前平淡)',
+      '2.14-2.20(春节+情人节)',
+      '2.7-2.13(节前冲刺)',
+      '2.21-2.28(节后回落)',
+    ]);
+  });
+});
+
+describe('sortChartDataRowsByXField', () => {
+  it('preserves row order for non-date categories', () => {
+    const rows = [
+      { 阶段: '节后', index: 4 },
+      { 阶段: '节前', index: 1 },
+      { 阶段: '春节', index: 2 },
+    ];
+    expect(sortChartDataRowsByXField(rows, '阶段')).toEqual(rows);
+  });
+
+  it('sorts rows only when all x are dates', () => {
+    const rows = [
+      { 月份: '2024-03', y: 3 },
+      { 月份: '2024-01', y: 1 },
+      { 月份: '2024-02', y: 2 },
+    ];
+    expect(sortChartDataRowsByXField(rows, '月份').map((row) => row['月份'])).toEqual([
+      '2024-01',
+      '2024-02',
+      '2024-03',
+    ]);
+  });
+});
+
+describe('extractAndSortXValues without sortBy', () => {
+  it('preserves data order for non-date x values', () => {
+    const data = [
+      { x: 'c', y: 30 },
+      { x: 'a', y: 10 },
+      { x: 'b', y: 20 },
+    ];
+    expect(extractAndSortXValues(data)).toEqual(['c', 'a', 'b']);
+  });
+
+  it('does not sort numeric categories', () => {
+    const data = [
+      { x: 3, y: 30 },
+      { x: 1, y: 10 },
+      { x: 2, y: 20 },
+    ];
+    expect(extractAndSortXValues(data)).toEqual([3, 1, 2]);
+  });
+
+  it('sorts when all x values are dates', () => {
+    const data = [
+      { x: '2024-03', y: 30 },
+      { x: '2024-01', y: 10 },
+      { x: '2024-02', y: 20 },
+    ];
+    expect(extractAndSortXValues(data)).toEqual(['2024-01', '2024-02', '2024-03']);
   });
 });
 

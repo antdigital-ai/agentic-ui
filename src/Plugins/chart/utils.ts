@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/ban-types */
 
+import dayjs from 'dayjs';
+
 /**
  * @fileoverview 图表插件工具函数文件
  *
@@ -140,10 +142,15 @@ export interface ChartDataItem {
   ytitle?: string;
   /** 筛选标签，用于数据筛选和过滤 */
   filterLabel?: string;
+  /** 类目排序键；配置 `sortBy` / `index` 列后用于 X 轴顺序 */
+  sortBy?: number | string;
 }
 
 /** 未提供 type 时的默认数据序列名（与折线/柱状等图表一致） */
 export const DEFAULT_CHART_DATASET_TYPE = '默认';
+
+/** 未配置 sortBy 时，若表格存在该列则自动用于 X 轴排序 */
+export const CHART_AUTO_SORT_BY_COLUMN = 'index';
 
 /**
  * 雷达图数据项：与 {@link ChartDataItem} 同形。
@@ -369,6 +376,151 @@ export const compareXValues = (
   return String(normalizedA).localeCompare(String(normalizedB));
 };
 
+/** 月.日-月.日 区间，如 2.7-2.13(节前冲刺) */
+const CHART_X_MD_RANGE_PATTERN =
+  /^(\d{1,2})\.(\d{1,2})\s*[-–—~至]\s*(\d{1,2})\.(\d{1,2})/;
+
+/** ISO 风格日期或日期区间起始，如 2024-01、2024/01/15 */
+const CHART_X_ISO_DATE_PATTERN = /^(\d{4})[-/](\d{1,2})(?:[-/](\d{1,2}))?/;
+
+/**
+ * 解析 X 轴日期/日期区间的排序键；非日期返回 null
+ */
+export const parseChartXDateSortKey = (
+  value: number | string,
+): number | null => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value === 'number') {
+    if (value >= 1000 && value <= 9999) {
+      return dayjs(`${value}-01-01`).valueOf();
+    }
+    return null;
+  }
+
+  const raw = String(value).trim();
+  if (!raw) return null;
+
+  const mdRange = raw.match(CHART_X_MD_RANGE_PATTERN);
+  if (mdRange) {
+    const month = Number(mdRange[1]);
+    const day = Number(mdRange[2]);
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      return dayjs()
+        .month(month - 1)
+        .date(day)
+        .startOf('day')
+        .valueOf();
+    }
+  }
+
+  const iso = raw.match(CHART_X_ISO_DATE_PATTERN);
+  if (iso) {
+    const year = Number(iso[1]);
+    const month = Number(iso[2]);
+    const day = iso[3] ? Number(iso[3]) : 1;
+    const parsed = dayjs(`${year}-${month}-${day}`);
+    if (parsed.isValid()) return parsed.valueOf();
+  }
+
+  if (/^\d{4}$/.test(raw)) {
+    const year = dayjs(`${raw}-01-01`);
+    if (year.isValid()) return year.valueOf();
+  }
+
+  if (/^\d{4}-\d{1,2}(-\d{1,2})?$/.test(raw) || /^\d{4}\/\d{1,2}(\/\d{1,2})?$/.test(raw)) {
+    const parsed = dayjs(raw);
+    if (parsed.isValid()) return parsed.valueOf();
+  }
+
+  return null;
+};
+
+export const isChartXDateOrRange = (value: number | string): boolean =>
+  parseChartXDateSortKey(value) !== null;
+
+export const areAllChartXDateOrRange = (
+  values: Array<number | string>,
+): boolean =>
+  values.length > 0 && values.every((value) => isChartXDateOrRange(value));
+
+/**
+ * 比较两个 X 轴日期/区间；非日期返回 0（不改变相对顺序）
+ */
+export const compareChartXValues = (
+  a: number | string,
+  b: number | string,
+): number => {
+  const keyA = parseChartXDateSortKey(a);
+  const keyB = parseChartXDateSortKey(b);
+  if (keyA === null || keyB === null) return 0;
+  return keyA - keyB;
+};
+
+const getChartXValueDedupeKey = (value: number | string): string => {
+  const normalized = normalizeXValue(value);
+  return typeof normalized === 'number'
+    ? `n:${normalized}`
+    : `s:${String(normalized)}`;
+};
+
+/** 按数据出现顺序去重提取 X 值 */
+export const uniqueChartXValuesPreservingOrder = (
+  data: ChartDataItem[],
+): Array<number | string> => {
+  const result: Array<number | string> = [];
+  const seen = new Set<string>();
+
+  for (const item of data) {
+    const x = item.x;
+    if (x === null || x === undefined || x === '' || String(x).trim() === '') {
+      continue;
+    }
+    const normalized = normalizeXValue(x);
+    const key = getChartXValueDedupeKey(normalized);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(normalized);
+  }
+
+  return result;
+};
+
+/**
+ * 表格行按 x 字段排序：仅当全部为日期/区间时排序，否则保持原顺序
+ */
+export const sortChartDataRowsByXField = <T extends Record<string, unknown>>(
+  rows: T[],
+  xField: string,
+): T[] => {
+  if (rows.length === 0) return rows;
+
+  const xValues = rows.map((row) => {
+    const raw = row[xField];
+    if (raw === null || raw === undefined || raw === '') {
+      return null;
+    }
+    return normalizeXValue(raw as number | string);
+  });
+
+  if (xValues.some((value) => value === null)) {
+    return rows;
+  }
+
+  if (!areAllChartXDateOrRange(xValues as Array<number | string>)) {
+    return rows;
+  }
+
+  return [...rows].sort((rowA, rowB) =>
+    compareChartXValues(
+      rowA[xField] as number | string,
+      rowB[xField] as number | string,
+    ),
+  );
+};
+
 /**
  * 检查两个 X 轴值是否相等
  *
@@ -389,6 +541,86 @@ export const compareXValues = (
  *
  * @since 1.0.0
  */
+/**
+ * 解析图表排序列名：显式 `sortBy` 优先，否则表格含 `index` 列时自动使用
+ */
+export const resolveChartSortByField = (
+  rows: Array<Record<string, unknown>> | null | undefined,
+  explicitSortBy?: string,
+  getCellValue: (
+    row: Record<string, unknown>,
+    field: string,
+  ) => unknown = (row, field) => row[field],
+): string | undefined => {
+  if (explicitSortBy) return explicitSortBy;
+  const data = rows ?? [];
+  const hasIndexColumn = data.some((row) => {
+    const value = getCellValue(row, CHART_AUTO_SORT_BY_COLUMN);
+    return (
+      value !== null &&
+      value !== undefined &&
+      String(value).trim() !== ''
+    );
+  });
+  return hasIndexColumn ? CHART_AUTO_SORT_BY_COLUMN : undefined;
+};
+
+/**
+ * 解析 sortBy 排序字段值
+ */
+export const parseSortByValue = (value: unknown): number | string | null => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+  const s = String(value).trim();
+  if (s === '') return null;
+  const n = Number(s);
+  if (Number.isFinite(n)) return n;
+  return s;
+};
+
+/**
+ * 比较两个 sortBy 值；缺失值排在后面
+ */
+export const compareSortByValues = (
+  a: number | string | null,
+  b: number | string | null,
+): number => {
+  if (a === null && b === null) return 0;
+  if (a === null) return 1;
+  if (b === null) return -1;
+  if (typeof a === 'number' && typeof b === 'number') {
+    return a - b;
+  }
+  return compareXValues(a, b);
+};
+
+/**
+ * 数据是否包含有效的 sortBy 字段
+ */
+export const hasChartSortBy = (data: ChartDataItem[]): boolean =>
+  data.some((item) => parseSortByValue(item.sortBy) !== null);
+
+/**
+ * 取某一 x 类目对应的 sortBy（多行取最小值）
+ */
+export const getSortByForX = (
+  data: ChartDataItem[],
+  xValue: number | string,
+): number | string | null => {
+  let best: number | string | null = null;
+  for (const item of data) {
+    if (!isXValueEqual(item.x, xValue)) continue;
+    const sortBy = parseSortByValue(item.sortBy);
+    if (sortBy === null) continue;
+    if (best === null || compareSortByValues(sortBy, best) < 0) {
+      best = sortBy;
+    }
+  }
+  return best;
+};
+
 export const isXValueEqual = (
   a: number | string,
   b: number | string,
@@ -408,8 +640,8 @@ export const isXValueEqual = (
 /**
  * 从数据中提取并排序 X 轴值
  *
- * 从图表数据数组中提取所有唯一的 X 轴值，并进行排序。
- * 先对值进行归一化处理，然后去重并排序。
+ * 从图表数据数组中提取所有唯一的 X 轴值。
+ * 有 sortBy/index 时按 sortBy 排序；否则仅当全部为日期/日期区间时按时间排序，其余保持数据顺序。
  *
  * @param {ChartDataItem[]} data - 图表数据数组
  * @returns {Array<number | string>} 排序后的唯一 X 轴值数组
@@ -431,19 +663,29 @@ export const isXValueEqual = (
 export const extractAndSortXValues = (
   data: ChartDataItem[],
 ): Array<number | string> => {
-  // 提取所有 x 值并归一化，同时过滤掉空值（null/undefined/空字符串）
-  const normalizedValues = data
-    .map((item) => item.x)
-    .filter(
-      (x) =>
-        x !== null && x !== undefined && x !== '' && String(x).trim() !== '',
-    )
-    .map((x) => normalizeXValue(x));
+  const uniqueValues = uniqueChartXValuesPreservingOrder(data);
 
-  // 去重并排序
-  const uniqueValues = [...new Set(normalizedValues)];
+  if (hasChartSortBy(data)) {
+    const position = new Map<number | string, number>();
+    uniqueValues.forEach((value, index) => {
+      position.set(value, index);
+    });
 
-  return uniqueValues.sort(compareXValues);
+    return [...uniqueValues].sort((a, b) => {
+      const sortCmp = compareSortByValues(
+        getSortByForX(data, a),
+        getSortByForX(data, b),
+      );
+      if (sortCmp !== 0) return sortCmp;
+      return (position.get(a) ?? 0) - (position.get(b) ?? 0);
+    });
+  }
+
+  if (areAllChartXDateOrRange(uniqueValues)) {
+    return [...uniqueValues].sort(compareChartXValues);
+  }
+
+  return uniqueValues;
 };
 
 /**

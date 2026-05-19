@@ -3,6 +3,7 @@ import {
   compareXValues,
   debounce,
   extractAndSortXValues,
+  resolveChartSortByField,
   findDataPointByXValue,
   getDataHash,
   hexToRgba,
@@ -376,23 +377,61 @@ describe('Chart Utils', () => {
     });
   });
 
+  describe('resolveChartSortByField', () => {
+    it('显式 sortBy 优先于自动 index', () => {
+      const rows = [{ index: 1, order: 2 }];
+      expect(resolveChartSortByField(rows, 'order')).toBe('order');
+    });
+
+    it('未配置 sortBy 且存在 index 列时自动使用 index', () => {
+      const rows = [
+        { 阶段: 'A', index: 2 },
+        { 阶段: 'B', index: 1 },
+      ];
+      expect(resolveChartSortByField(rows)).toBe('index');
+    });
+
+    it('无 index 列时返回 undefined', () => {
+      const rows = [{ x: 'a', y: 1 }];
+      expect(resolveChartSortByField(rows)).toBeUndefined();
+    });
+
+    it('index 列全为空时不自动启用', () => {
+      const rows = [{ 阶段: 'A', index: '' }, { 阶段: 'B', index: '  ' }];
+      expect(resolveChartSortByField(rows)).toBeUndefined();
+    });
+  });
+
   describe('extractAndSortXValues', () => {
-    it('应该提取并排序 x 值', () => {
+    it('非日期 x 值保持数据顺序', () => {
       const data = [
         { x: 3, y: 30 },
         { x: 1, y: 10 },
         { x: 2, y: 20 },
       ];
-      expect(extractAndSortXValues(data)).toEqual([1, 2, 3]);
+      expect(extractAndSortXValues(data)).toEqual([3, 1, 2]);
     });
 
-    it('应该处理字符串 x 值', () => {
+    it('非日期字符串 x 值保持数据顺序', () => {
       const data = [
         { x: 'c', y: 30 },
         { x: 'a', y: 10 },
         { x: 'b', y: 20 },
       ];
-      expect(extractAndSortXValues(data)).toEqual(['a', 'b', 'c']);
+      expect(extractAndSortXValues(data)).toEqual(['c', 'a', 'b']);
+    });
+
+    it('全部为日期时按时间排序', () => {
+      const data = [
+        { x: '2024-03', y: 30 },
+        { x: '2024-01', y: 10 },
+        { x: '2024-02', y: 20 },
+      ];
+      expect(extractAndSortXValues(data)).toEqual([
+        '2024-01',
+        '2024-02',
+        '2024-03',
+      ]);
     });
 
     it('应该去重相同的 x 值', () => {
@@ -402,6 +441,30 @@ describe('Chart Utils', () => {
         { x: 1, y: 15 },
       ];
       expect(extractAndSortXValues(data)).toEqual([1, 2]);
+    });
+
+    it('有 sortBy 时按 sortBy 排序，否则按 x 排序', () => {
+      const data = [
+        { x: '2.7-2.13(节前冲刺)', y: 265159.89, sortBy: 3 },
+        { x: '2.14-2.20(春节+情人节)', y: 265090.85, sortBy: 2 },
+        { x: '2.1-2.6(节前平淡)', y: 150960.55, sortBy: 1 },
+        { x: '2.21-2.28(节后回落)', y: 139049.37, sortBy: 4 },
+      ];
+      expect(extractAndSortXValues(data)).toEqual([
+        '2.1-2.6(节前平淡)',
+        '2.14-2.20(春节+情人节)',
+        '2.7-2.13(节前冲刺)',
+        '2.21-2.28(节后回落)',
+      ]);
+    });
+
+    it('无 sortBy 且非日期时不排序', () => {
+      const data = [
+        { x: 'c', y: 30 },
+        { x: 'a', y: 10 },
+        { x: 'b', y: 20 },
+      ];
+      expect(extractAndSortXValues(data)).toEqual(['c', 'a', 'b']);
     });
   });
 

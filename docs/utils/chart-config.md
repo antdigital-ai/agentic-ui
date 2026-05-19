@@ -55,6 +55,7 @@ type ChartConfig = {
   groupBy?: 业务分组维度; //（映射为 category）- 如：访客数据、营收数据
   filterBy?: 主筛选维度; //（映射为 filterLabel）- 如：全球、美国
   colorLegend?: 数据系列维度; //（映射为 type）- 如：本周访客、上周访客
+  sortBy?: string; // 排序列名；有则按该列排 X 轴类目。未配置时若表格含 `index` 列会自动使用；否则仅当 x 全部为日期/日期区间时按时间排序，其余保持表格顺序
   subgraphBy?: 分组字段，用于生成子图表; //（同段落按该字段拆分）
 };
 ```

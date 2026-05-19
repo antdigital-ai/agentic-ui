@@ -7,7 +7,7 @@ import { useEditorStore } from '../../MarkdownEditor/editor/store';
 import { DragHandle } from '../../MarkdownEditor/editor/tools/DragHandle';
 import { useMEditor } from '../../MarkdownEditor/hooks/editor';
 import { ChartRender } from './ChartRender';
-import { getDataHash } from './utils';
+import { getDataHash, sortChartDataRowsByXField } from './utils';
 
 /**
  * @fileoverview 图表插件主入口文件
@@ -458,20 +458,14 @@ export const ChartElement = (props: RenderElementProps) => {
                       );
                     }
 
-                    chartData = chartData
-                      .map((item: any) => {
-                        return {
-                          ...item,
-                          [x]: numberString(item[x]),
-                          [y]: numberString(item[y]),
-                        };
-                      })
-                      .sort((a: any, b: any) => {
-                        if (dayjs(a[x]).isValid() && dayjs(b[x]).isValid()) {
-                          return dayjs(a[x]).valueOf() - dayjs(b[x]).valueOf();
-                        }
-                        return 0;
-                      });
+                    chartData = sortChartDataRowsByXField(
+                      chartData.map((item: any) => ({
+                        ...item,
+                        [x]: numberString(item[x]),
+                        [y]: numberString(item[y]),
+                      })),
+                      x,
+                    );
 
                     const subgraphBy = rest?.subgraphBy;
 
