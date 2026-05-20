@@ -250,6 +250,65 @@ describe('FileComponent', () => {
       );
     });
 
+    it('树视图 onPreview 应与平铺 nodes 对齐（workspace: / file:）', async () => {
+      const onPreview = vi.fn(() => false);
+      const nodes: FileNode[] = [
+        {
+          id: 'workspace:AGENTS.md',
+          name: 'AGENTS.md',
+          canPreview: true,
+          content: '# Workspace agent guide',
+        },
+      ];
+
+      render(
+        <TestWrapper>
+          <FileComponent
+            nodes={nodes}
+            onPreview={onPreview}
+            fileTreeSwitch={{
+              treeProps: {
+                treeData: [
+                  {
+                    key: 'file:AGENTS.md',
+                    name: 'AGENTS.md',
+                    isLeaf: true,
+                  },
+                ],
+                onLoadChildren: vi.fn().mockResolvedValue([]),
+              },
+              view: 'tree',
+            }}
+          />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: '预览' }));
+      fireEvent.click(screen.getByText('AGENTS.md'));
+
+      await waitFor(() => {
+        expect(onPreview).toHaveBeenCalledTimes(2);
+      });
+      expect(onPreview).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          id: 'workspace:AGENTS.md',
+          name: 'AGENTS.md',
+          canPreview: true,
+          content: '# Workspace agent guide',
+        }),
+      );
+      expect(onPreview).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          id: 'workspace:AGENTS.md',
+          name: 'AGENTS.md',
+          canPreview: true,
+          content: '# Workspace agent guide',
+        }),
+      );
+    });
+
     it('展示段选择器并切换到内嵌文件树', async () => {
       const nodes: FileNode[] = [
         { id: 'f1', name: 'list.txt', url: 'https://example.com/a.txt' },
