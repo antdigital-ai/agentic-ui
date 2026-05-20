@@ -174,6 +174,12 @@ describe('isConfigEqual', () => {
     const b = { x: 'a', y: 'c' };
     expect(isConfigEqual(a, b)).toBe(false);
   });
+
+  it('returns false when sortBy differs', () => {
+    const a = { x: 'a', y: 'b', sortBy: 'index' };
+    const b = { x: 'a', y: 'b', sortBy: 'order' };
+    expect(isConfigEqual(a, b)).toBe(false);
+  });
 });
 
 describe('resolveChartSortByField', () => {
@@ -214,9 +220,7 @@ describe('parseChartXDateSortKey', () => {
 
 describe('compareChartXValues', () => {
   it('sorts date ranges chronologically', () => {
-    expect(
-      compareChartXValues('2.7-2.13', '2.1-2.6'),
-    ).toBeGreaterThan(0);
+    expect(compareChartXValues('2.7-2.13', '2.1-2.6')).toBeGreaterThan(0);
   });
 });
 
@@ -253,11 +257,9 @@ describe('sortChartDataRowsByXField', () => {
       { 月份: '2024-01', y: 1 },
       { 月份: '2024-02', y: 2 },
     ];
-    expect(sortChartDataRowsByXField(rows, '月份').map((row) => row['月份'])).toEqual([
-      '2024-01',
-      '2024-02',
-      '2024-03',
-    ]);
+    expect(
+      sortChartDataRowsByXField(rows, '月份').map((row) => row['月份']),
+    ).toEqual(['2024-01', '2024-02', '2024-03']);
   });
 });
 
@@ -286,7 +288,11 @@ describe('extractAndSortXValues without sortBy', () => {
       { x: '2024-01', y: 10 },
       { x: '2024-02', y: 20 },
     ];
-    expect(extractAndSortXValues(data)).toEqual(['2024-01', '2024-02', '2024-03']);
+    expect(extractAndSortXValues(data)).toEqual([
+      '2024-01',
+      '2024-02',
+      '2024-03',
+    ]);
   });
 });
 

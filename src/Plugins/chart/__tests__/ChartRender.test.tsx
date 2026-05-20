@@ -107,14 +107,28 @@ vi.mock('../ChartAttrToolBar', () => ({
   )),
 }));
 
+let runtimeMountSequence = 0;
+
 const createRuntimeComponent =
   (testId: string) =>
-  (props: { title?: string; toolbarExtra?: React.ReactNode }) => (
-    <div data-testid={testId}>
-      {props.title ?? `mock-${testId}`}
-      {props.toolbarExtra}
-    </div>
-  );
+  (props: {
+    title?: string;
+    toolbarExtra?: React.ReactNode;
+    data?: unknown[];
+  }) => {
+    const [mountId] = React.useState(() => `${++runtimeMountSequence}`);
+
+    return (
+      <div
+        data-testid={testId}
+        data-chart-data={JSON.stringify(props.data ?? [])}
+        data-mount-id={mountId}
+      >
+        {props.title ?? `mock-${testId}`}
+        {props.toolbarExtra}
+      </div>
+    );
+  };
 
 vi.mock('../loadChartRuntime', () => ({
   loadChartRuntime: vi.fn(async () => ({
@@ -170,6 +184,7 @@ describe('ChartRender', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    runtimeMountSequence = 0;
     // 设置测试环境，但允许图表渲染
     process.env.NODE_ENV = 'test-chart';
     // 确保 window 对象存在
@@ -1101,6 +1116,86 @@ describe('ChartRender', () => {
           fireEvent.click(submitBtn);
         });
       }
+    });
+
+    it('提交配置后应该重新挂载图表运行时，避免底层图表实例复用旧配置', async () => {
+      render(
+        <I18nContext.Provider value={mockI18n}>
+          <ChartRender {...defaultProps} />
+        </I18nContext.Provider>,
+      );
+
+      const chartBeforeSubmit = await screen.findByTestId(
+        'bar-chart',
+        {},
+        { timeout: 3000 },
+      );
+      const mountIdBeforeSubmit =
+        chartBeforeSubmit.getAttribute('data-mount-id');
+
+      const configTrigger = screen.getByRole('button', { name: '配置图表' });
+      await act(async () => {
+        fireEvent.click(configTrigger);
+      });
+
+      await waitFor(
+        () => {
+          const submitButton = document.body.querySelector(
+            'button.ant-btn-primary',
+          );
+          expect(submitButton).toBeInTheDocument();
+        },
+        { timeout: 2000 },
+      );
+
+      const submitButton = document.body.querySelector(
+        'button.ant-btn-primary',
+      );
+      await act(async () => {
+        fireEvent.click(submitButton!);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('bar-chart')).not.toHaveAttribute(
+          'data-mount-id',
+          mountIdBeforeSubmit,
+        );
+      });
+    });
+
+    it('应该把显式 sortBy 转换进图表数据，供运行时按业务顺序渲染', async () => {
+      render(
+        <I18nContext.Provider value={mockI18n}>
+          <ChartRender
+            {...defaultProps}
+            chartData={[
+              { name: '春节后', value: 30, order: 3 },
+              { name: '春节前', value: 10, order: 1 },
+            ]}
+            config={{
+              ...defaultProps.config,
+              sortBy: 'order',
+              columns: [
+                ...defaultProps.config.columns,
+                { title: 'Order', dataIndex: 'order' },
+              ],
+            }}
+          />
+        </I18nContext.Provider>,
+      );
+
+      const chart = await screen.findByTestId(
+        'bar-chart',
+        {},
+        { timeout: 3000 },
+      );
+
+      expect(JSON.parse(chart.getAttribute('data-chart-data') || '[]')).toEqual(
+        [
+          expect.objectContaining({ x: '春节后', y: 30, sortBy: 3 }),
+          expect.objectContaining({ x: '春节前', y: 10, sortBy: 1 }),
+        ],
+      );
     });
 
     it('应该处理配置中的 columns 过滤', () => {
