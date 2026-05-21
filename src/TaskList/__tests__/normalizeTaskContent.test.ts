@@ -38,6 +38,18 @@ describe('normalizeTaskContent', () => {
     expect(normalizeTaskContent(['line1', 'line2'])).toBe('line1\nline2');
   });
 
+  it('保留 falsy 基础值正文，不回退 title', () => {
+    expect(normalizeTaskContent(0, 'fallback title')).toBe('0');
+    expect(normalizeTaskContent(false, 'fallback title')).toBe('false');
+    expect(hasNormalizedTaskContent(0, undefined)).toBe(true);
+    expect(hasNormalizedTaskContent(false, undefined)).toBe(true);
+  });
+
+  it('数字 fallback title 应作为有效正文', () => {
+    expect(normalizeTaskContent('', 0)).toBe('0');
+    expect(hasNormalizedTaskContent('', 0)).toBe(true);
+  });
+
   it('保留合法 React 元素', () => {
     const el = React.createElement('span', null, 'ok');
     expect(normalizeTaskContent(el)).toBe(el);

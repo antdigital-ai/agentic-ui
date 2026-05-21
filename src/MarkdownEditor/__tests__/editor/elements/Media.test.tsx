@@ -178,6 +178,25 @@ describe('Media', () => {
       expect(mediaContainer).toBeInTheDocument();
     });
 
+    it('不安全的 media url 应渲染为纯文本而不是媒体节点', () => {
+      const unsafeUrl = '<img src=x onerror=alert(1)>';
+
+      renderWithProvider(
+        <Media
+          element={{ ...mockElement, url: unsafeUrl }}
+          attributes={mockAttributes}
+        >
+          {null}
+        </Media>,
+      );
+
+      expect(
+        screen.getByTestId('media-unsafe-url-plain-text'),
+      ).toHaveTextContent(unsafeUrl);
+      expect(screen.queryByTestId('media-container')).not.toBeInTheDocument();
+      expect(document.querySelector(`img[src="${unsafeUrl}"]`)).toBeNull();
+    });
+
     it('应该渲染图片元素', () => {
       renderWithProvider(
         <Media element={mockElement} attributes={mockAttributes}>

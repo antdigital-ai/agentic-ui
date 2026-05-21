@@ -83,6 +83,18 @@ describe('ReadonlyMedia', () => {
       expect(screen.getByTestId('media-container')).toBeInTheDocument();
     });
 
+    it('不安全的 media url 应渲染为纯文本而不是只读媒体节点', () => {
+      const unsafeUrl = 'javascript:alert(1)';
+
+      renderWithProvider({ ...baseElement, url: unsafeUrl });
+
+      expect(
+        screen.getByTestId('media-unsafe-url-plain-text'),
+      ).toHaveTextContent(unsafeUrl);
+      expect(screen.queryByTestId('media-container')).not.toBeInTheDocument();
+      expect(document.querySelector(`img[src="${unsafeUrl}"]`)).toBeNull();
+    });
+
     it('应传递 attributes 到根节点', () => {
       const { container } = renderWithProvider(baseElement);
       const root = container.firstChild as HTMLElement;
