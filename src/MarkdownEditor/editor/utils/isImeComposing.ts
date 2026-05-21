@@ -59,9 +59,11 @@ export function scheduleClearInputComposition(
     if (!cancelled) clear();
   };
 
-  if (typeof requestAnimationFrame === 'function') {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(runClear);
+  const requestAnimationFrameFn = globalThis.requestAnimationFrame;
+
+  if (typeof requestAnimationFrameFn === 'function') {
+    requestAnimationFrameFn(() => {
+      requestAnimationFrameFn(runClear);
     });
   } else {
     setTimeout(runClear, 0);
