@@ -26,12 +26,16 @@ describe('normalizeTaskContent', () => {
     expect(normalizeTaskContent('', 'web_search · query')).toBe(
       'web_search · query',
     );
-    expect(normalizeTaskContent(null, 'web_fetch · url')).toBe('web_fetch · url');
+    expect(normalizeTaskContent(null, 'web_fetch · url')).toBe(
+      'web_fetch · url',
+    );
     expect(normalizeTaskContent({}, 'exec · bash')).toBe('exec · bash');
   });
 
   it('空白字符串正文回退 title', () => {
-    expect(normalizeTaskContent('   ', 'fallback title')).toBe('fallback title');
+    expect(normalizeTaskContent('   ', 'fallback title')).toBe(
+      'fallback title',
+    );
   });
 
   it('数组 content join 为多行', () => {
