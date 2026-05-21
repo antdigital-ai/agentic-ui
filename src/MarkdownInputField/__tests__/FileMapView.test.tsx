@@ -253,6 +253,45 @@ describe('FileMapView', () => {
       );
     });
 
+    it('should call onViewAll when view all is activated by keyboard', () => {
+      const onViewAll = vi.fn();
+      const fileMap = new Map();
+      for (let i = 1; i <= 5; i++) {
+        fileMap.set(
+          `file-${i}`,
+          createMockFile(`file${i}.pdf`, 'application/pdf'),
+        );
+      }
+
+      render(
+        <FileMapView
+          fileMap={fileMap}
+          maxDisplayCount={3}
+          onViewAll={onViewAll}
+        />,
+      );
+
+      const viewAllButton = screen.getByTestId('file-view-view-all');
+      fireEvent.keyDown(viewAllButton, { key: 'Enter' });
+      fireEvent.keyDown(viewAllButton, { key: ' ' });
+
+      expect(onViewAll).toHaveBeenCalledTimes(2);
+      expect(onViewAll).toHaveBeenNthCalledWith(
+        1,
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'file1.pdf' }),
+          expect.objectContaining({ name: 'file5.pdf' }),
+        ]),
+      );
+      expect(onViewAll).toHaveBeenNthCalledWith(
+        2,
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'file1.pdf' }),
+          expect.objectContaining({ name: 'file5.pdf' }),
+        ]),
+      );
+    });
+
     it('should expand all files when onViewAll returns true', async () => {
       const fileMap = new Map();
       for (let i = 1; i <= 5; i++) {
