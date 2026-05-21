@@ -502,11 +502,7 @@ describe('SlateMarkdownEditor', () => {
         openInsertLink$: new Subject<Selection>(),
         domRect: null,
         setDomRect,
-        editorProps: {
-        placeholder: props.placeholder,
-        textAreaProps: props.textAreaProps,
-        titlePlaceholderContent: props.titlePlaceholderContent,
-      },
+        editorProps: {},
         markdownEditorRef: mockEditorRef,
         markdownContainerRef:
           containerRef as React.MutableRefObject<HTMLDivElement | null>,
@@ -804,11 +800,7 @@ describe('SlateMarkdownEditor', () => {
         openInsertLink$: new Subject<Selection>(),
         domRect: null,
         setDomRect: () => {},
-        editorProps: {
-        placeholder: props.placeholder,
-        textAreaProps: props.textAreaProps,
-        titlePlaceholderContent: props.titlePlaceholderContent,
-      },
+        editorProps: {},
         markdownEditorRef: mockEditorRef,
         markdownContainerRef:
           containerRef as React.MutableRefObject<HTMLDivElement | null>,
@@ -865,11 +857,7 @@ describe('SlateMarkdownEditor', () => {
         openInsertLink$: new Subject<Selection>(),
         domRect: null,
         setDomRect,
-        editorProps: {
-        placeholder: props.placeholder,
-        textAreaProps: props.textAreaProps,
-        titlePlaceholderContent: props.titlePlaceholderContent,
-      },
+        editorProps: {},
         markdownEditorRef: mockEditorRef,
         markdownContainerRef:
           containerRef as React.MutableRefObject<HTMLDivElement | null>,
@@ -1005,11 +993,7 @@ describe('SlateMarkdownEditor', () => {
         openInsertLink$: new Subject<Selection>(),
         domRect: null,
         setDomRect,
-        editorProps: {
-        placeholder: props.placeholder,
-        textAreaProps: props.textAreaProps,
-        titlePlaceholderContent: props.titlePlaceholderContent,
-      },
+        editorProps: {},
         markdownEditorRef: mockEditorRef,
         markdownContainerRef:
           containerRef as React.MutableRefObject<HTMLDivElement | null>,
@@ -1086,11 +1070,7 @@ describe('SlateMarkdownEditor', () => {
         openInsertLink$: new Subject<Selection>(),
         domRect: null,
         setDomRect: () => {},
-        editorProps: {
-        placeholder: props.placeholder,
-        textAreaProps: props.textAreaProps,
-        titlePlaceholderContent: props.titlePlaceholderContent,
-      },
+        editorProps: {},
         markdownEditorRef: mockEditorRef,
         markdownContainerRef:
           containerRef as React.MutableRefObject<HTMLDivElement | null>,
