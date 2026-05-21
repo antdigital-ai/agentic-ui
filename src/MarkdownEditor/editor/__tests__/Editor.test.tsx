@@ -12,6 +12,8 @@ import {
 import { HistoryEditor, withHistory } from 'slate-history';
 import { ReactEditor, withReact } from 'slate-react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { I18nContext } from '../../../I18n';
+import { DEFAULT_EDITOR_PLACEHOLDER } from '../utils/resolveEditorPlaceholder';
 import {
   CodeNode,
   ElementProps,
@@ -188,6 +190,7 @@ describe('SlateMarkdownEditor', () => {
       editorProps: {
         placeholder: props.placeholder,
         textAreaProps: props.textAreaProps,
+        titlePlaceholderContent: props.titlePlaceholderContent,
       },
       markdownEditorRef: mockEditorRef,
       markdownContainerRef:
@@ -197,6 +200,14 @@ describe('SlateMarkdownEditor', () => {
     return {
       ...render(
         <ConfigProvider>
+          <I18nContext.Provider
+            value={{
+              locale: props.localeInputPlaceholder
+                ? { inputPlaceholder: props.localeInputPlaceholder }
+                : undefined,
+              language: 'zh-CN',
+            }}
+          >
           <div ref={containerRef} data-testid="editor-wrapper">
             <EditorStoreContext.Provider value={contextValue}>
               <PluginContext.Provider value={props.plugins || []}>
@@ -230,6 +241,7 @@ describe('SlateMarkdownEditor', () => {
               </PluginContext.Provider>
             </EditorStoreContext.Provider>
           </div>
+          </I18nContext.Provider>
         </ConfigProvider>,
       ),
       containerRef,
@@ -490,7 +502,11 @@ describe('SlateMarkdownEditor', () => {
         openInsertLink$: new Subject<Selection>(),
         domRect: null,
         setDomRect,
-        editorProps: {},
+        editorProps: {
+        placeholder: props.placeholder,
+        textAreaProps: props.textAreaProps,
+        titlePlaceholderContent: props.titlePlaceholderContent,
+      },
         markdownEditorRef: mockEditorRef,
         markdownContainerRef:
           containerRef as React.MutableRefObject<HTMLDivElement | null>,
@@ -544,14 +560,112 @@ describe('SlateMarkdownEditor', () => {
   });
 
   describe('placeholder 与 textAreaProps', () => {
-    it('应支持 placeholder 与 textAreaProps.placeholder', () => {
+    it('空段落时应渲染 Slate 原生 placeholder', async () => {
       renderEditor({
         placeholder: 'Type here',
         initSchemaValue: [
           { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
         ],
       });
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toHaveTextContent('Type here');
+      });
+    });
+
+    it('textAreaProps.placeholder 作为回退', async () => {
+      renderEditor({
+        textAreaProps: { placeholder: 'From textAreaProps' },
+        initSchemaValue: [
+          { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toHaveTextContent('From textAreaProps');
+      });
+    });
+
+    it('titlePlaceholderContent 作为向下兼容回退', async () => {
+      renderEditor({
+        titlePlaceholderContent: 'Legacy placeholder',
+        initSchemaValue: [
+          { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toHaveTextContent('Legacy placeholder');
+      });
+    });
+
+    it('locale.inputPlaceholder 作为回退', async () => {
+      renderEditor({
+        localeInputPlaceholder: 'Locale placeholder',
+        initSchemaValue: [
+          { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toHaveTextContent('Locale placeholder');
+      });
+    });
+
+    it('readonly 时不渲染 placeholder', async () => {
+      renderEditor({
+        placeholder: 'Hidden',
+        readonly: true,
+        initSchemaValue: [
+          { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toBeNull();
+      });
+    });
+
+    it('含 tag 子节点时不渲染 editor 级 placeholder', async () => {
+      renderEditor({
+        placeholder: 'Should not show',
+        initSchemaValue: [
+          {
+            type: 'paragraph',
+            children: [{ text: '', tag: true } as { text: string; tag: boolean }],
+          } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toBeNull();
+      });
+    });
+
+    it('无任何配置时使用默认 placeholder', async () => {
+      renderEditor({
+        initSchemaValue: [
+          { type: 'paragraph', children: [{ text: '' }] } as ParagraphNode,
+        ],
+      });
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-slate-placeholder="true"]'),
+        ).toHaveTextContent(DEFAULT_EDITOR_PLACEHOLDER);
+      });
     });
   });
 
@@ -690,7 +804,11 @@ describe('SlateMarkdownEditor', () => {
         openInsertLink$: new Subject<Selection>(),
         domRect: null,
         setDomRect: () => {},
-        editorProps: {},
+        editorProps: {
+        placeholder: props.placeholder,
+        textAreaProps: props.textAreaProps,
+        titlePlaceholderContent: props.titlePlaceholderContent,
+      },
         markdownEditorRef: mockEditorRef,
         markdownContainerRef:
           containerRef as React.MutableRefObject<HTMLDivElement | null>,
@@ -747,7 +865,11 @@ describe('SlateMarkdownEditor', () => {
         openInsertLink$: new Subject<Selection>(),
         domRect: null,
         setDomRect,
-        editorProps: {},
+        editorProps: {
+        placeholder: props.placeholder,
+        textAreaProps: props.textAreaProps,
+        titlePlaceholderContent: props.titlePlaceholderContent,
+      },
         markdownEditorRef: mockEditorRef,
         markdownContainerRef:
           containerRef as React.MutableRefObject<HTMLDivElement | null>,
@@ -883,7 +1005,11 @@ describe('SlateMarkdownEditor', () => {
         openInsertLink$: new Subject<Selection>(),
         domRect: null,
         setDomRect,
-        editorProps: {},
+        editorProps: {
+        placeholder: props.placeholder,
+        textAreaProps: props.textAreaProps,
+        titlePlaceholderContent: props.titlePlaceholderContent,
+      },
         markdownEditorRef: mockEditorRef,
         markdownContainerRef:
           containerRef as React.MutableRefObject<HTMLDivElement | null>,
@@ -960,7 +1086,11 @@ describe('SlateMarkdownEditor', () => {
         openInsertLink$: new Subject<Selection>(),
         domRect: null,
         setDomRect: () => {},
-        editorProps: {},
+        editorProps: {
+        placeholder: props.placeholder,
+        textAreaProps: props.textAreaProps,
+        titlePlaceholderContent: props.titlePlaceholderContent,
+      },
         markdownEditorRef: mockEditorRef,
         markdownContainerRef:
           containerRef as React.MutableRefObject<HTMLDivElement | null>,
