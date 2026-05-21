@@ -1,9 +1,35 @@
-﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   DEFAULT_TEXT_SWAP_DURATION_MS,
+  TEXT_SWAP_BLUR_PX,
   TEXT_SWAP_EASING,
 } from '../Components/TextSwap/constants';
-import { textSwapEnterAnimationForwards } from '../Components/TextSwap/textSwapMotion';
+
+/** 流式段落专用的 keyframes 名称：纯 blur + opacity 淡入，不带 translateY 位移 */
+const STREAM_BLUR_FADE_KEYFRAME = 'agenticStreamBlurFadeIn';
+
+/** 注入一次全局 keyframes（不带 translateY，避免流式文字跳动） */
+let streamBlurStyleInjected = false;
+function ensureStreamBlurStyleInjected(): void {
+  if (
+    streamBlurStyleInjected ||
+    typeof document === 'undefined'
+  ) {
+    return;
+  }
+  streamBlurStyleInjected = true;
+  const style = document.createElement('style');
+  style.textContent = `@keyframes ${STREAM_BLUR_FADE_KEYFRAME}{from{opacity:0;filter:blur(${TEXT_SWAP_BLUR_PX}px)}to{opacity:1;filter:blur(0)}}`;
+  document.head.appendChild(style);
+}
+
+function streamBlurFadeAnimation(
+  durationMs: number,
+  easing: string,
+): string {
+  ensureStreamBlurStyleInjected();
+  return `${STREAM_BLUR_FADE_KEYFRAME} ${durationMs}ms ${easing} forwards`;
+}
 
 export interface AnimationConfig {
   /** 淡入动画持续时间（ms），默认与 TextSwap 一致 */
@@ -87,8 +113,8 @@ const AnimationText = React.memo<AnimationTextProps>(
     const animationStyle = useMemo(
       () => ({
         display: 'inline-block',
-        animation: textSwapEnterAnimationForwards(fadeDuration, easing),
-        willChange: 'opacity, transform, filter',
+        animation: streamBlurFadeAnimation(fadeDuration, easing),
+        willChange: 'opacity, filter',
         color: 'inherit',
       }),
       [fadeDuration, easing],

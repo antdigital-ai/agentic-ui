@@ -1,4 +1,4 @@
-﻿import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../../Hooks/useStyle';
 
 import {
   DEFAULT_TEXT_SWAP_DURATION_MS,
