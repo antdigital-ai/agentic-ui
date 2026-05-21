@@ -1,12 +1,14 @@
 import classNames from 'clsx';
-import React, { useContext, useEffect, useState } from 'react';
-import { Node } from 'slate';
+import React, { useContext } from 'react';
 import { I18nContext } from '../../../../I18n';
 import { debugInfo } from '../../../../Utils/debugUtils';
 import { ElementProps, ParagraphNode } from '../../../el';
 import { useSelStatus } from '../../../hooks/editor';
+import { useEditorComposition } from '../../hooks/useEditorComposition';
+import { useParagraphEmptyState } from '../../hooks/useParagraphEmptyState';
 import { useEditorStore } from '../../store';
 import { DragHandle } from '../../tools/DragHandle';
+import { resolveEditorPlaceholderFromProps } from '../../utils/resolveEditorPlaceholder';
 
 export const Paragraph = (props: ElementProps<ParagraphNode>) => {
   const align = props.element.align ?? props.element.otherProps?.align;
@@ -14,84 +16,45 @@ export const Paragraph = (props: ElementProps<ParagraphNode>) => {
     align,
     children: props.element.children,
   });
-  const {
-    store,
-    markdownEditorRef,
-    markdownContainerRef,
-    readonly,
-    editorProps,
-  } = useEditorStore();
+  const { store, markdownContainerRef, readonly, editorProps } =
+    useEditorStore();
   const { locale } = useContext(I18nContext);
   const [selected] = useSelStatus(props.element);
+  const isComposing = useEditorComposition();
+  const isEmpty = useParagraphEmptyState(props.element, isComposing);
+  const placeholderText = resolveEditorPlaceholderFromProps(
+    editorProps,
+    locale?.inputPlaceholder,
+  );
 
-  const [isComposing, setIsComposing] = useState(false);
-  useEffect(() => {
-    const container = markdownContainerRef.current;
-    if (!container) return;
-
-    const onStart = () => setIsComposing(true);
-    const onEnd = () => setIsComposing(false);
-    container.addEventListener('compositionstart', onStart);
-    container.addEventListener('compositionend', onEnd);
-    return () => {
-      container.removeEventListener('compositionstart', onStart);
-      container.removeEventListener('compositionend', onEnd);
-    };
-  }, [markdownContainerRef]);
-
-  return React.useMemo(() => {
-    const str = Node.string(props.element).trim();
-    debugInfo('Paragraph - useMemo 渲染', {
-      strLength: str.length,
-      selected,
-      readonly,
-      align,
-    });
-    const hasOnlyTextNodes = props.element?.children?.every?.(
-      (child: any) => !child.type && !child.code && !child.tag,
-    );
-    const isEmpty =
-      !str &&
-      !isComposing &&
-      markdownEditorRef.current?.children.length === 1 &&
-      hasOnlyTextNodes
-        ? true
-        : undefined;
-
-    return (
-      <div
-        {...props.attributes}
-        data-be={'paragraph'}
-        data-drag-el
-        className={classNames({
-          empty: isEmpty,
-        })}
-        data-align={align}
-        data-slate-placeholder={
-          isEmpty
-            ? editorProps.titlePlaceholderContent ||
-              locale?.inputPlaceholder ||
-              '请输入内容...'
-            : undefined
-        }
-        onDragStart={(e) => {
-          store.dragStart(e, markdownContainerRef.current!);
-        }}
-        data-empty={isEmpty}
-        style={{
-          textAlign: align,
-        }}
-      >
-        <DragHandle />
-        {props.children}
-      </div>
-    );
-  }, [
-    props.element.children,
-    align,
+  debugInfo('Paragraph - 渲染', {
+    strLength: props.element.children?.length,
     selected,
-    isComposing,
-    markdownEditorRef.current?.children.length,
-    editorProps.titlePlaceholderContent,
-  ]);
+    readonly,
+    align,
+    isEmpty,
+  });
+
+  return (
+    <div
+      {...props.attributes}
+      data-be={'paragraph'}
+      data-drag-el
+      className={classNames({
+        empty: isEmpty,
+      })}
+      data-align={align}
+      data-slate-placeholder={isEmpty ? placeholderText : undefined}
+      onDragStart={(e) => {
+        store.dragStart(e, markdownContainerRef.current!);
+      }}
+      data-empty={isEmpty}
+      style={{
+        textAlign: align,
+      }}
+    >
+      <DragHandle />
+      {props.children}
+    </div>
+  );
 };

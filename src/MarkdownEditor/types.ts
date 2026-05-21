@@ -306,7 +306,13 @@ export type MarkdownEditorProps = {
   slideMode?: boolean;
   containerClassName?: string;
   floatBar?: { enable?: boolean };
+  /** 编辑器空态占位文案；优先级高于 textAreaProps.placeholder 与 titlePlaceholderContent */
+  placeholder?: string;
   textAreaProps?: { enable?: boolean; placeholder?: string };
+  /**
+   * 编辑器空态占位文案（向下兼容）
+   * @deprecated 请使用 `placeholder`
+   */
   titlePlaceholderContent?: string;
   /** IME 组合开始/结束时回调，用于关闭与 `/`、`@` 冲突的浮动面板 */
   onCompositionActiveChange?: (active: boolean) => void;

@@ -166,6 +166,22 @@ describe('Head Component', () => {
       expect(heading).toHaveClass('empty');
     });
 
+    it('空首段标题应设置 data-slate-placeholder', () => {
+      const emptyProps = {
+        ...defaultProps,
+        element: {
+          ...defaultProps.element,
+          children: [{ text: '' }],
+        },
+      };
+      render(<Head {...emptyProps} />);
+      const heading = document.querySelector('h1');
+      expect(heading).toHaveAttribute(
+        'data-slate-placeholder',
+        'Enter title...',
+      );
+    });
+
     it('应该为打字机模式添加 typewriter 类', () => {
       // 简化测试，只验证组件能正常渲染
       render(<Head {...defaultProps} />);

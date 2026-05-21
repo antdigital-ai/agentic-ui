@@ -226,9 +226,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     return !childrenIsEmpty ? 'focus' : '';
   }, [readonly, !childrenIsEmpty]);
 
-  const { wrapSSR, hashId } = useStyle(`${props.prefixCls}-content`, {
-    placeholderContent: props?.textAreaProps?.placeholder || props?.placeholder,
-  });
+  const { wrapSSR, hashId } = useStyle(`${props.prefixCls}-content`, {});
 
   const commentMap = useMemo(() => {
     const map = new Map<string, Map<string, CommentDataType[]>>();

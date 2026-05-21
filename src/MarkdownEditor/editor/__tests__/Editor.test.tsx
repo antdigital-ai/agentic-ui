@@ -185,7 +185,10 @@ describe('SlateMarkdownEditor', () => {
       openInsertLink$: new Subject<Selection>(),
       domRect: null,
       setDomRect: () => {},
-      editorProps: {},
+      editorProps: {
+        placeholder: props.placeholder,
+        textAreaProps: props.textAreaProps,
+      },
       markdownEditorRef: mockEditorRef,
       markdownContainerRef:
         containerRef as React.MutableRefObject<HTMLDivElement | null>,
