@@ -1,4 +1,4 @@
-import { FileFolders } from '@sofa-design/icons';
+﻿import { FileFolders } from '@sofa-design/icons';
 import { ConfigProvider, Empty, Tree, Typography } from 'antd';
 import type { DataNode, EventDataNode, TreeProps } from 'antd/es/tree';
 import type { AntdTreeNodeAttribute } from 'antd/es/tree/Tree';
@@ -18,7 +18,10 @@ import type { FileNode, FileTreeNode, FileTreeProps } from '../../types';
 import { getFileType } from '../../types';
 import { FileItem } from '../components/FileItem';
 import type { ResolveTreeLeafFileOptions } from '../resolveTreeLeafFile';
-import { resolveTreeLeafFile } from '../resolveTreeLeafFile';
+import {
+  hasTreeLeafFileBinding,
+  resolveTreeLeafFile,
+} from '../resolveTreeLeafFile';
 import { useFileStyle } from '../style';
 import { getFileTypeIcon } from '../utils';
 import { useFileTreeStyle } from './style';
@@ -68,7 +71,10 @@ const mapTreeToDataNodes = (
     const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
 
     if (resolvedIsLeaf) {
-      const leafFile = resolveTreeLeafFile(node, ctx.resolveTreeLeafFileOptions);
+      const allowSyntheticLeaf = Boolean(ctx.onDownload);
+      const leafFile = hasTreeLeafFileBinding(node, { allowSyntheticLeaf })
+        ? resolveTreeLeafFile(node, ctx.resolveTreeLeafFileOptions)
+        : null;
       const title =
         leafFile !== null ? (
           <FileItem
@@ -116,8 +122,16 @@ const replaceNodeChildren = (
 ): FileTreeNode[] => {
   return nodes.map((n) => {
     if (n.key === key) {
+      if (newChildren.length === 0) {
+        return {
+          ...n,
+          isLeaf: true,
+          children: undefined,
+        };
+      }
       return {
         ...n,
+        isLeaf: false,
         children: newChildren,
       };
     }
@@ -321,6 +335,9 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       .then((loaded) => {
         const children = loaded ?? [];
         setInnerTree((prev) => replaceNodeChildren(prev, k, children));
+        if (children.length === 0) {
+          setExpandedKeys((keys) => keys.filter((key) => String(key) !== k));
+        }
       })
       .catch((error) => {
         console.error('Failed to load tree children:', error);
@@ -336,6 +353,10 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       const n = nodeMap.get(k);
       if (!n) return;
       onSelect?.(n);
+      const allowSyntheticLeaf = Boolean(onDownload);
+      if (!hasTreeLeafFileBinding(n, { allowSyntheticLeaf })) {
+        return;
+      }
       const file = resolveTreeLeafFile(n, resolveTreeLeafFileOptions);
       if (!file || n.disabled === true) return;
       if (onFileClick) {

@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+﻿import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -962,7 +962,10 @@ describe('TaskList', () => {
 
       render(<TaskList items={errorItems} variant="simple" />);
 
-      expect(screen.getByText('正在进行任务')).toBeInTheDocument();
+      expect(screen.getByText('任务已取消')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('task-list-simple-summary-status-error'),
+      ).toBeInTheDocument();
     });
 
     it('loading 任务无标题时应优先显示进行中状态', () => {

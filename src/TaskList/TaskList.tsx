@@ -1,4 +1,4 @@
-import { ChevronUp } from '@sofa-design/icons';
+﻿import { ChevronUp } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
@@ -91,12 +91,13 @@ export const TaskList = memo(
       };
     }, [simpleExpanded]);
 
-    const { summaryStatus, summaryText, summarySwapKey, lastItem } =
+    const { summaryStatus, summaryText, summarySwapKey, isCancelled, lastItem } =
       useMemo(() => {
         const completedCount = items.filter(
           (i) => i.status === 'success',
         ).length;
         const loadingItem = items.find((i) => i.status === 'loading');
+        const hasError = items.some((i) => i.status === 'error');
         const allDone =
           !externalLoading &&
           completedCount === items.length &&
@@ -128,8 +129,11 @@ export const TaskList = memo(
               : '';
           text = tpl.replace('${taskName}', taskName);
           swapKey = `loading:${loadingItem.key}:${taskName}`;
+        } else if (hasError) {
+          status = 'error';
+          text = locale?.['taskList.taskAborted'] || '任务已取消';
+          swapKey = `error:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
         } else if (externalLoading || items.length > 0) {
-          // 外部 loading 或内部未全部成功 → 视为进行中
           status = 'loading';
           const tpl =
             locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
@@ -141,6 +145,7 @@ export const TaskList = memo(
           summaryStatus: status,
           summaryText: text,
           summarySwapKey: swapKey,
+          isCancelled: hasError,
           lastItem: items[items.length - 1] as TaskItem | undefined,
         };
       }, [items, locale, taskCompleteText, externalLoading]);
@@ -179,7 +184,13 @@ export const TaskList = memo(
       ? locale?.['taskList.collapse'] || '收起'
       : locale?.['taskList.expand'] || '展开';
 
-    const visibleItems = simpleExpanded ? items : lastItem ? [lastItem] : [];
+    const visibleItems = simpleExpanded
+      ? isCancelled
+        ? items.slice(-1)
+        : items
+      : lastItem
+        ? [lastItem]
+        : [];
 
     return wrapSSR(
       <div
