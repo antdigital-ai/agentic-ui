@@ -12,7 +12,6 @@ import {
   Transforms,
 } from 'slate';
 import {
-  Editable,
   ReactEditor,
   RenderElementProps,
   RenderLeafProps,
@@ -29,6 +28,7 @@ import {
   MarkdownEditorProps,
 } from '../types';
 import { LazyElement } from './components/LazyElement';
+import { EditorEditable } from './components/EditorEditable';
 import { MElement, MLeaf } from './elements';
 import {
   handleFilesPaste,
@@ -1218,7 +1218,7 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
         initialValue={initialValue}
         onChange={onSlateChange}
       >
-        <Editable
+        <EditorEditable
           decorate={decorateFn}
           onDragOver={(e) => e.preventDefault()}
           readOnly={readonly}

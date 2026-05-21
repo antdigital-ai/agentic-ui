@@ -196,36 +196,10 @@ const genStyle: GenerateStyle<ChatTokenType> = (token) => {
         borderRadius: '20px',
       },
       '&-edit': {
-        // 空态占位：首段 paragraph 或首个 head，见 resolveEditorPlaceholder / useParagraphEmptyState
-        '> div[data-be="paragraph"].empty:first-child, > [data-be="head"].empty:first-child':
-          {
-            '[data-slate-zero-width="n"]': {
-              display: 'inline-block',
-              minWidth: 20,
-            },
-            '&::before': {
-              cursor: 'text',
-              content: 'attr(data-slate-placeholder)',
-              color: 'var(--color-gray-text-disabled, rgba(20, 22, 28, 0.25))',
-              display: 'inline-block',
-              position: 'absolute',
-              width: 'max-content',
-              maxWidth: '100%',
-              fontSize: '1em',
-              lineHeight: '21px',
-              wordBreak: 'break-word',
-              whiteSpace: 'wrap',
-              // 防止占位符伪元素响应触摸/点击事件，避免在移动端
-              // 竞态窗口内占位符遮挡用户对实际文字的交互。
-              pointerEvents: 'none',
-              userSelect: 'none',
-            },
-          },
-        '> div[data-be="paragraph"].empty:first-child [data-slate-node="text"], > [data-be="head"].empty:first-child [data-slate-node="text"]':
-          {
-            display: 'inline-block',
-            minWidth: 20,
-          },
+        '[data-slate-placeholder="true"]': {
+          color: 'var(--color-gray-text-disabled, rgba(20, 22, 28, 0.25)) !important',
+          opacity: '1 !important',
+        },
       },
 
       '&> *:first-child': {

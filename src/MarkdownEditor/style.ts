@@ -344,10 +344,6 @@ const genStyle: GenStyleFn<'MarkdownEditor'> = (token) => {
         scrollbarColor: 'hsl(240 5.9% 90%) transparent',
         boxSizing: 'border-box',
       },
-      'div[data-composition] div:not([data-no-focus]).empty:first-child::before':
-        {
-          display: 'none',
-        },
       '> *': {
         boxSizing: 'border-box',
         scrollbarWidth: 'thin',
