@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -798,6 +804,95 @@ describe('Workspace Component', () => {
 
     expect(onTabChange).not.toHaveBeenCalled();
     expect(screen.getByText('ok')).toBeInTheDocument();
+  });
+
+  it('受控切换离开文件标签时默认重置文件预览', async () => {
+    const onTabChange = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace activeTabKey="file" onTabChange={onTabChange}>
+          <Workspace.Realtime data={{ type: 'shell', content: 'realtime' }} />
+          <Workspace.File
+            nodes={[
+              {
+                id: 'preview-file',
+                name: 'report.md',
+                content: 'report',
+                canPreview: true,
+              },
+            ]}
+            onPreview={() => (
+              <div data-testid="workspace-file-preview">preview body</div>
+            )}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '文件：report.md' }));
+    expect(
+      await screen.findByTestId('workspace-file-preview'),
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      within(screen.getByTestId('workspace-segmented')).getByText('实时跟随'),
+    );
+
+    expect(onTabChange).toHaveBeenCalledWith('realtime');
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId('workspace-file-preview'),
+      ).not.toBeInTheDocument();
+    });
+    expect(
+      screen.getByRole('button', { name: '文件：report.md' }),
+    ).toBeInTheDocument();
+  });
+
+  it('preserveFilePreviewOnTabChange=true 时受控切换不重置文件预览', async () => {
+    const onTabChange = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace
+          activeTabKey="file"
+          preserveFilePreviewOnTabChange
+          onTabChange={onTabChange}
+        >
+          <Workspace.Realtime data={{ type: 'shell', content: 'realtime' }} />
+          <Workspace.File
+            nodes={[
+              {
+                id: 'preserved-preview-file',
+                name: 'preserved.md',
+                content: 'preserved',
+                canPreview: true,
+              },
+            ]}
+            onPreview={() => (
+              <div data-testid="workspace-preserved-preview">
+                preserved preview
+              </div>
+            )}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '文件：preserved.md' }));
+    expect(
+      await screen.findByTestId('workspace-preserved-preview'),
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      within(screen.getByTestId('workspace-segmented')).getByText('实时跟随'),
+    );
+
+    expect(onTabChange).toHaveBeenCalledWith('realtime');
+    expect(
+      screen.getByTestId('workspace-preserved-preview'),
+    ).toBeInTheDocument();
   });
 
   it('应该支持嵌套的复杂结构', () => {

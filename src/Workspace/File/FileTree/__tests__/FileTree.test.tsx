@@ -511,6 +511,59 @@ describe('Workspace.FileTree', () => {
     });
   });
 
+  it('treats leaf nodes without file metadata as plain selectable tree nodes', async () => {
+    const onFileClick = vi.fn();
+    const onPreview = vi.fn();
+    const onSelect = vi.fn();
+
+    render(
+      <TestWrapper>
+        <Workspace>
+          <Workspace.FileTree
+            treeData={[
+              {
+                key: 'leaf-with-null-file',
+                name: 'missing-file.md',
+                isLeaf: true,
+                file: null,
+              },
+              {
+                key: 'leaf-without-file',
+                name: 'omitted-file.md',
+                isLeaf: true,
+              },
+            ]}
+            onLoadChildren={vi.fn()}
+            onFileClick={onFileClick}
+            onPreview={onPreview}
+            onSelect={onSelect}
+          />
+        </Workspace>
+      </TestWrapper>,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: '预览' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '下载' }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('missing-file.md'));
+    fireEvent.click(screen.getByText('omitted-file.md'));
+
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith(
+        expect.objectContaining({ key: 'leaf-with-null-file' }),
+      );
+      expect(onSelect).toHaveBeenCalledWith(
+        expect.objectContaining({ key: 'leaf-without-file' }),
+      );
+    });
+    expect(onFileClick).not.toHaveBeenCalled();
+    expect(onPreview).not.toHaveBeenCalled();
+  });
+
   it('invokes onFileClick instead of onPreview when both are set', async () => {
     const onPreview = vi.fn();
     const onFileClick = vi.fn();
