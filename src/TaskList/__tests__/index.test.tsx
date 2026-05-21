@@ -1003,7 +1003,7 @@ describe('TaskList', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('展开后取消状态只显示最后一条任务', async () => {
+    it('收起状态只显示最后一条任务', () => {
       const errorItems = [
         {
           key: '1',
@@ -1019,7 +1019,7 @@ describe('TaskList', () => {
         },
       ];
 
-      render(<TaskList items={errorItems} variant="simple" open={true} />);
+      render(<TaskList items={errorItems} variant="simple" open={false} />);
 
       expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
       expect(screen.getByText('Error Task')).toBeInTheDocument();

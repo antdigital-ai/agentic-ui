@@ -87,6 +87,13 @@ vi.mock('slate-react', () => ({
     toDOMNode: vi.fn(() => document.createElement('div')),
   },
 }));
+vi.mock('../components/EditorEditable', () => ({
+  EditorEditable: (props: Record<string, any>) => {
+    editableProps = props;
+    return React.createElement('div', { 'data-testid': 'mock-editable' });
+  },
+}));
+
 
 vi.mock('../../../Hooks/useRefFunction', () => ({
   useRefFunction: (fn: (...args: any[]) => any) => fn,

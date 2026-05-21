@@ -37,6 +37,17 @@ describe('resolveTreeLeafFile', () => {
     );
   });
 
+  it('file 为 null 时应返回 null', () => {
+    const node = {
+      key: 'leaf-null',
+      name: 'missing.md',
+      isLeaf: true,
+      file: null,
+    } as FileTreeNode;
+
+    expect(resolveTreeLeafFile(node)).toBeNull();
+  });
+
   it('无 file 时应由 name 与 key 合成 FileNode', () => {
     const node: FileTreeNode = {
       key: 'leaf-2',

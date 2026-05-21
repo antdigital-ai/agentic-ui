@@ -166,7 +166,7 @@ describe('Head Component', () => {
       expect(heading).toHaveClass('empty');
     });
 
-    it('空首段标题应设置 data-slate-placeholder', () => {
+    it('空标题块级节点不应设置 data-slate-placeholder（由 EditorEditable 统一处理）', () => {
       const emptyProps = {
         ...defaultProps,
         element: {
@@ -174,12 +174,10 @@ describe('Head Component', () => {
           children: [{ text: '' }],
         },
       };
-      render(<Head {...emptyProps} />);
-      const heading = document.querySelector('h1');
-      expect(heading).toHaveAttribute(
-        'data-slate-placeholder',
-        'Enter title...',
-      );
+      const { container } = render(<Head {...emptyProps} />);
+      const heading = container.querySelector('h1');
+      expect(heading).not.toHaveAttribute('data-slate-placeholder');
+      expect(container.querySelector('[data-slate-placeholder="true"]')).toBeNull();
     });
 
     it('应该为打字机模式添加 typewriter 类', () => {

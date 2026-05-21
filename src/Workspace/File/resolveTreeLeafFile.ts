@@ -49,6 +49,10 @@ export const resolveTreeLeafFile = (
     return null;
   }
 
+  if (node.file === null) {
+    return null;
+  }
+
   const {
     key,
     name,
