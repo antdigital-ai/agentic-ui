@@ -5,7 +5,7 @@ const isPlainObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v) && !React.isValidElement(v);
 
 const extractTextFromUnknown = (value: unknown): string => {
-  if (value == null) return '';
+  if (value === null || value === undefined) return '';
   if (typeof value === 'string') return value;
   if (typeof value === 'number' || typeof value === 'boolean') {
     return String(value);
@@ -29,7 +29,7 @@ const extractTextFromUnknown = (value: unknown): string => {
 };
 
 const isContentEmpty = (content: TaskItem['content']): boolean => {
-  if (content == null) return true;
+  if (content === null || content === undefined) return true;
   if (typeof content === 'string') return content.trim().length === 0;
   if (typeof content === 'number' || typeof content === 'boolean') {
     return false;
@@ -46,7 +46,7 @@ const isContentEmpty = (content: TaskItem['content']): boolean => {
 const resolveFallbackTitle = (
   fallbackTitle?: React.ReactNode,
 ): TaskItem['content'] => {
-  if (fallbackTitle == null) return '';
+  if (fallbackTitle === null || fallbackTitle === undefined) return '';
   if (typeof fallbackTitle === 'string') {
     const trimmed = fallbackTitle.trim();
     return trimmed.length > 0 ? trimmed : '';
