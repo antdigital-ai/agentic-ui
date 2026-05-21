@@ -1,10 +1,14 @@
-import { LoadingOutlined } from '@ant-design/icons';
+﻿import { LoadingOutlined } from '@ant-design/icons';
 import { Skeleton } from 'antd';
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useRefFunction } from '../../../../Hooks/useRefFunction';
 import { ElementProps, MediaNode } from '../../../el';
 import { MediaErrorLink } from '../../components/MediaErrorLink';
 import { useGetSetState } from '../../utils';
+import {
+  shouldRenderUrlAsPlainText,
+  UNSAFE_URL_PLAIN_TEXT_STYLE,
+} from '../../../../Utils/htmlUrlSafety';
 import { getMediaType } from '../../utils/dom';
 import { ReadonlyImage } from '../Image';
 
@@ -50,6 +54,10 @@ export const ReadonlyMedia: React.FC<ElementProps<MediaNode>> = React.memo(
       url: '',
       type: getMediaType(element?.url, element.alt),
     });
+
+    const unsafeUrlPlainText = element?.url
+      ? shouldRenderUrlAsPlainText(element.url)
+      : false;
 
     // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
     useEffect(() => {
@@ -409,6 +417,26 @@ export const ReadonlyMedia: React.FC<ElementProps<MediaNode>> = React.memo(
       element.poster,
       state().loadSuccess,
     ]);
+
+    if (unsafeUrlPlainText && element?.url) {
+      return (
+        <div {...attributes}>
+          <div
+            data-be="media"
+            data-testid="media-unsafe-url-plain-text"
+            style={{
+              width: '100%',
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+            }}
+            contentEditable={false}
+          >
+            <span style={UNSAFE_URL_PLAIN_TEXT_STYLE}>{element.url}</span>
+            <div style={{ display: 'none' }}>{children}</div>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div {...attributes}>

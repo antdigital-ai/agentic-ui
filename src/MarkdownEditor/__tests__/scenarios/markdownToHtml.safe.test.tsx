@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import {
   markdownToHtml,
   markdownToHtmlSync,
@@ -155,11 +155,11 @@ Empty code: \`\`
         "<code>&#x3C;script>alert('xss')&#x3C;/script></code>",
       );
 
-      // 验证JavaScript链接被过滤
-      expect(html).not.toContain('javascript:alert');
-
-      // 验证img上的onerror事件被移除
-      expect(html).not.toContain('onerror');
+      // javascript: 链接与含 onerror 的 img 应降级为纯文本，不渲染为可点击/可执行的标签
+      expect(html).not.toMatch(/<a[\s>]/i);
+      expect(html).not.toMatch(/<img[\s>]/i);
+      expect(html).toMatch(/&#x3C;a|&lt;a/i);
+      expect(html).toMatch(/&#x3C;img|&lt;img/i);
 
       // 验证代码块中的内容被安全显示
       // 代码块中的内容被HTML转义，格式可能为 &#x26;lt; 或 &lt;

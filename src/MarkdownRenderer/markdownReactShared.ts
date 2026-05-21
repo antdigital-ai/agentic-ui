@@ -1,4 +1,4 @@
-import { Checkbox, Image } from 'antd';
+﻿import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
@@ -11,6 +11,10 @@ import type {
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import { debugInfo } from '../Utils/debugUtils';
+import {
+  shouldRenderUrlAsPlainText,
+  UNSAFE_URL_PLAIN_TEXT_STYLE,
+} from '../Utils/htmlUrlSafety';
 import {
   FncRefForMarkdown,
   extractFootnoteRefFromSupChildren,
@@ -355,6 +359,14 @@ const buildEditorAlignedComponents = (
 
     a: (props: any) => {
       const { node, href, onClick: _origOnClick, ...rest } = props;
+      if (shouldRenderUrlAsPlainText(href || '')) {
+        return jsx('span' as any, {
+          ...rest,
+          'data-testid': 'markdown-unsafe-url-plain-text',
+          style: UNSAFE_URL_PLAIN_TEXT_STYLE,
+          children: href,
+        });
+      }
       const openInNewTab = linkConfig?.openInNewTab !== false;
       const defaultDom = jsx('a' as any, {
         ...rest,
@@ -502,6 +514,14 @@ const buildEditorAlignedComponents = (
 
     img: (props: any) => {
       const { node, src, alt, width, height, ...rest } = props;
+      if (shouldRenderUrlAsPlainText(src || '')) {
+        return jsx('span' as any, {
+          ...rest,
+          'data-testid': 'markdown-unsafe-url-plain-text',
+          style: UNSAFE_URL_PLAIN_TEXT_STYLE,
+          children: src,
+        });
+      }
       const imgWidth = width ? Number(width) || width : 400;
       const defaultDom = jsx('div' as any, {
         'data-be': 'image',

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import {
   markdownToHtml,
   markdownToHtmlSync,
@@ -97,18 +97,20 @@ describe('rehypeSanitizeUserHtml', () => {
       expect(result).toContain('Safe');
     });
 
-    it('应移除 img 上的 onerror 属性', async () => {
+    it('应将含 onerror 的 img 降级为纯文本', async () => {
       const result = await markdownToHtml('<img src="x" onerror="alert(1)">');
-      expect(result).toContain('<img src="x"');
-      expect(result).not.toContain('onerror');
+      expect(result).not.toMatch(/<img[\s>]/i);
+      expect(result).toMatch(/&#x3C;img|&lt;img/i);
+      expect(result).toMatch(/onerror|onError/i);
     });
 
-    it('应移除 javascript: URL', async () => {
+    it('应将 javascript: 链接降级为纯文本', async () => {
       const result = await markdownToHtml(
         '<a href="javascript:alert(1)">link</a>',
       );
-      expect(result).not.toContain('javascript:');
-      expect(result).toContain('link');
+      expect(result).not.toMatch(/<a[\s>]/i);
+      expect(result).toContain('javascript:');
+      expect(result).toMatch(/&#x3C;a|&lt;a/i);
     });
   });
 

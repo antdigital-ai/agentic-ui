@@ -1,4 +1,4 @@
-/**
+﻿/**
  * rehype 插件：清理用户输入中的危险 HTML，防止页面布局错乱和 XSS 攻击。
  *
  * 在 rehypeRaw 之后使用，对 hast 树执行：
@@ -6,8 +6,15 @@
  * 2. 完全移除危险元素（script、style 等）及其子节点
  * 3. 解包结构性元素（html、head、body 等），保留子节点
  * 4. 保留 GFM 任务列表的 input[type=checkbox]，移除其他 input
- * 5. 清理所有元素的危险属性（on* 事件、javascript: URL）
+ * 5. 媒体/链接类元素若含 on* 事件、javascript: URL 或非法 HTML URL，降级为纯文本
+ * 6. 其余元素仅清理危险属性（on* 事件、javascript: URL）
  */
+
+import {
+  hasDangerousUrlScheme,
+  serializeHastElement,
+  shouldElementRenderAsPlainText,
+} from './htmlUrlSafety';
 
 /** 应完全移除（含子节点）的危险 HTML 标签 */
 const STRIP_ELEMENTS = new Set([
@@ -40,8 +47,6 @@ const UNWRAP_ELEMENTS = new Set([
   'legend',
 ]);
 
-const DANGEROUS_URL_SCHEMES = ['javascript:', 'vbscript:'];
-
 const sanitizeElementProperties = (
   properties: Record<string, unknown>,
 ): void => {
@@ -52,11 +57,8 @@ const sanitizeElementProperties = (
       continue;
     }
     const value = properties[key];
-    if (typeof value === 'string') {
-      const lower = value.toLowerCase().trimStart();
-      if (DANGEROUS_URL_SCHEMES.some((s) => lower.startsWith(s))) {
-        delete properties[key];
-      }
+    if (typeof value === 'string' && hasDangerousUrlScheme(value)) {
+      delete properties[key];
     }
   }
 };
@@ -79,6 +81,10 @@ const sanitizeHastNode = (node: any): any => {
     // input: 保留 GFM 任务列表 checkbox，移除其他 input
     if (node.tagName === 'input' && !isTaskListCheckbox(node)) {
       return null;
+    }
+
+    if (shouldElementRenderAsPlainText(node)) {
+      return { type: 'text', value: serializeHastElement(node) };
     }
 
     sanitizeElementProperties(node.properties);

@@ -1,4 +1,4 @@
-import { DeleteFilled, EyeOutlined, LoadingOutlined } from '@ant-design/icons';
+﻿import { DeleteFilled, EyeOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Modal, Popover, Skeleton } from 'antd';
 import React, {
   useContext,
@@ -21,6 +21,10 @@ import { AvatarList } from '../../components/ContributorAvatar';
 import { MediaErrorLink } from '../../components/MediaErrorLink';
 import { useEditorStore } from '../../store';
 import { useGetSetState } from '../../utils';
+import {
+  shouldRenderUrlAsPlainText,
+  UNSAFE_URL_PLAIN_TEXT_STYLE,
+} from '../../../../Utils/htmlUrlSafety';
 import { getMediaType } from '../../utils/dom';
 import { ReadonlyImage } from '../Image';
 
@@ -230,6 +234,10 @@ export function Media({
     if (!markdownEditorRef.current) return;
     Transforms.setNodes(markdownEditorRef.current, attr, { at: path });
   });
+
+  const unsafeUrlPlainText = element?.url
+    ? shouldRenderUrlAsPlainText(element.url)
+    : false;
 
   // 如果 finished 为 false，设置 5 秒超时，超时后显示为文本
   useEffect(() => {
@@ -628,6 +636,26 @@ export function Media({
     showAsText,
     (element as any)?.rawMarkdown,
   ]);
+
+  if (unsafeUrlPlainText && element?.url) {
+    return (
+      <div {...attributes}>
+        <div
+          data-be="media"
+          data-testid="media-unsafe-url-plain-text"
+          style={{
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+          }}
+          contentEditable={false}
+        >
+          <span style={UNSAFE_URL_PLAIN_TEXT_STYLE}>{element.url}</span>
+          <div style={{ display: 'none' }}>{children}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div {...attributes}>
