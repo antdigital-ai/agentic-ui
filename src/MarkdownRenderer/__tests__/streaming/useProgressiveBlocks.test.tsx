@@ -59,7 +59,10 @@ describe('useProgressiveBlocks', () => {
     );
 
     await act(async () => {
-      await vi.runOnlyPendingTimersAsync();
+      await vi.advanceTimersByTimeAsync(16);
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(16);
     });
     expect(result.current).toBe(20);
 
