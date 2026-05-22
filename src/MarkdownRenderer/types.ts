@@ -38,9 +38,29 @@ export interface RendererBlockProps {
 
 export type RenderMode = 'slate' | 'markdown';
 
+/** 流式内容限流：控制大段文本按帧顺序展示，避免一次性突变 */
+export interface ContentThrottleOptions {
+  /** 每帧最多推进字符数，默认 3 */
+  charsPerFrame?: number;
+  /** 速度倍率，默认 1 */
+  speed?: number;
+  /** 流式结束时是否立即展示剩余内容，默认 true */
+  flushOnComplete?: boolean;
+  /** 标签页不可见时的轮询间隔（ms），默认 100 */
+  backgroundInterval?: number;
+  /** 后台每批字符相对前台倍数，默认 10 */
+  backgroundBatchMultiplier?: number;
+  /** 为 false 时关闭限流，流式内容即时渲染 */
+  enabled?: boolean;
+}
+
 export interface MarkdownRendererProps {
   content: string;
   streaming?: boolean;
+  /** 流式是否已结束；为 true 时限流器立即 flush 剩余内容 */
+  isFinished?: boolean;
+  /** 流式限流配置；streaming 为 true 且未设 enabled: false 时默认开启 */
+  throttleOptions?: ContentThrottleOptions;
   plugins?: MarkdownEditorPlugin[];
   remarkPlugins?: MarkdownRemarkPlugin[];
   htmlConfig?: MarkdownToHtmlConfig;

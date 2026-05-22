@@ -2,6 +2,8 @@ import { act, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarkdownRenderer } from '../index';
+import type { MarkdownRendererRef } from '../types';
+import { installRafStub } from './installRafStub';
 
 vi.mock('mermaid', () => ({
   default: {
@@ -15,10 +17,12 @@ vi.mock('mermaid', () => ({
 describe('MarkdownRenderer', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    installRafStub();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it('应渲染基础 markdown 内容', async () => {
@@ -141,6 +145,7 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer
         content={'| Header |\n| --- |\n| Cell |'}
         streaming={true}
+        isFinished
       />,
     );
 
@@ -181,9 +186,67 @@ describe('MarkdownRenderer', () => {
     expect(container.textContent).toContain('updated');
   });
 
-  it('流式模式下应即时输出完整内容', () => {
+  it('关闭限流时应即时输出完整内容', () => {
     const { container } = render(
-      <MarkdownRenderer content="Hello World" streaming={true} />,
+      <MarkdownRenderer
+        content="Hello World"
+        streaming={true}
+        throttleOptions={{ enabled: false }}
+      />,
+    );
+
+    expect(container.textContent).toContain('Hello World');
+  });
+
+  it('流式模式下应按限流顺序逐步输出', async () => {
+    const ref = React.createRef<MarkdownRendererRef>();
+    const throttleOptions = { charsPerFrame: 5, speed: 1 as const };
+
+    const { rerender } = render(
+      <MarkdownRenderer
+        ref={ref}
+        content="Hello World"
+        streaming={true}
+        throttleOptions={throttleOptions}
+      />,
+    );
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(32);
+    });
+    expect(ref.current?.getDisplayedContent()).toContain('Hello');
+    expect(ref.current?.getDisplayedContent()).not.toBe('Hello World');
+
+    await act(async () => {
+      rerender(
+        <MarkdownRenderer
+          ref={ref}
+          content="Hello World"
+          streaming={true}
+          isFinished
+          throttleOptions={throttleOptions}
+        />,
+      );
+    });
+    expect(ref.current?.getDisplayedContent()).toBe('Hello World');
+  });
+
+  it('流式 isFinished 应 flush 全部内容', () => {
+    const { container, rerender } = render(
+      <MarkdownRenderer
+        content="Hello World"
+        streaming={true}
+        throttleOptions={{ charsPerFrame: 1 }}
+      />,
+    );
+
+    rerender(
+      <MarkdownRenderer
+        content="Hello World"
+        streaming={true}
+        isFinished={true}
+        throttleOptions={{ charsPerFrame: 1 }}
+      />,
     );
 
     expect(container.textContent).toContain('Hello World');
@@ -292,6 +355,7 @@ describe('MarkdownRenderer', () => {
           'Microsoft Corporation 是一家领先的技术公司，专注于云计算、生产力软件、业务应用程序和消费技术。公司的核心业务模式围绕三大分部展开：Productivity and Business Processes（生产力和业务流程）、Intelligent Cloud（智能云）、以及 More Personal Computing（更多个人计算）。[^1]'
         }
         streaming={true}
+        isFinished
       />,
     );
 
@@ -316,6 +380,7 @@ describe('MarkdownRenderer', () => {
       <MarkdownRenderer
         content={`${baseContent}[^1]`}
         streaming={true}
+        isFinished
       />,
     );
 
@@ -392,13 +457,18 @@ describe('MarkdownRenderer', () => {
     expect(img?.getAttribute('alt')).toBe('alt text');
   });
 
-  it('流式模式下应保留图片节点', () => {
+  it('流式模式下应保留图片节点', async () => {
     const { container } = render(
       <MarkdownRenderer
         content="![alt text](https://example.com/image.png)"
         streaming={true}
+        isFinished
       />,
     );
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(16);
+    });
 
     const img = container.querySelector('img');
     expect(img).toBeTruthy();

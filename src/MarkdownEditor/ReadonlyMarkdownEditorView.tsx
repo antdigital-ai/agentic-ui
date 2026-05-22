@@ -66,6 +66,8 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
           <MarkdownRenderer
             content={initValue}
             streaming={isStreaming}
+            isFinished={props.isFinished ?? !isStreaming}
+            throttleOptions={props.throttleOptions}
             plugins={props.plugins}
             remarkPlugins={props.markdownToHtmlOptions}
             codeProps={props.codeProps}

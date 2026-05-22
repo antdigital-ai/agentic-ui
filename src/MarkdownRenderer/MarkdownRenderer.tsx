@@ -17,6 +17,7 @@ import type {
   MarkdownRendererRef,
   RendererBlockProps,
 } from './types';
+import { useContentThrottle } from './useContentThrottle';
 import { useMarkdownToReact } from './useMarkdownToReact';
 import { useStreaming } from './useStreaming';
 
@@ -48,6 +49,8 @@ const InternalMarkdownRenderer = forwardRef<
   const {
     content,
     streaming = false,
+    isFinished,
+    throttleOptions,
     plugins,
     remarkPlugins,
     htmlConfig,
@@ -68,11 +71,20 @@ const InternalMarkdownRenderer = forwardRef<
   const contentCls = `${prefixCls}-content`;
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const text = content || '';
+  const sourceText = content || '';
+
+  const throttleEnabled = streaming && throttleOptions?.enabled !== false;
+
+  const displayedText = useContentThrottle(
+    sourceText,
+    throttleEnabled,
+    throttleOptions,
+    isFinished,
+  );
 
   useImperativeHandle(ref, () => ({
     nativeElement: containerRef.current,
-    getDisplayedContent: () => text,
+    getDisplayedContent: () => displayedText,
   }));
 
   const pluginComponents = useMemo(
@@ -84,7 +96,10 @@ const InternalMarkdownRenderer = forwardRef<
   useEffect(() => {
     const notify = fncProps?.onFootnoteDefinitionChange;
     if (!notify) return;
-    if (!/^\[\^[^\]]+\]:/m.test(text)) {
+    if (
+      !displayedText.includes('[^') ||
+      !/^\[\^[^\]]+\]:/m.test(displayedText)
+    ) {
       if (!lastFootnoteEmptyRef.current) {
         notify([]);
         lastFootnoteEmptyRef.current = true;
@@ -92,8 +107,8 @@ const InternalMarkdownRenderer = forwardRef<
       return;
     }
     lastFootnoteEmptyRef.current = false;
-    notify(extractFootnoteDefinitionsFromMarkdown(text));
-  }, [text, fncProps?.onFootnoteDefinitionChange]);
+    notify(extractFootnoteDefinitionsFromMarkdown(displayedText));
+  }, [displayedText, fncProps?.onFootnoteDefinitionChange]);
 
   const apaasifyRender = useMemo(() => {
     if (apaasify?.enable && apaasify.render) return apaasify.render;
@@ -118,7 +133,7 @@ const InternalMarkdownRenderer = forwardRef<
     };
   }, [pluginComponents, apaasifyRender, fileMapConfig, editorCodeProps]);
 
-  const safeContent = useStreaming(text, streaming);
+  const safeContent = useStreaming(displayedText, streaming);
 
   const reactContent = useMarkdownToReact(safeContent, {
     remarkPlugins,
@@ -128,7 +143,8 @@ const InternalMarkdownRenderer = forwardRef<
     linkConfig,
     fncProps,
     streaming,
-    contentRevisionSource: streaming ? text : undefined,
+    // 修订追踪用未限流的完整 source，保证缓存键随真实流入推进，而非随限流帧抖动。
+    contentRevisionSource: streaming ? sourceText : undefined,
     eleRender,
   });
 

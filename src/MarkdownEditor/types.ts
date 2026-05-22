@@ -4,7 +4,10 @@ import React from 'react';
 import { BaseEditor, Editor, Selection } from 'slate';
 import { HistoryEditor } from 'slate-history';
 import { ReactEditor, RenderElementProps } from 'slate-react';
-import type { RenderMode } from '../MarkdownRenderer/types';
+import type {
+  ContentThrottleOptions,
+  RenderMode,
+} from '../MarkdownRenderer/types';
 import { TagPopupProps } from './editor/elements/TagPopup';
 import { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
@@ -245,6 +248,9 @@ export type MarkdownEditorProps = {
     openInNewTab?: boolean;
     onClick?: (url?: string) => boolean | void;
   };
+
+  /** 流式限流（仅 renderMode: 'markdown'），默认 streaming 时开启 */
+  throttleOptions?: ContentThrottleOptions;
 
   /** MElement 刷新依赖 */
   deps?: string[];

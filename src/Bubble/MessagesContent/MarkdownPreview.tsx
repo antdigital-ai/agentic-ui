@@ -66,6 +66,7 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
   const isStreaming =
     (rc?.streaming ?? rc?.typewriter ?? Boolean(typing)) &&
     (props.originData?.isLast ?? true);
+  const isFinished = props.originData?.isFinished ?? props.isFinished;
   const noPadding = !!extra;
 
   useEffect(() => {
@@ -79,6 +80,8 @@ export const MarkdownPreview = (props: MarkdownPreviewProps) => {
         <MarkdownRenderer
           content={content}
           streaming={isStreaming}
+          isFinished={isFinished}
+          throttleOptions={rc?.throttleOptions}
           plugins={rc?.plugins}
           remarkPlugins={rc?.markdownToHtmlOptions}
           fncProps={fncProps}
