@@ -75,13 +75,11 @@ describe('ContentThrottle', () => {
 
     throttle.push('Hello World');
     vi.advanceTimersToNextTimer();
-    vi.advanceTimersToNextTimer();
     expect(throttle.getDisplayedLength()).toBe(5);
 
     throttle.push('Hellx World');
 
     expect(throttle.getDisplayedLength()).toBe(0);
-    vi.advanceTimersToNextTimer();
     vi.advanceTimersToNextTimer();
     expect(flushed.at(-1)).toBe('Hellx');
     throttle.dispose();
