@@ -88,9 +88,13 @@ describe('useProgressiveBlocks', () => {
       useProgressiveBlocks(LARGE_BLOCK_COUNT, false),
     );
 
-    await waitFor(() => {
-      expect(result.current).toBe(LARGE_BLOCK_COUNT);
+    expect(document.hidden).toBe(true);
+
+    await act(async () => {
+      await Promise.resolve();
     });
+
+    expect(result.current).toBe(LARGE_BLOCK_COUNT);
   });
 
   it('falls back to all blocks when visibility changes before the next frame', async () => {
@@ -124,7 +128,10 @@ describe('useProgressiveBlocks', () => {
     );
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(FRAME_MS * 2);
+      await vi.advanceTimersByTimeAsync(FRAME_MS);
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(FRAME_MS);
     });
 
     expect(result.current).toBe(LARGE_BLOCK_COUNT);
