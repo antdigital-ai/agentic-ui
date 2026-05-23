@@ -80,7 +80,10 @@ describe('useProgressiveBlocks', () => {
     );
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(48);
+      await vi.advanceTimersByTimeAsync(16);
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(16);
     });
     expectVisibleCount(LARGE_BLOCK_COUNT);
 
