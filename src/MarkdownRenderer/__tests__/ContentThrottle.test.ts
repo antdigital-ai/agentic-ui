@@ -78,4 +78,46 @@ describe('ContentThrottle', () => {
     expect(flushed.length).toBe(countAfterComplete);
     throttle.dispose();
   });
+
+  it('标签页不可见时应使用后台定时器与批量倍数推进', () => {
+    vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+    const flushed: string[] = [];
+    const throttle = new ContentThrottle((s) => flushed.push(s), {
+      backgroundBatchMultiplier: 4,
+      backgroundInterval: 50,
+      charsPerFrame: 2,
+    });
+
+    throttle.push('abcdefghijkl');
+
+    vi.advanceTimersByTime(49);
+    expect(flushed).toEqual([]);
+
+    vi.advanceTimersByTime(1);
+    expect(flushed.at(-1)).toBe('abcdefgh');
+
+    throttle.dispose();
+  });
+
+  it('可见性切到后台时应取消 RAF 并改用后台定时器', () => {
+    const visibilityStateSpy = vi.spyOn(document, 'visibilityState', 'get');
+    visibilityStateSpy.mockReturnValue('visible');
+    const flushed: string[] = [];
+    const throttle = new ContentThrottle((s) => flushed.push(s), {
+      backgroundInterval: 50,
+      charsPerFrame: 1,
+    });
+
+    throttle.push('abc');
+    visibilityStateSpy.mockReturnValue('hidden');
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    vi.advanceTimersByTime(16);
+    expect(flushed).toEqual([]);
+
+    vi.advanceTimersByTime(34);
+    expect(flushed.at(-1)).toBe('abc');
+
+    throttle.dispose();
+  });
 });
