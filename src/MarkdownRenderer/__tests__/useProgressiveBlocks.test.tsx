@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useProgressiveBlocks } from '../streaming/useProgressiveBlocks';
 import { installRafStub } from './installRafStub';
@@ -138,8 +138,10 @@ describe('useProgressiveBlocks', () => {
 
     rerender({ generation: 1 });
 
-    await waitFor(() => {
-      expect(result.current).toBe(INITIAL_VISIBLE_BLOCKS);
+    await act(async () => {
+      await Promise.resolve();
     });
+
+    expect(result.current).toBe(INITIAL_VISIBLE_BLOCKS);
   });
 });
