@@ -916,6 +916,22 @@ describe('TaskList', () => {
       expect(screen.getByText('Step 6')).toBeInTheDocument();
     });
 
+    it('showProgress=true 时应展示完成计数与进度条宽度', () => {
+      render(
+        <TaskList items={simpleItems} variant="simple" showProgress={true} />,
+      );
+
+      expect(
+        screen.getByTestId('task-list-simple-progress-count'),
+      ).toHaveTextContent('1/3');
+      expect(
+        screen.getByTestId('task-list-simple-progress'),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('task-list-simple-progress-bar')).toHaveStyle({
+        width: '33%',
+      });
+    });
+
     describe('taskCompleteText 自定义文案', () => {
       const allDoneItems = [
         {
