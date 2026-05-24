@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useProgressiveBlocks } from '../streaming/useProgressiveBlocks';
 import { installRafStub } from './installRafStub';
@@ -25,6 +25,12 @@ const setDocumentHidden = (hidden: boolean) => {
   });
 };
 
+const advanceNextFrame = async () => {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(16);
+  });
+};
+
 describe('useProgressiveBlocks', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -46,14 +52,10 @@ describe('useProgressiveBlocks', () => {
 
     expect(result.current).toBe(8);
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(16);
-    });
+    await advanceNextFrame();
     expect(result.current).toBe(14);
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(16);
-    });
+    await advanceNextFrame();
     expect(result.current).toBe(20);
   });
 
@@ -79,20 +81,19 @@ describe('useProgressiveBlocks', () => {
       generation: 0,
     });
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(32);
-    });
+    await advanceNextFrame();
+    await advanceNextFrame();
     expect(result.current).toBe(20);
 
-    rerender({
-      totalBlocks: 20,
-      streaming: false,
-      generation: 1,
+    await act(async () => {
+      rerender({
+        totalBlocks: 20,
+        streaming: false,
+        generation: 1,
+      });
     });
 
-    await waitFor(() => {
-      expect(result.current).toBe(8);
-    });
+    expect(result.current).toBe(8);
   });
 
   it('页面不可见时应直接渲染全量块避免后台 RAF 冻结导致内容缺失', async () => {
@@ -103,8 +104,10 @@ describe('useProgressiveBlocks', () => {
       streaming: false,
     });
 
-    await waitFor(() => {
-      expect(result.current).toBe(20);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
     });
+
+    expect(result.current).toBe(20);
   });
 });
