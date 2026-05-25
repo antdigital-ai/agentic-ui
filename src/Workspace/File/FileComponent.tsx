@@ -1,4 +1,4 @@
-﻿import { ApartmentOutlined, BarsOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, BarsOutlined } from '@ant-design/icons';
 import {
   ConfigProvider,
   Empty,
@@ -181,7 +181,7 @@ export const FileComponent: FC<{
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
   const prefixCls = getPrefixCls('workspace-file');
-  const { wrapSSR, hashId } = useFileStyle(prefixCls);
+  const { hashId } = useFileStyle(prefixCls);
 
   // 注入稳定 ID（基于 WeakMap 缓存）
   const ensureNodeWithStableId = useRefFunction(
@@ -683,7 +683,7 @@ export const FileComponent: FC<{
   };
 
   // 列表页：loading 时仅展示加载态，避免嵌套 Spin 与列表/空态叠加出现双 loading
-  return wrapSSR(
+  return (
     <>
       <div
         className={classNames(`${prefixCls}-container`, hashId)}
@@ -693,6 +693,6 @@ export const FileComponent: FC<{
         {loading ? renderListLoading() : renderListBody()}
       </div>
       {ImagePreviewComponent}
-    </>,
+    </>
   );
 };

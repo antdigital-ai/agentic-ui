@@ -180,7 +180,7 @@ const VisualListComponent: React.FC<VisualListProps> = ({
 }) => {
   // 兼容旧属性
   const loading = isLoading ?? legacyLoading;
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // 使用 useMemo 优化过滤后的数据计算
   const displayList = useMemo(() => {
@@ -266,7 +266,7 @@ const VisualListComponent: React.FC<VisualListProps> = ({
 
   // 加载状态渲染
   if (loading) {
-    return wrapSSR(
+    return (
       <ul
         className={classNames(
           prefixCls,
@@ -278,13 +278,13 @@ const VisualListComponent: React.FC<VisualListProps> = ({
         style={style}
       >
         {loadingRender ? loadingRender() : <span>加载中...</span>}
-      </ul>,
+      </ul>
     );
   }
 
   // 空状态渲染
   if (displayList.length === 0) {
-    return wrapSSR(
+    return (
       <ul
         className={classNames(
           prefixCls,
@@ -296,11 +296,11 @@ const VisualListComponent: React.FC<VisualListProps> = ({
         style={style}
       >
         {emptyRender ? emptyRender() : <span>暂无数据</span>}
-      </ul>,
+      </ul>
     );
   }
 
-  return wrapSSR(
+  return (
     <div className={containerClassName} data-testid={prefixCls} style={style}>
       <ul className={classNames(prefixCls, hashId)}>{listItems}</ul>
       {/* 用来处理margin-8*/}
@@ -310,7 +310,7 @@ const VisualListComponent: React.FC<VisualListProps> = ({
           {description}
         </div>
       )}
-    </div>,
+    </div>
   );
 };
 

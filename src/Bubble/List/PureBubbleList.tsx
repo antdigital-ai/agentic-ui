@@ -137,7 +137,7 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { compact } = useContext(BubbleConfigContext) || {};
   const prefixClass = getPrefixCls('agentic-bubble-list');
-  const { wrapSSR, hashId } = useStyle(prefixClass);
+  const { hashId } = useStyle(prefixClass);
 
   const deps = useMemo(() => [props.style], [props.style]);
 
@@ -305,7 +305,7 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
   ]);
 
   if (isLoading) {
-    return wrapSSR(
+    return (
       <div
         className={clsx(
           prefixClass,
@@ -320,11 +320,11 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
         }}
       >
         <SkeletonList />
-      </div>,
+      </div>
     );
   }
 
-  return wrapSSR(
+  return (
     <div
       className={clsx(`${prefixClass}`, className, hashId, {
         [`${prefixClass}-readonly`]: props.readonly,
@@ -341,7 +341,7 @@ export const PureBubbleList = React.memo<PureBubbleListProps>((props) => {
       }
     >
       {listDom}
-    </div>,
+    </div>
   );
 });
 

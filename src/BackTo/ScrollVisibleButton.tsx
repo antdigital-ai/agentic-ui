@@ -105,7 +105,7 @@ export const ScrollVisibleButton = forwardRef<
   } = props as WithShouldVisible;
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context?.getPrefixCls(prefixCls);
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
 
   const internalRef = React.useRef<HTMLButtonElement | null>(null);
 
@@ -162,11 +162,11 @@ export const ScrollVisibleButton = forwardRef<
   );
 
   // presence wrapper 始终挂载（position:fixed 脱离文档流），不会触发布局重排
-  return wrapSSR(
+  return (
     <>
       <div className={`${baseCls}-presence ${hashId}`} data-state={dataState}>
         {buttonWithTooltip}
       </div>
-    </>,
+    </>
   );
 });

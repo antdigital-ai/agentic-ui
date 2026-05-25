@@ -144,7 +144,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('scatter-chart');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   const { resolvedTheme, autoDetectTheme } = useResolvedChartTheme(theme);
   const { axisTextColor, gridColor, isLight } = useChartTheme(resolvedTheme);
@@ -257,7 +257,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
 
   // 如果没有有效数据，返回空状态
   if (safeData.length === 0 || datasetTypes.length === 0) {
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={resolvedTheme}
@@ -780,7 +780,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
 
   // 最终渲染，包含错误边界
   try {
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={resolvedTheme}
@@ -865,7 +865,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     );
   } catch (error) {
     console.error('ScatterChart 渲染错误:', error);
-    return wrapSSR(
+    return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}
         theme={resolvedTheme}

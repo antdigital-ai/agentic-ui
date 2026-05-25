@@ -216,7 +216,7 @@ const ChartStatistic: React.FC<ChartStatisticProps> = ({
           </span>
         )}
       </div>
-    </div>,
+    </div>
   );
 };
 

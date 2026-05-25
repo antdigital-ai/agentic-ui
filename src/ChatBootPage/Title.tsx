@@ -35,18 +35,16 @@ const TitleComponent: React.FC<TitleProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-chatboot-title', customPrefixCls);
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
-  // wrapSSR 必须在 hooks 之后、early return 之前执行，确保 SSR 场景样式正常注入。
-  // 无内容时返回空片段（仍经过 wrapSSR），避免 SSR 样式丢失。
   if (!title && !subtitle) {
-    return wrapSSR(<></>);
+    return <></>;
   }
 
   const mainCls = classNames(`${prefixCls}-main`, hashId);
   const subtitleCls = classNames(`${prefixCls}-subtitle`, hashId);
 
-  return wrapSSR(
+  return (
     <div
       className={classNames(prefixCls, hashId, className)}
       data-testid="agentic-chatboot-title"
@@ -54,7 +52,7 @@ const TitleComponent: React.FC<TitleProps> = ({
     >
       {title && <div className={mainCls}>{title}</div>}
       {subtitle && <div className={subtitleCls}>{subtitle}</div>}
-    </div>,
+    </div>
   );
 };
 

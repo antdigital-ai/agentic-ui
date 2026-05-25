@@ -49,7 +49,7 @@ const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
     'agentic-chatboot-button-tab-group',
     customPrefixCls,
   );
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // P0-1：受控判定一次确定，避免后续读取 props 时状态漂移
   const isControlled = activeKey !== undefined;
@@ -78,7 +78,7 @@ const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
     onChange?.(key);
   });
 
-  return wrapSSR(
+  return (
     // P0-2：用 clsx 拼接 className，避免模板字符串产生连续空格与命名风格不一致
     // P1-9：testid 与 prefixCls 解耦
     <div
@@ -100,7 +100,7 @@ const ButtonTabGroupComponent: React.FC<ButtonTabGroupProps> = ({
           {item.label}
         </ButtonTab>
       ))}
-    </div>,
+    </div>
   );
 };
 

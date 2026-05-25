@@ -41,7 +41,7 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
     'agentic-chatboot-button-tab',
     customPrefixCls,
   );
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
 
   // P0-3：disabled 时统一短路，避免键盘 Enter/Space 仍能触发 onClick
   const handleClick = useRefFunction(() => {
@@ -91,7 +91,7 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
   // P1-9：testid 与 prefixCls 解耦
   const testId = 'agentic-chatboot-button-tab';
 
-  return wrapSSR(
+  return (
     <button
       type="button"
       className={buttonClassName}
@@ -118,7 +118,7 @@ const ButtonTabComponent: React.FC<ButtonTabProps> = ({
           {icon}
         </span>
       )}
-    </button>,
+    </button>
   );
 };
 

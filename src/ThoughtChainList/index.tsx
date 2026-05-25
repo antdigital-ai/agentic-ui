@@ -392,7 +392,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
     const context = useContext(ConfigProvider.ConfigContext);
     const [collapse, setCollapse] = React.useState<boolean>(false);
     const prefixCls = context?.getPrefixCls('thought-chain-list');
-    const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
     const { ...restStyle } = customStyle || {};
     const [docMeta, setDocMeta] = React.useState<Partial<DocMeta> | null>(null);
 
@@ -473,7 +473,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
       locale,
     ]);
 
-    return wrapSSR(
+    return (
       <>
         <DocumentDrawer
           docMeta={docMeta}
@@ -527,7 +527,7 @@ export const ThoughtChainList: React.FC<ThoughtChainListProps> = React.memo(
             </div>
           </div>
         </div>
-      </>,
+      </>
     );
   },
 );

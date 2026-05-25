@@ -431,7 +431,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
   );
 
   const prefixClass = getPrefixCls('agentic-bubble-list');
-  const { wrapSSR, hashId } = useStyle(prefixClass);
+  const { hashId } = useStyle(prefixClass);
   const prevStyleRef = useRef(props.style);
   if (
     props.style !== prevStyleRef.current &&
@@ -682,7 +682,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
   ]);
 
   if (loading)
-    return wrapSSR(
+    return (
       <BubbleConfigContext.Provider value={mergedContext}>
         <div
           className={clsx(
@@ -698,10 +698,10 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
         >
           <SkeletonList />
         </div>
-      </BubbleConfigContext.Provider>,
+      </BubbleConfigContext.Provider>
     );
 
-  return wrapSSR(
+  return (
     <BubbleConfigContext.Provider value={mergedContext}>
       <div
         className={clsx(`${prefixClass}`, className, hashId, {
@@ -717,7 +717,7 @@ export const BubbleList: React.FC<BubbleListProps> = (props) => {
       >
         {bubbleListDom}
       </div>
-    </BubbleConfigContext.Provider>,
+    </BubbleConfigContext.Provider>
   );
 };
 

@@ -204,7 +204,7 @@ const TextAnimateBase = ({
 }: TextAnimateProps) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('text-animate');
-  const { wrapSSR, hashId } = useTextAnimateStyle(prefixCls);
+  const { hashId } = useTextAnimateStyle(prefixCls);
 
   const segments = useMemo(() => resolveSegments(children, by), [children, by]);
 
@@ -250,7 +250,7 @@ const TextAnimateBase = ({
     ...props,
   };
 
-  return wrapSSR(
+  return (
     React.createElement(
       Component,
       containerProps,
@@ -283,7 +283,7 @@ const TextAnimateBase = ({
           </span>
         );
       }),
-    ),
+    )
   );
 };
 

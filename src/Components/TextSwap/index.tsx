@@ -49,7 +49,7 @@ const TextSwapComponent: React.FC<TextSwapProps> = (props) => {
   } = props;
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('text-swap');
-  const { wrapSSR, hashId } = useTextSwapStyle(prefixCls);
+  const { hashId } = useTextSwapStyle(prefixCls);
 
   const resolvedDuration = durationMs ?? DEFAULT_TEXT_SWAP_DURATION_MS;
 
@@ -105,7 +105,7 @@ const TextSwapComponent: React.FC<TextSwapProps> = (props) => {
     ...style,
   };
 
-  return wrapSSR(
+  return (
     <span
       {...rest}
       className={classNames(prefixCls, hashId, className, {
@@ -116,7 +116,7 @@ const TextSwapComponent: React.FC<TextSwapProps> = (props) => {
       data-testid={dataTestId ?? 'text-swap'}
     >
       {displayContent}
-    </span>,
+    </span>
   );
 };
 

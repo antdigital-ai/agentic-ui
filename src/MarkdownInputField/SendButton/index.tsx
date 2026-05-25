@@ -236,7 +236,7 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
   const baseCls = getPrefixCls('agentic-md-input-field-send-button');
-  const { wrapSSR, hashId } = useStyle(baseCls);
+  const { hashId } = useStyle(baseCls);
 
   const displayColors = useMemo(
     () =>
@@ -308,7 +308,7 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
     locale?.['input.sendButtonAriaLabel.stop'] ?? '停止生成';
   const sendButtonAriaLabel = typing ? ariaLabelStop : ariaLabelSend;
 
-  return wrapSSR(
+  return (
     <Tooltip arrow={false} title={tooltipTitle} mouseEnterDelay={0.5}>
       <div
         data-testid="send-button"
@@ -344,6 +344,6 @@ export const SendButton: React.FC<SendButtonProps> = (props) => {
           />
         </ErrorBoundary>
       </div>
-    </Tooltip>,
+    </Tooltip>
   );
 };

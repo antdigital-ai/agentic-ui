@@ -249,7 +249,7 @@ const Workspace: FC<WorkspaceProps> & {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const { locale } = useContext(I18nContext);
   const prefixCls = getPrefixCls('workspace');
-  const { wrapSSR, hashId } = useWorkspaceStyle(prefixCls);
+  const { hashId } = useWorkspaceStyle(prefixCls);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [segmentedKey, setSegmentedKey] = useState(0);
@@ -467,7 +467,7 @@ const Workspace: FC<WorkspaceProps> & {
     return emptyContent ?? null;
   }
 
-  return wrapSSR(
+  return (
     <div
       ref={containerRef}
       className={classNames(
@@ -529,7 +529,7 @@ const Workspace: FC<WorkspaceProps> & {
       >
         {availableTabs.find((tab) => tab.key === currentActiveTab)?.content}
       </div>
-    </div>,
+    </div>
   );
 };
 

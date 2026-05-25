@@ -61,7 +61,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
   const { locale } = useContext(I18nContext);
   const containerRef = useRef<HTMLDivElement>(null);
   // 注册样式
-  const { wrapSSR, hashId } = useStyle(menuPrefixCls);
+  const { hashId } = useStyle(menuPrefixCls);
 
   const {
     open,
@@ -167,7 +167,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
   ]);
 
   if (props.standalone) {
-    return wrapSSR(
+    return (
       <div
         data-testid="history-standalone"
         style={{
@@ -221,7 +221,7 @@ const HistoryComponent: React.FC<HistoryProps> = (props) => {
             </>
           )}
         </div>
-      </div>,
+      </div>
     );
   }
 

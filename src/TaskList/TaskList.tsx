@@ -44,7 +44,7 @@ export const TaskList = memo(
   }: TaskListProps) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('task-list');
-    const { wrapSSR, hashId } = useStyle(prefixCls);
+    const { hashId } = useStyle(prefixCls);
     const { locale } = useContext(I18nContext);
 
     const isControlled = expandedKeys !== undefined;
@@ -175,10 +175,10 @@ export const TaskList = memo(
     );
 
     if (variant !== 'simple') {
-      return wrapSSR(
+      return (
         <div className={className} data-testid={prefixCls}>
           {renderItems(items)}
-        </div>,
+        </div>
       );
     }
 
@@ -198,7 +198,7 @@ export const TaskList = memo(
     const progressPercent =
       totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-    return wrapSSR(
+    return (
       <div
         className={classNames(`${simpleCls}-wrapper`, hashId, className)}
         data-testid="task-list-simple-wrapper"
@@ -271,7 +271,7 @@ export const TaskList = memo(
             </div>
           ) : null}
         </div>
-      </div>,
+      </div>
     );
   },
 );

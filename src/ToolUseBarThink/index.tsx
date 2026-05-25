@@ -123,7 +123,7 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-tool-use-bar-think');
-  const { wrapSSR, hashId } = useStyle(prefixCls);
+  const { hashId } = useStyle(prefixCls);
   const locale = useLocale();
 
   const [expandedState, setExpandedState] = useMergedState(defaultExpanded, {
@@ -299,7 +299,7 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
     floatingExpandedState,
   ]);
 
-  return wrapSSR(
+  return (
     <div
       data-testid={testId || 'ToolUseBarThink'}
       className={classNames(cls.root, {
@@ -440,7 +440,7 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
           {floatingExpandedState ? locale.collapse : locale.expand}
         </div>
       )}
-    </div>,
+    </div>
   );
 };
 

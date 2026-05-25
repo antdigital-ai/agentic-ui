@@ -140,7 +140,7 @@ DraggablePopupItem.displayName = 'DraggablePopupItem';
 export const ActionItemContainer = (props: ActionItemContainerProps) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const basePrefixCls = getPrefixCls('agentic-chat-action-item-box');
-  const { wrapSSR, hashId } = useStyle(basePrefixCls);
+  const { hashId } = useStyle(basePrefixCls);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isIndicatorHover, setIsIndicatorHover] = useState(false);
@@ -412,7 +412,7 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
     [basePrefixCls, props.size, isIndicatorHover, hashId],
   );
 
-  return wrapSSR(
+  return (
     <div
       ref={containerRef}
       style={containerStyle}
@@ -510,7 +510,7 @@ export const ActionItemContainer = (props: ActionItemContainerProps) => {
           </div>
         </div>
       )}
-    </div>,
+    </div>
   );
 };
 

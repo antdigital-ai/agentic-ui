@@ -231,11 +231,9 @@ const FileTreeComponent: FC<FileTreeProps> = ({
   const prefixCls = getPrefixCls('workspace-file-tree');
   const fileItemPrefixCls =
     fileItemPrefixClsProp ?? getPrefixCls('workspace-file');
-  const { wrapSSR, hashId } = useFileTreeStyle(prefixCls);
-  const { wrapSSR: wrapFileItemSSR, hashId: fileItemStyleHashId } =
-    useFileStyle(fileItemPrefixCls);
+  const { hashId } = useFileTreeStyle(prefixCls);
+  const { hashId: fileItemStyleHashId } = useFileStyle(fileItemPrefixCls);
   const fileItemHashId = fileItemHashIdProp ?? fileItemStyleHashId;
-  const injectFileItemStyles = fileItemHashIdProp === undefined;
 
   const [innerTree, setInnerTree] = useState<FileTreeNode[]>(treeData);
   const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
@@ -480,7 +478,7 @@ const FileTreeComponent: FC<FileTreeProps> = ({
     </div>
   );
 
-  return wrapSSR(injectFileItemStyles ? wrapFileItemSSR(panel) : panel);
+  return panel;
 };
 
 FileTreeComponent.displayName = 'FileTree';
