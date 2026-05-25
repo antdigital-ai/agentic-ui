@@ -1875,7 +1875,9 @@ describe('Editor branches - mouseup effect', () => {
     renderEditor({});
 
     expect(addSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
-    expect(addSpy).toHaveBeenCalledWith('touchend', expect.any(Function));
+    expect(addSpy).toHaveBeenCalledWith('touchend', expect.any(Function), {
+      passive: true,
+    });
     addSpy.mockRestore();
   });
 

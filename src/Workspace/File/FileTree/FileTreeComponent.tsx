@@ -48,6 +48,18 @@ const walkAndIndex = (
   }
 };
 
+/** 无显式 file 的叶子：有 onDownload，或 onPreview 且可与平铺 nodes 按路径对齐时 */
+const canBindSyntheticTreeLeaf = (options: {
+  onDownload?: unknown;
+  onPreview?: unknown;
+  resolveTreeLeafFileOptions?: ResolveTreeLeafFileOptions;
+}) =>
+  Boolean(
+    options.onDownload ||
+      (options.onPreview &&
+        options.resolveTreeLeafFileOptions?.fileNodeByRelativePath?.size),
+  );
+
 const mapTreeToDataNodes = (
   nodes: FileTreeNode[],
   ctx: {
@@ -68,7 +80,7 @@ const mapTreeToDataNodes = (
     const resolvedIsLeaf = node.isLeaf ?? !hasChildren;
 
     if (resolvedIsLeaf) {
-      const allowSyntheticLeaf = Boolean(ctx.onDownload);
+      const allowSyntheticLeaf = canBindSyntheticTreeLeaf(ctx);
       const leafFile = hasTreeLeafFileBinding(node, { allowSyntheticLeaf })
         ? resolveTreeLeafFile(node, ctx.resolveTreeLeafFileOptions)
         : null;
@@ -348,7 +360,11 @@ const FileTreeComponent: FC<FileTreeProps> = ({
       const n = nodeMap.get(k);
       if (!n) return;
       onSelect?.(n);
-      const allowSyntheticLeaf = Boolean(onDownload);
+      const allowSyntheticLeaf = canBindSyntheticTreeLeaf({
+        onDownload,
+        onPreview,
+        resolveTreeLeafFileOptions,
+      });
       if (!hasTreeLeafFileBinding(n, { allowSyntheticLeaf })) {
         return;
       }

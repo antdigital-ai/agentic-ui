@@ -268,8 +268,7 @@ describe('TaskList Component', () => {
       </TestWrapper>,
     );
 
-    // 数组内容被直接渲染，所以文本是连续的
-    expect(screen.getByText('内容1内容2内容3')).toBeInTheDocument();
+    expect(screen.getByText(/内容1\s*内容2\s*内容3/)).toBeInTheDocument();
   });
 
   it('应该处理空内容', () => {
@@ -291,9 +290,8 @@ describe('TaskList Component', () => {
     expect(
       screen.getByTestId('task-list-thoughtChainItem'),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByTestId('task-list-arrowContainer'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByTestId('task-list-arrowContainer')).toBeInTheDocument();
+    expect(screen.getByText('任务1')).toBeInTheDocument();
   });
 
   it('应该处理空数组内容', () => {
@@ -315,9 +313,8 @@ describe('TaskList Component', () => {
     expect(
       screen.getByTestId('task-list-thoughtChainItem'),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByTestId('task-list-arrowContainer'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByTestId('task-list-arrowContainer')).toBeInTheDocument();
+    expect(screen.getByText('任务1')).toBeInTheDocument();
   });
 
   it('应该支持受控模式', () => {
