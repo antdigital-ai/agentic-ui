@@ -180,8 +180,7 @@ export class ContentThrottle {
 
   private static isPageVisible(): boolean {
     return (
-      typeof document === 'undefined' ||
-      document.visibilityState === 'visible'
+      typeof document === 'undefined' || document.visibilityState === 'visible'
     );
   }
 }

@@ -14,8 +14,8 @@ import {
 } from '../markdownReactShared';
 
 import { MarkdownBlockPiece } from './MarkdownBlockPiece';
-import { useProgressiveBlocks } from './useProgressiveBlocks';
 import { shouldResetRevisionProgress } from './revisionPolicy';
+import { useProgressiveBlocks } from './useProgressiveBlocks';
 import { useShallowMemo } from './useShallowMemo';
 
 /** 空块数组常量，避免每次返回新引用 */
@@ -163,5 +163,12 @@ export const useStreamingMarkdownReact = (
     }
 
     return jsxs(Fragment, { children: elements });
-  }, [blocks, generation, visibleCount, processor, components, options?.streaming]);
+  }, [
+    blocks,
+    generation,
+    visibleCount,
+    processor,
+    components,
+    options?.streaming,
+  ]);
 };

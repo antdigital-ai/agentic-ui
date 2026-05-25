@@ -52,8 +52,6 @@ const useGenStyle = genStyleHooks('ToolBar', (token, info) => [
 
 export function useStyle(prefixCls?: string) {
   // 与 ToolBar 组件内 `getPrefixCls('agentic-md-editor-toolbar')` 对齐
-  const [, hashId] = useGenStyle(
-    prefixCls ?? 'agentic-md-editor-toolbar',
-  );
+  const [hashId] = useGenStyle(prefixCls ?? 'agentic-md-editor-toolbar');
   return { hashId };
 }

@@ -7,7 +7,5 @@ export const TextStyleTag = (props: { children: React.ReactNode }) => {
   const context = useContext(ConfigProvider.ConfigContext);
   const baseCls = context?.getPrefixCls('agentic-md-editor-text-style-tag');
   const { hashId } = useStyle(baseCls);
-  return (
-    <span className={classNames(baseCls, hashId)}>{props.children}</span>
-  );
+  return <span className={classNames(baseCls, hashId)}>{props.children}</span>;
 };

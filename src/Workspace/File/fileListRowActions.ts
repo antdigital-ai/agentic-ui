@@ -31,10 +31,10 @@ export const shouldShowFilePreviewAction = (
       ? !!(file.url || file.previewUrl)
       : Boolean(
           file.url ||
-            file.previewUrl ||
-            file.content ||
-            file.file ||
-            fileTypeProcessor.processFile(file).canPreview,
+          file.previewUrl ||
+          file.content ||
+          file.file ||
+          fileTypeProcessor.processFile(file).canPreview,
         )),
   );
 };

@@ -20,22 +20,7 @@ describe('useEditorStyleRegister Hook', () => {
     );
 
     expect(result.current).toBeDefined();
-    expect(result.current).toHaveProperty('wrapSSR');
     expect(result.current).toHaveProperty('hashId');
-  });
-
-  it('wrapSSR 应该是一个函数', () => {
-    const { result } = renderHook(
-      () =>
-        useEditorStyleRegister('test-component', (token) => ({
-          '.test-class': { color: token.colorText },
-        })),
-      {
-        wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
-      },
-    );
-
-    expect(typeof result.current.wrapSSR).toBe('function');
   });
 
   it('应该生成正确的样式', () => {
@@ -103,7 +88,6 @@ describe('useEditorStyleRegister Hook', () => {
     );
 
     expect(result.current).toBeDefined();
-    expect(result.current.wrapSSR).toBeDefined();
   });
 
   it('应该在不同组件名称下生成不同的样式', () => {
@@ -165,7 +149,6 @@ describe('useEditorStyleRegister Hook', () => {
     );
 
     expect(result.current).toBeDefined();
-    expect(result.current.wrapSSR).toBeDefined();
     expect(result.current.hashId).toBeDefined();
   });
 });

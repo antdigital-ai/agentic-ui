@@ -141,6 +141,6 @@ const genStyle: GenStyleFn<'QuadrantChart'> = (token) => {
 const useGenStyle = genStyleHooks('QuadrantChart', genStyle);
 
 export const useStyle = (prefixCls: string) => {
-  const [, hashId] = useGenStyle(prefixCls);
+  const [hashId] = useGenStyle(prefixCls);
   return { hashId };
 };

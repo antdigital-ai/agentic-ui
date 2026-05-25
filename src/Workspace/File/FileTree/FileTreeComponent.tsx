@@ -31,10 +31,7 @@ const renderTreeNodeTitle = (
   prefixCls: string,
   hashId: string,
 ) => (
-  <span
-    className={classNames(`${prefixCls}-node-title`, hashId)}
-    title={name}
-  >
+  <span className={classNames(`${prefixCls}-node-title`, hashId)} title={name}>
     {name}
   </span>
 );

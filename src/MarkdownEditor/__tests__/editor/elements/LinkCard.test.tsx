@@ -33,7 +33,6 @@ vi.mock('../../../editor/components/ContributorAvatar', () => ({
 
 vi.mock('../../../editor/elements/LinkCard/style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (component: any) => component,
     hashId: 'test-hash',
   })),
 }));

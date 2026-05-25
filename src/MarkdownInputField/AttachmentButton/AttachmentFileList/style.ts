@@ -298,8 +298,6 @@ const useGenStyle = genStyleHooks('AttachmentFileList', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(
-    prefixCls ?? 'md-editor-attachment-file-list',
-  );
+  const [hashId] = useGenStyle(prefixCls ?? 'md-editor-attachment-file-list');
   return { hashId };
 }

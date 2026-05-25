@@ -30,7 +30,6 @@ vi.mock('framer-motion', () => ({
 // Mock style
 vi.mock('../style', () => ({
   useTypingAnimationStyle: () => ({
-    wrapSSR: (node: React.ReactNode) => node,
     hashId: 'mock-hash',
   }),
 }));

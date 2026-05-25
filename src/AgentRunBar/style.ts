@@ -294,7 +294,7 @@ const genStyle: GenStyleFn<'AgentRunBar'> = (token) => {
  * - 动画效果
  *
  * @param prefixCls - 组件类名前缀
- * @returns 包含 `hashId` 的对象（wrapSSR 已废弃，详见 Hooks/useStyle 内 identityWrapSSR 注释）
+ * @returns 包含 `hashId` 的对象
  *
  * @example
  * ```tsx
@@ -304,6 +304,6 @@ const genStyle: GenStyleFn<'AgentRunBar'> = (token) => {
 const useGenStyle = genStyleHooks('AgentRunBar', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'agent-run-bar');
+  const [hashId] = useGenStyle(prefixCls ?? 'agent-run-bar');
   return { hashId };
 }

@@ -281,7 +281,8 @@ export const RerenderMdDemo = () => {
             <strong>streaming</strong>: 是否处于流式状态
           </li>
           <li>
-            <strong>streaming</strong>: 为 true 时启用流式 token 缓存，避免半截语法误解析
+            <strong>streaming</strong>: 为 true 时启用流式 token
+            缓存，避免半截语法误解析
           </li>
           <li>
             文末追加 <strong>agentar-card</strong> 示例：流式结束后应渲染 Schema

@@ -86,6 +86,6 @@ const useGenStyle = genStyleHooks('ChatBootButtonTab', genStyle);
  * ButtonTab 组件样式
  */
 export const useStyle = (prefixCls?: string) => {
-  const [, hashId] = useGenStyle(prefixCls ?? 'ChatBootButtonTab');
+  const [hashId] = useGenStyle(prefixCls ?? 'ChatBootButtonTab');
   return { hashId };
 };

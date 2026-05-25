@@ -92,66 +92,68 @@ export const TaskList = memo(
       };
     }, [simpleExpanded]);
 
-    const { summaryStatus, summaryText, summarySwapKey, isCancelled, lastItem, completedCount, totalCount } =
-      useMemo(() => {
-        const completedCount = items.filter(
-          (i) => i.status === 'success',
-        ).length;
-        const inProgressItem = items.find((i) => isTaskInProgress(i.status));
-        const hasError = items.some((i) => i.status === 'error');
-        const allSuccess =
-          completedCount === items.length && items.length > 0;
-        // 全部 item 已为 success 时展示完成态；不因 loading prop 滞留为「进行中」
-        const allDone = allSuccess;
+    const {
+      summaryStatus,
+      summaryText,
+      summarySwapKey,
+      isCancelled,
+      lastItem,
+      completedCount,
+      totalCount,
+    } = useMemo(() => {
+      const completedCount = items.filter((i) => i.status === 'success').length;
+      const inProgressItem = items.find((i) => isTaskInProgress(i.status));
+      const hasError = items.some((i) => i.status === 'error');
+      const allSuccess = completedCount === items.length && items.length > 0;
+      // 全部 item 已为 success 时展示完成态；不因 loading prop 滞留为「进行中」
+      const allDone = allSuccess;
 
-        let status: TaskStatus = 'pending';
-        let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
-        let swapKey = `idle:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
+      let status: TaskStatus = 'pending';
+      let text: React.ReactNode = locale?.['taskList.taskList'] || '任务列表';
+      let swapKey = `idle:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
 
-        if (allDone) {
-          status = 'success';
-          const customCompleteText =
-            typeof taskCompleteText === 'function'
-              ? taskCompleteText({ items })
-              : taskCompleteText;
-          text =
-            customCompleteText ??
-            locale?.['taskList.taskComplete'] ??
-            '任务完成';
-          swapKey = `done:${items.map((i) => i.key).join(',')}`;
-        } else if (inProgressItem) {
-          status = 'loading';
-          const tpl =
-            locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
-          const title = inProgressItem.title;
-          const taskName =
-            typeof title === 'string' || typeof title === 'number'
-              ? String(title)
-              : '';
-          text = tpl.replace('${taskName}', taskName);
-          swapKey = `loading:${inProgressItem.key}:${taskName}`;
-        } else if (hasError) {
-          status = 'error';
-          text = locale?.['taskList.taskAborted'] || '任务已取消';
-          swapKey = `error:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
-        } else if (externalLoading || items.length > 0) {
-          status = 'loading';
-          const tpl =
-            locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
-          text = tpl.replace('${taskName}', '');
-          swapKey = `in-progress:${externalLoading}:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
-        }
+      if (allDone) {
+        status = 'success';
+        const customCompleteText =
+          typeof taskCompleteText === 'function'
+            ? taskCompleteText({ items })
+            : taskCompleteText;
+        text =
+          customCompleteText ?? locale?.['taskList.taskComplete'] ?? '任务完成';
+        swapKey = `done:${items.map((i) => i.key).join(',')}`;
+      } else if (inProgressItem) {
+        status = 'loading';
+        const tpl =
+          locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
+        const title = inProgressItem.title;
+        const taskName =
+          typeof title === 'string' || typeof title === 'number'
+            ? String(title)
+            : '';
+        text = tpl.replace('${taskName}', taskName);
+        swapKey = `loading:${inProgressItem.key}:${taskName}`;
+      } else if (hasError) {
+        status = 'error';
+        text = locale?.['taskList.taskAborted'] || '任务已取消';
+        swapKey = `error:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
+      } else if (externalLoading || items.length > 0) {
+        status = 'loading';
+        const tpl =
+          locale?.['taskList.taskInProgress'] || '正在进行${taskName}任务';
+        text = tpl.replace('${taskName}', '');
+        swapKey = `in-progress:${externalLoading}:${items.map((i) => `${i.key}:${i.status}`).join('|')}`;
+      }
 
-        return {
-          summaryStatus: status,
-          summaryText: text,
-          summarySwapKey: swapKey,
-          isCancelled: hasError,
-          lastItem: items[items.length - 1] as TaskItem | undefined,
-          completedCount,
-          totalCount: items.length,
-        };
-      }, [items, locale, taskCompleteText, externalLoading]);
+      return {
+        summaryStatus: status,
+        summaryText: text,
+        summarySwapKey: swapKey,
+        isCancelled: hasError,
+        lastItem: items[items.length - 1] as TaskItem | undefined,
+        completedCount,
+        totalCount: items.length,
+      };
+    }, [items, locale, taskCompleteText, externalLoading]);
 
     // 注意：此处必须用 useCallback 而非 useRefFunction。
     // renderItems 在父组件渲染期被同步调用（`{renderItems(items)}`），
@@ -252,7 +254,8 @@ export const TaskList = memo(
           >
             <div
               className={classNames(`${simpleCls}-progress-bar`, hashId, {
-                [`${simpleCls}-progress-bar-success`]: summaryStatus === 'success',
+                [`${simpleCls}-progress-bar-success`]:
+                  summaryStatus === 'success',
                 [`${simpleCls}-progress-bar-error`]: summaryStatus === 'error',
               })}
               style={{ width: `${progressPercent}%` }}

@@ -16,8 +16,8 @@ import {
   UNSAFE_URL_PLAIN_TEXT_STYLE,
 } from '../Utils/htmlUrlSafety';
 import {
-  FncRefForMarkdown,
   extractFootnoteRefFromSupChildren,
+  FncRefForMarkdown,
 } from './FncRefForMarkdown';
 import { createHastProcessor } from './processor';
 import {

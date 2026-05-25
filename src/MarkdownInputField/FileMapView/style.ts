@@ -361,6 +361,6 @@ const useGenStyle = genStyleHooks('FileMapView', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'md-md-editor-file-view');
+  const [hashId] = useGenStyle(prefixCls ?? 'md-md-editor-file-view');
   return { hashId };
 }

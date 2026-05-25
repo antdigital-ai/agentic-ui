@@ -29,7 +29,7 @@ vi.mock('react-chartjs-2', () => ({
 }));
 
 vi.mock('../../ScatterChart/style', () => ({
-  useStyle: () => ({ wrapSSR: (node: any) => node, hashId: 'test-hash' }),
+  useStyle: () => ({ hashId: 'test-hash' }),
 }));
 
 vi.mock('../../components', () => ({

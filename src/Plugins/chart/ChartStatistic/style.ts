@@ -182,6 +182,6 @@ const useGenStyle = genStyleHooks('ChartStatistic', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'Statistic');
+  const [hashId] = useGenStyle(prefixCls ?? 'Statistic');
   return { hashId };
 }

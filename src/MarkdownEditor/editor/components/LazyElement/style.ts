@@ -25,6 +25,6 @@ const useGenStyle = genStyleHooks('LazyElement', (token, info) => [
 ]);
 
 export const useStyle = (prefixCls?: string) => {
-  const [, hashId] = useGenStyle(prefixCls ?? 'LazyElement');
+  const [hashId] = useGenStyle(prefixCls ?? 'LazyElement');
   return { hashId };
 };

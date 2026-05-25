@@ -227,6 +227,6 @@ const useGenStyle = genStyleHooks('ChatLayout', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'ChatLayout');
+  const [hashId] = useGenStyle(prefixCls ?? 'ChatLayout');
   return { hashId };
 }

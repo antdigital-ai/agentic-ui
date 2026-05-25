@@ -55,6 +55,6 @@ const useGenStyle = genStyleHooks('RefinePromptButton', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'RefinePromptButton');
+  const [hashId] = useGenStyle(prefixCls ?? 'RefinePromptButton');
   return { hashId };
 }

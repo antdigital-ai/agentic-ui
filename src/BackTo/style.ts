@@ -62,6 +62,6 @@ export const prefixCls = 'back-to';
 const useGenStyle = genStyleHooks('BackTo', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'back-to');
+  const [hashId] = useGenStyle(prefixCls ?? 'back-to');
   return { hashId };
 }

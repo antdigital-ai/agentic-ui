@@ -1,17 +1,16 @@
 import {
   MarkdownInputField,
+  useRefFunction,
   type AttachmentFile,
   type MarkdownEditorInstance,
-  useRefFunction,
 } from '@ant-design/agentic-ui';
-import { PaperClipOutlined, ThunderboltOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  PaperClipOutlined,
+  ThunderboltOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { List, Tooltip, Typography } from 'antd';
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { mockUpload } from './_constants';
 import { logCaughtError } from './_logCaughtError';
 
@@ -500,8 +499,7 @@ export function ChatComposerForImeDemo({
             const normalized = combined.replace(/\u00a0/g, ' ').trim();
             const isSystemCmd = quickExecuteItems.some(
               (item) =>
-                item.category !== 'skill' &&
-                normalized === `/${item.label}`,
+                item.category !== 'skill' && normalized === `/${item.label}`,
             );
             skipDraftPersistRef.current = true;
             try {

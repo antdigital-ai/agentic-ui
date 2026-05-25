@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import {
   afterEach,
@@ -180,7 +180,6 @@ vi.mock('../../utils', () => ({
 // Mock style hook
 vi.mock('../../LineChart/style', () => ({
   useStyle: () => ({
-    wrapSSR: (node: any) => node,
     hashId: 'test-hash',
   }),
 }));

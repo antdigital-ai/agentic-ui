@@ -698,6 +698,6 @@ const useGenStyle = genStyleHooks('MarkdownEditor', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'MarkdownEditor');
+  const [hashId] = useGenStyle(prefixCls ?? 'MarkdownEditor');
   return { hashId };
 }

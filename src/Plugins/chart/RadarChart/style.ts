@@ -106,6 +106,6 @@ const useGenStyle = genStyleHooks('RadarChart', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'RadarChart');
+  const [hashId] = useGenStyle(prefixCls ?? 'RadarChart');
   return { hashId };
 }

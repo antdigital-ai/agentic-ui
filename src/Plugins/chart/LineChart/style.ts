@@ -73,6 +73,6 @@ const genStyle: GenStyleFn<'LineChart'> = (token) => {
 const useGenStyle = genStyleHooks('LineChart', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'LineChart');
+  const [hashId] = useGenStyle(prefixCls ?? 'LineChart');
   return { hashId };
 }

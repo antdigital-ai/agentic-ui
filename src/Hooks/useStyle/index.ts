@@ -133,31 +133,11 @@ const styleUtils = genStyleUtils<
 });
 
 /**
- * `wrapSSR` 在我们的配置下是死代码：
- *
- * - 浏览器（CSR）里 cssinjs 的 `wrapSSR` 永远等价于 `<><Empty/>{node}</>`
- *   （`Empty` 是 `() => null`），样式注入靠 `useGlobalCache` 内的 `updateCSS`
- *   副作用完成，与 `wrapSSR` 无关；
- * - 我们的 `hashId` 强制为空，`wrapSSR` 也不会在节点上注入任何 className；
- * - 仅在 `<StyleProvider ssrInline>` 这种 SSR 内联模式下 `wrapSSR` 才会真正
- *   emit `<style>` 标签，但组件库从未承诺该模式，整个仓库也没有相关入口。
- *
- * 历史上 `genStyleHooks` / `genComponentStyleHook` 元组的第 0 位为 `wrapSSR`，
- * 为兼容 antd `cssinjs-utils` 的 tuple 形状继续保留该位置；新代码请直接忽略，
- * 避免每次渲染白白创建一层 Fragment + `<Empty/>`。`useEditorStyleRegister`
- * 已彻底从返回对象里移除 `wrapSSR`。
- */
-const identityWrapSSR = <T extends React.ReactElement>(node: T): T => node;
-
-/**
  * 注册组件样式（含 antCls / iconCls / 计算工具），返回 `useStyle(prefixCls)`。
  *
  * 与 antd `genStyleHooks` 行为一致：
- *   - 顶层调用一次，签名 `(prefixCls, rootCls?) => [wrapSSR, hashId, cssVarCls]`
+ *   - 顶层调用一次，签名 `(prefixCls, rootCls?) => [hashId, cssVarCls]`
  *   - styleFn 接收的 token 含 `componentCls`、`prefixCls`、`antCls` 等
- *   - **wrapSSR 为 identity 函数**（见 {@link identityWrapSSR} 说明），元组第 0 位
- *     仅为保持 antd tuple 形状，调用方一律使用 `const [, hashId] = useStyle(...)`
- *     的解构形式忽略它。
  *
  * @example
  * ```ts
@@ -182,20 +162,15 @@ export const genStyleHooks: typeof styleUtils.genStyleHooks = ((
     getDefaultToken,
     options,
   );
-  // 仍然调用原 hook 触发样式注册副作用（updateCSS 注入 document.head），
-  // 但用 identityWrapSSR 替换其返回的 wrapSSR。元组形状保留为兼容 antd 公共类型，
-  // 调用方应忽略第 0 位。
   return (prefixCls: string, rootCls?: string) => {
     const [, hashId, cssVarCls] = inner(prefixCls, rootCls);
-    return [identityWrapSSR, hashId, cssVarCls] as const;
+    return [hashId, cssVarCls] as const;
   };
 }) as typeof styleUtils.genStyleHooks;
 
 /**
  * 同 antd `genComponentStyleHook`：与 `genStyleHooks` 类似，但不接管 CSS Var 注册，
- * 返回 `[wrapSSR, hashId]`。在子样式 / 不需要 CSS Var 的场景使用。
- *
- * 同样把 `wrapSSR` 替换为 identity，调用方应忽略第 0 位。
+ * 返回 `[hashId]`。在子样式 / 不需要 CSS Var 的场景使用。
  */
 export const genComponentStyleHook: typeof styleUtils.genComponentStyleHook = ((
   component: Parameters<typeof styleUtils.genComponentStyleHook>[0],
@@ -211,7 +186,7 @@ export const genComponentStyleHook: typeof styleUtils.genComponentStyleHook = ((
   );
   return (prefixCls: string, rootCls?: string) => {
     const [, hashId] = inner(prefixCls, rootCls);
-    return [identityWrapSSR, hashId] as const;
+    return [hashId] as const;
   };
 }) as typeof styleUtils.genComponentStyleHook;
 
@@ -242,9 +217,8 @@ export function useEditorStyleRegister(
     antCls: `.${getPrefixCls()}`,
   };
 
-  // 调用 useStyleRegister 是为了触发 cssinjs 的样式注册副作用（updateCSS
-  // 注入到 document.head）；返回的 wrapSSR 在我们的配置下是无意义 Fragment 包装
-  // （详见 identityWrapSSR 注释），故直接丢弃，对外只暴露 hashId。
+  // 调用 useStyleRegister 触发 cssinjs 的样式注册副作用（updateCSS 注入到
+  // document.head）；返回值不使用，对外只暴露 hashId。
   useStyleRegister(
     {
       theme: theme as any,

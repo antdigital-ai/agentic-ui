@@ -223,29 +223,27 @@ const TypingAnimationBase = ({
   // 替代 framer-motion 的 motion(Component) HOC：
   // 由于 TypingAnimation 仅用 motion 作为 ref 容器（无 variants/animate 等动画属性），
   // 直接 createElement(Component) 即可，行为完全等价。
-  return (
-    React.createElement(
-      Component,
-      {
-        ref: elementRef,
-        className: classNames(prefixCls, hashId, className),
-        'data-testid': prefixCls,
-        ...props,
-      },
-      displayedText,
-      shouldShowCursor && (
-        <span
-          key="__typing-cursor__"
-          className={classNames(
-            `${prefixCls}-cursor`,
-            hashId,
-            blinkCursor && `${prefixCls}-cursor-blinking`,
-          )}
-        >
-          {getCursorChar()}
-        </span>
-      ),
-    )
+  return React.createElement(
+    Component,
+    {
+      ref: elementRef,
+      className: classNames(prefixCls, hashId, className),
+      'data-testid': prefixCls,
+      ...props,
+    },
+    displayedText,
+    shouldShowCursor && (
+      <span
+        key="__typing-cursor__"
+        className={classNames(
+          `${prefixCls}-cursor`,
+          hashId,
+          blinkCursor && `${prefixCls}-cursor-blinking`,
+        )}
+      >
+        {getCursorChar()}
+      </span>
+    ),
   );
 };
 

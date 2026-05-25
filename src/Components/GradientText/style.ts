@@ -42,6 +42,6 @@ const genStyle: GenStyleFn<'GradientText'> = (token) => {
 const useGenStyle = genStyleHooks('GradientText', genStyle);
 
 export const useGradientTextStyle = (prefixCls: string) => {
-  const [, hashId] = useGenStyle(prefixCls);
+  const [hashId] = useGenStyle(prefixCls);
   return { hashId };
 };

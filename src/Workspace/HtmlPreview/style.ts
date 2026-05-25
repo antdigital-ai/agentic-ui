@@ -62,6 +62,6 @@ const genStyle: GenStyleFn<'WorkspaceHtmlPreview'> = (token) => {
 const useGenStyle = genStyleHooks('WorkspaceHtmlPreview', genStyle);
 
 export function useHtmlPreviewStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'WorkspaceHtmlPreview');
+  const [hashId] = useGenStyle(prefixCls ?? 'WorkspaceHtmlPreview');
   return { hashId };
 }

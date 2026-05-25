@@ -27,6 +27,7 @@ import type {
   FileType,
   GroupNode,
 } from '../types';
+import { buildFileNodeRelativePathIndex } from './buildFileNodeRelativePathIndex';
 import {
   FileGroup,
   GROUP_INITIAL_PAGE_SIZE,
@@ -34,7 +35,6 @@ import {
 } from './components/FileGroup';
 import { FileItem } from './components/FileItem';
 import { SearchInput } from './components/SearchInput';
-import { buildFileNodeRelativePathIndex } from './buildFileNodeRelativePathIndex';
 import { FileTree } from './FileTree';
 import { isImageFile } from './FileTypeProcessor';
 import {

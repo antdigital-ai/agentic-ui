@@ -57,8 +57,6 @@ vi.mock('../utils', async (importOriginal) => {
   };
 });
 
-const mockWrapSSR = vi.fn((node: any) => node);
-
 vi.mock('../components', () => ({
   ChartContainer: ({ children, ...p }: any) => (
     <div data-testid="chart-container" {...p}>
@@ -100,7 +98,6 @@ vi.mock('../ChartStatistic', () => ({
 
 vi.mock('../RadarChart/style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: mockWrapSSR,
     hashId: 'h',
   })),
 }));
@@ -120,7 +117,6 @@ describe('RadarChart 分支逻辑', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     capturedRadarProps = null;
-    mockWrapSSR.mockImplementation((node: any) => node);
 
     HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
       measureText: vi.fn((text: string) => ({ width: text.length * 8 })),
@@ -398,36 +394,6 @@ describe('RadarChart 分支逻辑', () => {
 
       expect(warnSpy).toHaveBeenCalledWith('图表下载失败:', expect.any(Error));
       warnSpy.mockRestore();
-    });
-  });
-
-  describe('try/catch 渲染错误分支', () => {
-    it('wrapSSR 抛出错误时渲染错误提示', () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-      // 第一次调用 wrapSSR 正常（空数据不走 try），
-      // 对有效数据时让 wrapSSR 在 try 块中抛出
-      let callCount = 0;
-      mockWrapSSR.mockImplementation((node: any) => {
-        callCount++;
-        // try 块中的 wrapSSR 是第一次调用（有效数据路径）
-        if (callCount === 1) {
-          throw new Error('render error');
-        }
-        return node;
-      });
-
-      render(<RadarChart data={validData} />);
-
-      expect(errorSpy).toHaveBeenCalledWith(
-        'RadarChart 渲染错误:',
-        expect.any(Error),
-      );
-      expect(
-        screen.getByText('图表渲染失败，请检查数据格式'),
-      ).toBeInTheDocument();
-
-      errorSpy.mockRestore();
     });
   });
 });

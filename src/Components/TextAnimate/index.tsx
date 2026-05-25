@@ -250,40 +250,38 @@ const TextAnimateBase = ({
     ...props,
   };
 
-  return (
-    React.createElement(
-      Component,
-      containerProps,
-      segments.map((segment, i) => {
-        const itemKey = `${by}-${
-          isObject(segment) ? (segment as React.ReactElement).key : segment
-        }-${i}`;
-        const itemDelaySec =
-          delay + i * (variants ? customStaggerDelaySec : staggerChildrenSec);
+  return React.createElement(
+    Component,
+    containerProps,
+    segments.map((segment, i) => {
+      const itemKey = `${by}-${
+        isObject(segment) ? (segment as React.ReactElement).key : segment
+      }-${i}`;
+      const itemDelaySec =
+        delay + i * (variants ? customStaggerDelaySec : staggerChildrenSec);
 
-        return (
-          <span
-            key={itemKey}
-            data-animation={shouldPlay ? itemAnimationName : 'none'}
-            className={classNames(
-              `${prefixCls}-item`,
-              `${prefixCls}-item-${by}`,
-              hashId,
-              segmentClassName,
-            )}
-            aria-hidden={accessible ? true : undefined}
-            style={
-              {
-                animationDuration: `${duration}s`,
-                '--text-animate-delay': `${itemDelaySec}s`,
-              } as React.CSSProperties
-            }
-          >
-            {segment}
-          </span>
-        );
-      }),
-    )
+      return (
+        <span
+          key={itemKey}
+          data-animation={shouldPlay ? itemAnimationName : 'none'}
+          className={classNames(
+            `${prefixCls}-item`,
+            `${prefixCls}-item-${by}`,
+            hashId,
+            segmentClassName,
+          )}
+          aria-hidden={accessible ? true : undefined}
+          style={
+            {
+              animationDuration: `${duration}s`,
+              '--text-animate-delay': `${itemDelaySec}s`,
+            } as React.CSSProperties
+          }
+        >
+          {segment}
+        </span>
+      );
+    }),
   );
 };
 

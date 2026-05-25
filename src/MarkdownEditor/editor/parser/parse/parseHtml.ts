@@ -465,9 +465,7 @@ const handleBlockHtml = (
 
   const blockOnlyMarkMatch =
     typeof currentElement?.value === 'string' &&
-    currentElement.value.match(
-      /^\s*<mark(?:\s[^>]*)?>([\s\S]*?)<\/mark>\s*$/i,
-    );
+    currentElement.value.match(/^\s*<mark(?:\s[^>]*)?>([\s\S]*?)<\/mark>\s*$/i);
   if (blockOnlyMarkMatch) {
     const innerMd = blockOnlyMarkMatch[1];
     const applyMarkRecursive = (node: any): any => {

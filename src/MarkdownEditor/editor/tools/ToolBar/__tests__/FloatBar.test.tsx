@@ -28,7 +28,7 @@ vi.mock('../../../store', () => ({
 }));
 
 vi.mock('../floatBarStyle', () => ({
-  useStyle: () => ({ wrapSSR: (node: React.ReactNode) => node, hashId: '' }),
+  useStyle: () => ({ hashId: '' }),
 }));
 
 vi.mock('../BaseBar', () => ({

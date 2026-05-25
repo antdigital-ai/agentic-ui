@@ -31,7 +31,6 @@ vi.mock('../../../../utils/native-table', () => ({
 
 vi.mock('../../../../editor/elements/Table/TableCellIndex/style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (component: any) => component,
     hashId: 'test-hash',
   })),
 }));

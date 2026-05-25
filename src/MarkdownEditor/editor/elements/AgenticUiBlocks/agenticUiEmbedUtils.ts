@@ -35,10 +35,7 @@ export function normalizeTaskListPropsFromJson(parsed: unknown): TaskListProps {
       const key = x.key !== undefined && x.key !== null ? String(x.key) : '';
       const title =
         x.title === undefined || x.title === null ? undefined : String(x.title);
-      const content = normalizeTaskContent(
-        x.content,
-        title,
-      );
+      const content = normalizeTaskContent(x.content, title);
       return { key, title, content, status };
     })
     .filter((item) => item.key.length > 0);

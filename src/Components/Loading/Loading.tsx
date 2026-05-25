@@ -226,5 +226,5 @@ export const Loading = ({
     );
   }
 
-  return (loadingElement);
+  return loadingElement;
 };

@@ -117,6 +117,6 @@ const genStyle: GenStyleFn<'VisualList'> = (token) => {
 const useGenStyle = genStyleHooks('VisualList', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'visual-list');
+  const [hashId] = useGenStyle(prefixCls ?? 'visual-list');
   return { hashId };
 }

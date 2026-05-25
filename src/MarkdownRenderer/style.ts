@@ -21,6 +21,6 @@ const useGenVarStyle = genStyleHooks('MarkdownRendererVars', (token) => ({
 }));
 
 export const useRendererVarStyle = (prefixCls: string) => {
-  const [, hashId] = useGenVarStyle(prefixCls);
+  const [hashId] = useGenVarStyle(prefixCls);
   return { hashId };
 };

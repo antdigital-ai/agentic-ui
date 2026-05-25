@@ -30,7 +30,6 @@ vi.mock('antd', () => ({
 // Mock useStyle hook
 vi.mock('../../../../editor/elements/TagPopup/style', () => ({
   useStyle: () => ({
-    wrapSSR: (node: React.ReactNode) => node,
     hashId: 'hash-id',
   }),
 }));

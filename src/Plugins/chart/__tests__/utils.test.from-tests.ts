@@ -3,7 +3,6 @@ import {
   compareXValues,
   debounce,
   extractAndSortXValues,
-  resolveChartSortByField,
   findDataPointByXValue,
   getDataHash,
   hexToRgba,
@@ -12,6 +11,7 @@ import {
   isXValueEqual,
   normalizeXValue,
   parseChineseCurrencyToNumber,
+  resolveChartSortByField,
   resolveCssVariable,
   stringFormatNumber,
   toNumber,
@@ -397,7 +397,10 @@ describe('Chart Utils', () => {
     });
 
     it('index 列全为空时不自动启用', () => {
-      const rows = [{ 阶段: 'A', index: '' }, { 阶段: 'B', index: '  ' }];
+      const rows = [
+        { 阶段: 'A', index: '' },
+        { 阶段: 'B', index: '  ' },
+      ];
       expect(resolveChartSortByField(rows)).toBeUndefined();
     });
   });

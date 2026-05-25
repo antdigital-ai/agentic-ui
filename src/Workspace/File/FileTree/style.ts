@@ -74,6 +74,6 @@ const genStyle: GenStyleFn<'WorkspaceFileTree'> = (token) => {
 const useGenStyle = genStyleHooks('WorkspaceFileTree', genStyle);
 
 export function useFileTreeStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'WorkspaceFileTree');
+  const [hashId] = useGenStyle(prefixCls ?? 'WorkspaceFileTree');
   return { hashId };
 }

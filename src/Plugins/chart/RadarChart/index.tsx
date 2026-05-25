@@ -187,21 +187,24 @@ const RadarChart: React.FC<RadarChartProps> = ({
   );
 
   const datasetTypes = useMemo(
-    () =>
-      [
-        ...new Set(
-          filteredData
-            .map((item) => item.type)
-            .filter((type): type is string => Boolean(type)),
-        ),
-      ],
+    () => [
+      ...new Set(
+        filteredData
+          .map((item) => item.type)
+          .filter((type): type is string => Boolean(type)),
+      ),
+    ],
     [filteredData],
   );
 
   const classNamesObj = classNamesProp;
 
   // 如果没有有效数据，返回空状态
-  if (safeData.length === 0 || xValues.length === 0 || datasetTypes.length === 0) {
+  if (
+    safeData.length === 0 ||
+    xValues.length === 0 ||
+    datasetTypes.length === 0
+  ) {
     return (
       <ChartContainer
         baseClassName={classNames(`${prefixCls}-container`)}

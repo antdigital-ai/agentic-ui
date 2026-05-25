@@ -56,6 +56,6 @@ const genStyle: GenStyleFn<'TextSwap'> = (token) => {
 const useGenStyle = genStyleHooks('TextSwap', genStyle);
 
 export function useTextSwapStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'text-swap');
+  const [hashId] = useGenStyle(prefixCls ?? 'text-swap');
   return { hashId };
 }

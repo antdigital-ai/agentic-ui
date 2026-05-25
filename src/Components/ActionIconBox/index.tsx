@@ -245,18 +245,11 @@ export const ActionIconBox: React.FC<ActionIconBoxProps> = (props) => {
     </span>
   );
 
-  return (
-    title ? (
-      <Tooltip
-        title={title}
-        arrow={false}
-        mouseEnterDelay={1}
-        {...tooltipProps}
-      >
-        {renderInner({ 'data-title': titleText })}
-      </Tooltip>
-    ) : (
-      renderInner()
-    )
+  return title ? (
+    <Tooltip title={title} arrow={false} mouseEnterDelay={1} {...tooltipProps}>
+      {renderInner({ 'data-title': titleText })}
+    </Tooltip>
+  ) : (
+    renderInner()
   );
 };

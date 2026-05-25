@@ -204,6 +204,6 @@ const genStyle: GenStyleFn<'IconButton'> = (token) => {
 const useGenStyle = genStyleHooks('IconButton', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'icon-button');
+  const [hashId] = useGenStyle(prefixCls ?? 'icon-button');
   return { hashId };
 }

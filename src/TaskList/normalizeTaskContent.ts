@@ -2,7 +2,10 @@
 import type { TaskItem } from './types';
 
 const isPlainObject = (v: unknown): v is Record<string, unknown> =>
-  typeof v === 'object' && v !== null && !Array.isArray(v) && !React.isValidElement(v);
+  typeof v === 'object' &&
+  v !== null &&
+  !Array.isArray(v) &&
+  !React.isValidElement(v);
 
 const extractTextFromUnknown = (value: unknown): string => {
   if (value === null || value === undefined) return '';
@@ -72,7 +75,10 @@ export function normalizeTaskContent(
   }
 
   if (Array.isArray(content)) {
-    if (content.length > 0 && content.every((part) => React.isValidElement(part))) {
+    if (
+      content.length > 0 &&
+      content.every((part) => React.isValidElement(part))
+    ) {
       return content;
     }
     const text = extractTextFromUnknown(content);

@@ -147,6 +147,6 @@ const genStyle: GenStyleFn<'AgenticLayout'> = (token) => {
 const useGenStyle = genStyleHooks('AgenticLayout', genStyle);
 
 export const useAgenticLayoutStyle = (prefixCls: string) => {
-  const [, hashId] = useGenStyle(prefixCls);
+  const [hashId] = useGenStyle(prefixCls);
   return { hashId };
 };

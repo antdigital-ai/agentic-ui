@@ -17,6 +17,6 @@ const genAbstractLottieStyle: GenStyleFn<'Abstract'> = (token) => {
 const useGenStyle = genStyleHooks('Abstract', genAbstractLottieStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'bubble-actions-lottie');
+  const [hashId] = useGenStyle(prefixCls ?? 'bubble-actions-lottie');
   return { hashId };
 }

@@ -12,6 +12,7 @@ import { Subject } from 'rxjs';
 import { createEditor, Editor, Selection } from 'slate';
 import { withHistory } from 'slate-history';
 import { withReact } from 'slate-react';
+import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { CommentList } from './editor/components/CommentList';
 import { SlateMarkdownEditor } from './editor/Editor';
@@ -42,7 +43,6 @@ import {
   MarkdownEditorProps,
 } from './types';
 import { exportHtml } from './utils/exportHtml';
-import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { sanitizeEditorChromeStyle } from './utils/sanitizeChromeStyle';
 
 // 组合器函数

@@ -97,6 +97,6 @@ const useGenStyle = genStyleHooks('BubbleDocInfo', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'DocInfo');
+  const [hashId] = useGenStyle(prefixCls ?? 'DocInfo');
   return { hashId };
 }

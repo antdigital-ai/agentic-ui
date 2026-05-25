@@ -724,10 +724,9 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
                               return o.key === el.key;
                             });
 
-                          const myInsertOptions =
-                            props?.insertOptions?.find?.(
-                              (o) => o.key === el.key,
-                            );
+                          const myInsertOptions = props?.insertOptions?.find?.(
+                            (o) => o.key === el.key,
+                          );
 
                           if (myInsertOptions) {
                             runInsertTask(myInsertOptions, {
@@ -852,9 +851,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
                           insertAttachByLink();
                         }
                       }}
-                      onChange={(e) =>
-                        setState({ insertUrl: e.target.value })
-                      }
+                      onChange={(e) => setState({ insertUrl: e.target.value })}
                     />
                     <Button
                       block={true}

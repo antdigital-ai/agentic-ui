@@ -94,6 +94,6 @@ const genStyle: GenStyleFn<'ActionIconBox'> = (token) => {
 const useGenStyle = genStyleHooks('ActionIconBox', genStyle);
 
 export function useStyle(prefixCls: string) {
-  const [, hashId] = useGenStyle(prefixCls);
+  const [hashId] = useGenStyle(prefixCls);
   return { hashId };
 }

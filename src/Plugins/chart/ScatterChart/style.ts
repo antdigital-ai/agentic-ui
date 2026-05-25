@@ -84,6 +84,6 @@ const useGenStyle = genStyleHooks('ScatterChart', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'ScatterChart');
+  const [hashId] = useGenStyle(prefixCls ?? 'ScatterChart');
   return { hashId };
 }

@@ -51,8 +51,6 @@ const useGenStyle = genStyleHooks('AttachmentButton', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(
-    prefixCls ?? 'md-editor-attachment-button',
-  );
+  const [hashId] = useGenStyle(prefixCls ?? 'md-editor-attachment-button');
   return { hashId };
 }

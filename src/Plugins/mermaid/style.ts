@@ -178,6 +178,6 @@ const genStyle: GenStyleFn<'Mermaid'> = (token) => {
 const useGenStyle = genStyleHooks('Mermaid', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'agentic-plugin-mermaid');
+  const [hashId] = useGenStyle(prefixCls ?? 'agentic-plugin-mermaid');
   return { hashId };
 }

@@ -25,8 +25,8 @@ export default () => {
       <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
         对齐业务侧 <Text code>ChatInputField</Text> 形态：
         <Text code>actionsRender</Text> 注入 @ / 、浮动面板、附件、
-        <Text code>inputRef</Text> 与 sessionStorage 草稿。用于验证 IME
-        Enter 确认选字不会误发送。
+        <Text code>inputRef</Text> 与 sessionStorage 草稿。用于验证 IME Enter
+        确认选字不会误发送。
       </Text>
 
       <Alert
@@ -36,8 +36,12 @@ export default () => {
         description={
           <ol style={{ margin: '8px 0 0', paddingLeft: 20 }}>
             <li>用中文输入法输入拼音，按 Enter 确认候选（不应发送）</li>
-            <li>输入 <Text code>@</Text> 或点 @ 按钮，选助理后继续中文输入</li>
-            <li>输入 <Text code>/</Text> 选 skill 后继续中文输入</li>
+            <li>
+              输入 <Text code>@</Text> 或点 @ 按钮，选助理后继续中文输入
+            </li>
+            <li>
+              输入 <Text code>/</Text> 选 skill 后继续中文输入
+            </li>
             <li>完整句子后按发送快捷键；刷新页面应恢复未发送草稿</li>
             <li>
               IME 组合期间会隐藏 <Text code>/</Text>、<Text code>@</Text>{' '}

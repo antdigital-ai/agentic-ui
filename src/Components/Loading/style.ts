@@ -127,6 +127,6 @@ export const prefixCls = 'loading';
 const useGenStyle = genStyleHooks('Loading', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'loading');
+  const [hashId] = useGenStyle(prefixCls ?? 'loading');
   return { hashId };
 }

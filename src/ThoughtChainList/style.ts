@@ -273,6 +273,6 @@ const useGenStyle = genStyleHooks('ThoughtChainList', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'ThoughtChainList');
+  const [hashId] = useGenStyle(prefixCls ?? 'ThoughtChainList');
   return { hashId };
 }

@@ -701,10 +701,7 @@ describe('Workspace Component', () => {
 
     render(
       <TestWrapper>
-        <Workspace
-          defaultActiveTabKey="missing-tab"
-          onTabChange={onTabChange}
-        >
+        <Workspace defaultActiveTabKey="missing-tab" onTabChange={onTabChange}>
           <Workspace.Realtime data={{ type: 'shell', content: 'fallback' }} />
           <Workspace.Browser
             suggestions={browserSuggestions}

@@ -133,10 +133,7 @@ describe('MarkdownRenderer', () => {
   it('流式表格应在 header 与首行完整后再渲染', () => {
     const tablePrefix = '| Header |\n| --- |\n| Cel';
     const { container, rerender } = render(
-      <MarkdownRenderer
-        content={tablePrefix}
-        streaming={true}
-      />,
+      <MarkdownRenderer content={tablePrefix} streaming={true} />,
     );
 
     expect(container.querySelector('table')).toBeFalsy();
@@ -368,10 +365,7 @@ describe('MarkdownRenderer', () => {
     const baseContent =
       'Microsoft Corporation 是一家领先的技术公司，专注于云计算、生产力软件、业务应用程序和消费技术。';
     const { container, rerender } = render(
-      <MarkdownRenderer
-        content={baseContent}
-        streaming={true}
-      />,
+      <MarkdownRenderer content={baseContent} streaming={true} />,
     );
 
     expect(container.textContent).toContain('Microsoft Corporation');

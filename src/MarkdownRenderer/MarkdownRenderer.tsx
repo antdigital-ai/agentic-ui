@@ -151,12 +151,7 @@ const InternalMarkdownRenderer = forwardRef<
   return (
     <div
       ref={containerRef}
-      className={clsx(
-        prefixCls,
-        `${prefixCls}-readonly`,
-        hashId,
-        className,
-      )}
+      className={clsx(prefixCls, `${prefixCls}-readonly`, hashId, className)}
       data-testid="markdown-renderer"
       style={style}
     >

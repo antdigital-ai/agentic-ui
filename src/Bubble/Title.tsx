@@ -68,7 +68,7 @@ const useGenStyle = genStyleHooks('BubbleTitle', (token, info) => [
 ]);
 
 const useStyle = (prefixCls?: string) => {
-  const [, hashId] = useGenStyle(prefixCls ?? 'BubbleTitle');
+  const [hashId] = useGenStyle(prefixCls ?? 'BubbleTitle');
   return { hashId };
 };
 

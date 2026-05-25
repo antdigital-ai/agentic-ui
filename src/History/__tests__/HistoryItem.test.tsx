@@ -34,7 +34,7 @@ vi.mock('antd', () => ({
 }));
 
 vi.mock('../style', () => ({
-  useStyle: () => ({ wrapSSR: (n: any) => n, hashId: 'h' }),
+  useStyle: () => ({ hashId: 'h' }),
 }));
 
 vi.mock('../utils', () => ({

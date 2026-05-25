@@ -1,12 +1,12 @@
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { useContext, useRef } from 'react';
+import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { MarkdownRenderer } from '../MarkdownRenderer';
 import I18nBoundary from './I18nBoundary';
 import { PluginContext } from './plugin';
 import { useStyle } from './style';
 import { MarkdownEditorProps } from './types';
-import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
 import { sanitizeEditorChromeStyle } from './utils/sanitizeChromeStyle';
 
 /**

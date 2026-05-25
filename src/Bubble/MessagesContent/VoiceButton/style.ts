@@ -87,6 +87,6 @@ const useGenStyle = genStyleHooks('BubbleVoiceButton', (token, info) => [
 ]);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'VoiceButton');
+  const [hashId] = useGenStyle(prefixCls ?? 'VoiceButton');
   return { hashId };
 }

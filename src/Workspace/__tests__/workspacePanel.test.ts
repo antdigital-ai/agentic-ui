@@ -14,10 +14,7 @@ describe('resolveWorkspacePanelType', () => {
   it('应从 memo 外层解析到已标记的内层组件', () => {
     const Inner = () => null;
     markWorkspacePanel(Inner, 'file');
-    const MemoInner = Object.assign(
-      (() => null) as FC,
-      { type: Inner },
-    );
+    const MemoInner = Object.assign((() => null) as FC, { type: Inner });
 
     expect(resolveWorkspacePanelType(MemoInner)).toBe('file');
   });
@@ -48,9 +45,9 @@ describe('resolveWorkspacePanelType', () => {
   });
 
   it('isWorkspaceSegmentedDividerKey 应识别分隔占位 key', () => {
-    expect(isWorkspaceSegmentedDividerKey(WORKSPACE_SEGMENTED_DIVIDER_KEY)).toBe(
-      true,
-    );
+    expect(
+      isWorkspaceSegmentedDividerKey(WORKSPACE_SEGMENTED_DIVIDER_KEY),
+    ).toBe(true);
     expect(isWorkspaceSegmentedDividerKey('__divider__')).toBe(true);
     expect(isWorkspaceSegmentedDividerKey('file')).toBe(false);
   });

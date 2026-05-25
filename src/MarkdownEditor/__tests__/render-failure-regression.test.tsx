@@ -321,9 +321,7 @@ Logs: openclaw logs --follow
     it('流式模式下应正常渲染', async () => {
       let result: { container: HTMLElement } | null = null;
       expect(() => {
-        result = render(
-          <MarkdownRenderer content="# Title" streaming />,
-        );
+        result = render(<MarkdownRenderer content="# Title" streaming />);
       }).not.toThrow();
 
       await act(async () => {

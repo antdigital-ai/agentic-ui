@@ -72,6 +72,6 @@ const genStyle: GenStyleFn<'AreaChart'> = (token) => {
 const useGenStyle = genStyleHooks('AreaChart', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'AreaChart');
+  const [hashId] = useGenStyle(prefixCls ?? 'AreaChart');
   return { hashId };
 }

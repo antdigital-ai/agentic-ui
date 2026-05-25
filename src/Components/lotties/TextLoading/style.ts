@@ -56,6 +56,6 @@ const genStyle: GenStyleFn<'TextLoading'> = (token) => {
 const useGenStyle = genStyleHooks('TextLoading', genStyle);
 
 export function useStyle(prefixCls: string) {
-  const [, hashId] = useGenStyle(prefixCls);
+  const [hashId] = useGenStyle(prefixCls);
   return { hashId };
 }

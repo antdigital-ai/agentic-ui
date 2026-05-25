@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ScatterChart, { ScatterChartDataItem } from '../ScatterChart';
-import { useStyle as useScatterStyle } from '../ScatterChart/style';
 
 const lastScatterOptionsRef = vi.hoisted(() => ({ current: null as any }));
 
@@ -102,7 +101,6 @@ vi.mock('../ChartStatistic', () => ({
 // Mock style hook
 vi.mock('../ScatterChart/style', () => ({
   useStyle: vi.fn(() => ({
-    wrapSSR: (node: any) => node,
     hashId: 'test-hash-id',
   })),
 }));
@@ -880,31 +878,6 @@ describe('ScatterChart', () => {
       await waitFor(() => {
         expect(downloadChart).toHaveBeenCalled();
       });
-    });
-
-    it('wrapSSR 首次调用抛错时显示错误状态', () => {
-      vi.mocked(useScatterStyle).mockImplementationOnce(() => {
-        let firstCall = true;
-        return {
-          wrapSSR: (node: any) => {
-            if (firstCall) {
-              firstCall = false;
-              throw new Error('render error');
-            }
-            return node;
-          },
-          hashId: 'err',
-        };
-      });
-
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-      render(<ScatterChart data={sampleData} title="错误" />);
-      expect(
-        screen.getByText('图表渲染失败，请检查数据格式'),
-      ).toBeInTheDocument();
-      consoleSpy.mockRestore();
     });
   });
 });

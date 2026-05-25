@@ -1,5 +1,11 @@
 ﻿import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TaskList } from '..';
@@ -888,9 +894,7 @@ describe('TaskList', () => {
         },
       ];
 
-      render(
-        <TaskList items={allDoneItems} variant="simple" loading={true} />,
-      );
+      render(<TaskList items={allDoneItems} variant="simple" loading={true} />);
 
       expect(screen.getByText('任务完成')).toBeInTheDocument();
       expect(screen.queryByText('正在进行任务')).not.toBeInTheDocument();
@@ -904,9 +908,7 @@ describe('TaskList', () => {
         status: 'success' as const,
       }));
 
-      render(
-        <TaskList items={sixItems} variant="simple" open={true} />,
-      );
+      render(<TaskList items={sixItems} variant="simple" open={true} />);
 
       const taskItems = document.querySelectorAll(
         '[data-testid="task-list-thoughtChainItem"]',

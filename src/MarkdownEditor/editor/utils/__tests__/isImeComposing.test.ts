@@ -13,15 +13,15 @@ describe('isImeComposing', () => {
   });
 
   it('inputComposition 为 true 时返回 true', () => {
-    expect(
-      isImeComposing({ nativeEvent: { isComposing: false } }, true),
-    ).toBe(true);
+    expect(isImeComposing({ nativeEvent: { isComposing: false } }, true)).toBe(
+      true,
+    );
   });
 
   it('nativeEvent.isComposing 为 true 时返回 true', () => {
-    expect(
-      isImeComposing({ nativeEvent: { isComposing: true } }, false),
-    ).toBe(true);
+    expect(isImeComposing({ nativeEvent: { isComposing: true } }, false)).toBe(
+      true,
+    );
   });
 
   it('keyCode 229 时返回 true', () => {

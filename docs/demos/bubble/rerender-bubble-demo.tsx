@@ -440,9 +440,8 @@ const RerenderBubbleDemo = () => {
           通过 <code>markdownRenderConfig.throttleOptions</code>{' '}
           配置流式限流：关闭（<code>enabled: false</code>
           ）时内容随 <code>originData.content</code> 即时渲染；开启后由{' '}
-          <code>charsPerFrame</code>、<code>speed</code>{' '}
-          控制每帧推进节奏（消息 <code>isFinished: false</code>{' '}
-          时自动视为流式）。
+          <code>charsPerFrame</code>、<code>speed</code> 控制每帧推进节奏（消息{' '}
+          <code>isFinished: false</code> 时自动视为流式）。
         </p>
         <p style={{ margin: 0 }}>
           与 Slate 打字机动画不同；末段段落淡入由{' '}

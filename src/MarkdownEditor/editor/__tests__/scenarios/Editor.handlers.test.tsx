@@ -46,7 +46,6 @@ vi.mock('../../plugins/useHighlight', () => ({
 
 vi.mock('../../style', () => ({
   useStyle: () => ({
-    wrapSSR: (node: React.ReactNode) => node,
     hashId: '',
   }),
 }));

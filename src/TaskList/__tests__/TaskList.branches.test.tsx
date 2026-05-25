@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -32,7 +32,6 @@ vi.mock('../../Components/ActionIconBox', () => ({
 // Mock 样式hook
 vi.mock('../style', () => ({
   useStyle: () => ({
-    wrapSSR: (node: React.ReactNode) => node,
     hashId: 'test-hash-id',
   }),
 }));
@@ -172,9 +171,8 @@ describe('TaskList Component', () => {
     );
 
     const loadingStatus = screen.getByTestId('task-list-status-loading');
-    const loadingComponent = within(loadingStatus).getByTestId(
-      'task-list-loading',
-    );
+    const loadingComponent =
+      within(loadingStatus).getByTestId('task-list-loading');
     expect(loadingComponent).toHaveAttribute('data-size', '16');
   });
 

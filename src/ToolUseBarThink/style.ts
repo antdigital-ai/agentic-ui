@@ -399,6 +399,6 @@ const genStyle: GenStyleFn<'ToolUseBarThink'> = (token) => {
 const useGenStyle = genStyleHooks('ToolUseBarThink', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'tool-use-bar-think');
+  const [hashId] = useGenStyle(prefixCls ?? 'tool-use-bar-think');
   return { hashId };
 }

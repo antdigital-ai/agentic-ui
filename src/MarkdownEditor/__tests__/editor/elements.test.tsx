@@ -348,9 +348,7 @@ describe('elements.ts', () => {
 
   describe('BlockMathNodes and TextMatchNodes', () => {
     it('should filter block nodes correctly', () => {
-      expect(
-        BlockMathNodes.some((node) => node.type === 'table'),
-      ).toBe(false);
+      expect(BlockMathNodes.some((node) => node.type === 'table')).toBe(false);
 
       expect(BlockMathNodes).toContainEqual(
         expect.objectContaining({

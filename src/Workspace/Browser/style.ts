@@ -141,6 +141,6 @@ const genStyle: GenStyleFn<'WorkspaceBrowser'> = (token) => {
 const useGenStyle = genStyleHooks('WorkspaceBrowser', genStyle);
 
 export function useBrowserStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'WorkspaceBrowser');
+  const [hashId] = useGenStyle(prefixCls ?? 'WorkspaceBrowser');
   return { hashId };
 }

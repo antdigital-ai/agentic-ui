@@ -66,19 +66,18 @@ const genStyle: GenStyleFn<'SwitchButton'> = (token) => {
       },
 
       // 与 antd 变体类（outlined）组合时的 active 覆盖（按下）
-      [`&${btnVariantOutlined}:not(:disabled):not(${btnDisabled}):active`]:
-        {
-          background: 'var(--color-primary-bg-card-light)',
-          borderColor: 'var(--color-primary-border-light)',
+      [`&${btnVariantOutlined}:not(:disabled):not(${btnDisabled}):active`]: {
+        background: 'var(--color-primary-bg-card-light)',
+        borderColor: 'var(--color-primary-border-light)',
+        color: 'var(--color-blue-text-secondary)',
+        [`${token.componentCls}-text, ${token.componentCls}-icon`]: {
           color: 'var(--color-blue-text-secondary)',
-          [`${token.componentCls}-text, ${token.componentCls}-icon`]: {
-            color: 'var(--color-blue-text-secondary)',
-          },
-          [`${token.componentCls}-icon svg`]: {
-            fill: 'currentColor',
-            color: 'currentColor',
-          },
         },
+        [`${token.componentCls}-icon svg`]: {
+          fill: 'currentColor',
+          color: 'currentColor',
+        },
+      },
       // 与 antd 变体类（outlined）组合时的受控 active 常驻覆盖
       [`&${btnVariantOutlined}&-active`]: {
         background: 'var(--color-primary-bg-card-light)',
@@ -142,6 +141,6 @@ const genStyle: GenStyleFn<'SwitchButton'> = (token) => {
 const useGenStyle = genStyleHooks('SwitchButton', genStyle);
 
 export function useStyle(prefixCls?: string) {
-  const [, hashId] = useGenStyle(prefixCls ?? 'switch-button');
+  const [hashId] = useGenStyle(prefixCls ?? 'switch-button');
   return { hashId };
 }
