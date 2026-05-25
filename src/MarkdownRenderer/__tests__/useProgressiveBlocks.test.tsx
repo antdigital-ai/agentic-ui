@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useProgressiveBlocks } from '../streaming/useProgressiveBlocks';
@@ -29,6 +29,12 @@ const mockDocumentHidden = (hidden: boolean) => {
   });
 };
 
+const advanceFrame = async () => {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(16);
+  });
+};
+
 describe('useProgressiveBlocks', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -49,16 +55,12 @@ describe('useProgressiveBlocks', () => {
       String(INITIAL_VISIBLE_BLOCKS),
     );
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(16);
-    });
+    await advanceFrame();
     expect(screen.getByTestId('visible-count')).toHaveTextContent(
       String(NEXT_FRAME_VISIBLE_BLOCKS),
     );
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(16);
-    });
+    await advanceFrame();
     expect(screen.getByTestId('visible-count')).toHaveTextContent(
       String(TOTAL_BLOCKS),
     );
@@ -77,19 +79,19 @@ describe('useProgressiveBlocks', () => {
 
     render(<ProgressiveBlocksProbe />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('visible-count')).toHaveTextContent(
-        String(TOTAL_BLOCKS),
-      );
+    await act(async () => {
+      await Promise.resolve();
     });
+    expect(screen.getByTestId('visible-count')).toHaveTextContent(
+      String(TOTAL_BLOCKS),
+    );
   });
 
   it('resets visible blocks when equal-sized content moves to a new generation', async () => {
     const { rerender } = render(<ProgressiveBlocksProbe generation={0} />);
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(32);
-    });
+    await advanceFrame();
+    await advanceFrame();
     expect(screen.getByTestId('visible-count')).toHaveTextContent(
       String(TOTAL_BLOCKS),
     );
