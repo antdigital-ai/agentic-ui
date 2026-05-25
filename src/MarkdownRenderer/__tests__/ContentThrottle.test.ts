@@ -113,21 +113,25 @@ describe('ContentThrottle', () => {
     const throttle = new ContentThrottle((s) => flushed.push(s), {
       backgroundBatchMultiplier: 10,
       backgroundInterval: 100,
-      charsPerFrame: 2,
+      charsPerFrame: 1,
     });
 
-    throttle.push('abcdef');
+    throttle.push('abcdefghij');
     visibilityState = 'visible';
     document.dispatchEvent(new Event('visibilitychange'));
 
     vi.advanceTimersByTime(16);
-    expect(flushed).toEqual(['ab']);
+    expect(flushed).toEqual(['a']);
 
-    vi.advanceTimersByTime(84);
-    expect(flushed).toEqual(['ab']);
+    vi.advanceTimersByTime(80);
+    expect(flushed).toHaveLength(6);
+    expect(flushed.at(-1)).toBe('abcdef');
 
-    vi.advanceTimersByTime(16);
-    expect(flushed).toEqual(['ab', 'abcd']);
+    vi.advanceTimersByTime(4);
+    expect(flushed).toHaveLength(6);
+
+    vi.advanceTimersByTime(12);
+    expect(flushed.at(-1)).toBe('abcdefg');
     throttle.dispose();
   });
 });
