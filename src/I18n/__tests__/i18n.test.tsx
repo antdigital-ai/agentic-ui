@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -13,6 +19,20 @@ import {
   saveUserLanguage,
   useMergedLocale,
 } from '..';
+
+const LocaleConsumer = () => {
+  const { language, locale, setLanguage } = React.useContext(I18nContext);
+
+  return (
+    <div>
+      <span data-testid="context-language">{language}</span>
+      <span data-testid="context-table-label">{locale.table}</span>
+      <button type="button" onClick={() => setLanguage?.('en-US')}>
+        Switch English
+      </button>
+    </div>
+  );
+};
 
 describe('I18n Provider', () => {
   afterEach(() => {
@@ -91,6 +111,72 @@ describe('I18n Provider', () => {
     );
 
     expect(screen.getByTestId('test')).toHaveTextContent('Table');
+  });
+});
+
+describe('I18nProvide context locale resolution', () => {
+  afterEach(() => {
+    cleanup();
+    window.localStorage.clear();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('syncs the provided context locale from Ant Design ConfigProvider locale', async () => {
+    window.localStorage.setItem('md-editor-language', 'en-US');
+
+    render(
+      <ConfigProvider locale={{ locale: 'zh-CN' }}>
+        <I18nProvide>
+          <LocaleConsumer />
+        </I18nProvide>
+      </ConfigProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('context-language')).toHaveTextContent(
+        'zh-CN',
+      );
+    });
+    expect(screen.getByTestId('context-table-label')).toHaveTextContent('表格');
+    expect(window.localStorage.getItem('md-editor-language')).toBe('zh-CN');
+  });
+
+  it('uses saved language before browser language when no ConfigProvider locale exists', () => {
+    window.localStorage.setItem('md-editor-language', 'zh-CN');
+    vi.stubGlobal('navigator', {
+      languages: ['en-US'],
+      language: 'en-US',
+    });
+
+    render(
+      <I18nProvide>
+        <LocaleConsumer />
+      </I18nProvide>,
+    );
+
+    expect(screen.getByTestId('context-language')).toHaveTextContent('zh-CN');
+    expect(screen.getByTestId('context-table-label')).toHaveTextContent('表格');
+  });
+
+  it('updates locale and persists language when setLanguage is called', async () => {
+    render(
+      <I18nProvide defaultLanguage="zh-CN" autoDetect={false}>
+        <LocaleConsumer />
+      </I18nProvide>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Switch English' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('context-language')).toHaveTextContent(
+        'en-US',
+      );
+    });
+    expect(screen.getByTestId('context-table-label')).toHaveTextContent(
+      'Table',
+    );
+    expect(window.localStorage.getItem('md-editor-language')).toBe('en-US');
   });
 });
 
