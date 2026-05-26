@@ -134,9 +134,7 @@ describe('I18nProvide context locale resolution', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('context-language')).toHaveTextContent(
-        'zh-CN',
-      );
+      expect(screen.getByTestId('context-language')).toHaveTextContent('zh-CN');
     });
     expect(screen.getByTestId('context-table-label')).toHaveTextContent('表格');
     expect(window.localStorage.getItem('md-editor-language')).toBe('zh-CN');
@@ -169,9 +167,7 @@ describe('I18nProvide context locale resolution', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Switch English' }));
 
     await waitFor(() => {
-      expect(screen.getByTestId('context-language')).toHaveTextContent(
-        'en-US',
-      );
+      expect(screen.getByTestId('context-language')).toHaveTextContent('en-US');
     });
     expect(screen.getByTestId('context-table-label')).toHaveTextContent(
       'Table',
