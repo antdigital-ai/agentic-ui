@@ -9,6 +9,21 @@ group:
 
 # Changelog
 
+## v2.32.31
+
+- MarkdownRenderer
+  - 🛠 Removed all streaming animations and character queues (paragraph fade-in, progressive fade-in, `CharacterQueue` typewriter, and `AnimationText`). Streaming content is now rendered immediately after `useStreaming` caching; removed obsolete APIs and exports including `queueOptions`, `streamingParagraphAnimation`, and `isFinished`.
+  - 🆕 Added `ContentThrottle` + `useContentThrottle` to progressively render large SSE text chunks frame-by-frame, mitigating full-page flashes. `isFinished` / `throttleOptions` are now exposed to `MarkdownPreview` and `ReadonlyMarkdownEditorView`.
+- TaskList
+  - 💄 Simple variant wrapper now uses `fit-content` to avoid stretching full width.
+- ToolUseBar
+  - 💄 Tool container uses `grid 0fr/1fr` transition instead of `max-height`, and registers `--tool-rotate` custom property for stable rotation animation.
+- Workspace
+  - 🆕 `FileTree`: support synthetic tree leaf node binding in preview-only mode.
+- 🛠 Styling
+  - 🛠 Removed the deprecated `wrapSSR` wrapper from `useGenStyle`; `useStyle` no longer returns `wrapSSR`.
+  - 🛠 Removed `wrapSSR(...)` wrapper calls from 70+ components; components now return JSX directly.
+
 ## Unreleased
 
 - 🛠 Styling
