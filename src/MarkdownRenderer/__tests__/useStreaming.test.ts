@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+﻿import { renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { useStreaming } from '../useStreaming';
 
@@ -370,9 +370,10 @@ describe('useStreaming', () => {
       },
     );
 
-    // 围栏尚未被后续换行确认关闭，内容仍在 pending 中
+    // 围栏未闭合时 opening line 已 commit，正文随 pending 增量可见
     await waitFor(() => {
-      expect(result.current).toBe('```js');
+      expect(result.current).toContain('```js');
+      expect(result.current).toContain('const x = 1');
     });
 
     rerender({
@@ -385,20 +386,29 @@ describe('useStreaming', () => {
     });
   });
 
-  it('code block 打开但未关闭时应缓存', async () => {
-    const { result } = renderHook(
+  it('code block 打开但未关闭时应流式输出围栏正文', async () => {
+    const { result, rerender } = renderHook(
       ({ input, enabled }: UseStreamingHookProps) =>
         useStreaming(input, enabled),
       {
         initialProps: {
-          input: '```\nsome code',
+          input: '```\nso',
           enabled: true,
         },
       },
     );
 
     await waitFor(() => {
-      expect(result.current).toBe('...');
+      expect(result.current).toContain('some code'.slice(0, 2));
+    });
+
+    rerender({
+      input: '```\nsome code',
+      enabled: true,
+    });
+
+    await waitFor(() => {
+      expect(result.current).toContain('some code');
     });
   });
 
@@ -525,9 +535,10 @@ describe('useStreaming', () => {
       },
     );
 
-    // 增量围栏追踪：~~~ 在换行时被识别为围栏开启，后续内容在围栏内
+    // 增量围栏追踪：~~~ 在换行时被识别为围栏开启，正文随 pending 输出
     await waitFor(() => {
-      expect(result.current).toBe('~~~');
+      expect(result.current).toContain('~~~');
+      expect(result.current).toContain('code');
     });
   });
 
@@ -961,7 +972,7 @@ describe('useStreaming', () => {
     );
 
     await waitFor(() => {
-      expect(result.current).toBe('...');
+      expect(result.current).toContain('code here');
     });
 
     rerender({

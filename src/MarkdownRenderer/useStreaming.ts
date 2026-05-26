@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   INITIAL_FENCE_STATE,
   updateFenceStateForLine,
@@ -274,7 +274,11 @@ const getInitialCache = (): StreamCache => ({
 });
 
 const getStreamingOutput = (cache: StreamCache): string => {
-  if (cache.completeMarkdown) return cache.completeMarkdown;
+  // 围栏内正文留在 pending、不 commit，但仍需交给下游 parse，否则代码块流式阶段 frozen
+  const visible = cache.fenceState.inFenced
+    ? cache.completeMarkdown + cache.pending
+    : cache.completeMarkdown;
+  if (visible) return visible;
   if (cache.pending) return STREAMING_LOADING_PLACEHOLDER;
   return '';
 };

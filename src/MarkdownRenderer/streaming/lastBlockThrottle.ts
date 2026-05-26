@@ -1,3 +1,5 @@
+﻿import { endsInsideUnclosedFence } from './fenceTracker';
+
 const LAST_BLOCK_THROTTLE_CHARS = 20;
 const BLOCK_BOUNDARY_TRIGGERS = /[\n`|#>*\-!~]/;
 // inline 起始字符出现在行首或空白后时立即重 parse，避免 `<a` / `_em` / `[link`
@@ -16,6 +18,8 @@ export const shouldReparseLastBlock = (
   if (!prevParsedSource) return true;
   if (newSource.length < prevParsedSource.length) return true;
   if (!newSource.startsWith(prevParsedSource)) return true;
+  // 围栏代码块内增量多为字母数字，不会触发边界符；须每帧重 parse 否则 code 子树冻结
+  if (endsInsideUnclosedFence(newSource)) return true;
   const added = newSource.slice(prevParsedSource.length);
   if (added.length >= LAST_BLOCK_THROTTLE_CHARS) return true;
   if (BLOCK_BOUNDARY_TRIGGERS.test(added)) return true;
