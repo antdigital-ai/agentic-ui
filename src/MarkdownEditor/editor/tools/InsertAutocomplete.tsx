@@ -768,10 +768,10 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
             }}
           >
             <PlayCircleOutlined />
-            <span>Embed media links</span>
+            <span>{i18n.locale['editor.embedMediaLinks']}</span>
           </div>
           <Input
-            placeholder={'Paste media link'}
+            placeholder={i18n.locale['editor.pasteMediaLink']}
             onMouseDown={(e) => e.stopPropagation()}
             value={state.insertUrl}
             onKeyDown={(e) => {
@@ -792,7 +792,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
             onClick={insertMedia}
             disabled={!state.insertUrl}
           >
-            Embed
+            {i18n.locale['editor.embed']}
           </Button>
         </div>
       )}
@@ -807,7 +807,7 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
             size={'small'}
             items={[
               {
-                label: 'Local',
+                label: i18n.locale['editor.local'],
                 key: 'local',
                 children: (
                   <div>
@@ -832,18 +832,18 @@ export const InsertAutocomplete: React.FC<InsertAutocompleteProps> = (
                         insertAttachByLink();
                       }}
                     >
-                      Choose a file
+                      {i18n.locale['editor.chooseFile']}
                     </Button>
                   </div>
                 ),
               },
               {
-                label: 'Embed Link',
+                label: i18n.locale['editor.embedLink'],
                 key: 'embed',
                 children: (
                   <div>
                     <Input
-                      placeholder={'Paste attachment link'}
+                      placeholder={i18n.locale['editor.pasteAttachmentLink']}
                       onMouseDown={(e) => e.stopPropagation()}
                       value={state.insertUrl}
                       onKeyDown={(e) => {
