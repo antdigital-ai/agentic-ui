@@ -26,6 +26,15 @@ group:
 
 ## 未发布
 
+- TaskList
+  - 🛠 `simple` 模式移除摘要条下方 2px 细线进度条；`showProgress` 现仅控制摘要内「已完成/总数」计数文本是否展示。
+  - 🆕 新增 `scrollIntoViewOnExpand` 属性（`boolean | ScrollIntoViewOptions`，默认 `false`）：`simple` 模式下展开摘要条时将组件滚动到视窗内；传 `true` 走默认 `{ behavior: 'smooth', block: 'nearest' }`，初次挂载不触发。
+
+- ToolUseBarThink
+  - 💄 移除底部 `content-expand`（展开/收起）按钮的默认背景与 hover 背景填充，仅保留文字颜色变化；hover 整个卡片时不再叠加另一层灰色，与根容器背景统一为单一灰。
+  - 🆕 新增 `scrollIntoViewOnExpand` 属性（`boolean | ScrollIntoViewOptions`，默认 `false`）：展开时将组件滚动到视窗内，初次挂载不触发；行为与 `TaskList` 一致。
+  - 🆕 `MarkdownEditor.codeProps` 新增 `scrollDeepThinkIntoViewOnExpand`，透传至深度思考块的 `ToolUseBarThink.scrollIntoViewOnExpand`，使编辑器内 ` ```think ` 代码块也能配置展开滚动。
+
 - 🛠 样式系统
   - 🛠 `Hooks/useStyle` 重写为基于 `@ant-design/cssinjs-utils` 的 `genStyleUtils`，与 antd 上游 `theme/util/genStyleUtils` 同源；新增导出 `genStyleHooks` / `genComponentStyleHook` / `genSubStyleComponent` 及类型 `AgenticComponentTokenMap` / `FullToken` / `GenStyleFn`，组件可通过模块声明扩展自己的 `ComponentToken`。
   - 🛠 全量迁移 70+ 组件的 `style.ts` 至 `genStyleHooks('ComponentName', genStyle)` 模式（`AILabel` / `TaskList` / `ToolUseBar` / `Workspace` / `Plugins/chart/*` / `MarkdownEditor` 主样式 等）；`useEditorStyleRegister` 作为兼容入口保留，少数动态 token / 动态 classNames 场景（`Bubble` 主样式、`MarkdownInputField` 主样式、`MarkdownEditor/editor` content 样式）继续走该入口，其内部已改由 `@ant-design/cssinjs` 的 `useStyleRegister` 直接驱动。

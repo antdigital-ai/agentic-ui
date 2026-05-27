@@ -341,12 +341,11 @@ const genStyle: GenStyleFn<'ToolUseBarThink'> = (token) => {
         fontSize: 'var(--font-size-base)',
         cursor: 'pointer',
         borderRadius: 'var(--radius-control-base)',
-        background: 'var(--color-gray-control-fill-active)',
+        background: 'transparent',
         color: 'var(--color-gray-text-secondary)',
         font: 'var(--font-text-body-emphasized-sm)',
         flexShrink: 0,
         '&:hover': {
-          background: 'var(--color-gray-control-fill-hover)',
           color: 'var(--color-gray-text-default)',
         },
       },

@@ -117,6 +117,12 @@ export type MarkdownEditorProps = {
     Languages?: string[];
     hideToolBar?: boolean;
     alwaysExpandedDeepThink?: boolean;
+    /**
+     * 深度思考块展开时是否将组件滚动到视窗内。
+     * 传入 `true` 时使用默认参数 `{ behavior: 'smooth', block: 'nearest' }`，
+     * 也可直接传入 `ScrollIntoViewOptions` 自定义滚动行为。
+     */
+    scrollDeepThinkIntoViewOnExpand?: boolean | ScrollIntoViewOptions;
     disableHtmlPreview?: boolean;
     viewModeLabels?: {
       /** 默认 '预览' */

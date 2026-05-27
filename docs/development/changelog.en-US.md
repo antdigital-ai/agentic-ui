@@ -26,6 +26,15 @@ group:
 
 ## Unreleased
 
+- TaskList
+  - 🛠 `simple` variant drops the 2px progress bar underneath the summary; `showProgress` now only toggles the inline "completed/total" count text.
+  - 🆕 Added `scrollIntoViewOnExpand` (`boolean | ScrollIntoViewOptions`, default `false`): when the `simple` summary expands, scroll the component into the viewport. `true` resolves to `{ behavior: 'smooth', block: 'nearest' }`; the initial mount does not trigger it.
+
+- ToolUseBarThink
+  - 💄 Removed the default and hover background fills on the bottom `content-expand` (expand/collapse) button — only the text color changes on hover. Hovering the whole card no longer stacks a second grey on top of the root background.
+  - 🆕 Added `scrollIntoViewOnExpand` (`boolean | ScrollIntoViewOptions`, default `false`): scroll the component into the viewport on expand (skips the initial mount), mirroring `TaskList`.
+  - 🆕 `MarkdownEditor.codeProps` gains `scrollDeepThinkIntoViewOnExpand`, forwarded to the deep-think block's `ToolUseBarThink.scrollIntoViewOnExpand` so in-editor ` ```think ` blocks can opt into the scroll-on-expand behavior.
+
 - 🛠 Styling
   - 🛠 Rewrote `Hooks/useStyle` on top of `@ant-design/cssinjs-utils`'s `genStyleUtils`, mirroring antd's own `theme/util/genStyleUtils`. Exposes `genStyleHooks` / `genComponentStyleHook` / `genSubStyleComponent` plus `AgenticComponentTokenMap` / `FullToken` / `GenStyleFn` types; components can declare their own `ComponentToken` via module augmentation.
   - 🛠 Migrated 70+ `style.ts` files to the `genStyleHooks('ComponentName', genStyle)` pattern (`AILabel` / `TaskList` / `ToolUseBar` / `Workspace` / `Plugins/chart/*` / `MarkdownEditor` root, etc.). `useEditorStyleRegister` remains as a thin compatibility entry for cases that need a dynamic token / dynamic classNames (`Bubble`, `MarkdownInputField`, `MarkdownEditor/editor` content), and is now backed directly by `@ant-design/cssinjs`'s `useStyleRegister`.

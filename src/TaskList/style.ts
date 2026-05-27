@@ -1,4 +1,4 @@
-﻿import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
+import { genStyleHooks, type GenStyleFn } from '../Hooks/useStyle';
 
 const genStyle: GenStyleFn<'TaskList'> = (token) => {
   const { componentCls } = token;
@@ -107,7 +107,11 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
       },
 
       '&-body': {
-        display: 'flex',
+        overflow: 'hidden',
+        height: 'auto',
+        opacity: 1,
+        transition:
+          'height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease',
 
         [`${componentCls}-content`]: {
           font: 'var(--font-text-paragraph-sm)',
@@ -118,6 +122,10 @@ const genStyle: GenStyleFn<'TaskList'> = (token) => {
           letterSpacing: 'var(--letter-spacing-paragraph-sm, normal)',
           color: 'var(--color-gray-text-secondary)',
         },
+      },
+
+      '&-body-collapsed': {
+        opacity: 0,
       },
 
       // Simple variant - wrapper

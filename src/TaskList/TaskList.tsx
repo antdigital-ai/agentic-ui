@@ -1,4 +1,4 @@
-﻿import { ChevronUp } from '@sofa-design/icons';
+import { ChevronUp } from '@sofa-design/icons';
 import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import { useMergedState } from 'rc-util';
@@ -8,6 +8,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { ActionIconBox } from '../Components/ActionIconBox';
@@ -41,6 +42,7 @@ export const TaskList = memo(
     onOpenChange,
     taskCompleteText,
     showProgress = false,
+    scrollIntoViewOnExpand = false,
   }: TaskListProps) => {
     const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
     const prefixCls = getPrefixCls('task-list');
@@ -73,6 +75,9 @@ export const TaskList = memo(
 
     const [shouldRenderContent, setShouldRenderContent] = useState(true);
 
+    const simpleWrapperRef = useRef<HTMLDivElement>(null);
+    const didMountRef = useRef(false);
+
     const handleSimpleToggle = useRefFunction(() => {
       setSimpleExpanded((prev: boolean) => !prev);
     });
@@ -91,6 +96,27 @@ export const TaskList = memo(
         window.clearTimeout(timer);
       };
     }, [simpleExpanded]);
+
+    useEffect(() => {
+      if (!didMountRef.current) {
+        didMountRef.current = true;
+        return;
+      }
+      if (!simpleExpanded || !scrollIntoViewOnExpand) return;
+
+      const options: ScrollIntoViewOptions =
+        typeof scrollIntoViewOnExpand === 'object'
+          ? scrollIntoViewOnExpand
+          : { behavior: 'smooth', block: 'nearest' };
+
+      const timer = window.setTimeout(() => {
+        simpleWrapperRef.current?.scrollIntoView(options);
+      }, SIMPLE_COLLAPSE_DURATION_MS);
+
+      return () => {
+        window.clearTimeout(timer);
+      };
+    }, [simpleExpanded, scrollIntoViewOnExpand]);
 
     const {
       summaryStatus,
@@ -199,6 +225,7 @@ export const TaskList = memo(
 
     return (
       <div
+        ref={simpleWrapperRef}
         className={classNames(`${simpleCls}-wrapper`, hashId, className)}
         data-testid="task-list-simple-wrapper"
       >

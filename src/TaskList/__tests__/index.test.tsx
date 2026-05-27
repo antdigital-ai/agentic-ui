@@ -20,6 +20,26 @@ vi.mock('../../Components/Loading', () => ({
   ),
 }));
 
+// 折叠改为基于 CSS 的 grid 0fr/1fr 过渡：内容节点始终保留在 DOM 中，
+// 通过 `*-body-collapsed` class 区分展开/折叠态。
+const findBody = (contentText: string): HTMLElement => {
+  const node = screen.getByText(contentText);
+  let el: HTMLElement | null = node;
+  while (el && !/(^|\s)[\w-]*-body($|\s|-collapsed)/.test(el.className)) {
+    el = el.parentElement;
+  }
+  if (!el) throw new Error(`No body wrapper found for "${contentText}"`);
+  return el;
+};
+
+const expectBodyCollapsed = (contentText: string) => {
+  expect(findBody(contentText).className).toMatch(/-body-collapsed/);
+};
+
+const expectBodyExpanded = (contentText: string) => {
+  expect(findBody(contentText).className).not.toMatch(/-body-collapsed/);
+};
+
 describe('TaskList', () => {
   const mockItems = [
     {
@@ -135,16 +155,16 @@ describe('TaskList', () => {
       const successTask = screen.getByText('Success Task');
       const successContent = 'Success content';
 
-      expect(screen.getByText(successContent)).toBeInTheDocument();
+      expectBodyExpanded(successContent);
 
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.queryByText(successContent)).not.toBeInTheDocument();
+        expectBodyCollapsed(successContent);
       });
 
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.getByText(successContent)).toBeInTheDocument();
+        expectBodyExpanded(successContent);
       });
     });
 
@@ -156,21 +176,21 @@ describe('TaskList', () => {
 
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+        expectBodyCollapsed('Success content');
       });
-      expect(screen.getByText('Pending content 1')).toBeInTheDocument();
+      expectBodyExpanded('Pending content 1');
 
       fireEvent.click(pendingTask);
       await waitFor(() => {
-        expect(screen.queryByText('Pending content 1')).not.toBeInTheDocument();
+        expectBodyCollapsed('Pending content 1');
       });
-      expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+      expectBodyCollapsed('Success content');
 
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.getByText('Success content')).toBeInTheDocument();
+        expectBodyExpanded('Success content');
       });
-      expect(screen.queryByText('Pending content 1')).not.toBeInTheDocument();
+      expectBodyCollapsed('Pending content 1');
     });
 
     it('应该为有内容的任务显示箭头图标', () => {
@@ -502,12 +522,12 @@ describe('TaskList', () => {
       // 测试点击事件，因为组件没有实现键盘导航
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+        expectBodyCollapsed('Success content');
       });
 
       fireEvent.click(successTask);
       await waitFor(() => {
-        expect(screen.getByText('Success content')).toBeInTheDocument();
+        expectBodyExpanded('Success content');
       });
     });
   });
@@ -628,13 +648,13 @@ describe('TaskList', () => {
         />,
       );
 
-      // 检查展开的任务内容是否可见
-      expect(screen.getByText('Success content')).toBeVisible();
-      expect(screen.getByText('Pending content 1')).toBeVisible();
-      expect(screen.getByText('Pending content 2')).toBeVisible();
+      // 检查展开的任务 body 没有 collapsed class
+      expectBodyExpanded('Success content');
+      expectBodyExpanded('Pending content 1');
+      expectBodyExpanded('Pending content 2');
 
-      // 检查未展开的任务内容是否不可见
-      expect(screen.queryByText('Another pending content')).toBeNull();
+      // 检查未展开的任务 body 处于 collapsed 态（DOM 仍保留）
+      expectBodyCollapsed('Another pending content');
     });
 
     it('点击时应该调用 onExpandedKeysChange 回调', () => {
@@ -696,8 +716,8 @@ describe('TaskList', () => {
       );
 
       // 初始状态：只有第一个任务展开
-      expect(screen.getByText('Success content')).toBeVisible();
-      expect(screen.queryByText('Pending content 1')).not.toBeInTheDocument();
+      expectBodyExpanded('Success content');
+      expectBodyCollapsed('Pending content 1');
 
       // 更新 expandedKeys
       expandedKeys = ['1', '2'];
@@ -711,8 +731,8 @@ describe('TaskList', () => {
 
       // 现在两个任务都应该展开
       await waitFor(() => {
-        expect(screen.getByText('Success content')).toBeVisible();
-        expect(screen.getByText('Pending content 1')).toBeVisible();
+        expectBodyExpanded('Success content');
+        expectBodyExpanded('Pending content 1');
       });
     });
 
@@ -755,8 +775,8 @@ describe('TaskList', () => {
       render(<TaskList items={mockItems} />);
 
       // 初始状态：所有任务都应该是展开的（保持向后兼容）
-      expect(screen.getByText('Success content')).toBeVisible();
-      expect(screen.getByText('Pending content 1')).toBeVisible();
+      expectBodyExpanded('Success content');
+      expectBodyExpanded('Pending content 1');
 
       // 点击折叠第一个任务
       const firstTaskTitle = screen.getByText('Success Task');
@@ -764,10 +784,10 @@ describe('TaskList', () => {
 
       // 第一个任务应该折叠
       await waitFor(() => {
-        expect(screen.queryByText('Success content')).not.toBeInTheDocument();
+        expectBodyCollapsed('Success content');
       });
       // 其他任务仍然展开
-      expect(screen.getByText('Pending content 1')).toBeVisible();
+      expectBodyExpanded('Pending content 1');
     });
   });
 

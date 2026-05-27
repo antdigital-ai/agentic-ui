@@ -75,6 +75,12 @@ export interface ToolUseBarThinkProps {
   floatingExpanded?: boolean;
   defaultFloatingExpanded?: boolean;
   onFloatingExpandedChange?: (floatingExpanded: boolean) => void;
+  /**
+   * 展开时是否将组件滚动到视窗内。
+   * 传入 `true` 时使用默认参数 `{ behavior: 'smooth', block: 'nearest' }`，
+   * 也可直接传入 `ScrollIntoViewOptions` 自定义滚动行为。初次挂载不触发。
+   */
+  scrollIntoViewOnExpand?: boolean | ScrollIntoViewOptions;
   classNames?: {
     root?: string;
     bar?: string;
@@ -120,6 +126,7 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
   classNames: customClassNames,
   styles,
   light = false,
+  scrollIntoViewOnExpand = false,
 }) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-tool-use-bar-think');
@@ -158,6 +165,30 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
       setExpandedState(true);
     }
   }, [isLoading, setExpandedState]);
+
+  const rootRef = useRef<HTMLDivElement>(null);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    if (!expandedState || !scrollIntoViewOnExpand) return;
+
+    const options: ScrollIntoViewOptions =
+      typeof scrollIntoViewOnExpand === 'object'
+        ? scrollIntoViewOnExpand
+        : { behavior: 'smooth', block: 'nearest' };
+
+    const timer = window.setTimeout(() => {
+      rootRef.current?.scrollIntoView(options);
+    }, CARD_RESIZE_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [expandedState, scrollIntoViewOnExpand]);
 
   // --- Container overflow detection ---
   // Only active when expanded AND not loading (overflow UI is hidden during loading)
@@ -301,6 +332,7 @@ const ToolUseBarThinkComponent: React.FC<ToolUseBarThinkProps> = ({
 
   return (
     <div
+      ref={rootRef}
       data-testid={testId || 'ToolUseBarThink'}
       className={classNames(cls.root, {
         [`${prefixCls}-root-think-collapsed`]:

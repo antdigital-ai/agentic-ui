@@ -35,6 +35,8 @@ group:
 | open                 | `simple` 模式下摘要条是否展开（受控）                                                    | `boolean`                                                                       | -           | 2.31.0 |
 | onOpenChange         | `simple` 模式下摘要条展开状态变化回调                                                    | `(open: boolean) => void`                                                       | -           | 2.31.0 |
 | taskCompleteText     | 任务全部完成时摘要条的文案，未配置时回退到 i18n 默认值（仅在 `variant="simple"` 时渲染） | `` `React.ReactNode \| ((params: { items: TaskItem[] }) => React.ReactNode)` `` | -           | 2.31.0 |
+| showProgress         | `simple` 模式下摘要条内是否展示「已完成/总数」进度计数                                   | `boolean`                                                                       | `false`     | 2.32.33 |
+| scrollIntoViewOnExpand | `simple` 模式下展开摘要条时是否将组件滚动到视窗内；传 `true` 默认 `{ behavior: 'smooth', block: 'nearest' }`，也可传 `ScrollIntoViewOptions` 自定义；初次挂载不触发 | `boolean \| ScrollIntoViewOptions`                                              | `false`     | 2.32.33 |
 
 ### TaskItem
 

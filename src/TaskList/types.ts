@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 /** `pending` 与 `loading` 在 UI 上合并为同一进行中样式（主色 + Loading 图标） */
 export type TaskStatus = 'success' | 'pending' | 'loading' | 'error';
@@ -47,6 +47,13 @@ export interface TaskListProps {
    * 仅在 `variant="simple"` 时生效。
    */
   showProgress?: boolean;
+  /**
+   * simple 模式下展开摘要条时是否将组件滚动到视窗内。
+   * 传入 `true` 时使用默认参数 `{ behavior: 'smooth', block: 'nearest' }`，
+   * 也可直接传入 `ScrollIntoViewOptions` 自定义滚动行为。
+   * 仅在 `variant="simple"` 时生效，初次挂载不触发。
+   */
+  scrollIntoViewOnExpand?: boolean | ScrollIntoViewOptions;
 }
 
 /**
