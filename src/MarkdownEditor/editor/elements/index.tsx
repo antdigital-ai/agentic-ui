@@ -529,7 +529,29 @@ const MLeafComponent = (
     style.fontStyle = 'italic';
   }
   if (leaf.mark) {
-    children = <mark data-testid="markdown-mark">{children}</mark>;
+    const markStyle: React.CSSProperties = {};
+    if (leaf.markColor) markStyle.color = leaf.markColor;
+    if (leaf.markBg) markStyle.backgroundColor = leaf.markBg;
+    children = (
+      <mark
+        data-testid="markdown-mark"
+        style={Object.keys(markStyle).length ? markStyle : undefined}
+      >
+        {leaf.markLabel && (
+          <span
+            data-testid="markdown-mark-label"
+            style={{
+              marginInlineEnd: 4,
+              fontSize: '0.85em',
+              opacity: 0.75,
+            }}
+          >
+            {leaf.markLabel}
+          </span>
+        )}
+        {children}
+      </mark>
+    );
   }
   if (leaf.html) {
     prefixClassName = classNames(mdEditorBaseClass + '-m-html');

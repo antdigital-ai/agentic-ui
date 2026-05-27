@@ -468,9 +468,22 @@ const handleBlockHtml = (
     currentElement.value.match(/^\s*<mark(?:\s[^>]*)?>([\s\S]*?)<\/mark>\s*$/i);
   if (blockOnlyMarkMatch) {
     const innerMd = blockOnlyMarkMatch[1];
+    // 提取 mark 标签属性：color、bg、label
+    const tagAttrs = currentElement.value.match(
+      /^<mark([^>]*)>/i,
+    );
+    const attrStr = tagAttrs?.[1] || '';
+    const colorMatch = attrStr.match(/\bcolor\s*=\s*["']([^"']*)["']/i);
+    const bgMatch = attrStr.match(/\bbg\s*=\s*["']([^"']*)["']/i);
+    const labelMatch = attrStr.match(/\blabel\s*=\s*["']([^"']*)["']/i);
+    const markProps: Record<string, any> = { mark: true };
+    if (colorMatch?.[1]) markProps.markColor = colorMatch[1];
+    if (bgMatch?.[1]) markProps.markBg = bgMatch[1];
+    if (labelMatch?.[1]) markProps.markLabel = labelMatch[1];
+
     const applyMarkRecursive = (node: any): any => {
       if (node && typeof node.text === 'string') {
-        return { ...node, mark: true };
+        return { ...node, ...markProps };
       }
       if (node?.children && Array.isArray(node.children)) {
         return {
@@ -488,7 +501,7 @@ const handleBlockHtml = (
     }
     return {
       type: 'paragraph',
-      children: [{ text: innerMd, mark: true }],
+      children: [{ text: innerMd, ...markProps }],
     };
   }
 

@@ -1,4 +1,4 @@
-﻿import { Checkbox, Image } from 'antd';
+import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
@@ -422,11 +422,24 @@ const buildEditorAlignedComponents = (
     },
 
     mark: (props: any) => {
-      const { node, children, ...rest } = props;
+      const { node, children, color, bg, label, ...rest } = props;
+      const markStyle: Record<string, string> = {};
+      if (color) markStyle.color = color;
+      if (bg) markStyle.backgroundColor = bg;
+      const labelNode =
+        label &&
+        jsx('span' as any, {
+          'data-testid': 'markdown-mark-label',
+          style: { marginInlineEnd: 4, fontSize: '0.85em', opacity: 0.75 },
+          children: label,
+        });
       const defaultDom = jsx('mark' as any, {
         ...rest,
         'data-testid': 'markdown-mark',
-        children,
+        style: Object.keys(markStyle).length
+          ? { ...rest.style, ...markStyle }
+          : rest.style,
+        children: labelNode ? [labelNode, children] : children,
       });
       return applyEleRender('mark', { node, children, ...rest }, defaultDom);
     },

@@ -159,6 +159,65 @@ describe('parseHtml', () => {
       expect(r.el).toEqual({ text: 'answer content' });
     });
 
+    it('块级：<mark> 无属性应设置 mark: true', () => {
+      const el = { value: '<mark>highlighted</mark>' };
+      const r = handleHtml(el, null, [], undefined);
+      expect(r.el).toMatchObject({
+        type: 'paragraph',
+        children: [{ text: 'highlighted', mark: true }],
+      });
+    });
+
+    it('块级：<mark color="red" bg="#eee" label="Note"> 应提取属性', () => {
+      const el = {
+        value: '<mark color="red" bg="#eee" label="Note">content</mark>',
+      };
+      const r = handleHtml(el, null, [], undefined);
+      expect(r.el).toMatchObject({
+        type: 'paragraph',
+        children: [
+          {
+            text: 'content',
+            mark: true,
+            markColor: 'red',
+            markBg: '#eee',
+            markLabel: 'Note',
+          },
+        ],
+      });
+    });
+
+    it('块级：<mark> 仅部分属性时只设置有值的字段', () => {
+      const el = { value: '<mark bg="#ff0">partial</mark>' };
+      const r = handleHtml(el, null, [], undefined);
+      const leaf = (r.el as any).children[0];
+      expect(leaf.mark).toBe(true);
+      expect(leaf.markBg).toBe('#ff0');
+      expect(leaf.markColor).toBeUndefined();
+      expect(leaf.markLabel).toBeUndefined();
+    });
+
+    it('块级：<mark> 配合 parseMarkdownFn 应递归应用属性', () => {
+      const el = {
+        value: '<mark color="blue" label="@test">**bold**</mark>',
+      };
+      const parseMarkdownFn = (md: string) => ({
+        schema: [
+          {
+            type: 'paragraph',
+            children: [{ text: md.replace(/\*\*/g, ''), bold: true }],
+          },
+        ],
+      });
+      const r = handleHtml(el, null, [], parseMarkdownFn);
+      const nodes = Array.isArray(r.el) ? r.el : [r.el];
+      const leaf = nodes[0]?.children?.[0];
+      expect(leaf.mark).toBe(true);
+      expect(leaf.markColor).toBe('blue');
+      expect(leaf.markLabel).toBe('@test');
+      expect(leaf.bold).toBe(true);
+    });
+
     it('块级：<br/> 应转为空段落', () => {
       const el = { value: '<br/>' };
       const r = handleHtml(el, null, [], undefined);

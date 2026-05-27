@@ -401,6 +401,43 @@ describe('buildEditorAlignedComponents', () => {
       expect(comps.mark({ node: {}, children: 'marked' })).toBeDefined();
     });
 
+    it('renders mark with color and bg attributes', () => {
+      const comps = buildComponents();
+      const result = comps.mark({
+        node: {},
+        children: 'highlighted',
+        color: 'red',
+        bg: '#eee',
+      });
+      expect(result).toBeDefined();
+      expect(result.props.style).toMatchObject({
+        color: 'red',
+        backgroundColor: '#eee',
+      });
+    });
+
+    it('renders mark with label attribute', () => {
+      const comps = buildComponents();
+      const result = comps.mark({
+        node: {},
+        children: 'content',
+        label: '@qixian',
+      });
+      expect(result).toBeDefined();
+      // children should be array with label span + content
+      const children = result.props.children;
+      expect(Array.isArray(children)).toBe(true);
+      expect(children[0].props.children).toBe('@qixian');
+      expect(children[1]).toBe('content');
+    });
+
+    it('renders mark without custom attributes keeps default style', () => {
+      const comps = buildComponents();
+      const result = comps.mark({ node: {}, children: 'plain' });
+      expect(result.props.style).toBeUndefined();
+      expect(result.props.children).toBe('plain');
+    });
+
     it('renders kbd', () => {
       const comps = buildComponents();
       expect(comps.kbd({ node: {}, children: 'Ctrl' })).toBeDefined();
