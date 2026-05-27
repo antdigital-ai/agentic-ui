@@ -115,9 +115,9 @@ describe('resolveTreeLeafFile', () => {
     };
 
     expect(hasTreeLeafFileBinding(treeLeaf)).toBe(false);
-    expect(
-      hasTreeLeafFileBinding(treeLeaf, { allowSyntheticLeaf: true }),
-    ).toBe(true);
+    expect(hasTreeLeafFileBinding(treeLeaf, { allowSyntheticLeaf: true })).toBe(
+      true,
+    );
   });
 
   it('file 为 null 时即使允许合成也不绑定文件', () => {
@@ -128,8 +128,8 @@ describe('resolveTreeLeafFile', () => {
       file: null,
     } as any;
 
-    expect(
-      hasTreeLeafFileBinding(treeLeaf, { allowSyntheticLeaf: true }),
-    ).toBe(false);
+    expect(hasTreeLeafFileBinding(treeLeaf, { allowSyntheticLeaf: true })).toBe(
+      false,
+    );
   });
 });
