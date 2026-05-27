@@ -174,6 +174,9 @@ export const applyHtmlTagsToElement = (el: any, htmlTag: any[]): any => {
     }
     if (t.tag === 'mark') {
       result.mark = true;
+      if (t.markColor) result.markColor = t.markColor;
+      if (t.markBg) result.markBg = t.markBg;
+      if (t.markLabel) result.markLabel = t.markLabel;
     }
   }
 

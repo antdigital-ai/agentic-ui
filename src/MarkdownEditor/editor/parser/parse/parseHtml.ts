@@ -708,6 +708,20 @@ const processFontTag = (str: string, tag: string, htmlTag: any[]): any[] => {
 };
 
 /**
+ * 处理 mark 标签的 color/bg/label 属性（纯函数版本）
+ */
+const processMarkTag = (str: string, tag: string, htmlTag: any[]): any[] => {
+  const colorMatch = str.match(/\bcolor\s*=\s*["']([^"']*)["']/i);
+  const bgMatch = str.match(/\bbg\s*=\s*["']([^"']*)["']/i);
+  const labelMatch = str.match(/\blabel\s*=\s*["']([^"']*)["']/i);
+  const entry: Record<string, any> = { tag };
+  if (colorMatch?.[1]) entry.markColor = colorMatch[1];
+  if (bgMatch?.[1]) entry.markBg = bgMatch[1];
+  if (labelMatch?.[1]) entry.markLabel = labelMatch[1];
+  return [...htmlTag, entry];
+};
+
+/**
  * HTML 标签处理器映射表
  */
 const htmlTagProcessors: Record<
@@ -717,6 +731,7 @@ const htmlTagProcessors: Record<
   span: processSpanTag,
   a: processATag,
   font: processFontTag,
+  mark: processMarkTag,
 };
 
 /**

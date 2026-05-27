@@ -188,6 +188,16 @@ export const TEXT_TAGS = {
   S: () => ({ strikethrough: true }),
   STRONG: () => ({ bold: true }),
   B: () => ({ bold: true }),
+  MARK: (el: HTMLElement) => {
+    const props: Record<string, any> = { mark: true };
+    const color = el?.getAttribute?.('color');
+    const bg = el?.getAttribute?.('bg');
+    const label = el?.getAttribute?.('label');
+    if (color) props.markColor = color;
+    if (bg) props.markBg = bg;
+    if (label) props.markLabel = label;
+    return props;
+  },
 };
 
 export const deserialize = (
