@@ -197,9 +197,6 @@ export const TaskList = memo(
         ? [lastItem]
         : [];
 
-    const progressPercent =
-      totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
     return (
       <div
         className={classNames(`${simpleCls}-wrapper`, hashId, className)}
@@ -247,22 +244,6 @@ export const TaskList = memo(
             </ActionIconBox>
           </div>
         </div>
-        {showProgress && totalCount > 0 && (
-          <div
-            className={classNames(`${simpleCls}-progress`, hashId)}
-            data-testid="task-list-simple-progress"
-          >
-            <div
-              className={classNames(`${simpleCls}-progress-bar`, hashId, {
-                [`${simpleCls}-progress-bar-success`]:
-                  summaryStatus === 'success',
-                [`${simpleCls}-progress-bar-error`]: summaryStatus === 'error',
-              })}
-              style={{ width: `${progressPercent}%` }}
-              data-testid="task-list-simple-progress-bar"
-            />
-          </div>
-        )}
         <div
           className={classNames(`${simpleCls}-content`, hashId, {
             [`${simpleCls}-content-expanded`]: simpleExpanded,
