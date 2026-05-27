@@ -336,6 +336,36 @@ describe('parseHtml', () => {
       );
     });
 
+    it('内联 <mark color="red" bg="#eee" label="Note"> 应更新 htmlTag 带标记属性', () => {
+      const parent = { type: 'paragraph' };
+      const el = { value: '<mark color="red" bg="#eee" label="Note">' };
+      const r = handleHtml(el, parent, [], undefined);
+      expect(r.el).toBeNull();
+      expect(r.htmlTag).toContainEqual(
+        expect.objectContaining({
+          tag: 'mark',
+          markColor: 'red',
+          markBg: '#eee',
+          markLabel: 'Note',
+        }),
+      );
+    });
+
+    it('内联 <mark> 仅部分属性时只设置有值的标记字段', () => {
+      const parent = { type: 'paragraph' };
+      const el = { value: '<mark bg="#ff0">' };
+      const r = handleHtml(el, parent, [], undefined);
+      expect(r.el).toBeNull();
+      expect(r.htmlTag).toContainEqual(
+        expect.objectContaining({
+          tag: 'mark',
+          markBg: '#ff0',
+        }),
+      );
+      expect(r.htmlTag[0]).not.toHaveProperty('markColor');
+      expect(r.htmlTag[0]).not.toHaveProperty('markLabel');
+    });
+
     it('内联 <a href="https://a.com"> 应更新 htmlTag 带 url', () => {
       const parent = { type: 'paragraph' };
       const el = { value: '<a href="https://a.com">' };
