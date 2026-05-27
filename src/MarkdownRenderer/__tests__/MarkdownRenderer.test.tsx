@@ -70,7 +70,7 @@ describe('MarkdownRenderer', () => {
     expect(label?.textContent).toBe('Note');
     expect(mark.textContent).toBe('Notehighlighted');
     expect(mark.style.color).toBe('red');
-    expect(mark.style.backgroundColor).toBe('rgb(238, 238, 238)');
+    expect(mark.style.backgroundColor).toBe('#eee');
   });
 
   it('应完整渲染 HH:mm 时间（仅 ::: 为指令，行内时间保持原文）', () => {
