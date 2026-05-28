@@ -1440,6 +1440,25 @@ describe('parserSlateNodeToMarkdown - coverage', () => {
     expect(result).toBe('<mark>/alipay </mark>');
   });
 
+  it('should serialize mark leaf color bg and label attributes', () => {
+    const node = {
+      type: 'paragraph',
+      children: [
+        {
+          text: 'marked',
+          mark: true,
+          markColor: '#fff',
+          markBg: '#1677ff',
+          markLabel: 'Important',
+        },
+      ],
+    };
+    const result = parserSlateNodeToMarkdown([node]);
+    expect(result).toBe(
+      '<mark color="#fff" bg="#1677ff" label="Important">marked</mark>',
+    );
+  });
+
   it('should handle mixed format text with no space then next word (isMix space)', () => {
     const node = {
       type: 'paragraph',
