@@ -1,5 +1,6 @@
 ﻿import '@testing-library/jest-dom';
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -813,6 +814,21 @@ describe('TaskList', () => {
       },
     ];
 
+    const simpleItemsWithError = [
+      {
+        key: '1',
+        title: 'Task 1',
+        content: 'Content 1',
+        status: 'success' as const,
+      },
+      {
+        key: '2',
+        title: 'Error Task',
+        content: 'Error content',
+        status: 'error' as const,
+      },
+    ];
+
     it('应该渲染紧凑摘要条', () => {
       render(<TaskList items={simpleItems} variant="simple" />);
 
@@ -1055,27 +1071,19 @@ describe('TaskList', () => {
     });
 
     it('有错误任务时应显示取消状态', () => {
-      const errorItems = [
-        {
-          key: '1',
-          title: 'Task 1',
-          content: 'Content 1',
-          status: 'success' as const,
-        },
-        {
-          key: '2',
-          title: 'Error Task',
-          content: 'Error content',
-          status: 'error' as const,
-        },
-      ];
-
-      render(<TaskList items={errorItems} variant="simple" />);
+      render(<TaskList items={simpleItemsWithError} variant="simple" />);
 
       expect(screen.getByText('任务已取消')).toBeInTheDocument();
       expect(
         screen.getByTestId('task-list-simple-summary-status-error'),
       ).toBeInTheDocument();
+    });
+
+    it('收起且存在 error 项时仍只展示最后一个任务', () => {
+      render(<TaskList items={simpleItemsWithError} variant="simple" />);
+
+      expect(screen.getByText('Error Task')).toBeInTheDocument();
+      expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
     });
 
     it('loading 任务无标题时应优先显示进行中状态', () => {
@@ -1117,25 +1125,96 @@ describe('TaskList', () => {
     });
 
     it('展开后存在 error 项时仍展示全部任务（工具失败不等同于整任务取消）', async () => {
-      const errorItems = [
-        {
-          key: '1',
-          title: 'Task 1',
-          content: 'Content 1',
-          status: 'success' as const,
-        },
-        {
-          key: '2',
-          title: 'Error Task',
-          content: 'Error content',
-          status: 'error' as const,
-        },
-      ];
+      render(<TaskList items={simpleItemsWithError} variant="simple" />);
 
-      render(<TaskList items={errorItems} variant="simple" open={true} />);
+      fireEvent.click(screen.getByTestId('task-list-simple-bar'));
 
-      expect(screen.getByText('Task 1')).toBeInTheDocument();
-      expect(screen.getByText('Error Task')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Task 1')).toBeInTheDocument();
+        expect(screen.getByText('Error Task')).toBeInTheDocument();
+      });
+    });
+
+    it('展开时应在折叠动画结束后滚动到 simple 容器', () => {
+      const scrollIntoViewSpy = vi.fn();
+      vi.useFakeTimers();
+      Element.prototype.scrollIntoView = scrollIntoViewSpy;
+
+      try {
+        render(
+          <TaskList
+            items={simpleItems}
+            variant="simple"
+            scrollIntoViewOnExpand
+          />,
+        );
+
+        fireEvent.click(screen.getByTestId('task-list-simple-bar'));
+
+        expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+        act(() => {
+          vi.advanceTimersByTime(350);
+        });
+
+        expect(scrollIntoViewSpy).toHaveBeenCalledWith({
+          behavior: 'smooth',
+          block: 'nearest',
+        });
+      } finally {
+        vi.useRealTimers();
+        delete (Element.prototype as Partial<Element>).scrollIntoView;
+      }
+    });
+
+    it('初始 open=true 时不应触发滚动，仅后续展开触发', () => {
+      const scrollIntoViewSpy = vi.fn();
+      vi.useFakeTimers();
+      Element.prototype.scrollIntoView = scrollIntoViewSpy;
+
+      try {
+        const { rerender } = render(
+          <TaskList
+            items={simpleItems}
+            variant="simple"
+            open={true}
+            scrollIntoViewOnExpand
+          />,
+        );
+
+        act(() => {
+          vi.advanceTimersByTime(350);
+        });
+        expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+
+        rerender(
+          <TaskList
+            items={simpleItems}
+            variant="simple"
+            open={false}
+            scrollIntoViewOnExpand
+          />,
+        );
+        act(() => {
+          vi.advanceTimersByTime(350);
+        });
+
+        rerender(
+          <TaskList
+            items={simpleItems}
+            variant="simple"
+            open={true}
+            scrollIntoViewOnExpand
+          />,
+        );
+        act(() => {
+          vi.advanceTimersByTime(350);
+        });
+
+        expect(scrollIntoViewSpy).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+        delete (Element.prototype as Partial<Element>).scrollIntoView;
+      }
     });
 
     it('应该支持自定义 className', () => {
