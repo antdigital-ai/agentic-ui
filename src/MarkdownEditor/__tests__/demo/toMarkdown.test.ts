@@ -153,4 +153,30 @@ describe('toMarkdown plugin functionality', () => {
     expect(result).toContain('# Heading');
     expect(result).toContain('Paragraph text');
   });
+
+  it('should serialize mark attributes and preserve nested text formatting', () => {
+    const slateNodes = [
+      {
+        type: 'paragraph',
+        children: [
+          { text: 'Status ' },
+          {
+            text: 'needs review',
+            bold: true,
+            mark: true,
+            markColor: 'red',
+            markBg: '#fff3cd',
+            markLabel: 'Risk',
+          },
+          { text: ' now' },
+        ],
+      },
+    ];
+
+    const result = parserSlateNodeToMarkdown(slateNodes);
+
+    expect(result).toBe(
+      'Status <mark color="red" bg="#fff3cd" label="Risk"><b>needs review</b></mark> now',
+    );
+  });
 });

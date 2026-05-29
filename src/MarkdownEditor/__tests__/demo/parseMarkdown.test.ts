@@ -89,6 +89,27 @@ describe('parseMarkdown plugin functionality', () => {
     expect(result.schema[1].type).toBe('paragraph');
   });
 
+  it('should preserve inline mark attributes in parsed leaves', () => {
+    const markdown =
+      'Status <mark color="red" bg="#fff3cd" label="Risk">needs review</mark> now';
+    const result = parserMarkdownToSlateNode(markdown);
+
+    expect(result.schema).toHaveLength(1);
+    expect(result.schema[0].type).toBe('paragraph');
+    expect((result.schema[0] as any).children).toEqual([
+      { data: {}, text: 'Status ' },
+      {
+        data: {},
+        text: 'needs review',
+        mark: true,
+        markColor: 'red',
+        markBg: '#fff3cd',
+        markLabel: 'Risk',
+      },
+      { data: {}, text: ' now' },
+    ]);
+  });
+
   it('should handle multiple plugins with priority', () => {
     const plugin1: MarkdownEditorPlugin = {
       parseMarkdown: [
