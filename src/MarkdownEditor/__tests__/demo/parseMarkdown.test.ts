@@ -97,16 +97,15 @@ describe('parseMarkdown plugin functionality', () => {
     expect(result.schema).toHaveLength(1);
     expect(result.schema[0].type).toBe('paragraph');
     expect((result.schema[0] as any).children).toEqual([
-      { data: {}, text: 'Status ' },
+      { text: 'Status ' },
       {
-        data: {},
         text: 'needs review',
         mark: true,
         markColor: 'red',
         markBg: '#fff3cd',
         markLabel: 'Risk',
       },
-      { data: {}, text: ' now' },
+      { text: ' now' },
     ]);
   });
 
