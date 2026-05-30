@@ -3,6 +3,7 @@ import remarkGfm from 'remark-gfm';
 import remarkHtml from 'remark-html';
 import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
+import type { Root } from 'mdast';
 import type { Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
@@ -405,11 +406,13 @@ export function protectJinjaDollarInText() {
   };
 }
 
+type MarkdownParser = Processor<Root, Root, Root, Root, string>;
+
 // Markdown 解析器（用于解析 Markdown 为 mdast AST）
 // 注意：这个解析器只用于解析，不包含 HTML 渲染相关的插件
 export const createMarkdownParser = (
   formulaConfig?: FormulaConfig,
-): Processor => {
+): MarkdownParser => {
   const processor = unified()
     .use(remarkParse)
     .use(remarkDirectiveContainersOnly)
@@ -426,15 +429,15 @@ export const createMarkdownParser = (
       .use(remarkMath as any, remarkMathOptions);
   }
 
-  return processor as Processor;
+  return processor as MarkdownParser;
 };
 
-let cachedParser: Processor | null = null;
+let cachedParser: MarkdownParser | null = null;
 let cachedParserKey = '';
 
 export const getMarkdownParser = (
   formulaConfig?: FormulaConfig,
-): Processor => {
+): MarkdownParser => {
   const remarkMathOptions = getRemarkMathOptions(formulaConfig);
   const parserKey = remarkMathOptions
     ? `1-${remarkMathOptions.singleDollarTextMath}`
