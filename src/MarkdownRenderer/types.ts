@@ -3,6 +3,7 @@ import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
+import type { FormulaConfig } from '../Config/formulaConfig';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import type { AttachmentFile } from '../MarkdownInputField/AttachmentButton/types';
@@ -64,6 +65,8 @@ export interface MarkdownRendererProps {
   plugins?: MarkdownEditorPlugin[];
   remarkPlugins?: MarkdownRemarkPlugin[];
   htmlConfig?: MarkdownToHtmlConfig;
+  /** 公式解析与 KaTeX 渲染配置；可通过 AgenticConfigProvide 全局设置 */
+  formula?: FormulaConfig;
   className?: string;
   style?: React.CSSProperties;
   prefixCls?: string;

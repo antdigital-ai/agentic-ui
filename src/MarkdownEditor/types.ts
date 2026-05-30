@@ -8,6 +8,7 @@ import type {
   ContentThrottleOptions,
   RenderMode,
 } from '../MarkdownRenderer/types';
+import type { FormulaConfig } from '../Config/formulaConfig';
 import { TagPopupProps } from './editor/elements/TagPopup';
 import { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
@@ -201,6 +202,8 @@ export type MarkdownEditorProps = {
   };
 
   jinja?: JinjaConfig;
+  /** 公式解析与 KaTeX 渲染配置；可通过 AgenticConfigProvide 全局设置 */
+  formula?: FormulaConfig;
   plugins?: any[];
   onChange?: (value: string, schema: Elements[]) => void;
   onSelectionChange?: (

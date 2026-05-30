@@ -34,7 +34,11 @@ export const markdownToReactSync = (
   if (!content) return null;
 
   try {
-    const processor = createHastProcessor(remarkPlugins, htmlConfig);
+    const processor = createHastProcessor(
+      remarkPlugins,
+      htmlConfig,
+      htmlConfig?.formula,
+    );
     const preprocessed = preprocessNormalizeLeafToContainerDirective(
       content.replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$'),
     );

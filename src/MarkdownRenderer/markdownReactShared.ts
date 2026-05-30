@@ -8,6 +8,7 @@ import type {
   MarkdownRemarkPlugin,
   MarkdownToHtmlConfig,
 } from '../MarkdownEditor/editor/utils/markdownToHtml';
+import type { FormulaConfig } from '../Config/formulaConfig';
 import type { MarkdownEditorProps } from '../MarkdownEditor/types';
 import { ToolUseBarThink } from '../ToolUseBarThink';
 import { debugInfo } from '../Utils/debugUtils';
@@ -854,6 +855,7 @@ const splitMarkdownBlocks = (content: string): string[] => {
 export interface UseMarkdownToReactOptions {
   remarkPlugins?: MarkdownRemarkPlugin[];
   htmlConfig?: MarkdownToHtmlConfig;
+  formula?: FormulaConfig;
   components?: Record<string, React.ComponentType<RendererBlockProps>>;
   prefixCls?: string;
   linkConfig?: {

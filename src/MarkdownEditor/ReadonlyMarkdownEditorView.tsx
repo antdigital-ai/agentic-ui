@@ -2,6 +2,7 @@ import { ConfigProvider } from 'antd';
 import classNames from 'clsx';
 import React, { useContext, useRef } from 'react';
 import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
+import { useFormulaConfig } from '../Config';
 import { MarkdownRenderer } from '../MarkdownRenderer';
 import I18nBoundary from './I18nBoundary';
 import { PluginContext } from './plugin';
@@ -34,6 +35,7 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
   const markdownContainerRef = useRef<HTMLDivElement | null>(null);
 
   const isStreaming = props.streaming ?? props.typewriter ?? false;
+  const formulaConfig = useFormulaConfig(props.formula);
 
   const context = useContext(ConfigProvider.ConfigContext);
   const baseClassName = context?.getPrefixCls('agentic-md-editor');
@@ -70,6 +72,7 @@ const ReadonlyMarkdownEditorView: React.FC<MarkdownEditorProps> = (props) => {
             throttleOptions={props.throttleOptions}
             plugins={props.plugins}
             remarkPlugins={props.markdownToHtmlOptions}
+            formula={formulaConfig}
             codeProps={props.codeProps}
             apaasify={props.apaasify}
             style={{

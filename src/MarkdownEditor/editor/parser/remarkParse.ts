@@ -3,8 +3,13 @@ import remarkGfm from 'remark-gfm';
 import remarkHtml from 'remark-html';
 import remarkMath from 'remark-math';
 import remarkParse from 'remark-parse';
+import type { Processor } from 'unified';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
+import {
+  getRemarkMathOptions,
+  type FormulaConfig,
+} from '../../../Config/formulaConfig';
 import { JINJA_DOLLAR_PLACEHOLDER } from './constants';
 import remarkDirectiveContainersOnly from './remarkDirectiveContainersOnly';
 
@@ -402,18 +407,47 @@ export function protectJinjaDollarInText() {
 
 // Markdown 解析器（用于解析 Markdown 为 mdast AST）
 // 注意：这个解析器只用于解析，不包含 HTML 渲染相关的插件
-const markdownParser = unified()
-  .use(remarkParse) // 解析 Markdown
-  .use(remarkDirectiveContainersOnly) // 仅解析 ::: 容器（不解析行内 :foo）
-  .use(remarkHtml)
-  .use(remarkFrontmatter, ['yaml']) // 处理前置元数据
-  .use(remarkGfm, { singleTilde: false }) // GFM 插件，禁用单波浪线删除线
-  .use(fixStrongWithSpecialChars) // 修复包含特殊字符的加粗文本
-  .use(convertParagraphToImage) // 将以 ! 开头的段落转换为图片,将 | 开头的段落转换为表格
-  .use(protectJinjaDollarInText) // 保护 Jinja 块内 $，避免被 remark-math 误解析
-  .use(remarkMath as any, {
-    singleDollarTextMath: true, // 允许单美元符号渲染内联数学公式
-  });
+export const createMarkdownParser = (
+  formulaConfig?: FormulaConfig,
+): Processor => {
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkDirectiveContainersOnly)
+    .use(remarkHtml)
+    .use(remarkFrontmatter, ['yaml'])
+    .use(remarkGfm, { singleTilde: false })
+    .use(fixStrongWithSpecialChars)
+    .use(convertParagraphToImage);
+
+  const remarkMathOptions = getRemarkMathOptions(formulaConfig);
+  if (remarkMathOptions) {
+    processor
+      .use(protectJinjaDollarInText)
+      .use(remarkMath as any, remarkMathOptions);
+  }
+
+  return processor as Processor;
+};
+
+let cachedParser: Processor | null = null;
+let cachedParserKey = '';
+
+export const getMarkdownParser = (
+  formulaConfig?: FormulaConfig,
+): Processor => {
+  const remarkMathOptions = getRemarkMathOptions(formulaConfig);
+  const parserKey = remarkMathOptions
+    ? `1-${remarkMathOptions.singleDollarTextMath}`
+    : '0';
+
+  if (cachedParser && cachedParserKey === parserKey) {
+    return cachedParser;
+  }
+
+  cachedParser = createMarkdownParser(formulaConfig);
+  cachedParserKey = parserKey;
+  return cachedParser;
+};
 
 // 默认导出解析器（用于解析 Markdown 为 mdast AST）
-export default markdownParser;
+export default getMarkdownParser();

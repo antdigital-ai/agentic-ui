@@ -13,6 +13,7 @@ import { createEditor, Editor, Selection } from 'slate';
 import { withHistory } from 'slate-history';
 import { withReact } from 'slate-react';
 import { resolveContainerContentStyle } from '../Constants/contentPaddingVars';
+import { useFormulaConfig } from '../Config';
 import { useRefFunction } from '../Hooks/useRefFunction';
 import { CommentList } from './editor/components/CommentList';
 import { SlateMarkdownEditor } from './editor/Editor';
@@ -163,20 +164,28 @@ const BaseMarkdownEditorSlate: React.FC<MarkdownEditorProps> = (props) => {
     };
   }, []);
 
+  const formulaConfig = useFormulaConfig(props.formula);
+  const parserConfig = useMemo(
+    () => ({ formula: formulaConfig }),
+    [formulaConfig.enable, formulaConfig.singleDollarTextMath],
+  );
+
   const store = useMemo(
     () =>
       new EditorStore(
         markdownEditorRef,
         props.plugins,
         props.markdownToHtmlOptions,
+        parserConfig,
       ),
-    [props.plugins, props.markdownToHtmlOptions],
+    [props.plugins, props.markdownToHtmlOptions, parserConfig],
   );
 
   const initSchemaValue = useMemo(() => {
     const parseResult = parserMdToSchema(
       initValue || '',
       pluginsForInitParseRef.current || [],
+      parserConfig,
     );
     let list = parseResult?.schema || [];
 

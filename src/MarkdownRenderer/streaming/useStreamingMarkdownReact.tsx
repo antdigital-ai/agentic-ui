@@ -48,8 +48,13 @@ export const useStreamingMarkdownReact = (
       : content;
 
   const processor = useMemo(
-    () => createHastProcessor(options?.remarkPlugins, options?.htmlConfig),
-    [options?.remarkPlugins, options?.htmlConfig],
+    () =>
+      createHastProcessor(
+        options?.remarkPlugins,
+        options?.htmlConfig,
+        options?.formula,
+      ),
+    [options?.remarkPlugins, options?.htmlConfig, options?.formula],
   );
 
   const prefixCls = options?.prefixCls || 'ant-agentic-md-editor';

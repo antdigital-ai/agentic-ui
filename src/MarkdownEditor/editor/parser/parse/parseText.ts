@@ -1,7 +1,6 @@
 import type { RootContent } from 'mdast';
 import { CustomLeaf } from '../../../el';
 import { handleInlineCode } from './parseElements';
-import { shouldTreatInlineMathAsText } from './parseMath';
 
 /**
  * 设置节点的 finished 属性
@@ -115,15 +114,7 @@ export const parseText = (
     if (n.type === 'inlineMath') {
       const inlineMathValue =
         typeof (n as any).value === 'string' ? (n as any).value : '';
-      if (shouldTreatInlineMathAsText(inlineMathValue)) {
-        leafs.push({ ...leaf, text: `$${inlineMathValue}$` });
-      } else {
-        leafs.push({
-          ...leaf,
-          type: 'inline-katex',
-          children: [{ text: inlineMathValue }],
-        } as any);
-      }
+      leafs.push({ ...leaf, text: `$${inlineMathValue}$` });
       continue;
     }
 

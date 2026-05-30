@@ -14,6 +14,7 @@ vi.mock('../chart', () => ({
 vi.mock('../katex', () => ({
   KatexElement: vi.fn(() => <div>Katex Element</div>),
   InlineKatex: vi.fn(() => <span>Inline Katex</span>),
+  InlineKatexFix: vi.fn(() => <span>Inline Katex Fix</span>),
 }));
 
 vi.mock('../mermaid/Mermaid', () => ({

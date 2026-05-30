@@ -729,6 +729,23 @@ export {
   type AdaptiveTooltipKind,
 } from './Utils/adaptiveTooltip';
 
+// ─── 全局配置 ────────────────────────────────────────────────────────────────
+export {
+  AgenticConfigContext,
+  AgenticConfigProvide,
+  DEFAULT_FORMULA_CONFIG,
+  getRemarkMathOptions,
+  isFormulaEnabled,
+  resetGlobalFormulaConfig,
+  resolveFormulaConfig,
+  setGlobalFormulaConfig,
+  useAgenticConfig,
+  useFormulaConfig,
+  type AgenticConfigType,
+  type FormulaConfig,
+  type ResolvedFormulaConfig,
+} from './Config';
+
 // ─── 国际化 ──────────────────────────────────────────────────────────────────
 export {
   I18nContext,

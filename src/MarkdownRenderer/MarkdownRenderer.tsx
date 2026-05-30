@@ -8,6 +8,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import { useFormulaConfig } from '../Config';
 import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
 import { DefaultCodeRouter } from './DefaultCodeRouter';
@@ -63,7 +64,10 @@ const InternalMarkdownRenderer = forwardRef<
     fileMapConfig,
     fncProps,
     codeProps: editorCodeProps,
+    formula: formulaProp,
   } = props;
+
+  const formulaConfig = useFormulaConfig(formulaProp);
 
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('agentic-md-editor', customPrefixCls);
@@ -138,6 +142,7 @@ const InternalMarkdownRenderer = forwardRef<
   const reactContent = useMarkdownToReact(safeContent, {
     remarkPlugins,
     htmlConfig,
+    formula: formulaConfig,
     components,
     prefixCls,
     linkConfig,

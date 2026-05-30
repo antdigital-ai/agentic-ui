@@ -24,7 +24,7 @@ describe('parserMarkdownToSlateNode', () => {
       });
     });
 
-    it('should parse single dollar inline math into inline-katex node', () => {
+    it('should keep single dollar inline math as plain text by default', () => {
       const markdown = 'Inline math $a^2 + b^2 = c^2$ stays inline.';
       const { schema } = parserMarkdownToSlateNode(markdown);
 
@@ -35,15 +35,51 @@ describe('parserMarkdownToSlateNode', () => {
       const inlineKatexNode = paragraph.children.find(
         (child: any) => child?.type === 'inline-katex',
       );
-      expect(inlineKatexNode).toMatchObject({
-        type: 'inline-katex',
-        children: [{ text: 'a^2 + b^2 = c^2' }],
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('$a^2 + b^2 = c^2$');
+    });
+
+    it('should parse single dollar inline math as plain text even when enabled', () => {
+      const markdown = 'Inline math $a^2 + b^2 = c^2$ stays inline.';
+      const { schema } = parserMarkdownToSlateNode(markdown, undefined, {
+        formula: { singleDollarTextMath: true },
       });
 
-      const numericTextNode = paragraph.children.find(
-        (child: any) => child?.text === '$a^2 + b^2 = c^2$',
+      expect(schema).toHaveLength(1);
+      const paragraph = schema[0] as any;
+
+      const inlineKatexNode = paragraph.children.find(
+        (child: any) => child?.type === 'inline-katex',
       );
-      expect(numericTextNode).toBeUndefined();
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('$a^2 + b^2 = c^2$');
+    });
+
+    it('should keep $24.4B$ financial amounts as plain text', () => {
+      const markdown = '$24.4B$ 订单 / $18.2B$ 订单';
+      const { schema } = parserMarkdownToSlateNode(markdown, undefined, {
+        formula: { singleDollarTextMath: true },
+      });
+
+      const paragraph = schema[0] as any;
+      const inlineKatexNode = paragraph.children.find(
+        (child: any) => child?.type === 'inline-katex',
+      );
+      expect(inlineKatexNode).toBeUndefined();
+
+      const textContent = paragraph.children
+        .map((c: any) => c?.text ?? '')
+        .join('');
+      expect(textContent).toContain('$24.4B$');
+      expect(textContent).toContain('$18.2B$');
     });
 
     it('should keep $ inside Jinja {{ }} as plain text (system variable)', () => {
