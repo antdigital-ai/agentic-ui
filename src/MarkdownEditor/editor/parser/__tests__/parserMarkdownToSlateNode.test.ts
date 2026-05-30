@@ -68,9 +68,7 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const textContent = paragraph.children
-        .map((c: any) => c?.text ?? '')
-        .join('');
+      const textContent = collectSlateText(paragraph);
       expect(textContent).toContain('$a^2 + b^2 = c^2$');
     });
 
