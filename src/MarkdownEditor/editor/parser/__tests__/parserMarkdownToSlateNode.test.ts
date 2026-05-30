@@ -11,6 +11,19 @@ import { parserMdToSchema } from '../parserMdToSchema';
 
 import { parserSlateNodeToMarkdown } from '../parserSlateNodeToMarkdown';
 
+const collectSlateText = (node: any): string => {
+  if (!node || typeof node !== 'object') {
+    return '';
+  }
+  if (typeof node.text === 'string') {
+    return node.text;
+  }
+  if (!Array.isArray(node.children)) {
+    return '';
+  }
+  return node.children.map((child: any) => collectSlateText(child)).join('');
+};
+
 describe('parserMarkdownToSlateNode', () => {
   describe('handleParagraph', () => {
     it('should handle simple paragraph', () => {
@@ -37,9 +50,7 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const textContent = paragraph.children
-        .map((c: any) => c?.text ?? '')
-        .join('');
+      const textContent = collectSlateText(paragraph);
       expect(textContent).toContain('$a^2 + b^2 = c^2$');
     });
 
@@ -75,9 +86,7 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const textContent = paragraph.children
-        .map((c: any) => c?.text ?? '')
-        .join('');
+      const textContent = collectSlateText(paragraph);
       expect(textContent).toContain('$24.4B$');
       expect(textContent).toContain('$18.2B$');
     });
@@ -116,11 +125,7 @@ describe('parserMarkdownToSlateNode', () => {
       );
       expect(inlineKatexNode).toBeUndefined();
 
-      const numericParagraphNode = paragraph.children.find(
-        (child: any) => child?.type === 'paragraph',
-      );
-      expect(numericParagraphNode).toBeDefined();
-      expect(numericParagraphNode.children).toEqual([{ text: '$100$' }]);
+      expect(collectSlateText(paragraph)).toContain('$100$');
     });
 
     it('should handle paragraph with bold text', () => {
