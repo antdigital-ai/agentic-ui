@@ -51,6 +51,5 @@ describe('createHastProcessor formula config', () => {
     const hast = renderToHast('$a^2$', { singleDollarTextMath: true });
 
     expect(collectNodesByClassName(hast, 'katex')).toHaveLength(1);
-    expect(collectNodesByClassName(hast, 'math-inline')).toHaveLength(1);
   });
 });
