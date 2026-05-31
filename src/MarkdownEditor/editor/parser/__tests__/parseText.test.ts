@@ -161,6 +161,28 @@ describe('parseText', () => {
       const result = applyHtmlTagsToElement({ text: 'hi' }, [{ tag: 'mark' }]);
       expect(result).toEqual({ text: 'hi', mark: true });
     });
+
+    it('tag 为 mark 时保留颜色、背景和 label 属性', () => {
+      const result = applyHtmlTagsToElement(
+        { text: 'highlighted' },
+        [
+          {
+            tag: 'mark',
+            markColor: '#1677ff',
+            markBg: '#e6f4ff',
+            markLabel: 'Source A',
+          },
+        ],
+      );
+
+      expect(result).toEqual({
+        text: 'highlighted',
+        mark: true,
+        markColor: '#1677ff',
+        markBg: '#e6f4ff',
+        markLabel: 'Source A',
+      });
+    });
   });
 
   describe('handleTextAndInlineElementsPure', () => {
