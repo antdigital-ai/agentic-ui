@@ -10,7 +10,7 @@ import type {
 } from '../MarkdownRenderer/types';
 import type { FormulaConfig } from '../Config/formulaConfig';
 import { TagPopupProps } from './editor/elements/TagPopup';
-import { EditorStore } from './editor/store';
+import type { EditorStore } from './editor/store';
 import { InsertAutocompleteProps } from './editor/tools/InsertAutocomplete';
 import type { ToolsKeyType } from './editor/tools/ToolBar/config/toolsConfig';
 import type { MarkdownToHtmlOptions } from './editor/utils/markdownToHtml';
@@ -74,8 +74,10 @@ export interface MarkdownEditorInstance {
   markdownContainerRef: React.MutableRefObject<HTMLDivElement | null>;
   markdownEditorRef: React.MutableRefObject<
     BaseEditor & ReactEditor & HistoryEditor
-  >;
+  > | React.MutableRefObject<null>;
   exportHtml: (filename?: string) => void;
+  /** renderMode=markdown 时可用 */
+  getDisplayedContent?: () => string;
 }
 
 export type MarkdownEditorProps = {

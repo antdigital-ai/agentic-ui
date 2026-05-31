@@ -30,6 +30,7 @@ export const markdownToReactSync = (
   components?: Record<string, React.ComponentType<RendererBlockProps>>,
   remarkPlugins?: MarkdownRemarkPlugin[],
   htmlConfig?: MarkdownToHtmlConfig,
+  rehypePlugins?: import('unified').Plugin[],
 ): React.ReactNode => {
   if (!content) return null;
 
@@ -38,6 +39,7 @@ export const markdownToReactSync = (
       remarkPlugins,
       htmlConfig,
       htmlConfig?.formula,
+      rehypePlugins,
     );
     const preprocessed = preprocessNormalizeLeafToContainerDirective(
       content.replace(new RegExp(JINJA_DOLLAR_PLACEHOLDER, 'g'), '$'),

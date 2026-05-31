@@ -66,6 +66,7 @@ export const createHastProcessor = (
   extraRemarkPlugins?: MarkdownRemarkPlugin[],
   config?: MarkdownToHtmlConfig,
   formulaConfig?: FormulaConfig,
+  extraRehypePlugins?: Plugin[],
 ): Processor => {
   const processor = unified() as Processor & {
     use: (plugin: Plugin, ...args: unknown[]) => Processor;
@@ -102,6 +103,12 @@ export const createHastProcessor = (
   }
 
   (processor as any).use(rehypeFootnoteRef);
+
+  if (extraRehypePlugins?.length) {
+    extraRehypePlugins.forEach((plugin) => {
+      processor.use(plugin);
+    });
+  }
 
   if (extraRemarkPlugins) {
     extraRemarkPlugins.forEach((entry) => {

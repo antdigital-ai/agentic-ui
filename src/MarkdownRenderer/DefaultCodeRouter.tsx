@@ -199,6 +199,13 @@ export const DefaultCodeRouter: React.FC<DefaultCodeRouterProps> = (props) => {
     );
   }
 
+  if (language && pluginComponents[language]) {
+    const C = pluginComponents[language];
+    return (
+      <C {...rest} language={language} editorCodeProps={editorCodeProps} />
+    );
+  }
+
   if (pluginComponents.code) {
     const C = pluginComponents.code;
     return (

@@ -2,7 +2,7 @@ import { Checkbox, Image } from 'antd';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import React from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
-import type { Processor } from 'unified';
+import type { Processor, Plugin } from 'unified';
 
 import type {
   MarkdownRemarkPlugin,
@@ -854,6 +854,7 @@ const splitMarkdownBlocks = (content: string): string[] => {
 
 export interface UseMarkdownToReactOptions {
   remarkPlugins?: MarkdownRemarkPlugin[];
+  rehypePlugins?: Plugin[];
   htmlConfig?: MarkdownToHtmlConfig;
   formula?: FormulaConfig;
   components?: Record<string, React.ComponentType<RendererBlockProps>>;

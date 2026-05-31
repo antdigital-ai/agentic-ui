@@ -9,8 +9,12 @@ import React, {
   useRef,
 } from 'react';
 import { useFormulaConfig } from '../Config';
-import type { MarkdownEditorPlugin } from '../MarkdownEditor/plugin';
 import { useStyle as useEditorStyle } from '../MarkdownEditor/style';
+import {
+  collectRendererComponents,
+  collectRendererRehypePlugins,
+  collectRendererRemarkPlugins,
+} from './collectMarkdownRendererPlugin';
 import { DefaultCodeRouter } from './DefaultCodeRouter';
 import { extractFootnoteDefinitionsFromMarkdown } from './extractFootnoteDefinitions';
 import type {
@@ -21,26 +25,6 @@ import type {
 import { useContentThrottle } from './useContentThrottle';
 import { useMarkdownToReact } from './useMarkdownToReact';
 import { useStreaming } from './useStreaming';
-
-/**
- * 从插件列表中收集 rendererComponents
- */
-const collectRendererComponents = (
-  plugins?: MarkdownEditorPlugin[],
-): Record<string, React.ComponentType<RendererBlockProps>> => {
-  const components: Record<
-    string,
-    React.ComponentType<RendererBlockProps>
-  > = {};
-  if (!plugins) return components;
-  for (const plugin of plugins) {
-    const renderer = (plugin as any).renderer;
-    if (renderer?.rendererComponents) {
-      Object.assign(components, renderer.rendererComponents);
-    }
-  }
-  return components;
-};
 
 /** 轻量流式 Markdown 渲染器——无 Slate 实例，Markdown → hast → React */
 const InternalMarkdownRenderer = forwardRef<
@@ -96,6 +80,22 @@ const InternalMarkdownRenderer = forwardRef<
     [plugins],
   );
 
+  const mergedRemarkPlugins = useMemo(() => {
+    const fromPlugins = collectRendererRemarkPlugins(plugins);
+    if (!remarkPlugins?.length) {
+      return fromPlugins.length ? fromPlugins : undefined;
+    }
+    if (!fromPlugins.length) {
+      return remarkPlugins;
+    }
+    return [...remarkPlugins, ...fromPlugins];
+  }, [plugins, remarkPlugins]);
+
+  const mergedRehypePlugins = useMemo(
+    () => collectRendererRehypePlugins(plugins),
+    [plugins],
+  );
+
   const lastFootnoteEmptyRef = useRef(false);
   useEffect(() => {
     const notify = fncProps?.onFootnoteDefinitionChange;
@@ -140,7 +140,10 @@ const InternalMarkdownRenderer = forwardRef<
   const safeContent = useStreaming(displayedText, streaming);
 
   const reactContent = useMarkdownToReact(safeContent, {
-    remarkPlugins,
+    remarkPlugins: mergedRemarkPlugins,
+    rehypePlugins: mergedRehypePlugins.length
+      ? mergedRehypePlugins
+      : undefined,
     htmlConfig,
     formula: formulaConfig,
     components,

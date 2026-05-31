@@ -53,8 +53,14 @@ export const useStreamingMarkdownReact = (
         options?.remarkPlugins,
         options?.htmlConfig,
         options?.formula,
+        options?.rehypePlugins,
       ),
-    [options?.remarkPlugins, options?.htmlConfig, options?.formula],
+    [
+      options?.remarkPlugins,
+      options?.htmlConfig,
+      options?.formula,
+      options?.rehypePlugins,
+    ],
   );
 
   const prefixCls = options?.prefixCls || 'ant-agentic-md-editor';
