@@ -1,4 +1,4 @@
-/**
+﻿/**
  * parseText 及相关函数单元测试
  * 覆盖 parseText.ts 中 setFinishedProp、parseText、applyHtmlTagsToElement、handleTextAndInlineElementsPure
  */
@@ -13,21 +13,6 @@ import {
 
 vi.mock('../parse/parseElements', () => ({
   handleInlineCode: vi.fn((n: any) => ({ code: true, text: n?.value ?? '' })),
-}));
-
-vi.mock('../parse/parseMath', () => ({
-  shouldTreatInlineMathAsText: vi.fn((value: string) => {
-    if (!value?.trim()) return true;
-    if (/[=^_\\{}]/.test(value)) return false;
-    return (
-      /^[+-]?\d{1,3}(?:,\d{3})*(?:\.\d+)?(?:%|[kKmMbB]|千|万|亿|兆|万亿|百万|亿万)?$/.test(
-        value,
-      ) ||
-      /^[+-]?\d+(?:\.\d+)?(?:%|[kKmMbB]|千|万|亿|兆|万亿|百万|亿万)?$/.test(
-        value,
-      )
-    );
-  }),
 }));
 
 describe('parseText', () => {
@@ -113,21 +98,33 @@ describe('parseText', () => {
       expect(result[0].text).toBe('code');
     });
 
-    it('inlineMath 当 shouldTreatInlineMathAsText 为 false 时生成 inline-katex', () => {
+    it('inlineMath 始终保留为 $...$ 文本，不生成 inline-katex', () => {
       const result = parseText([{ type: 'inlineMath', value: 'x^2' } as any]);
-      expect(result[0].type).toBe('inline-katex');
-      expect(result[0].children).toEqual([{ text: 'x^2' }]);
+      expect(result[0].type).toBeUndefined();
+      expect(result[0].text).toBe('$x^2$');
     });
 
-    it('inlineMath 当 shouldTreatInlineMathAsText 为 true 时生成文本', () => {
-      const result = parseText([{ type: 'inlineMath', value: '1' } as any]);
-      expect(result[0].text).toBe('$1$');
+    it('inlineMath 金额类内容保留为文本', () => {
+      const result = parseText([{ type: 'inlineMath', value: '24.4B' } as any]);
+      expect(result[0].text).toBe('$24.4B$');
+      expect(result[0].type).toBeUndefined();
     });
 
     it('text 节点走默认 value 分支', () => {
       const result = parseText([{ type: 'text', value: 'hello' } as any]);
       expect(result).toHaveLength(1);
       expect(result[0].text).toBe('hello');
+    });
+
+    it('footnoteReference 在 parseText 循环中转为 fnc 叶子', () => {
+      const result = parseText([
+        { type: 'footnoteReference', identifier: 'ref-a' } as any,
+      ]);
+      expect(result[0]).toMatchObject({
+        text: '[^ref-a]',
+        identifier: 'ref-a',
+        fnc: true,
+      });
     });
   });
 
@@ -285,6 +282,20 @@ describe('parseText', () => {
       expect(parseNodesFn).toHaveBeenCalled();
       expect(result.url).toBe('https://link.com');
       expect(result.text).toBe('from-html');
+    });
+
+    it('footnoteReference 转为 fnc 文本叶子', () => {
+      const result = handleTextAndInlineElementsPure(
+        { type: 'footnoteReference', identifier: '9' },
+        [],
+        identityFormat,
+        parseNodesFn,
+      );
+      expect(result).toEqual({
+        text: '[^9]',
+        identifier: '9',
+        fnc: true,
+      });
     });
 
     it('未知 elementType 时返回空文本', () => {

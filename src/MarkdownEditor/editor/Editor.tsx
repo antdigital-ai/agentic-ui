@@ -31,6 +31,7 @@ import {
 import { LazyElement } from './components/LazyElement';
 import { EditorEditable } from './components/EditorEditable';
 import { MElement, MLeaf } from './elements';
+import { buildFootnoteDefinitionChangePayload } from './utils/footnoteDisplay';
 import {
   handleFilesPaste,
   handleHtmlPaste,
@@ -433,20 +434,18 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- markdownEditorRef.current 是可变 ref，此处需在编辑器实例变化时重新执行
   }, [props.instance]);
 
+  const emitFootnoteDefinitionChange = useRefFunction((schema: Elements[]) => {
+    const onFootnoteDefinitionChange =
+      props?.fncProps?.onFootnoteDefinitionChange;
+    if (!onFootnoteDefinitionChange) {
+      return;
+    }
+    onFootnoteDefinitionChange(buildFootnoteDefinitionChangePayload(schema));
+  });
+
   useEffect(() => {
-    const footnoteDefinitionList = markdownEditorRef.current.children
-      .filter((item) => item.type === 'footnoteDefinition')
-      .map((item, index) => {
-        return {
-          id: item.id || index,
-          placeholder: item.identifier,
-          origin_text: item.value,
-          url: item.url,
-          origin_url: item.url,
-        };
-      });
-    props?.fncProps?.onFootnoteDefinitionChange?.(footnoteDefinitionList);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- markdownEditorRef.current?.children 是可变 ref，Slate 编辑器内容变化时需重新执行
+    emitFootnoteDefinitionChange(markdownEditorRef.current.children);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 挂载 / 回调引用变更时同步一次
   }, [props?.fncProps?.onFootnoteDefinitionChange]);
 
   // 非hook变量声明
@@ -472,6 +471,9 @@ export const SlateMarkdownEditor = React.memo((props: MEditorProps) => {
     );
     if (hasContentChanges && !changedMark.current) {
       changedMark.current = true;
+    }
+    if (hasContentChanges) {
+      emitFootnoteDefinitionChange(v);
     }
   });
 
